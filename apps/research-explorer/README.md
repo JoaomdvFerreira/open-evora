@@ -62,7 +62,7 @@ The repository root's `vercel.json` pins the settings a Vercel project needs; an
 | Install Command | `npm ci --prefix apps/research-explorer` |
 | Build Command | `npm run explorer:build` |
 | Output Directory | `apps/research-explorer/dist` |
-| Node.js Version | project reads `engines.node` (`^20.19.0 \|\| >=22.12.0`, required by Vite 8) from the root `package.json`; no separate Vercel setting needed |
+| Node.js Version | project reads `engines.node` (`24.x`, required by Vite 8) from the root `package.json`; no separate Vercel setting needed |
 
 No rewrites/redirects are configured because Explorer navigation is query-string state on a single `/` route (`useExplorerUrlState.ts`) — every view (`?view=records`, `?view=records&id=...`, `?view=problem&id=...`, etc.) resolves to the same static `index.html`/entry and needs no server-side rewrite.
 
