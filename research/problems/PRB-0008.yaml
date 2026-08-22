@@ -1,5 +1,5 @@
 problem_id: PRB-0008
-title: "As competências da força de trabalho e as necessidades dos empregadores não estão plenamente alinhadas"
+title: "O alinhamento entre competências e necessidades dos empregadores é uma preocupação institucional ativa, mas o desfasamento específico em Évora ainda não está caracterizado"
 domain:
   - "EMP"
   - "EDU"
@@ -11,7 +11,7 @@ affected_populations:
   - "workers and job seekers"
   - "employers"
   - "training/education providers"
-problem_statement: "O planeamento institucional local identifica um desfasamento entre as qualificações da força de trabalho e as necessidades dos empregadores e trata o mapeamento de competências, a adaptação da formação e uma articulação mais forte entre educação e empregadores como uma linha de trabalho atual e ativa, e não como uma preocupação resolvida, apesar da considerável infraestrutura existente de apoio económico/empresarial e das iniciativas de transição da educação para o emprego."
+problem_statement: "O planeamento institucional local trata o alinhamento entre as competências da força de trabalho e as necessidades dos empregadores — através do mapeamento de competências, da adaptação da formação e de uma articulação mais forte entre educação e empregadores — como uma linha de trabalho atual e ativa, e não como uma preocupação resolvida, apesar da considerável infraestrutura existente de apoio económico/empresarial e das iniciativas de transição da educação para o emprego. Não está ainda estabelecido quais as competências ou profissões concretamente em falta especificamente em Évora, por oposição à região do Alentejo em geral, para a qual existe uma lista regional de profissões em escassez."
 current_journey: null
 reported_consequences: []
 possible_root_causes:
@@ -35,7 +35,7 @@ evidence:
   - "EVD-000103"
   - "EVD-000115"
   - "EVD-000116"
-evidence_status: corroborated
+evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
 existing_solutions: not_assessed

@@ -35,6 +35,7 @@ evidence: []
 
 evidence_status:
   discovered | corroborated
+  # see "evidence_status contract" below
 
 validation_status:
   unvalidated | partially_validated | validated
@@ -107,6 +108,41 @@ A problem may legitimately end as:
 - `INSUFFICIENT_EVIDENCE`.
 
 These outcomes prevent solutionism and wasted development.
+
+## `evidence_status` contract
+
+Canonicalized as part of the IPE-04 corpus reconciliation
+(`docs/discovery/ipe-04-corpus-reconciliation.md`). No schema change — this clarifies the
+existing `discovered` / `corroborated` enum; it does not add a state and does not alter
+`validation_status`, which remains a fully separate, D5-governed contract (see below).
+
+### `discovered`
+
+`discovered` means the CURRENT corroboration claim does not presently carry a
+human-approved Corroboration decision (the human Corroboration gate,
+`docs/discovery/investigation-promotion-engine.md` §4.2, is not `PASS`/`PASS_BOUNDED` for
+the claim/scope as currently framed).
+
+`discovered` does NOT mean the evidence is thin, weak, single-source, or structurally
+incomplete. A record may have extensive evidence, or even a structurally complete
+`decision_basis`, and still be `discovered` if the human Corroboration gate outcome for it
+is `HOLD` — Corroboration is a deliberate human approval, not a derived count or structural
+score.
+
+### `corroborated`
+
+`corroborated` means the evidence basis for the CURRENT claim and scope has received a
+deliberate human Corroboration approval (§4.2). The supporting evidence, its independence
+across sources, and the scope it is approved for must be explicit enough for that human
+decision to have been made — whether or not that basis is additionally captured in a
+`decision_basis.corroboration_basis` field. `decision_basis` remains optional
+(`docs/discovery/investigation-promotion-engine.md` §5), and its verifier result never
+automatically changes `evidence_status`.
+
+Neither state implies anything about `validation_status`: a `discovered` problem can
+still be a legitimate, publishable `STOP`/`WATCH`, and moving from `discovered` to
+`corroborated` (or the reverse) is always a deliberate, recorded human judgement, never
+an automatic transition inferred from evidence count or wording.
 
 ## Validation-status contract (D5)
 

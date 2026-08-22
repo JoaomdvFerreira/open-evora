@@ -1,5 +1,5 @@
 problem_id: PRB-0010
-title: "A degradação do pavimento rodoviário e a fiabilidade da manutenção afetam a segurança e a mobilidade em Évora"
+title: "Degradação do pavimento rodoviário em Évora, com extensão atual ainda por confirmar"
 domain:
   - "URB"
   - "MOB"
@@ -9,7 +9,7 @@ geography:
 affected_populations:
   - "residents"
   - "drivers"
-problem_statement: "A degradação do pavimento rodoviário e a fiabilidade da manutenção das vias constituem um problema cívico atual ao nível do município. Uma petição de janeiro de 2026 relatou a existência generalizada de buracos e pavimento degradado, bem como impactos na segurança e danos nos veículos; posteriormente, o Município reconheceu uma necessidade significativa de manutenção/requalificação e uma resposta de reparação na ordem dos 1,5 milhões de euros; um sinal público posterior, relativo a uma localização específica, alegou que o problema persistia na entrada da N114 em Évora. Esse sinal posterior, de natureza social/comunitária, não está verificado, e a evidência disponível não deve ser interpretada como uma estimativa da prevalência em todo o município."
+problem_statement: "Uma petição de janeiro de 2026 relatou a existência generalizada de buracos e pavimento degradado no município, com impactos na segurança e danos nos veículos; o Município reconheceu a necessidade de manutenção/requalificação e respondeu com reparações na ordem dos 1,5 milhões de euros. Um sinal público posterior, relativo a uma localização específica (entrada da N114 em Évora), alegou persistência do problema; este sinal, de natureza social/comunitária, não está verificado. Estes elementos evidenciam um problema real de degradação do pavimento rodoviário e de fiabilidade da manutenção, embora a evidência disponível — uma petição e um sinal público posterior não verificado — não permita estimar a prevalência atual em todo o município."
 current_journey: null
 reported_consequences: []
 possible_root_causes:
@@ -18,7 +18,7 @@ evidence:
   - "EVD-000082"
   - "EVD-000083"
   - "EVD-000084"
-evidence_status: corroborated
+evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: low
 existing_solutions: assessed
