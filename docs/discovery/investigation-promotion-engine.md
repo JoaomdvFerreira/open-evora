@@ -21,9 +21,12 @@ so a reader (human or tooling) can see *why* a decision was made without re-deri
 from prose scattered across `possible_root_causes` and `notes`.
 
 This document is the IPE-01 contract: what `decision_basis` means, what it does and does
-not represent, and the non-goals that keep IPE-02 (the deterministic verifier itself)
-from growing into a semantic decision-maker. IPE-01 adds no verifier — only the schema
-extension and corpus-hygiene hardening needed for IPE-02 to be well-scoped.
+not represent, and the non-goals that keep IPE (IPE-01's schema/hygiene work and the
+IPE-02 deterministic verifier built on top of it) from growing into a semantic
+decision-maker or an automatic promotion mechanism. IPE-01 itself adds no verifier — only
+the schema extension and corpus-hygiene hardening needed for IPE-02 to be well-scoped;
+IPE-02 (§10) is the deterministic verifier, implemented in
+`tools/evaluate-research-decisions.js`.
 
 ## 2. Relationship to PRB / EVD / ASM
 
@@ -193,7 +196,11 @@ decision_basis:
   structured trace of the D5 "actively seek counterexamples" requirement
   (`docs/discovery/research-methodology.md` §13.1, §13.6).
 - **`overlap_check`** — whether the researcher checked for overlap/duplication with other
-  `PRB-*`, and which ones were considered.
+  `PRB-*`, and which ones were considered. This gates Eligibility, not Corroboration
+  (§10): overlap/deduplication is a question of whether this `PRB-*` should exist as a
+  distinct record at all, which is settled before corroborating evidence for it is
+  checked, so the IPE-02 verifier requires `overlap_check` to be explicitly authored only
+  when evaluating Eligibility.
 - **`corroboration_statement`** — a snapshot sentence stating the corroboration claim as
   of `as_of`-style authoring time (a frozen statement, not a live pointer — later evidence
   changes do not retroactively edit this snapshot; a fresh decision requires a fresh
@@ -266,7 +273,9 @@ This is corpus hygiene, not a semantic check: it does not infer whether a refere
 
 IPE-01, and IPE generally, does **not**:
 
-- add a decision verifier (IPE-02's job, not built here);
+- add a *semantic* decision-maker or an automatic promotion mechanism — IPE-02 is a
+  deterministic, structural verifier (§4.4, §10); it never itself decides that a problem
+  is real, sufficient, or promotable, and it never triggers a status change;
 - infer semantic truth, causality, prevalence, or independence from evidence content;
 - make or suggest a promotion decision, or assign a score/confidence number;
 - introduce a new canonical record type, database, service, workflow engine, or claim
@@ -276,8 +285,9 @@ IPE-01, and IPE generally, does **not**:
   `ASM.triage`;
 - backfill or mutate any existing `PRB-*`, `EVD-*`, `SRC-*`, or `ASM-*` record;
 - change the Research Explorer UI or any runtime application code;
-- require `decision_basis` on any record — it stays optional through IPE-01, and its
-  eventual enforcement scope (if any) is an IPE-02+ decision, not assumed here.
+- require `decision_basis` on any record — it stays optional through IPE-01 (and IPE-02
+  evaluates it as-authored, never backfilling it), and its eventual corpus-validity
+  enforcement scope (if any) remains an open question (§9).
 
 ## 8. Public explainability
 
@@ -307,7 +317,7 @@ that surfaced during implementation — whether an authored `scope` with `bounde
 may be read as `false` — no: absence is `REVIEW_REQUIRED`. The three questions above
 remain open.
 
-## 10. IPE-02 contract clarification — `scope.bounded`
+## 10. IPE-02 contract clarification — `scope.bounded` and the Eligibility/Corroboration boundary
 
 IPE-02 (`tools/evaluate-research-decisions.js`) implements the deterministic verifier
 scoped by §4.4. One of its required checks is "bounded/limited bases have explicit
@@ -335,24 +345,48 @@ scope:
 
 `scope.bounded` is schema-optional the same way the rest of `decision_basis` is (§5, §7):
 a `PRB-*` with no `scope` block, or a `scope` block with no `bounded` key, remains a valid
-corpus record. But the IPE-02 verifier requires `scope.bounded` to be explicitly `true` or
-`false` whenever a `scope` block is present and the verifier is asked to evaluate that
-`PRB-*`'s Eligibility or Corroboration basis: an authored `scope` with `bounded` absent is
-`REVIEW_REQUIRED`, resolving IPE-01 §9's open question of whether boundedness may be
-silently read as `false` — it may not. This is a verifier-evaluation requirement, not a
-corpus-validity requirement; the two remain distinct exactly as `NO_DECISION_BASIS` is a
-verifier finding rather than a validation error (§4.1).
+corpus record. **`scope`/`scope.bounded` gates Corroboration, not Eligibility.** The
+IPE-02 verifier requires `scope` (`geography`, `population`, `temporal`) and an explicit
+`scope.bounded` (`true` or `false`) only when evaluating a `PRB-*`'s Corroboration basis;
+an authored `scope` with `bounded` absent is `REVIEW_REQUIRED` for Corroboration,
+resolving IPE-01 §9's open question of whether boundedness may be silently read as
+`false` — it may not. Eligibility does not require `scope` or `scope.bounded` at all: a
+structurally complete Eligibility basis with no `scope` block is `READY`. This is a
+verifier-evaluation requirement, not a corpus-validity requirement; the two remain
+distinct exactly as `NO_DECISION_BASIS` is a verifier finding rather than a validation
+error (§4.1).
 
-The verifier's rule, once `scope` is present and `bounded` is explicitly authored: if
-`scope.bounded: true`, `limitations` must be a non-empty string
+The verifier's rule, once `scope` is present and `bounded` is explicitly authored (for
+Corroboration): if `scope.bounded: true`, `limitations` must be a non-empty string
 (`BOUNDED_SCOPE_WITHOUT_LIMITATIONS` otherwise); if `scope.bounded: false`, `limitations`
 is not required by this check (though it may still be authored).
 
-This is the only schema-shape addition IPE-02 makes to `decision_basis`; every other
-IPE-02 check reads fields already defined in IPE-01 §5. Corroboration reuses the same
-human-authored `currentness` and `contradiction_search` fields Eligibility already reads
-(§5) rather than introducing a second currentness/contradiction mechanism, and both
-Eligibility and Corroboration require `overlap_check`/`contradiction_search` to be
-explicitly authored, with `performed: false` recorded as a valid but not gate-ready
-structured fact (`OVERLAP_CHECK_NOT_PERFORMED` / `CONTRADICTION_SEARCH_NOT_PERFORMED`,
-or their Corroboration-scoped equivalents) rather than an error.
+Symmetrically, **`overlap_check` gates Eligibility, not Corroboration.** Whether a
+`PRB-*` overlaps/duplicates another problem is a question of whether it is eligible to
+exist as a distinct record, settled before its corroborating evidence is evaluated — so
+the IPE-02 verifier requires `overlap_check.performed` to be explicitly authored only when
+evaluating Eligibility; Corroboration does not read `overlap_check` at all.
+`contradiction_search` is the only one of these three checks Eligibility and Corroboration
+both require, since both ask independently whether a deliberate search for
+counterevidence was performed for their respective claim.
+
+`scope.bounded` is the only schema-shape addition IPE-02 makes to `decision_basis`; every
+other IPE-02 check reads fields already defined in IPE-01 §5. Corroboration reuses the
+same human-authored `currentness` and `contradiction_search` fields Eligibility already
+reads (§5) rather than introducing a second currentness/contradiction mechanism. Wherever
+`overlap_check` or `contradiction_search` is required (per the split above),
+`performed: false` is recorded as a valid but not gate-ready structured fact
+(`OVERLAP_CHECK_NOT_PERFORMED` / `CONTRADICTION_SEARCH_NOT_PERFORMED`, or their
+Corroboration-scoped equivalents) rather than an error.
+
+### 10.1 IPE-02 contract clarification — `contract_version`
+
+`decision_basis.contract_version` (§5) is schema-optional the same way the rest of
+`decision_basis` is. Once a `decision_basis` block is present, the IPE-02 verifier
+requires `contract_version` to be explicitly authored as a non-empty string for both
+Eligibility and Corroboration: a present `decision_basis` with an absent or empty
+`contract_version` is `REVIEW_REQUIRED` / `MISSING_CONTRACT_VERSION`. A non-empty version
+string is sufficient for IPE-02 v0 — the verifier does not compare the authored version
+against its own expected contract version, or reject a mismatch. Whether a
+`contract_version` mismatch between a record and the running verifier should be a hard
+error or a warning remains an explicitly open question (§9), not resolved here.

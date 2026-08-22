@@ -149,19 +149,16 @@ notes: ""
 function fullEligibilityBasis({
   includeManifestation = true,
   includeConsequence = true,
-  includeScope = true,
   manifestationEvidence = "[EVD-900101]",
-  bounded = false,
-  includeBounded = true,
   limitations = "",
   contradictionPerformed = true,
   overlapPerformed = true,
   includeOverlapCheck = true,
+  includeContractVersion = true,
 } = {}) {
   return `
 decision_basis:
-  contract_version: "0.1"
-  eligibility_basis: "Fixture eligibility reasoning."
+${includeContractVersion ? `  contract_version: "0.1"\n` : ""}  eligibility_basis: "Fixture eligibility reasoning."
 ${
   includeManifestation
     ? `  manifestation:
@@ -192,14 +189,6 @@ ${
     related_problems: []
 `
     : ""
-}${
-  includeScope
-    ? `  scope:
-    geography: "Fixture area"
-    population: "residents"
-    temporal: "2026"
-${includeBounded ? `    bounded: ${bounded}\n` : ""}`
-    : ""
 }  limitations: "${limitations}"
 `;
 }
@@ -213,16 +202,11 @@ function fullCorroborationBasis({
   includeCorroborationBasis = true,
   includeScope = true,
   contradictionPerformed = true,
-  overlapPerformed = true,
+  includeContractVersion = true,
 } = {}) {
   return `
 decision_basis:
-  contract_version: "0.1"
-${includeCorroborationBasis ? `  corroboration_basis: "Fixture corroboration reasoning."\n` : ""}  overlap_check:
-    performed: ${overlapPerformed}
-    summary: "No overlap found."
-    related_problems: []
-  currentness:
+${includeContractVersion ? `  contract_version: "0.1"\n` : ""}${includeCorroborationBasis ? `  corroboration_basis: "Fixture corroboration reasoning."\n` : ""}  currentness:
     assessment: "Fixture currentness call."
     evidence: [EVD-900101]
   contradiction_search:
@@ -435,7 +419,7 @@ test("eligibility: EVD exists but not linked to target PRB -> REVIEW", () => {
   }
 });
 
-test("eligibility: missing scope assessment -> REVIEW", () => {
+test("eligibility: valid basis with no scope block at all -> READY (scope is a Corroboration-only concern)", () => {
   const root = makeFixtureRoot();
   try {
     const decisionBasis = fullEligibilityBasis({ includeScope: false });
@@ -448,83 +432,23 @@ test("eligibility: missing scope assessment -> REVIEW", () => {
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
     write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
-    assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
-    assert.ok(codesOf(report.eligibility.reasons).includes(REASON.MISSING_SCOPE));
+    assert.strictEqual(report.eligibility.result, READY.ELIGIBILITY, JSON.stringify(report.eligibility.reasons));
+    assert.ok(!codesOf(report.eligibility.reasons).includes(REASON.MISSING_SCOPE));
+    assert.ok(!codesOf(report.eligibility.reasons).includes(REASON.MISSING_SCOPE_BOUNDED));
   } finally {
     cleanup(root);
   }
 });
 
-test("eligibility: bounded scope without limitations -> REVIEW", () => {
+test("eligibility: missing/false scope.bounded does not gate Eligibility (Corroboration-only concern)", () => {
   const root = makeFixtureRoot();
   try {
-    const decisionBasis = fullEligibilityBasis({ bounded: true });
-    write(
-      root,
-      "problems",
-      "PRB-9001.yaml",
-      prb({ validationStatus: "validated", decisionBasis })
-    );
+    const decisionBasis = fullEligibilityBasis({ includeScope: false });
+    write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
     write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
-    assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
-    assert.ok(
-      codesOf(report.eligibility.reasons).includes(REASON.BOUNDED_SCOPE_WITHOUT_LIMITATIONS),
-      JSON.stringify(report.eligibility.reasons)
-    );
-  } finally {
-    cleanup(root);
-  }
-});
-
-test("eligibility: bounded scope WITH limitations authored -> no BOUNDED_SCOPE finding", () => {
-  const root = makeFixtureRoot();
-  try {
-    const decisionBasis = fullEligibilityBasis({
-      bounded: true,
-      limitations: "Only one parish was surveyed; not generalized further.",
-    });
-    write(
-      root,
-      "problems",
-      "PRB-9001.yaml",
-      prb({ validationStatus: "validated", decisionBasis })
-    );
-    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
-    const report = loadAndEvaluate(root, "PRB-9001");
-    assert.ok(
-      !codesOf(report.eligibility.reasons).includes(REASON.BOUNDED_SCOPE_WITHOUT_LIMITATIONS),
-      JSON.stringify(report.eligibility.reasons)
-    );
-  } finally {
-    cleanup(root);
-  }
-});
-
-test("eligibility: scope.bounded is never inferred from geography/population/temporal wording", () => {
-  const root = makeFixtureRoot();
-  try {
-    // geography/population text contains "limited"/"partial" but scope.bounded is explicitly
-    // false — must NOT trigger BOUNDED_SCOPE_WITHOUT_LIMITATIONS.
-    const decisionBasis = fullEligibilityBasis().replace(
-      'geography: "Fixture area"',
-      'geography: "Fixture area (limited, partial coverage)"'
-    );
-    write(
-      root,
-      "problems",
-      "PRB-9001.yaml",
-      prb({ validationStatus: "validated", decisionBasis })
-    );
-    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
-    const report = loadAndEvaluate(root, "PRB-9001");
-    assert.ok(
-      !codesOf(report.eligibility.reasons).includes(REASON.BOUNDED_SCOPE_WITHOUT_LIMITATIONS),
-      JSON.stringify(report.eligibility.reasons)
-    );
+    assert.strictEqual(report.eligibility.result, READY.ELIGIBILITY, JSON.stringify(report.eligibility.reasons));
   } finally {
     cleanup(root);
   }
@@ -657,17 +581,17 @@ test("eligibility: consequence evidence empty -> REVIEW", () => {
   }
 });
 
-test("eligibility: scope.bounded absent -> REVIEW", () => {
+test("eligibility: missing contract_version -> REVIEW", () => {
   const root = makeFixtureRoot();
   try {
-    const decisionBasis = fullEligibilityBasis({ includeBounded: false });
+    const decisionBasis = fullEligibilityBasis({ includeContractVersion: false });
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
     write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(
-      codesOf(report.eligibility.reasons).includes(REASON.MISSING_SCOPE_BOUNDED),
+      codesOf(report.eligibility.reasons).includes(REASON.MISSING_CONTRACT_VERSION),
       JSON.stringify(report.eligibility.reasons)
     );
   } finally {
@@ -708,7 +632,7 @@ test("corroboration: discovered PRB with no decision_basis is still REVIEW_REQUI
   }
 });
 
-test("corroboration: valid basis -> READY", () => {
+test("corroboration: valid basis without overlap_check -> READY (overlap/deduplication is an Eligibility concern)", () => {
   const root = makeFixtureRoot();
   try {
     write(
@@ -721,6 +645,7 @@ test("corroboration: valid basis -> READY", () => {
     write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, READY.CORROBORATION, JSON.stringify(report.corroboration.reasons));
+    assert.ok(!codesOf(report.corroboration.reasons).includes(REASON.OVERLAP_CHECK_NOT_PERFORMED));
   } finally {
     cleanup(root);
   }
@@ -808,17 +733,17 @@ test("corroboration: contradiction_search.performed=false -> REVIEW", () => {
   }
 });
 
-test("corroboration: overlap_check.performed=false -> REVIEW", () => {
+test("corroboration: missing contract_version -> REVIEW", () => {
   const root = makeFixtureRoot();
   try {
-    const decisionBasis = fullCorroborationBasis({ overlapPerformed: false });
+    const decisionBasis = fullCorroborationBasis({ includeContractVersion: false });
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
     write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(
-      codesOf(report.corroboration.reasons).includes(REASON.OVERLAP_CHECK_NOT_PERFORMED),
+      codesOf(report.corroboration.reasons).includes(REASON.MISSING_CONTRACT_VERSION),
       JSON.stringify(report.corroboration.reasons)
     );
   } finally {
@@ -1038,21 +963,20 @@ test("corroboration: missing corroboration_basis -> REVIEW", () => {
   }
 });
 
-test("corroboration: unknown PRB in overlap_check.related_problems -> REVIEW", () => {
+test("eligibility: unknown PRB in overlap_check.related_problems -> REVIEW (overlap/deduplication is an Eligibility concern)", () => {
   const prbRecord = {
     problem_id: "PRB-9001",
     problem_statement: PROBLEM_STATEMENT,
     evidence: ["EVD-900101"],
-    evidence_status: "corroborated",
+    validation_status: "validated",
     decision_basis: {
       contract_version: "0.1",
-      corroboration_basis: "Fixture corroboration reasoning.",
+      eligibility_basis: "Fixture eligibility reasoning.",
+      manifestation: { kind: "access failure", summary: "Fixture manifestation.", evidence: ["EVD-900101"] },
+      consequence: { summary: "Fixture consequence.", evidence: ["EVD-900101"] },
+      currentness: { assessment: "Fixture currentness call.", evidence: [] },
+      contradiction_search: { performed: true, summary: "None found.", evidence: [] },
       overlap_check: { performed: true, summary: "Checked.", related_problems: ["PRB-9999"] },
-      corroboration_statement: PROBLEM_STATEMENT,
-      supporting_evidence: ["EVD-900101"],
-      boundary_evidence: [],
-      independence_assessment: "Fixture independence judgement.",
-      scope: { geography: "Fixture area", population: "residents", temporal: "2026", bounded: false },
       limitations: "",
     },
   };
@@ -1061,7 +985,7 @@ test("corroboration: unknown PRB in overlap_check.related_problems -> REVIEW", (
     evidenceById: new Map([["EVD-900101", { record: { evidence_id: "EVD-900101" } }]]),
     assessmentsByProblem: new Map([["PRB-9001", [{ record: { assessment_id: "ASM-9001" } }]]]),
   };
-  const result = evaluateCorroboration("PRB-9001", corpus);
+  const result = evaluateEligibility("PRB-9001", corpus);
   assert.strictEqual(result.result, REVIEW_REQUIRED);
   assert.ok(
     codesOf(result.reasons).includes(REASON.UNKNOWN_RELATED_PROBLEM_REFERENCE),

@@ -54,9 +54,9 @@ const REASON = {
   MISSING_CONSEQUENCE_EVIDENCE: "MISSING_CONSEQUENCE_EVIDENCE",
   MISSING_OVERLAP_CHECK_ELIGIBILITY: "MISSING_OVERLAP_CHECK_ELIGIBILITY",
   OVERLAP_CHECK_NOT_PERFORMED: "OVERLAP_CHECK_NOT_PERFORMED",
+  MISSING_CONTRACT_VERSION: "MISSING_CONTRACT_VERSION",
 
   MISSING_CORROBORATION_BASIS: "MISSING_CORROBORATION_BASIS",
-  MISSING_OVERLAP_CHECK: "MISSING_OVERLAP_CHECK",
   MISSING_CORROBORATION_STATEMENT: "MISSING_CORROBORATION_STATEMENT",
   STALE_CORROBORATION_STATEMENT: "STALE_CORROBORATION_STATEMENT",
   MISSING_SUPPORTING_EVIDENCE: "MISSING_SUPPORTING_EVIDENCE",
@@ -123,6 +123,10 @@ function evaluateEligibility(prbId, corpus) {
   if (db === undefined || db === null) {
     findings.push({ code: REASON.NO_DECISION_BASIS, detail: "PRB.decision_basis is absent" });
     return { result: REVIEW_REQUIRED, reasons: findings };
+  }
+
+  if (!isNonEmptyString(db.contract_version)) {
+    findings.push({ code: REASON.MISSING_CONTRACT_VERSION, field: "decision_basis.contract_version" });
   }
 
   if (!isNonEmptyString(db.eligibility_basis)) {
@@ -246,8 +250,6 @@ function evaluateEligibility(prbId, corpus) {
     }
   }
 
-  checkScopeAndBoundedness(db, findings);
-
   checkRequiredAsmDependency(prbId, corpus, findings);
 
   return {
@@ -261,7 +263,8 @@ function evaluateEligibility(prbId, corpus) {
  * docs/discovery/investigation-promotion-engine.md §10) — never inferred from the
  * wording of geography/population/temporal, from boundary_evidence, or from
  * contradiction_search. Its absence is itself REVIEW_REQUIRED (not a default-false
- * reading); when bounded is explicitly true, limitations must be authored.
+ * reading); when bounded is explicitly true, limitations must be authored. This gates
+ * Corroboration only (§10) — Eligibility does not require scope at all.
  */
 function checkScopeAndBoundedness(db, findings) {
   const scope = db.scope;
@@ -341,35 +344,12 @@ function evaluateCorroboration(prbId, corpus) {
     return { result: REVIEW_REQUIRED, reasons: findings };
   }
 
-  if (!isNonEmptyString(db.corroboration_basis)) {
-    findings.push({ code: REASON.MISSING_CORROBORATION_BASIS, field: "decision_basis.corroboration_basis" });
+  if (!isNonEmptyString(db.contract_version)) {
+    findings.push({ code: REASON.MISSING_CONTRACT_VERSION, field: "decision_basis.contract_version" });
   }
 
-  const overlapCheck = db.overlap_check;
-  if (!overlapCheck || (overlapCheck.performed !== true && overlapCheck.performed !== false)) {
-    findings.push({
-      code: REASON.MISSING_OVERLAP_CHECK,
-      field: "decision_basis.overlap_check",
-      detail: "performed (boolean) must be explicitly authored",
-    });
-  } else {
-    for (const relatedId of asList(overlapCheck.related_problems)) {
-      if (!isNonEmptyString(relatedId)) continue;
-      if (!corpus.problemsById.has(relatedId)) {
-        findings.push({
-          code: REASON.UNKNOWN_RELATED_PROBLEM_REFERENCE,
-          field: "decision_basis.overlap_check.related_problems",
-          detail: `${relatedId} does not exist`,
-        });
-      }
-    }
-    if (overlapCheck.performed === false) {
-      findings.push({
-        code: REASON.OVERLAP_CHECK_NOT_PERFORMED,
-        field: "decision_basis.overlap_check.performed",
-        detail: "explicitly recorded as not performed; not ready for the corroboration gate",
-      });
-    }
+  if (!isNonEmptyString(db.corroboration_basis)) {
+    findings.push({ code: REASON.MISSING_CORROBORATION_BASIS, field: "decision_basis.corroboration_basis" });
   }
 
   const currentness = db.currentness;
