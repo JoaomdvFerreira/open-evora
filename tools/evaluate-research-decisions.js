@@ -314,12 +314,13 @@ function checkContradictionEvidenceConsistency(contradictionSearch, corpus, prbI
 }
 
 /**
- * IPE-01 §9 leaves required ASM/reference dependencies as an open design question; this
- * verifier's minimal interpretation of "relevant ASM/reference dependencies required by
- * the contract" is: a PRB whose decision_basis asserts validated/partially_validated
- * eligibility must have at least one ASM-* record on file (docs/models/assessment-model.md
- * — "One active ASM-* is intended per canonical active PRB-*"). This does not require the
- * ASM's assessment_status, triage, or any gate value — those remain human judgement.
+ * Both Eligibility and Corroboration require at least one ASM-* record on file that
+ * references the target PRB (docs/discovery/investigation-promotion-engine.md §4.6;
+ * docs/models/assessment-model.md — "One active ASM-* is intended per canonical active
+ * PRB-*"). This runs unconditionally for every evaluated PRB, regardless of its
+ * validation_status/evidence_status — it is a structural-existence check only. It does
+ * not require the ASM's assessment_status, triage, or any decision_gates value — those
+ * remain human judgement.
  */
 function checkRequiredAsmDependency(prbId, corpus, findings) {
   const asmRecords = corpus.assessmentsByProblem.get(prbId) || [];

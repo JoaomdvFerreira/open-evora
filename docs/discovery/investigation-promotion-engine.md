@@ -7,9 +7,25 @@
 ## 1. Purpose
 
 The Investigation & Promotion Engine (IPE) is a deterministic verifier of explicitly
-authored research decisions. It checks that a promotion-relevant decision (e.g. a `PRB-*`
-reaching `validated`, or a `triage` of `PROCEED`) is backed by an explicit, structured
-record of the basis for that decision — not that the decision is *correct*.
+authored research decisions. **IPE-02 v0 verifies exactly two questions, both scoped to a
+single `PRB-*`:**
+
+1. **PRB Eligibility** — is there sufficient explicitly authored structural basis on
+   record for the human PRB-promotion gate to consider this a distinct, well-formed
+   problem of investigation? (§4.1, §10)
+2. **Corroboration** — is there sufficient explicitly authored structural basis on record
+   for the corroboration claim (`evidence_status`) associated with this `PRB-*`? (§4.2,
+   §10)
+
+It checks that the explicit basis for these two questions is present, structurally
+well-formed, and internally consistent — not that the underlying decision is *correct*,
+and not any other question. There is no `VALIDATION-v0` contract in IPE-02: `PRB-*.
+validation_status` (`unvalidated`/`partially_validated`/`validated`), D5 validation
+sufficiency, and `ASM.triage: PROCEED` are not evaluated by IPE-02 at all — they remain
+governed entirely by the existing D5 / ASM human process
+(`docs/discovery/research-methodology.md` §13.7, `docs/models/assessment-model.md`
+"Interpretation rules"). `decision_basis` may support broader public explainability of a
+`PRB-*` (§4.5), but IPE-02 must not be read as verifying contracts it does not implement.
 
 IPE never decides whether a problem is real, whether corroboration is sufficient, whether
 a root cause is right, or whether a problem should be promoted. Those remain human,
@@ -66,26 +82,37 @@ produces a pass/fail judgement, a score, or a promotion recommendation. That is 
 
 ### 4.1 PRB Eligibility
 
-"Eligibility" is whether a `PRB-*` has the *explicit basis on record* to support its
-current `evidence_status`/`validation_status` claim — not whether the underlying civic
-problem is real or important. `decision_basis` stays optional and corpus-valid without
-it (§5, §7): a problem can be a legitimate `STOP`/`WATCH` with no `decision_basis` at all,
-and that record remains a valid, publishable part of the corpus. But once the IPE-02
-verifier (`tools/evaluate-research-decisions.js`) is asked to evaluate a given `PRB-*`,
-there is no "not applicable" outcome — an absent `decision_basis` is itself the
-`REVIEW_REQUIRED` / `NO_DECISION_BASIS` finding for both Eligibility and Corroboration,
-never `N/A`. Optional-to-author and evaluated-as-review-required are not in tension: the
-first is about what the corpus requires to be valid; the second is about what the
-verifier reports when asked to check a specific record.
+"Eligibility" is readiness for the human PRB-promotion gate: whether a `PRB-*` has
+sufficient explicitly authored structural basis on record to be treated as a distinct,
+well-formed problem of investigation — not whether the underlying civic problem is real
+or important, and not a verification of `validation_status`. `validation_status` is a
+separate, D5-governed human judgement that IPE-02 does not read or verify (§1); Eligibility
+is answered entirely from the structural completeness of `decision_basis` (manifestation,
+consequence, currentness, contradiction search, overlap check — §10) and the existing
+structural ASM-existence dependency (§4.6). `decision_basis` stays optional and
+corpus-valid without it (§5, §7): a problem can be a
+legitimate `STOP`/`WATCH` with no `decision_basis` at all, and that record remains a
+valid, publishable part of the corpus. But once the IPE-02 verifier
+(`tools/evaluate-research-decisions.js`) is asked to evaluate a given `PRB-*`, there is no
+"not applicable" outcome — an absent `decision_basis` is itself the `REVIEW_REQUIRED` /
+`NO_DECISION_BASIS` finding for both Eligibility and Corroboration, never `N/A`.
+Optional-to-author and evaluated-as-review-required are not in tension: the first is
+about what the corpus requires to be valid; the second is about what the verifier
+reports when asked to check a specific record.
 
 ### 4.2 Corroboration
 
-Corroboration basis records *which* independent evidence classes converge
-(`docs/discovery/research-methodology.md` §3) and *why* they are treated as independent
-rather than restating the same underlying source (mirroring the existing
+"Corroboration" is the structural verification associated with the explicitly authored
+basis for the `PRB-*`'s corroboration claim (`evidence_status: corroborated`) — not a
+judgement that the corroboration is actually sufficient or that the cited evidence is
+actually independent. Corroboration basis records *which* independent evidence classes
+converge (`docs/discovery/research-methodology.md` §3) and *why* they are treated as
+independent rather than restating the same underlying source (mirroring the existing
 `analysis.lineage_id` / `ASM.evidence_confidence.independence` distinction —
 `docs/discovery/d3-execution-protocol.md` §4.2, §5). `decision_basis` does not introduce a
-second independence mechanism; it references the same concept at problem level.
+second independence mechanism; it references the same concept at problem level. IPE-02
+checks only that this basis is present, structurally well-formed, and internally
+consistent (§10); it never itself asserts independence or corroboration sufficiency.
 
 ### 4.3 Human gates
 
@@ -99,12 +126,15 @@ independently, by the same human judgement that has always made these calls.
 ### 4.4 Deterministic-verifier boundary
 
 The IPE-02 verifier (not built in IPE-01) is scoped to answer only structural and
-referential questions, for example: *is `decision_basis` present when
-`validation_status: validated`? do the referenced `EVD-*`/`SRC-*` IDs exist? is
-`corroboration_basis` non-empty when `evidence_status: corroborated`?* It is explicitly
+referential questions about the two questions in §1 — Eligibility and Corroboration —
+for example: *is `decision_basis` present at all? do the referenced `EVD-*`/`SRC-*` IDs
+exist? is `corroboration_basis` non-empty? is `scope.bounded` explicitly authored?* It
+evaluates every `PRB-*` the same way regardless of its current `validation_status`/
+`evidence_status` (§1) — it is never conditioned on those fields' values. It is explicitly
 never scoped to answer semantic questions such as *is this corroboration actually
-independent? is this evidence actually sufficient? should this problem be promoted?* —
-those stay human judgement, recorded as the content of `decision_basis`, not computed by
+independent? is this evidence actually sufficient? should this problem be promoted? is
+`validation_status: validated` correctly assigned?* — those stay human judgement, recorded
+as the content of `decision_basis` or decided directly on `PRB-*`/`ASM-*`, not computed by
 IPE.
 
 ### 4.5 Decision basis / explainability
@@ -113,7 +143,22 @@ The purpose of `decision_basis` is public explainability: a reader of the publis
 research corpus should be able to see, for any `validated` problem, an explicit,
 structured account of what was checked, not just a status field and prose. This directly
 supports the repository's canonical-integrity guardrail (`AGENTS.md` §8) by making the
-evidence for a promotion-relevant claim inspectable rather than implicit.
+evidence for a promotion-relevant claim inspectable rather than implicit. This
+explainability purpose is broader than what IPE-02 itself verifies (§1): `decision_basis`
+may be read and cited by humans or other tooling for context on `validation_status` and
+other human judgements, but IPE-02's own pass/fail output never covers those broader
+questions.
+
+### 4.6 ASM structural dependency
+
+Both Eligibility and Corroboration currently require at least one `ASM-*` record on file
+that references the target `PRB-*` (`docs/models/assessment-model.md` — "One active
+`ASM-*` is intended per canonical active `PRB-*`"). This is a structural-existence check
+only: the IPE-02 verifier confirms an `ASM-*` record referencing the `PRB-*` exists; it
+never reads or requires any particular `ASM.assessment_status`, `ASM.triage`, or
+`decision_gates.*` value. An existing `PRB-*` with no `ASM-*` on file at all fails this
+check (`MISSING_REQUIRED_ASM`) for both questions; an `ASM-*` in any `assessment_status`,
+with any `triage` value (including `STOP`/`WATCH`), satisfies it.
 
 ## 5. `decision_basis` — v0 shape (optional, on `PRB-*`)
 
@@ -283,6 +328,10 @@ IPE-01, and IPE generally, does **not**:
 - use an LLM judge or any domain-specific rule engine;
 - automatically change `evidence_status`, `validation_status`, `PRB.status`, or
   `ASM.triage`;
+- verify `validation_status: validated` or `validation_status: partially_validated`, D5
+  validation sufficiency, or `ASM.triage: PROCEED` — IPE-02 v0 verifies only PRB
+  Eligibility and Corroboration (§1); there is no `VALIDATION-v0` contract in IPE-02, and
+  these remain entirely governed by the existing D5 / ASM human process;
 - backfill or mutate any existing `PRB-*`, `EVD-*`, `SRC-*`, or `ASM-*` record;
 - change the Research Explorer UI or any runtime application code;
 - require `decision_basis` on any record — it stays optional through IPE-01 (and IPE-02
