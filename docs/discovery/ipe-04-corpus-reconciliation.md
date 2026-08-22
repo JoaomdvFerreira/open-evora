@@ -17,8 +17,9 @@ this reconciliation fixes without touching the contract itself:
    present-day, characterized magnitude.
 2. `evidence_status: corroborated` had been applied to several of those same records
    without an explicit, on-record account of which evidence classes converge
-   independently on the claim as framed (§4.2 of the IPE-04 contract document) — i.e. the
-   corroboration claim outran the explicit basis for it.
+   independently on the claim as framed
+   (`docs/discovery/investigation-promotion-engine.md` §4.2) — i.e. the corroboration
+   claim outran the explicit basis for it.
 
 This reconciliation brings wording and `evidence_status` into alignment with what is
 actually on record today. It is a hygiene/precision pass over existing canonical text and
@@ -29,10 +30,10 @@ reconciliation; see §5).
 ## 2. Fixed human-gate outcomes
 
 Recorded as given by the project owner; this document does not re-derive or second-guess
-them. Two values per row: outcome for the wording reconciliation, outcome for the
-`evidence_status` transition.
+them. Two values per row: the Eligibility human-gate outcome, and the Corroboration
+human-gate outcome.
 
-| PRB | Wording gate | `evidence_status` gate |
+| PRB | Eligibility human gate | Corroboration human gate |
 |---|---|---|
 | PRB-0001 | PASS | PASS_BOUNDED |
 | PRB-0002 | HOLD | HOLD |
@@ -45,12 +46,17 @@ them. Two values per row: outcome for the wording reconciliation, outcome for th
 | PRB-0009 | PASS | PASS_BOUNDED |
 | PRB-0010 | PASS | HOLD |
 
-A `HOLD` outcome on either gate means the corresponding change (wording or
-`evidence_status`) was applied under this reconciliation as approved, but the record's
-overall readiness for the next programme decision remains gated — it is not a pass/fail
-judgement on the problem's importance. `PASS_BOUNDED` means the applied change is approved
-and the record's basis, while not fully re-derived here, is bounded and explicit enough
-not to require further hold.
+Eligibility concerns the record's readiness for the human PRB-promotion gate
+(`docs/discovery/investigation-promotion-engine.md` §4.1). Corroboration concerns human
+approval of the evidence basis for the *current* problem claim/scope, i.e. the basis for
+`evidence_status: corroborated` (§4.2 of the same document). These are two distinct human
+judgements, not two readings of the same wording/evidence-status change.
+
+`PASS_BOUNDED` on the Corroboration gate means Corroboration is human-approved only within
+the explicitly bounded claim/scope recorded for that `PRB-*` — not as an unbounded or
+general claim. `HOLD` on either gate means that gate's readiness remains open for that
+record; it is not a judgement that the underlying civic problem is false, unimportant, or
+unlikely to be real.
 
 ## 2a. Public-impact findings
 
@@ -92,13 +98,14 @@ Kept `corroborated` (no change):
 - PRB-0006
 - PRB-0009
 
-Rationale for the six transitions: in each case, the canonical record's own
-`possible_root_causes` history documents unresolved current-state, magnitude, or
-independence questions (see each record's own history for specifics) that mean the
-explicit basis for treating the evidence as convergent/independent on the *current*
-framing is not yet on record — the §4.2 corroboration bar this reconciliation applies
-uniformly. This is a structural read of what is already written on each record, not a new
-evidentiary judgement; no evidence was added, removed, or reweighted to reach it.
+Rationale for the six transitions: each of PRB-0002, PRB-0004, PRB-0005, PRB-0007,
+PRB-0008, and PRB-0010 changed from `corroborated` to `discovered` because its fixed
+IPE-03 human Corroboration outcome (§2) was `HOLD` for the current claim/scope. No `EVD-*`
+or `ASM-*` content was modified to produce these transitions. The status changes record the
+approved human epistemic judgement produced by the read-only IPE-03 review and reconciled
+here in IPE-04 — a deliberate human determination that the explicit basis for treating the
+evidence as convergent/independent on the *current* framing was not established for these
+six records, not merely a structural re-reading of existing text.
 `validation_status: unvalidated` is unchanged on every one of these six records and was
 never part of this evaluation (§5).
 
@@ -155,9 +162,10 @@ future, separate decision — not a `decision_basis` value, not a promotion, and
   to whoever authors `decision_basis` verifying that directly.
 - **Corroboration-only basis readiness later:** PRB-0003 — corroboration basis appears
   plausibly authorable from the existing APCE/CME institutional-response and
-  factual-corroboration evidence already on record, but Eligibility basis (in particular
-  `overlap_check` and current manifestation currentness against the 2025-2026
-  intervention timeline) is not yet clearly settled.
+  factual-corroboration evidence already on record, but Eligibility basis is not yet
+  clearly settled: consequence evidence for the record's claimed impact is insufficient
+  and not yet concretely evidenced, which is the primary blocker rather than
+  `overlap_check` or currentness.
 - **Eligibility-only basis readiness later:** PRB-0010 — the manifestation/consequence
   basis for treating this as a distinct, well-formed problem (promoted from a
   NEW-CANDIDATE per the WU-D3-03 record) appears plausibly authorable, but Corroboration
@@ -175,10 +183,16 @@ deliberate act governed entirely by IPE-01/IPE-02 (`docs/discovery/investigation
 
 ## 6. Historical/provenance note
 
-- This reconciliation is downstream of IPE-01 (`decision_basis` schema/hygiene,
-  implemented) and IPE-02 (`tools/evaluate-research-decisions.js`, deterministic
-  verifier, implemented). It performs no IPE-03-equivalent or new-verifier work; there is
-  no IPE-03 referenced or implied by this document.
+- IPE-01 (`decision_basis`/schema foundation, implemented) and IPE-02
+  (`tools/evaluate-research-decisions.js`, deterministic structural verification,
+  implemented) preceded this reconciliation.
+- IPE-03 was the read-only human-gate review of `PRB-0001`–`PRB-0010`: it inspected the
+  relevant `PRB-*`/`ASM-*`/`EVD-*`/`SRC-*` material for each record and produced the fixed
+  Eligibility and Corroboration outcomes recorded in §2 of this document. IPE-03 made no
+  edits to any canonical record.
+- IPE-04 (this document) applies the approved corpus wording and `evidence_status`
+  reconciliation derived from those IPE-03 outcomes. IPE-04 itself does not modify `EVD-*`
+  or `ASM-*` evidence.
 - The wording and `evidence_status` changes applied here were approved by the project
   owner prior to this document's authoring; this document is the audit record of that
   approval being applied, not the approval decision itself.
@@ -187,9 +201,6 @@ deliberate act governed entirely by IPE-01/IPE-02 (`docs/discovery/investigation
   for the governance/history narrative behind these wording and `evidence_status`
   changes, per the explicit instruction that governance/history notes do not belong in
   `possible_root_causes`.
-- No `EVD-*` or `ASM-*` record was read for evaluation purposes beyond what each `PRB-*`'s
-  own existing `possible_root_causes` history already cites; no new evidence was
-  introduced or cited.
 
 ## 7. Constraints observed
 
