@@ -308,7 +308,15 @@ function validateResearchTree(researchRoot) {
         }
         const targets = ref.isList ? (Array.isArray(val) ? val : [val]) : [val];
         for (const t of targets) {
-          if (typeof t !== "string" || t.trim() === "") continue;
+          if (typeof t !== "string") continue;
+          if (t.trim() === "") {
+            if (ref.isList) {
+              errors.push(
+                `[${file}] field "${ref.field}" contains an empty reference entry (expected a ${ref.targetPrefix}* ID)`
+              );
+            }
+            continue;
+          }
           if (!targetIds.has(t)) {
             errors.push(
               `[${file}] field "${ref.field}" references non-existent ${ref.targetPrefix}* record "${t}"`

@@ -48,7 +48,21 @@ existing_solutions:
 status:
   OPEN | REJECTED | DUPLICATE | NON_DIGITAL |
   ALREADY_SOLVED | INSUFFICIENT_EVIDENCE
+
+# Optional (IPE-01, v0) — see docs/discovery/investigation-promotion-engine.md
+decision_basis: null
 ```
+
+## `decision_basis` (optional, IPE-01)
+
+`decision_basis` is an optional structure recording the explicit basis for this record's
+own `evidence_status`/`validation_status` claim — eligibility basis, corroboration basis,
+manifestation, consequence, currentness, contradiction/current-state search, overlap
+check, a corroboration-statement snapshot, supporting/boundary evidence, an independence
+assessment, geography/population/temporal scope, and limitations. It is never required,
+no existing canonical `PRB-*` is backfilled with it, and writing it never itself changes
+`evidence_status` or `validation_status` — both remain independent human decisions. Full
+contract: `docs/discovery/investigation-promotion-engine.md`.
 
 ## Lifecycle
 
