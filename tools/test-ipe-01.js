@@ -120,6 +120,7 @@ decision_basis:
     geography: "Fixture area"
     population: "residents"
     temporal: "2026"
+    bounded: false
   limitations: "Fixture limitations."
 `;
 
@@ -255,6 +256,183 @@ decision_basis:
     write(root, "evidence", "EVD-900101.yaml", minimalEvd());
     const { errors } = validateResearchTree(root);
     assert.deepStrictEqual(errors, []);
+  } finally {
+    cleanup(root);
+  }
+});
+
+// ---- decision_basis.scope.bounded (IPE-02 contract clarification) ----------
+
+test("decision_basis.scope.bounded=true passes schema/type validation (integration path)", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  scope:
+    geography: "Fixture area (limited to one parish)"
+    population: "residents"
+    temporal: "2026"
+    bounded: true
+  limitations: "Only one parish was surveyed; not generalized further."
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.deepStrictEqual(errors, []);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.scope.bounded with a non-boolean value is rejected (integration path)", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  scope:
+    geography: "Fixture area"
+    population: "residents"
+    temporal: "2026"
+    bounded: "yes"
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.ok(
+      errorsContain(errors, 'field "decision_basis.scope.bounded" must be a boolean'),
+      errors.join("\n")
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+// ---- decision_basis.contradiction_search.performed / overlap_check.performed
+// (IPE-02 contract fix: both are schema-declared booleanFields) -------------
+
+test("decision_basis.contradiction_search.performed=true passes schema/type validation", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  contradiction_search:
+    performed: true
+    summary: "No contradicting evidence found."
+    evidence: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.deepStrictEqual(errors, []);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.contradiction_search.performed=false passes schema/type validation", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  contradiction_search:
+    performed: false
+    summary: "Not performed."
+    evidence: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.deepStrictEqual(errors, []);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.contradiction_search.performed with a non-boolean value is rejected", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  contradiction_search:
+    performed: "yes"
+    summary: "Fixture."
+    evidence: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.ok(
+      errorsContain(errors, 'field "decision_basis.contradiction_search.performed" must be a boolean'),
+      errors.join("\n")
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.overlap_check.performed=true passes schema/type validation", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  overlap_check:
+    performed: true
+    summary: "No overlap found."
+    related_problems: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.deepStrictEqual(errors, []);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.overlap_check.performed=false passes schema/type validation", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  overlap_check:
+    performed: false
+    summary: "Not performed."
+    related_problems: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.deepStrictEqual(errors, []);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.overlap_check.performed with a non-boolean value is rejected", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  overlap_check:
+    performed: "yes"
+    summary: "Fixture."
+    related_problems: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.ok(
+      errorsContain(errors, 'field "decision_basis.overlap_check.performed" must be a boolean'),
+      errors.join("\n")
+    );
   } finally {
     cleanup(root);
   }
