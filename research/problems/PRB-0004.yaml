@@ -1,5 +1,5 @@
 problem_id: PRB-0004
-title: "A rede ciclável ainda não constitui uma rede coerente e prática para as deslocações quotidianas"
+title: "Descontinuidades na rede ciclável de Évora e impacto quotidiano ainda por caracterizar"
 domain:
   - "MOB"
   - "URB"
@@ -8,7 +8,7 @@ geography:
   area: "Évora city"
 affected_populations:
   - "current and potential cyclists"
-problem_statement: "Os percursos cicláveis são descritos como limitados, descontínuos e insuficientemente ligados a destinos importantes, o que reduz a sua utilidade para deslocações habituais."
+problem_statement: "O planeamento institucional descreve os percursos cicláveis como limitados, descontínuos e insuficientemente ligados a destinos importantes. Não está ainda estabelecido quais as deslocações quotidianas concretas afetadas por esta descontinuidade, nem em que medida esta reduz, na prática, a utilidade da rede para quem se desloca diariamente de bicicleta."
 current_journey: null
 reported_consequences: []
 possible_root_causes:
@@ -25,7 +25,7 @@ evidence:
   - "EVD-000119"
   - "EVD-000120"
   - "EVD-000121"
-evidence_status: corroborated
+evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
 existing_solutions: not_assessed

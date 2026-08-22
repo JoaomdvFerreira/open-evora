@@ -1,5 +1,5 @@
 problem_id: PRB-0002
-title: "A informação aos passageiros dos transportes públicos não é consistentemente completa, fiável e utilizável ao longo de toda a deslocação"
+title: "A informação dos transportes públicos apresenta lacunas documentadas, com impacto nas viagens ainda por caracterizar"
 domain:
   - "MOB"
   - "DIG"
@@ -8,7 +8,7 @@ geography:
   area: "Alentejo Central; urban Évora to be investigated separately"
 affected_populations:
   - "public-transport users"
-problem_statement: "Os passageiros dos transportes públicos podem deparar-se com informação incompleta, inconsistente ou pouco fiável ao longo de toda a deslocação — nas paragens, nos canais digitais e no momento de uma falha do serviço — apesar de existirem atualmente canais de informação destinados aos passageiros (TREVO, TPAC)."
+problem_statement: "Existem lacunas documentadas no ambiente de informação aos passageiros dos transportes públicos — nomeadamente heterogeneidade na informação disponível nas paragens e melhorias de informação em tempo real ainda planeadas, não confirmadas como concretizadas — apesar de existirem atualmente canais de informação destinados aos passageiros (TREVO, TPAC). Em que medida estas lacunas afetam realmente as viagens dos passageiros — a sua frequência, gravidade e os pontos concretos de falha — não está ainda estabelecido."
 current_journey: null
 reported_consequences: []
 possible_root_causes:
@@ -25,7 +25,7 @@ evidence:
   - "EVD-000080"
   - "EVD-000122"
   - "EVD-000123"
-evidence_status: corroborated
+evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
 existing_solutions: not_assessed

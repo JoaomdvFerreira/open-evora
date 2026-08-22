@@ -31,7 +31,7 @@ evidence:
   - "EVD-000105"
   - "EVD-000106"
   - "EVD-000107"
-evidence_status: corroborated
+evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
 existing_solutions: not_assessed

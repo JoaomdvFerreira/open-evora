@@ -35,6 +35,7 @@ evidence: []
 
 evidence_status:
   discovered | corroborated
+  # see "evidence_status contract" below
 
 validation_status:
   unvalidated | partially_validated | validated
@@ -107,6 +108,38 @@ A problem may legitimately end as:
 - `INSUFFICIENT_EVIDENCE`.
 
 These outcomes prevent solutionism and wasted development.
+
+## `evidence_status` contract
+
+Canonicalized as part of the IPE-04 corpus reconciliation
+(`docs/discovery/ipe-04-corpus-reconciliation.md`). No schema change — this clarifies the
+existing `discovered` / `corroborated` enum; it does not add a state and does not alter
+`validation_status`, which remains a fully separate, D5-governed contract (see below).
+
+### `discovered`
+
+The problem has documented institutional and/or public-signal manifestation, but the
+explicitly authored structural basis for treating it as corroborated — convergent,
+independent evidence classes supporting the specific claim as framed, per
+`docs/discovery/investigation-promotion-engine.md` §4.2 — is not yet on record for the
+current framing. `discovered` does not mean the problem is weak, unimportant, or
+unlikely to be real; it means the corroboration basis for the problem as currently
+stated has not been explicitly established, often because the claim mixes institutional
+planning/acknowledgement with an unestablished current-state or affected-journey
+magnitude.
+
+### `corroborated`
+
+Independent evidence classes converge on the problem as currently framed, and the basis
+for treating them as independent (rather than restating the same underlying source) is
+explicit and on record — whether or not that basis is formally captured in a
+`decision_basis.corroboration_basis` field (`decision_basis` remains optional,
+`docs/discovery/investigation-promotion-engine.md` §5).
+
+Neither state implies anything about `validation_status`: a `discovered` problem can
+still be a legitimate, publishable `STOP`/`WATCH`, and moving from `discovered` to
+`corroborated` (or the reverse) is always a deliberate, recorded human judgement, never
+an automatic transition inferred from evidence count or wording.
 
 ## Validation-status contract (D5)
 

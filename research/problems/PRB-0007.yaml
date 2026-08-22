@@ -1,5 +1,5 @@
 problem_id: PRB-0007
-title: "Os cuidadores informais deparam-se com informação fragmentada e com necessidades de orientação para aceder a apoios"
+title: "Os cuidadores informais em Évora enfrentam dificuldades no acesso a apoios, incluindo necessidades de informação e orientação"
 domain:
   - "SOC"
   - "HEA"
@@ -9,7 +9,7 @@ geography:
 affected_populations:
   - "informal caregivers"
   - "cared-for people"
-problem_statement: "Os cuidadores informais em Évora têm necessidades documentadas de informação que abrangem saúde, mobilidade, estruturas de apoio e apoio financeiro/social, e uma proporção substancial das pessoas cuidadas não recebe qualquer serviço formal de apoio, apesar de Évora dispor de uma densa rede interinstitucional de apoio social (CLASE / Rede Social)."
+problem_statement: "Os cuidadores informais em Évora têm necessidades documentadas de informação que abrangem saúde, mobilidade, estruturas de apoio e apoio financeiro/social. Um estudo com 68 cuidadores e 89 pessoas cuidadas, integrado no Plano Concelhio dos Cuidadores Informais, apurou que 35% das pessoas cuidadas não utilizava qualquer serviço formal de apoio — um resultado específico dessa amostra, não generalizável ao conjunto dos cuidadores de Évora. Material de grupos focais do mesmo plano identifica, numa amostra distinta, a burocracia e a dificuldade em compreender os direitos dos cuidadores como uma fonte de sobrecarga separada da sobrecarga geral do cuidar; a evidência atual não estabelece uma relação causal entre esta fragmentação da informação e a não utilização de apoio formal reportada no estudo dos 68/89. Um terceiro inquérito, a 133 cuidadores, indica que as necessidades de apoio direto no cuidar, descanso, apoio financeiro e apoio psicológico são reportadas com maior frequência do que necessidades relacionadas com orientação, pelo que estas permanecem uma explicação alternativa, e possivelmente mais prevalente, para as dificuldades de acesso a apoios — apesar de Évora dispor de uma densa rede interinstitucional de apoio social (CLASE / Rede Social)."
 current_journey: null
 reported_consequences: []
 possible_root_causes:
@@ -28,7 +28,7 @@ evidence:
   - "EVD-000091"
   - "EVD-000092"
   - "EVD-000124"
-evidence_status: corroborated
+evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
 existing_solutions: not_assessed
