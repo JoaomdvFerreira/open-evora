@@ -283,6 +283,14 @@ function validateResearchTree(researchRoot) {
         }
       }
 
+      for (const field of schema.booleanFields || []) {
+        const val = getPath(record, field);
+        if (val === undefined || val === null) continue;
+        if (typeof val !== "boolean") {
+          errors.push(`[${rel}] field "${field}" must be a boolean (true|false), got "${val}"`);
+        }
+      }
+
       if (schema.prefix === "ASM-") {
         validateCriticalUnknowns(rel, record, errors);
       }

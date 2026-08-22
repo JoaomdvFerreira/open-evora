@@ -3,7 +3,7 @@
   "directory": "problems",
   "idField": "problem_id",
   "sourceModel": "docs/models/problem-model.md",
-  "notes": "domain accepts either a single string or a list of domain codes; docs/models/problem-model.md shows a single string, but multi-domain problems (see WU-D1-02) are recorded as a list, consistent with the existing evidence.domain list convention. No enum is enforced on domain values. decision_basis is an OPTIONAL v0 (IPE-01) structure — see docs/discovery/investigation-promotion-engine.md. It is never required and no existing canonical PRB-* is backfilled with it. contract_version is a free-form string, not enum-checked, so future decision_basis contract revisions do not require a schema/validator change merely to be recorded.",
+  "notes": "domain accepts either a single string or a list of domain codes; docs/models/problem-model.md shows a single string, but multi-domain problems (see WU-D1-02) are recorded as a list, consistent with the existing evidence.domain list convention. No enum is enforced on domain values. decision_basis is an OPTIONAL v0 (IPE-01) structure — see docs/discovery/investigation-promotion-engine.md. It is never required and no existing canonical PRB-* is backfilled with it. contract_version is a free-form string, not enum-checked, so future decision_basis contract revisions do not require a schema/validator change merely to be recorded. decision_basis.scope.bounded (added IPE-02, docs/discovery/investigation-promotion-engine.md §10) is an explicit human-authored boolean, never inferred from scope.geography/population/temporal text; booleanFields enforces it is true|false when present, not merely truthy.",
   "requiredFields": [
     "problem_id",
     "title",
@@ -26,6 +26,9 @@
     "existing_solutions": ["not_assessed", "assessed"],
     "status": ["OPEN", "REJECTED", "DUPLICATE", "NON_DIGITAL", "ALREADY_SOLVED", "INSUFFICIENT_EVIDENCE"]
   },
+  "booleanFields": [
+    "decision_basis.scope.bounded"
+  ],
   "references": [
     {
       "field": "evidence",
