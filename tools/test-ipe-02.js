@@ -244,14 +244,14 @@ function test(name, fn) {
 
 // ---- eligibility ------------------------------------------------------------
 
-test("eligibility: not applicable when validation_status is unvalidated", () => {
+test("eligibility: unvalidated PRB with no decision_basis is still REVIEW_REQUIRED / NO_DECISION_BASIS (never READY)", () => {
   const root = makeFixtureRoot();
   try {
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "unvalidated" }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
     const report = loadAndEvaluate(root, "PRB-9001");
-    assert.strictEqual(report.eligibility.applicable, false);
-    assert.strictEqual(report.eligibility.result, READY.ELIGIBILITY);
+    assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
+    assert.deepStrictEqual(codesOf(report.eligibility.reasons), [REASON.NO_DECISION_BASIS]);
   } finally {
     cleanup(root);
   }
@@ -530,14 +530,14 @@ test("eligibility: missing required ASM -> REVIEW", () => {
 
 // ---- corroboration ------------------------------------------------------------
 
-test("corroboration: not applicable when evidence_status is discovered", () => {
+test("corroboration: discovered PRB with no decision_basis is still REVIEW_REQUIRED / NO_DECISION_BASIS (never READY)", () => {
   const root = makeFixtureRoot();
   try {
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "discovered" }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
     const report = loadAndEvaluate(root, "PRB-9001");
-    assert.strictEqual(report.corroboration.applicable, false);
-    assert.strictEqual(report.corroboration.result, READY.CORROBORATION);
+    assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
+    assert.deepStrictEqual(codesOf(report.corroboration.reasons), [REASON.NO_DECISION_BASIS]);
   } finally {
     cleanup(root);
   }

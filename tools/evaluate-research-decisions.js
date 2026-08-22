@@ -15,6 +15,13 @@
  * or whether promotion/corroboration should be approved. Those remain human judgement
  * recorded in PRB-* / ASM-* (see docs/discovery/investigation-promotion-engine.md §4.4).
  *
+ * Every PRB is evaluated the same way regardless of its current validation_status/
+ * evidence_status: a PRB with no decision_basis is always REVIEW_REQUIRED /
+ * NO_DECISION_BASIS for both questions, never READY. There is no "not applicable"
+ * state — decision_basis is optional to author (IPE-01 §3), but once IPE-02 is asked
+ * to evaluate a PRB, "no explicit basis on record" is itself the review-required
+ * finding, not an exemption from the question.
+ *
  * Usage:
  *   node tools/evaluate-research-decisions.js --problem PRB-XXXX
  *   node tools/evaluate-research-decisions.js --all
@@ -53,8 +60,6 @@ const REASON = {
   UNKNOWN_RELATED_PROBLEM_REFERENCE: "UNKNOWN_RELATED_PROBLEM_REFERENCE",
   LINEAGE_REQUIREMENT_NOT_STRUCTURALLY_AVAILABLE: "LINEAGE_REQUIREMENT_NOT_STRUCTURALLY_AVAILABLE",
   CONTRADICTION_EVIDENCE_STRUCTURALLY_INCONSISTENT: "CONTRADICTION_EVIDENCE_STRUCTURALLY_INCONSISTENT",
-
-  NOT_APPLICABLE: "NOT_APPLICABLE",
 };
 
 const READY = {
@@ -103,23 +108,12 @@ function checkEvidenceRefs(fieldPath, evdIds, corpus, prbId, unknownCode, unlink
 
 function evaluateEligibility(prbId, corpus) {
   const prb = corpus.problemsById.get(prbId).record;
-  const applicable =
-    prb.validation_status === "validated" || prb.validation_status === "partially_validated";
-
-  if (!applicable) {
-    return {
-      applicable: false,
-      result: READY.ELIGIBILITY,
-      reasons: [{ code: REASON.NOT_APPLICABLE, detail: "validation_status is not validated/partially_validated" }],
-    };
-  }
-
   const db = prb.decision_basis;
   const findings = [];
 
   if (db === undefined || db === null) {
     findings.push({ code: REASON.NO_DECISION_BASIS, detail: "PRB.decision_basis is absent" });
-    return { applicable: true, result: REVIEW_REQUIRED, reasons: findings };
+    return { result: REVIEW_REQUIRED, reasons: findings };
   }
 
   if (!isNonEmptyString(db.eligibility_basis)) {
@@ -200,7 +194,6 @@ function evaluateEligibility(prbId, corpus) {
   checkRequiredAsmDependency(prbId, corpus, findings);
 
   return {
-    applicable: true,
     result: findings.length === 0 ? READY.ELIGIBILITY : REVIEW_REQUIRED,
     reasons: findings,
   };
@@ -274,22 +267,12 @@ function checkRequiredAsmDependency(prbId, corpus, findings) {
 
 function evaluateCorroboration(prbId, corpus) {
   const prb = corpus.problemsById.get(prbId).record;
-  const applicable = prb.evidence_status === "corroborated";
-
-  if (!applicable) {
-    return {
-      applicable: false,
-      result: READY.CORROBORATION,
-      reasons: [{ code: REASON.NOT_APPLICABLE, detail: "evidence_status is not corroborated" }],
-    };
-  }
-
   const db = prb.decision_basis;
   const findings = [];
 
   if (db === undefined || db === null) {
     findings.push({ code: REASON.NO_DECISION_BASIS, detail: "PRB.decision_basis is absent" });
-    return { applicable: true, result: REVIEW_REQUIRED, reasons: findings };
+    return { result: REVIEW_REQUIRED, reasons: findings };
   }
 
   if (!isNonEmptyString(db.corroboration_basis)) {
@@ -362,7 +345,6 @@ function evaluateCorroboration(prbId, corpus) {
   checkRequiredAsmDependency(prbId, corpus, findings);
 
   return {
-    applicable: true,
     result: findings.length === 0 ? READY.CORROBORATION : REVIEW_REQUIRED,
     reasons: findings,
   };
@@ -445,13 +427,9 @@ function printReport(report) {
   console.log(report.problem_id);
   const elig = report.eligibility;
   const corr = report.corroboration;
-  console.log(
-    `  eligibility:    ${elig.applicable ? elig.result : `${elig.result} (not applicable)`}`
-  );
+  console.log(`  eligibility:    ${elig.result}`);
   if (elig.reasons.length > 0) console.log(`    ${formatReasons(elig.reasons)}`);
-  console.log(
-    `  corroboration:  ${corr.applicable ? corr.result : `${corr.result} (not applicable)`}`
-  );
+  console.log(`  corroboration:  ${corr.result}`);
   if (corr.reasons.length > 0) console.log(`    ${formatReasons(corr.reasons)}`);
 }
 
