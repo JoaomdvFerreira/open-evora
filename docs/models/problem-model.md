@@ -59,9 +59,10 @@ decision_basis: null
 own `evidence_status`/`validation_status` claim — eligibility basis, corroboration basis,
 manifestation, consequence, currentness, contradiction/current-state search, overlap
 check, a corroboration-statement snapshot, supporting/boundary evidence, an independence
-assessment, geography/population/temporal scope, and limitations. It is never required,
-no existing canonical `PRB-*` is backfilled with it, and writing it never itself changes
-`evidence_status` or `validation_status` — both remain independent human decisions. Full
+assessment, geography/population/temporal scope (with an explicit `scope.bounded` flag,
+added IPE-02), and limitations. It is never required, no existing canonical `PRB-*` is
+backfilled with it, and writing it never itself changes `evidence_status` or
+`validation_status` — both remain independent human decisions. Full
 contract: `docs/discovery/investigation-promotion-engine.md`.
 
 ## Lifecycle

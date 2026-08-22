@@ -159,6 +159,7 @@ decision_basis:
     geography: ""
     population: ""
     temporal: ""
+    bounded: false
 
   limitations: ""
 ```
@@ -198,7 +199,12 @@ decision_basis:
   problem-decision level, not a new independence mechanism).
 - **`scope`** — the geography, population, and temporal bounds the decision is actually
   good for, kept explicit so a `validated` status is never read as broader than what was
-  checked.
+  checked. `scope.bounded` (added IPE-02, `docs/discovery/investigation-promotion-engine.md`
+  §9) is an explicit human-authored boolean: `true` when the researcher considers this
+  scope narrower/more limited than the problem's general framing, `false` otherwise. It is
+  never inferred from the wording of `geography`/`population`/`temporal` — the researcher
+  states it directly, the same way every other `decision_basis` judgement is stated, not
+  detected from prose.
 - **`limitations`** — free text: known gaps, caveats, or things the decision does not
   cover.
 
@@ -287,3 +293,38 @@ Recorded here so IPE-02 does not have to rediscover them:
   (`docs/discovery/d3-execution-protocol.md` §10) without duplicating it.
 
 These are explicitly not resolved by IPE-01.
+
+## 10. IPE-02 contract clarification — `scope.bounded`
+
+IPE-02 (`tools/evaluate-research-decisions.js`) implements the deterministic verifier
+scoped by §4.4. One of its required checks is "bounded/limited bases have explicit
+limitations" — this needs a deterministic, non-semantic way to know whether a basis is
+"bounded" at all. Detecting this from the wording of `scope.geography`/`population`/
+`temporal` (e.g. matching "limited"/"partial" in free text) would be exactly the kind of
+semantic inference over prose this verifier is barred from performing (§4.4, §7), so
+IPE-02 adds one field to the `decision_basis.scope` shape (§5) instead:
+
+```yaml
+scope:
+  geography: ""
+  population: ""
+  temporal: ""
+  bounded: false
+```
+
+- **`scope.bounded`** — an explicit human-authored boolean. `true` means the researcher
+  considers this decision's scope narrower/more limited than the problem's general
+  framing (e.g. one parish surveyed out of the whole municipality); `false` means it is
+  not. It is never inferred from `geography`/`population`/`temporal` content, from
+  `boundary_evidence`, or from `contradiction_search` — those may be present independently
+  of scope boundedness and are not used as a proxy for it. It is optional the same way the
+  rest of `scope` is (absence is only flagged by the existing `MISSING_SCOPE` check); when
+  present it is a plain boolean like `contradiction_search.performed` and
+  `overlap_check.performed`.
+
+The verifier's rule, once `scope` is present: if `scope.bounded: true`, `limitations` must
+be a non-empty string; if `scope.bounded` is `false` or absent, `limitations` is not
+required by this check (though it may still be authored).
+
+This is the only schema-shape addition IPE-02 makes to `decision_basis`; every other
+IPE-02 check reads fields already defined in IPE-01 §5.
