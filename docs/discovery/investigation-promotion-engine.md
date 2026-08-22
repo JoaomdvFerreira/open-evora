@@ -1,7 +1,8 @@
 # Investigation & Promotion Engine (IPE) — v0 Contract Foundation
 
 **Version:** 0.1
-**Status:** IPE-01 — contract foundation only. No verifier implemented.
+**Status:** IPE-01 (contract foundation) and IPE-02 (deterministic verifier,
+`tools/evaluate-research-decisions.js`) are both implemented.
 
 ## 1. Purpose
 
@@ -64,9 +65,15 @@ produces a pass/fail judgement, a score, or a promotion recommendation. That is 
 
 "Eligibility" is whether a `PRB-*` has the *explicit basis on record* to support its
 current `evidence_status`/`validation_status` claim — not whether the underlying civic
-problem is real or important. A problem can be a legitimate `STOP`/`WATCH` with no
-`decision_basis` at all; eligibility only becomes a relevant question once a researcher
-asserts `corroborated` or `validated`.
+problem is real or important. `decision_basis` stays optional and corpus-valid without
+it (§5, §7): a problem can be a legitimate `STOP`/`WATCH` with no `decision_basis` at all,
+and that record remains a valid, publishable part of the corpus. But once the IPE-02
+verifier (`tools/evaluate-research-decisions.js`) is asked to evaluate a given `PRB-*`,
+there is no "not applicable" outcome — an absent `decision_basis` is itself the
+`REVIEW_REQUIRED` / `NO_DECISION_BASIS` finding for both Eligibility and Corroboration,
+never `N/A`. Optional-to-author and evaluated-as-review-required are not in tension: the
+first is about what the corpus requires to be valid; the second is about what the
+verifier reports when asked to check a specific record.
 
 ### 4.2 Corroboration
 
@@ -200,11 +207,14 @@ decision_basis:
 - **`scope`** — the geography, population, and temporal bounds the decision is actually
   good for, kept explicit so a `validated` status is never read as broader than what was
   checked. `scope.bounded` (added IPE-02, `docs/discovery/investigation-promotion-engine.md`
-  §9) is an explicit human-authored boolean: `true` when the researcher considers this
+  §10) is an explicit human-authored boolean: `true` when the researcher considers this
   scope narrower/more limited than the problem's general framing, `false` otherwise. It is
   never inferred from the wording of `geography`/`population`/`temporal` — the researcher
   states it directly, the same way every other `decision_basis` judgement is stated, not
-  detected from prose.
+  detected from prose. `scope.bounded` is optional the same way the rest of `decision_basis`
+  is for corpus validity (§5, §7) — but the IPE-02 verifier requires it to be explicitly
+  authored (`true` or `false`) whenever it evaluates a Corroboration basis; its absence is
+  `REVIEW_REQUIRED`, not silently treated as `false` (§10).
 - **`limitations`** — free text: known gaps, caveats, or things the decision does not
   cover.
 
@@ -292,7 +302,10 @@ Recorded here so IPE-02 does not have to rediscover them:
 - How `overlap_check` should interact with a future structural-decision process
   (`docs/discovery/d3-execution-protocol.md` §10) without duplicating it.
 
-These are explicitly not resolved by IPE-01.
+These are explicitly not resolved by IPE-01. IPE-02 (§10) resolves one related question
+that surfaced during implementation — whether an authored `scope` with `bounded` absent
+may be read as `false` — no: absence is `REVIEW_REQUIRED`. The three questions above
+remain open.
 
 ## 10. IPE-02 contract clarification — `scope.bounded`
 
@@ -317,14 +330,29 @@ scope:
   framing (e.g. one parish surveyed out of the whole municipality); `false` means it is
   not. It is never inferred from `geography`/`population`/`temporal` content, from
   `boundary_evidence`, or from `contradiction_search` — those may be present independently
-  of scope boundedness and are not used as a proxy for it. It is optional the same way the
-  rest of `scope` is (absence is only flagged by the existing `MISSING_SCOPE` check); when
-  present it is a plain boolean like `contradiction_search.performed` and
-  `overlap_check.performed`.
+  of scope boundedness and are not used as a proxy for it; when present it is a plain
+  boolean like `contradiction_search.performed` and `overlap_check.performed`.
 
-The verifier's rule, once `scope` is present: if `scope.bounded: true`, `limitations` must
-be a non-empty string; if `scope.bounded` is `false` or absent, `limitations` is not
-required by this check (though it may still be authored).
+`scope.bounded` is schema-optional the same way the rest of `decision_basis` is (§5, §7):
+a `PRB-*` with no `scope` block, or a `scope` block with no `bounded` key, remains a valid
+corpus record. But the IPE-02 verifier requires `scope.bounded` to be explicitly `true` or
+`false` whenever a `scope` block is present and the verifier is asked to evaluate that
+`PRB-*`'s Eligibility or Corroboration basis: an authored `scope` with `bounded` absent is
+`REVIEW_REQUIRED`, resolving IPE-01 §9's open question of whether boundedness may be
+silently read as `false` — it may not. This is a verifier-evaluation requirement, not a
+corpus-validity requirement; the two remain distinct exactly as `NO_DECISION_BASIS` is a
+verifier finding rather than a validation error (§4.1).
+
+The verifier's rule, once `scope` is present and `bounded` is explicitly authored: if
+`scope.bounded: true`, `limitations` must be a non-empty string
+(`BOUNDED_SCOPE_WITHOUT_LIMITATIONS` otherwise); if `scope.bounded: false`, `limitations`
+is not required by this check (though it may still be authored).
 
 This is the only schema-shape addition IPE-02 makes to `decision_basis`; every other
-IPE-02 check reads fields already defined in IPE-01 §5.
+IPE-02 check reads fields already defined in IPE-01 §5. Corroboration reuses the same
+human-authored `currentness` and `contradiction_search` fields Eligibility already reads
+(§5) rather than introducing a second currentness/contradiction mechanism, and both
+Eligibility and Corroboration require `overlap_check`/`contradiction_search` to be
+explicitly authored, with `performed: false` recorded as a valid but not gate-ready
+structured fact (`OVERLAP_CHECK_NOT_PERFORMED` / `CONTRADICTION_SEARCH_NOT_PERFORMED`,
+or their Corroboration-scoped equivalents) rather than an error.

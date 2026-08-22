@@ -309,6 +309,135 @@ decision_basis:
   }
 });
 
+// ---- decision_basis.contradiction_search.performed / overlap_check.performed
+// (IPE-02 contract fix: both are schema-declared booleanFields) -------------
+
+test("decision_basis.contradiction_search.performed=true passes schema/type validation", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  contradiction_search:
+    performed: true
+    summary: "No contradicting evidence found."
+    evidence: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.deepStrictEqual(errors, []);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.contradiction_search.performed=false passes schema/type validation", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  contradiction_search:
+    performed: false
+    summary: "Not performed."
+    evidence: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.deepStrictEqual(errors, []);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.contradiction_search.performed with a non-boolean value is rejected", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  contradiction_search:
+    performed: "yes"
+    summary: "Fixture."
+    evidence: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.ok(
+      errorsContain(errors, 'field "decision_basis.contradiction_search.performed" must be a boolean'),
+      errors.join("\n")
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.overlap_check.performed=true passes schema/type validation", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  overlap_check:
+    performed: true
+    summary: "No overlap found."
+    related_problems: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.deepStrictEqual(errors, []);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.overlap_check.performed=false passes schema/type validation", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  overlap_check:
+    performed: false
+    summary: "Not performed."
+    related_problems: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.deepStrictEqual(errors, []);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("decision_basis.overlap_check.performed with a non-boolean value is rejected", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  overlap_check:
+    performed: "yes"
+    summary: "Fixture."
+    related_problems: []
+`;
+    write(root, "problems", "PRB-9001.yaml", minimalPrb({ decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+    const { errors } = validateResearchTree(root);
+    assert.ok(
+      errorsContain(errors, 'field "decision_basis.overlap_check.performed" must be a boolean'),
+      errors.join("\n")
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
 // ---- empty-reference-entry hardening ---------------------------------------
 
 test("an empty string inside PRB.evidence is now a validation error", () => {

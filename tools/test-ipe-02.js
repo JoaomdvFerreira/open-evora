@@ -152,7 +152,11 @@ function fullEligibilityBasis({
   includeScope = true,
   manifestationEvidence = "[EVD-900101]",
   bounded = false,
+  includeBounded = true,
   limitations = "",
+  contradictionPerformed = true,
+  overlapPerformed = true,
+  includeOverlapCheck = true,
 } = {}) {
   return `
 decision_basis:
@@ -177,17 +181,24 @@ ${
     assessment: "Fixture currentness call."
     evidence: [EVD-900101]
   contradiction_search:
-    performed: true
-    summary: "No contradicting evidence found."
+    performed: ${contradictionPerformed}
+    summary: "Contradiction/current-state search recorded."
     evidence: []
 ${
+  includeOverlapCheck
+    ? `  overlap_check:
+    performed: ${overlapPerformed}
+    summary: "Overlap/deduplication check recorded."
+    related_problems: []
+`
+    : ""
+}${
   includeScope
     ? `  scope:
     geography: "Fixture area"
     population: "residents"
     temporal: "2026"
-    bounded: ${bounded}
-`
+${includeBounded ? `    bounded: ${bounded}\n` : ""}`
     : ""
 }  limitations: "${limitations}"
 `;
@@ -197,17 +208,27 @@ function fullCorroborationBasis({
   corroborationStatement = PROBLEM_STATEMENT,
   supportingEvidence = "[EVD-900101]",
   bounded = false,
+  includeBounded = true,
   limitations = "",
   includeCorroborationBasis = true,
   includeScope = true,
+  contradictionPerformed = true,
+  overlapPerformed = true,
 } = {}) {
   return `
 decision_basis:
   contract_version: "0.1"
 ${includeCorroborationBasis ? `  corroboration_basis: "Fixture corroboration reasoning."\n` : ""}  overlap_check:
-    performed: true
+    performed: ${overlapPerformed}
     summary: "No overlap found."
     related_problems: []
+  currentness:
+    assessment: "Fixture currentness call."
+    evidence: [EVD-900101]
+  contradiction_search:
+    performed: ${contradictionPerformed}
+    summary: "Contradiction/current-state search recorded."
+    evidence: []
   corroboration_statement: "${corroborationStatement}"
   supporting_evidence: ${supportingEvidence}
   boundary_evidence: []
@@ -218,8 +239,7 @@ ${
     geography: "Fixture area"
     population: "residents"
     temporal: "2026"
-    bounded: ${bounded}
-`
+${includeBounded ? `    bounded: ${bounded}\n` : ""}`
     : ""
 }  limitations: "${limitations}"
 `;
@@ -367,11 +387,12 @@ test("eligibility: IPE-02's own evidence-existence check flags an unknown EVD re
       decision_basis: {
         contract_version: "0.1",
         eligibility_basis: "Fixture eligibility reasoning.",
-        manifestation: { summary: "Fixture manifestation.", evidence: ["EVD-999999"] },
-        consequence: { summary: "Fixture consequence.", evidence: [] },
+        manifestation: { kind: "access failure", summary: "Fixture manifestation.", evidence: ["EVD-999999"] },
+        consequence: { summary: "Fixture consequence.", evidence: ["EVD-900101"] },
         currentness: { assessment: "Fixture currentness call.", evidence: [] },
         contradiction_search: { performed: true, summary: "None found.", evidence: [] },
-        scope: { geography: "Fixture area", population: "residents", temporal: "2026" },
+        overlap_check: { performed: true, summary: "Checked.", related_problems: [] },
+        scope: { geography: "Fixture area", population: "residents", temporal: "2026", bounded: false },
         limitations: "",
       },
     })
@@ -485,8 +506,8 @@ test("eligibility: bounded scope WITH limitations authored -> no BOUNDED_SCOPE f
 test("eligibility: scope.bounded is never inferred from geography/population/temporal wording", () => {
   const root = makeFixtureRoot();
   try {
-    // geography/population text contains "limited"/"partial" but scope.bounded is not set
-    // (defaults to false) — must NOT trigger BOUNDED_SCOPE_WITHOUT_LIMITATIONS.
+    // geography/population text contains "limited"/"partial" but scope.bounded is explicitly
+    // false — must NOT trigger BOUNDED_SCOPE_WITHOUT_LIMITATIONS.
     const decisionBasis = fullEligibilityBasis().replace(
       'geography: "Fixture area"',
       'geography: "Fixture area (limited, partial coverage)"'
@@ -523,6 +544,150 @@ test("eligibility: missing required ASM -> REVIEW", () => {
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.MISSING_REQUIRED_ASM));
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("eligibility: contradiction_search.performed=false -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullEligibilityBasis({ contradictionPerformed: false });
+    write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.eligibility.reasons).includes(REASON.CONTRADICTION_SEARCH_NOT_PERFORMED),
+      JSON.stringify(report.eligibility.reasons)
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("eligibility: overlap_check missing -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullEligibilityBasis({ includeOverlapCheck: false });
+    write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.eligibility.reasons).includes(REASON.MISSING_OVERLAP_CHECK_ELIGIBILITY),
+      JSON.stringify(report.eligibility.reasons)
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("eligibility: overlap_check.performed=false -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullEligibilityBasis({ overlapPerformed: false });
+    write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.eligibility.reasons).includes(REASON.OVERLAP_CHECK_NOT_PERFORMED),
+      JSON.stringify(report.eligibility.reasons)
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("eligibility: manifestation evidence empty -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullEligibilityBasis({ manifestationEvidence: "[]" });
+    write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.eligibility.reasons).includes(REASON.MISSING_MANIFESTATION_EVIDENCE),
+      JSON.stringify(report.eligibility.reasons)
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("eligibility: consequence evidence empty -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const prbRecord = {
+      problem_id: "PRB-9001",
+      problem_statement: PROBLEM_STATEMENT,
+      evidence: ["EVD-900101"],
+      validation_status: "validated",
+      decision_basis: {
+        contract_version: "0.1",
+        eligibility_basis: "Fixture eligibility reasoning.",
+        manifestation: { kind: "access failure", summary: "Fixture manifestation.", evidence: ["EVD-900101"] },
+        consequence: { summary: "Fixture consequence.", evidence: [] },
+        currentness: { assessment: "Fixture currentness call.", evidence: [] },
+        contradiction_search: { performed: true, summary: "None found.", evidence: [] },
+        overlap_check: { performed: true, summary: "Checked.", related_problems: [] },
+        scope: { geography: "Fixture area", population: "residents", temporal: "2026", bounded: false },
+        limitations: "",
+      },
+    };
+    const corpus = {
+      problemsById: new Map([["PRB-9001", { record: prbRecord }]]),
+      evidenceById: new Map([["EVD-900101", { record: { evidence_id: "EVD-900101" } }]]),
+      assessmentsByProblem: new Map([["PRB-9001", [{ record: { assessment_id: "ASM-9001" } }]]]),
+    };
+    const result = evaluateEligibility("PRB-9001", corpus);
+    assert.strictEqual(result.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(result.reasons).includes(REASON.MISSING_CONSEQUENCE_EVIDENCE),
+      JSON.stringify(result.reasons)
+    );
+  } finally {
+    // no fixture root used in this test
+  }
+});
+
+test("eligibility: scope.bounded absent -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullEligibilityBasis({ includeBounded: false });
+    write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.eligibility.reasons).includes(REASON.MISSING_SCOPE_BOUNDED),
+      JSON.stringify(report.eligibility.reasons)
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("eligibility: complete valid basis with all new checks -> READY", () => {
+  const root = makeFixtureRoot();
+  try {
+    write(
+      root,
+      "problems",
+      "PRB-9001.yaml",
+      prb({ validationStatus: "validated", decisionBasis: fullEligibilityBasis() })
+    );
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.eligibility.result, READY.ELIGIBILITY, JSON.stringify(report.eligibility.reasons));
   } finally {
     cleanup(root);
   }
@@ -578,6 +743,120 @@ test("corroboration: stale corroboration_statement snapshot -> REVIEW", () => {
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.STALE_CORROBORATION_STATEMENT));
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("corroboration: currentness missing -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullCorroborationBasis().replace(
+      /  currentness:\n    assessment: "Fixture currentness call\."\n    evidence: \[EVD-900101\]\n/,
+      ""
+    );
+    write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.corroboration.reasons).includes(REASON.MISSING_CURRENTNESS_CORROBORATION),
+      JSON.stringify(report.corroboration.reasons)
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("corroboration: contradiction_search missing -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullCorroborationBasis().replace(
+      /  contradiction_search:\n    performed: true\n    summary: "Contradiction\/current-state search recorded\."\n    evidence: \[\]\n/,
+      ""
+    );
+    write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.corroboration.reasons).includes(REASON.MISSING_CONTRADICTION_SEARCH_CORROBORATION),
+      JSON.stringify(report.corroboration.reasons)
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("corroboration: contradiction_search.performed=false -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullCorroborationBasis({ contradictionPerformed: false });
+    write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.corroboration.reasons).includes(REASON.CONTRADICTION_SEARCH_NOT_PERFORMED_CORROBORATION),
+      JSON.stringify(report.corroboration.reasons)
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("corroboration: overlap_check.performed=false -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullCorroborationBasis({ overlapPerformed: false });
+    write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.corroboration.reasons).includes(REASON.OVERLAP_CHECK_NOT_PERFORMED),
+      JSON.stringify(report.corroboration.reasons)
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("corroboration: scope.bounded absent -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullCorroborationBasis({ includeBounded: false });
+    write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.corroboration.reasons).includes(REASON.MISSING_SCOPE_BOUNDED),
+      JSON.stringify(report.corroboration.reasons)
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("corroboration: bounded=true + no limitations -> REVIEW", () => {
+  const root = makeFixtureRoot();
+  try {
+    const decisionBasis = fullCorroborationBasis({ bounded: true });
+    write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
+    assert.ok(
+      codesOf(report.corroboration.reasons).includes(REASON.BOUNDED_SCOPE_WITHOUT_LIMITATIONS),
+      JSON.stringify(report.corroboration.reasons)
+    );
   } finally {
     cleanup(root);
   }

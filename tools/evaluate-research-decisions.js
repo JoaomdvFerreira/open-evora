@@ -43,11 +43,17 @@ const REASON = {
   MISSING_CONSEQUENCE: "MISSING_CONSEQUENCE",
   MISSING_CURRENTNESS: "MISSING_CURRENTNESS",
   MISSING_CONTRADICTION_SEARCH: "MISSING_CONTRADICTION_SEARCH",
+  CONTRADICTION_SEARCH_NOT_PERFORMED: "CONTRADICTION_SEARCH_NOT_PERFORMED",
   MISSING_SCOPE: "MISSING_SCOPE",
+  MISSING_SCOPE_BOUNDED: "MISSING_SCOPE_BOUNDED",
   BOUNDED_SCOPE_WITHOUT_LIMITATIONS: "BOUNDED_SCOPE_WITHOUT_LIMITATIONS",
   UNKNOWN_EVIDENCE_REFERENCE: "UNKNOWN_EVIDENCE_REFERENCE",
   EVIDENCE_NOT_LINKED_TO_PRB: "EVIDENCE_NOT_LINKED_TO_PRB",
   MISSING_REQUIRED_ASM: "MISSING_REQUIRED_ASM",
+  MISSING_MANIFESTATION_EVIDENCE: "MISSING_MANIFESTATION_EVIDENCE",
+  MISSING_CONSEQUENCE_EVIDENCE: "MISSING_CONSEQUENCE_EVIDENCE",
+  MISSING_OVERLAP_CHECK_ELIGIBILITY: "MISSING_OVERLAP_CHECK_ELIGIBILITY",
+  OVERLAP_CHECK_NOT_PERFORMED: "OVERLAP_CHECK_NOT_PERFORMED",
 
   MISSING_CORROBORATION_BASIS: "MISSING_CORROBORATION_BASIS",
   MISSING_OVERLAP_CHECK: "MISSING_OVERLAP_CHECK",
@@ -60,6 +66,9 @@ const REASON = {
   UNKNOWN_RELATED_PROBLEM_REFERENCE: "UNKNOWN_RELATED_PROBLEM_REFERENCE",
   LINEAGE_REQUIREMENT_NOT_STRUCTURALLY_AVAILABLE: "LINEAGE_REQUIREMENT_NOT_STRUCTURALLY_AVAILABLE",
   CONTRADICTION_EVIDENCE_STRUCTURALLY_INCONSISTENT: "CONTRADICTION_EVIDENCE_STRUCTURALLY_INCONSISTENT",
+  MISSING_CURRENTNESS_CORROBORATION: "MISSING_CURRENTNESS_CORROBORATION",
+  MISSING_CONTRADICTION_SEARCH_CORROBORATION: "MISSING_CONTRADICTION_SEARCH_CORROBORATION",
+  CONTRADICTION_SEARCH_NOT_PERFORMED_CORROBORATION: "CONTRADICTION_SEARCH_NOT_PERFORMED_CORROBORATION",
 };
 
 const READY = {
@@ -121,8 +130,8 @@ function evaluateEligibility(prbId, corpus) {
   }
 
   const manifestation = db.manifestation;
-  if (!manifestation || !isNonEmptyString(manifestation.summary)) {
-    findings.push({ code: REASON.MISSING_MANIFESTATION, field: "decision_basis.manifestation.summary" });
+  if (!manifestation || !isNonEmptyString(manifestation.kind) || !isNonEmptyString(manifestation.summary)) {
+    findings.push({ code: REASON.MISSING_MANIFESTATION, field: "decision_basis.manifestation" });
   } else {
     checkEvidenceRefs(
       "decision_basis.manifestation.evidence",
@@ -133,6 +142,13 @@ function evaluateEligibility(prbId, corpus) {
       REASON.EVIDENCE_NOT_LINKED_TO_PRB,
       findings
     );
+    if (asList(manifestation.evidence).filter(isNonEmptyString).length === 0) {
+      findings.push({
+        code: REASON.MISSING_MANIFESTATION_EVIDENCE,
+        field: "decision_basis.manifestation.evidence",
+        detail: "no non-empty EVD-* reference cited",
+      });
+    }
   }
 
   const consequence = db.consequence;
@@ -148,6 +164,13 @@ function evaluateEligibility(prbId, corpus) {
       REASON.EVIDENCE_NOT_LINKED_TO_PRB,
       findings
     );
+    if (asList(consequence.evidence).filter(isNonEmptyString).length === 0) {
+      findings.push({
+        code: REASON.MISSING_CONSEQUENCE_EVIDENCE,
+        field: "decision_basis.consequence.evidence",
+        detail: "no non-empty EVD-* reference cited",
+      });
+    }
   }
 
   const currentness = db.currentness;
@@ -187,6 +210,40 @@ function evaluateEligibility(prbId, corpus) {
       findings
     );
     checkContradictionEvidenceConsistency(contradictionSearch, corpus, prbId, findings);
+    if (contradictionSearch.performed === false) {
+      findings.push({
+        code: REASON.CONTRADICTION_SEARCH_NOT_PERFORMED,
+        field: "decision_basis.contradiction_search.performed",
+        detail: "explicitly recorded as not performed; not ready for the promotion gate",
+      });
+    }
+  }
+
+  const overlapCheck = db.overlap_check;
+  if (!overlapCheck || (overlapCheck.performed !== true && overlapCheck.performed !== false)) {
+    findings.push({
+      code: REASON.MISSING_OVERLAP_CHECK_ELIGIBILITY,
+      field: "decision_basis.overlap_check",
+      detail: "performed (boolean) must be explicitly authored",
+    });
+  } else {
+    for (const relatedId of asList(overlapCheck.related_problems)) {
+      if (!isNonEmptyString(relatedId)) continue;
+      if (!corpus.problemsById.has(relatedId)) {
+        findings.push({
+          code: REASON.UNKNOWN_RELATED_PROBLEM_REFERENCE,
+          field: "decision_basis.overlap_check.related_problems",
+          detail: `${relatedId} does not exist`,
+        });
+      }
+    }
+    if (overlapCheck.performed === false) {
+      findings.push({
+        code: REASON.OVERLAP_CHECK_NOT_PERFORMED,
+        field: "decision_basis.overlap_check.performed",
+        detail: "explicitly recorded as not performed; not ready for the promotion gate",
+      });
+    }
   }
 
   checkScopeAndBoundedness(db, findings);
@@ -203,7 +260,8 @@ function evaluateEligibility(prbId, corpus) {
  * scope.bounded is an explicit human-authored boolean (IPE-02 contract clarification,
  * docs/discovery/investigation-promotion-engine.md §10) — never inferred from the
  * wording of geography/population/temporal, from boundary_evidence, or from
- * contradiction_search. When bounded is explicitly true, limitations must be authored.
+ * contradiction_search. Its absence is itself REVIEW_REQUIRED (not a default-false
+ * reading); when bounded is explicitly true, limitations must be authored.
  */
 function checkScopeAndBoundedness(db, findings) {
   const scope = db.scope;
@@ -212,6 +270,14 @@ function checkScopeAndBoundedness(db, findings) {
       code: REASON.MISSING_SCOPE,
       field: "decision_basis.scope",
       detail: "geography, population, and temporal must all be explicitly authored",
+    });
+    return;
+  }
+  if (scope.bounded !== true && scope.bounded !== false) {
+    findings.push({
+      code: REASON.MISSING_SCOPE_BOUNDED,
+      field: "decision_basis.scope.bounded",
+      detail: "scope.bounded must be explicitly authored as true or false",
     });
     return;
   }
@@ -296,6 +362,59 @@ function evaluateCorroboration(prbId, corpus) {
           detail: `${relatedId} does not exist`,
         });
       }
+    }
+    if (overlapCheck.performed === false) {
+      findings.push({
+        code: REASON.OVERLAP_CHECK_NOT_PERFORMED,
+        field: "decision_basis.overlap_check.performed",
+        detail: "explicitly recorded as not performed; not ready for the corroboration gate",
+      });
+    }
+  }
+
+  const currentness = db.currentness;
+  if (!currentness || !isNonEmptyString(currentness.assessment)) {
+    findings.push({ code: REASON.MISSING_CURRENTNESS_CORROBORATION, field: "decision_basis.currentness.assessment" });
+  } else {
+    checkEvidenceRefs(
+      "decision_basis.currentness.evidence",
+      currentness.evidence,
+      corpus,
+      prbId,
+      REASON.UNKNOWN_EVIDENCE_REFERENCE,
+      REASON.EVIDENCE_NOT_LINKED_TO_PRB,
+      findings
+    );
+  }
+
+  const contradictionSearch = db.contradiction_search;
+  if (
+    !contradictionSearch ||
+    (contradictionSearch.performed !== true && contradictionSearch.performed !== false) ||
+    !isNonEmptyString(contradictionSearch.summary)
+  ) {
+    findings.push({
+      code: REASON.MISSING_CONTRADICTION_SEARCH_CORROBORATION,
+      field: "decision_basis.contradiction_search",
+      detail: "performed (boolean) and summary must both be explicitly authored",
+    });
+  } else {
+    checkEvidenceRefs(
+      "decision_basis.contradiction_search.evidence",
+      contradictionSearch.evidence,
+      corpus,
+      prbId,
+      REASON.UNKNOWN_EVIDENCE_REFERENCE,
+      REASON.EVIDENCE_NOT_LINKED_TO_PRB,
+      findings
+    );
+    checkContradictionEvidenceConsistency(contradictionSearch, corpus, prbId, findings);
+    if (contradictionSearch.performed === false) {
+      findings.push({
+        code: REASON.CONTRADICTION_SEARCH_NOT_PERFORMED_CORROBORATION,
+        field: "decision_basis.contradiction_search.performed",
+        detail: "explicitly recorded as not performed; not ready for the corroboration gate",
+      });
     }
   }
 
