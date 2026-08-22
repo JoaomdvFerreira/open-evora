@@ -39,6 +39,7 @@ const { validateResearchTree } = require("./validate-research.js");
 const REASON = {
   NO_DECISION_BASIS: "NO_DECISION_BASIS",
   MISSING_ELIGIBILITY_BASIS: "MISSING_ELIGIBILITY_BASIS",
+  MISSING_AFFECTED_POPULATION: "MISSING_AFFECTED_POPULATION",
   MISSING_MANIFESTATION: "MISSING_MANIFESTATION",
   MISSING_CONSEQUENCE: "MISSING_CONSEQUENCE",
   MISSING_CURRENTNESS: "MISSING_CURRENTNESS",
@@ -131,6 +132,10 @@ function evaluateEligibility(prbId, corpus) {
 
   if (!isNonEmptyString(db.eligibility_basis)) {
     findings.push({ code: REASON.MISSING_ELIGIBILITY_BASIS, field: "decision_basis.eligibility_basis" });
+  }
+
+  if (asList(prb.affected_populations).filter(isNonEmptyString).length === 0) {
+    findings.push({ code: REASON.MISSING_AFFECTED_POPULATION, field: "affected_populations" });
   }
 
   const manifestation = db.manifestation;

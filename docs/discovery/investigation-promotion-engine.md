@@ -54,16 +54,20 @@ SRC → EVD(+analysis) → PRB(+decision_basis) → ASM → HYP → Experiment �
 - `ASM-*` remains the qualitative Problem Assessment that routes a problem to
   `STOP`/`WATCH`/`DEEPEN`/`PROCEED` (`docs/models/assessment-model.md`).
 - `PRB-*` gains one new **optional** structure, `decision_basis`, that records the
-  explicit basis for the problem's own promotion-relevant fields (chiefly
-  `evidence_status: corroborated` and `validation_status: validated`) — not a
-  replacement for `ASM-*`, and not a new record type.
+  explicit basis for the problem's own Eligibility (readiness for the human
+  PRB-promotion gate) and Corroboration (`evidence_status: corroborated`) claims — not a
+  replacement for `ASM-*`, and not a new record type. `decision_basis` does not verify or
+  structurally justify `validation_status`; that remains solely a D5-governed human
+  judgement (§4.1, §4.4).
 
 `decision_basis` is a projection of reasoning the researcher already has to do under the
 existing methodology (`docs/discovery/research-methodology.md` §3 "Evidence convergence",
-§13.7 "D5 decision record"; `docs/models/problem-model.md` "Validation-status contract").
-IPE-01 gives that reasoning a structured home on the `PRB-*` record itself so it is
-addressable and machine-checkable, instead of only living in free-text `notes` and
-`possible_root_causes` prose.
+§13.7 "D5 decision record"). IPE-01 gives that reasoning a structured home on the `PRB-*`
+record itself so it is addressable and machine-checkable, instead of only living in
+free-text `notes` and `possible_root_causes` prose. `decision_basis` may still support
+broader human/public understanding of a problem's overall diagnosis — including context
+relevant to a `validation_status` judgement a human makes elsewhere — but IPE-02 itself
+verifies only Eligibility and Corroboration, never `validation_status` (§1).
 
 ## 3. Scope of IPE-01
 
@@ -87,10 +91,13 @@ sufficient explicitly authored structural basis on record to be treated as a dis
 well-formed problem of investigation — not whether the underlying civic problem is real
 or important, and not a verification of `validation_status`. `validation_status` is a
 separate, D5-governed human judgement that IPE-02 does not read or verify (§1); Eligibility
-is answered entirely from the structural completeness of `decision_basis` (manifestation,
-consequence, currentness, contradiction search, overlap check — §10) and the existing
-structural ASM-existence dependency (§4.6). `decision_basis` stays optional and
-corpus-valid without it (§5, §7): a problem can be a
+is answered from the structural completeness of `decision_basis` (manifestation,
+consequence, currentness, contradiction search, overlap check — §10), the existing
+structural ASM-existence dependency (§4.6), and one plain `PRB-*` field outside
+`decision_basis`: `PRB.affected_populations` must contain at least one non-empty value
+(`MISSING_AFFECTED_POPULATION` otherwise) — a structural-completeness check only; IPE-02
+never assesses whether the listed population is correct or sufficiently representative.
+`decision_basis` stays optional and corpus-valid without it (§5, §7): a problem can be a
 legitimate `STOP`/`WATCH` with no `decision_basis` at all, and that record remains a
 valid, publishable part of the corpus. But once the IPE-02 verifier
 (`tools/evaluate-research-decisions.js`) is asked to evaluate a given `PRB-*`, there is no
@@ -140,14 +147,16 @@ IPE.
 ### 4.5 Decision basis / explainability
 
 The purpose of `decision_basis` is public explainability: a reader of the published
-research corpus should be able to see, for any `validated` problem, an explicit,
-structured account of what was checked, not just a status field and prose. This directly
-supports the repository's canonical-integrity guardrail (`AGENTS.md` §8) by making the
-evidence for a promotion-relevant claim inspectable rather than implicit. This
-explainability purpose is broader than what IPE-02 itself verifies (§1): `decision_basis`
-may be read and cited by humans or other tooling for context on `validation_status` and
-other human judgements, but IPE-02's own pass/fail output never covers those broader
-questions.
+research corpus should be able to see, for a problem with a recorded Eligibility or
+Corroboration claim, an explicit, structured account of what was checked, not just a
+status field and prose. This directly supports the repository's canonical-integrity
+guardrail (`AGENTS.md` §8) by making the evidence for a promotion-relevant claim
+inspectable rather than implicit. This explainability purpose is broader than what
+IPE-02 itself verifies (§1): `decision_basis` content may be read and cited by humans or
+other tooling as context for a separate `validation_status` judgement, but IPE-02's own
+pass/fail output never verifies or structurally justifies `validation_status` — that
+remains solely the D5 process's responsibility (`docs/models/problem-model.md`
+"Validation-status contract").
 
 ### 4.6 ASM structural dependency
 
@@ -165,9 +174,10 @@ with any `triage` value (including `STOP`/`WATCH`), satisfies it.
 `decision_basis` is entirely optional in IPE-01. Its absence is valid for every existing
 canonical `PRB-*` and remains valid for any problem that stays `unvalidated`/`discovered`
 or resolves to a terminal non-`validated` outcome. It is intended to be populated only
-when a researcher is asserting `evidence_status: corroborated` and/or
-`validation_status: validated`/`partially_validated` and wants to record the explicit
-basis for that assertion.
+when a researcher is asserting readiness for the human PRB-promotion gate (Eligibility)
+and/or `evidence_status: corroborated` (Corroboration) and wants to record the explicit
+basis for that assertion. It is not intended as a basis for `validation_status`, which
+remains solely a D5-governed human judgement outside IPE's scope (§1, §4.1).
 
 The shape below uses only nested maps, scalars, and scalar lists — the structures already
 supported by `tools/validate-research.js`'s YAML subset. No list of objects is
@@ -225,8 +235,9 @@ decision_basis:
   against (starts at `"0.1"`, matching this document). Lets IPE-02 (or a future revision)
   distinguish records written under different `decision_basis` contracts without guessing
   from shape alone.
-- **`eligibility_basis`** — free text: why the researcher considers the problem eligible
-  for its current `evidence_status`/`validation_status` claim.
+- **`eligibility_basis`** — free text: why the researcher considers the problem ready for
+  the human PRB-promotion gate — i.e. a distinct, well-formed problem of investigation
+  (§4.1) — not a basis for `validation_status`.
 - **`corroboration_basis`** — free text: which evidence classes converge and why they are
   treated as corroborating (see §4.2).
 - **`manifestation`** — how the problem actually shows up (`kind`, e.g. "access failure",
@@ -288,8 +299,8 @@ error.
 - Not a new record type. It lives inline on the existing `PRB-*` YAML file.
 - Not a replacement for `ASM-*`. `ASM-*` remains the qualitative assessment and triage
   mechanism; `decision_basis` is narrower — it documents the basis for the `PRB-*`
-  record's own `evidence_status`/`validation_status`, not the full D3 decision-gate
-  analysis.
+  record's own Eligibility and `evidence_status: corroborated` claims, not the full D3
+  decision-gate analysis, and not `validation_status`.
 - Not retroactive. Existing canonical `PRB-*` records are not backfilled with
   `decision_basis` as part of IPE-01 (see §7).
 

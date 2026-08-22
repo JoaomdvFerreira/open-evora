@@ -84,6 +84,7 @@ function prb({
   evidenceStatus = "discovered",
   validationStatus = "unvalidated",
   decisionBasis = "",
+  affectedPopulations = "[residents]",
 } = {}) {
   return `
 problem_id: ${id}
@@ -91,7 +92,7 @@ title: "Fixture problem"
 domain: [example]
 geography:
   level: municipality
-affected_populations: [residents]
+affected_populations: ${affectedPopulations}
 problem_statement: "${PROBLEM_STATEMENT}"
 evidence: [${evidenceIds.join(", ")}]
 evidence_status: ${evidenceStatus}
@@ -274,6 +275,51 @@ test("eligibility: complete valid basis -> READY", () => {
     write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, READY.ELIGIBILITY, JSON.stringify(report.eligibility.reasons));
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("eligibility: complete valid basis with affected_populations -> READY", () => {
+  const root = makeFixtureRoot();
+  try {
+    write(
+      root,
+      "problems",
+      "PRB-9001.yaml",
+      prb({
+        validationStatus: "validated",
+        decisionBasis: fullEligibilityBasis(),
+        affectedPopulations: "[residents, students]",
+      })
+    );
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.eligibility.result, READY.ELIGIBILITY, JSON.stringify(report.eligibility.reasons));
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("eligibility: affected_populations: [] -> REVIEW / MISSING_AFFECTED_POPULATION", () => {
+  const root = makeFixtureRoot();
+  try {
+    write(
+      root,
+      "problems",
+      "PRB-9001.yaml",
+      prb({
+        validationStatus: "validated",
+        decisionBasis: fullEligibilityBasis(),
+        affectedPopulations: "[]",
+      })
+    );
+    write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
+    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
+    const report = loadAndEvaluate(root, "PRB-9001");
+    assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
+    assert.ok(codesOf(report.eligibility.reasons).includes(REASON.MISSING_AFFECTED_POPULATION));
   } finally {
     cleanup(root);
   }

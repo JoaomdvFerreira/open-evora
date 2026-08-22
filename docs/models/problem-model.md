@@ -56,14 +56,17 @@ decision_basis: null
 ## `decision_basis` (optional, IPE-01)
 
 `decision_basis` is an optional structure recording the explicit basis for this record's
-own `evidence_status`/`validation_status` claim — eligibility basis, corroboration basis,
+own Eligibility (readiness for the human PRB-promotion gate) and Corroboration
+(`evidence_status: corroborated`) claims — eligibility basis, corroboration basis,
 manifestation, consequence, currentness, contradiction/current-state search, overlap
 check, a corroboration-statement snapshot, supporting/boundary evidence, an independence
 assessment, geography/population/temporal scope (with an explicit `scope.bounded` flag,
 added IPE-02), and limitations. It is never required, no existing canonical `PRB-*` is
 backfilled with it, and writing it never itself changes `evidence_status` or
-`validation_status` — both remain independent human decisions. Full
-contract: `docs/discovery/investigation-promotion-engine.md`.
+`validation_status` — both remain independent human decisions. `decision_basis` does not
+verify or structurally justify `validation_status`: that remains solely the D5 process's
+responsibility (see "Validation-status contract" below); the IPE-02 verifier has no
+`VALIDATION-v0` contract. Full contract: `docs/discovery/investigation-promotion-engine.md`.
 
 ## Lifecycle
 
