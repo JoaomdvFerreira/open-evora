@@ -171,9 +171,12 @@ with any `triage` value (including `STOP`/`WATCH`), satisfies it.
 
 ## 5. `decision_basis` — v0 shape (optional, on `PRB-*`)
 
-`decision_basis` is entirely optional in IPE-01. Its absence is valid for every existing
-canonical `PRB-*` and remains valid for any problem that stays `unvalidated`/`discovered`
-or resolves to a terminal non-`validated` outcome. It is intended to be populated only
+`decision_basis` is entirely optional in IPE-01. Its absence remains valid and
+corpus-valid for any `PRB-*` regardless of current `evidence_status` or
+`validation_status` — this is not limited to unvalidated/discovered or non-`validated`
+records. When IPE-02 evaluation is explicitly requested, an absent `decision_basis` still
+yields `REVIEW_REQUIRED` / `NO_DECISION_BASIS` (§4.1); that verifier outcome does not make
+the field required for corpus validity. It is intended to be populated only
 when a researcher is asserting readiness for the human PRB-promotion gate (Eligibility)
 and/or `evidence_status: corroborated` (Corroboration) and wants to record the explicit
 basis for that assertion. It is not intended as a basis for `validation_status`, which
@@ -267,9 +270,9 @@ decision_basis:
 - **`independence_assessment`** — free text: the explicit judgement of whether the cited
   evidence is independent (echoes `ASM.evidence_confidence.independence`'s meaning at
   problem-decision level, not a new independence mechanism).
-- **`scope`** — the geography, population, and temporal bounds the decision is actually
-  good for, kept explicit so a `validated` status is never read as broader than what was
-  checked. `scope.bounded` (added IPE-02, `docs/discovery/investigation-promotion-engine.md`
+- **`scope`** — the geography, population, and temporal bounds the corroboration claim /
+  problem framing is actually good for, kept explicit so that claim is never read as
+  broader than what was checked. `scope.bounded` (added IPE-02, `docs/discovery/investigation-promotion-engine.md`
   §10) is an explicit human-authored boolean: `true` when the researcher considers this
   scope narrower/more limited than the problem's general framing, `false` otherwise. It is
   never inferred from the wording of `geography`/`population`/`temporal` — the researcher
@@ -345,9 +348,9 @@ IPE-01, and IPE generally, does **not**:
   these remain entirely governed by the existing D5 / ASM human process;
 - backfill or mutate any existing `PRB-*`, `EVD-*`, `SRC-*`, or `ASM-*` record;
 - change the Research Explorer UI or any runtime application code;
-- require `decision_basis` on any record — it stays optional through IPE-01 (and IPE-02
-  evaluates it as-authored, never backfilling it), and its eventual corpus-validity
-  enforcement scope (if any) remains an open question (§9).
+- require `decision_basis` on any record — it stays optional and corpus-valid regardless
+  of `evidence_status` or `validation_status` (IPE-02 evaluates it as-authored, never
+  backfilling it, and never gates corpus validity on its presence).
 
 ## 8. Public explainability
 
@@ -364,9 +367,6 @@ publishable in an existing field.
 
 Recorded here so IPE-02 does not have to rediscover them:
 
-- Whether `decision_basis` should eventually be required (not merely present-if-used) for
-  `validation_status: validated`, and under what grandfathering rule for the existing
-  corpus.
 - Whether `contract_version` mismatches between a record and the running verifier should
   be a hard error or a warning.
 - How `overlap_check` should interact with a future structural-decision process
@@ -374,7 +374,7 @@ Recorded here so IPE-02 does not have to rediscover them:
 
 These are explicitly not resolved by IPE-01. IPE-02 (§10) resolves one related question
 that surfaced during implementation — whether an authored `scope` with `bounded` absent
-may be read as `false` — no: absence is `REVIEW_REQUIRED`. The three questions above
+may be read as `false` — no: absence is `REVIEW_REQUIRED`. The two questions above
 remain open.
 
 ## 10. IPE-02 contract clarification — `scope.bounded` and the Eligibility/Corroboration boundary
