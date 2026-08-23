@@ -6,6 +6,7 @@ import { describeType, formatTypedId } from "../typeGlossary";
 import { findMeaningField } from "./meaningField";
 import { ContributionChip } from "./ContributionChip";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation";
+import { ContextTabs } from "../ContextTabs";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -260,6 +261,10 @@ function RecordDetailContent({
     <div className="record-detail-layout">
       <Breadcrumb detail={detail} onBackToRecords={onBackToRecords} />
 
+      {detail.type === "PRB-" && (
+        <ContextTabs prbId={detail.id} active="detail" onOpenGeneric={onSelect} onViewAsProblem={onViewAsProblem} onViewInGraph={onViewInGraph} />
+      )}
+
       <div className="record-detail-columns">
         <div className="record-detail-main">
           <section aria-label="Significado" className="record-meaning-zone">
@@ -307,19 +312,16 @@ function RecordDetailContent({
             <p>{typeInfo.description}</p>
           </div>
           <div className="detail-rail-actions">
-            {detail.type === "PRB-" && (
-              <button type="button" onClick={() => onViewAsProblem(detail.id)}>
-                Ver como Problema (contexto completo)
-              </button>
-            )}
             {relatedProblemId && (
               <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
                 Ver como Problema ({relatedProblemId})
               </button>
             )}
-            <button type="button" onClick={() => onViewInGraph(detail.id)}>
-              Ver no Grafo
-            </button>
+            {detail.type !== "PRB-" && (
+              <button type="button" onClick={() => onViewInGraph(detail.id)}>
+                Ver no Grafo
+              </button>
+            )}
             <span className="detail-rail-file">{detail.file}</span>
           </div>
         </aside>

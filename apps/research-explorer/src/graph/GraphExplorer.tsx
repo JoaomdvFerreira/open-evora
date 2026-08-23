@@ -18,6 +18,7 @@ import { buildRenderGraph } from "./renderGraph";
 import { GraphCanvas, type GraphCanvasHandle } from "./GraphCanvas";
 import { FOCUS_NODE_COLOR, typeVisual } from "./typeVisuals";
 import type { ResearchGraph } from "./buildGraphModel";
+import { ContextTabs } from "../ContextTabs";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -205,6 +206,10 @@ export function GraphExplorer({
         complementar aos Registos e à vista de Problema, nunca a única forma de aceder a um facto.
       </p>
 
+      {!fullCorpusView && focusSummary?.type === "PRB-" && (
+        <ContextTabs prbId={focusSummary.id} active="graph" onOpenGeneric={onOpenGeneric} onViewAsProblem={onViewAsProblem} onViewInGraph={onFocusChange} />
+      )}
+
       <div className="graph-controls">
         <div>
           <label htmlFor="graph-search">Procurar registo para focar</label>
@@ -363,39 +368,41 @@ export function GraphExplorer({
             {rows.length === 0 ? (
               <p>Nenhuma relação visível com os filtros atuais.</p>
             ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Origem</th>
-                    <th scope="col">Destino</th>
-                    <th scope="col">Referência canónica</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => {
-                    const from = lookup.get(row.from);
-                    const to = lookup.get(row.to);
-                    return (
-                      <tr key={row.key}>
-                        <td>
-                          <button type="button" onClick={() => handleNodeClick(row.from)}>
-                            {from ? formatTypedId(from.type, from.id) : row.from}
-                          </button>
-                        </td>
-                        <td>
-                          <button type="button" onClick={() => handleNodeClick(row.to)}>
-                            {to ? formatTypedId(to.type, to.id) : row.to}
-                          </button>
-                        </td>
-                        <td>
-                          através de <code>{row.field}</code>
-                          {row.ordinal !== null ? `[${row.ordinal}]` : ""}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div className="graph-edges-table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">Origem</th>
+                      <th scope="col">Destino</th>
+                      <th scope="col">Referência canónica</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((row) => {
+                      const from = lookup.get(row.from);
+                      const to = lookup.get(row.to);
+                      return (
+                        <tr key={row.key}>
+                          <td>
+                            <button type="button" onClick={() => handleNodeClick(row.from)}>
+                              {from ? formatTypedId(from.type, from.id) : row.from}
+                            </button>
+                          </td>
+                          <td>
+                            <button type="button" onClick={() => handleNodeClick(row.to)}>
+                              {to ? formatTypedId(to.type, to.id) : row.to}
+                            </button>
+                          </td>
+                          <td>
+                            através de <code>{row.field}</code>
+                            {row.ordinal !== null ? `[${row.ordinal}]` : ""}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
           </section>
         </>

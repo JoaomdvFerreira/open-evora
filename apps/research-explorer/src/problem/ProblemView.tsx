@@ -8,6 +8,7 @@ import { summarizeContributions } from "./contributionSummary";
 import { DISCLOSURE_FIELDS, DISCLOSURE_FIELD_LABELS, FIELD_CAPTIONS, glossFor, type FieldGloss } from "./statusGloss";
 import { describeType, formatTypedId } from "../typeGlossary";
 import { formatPublicCount, publicEnumLabel, publicFieldCaption } from "../presentation";
+import { ContextTabs } from "../ContextTabs";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -123,25 +124,52 @@ function ProblemBreadcrumb({ problemId, onBackToRecords }: { problemId: string; 
 }
 
 /**
- * PRB-scoped orientation switcher (REDUX-008): "where am I, and how do I
- * reach the other views of this same record" — for any entry path,
- * including a direct deep link. Scoped to Problem View only; non-PRB
- * records keep RecordDetailPanel's existing "Ver como Problema"/"Ver no
- * Grafo" contextual links (Slice 1), not this switcher.
+ * Section anchors for Problem View's desktop reading rail (design-system.md
+ * §3's ContextTabs sits above this; this is the "Nesta página" index the
+ * rail links into) — kept as one ordered list so the rail and the section
+ * `id`s below can never drift apart.
  */
-function PrbContextSwitcher({ problemId, onOpenGeneric, onViewInGraph }: { problemId: string; onOpenGeneric: (id: string) => void; onViewInGraph: (id: string) => void }) {
+const PROBLEM_SECTIONS = [
+  { id: "problem-estado-atual", label: "Estado atual" },
+  { id: "problem-avaliacao", label: "Avaliação" },
+  { id: "problem-evidencia", label: "Evidência" },
+  { id: "problem-incertezas", label: "Incertezas e lacunas" },
+  { id: "problem-hipoteses", label: "Hipóteses" },
+] as const;
+
+/**
+ * Desktop reading rail (scope §3/§4): reuses Record Detail's rail/layout
+ * pattern (`.record-detail-rail`, `.detail-rail-type-note`,
+ * `.detail-rail-actions`) rather than inventing a second sticky-rail
+ * treatment. Provides lightweight contextual orientation, a "Nesta página"
+ * index, and a link into the full Reading Guide — never a duplicate of it.
+ * Desktop-only by CSS (hidden under the existing 767px breakpoint, matching
+ * `.record-detail-rail`); compact gets the equivalent index in-flow via
+ * `ProblemHelpDisclosure` instead (Slice UX-B §4).
+ */
+function ProblemReadingRail() {
   return (
-    <nav aria-label={`Navegação de ${problemId}`} className="context-tabs">
-      <button type="button" onClick={() => onOpenGeneric(problemId)}>
-        Detalhe
-      </button>
-      <button type="button" aria-current="page">
-        Problema
-      </button>
-      <button type="button" onClick={() => onViewInGraph(problemId)}>
-        Grafo
-      </button>
-    </nav>
+    <aside className="record-detail-rail problem-reading-rail">
+      <div className="detail-rail-type-note">
+        <p>
+          Cada secção reúne o que já é canónico sobre este Problema — nenhuma ordem ou destaque aqui implica classificação, força ou
+          confiança.
+        </p>
+      </div>
+      <nav aria-label="Nesta página" className="problem-rail-nav">
+        <h4 className="detail-panel-label">Nesta página</h4>
+        <ul>
+          {PROBLEM_SECTIONS.map((section) => (
+            <li key={section.id}>
+              <a href={`#${section.id}`}>{section.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div className="detail-rail-actions">
+        <a href="#reading-guide">Ver a Orientação completa do Explorer</a>
+      </div>
+    </aside>
   );
 }
 
@@ -172,6 +200,18 @@ function ProblemHelpDisclosure({ record }: { record: Record<string, unknown> }) 
             {gloss?.explanation ? ` — ${gloss.explanation}` : ""}
           </p>
         ))}
+        {/* Compact substitute for the desktop reading rail's "Nesta página" index (UX-B §4) —
+            hidden on desktop (index.css) where `.record-detail-rail`'s own nav already covers it. */}
+        <nav aria-label="Nesta página (versão compacta)" className="problem-help-section-index">
+          <p className="problem-help-section-index-label">Nesta página:</p>
+          <ul>
+            {PROBLEM_SECTIONS.map((section) => (
+              <li key={section.id}>
+                <a href={`#${section.id}`}>{section.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <p>
           <a href="#reading-guide">Ver a Orientação completa do Explorer →</a>
         </p>
@@ -279,145 +319,151 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
     <article aria-labelledby="problem-heading" className="problem-view">
       <ProblemBreadcrumb problemId={problem.id} onBackToRecords={onBackToRecords} />
 
-      <PrbContextSwitcher problemId={problem.id} onOpenGeneric={onOpenGeneric} onViewInGraph={onViewInGraph} />
+      <ContextTabs prbId={problem.id} active="problem" onOpenGeneric={onOpenGeneric} onViewAsProblem={onOpenGeneric} onViewInGraph={onViewInGraph} />
 
       <ProblemHelpDisclosure record={record} />
 
-      <div className="problem-identity">
-        <div className="problem-identity-id">{problem.id}</div>
-        <h2 ref={headingRef} id="problem-heading" tabIndex={-1} className="problem-identity-title">
-          {title}
-        </h2>
-      </div>
-      <p className="problem-file-path">
-        <code>{problem.file}</code>
-      </p>
+      <div className="record-detail-columns problem-view-columns">
+        <div className="record-detail-main">
+          <div className="problem-identity">
+            <div className="problem-identity-id">{problem.id}</div>
+            <h2 ref={headingRef} id="problem-heading" tabIndex={-1} className="problem-identity-title">
+              {title}
+            </h2>
+          </div>
+          <p className="problem-file-path">
+            <code>{problem.file}</code>
+          </p>
 
-      <section aria-label="Estado atual" className="problem-section">
-        <h3 className="detail-panel-label">Estado atual</h3>
-        <div className="status-chip-row">
-          {PROBLEM_STATE_FIELDS.map((key) => {
-            const value = fieldValue(record, key);
-            return value === null ? null : <StatusChip key={key} field={key} value={value} />;
-          })}
-        </div>
-        {fieldValue(record, "problem_statement") && <p className="problem-statement">{fieldValue(record, "problem_statement")}</p>}
-      </section>
-
-      <section aria-label="Avaliação" className="problem-section">
-        <h3 className="detail-panel-label">Avaliação</h3>
-        {assessments.length === 0 ? (
-          <p>Nenhuma avaliação associada.</p>
-        ) : (
-          <ul className="assessment-list">
-            {assessments.map((assessment) => {
-              const asmRecord = assessment.record as Record<string, unknown>;
-              return (
-                <li key={assessment.id} className="assessment-card">
-                  <TypedLinkButton detail={assessment} onOpenGeneric={onOpenGeneric} />
-                  <dl className="assessment-fields">
-                    {ASSESSMENT_SUMMARY_FIELDS.map((key) => {
-                      const value = fieldValue(asmRecord, key);
-                      return value === null ? null : (
-                        <div key={key}>
-                          <dt>{publicFieldCaption(key)}</dt>
-                          <dd>{publicEnumLabel(key, value)}</dd>
-                        </div>
-                      );
-                    })}
-                  </dl>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
-
-      <section aria-label="Evidência" className="problem-section">
-        <h3 className="detail-panel-label">Evidência ({formatPublicCount(evidence.length)})</h3>
-        <ContributionOccurrenceSummary evidence={evidence} />
-        {evidence.length === 0 ? (
-          <p>Nenhuma evidência associada.</p>
-        ) : (
-          <ul className="evidence-list">
-            {evidence.map(({ detail, sources }) => {
-              const evidenceRecord = detail.record as Record<string, unknown>;
-              const analysis = recordValue(evidenceRecord.analysis);
-              const contributions = stringValues(analysis?.contribution);
-              const observation = recordValue(evidenceRecord.observation);
-              const observationSummary = observation ? fieldValue(observation, "summary") : null;
-              const provenance = evidenceSourceLabel(evidenceRecord);
-
-              return (
-                <li key={detail.id} className="evidence-card">
-                  <div className="evidence-item-header">
-                    <TypedLinkButton detail={detail} onOpenGeneric={onOpenGeneric} suffix={fieldValue(evidenceRecord, "type") ? publicEnumLabel("type", fieldValue(evidenceRecord, "type")!) : undefined} />
-                    <span className="evidence-item-contributions" aria-label="Contribuição canónica">
-                      {contributions.length > 0 ? (
-                        contributions.map((value, index) => <ContributionChip key={`${value}-${index}`} value={value} />)
-                      ) : (
-                        <span className="field-empty">contribuição não registada.</span>
-                      )}
-                    </span>
-                  </div>
-                  {observationSummary && (
-                    <p className="evidence-observation">
-                      <strong>Observação:</strong> {observationSummary}
-                    </p>
-                  )}
-                  {(provenance || sources.length > 0) && (
-                    <p className="evidence-provenance">
-                      <strong>Origem:</strong> {provenance ?? "registo de fonte relacionado abaixo"}.
-                    </p>
-                  )}
-                  {sources.length > 0 && (
-                    <ul aria-label={`Registos de fonte relacionados com ${detail.id}`} className="evidence-sources">
-                      {sources.map((source) => (
-                        <li key={source.id}>
-                          <TypedLinkButton
-                            detail={source}
-                            onOpenGeneric={onOpenGeneric}
-                            suffix={fieldValue(source.record as Record<string, unknown>, "publisher") ?? undefined}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
-
-      <section aria-label="Incertezas e lacunas" className="problem-section">
-        <h3 className="detail-panel-label">Incertezas e lacunas conhecidas</h3>
-        {unknownsSections.length === 0 ? (
-          <p>Nenhuma registada nas avaliações associadas.</p>
-        ) : (
-          unknownsSections.map(({ assessment, picked }) => (
-            <div key={assessment.id} className="unknowns-card">
-              <h4>{formatTypedId(assessment.type, assessment.id)}</h4>
-              <AssessmentUnknowns record={picked} />
+          <section id="problem-estado-atual" aria-label="Estado atual" className="problem-section">
+            <h3 className="detail-panel-label">Estado atual</h3>
+            <div className="status-chip-row">
+              {PROBLEM_STATE_FIELDS.map((key) => {
+                const value = fieldValue(record, key);
+                return value === null ? null : <StatusChip key={key} field={key} value={value} />;
+              })}
             </div>
-          ))
-        )}
-      </section>
+            {fieldValue(record, "problem_statement") && <p className="problem-statement">{fieldValue(record, "problem_statement")}</p>}
+          </section>
 
-      <section aria-label="Hipóteses" className="problem-section">
-        <h3 className="detail-panel-label">Hipóteses</h3>
-        {hypotheses.length === 0 ? (
-          <p>Nenhuma hipótese associada.</p>
-        ) : (
-          <ul>
-            {hypotheses.map((hypothesis) => (
-              <li key={hypothesis.id}>
-                <TypedLinkButton detail={hypothesis} onOpenGeneric={onOpenGeneric} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+          <section id="problem-avaliacao" aria-label="Avaliação" className="problem-section">
+            <h3 className="detail-panel-label">Avaliação</h3>
+            {assessments.length === 0 ? (
+              <p>Nenhuma avaliação associada.</p>
+            ) : (
+              <ul className="assessment-list">
+                {assessments.map((assessment) => {
+                  const asmRecord = assessment.record as Record<string, unknown>;
+                  return (
+                    <li key={assessment.id} className="assessment-card">
+                      <TypedLinkButton detail={assessment} onOpenGeneric={onOpenGeneric} />
+                      <dl className="assessment-fields">
+                        {ASSESSMENT_SUMMARY_FIELDS.map((key) => {
+                          const value = fieldValue(asmRecord, key);
+                          return value === null ? null : (
+                            <div key={key}>
+                              <dt>{publicFieldCaption(key)}</dt>
+                              <dd>{publicEnumLabel(key, value)}</dd>
+                            </div>
+                          );
+                        })}
+                      </dl>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+
+          <section id="problem-evidencia" aria-label="Evidência" className="problem-section">
+            <h3 className="detail-panel-label">Evidência ({formatPublicCount(evidence.length)})</h3>
+            <ContributionOccurrenceSummary evidence={evidence} />
+            {evidence.length === 0 ? (
+              <p>Nenhuma evidência associada.</p>
+            ) : (
+              <ul className="evidence-list">
+                {evidence.map(({ detail, sources }) => {
+                  const evidenceRecord = detail.record as Record<string, unknown>;
+                  const analysis = recordValue(evidenceRecord.analysis);
+                  const contributions = stringValues(analysis?.contribution);
+                  const observation = recordValue(evidenceRecord.observation);
+                  const observationSummary = observation ? fieldValue(observation, "summary") : null;
+                  const provenance = evidenceSourceLabel(evidenceRecord);
+
+                  return (
+                    <li key={detail.id} className="evidence-card">
+                      <div className="evidence-item-header">
+                        <TypedLinkButton detail={detail} onOpenGeneric={onOpenGeneric} suffix={fieldValue(evidenceRecord, "type") ? publicEnumLabel("type", fieldValue(evidenceRecord, "type")!) : undefined} />
+                        <span className="evidence-item-contributions" aria-label="Contribuição canónica">
+                          {contributions.length > 0 ? (
+                            contributions.map((value, index) => <ContributionChip key={`${value}-${index}`} value={value} />)
+                          ) : (
+                            <span className="field-empty">contribuição não registada.</span>
+                          )}
+                        </span>
+                      </div>
+                      {observationSummary && (
+                        <p className="evidence-observation">
+                          <strong>Observação:</strong> {observationSummary}
+                        </p>
+                      )}
+                      {(provenance || sources.length > 0) && (
+                        <p className="evidence-provenance">
+                          <strong>Origem:</strong> {provenance ?? "registo de fonte relacionado abaixo"}.
+                        </p>
+                      )}
+                      {sources.length > 0 && (
+                        <ul aria-label={`Registos de fonte relacionados com ${detail.id}`} className="evidence-sources">
+                          {sources.map((source) => (
+                            <li key={source.id}>
+                              <TypedLinkButton
+                                detail={source}
+                                onOpenGeneric={onOpenGeneric}
+                                suffix={fieldValue(source.record as Record<string, unknown>, "publisher") ?? undefined}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+
+          <section id="problem-incertezas" aria-label="Incertezas e lacunas" className="problem-section">
+            <h3 className="detail-panel-label">Incertezas e lacunas conhecidas</h3>
+            {unknownsSections.length === 0 ? (
+              <p>Nenhuma registada nas avaliações associadas.</p>
+            ) : (
+              unknownsSections.map(({ assessment, picked }) => (
+                <div key={assessment.id} className="unknowns-card">
+                  <h4>{formatTypedId(assessment.type, assessment.id)}</h4>
+                  <AssessmentUnknowns record={picked} />
+                </div>
+              ))
+            )}
+          </section>
+
+          <section id="problem-hipoteses" aria-label="Hipóteses" className="problem-section">
+            <h3 className="detail-panel-label">Hipóteses</h3>
+            {hypotheses.length === 0 ? (
+              <p>Nenhuma hipótese associada.</p>
+            ) : (
+              <ul>
+                {hypotheses.map((hypothesis) => (
+                  <li key={hypothesis.id}>
+                    <TypedLinkButton detail={hypothesis} onOpenGeneric={onOpenGeneric} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+
+        <ProblemReadingRail />
+      </div>
     </article>
   );
 }

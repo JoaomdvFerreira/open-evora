@@ -317,6 +317,53 @@ describe("GraphExplorer", () => {
     expect(within(searchArea).getAllByRole("button")).toHaveLength(12);
   });
 
+  it("shows a PRB-scoped Detalhe/Problema/Grafo context switcher with Grafo active when focused on a PRB record", async () => {
+    const onOpenGeneric = vi.fn();
+    const onViewAsProblem = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <GraphExplorer
+        dataProvider={fakeProvider()}
+        focusId="PRB-0005"
+        depth={1}
+        onFocusChange={vi.fn()}
+        onClearFocus={vi.fn()}
+        onDepthChange={vi.fn()}
+        onOpenGeneric={onOpenGeneric}
+        onViewAsProblem={onViewAsProblem}
+      />
+    );
+
+    const switcher = await screen.findByRole("navigation", { name: /PRB-0005/ });
+    const grafoButton = within(switcher).getByRole("button", { name: "Grafo" });
+    expect(grafoButton.getAttribute("aria-current")).toBe("page");
+
+    await user.click(within(switcher).getByRole("button", { name: "Detalhe" }));
+    expect(onOpenGeneric).toHaveBeenCalledWith("PRB-0005");
+
+    await user.click(within(switcher).getByRole("button", { name: "Problema" }));
+    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0005");
+  });
+
+  it("does not render a PRB context switcher when the Graph focus is a non-PRB record", async () => {
+    render(
+      <GraphExplorer
+        dataProvider={fakeProvider()}
+        focusId="EVD-0001"
+        depth={1}
+        onFocusChange={vi.fn()}
+        onClearFocus={vi.fn()}
+        onDepthChange={vi.fn()}
+        onOpenGeneric={vi.fn()}
+        onViewAsProblem={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Nós visíveis" });
+    expect(screen.queryByRole("navigation", { name: /EVD-0001/ })).toBeNull();
+    expect(screen.queryByRole("navigation", { name: "Nesta página" })).toBeNull();
+  });
+
   it("does not infer SUPPORTS/CONTRADICTS/CAUSES semantics anywhere in the rendered output", async () => {
     render(
       <GraphExplorer

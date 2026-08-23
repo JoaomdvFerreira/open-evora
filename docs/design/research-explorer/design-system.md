@@ -20,7 +20,7 @@ These corrections were made when integrating the approved source into this repos
 
 - **Breakpoints**: production uses **compact `<=767px`** and **desktop `>=768px`**. **360px is a QA/golden viewport used for Playwright visual comparison, not a breakpoint.** (The approved source's "bp-compact" bucket corresponds to `<=767px`.)
 - **Production content widths** (supersede the Design System doc-shell width, which is doc chrome only and never production):
-  - Reading (Problem View): **800px**
+  - Problem View: **980px** total = 720px main content column + 44px gap (`--detail-gap`) + 216px reading rail (reuses Record Detail's two-column geometry)
   - Workspace / Overview: **900px**
   - Record Detail: **980px** total = 720px main content column + 44px gap (`--detail-gap`) + 216px rail
   - Design System doc shell width (1180px) is never a production content width.
@@ -34,11 +34,11 @@ Declared once as custom properties on `:root` (see [§6](#6-current-production-m
 
 - **Colour**: `canvas #FAF8F3`, `surface-recessed #F5F3EC`, `surface-chip #F1EFE8`, `surface-raised #FFFFFF`, `text-primary #1F1D1A`, `text-secondary #3A372E`, `text-tertiary #565248`, `text-muted #6B675F`, `text-faint #8A8578`, `text-disclaimer #A6A192`, `icon-muted #B7B2A4`, `border #DDD8CC`, `border-light #EEEAE0`, `border-control #C7C2B4`, `border-emphasis #1F1D1A`, `link #2B5D5A`, `link-hover #1D4341`.
 - **Spacing scale**: `space-1…11` = 4/8/12/16/20/24/32/40/48/64/90px.
-- **Named exceptions to the scale** (not on the space-N ladder): `control-height:40px` (inputs/selects/buttons), `tap-min:44px` (any tappable row/link), `detail-gap:44px` (desktop two-column gap, Record Detail).
+- **Named exceptions to the scale** (not on the space-N ladder): `control-height:40px` (inputs/selects/buttons), `tap-min:44px` (any tappable row/link), `detail-gap:44px` (canonical desktop two-column gap, reused by Record Detail and Problem View).
 - **Radii**: `radius-sm:3px`, `radius-md:4px`, `radius-lg:5px`.
 - **No-shadow rule**: `box-shadow` is never used in production. Elevation/separation comes only from 1px borders and the three flat surface steps (surface-raised → surface-recessed → surface-chip). A component that seems to need a shadow needs a border or surface step instead.
 - **Breakpoints**: two canonical buckets, no intermediate tablet tier — **desktop `>=768px`** (full GlobalShell, §3) and **compact `<=767px`** (wordmark row + 3 equal-width nav tabs, §3). 360px is a QA/golden reference width for Playwright comparison, not a breakpoint (§0.1).
-- **Production content widths (approved, per surface)**: Record Detail **980px** = 720px main content column + 44px gap (`detail-gap`) + 216px rail · Reading (Problem View) **800px** · Workspace / Overview **900px** · compact, all surfaces: full-bleed to viewport, 360px used only as the QA/golden reference width.
+- **Production content widths (approved, per surface)**: Record Detail **980px** = 720px main content column + 44px gap (`detail-gap`) + 216px rail · Problem View **980px** = 720px main content column + 44px gap (`detail-gap`) + 216px reading rail (reuses Record Detail's two-column geometry) · Workspace / Overview **900px** · compact, all surfaces: full-bleed to viewport, 360px used only as the QA/golden reference width.
 
 ## 2. Semantic Typography Recipes (implementation-ready)
 
@@ -72,9 +72,9 @@ Used identically by all four surfaces (Overview, Records, Record Detail, Problem
 
 **Desktop (`>=768px`)**: `text-wordmark` + `text-shell-subtitle`; nav items `text-global-nav`, gap `space-6`; active item weight 600, `border-bottom:2px solid color-link`, `padding-bottom:space-1`; breadcrumb (record-scoped pages only) sits directly beneath as a second bar, same horizontal padding as shell.
 
-**Compact (`<=767px`) canonical order** (record-scoped pages): wordmark row → 3 equal-width global-nav tabs → breadcrumb → ContextTabs (Problem View only) → page content. Global navigation is never hidden or collapsed to an icon at compact widths.
+**Compact (`<=767px`) canonical order** (record-scoped pages): wordmark row → 3 equal-width global-nav tabs → breadcrumb → ContextTabs (PRB identity in view only, per below) → page content. Global navigation is never hidden or collapsed to an icon at compact widths.
 
-**ContextTabs rule, explicit**: Detalhe/Problema/Grafo is a Problem-scoped triad — it appears only once a PRB record's identity is in view (Problem View). Record Detail (e.g. a bare EVD- evidence record reached directly, outside any Problem) is not itself one vertex of that triad, so it never renders ContextTabs; it exposes equivalent navigation as explicit named links inside "Mais ações" (Ver como Problema / Ver no Grafo). This is a rule, not an omission.
+**ContextTabs rule, explicit (corrected UX-B)**: Detalhe/Problema/Grafo is a PRB-identity-scoped triad, not a Problem-View-only one — it appears while viewing the **same PRB record's identity** across all three of its representations: PRB Record Detail (`Detalhe` active), Problem View (`Problema` active), and Graph focused on that PRB (`Grafo` active). Navigating between tabs preserves the PRB identity. A non-PRB record never renders ContextTabs in any of the three surfaces — Record Detail for a non-PRB record (e.g. a bare EVD- evidence record reached directly) keeps its equivalent navigation as explicit named links inside "Mais ações" (Ver como Problema / Ver no Grafo), and Graph focused on a non-PRB record likewise renders no PRB ContextTabs. This is a rule, not an omission.
 
 **Hover/focus**: nav items are real links; hover → `color-link-hover` + underline; focus-visible → `outline:2px solid color-link; outline-offset:2px` on the control itself, never on a sub-element.
 
