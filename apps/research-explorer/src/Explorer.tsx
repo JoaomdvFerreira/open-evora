@@ -57,7 +57,9 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
             <button type="button" aria-current={url.state.view === "records" ? "page" : undefined} onClick={() => url.clearSelectionAndSetView("records")}>
               Registos
             </button>
-            <button type="button" disabled aria-disabled="true" title="Em desenvolvimento">
+            {/* UX-F: kept focusable (no native `disabled`) so keyboard users can reach it and discover
+                why it's unavailable via aria-disabled + title — no onClick, so activation is a no-op. */}
+            <button type="button" aria-disabled="true" title="Em desenvolvimento">
               Grafo
             </button>
           </nav>

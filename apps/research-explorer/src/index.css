@@ -869,13 +869,13 @@ main.explorer-shell {
   background: var(--surface-muted);
 }
 
-.explorer-navigation button:disabled {
+.explorer-navigation button[aria-disabled="true"] {
   color: var(--ink-faintest);
   cursor: not-allowed;
   opacity: 0.72;
 }
 
-.explorer-navigation button:disabled:hover {
+.explorer-navigation button[aria-disabled="true"]:hover {
   background: none;
 }
 
@@ -2174,13 +2174,13 @@ main.explorer-shell {
   background: var(--surface-muted);
 }
 
-.context-tabs button:disabled {
+.context-tabs button[aria-disabled="true"] {
   color: var(--ink-faintest);
   cursor: not-allowed;
   opacity: 0.72;
 }
 
-.context-tabs button:disabled:hover {
+.context-tabs button[aria-disabled="true"]:hover {
   background: none;
 }
 

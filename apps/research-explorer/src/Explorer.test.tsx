@@ -433,22 +433,49 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
   });
 
-  it("UX-F: GlobalNav Grafo is visible but disabled — clicking it cannot navigate away from the current Problem view", async () => {
+  it("UX-F: GlobalNav Grafo is visible, focusable, and aria-disabled — activation cannot navigate away from the current Problem view", async () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
     const grafoButton = within(globalNav()).getByRole("button", { name: "Grafo" }) as HTMLButtonElement;
-    expect(grafoButton.disabled).toBe(true);
+    // Not natively `disabled` — must remain reachable by keyboard (Tab) so
+    // a keyboard user can discover the "Em desenvolvimento" tooltip at all.
+    expect(grafoButton.disabled).toBe(false);
     expect(grafoButton.getAttribute("aria-disabled")).toBe("true");
     expect(grafoButton.getAttribute("title")).toBe("Em desenvolvimento");
 
-    await user.click(grafoButton);
+    grafoButton.focus();
+    expect(document.activeElement).toBe(grafoButton);
 
+    await user.click(grafoButton);
     expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
     expect(window.location.search).toContain("view=problem");
     expect(window.location.search).toContain("id=PRB-0005");
+
+    await user.keyboard("{Enter}");
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    expect(window.location.search).toContain("view=problem");
+    expect(window.location.search).toContain("id=PRB-0005");
+
+    await user.keyboard(" ");
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    expect(window.location.search).toContain("view=problem");
+    expect(window.location.search).toContain("id=PRB-0005");
+  });
+
+  it("UX-F: GlobalNav Visão geral / Registos remain fully navigable, unaffected by Grafo's aria-disabled state", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("button", { name: /PRB-0005/ });
+
+    await user.click(within(globalNav()).getByRole("button", { name: "Registos" }));
+    expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
+
+    await user.click(within(globalNav()).getByRole("button", { name: "Visão geral" }));
+    await screen.findByRole("heading", { name: "Visão geral" });
+    expect(within(globalNav()).getByRole("button", { name: "Visão geral" }).getAttribute("aria-current")).toBe("page");
   });
 
   it("navigating from a selected Record Detail to global Visão geral clears the hidden selectedId", async () => {
@@ -497,7 +524,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     expect(window.location.search).toContain("id=PRB-0005");
   });
 
-  it("UX-F: PRB ContextTabs Grafo is visible but disabled — activating it cannot navigate to Graph", async () => {
+  it("UX-F: PRB ContextTabs Grafo is visible, focusable, and aria-disabled — activation cannot navigate to Graph", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
@@ -505,15 +532,31 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
 
     const grafoTab = within(switcher).getByRole("button", { name: "Grafo" }) as HTMLButtonElement;
-    expect(grafoTab.disabled).toBe(true);
+    expect(grafoTab.disabled).toBe(false);
     expect(grafoTab.getAttribute("aria-disabled")).toBe("true");
     expect(grafoTab.getAttribute("title")).toBe("Em desenvolvimento");
 
-    await user.click(grafoTab);
+    grafoTab.focus();
+    expect(document.activeElement).toBe(grafoTab);
 
+    await user.click(grafoTab);
     expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
-    const stillDetailPanel = await getDetailPanel();
-    const breadcrumb = within(stillDetailPanel).getByLabelText("Localização");
+    let stillDetailPanel = await getDetailPanel();
+    let breadcrumb = within(stillDetailPanel).getByLabelText("Localização");
+    await within(breadcrumb).findByText("PRB-0005");
+
+    grafoTab.focus();
+    await user.keyboard("{Enter}");
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    stillDetailPanel = await getDetailPanel();
+    breadcrumb = within(stillDetailPanel).getByLabelText("Localização");
+    await within(breadcrumb).findByText("PRB-0005");
+
+    grafoTab.focus();
+    await user.keyboard(" ");
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    stillDetailPanel = await getDetailPanel();
+    breadcrumb = within(stillDetailPanel).getByLabelText("Localização");
     await within(breadcrumb).findByText("PRB-0005");
   });
 

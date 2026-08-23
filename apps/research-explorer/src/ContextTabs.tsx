@@ -26,8 +26,10 @@ export function ContextTabs({ prbId, active, onOpenGeneric, onViewAsProblem }: C
       <button type="button" aria-current={active === "problem" ? "page" : undefined} onClick={active === "problem" ? undefined : () => onViewAsProblem(prbId)}>
         Problema
       </button>
-      {/* UX-F: Grafo is temporarily unavailable — see Explorer.tsx GlobalNav for the same treatment. */}
-      <button type="button" disabled aria-disabled="true" title="Em desenvolvimento">
+      {/* UX-F: Grafo is temporarily unavailable — see Explorer.tsx GlobalNav for the same treatment.
+          Kept focusable (no native `disabled`) so keyboard users can reach it and discover why it's
+          unavailable via aria-disabled + title — no onClick, so activation is a no-op. */}
+      <button type="button" aria-disabled="true" title="Em desenvolvimento">
         Grafo
       </button>
     </nav>

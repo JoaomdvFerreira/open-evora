@@ -335,11 +335,13 @@ describe("GraphExplorer", () => {
     );
 
     const switcher = await screen.findByRole("navigation", { name: /PRB-0005/ });
-    // UX-F: Grafo is always rendered visible-but-disabled by ContextTabs now,
-    // regardless of the `active` prop — it never carries aria-current="page".
+    // UX-F: Grafo is always rendered visible/focusable + aria-disabled by
+    // ContextTabs now, regardless of the `active` prop — it never carries
+    // aria-current="page" and is never natively `disabled`.
     const grafoButton = within(switcher).getByRole("button", { name: "Grafo" }) as HTMLButtonElement;
     expect(grafoButton.getAttribute("aria-current")).toBeNull();
-    expect(grafoButton.disabled).toBe(true);
+    expect(grafoButton.disabled).toBe(false);
+    expect(grafoButton.getAttribute("aria-disabled")).toBe("true");
 
     await user.click(within(switcher).getByRole("button", { name: "Detalhe" }));
     expect(onOpenGeneric).toHaveBeenCalledWith("PRB-0005");

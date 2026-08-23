@@ -331,11 +331,20 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const switcher = within(panel).getByRole("navigation", { name: /PRB-0006/ });
     const grafoTab = within(switcher).getByRole("button", { name: "Grafo" }) as HTMLButtonElement;
-    expect(grafoTab.disabled).toBe(true);
+    expect(grafoTab.disabled).toBe(false);
     expect(grafoTab.getAttribute("aria-disabled")).toBe("true");
     expect(grafoTab.getAttribute("title")).toBe("Em desenvolvimento");
 
+    grafoTab.focus();
+    expect(document.activeElement).toBe(grafoTab);
+
     await user.click(grafoTab);
+    expect(onViewInGraph).not.toHaveBeenCalled();
+
+    await user.keyboard("{Enter}");
+    expect(onViewInGraph).not.toHaveBeenCalled();
+
+    await user.keyboard(" ");
     expect(onViewInGraph).not.toHaveBeenCalled();
   });
 
