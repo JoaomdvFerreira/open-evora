@@ -71,7 +71,7 @@ function RelationshipList({ detail, lookup, onSelect }: RelationshipListProps) {
     <section aria-label="Registos relacionados">
       <h4>Registos relacionados</h4>
       {relatedIds.length === 0 ? (
-        <p>Nenhuma.</p>
+        <p>Nenhum registo relacionado.</p>
       ) : (
         <ul>
           {relatedIds.map((relatedId) => {

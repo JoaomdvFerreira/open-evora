@@ -614,4 +614,40 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
     await within(panel).findByText("widget_id");
     expect(within(panel).queryByRole("button", { name: /Ver como Problema/ })).toBeNull();
   });
+
+  it("renders the correct gender-agreeing empty state ('Nenhum registo relacionado.') for a record with zero incoming/outgoing relationships", async () => {
+    const isolatedSummary: RecordSummary = {
+      id: "WID-0002",
+      type: "WID-",
+      label: "WID-0002",
+      file: "research/widgets/WID-0002.yaml",
+      summaryFields: {},
+    };
+    const isolatedDetail: RecordDetail = {
+      id: "WID-0002",
+      type: "WID-",
+      file: "research/widgets/WID-0002.yaml",
+      record: { widget_id: "WID-0002" },
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "WID-0002": isolatedDetail })}
+        lookup={buildLookup(isolatedSummary)}
+        selectedId="WID-0002"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const relacoes = within(panel).getByLabelText("Relações");
+    const relatedGroup = within(relacoes).getByLabelText("Registos relacionados");
+    expect(within(relatedGroup).getByText("Nenhum registo relacionado.")).toBeTruthy();
+    expect(within(relatedGroup).queryByText("Nenhuma.")).toBeNull();
+  });
 });
