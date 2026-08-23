@@ -237,18 +237,15 @@ function TypeBadge({ detail }: { detail: RecordDetail }) {
 }
 
 /**
- * UX-E §1: one concise sentence orienting a first-time visitor to what kind
- * of record this is and why the technical surface below exists — reuses
- * `describeType()`'s existing PT-PT purpose sentence rather than inventing a
- * second description, and adds only the shared "this exposes the underlying
- * research record for provenance/auditability" framing that describeType()
- * does not itself carry.
+ * UX-E §1: one concise, plain-language sentence orienting a first-time
+ * visitor to Record Detail. TypeBadge already identifies the record kind
+ * (Evidência/Fonte/Avaliação/etc.), so this sentence stays generic rather
+ * than duplicating that per-type.
  */
-function OrientationIntro({ detail }: { detail: RecordDetail }) {
-  const typeInfo = describeType(detail.type);
+function OrientationIntro() {
   return (
     <p className="record-orientation-intro">
-      Este é um registo de {typeInfo.label.toLowerCase()} do corpus de investigação — exposto aqui para consulta e verificação de proveniência, não como um resumo editorial.
+      Este é um registo técnico da investigação. Mostra a informação guardada e as suas ligações para que possa ser consultada e verificada.
     </p>
   );
 }
@@ -384,7 +381,7 @@ function RecordDetailContent({
         <div className="record-detail-main">
           <section aria-label="Significado" className="record-meaning-zone">
             <TypeBadge detail={detail} />
-            <OrientationIntro detail={detail} />
+            <OrientationIntro />
             {meaning ? (
               <p className="record-meaning">{meaning.value}</p>
             ) : (

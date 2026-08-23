@@ -976,7 +976,7 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
   });
 
-  it("shows a public-facing orientation sentence identifying the record kind before the technical inspection, for EVD", async () => {
+  it("shows a plain-language orientation sentence before the technical inspection, for EVD", async () => {
     render(
       <RecordDetailPanel
         dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
@@ -991,7 +991,7 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const meaningZone = await within(panel).findByLabelText("Significado");
-    const orientation = within(meaningZone).getByText(/registo de evidência do corpus de investigação/);
+    const orientation = within(meaningZone).getByText(/Este é um registo técnico da investigação\. Mostra a informação guardada e as suas ligações/);
     const technicalSummary = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos");
     expect(orientation.compareDocumentPosition(technicalSummary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
