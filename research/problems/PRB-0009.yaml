@@ -42,3 +42,69 @@ validation_status: unvalidated
 digital_tractability: low
 existing_solutions: assessed
 status: OPEN
+
+decision_basis:
+  contract_version: "0.1"
+
+  eligibility_basis: "PRB-0009 is a distinct, well-formed problem of investigation: it names a specific service-reliability failure (municipal urban-hygiene / solid-waste collection) with a bounded geography (Município de Évora), a named affected population, an institutionally documented manifestation (EVD-000065, EVD-000066, EVD-000071, EVD-000072, EVD-000073), and a concrete resident-facing consequence (EVD-000093, EVD-000094 — direct missed-collection/accumulation instances). It is not framed as a solution ('need for an app') and does not overlap another canonical PRB-*."
+
+  corroboration_basis: "Corroboration rests on institutionally documented, primary-authoritative evidence from two independent-lineage groups plus one standalone institutional record, all from the Município de Évora itself: (1) EVD-000071/EVD-000072 (lineage ENV-2026-02-RSU-DISRUPTION-COMMUNICADO, primary source SRC-0061) document a February 2026 service interruption caused by an ageing/breaking-down fleet; (2) EVD-000066/EVD-000073 (lineage ENV-2026-07-MUNICIPAL-STRUCTURAL-RESPONSE, primary source SRC-0053) document a July-August 2026 municipal acknowledgement of urban hygiene as an urgent management challenge and a substantial structural response covering fleet, staffing, collection models, responsibilities, and monitoring; (3) EVD-000065 (primary source SRC-0054, a distinct public-meeting record, deliberately not grouped into the SRC-0053 lineage) independently corroborates the same July 2026 institutional urgency statement. These three sources are institutionally independent in the sense the record can verify (distinct primary source_id values), not merely restating one another. EVD-000093/EVD-000094 add a secondary, independent evidence class (self-selected citizen reports) that concretely confirms individual missed-collection/accumulation instances occurred; they are explicitly UNKNOWN representativeness and are not used as prevalence evidence, and are not counted as additional strong independent institutional corroboration threads."
+
+  manifestation:
+    kind: "service reliability / operational failure"
+    summary: "The Município documented a direct service interruption in February 2026 (ageing/breaking-down collection fleet, EVD-000071, EVD-000072) and, in July 2026, publicly identified urban hygiene as one of the most urgent challenges of municipal management, describing a substantial ongoing restructuring of fleet, staffing, collection models, responsibility distribution, and monitoring (EVD-000065, EVD-000066, EVD-000073)."
+    evidence:
+      - "EVD-000065"
+      - "EVD-000066"
+      - "EVD-000071"
+      - "EVD-000072"
+      - "EVD-000073"
+
+  consequence:
+    summary: "The concrete, resident-facing consequence documented on record is direct non-collection: EVD-000093 reports a multi-day non-collection instance with waste accumulated at a residential location, and EVD-000094 reports a geographically specific waste-accumulation instance in Canaviais. Both are self-selected, anecdotal public-post reports with UNKNOWN representativeness; they establish that concrete missed-collection/accumulation instances occurred, not the frequency, prevalence, or municipality-wide extent of such instances."
+    evidence:
+      - "EVD-000093"
+      - "EVD-000094"
+
+  currentness:
+    assessment: "MEDIUM. The February 2026 near-collapse (EVD-000071, EVD-000072) is HISTORICAL, not the current operating baseline. A May 2026 fleet-normalisation step (EVD-000095) and a July 2026 reinforcement to 19 vehicles (SRC-0055, referenced via EVD-000066) show material change since February. The July-August 2026 institutional statements (EVD-000065, EVD-000066, EVD-000073) are the most current primary-authoritative evidence and are the basis for the corroborated claim; they include the Município's own acknowledgement that difficulties persist in some areas at that point in time. No public operational performance data for the post-August 2026 period was located."
+    evidence:
+      - "EVD-000065"
+      - "EVD-000066"
+      - "EVD-000073"
+      - "EVD-000095"
+
+  contradiction_search:
+    performed: true
+    summary: "A bounded post-July open-web search for evidence that would contradict or supersede the corroborated claim (i.e. that collection is now generally reliable, or conversely that city-wide collapse persists) did not surface a comparably strong new public signal of ongoing city-wide ordinary-collection failure. This is a search/saturation result, not evidence that the service is now reliable or that PRB-0009 is resolved. The May 2026 normalisation record (EVD-000095) was actively incorporated as a current-state correction rather than omitted, and the Município's own July-August acknowledgement of persisting difficulties in some areas (EVD-000065, EVD-000066, EVD-000073) was preserved rather than treated as resolved."
+    evidence:
+      - "EVD-000095"
+
+  overlap_check:
+    performed: true
+    summary: "No other canonical PRB-* addresses municipal urban-hygiene/waste-collection service reliability; PRB-0009 does not duplicate or overlap another record."
+    related_problems: []
+
+  corroboration_statement: "A fiabilidade dos serviços de recolha de resíduos sólidos urbanos e de higiene urbana constitui um problema cívico atual reconhecido institucionalmente: o Município documentou uma interrupção do serviço de recolha em fevereiro de 2026, causada por avarias numa frota envelhecida, e, em julho-agosto de 2026, o Presidente da Câmara e o Município identificaram publicamente a higiene urbana como um dos desafios mais urgentes da gestão municipal, avançando com uma reestruturação substancial da frota, dos recursos humanos, dos modelos de recolha, da distribuição de responsabilidades e da monitorização, ao mesmo tempo que reconheceram explicitamente que persistem dificuldades em algumas zonas."
+
+  supporting_evidence:
+    - "EVD-000065"
+    - "EVD-000066"
+    - "EVD-000071"
+    - "EVD-000072"
+    - "EVD-000073"
+    - "EVD-000093"
+    - "EVD-000094"
+
+  boundary_evidence:
+    - "EVD-000095"
+
+  independence_assessment: "Three materially distinct institutional source/event units support the bounded claim: SRC-0061 (February 2026 disruption communicado, lineage ENV-2026-02-RSU-DISRUPTION-COMMUNICADO, underlying EVD-000071/EVD-000072), SRC-0053 (July 2026 structural-response announcement, lineage ENV-2026-07-MUNICIPAL-STRUCTURAL-RESPONSE, underlying EVD-000066/EVD-000073), and SRC-0054 (a distinct 9 July public-meeting record, underlying EVD-000065, deliberately not grouped into the SRC-0053 lineage because its primary source differs). Independence among these three is assessed by distinct primary source_id, not by raw EVD count or shared publisher/topic — all three remain the same institutional voice (Município de Évora), so independence here means independent documents/events, not independent institutions. EVD-000093 and EVD-000094 come from a materially different evidence-generating process — self-selected public citizen reports, not institutional communication — and provide a secondary, independent confirmation that concrete missed-collection/accumulation instances actually occurred on the ground, distinct in kind from the institutional acknowledgement. They are not counted as two additional strong independent corroboration threads on the same footing as the institutional sources, and they do not establish prevalence or a current municipality-wide failure: their role is limited to corroborating that the institutionally documented failure had concrete, observable resident-facing instances, with UNKNOWN representativeness beyond those instances. EVD-000095 (May 2026, SRC-0080) is a further distinct primary source used as boundary/current-state evidence showing partial fleet normalisation and narrowing the February baseline, rather than as additional corroborating support for the failure claim."
+
+  scope:
+    geography: "Município de Évora (municipality-level); EVD-000094 additionally names Canaviais as one specific parish-level instance, not the basis for the municipality-level claim."
+    population: "residents and urban parish councils of the Município de Évora, as institutionally addressed by the cited Município communications."
+    temporal: "Bounded to the period documented on record: a February 2026 service-interruption episode, a May 2026 partial fleet-normalisation step, and a July-August 2026 institutional acknowledgement of urgency and persisting difficulties in some areas. The claim does not extend to, and is not corroborated for, any operational state after August 2026."
+    bounded: true
+
+  limitations: "The corroborated claim is SUPPORTED only as follows: during 2026 Évora experienced a material, institutionally documented waste-collection/urban-hygiene reliability failure, followed by substantial municipal intervention, with the Município still acknowledging difficulties in some areas at the July-August 2026 point in time. It is NOT SUPPORTED as a claim that the service continues today to fail generally across Évora. Post-intervention/current-state evidence (EVD-000095, and the July-August acknowledgement itself) is included as boundary evidence, not ignored. Anecdotal citizen reports (EVD-000093, EVD-000094) support that concrete individual non-collection/accumulation incidents occurred but are UNKNOWN representativeness and are not treated as prevalence evidence. No public operational-performance dataset (resolution time, missed-collection rate, backlog) for the post-August 2026 period was located; current post-August operational performance is not inferred one way or the other. Comparator/mechanism evidence from other municipalities (EVD-000108, EVD-000109, EVD-000110, EVD-000111) is explicitly excluded from this corroboration basis: it is not Évora-specific and describes operating patterns elsewhere, not evidence for Évora's own problem claim."
