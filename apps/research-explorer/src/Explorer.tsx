@@ -51,13 +51,13 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
             <span className="explorer-subtitle">Explorador de Investigação</span>
           </h1>
           <nav aria-label="Vistas do Explorador de Investigação" className="explorer-navigation">
-            <button type="button" aria-current={url.state.view === "overview" ? "page" : undefined} onClick={() => url.setView("overview")}>
+            <button type="button" aria-current={url.state.view === "overview" ? "page" : undefined} onClick={() => url.clearSelectionAndSetView("overview")}>
               Visão geral
             </button>
-            <button type="button" aria-current={url.state.view === "records" ? "page" : undefined} onClick={() => url.setView("records")}>
+            <button type="button" aria-current={url.state.view === "records" ? "page" : undefined} onClick={() => url.clearSelectionAndSetView("records")}>
               Registos
             </button>
-            <button type="button" aria-current={url.state.view === "graph" ? "page" : undefined} onClick={() => url.setView("graph")}>
+            <button type="button" aria-current={url.state.view === "graph" ? "page" : undefined} onClick={() => url.clearSelectionAndSetView("graph")}>
               Grafo
             </button>
           </nav>
@@ -95,6 +95,7 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
           problemId={url.state.selectedId}
           onOpenGeneric={(id) => url.setViewAndSelection("records", id)}
           onBackToRecords={() => url.clearSelectionAndSetView("records")}
+          onBackToOverview={() => url.clearSelectionAndSetView("overview")}
           onViewInGraph={(id) => url.setViewAndSelection("graph", id)}
         />
       )}

@@ -30,8 +30,14 @@ const LABELS: Record<string, Record<string, string>> = {
   type: { institutional: "Institucional", statistical: "Estatística", "formal-public": "Fonte pública formal", social: "Social", press: "Imprensa", stakeholder: "Interveniente", observation: "Observação" },
 };
 
+/**
+ * UX-D §4 finding F01: compact labels agree grammatically with the dimension
+ * noun they're displayed after ("Validação: <label>" / "Evidência: <label>"),
+ * distinct from the full/non-compact LABELS mapping used elsewhere.
+ */
 const COMPACT_LABELS: Record<string, Record<string, string>> = {
-  evidence_status: { discovered: "Identificada", corroborated: "Corroborado" },
+  validation_status: { unvalidated: "Por validar", partially_validated: "Parcialmente validada", validated: "Validada" },
+  evidence_status: { discovered: "Identificada", corroborated: "Corroborada" },
 };
 
 const FIELD_CAPTIONS: Record<string, string> = {

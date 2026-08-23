@@ -12,13 +12,26 @@ const ERROR_TITLES: Record<string, string> = {
   network: "Falha ao carregar a visão geral",
 };
 
-function compactProblemStatuses(validationStatus: string | null, evidenceStatus: string | null): string {
-  return [
-    validationStatus === null ? null : publicCompactEnumLabel("validation_status", validationStatus),
-    evidenceStatus === null ? null : publicCompactEnumLabel("evidence_status", evidenceStatus),
-  ]
-    .filter((label): label is string => label !== null)
-    .join(" · ");
+interface ProblemStatusDimension {
+  caption: string;
+  label: string;
+}
+
+/**
+ * UX-D §4: Validação and Evidência are two independent dimensions — an
+ * unlabeled "Por validar · Corroborado" reads as one combined judgement.
+ * Each dimension keeps its own caption so a public reader can tell them
+ * apart without inferring which word belongs to which axis.
+ */
+function problemStatusDimensions(validationStatus: string | null, evidenceStatus: string | null): ProblemStatusDimension[] {
+  const dimensions: ProblemStatusDimension[] = [];
+  if (validationStatus !== null) {
+    dimensions.push({ caption: "Validação", label: publicCompactEnumLabel("validation_status", validationStatus) });
+  }
+  if (evidenceStatus !== null) {
+    dimensions.push({ caption: "Evidência", label: publicCompactEnumLabel("evidence_status", evidenceStatus) });
+  }
+  return dimensions;
 }
 
 /**
@@ -138,7 +151,7 @@ export function Overview({
         ) : (
           <ul className="overview-problem-list">
             {overview.problems.map((problem) => {
-              const statuses = compactProblemStatuses(problem.validationStatus, problem.evidenceStatus);
+              const dimensions = problemStatusDimensions(problem.validationStatus, problem.evidenceStatus);
               return (
               <li key={problem.id}>
                 <div className="overview-problem-identity">
@@ -146,7 +159,16 @@ export function Overview({
                   <h4 className="overview-problem-title">{fullTitles.get(problem.id) ?? problem.title}</h4>
                 </div>
                 <div className="overview-problem-action">
-                  {statuses && <p className="overview-statuses">{statuses}</p>}
+                  {dimensions.length > 0 && (
+                    <p className="overview-statuses">
+                      {dimensions.map((dimension, index) => (
+                        <span key={dimension.caption} className="overview-status-dimension">
+                          {index > 0 ? " · " : ""}
+                          {dimension.caption}: {dimension.label}
+                        </span>
+                      ))}
+                    </p>
+                  )}
                   <button type="button" onClick={() => onExploreProblem(problem.id)}>Explorar →</button>
                 </div>
               </li>

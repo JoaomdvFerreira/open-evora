@@ -689,3 +689,146 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
     expect(within(relatedGroup).queryByText("Nenhuma.")).toBeNull();
   });
 });
+
+describe("RecordDetailPanel — SRC original-source action (UX-D §3)", () => {
+  const SRC_PUBLIC_SUMMARY: RecordSummary = {
+    id: "SRC-0002",
+    type: "SRC-",
+    label: "Plano de Desenvolvimento Social de Évora 2024-2027",
+    file: "research/sources/SRC-0002.yaml",
+    summaryFields: {},
+  };
+
+  function srcDetail(overrides: Record<string, unknown>): RecordDetail {
+    return {
+      id: "SRC-0002",
+      type: "SRC-",
+      file: "research/sources/SRC-0002.yaml",
+      record: {
+        source_id: "SRC-0002",
+        publisher: "Município de Évora",
+        access: { public: true },
+        canonical_reference: "https://www.cm-evora.pt/exemplo.pdf",
+        ...overrides,
+      },
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+  }
+
+  it("shows 'Abrir fonte' with a safe external link when the SRC is publicly accessible via HTTPS", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0002": srcDetail({}) })}
+        lookup={buildLookup(SRC_PUBLIC_SUMMARY)}
+        selectedId="SRC-0002"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const link = await within(panel).findByRole("link", { name: /Abrir fonte/ });
+    expect(link.getAttribute("href")).toBe("https://www.cm-evora.pt/exemplo.pdf");
+    expect(link.getAttribute("target")).toBe("_blank");
+    expect(link.getAttribute("rel")).toContain("noopener");
+    expect(link.getAttribute("rel")).toContain("noreferrer");
+  });
+
+  it("does not show the action when access.public is false", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0002": srcDetail({ access: { public: false } }) })}
+        lookup={buildLookup(SRC_PUBLIC_SUMMARY)}
+        selectedId="SRC-0002"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    await screen.findByText("Detalhes");
+    expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+  });
+
+  it("does not show the action when canonical_reference is missing", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0002": srcDetail({ canonical_reference: undefined }) })}
+        lookup={buildLookup(SRC_PUBLIC_SUMMARY)}
+        selectedId="SRC-0002"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    await screen.findByText("Detalhes");
+    expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+  });
+
+  it("does not show the action for a non-HTTP(S) canonical_reference", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0002": srcDetail({ canonical_reference: "ftp://internal/file.pdf" }) })}
+        lookup={buildLookup(SRC_PUBLIC_SUMMARY)}
+        selectedId="SRC-0002"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    await screen.findByText("Detalhes");
+    expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+  });
+
+  it("does not show the action for a malformed canonical_reference string", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0002": srcDetail({ canonical_reference: "not a url" }) })}
+        lookup={buildLookup(SRC_PUBLIC_SUMMARY)}
+        selectedId="SRC-0002"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    await screen.findByText("Detalhes");
+    expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+  });
+
+  it("never shows the action on a non-SRC record, even with an HTTP(S)-shaped field of the same name", async () => {
+    const evdDetail: RecordDetail = {
+      id: "EVD-0001",
+      type: "EVD-",
+      file: "research/evidence/EVD-0001.yaml",
+      record: { evidence_id: "EVD-0001", access: { public: true }, canonical_reference: "https://example.org/not-a-source" },
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    const evdSummary: RecordSummary = { id: "EVD-0001", type: "EVD-", label: "EVD-0001", file: "research/evidence/EVD-0001.yaml", summaryFields: {} };
+
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-0001": evdDetail })}
+        lookup={buildLookup(evdSummary)}
+        selectedId="EVD-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    await screen.findByText("Detalhes");
+    expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+  });
+});

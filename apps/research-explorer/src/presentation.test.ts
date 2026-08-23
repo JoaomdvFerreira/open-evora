@@ -7,8 +7,16 @@ describe("PT-PT public presentation terminology", () => {
     expect(publicEnumLabel("existing_solutions", "not_assessed")).toBe("Não avaliadas");
   });
 
-  it("uses a shorter field-aware label in compact problem status presentation", () => {
-    expect(publicCompactEnumLabel("evidence_status", "corroborated")).toBe("Corroborado");
+  it("uses a shorter field-aware label in compact problem status presentation, agreeing grammatically with its dimension noun", () => {
+    expect(publicCompactEnumLabel("evidence_status", "discovered")).toBe("Identificada");
+    expect(publicCompactEnumLabel("evidence_status", "corroborated")).toBe("Corroborada");
+    expect(publicCompactEnumLabel("validation_status", "unvalidated")).toBe("Por validar");
+    expect(publicCompactEnumLabel("validation_status", "partially_validated")).toBe("Parcialmente validada");
+    expect(publicCompactEnumLabel("validation_status", "validated")).toBe("Validada");
+  });
+
+  it("falls back to the full label when a field has no compact mapping for a value, preserving the full non-compact mapping", () => {
+    expect(publicEnumLabel("validation_status", "validated")).toBe("Validado");
   });
 
   it("distinguishes evidential authority from publication permission", () => {

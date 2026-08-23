@@ -103,17 +103,19 @@ function StatusChip({ field, value }: { field: string; value: string }) {
 }
 
 /**
- * Problem-scoped breadcrumb ("Localização"): mirrors Record Detail's
- * Breadcrumb (RecordDetailPanel.tsx) so both record-scoped surfaces share
- * one navigational pattern (design-system.md §3) — "Registos › PRB-0006".
- * Replaces the earlier plain "← Voltar aos Registos" button with the same
- * onBackToRecords action.
+ * Problem-scoped breadcrumb ("Localização"): visually mirrors Record
+ * Detail's Breadcrumb (RecordDetailPanel.tsx) — same navigational pattern
+ * (design-system.md §3) — but Problem View is a public problem-reading
+ * surface, not conceptually a child of Records (UX-D §2), so its first
+ * breadcrumb action returns to Overview ("Visão geral › PRB-0006"), not
+ * Registos. Generic Record Detail keeps its own Registos-based breadcrumb
+ * unchanged.
  */
-function ProblemBreadcrumb({ problemId, onBackToRecords }: { problemId: string; onBackToRecords: () => void }) {
+function ProblemBreadcrumb({ problemId, onBackToOverview }: { problemId: string; onBackToOverview: () => void }) {
   return (
     <nav aria-label="Localização" className="detail-breadcrumb">
-      <button type="button" onClick={onBackToRecords}>
-        Registos
+      <button type="button" onClick={onBackToOverview}>
+        Visão geral
       </button>
       <span aria-hidden="true" className="detail-breadcrumb-separator">
         ›
@@ -227,16 +229,14 @@ function ContributionOccurrenceSummary({ evidence }: { evidence: EvidenceWithSou
   if (summary.occurrences.length === 0) return null;
 
   return (
-    <div className="contribution-summary" aria-label="Resumo de ocorrências de contribuição canónica">
+    <div className="contribution-summary" aria-label="Papel destes registos nesta leitura">
       <p className="contribution-summary-caption">
-        Ocorrências de contribuição canónica nesta lista — nenhuma implica força, confiança ou classificação.
+        Papel destes registos nesta leitura — os papéis indicados não representam força, confiança ou classificação.
       </p>
       <p className="contribution-summary-counts">
-        {summary.itemCount} {summary.itemCount === 1 ? "item de evidência" : "itens de evidência"} · {summary.occurrenceCount}{" "}
-        {summary.occurrenceCount === 1 ? "ocorrência de contribuição" : "ocorrências de contribuição"}
-        {summary.occurrenceCount !== summary.itemCount
-          ? " (uma evidência pode ter mais do que uma contribuição — estas contagens não correspondem ao número de itens de evidência)"
-          : ""}
+        {summary.itemCount} {summary.itemCount === 1 ? "registo" : "registos"} · {summary.occurrenceCount}{" "}
+        {summary.occurrenceCount === 1 ? "papel registado" : "papéis registados"}
+        {summary.occurrenceCount !== summary.itemCount ? " (um registo pode ter mais do que um papel nesta leitura)" : ""}
       </p>
       <div className="contribution-summary-chips">
         {summary.occurrences.map(({ value, count }) => (
@@ -254,11 +254,11 @@ interface ProblemContentProps {
   lookup: Map<string, RecordSummary>;
   problemId: string;
   onOpenGeneric: (id: string) => void;
-  onBackToRecords: () => void;
+  onBackToOverview: () => void;
   onViewInGraph: (id: string) => void;
 }
 
-function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToRecords, onViewInGraph }: ProblemContentProps) {
+function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToOverview, onViewInGraph }: ProblemContentProps) {
   const state = useProblemProjection(dataProvider, lookup, problemId);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -313,7 +313,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
 
   return (
     <article aria-labelledby="problem-heading" className="problem-view shell-frame">
-      <ProblemBreadcrumb problemId={problem.id} onBackToRecords={onBackToRecords} />
+      <ProblemBreadcrumb problemId={problem.id} onBackToOverview={onBackToOverview} />
 
       <ContextTabs prbId={problem.id} active="problem" onOpenGeneric={onOpenGeneric} onViewAsProblem={onOpenGeneric} onViewInGraph={onViewInGraph} />
 
@@ -372,7 +372,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
           </section>
 
           <section id="problem-evidencia" aria-label="Evidência" className="problem-section">
-            <h3 className="detail-panel-label">Evidência ({formatPublicCount(evidence.length)})</h3>
+            <h3 className="detail-panel-label">Registos de evidência associados ({formatPublicCount(evidence.length)})</h3>
             <ContributionOccurrenceSummary evidence={evidence} />
             {evidence.length === 0 ? (
               <p>Nenhuma evidência associada.</p>
@@ -469,6 +469,8 @@ interface ProblemViewProps {
   problemId: string | null;
   onOpenGeneric: (id: string) => void;
   onBackToRecords: () => void;
+  /** UX-D §2: the Problem breadcrumb's own first action — Problem View reads as "Visão geral › PRB-*", not a child of Records. */
+  onBackToOverview: () => void;
   onViewInGraph: (id: string) => void;
 }
 
@@ -480,7 +482,7 @@ interface ProblemViewProps {
  * record type reached from here (assessment, evidence, source, hypothesis)
  * still opens through the same generic detail renderer via onOpenGeneric.
  */
-export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onViewInGraph }: ProblemViewProps) {
+export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewInGraph }: ProblemViewProps) {
   const indexState = useRecordIndex(dataProvider);
 
   if (indexState.status === "loading") {
@@ -533,7 +535,7 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
       lookup={indexState.lookup}
       problemId={problemId}
       onOpenGeneric={onOpenGeneric}
-      onBackToRecords={onBackToRecords}
+      onBackToOverview={onBackToOverview}
       onViewInGraph={onViewInGraph}
     />
   );
