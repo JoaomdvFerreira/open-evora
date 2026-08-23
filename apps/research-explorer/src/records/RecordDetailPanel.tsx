@@ -7,6 +7,7 @@ import { findMeaningField } from "./meaningField";
 import { ContributionChip } from "./ContributionChip";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation";
 import { ContextTabs } from "../ContextTabs";
+import { evidenceQuickRead, sourceQuickRead, sourceName, type QuickReadItem } from "./recordOrientation";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -235,6 +236,84 @@ function TypeBadge({ detail }: { detail: RecordDetail }) {
   );
 }
 
+/**
+ * UX-E §1: one concise sentence orienting a first-time visitor to what kind
+ * of record this is and why the technical surface below exists — reuses
+ * `describeType()`'s existing PT-PT purpose sentence rather than inventing a
+ * second description, and adds only the shared "this exposes the underlying
+ * research record for provenance/auditability" framing that describeType()
+ * does not itself carry.
+ */
+function OrientationIntro({ detail }: { detail: RecordDetail }) {
+  const typeInfo = describeType(detail.type);
+  return (
+    <p className="record-orientation-intro">
+      Este é um registo de {typeInfo.label.toLowerCase()} do corpus de investigação — exposto aqui para consulta e verificação de proveniência, não como um resumo editorial.
+    </p>
+  );
+}
+
+/** UX-E §2: bounded "Leitura rápida" — only fields recordOrientation.ts found present on this exact record; never a fallback/invented value. */
+function QuickReadList({ items }: { items: QuickReadItem[] }) {
+  if (items.length === 0) return null;
+  return (
+    <dl className="record-quick-read-grid">
+      {items.map((item) => (
+        <div key={item.field} className="record-quick-read-item">
+          <dt>{item.label}</dt>
+          <dd>{item.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/**
+ * Source/related-problem relationship navigation is deliberately not
+ * repeated here: `RelationshipList` below already renders every related
+ * record (SRC/PRB included) as its own single navigable entry with the
+ * exact reference path, and duplicating that as a second, differently-worded
+ * button for the same record would both add a second click target for the
+ * same destination and (per UX-E's "no duplicate blocks" rule) restate
+ * content already presented more clearly. The quick read stays limited to
+ * data fields the record carries but the meaning zone does not already show.
+ */
+function EvidenceQuickRead({ detail }: { detail: RecordDetail }) {
+  const items = evidenceQuickRead(detail.record);
+  if (items.length === 0) return null;
+
+  return (
+    <section aria-label="Leitura rápida" className="record-quick-read">
+      <h3 className="detail-panel-label">Leitura rápida</h3>
+      <QuickReadList items={items} />
+    </section>
+  );
+}
+
+/**
+ * The `Abrir fonte ↗` action itself is deliberately not repeated here — it
+ * already renders once, in the "Mais ações" rail, via `SourceOriginalLinkAction`.
+ * Repeating the same link here would duplicate an action already present
+ * (UX-E "Do not duplicate large blocks already presented more clearly
+ * elsewhere") and would break the singular `getByRole("link", ...)`
+ * accessibility contract existing UX-D tests rely on. This section notes
+ * public-access availability as a fact (Sim/Não) without re-rendering the link.
+ */
+function SourceQuickRead({ detail }: { detail: RecordDetail }) {
+  const items = sourceQuickRead(detail.record);
+  const name = sourceName(detail.record);
+
+  if (items.length === 0 && !name) return null;
+
+  return (
+    <section aria-label="Leitura rápida" className="record-quick-read">
+      <h3 className="detail-panel-label">Leitura rápida</h3>
+      {name && <p className="record-quick-read-title">{name}</p>}
+      <QuickReadList items={items} />
+    </section>
+  );
+}
+
 function ProvenancePanel({ detail }: { detail: RecordDetail }) {
   const uniqueRelatedCount = countUniqueRelatedRecords(detail);
   return (
@@ -260,6 +339,7 @@ function TechnicalDisclosure({ detail }: { detail: RecordDetail }) {
   return (
     <details className="technical-disclosure">
       <summary>Inspeção técnica completa — todos os campos canónicos</summary>
+      <p className="technical-disclosure-caption">Campos do corpus canónico apresentados tal como registados, para auditabilidade e rastreabilidade — não uma reformulação pública.</p>
       <RecordFieldTree data={detail.record} />
     </details>
   );
@@ -304,6 +384,7 @@ function RecordDetailContent({
         <div className="record-detail-main">
           <section aria-label="Significado" className="record-meaning-zone">
             <TypeBadge detail={detail} />
+            <OrientationIntro detail={detail} />
             {meaning ? (
               <p className="record-meaning">{meaning.value}</p>
             ) : (
@@ -328,6 +409,9 @@ function RecordDetailContent({
               </div>
             )}
           </section>
+
+          {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
+          {detail.type === "SRC-" && <SourceQuickRead detail={detail} />}
 
           <ProvenancePanel detail={detail} />
 

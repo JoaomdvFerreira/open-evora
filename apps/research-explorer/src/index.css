@@ -1733,6 +1733,84 @@ main.explorer-shell {
   text-transform: var(--recipe-section-label-transform);
 }
 
+.technical-disclosure-caption {
+  margin: var(--space-2) 0 var(--space-4);
+  color: var(--ink-faint);
+  font-size: 13px;
+}
+
+/* UX-E orientation: one plain-language sentence, above the meaning sentence,
+   framing Record Detail as an auditability surface (not editorial content). */
+.record-orientation-intro {
+  margin: var(--space-1) 0 var(--space-3);
+  color: var(--ink-soft);
+  font-family: var(--recipe-interface-body-family);
+  font-size: var(--recipe-interface-body-size);
+  line-height: var(--recipe-interface-body-line-height);
+}
+
+/* UX-E bounded quick-read: reuses the .record-provenance box treatment so
+   it reads as the same family of "compact canonical summary" surface. */
+.record-quick-read {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
+  padding: var(--space-4) var(--space-5);
+  margin: 0 0 var(--space-6);
+}
+
+.record-quick-read-title {
+  margin: 0 0 var(--space-2);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.record-quick-read-grid {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  row-gap: var(--space-2);
+  column-gap: var(--space-4);
+  margin: 0;
+  font-size: 14px;
+}
+
+.record-quick-read-item {
+  display: contents;
+}
+
+.record-quick-read-item dt {
+  color: var(--ink-faint);
+}
+
+.record-quick-read-item dd {
+  margin: 0;
+  color: var(--ink);
+}
+
+.record-quick-read-relations {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: 14px;
+}
+
+.record-quick-read-relations button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent-dark);
+  cursor: pointer;
+  text-decoration: underline;
+  font: inherit;
+}
+
+.record-quick-read-relations button:hover {
+  color: var(--accent);
+}
+
 .record-detail-relations {
   margin-top: var(--space-8);
   padding-top: var(--space-5);
