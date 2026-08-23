@@ -1747,6 +1747,16 @@ main.explorer-shell {
   overflow-wrap: anywhere;
 }
 
+/* Compact-only substitute for the desktop reading rail's "Nesta página"
+   index (UX-B §4) — the rail already provides it on desktop, so this stays
+   hidden there to avoid a duplicate section index. Placed before the
+   responsive overrides below so their `display: block` wins by source
+   order in the bands where the section index should show. */
+.problem-help-section-index {
+  display: none;
+  margin: 0 0 var(--space-3);
+}
+
 /* F1 intermediate reading-layout recomposition (768px-1059px): the
    canonical 720 main + 44 gap + 216 rail composition cannot fit in this
    band without destructively compressing the 720px reading column. Reuse
@@ -2112,14 +2122,6 @@ main.explorer-shell {
 
 .problem-help-content p {
   margin: 0 0 var(--space-2);
-}
-
-/* Compact-only substitute for the desktop reading rail's "Nesta página"
-   index (UX-B §4) — the rail already provides it on desktop, so this stays
-   hidden there to avoid a duplicate section index. */
-.problem-help-section-index {
-  display: none;
-  margin: 0 0 var(--space-3);
 }
 
 .problem-help-section-index-label {
