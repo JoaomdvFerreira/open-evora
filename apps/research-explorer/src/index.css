@@ -1668,6 +1668,10 @@ main.explorer-shell {
   border-top: 1px solid var(--line);
 }
 
+.record-detail-relations .relationship-paths {
+  margin: var(--space-1) 0 var(--space-3) var(--space-5);
+}
+
 @media (max-width: 767px) {
   main.explorer-shell {
     padding: 0 1rem 2rem;

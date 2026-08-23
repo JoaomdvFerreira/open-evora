@@ -68,7 +68,13 @@ export function ReadingGuide({ schemaPrefixes }: ReadingGuideProps) {
         <strong>Entradas</strong> são referências que outros registos fazem a este (ex.: uma Avaliação que aponta para o Problema que avalia).
       </p>
 
-      <h3>Caminhos de referência canónica</h3>
+      <h3>Registos relacionados e caminhos de referência canónica</h3>
+      <p>
+        O número de <strong>registos relacionados</strong> conta cada registo distinto uma única vez, mesmo quando existe mais do que um{" "}
+        <strong>caminho de referência canónica</strong> entre os dois registos — por exemplo, entrada e saída para o mesmo registo, ou mais
+        do que um campo. É normal e legítimo que o mesmo registo tenha caminhos nas duas direções; nesse caso aparece uma vez como registo
+        relacionado, com todos os seus caminhos exatos listados por baixo.
+      </p>
       <p>
         O texto após <em>"através de"</em> (ex.: <code>analysis.related_problems[0]</code>) indica o campo exato do registo canónico de onde a
         referência provém, e a posição na lista quando aplicável (<code>[0]</code>, <code>[1]</code>, …). É o caminho real no ficheiro YAML

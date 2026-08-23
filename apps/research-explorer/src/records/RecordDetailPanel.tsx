@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { DataProvider, RecordDetail, RecordEdgeRef, RecordSummary } from "../dataProvider/types";
+import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordDetail } from "./useRecordDetail";
 import { RecordFieldTree } from "./RecordFieldTree";
 import { describeType, formatTypedId } from "../typeGlossary";
@@ -17,36 +17,85 @@ const ERROR_TITLES: Record<string, string> = {
 };
 
 interface RelationshipListProps {
-  title: string;
-  edges: RecordEdgeRef[];
+  detail: RecordDetail;
   lookup: Map<string, RecordSummary>;
-  direction: "incoming" | "outgoing";
   onSelect: (id: string) => void;
 }
 
-function RelationshipList({ title, edges, lookup, direction, onSelect }: RelationshipListProps) {
+/**
+ * One canonical reference-path occurrence, direction-tagged, kept exact
+ * (field + ordinal) — this is the unit the acceptance case calls a "path",
+ * never itself presented as a "record".
+ */
+interface DirectedPath {
+  direction: "incoming" | "outgoing";
+  field: string;
+  ordinal: number | null;
+}
+
+/**
+ * `incomingEdges`/`outgoingEdges` are exact canonical reference paths, not
+ * unique related-record cardinality (finding under correction here) — a
+ * record referenced from both directions, or via more than one field/ordinal
+ * in the same direction, must still surface as exactly one related-record
+ * group with every one of its paths preserved beneath it. Grouping is by
+ * related record ID only; nothing here discards a distinct path.
+ */
+function groupPathsByRelatedRecord(detail: RecordDetail): Map<string, DirectedPath[]> {
+  const groups = new Map<string, DirectedPath[]>();
+  for (const edge of detail.outgoingEdges) {
+    const relatedId = edge.to!;
+    const paths = groups.get(relatedId) ?? [];
+    paths.push({ direction: "outgoing", field: edge.field, ordinal: edge.ordinal });
+    groups.set(relatedId, paths);
+  }
+  for (const edge of detail.incomingEdges) {
+    const relatedId = edge.from!;
+    const paths = groups.get(relatedId) ?? [];
+    paths.push({ direction: "incoming", field: edge.field, ordinal: edge.ordinal });
+    groups.set(relatedId, paths);
+  }
+  return groups;
+}
+
+/** Count of unique related record IDs across both directions — the cardinality this correction surfaces as "registos relacionados", distinct from the raw edge/path count. */
+function countUniqueRelatedRecords(detail: RecordDetail): number {
+  return groupPathsByRelatedRecord(detail).size;
+}
+
+function RelationshipList({ detail, lookup, onSelect }: RelationshipListProps) {
+  const groups = groupPathsByRelatedRecord(detail);
+  const relatedIds = [...groups.keys()];
+
   return (
-    <section aria-label={title}>
-      <h4>{title}</h4>
-      {edges.length === 0 ? (
-        <p>Nenhuma.</p>
+    <section aria-label="Registos relacionados">
+      <h4>Registos relacionados</h4>
+      {relatedIds.length === 0 ? (
+        <p>Nenhum registo relacionado.</p>
       ) : (
         <ul>
-          {edges.map((edge, index) => {
-            const relatedId = direction === "outgoing" ? edge.to! : edge.from!;
+          {relatedIds.map((relatedId) => {
             const related = lookup.get(relatedId);
-            const arrow = direction === "outgoing" ? "→" : "←";
-            const relation = direction === "outgoing" ? "referencia através de" : "referenciado através de";
-            const ordinalSuffix = edge.ordinal !== null ? `[${edge.ordinal}]` : "";
+            const paths = groups.get(relatedId)!;
             return (
-              <li key={`${direction}-${edge.field}-${edge.ordinal}-${relatedId}-${index}`}>
+              <li key={relatedId}>
                 <button type="button" onClick={() => onSelect(relatedId)}>
-                  {arrow} {related ? `${formatTypedId(related.type, related.id)} — ${related.label}` : relatedId}
-                </button>{" "}
-                <span>
-                  — {relation} <code>{edge.field}</code>
-                  {ordinalSuffix}
-                </span>
+                  {related ? `${formatTypedId(related.type, related.id)} — ${related.label}` : relatedId}
+                </button>
+                <ul className="relationship-paths">
+                  {paths.map((path, index) => {
+                    const arrow = path.direction === "outgoing" ? "→" : "←";
+                    const label = path.direction === "outgoing" ? "Saída" : "Entrada";
+                    const relation = path.direction === "outgoing" ? "referencia através de" : "referenciado através de";
+                    const ordinalSuffix = path.ordinal !== null ? `[${path.ordinal}]` : "";
+                    return (
+                      <li key={`${path.direction}-${path.field}-${path.ordinal}-${index}`}>
+                        {arrow} {label} — {relation} <code>{path.field}</code>
+                        {ordinalSuffix}
+                      </li>
+                    );
+                  })}
+                </ul>
               </li>
             );
           })}
@@ -151,6 +200,7 @@ function TypeBadge({ detail }: { detail: RecordDetail }) {
 }
 
 function ProvenancePanel({ detail }: { detail: RecordDetail }) {
+  const uniqueRelatedCount = countUniqueRelatedRecords(detail);
   return (
     <section aria-label="Proveniência" className="record-provenance">
       <h3 className="detail-panel-label">Proveniência</h3>
@@ -161,8 +211,8 @@ function ProvenancePanel({ detail }: { detail: RecordDetail }) {
         <dd className="detail-technical-field">{detail.file}</dd>
         <dt>Relações</dt>
         <dd>
-          referenciado por {formatPublicCount(detail.incomingEdges.length)} registo(s) · referencia {formatPublicCount(detail.outgoingEdges.length)} registo(s) —{" "}
-          <a href="#relacoes">ver caminhos exatos ↓</a>
+          {formatPublicCount(uniqueRelatedCount)} registo(s) relacionado(s) ({formatPublicCount(detail.incomingEdges.length)} caminho(s) de entrada,{" "}
+          {formatPublicCount(detail.outgoingEdges.length)} caminho(s) de saída) — <a href="#relacoes">ver caminhos exatos ↓</a>
         </dd>
       </dl>
     </section>
@@ -246,9 +296,8 @@ function RecordDetailContent({
           </section>
 
           <section aria-label="Relações" id="relacoes" className="record-detail-relations">
-            <h3 className="detail-panel-label">Relações — caminho de referência exato</h3>
-            <RelationshipList title="Entradas" edges={detail.incomingEdges} lookup={lookup} direction="incoming" onSelect={onSelect} />
-            <RelationshipList title="Saídas" edges={detail.outgoingEdges} lookup={lookup} direction="outgoing" onSelect={onSelect} />
+            <h3 className="detail-panel-label">Relações — por registo relacionado, com caminhos de referência exatos</h3>
+            <RelationshipList detail={detail} lookup={lookup} onSelect={onSelect} />
           </section>
         </div>
 
