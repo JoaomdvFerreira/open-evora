@@ -89,7 +89,7 @@ export function Overview({
   const compactCorroboratedLabel = publicCompactEnumLabel("evidence_status", "corroborated");
 
   return (
-    <section aria-labelledby="overview-heading" className="public-overview">
+    <section aria-labelledby="overview-heading" className="public-overview shell-frame">
       <h2 id="overview-heading">Visão geral</h2>
       <p className="overview-introduction">Open Évora é um projeto de investigação cívica independente sobre problemas práticos que afetam Évora e onde podem existir oportunidades de intervenção úteis.</p>
       <p className="overview-supporting-copy">Este Explorador de Investigação dá acesso público às evidências, avaliações e incertezas que sustentam essa investigação.</p>

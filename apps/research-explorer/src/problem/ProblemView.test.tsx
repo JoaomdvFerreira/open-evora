@@ -287,13 +287,16 @@ describe("ProblemView", () => {
     expect(within(details).getAllByText(/FUTURE_STATUS/).length).toBeGreaterThan(0);
   });
 
-  it("exposes a collapsed-by-default point-of-use Problem help disclosure", async () => {
+  it("exposes a collapsed-by-default point-of-use Problem help disclosure, self-sufficient with no link to the removed global reading guide", async () => {
     render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
     await screen.findByRole("heading", { name: "Parking pressure" });
     const details = screen.getByText("O que é um Problema, e o que significam os estados abaixo?").closest("details");
     expect(details).toBeTruthy();
     expect(details!.hasAttribute("open")).toBe(false);
-    expect(within(details!).getByRole("link", { name: /Orientação completa do Explorer/ }).getAttribute("href")).toBe("#reading-guide");
+    // UX-C §3: the global ReadingGuide no longer exists on Problem View, so
+    // neither the help disclosure nor the desktop rail points into it.
+    expect(within(details!).queryByRole("link", { name: /Orientação completa do Explorer/ })).toBeNull();
+    expect(document.querySelector('a[href="#reading-guide"]')).toBeNull();
   });
 
   it("shows a PRB-scoped Detalhe/Problema/Grafo context switcher with Problema active and correct navigation calls", async () => {

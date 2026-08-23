@@ -20,9 +20,9 @@ These corrections were made when integrating the approved source into this repos
 
 - **Breakpoints**: production uses **compact `<=767px`** and **desktop `>=768px`**. **360px is a QA/golden viewport used for Playwright visual comparison, not a breakpoint.** (The approved source's "bp-compact" bucket corresponds to `<=767px`.)
 - **Production content widths** (supersede the Design System doc-shell width, which is doc chrome only and never production):
-  - Problem View: **980px** total = 720px main content column + 44px gap (`--detail-gap`) + 216px reading rail (reuses Record Detail's two-column geometry)
-  - Workspace / Overview: **900px**
-  - Record Detail: **980px** total = 720px main content column + 44px gap (`--detail-gap`) + 216px rail
+  - **Primary desktop outer production frame: 980px remains the canonical maximum**, shared by Header (inner content), Overview, Records, Record Detail, and Problem View via one shared CSS structural primitive (`--shell-content-max` / `.shell-frame`) — not page-specific variants. Record Detail's 980px = 720px main content column + 44px gap (`--detail-gap`) + 216px rail; Problem View reuses that same two-column geometry for its own 980px. The full two-column reading composition (720 main + 44 gap + 216 rail) is used only from `>=1060px`, where enough viewport space exists to preserve the 720px main column without compressing it.
+  - **`768px-1059px` intermediate reading recomposition (Record Detail, Problem View only)**: the two-column composition cannot fit in this band without destructively compressing the 720px main column, so these two reading surfaces recompose to a single-column, max-720px reading composition — the rail becomes non-sticky and flows after the main content (Record Detail), or is hidden in favor of the existing compact in-flow section index (Problem View). This reuses the existing compact single-column mechanics rather than a parallel layout system, and does not apply compact typography/navigation rules. This is not a new breakpoint tier for the application generally — `<=767px` remains the sole canonical compact breakpoint (§0.1 above); `768px-1059px` is a narrower CSS-only treatment scoped to these two reading surfaces.
+  - Narrower editorial/content-specific reading measures may exist inside that shared 980px outer frame where already intentional (e.g. `.overview-introduction`, `.record-meaning-zone`) — this does not reintroduce a second outer-frame width.
   - Design System doc shell width (1180px) is never a production content width.
 - **Fonts**: Inter, Source Serif 4, and IBM Plex Mono are **locally bundled/self-hosted** in production (currently via `@fontsource/*`, imported in [main.tsx](../../../apps/research-explorer/src/main.tsx)). There is no runtime Google Fonts fetch or other network font dependency. This matches §10 of the approved source (deterministic golden rendering via `local()` fallback) but production goes further: it ships the font files itself rather than relying on `local()` resolution.
 
@@ -38,7 +38,7 @@ Declared once as custom properties on `:root` (see [§6](#6-current-production-m
 - **Radii**: `radius-sm:3px`, `radius-md:4px`, `radius-lg:5px`.
 - **No-shadow rule**: `box-shadow` is never used in production. Elevation/separation comes only from 1px borders and the three flat surface steps (surface-raised → surface-recessed → surface-chip). A component that seems to need a shadow needs a border or surface step instead.
 - **Breakpoints**: two canonical buckets, no intermediate tablet tier — **desktop `>=768px`** (full GlobalShell, §3) and **compact `<=767px`** (wordmark row + 3 equal-width nav tabs, §3). 360px is a QA/golden reference width for Playwright comparison, not a breakpoint (§0.1).
-- **Production content widths (approved, per surface)**: Record Detail **980px** = 720px main content column + 44px gap (`detail-gap`) + 216px rail · Problem View **980px** = 720px main content column + 44px gap (`detail-gap`) + 216px reading rail (reuses Record Detail's two-column geometry) · Workspace / Overview **900px** · compact, all surfaces: full-bleed to viewport, 360px used only as the QA/golden reference width.
+- **Production content widths (approved, per surface)**: **primary desktop outer frame is 980px**, shared by Header / Overview / Records / Record Detail / Problem View (Record Detail = 720px main content column + 44px gap (`detail-gap`) + 216px rail; Problem View reuses that same geometry) · narrower editorial measures may exist inside that outer frame · compact, all surfaces: full-bleed to viewport, 360px used only as the QA/golden reference width.
 
 ## 2. Semantic Typography Recipes (implementation-ready)
 
@@ -70,7 +70,7 @@ Zero production-binding literal font sizes should remain outside this table once
 
 Used identically by all four surfaces (Overview, Records, Record Detail, Problem View). No page-specific shell variants.
 
-**Desktop (`>=768px`)**: `text-wordmark` + `text-shell-subtitle`; nav items `text-global-nav`, gap `space-6`; active item weight 600, `border-bottom:2px solid color-link`, `padding-bottom:space-1`; breadcrumb (record-scoped pages only) sits directly beneath as a second bar, same horizontal padding as shell.
+**Desktop (`>=768px`)**: `text-wordmark` + `text-shell-subtitle`; nav items `text-global-nav`, gap `space-6`; active item weight 600, `border-bottom:2px solid color-link`, `padding-bottom:space-1`; breadcrumb (record-scoped pages only) sits directly beneath as a second bar, same horizontal padding as shell. The header's inner content (wordmark + nav) shares the primary 980px outer frame. The active nav item's 2px accent indicator aligns flush with the shell's own bottom rule (corrected UX-C) — the nav row stretches to the header's full height so the indicator sits at `bottom:0` structurally, never via an arbitrary negative offset.
 
 **Compact (`<=767px`) canonical order** (record-scoped pages): wordmark row → 3 equal-width global-nav tabs → breadcrumb → ContextTabs (PRB identity in view only, per below) → page content. Global navigation is never hidden or collapsed to an icon at compact widths.
 

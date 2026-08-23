@@ -258,7 +258,7 @@ function RecordDetailContent({
   const roleFields = Object.entries(lookup.get(detail.id)?.summaryFields ?? {}).filter(([field]) => field !== "analysis.contribution");
 
   return (
-    <div className="record-detail-layout">
+    <div className="record-detail-layout shell-frame">
       <Breadcrumb detail={detail} onBackToRecords={onBackToRecords} />
 
       {detail.type === "PRB-" && (

@@ -86,7 +86,7 @@ export function RecordsExplorer({
   }
 
   return (
-    <div className="records-explorer">
+    <div className="records-explorer shell-frame">
       <RecordsTable
         records={indexState.records}
         selectedId={selectedId}

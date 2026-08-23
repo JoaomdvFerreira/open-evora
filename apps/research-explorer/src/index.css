@@ -58,10 +58,6 @@ main {
 
 /* Public first-contact Overview: reuses the Explorer's restrained surfaces,
    typography roles, native disclosure, and text-first navigation. */
-.public-overview {
-  max-width: 60rem;
-}
-
 .overview-introduction {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.2rem;
@@ -789,14 +785,30 @@ main.explorer-shell {
   border-bottom: 1px solid var(--line);
 }
 
-.explorer-chrome-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
+/* Shared desktop outer-frame primitive (UX-C): width + centering only, no
+   page-specific styling. Applied alongside each surface's own class to
+   consolidate what was previously independent per-surface max-width/margin
+   drift (Header/Overview/Records/Record Detail/Problem View) onto one
+   canonical 980px frame (design-system.md §1). Content-specific/editorial
+   measures narrower than this remain their own concern, unaffected here. */
+.shell-frame {
+  box-sizing: border-box;
   width: 100%;
   max-width: var(--shell-content-max);
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.explorer-chrome-inner {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 2rem;
+  min-height: inherit;
+}
+
+.explorer-chrome-inner > h1 {
+  align-self: center;
 }
 
 .explorer-chrome-inner > h1 {
@@ -832,6 +844,8 @@ main.explorer-shell {
 }
 
 .explorer-navigation {
+  display: flex;
+  align-items: stretch;
   gap: 0;
   margin: 0;
   border: 0;
@@ -840,6 +854,8 @@ main.explorer-shell {
 
 .explorer-navigation button {
   position: relative;
+  display: flex;
+  align-items: center;
   min-height: 42px;
   padding: 0.55rem 1rem;
   color: var(--ink-soft);
@@ -862,7 +878,7 @@ main.explorer-shell {
 .explorer-navigation button[aria-current="page"]::after {
   position: absolute;
   right: 1rem;
-  bottom: -1px;
+  bottom: 0;
   left: 1rem;
   height: 2px;
   background: var(--accent);
@@ -893,8 +909,6 @@ main.explorer-shell {
 }
 
 .public-overview {
-  max-width: 58rem;
-  margin: 0 auto;
   padding: 2.75rem 0 2rem;
 }
 
@@ -1151,8 +1165,6 @@ main.explorer-shell {
 /* Records keeps its current search/select/detail workflow while giving the
    scanning surface a lighter, intentional treatment. */
 .records-explorer {
-  max-width: 72rem;
-  margin: 0 auto;
   gap: 2rem;
 }
 
@@ -1451,8 +1463,7 @@ main.explorer-shell {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  max-width: 980px;
-  margin: 0 auto var(--space-6);
+  margin: var(--space-6) 0;
   font-family: var(--recipe-technical-field-family);
   font-size: 13px;
   color: var(--ink-faint);
@@ -1485,8 +1496,7 @@ main.explorer-shell {
   display: flex;
   align-items: flex-start;
   gap: var(--detail-gap);
-  max-width: 980px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .record-detail-main {
@@ -1737,14 +1747,61 @@ main.explorer-shell {
   overflow-wrap: anywhere;
 }
 
+/* Compact-only substitute for the desktop reading rail's "Nesta página"
+   index (UX-B §4) — the rail already provides it on desktop, so this stays
+   hidden there to avoid a duplicate section index. Placed before the
+   responsive overrides below so their `display: block` wins by source
+   order in the bands where the section index should show. */
+.problem-help-section-index {
+  display: none;
+  margin: 0 0 var(--space-3);
+}
+
+/* F1 intermediate reading-layout recomposition (768px-1059px): the
+   canonical 720 main + 44 gap + 216 rail composition cannot fit in this
+   band without destructively compressing the 720px reading column. Reuse
+   the compact single-column recomposition for the two reading surfaces
+   only (Record Detail, Problem View) rather than a parallel layout
+   system; compact typography/navigation rules are intentionally excluded.
+   At >=1060px the canonical two-column geometry resumes unchanged. */
+@media (min-width: 768px) and (max-width: 1059px) {
+  .record-detail-columns {
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .record-detail-main {
+    max-width: 720px;
+  }
+
+  .record-detail-rail {
+    position: static;
+    width: 100%;
+    max-width: 720px;
+    flex-basis: auto;
+  }
+
+  .problem-reading-rail {
+    display: none;
+  }
+
+  .problem-help-section-index {
+    display: block;
+  }
+}
+
 @media (max-width: 767px) {
   main.explorer-shell {
     padding: 0 1rem 2rem;
   }
 
   .explorer-chrome {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     margin: 0 -1rem;
     padding: 0;
+    background: var(--canvas);
   }
 
   .explorer-chrome-inner {
@@ -1780,6 +1837,7 @@ main.explorer-shell {
 
   .explorer-navigation button {
     flex: 1 1 0;
+    justify-content: center;
     padding-right: 0.35rem;
     padding-left: 0.35rem;
     font-size: 0.78rem;
@@ -1874,12 +1932,20 @@ main.explorer-shell {
     font-size: 0.94rem;
   }
 
+  /* Sticky compact header (F4): anchor-target sections must not land
+     underneath it — scroll-margin-top offsets by the header's own height. */
+  #overview-problemas,
+  .problem-section {
+    scroll-margin-top: 108px;
+  }
+
   .overview-problem-action {
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.35rem;
+    width: 100%;
   }
 
   .overview-statuses {
@@ -1889,7 +1955,7 @@ main.explorer-shell {
   }
 
   .overview-problem-action button {
-    min-height: 36px;
+    min-height: auto;
   }
 
   .records-explorer {
@@ -1983,9 +2049,6 @@ main.explorer-shell {
    767px media query below. No shadows — separation comes from 1px borders
    and surface steps only. */
 .problem-view {
-  box-sizing: border-box;
-  max-width: 980px;
-  margin: 0 auto;
   padding-bottom: var(--space-9);
 }
 
@@ -1994,6 +2057,7 @@ main.explorer-shell {
 }
 
 .context-tabs {
+  box-sizing: border-box;
   display: inline-flex;
   gap: 0;
   margin: var(--space-3) 0 var(--space-6);
@@ -2058,14 +2122,6 @@ main.explorer-shell {
 
 .problem-help-content p {
   margin: 0 0 var(--space-2);
-}
-
-/* Compact-only substitute for the desktop reading rail's "Nesta página"
-   index (UX-B §4) — the rail already provides it on desktop, so this stays
-   hidden there to avoid a duplicate section index. */
-.problem-help-section-index {
-  display: none;
-  margin: 0 0 var(--space-3);
 }
 
 .problem-help-section-index-label {
