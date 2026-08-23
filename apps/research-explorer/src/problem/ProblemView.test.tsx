@@ -32,6 +32,7 @@ const DETAILS: Record<string, RecordDetail> = {
       problem: "PRB-0005",
       triage: "DEEPEN",
       assessment_status: "CURRENT",
+      existing_solution_understanding: "SUFFICIENT",
       remaining_gap: "PARTIAL",
       critical_unknowns: { U1: { question: "Existe uma fricção significativa na procura?", decision_impact: "HIGH", target_phase: "D5", best_next_evidence: ["observação delimitada do percurso"] }, U2: { question: "A informação atual é suficiente?", decision_impact: "MEDIUM", target_phase: "D3", best_next_evidence: ["validação com utilizadores"] } },
     },
@@ -117,7 +118,9 @@ describe("ProblemView", () => {
     expect(within(evidenceSection).getByText(/SRC-0001/)).toBeTruthy();
 
     const unknownsSection = screen.getByLabelText("Incertezas e lacunas");
+    // existing_solution_understanding and remaining_gap are paired (ux-g2-asm-audit.md §5 point 5/§9 point 3): both present together, not one without the other.
     expect(within(unknownsSection).getByText("Lacuna remanescente:")).toBeTruthy();
+    expect(within(unknownsSection).getByText(/Compreensão das soluções existentes:/)).toBeTruthy();
     expect(within(unknownsSection).getByText("Incertezas")).toBeTruthy();
     expect(within(unknownsSection).getAllByText("Questão em aberto:").length).toBe(2);
     expect(within(unknownsSection).getAllByText("Próxima evidência:").length).toBe(2);
@@ -128,7 +131,7 @@ describe("ProblemView", () => {
     expect(within(unknownsSection).getByText("D5")).toBeTruthy();
     expect(within(unknownsSection).getByText("Existe uma fricção significativa na procura?")).toBeTruthy();
     expect(within(unknownsSection).getByText("observação delimitada do percurso")).toBeTruthy();
-    for (const raw of ["remaining_gap", "critical_unknowns", "PARTIAL", "HIGH", "MEDIUM", "decision_impact", "target_phase"]) {
+    for (const raw of ["remaining_gap", "existing_solution_understanding", "critical_unknowns", "PARTIAL", "SUFFICIENT", "HIGH", "MEDIUM", "decision_impact", "target_phase"]) {
       expect(within(unknownsSection).queryByText(raw)).toBeNull();
     }
 

@@ -83,12 +83,79 @@ const EXISTING_SOLUTIONS_GLOSS: FieldGlossMap = {
   assessed: { label: "Soluções existentes: avaliadas" },
 };
 
+/**
+ * `decision_gates.*` PASS/PARTIAL/FAIL/UNKNOWN/NOT_ASSESSED glosses —
+ * paraphrased verbatim from docs/discovery/d3-execution-protocol.md §5.1b.
+ * PARTIAL vs UNKNOWN is the distinction the protocol explicitly added
+ * WU-D3-03 to preserve (§5.1b): "we have something, but not enough" vs
+ * "we have nothing to characterize this gate with at all" — collapsing them
+ * would hide exactly the information a reader needs here.
+ */
+const DECISION_GATE_GLOSS: FieldGlossMap = {
+  PASS: { label: "Cumpre", explanation: "existe evidência suficiente para sustentar a decisão nesta fase." },
+  PARTIAL: {
+    label: "Cumpre parcialmente",
+    explanation: "existe evidência real e relevante, mas insuficiente para considerar o critério cumprido — distinto de \"desconhecido\", que significa não haver evidência alguma.",
+  },
+  FAIL: { label: "Não cumpre", explanation: "a evidência disponível sustenta a conclusão de que o critério não é cumprido." },
+  UNKNOWN: { label: "Desconhecido", explanation: "não existe evidência suficiente, ou nenhuma, para caracterizar este critério." },
+  NOT_ASSESSED: { label: "Não avaliado", explanation: "este critério ainda não foi avaliado nesta investigação." },
+};
+
+/**
+ * `triage` glosses — paraphrased from docs/discovery/d3-execution-protocol.md
+ * §5.2. STOP/WATCH carry an explicit, canonically-grounded caveat: they
+ * describe Open Évora's project posture, never a judgement of the
+ * underlying civic problem's importance (see PRB-0009/ASM-0009, the
+ * protocol's own paradigm case: civic_importance PASS, triage WATCH).
+ */
+const TRIAGE_GLOSS: FieldGlossMap = {
+  STOP: {
+    label: "Não prosseguir",
+    explanation:
+      "o projeto não vai investir mais esforço de investigação/intervenção nesta formulação do problema — por exemplo, por não haver alavancagem digital, a lacuna já estar coberta, ou outro mecanismo ser claramente mais adequado. É um desfecho legítimo, não uma falha, e nunca uma afirmação de que o problema cívico não importa.",
+  },
+  WATCH: {
+    label: "Acompanhar",
+    explanation:
+      "o projeto não está, para já, a aprofundar ou a construir uma solução, mas mantém o problema sob observação, para o caso de a situação mudar ou surgir uma lacuna concreta a resolver. Não é uma afirmação de que o problema cívico não importa.",
+  },
+  DEEPEN: {
+    label: "Aprofundar",
+    explanation: "existe pelo menos um critério de decisão bloqueado por uma incerteza crítica; o projeto vai recolher evidência específica para o resolver.",
+  },
+  PROCEED: {
+    label: "Prosseguir",
+    explanation: "existe compreensão suficiente para avançar para a fase seguinte de investigação — não é, por si só, autorização para construir software.",
+  },
+};
+
+/**
+ * `evidence_confidence.contradiction_status` — deliberately **not** the
+ * generic `confidence` HIGH/MEDIUM/LOW label set. Protocol §5.1a: this field
+ * measures the degree of contradiction PRESENT in the evidence, not the
+ * assessor's confidence in the call — LOW is the coherent/good state, HIGH
+ * is the state with substantial unresolved contradiction. A literal
+ * "Elevado/Baixo" translation reads naturally as a confidence scale and
+ * would invite exactly the misreading this gloss exists to prevent.
+ */
+const CONTRADICTION_STATUS_GLOSS: FieldGlossMap = {
+  LOW: { label: "Baixo grau de contradição", explanation: "a base de evidência é coerente — existe pouca ou nenhuma contradição por resolver." },
+  MEDIUM: { label: "Grau de contradição médio", explanation: "existe alguma contradição na base de evidência, ainda não totalmente resolvida." },
+  HIGH: { label: "Grau de contradição elevado", explanation: "existe contradição substancial e por resolver na base de evidência." },
+  UNKNOWN: { label: "Grau de contradição desconhecido", explanation: "não é possível, atualmente, caracterizar o grau de contradição na base de evidência." },
+  NOT_ASSESSED: { label: "Grau de contradição não avaliado" },
+};
+
 const FIELD_GLOSSARIES: Record<string, FieldGlossMap> = {
   status: STATUS_GLOSS,
   validation_status: VALIDATION_STATUS_GLOSS,
   evidence_status: EVIDENCE_STATUS_GLOSS,
   digital_tractability: DIGITAL_TRACTABILITY_GLOSS,
   existing_solutions: EXISTING_SOLUTIONS_GLOSS,
+  decision_gate: DECISION_GATE_GLOSS,
+  triage: TRIAGE_GLOSS,
+  contradiction_status: CONTRADICTION_STATUS_GLOSS,
 };
 
 /** PT captions for every "Estado atual" field — used as the accessible field context for a status chip (screen readers otherwise lose the field-name context a `<dt>/<dd>` pair used to give). */
@@ -113,5 +180,10 @@ export const DISCLOSURE_FIELDS = ["status", "validation_status", "evidence_statu
 
 /** Returns a safe label/explanation pair for a known field+value, or null when nothing safe exists — callers must still render the canonical value regardless of this result. */
 export function glossFor(field: string, value: string): FieldGloss | null {
-  return FIELD_GLOSSARIES[field]?.[value] ?? null;
+  const glossaryField = field.startsWith("decision_gates.")
+    ? "decision_gate"
+    : field === "evidence_confidence.contradiction_status"
+      ? "contradiction_status"
+      : field;
+  return FIELD_GLOSSARIES[glossaryField]?.[value] ?? null;
 }

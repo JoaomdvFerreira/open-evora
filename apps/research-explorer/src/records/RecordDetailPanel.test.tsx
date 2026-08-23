@@ -1068,3 +1068,351 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
   });
 });
+
+/**
+ * UX-G2: ASM current-state comprehension (docs/design/research-explorer/ux-g2-asm-audit.md).
+ * Fixtures mirror the shapes of the real corpus cases named in the audit's
+ * acceptance coverage: ASM-0001 (normal DEEPEN/current), ASM-0004
+ * (UNKNOWN-heavy/thin-evidence), ASM-0005 (mature/multi-revision), ASM-0009
+ * (WATCH + civic importance), ASM-0010 (WATCH/posture interpretation).
+ */
+describe("RecordDetailPanel — UX-G2 ASM current-state comprehension", () => {
+  const PRB_0001_SUMMARY: RecordSummary = {
+    id: "PRB-0001",
+    type: "PRB-",
+    label: "Reduced evening/weekend/holiday transport service",
+    file: "research/problems/PRB-0001.yaml",
+    summaryFields: { status: "OPEN" },
+  };
+
+  function asmDetail(id: string, problem: string, overrides: Record<string, unknown>): RecordDetail {
+    return {
+      id,
+      type: "ASM-",
+      file: `research/assessments/${id}.yaml`,
+      record: {
+        assessment_id: id,
+        problem,
+        as_of: "2026-08-12",
+        phase: "D3",
+        assessment_status: "CURRENT",
+        evidence_confidence: {
+          overall: "MEDIUM",
+          independence: "MEDIUM",
+          coherence: "HIGH",
+          adequacy: "MEDIUM",
+          relevance: "HIGH",
+          currentness: "HIGH",
+          contradiction_status: "LOW",
+          stakeholder_validation: "PENDING",
+        },
+        civic_importance: { reach: "MEDIUM", frequency: "UNKNOWN", severity: "MEDIUM", persistence: "HIGH", equity: "UNKNOWN" },
+        journey_understanding: "PARTIAL",
+        causal_understanding: "PARTIAL",
+        existing_solution_understanding: "PARTIAL",
+        remaining_gap: "PARTIAL",
+        digital_leverage: "not_assessed",
+        structure_action: "KEEP",
+        decision_gates: {
+          problem_real: "PASS",
+          civic_importance: "PARTIAL",
+          journey_understood: "PARTIAL",
+          root_cause_understood: "PARTIAL",
+          remaining_gap_supported: "PARTIAL",
+          digital_causality: "NOT_ASSESSED",
+          operability: "NOT_ASSESSED",
+          testability: "NOT_ASSESSED",
+        },
+        critical_unknowns: {
+          U1: { question: "Que linhas sofrem a redução mais acentuada?", decision_impact: "HIGH", target_phase: "D3", best_next_evidence: ["análise de horários"] },
+        },
+        triage: "DEEPEN",
+        next_action: "Do not assume a software solution. Internal operational next step only.",
+        notes: "WU017 baseline internal lineage accounting, not for public display.",
+        ...overrides,
+      },
+      outgoingEdges: [{ field: "problem", ordinal: null, to: problem }],
+      incomingEdges: [],
+    };
+  }
+
+  const ASM_0001_LIKE = asmDetail("ASM-0001", "PRB-0001", {});
+
+  function renderAsm(detail: RecordDetail, extraSummaries: RecordSummary[] = []) {
+    const summary: RecordSummary = { id: detail.id, type: "ASM-", label: detail.id, file: detail.file, summaryFields: { assessment_status: "CURRENT" } };
+    return render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ [detail.id]: detail })}
+        lookup={buildLookup(summary, PRB_0001_SUMMARY, ...extraSummaries)}
+        selectedId={detail.id}
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+  }
+
+  it("orients the ASM meaning zone to its related PRB, replacing the empty placeholder", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    expect(within(meaningZone).getByText(/Avaliação do Problema/)).toBeTruthy();
+    expect(within(meaningZone).getByText(/PRB-0001/)).toBeTruthy();
+    expect(within(meaningZone).queryByText(/sem campo de significado canónico identificado/)).toBeNull();
+  });
+
+  it("shows assessment currentness (assessment_status + as_of) in the orientation", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    expect(within(meaningZone).getByText("Atual")).toBeTruthy();
+    expect(within(meaningZone).getByText(/2026-08-12/)).toBeTruthy();
+  });
+
+  it("offers a route to the Problem representation (Ver como Problema) from an ASM opened directly", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByRole("button", { name: "Ver como Problema (PRB-0001)" })).toBeTruthy();
+  });
+
+  it("names all 8 decision_gates individually with their PASS/PARTIAL/FAIL/UNKNOWN/NOT_ASSESSED values and glosses, in canonical protocol order", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const gates = await within(panel).findByLabelText("Como chegámos à decisão");
+    const gateNames = ["Problema real", "Importância cívica", "Percurso compreendido", "Causa-raiz compreendida", "Lacuna remanescente sustentada", "Causalidade digital", "Operacionalidade", "Testabilidade"];
+    for (const name of gateNames) {
+      expect(within(gates).getByText(name)).toBeTruthy();
+    }
+    // PARTIAL is distinguished from UNKNOWN/NOT_ASSESSED, not collapsed.
+    expect(within(gates).getAllByText("Cumpre parcialmente").length).toBeGreaterThan(0);
+    expect(within(gates).getAllByText("Não avaliado").length).toBeGreaterThan(0);
+
+    // Order follows the canonical protocol order (problem_real first, testability last).
+    const order = gateNames.map((name) => within(gates).getByText(name).compareDocumentPosition(within(gates).getByText(gateNames[gateNames.length - 1])));
+    expect(order.every((bits) => (bits & Node.DOCUMENT_POSITION_FOLLOWING) !== 0 || bits === 0)).toBe(true);
+  });
+
+  it("does not synthesize per-gate rationale — no gate row quotes or paraphrases `notes`/`next_action`", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const gates = await within(panel).findByLabelText("Como chegámos à decisão");
+    expect(within(gates).queryByText(/Do not assume a software solution/)).toBeNull();
+    expect(within(gates).queryByText(/WU017/)).toBeNull();
+  });
+
+  it("groups evidence_confidence and civic_importance dimensions under 'O que sabemos' with field captions, never raw schema paths", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const known = await within(panel).findByLabelText("O que sabemos");
+    expect(within(known).getByText("Confiança na evidência")).toBeTruthy();
+    expect(within(known).getByText("Importância cívica")).toBeTruthy();
+    // Each dimension chip carries its field caption as an accessible label.
+    expect(within(known).getByLabelText(/^Coerência:/)).toBeTruthy();
+    expect(within(known).getByLabelText(/^Alcance:/)).toBeTruthy();
+    // Raw schema path must never appear in the public-facing layer.
+    expect(within(known).queryByText(/evidence_confidence\.coherence/)).toBeNull();
+    expect(within(known).queryByText("civic_importance.reach")).toBeNull();
+  });
+
+  it("never aggregates civic_importance dimensions into a single score", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const known = await within(panel).findByLabelText("O que sabemos");
+    // All five dimensions render individually, each with its own caption.
+    for (const caption of ["Alcance", "Frequência", "Gravidade", "Persistência", "Equidade"]) {
+      expect(within(known).getByLabelText(new RegExp(`^${caption}:`))).toBeTruthy();
+    }
+    // No aggregate/score wording is attached to any individual dimension chip.
+    expect(within(known).queryByText(/^\d+([.,]\d+)?$/)).toBeNull();
+  });
+
+  it("gives evidence_confidence.contradiction_status safe, non-inverted wording before surfacing it (LOW = coherent, not low confidence)", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const known = await within(panel).findByLabelText("O que sabemos");
+    expect(within(known).getByText(/Baixo grau de contradição/)).toBeTruthy();
+  });
+
+  it("shows the WATCH/STOP project-posture caveat for a WATCH triage, distinguishing it from civic importance", async () => {
+    const asm0009Like = asmDetail("ASM-0009", "PRB-0009", {
+      civic_importance: { reach: "HIGH", frequency: "UNKNOWN", severity: "HIGH", persistence: "MEDIUM", equity: "UNKNOWN" },
+      decision_gates: {
+        problem_real: "PASS",
+        civic_importance: "PASS",
+        journey_understood: "FAIL",
+        root_cause_understood: "PASS",
+        remaining_gap_supported: "PARTIAL",
+        digital_causality: "FAIL",
+        operability: "NOT_ASSESSED",
+        testability: "NOT_ASSESSED",
+      },
+      digital_leverage: "low",
+      triage: "WATCH",
+    });
+    const prb0009: RecordSummary = { id: "PRB-0009", type: "PRB-", label: "Waste collection reliability", file: "research/problems/PRB-0009.yaml", summaryFields: {} };
+    renderAsm(asm0009Like, [prb0009]);
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const summary = await within(panel).findByLabelText("Estado atual e decisão");
+    expect(within(summary).getByText("Acompanhar")).toBeTruthy();
+    expect(within(summary).getByText(/não é um juízo sobre a importância cívica/)).toBeTruthy();
+
+    // civic_importance itself (PASS / HIGH reach / HIGH severity) still shows separately, unreconciled with triage.
+    const known = within(panel).getByLabelText("O que sabemos");
+    expect(within(known).getByLabelText(/^Alcance:/)).toBeTruthy();
+  });
+
+  it("shows the WATCH/STOP caveat for a second WATCH case (posture interpretation), confirming it is not ASM-0009-specific", async () => {
+    const asm0010Like = asmDetail("ASM-0010", "PRB-0010", {
+      journey_understanding: "INSUFFICIENT",
+      causal_understanding: "SUFFICIENT",
+      existing_solution_understanding: "PARTIAL",
+      digital_leverage: "low",
+      decision_gates: {
+        problem_real: "PASS",
+        civic_importance: "PARTIAL",
+        journey_understood: "FAIL",
+        root_cause_understood: "PASS",
+        remaining_gap_supported: "PARTIAL",
+        digital_causality: "FAIL",
+        operability: "NOT_ASSESSED",
+        testability: "NOT_ASSESSED",
+      },
+      triage: "WATCH",
+    });
+    const prb0010: RecordSummary = { id: "PRB-0010", type: "PRB-", label: "Road surface degradation", file: "research/problems/PRB-0010.yaml", summaryFields: {} };
+    renderAsm(asm0010Like, [prb0010]);
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const summary = await within(panel).findByLabelText("Estado atual e decisão");
+    expect(within(summary).getByText("Acompanhar")).toBeTruthy();
+    expect(within(summary).getByText(/postura do projeto Open Évora/)).toBeTruthy();
+  });
+
+  it("does not attach the WATCH/STOP caveat to a DEEPEN triage", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const summary = await within(panel).findByLabelText("Estado atual e decisão");
+    expect(within(summary).getByText("Aprofundar")).toBeTruthy();
+    expect(within(summary).queryByText(/postura do projeto Open Évora/)).toBeNull();
+  });
+
+  it("pairs existing_solution_understanding with remaining_gap so their distinct meanings cannot be conflated", async () => {
+    const asm0005Like = asmDetail("ASM-0005", "PRB-0005", {
+      phase: "D4",
+      existing_solution_understanding: "SUFFICIENT",
+      remaining_gap: "PARTIAL",
+      journey_understanding: "PARTIAL",
+      causal_understanding: "PARTIAL",
+      civic_importance: { reach: "HIGH", frequency: "HIGH", severity: "MEDIUM", persistence: "HIGH", equity: "UNKNOWN" },
+    });
+    const prb0005: RecordSummary = { id: "PRB-0005", type: "PRB-", label: "Parking pressure", file: "research/problems/PRB-0005.yaml", summaryFields: {} };
+    renderAsm(asm0005Like, [prb0005]);
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const unknown = await within(panel).findByLabelText("O que ainda não sabemos");
+    const pair = unknown.querySelector(".asm-solution-gap-pair") as HTMLElement;
+    expect(pair).toBeTruthy();
+    expect(within(pair).getByText(/Compreensão das soluções existentes/)).toBeTruthy();
+    expect(within(pair).getByText(/Lacuna remanescente/)).toBeTruthy();
+    expect(within(pair).getByText("Suficiente")).toBeTruthy();
+    expect(within(pair).getByText("Parcial")).toBeTruthy();
+  });
+
+  it("surfaces critical_unknowns using the existing question/impact/phase/next-evidence pattern", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const unknown = await within(panel).findByLabelText("O que ainda não sabemos");
+    expect(within(unknown).getByText("Que linhas sofrem a redução mais acentuada?")).toBeTruthy();
+    expect(within(unknown).getByText("análise de horários")).toBeTruthy();
+  });
+
+  it("handles an UNKNOWN-heavy, thin-evidence ASM (ASM-0004-like) as a first-class, non-alarming state — UNKNOWN stays distinct from PARTIAL/NOT_ASSESSED", async () => {
+    const asm0004Like = asmDetail("ASM-0004", "PRB-0004", {
+      evidence_confidence: {
+        overall: "MEDIUM",
+        independence: "MEDIUM",
+        coherence: "MEDIUM",
+        adequacy: "LOW",
+        relevance: "MEDIUM",
+        currentness: "MEDIUM",
+        contradiction_status: "UNKNOWN",
+        stakeholder_validation: "PENDING",
+      },
+      civic_importance: { reach: "UNKNOWN", frequency: "UNKNOWN", severity: "UNKNOWN", persistence: "UNKNOWN", equity: "UNKNOWN" },
+      journey_understanding: "INSUFFICIENT",
+      existing_solution_understanding: "SUFFICIENT",
+      decision_gates: {
+        problem_real: "PASS",
+        civic_importance: "UNKNOWN",
+        journey_understood: "FAIL",
+        root_cause_understood: "PARTIAL",
+        remaining_gap_supported: "PARTIAL",
+        digital_causality: "FAIL",
+        operability: "NOT_ASSESSED",
+        testability: "PARTIAL",
+      },
+      digital_leverage: "low",
+    });
+    const prb0004: RecordSummary = { id: "PRB-0004", type: "PRB-", label: "Cycling network discontinuity", file: "research/problems/PRB-0004.yaml", summaryFields: {} };
+    renderAsm(asm0004Like, [prb0004]);
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const known = await within(panel).findByLabelText("O que sabemos");
+    // All five civic_importance dimensions are UNKNOWN — rendered plainly, not omitted or flagged as an error state.
+    const civicGroup = within(known).getByText("Importância cívica").closest(".asm-dimension-group") as HTMLElement;
+    expect(within(civicGroup).getAllByText("Desconhecida").length).toBe(5);
+
+    const gates = within(panel).getByLabelText("Como chegámos à decisão");
+    expect(within(gates).getByText("Desconhecido")).toBeTruthy(); // civic_importance gate: UNKNOWN
+    expect(within(gates).getAllByText("Cumpre parcialmente").length).toBeGreaterThan(0); // root_cause_understood/remaining_gap_supported/testability: PARTIAL, distinct from UNKNOWN
+  });
+
+  it("keeps notes and next_action out of the public-facing ASM presentation, reachable only via technical inspection", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+
+    for (const publicRegion of [
+      await within(panel).findByLabelText("Significado"),
+      within(panel).getByLabelText("Estado atual e decisão"),
+      within(panel).getByLabelText("Como chegámos à decisão"),
+      within(panel).getByLabelText("O que sabemos"),
+      within(panel).getByLabelText("O que ainda não sabemos"),
+    ]) {
+      expect(within(publicRegion).queryByText(/Do not assume a software solution/)).toBeNull();
+      expect(within(publicRegion).queryByText(/WU017 baseline/)).toBeNull();
+    }
+
+    // Both remain reachable inside the technical disclosure.
+    const technical = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos").closest(".technical-disclosure") as HTMLElement;
+    expect(within(technical).getByText("next_action")).toBeTruthy();
+    expect(within(technical).getByText("notes")).toBeTruthy();
+  });
+
+  it("never surfaces raw schema-path labels (e.g. evidence_confidence.coherence) anywhere in the main ASM presentation", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+
+    for (const publicRegion of [
+      await within(panel).findByLabelText("Significado"),
+      within(panel).getByLabelText("Estado atual e decisão"),
+      within(panel).getByLabelText("Como chegámos à decisão"),
+      within(panel).getByLabelText("O que sabemos"),
+      within(panel).getByLabelText("O que ainda não sabemos"),
+    ]) {
+      expect(within(publicRegion).queryByText(/evidence_confidence\./)).toBeNull();
+      expect(within(publicRegion).queryByText(/civic_importance\./)).toBeNull();
+      expect(within(publicRegion).queryByText(/decision_gates\./)).toBeNull();
+    }
+  });
+
+  it("preserves the summary/status row (assessment_status, structure_action, digital_leverage) as compact chips", async () => {
+    renderAsm(ASM_0001_LIKE);
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const summary = await within(panel).findByLabelText("Estado atual e decisão");
+    expect(within(summary).getByText("Atual")).toBeTruthy();
+    expect(within(summary).getByText("Manter")).toBeTruthy();
+    expect(within(summary).getByText("Não avaliada")).toBeTruthy();
+  });
+});

@@ -9,6 +9,7 @@ import { DISCLOSURE_FIELDS, DISCLOSURE_FIELD_LABELS, FIELD_CAPTIONS, glossFor, t
 import { describeType, formatTypedId } from "../typeGlossary";
 import { formatPublicCount, publicEnumLabel, publicFieldCaption } from "../presentation";
 import { ContextTabs } from "../ContextTabs";
+import { AssessmentUnknownsSummary } from "../records/AssessmentUnknowns";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -33,42 +34,6 @@ function recordValue(value: unknown): Record<string, unknown> | null {
 
 function stringValues(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
-}
-
-function AssessmentUnknowns({ record }: { record: Record<string, unknown> }) {
-  const remainingGap = fieldValue(record, "remaining_gap");
-  const unknowns = recordValue(record.critical_unknowns);
-  return (
-    <>
-      {remainingGap !== null && (
-        <p><strong>{publicFieldCaption("remaining_gap")}:</strong> {publicEnumLabel("remaining_gap", remainingGap)}</p>
-      )}
-      {unknowns && Object.keys(unknowns).length > 0 && (
-        <section aria-label="Incertezas">
-          <h5>Incertezas</h5>
-          {Object.entries(unknowns).map(([id, value]) => {
-            const unknown = recordValue(value);
-            if (!unknown) return null;
-            const question = fieldValue(unknown, "question");
-            const impact = fieldValue(unknown, "decision_impact");
-            const phase = fieldValue(unknown, "target_phase");
-            const nextEvidence = stringValues(unknown.best_next_evidence);
-            return (
-              <section key={id} aria-label={`Incerteza ${id}`}>
-                <h6>Incerteza {id}</h6>
-                {question && <p><strong>Questão em aberto:</strong> {question}</p>}
-                {impact && <p><strong>{publicFieldCaption("decision_impact")}:</strong> {publicEnumLabel("decision_impact", impact)}</p>}
-                {phase && <p><strong>{publicFieldCaption("target_phase")}:</strong> {phase}</p>}
-                {nextEvidence.length > 0 && (
-                  <><strong>Próxima evidência:</strong><ul>{nextEvidence.map((item, index) => <li key={index}>{item}</li>)}</ul></>
-                )}
-              </section>
-            );
-          })}
-        </section>
-      )}
-    </>
-  );
 }
 
 function evidenceSourceLabel(record: Record<string, unknown>): string | null {
@@ -306,6 +271,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
       const asmRecord = assessment.record as Record<string, unknown>;
       const picked: Record<string, unknown> = {};
       if (asmRecord.remaining_gap !== undefined) picked.remaining_gap = asmRecord.remaining_gap;
+      if (asmRecord.existing_solution_understanding !== undefined) picked.existing_solution_understanding = asmRecord.existing_solution_understanding;
       if (asmRecord.critical_unknowns !== undefined) picked.critical_unknowns = asmRecord.critical_unknowns;
       return Object.keys(picked).length > 0 ? { assessment, picked } : null;
     })
@@ -436,7 +402,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
               unknownsSections.map(({ assessment, picked }) => (
                 <div key={assessment.id} className="unknowns-card">
                   <h4>{formatTypedId(assessment.type, assessment.id)}</h4>
-                  <AssessmentUnknowns record={picked} />
+                  <AssessmentUnknownsSummary record={picked} />
                 </div>
               ))
             )}

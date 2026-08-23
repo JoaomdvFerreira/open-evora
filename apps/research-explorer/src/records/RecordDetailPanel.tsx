@@ -8,6 +8,16 @@ import { ContributionChip } from "./ContributionChip";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation";
 import { ContextTabs } from "../ContextTabs";
 import { evidenceQuickRead, sourceQuickRead, sourceName, type QuickReadItem } from "./recordOrientation";
+import {
+  asmCurrentness,
+  civicImportanceDimensions,
+  decisionGates,
+  decisionSummaryFields,
+  evidenceConfidenceDimensions,
+  triageSummary,
+  type GlossedField,
+} from "./asmPresentation";
+import { AssessmentUnknownsFull } from "./AssessmentUnknowns";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -311,6 +321,141 @@ function SourceQuickRead({ detail }: { detail: RecordDetail }) {
   );
 }
 
+/**
+ * UX-G2: ASM orientation to its related Problem, shown in the meaning zone
+ * in place of the previous empty "sem campo de significado" placeholder —
+ * ux-g2-asm-audit.md §6/§9 point 1. `relatedProblem` is null only when no
+ * canonical `problem` reference resolves (should not happen for a
+ * schema-valid ASM, but the caller degrades honestly rather than inventing
+ * a Problem reference).
+ */
+function AsmOrientation({ detail, relatedProblem }: { detail: RecordDetail; relatedProblem: RecordSummary | null }) {
+  const currentness = asmCurrentness(detail.record);
+  return (
+    <div className="asm-orientation">
+      {relatedProblem ? (
+        <p className="record-meaning">
+          Avaliação do Problema <strong>{formatTypedId(relatedProblem.type, relatedProblem.id)} — {relatedProblem.label}</strong>.
+        </p>
+      ) : (
+        <p className="record-meaning field-empty">{detail.id} — Problema avaliado não identificado nas relações canónicas deste registo.</p>
+      )}
+      {(currentness.assessmentStatus || currentness.asOf) && (
+        <p className="asm-orientation-currentness">
+          {currentness.assessmentStatus && (
+            <span className="status-chip" aria-label={`${currentness.assessmentStatus.caption}: ${currentness.assessmentStatus.label}`}>
+              {currentness.assessmentStatus.label}
+            </span>
+          )}
+          {currentness.asOf && <span className="asm-orientation-as-of">{publicFieldCaption("as_of")}: {currentness.asOf}</span>}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function GlossedChip({ item }: { item: GlossedField }) {
+  return (
+    <span className="status-chip" aria-label={`${item.caption}: ${item.label}`} title={item.explanation}>
+      {item.label}
+    </span>
+  );
+}
+
+function GlossedRow({ item }: { item: GlossedField }) {
+  return (
+    <div className="asm-gate-row">
+      <span className="asm-gate-name">{item.caption}</span>
+      <GlossedChip item={item} />
+      {item.explanation && <span className="asm-gate-explanation">{item.explanation}</span>}
+    </div>
+  );
+}
+
+/** "Estado atual e decisão": summary chips + triage with its STOP/WATCH caveat — ux-g2-asm-audit.md §9 points 5/6. */
+function AsmDecisionSummary({ record }: { record: Record<string, unknown> }) {
+  const summaryFields = decisionSummaryFields(record);
+  const { field: triage, caveat } = triageSummary(record);
+  if (summaryFields.length === 0 && !triage) return null;
+  return (
+    <section aria-label="Estado atual e decisão" className="asm-decision-summary">
+      <h3 className="detail-panel-label">Estado atual e decisão</h3>
+      <div className="status-chip-row">
+        {summaryFields.map((item) => (
+          <GlossedChip key={item.field} item={item} />
+        ))}
+        {triage && <GlossedChip item={triage} />}
+      </div>
+      {caveat && <p className="asm-triage-caveat">{caveat}</p>}
+    </section>
+  );
+}
+
+/** "Como chegámos à decisão": the 8 decision_gates.*, named individually with PASS/PARTIAL/FAIL/UNKNOWN/NOT_ASSESSED glosses grounded in d3-execution-protocol.md §5.1b — no per-gate rationale is synthesized from `notes` (ux-g2-asm-audit.md §8/§9a). */
+function AsmDecisionGates({ record }: { record: Record<string, unknown> }) {
+  const gates = decisionGates(record);
+  if (gates.length === 0) return null;
+  return (
+    <section aria-label="Como chegámos à decisão" className="asm-decision-gates">
+      <h3 className="detail-panel-label">Como chegámos à decisão</h3>
+      <p className="asm-section-caption">
+        Os 8 critérios de decisão avaliados para este Problema, tal como definidos no protocolo de execução D3. A justificação específica de cada critério
+        permanece disponível apenas na inspeção técnica completa.
+      </p>
+      <div className="asm-gate-list">
+        {gates.map((item) => (
+          <GlossedRow key={item.field} item={item} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/** "O que sabemos": evidence_confidence.* and civic_importance.* as two labelled dimension groups — civic_importance dimensions are never aggregated (ux-g2-asm-audit.md §9a). */
+function AsmKnown({ record }: { record: Record<string, unknown> }) {
+  const evidence = evidenceConfidenceDimensions(record);
+  const civic = civicImportanceDimensions(record);
+  if (evidence.length === 0 && civic.length === 0) return null;
+  return (
+    <section aria-label="O que sabemos" className="asm-known">
+      <h3 className="detail-panel-label">O que sabemos</h3>
+      {evidence.length > 0 && (
+        <div className="asm-dimension-group">
+          <h4>Confiança na evidência</h4>
+          <div className="status-chip-row">
+            {evidence.map((item) => (
+              <GlossedChip key={item.field} item={item} />
+            ))}
+          </div>
+        </div>
+      )}
+      {civic.length > 0 && (
+        <div className="asm-dimension-group">
+          <h4>Importância cívica</h4>
+          <p className="asm-section-caption">
+            Cada dimensão é registada de forma independente — estes valores nunca são combinados numa pontuação única.
+          </p>
+          <div className="status-chip-row">
+            {civic.map((item) => (
+              <GlossedChip key={item.field} item={item} />
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** "O que ainda não sabemos": existing_solution_understanding + remaining_gap (always paired), understanding dimensions, and critical_unknowns (existing pattern reused via AssessmentUnknownsFull) — ux-g2-asm-audit.md §9a. */
+function AsmUnknown({ record }: { record: Record<string, unknown> }) {
+  return (
+    <section aria-label="O que ainda não sabemos" className="asm-unknown">
+      <h3 className="detail-panel-label">O que ainda não sabemos</h3>
+      <AssessmentUnknownsFull record={record} />
+    </section>
+  );
+}
+
 function ProvenancePanel({ detail }: { detail: RecordDetail }) {
   const uniqueRelatedCount = countUniqueRelatedRecords(detail);
   return (
@@ -360,6 +505,7 @@ function RecordDetailContent({
   const meaning = findMeaningField(detail.record);
   const typeInfo = describeType(detail.type);
   const relatedProblemId = findRelatedProblemId(detail, lookup);
+  const relatedProblem = relatedProblemId ? (lookup.get(relatedProblemId) ?? null) : null;
   const contributions = contributionValues(detail.record);
   // Already-explicit, schema-driven classification/status fields (RE-01's
   // `buildSummaryFields()` — every enum-constrained field the record's own
@@ -367,7 +513,12 @@ function RecordDetailContent({
   // record-type-specific field for special presentation. `analysis.contribution`
   // is excluded: it already has its own authoritative rendering via
   // ContributionChip above, so including it here would render it twice.
-  const roleFields = Object.entries(lookup.get(detail.id)?.summaryFields ?? {}).filter(([field]) => field !== "analysis.contribution");
+  // ASM- is excluded entirely (UX-G2): `buildSummaryFields()` includes every
+  // enum-constrained ASM field (all 8 decision_gates, all evidence_confidence/
+  // civic_importance dimensions, etc.) — rendering that generic chip wall
+  // here would duplicate, unlabelled, everything the dedicated ASM sections
+  // below now present grouped and glossed.
+  const roleFields = detail.type === "ASM-" ? [] : Object.entries(lookup.get(detail.id)?.summaryFields ?? {}).filter(([field]) => field !== "analysis.contribution");
 
   return (
     <div className="record-detail-layout shell-frame">
@@ -382,7 +533,9 @@ function RecordDetailContent({
           <section aria-label="Significado" className="record-meaning-zone">
             <TypeBadge detail={detail} />
             <OrientationIntro />
-            {meaning ? (
+            {detail.type === "ASM-" ? (
+              <AsmOrientation detail={detail} relatedProblem={relatedProblem} />
+            ) : meaning ? (
               <p className="record-meaning">{meaning.value}</p>
             ) : (
               <p className="record-meaning field-empty">{detail.id} — sem campo de significado canónico identificado para este tipo de registo.</p>
@@ -409,6 +562,14 @@ function RecordDetailContent({
 
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
           {detail.type === "SRC-" && <SourceQuickRead detail={detail} />}
+          {detail.type === "ASM-" && (
+            <>
+              <AsmDecisionSummary record={detail.record} />
+              <AsmDecisionGates record={detail.record} />
+              <AsmKnown record={detail.record} />
+              <AsmUnknown record={detail.record} />
+            </>
+          )}
 
           <ProvenancePanel detail={detail} />
 

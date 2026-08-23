@@ -169,11 +169,14 @@ main {
 }
 
 /* Desktop-first split view; stacks on narrower laptop/tablet widths rather
-   than compressing both panes unreadably. */
+   than compressing both panes unreadably. UX-G2 §8: top margin separates
+   this from the global header — previously the search/filter controls sat
+   flush against the header's bottom rule. */
 .records-explorer {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
+  margin-top: var(--space-6);
 }
 
 @media (max-width: 767px) {
@@ -1825,6 +1828,129 @@ main.explorer-shell {
   margin-top: var(--space-8);
   padding-top: var(--space-5);
   border-top: 1px solid var(--line);
+}
+
+/* UX-G2: ASM current-state comprehension — orientation, decision summary,
+   decision-gate list, and the two structured "O que sabemos"/"O que ainda
+   não sabemos" groups. Deliberately labelled/grouped rather than a chip
+   wall (ux-g2-asm-audit.md §9 point 6). */
+.asm-orientation-currentness {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-2);
+}
+
+.asm-orientation-as-of {
+  color: var(--ink-faint);
+  font-size: 13px;
+}
+
+.asm-decision-summary,
+.asm-decision-gates,
+.asm-known,
+.asm-unknown {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
+  padding: var(--space-4) var(--space-5);
+  margin: 0 0 var(--space-6);
+}
+
+.asm-triage-caveat {
+  margin: var(--space-3) 0 0;
+  color: var(--ink-faint);
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 56ch;
+}
+
+.asm-section-caption {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-faint);
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 62ch;
+}
+
+.asm-gate-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.asm-gate-row {
+  display: grid;
+  grid-template-columns: 200px auto 1fr;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line-subtle);
+}
+
+.asm-gate-row:last-child {
+  border-bottom: none;
+}
+
+.asm-gate-name {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.asm-gate-explanation {
+  color: var(--ink-faint);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.asm-dimension-group {
+  margin: 0 0 var(--space-5);
+}
+
+.asm-dimension-group:last-child {
+  margin-bottom: 0;
+}
+
+.asm-dimension-group h4 {
+  margin: 0 0 var(--space-2);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.asm-solution-gap-pair {
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin: 0 0 var(--space-4);
+  background: var(--surface);
+}
+
+.asm-solution-gap-pair p,
+.asm-understanding-rows p {
+  margin: 0 0 var(--space-2);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.asm-solution-gap-pair p:last-child,
+.asm-understanding-rows p:last-child {
+  margin-bottom: 0;
+}
+
+.asm-understanding-rows {
+  margin: 0 0 var(--space-4);
+}
+
+@media (max-width: 767px) {
+  .asm-gate-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
 }
 
 .record-detail-relations .relationship-paths {

@@ -42,6 +42,11 @@ const COMPACT_LABELS: Record<string, Record<string, string>> = {
 
 const FIELD_CAPTIONS: Record<string, string> = {
   status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", digital_leverage: "Alavancagem digital", existing_solutions: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", contribution: "Contribuição", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", assessment_status: "Estado da avaliação", contradiction_status: "Grau de contradição", stakeholder_validation: "Validação por intervenientes", structure_action: "Ação estrutural", triage: "Triagem", remaining_gap: "Lacuna remanescente", decision_impact: "Impacto na decisão", target_phase: "Fase prevista", decision_gate: "Critério de decisão", geography: "Âmbito geográfico", source_type: "Tipo de fonte", authority: "Autoridade", freshness: "Atualidade", licensing: "Licenciamento",
+  overall: "Confiança global", independence: "Independência", coherence: "Coerência", adequacy: "Adequação", relevance: "Relevância", currentness: "Atualidade da evidência",
+  reach: "Alcance", frequency: "Frequência", severity: "Gravidade", persistence: "Persistência", equity: "Equidade",
+  journey_understanding: "Compreensão do percurso", causal_understanding: "Compreensão causal", existing_solution_understanding: "Compreensão das soluções existentes",
+  problem_real: "Problema real", civic_importance: "Importância cívica", journey_understood: "Percurso compreendido", root_cause_understood: "Causa-raiz compreendida", remaining_gap_supported: "Lacuna remanescente sustentada", digital_causality: "Causalidade digital", operability: "Operacionalidade", testability: "Testabilidade",
+  as_of: "Avaliado em",
 };
 
 const PS_LABELS: Record<string, string> = {
@@ -79,6 +84,12 @@ export function publicFieldCaption(field: string): string {
   const terminalField = field.split(".").at(-1) ?? field;
   const captionField = field.startsWith("decision_gates.") ? "decision_gate" : field.startsWith("geography.") ? "geography" : field.startsWith("licensing.") ? "licensing" : field.startsWith("analysis.public_signal_class") ? "public_signal_class" : terminalField;
   return FIELD_CAPTIONS[captionField] ?? field;
+}
+
+/** Per-gate name (e.g. "Problema real"), distinct from `publicFieldCaption`'s generic "Critério de decisão" caption used elsewhere — the Como-chegámos gate list needs to name each of the 8 gates individually. */
+export function decisionGateName(field: string): string {
+  const terminalField = field.split(".").at(-1) ?? field;
+  return FIELD_CAPTIONS[terminalField] ?? field;
 }
 
 export function formatPublicCount(value: number): string {
