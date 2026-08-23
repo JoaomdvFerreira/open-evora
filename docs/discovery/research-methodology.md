@@ -1,7 +1,7 @@
 # Research Methodology
 
-**Version:** 0.4  
-**Status:** Baseline draft; §2.3–2.4 reconciled for D3/D5 2026-08-11; §11–12 added for D4–D9 programme reconciliation 2026-08-11; §13 (D5 Execution Strategy) added 2026-08-11
+**Version:** 0.5  
+**Status:** Baseline draft; §2.3–2.4 reconciled for D3/D5 2026-08-11; §11–12 added for D4–D9 programme reconciliation 2026-08-11; §13 (D5 Execution Strategy) added 2026-08-11; §14 (Evidence Qualification v1) added 2026-08-23
 
 ## 1. Purpose
 
@@ -341,3 +341,20 @@ Not created by this canonicalization. Recommended later structure, for the proje
 3. **Validation Decisions & D5 Closure** — integrate evidence, apply the validation contract (`docs/models/problem-model.md`), update `ASM`/`PRB` only where justified, create the D6 handoff, and close D5.
 
 External contacts/data requests may run in parallel outside AIQT while canonical repository integration remains serialized.
+
+## 14. Evidence Qualification v1 — authoring/intake rule
+
+Canonicalized 2026-08-23, following a read-only audit of the `EVD-*` corpus. This is a human authoring/reconciliation methodology, applied when drafting or reconciling `EVD-*` records — it is **not** a semantic verifier, truth engine, or automated check, and it does not add fields to the Evidence schema (`docs/models/evidence-model.md`).
+
+Before promoting information to a canonical `EVD-*`, the investigator should be able to determine, from the record's canonical representation (the `observation`, `source`, `geography`/`population`, and `notes` fields already in the schema — no new fields required):
+
+1. **Observation** — there is one identifiable, sufficiently atomic factual observation (not a bundle of unrelated claims).
+2. **Provenance** — the observation is directly supported by the cited `SRC-*`/engagement, not inferred beyond what it states.
+3. **Scope** — its actual place/population/time bounds are understood.
+4. **Inference limits** — the material conclusion(s) it does *not* support are understood (see `docs/models/evidence-model.md`'s waiting-time example).
+
+Qualification as `EVD` is not evidential strength — `strength` and `evidence_nature` remain the separate dimensions already defined in the Evidence Model. Weak, scoped, or anecdotal information may still qualify as `EVD` when represented honestly and its scope/limits are clear. If a material question above cannot be answered, the information should normally remain source/context/research note/lead pending further investigation, rather than being promoted.
+
+Independence stays relational and is assessed at `ASM-*`/problem level, not per-record (§13; `docs/models/evidence-model.md`). Directness stays `PRB-*`-relative, assessed per-problem, not per-record. Neither is redefined by this section.
+
+Apply this prospectively, and during other reconciliation work already touching a record. Do not trigger a historical corpus backfill merely because this section now exists.
