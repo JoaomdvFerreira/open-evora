@@ -804,6 +804,7 @@ main.explorer-shell {
   align-items: stretch;
   justify-content: space-between;
   gap: 2rem;
+  min-height: inherit;
 }
 
 .explorer-chrome-inner > h1 {
