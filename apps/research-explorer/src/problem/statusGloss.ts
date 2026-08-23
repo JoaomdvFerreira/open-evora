@@ -35,7 +35,8 @@ type FieldGlossMap = Record<string, FieldGloss>;
 const STATUS_GLOSS: FieldGlossMap = {
   OPEN: {
     label: "Aberto",
-    explanation: "ainda não atingiu um dos resultados terminais do modelo canónico (REJECTED, DUPLICATE, NON_DIGITAL, ALREADY_SOLVED, INSUFFICIENT_EVIDENCE).",
+    explanation:
+      "ainda não atingiu um dos resultados terminais do modelo canónico — por exemplo, rejeitado, identificado como duplicado, considerado não digital, já resolvido, ou encerrado por evidência insuficiente.",
   },
   REJECTED: { label: "Rejeitado" },
   DUPLICATE: { label: "Duplicado" },
@@ -48,7 +49,7 @@ const VALIDATION_STATUS_GLOSS: FieldGlossMap = {
   unvalidated: {
     label: "Por validar",
     explanation:
-      "nenhum desafio D5 deliberado foi concluído, ou a evidência direta ainda é insuficiente para sustentar o enquadramento atual; não significa que o problema seja falso.",
+      "ainda não foi concluído um desafio deliberado ao enquadramento atual, ou a evidência direta ainda é insuficiente para o sustentar; não significa que o problema seja falso.",
   },
   partially_validated: {
     label: "Parcialmente validado",
@@ -66,7 +67,7 @@ const EVIDENCE_STATUS_GLOSS: FieldGlossMap = {
   corroborated: {
     label: "Evidência corroborada",
     explanation:
-      "surge depois de discovered na sequência do ciclo de vida documentada para o Problema (DISCOVERED → CORROBORATED → …); o critério exato de distinção entre os dois valores não está documentado nos modelos consultados.",
+      "surge depois de \"evidência identificada\" na sequência do ciclo de vida documentada para o Problema; o critério exato de distinção entre os dois valores não está documentado nos modelos consultados.",
   },
 };
 
