@@ -514,6 +514,12 @@ code {
   margin: 0.75rem 0;
 }
 
+/* Keeps the wide edges table inspectable at compact widths without the
+   table itself forcing page-level horizontal overflow (§F2). */
+.graph-edges-table-scroll {
+  overflow-x: auto;
+}
+
 /* Contribution chips (REDUX-002) — every canonical value, including
    CONTRADICTS, shares identical border weight/padding/background/font size.
    Never give any one value structural or colour emphasis over another.
@@ -1725,6 +1731,10 @@ main.explorer-shell {
 
 .record-detail-relations .relationship-paths {
   margin: var(--space-1) 0 var(--space-3) var(--space-5);
+}
+
+.record-detail-relations .relationship-paths code {
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 767px) {

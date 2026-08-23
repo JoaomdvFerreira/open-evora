@@ -368,39 +368,41 @@ export function GraphExplorer({
             {rows.length === 0 ? (
               <p>Nenhuma relação visível com os filtros atuais.</p>
             ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Origem</th>
-                    <th scope="col">Destino</th>
-                    <th scope="col">Referência canónica</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => {
-                    const from = lookup.get(row.from);
-                    const to = lookup.get(row.to);
-                    return (
-                      <tr key={row.key}>
-                        <td>
-                          <button type="button" onClick={() => handleNodeClick(row.from)}>
-                            {from ? formatTypedId(from.type, from.id) : row.from}
-                          </button>
-                        </td>
-                        <td>
-                          <button type="button" onClick={() => handleNodeClick(row.to)}>
-                            {to ? formatTypedId(to.type, to.id) : row.to}
-                          </button>
-                        </td>
-                        <td>
-                          através de <code>{row.field}</code>
-                          {row.ordinal !== null ? `[${row.ordinal}]` : ""}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div className="graph-edges-table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">Origem</th>
+                      <th scope="col">Destino</th>
+                      <th scope="col">Referência canónica</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((row) => {
+                      const from = lookup.get(row.from);
+                      const to = lookup.get(row.to);
+                      return (
+                        <tr key={row.key}>
+                          <td>
+                            <button type="button" onClick={() => handleNodeClick(row.from)}>
+                              {from ? formatTypedId(from.type, from.id) : row.from}
+                            </button>
+                          </td>
+                          <td>
+                            <button type="button" onClick={() => handleNodeClick(row.to)}>
+                              {to ? formatTypedId(to.type, to.id) : row.to}
+                            </button>
+                          </td>
+                          <td>
+                            através de <code>{row.field}</code>
+                            {row.ordinal !== null ? `[${row.ordinal}]` : ""}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
           </section>
         </>
