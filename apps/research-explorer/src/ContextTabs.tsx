@@ -1,3 +1,5 @@
+import { useUnavailableNote } from "./UnavailableNote";
+
 export type ContextTabsActive = "detail" | "problem" | "graph";
 
 interface ContextTabsProps {
@@ -18,6 +20,7 @@ interface ContextTabsProps {
  * reimplemented per surface.
  */
 export function ContextTabs({ prbId, active, onOpenGeneric, onViewAsProblem }: ContextTabsProps) {
+  const { id: grafoNoteId, describedBy: grafoNote } = useUnavailableNote("Em desenvolvimento");
   return (
     <nav aria-label={`Navegação de ${prbId}`} className="context-tabs">
       <button type="button" aria-current={active === "detail" ? "page" : undefined} onClick={active === "detail" ? undefined : () => onOpenGeneric(prbId)}>
@@ -27,11 +30,16 @@ export function ContextTabs({ prbId, active, onOpenGeneric, onViewAsProblem }: C
         Problema
       </button>
       {/* UX-F: Grafo is temporarily unavailable — see Explorer.tsx GlobalNav for the same treatment.
-          Kept focusable (no native `disabled`) so keyboard users can reach it and discover why it's
-          unavailable via aria-disabled + title — no onClick, so activation is a no-op. */}
-      <button type="button" aria-disabled="true" title="Em desenvolvimento">
-        Grafo
-      </button>
+          Kept focusable (no native `disabled`) so keyboard users can reach it; the explanation is
+          exposed visibly (hover/focus, via .unavailable-note) and associated through aria-describedby
+          rather than relying solely on `title`, which isn't reliably surfaced on keyboard focus.
+          No onClick, so activation is a no-op. */}
+      <span className="unavailable-control">
+        <button type="button" aria-disabled="true" title="Em desenvolvimento" aria-describedby={grafoNoteId}>
+          Grafo
+        </button>
+        {grafoNote}
+      </span>
     </nav>
   );
 }
