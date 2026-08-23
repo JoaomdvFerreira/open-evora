@@ -40,14 +40,36 @@ function isExplorerView(value: string | null): value is ExplorerView {
   return value === "overview" || value === "records" || value === "problem" || value === "graph";
 }
 
+/**
+ * UX-F: Graph is temporarily unavailable to public users (not removed — see
+ * docs/design/research-explorer/visual-implementation-contract.md and the
+ * UX-F work unit). A direct/bookmarked Graph URL must not render Graph, so
+ * `view=graph` is normalized away here — the one place both initial load and
+ * popstate (browser Back/Forward, via useExplorerUrlState) already funnel
+ * through — rather than patched separately in every caller. A PRB-shaped
+ * `id` still gets its Problem View (the closest still-available surface to
+ * "focused on this PRB"); anything else falls back to Overview. This is a
+ * syntactic prefix check only — id existence is validated downstream (same
+ * as any other selectedId) by ProblemView/StaticDataProvider.
+ */
+const PRB_ID_PATTERN = /^PRB-[A-Za-z0-9-]+$/;
+
+function isPrbShapedId(id: string | null): id is string {
+  return id !== null && PRB_ID_PATTERN.test(id);
+}
+
 export function parseUrlState(search: string): ExplorerUrlState {
   const params = new URLSearchParams(search);
   const view = params.get("view");
   const id = params.get("id");
   const depthParam = Number(params.get("d"));
+  const selectedId = id !== null && id.trim() !== "" ? id : null;
+  const requestedView = isExplorerView(view) ? view : DEFAULT_VIEW;
+  const view_ =
+    requestedView === "graph" ? (isPrbShapedId(selectedId) ? "problem" : DEFAULT_VIEW) : requestedView;
   return {
-    view: isExplorerView(view) ? view : DEFAULT_VIEW,
-    selectedId: id !== null && id.trim() !== "" ? id : null,
+    view: view_,
+    selectedId: requestedView === "graph" && !isPrbShapedId(selectedId) ? null : selectedId,
     query: params.get("q") ?? "",
     typeFilter: params.get("type") ?? ALL_TYPES,
     graphDepth: Number.isFinite(depthParam) && depthParam > 0 ? clampDepth(depthParam) : DEFAULT_GRAPH_DEPTH,

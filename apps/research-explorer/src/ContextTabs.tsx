@@ -17,7 +17,7 @@ interface ContextTabsProps {
  * and its markup/styling (`.context-tabs`) stay single-sourced rather than
  * reimplemented per surface.
  */
-export function ContextTabs({ prbId, active, onOpenGeneric, onViewAsProblem, onViewInGraph }: ContextTabsProps) {
+export function ContextTabs({ prbId, active, onOpenGeneric, onViewAsProblem }: ContextTabsProps) {
   return (
     <nav aria-label={`Navegação de ${prbId}`} className="context-tabs">
       <button type="button" aria-current={active === "detail" ? "page" : undefined} onClick={active === "detail" ? undefined : () => onOpenGeneric(prbId)}>
@@ -26,7 +26,8 @@ export function ContextTabs({ prbId, active, onOpenGeneric, onViewAsProblem, onV
       <button type="button" aria-current={active === "problem" ? "page" : undefined} onClick={active === "problem" ? undefined : () => onViewAsProblem(prbId)}>
         Problema
       </button>
-      <button type="button" aria-current={active === "graph" ? "page" : undefined} onClick={active === "graph" ? undefined : () => onViewInGraph(prbId)}>
+      {/* UX-F: Grafo is temporarily unavailable — see Explorer.tsx GlobalNav for the same treatment. */}
+      <button type="button" disabled aria-disabled="true" title="Em desenvolvimento">
         Grafo
       </button>
     </nav>

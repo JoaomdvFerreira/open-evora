@@ -869,6 +869,16 @@ main.explorer-shell {
   background: var(--surface-muted);
 }
 
+.explorer-navigation button:disabled {
+  color: var(--ink-faintest);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.explorer-navigation button:disabled:hover {
+  background: none;
+}
+
 .explorer-navigation button[aria-current="page"] {
   color: var(--ink);
   border-color: transparent;
@@ -2162,6 +2172,16 @@ main.explorer-shell {
 .context-tabs button:hover {
   color: var(--ink);
   background: var(--surface-muted);
+}
+
+.context-tabs button:disabled {
+  color: var(--ink-faintest);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.context-tabs button:disabled:hover {
+  background: none;
 }
 
 .context-tabs button[aria-current="page"] {

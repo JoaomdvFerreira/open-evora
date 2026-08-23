@@ -57,7 +57,7 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
             <button type="button" aria-current={url.state.view === "records" ? "page" : undefined} onClick={() => url.clearSelectionAndSetView("records")}>
               Registos
             </button>
-            <button type="button" aria-current={url.state.view === "graph" ? "page" : undefined} onClick={() => url.clearSelectionAndSetView("graph")}>
+            <button type="button" disabled aria-disabled="true" title="Em desenvolvimento">
               Grafo
             </button>
           </nav>

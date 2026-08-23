@@ -311,9 +311,32 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
 
     await user.click(within(switcher).getByRole("button", { name: "Problema" }));
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0006");
+  });
 
-    await user.click(within(switcher).getByRole("button", { name: "Grafo" }));
-    expect(onViewInGraph).toHaveBeenCalledWith("PRB-0006");
+  it("UX-F: the Detalhe/Problema/Grafo context switcher's Grafo tab is visible but disabled, and cannot invoke onViewInGraph", async () => {
+    const onViewInGraph = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={onViewInGraph}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const switcher = within(panel).getByRole("navigation", { name: /PRB-0006/ });
+    const grafoTab = within(switcher).getByRole("button", { name: "Grafo" }) as HTMLButtonElement;
+    expect(grafoTab.disabled).toBe(true);
+    expect(grafoTab.getAttribute("aria-disabled")).toBe("true");
+    expect(grafoTab.getAttribute("title")).toBe("Em desenvolvimento");
+
+    await user.click(grafoTab);
+    expect(onViewInGraph).not.toHaveBeenCalled();
   });
 
   it("renders a future/unknown schema-shaped record generically, with no meaning-zone crash, and no fabricated meaning text", async () => {
