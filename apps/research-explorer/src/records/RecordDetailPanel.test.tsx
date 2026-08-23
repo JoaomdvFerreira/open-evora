@@ -71,6 +71,15 @@ const PRB_0006_SUMMARY: RecordSummary = {
   summaryFields: { status: "OPEN" },
 };
 
+const PRB_0006_DETAIL: RecordDetail = {
+  id: "PRB-0006",
+  type: "PRB-",
+  file: "research/problems/PRB-0006.yaml",
+  record: { problem_id: "PRB-0006", status: "OPEN" },
+  outgoingEdges: [],
+  incomingEdges: [{ field: "analysis.related_problems", ordinal: 0, from: "EVD-000127" }],
+};
+
 const WID_0001_SUMMARY: RecordSummary = {
   id: "WID-0001",
   type: "WID-",
@@ -276,6 +285,35 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
     await within(panel).findByText("Inspeção técnica completa — todos os campos canónicos");
     expect(within(panel).queryByRole("button", { name: "Ver como Problema (contexto completo)" })).toBeNull();
     expect(within(panel).queryByText("Detalhe · Problema · Grafo")).toBeNull();
+    expect(within(panel).queryByRole("navigation", { name: /Navegação de/ })).toBeNull();
+  });
+
+  it("shows a persistent Detalhe/Problema/Grafo context switcher with Detalhe active on PRB Record Detail, preserving the PRB identity when navigating", async () => {
+    const onViewAsProblem = vi.fn();
+    const onViewInGraph = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={onViewAsProblem}
+        onViewInGraph={onViewInGraph}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const switcher = within(panel).getByRole("navigation", { name: /PRB-0006/ });
+    const detalheButton = within(switcher).getByRole("button", { name: "Detalhe" });
+    expect(detalheButton.getAttribute("aria-current")).toBe("page");
+
+    await user.click(within(switcher).getByRole("button", { name: "Problema" }));
+    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0006");
+
+    await user.click(within(switcher).getByRole("button", { name: "Grafo" }));
+    expect(onViewInGraph).toHaveBeenCalledWith("PRB-0006");
   });
 
   it("renders a future/unknown schema-shaped record generically, with no meaning-zone crash, and no fabricated meaning text", async () => {

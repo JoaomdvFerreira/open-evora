@@ -635,6 +635,10 @@ code {
   --radius-sm: 3px;
   --radius-md: 4px;
   --radius-lg: 5px;
+  /* Widest approved production content width (Record Detail, design-system.md §1) —
+     reused as the header's inner-content frame so chrome stays full-bleed while its
+     content aligns with every surface's own max width beneath it. */
+  --shell-content-max: 980px;
 
   /* Semantic typography recipes — design-system.md §2. Primitives only;
      no component selectors consume these yet (V1/V2/V3 reconciliation). */
@@ -773,14 +777,20 @@ main.explorer-shell {
 }
 
 .explorer-chrome {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
   min-height: 48px;
   margin: 0 -2rem;
   padding: 0 2rem;
   border-bottom: 1px solid var(--line);
+}
+
+.explorer-chrome-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  width: 100%;
+  max-width: var(--shell-content-max);
+  margin: 0 auto;
 }
 
 .explorer-chrome > h1 {
@@ -1537,6 +1547,63 @@ main.explorer-shell {
   color: var(--accent-dark);
 }
 
+.detail-rail-actions a {
+  display: block;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.detail-rail-actions a:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+/* Problem View reading rail (UX-B §3/§4) — "Nesta página" index plus a
+   canonical-contribution-label reference, inside the reused
+   `.record-detail-rail` shell. */
+.problem-rail-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.problem-rail-nav a {
+  display: block;
+  padding: var(--space-1) 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.problem-rail-nav a:hover {
+  color: var(--accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.problem-rail-contributions {
+  border-top: 1px solid var(--line-subtle);
+  padding-top: var(--space-4);
+}
+
+.problem-rail-contribution-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin-top: var(--space-2);
+}
+
 .detail-rail-file {
   display: block;
   padding: var(--space-2) var(--space-3);
@@ -1678,11 +1745,15 @@ main.explorer-shell {
   }
 
   .explorer-chrome {
+    margin: 0 -1rem;
+    padding: 0;
+  }
+
+  .explorer-chrome-inner {
     align-items: stretch;
     flex-direction: column;
     gap: 0;
-    margin: 0 -1rem;
-    padding: 0;
+    max-width: none;
   }
 
   .explorer-chrome > h1 {
@@ -1902,17 +1973,26 @@ main.explorer-shell {
   }
 }
 
-/* V3: Problem View (design-system.md §1/§2/§3, Prototype B) — a single-
-   column editorial reading composition, 800px content width, sharing the
-   Breadcrumb pattern with Record Detail and the ContextTabs pattern
-   (Detalhe/Problema/Grafo) unique to this Problem-scoped surface. Desktop
-   sizing lives here; compact overrides are in the 767px media query below.
-   No shadows — separation comes from 1px borders and surface steps only. */
+/* V3/UX-B: Problem View (design-system.md §1/§2/§3, Prototype B) — an
+   editorial reading composition sharing the Breadcrumb pattern with Record
+   Detail and the ContextTabs pattern (Detalhe/Problema/Grafo) unique to
+   PRB-scoped surfaces. UX-B adds a desktop reading rail reusing Record
+   Detail's exact two-column geometry (`.record-detail-columns`/`-main`/
+   `-rail`: 720px main + 44px `--detail-gap` + 216px rail = 980px), rather
+   than a second bespoke rail width — `.problem-view`'s own frame widens
+   from the original 800px main-only reading width to that same 980px total
+   to house it. Desktop sizing lives here; compact overrides are in the
+   767px media query below. No shadows — separation comes from 1px borders
+   and surface steps only. */
 .problem-view {
   box-sizing: border-box;
-  max-width: 800px;
+  max-width: 980px;
   margin: 0 auto;
   padding-bottom: var(--space-9);
+}
+
+.problem-view-columns {
+  align-items: flex-start;
 }
 
 .context-tabs {
@@ -1980,6 +2060,28 @@ main.explorer-shell {
 
 .problem-help-content p {
   margin: 0 0 var(--space-2);
+}
+
+/* Compact-only substitute for the desktop reading rail's "Nesta página"
+   index (UX-B §4) — the rail already provides it on desktop, so this stays
+   hidden there to avoid a duplicate section index. */
+.problem-help-section-index {
+  display: none;
+  margin: 0 0 var(--space-3);
+}
+
+.problem-help-section-index-label {
+  margin: 0 0 var(--space-1);
+  font-weight: 600;
+}
+
+.problem-help-section-index ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
 }
 
 .problem-identity {
@@ -2161,6 +2263,18 @@ main.explorer-shell {
     max-width: 100%;
   }
 
+  .problem-view-columns {
+    display: block;
+  }
+
+  /* No persistent side rail on compact (UX-B §4) — the "Nesta página"
+     index and canonical-contribution reference are desktop-only; compact
+     gets the equivalent essential help in-flow via ProblemHelpDisclosure
+     instead, not a restacked copy of this rail. */
+  .problem-reading-rail {
+    display: none;
+  }
+
   .context-tabs {
     display: flex;
     width: 100%;
@@ -2186,5 +2300,9 @@ main.explorer-shell {
 
   .assessment-fields dt {
     margin-top: var(--space-2);
+  }
+
+  .problem-help-section-index {
+    display: block;
   }
 }

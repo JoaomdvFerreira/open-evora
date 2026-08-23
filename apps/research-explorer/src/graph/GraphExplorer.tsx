@@ -18,6 +18,7 @@ import { buildRenderGraph } from "./renderGraph";
 import { GraphCanvas, type GraphCanvasHandle } from "./GraphCanvas";
 import { FOCUS_NODE_COLOR, typeVisual } from "./typeVisuals";
 import type { ResearchGraph } from "./buildGraphModel";
+import { ContextTabs } from "../ContextTabs";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -204,6 +205,10 @@ export function GraphExplorer({
         Modo de exploração por vizinhança: mostra o registo focado e as suas relações diretas — não o corpus completo. O grafo é
         complementar aos Registos e à vista de Problema, nunca a única forma de aceder a um facto.
       </p>
+
+      {!fullCorpusView && focusSummary?.type === "PRB-" && (
+        <ContextTabs prbId={focusSummary.id} active="graph" onOpenGeneric={onOpenGeneric} onViewAsProblem={onViewAsProblem} onViewInGraph={onFocusChange} />
+      )}
 
       <div className="graph-controls">
         <div>

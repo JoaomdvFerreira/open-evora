@@ -72,9 +72,9 @@ Used identically by all four surfaces (Overview, Records, Record Detail, Problem
 
 **Desktop (`>=768px`)**: `text-wordmark` + `text-shell-subtitle`; nav items `text-global-nav`, gap `space-6`; active item weight 600, `border-bottom:2px solid color-link`, `padding-bottom:space-1`; breadcrumb (record-scoped pages only) sits directly beneath as a second bar, same horizontal padding as shell.
 
-**Compact (`<=767px`) canonical order** (record-scoped pages): wordmark row → 3 equal-width global-nav tabs → breadcrumb → ContextTabs (Problem View only) → page content. Global navigation is never hidden or collapsed to an icon at compact widths.
+**Compact (`<=767px`) canonical order** (record-scoped pages): wordmark row → 3 equal-width global-nav tabs → breadcrumb → ContextTabs (PRB identity in view only, per below) → page content. Global navigation is never hidden or collapsed to an icon at compact widths.
 
-**ContextTabs rule, explicit**: Detalhe/Problema/Grafo is a Problem-scoped triad — it appears only once a PRB record's identity is in view (Problem View). Record Detail (e.g. a bare EVD- evidence record reached directly, outside any Problem) is not itself one vertex of that triad, so it never renders ContextTabs; it exposes equivalent navigation as explicit named links inside "Mais ações" (Ver como Problema / Ver no Grafo). This is a rule, not an omission.
+**ContextTabs rule, explicit (corrected UX-B)**: Detalhe/Problema/Grafo is a PRB-identity-scoped triad, not a Problem-View-only one — it appears while viewing the **same PRB record's identity** across all three of its representations: PRB Record Detail (`Detalhe` active), Problem View (`Problema` active), and Graph focused on that PRB (`Grafo` active). Navigating between tabs preserves the PRB identity. A non-PRB record never renders ContextTabs in any of the three surfaces — Record Detail for a non-PRB record (e.g. a bare EVD- evidence record reached directly) keeps its equivalent navigation as explicit named links inside "Mais ações" (Ver como Problema / Ver no Grafo), and Graph focused on a non-PRB record likewise renders no PRB ContextTabs. This is a rule, not an omission.
 
 **Hover/focus**: nav items are real links; hover → `color-link-hover` + underline; focus-visible → `outline:2px solid color-link; outline-offset:2px` on the control itself, never on a sub-element.
 

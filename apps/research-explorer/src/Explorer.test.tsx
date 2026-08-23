@@ -401,13 +401,14 @@ describe("Explorer — Problem view (RE-03)", () => {
     expect(within(evidenceSection).getByText(/EVD-000105/)).toBeTruthy();
   });
 
-  it("'Ver como Problema' from the generic detail panel switches to the Problem view for the same ID", async () => {
+  it("the PRB Record Detail context switcher's 'Problema' tab switches to the Problem view for the same ID", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
 
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     const detailPanel = await getDetailPanel();
-    await user.click(await within(detailPanel).findByRole("button", { name: "Ver como Problema (contexto completo)" }));
+    const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
+    await user.click(within(switcher).getByRole("button", { name: "Problema" }));
 
     const heading = await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
     expect(window.location.search).toContain("view=problem");
@@ -416,13 +417,14 @@ describe("Explorer — Problem view (RE-03)", () => {
     expect(document.activeElement).toBe(heading);
   });
 
-  it("opens Graph from record detail with a focused heading and record-specific title", async () => {
+  it("opens Graph from a PRB record detail's context switcher with a focused heading and record-specific title", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
 
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     const detailPanel = await getDetailPanel();
-    await user.click(await within(detailPanel).findByRole("button", { name: "Ver no Grafo" }));
+    const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
+    await user.click(within(switcher).getByRole("button", { name: "Grafo" }));
 
     const heading = await screen.findByRole("heading", { name: "Grafo", level: 2 });
     expect(document.title).toBe("Grafo PRB-0005 — Explorador de Investigação Open Évora");
@@ -538,7 +540,11 @@ describe("Explorer — Problem view (RE-03)", () => {
     const guide = screen.getByText("Como ler o Explorer").closest("details")!;
     expect(guide.open).toBe(false);
 
-    await user.click(screen.getByRole("link", { name: /Orientação completa do Explorer/ }));
+    // Both the desktop reading rail and the compact-substitute section index
+    // inside ProblemHelpDisclosure carry this link (CSS alone decides which
+    // is visible at a given width) — either must open the same guide.
+    const [firstLink] = screen.getAllByRole("link", { name: /Orientação completa do Explorer/ });
+    await user.click(firstLink);
 
     expect(window.location.hash).toBe("#reading-guide");
     expect(guide.open).toBe(true);

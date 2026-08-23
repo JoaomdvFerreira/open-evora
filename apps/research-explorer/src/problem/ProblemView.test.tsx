@@ -293,7 +293,7 @@ describe("ProblemView", () => {
     const details = screen.getByText("O que é um Problema, e o que significam os estados abaixo?").closest("details");
     expect(details).toBeTruthy();
     expect(details!.hasAttribute("open")).toBe(false);
-    expect(screen.getByRole("link", { name: /Orientação completa do Explorer/ }).getAttribute("href")).toBe("#reading-guide");
+    expect(within(details!).getByRole("link", { name: /Orientação completa do Explorer/ }).getAttribute("href")).toBe("#reading-guide");
   });
 
   it("shows a PRB-scoped Detalhe/Problema/Grafo context switcher with Problema active and correct navigation calls", async () => {
@@ -312,6 +312,40 @@ describe("ProblemView", () => {
 
     await user.click(within(switcher).getByRole("button", { name: "Grafo" }));
     expect(onViewInGraph).toHaveBeenCalledWith("PRB-0005");
+  });
+
+  it("exposes 'Nesta página' section-index anchors that target every major Problem View section", async () => {
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    await screen.findByRole("heading", { name: "Parking pressure" });
+
+    const expectedSections = [
+      { id: "problem-estado-atual", label: "Estado atual" },
+      { id: "problem-avaliacao", label: "Avaliação" },
+      { id: "problem-evidencia", label: "Evidência" },
+      { id: "problem-incertezas", label: "Incertezas e lacunas" },
+      { id: "problem-hipoteses", label: "Hipóteses" },
+    ];
+
+    for (const { id, label } of expectedSections) {
+      // The target anchor itself must exist in the DOM...
+      expect(document.getElementById(id)).toBeTruthy();
+      // ...and the rail's index must link to it by that exact id.
+      const railLink = screen.getByRole("navigation", { name: "Nesta página" }).querySelector(`a[href="#${id}"]`);
+      expect(railLink?.textContent).toBe(label);
+    }
+  });
+
+  it("keeps the compact section-index self-sufficient — its anchors do not depend on the desktop reading rail rendering", async () => {
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    await screen.findByRole("heading", { name: "Parking pressure" });
+
+    // The compact-substitute index (inside ProblemHelpDisclosure) is a
+    // second, independent nav carrying the same anchors — CSS alone decides
+    // which of the two is visible at a given width, so both must exist and
+    // link correctly regardless of which one compact/desktop actually shows.
+    const compactIndex = screen.getByRole("navigation", { name: "Nesta página (versão compacta)" });
+    expect(within(compactIndex).getByRole("link", { name: "Evidência" }).getAttribute("href")).toBe("#problem-evidencia");
+    expect(within(compactIndex).getByRole("link", { name: "Hipóteses" }).getAttribute("href")).toBe("#problem-hipoteses");
   });
 
   it("fails closed on a child-detail failure and retries the complete projection", async () => {
