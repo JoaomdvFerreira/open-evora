@@ -1747,6 +1747,39 @@ main.explorer-shell {
   overflow-wrap: anywhere;
 }
 
+/* F1 intermediate reading-layout recomposition (768px-1059px): the
+   canonical 720 main + 44 gap + 216 rail composition cannot fit in this
+   band without destructively compressing the 720px reading column. Reuse
+   the compact single-column recomposition for the two reading surfaces
+   only (Record Detail, Problem View) rather than a parallel layout
+   system; compact typography/navigation rules are intentionally excluded.
+   At >=1060px the canonical two-column geometry resumes unchanged. */
+@media (min-width: 768px) and (max-width: 1059px) {
+  .record-detail-columns {
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .record-detail-main {
+    max-width: 720px;
+  }
+
+  .record-detail-rail {
+    position: static;
+    width: 100%;
+    max-width: 720px;
+    flex-basis: auto;
+  }
+
+  .problem-reading-rail {
+    display: none;
+  }
+
+  .problem-help-section-index {
+    display: block;
+  }
+}
+
 @media (max-width: 767px) {
   main.explorer-shell {
     padding: 0 1rem 2rem;
@@ -2002,6 +2035,7 @@ main.explorer-shell {
 }
 
 .context-tabs {
+  box-sizing: border-box;
   display: inline-flex;
   gap: 0;
   margin: var(--space-3) 0 var(--space-6);
