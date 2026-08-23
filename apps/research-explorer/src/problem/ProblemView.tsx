@@ -138,11 +138,12 @@ const PROBLEM_SECTIONS = [
 ] as const;
 
 /**
- * Desktop reading rail (scope §3/§4): reuses Record Detail's rail/layout
- * pattern (`.record-detail-rail`, `.detail-rail-type-note`,
- * `.detail-rail-actions`) rather than inventing a second sticky-rail
- * treatment. Provides lightweight contextual orientation, a "Nesta página"
- * index, and a link into the full Reading Guide — never a duplicate of it.
+ * Desktop reading rail (scope §3/§4, UX-C §3): reuses Record Detail's
+ * rail/layout pattern (`.record-detail-rail`, `.detail-rail-type-note`)
+ * rather than inventing a second sticky-rail treatment. Provides lightweight
+ * contextual orientation and a "Nesta página" index — the global
+ * ReadingGuide no longer exists on this surface (UX-C §3), so this rail is
+ * Problem View's own, self-sufficient orientation, not a link into it.
  * Desktop-only by CSS (hidden under the existing 767px breakpoint, matching
  * `.record-detail-rail`); compact gets the equivalent index in-flow via
  * `ProblemHelpDisclosure` instead (Slice UX-B §4).
@@ -166,9 +167,6 @@ function ProblemReadingRail() {
           ))}
         </ul>
       </nav>
-      <div className="detail-rail-actions">
-        <a href="#reading-guide">Ver a Orientação completa do Explorer</a>
-      </div>
     </aside>
   );
 }
@@ -177,8 +175,9 @@ function ProblemReadingRail() {
  * Point-of-use Problem orientation (REDUX-007): a small, collapsed-by-default
  * native disclosure explaining what a PRB- record is and, where canonically
  * grounded, what this Problem's own current status values mean — not a
- * modal, not a tour, no first-session/localStorage state. Points to the full
- * Reading Guide for deeper orientation rather than duplicating it.
+ * modal, not a tour, no first-session/localStorage state. Self-contained
+ * (UX-C §3): the global ReadingGuide no longer exists on Problem View, so
+ * this does not point into it.
  */
 function ProblemHelpDisclosure({ record }: { record: Record<string, unknown> }) {
   const explainedFields: { field: string; value: string; gloss: FieldGloss | null }[] = [];
@@ -212,9 +211,6 @@ function ProblemHelpDisclosure({ record }: { record: Record<string, unknown> }) 
             ))}
           </ul>
         </nav>
-        <p>
-          <a href="#reading-guide">Ver a Orientação completa do Explorer →</a>
-        </p>
       </div>
     </details>
   );
@@ -316,7 +312,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
     .filter((x): x is { assessment: RecordDetail; picked: Record<string, unknown> } => x !== null);
 
   return (
-    <article aria-labelledby="problem-heading" className="problem-view">
+    <article aria-labelledby="problem-heading" className="problem-view shell-frame">
       <ProblemBreadcrumb problemId={problem.id} onBackToRecords={onBackToRecords} />
 
       <ContextTabs prbId={problem.id} active="problem" onOpenGeneric={onOpenGeneric} onViewAsProblem={onOpenGeneric} onViewInGraph={onViewInGraph} />

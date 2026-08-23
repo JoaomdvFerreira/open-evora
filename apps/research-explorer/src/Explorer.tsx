@@ -45,7 +45,7 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
   return (
     <>
       <header className="explorer-chrome">
-        <div className="explorer-chrome-inner">
+        <div className="explorer-chrome-inner shell-frame">
           <h1>
             <span className="explorer-brand">Open Évora</span>
             <span className="explorer-subtitle">Explorador de Investigação</span>
@@ -64,7 +64,7 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
         </div>
       </header>
 
-      {url.state.view !== "overview" && <ReadingGuide schemaPrefixes={schemaPrefixes} />}
+      {url.state.view === "graph" && <ReadingGuide schemaPrefixes={schemaPrefixes} />}
 
       {url.state.view === "overview" && (
         <Overview

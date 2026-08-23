@@ -520,34 +520,38 @@ describe("Explorer — Problem view (RE-03)", () => {
     expect(window.location.search).not.toContain("view=problem");
   });
 
-  it("the reading guide explains type prefixes generically outside the first-contact Overview", async () => {
+  it("UX-C: the global reading guide is absent on Records, including Record Detail", async () => {
     window.history.replaceState(null, "", "/?view=records");
     render(<Explorer dataProvider={fakeProvider()} />);
-    const guide = screen.getByText("Como ler o Explorer").closest("details")!;
-    expect(within(guide).getAllByText(/Problema/).length).toBeGreaterThan(0);
-    expect(within(guide).getAllByText(/Fonte/).length).toBeGreaterThan(0);
-    expect(within(guide).getAllByText(/Avaliação/).length).toBeGreaterThan(0);
-    expect(within(guide).getByRole("heading", { name: "Entradas e Saídas" })).toBeTruthy();
-    expect(within(guide).getByText(/não significa, por si só/i)).toBeTruthy();
+    await screen.findByRole("button", { name: /PRB-0005/ });
+    expect(screen.queryByText("Como ler o Explorer")).toBeNull();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: /PRB-0005/ }));
+    await screen.findByText("Inspeção técnica completa — todos os campos canónicos");
+    expect(screen.queryByText("Como ler o Explorer")).toBeNull();
   });
 
-  it("Problem View's 'Ver a Orientação completa' link actually opens the collapsed reading guide, not just navigates to its anchor", async () => {
-    const user = userEvent.setup();
+  it("UX-C: the global reading guide is absent on Problem View", async () => {
+    window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+    expect(screen.queryByText("Como ler o Explorer")).toBeNull();
+  });
+
+  it("UX-C: the global reading guide is retained on Graph", async () => {
+    window.history.replaceState(null, "", "/?view=graph");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    expect(await screen.findByText("Como ler o Explorer")).toBeTruthy();
+  });
+
+  it("UX-C: Problem View's help/rail no longer link to a #reading-guide that doesn't exist on this surface", async () => {
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
-    const guide = screen.getByText("Como ler o Explorer").closest("details")!;
-    expect(guide.open).toBe(false);
-
-    // Both the desktop reading rail and the compact-substitute section index
-    // inside ProblemHelpDisclosure carry this link (CSS alone decides which
-    // is visible at a given width) — either must open the same guide.
-    const [firstLink] = screen.getAllByRole("link", { name: /Orientação completa do Explorer/ });
-    await user.click(firstLink);
-
-    expect(window.location.hash).toBe("#reading-guide");
-    expect(guide.open).toBe(true);
+    expect(screen.queryByRole("link", { name: /Orientação completa do Explorer/ })).toBeNull();
+    expect(document.querySelector('a[href="#reading-guide"]')).toBeNull();
   });
 });
 
