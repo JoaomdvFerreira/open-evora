@@ -1463,7 +1463,7 @@ main.explorer-shell {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin: 0 0 var(--space-6);
+  margin: var(--space-6) 0;
   font-family: var(--recipe-technical-field-family);
   font-size: 13px;
   color: var(--ink-faint);
@@ -1786,8 +1786,12 @@ main.explorer-shell {
   }
 
   .explorer-chrome {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     margin: 0 -1rem;
     padding: 0;
+    background: var(--canvas);
   }
 
   .explorer-chrome-inner {
@@ -1918,12 +1922,20 @@ main.explorer-shell {
     font-size: 0.94rem;
   }
 
+  /* Sticky compact header (F4): anchor-target sections must not land
+     underneath it — scroll-margin-top offsets by the header's own height. */
+  #overview-problemas,
+  .problem-section {
+    scroll-margin-top: 108px;
+  }
+
   .overview-problem-action {
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.35rem;
+    width: 100%;
   }
 
   .overview-statuses {
@@ -1933,7 +1945,7 @@ main.explorer-shell {
   }
 
   .overview-problem-action button {
-    min-height: 36px;
+    min-height: auto;
   }
 
   .records-explorer {
