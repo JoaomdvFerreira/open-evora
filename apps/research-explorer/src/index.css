@@ -793,7 +793,7 @@ main.explorer-shell {
   margin: 0 auto;
 }
 
-.explorer-chrome > h1 {
+.explorer-chrome-inner > h1 {
   display: flex;
   align-items: baseline;
   gap: 0.42rem;
@@ -1592,18 +1592,6 @@ main.explorer-shell {
   text-underline-offset: 0.16em;
 }
 
-.problem-rail-contributions {
-  border-top: 1px solid var(--line-subtle);
-  padding-top: var(--space-4);
-}
-
-.problem-rail-contribution-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-2);
-  margin-top: var(--space-2);
-}
-
 .detail-rail-file {
   display: block;
   padding: var(--space-2) var(--space-3);
@@ -1756,7 +1744,7 @@ main.explorer-shell {
     max-width: none;
   }
 
-  .explorer-chrome > h1 {
+  .explorer-chrome-inner > h1 {
     min-height: 1rem;
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--line);

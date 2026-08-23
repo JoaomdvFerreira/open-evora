@@ -150,7 +150,7 @@ const PROBLEM_SECTIONS = [
  */
 function ProblemReadingRail() {
   return (
-    <aside className="record-detail-rail problem-reading-rail" aria-label="Nesta página">
+    <aside className="record-detail-rail problem-reading-rail">
       <div className="detail-rail-type-note">
         <p>
           Cada secção reúne o que já é canónico sobre este Problema — nenhuma ordem ou destaque aqui implica classificação, força ou
@@ -167,16 +167,6 @@ function ProblemReadingRail() {
           ))}
         </ul>
       </nav>
-      <div className="problem-rail-contributions">
-        <h4 className="detail-panel-label">Contribuição canónica</h4>
-        <div className="problem-rail-contribution-chips">
-          {["CONFIRMS", "REFINES", "CONTRADICTS", "CURRENT-STATE-UPDATE", "EXISTING-SOLUTION", "PLANNED-SOLUTION", "NEW-CANDIDATE"].map(
-            (value) => (
-              <ContributionChip key={value} value={value} />
-            ),
-          )}
-        </div>
-      </div>
       <div className="detail-rail-actions">
         <a href="#reading-guide">Ver a Orientação completa do Explorer</a>
       </div>
