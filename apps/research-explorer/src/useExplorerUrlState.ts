@@ -27,16 +27,40 @@ export function useExplorerUrlState() {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
+  // UX-F: parseUrlState normalizes an unavailable view=graph out of `state`
+  // (initial load and popstate both already funnel through it above), but
+  // the address bar itself is a separate, raw string — left alone it would
+  // still show/round-trip the original "?view=graph..." on share/reload.
+  // Correct it in place via replaceState (no new history entry) whenever it
+  // no longer matches the serialized, normalized state — covers a direct
+  // navigation, a bookmark, and a browser Back/Forward onto a stale URL.
+  useEffect(() => {
+    const normalizedSearch = serializeUrlState(state);
+    if (window.location.search !== normalizedSearch) {
+      window.history.replaceState(null, "", normalizedSearch || window.location.pathname);
+    }
+  }, [state]);
+
+  // Round-tripped through serialize->parse before every write (not just on
+  // load/popstate) so UX-F's view=graph normalization (parseUrlState) governs
+  // every path into state uniformly — including in-app calls like "Ver no
+  // Grafo" or a ContextTabs graph link — not just direct/bookmarked URLs.
+  function normalize(next: ExplorerUrlState): ExplorerUrlState {
+    return parseUrlState(serializeUrlState(next));
+  }
+
   function push(next: ExplorerUrlState) {
-    if (serializeUrlState(next) === serializeUrlState(state)) return;
-    window.history.pushState(null, "", serializeUrlState(next) || window.location.pathname);
-    setState(next);
+    const normalized = normalize(next);
+    if (serializeUrlState(normalized) === serializeUrlState(state)) return;
+    window.history.pushState(null, "", serializeUrlState(normalized) || window.location.pathname);
+    setState(normalized);
   }
 
   function replace(next: ExplorerUrlState) {
-    if (serializeUrlState(next) === serializeUrlState(state)) return;
-    window.history.replaceState(null, "", serializeUrlState(next) || window.location.pathname);
-    setState(next);
+    const normalized = normalize(next);
+    if (serializeUrlState(normalized) === serializeUrlState(state)) return;
+    window.history.replaceState(null, "", serializeUrlState(normalized) || window.location.pathname);
+    setState(normalized);
   }
 
   return {

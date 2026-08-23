@@ -5,6 +5,7 @@ import { Overview } from "./overview/Overview";
 import { RecordsExplorer } from "./records/RecordsExplorer";
 import { ProblemView } from "./problem/ProblemView";
 import { ReadingGuide } from "./guide/ReadingGuide";
+import { useUnavailableNote } from "./UnavailableNote";
 
 // RE-05: lazily imported, not just GraphCanvas's Sigma module inside it —
 // GraphExplorer's own module graph (Graphology + buildGraphModel/neighbourhood/
@@ -28,6 +29,7 @@ interface ExplorerProps {
  */
 export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
   const url = useExplorerUrlState();
+  const { id: grafoNoteId, describedBy: grafoNote } = useUnavailableNote("Em desenvolvimento");
 
   useEffect(() => {
     const selected = url.state.selectedId ? ` ${url.state.selectedId}` : "";
@@ -57,9 +59,16 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
             <button type="button" aria-current={url.state.view === "records" ? "page" : undefined} onClick={() => url.clearSelectionAndSetView("records")}>
               Registos
             </button>
-            <button type="button" aria-current={url.state.view === "graph" ? "page" : undefined} onClick={() => url.clearSelectionAndSetView("graph")}>
-              Grafo
-            </button>
+            {/* UX-F: kept focusable (no native `disabled`) so keyboard users can reach it; the
+                explanation is exposed visibly (hover/focus, via .unavailable-note) and associated
+                through aria-describedby rather than relying solely on `title`, which isn't
+                reliably surfaced on keyboard focus. No onClick, so activation is a no-op. */}
+            <span className="unavailable-control">
+              <button type="button" aria-disabled="true" title="Em desenvolvimento" aria-describedby={grafoNoteId}>
+                Grafo
+              </button>
+              {grafoNote}
+            </span>
           </nav>
         </div>
       </header>

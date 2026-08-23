@@ -31,13 +31,37 @@ describe("parseUrlState", () => {
     });
   });
 
-  it("recognizes the RE-04 'graph' view and a graph-depth param", () => {
-    expect(parseUrlState("?view=graph&id=PRB-0005&d=2")).toEqual({
-      view: "graph",
-      selectedId: "PRB-0005",
-      query: "",
-      typeFilter: ALL_TYPES,
-      graphDepth: 2,
+  it("UX-F: a graph-depth param round-trips even though 'graph' itself is normalized away below", () => {
+    expect(parseUrlState("?d=2").graphDepth).toBe(2);
+  });
+
+  describe("UX-F: Graph Availability Gate — view=graph is normalized away", () => {
+    it("a graph URL with a PRB-shaped id normalizes to the Problem view for that id", () => {
+      expect(parseUrlState("?view=graph&id=PRB-0005&d=2")).toEqual({
+        view: "problem",
+        selectedId: "PRB-0005",
+        query: "",
+        typeFilter: ALL_TYPES,
+        graphDepth: 2,
+      });
+    });
+
+    it("a graph URL without a usable PRB selection normalizes to Overview, dropping the id", () => {
+      expect(parseUrlState("?view=graph")).toEqual(DEFAULT_URL_STATE);
+      expect(parseUrlState("?view=graph&id=EVD-000105")).toEqual({ ...DEFAULT_URL_STATE });
+      expect(parseUrlState("?view=graph&id=EVD-000105").selectedId).toBeNull();
+    });
+
+    it("a stale/non-existent PRB-shaped id still normalizes to Problem view (existence is validated downstream)", () => {
+      expect(parseUrlState("?view=graph&id=PRB-STALE").view).toBe("problem");
+      expect(parseUrlState("?view=graph&id=PRB-STALE").selectedId).toBe("PRB-STALE");
+    });
+
+    it("preserves q and type alongside the normalized view/id", () => {
+      const state = parseUrlState("?view=graph&id=PRB-0005&q=parking&type=PRB-");
+      expect(state.view).toBe("problem");
+      expect(state.query).toBe("parking");
+      expect(state.typeFilter).toBe("PRB-");
     });
   });
 

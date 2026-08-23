@@ -869,6 +869,16 @@ main.explorer-shell {
   background: var(--surface-muted);
 }
 
+.explorer-navigation button[aria-disabled="true"] {
+  color: var(--ink-faintest);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.explorer-navigation button[aria-disabled="true"]:hover {
+  background: none;
+}
+
 .explorer-navigation button[aria-current="page"] {
   color: var(--ink);
   border-color: transparent;
@@ -1913,13 +1923,21 @@ main.explorer-shell {
     margin-bottom: 1rem;
   }
 
-  .explorer-navigation button {
+  .explorer-navigation button,
+  .explorer-navigation .unavailable-control {
     flex: 1 1 0;
+  }
+
+  .explorer-navigation button {
     justify-content: center;
     padding-right: 0.35rem;
     padding-left: 0.35rem;
     font-size: 0.78rem;
     text-align: center;
+  }
+
+  .explorer-navigation .unavailable-control button {
+    width: 100%;
   }
 
   .explorer-navigation button[aria-current="page"]::after {
@@ -2155,7 +2173,8 @@ main.explorer-shell {
   cursor: pointer;
 }
 
-.context-tabs button:last-child {
+.context-tabs button:last-child,
+.context-tabs .unavailable-control:last-child button {
   border-right: 0;
 }
 
@@ -2164,11 +2183,57 @@ main.explorer-shell {
   background: var(--surface-muted);
 }
 
+.context-tabs button[aria-disabled="true"] {
+  color: var(--ink-faintest);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.context-tabs button[aria-disabled="true"]:hover {
+  background: none;
+}
+
 .context-tabs button[aria-current="page"] {
   color: var(--canvas);
   background: var(--ink);
   font-weight: 600;
   cursor: default;
+}
+
+/* UX-F: shared unavailable-control pattern (GlobalNav Grafo, ContextTabs Grafo) —
+   exposes the aria-disabled button's explanation as visible text on pointer hover
+   and keyboard focus, not just `title`, which screen magnifier / low-vision keyboard
+   users can miss. `position: relative` on the wrapper anchors the absolutely
+   positioned note without disturbing the surrounding flex/inline-flex nav layout. */
+.unavailable-control {
+  position: relative;
+  display: inline-flex;
+}
+
+.unavailable-note {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 4px);
+  z-index: 1;
+  padding: 3px 8px;
+  color: var(--canvas);
+  background: var(--ink);
+  border-radius: var(--radius-sm);
+  font-family: var(--ui);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+}
+
+.unavailable-control:hover .unavailable-note,
+.unavailable-control button:focus-visible ~ .unavailable-note {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Point-of-use Problem help (REDUX-007) — collapsed by default, native
@@ -2412,9 +2477,17 @@ main.explorer-shell {
     width: 100%;
   }
 
-  .context-tabs button {
+  .context-tabs button,
+  .context-tabs .unavailable-control {
     flex: 1 1 0;
+  }
+
+  .context-tabs button {
     text-align: center;
+  }
+
+  .context-tabs .unavailable-control button {
+    width: 100%;
   }
 
   .problem-identity {

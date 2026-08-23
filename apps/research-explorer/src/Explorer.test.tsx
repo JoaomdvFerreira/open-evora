@@ -433,18 +433,58 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
   });
 
-  it("navigating from a selected Problem to global Grafo produces an unfocused Graph", async () => {
+  it("UX-F: GlobalNav Grafo is visible, focusable, and aria-disabled — activation cannot navigate away from the current Problem view", async () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Grafo" }));
+    const grafoButton = within(globalNav()).getByRole("button", { name: "Grafo" }) as HTMLButtonElement;
+    // Not natively `disabled` — must remain reachable by keyboard (Tab) so
+    // a keyboard user can discover the "Em desenvolvimento" explanation at all.
+    expect(grafoButton.disabled).toBe(false);
+    expect(grafoButton.getAttribute("aria-disabled")).toBe("true");
+    expect(grafoButton.getAttribute("title")).toBe("Em desenvolvimento");
 
-    await screen.findByRole("heading", { name: "Grafo", level: 2 });
-    expect(window.location.search).toContain("view=graph");
-    expect(window.location.search).not.toContain("id=PRB-0005");
-    expect(screen.getByRole("button", { name: /Limpar seleção|Procure/ })).toBeTruthy();
+    // UX-F accessibility fix: `title` alone isn't reliably exposed to keyboard
+    // focus, so the explanation must also be reachable via aria-describedby,
+    // pointing at a real, non-empty, on-page element with that text.
+    const describedById = grafoButton.getAttribute("aria-describedby");
+    expect(describedById).toBeTruthy();
+    const grafoNote = document.getElementById(describedById!);
+    expect(grafoNote).not.toBeNull();
+    expect(grafoNote!.textContent).toBe("Em desenvolvimento");
+
+    grafoButton.focus();
+    expect(document.activeElement).toBe(grafoButton);
+
+    await user.click(grafoButton);
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    expect(window.location.search).toContain("view=problem");
+    expect(window.location.search).toContain("id=PRB-0005");
+
+    await user.keyboard("{Enter}");
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    expect(window.location.search).toContain("view=problem");
+    expect(window.location.search).toContain("id=PRB-0005");
+
+    await user.keyboard(" ");
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    expect(window.location.search).toContain("view=problem");
+    expect(window.location.search).toContain("id=PRB-0005");
+  });
+
+  it("UX-F: GlobalNav Visão geral / Registos remain fully navigable, unaffected by Grafo's aria-disabled state", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("button", { name: /PRB-0005/ });
+
+    await user.click(within(globalNav()).getByRole("button", { name: "Registos" }));
+    expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
+
+    await user.click(within(globalNav()).getByRole("button", { name: "Visão geral" }));
+    await screen.findByRole("heading", { name: "Visão geral" });
+    expect(within(globalNav()).getByRole("button", { name: "Visão geral" }).getAttribute("aria-current")).toBe("page");
   });
 
   it("navigating from a selected Record Detail to global Visão geral clears the hidden selectedId", async () => {
@@ -474,23 +514,97 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     expect((screen.getByLabelText("Tipo") as HTMLSelectElement).value).toBe("PRB-");
   });
 
-  it("ContextTabs continue preserving PRB identity across Detalhe/Problema/Grafo, unlike GlobalNav", async () => {
+  it("ContextTabs continue preserving PRB identity across Detalhe/Problema, unlike GlobalNav", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     const detailPanel = await getDetailPanel();
     const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
 
-    await user.click(within(switcher).getByRole("button", { name: "Grafo" }));
-    await screen.findByRole("heading", { name: "Grafo", level: 2 });
+    await user.click(within(switcher).getByRole("button", { name: "Problema" }));
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
     expect(window.location.search).toContain("id=PRB-0005");
 
-    const graphSwitcher = await screen.findByRole("navigation", { name: /PRB-0005/ });
-    await user.click(within(graphSwitcher).getByRole("button", { name: "Detalhe" }));
+    const problemSwitcher = await screen.findByRole("navigation", { name: /PRB-0005/ });
+    await user.click(within(problemSwitcher).getByRole("button", { name: "Detalhe" }));
     const backDetailPanel = await getDetailPanel();
     const backBreadcrumb = within(backDetailPanel).getByLabelText("Localização");
     await within(backBreadcrumb).findByText("PRB-0005");
     expect(window.location.search).toContain("id=PRB-0005");
+  });
+
+  it("UX-F: PRB ContextTabs Grafo is visible, focusable, and aria-disabled — activation cannot navigate to Graph", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    const detailPanel = await getDetailPanel();
+    const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
+
+    const grafoTab = within(switcher).getByRole("button", { name: "Grafo" }) as HTMLButtonElement;
+    expect(grafoTab.disabled).toBe(false);
+    expect(grafoTab.getAttribute("aria-disabled")).toBe("true");
+    expect(grafoTab.getAttribute("title")).toBe("Em desenvolvimento");
+
+    // UX-F accessibility fix: aria-describedby must resolve to a real,
+    // non-empty, on-page element carrying the explanation text.
+    const describedById = grafoTab.getAttribute("aria-describedby");
+    expect(describedById).toBeTruthy();
+    const grafoNote = document.getElementById(describedById!);
+    expect(grafoNote).not.toBeNull();
+    expect(grafoNote!.textContent).toBe("Em desenvolvimento");
+
+    grafoTab.focus();
+    expect(document.activeElement).toBe(grafoTab);
+
+    await user.click(grafoTab);
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    let stillDetailPanel = await getDetailPanel();
+    let breadcrumb = within(stillDetailPanel).getByLabelText("Localização");
+    await within(breadcrumb).findByText("PRB-0005");
+
+    grafoTab.focus();
+    await user.keyboard("{Enter}");
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    stillDetailPanel = await getDetailPanel();
+    breadcrumb = within(stillDetailPanel).getByLabelText("Localização");
+    await within(breadcrumb).findByText("PRB-0005");
+
+    grafoTab.focus();
+    await user.keyboard(" ");
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    stillDetailPanel = await getDetailPanel();
+    breadcrumb = within(stillDetailPanel).getByLabelText("Localização");
+    await within(breadcrumb).findByText("PRB-0005");
+  });
+
+  it("UX-F: GlobalNav and ContextTabs Grafo unavailable-notes don't collide when both render on the same PRB Detail page", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    const detailPanel = await getDetailPanel();
+    const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
+
+    const globalGrafo = within(globalNav()).getByRole("button", { name: "Grafo" });
+    const tabsGrafo = within(switcher).getByRole("button", { name: "Grafo" });
+
+    const globalDescribedById = globalGrafo.getAttribute("aria-describedby")!;
+    const tabsDescribedById = tabsGrafo.getAttribute("aria-describedby")!;
+    expect(globalDescribedById).toBeTruthy();
+    expect(tabsDescribedById).toBeTruthy();
+    expect(globalDescribedById).not.toBe(tabsDescribedById);
+
+    expect(document.getElementById(globalDescribedById)!.textContent).toBe("Em desenvolvimento");
+    expect(document.getElementById(tabsDescribedById)!.textContent).toBe("Em desenvolvimento");
+
+    // No duplicate ids anywhere on the page (getElementById only ever returns
+    // the first match, so this catches a collision that assertion would hide).
+    const idCounts = new Map<string, number>();
+    document.querySelectorAll("[id]").forEach((el) => {
+      idCounts.set(el.id, (idCounts.get(el.id) ?? 0) + 1);
+    });
+    for (const [id, count] of idCounts) {
+      expect(count, `duplicate id: ${id}`).toBe(1);
+    }
   });
 
   it("browser back after a GlobalNav area change restores the prior area and selection deterministically", async () => {
@@ -534,44 +648,61 @@ describe("Explorer — Problem view (RE-03)", () => {
     expect(document.activeElement).toBe(heading);
   });
 
-  it("opens Graph from a PRB record detail's context switcher with a focused heading and record-specific title", async () => {
-    const user = userEvent.setup();
-    render(<Explorer dataProvider={fakeProvider()} />);
-
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
-    const detailPanel = await getDetailPanel();
-    const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
-    await user.click(within(switcher).getByRole("button", { name: "Grafo" }));
-
-    const heading = await screen.findByRole("heading", { name: "Grafo", level: 2 });
-    expect(document.title).toBe("Grafo PRB-0005 — Explorador de Investigação Open Évora");
-    expect(document.activeElement).toBe(heading);
-  });
-
-  it("does not steal focus during an ordinary Graph filter update", async () => {
-    const user = userEvent.setup();
+  it("UX-F: a direct Graph URL with a valid PRB id normalizes to that PRB's Problem view, not Graph", async () => {
     window.history.replaceState(null, "", "/?view=graph&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    const typeFilter = await screen.findByLabelText(/PRB-\s*—/);
-    await user.click(typeFilter);
-    expect(document.activeElement).toBe(typeFilter);
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    expect(window.location.search).toContain("view=problem");
+    expect(window.location.search).toContain("id=PRB-0005");
   });
 
-  it("turns a direct stale Graph URL into a recoverable state and keeps history navigation coherent", async () => {
-    const user = userEvent.setup();
-    window.history.replaceState(null, "", "/?view=graph&id=PRB-STALE");
+  it("UX-F: a direct Graph URL without a usable PRB selection normalizes to Overview, not Graph", async () => {
+    window.history.replaceState(null, "", "/?view=graph");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    const alert = await screen.findByRole("alert");
-    await user.click(within(alert).getByRole("button", { name: /Limpar seleção/ }));
-    await screen.findByText(/Procure e selecione um registo/);
-    expect(window.location.search).toBe("?view=graph");
+    await screen.findByRole("heading", { name: "Visão geral" });
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+    expect(window.location.search).not.toContain("view=graph");
+  });
+
+  it("UX-F: a direct Graph URL for a non-PRB id also normalizes to Overview, dropping the id", async () => {
+    window.history.replaceState(null, "", "/?view=graph&id=EVD-000105");
+    render(<Explorer dataProvider={fakeProvider()} />);
+
+    await screen.findByRole("heading", { name: "Visão geral" });
+    expect(window.location.search).not.toContain("view=graph");
+    expect(window.location.search).not.toContain("id=EVD-000105");
+  });
+
+  it("UX-F: a stale/unknown PRB-shaped Graph URL still normalizes to Problem view, which then shows its own not-found recovery", async () => {
+    window.history.replaceState(null, "", "/?view=graph&id=PRB-9999-does-not-exist");
+    render(<Explorer dataProvider={fakeProvider()} />);
+
+    await waitFor(() => expect(window.location.search).toContain("view=problem"));
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+  });
+
+  it("UX-F: browser Back/Forward across a normalized Graph URL stays deterministic and never lands on Graph", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    await screen.findByText("Inspeção técnica completa — todos os campos canónicos");
+
+    window.history.pushState(null, "", "/?view=graph&id=PRB-0005");
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+    expect(window.location.search).toContain("view=problem");
 
     window.history.back();
-    await screen.findByRole("alert");
+    await waitFor(() => expect(window.location.search).not.toContain("view=problem"));
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
+
     window.history.forward();
-    await screen.findByText(/Procure e selecione um registo/);
+    await waitFor(() => expect(window.location.search).toContain("view=problem"));
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
   });
 
   it("UX-D §2: Problem View's breadcrumb points to Visão geral (not Registos), clearing the selected id", async () => {
@@ -663,11 +794,12 @@ describe("Explorer — Problem view (RE-03)", () => {
     expect(screen.queryByText("Como ler o Explorer")).toBeNull();
   });
 
-  it("UX-C: the global reading guide is retained on Graph", async () => {
-    window.history.replaceState(null, "", "/?view=graph");
-    render(<Explorer dataProvider={fakeProvider()} />);
-    expect(await screen.findByText("Como ler o Explorer")).toBeTruthy();
-  });
+  // UX-F: Graph is temporarily unavailable — a "/?view=graph" URL now
+  // normalizes to Overview (see the "UX-F" describe block above), so the
+  // reading guide's Graph-specific rendering is no longer publicly
+  // reachable through Explorer. The guide's own conditional logic is
+  // untouched; GraphExplorer.test.tsx / graph/* tests continue to exercise
+  // it directly at the component level.
 
   it("UX-C: Problem View's help/rail no longer link to a #reading-guide that doesn't exist on this surface", async () => {
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");

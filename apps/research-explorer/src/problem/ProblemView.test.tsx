@@ -316,8 +316,23 @@ describe("ProblemView", () => {
     await user.click(within(switcher).getByRole("button", { name: "Detalhe" }));
     expect(onOpenGeneric).toHaveBeenCalledWith("PRB-0005");
 
-    await user.click(within(switcher).getByRole("button", { name: "Grafo" }));
-    expect(onViewInGraph).toHaveBeenCalledWith("PRB-0005");
+    // UX-F: Grafo is visible and focusable but aria-disabled — cannot invoke onViewInGraph.
+    const grafoButton = within(switcher).getByRole("button", { name: "Grafo" }) as HTMLButtonElement;
+    expect(grafoButton.disabled).toBe(false);
+    expect(grafoButton.getAttribute("aria-disabled")).toBe("true");
+    expect(grafoButton.getAttribute("title")).toBe("Em desenvolvimento");
+
+    grafoButton.focus();
+    expect(document.activeElement).toBe(grafoButton);
+
+    await user.click(grafoButton);
+    expect(onViewInGraph).not.toHaveBeenCalled();
+
+    await user.keyboard("{Enter}");
+    expect(onViewInGraph).not.toHaveBeenCalled();
+
+    await user.keyboard(" ");
+    expect(onViewInGraph).not.toHaveBeenCalled();
   });
 
   it("exposes 'Nesta página' section-index anchors that target every major Problem View section", async () => {
