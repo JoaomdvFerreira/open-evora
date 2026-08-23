@@ -832,3 +832,207 @@ describe("RecordDetailPanel — SRC original-source action (UX-D §3)", () => {
     expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
   });
 });
+
+describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
+  it("exposes an EVD quick read with evidence nature and representativeness from existing canonical data, without duplicating relationship navigation", async () => {
+    const detail: RecordDetail = {
+      id: "EVD-000127",
+      type: "EVD-",
+      file: "research/evidence/EVD-000127.yaml",
+      record: {
+        evidence_id: "EVD-000127",
+        observation: { summary: "Texto de observação." },
+        evidence_nature: "claim",
+        analysis: { representativeness: "LIMITED", related_problems: ["PRB-0006"] },
+      },
+      outgoingEdges: [{ field: "analysis.related_problems", ordinal: 0, to: "PRB-0006" }],
+      incomingEdges: [],
+    };
+    const summary: RecordSummary = { id: "EVD-000127", type: "EVD-", label: "…", file: detail.file, summaryFields: {} };
+
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": detail })}
+        lookup={buildLookup(summary, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const quickRead = await within(panel).findByLabelText("Leitura rápida");
+    expect(within(quickRead).getByText("Alegação")).toBeTruthy();
+    expect(within(quickRead).getByText("Limitada")).toBeTruthy();
+
+    // The related PRB still appears exactly once, via the existing
+    // Relações section — the quick read does not add a second button.
+    const relacoes = within(panel).getByLabelText("Relações");
+    expect(within(relacoes).getAllByRole("button", { name: new RegExp(PRB_0006_SUMMARY.label) })).toHaveLength(1);
+  });
+
+  it("does not invent EVD quick-read fields that are absent from the canonical record", async () => {
+    const detail: RecordDetail = {
+      id: "EVD-000129",
+      type: "EVD-",
+      file: "research/evidence/EVD-000129.yaml",
+      record: {
+        evidence_id: "EVD-000129",
+        observation: { summary: "Texto de observação sem analysis." },
+      },
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    const summary: RecordSummary = { id: "EVD-000129", type: "EVD-", label: "…", file: detail.file, summaryFields: {} };
+
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000129": detail })}
+        lookup={buildLookup(summary)}
+        selectedId="EVD-000129"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    // No evidence_nature/representativeness/relationship fields exist on this
+    // fixture, and no source is present, so the quick-read section must not render at all.
+    await within(panel).findByText("evidence_id");
+    expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
+  });
+
+  it("exposes an SRC quick read with title, publisher, and freshness/access-status labels from existing canonical data", async () => {
+    const detail: RecordDetail = {
+      id: "SRC-0002",
+      type: "SRC-",
+      file: "research/sources/SRC-0002.yaml",
+      record: {
+        source_id: "SRC-0002",
+        name: "Plano de Desenvolvimento Social de Évora 2024-2027",
+        publisher: "Município de Évora",
+        access: { public: true },
+        freshness: { status: "UNKNOWN" },
+        canonical_reference: "https://www.cm-evora.pt/exemplo.pdf",
+      },
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    const summary: RecordSummary = { id: "SRC-0002", type: "SRC-", label: "Plano de Desenvolvimento Social de Évora 2024-2027", file: detail.file, summaryFields: {} };
+
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0002": detail })}
+        lookup={buildLookup(summary)}
+        selectedId="SRC-0002"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const quickRead = await within(panel).findByLabelText("Leitura rápida");
+    expect(within(quickRead).getByText("Plano de Desenvolvimento Social de Évora 2024-2027")).toBeTruthy();
+    expect(within(quickRead).getByText("Município de Évora")).toBeTruthy();
+    expect(within(quickRead).getByText("Desconhecida")).toBeTruthy();
+    expect(within(quickRead).getByText("Sim")).toBeTruthy();
+
+    // The existing "Abrir fonte" action still renders exactly once (in the
+    // rail), not duplicated inside the quick read.
+    expect(within(panel).getAllByRole("link", { name: /Abrir fonte/ })).toHaveLength(1);
+  });
+
+  it("does not invent SRC quick-read fields that are absent from the canonical record", async () => {
+    const detail: RecordDetail = {
+      id: "SRC-0003",
+      type: "SRC-",
+      file: "research/sources/SRC-0003.yaml",
+      record: { source_id: "SRC-0003" },
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    const summary: RecordSummary = { id: "SRC-0003", type: "SRC-", label: "SRC-0003", file: detail.file, summaryFields: {} };
+
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0003": detail })}
+        lookup={buildLookup(summary)}
+        selectedId="SRC-0003"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("source_id");
+    expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
+  });
+
+  it("shows a plain-language orientation sentence before the technical inspection, for EVD", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    const orientation = within(meaningZone).getByText(/Este é um registo técnico da investigação\. Mostra a informação guardada e as suas ligações/);
+    const technicalSummary = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos");
+    expect(orientation.compareDocumentPosition(technicalSummary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("keeps the technical inspection clearly labeled as an audit surface, with canonical raw field paths unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("Inspeção técnica completa — todos os campos canónicos");
+    await within(panel).findByText(/auditabilidade e rastreabilidade/);
+    // Raw canonical field names remain untranslated inside the technical disclosure.
+    expect(within(panel).getByText("analysis")).toBeTruthy();
+    expect(within(panel).getByText("related_problems")).toBeTruthy();
+  });
+
+  it("does not add the EVD/SRC quick read for a PRB record, and leaves ContextTabs/navigation unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const switcher = within(panel).getByRole("navigation", { name: /PRB-0006/ });
+    expect(within(switcher).getByRole("button", { name: "Detalhe" }).getAttribute("aria-current")).toBe("page");
+    expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
+  });
+});
