@@ -146,7 +146,7 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
     const meaningZone = await within(panel).findByLabelText("Significado");
     const meaning = within(meaningZone).getByText(/totalmente operacional/);
 
-    const provenance = within(panel).getByText(/referencia 1 registo\(s\)/).closest("section")!;
+    const provenance = within(panel).getByText(/registo\(s\) relacionado\(s\)/).closest("section")!;
     const technicalSummary = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos");
     const relacoes = within(panel).getByLabelText("Relações");
 
@@ -200,7 +200,7 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
     expect(within(panel).getByText("Não")).toBeTruthy();
   });
 
-  it("shows compact provenance (relationship counts) without requiring the technical disclosure to be opened", async () => {
+  it("shows compact provenance (unique related-record count, distinct from path counts) without requiring the technical disclosure to be opened", async () => {
     render(
       <RecordDetailPanel
         dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
@@ -214,8 +214,11 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    await within(panel).findByText(/referenciado por 0 registo\(s\)/);
-    expect(within(panel).getByText(/referencia 1 registo\(s\)/)).toBeTruthy();
+    // EVD-000127 has 1 outgoing path (to PRB-0006) and 0 incoming paths — 1 unique related record.
+    const provenance = await within(panel).findByText(/registo\(s\) relacionado\(s\)/);
+    expect(provenance.textContent).toContain("1 registo(s) relacionado(s)");
+    expect(provenance.textContent).toContain("0 caminho(s) de entrada");
+    expect(provenance.textContent).toContain("1 caminho(s) de saída");
   });
 
   it("preserves exact outgoing reference-path notation (via <field>[ordinal]) in Relações", async () => {
@@ -233,11 +236,10 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const relacoes = within(panel).getByLabelText("Relações");
-    const saidas = within(relacoes).getByLabelText("Saídas");
-    expect(saidas.textContent).toContain("referencia através de");
-    expect(saidas.textContent).toContain("analysis.related_problems");
-    expect(saidas.textContent).toContain("[0]");
-    expect(saidas.textContent).toContain("PRB-0006");
+    expect(relacoes.textContent).toContain("referencia através de");
+    expect(relacoes.textContent).toContain("analysis.related_problems");
+    expect(relacoes.textContent).toContain("[0]");
+    expect(relacoes.textContent).toContain("PRB-0006");
   });
 
   it("offers a 'Ver como Problema' action for a related PRB without implying it is a view of the EVD itself", async () => {
@@ -458,5 +460,158 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
     const meaningZone = await within(panel).findByLabelText("Significado");
     expect(within(meaningZone).getAllByText("Confirma")).toHaveLength(1);
     expect(within(meaningZone).queryByText(/desafia a leitura de/)).toBeNull();
+  });
+});
+
+/**
+ * PRB-0001 acceptance case (relationship semantics correction): 10 outgoing
+ * PRB→EVD paths, 11 incoming paths (the same 10 EVDs → PRB, plus ASM-0001 →
+ * PRB) = 21 exact paths total, but only 11 unique related records (10 EVDs +
+ * 1 ASM, since every EVD is reciprocally referenced in both directions).
+ * `edges.length` alone (10 or 11 or 21) must never be presented as "records".
+ */
+function buildPrb0001Fixture() {
+  const evdIds = Array.from({ length: 10 }, (_, i) => `EVD-${String(i + 1).padStart(6, "0")}`);
+  const evdSummaries = evdIds.map(
+    (id): RecordSummary => ({
+      id,
+      type: "EVD-",
+      label: `Evidência ${id}`,
+      file: `research/evidence/${id}.yaml`,
+      summaryFields: {},
+    })
+  );
+  const asmSummary: RecordSummary = {
+    id: "ASM-0001",
+    type: "ASM-",
+    label: "Avaliação de PRB-0001",
+    file: "research/assessments/ASM-0001.yaml",
+    summaryFields: { assessment_status: "CURRENT" },
+  };
+  const prbSummary: RecordSummary = {
+    id: "PRB-0001",
+    type: "PRB-",
+    label: "Problema PRB-0001",
+    file: "research/problems/PRB-0001.yaml",
+    summaryFields: { status: "OPEN" },
+  };
+
+  const outgoingEdges = evdIds.map((id, index) => ({ field: "evidence", ordinal: index, to: id }));
+  const incomingEdges = [
+    ...evdIds.map((id) => ({ field: "analysis.related_problems", ordinal: 0, from: id })),
+    { field: "problem", ordinal: null, from: "ASM-0001" },
+  ];
+
+  const prbDetail: RecordDetail = {
+    id: "PRB-0001",
+    type: "PRB-",
+    file: "research/problems/PRB-0001.yaml",
+    record: { problem_id: "PRB-0001" },
+    outgoingEdges,
+    incomingEdges,
+  };
+
+  return { prbDetail, lookup: buildLookup(prbSummary, asmSummary, ...evdSummaries) };
+}
+
+describe("RecordDetailPanel — unique related-record cardinality (relationship semantics correction)", () => {
+  it("PRB-0001-equivalent fixture: 21 exact paths (10 outgoing + 11 incoming) resolve to 11 unique related records, not 10 or 21", async () => {
+    const { prbDetail, lookup } = buildPrb0001Fixture();
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": prbDetail })}
+        lookup={lookup}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const provenance = await within(panel).findByText(/registo\(s\) relacionado\(s\)/);
+    // Unique-record cardinality (11) must differ from, and not be confused with, the raw edge counts (10 outgoing, 11 incoming, 21 total).
+    expect(provenance.textContent).toContain("11 registo(s) relacionado(s)");
+    expect(provenance.textContent).toContain("11 caminho(s) de entrada");
+    expect(provenance.textContent).toContain("10 caminho(s) de saída");
+
+    const relacoes = within(panel).getByLabelText("Relações");
+    const relatedGroup = within(relacoes).getByLabelText("Registos relacionados");
+    // Exactly 11 related-record entries (10 EVDs + 1 ASM), each rendered once.
+    expect(within(relatedGroup).getAllByRole("button")).toHaveLength(11);
+  });
+
+  it("groups reciprocal incoming+outgoing paths to the same ID into a single related-record entry, with both directions and exact field/ordinal preserved", async () => {
+    const { prbDetail, lookup } = buildPrb0001Fixture();
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": prbDetail })}
+        lookup={lookup}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const relacoes = within(panel).getByLabelText("Relações");
+    const evdButton = await within(relacoes).findByRole("button", { name: /EVD-000001/ });
+    const evdEntry = evdButton.closest("li") as HTMLElement;
+
+    // Both directions are visible beneath the single EVD-000001 entry.
+    expect(evdEntry.textContent).toContain("Saída");
+    expect(evdEntry.textContent).toContain("Entrada");
+    expect(evdEntry.textContent).toContain("evidence");
+    expect(evdEntry.textContent).toContain("[0]");
+    expect(evdEntry.textContent).toContain("analysis.related_problems");
+
+    // Only one <li> (one related-record group) exists for EVD-000001, not two.
+    const allEvd1Entries = within(relacoes).getAllByRole("button", { name: /EVD-000001/ });
+    expect(allEvd1Entries).toHaveLength(1);
+  });
+
+  it("preserves the ASM-0001 (incoming-only) related record alongside the reciprocal EVDs, with its own exact path", async () => {
+    const { prbDetail, lookup } = buildPrb0001Fixture();
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": prbDetail })}
+        lookup={lookup}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const relacoes = within(panel).getByLabelText("Relações");
+    const asmButton = await within(relacoes).findByRole("button", { name: /ASM-0001/ });
+    const asmEntry = asmButton.closest("li") as HTMLElement;
+
+    expect(asmEntry.textContent).toContain("Entrada");
+    expect(asmEntry.textContent).not.toContain("Saída");
+    expect(asmEntry.textContent).toContain("problem");
+  });
+
+  it("still excludes generic connectivity from 'Ver como Problema' semantics — unrelated to the cardinality fix", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "WID-0001": WID_0001_DETAIL })}
+        lookup={buildLookup(WID_0001_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="WID-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("widget_id");
+    expect(within(panel).queryByRole("button", { name: /Ver como Problema/ })).toBeNull();
   });
 });
