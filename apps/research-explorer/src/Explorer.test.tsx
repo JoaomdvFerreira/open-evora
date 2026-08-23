@@ -245,6 +245,25 @@ describe("Explorer — Overview view", () => {
     expect(screen.getByRole("button", { name: "Visão geral" }).getAttribute("aria-current")).toBe("page");
   });
 
+  it("UX-D §4: renders Validação and Evidência as two explicitly labeled dimensions, not an unlabeled combination", async () => {
+    const statusIndex: RecordSummary[] = [
+      {
+        id: "PRB-0005",
+        type: "PRB-",
+        label: "Pressão de estacionamento com uma descrição…",
+        file: "research/problems/PRB-0005.yaml",
+        summaryFields: { status: "OPEN", validation_status: "unvalidated", evidence_status: "corroborated" },
+      },
+    ];
+    window.history.replaceState(null, "", "/");
+    render(<Explorer dataProvider={fakeProvider({ listRecords: () => Promise.resolve(statusIndex) })} />);
+
+    await screen.findByRole("heading", { name: "Visão geral" });
+    expect(screen.queryByText("Por validar · Corroborado")).toBeNull();
+    expect(await screen.findByText(/Validação: Por validar/)).toBeTruthy();
+    expect(screen.getByText(/Evidência: Corroborado/)).toBeTruthy();
+  });
+
   it("opens the exact PRB in Problem View when Explore is selected", async () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/");
@@ -391,6 +410,101 @@ describe("Explorer — URL-addressable state", () => {
   });
 });
 
+function globalNav(): HTMLElement {
+  return screen.getByRole("navigation", { name: "Vistas do Explorador de Investigação" });
+}
+
+describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
+  it("navigating from a selected Problem to global Registos clears selectedId (no hidden-context leak)", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+
+    await user.click(within(globalNav()).getByRole("button", { name: "Registos" }));
+
+    expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
+    expect(window.location.search).toContain("view=records");
+    expect(window.location.search).not.toContain("id=PRB-0005");
+    // Records renders its table, not a still-selected Record Detail.
+    expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
+  });
+
+  it("navigating from a selected Problem to global Grafo produces an unfocused Graph", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+
+    await user.click(within(globalNav()).getByRole("button", { name: "Grafo" }));
+
+    await screen.findByRole("heading", { name: "Grafo", level: 2 });
+    expect(window.location.search).toContain("view=graph");
+    expect(window.location.search).not.toContain("id=PRB-0005");
+    expect(screen.getByRole("button", { name: /Limpar seleção|Procure/ })).toBeTruthy();
+  });
+
+  it("navigating from a selected Record Detail to global Visão geral clears the hidden selectedId", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    await screen.findByText("Inspeção técnica completa — todos os campos canónicos");
+    expect(window.location.search).toContain("id=PRB-0005");
+
+    await user.click(within(globalNav()).getByRole("button", { name: "Visão geral" }));
+
+    await screen.findByRole("heading", { name: "Visão geral" });
+    expect(window.location.search).not.toContain("id=PRB-0005");
+  });
+
+  it("does not erase existing Records search/type-filter state when navigating away and back via GlobalNav", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&q=PRB&type=PRB-");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("button", { name: /PRB-0005/ });
+
+    await user.click(within(globalNav()).getByRole("button", { name: "Visão geral" }));
+    await screen.findByRole("heading", { name: "Visão geral" });
+    await user.click(within(globalNav()).getByRole("button", { name: "Registos" }));
+
+    expect((await screen.findByLabelText("Pesquisar") as HTMLInputElement).value).toBe("PRB");
+    expect((screen.getByLabelText("Tipo") as HTMLSelectElement).value).toBe("PRB-");
+  });
+
+  it("ContextTabs continue preserving PRB identity across Detalhe/Problema/Grafo, unlike GlobalNav", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    const detailPanel = await getDetailPanel();
+    const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
+
+    await user.click(within(switcher).getByRole("button", { name: "Grafo" }));
+    await screen.findByRole("heading", { name: "Grafo", level: 2 });
+    expect(window.location.search).toContain("id=PRB-0005");
+
+    const graphSwitcher = await screen.findByRole("navigation", { name: /PRB-0005/ });
+    await user.click(within(graphSwitcher).getByRole("button", { name: "Detalhe" }));
+    const backDetailPanel = await getDetailPanel();
+    const backBreadcrumb = within(backDetailPanel).getByLabelText("Localização");
+    await within(backBreadcrumb).findByText("PRB-0005");
+    expect(window.location.search).toContain("id=PRB-0005");
+  });
+
+  it("browser back after a GlobalNav area change restores the prior area and selection deterministically", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    await screen.findByText("Inspeção técnica completa — todos os campos canónicos");
+
+    await user.click(within(globalNav()).getByRole("button", { name: "Visão geral" }));
+    await screen.findByRole("heading", { name: "Visão geral" });
+
+    window.history.back();
+    await waitFor(() => expect(window.location.search).toContain("id=PRB-0005"));
+    await screen.findByText("Inspeção técnica completa — todos os campos canónicos");
+  });
+});
+
 describe("Explorer — Problem view (RE-03)", () => {
   it("opens a problem directly via URL, without visiting Records first", async () => {
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
@@ -457,25 +571,32 @@ describe("Explorer — Problem view (RE-03)", () => {
     await screen.findByText(/Procure e selecione um registo/);
   });
 
-  it("Problem View's Registos breadcrumb clears the selected id and returns straight to the Records list, preserving search context", async () => {
+  it("UX-D §2: Problem View's breadcrumb points to Visão geral (not Registos), clearing the selected id", async () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/?q=PRB-0005&view=problem&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    // V3: Problem View exposes the same "Localização" breadcrumb pattern as
-    // Record Detail (Registos › PRB-0005), but — unlike a still-selected
-    // Records breadcrumb — Registos here must clear the selection outright:
-    // Problem View is never itself the Records table, so preserving the id
-    // would silently redirect into Record Detail instead of the list.
+    // Problem View is a public problem-reading surface, not conceptually a
+    // child of Records — its breadcrumb reads "Visão geral › PRB-0005", and
+    // its first action returns to Overview, clearing the selection outright.
     const problemBreadcrumb = await screen.findByLabelText("Localização");
-    await user.click(within(problemBreadcrumb).getByRole("button", { name: "Registos" }));
+    expect(within(problemBreadcrumb).queryByRole("button", { name: "Registos" })).toBeNull();
+    await user.click(within(problemBreadcrumb).getByRole("button", { name: "Visão geral" }));
 
-    await screen.findByRole("heading", { name: "Registos" });
-    expect(window.location.search).toContain("view=records");
+    await screen.findByRole("heading", { name: "Visão geral" });
+    expect(window.location.search).not.toContain("view=problem");
     expect(window.location.search).not.toContain("id=PRB-0005");
-    expect(window.location.search).toContain("q=PRB-0005");
-    expect((screen.getByLabelText("Pesquisar") as HTMLInputElement).value).toBe("PRB-0005");
-    expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
+  });
+
+  it("generic Record Detail's breadcrumb remains Registos-based, unlike Problem View's", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /EVD-000105/ }));
+
+    const detailPanel = await getDetailPanel();
+    const breadcrumb = within(detailPanel).getByLabelText("Localização");
+    expect(within(breadcrumb).getByRole("button", { name: "Registos" })).toBeTruthy();
+    expect(within(breadcrumb).queryByRole("button", { name: "Visão geral" })).toBeNull();
   });
 
   it("Problem View's Detalhe ContextTab preserves the current PRB id and opens its Record Detail, not the Records list", async () => {

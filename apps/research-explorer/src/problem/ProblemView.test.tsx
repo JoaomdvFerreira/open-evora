@@ -87,13 +87,13 @@ function fakeProvider(): DataProvider {
 
 describe("ProblemView", () => {
   it("shows a prompt when no problem is selected", async () => {
-    render(<ProblemView dataProvider={fakeProvider()} problemId={null} onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId={null} onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
     await screen.findByText("Nenhum Problema selecionado.");
   });
 
   it("shows a redirect message when the selected record is not a Problem", async () => {
     const onOpenGeneric = vi.fn();
-    render(<ProblemView dataProvider={fakeProvider()} problemId="EVD-0001" onOpenGeneric={onOpenGeneric} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="EVD-0001" onOpenGeneric={onOpenGeneric} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText(/não pode ser aberto/)).toBeTruthy();
@@ -103,7 +103,7 @@ describe("ProblemView", () => {
   });
 
   it("surfaces identity, current state, assessment, evidence, sources, unknowns, and (absent) hypotheses for a real problem shape", async () => {
-    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
     await screen.findByRole("heading", { name: "Parking pressure" });
     expect(screen.getByText(/Traffic and parking conflict/)).toBeTruthy();
@@ -142,7 +142,7 @@ describe("ProblemView", () => {
     // non-SRC- target is correctly excluded from it rather than mislabelled
     // as a "source" — and its presence must not crash the projection or the
     // render.
-    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
     const evidenceSection = await screen.findByLabelText("Evidência");
     await within(evidenceSection).findByText(/EVD-0001/);
     expect(within(evidenceSection).getByText(/SRC-0001/)).toBeTruthy();
@@ -152,7 +152,7 @@ describe("ProblemView", () => {
   it("clicking an evidence or source ID calls onOpenGeneric with that ID", async () => {
     const onOpenGeneric = vi.fn();
     const user = userEvent.setup();
-    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={onOpenGeneric} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={onOpenGeneric} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
     const sourceButton = await screen.findByRole("button", { name: /SRC-0001/ });
     await user.click(sourceButton);
@@ -160,7 +160,7 @@ describe("ProblemView", () => {
   });
 
   it("shows explicit canonical evidence contributions as distinct chips, observation, and provenance context", async () => {
-    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
     await screen.findByRole("heading", { name: "Parking pressure" });
     const evidenceSection = screen.getByLabelText("Evidência");
     const evidenceItems = within(evidenceSection.querySelector("ul")!);
@@ -180,7 +180,7 @@ describe("ProblemView", () => {
       const detail = DETAILS[id];
       return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
     };
-    render(<ProblemView dataProvider={provider} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={provider} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
     const evidenceSection = await screen.findByLabelText("Evidência");
     expect(within(evidenceSection).getByText("contribuição não registada.")).toBeTruthy();
@@ -212,7 +212,7 @@ describe("ProblemView", () => {
       const detail = DETAILS[id];
       return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
     };
-    render(<ProblemView dataProvider={provider} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={provider} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
     const evidenceSection = await screen.findByLabelText("Evidência");
     const evidenceItems = within(evidenceSection.querySelector("ul")!);
@@ -242,14 +242,14 @@ describe("ProblemView", () => {
       const detail = DETAILS[id];
       return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
     };
-    render(<ProblemView dataProvider={provider} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={provider} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
     const evidenceSection = await screen.findByLabelText("Evidência");
     expect(within(evidenceSection.querySelector("ul")!).getByText("FUTURE-VALUE")).toBeTruthy();
   });
 
   it("shows a contribution occurrence summary distinguishing occurrences from evidence-item count", async () => {
-    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
     const evidenceSection = await screen.findByLabelText("Evidência");
     // 1 evidence item, 2 contributions (CONFIRMS, REFINES) — occurrenceCount (2) must not be presented as the item count (1).
     expect(within(evidenceSection).getByText(/1 item de evidência/)).toBeTruthy();
@@ -258,7 +258,7 @@ describe("ProblemView", () => {
   });
 
   it("shows localized Estado atual values without inventing a corroborated-independence claim", async () => {
-    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
     await screen.findByRole("heading", { name: "Parking pressure" });
     const stateSection = screen.getByLabelText("Estado atual");
     expect(within(stateSection).queryByText("OPEN")).toBeNull();
@@ -276,7 +276,7 @@ describe("ProblemView", () => {
       const detail = DETAILS[id];
       return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
     };
-    render(<ProblemView dataProvider={provider} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={provider} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
     await screen.findByRole("heading", { name: "Parking pressure" });
 
     const stateSection = screen.getByLabelText("Estado atual");
@@ -288,7 +288,7 @@ describe("ProblemView", () => {
   });
 
   it("exposes a collapsed-by-default point-of-use Problem help disclosure, self-sufficient with no link to the removed global reading guide", async () => {
-    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
     await screen.findByRole("heading", { name: "Parking pressure" });
     const details = screen.getByText("O que é um Problema, e o que significam os estados abaixo?").closest("details");
     expect(details).toBeTruthy();
@@ -303,7 +303,7 @@ describe("ProblemView", () => {
     const onOpenGeneric = vi.fn();
     const onViewInGraph = vi.fn();
     const user = userEvent.setup();
-    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={onOpenGeneric} onBackToRecords={vi.fn()} onViewInGraph={onViewInGraph} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={onOpenGeneric} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={onViewInGraph} />);
     await screen.findByRole("heading", { name: "Parking pressure" });
 
     const switcher = screen.getByRole("navigation", { name: /PRB-0005/ });
@@ -318,7 +318,7 @@ describe("ProblemView", () => {
   });
 
   it("exposes 'Nesta página' section-index anchors that target every major Problem View section", async () => {
-    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
     await screen.findByRole("heading", { name: "Parking pressure" });
 
     const expectedSections = [
@@ -339,7 +339,7 @@ describe("ProblemView", () => {
   });
 
   it("keeps the compact section-index self-sufficient — its anchors do not depend on the desktop reading rail rendering", async () => {
-    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
     await screen.findByRole("heading", { name: "Parking pressure" });
 
     // The compact-substitute index (inside ProblemHelpDisclosure) is a
@@ -360,7 +360,7 @@ describe("ProblemView", () => {
       return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
     };
     const user = userEvent.setup();
-    render(<ProblemView dataProvider={provider} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={provider} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText(/temporary evidence failure/)).toBeTruthy();
@@ -369,6 +369,42 @@ describe("ProblemView", () => {
 
     expect(await screen.findByLabelText("Evidência")).toBeTruthy();
     expect(evidenceAttempts).toBeGreaterThanOrEqual(2);
+  });
+
+  it("UX-D §2: the Problem breadcrumb's first action is Visão geral, not Registos", async () => {
+    const onBackToOverview = vi.fn();
+    const onBackToRecords = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <ProblemView
+        dataProvider={fakeProvider()}
+        problemId="PRB-0005"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={onBackToRecords}
+        onBackToOverview={onBackToOverview}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    const breadcrumb = await screen.findByLabelText("Localização");
+    expect(within(breadcrumb).queryByRole("button", { name: "Registos" })).toBeNull();
+    const overviewLink = within(breadcrumb).getByRole("button", { name: "Visão geral" });
+    await user.click(overviewLink);
+
+    expect(onBackToOverview).toHaveBeenCalledTimes(1);
+    expect(onBackToRecords).not.toHaveBeenCalled();
+  });
+
+  it("UX-D §5: uses public evidence-comprehension copy instead of raw contribution-occurrence language", async () => {
+    render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
+
+    const evidenceSection = await screen.findByLabelText("Evidência");
+    expect(within(evidenceSection).getByText(/Registos de evidência associados \(1\)/)).toBeTruthy();
+    expect(within(evidenceSection).getByText(/Papel destes registos nesta leitura/)).toBeTruthy();
+    expect(within(evidenceSection).queryByText(/Ocorrências de contribuição canónica/)).toBeNull();
+    // Canonical contribution labels/counts (CONFIRMS, REFINES) are unchanged.
+    expect(within(evidenceSection).getAllByText("Confirma").length).toBeGreaterThan(0);
+    expect(within(evidenceSection).getAllByText("Refina").length).toBeGreaterThan(0);
   });
 });
 
@@ -387,7 +423,7 @@ describe.skipIf(!hasRealCorpus)("ProblemView — real generated corpus regressio
   }
 
   it("keeps EVD-000127's explicit CONTRADICTS contribution, observation, and source visible for PRB-0006", async () => {
-    render(<ProblemView dataProvider={realCorpusProvider()} problemId="PRB-0006" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onViewInGraph={vi.fn()} />);
+    render(<ProblemView dataProvider={realCorpusProvider()} problemId="PRB-0006" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
     const evidenceButton = await screen.findByRole("button", { name: /EVD-000127/ });
     const evidenceItem = evidenceButton.closest("li")!;

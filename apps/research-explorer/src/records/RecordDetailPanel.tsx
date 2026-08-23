@@ -172,6 +172,41 @@ function contributionTargetSentence(value: string, relatedProblemId: string): st
   return value === "CONTRADICTS" ? `desafia a leitura de ${formatTypedId("PRB-", relatedProblemId)}` : null;
 }
 
+/**
+ * UX-D §3: SRC-only public provenance-verification action. Only a canonical
+ * external HTTP(S) reference that the source's own `access.public` marks as
+ * valid for public access qualifies — this reuses existing SRC read-model
+ * data (`canonical_reference`, `access.public`) rather than adding a schema
+ * field. Anything else (missing reference, non-HTTP(S) scheme, or a source
+ * not marked publicly accessible) renders no action: this is deliberately
+ * not a generic auto-linker for arbitrary strings.
+ */
+function publicSourceReferenceUrl(record: Record<string, unknown>): string | null {
+  const access = record.access;
+  const isPublic = access !== null && typeof access === "object" && !Array.isArray(access) && (access as Record<string, unknown>).public === true;
+  if (!isPublic) return null;
+  const reference = record.canonical_reference;
+  if (typeof reference !== "string") return null;
+  let url: URL;
+  try {
+    url = new URL(reference);
+  } catch {
+    return null;
+  }
+  return url.protocol === "http:" || url.protocol === "https:" ? reference : null;
+}
+
+function SourceOriginalLinkAction({ detail }: { detail: RecordDetail }) {
+  if (detail.type !== "SRC-") return null;
+  const url = publicSourceReferenceUrl(detail.record);
+  if (url === null) return null;
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer">
+      Abrir fonte ↗
+    </a>
+  );
+}
+
 function Breadcrumb({ detail, onBackToRecords }: { detail: RecordDetail; onBackToRecords: () => void }) {
   return (
     <nav aria-label="Localização" className="detail-breadcrumb">
@@ -312,6 +347,7 @@ function RecordDetailContent({
             <p>{typeInfo.description}</p>
           </div>
           <div className="detail-rail-actions">
+            <SourceOriginalLinkAction detail={detail} />
             {relatedProblemId && (
               <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
                 Ver como Problema ({relatedProblemId})
