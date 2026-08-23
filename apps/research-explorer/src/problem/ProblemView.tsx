@@ -231,14 +231,12 @@ function ContributionOccurrenceSummary({ evidence }: { evidence: EvidenceWithSou
   return (
     <div className="contribution-summary" aria-label="Papel destes registos nesta leitura">
       <p className="contribution-summary-caption">
-        Papel destes registos nesta leitura — nenhuma implica força, confiança ou classificação.
+        Papel destes registos nesta leitura — os papéis indicados não representam força, confiança ou classificação.
       </p>
       <p className="contribution-summary-counts">
-        {summary.itemCount} {summary.itemCount === 1 ? "item de evidência" : "itens de evidência"} · {summary.occurrenceCount}{" "}
-        {summary.occurrenceCount === 1 ? "ocorrência de contribuição" : "ocorrências de contribuição"}
-        {summary.occurrenceCount !== summary.itemCount
-          ? " (uma evidência pode ter mais do que uma contribuição — estas contagens não correspondem ao número de itens de evidência)"
-          : ""}
+        {summary.itemCount} {summary.itemCount === 1 ? "registo" : "registos"} · {summary.occurrenceCount}{" "}
+        {summary.occurrenceCount === 1 ? "papel registado" : "papéis registados"}
+        {summary.occurrenceCount !== summary.itemCount ? " (um registo pode ter mais do que um papel nesta leitura)" : ""}
       </p>
       <div className="contribution-summary-chips">
         {summary.occurrences.map(({ value, count }) => (

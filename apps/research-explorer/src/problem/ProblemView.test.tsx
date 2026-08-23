@@ -248,13 +248,16 @@ describe("ProblemView", () => {
     expect(within(evidenceSection.querySelector("ul")!).getByText("FUTURE-VALUE")).toBeTruthy();
   });
 
-  it("shows a contribution occurrence summary distinguishing occurrences from evidence-item count", async () => {
+  it("shows a contribution occurrence summary distinguishing occurrences from evidence-item count, in public wording (F02)", async () => {
     render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
     const evidenceSection = await screen.findByLabelText("Evidência");
     // 1 evidence item, 2 contributions (CONFIRMS, REFINES) — occurrenceCount (2) must not be presented as the item count (1).
-    expect(within(evidenceSection).getByText(/1 item de evidência/)).toBeTruthy();
-    expect(within(evidenceSection).getByText(/2 ocorrências de contribuição/)).toBeTruthy();
-    expect(within(evidenceSection).getByText(/não correspondem ao número de itens de evidência/)).toBeTruthy();
+    const countsLine = within(evidenceSection).getByText(/registos? · \d+ papéis? registado/);
+    expect(countsLine.textContent).toContain("1 registo");
+    expect(countsLine.textContent).toContain("2 papéis registados");
+    expect(within(evidenceSection).getByText(/um registo pode ter mais do que um papel nesta leitura/)).toBeTruthy();
+    expect(within(evidenceSection).queryByText(/item de evidência/)).toBeNull();
+    expect(within(evidenceSection).queryByText(/ocorrências de contribuição/)).toBeNull();
   });
 
   it("shows localized Estado atual values without inventing a corroborated-independence claim", async () => {
@@ -400,8 +403,9 @@ describe("ProblemView", () => {
 
     const evidenceSection = await screen.findByLabelText("Evidência");
     expect(within(evidenceSection).getByText(/Registos de evidência associados \(1\)/)).toBeTruthy();
-    expect(within(evidenceSection).getByText(/Papel destes registos nesta leitura/)).toBeTruthy();
+    expect(within(evidenceSection).getByText("Papel destes registos nesta leitura — os papéis indicados não representam força, confiança ou classificação.")).toBeTruthy();
     expect(within(evidenceSection).queryByText(/Ocorrências de contribuição canónica/)).toBeNull();
+    expect(within(evidenceSection).queryByText(/nenhuma implica força, confiança ou classificação/)).toBeNull();
     // Canonical contribution labels/counts (CONFIRMS, REFINES) are unchanged.
     expect(within(evidenceSection).getAllByText("Confirma").length).toBeGreaterThan(0);
     expect(within(evidenceSection).getAllByText("Refina").length).toBeGreaterThan(0);
