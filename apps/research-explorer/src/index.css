@@ -1566,8 +1566,8 @@ main.explorer-shell {
   text-underline-offset: 0.16em;
 }
 
-/* Problem View reading rail (UX-B §3/§4) — "Nesta página" index plus a
-   canonical-contribution-label reference, inside the reused
+/* Problem View reading rail (UX-B §3/§4) — lightweight contextual
+   orientation and a "Nesta página" index, inside the reused
    `.record-detail-rail` shell. */
 .problem-rail-nav ul {
   list-style: none;
@@ -2256,9 +2256,9 @@ main.explorer-shell {
   }
 
   /* No persistent side rail on compact (UX-B §4) — the "Nesta página"
-     index and canonical-contribution reference are desktop-only; compact
-     gets the equivalent essential help in-flow via ProblemHelpDisclosure
-     instead, not a restacked copy of this rail. */
+     index is desktop-only; compact gets the equivalent essential help
+     in-flow via ProblemHelpDisclosure instead, not a restacked copy of
+     this rail. */
   .problem-reading-rail {
     display: none;
   }

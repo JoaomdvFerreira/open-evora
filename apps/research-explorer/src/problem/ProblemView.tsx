@@ -141,10 +141,9 @@ const PROBLEM_SECTIONS = [
  * Desktop reading rail (scope §3/§4): reuses Record Detail's rail/layout
  * pattern (`.record-detail-rail`, `.detail-rail-type-note`,
  * `.detail-rail-actions`) rather than inventing a second sticky-rail
- * treatment. Provides a "Nesta página" index, the same canonical
- * contribution chips already used inline (no new semantics), and a link
- * into the full Reading Guide — never a duplicate of it. Desktop-only by
- * CSS (hidden under the existing 767px breakpoint, matching
+ * treatment. Provides lightweight contextual orientation, a "Nesta página"
+ * index, and a link into the full Reading Guide — never a duplicate of it.
+ * Desktop-only by CSS (hidden under the existing 767px breakpoint, matching
  * `.record-detail-rail`); compact gets the equivalent index in-flow via
  * `ProblemHelpDisclosure` instead (Slice UX-B §4).
  */
