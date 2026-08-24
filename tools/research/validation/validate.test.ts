@@ -1,9 +1,14 @@
 /**
- * Focused tests for the TC-02 typed validator (validate.ts), covering
- * schema validation, malformed records, duplicate IDs, invalid references,
- * and the ASM-* critical_unknowns special case. Preserves the legacy
- * tools/validate-research.js rule set; see validate.parity.test.ts for
- * direct legacy-vs-new comparisons on the canonical corpus.
+ * Focused tests for the typed validator (validate.ts), covering schema
+ * validation, malformed records, duplicate IDs, invalid references, the
+ * ASM-* critical_unknowns special case, the optional EVD.analysis and
+ * ASM-* assessment contracts, and the PRB.decision_basis optional structure
+ * (including its reference fields and the empty-reference-entry hardening).
+ * Preserves the full validation rule set of the retired
+ * tools/validate-research.js, which this module and its behavioural-parity
+ * testing (TC-02) fully superseded; the durable coverage previously split
+ * across tools/test-analytical-foundation.js and tools/test-ipe-01.js has
+ * been migrated in below rather than kept as separate legacy oracles.
  *
  * Run with Node's built-in test runner: node --test tools/research (recursively)
  */
@@ -369,6 +374,551 @@ describe("validateResearchRoot: ASM-* critical_unknowns special case", () => {
       const result = validateResearchRoot(root);
       assert.ok(
         result.errors.some((e) => e.includes('field "critical_unknowns.U1.best_next_evidence" must be a list'))
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
+// ---- EVD.analysis / ASM-* contract tests -----------------------------------
+// Migrated from the retired tools/test-analytical-foundation.js (D3
+// analytical foundation, WU014/WU-D3-01): the optional EVD.analysis metadata
+// contract and the ASM-* assessment contract. Generic enum/reference/boolean
+// mechanics are already covered above; these exercise the specific
+// analysis.*/ASM-* fields and enum members that mechanism validates.
+
+function minimalPrbForAnalysis(): string {
+  return `
+problem_id: PRB-9001
+title: "Fixture problem"
+domain: [example]
+geography:
+  level: municipality
+affected_populations: [residents]
+problem_statement: "Fixture statement for validator/analyzer testing."
+evidence: [EVD-900101]
+evidence_status: discovered
+validation_status: unvalidated
+digital_tractability: not_assessed
+existing_solutions: not_assessed
+status: OPEN
+`;
+}
+
+function minimalEvdForAnalysis({ id = "EVD-900101", analysis = "" }: { id?: string; analysis?: string } = {}): string {
+  return `
+evidence_id: ${id}
+type: observation
+source:
+  publisher: "Fixture Publisher"
+  title: "Fixture Source"
+  source_reference: "https://example.invalid/fixture"
+  published_at: null
+  retrieved_at: "2026-08-11"
+geography:
+  level: municipality
+  area: "Fixture area"
+population: [example-population]
+domain: [example]
+observation:
+  summary: "Fixture observation."
+evidence_nature: claim
+strength: anecdotal
+personal_data:
+  present: false
+  retained: false
+notes: "Fixture only."
+${analysis}
+`;
+}
+
+const VALID_ANALYSIS_BLOCK = `
+analysis:
+  related_problems: [PRB-9001]
+  contribution: [CONFIRMS, REFINES]
+  friction_types: [OPERATIONAL]
+  public_signal_class: PS1
+  lineage_id: "FIXTURE-LINEAGE-1"
+  representativeness: UNKNOWN
+  verification: REPORTED
+  temporal_relevance: CURRENT
+`;
+
+function minimalAsmForAnalysis({
+  triage = "DEEPEN",
+  criticalUnknowns = "",
+}: { triage?: string; criticalUnknowns?: string } = {}): string {
+  return `
+assessment_id: ASM-9001
+problem: PRB-9001
+as_of: "2026-08-11"
+phase: D3
+assessment_status: CURRENT
+evidence_confidence:
+  overall: MEDIUM
+  independence: UNKNOWN
+  coherence: UNKNOWN
+  adequacy: UNKNOWN
+  relevance: UNKNOWN
+  currentness: UNKNOWN
+  contradiction_status: UNKNOWN
+  stakeholder_validation: PENDING
+civic_importance:
+  reach: UNKNOWN
+  frequency: UNKNOWN
+  severity: UNKNOWN
+  persistence: UNKNOWN
+  equity: UNKNOWN
+journey_understanding: PARTIAL
+causal_understanding: UNKNOWN
+existing_solution_understanding: UNKNOWN
+remaining_gap: UNKNOWN
+digital_leverage: not_assessed
+structure_action: KEEP
+decision_gates:
+  problem_real: PASS
+  civic_importance: UNKNOWN
+  journey_understood: UNKNOWN
+  root_cause_understood: UNKNOWN
+  remaining_gap_supported: UNKNOWN
+  digital_causality: NOT_ASSESSED
+  operability: NOT_ASSESSED
+  testability: NOT_ASSESSED
+triage: ${triage}
+next_action: "Do targeted journey research."
+notes: "Fixture."
+${criticalUnknowns}
+`;
+}
+
+describe("validateResearchRoot: EVD.analysis optional contract", () => {
+  test("valid optional EVD.analysis block passes", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(root, "evidence", "EVD-900101.yaml", minimalEvdForAnalysis({ analysis: VALID_ANALYSIS_BLOCK }));
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("invalid analysis.contribution enum value is rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(
+        root,
+        "evidence",
+        "EVD-900101.yaml",
+        minimalEvdForAnalysis({ analysis: "\nanalysis:\n  contribution: [NOT-A-REAL-CONTRIBUTION]\n" })
+      );
+      const result = validateResearchRoot(root);
+      assert.ok(result.errors.some((e) => e.includes('field "analysis.contribution"')));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("invalid analysis.friction_types enum value is rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(
+        root,
+        "evidence",
+        "EVD-900101.yaml",
+        minimalEvdForAnalysis({ analysis: "\nanalysis:\n  friction_types: [NOT-A-REAL-FRICTION-TYPE]\n" })
+      );
+      const result = validateResearchRoot(root);
+      assert.ok(result.errors.some((e) => e.includes('field "analysis.friction_types"')));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("invalid analysis.related_problems reference is rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(
+        root,
+        "evidence",
+        "EVD-900101.yaml",
+        minimalEvdForAnalysis({ analysis: "\nanalysis:\n  related_problems: [PRB-9999]\n" })
+      );
+      const result = validateResearchRoot(root);
+      assert.ok(result.errors.some((e) => e.includes("non-existent PRB-* record")));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("EVD with no analysis block remains valid", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(root, "evidence", "EVD-900101.yaml", minimalEvdForAnalysis());
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("EVD analysis block with no lineage_id remains valid", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(
+        root,
+        "evidence",
+        "EVD-900101.yaml",
+        minimalEvdForAnalysis({ analysis: "\nanalysis:\n  contribution: [CONFIRMS]\n" })
+      );
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("analysis.contribution accepts PLANNED-SOLUTION distinctly from EXISTING-SOLUTION", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(
+        root,
+        "evidence",
+        "EVD-900101.yaml",
+        minimalEvdForAnalysis({ analysis: "\nanalysis:\n  contribution: [CONFIRMS, PLANNED-SOLUTION]\n" })
+      );
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("invalid PLANNED-SOLUTION spelling/value is rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(
+        root,
+        "evidence",
+        "EVD-900101.yaml",
+        minimalEvdForAnalysis({ analysis: "\nanalysis:\n  contribution: [PLANNED_SOLUTION]\n" })
+      );
+      const result = validateResearchRoot(root);
+      assert.ok(result.errors.some((e) => e.includes('field "analysis.contribution"')));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("validateResearchRoot: ASM-* assessment contract", () => {
+  test("valid minimal ASM-Lite passes", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(root, "evidence", "EVD-900101.yaml", minimalEvdForAnalysis());
+      write(root, "assessments", "ASM-9001.yaml", minimalAsmForAnalysis());
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("ASM decision_gates accepts PARTIAL alongside PASS/FAIL/UNKNOWN/NOT_ASSESSED", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(root, "evidence", "EVD-900101.yaml", minimalEvdForAnalysis());
+      const asm = minimalAsmForAnalysis().replace("problem_real: PASS", "problem_real: PARTIAL");
+      write(root, "assessments", "ASM-9001.yaml", asm);
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("ASM with an invalid triage value is rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(root, "evidence", "EVD-900101.yaml", minimalEvdForAnalysis());
+      write(root, "assessments", "ASM-9001.yaml", minimalAsmForAnalysis({ triage: "SOMEDAY" }));
+      const result = validateResearchRoot(root);
+      assert.ok(result.errors.some((e) => e.includes('field "triage"')));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("empty assessments directory is valid (zero ASM records)", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
+      write(root, "evidence", "EVD-900101.yaml", minimalEvdForAnalysis());
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+      assert.equal(result.totalRecords, 2); // 1 PRB + 1 EVD, 0 ASM
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
+// ---- decision_basis contract tests ------------------------------------------
+// Migrated from the retired tools/test-ipe-01.js (IPE-01 contract foundation):
+// the optional PRB.decision_basis structure, its reference fields, and the
+// empty-reference-entry hardening (docs/investigationstrategy.md §6).
+// decision_basis.scope.bounded's boolean-field validation is already covered
+// above (see "non-boolean value in a declared boolean field is reported");
+// these cover decision_basis's other reference/boolean fields plus the
+// empty-reference-entry rule generally.
+
+function minimalPrbWithDecisionBasis({
+  evidence = "[EVD-900101]",
+  decisionBasis = "",
+}: { evidence?: string; decisionBasis?: string } = {}): string {
+  return `
+problem_id: PRB-9001
+title: "Fixture problem"
+domain: [example]
+geography:
+  level: municipality
+affected_populations: [residents]
+problem_statement: "Fixture statement for validator testing."
+evidence: ${evidence}
+evidence_status: discovered
+validation_status: unvalidated
+digital_tractability: not_assessed
+existing_solutions: not_assessed
+status: OPEN
+${decisionBasis}
+`;
+}
+
+describe("validateResearchRoot: PRB.decision_basis optional contract", () => {
+  test("PRB with no decision_basis remains valid (optional field)", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis());
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("decision_basis.manifestation.evidence referencing a non-existent EVD is rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  manifestation:
+    evidence: [EVD-999999]
+`;
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis({ decisionBasis }));
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      assert.ok(
+        result.errors.some((e) =>
+          e.includes('field "decision_basis.manifestation.evidence" references non-existent EVD-* record "EVD-999999"')
+        )
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("decision_basis.supporting_evidence referencing a non-existent EVD is rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  supporting_evidence: [EVD-999999]
+`;
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis({ decisionBasis }));
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      assert.ok(
+        result.errors.some((e) =>
+          e.includes('field "decision_basis.supporting_evidence" references non-existent EVD-* record "EVD-999999"')
+        )
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("decision_basis.overlap_check.related_problems referencing a non-existent PRB is rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  overlap_check:
+    related_problems: [PRB-9999]
+`;
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis({ decisionBasis }));
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      assert.ok(
+        result.errors.some((e) =>
+          e.includes('field "decision_basis.overlap_check.related_problems" references non-existent PRB-* record "PRB-9999"')
+        )
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("decision_basis reference fields accept an empty list", () => {
+    const root = makeFixtureRoot();
+    try {
+      const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  manifestation:
+    evidence: []
+  supporting_evidence: []
+  boundary_evidence: []
+`;
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis({ decisionBasis }));
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("decision_basis.contradiction_search.performed with a non-boolean value is rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  contradiction_search:
+    performed: "yes"
+    summary: "Fixture."
+    evidence: []
+`;
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis({ decisionBasis }));
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      assert.ok(
+        result.errors.some((e) => e.includes('field "decision_basis.contradiction_search.performed" must be a boolean'))
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("decision_basis.overlap_check.performed with a non-boolean value is rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  overlap_check:
+    performed: "yes"
+    summary: "Fixture."
+    related_problems: []
+`;
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis({ decisionBasis }));
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      assert.ok(
+        result.errors.some((e) => e.includes('field "decision_basis.overlap_check.performed" must be a boolean'))
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("validateResearchRoot: empty-reference-entry hardening", () => {
+  test("an empty string inside PRB.evidence is a validation error", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis({ evidence: '[EVD-900101, ""]' }));
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      assert.ok(result.errors.some((e) => e.includes('field "evidence" contains an empty reference entry')));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("multiple empty entries in a reference list are each reported", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(
+        root,
+        "problems",
+        "PRB-9001.yaml",
+        minimalPrbWithDecisionBasis({ evidence: '[EVD-900101, "", "", ""]' })
+      );
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      const count = result.errors.filter((e) => e.includes('field "evidence" contains an empty reference entry')).length;
+      assert.equal(count, 3);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("a whitespace-only entry in a reference list is also rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis({ evidence: '[EVD-900101, "   "]' }));
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      assert.ok(result.errors.some((e) => e.includes('field "evidence" contains an empty reference entry')));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("an empty reference list ([]) is still valid — no empty-entry error", () => {
+    const root = makeFixtureRoot();
+    try {
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis({ evidence: "[]" }));
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("empty entries in decision_basis.manifestation.evidence are also rejected", () => {
+    const root = makeFixtureRoot();
+    try {
+      const decisionBasis = `
+decision_basis:
+  contract_version: "0.1"
+  manifestation:
+    evidence: [EVD-900101, ""]
+`;
+      write(root, "problems", "PRB-9001.yaml", minimalPrbWithDecisionBasis({ decisionBasis }));
+      write(root, "evidence", "EVD-900101.yaml", VALID_EVD.replace("  source_id: SRC-9001\n", ""));
+      const result = validateResearchRoot(root);
+      assert.ok(
+        result.errors.some((e) =>
+          e.includes('field "decision_basis.manifestation.evidence" contains an empty reference entry')
+        )
       );
     } finally {
       rmSync(root, { recursive: true, force: true });

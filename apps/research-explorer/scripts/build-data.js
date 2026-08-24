@@ -21,7 +21,7 @@ const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
 
-const { validateResearchTree } = require("../../../tools/validate-research.js");
+const { validateResearchTree } = require("./validate-research-bridge.js");
 const { buildReadModel } = require("./read-model.js");
 const { publishDirectoryAtomically } = require("./atomic-write.js");
 

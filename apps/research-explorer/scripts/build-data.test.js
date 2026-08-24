@@ -3,11 +3,11 @@
  * Focused tests for the RE-01 Research Explorer adapter
  * (read-model.js + atomic-write.js + build-data.js).
  *
- * Zero-dependency, matching tools/validate-research.js's and
- * tools/test-analytical-foundation.js's convention: only Node's built-in
- * assert/fs/os/path/crypto. Fixtures are generated into a fresh temp
- * directory per test and discarded — nothing here touches or contaminates
- * the canonical research/ corpus.
+ * Only Node's built-in assert/fs/os/path/crypto, plus the typed tools/research/
+ * tooling via ./validate-research-bridge.js (see that file for why a thin
+ * CommonJS bridge is used instead of a direct import). Fixtures are
+ * generated into a fresh temp directory per test and discarded — nothing
+ * here touches or contaminates the canonical research/ corpus.
  *
  * Usage: node apps/research-explorer/scripts/build-data.test.js
  * Exit code 0 = all tests passed, 1 = at least one failure.
@@ -18,7 +18,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 
-const { validateResearchTree } = require("../../../tools/validate-research.js");
+const { validateResearchTree } = require("./validate-research-bridge.js");
 const { buildReadModel } = require("./read-model.js");
 const { publishDirectoryAtomically } = require("./atomic-write.js");
 const { run } = require("./build-data.js");

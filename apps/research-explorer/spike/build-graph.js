@@ -7,14 +7,15 @@
  * intentionally stays small and generates a single combined graph.json
  * plus a stats summary, not the full v1 read model.
  *
- * Zero new dependencies: reuses tools/validate-research.js as-is.
+ * Zero new dependencies: reuses the typed tools/research/ tooling via
+ * ../scripts/validate-research-bridge.js.
  *
  * Usage: node apps/research-explorer/spike/build-graph.js
  */
 
 const fs = require("fs");
 const path = require("path");
-const { validateResearchTree, getPath } = require("../../../tools/validate-research.js");
+const { validateResearchTree, getPath } = require("../scripts/validate-research-bridge.js");
 
 const repoRoot = path.resolve(__dirname, "..", "..", "..");
 const researchRoot = path.join(repoRoot, "research");

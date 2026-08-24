@@ -9,8 +9,12 @@
   "scripts": {
     "explorer": "npm run build-data --prefix apps/research-explorer && npm run dev --prefix apps/research-explorer",
     "explorer:build": "npm run build-data --prefix apps/research-explorer && npm run typecheck --prefix apps/research-explorer && npm run test --prefix apps/research-explorer && npm run build --prefix apps/research-explorer",
+    "research:validate": "node tools/research/validation/cli.ts",
+    "research:analyze": "node tools/research/analysis/cli.ts --all",
+    "research:readiness": "node tools/research/readiness/cli.ts --all",
     "research:typecheck": "tsc --noEmit -p tools/research/tsconfig.json",
-    "research:test": "node --test --experimental-strip-types tools/research/**/*.test.ts"
+    "research:test": "node --test --experimental-strip-types tools/research/**/*.test.ts",
+    "research:check": "npm run research:typecheck && npm run research:test && npm run research:validate"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

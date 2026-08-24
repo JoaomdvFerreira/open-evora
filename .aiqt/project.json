@@ -16,7 +16,7 @@
     "constraints": [
       "Documentation/research-first repository: no application framework, database, or cloud infrastructure during D1.",
       "Substantive Évora research is performed externally and integrated via reviewed handoffs (docs/discovery/research-handoff-protocol.md).",
-      "Research records use the YAML schemas in research/schemas/ and are validated with tools/validate-research.js (zero third-party dependencies)."
+      "Research records use the YAML schemas in research/schemas/ and are validated with tools/research/ (typed, minimal dependency surface)."
     ],
     "nonGoals": [
       "No civic product selection during D1.",
