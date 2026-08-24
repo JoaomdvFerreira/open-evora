@@ -7,7 +7,7 @@ import type { RecordSummary } from "../dataProvider/types";
 const RECORDS: RecordSummary[] = [
   { id: "EVD-000001", type: "EVD-", label: "The Social Development Plan reports a lack of transport", file: "research/evidence/EVD-000001.yaml", summaryFields: {} },
   { id: "PRB-0006", type: "PRB-", label: "Adequate and affordable housing is difficult to access", file: "research/problems/PRB-0006.yaml", summaryFields: {} },
-  { id: "ASM-0006", type: "ASM-", label: "ASM-0006", file: "research/assessments/ASM-0006.yaml", summaryFields: {} },
+  { id: "WID-0002", type: "WID-", label: "WID-0002", file: "research/widgets/WID-0002.yaml", summaryFields: {} },
   { id: "WID-0001", type: "WID-", label: "Future widget label", file: "research/widgets/WID-0001.yaml", summaryFields: {} },
 ];
 
@@ -24,9 +24,9 @@ describe("NarrowRecordsList", () => {
 
   it("does not duplicate the ID as a secondary line when the label already equals the ID", () => {
     render(<NarrowRecordsList records={RECORDS} selectedId={null} onSelect={vi.fn()} />);
-    const row = screen.getByRole("button", { name: /ASM-0006/ });
-    // Only one occurrence of "ASM-0006" text within the row, not a repeated label+id pair.
-    const occurrences = (row.textContent!.match(/ASM-0006/g) ?? []).length;
+    const row = screen.getByRole("button", { name: /WID-0002/ });
+    // Only one occurrence of "WID-0002" text within the row, not a repeated label+id pair.
+    const occurrences = (row.textContent!.match(/WID-0002/g) ?? []).length;
     expect(occurrences).toBe(1);
   });
 

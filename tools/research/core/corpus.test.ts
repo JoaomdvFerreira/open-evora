@@ -22,7 +22,7 @@ import { parseRecordYaml } from "./yaml.ts";
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const REAL_RESEARCH_ROOT = join(__dirname, "..", "..", "..", "research");
 const REAL_SCHEMAS_DIR = join(REAL_RESEARCH_ROOT, "schemas");
-const DIRS = ["sources", "evidence", "problems", "assessments", "schemas"];
+const DIRS = ["sources", "evidence", "problems", "schemas"];
 
 function makeFixtureRoot(): string {
   const root = mkdtempSync(join(tmpdir(), "evora-tc01-"));
@@ -93,45 +93,6 @@ existing_solutions: not_assessed
 status: OPEN
 `;
 
-const MINIMAL_ASM = `
-assessment_id: ASM-9001
-problem: PRB-9001
-as_of: "2026-08-11"
-phase: D3
-assessment_status: CURRENT
-evidence_confidence:
-  overall: MEDIUM
-  independence: UNKNOWN
-  coherence: UNKNOWN
-  adequacy: UNKNOWN
-  relevance: UNKNOWN
-  currentness: UNKNOWN
-  contradiction_status: UNKNOWN
-  stakeholder_validation: PENDING
-civic_importance:
-  reach: UNKNOWN
-  frequency: UNKNOWN
-  severity: UNKNOWN
-  persistence: UNKNOWN
-  equity: UNKNOWN
-journey_understanding: PARTIAL
-causal_understanding: UNKNOWN
-existing_solution_understanding: UNKNOWN
-remaining_gap: UNKNOWN
-digital_leverage: not_assessed
-structure_action: KEEP
-decision_gates:
-  problem_real: PASS
-  civic_importance: UNKNOWN
-  journey_understood: UNKNOWN
-  root_cause_understood: UNKNOWN
-  remaining_gap_supported: UNKNOWN
-  digital_causality: NOT_ASSESSED
-  operability: NOT_ASSESSED
-  testability: NOT_ASSESSED
-triage: DEEPEN
-`;
-
 describe("parseRecordYaml", () => {
   test("parses nested maps, lists, scalars, and booleans", () => {
     const fields = parseRecordYaml(MINIMAL_PRB);
@@ -151,10 +112,10 @@ describe("parseRecordYaml", () => {
 });
 
 describe("loadSchemas", () => {
-  test("loads all four canonical schema files with expected prefixes", () => {
+  test("loads all three canonical schema files with expected prefixes", () => {
     const schemas = loadSchemas(REAL_RESEARCH_ROOT);
     const prefixes = schemas.map((s) => s.prefix).sort();
-    assert.deepEqual(prefixes, ["ASM-", "EVD-", "PRB-", "SRC-"]);
+    assert.deepEqual(prefixes, ["EVD-", "PRB-", "SRC-"]);
   });
 });
 
@@ -166,7 +127,6 @@ describe("loadCorpusIndex (fixture corpus)", () => {
     write(root, "sources", "SRC-9001.yaml", MINIMAL_SRC);
     write(root, "evidence", "EVD-900101.yaml", MINIMAL_EVD);
     write(root, "problems", "PRB-9001.yaml", MINIMAL_PRB);
-    write(root, "assessments", "ASM-9001.yaml", MINIMAL_ASM);
   });
 
   after(() => {
@@ -175,11 +135,10 @@ describe("loadCorpusIndex (fixture corpus)", () => {
 
   test("indexes exactly one record per canonical type", () => {
     const index = loadCorpusIndex(root);
-    assert.equal(index.totalRecords, 4);
+    assert.equal(index.totalRecords, 3);
     assert.equal(index.byPrefix.get("SRC-")?.records.length, 1);
     assert.equal(index.byPrefix.get("EVD-")?.records.length, 1);
     assert.equal(index.byPrefix.get("PRB-")?.records.length, 1);
-    assert.equal(index.byPrefix.get("ASM-")?.records.length, 1);
   });
 
   test("byId resolves each record by its schema-declared idField", () => {
@@ -187,10 +146,6 @@ describe("loadCorpusIndex (fixture corpus)", () => {
     const prb = index.byPrefix.get("PRB-")?.byId.get("PRB-9001");
     assert.ok(prb);
     assert.equal(prb?.fields.title, "Fixture problem");
-
-    const asm = index.byPrefix.get("ASM-")?.byId.get("ASM-9001");
-    assert.ok(asm);
-    assert.equal(asm?.fields.problem, "PRB-9001");
 
     const evd = index.byPrefix.get("EVD-")?.byId.get("EVD-900101");
     assert.ok(evd);
@@ -205,14 +160,14 @@ describe("loadCorpusIndex (fixture corpus)", () => {
     assert.equal(prb?.file, "problems/PRB-9001.yaml");
   });
 
-  test("an empty assessments directory yields zero ASM records without error", () => {
+  test("an empty sources directory yields zero SRC records without error", () => {
     const emptyRoot = makeFixtureRoot();
     try {
       write(emptyRoot, "problems", "PRB-9001.yaml", MINIMAL_PRB);
       write(emptyRoot, "evidence", "EVD-900101.yaml", MINIMAL_EVD);
       const index = loadCorpusIndex(emptyRoot);
-      assert.equal(index.byPrefix.get("ASM-")?.records.length, 0);
-      assert.equal(index.byPrefix.get("ASM-")?.byId.size, 0);
+      assert.equal(index.byPrefix.get("SRC-")?.records.length, 0);
+      assert.equal(index.byPrefix.get("SRC-")?.byId.size, 0);
     } finally {
       rmSync(emptyRoot, { recursive: true, force: true });
     }
@@ -241,10 +196,10 @@ describe("loadCorpusIndex (fixture corpus)", () => {
 });
 
 describe("loadCorpusIndex (real canonical corpus)", () => {
-  test("reads the current research/ corpus and constructs all four indexes without throwing", () => {
+  test("reads the current research/ corpus and constructs all three indexes without throwing", () => {
     const index = loadCorpusIndex(REAL_RESEARCH_ROOT);
     assert.ok(index.totalRecords > 0);
-    for (const prefix of ["SRC-", "EVD-", "PRB-", "ASM-"]) {
+    for (const prefix of ["SRC-", "EVD-", "PRB-"]) {
       assert.ok(index.byPrefix.has(prefix), `expected an index for prefix ${prefix}`);
     }
   });

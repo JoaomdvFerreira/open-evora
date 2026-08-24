@@ -34,7 +34,7 @@ import type { ReadinessFinding } from "./readiness.ts";
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const REAL_RESEARCH_ROOT = join(__dirname, "..", "..", "..", "research");
 const REAL_SCHEMAS_DIR = join(REAL_RESEARCH_ROOT, "schemas");
-const DIRS = ["sources", "evidence", "problems", "assessments", "schemas"];
+const DIRS = ["sources", "evidence", "problems", "schemas"];
 
 function makeFixtureRoot(): string {
   const root = mkdtempSync(join(tmpdir(), "evora-readiness-"));
@@ -112,49 +112,6 @@ digital_tractability: not_assessed
 existing_solutions: not_assessed
 status: OPEN
 ${decisionBasis}
-`;
-}
-
-function asm(id: string, problemId: string): string {
-  return `
-assessment_id: ${id}
-problem: ${problemId}
-as_of: "2026-08-11"
-phase: D3
-assessment_status: CURRENT
-evidence_confidence:
-  overall: UNKNOWN
-  independence: UNKNOWN
-  coherence: UNKNOWN
-  adequacy: UNKNOWN
-  relevance: UNKNOWN
-  currentness: UNKNOWN
-  contradiction_status: UNKNOWN
-  stakeholder_validation: PENDING
-civic_importance:
-  reach: UNKNOWN
-  frequency: UNKNOWN
-  severity: UNKNOWN
-  persistence: UNKNOWN
-  equity: UNKNOWN
-journey_understanding: UNKNOWN
-causal_understanding: UNKNOWN
-existing_solution_understanding: UNKNOWN
-remaining_gap: UNKNOWN
-digital_leverage: not_assessed
-structure_action: KEEP
-decision_gates:
-  problem_real: UNKNOWN
-  civic_importance: UNKNOWN
-  journey_understood: UNKNOWN
-  root_cause_understood: UNKNOWN
-  remaining_gap_supported: UNKNOWN
-  digital_causality: NOT_ASSESSED
-  operability: NOT_ASSESSED
-  testability: NOT_ASSESSED
-triage: DEEPEN
-next_action: "Fixture next action."
-notes: ""
 `;
 }
 
@@ -294,7 +251,6 @@ describe("eligibility", () => {
     root = makeFixtureRoot();
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis: fullEligibilityBasis() }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, READY.ELIGIBILITY, JSON.stringify(report.eligibility.reasons));
   });
@@ -308,7 +264,6 @@ describe("eligibility", () => {
       prb({ validationStatus: "validated", decisionBasis: fullEligibilityBasis(), affectedPopulations: "[residents, students]" })
     );
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, READY.ELIGIBILITY, JSON.stringify(report.eligibility.reasons));
   });
@@ -322,7 +277,6 @@ describe("eligibility", () => {
       prb({ validationStatus: "validated", decisionBasis: fullEligibilityBasis(), affectedPopulations: "[]" })
     );
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.MISSING_AFFECTED_POPULATION));
@@ -332,7 +286,6 @@ describe("eligibility", () => {
     root = makeFixtureRoot();
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated" }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.NO_DECISION_BASIS));
@@ -343,7 +296,6 @@ describe("eligibility", () => {
     const decisionBasis = fullEligibilityBasis({ includeManifestation: false });
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.MISSING_MANIFESTATION));
@@ -354,7 +306,6 @@ describe("eligibility", () => {
     const decisionBasis = fullEligibilityBasis({ includeConsequence: false });
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.MISSING_CONSEQUENCE));
@@ -372,7 +323,6 @@ describe("eligibility", () => {
     const decisionBasis = fullEligibilityBasis({ manifestationEvidence: "[EVD-999999]" });
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const index = loadCorpusIndex(root);
     const { errors } = validateCorpusIndex(index);
     assert.ok(errors.length > 0, "expected validation to refuse a corpus with a broken reference");
@@ -402,7 +352,6 @@ describe("eligibility", () => {
         },
       ],
       evidence: [{ evidence_id: "EVD-900101" }],
-      assessments: [{ assessment_id: "ASM-9001", problem: "PRB-9001" }],
     });
     const result = evaluateEligibility("PRB-9001", index);
     assert.strictEqual(result.result, REVIEW_REQUIRED);
@@ -416,7 +365,6 @@ describe("eligibility", () => {
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
     write(root, "evidence", "EVD-900102.yaml", evd("EVD-900102"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.EVIDENCE_NOT_LINKED_TO_PRB), JSON.stringify(report.eligibility.reasons));
@@ -427,21 +375,18 @@ describe("eligibility", () => {
     const decisionBasis = fullEligibilityBasis({ includeManifestation: true });
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, READY.ELIGIBILITY, JSON.stringify(report.eligibility.reasons));
     assert.ok(!codesOf(report.eligibility.reasons).includes(REASON.MISSING_SCOPE));
     assert.ok(!codesOf(report.eligibility.reasons).includes(REASON.MISSING_SCOPE_BOUNDED));
   });
 
-  test("missing required ASM -> REVIEW", () => {
+  test("complete valid basis with no ASM-* records in the corpus -> READY (Eligibility has no Assessment dependency)", () => {
     root = makeFixtureRoot();
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis: fullEligibilityBasis() }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    // No ASM-* written.
     const report = loadAndEvaluate(root, "PRB-9001");
-    assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
-    assert.ok(codesOf(report.eligibility.reasons).includes(REASON.MISSING_REQUIRED_ASM));
+    assert.strictEqual(report.eligibility.result, READY.ELIGIBILITY, JSON.stringify(report.eligibility.reasons));
   });
 
   test("contradiction_search.performed=false -> REVIEW", () => {
@@ -449,7 +394,6 @@ describe("eligibility", () => {
     const decisionBasis = fullEligibilityBasis({ contradictionPerformed: false });
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.CONTRADICTION_SEARCH_NOT_PERFORMED), JSON.stringify(report.eligibility.reasons));
@@ -460,7 +404,6 @@ describe("eligibility", () => {
     const decisionBasis = fullEligibilityBasis({ includeOverlapCheck: false });
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.MISSING_OVERLAP_CHECK_ELIGIBILITY), JSON.stringify(report.eligibility.reasons));
@@ -471,7 +414,6 @@ describe("eligibility", () => {
     const decisionBasis = fullEligibilityBasis({ overlapPerformed: false });
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.OVERLAP_CHECK_NOT_PERFORMED), JSON.stringify(report.eligibility.reasons));
@@ -482,7 +424,6 @@ describe("eligibility", () => {
     const decisionBasis = fullEligibilityBasis({ manifestationEvidence: "[]" });
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.MISSING_MANIFESTATION_EVIDENCE), JSON.stringify(report.eligibility.reasons));
@@ -510,7 +451,6 @@ describe("eligibility", () => {
         },
       ],
       evidence: [{ evidence_id: "EVD-900101" }],
-      assessments: [{ assessment_id: "ASM-9001", problem: "PRB-9001" }],
     });
     const result = evaluateEligibility("PRB-9001", index);
     assert.strictEqual(result.result, REVIEW_REQUIRED);
@@ -522,7 +462,6 @@ describe("eligibility", () => {
     const decisionBasis = fullEligibilityBasis({ includeContractVersion: false });
     write(root, "problems", "PRB-9001.yaml", prb({ validationStatus: "validated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.eligibility.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.eligibility.reasons).includes(REASON.MISSING_CONTRACT_VERSION), JSON.stringify(report.eligibility.reasons));
@@ -549,7 +488,6 @@ describe("eligibility", () => {
         },
       ],
       evidence: [{ evidence_id: "EVD-900101" }],
-      assessments: [{ assessment_id: "ASM-9001", problem: "PRB-9001" }],
     });
     const result = evaluateEligibility("PRB-9001", index);
     assert.strictEqual(result.result, REVIEW_REQUIRED);
@@ -578,7 +516,6 @@ describe("corroboration", () => {
     root = makeFixtureRoot();
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis: fullCorroborationBasis() }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, READY.CORROBORATION, JSON.stringify(report.corroboration.reasons));
     assert.ok(!codesOf(report.corroboration.reasons).includes(REASON.OVERLAP_CHECK_NOT_PERFORMED));
@@ -593,7 +530,6 @@ describe("corroboration", () => {
       prb({ evidenceStatus: "corroborated", decisionBasis: fullCorroborationBasis({ corroborationStatement: "A stale, no-longer-matching statement." }) })
     );
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.STALE_CORROBORATION_STATEMENT));
@@ -607,7 +543,6 @@ describe("corroboration", () => {
     );
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.MISSING_CURRENTNESS_CORROBORATION), JSON.stringify(report.corroboration.reasons));
@@ -621,7 +556,6 @@ describe("corroboration", () => {
     );
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.MISSING_CONTRADICTION_SEARCH_CORROBORATION), JSON.stringify(report.corroboration.reasons));
@@ -632,7 +566,6 @@ describe("corroboration", () => {
     const decisionBasis = fullCorroborationBasis({ contradictionPerformed: false });
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.CONTRADICTION_SEARCH_NOT_PERFORMED_CORROBORATION), JSON.stringify(report.corroboration.reasons));
@@ -643,7 +576,6 @@ describe("corroboration", () => {
     const decisionBasis = fullCorroborationBasis({ includeContractVersion: false });
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.MISSING_CONTRACT_VERSION), JSON.stringify(report.corroboration.reasons));
@@ -654,7 +586,6 @@ describe("corroboration", () => {
     const decisionBasis = fullCorroborationBasis({ includeBounded: false });
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.MISSING_SCOPE_BOUNDED), JSON.stringify(report.corroboration.reasons));
@@ -665,7 +596,6 @@ describe("corroboration", () => {
     const decisionBasis = fullCorroborationBasis({ bounded: true });
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.BOUNDED_SCOPE_WITHOUT_LIMITATIONS), JSON.stringify(report.corroboration.reasons));
@@ -676,7 +606,6 @@ describe("corroboration", () => {
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis: fullCorroborationBasis() }));
     // lineage_id present but empty/whitespace-only — structurally broken, not "UNASSESSED".
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101", { lineageId: "   " }));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.LINEAGE_REQUIREMENT_NOT_STRUCTURALLY_AVAILABLE), JSON.stringify(report.corroboration.reasons));
@@ -686,7 +615,6 @@ describe("corroboration", () => {
     root = makeFixtureRoot();
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis: fullCorroborationBasis() }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.ok(!codesOf(report.corroboration.reasons).includes(REASON.LINEAGE_REQUIREMENT_NOT_STRUCTURALLY_AVAILABLE), JSON.stringify(report.corroboration.reasons));
   });
@@ -696,20 +624,17 @@ describe("corroboration", () => {
     const decisionBasis = fullCorroborationBasis({ includeScope: false });
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.MISSING_SCOPE));
   });
 
-  test("missing required ASM -> REVIEW", () => {
+  test("complete valid basis with no ASM-* records in the corpus -> READY (Corroboration has no Assessment dependency)", () => {
     root = makeFixtureRoot();
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis: fullCorroborationBasis() }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    // No ASM-* written.
     const report = loadAndEvaluate(root, "PRB-9001");
-    assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
-    assert.ok(codesOf(report.corroboration.reasons).includes(REASON.MISSING_REQUIRED_ASM));
+    assert.strictEqual(report.corroboration.result, READY.CORROBORATION, JSON.stringify(report.corroboration.reasons));
   });
 
   test("unknown EVD in supporting_evidence is caught by validation before readiness runs", () => {
@@ -717,7 +642,6 @@ describe("corroboration", () => {
     const decisionBasis = fullCorroborationBasis({ supportingEvidence: "[EVD-999999]" });
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const index = loadCorpusIndex(root);
     const { errors } = validateCorpusIndex(index);
     assert.ok(errors.length > 0, "expected validation to refuse a corpus with a broken reference");
@@ -745,7 +669,6 @@ describe("corroboration", () => {
         },
       ],
       evidence: [{ evidence_id: "EVD-900101" }],
-      assessments: [{ assessment_id: "ASM-9001", problem: "PRB-9001" }],
     });
     const result = evaluateCorroboration("PRB-9001", index);
     assert.strictEqual(result.result, REVIEW_REQUIRED);
@@ -757,7 +680,6 @@ describe("corroboration", () => {
     const decisionBasis = fullCorroborationBasis({ includeCorroborationBasis: false });
     write(root, "problems", "PRB-9001.yaml", prb({ evidenceStatus: "corroborated", decisionBasis }));
     write(root, "evidence", "EVD-900101.yaml", evd("EVD-900101"));
-    write(root, "assessments", "ASM-9001.yaml", asm("ASM-9001", "PRB-9001"));
     const report = loadAndEvaluate(root, "PRB-9001");
     assert.strictEqual(report.corroboration.result, REVIEW_REQUIRED);
     assert.ok(codesOf(report.corroboration.reasons).includes(REASON.MISSING_CORROBORATION_BASIS));
@@ -775,11 +697,9 @@ describe("corroboration", () => {
 function buildManualIndex({
   problems,
   evidence,
-  assessments,
 }: {
   problems: Record<string, unknown>[];
   evidence: Record<string, unknown>[];
-  assessments: Record<string, unknown>[];
 }): CorpusIndex {
   function toRecordIndex(records: Record<string, unknown>[], idField: string, prefix: string, directory: string) {
     const parsed = records.map((fields) => ({ file: `${directory}/${fields[idField]}.yaml`, fields }));
@@ -794,9 +714,8 @@ function buildManualIndex({
   const byPrefix = new Map();
   byPrefix.set("PRB-", toRecordIndex(problems, "problem_id", "PRB-", "problems"));
   byPrefix.set("EVD-", toRecordIndex(evidence, "evidence_id", "EVD-", "evidence"));
-  byPrefix.set("ASM-", toRecordIndex(assessments, "assessment_id", "ASM-", "assessments"));
   byPrefix.set("SRC-", toRecordIndex([], "source_id", "SRC-", "sources"));
 
-  const totalRecords = problems.length + evidence.length + assessments.length;
+  const totalRecords = problems.length + evidence.length;
   return { researchRoot: "<manual>", byPrefix, totalRecords } as CorpusIndex;
 }

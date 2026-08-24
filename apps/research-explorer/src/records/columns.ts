@@ -8,7 +8,7 @@ import type { RecordSummary } from "../dataProvider/types";
  * logic, with no JSX/React dependency here.
  *
  * Deliberately generic: only universal fields (ID, Type, Label, provenance
- * file path). No SRC-/EVD-/PRB-/ASM- specific columns — a future
+ * file path). No SRC-/EVD-/PRB- specific columns — a future
  * schema-conforming record type renders through these same four columns
  * with no change here.
  */

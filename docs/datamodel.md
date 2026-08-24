@@ -6,15 +6,14 @@ This document owns **record meaning, state ownership, relationships, and authore
 
 It does not own research workflow or decision criteria; those belong to `docs/investigationstrategy.md`. It does not duplicate concrete field shapes or enum inventories; those belong to executable schemas.
 
-The canonical research model contains exactly four record types:
+The canonical research model contains exactly three record types:
 - Source (`SRC-*`)
 - Evidence (`EVD-*`)
 - Problem (`PRB-*`)
-- Assessment (`ASM-*`)
 
 No Hypothesis (`HYP-*`) record type is part of the current process or target model.
 
-> **Transition:** the PRB-current-state / ASM-immutable-snapshot model below is the adopted target model. Until its schema/tooling migration is complete, implemented contracts may still expose legacy ASM current-state fields. Treat that mismatch as explicit migration work. Pre-migration analyzers/verifiers may still require or select a legacy current ASM for a PRB. This is transitional runtime compatibility, not target state ownership.
+Assessment (`ASM-*`) is not part of the current canonical model. Historical snapshot storage for material Problem history is deferred until material Problem history actually justifies it; see §4's future-policy note.
 
 ## 1. Source (`SRC-*`)
 
@@ -109,48 +108,15 @@ Inverse genealogy should be derived rather than redundantly authored.
 
 Considering and rejecting structural change creates no genealogy.
 
-## 4. Assessment (`ASM-*`)
+## 4. Future historical-snapshot policy
 
-An Assessment is an immutable historical record associated with exactly one Problem.
+Assessment (`ASM-*`) is not an implemented canonical record type. Historical snapshots of Problem state are deferred until material Problem history actually justifies storing them; this unit does not design that future schema.
 
-Its semantic kind is either **REVIEW** (a material investigation-state snapshot) or **CORRECTION** (a correction to an incorrectly recorded historical snapshot).
+The material-change criteria that previously governed Assessment creation are preserved here as the future policy for when a historical snapshot would be justified, so a later decision to implement snapshot storage does not require redefining what counts as a materially significant Problem change. `docs/investigationstrategy.md` §9 owns the operational rules; this section anchors their status as forward-looking policy, not an active requirement.
 
-It is not current investigation state. The target model has no mutable, continuously edited, or draft current Assessment.
+A materially significant Problem change is one where, if the project were asked what it currently believes or has decided about the Problem, the answer would differ from before the change. This includes changes to lifecycle status, `evidence_status`, `validation_status`, investigation posture/triage, an actual structural disposition (split/merge), or an effect-tested material change to manifestation, consequence, scope, a high-impact critical uncertainty, or a materially conclusion-changing contradiction. It excludes reinforcing evidence, metadata/wording/formatting changes, maintained provenance links, mere passage of time, or a review reaffirming materially equivalent state.
 
-### REVIEW
-
-A REVIEW records genuine evolution in the Problem's understanding or decision.
-
-It preserves:
-- the relevant resulting state;
-- the semantic delta;
-- materiality rationale;
-- supporting provenance;
-- the preceding REVIEW relationship for the same Problem.
-
-A REVIEW supersession chain never crosses Problem identities.
-
-### CORRECTION
-
-A CORRECTION fixes an Assessment that was recorded incorrectly.
-
-It is a new immutable Assessment, does not create a new investigation-state transition, identifies the erroneous Assessment through a distinct correction relationship, and leaves that erroneous record intact.
-
-The valid historical state at that chain position is read through the applicable correction. Later REVIEWs continue from the corrected understanding.
-
-Historical resolution must remain unambiguous. Schema/tooling must prevent or deterministically resolve competing correction paths rather than leaving multiple effective versions of the same chain position.
-
-### Derived lifecycle
-
-The target model has no authored `assessment_status`.
-
-Current/superseded position is derived from history. A draft is not yet an Assessment. Archival belongs to Problem lifecycle or presentation policy rather than intrinsic Assessment state.
-
-### Migration boundary
-
-Structured Assessment history begins from adoption of this model forward. Existing pre-migration Assessment records may be carried forward as migration-boundary seed snapshots without inventing predecessor history.
-
-Do not infer historical snapshots from legacy notes, work-unit labels, or narrative change logs.
+Should historical snapshot storage be implemented in the future, it may reuse these criteria as its creation trigger rather than redefining materiality from scratch.
 
 ## 5. Core relationships
 
@@ -158,9 +124,7 @@ Conceptually:
 
 `SRC → EVD → PRB`
 
-`PRB → ASM history`
-
-A Source supports Evidence. Evidence informs one or more Problems. A Problem owns current state. Assessments preserve material historical states of one Problem.
+A Source supports Evidence. Evidence informs one or more Problems. A Problem owns current state, including current investigation state.
 
 No additional canonical research record type sits between Problem and future intervention/project work.
 
@@ -172,7 +136,7 @@ Problem overlap remains distinct from split/merge genealogy.
 
 **Derived state** is deterministically calculated from canonical state without adding semantic judgement.
 
-Derived systems may project relationships, calculate structural readiness, derive Assessment chain position, and prepare presentation read models.
+Derived systems may project relationships, calculate structural readiness, and prepare presentation read models.
 
 They must not silently create authored decisions such as corroboration, validation, or investigation posture.
 

@@ -2333,7 +2333,6 @@ main.explorer-shell {
   line-height: var(--recipe-editorial-body-line-height);
 }
 
-.assessment-list,
 .evidence-list {
   list-style: none;
   margin: 0;
@@ -2343,45 +2342,10 @@ main.explorer-shell {
   gap: var(--space-4);
 }
 
-.assessment-card,
 .evidence-card {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
-}
-
-.assessment-card > button {
-  padding: 0;
-  color: var(--ink-faintest);
-  border: 0;
-  background: none;
-  font-family: var(--recipe-technical-id-family);
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.assessment-card > button:hover {
-  color: var(--accent-dark);
-  text-decoration: underline;
-  text-underline-offset: 0.16em;
-}
-
-.assessment-fields {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  row-gap: var(--space-2);
-  margin: var(--space-3) 0 0;
-  font-size: 13px;
-}
-
-.assessment-fields dt {
-  color: var(--ink-faintest);
-  font-family: var(--recipe-technical-field-family);
-}
-
-.assessment-fields dd {
-  margin: 0;
-  color: var(--ink);
 }
 
 .evidence-item-header > a,
@@ -2407,24 +2371,6 @@ main.explorer-shell {
   margin: var(--space-2) 0 0;
   padding-left: var(--space-5);
   font-size: 13px;
-}
-
-.unknowns-card {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-  margin-bottom: var(--space-3);
-}
-
-.unknowns-card:last-child {
-  margin-bottom: 0;
-}
-
-.unknowns-card h4 {
-  margin: 0 0 var(--space-2);
-  color: var(--ink-faint);
-  font-family: var(--recipe-technical-id-family);
-  font-size: var(--recipe-technical-id-size);
 }
 
 /* "Estado atual" canonical-value-plus-gloss chips (REDUX-007/008 §8) —
@@ -2494,15 +2440,6 @@ main.explorer-shell {
 
   .problem-identity-title {
     font-size: var(--recipe-editorial-h1-size-compact);
-  }
-
-  .assessment-fields {
-    grid-template-columns: 1fr;
-    row-gap: var(--space-1);
-  }
-
-  .assessment-fields dt {
-    margin-top: var(--space-2);
   }
 
   .problem-help-section-index {

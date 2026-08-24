@@ -97,7 +97,7 @@ function buildCorpusIndex(researchRoot: string, tolerant: boolean, issues: Malfo
 }
 
 /**
- * Builds the deterministic SRC/EVD/PRB/ASM corpus index for researchRoot
+ * Builds the deterministic SRC/EVD/PRB corpus index for researchRoot
  * (defaults to the repository's research/ directory). One shared
  * loading/indexing layer for research tooling built on top of it (TC-01
  * scope) — this performs no validation and no semantic interpretation; it

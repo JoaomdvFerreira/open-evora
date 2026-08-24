@@ -25,7 +25,7 @@ import type { ProblemAnalysis } from "./analyze.ts";
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const REAL_RESEARCH_ROOT = join(__dirname, "..", "..", "..", "research");
 const REAL_SCHEMAS_DIR = join(REAL_RESEARCH_ROOT, "schemas");
-const DIRS = ["sources", "evidence", "problems", "assessments", "schemas"];
+const DIRS = ["sources", "evidence", "problems", "schemas"];
 
 function makeFixtureRoot(): string {
   const root = mkdtempSync(join(tmpdir(), "evora-tc03-char-"));
@@ -54,9 +54,6 @@ function assertReportMatches(
     temporalRelevanceDistribution: Array<[string, number]>;
     representativenessDistribution: Array<[string, number]>;
     publicSignalClassDistribution: Array<[string, number]>;
-    asmRecordCount: number;
-    currentAsmId: string | null;
-    currentAsmTriage: string | null;
   }
 ): void {
   assert.strictEqual(report.linkedEvdCount, expected.linkedEvdCount, `${prbId}.linkedEvdCount`);
@@ -81,14 +78,12 @@ function assertReportMatches(
     expected.publicSignalClassDistribution,
     `${prbId}.publicSignalClassDistribution`
   );
-  assert.strictEqual(report.asmRecords.length, expected.asmRecordCount, `${prbId}.asmRecords.length`);
-  assert.strictEqual(report.currentAsm ? (report.currentAsm.assessment_id as string) : null, expected.currentAsmId, `${prbId}.currentAsm.assessment_id`);
-  assert.strictEqual(report.currentAsm ? (report.currentAsm.triage as string) : null, expected.currentAsmTriage, `${prbId}.currentAsm.triage`);
 }
 
 // Captured from the legacy tools/analyze-research.js analyzer against the
-// canonical research/ corpus (10 PRB, 128 EVD, 98 SRC, 10 ASM, 246 total
-// records) prior to its removal in this change.
+// canonical research/ corpus (10 PRB, 128 EVD, 98 SRC, 236 total records)
+// prior to its removal in this change. ASM-specific expectations were
+// retired alongside the AR-01 removal of ASM from the canonical model.
 const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[2]> = {
   "PRB-0001": {
     linkedEvdCount: 10,
@@ -101,9 +96,6 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
     temporalRelevanceDistribution: [["CURRENT", 7], ["HISTORICAL", 3]],
     representativenessDistribution: [["DESIGNED_REPRESENTATIVE", 5], ["UNKNOWN", 5]],
     publicSignalClassDistribution: [["PS3", 1]],
-    asmRecordCount: 1,
-    currentAsmId: "ASM-0001",
-    currentAsmTriage: "DEEPEN",
   },
   "PRB-0002": {
     linkedEvdCount: 6,
@@ -116,9 +108,6 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
     temporalRelevanceDistribution: [["CURRENT", 4], ["HISTORICAL", 2]],
     representativenessDistribution: [["NOT_APPLICABLE", 3], ["UNKNOWN", 3]],
     publicSignalClassDistribution: [["PS3", 1]],
-    asmRecordCount: 1,
-    currentAsmId: "ASM-0002",
-    currentAsmTriage: "DEEPEN",
   },
   "PRB-0003": {
     linkedEvdCount: 15,
@@ -137,9 +126,6 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
     temporalRelevanceDistribution: [["CURRENT", 9], ["HISTORICAL", 4], ["UNKNOWN", 1]],
     representativenessDistribution: [["LIMITED", 6], ["NOT_APPLICABLE", 1], ["UNKNOWN", 7]],
     publicSignalClassDistribution: [],
-    asmRecordCount: 1,
-    currentAsmId: "ASM-0003",
-    currentAsmTriage: "DEEPEN",
   },
   "PRB-0004": {
     linkedEvdCount: 6,
@@ -163,9 +149,6 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
       ["UNKNOWN", 1],
     ],
     publicSignalClassDistribution: [],
-    asmRecordCount: 1,
-    currentAsmId: "ASM-0004",
-    currentAsmTriage: "DEEPEN",
   },
   "PRB-0005": {
     linkedEvdCount: 8,
@@ -183,9 +166,6 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
       ["UNKNOWN", 2],
     ],
     publicSignalClassDistribution: [],
-    asmRecordCount: 1,
-    currentAsmId: "ASM-0005",
-    currentAsmTriage: "DEEPEN",
   },
   "PRB-0006": {
     linkedEvdCount: 10,
@@ -204,9 +184,6 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
     temporalRelevanceDistribution: [["CURRENT", 7], ["HISTORICAL", 3]],
     representativenessDistribution: [["NOT_APPLICABLE", 4], ["UNKNOWN", 6]],
     publicSignalClassDistribution: [],
-    asmRecordCount: 1,
-    currentAsmId: "ASM-0006",
-    currentAsmTriage: "WATCH",
   },
   "PRB-0007": {
     linkedEvdCount: 9,
@@ -225,9 +202,6 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
     temporalRelevanceDistribution: [["CURRENT", 8], ["HISTORICAL", 1]],
     representativenessDistribution: [["LIMITED", 6], ["NOT_APPLICABLE", 3]],
     publicSignalClassDistribution: [],
-    asmRecordCount: 1,
-    currentAsmId: "ASM-0007",
-    currentAsmTriage: "DEEPEN",
   },
   "PRB-0008": {
     linkedEvdCount: 11,
@@ -245,9 +219,6 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
     temporalRelevanceDistribution: [["CURRENT", 6], ["HISTORICAL", 2], ["UNKNOWN", 3]],
     representativenessDistribution: [["LIMITED", 4], ["UNKNOWN", 7]],
     publicSignalClassDistribution: [],
-    asmRecordCount: 1,
-    currentAsmId: "ASM-0008",
-    currentAsmTriage: "DEEPEN",
   },
   "PRB-0009": {
     linkedEvdCount: 15,
@@ -265,9 +236,6 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
     temporalRelevanceDistribution: [["CURRENT", 11], ["HISTORICAL", 2], ["UNKNOWN", 2]],
     representativenessDistribution: [["LIMITED", 4], ["NOT_APPLICABLE", 9], ["UNKNOWN", 2]],
     publicSignalClassDistribution: [["PS1", 2], ["PS2", 2]],
-    asmRecordCount: 1,
-    currentAsmId: "ASM-0009",
-    currentAsmTriage: "WATCH",
   },
   "PRB-0010": {
     linkedEvdCount: 3,
@@ -280,34 +248,11 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
     temporalRelevanceDistribution: [["CURRENT", 2], ["HISTORICAL", 1]],
     representativenessDistribution: [["LIMITED", 1], ["UNKNOWN", 2]],
     publicSignalClassDistribution: [],
-    asmRecordCount: 1,
-    currentAsmId: "ASM-0010",
-    currentAsmTriage: "WATCH",
   },
 };
 
 const CANONICAL_EXPECTED_GAPS = [
   "PRB-0003: 1/15 linked EVD missing analytical metadata (analysis block absent)",
-  "ASM-0001: 3 decision gate(s) UNKNOWN/NOT_ASSESSED (digital_causality=NOT_ASSESSED, operability=NOT_ASSESSED, testability=NOT_ASSESSED)",
-  "ASM-0001: 2 critical unknown(s) recorded",
-  "ASM-0002: 3 decision gate(s) UNKNOWN/NOT_ASSESSED (digital_causality=NOT_ASSESSED, operability=NOT_ASSESSED, testability=NOT_ASSESSED)",
-  "ASM-0002: 2 critical unknown(s) recorded",
-  "ASM-0003: 1 decision gate(s) UNKNOWN/NOT_ASSESSED (operability=NOT_ASSESSED)",
-  "ASM-0003: 1 critical unknown(s) recorded",
-  "ASM-0004: 2 decision gate(s) UNKNOWN/NOT_ASSESSED (civic_importance=UNKNOWN, operability=NOT_ASSESSED)",
-  "ASM-0004: 2 critical unknown(s) recorded",
-  "ASM-0005: 1 decision gate(s) UNKNOWN/NOT_ASSESSED (operability=NOT_ASSESSED)",
-  "ASM-0005: 3 critical unknown(s) recorded",
-  "ASM-0006: 1 decision gate(s) UNKNOWN/NOT_ASSESSED (operability=NOT_ASSESSED)",
-  "ASM-0006: 1 critical unknown(s) recorded",
-  "ASM-0007: 3 decision gate(s) UNKNOWN/NOT_ASSESSED (digital_causality=NOT_ASSESSED, operability=NOT_ASSESSED, testability=NOT_ASSESSED)",
-  "ASM-0007: 3 critical unknown(s) recorded",
-  "ASM-0008: 2 decision gate(s) UNKNOWN/NOT_ASSESSED (digital_causality=NOT_ASSESSED, operability=NOT_ASSESSED)",
-  "ASM-0008: 2 critical unknown(s) recorded",
-  "ASM-0009: 2 decision gate(s) UNKNOWN/NOT_ASSESSED (operability=NOT_ASSESSED, testability=NOT_ASSESSED)",
-  "ASM-0009: 3 critical unknown(s) recorded",
-  "ASM-0010: 2 decision gate(s) UNKNOWN/NOT_ASSESSED (operability=NOT_ASSESSED, testability=NOT_ASSESSED)",
-  "ASM-0010: 1 critical unknown(s) recorded",
 ];
 
 describe("characterization: canonical corpus", () => {
@@ -317,8 +262,7 @@ describe("characterization: canonical corpus", () => {
     assert.strictEqual(result.summary.sourceCount, 98);
     assert.strictEqual(result.summary.evidenceCount, 128);
     assert.strictEqual(result.summary.problemCount, 10);
-    assert.strictEqual(result.summary.assessmentCount, 10);
-    assert.strictEqual(result.summary.totalRecords, 246);
+    assert.strictEqual(result.summary.totalRecords, 236);
     assert.deepEqual(result.problemIds, Object.keys(CANONICAL_EXPECTED));
   });
 
@@ -392,66 +336,17 @@ analysis:
   temporal_relevance: CURRENT
 `;
 
-function minimalAsm({
-  id = "ASM-9001",
-  problem = "PRB-9001",
-  status = "CURRENT",
-  triage = "DEEPEN",
-}: { id?: string; problem?: string; status?: string; triage?: string } = {}): string {
-  return `
-assessment_id: ${id}
-problem: ${problem}
-as_of: "2026-08-11"
-phase: D3
-assessment_status: ${status}
-evidence_confidence:
-  overall: MEDIUM
-  independence: UNKNOWN
-  coherence: UNKNOWN
-  adequacy: UNKNOWN
-  relevance: UNKNOWN
-  currentness: UNKNOWN
-  contradiction_status: UNKNOWN
-  stakeholder_validation: PENDING
-civic_importance:
-  reach: UNKNOWN
-  frequency: UNKNOWN
-  severity: UNKNOWN
-  persistence: UNKNOWN
-  equity: UNKNOWN
-journey_understanding: PARTIAL
-causal_understanding: UNKNOWN
-existing_solution_understanding: UNKNOWN
-remaining_gap: UNKNOWN
-digital_leverage: not_assessed
-structure_action: KEEP
-decision_gates:
-  problem_real: PASS
-  civic_importance: UNKNOWN
-  journey_understood: UNKNOWN
-  root_cause_understood: UNKNOWN
-  remaining_gap_supported: UNKNOWN
-  digital_causality: NOT_ASSESSED
-  operability: NOT_ASSESSED
-  testability: NOT_ASSESSED
-triage: ${triage}
-next_action: "Fixture next action."
-notes: "Fixture."
-`;
-}
-
 // These fixture cases mirror the corpus shapes previously used to
-// demonstrate legacy-vs-new parity for TC-03 (zero-ASM, one CURRENT ASM,
-// multiple ASM none CURRENT, mixed lineage, multi-problem coverage).
-// Expected values are asserted directly rather than by importing the
-// removed legacy module.
+// demonstrate legacy-vs-new parity for TC-03 (mixed lineage, multi-problem
+// coverage). Expected values are asserted directly rather than by importing
+// the removed legacy module.
 describe("characterization: fixture corpora", () => {
   let root: string;
   after(() => {
     if (root) rmSync(root, { recursive: true, force: true });
   });
 
-  test("zero-ASM problem", () => {
+  test("problem with no analysis metadata", () => {
     root = makeFixtureRoot();
     write(root, "problems", "PRB-9001.yaml", MINIMAL_PRB);
     write(root, "evidence", "EVD-900101.yaml", minimalEvd());
@@ -468,17 +363,13 @@ describe("characterization: fixture corpora", () => {
       temporalRelevanceDistribution: [],
       representativenessDistribution: [],
       publicSignalClassDistribution: [],
-      asmRecordCount: 0,
-      currentAsmId: null,
-      currentAsmTriage: null,
     });
   });
 
-  test("one CURRENT ASM with analysis metadata", () => {
+  test("problem with full analysis metadata", () => {
     root = makeFixtureRoot();
     write(root, "problems", "PRB-9001.yaml", MINIMAL_PRB);
     write(root, "evidence", "EVD-900101.yaml", minimalEvd({ analysis: VALID_ANALYSIS }));
-    write(root, "assessments", "ASM-9001.yaml", minimalAsm());
     const index = loadCorpusIndex(root);
     const report = computeProblemAnalysis(index, "PRB-9001")!;
     assertReportMatches("PRB-9001", report, {
@@ -492,22 +383,7 @@ describe("characterization: fixture corpora", () => {
       temporalRelevanceDistribution: [["CURRENT", 1]],
       representativenessDistribution: [["UNKNOWN", 1]],
       publicSignalClassDistribution: [["PS1", 1]],
-      asmRecordCount: 1,
-      currentAsmId: "ASM-9001",
-      currentAsmTriage: "DEEPEN",
     });
-  });
-
-  test("multiple ASM records, none CURRENT", () => {
-    root = makeFixtureRoot();
-    write(root, "problems", "PRB-9001.yaml", MINIMAL_PRB);
-    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
-    write(root, "assessments", "ASM-9001.yaml", minimalAsm({ status: "SUPERSEDED" }));
-    write(root, "assessments", "ASM-9002.yaml", minimalAsm({ id: "ASM-9002", status: "ARCHIVED" }));
-    const index = loadCorpusIndex(root);
-    const report = computeProblemAnalysis(index, "PRB-9001")!;
-    assert.strictEqual(report.asmRecords.length, 2);
-    assert.strictEqual(report.currentAsm, null);
   });
 
   test("mixed lineage known/missing across multiple EVD", () => {
@@ -535,7 +411,6 @@ describe("characterization: fixture corpora", () => {
     root = makeFixtureRoot();
     write(root, "problems", "PRB-9001.yaml", MINIMAL_PRB);
     write(root, "evidence", "EVD-900101.yaml", minimalEvd({ analysis: VALID_ANALYSIS }));
-    write(root, "assessments", "ASM-9001.yaml", minimalAsm({ triage: "PROCEED" }));
 
     const prb2 = MINIMAL_PRB.replace("PRB-9001", "PRB-9002")
       .replace("evidence: [EVD-900101]", "evidence: [EVD-900201]")
@@ -548,11 +423,9 @@ describe("characterization: fixture corpora", () => {
     assert.deepEqual(result.problemIds, ["PRB-9001", "PRB-9002"]);
 
     const report1 = result.problems.get("PRB-9001")!;
-    assert.strictEqual(report1.currentAsm!.triage, "PROCEED");
     assert.strictEqual(report1.evdWithAnalysisCount, 1);
 
     const report2 = result.problems.get("PRB-9002")!;
-    assert.strictEqual(report2.currentAsm, null);
     assert.strictEqual(report2.evdWithAnalysisCount, 0);
     // PRB-9002 is REJECTED (non-active), so it is excluded from --gaps checks.
     assert.deepEqual(

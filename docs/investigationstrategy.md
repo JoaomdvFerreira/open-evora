@@ -4,7 +4,7 @@ Operational strategy for investigating civic problems and integrating new resear
 
 This document owns **research method, integration decisions, challenge/validation method, material-review rules, and stopping rules**.
 
-It does not define what Source, Evidence, Problem, or Assessment records mean; those semantics belong to `docs/datamodel.md`. Repository-wide safety and publication rules belong to `AGENTS.md`.
+It does not define what Source, Evidence, or Problem records mean; those semantics belong to `docs/datamodel.md`. Repository-wide safety and publication rules belong to `AGENTS.md`.
 
 ## 1. Objective
 
@@ -41,8 +41,7 @@ For new research:
 7. check relevant existing/planned solutions and significant uncertainty;
 8. perform direct challenge when needed;
 9. update current Problem state only when justified and authorized;
-10. create an Assessment only when the material-review rules require one;
-11. stop when further research is unlikely to change the current decision proportionately.
+10. stop when further research is unlikely to change the current decision proportionately.
 
 ## 4. Integrating Sources
 
@@ -201,9 +200,9 @@ For public-repository handling, follow `AGENTS.md`. Operationally, canonicalize 
 
 Recording requires a concrete need, appropriate consent, and an explicit retention basis.
 
-## 9. Material reviews and Assessment snapshots
+## 9. Material change and future historical snapshots
 
-Assessment creation is governed by material change, not research activity volume.
+Assessment (`ASM-*`) is not an implemented canonical record type (`docs/datamodel.md` §4). Historical snapshot storage for Problem state is deferred until material Problem history actually justifies it. The rules below define materiality itself and are preserved as the future trigger for that snapshot storage, not as a current record-creation requirement.
 
 ### Effect test
 
@@ -211,11 +210,9 @@ Ask:
 
 > If the project were asked now what it believes or has decided about this Problem, would the answer materially differ from before the review?
 
-For conditional changes, create no Assessment if the resulting materially relevant state is equivalent to the latest valid REVIEW state.
+### Mandatory-significance triggers
 
-### Mandatory REVIEW triggers
-
-A completed review requires a new REVIEW when it changes:
+A completed review is materially significant when it changes:
 - Problem lifecycle status;
 - `evidence_status` (Corroboration);
 - `validation_status` (Validation);
@@ -224,9 +221,9 @@ A completed review requires a new REVIEW when it changes:
 
 These transitions are formal changes in project standing.
 
-### Effect-tested REVIEW triggers
+### Effect-tested significance triggers
 
-Create a REVIEW when the effect test is met by:
+A review is materially significant when the effect test is met by:
 - material change to manifestation, consequence, or scope;
 - creation, resolution, or material reformulation of a high-impact critical uncertainty;
 - a contradiction that materially changes the current conclusion;
@@ -236,20 +233,12 @@ A field diff alone is not sufficient for these conditional triggers.
 
 ### Non-triggers
 
-Do not create an Assessment merely because:
+A review is not materially significant merely because:
 - new Evidence reinforces the existing reading;
 - metadata, wording, or formatting changes;
 - provenance or Source links are maintained;
 - time passes;
 - a review reaffirms materially equivalent state.
-
-### Snapshot integrity
-
-A REVIEW must preserve the resulting state, explicit semantic delta, materiality rationale, supporting provenance, and predecessor relationship required by `docs/datamodel.md`.
-
-At completion of a material review, the latest valid REVIEW for the Problem, read through any applicable correction, must match the materially relevant current Problem state. Historical REVIEWs are expected to differ.
-
-Do not mutate an Assessment to represent later state. Use the CORRECTION semantics in `docs/datamodel.md` when a historical Assessment was recorded incorrectly.
 
 ## 10. Stopping and completion
 
@@ -270,7 +259,6 @@ Before completing an integration:
 - avoid duplicate Sources, Evidence, and Problems;
 - preserve provenance, scope, contradictions, and material uncertainty;
 - confirm current-state changes were authorized;
-- create an Assessment only when required;
 - run applicable schema/deterministic validation;
 - report unresolved gaps rather than silently resolving them.
 

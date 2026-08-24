@@ -5,7 +5,6 @@ import { buildRecordLookup } from "../records/recordIndex";
 
 const INDEX: RecordSummary[] = [
   { id: "PRB-0005", type: "PRB-", label: "Parking pressure", file: "research/problems/PRB-0005.yaml", summaryFields: {} },
-  { id: "ASM-0005", type: "ASM-", label: "ASM-0005", file: "research/assessments/ASM-0005.yaml", summaryFields: {} },
   { id: "EVD-0001", type: "EVD-", label: "Evidence one", file: "research/evidence/EVD-0001.yaml", summaryFields: {} },
   { id: "EVD-0002", type: "EVD-", label: "Evidence two (linked only via analysis.related_problems)", file: "research/evidence/EVD-0002.yaml", summaryFields: {} },
   { id: "SRC-0001", type: "SRC-", label: "Source one", file: "research/sources/SRC-0001.yaml", summaryFields: {} },
@@ -18,18 +17,7 @@ const DETAILS: Record<string, RecordDetail> = {
     file: "research/problems/PRB-0005.yaml",
     record: { title: "Parking pressure" },
     outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-0001" }],
-    incomingEdges: [
-      { field: "problem", ordinal: null, from: "ASM-0005" },
-      { field: "analysis.related_problems", ordinal: 0, from: "EVD-0002" },
-    ],
-  },
-  "ASM-0005": {
-    id: "ASM-0005",
-    type: "ASM-",
-    file: "research/assessments/ASM-0005.yaml",
-    record: { assessment_id: "ASM-0005", problem: "PRB-0005", triage: "DEEPEN" },
-    outgoingEdges: [{ field: "problem", ordinal: null, to: "PRB-0005" }],
-    incomingEdges: [],
+    incomingEdges: [{ field: "analysis.related_problems", ordinal: 0, from: "EVD-0002" }],
   },
   "EVD-0001": {
     id: "EVD-0001",
@@ -70,12 +58,11 @@ function fakeProvider(): DataProvider {
 }
 
 describe("loadProblemProjection", () => {
-  it("assembles the problem, its assessment, evidence (both directions), and sources", async () => {
+  it("assembles the problem and its evidence (both directions) and sources", async () => {
     const lookup = buildRecordLookup(INDEX);
     const projection = await loadProblemProjection(fakeProvider(), lookup, "PRB-0005");
 
     expect(projection.problem.id).toBe("PRB-0005");
-    expect(projection.assessments.map((a) => a.id)).toEqual(["ASM-0005"]);
 
     // Evidence linked via PRB's own outgoing "evidence" AND via EVD's incoming
     // "analysis.related_problems" are both included, deduplicated.
@@ -95,11 +82,11 @@ describe("loadProblemProjection", () => {
 
     await loadProblemProjection(provider, lookup, "PRB-0005");
 
-    // 1 (problem) + 1 (assessment) + 2 (evidence) + 1 (source) = 5
-    expect(getRecordSpy).toHaveBeenCalledTimes(5);
+    // 1 (problem) + 2 (evidence) + 1 (source) = 4
+    expect(getRecordSpy).toHaveBeenCalledTimes(4);
   });
 
-  it("handles a problem with no assessments or evidence gracefully", async () => {
+  it("handles a problem with no evidence gracefully", async () => {
     const soloIndex: RecordSummary[] = [
       { id: "PRB-9001", type: "PRB-", label: "Solo problem", file: "research/problems/PRB-9001.yaml", summaryFields: {} },
     ];
@@ -119,7 +106,6 @@ describe("loadProblemProjection", () => {
     };
 
     const projection = await loadProblemProjection(provider, buildRecordLookup(soloIndex), "PRB-9001");
-    expect(projection.assessments).toEqual([]);
     expect(projection.evidence).toEqual([]);
   });
 });

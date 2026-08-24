@@ -17,10 +17,10 @@ function asDataLoadError(error: unknown): DataLoadError {
 }
 
 /**
- * Lazy-loads the full Problem projection (problem + assessments + evidence +
- * sources) whenever `problemId` changes. A failure here is
- * isolated to this hook's own state — it never affects the already-loaded
- * Records index or any other selection.
+ * Lazy-loads the full Problem projection (problem + evidence + sources)
+ * whenever `problemId` changes. A failure here is isolated to this hook's
+ * own state — it never affects the already-loaded Records index or any
+ * other selection.
  */
 export function useProblemProjection(provider: DataProvider, lookup: Map<string, RecordSummary>, problemId: string | null): ProblemProjectionState & { retry: () => void } {
   const [state, setState] = useState<ProblemProjectionState>({ status: "idle" });

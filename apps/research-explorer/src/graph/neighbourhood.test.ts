@@ -4,13 +4,13 @@ import { buildGraphModel } from "./buildGraphModel";
 import { canExpand, clampDepth, computeHopMap, neighbourhoodView, typesWithinHops } from "./neighbourhood";
 
 // PRB-0005 --evidence--> EVD-0001 --source.source_id--> SRC-0001
-// ASM-0005 --problem--> PRB-0005
+// WID-0005 --related--> PRB-0005
 // EVD-0002 is unrelated (not reachable from PRB-0005 at all)
 const RECORDS: RecordSummary[] = [
   { id: "PRB-0005", type: "PRB-", label: "Parking pressure", file: "research/problems/PRB-0005.yaml", summaryFields: {} },
   { id: "EVD-0001", type: "EVD-", label: "Evidence one", file: "research/evidence/EVD-0001.yaml", summaryFields: {} },
   { id: "SRC-0001", type: "SRC-", label: "Source one", file: "research/sources/SRC-0001.yaml", summaryFields: {} },
-  { id: "ASM-0005", type: "ASM-", label: "Assessment five", file: "research/assessments/ASM-0005.yaml", summaryFields: {} },
+  { id: "WID-0005", type: "WID-", label: "Widget five", file: "research/widgets/WID-0005.yaml", summaryFields: {} },
   { id: "EVD-0002", type: "EVD-", label: "Unrelated evidence", file: "research/evidence/EVD-0002.yaml", summaryFields: {} },
 ];
 
@@ -24,7 +24,7 @@ const EDGES: RecordEdge[] = [
     ordinal: null,
     required: true,
   },
-  { id: "ASM-0005::problem::-::PRB-0005", from: "ASM-0005", to: "PRB-0005", field: "problem", ordinal: null, required: true },
+  { id: "WID-0005::related::-::PRB-0005", from: "WID-0005", to: "PRB-0005", field: "related", ordinal: null, required: true },
 ];
 
 const graph = buildGraphModel(RECORDS, EDGES);
@@ -43,7 +43,7 @@ describe("computeHopMap", () => {
     const hopOf = computeHopMap(graph, "PRB-0005");
     expect(hopOf.get("PRB-0005")).toBe(0);
     expect(hopOf.get("EVD-0001")).toBe(1);
-    expect(hopOf.get("ASM-0005")).toBe(1); // incoming reference counts as a neighbour too
+    expect(hopOf.get("WID-0005")).toBe(1); // incoming reference counts as a neighbour too
     expect(hopOf.get("SRC-0001")).toBe(2);
     expect(hopOf.has("EVD-0002")).toBe(false); // unreachable within MAX_DEPTH
   });
@@ -66,22 +66,22 @@ describe("neighbourhoodView", () => {
 
   it("at depth 1, includes the focus and its direct neighbours only", () => {
     const view = neighbourhoodView(graph, "PRB-0005", hopOf, 1, null);
-    expect(new Set(view.nodeIds)).toEqual(new Set(["PRB-0005", "EVD-0001", "ASM-0005"]));
+    expect(new Set(view.nodeIds)).toEqual(new Set(["PRB-0005", "EVD-0001", "WID-0005"]));
     expect(view.edgeIds).toContain("PRB-0005::evidence::0::EVD-0001");
-    expect(view.edgeIds).toContain("ASM-0005::problem::-::PRB-0005");
+    expect(view.edgeIds).toContain("WID-0005::related::-::PRB-0005");
     expect(view.edgeIds).not.toContain("EVD-0001::source.source_id::-::SRC-0001");
   });
 
   it("at depth 2, reaches the second hop (e.g. Evidence -> Source)", () => {
     const view = neighbourhoodView(graph, "PRB-0005", hopOf, 2, null);
-    expect(new Set(view.nodeIds)).toEqual(new Set(["PRB-0005", "EVD-0001", "ASM-0005", "SRC-0001"]));
+    expect(new Set(view.nodeIds)).toEqual(new Set(["PRB-0005", "EVD-0001", "WID-0005", "SRC-0001"]));
     expect(view.edgeIds).toContain("EVD-0001::source.source_id::-::SRC-0001");
   });
 
   it("always keeps the focus node visible even if its own type is excluded by the filter", () => {
     const view = neighbourhoodView(graph, "PRB-0005", hopOf, 1, new Set(["EVD-"]));
     expect(view.nodeIds).toContain("PRB-0005");
-    expect(view.nodeIds).not.toContain("ASM-0005");
+    expect(view.nodeIds).not.toContain("WID-0005");
     expect(view.nodeIds).toContain("EVD-0001");
   });
 
@@ -108,6 +108,6 @@ describe("canExpand", () => {
 describe("typesWithinHops", () => {
   it("lists only the record types actually reachable, not the whole corpus's types", () => {
     const hopOf = computeHopMap(graph, "PRB-0005");
-    expect(typesWithinHops(graph, hopOf)).toEqual(["ASM-", "EVD-", "PRB-", "SRC-"]);
+    expect(typesWithinHops(graph, hopOf)).toEqual(["EVD-", "PRB-", "SRC-", "WID-"]);
   });
 });

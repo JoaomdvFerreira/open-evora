@@ -1,6 +1,6 @@
 /**
  * Types mirroring the generated read model (docs/explorerarchitecture.md).
- * Kept intentionally generic — no SRC-/EVD-/PRB-/ASM- specific fields — because the read
+ * Kept intentionally generic — no SRC-/EVD-/PRB- specific fields — because the read
  * model itself is schema-driven and must represent future record types
  * without a shape change here.
  */

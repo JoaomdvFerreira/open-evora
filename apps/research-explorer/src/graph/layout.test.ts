@@ -8,7 +8,7 @@ const RECORDS: RecordSummary[] = [
   { id: "PRB-0005", type: "PRB-", label: "Parking pressure", file: "research/problems/PRB-0005.yaml", summaryFields: {} },
   { id: "EVD-0001", type: "EVD-", label: "Evidence one", file: "research/evidence/EVD-0001.yaml", summaryFields: {} },
   { id: "SRC-0001", type: "SRC-", label: "Source one", file: "research/sources/SRC-0001.yaml", summaryFields: {} },
-  { id: "ASM-0005", type: "ASM-", label: "Assessment five", file: "research/assessments/ASM-0005.yaml", summaryFields: {} },
+  { id: "WID-0005", type: "WID-", label: "Widget five", file: "research/widgets/WID-0005.yaml", summaryFields: {} },
 ];
 
 const EDGES: RecordEdge[] = [
@@ -21,7 +21,7 @@ const EDGES: RecordEdge[] = [
     ordinal: null,
     required: true,
   },
-  { id: "ASM-0005::problem::-::PRB-0005", from: "ASM-0005", to: "PRB-0005", field: "problem", ordinal: null, required: true },
+  { id: "WID-0005::related::-::PRB-0005", from: "WID-0005", to: "PRB-0005", field: "related", ordinal: null, required: true },
 ];
 
 const graph = buildGraphModel(RECORDS, EDGES);

@@ -8,11 +8,11 @@ import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/
  * *presentation* projection, discarded and rebuilt whenever a Problem is
  * selected, never stored as its own source of truth.
  *
- * Type-specific logic (literal "ASM-"/"EVD-"/"SRC-" checks) is
- * intentional and scoped to this file only — RE-03's whole purpose is a
- * specialised Problem projection (see docs/explorerarchitecture.md on
- * presentation projections); the generic DataProvider/Records/RecordDetail
- * layers this builds on remain untouched and fully generic.
+ * Type-specific logic (literal "EVD-"/"SRC-" checks) is intentional and
+ * scoped to this file only — RE-03's whole purpose is a specialised Problem
+ * projection (see docs/explorerarchitecture.md on presentation
+ * projections); the generic DataProvider/Records/RecordDetail layers this
+ * builds on remain untouched and fully generic.
  */
 
 export interface EvidenceWithSources {
@@ -22,7 +22,6 @@ export interface EvidenceWithSources {
 
 export interface ProblemProjection {
   problem: RecordDetail;
-  assessments: RecordDetail[];
   evidence: EvidenceWithSources[];
 }
 
@@ -42,9 +41,8 @@ function outgoingIdsByType(detail: RecordDetail, type: string, lookup: Map<strin
 
 /**
  * Loads and assembles the full Problem projection for one PRB-* ID.
- * Fetches: the problem itself, its linked assessments (ASM- pointing at it
- * via `problem`), its linked evidence (both the problem's own outgoing
- * `evidence` list and any EVD- pointing back at it via
+ * Fetches: the problem itself, its linked evidence (both the problem's own
+ * outgoing `evidence` list and any EVD- pointing back at it via
  * `analysis.related_problems`, unioned/deduplicated), and each evidence
  * item's own linked sources (SRC-). All independent fetches run in parallel.
  */
@@ -55,16 +53,12 @@ export async function loadProblemProjection(
 ): Promise<ProblemProjection> {
   const problem = await provider.getRecord(problemId);
 
-  const assessmentIds = incomingIdsByFieldAndType(problem, "problem", "ASM-", lookup);
   const evidenceIds = uniqueIds([
     ...outgoingIdsByType(problem, "EVD-", lookup),
     ...incomingIdsByFieldAndType(problem, "analysis.related_problems", "EVD-", lookup),
   ]);
 
-  const [assessments, evidenceDetails] = await Promise.all([
-    Promise.all(assessmentIds.map((id) => provider.getRecord(id))),
-    Promise.all(evidenceIds.map((id) => provider.getRecord(id))),
-  ]);
+  const evidenceDetails = await Promise.all(evidenceIds.map((id) => provider.getRecord(id)));
 
   const evidence = await Promise.all(
     evidenceDetails.map(async (evidenceDetail): Promise<EvidenceWithSources> => {
@@ -74,5 +68,5 @@ export async function loadProblemProjection(
     })
   );
 
-  return { problem, assessments, evidence };
+  return { problem, evidence };
 }
