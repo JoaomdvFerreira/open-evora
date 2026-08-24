@@ -166,6 +166,12 @@ const PATH_STAGE_LABELS: Record<PathStageKey, string> = {
   delimitation: "Delimitação",
 };
 
+const PATH_STAGE_ANCHOR_IDS: Record<PathStageKey, string> = {
+  initial_signal: "problem-percurso-sinal-inicial",
+  development: "problem-percurso-desenvolvimento",
+  delimitation: "problem-percurso-delimitacao",
+};
+
 interface PathStage {
   key: PathStageKey;
   summary: string;
@@ -296,44 +302,86 @@ function ProblemBreadcrumb({ problemId, onBackToOverview }: { problemId: string;
 }
 
 /**
- * PI-02F1: the "Nesta página" index (desktop rail + compact substitute) must
- * list exactly the sections actually rendered for the current PRB, in the
- * fixed canonical order — never a link to a section that PI-02B/C/D/E's own
- * conditional render would omit. Each entry's `present` predicate mirrors
- * that section component's own omission condition exactly; this is the one
- * shared source of truth so the two can never drift apart. "Estado atual"
- * and "Evidência" are unconditional (both sections always render — Evidência
- * shows an explicit empty state rather than being omitted), so they are
- * always present.
+ * PI-02F1/PI-02F3: the "Nesta página" index (desktop rail + compact
+ * substitute) must list exactly the sections and subsections actually
+ * rendered for the current PRB, in the fixed canonical order — never a link
+ * to content that its own conditional render would omit. Each entry's
+ * `present` predicate mirrors that section/item's own omission condition
+ * exactly; this is the one shared source of truth so the two can never drift
+ * apart. "Estado atual" and "Evidência" top-level entries are themselves
+ * conditional per the task spec, but "Evidência" always has its own
+ * unconditional groups rendered (the empty state is not indexed as a
+ * subsection). Subsections are indexed only when the top-level section
+ * itself is rendered.
  */
-interface ProblemSectionEntry {
+interface ProblemSubsectionEntry {
   id: string;
   label: string;
   present: (record: Record<string, unknown>) => boolean;
 }
 
+interface ProblemSectionEntry {
+  id: string;
+  label: string;
+  present: (record: Record<string, unknown>) => boolean;
+  subsections: readonly ProblemSubsectionEntry[];
+}
+
 const PROBLEM_SECTION_ENTRIES: readonly ProblemSectionEntry[] = [
-  { id: "problem-estado-atual", label: "Estado atual", present: hasCurrentStateContent },
   {
-    id: "problem-sustentacao",
-    label: "O que sustenta esta leitura",
-    present: (record) => decisionBasisText(record, "corroboration_statement") !== null || decisionBasisText(record, "independence_assessment") !== null,
+    id: "problem-estado-atual",
+    label: "Estado atual",
+    present: hasCurrentStateContent,
+    subsections: [
+      { id: "problem-estado-observamos", label: "O que observamos", present: (record) => decisionBasisField(record, "manifestation", "summary") !== null },
+      { id: "problem-estado-consequencias", label: "Consequências conhecidas", present: (record) => decisionBasisField(record, "consequence", "summary") !== null },
+      { id: "problem-estado-atualidade", label: "Atualidade", present: (record) => decisionBasisField(record, "currentness", "assessment") !== null },
+      { id: "problem-estado-ambito", label: "Âmbito conhecido", present: (record) => decisionBasisScope(record) !== null },
+    ],
   },
-  { id: "problem-evidencia", label: "Evidência", present: () => true },
+  {
+    id: "problem-evidencia",
+    label: "Evidência",
+    present: () => true,
+    subsections: [
+      { id: "problem-evidencia-suporta", label: "Evidência que suporta", present: (record) => decisionBasisEvidenceIds(record, "supporting_evidence").length > 0 },
+      { id: "problem-evidencia-limita", label: "Evidência que limita a conclusão", present: (record) => decisionBasisEvidenceIds(record, "boundary_evidence").length > 0 },
+      { id: "problem-evidencia-outra", label: "Outra evidência relacionada", present: (record) => stringValues(record.evidence).length > 0 },
+    ],
+  },
   {
     id: "problem-questoes-abertas",
     label: "O que ainda não sabemos — e o que estamos a fazer",
     present: (record) => openQuestions(record).length > 0 || contradictionSearch(record) !== null,
+    subsections: [
+      { id: "problem-questoes-perguntas", label: "Perguntas em aberto", present: (record) => openQuestions(record).length > 0 },
+      { id: "problem-questoes-contraditoria", label: "Procura de evidência contraditória", present: (record) => contradictionSearch(record) !== null },
+    ],
   },
   {
     id: "problem-percurso",
     label: "Como chegámos a este problema",
     present: (record) => investigationPathStages(record).length > 0,
+    subsections: [
+      { id: "problem-percurso-sinal-inicial", label: "Sinal inicial", present: (record) => investigationPathStages(record).some((stage) => stage.key === "initial_signal") },
+      { id: "problem-percurso-desenvolvimento", label: "Desenvolvimento da investigação", present: (record) => investigationPathStages(record).some((stage) => stage.key === "development") },
+      { id: "problem-percurso-delimitacao", label: "Delimitação", present: (record) => investigationPathStages(record).some((stage) => stage.key === "delimitation") },
+    ],
   },
 ] as const;
 
-function problemSectionIndex(record: Record<string, unknown>): { id: string; label: string }[] {
-  return PROBLEM_SECTION_ENTRIES.filter((section) => section.present(record)).map(({ id, label }) => ({ id, label }));
+interface ProblemSectionIndexEntry {
+  id: string;
+  label: string;
+  subsections: { id: string; label: string }[];
+}
+
+function problemSectionIndex(record: Record<string, unknown>): ProblemSectionIndexEntry[] {
+  return PROBLEM_SECTION_ENTRIES.filter((section) => section.present(record)).map(({ id, label, subsections }) => ({
+    id,
+    label,
+    subsections: subsections.filter((subsection) => subsection.present(record)).map(({ id: subId, label: subLabel }) => ({ id: subId, label: subLabel })),
+  }));
 }
 
 /**
@@ -363,6 +411,15 @@ function ProblemReadingRail({ record }: { record: Record<string, unknown> }) {
           {sections.map((section) => (
             <li key={section.id}>
               <a href={`#${section.id}`}>{section.label}</a>
+              {section.subsections.length > 0 && (
+                <ul>
+                  {section.subsections.map((subsection) => (
+                    <li key={subsection.id}>
+                      <a href={`#${subsection.id}`}>{subsection.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>
@@ -407,6 +464,15 @@ function ProblemHelpDisclosure({ record }: { record: Record<string, unknown> }) 
             {problemSectionIndex(record).map((section) => (
               <li key={section.id}>
                 <a href={`#${section.id}`}>{section.label}</a>
+                {section.subsections.length > 0 && (
+                  <ul>
+                    {section.subsections.map((subsection) => (
+                      <li key={subsection.id}>
+                        <a href={`#${subsection.id}`}>{subsection.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>
@@ -417,12 +483,11 @@ function ProblemHelpDisclosure({ record }: { record: Record<string, unknown> }) 
 }
 
 /**
- * PI-02B header: what/where/who at a glance, plus compact canonical
- * investigation-state chips. Currentness/scope render only as a short,
- * labelled presence indicator here — never the full authored sentence
- * (that lives in `ProblemCurrentStateSection` below, so the two never repeat
- * the same prose). Every item is omitted, not fabricated, when its
- * canonical field is absent.
+ * PI-02B header: what/where/who at a glance. Currentness/scope are
+ * deliberately not summarised here (PI-02F3) — their only authored
+ * presentation lives in `ProblemCurrentStateSection` below, so the header
+ * carries no compact/duplicate indicator for them. Every item is omitted,
+ * not fabricated, when its canonical field is absent.
  */
 function ProblemHeader({
   problemId,
@@ -437,8 +502,6 @@ function ProblemHeader({
   const problemStatement = fieldValue(record, "problem_statement");
   const geography = geographySummary(record);
   const affectedPopulations = stringValues(record.affected_populations);
-  const currentnessAssessment = decisionBasisField(record, "currentness", "assessment");
-  const scope = decisionBasisScope(record);
 
   return (
     <div className="problem-identity">
@@ -459,18 +522,6 @@ function ProblemHeader({
           <div className="problem-header-fact">
             <dt>Quem é afetado</dt>
             <dd>{affectedPopulations.join(", ")}</dd>
-          </div>
-        )}
-        {currentnessAssessment && (
-          <div className="problem-header-fact">
-            <dt>Atualidade da evidência</dt>
-            <dd>Avaliação de atualidade disponível — ver &ldquo;Estado atual&rdquo; abaixo.</dd>
-          </div>
-        )}
-        {scope && (
-          <div className="problem-header-fact">
-            <dt>Âmbito</dt>
-            <dd>{scope.bounded === true ? "Delimitado" : scope.bounded === false ? "Não delimitado" : "Âmbito registado"} — ver &ldquo;Estado atual&rdquo; abaixo.</dd>
           </div>
         )}
       </dl>
@@ -525,28 +576,28 @@ function ProblemCurrentStateSection({ record }: { record: Record<string, unknown
       </div>
 
       {manifestationSummary && (
-        <div className="problem-current-state-item">
+        <div id="problem-estado-observamos" className="problem-current-state-item">
           <h4>O que observamos</h4>
           <p>{manifestationSummary}</p>
         </div>
       )}
 
       {consequenceSummary && (
-        <div className="problem-current-state-item">
+        <div id="problem-estado-consequencias" className="problem-current-state-item">
           <h4>Consequências conhecidas</h4>
           <p>{consequenceSummary}</p>
         </div>
       )}
 
       {currentnessAssessment && (
-        <div className="problem-current-state-item">
+        <div id="problem-estado-atualidade" className="problem-current-state-item">
           <h4>Atualidade</h4>
           <p>{currentnessAssessment}</p>
         </div>
       )}
 
       {scope && (
-        <div className="problem-current-state-item">
+        <div id="problem-estado-ambito" className="problem-current-state-item">
           <h4>Âmbito conhecido</h4>
           <dl className="problem-scope-grid">
             {scope.geography && (
@@ -574,33 +625,6 @@ function ProblemCurrentStateSection({ record }: { record: Record<string, unknown
               </div>
             )}
           </dl>
-        </div>
-      )}
-    </section>
-  );
-}
-
-/**
- * PI-02B/C §2 "O que sustenta esta leitura": conditional on `decision_basis`
- * authored prose only — `corroboration_statement` as the main explanatory
- * text, `independence_assessment` as a secondary, explicitly labelled item.
- * No confidence score, ranking, or extra interpretation is added; the
- * section itself is omitted when neither field is authored.
- */
-function ProblemSupportSection({ record }: { record: Record<string, unknown> }) {
-  const corroborationStatement = decisionBasisText(record, "corroboration_statement");
-  const independenceAssessment = decisionBasisText(record, "independence_assessment");
-
-  if (!corroborationStatement && !independenceAssessment) return null;
-
-  return (
-    <section id="problem-sustentacao" aria-label="O que sustenta esta leitura" className="problem-section">
-      <h3 className="detail-panel-label">O que sustenta esta leitura</h3>
-      {corroborationStatement && <p className="problem-support-statement">{corroborationStatement}</p>}
-      {independenceAssessment && (
-        <div className="problem-current-state-item">
-          <h4>Independência da evidência</h4>
-          <p>{independenceAssessment}</p>
         </div>
       )}
     </section>
@@ -667,10 +691,20 @@ function EvidenceCard({ detail, sources, onOpenGeneric }: EvidenceWithSources & 
  * empty. Category order (supporting, boundary, other) matches the reading
  * priority in the task spec, not a strength/confidence ranking.
  */
-function EvidenceGroup({ label, items, onOpenGeneric }: { label: string; items: EvidenceWithSources[]; onOpenGeneric: (id: string) => void }) {
+function EvidenceGroup({
+  id,
+  label,
+  items,
+  onOpenGeneric,
+}: {
+  id: string;
+  label: string;
+  items: EvidenceWithSources[];
+  onOpenGeneric: (id: string) => void;
+}) {
   if (items.length === 0) return null;
   return (
-    <div className="evidence-group">
+    <div id={id} className="evidence-group">
       <h4>
         {label} ({formatPublicCount(items.length)})
       </h4>
@@ -800,7 +834,7 @@ function ContradictionSearchItem({
   onOpenGeneric: (id: string) => void;
 }) {
   return (
-    <li className="open-question-item">
+    <li id="problem-questoes-contraditoria" className="open-question-item">
       <p className="open-question-question">Procura de evidência contraditória</p>
       {search.performed !== null && (
         <div className="problem-current-state-item">
@@ -846,7 +880,7 @@ function ProblemOpenQuestionsSection({
   return (
     <section id="problem-questoes-abertas" aria-label="O que ainda não sabemos — e o que estamos a fazer" className="problem-section">
       <h3 className="detail-panel-label">O que ainda não sabemos — e o que estamos a fazer</h3>
-      <ul className="open-question-list">
+      <ul id={questions.length > 0 ? "problem-questoes-perguntas" : undefined} className="open-question-list">
         {questions.map((item, index) => (
           <OpenQuestionItem key={index} item={item} evidenceById={evidenceById} onOpenGeneric={onOpenGeneric} />
         ))}
@@ -883,7 +917,7 @@ function ProblemPathSection({
       <h3 className="detail-panel-label">Como chegámos a este problema</h3>
       <ul className="open-question-list">
         {stages.map((stage) => (
-          <li key={stage.key} className="open-question-item">
+          <li key={stage.key} id={PATH_STAGE_ANCHOR_IDS[stage.key]} className="open-question-item">
             <p className="open-question-question">{PATH_STAGE_LABELS[stage.key]}</p>
             <p>{stage.summary}</p>
             <OpenQuestionEvidenceRefs evidenceIds={stage.evidenceIds} evidenceById={evidenceById} onOpenGeneric={onOpenGeneric} />
@@ -944,6 +978,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
 
   const { problem, evidence } = state.projection;
   const record = problem.record as Record<string, unknown>;
+  const independenceAssessment = decisionBasisText(record, "independence_assessment");
 
   return (
     <article aria-labelledby="problem-heading" className="problem-view shell-frame">
@@ -962,10 +997,14 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
 
           <ProblemCurrentStateSection record={record} />
 
-          <ProblemSupportSection record={record} />
-
           <section id="problem-evidencia" aria-label="Evidência" className="problem-section">
             <h3 className="detail-panel-label">Registos de evidência associados ({formatPublicCount(evidence.length)})</h3>
+            {independenceAssessment && (
+              <div className="problem-current-state-item">
+                <h4>Independência da evidência</h4>
+                <p>{independenceAssessment}</p>
+              </div>
+            )}
             <ContributionOccurrenceSummary evidence={evidence} />
             {evidence.length === 0 ? (
               <p>Nenhuma evidência associada.</p>
@@ -974,9 +1013,9 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
                 const groups = groupEvidenceByDecisionBasis(record, evidence);
                 return (
                   <>
-                    <EvidenceGroup label="Evidência que suporta" items={groups.supporting} onOpenGeneric={onOpenGeneric} />
-                    <EvidenceGroup label="Evidência que limita a conclusão" items={groups.boundary} onOpenGeneric={onOpenGeneric} />
-                    <EvidenceGroup label="Outra evidência relacionada" items={groups.other} onOpenGeneric={onOpenGeneric} />
+                    <EvidenceGroup id="problem-evidencia-suporta" label="Evidência que suporta" items={groups.supporting} onOpenGeneric={onOpenGeneric} />
+                    <EvidenceGroup id="problem-evidencia-limita" label="Evidência que limita a conclusão" items={groups.boundary} onOpenGeneric={onOpenGeneric} />
+                    <EvidenceGroup id="problem-evidencia-outra" label="Outra evidência relacionada" items={groups.other} onOpenGeneric={onOpenGeneric} />
                   </>
                 );
               })()

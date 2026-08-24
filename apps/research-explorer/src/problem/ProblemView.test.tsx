@@ -583,7 +583,7 @@ describe("ProblemView — PI-02C support section + evidence grouping", () => {
     };
   }
 
-  it("renders corroboration_statement and independence_assessment in 'O que sustenta esta leitura', and omits the section when decision_basis carries neither", async () => {
+  it("PI-02F3: renders independence_assessment as a conditional 'Independência da evidência' item inside Evidência, never in a separate 'O que sustenta esta leitura' section, and never renders corroboration_statement", async () => {
     const { rerender } = render(
       <ProblemView
         dataProvider={supportProvider(
@@ -607,10 +607,12 @@ describe("ProblemView — PI-02C support section + evidence grouping", () => {
     );
 
     await screen.findByRole("heading", { name: "Support fixture" });
-    const supportSection = screen.getByLabelText("O que sustenta esta leitura");
-    expect(within(supportSection).getByText("The reading is corroborated by two institutional threads.")).toBeTruthy();
-    expect(within(supportSection).getByText("Independência da evidência")).toBeTruthy();
-    expect(within(supportSection).getByText("Independence is assessed as MEDIUM.")).toBeTruthy();
+    expect(screen.queryByLabelText("O que sustenta esta leitura")).toBeNull();
+    expect(screen.queryByText("The reading is corroborated by two institutional threads.")).toBeNull();
+
+    const evidenceSection = screen.getByLabelText("Evidência");
+    expect(within(evidenceSection).getByText("Independência da evidência")).toBeTruthy();
+    expect(within(evidenceSection).getByText("Independence is assessed as MEDIUM.")).toBeTruthy();
 
     rerender(
       <ProblemView
@@ -624,6 +626,7 @@ describe("ProblemView — PI-02C support section + evidence grouping", () => {
     );
     await screen.findByRole("heading", { name: "Support fixture" });
     expect(screen.queryByLabelText("O que sustenta esta leitura")).toBeNull();
+    expect(screen.queryByText("Independência da evidência")).toBeNull();
   });
 
   it("partitions evidence into Evidência que suporta / que limita a conclusão / Outra evidência relacionada by decision_basis membership, deduplicated and category-exclusive", async () => {
@@ -1105,7 +1108,7 @@ describe("ProblemView — PI-02E investigation path + final section order", () =
     expect(screen.queryByText("This must never be rendered by PI-02E.")).toBeNull();
   });
 
-  it("renders the final Problem View body section order: Estado atual, O que sustenta esta leitura, Evidência, O que ainda não sabemos, Como chegámos a este problema", async () => {
+  it("renders the final Problem View body section order: Estado atual, Evidência, O que ainda não sabemos, Como chegámos a este problema", async () => {
     render(
       <ProblemView
         dataProvider={pathProvider(
@@ -1138,7 +1141,6 @@ describe("ProblemView — PI-02E investigation path + final section order", () =
 
     expect(sections).toEqual([
       "Estado atual",
-      "O que sustenta esta leitura",
       "Evidência",
       "O que ainda não sabemos — e o que estamos a fazer",
       "Como chegámos a este problema",
@@ -1168,12 +1170,24 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     };
   }
 
+  function topLevelLabels(navName: string) {
+    return Array.from(screen.getByRole("navigation", { name: navName }).querySelectorAll(":scope > ul > li > a")).map((a) => a.textContent);
+  }
+
   function railLabels() {
-    return Array.from(screen.getByRole("navigation", { name: "Nesta página" }).querySelectorAll("a")).map((a) => a.textContent);
+    return topLevelLabels("Nesta página");
   }
 
   function compactLabels() {
-    return Array.from(screen.getByRole("navigation", { name: "Nesta página (versão compacta)" }).querySelectorAll("a")).map((a) => a.textContent);
+    return topLevelLabels("Nesta página (versão compacta)");
+  }
+
+  function subsectionLabels(navName: string, topLevelLabel: string) {
+    const nav = screen.getByRole("navigation", { name: navName });
+    const topLevelLink = within(nav).getByRole("link", { name: topLevelLabel });
+    const li = topLevelLink.closest("li")!;
+    const nestedList = li.querySelector(":scope > ul")!;
+    return Array.from(nestedList.querySelectorAll("a")).map((a) => a.textContent);
   }
 
   it("lists only Evidência when no section — including Estado atual — has authored content, in canonical order, in both the rail and the compact index", async () => {
@@ -1213,11 +1227,12 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     await screen.findByRole("heading", { name: "Partial current-state problem" });
 
     expect(railLabels()).toEqual(["Estado atual", "Evidência"]);
+    expect(subsectionLabels("Nesta página", "Estado atual")).toEqual(["Consequências conhecidas"]);
     const stateSection = screen.getByLabelText("Estado atual");
     expect(within(stateSection).getByText("A documented downstream effect.")).toBeTruthy();
   });
 
-  it("PI-02F1 follow-up: 'Estado atual' remains absent (section and index link) when decision_basis authors only fields it does not read, e.g. corroboration_statement alone", async () => {
+  it("PI-02F3: 'O que sustenta esta leitura' no longer exists as a section or index entry, with or without corroboration_statement authored", async () => {
     render(
       <ProblemView
         dataProvider={indexProvider({
@@ -1234,12 +1249,15 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     );
     await screen.findByRole("heading", { name: "Support-only, no current-state problem" });
 
-    expect(railLabels()).toEqual(["O que sustenta esta leitura", "Evidência"]);
+    expect(railLabels()).toEqual(["Evidência"]);
+    expect(screen.queryByLabelText("O que sustenta esta leitura")).toBeNull();
+    expect(document.getElementById("problem-sustentacao")).toBeNull();
+    expect(screen.queryByText("Corroborated by two threads.")).toBeNull();
     expect(screen.queryByLabelText("Estado atual")).toBeNull();
     expect(document.getElementById("problem-estado-atual")).toBeNull();
   });
 
-  it("adds 'O que ainda não sabemos — e o que estamos a fazer' to the index only when investigation.open_questions or decision_basis.contradiction_search is authored", async () => {
+  it("adds 'O que ainda não sabemos — e o que estamos a fazer' to the index only when investigation.open_questions or decision_basis.contradiction_search is authored, with a 'Perguntas em aberto' subsection entry", async () => {
     render(
       <ProblemView
         dataProvider={indexProvider({
@@ -1257,9 +1275,10 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     await screen.findByRole("heading", { name: "Open questions problem" });
 
     expect(railLabels()).toEqual(["Evidência", "O que ainda não sabemos — e o que estamos a fazer"]);
+    expect(subsectionLabels("Nesta página", "O que ainda não sabemos — e o que estamos a fazer")).toEqual(["Perguntas em aberto"]);
   });
 
-  it("adds 'Como chegámos a este problema' to the index only when investigation.path has an authored stage", async () => {
+  it("adds 'Como chegámos a este problema' to the index only when investigation.path has an authored stage, with a matching stage subsection entry", async () => {
     render(
       <ProblemView
         dataProvider={indexProvider({
@@ -1277,9 +1296,10 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     await screen.findByRole("heading", { name: "Path problem" });
 
     expect(railLabels()).toEqual(["Evidência", "Como chegámos a este problema"]);
+    expect(subsectionLabels("Nesta página", "Como chegámos a este problema")).toEqual(["Sinal inicial"]);
   });
 
-  it("lists every section, in canonical order, when all optional sections are authored, matching both index and body order", async () => {
+  it("lists every top-level section, in canonical order, when all optional sections are authored, matching both index and body order", async () => {
     render(
       <ProblemView
         dataProvider={indexProvider({
@@ -1303,17 +1323,11 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     );
     await screen.findByRole("heading", { name: "Full problem" });
 
-    const expected = [
-      "Estado atual",
-      "O que sustenta esta leitura",
-      "Evidência",
-      "O que ainda não sabemos — e o que estamos a fazer",
-      "Como chegámos a este problema",
-    ];
+    const expected = ["Estado atual", "Evidência", "O que ainda não sabemos — e o que estamos a fazer", "Como chegámos a este problema"];
     expect(railLabels()).toEqual(expected);
     expect(compactLabels()).toEqual(expected);
 
-    // Every listed anchor id must resolve to an actual rendered section in the document.
+    // Every listed anchor id — top-level and subsection — must resolve to an actual rendered element in the document.
     for (const href of Array.from(screen.getByRole("navigation", { name: "Nesta página" }).querySelectorAll("a")).map((a) =>
       a.getAttribute("href")
     )) {
@@ -1334,10 +1348,12 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     );
     await screen.findByRole("heading", { name: "Minimal problem" });
 
-    expect(railLabels()).not.toContain("Estado atual");
-    expect(railLabels()).not.toContain("O que sustenta esta leitura");
-    expect(railLabels()).not.toContain("O que ainda não sabemos — e o que estamos a fazer");
-    expect(railLabels()).not.toContain("Como chegámos a este problema");
+    const rail = screen.getByRole("navigation", { name: "Nesta página" });
+    const allRailLabels = Array.from(rail.querySelectorAll("a")).map((a) => a.textContent);
+    expect(allRailLabels).not.toContain("Estado atual");
+    expect(allRailLabels).not.toContain("O que sustenta esta leitura");
+    expect(allRailLabels).not.toContain("O que ainda não sabemos — e o que estamos a fazer");
+    expect(allRailLabels).not.toContain("Como chegámos a este problema");
     expect(document.getElementById("problem-estado-atual")).toBeNull();
     expect(document.getElementById("problem-sustentacao")).toBeNull();
     expect(document.getElementById("problem-questoes-abertas")).toBeNull();
