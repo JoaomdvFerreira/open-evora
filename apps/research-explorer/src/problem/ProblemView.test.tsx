@@ -949,6 +949,193 @@ describe("ProblemView — PI-02D open questions + contradiction search", () => {
   });
 });
 
+describe("ProblemView — PI-02E investigation path + final section order", () => {
+  const PATH_INDEX: RecordSummary[] = [
+    { id: "PRB-0500", type: "PRB-", label: "Path fixture", file: "research/problems/PRB-0500.yaml", summaryFields: {} },
+    { id: "EVD-0501", type: "EVD-", label: "Initial signal evidence", file: "research/evidence/EVD-0501.yaml", summaryFields: {} },
+    { id: "EVD-0502", type: "EVD-", label: "Development evidence", file: "research/evidence/EVD-0502.yaml", summaryFields: {} },
+  ];
+
+  function pathEvidenceDetail(id: string): RecordDetail {
+    return {
+      id,
+      type: "EVD-",
+      file: `research/evidence/${id}.yaml`,
+      record: { evidence_id: id, type: "institutional", observation: { summary: `${id} observation.` } },
+      outgoingEdges: [],
+      incomingEdges: [{ field: "evidence", ordinal: 0, from: "PRB-0500" }],
+    };
+  }
+
+  function pathProvider(record: Record<string, unknown>, evidenceIds: string[]): DataProvider {
+    const problemDetail: RecordDetail = {
+      id: "PRB-0500",
+      type: "PRB-",
+      file: "research/problems/PRB-0500.yaml",
+      record,
+      outgoingEdges: evidenceIds.map((id, ordinal) => ({ field: "evidence", ordinal, to: id })),
+      incomingEdges: [],
+    };
+    const evidenceDetails: Record<string, RecordDetail> = {
+      "EVD-0501": pathEvidenceDetail("EVD-0501"),
+      "EVD-0502": pathEvidenceDetail("EVD-0502"),
+    };
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(PATH_INDEX),
+      getRecord: (id: string) => {
+        if (id === "PRB-0500") return Promise.resolve(problemDetail);
+        const detail = evidenceDetails[id];
+        return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
+      },
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  it("omits the path section entirely when investigation.path has no authored stage", async () => {
+    render(
+      <ProblemView
+        dataProvider={pathProvider({ title: "No path", status: "OPEN" }, [])}
+        problemId="PRB-0500"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "No path" });
+    expect(screen.queryByLabelText("Como chegámos a este problema")).toBeNull();
+  });
+
+  it("renders initial_signal, development, and delimitation under their PT-PT labels with compact evidence references, omitting evidence rows when absent", async () => {
+    render(
+      <ProblemView
+        dataProvider={pathProvider(
+          {
+            title: "Path fixture",
+            status: "OPEN",
+            evidence: ["EVD-0501", "EVD-0502"],
+            investigation: {
+              path: {
+                initial_signal: { summary: "The first signal that surfaced this problem.", evidence: ["EVD-0501"] },
+                development: { summary: "How the investigation developed.", evidence: ["EVD-0502"] },
+                delimitation: { summary: "How the problem was bounded." },
+              },
+            },
+          },
+          ["EVD-0501", "EVD-0502"]
+        )}
+        problemId="PRB-0500"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Path fixture" });
+    const section = screen.getByLabelText("Como chegámos a este problema");
+
+    expect(within(section).getByText("Sinal inicial")).toBeTruthy();
+    expect(within(section).getByText("The first signal that surfaced this problem.")).toBeTruthy();
+    expect(within(section).getByText("Desenvolvimento da investigação")).toBeTruthy();
+    expect(within(section).getByText("How the investigation developed.")).toBeTruthy();
+    expect(within(section).getByText("Delimitação")).toBeTruthy();
+    expect(within(section).getByText("How the problem was bounded.")).toBeTruthy();
+
+    const items = within(section).getAllByRole("listitem");
+    const initialSignalItem = items.find((item) => within(item).queryByText("Sinal inicial"))!;
+    expect(within(initialSignalItem).getByRole("button", { name: /EVD-0501/ })).toBeTruthy();
+    const delimitationItem = items.find((item) => within(item).queryByText("Delimitação"))!;
+    expect(within(delimitationItem).queryByText("Evidência relacionada:")).toBeNull();
+  });
+
+  it("omits an individual stage when its summary is absent, without inferring or fabricating text", async () => {
+    render(
+      <ProblemView
+        dataProvider={pathProvider(
+          { title: "Partial path", status: "OPEN", investigation: { path: { development: { summary: "Only development is authored." } } } },
+          []
+        )}
+        problemId="PRB-0500"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Partial path" });
+    const section = screen.getByLabelText("Como chegámos a este problema");
+    expect(within(section).getByText("Desenvolvimento da investigação")).toBeTruthy();
+    expect(within(section).queryByText("Sinal inicial")).toBeNull();
+    expect(within(section).queryByText("Delimitação")).toBeNull();
+  });
+
+  it("does not render current_formulation anywhere in the path section", async () => {
+    render(
+      <ProblemView
+        dataProvider={pathProvider(
+          {
+            title: "Current formulation fixture",
+            status: "OPEN",
+            investigation: {
+              current_formulation: "This must never be rendered by PI-02E.",
+              path: { initial_signal: { summary: "Authored initial signal." } },
+            },
+          },
+          []
+        )}
+        problemId="PRB-0500"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Current formulation fixture" });
+    expect(screen.queryByText("This must never be rendered by PI-02E.")).toBeNull();
+  });
+
+  it("renders the final Problem View body section order: Estado atual, O que sustenta esta leitura, Evidência, O que ainda não sabemos, Como chegámos a este problema", async () => {
+    render(
+      <ProblemView
+        dataProvider={pathProvider(
+          {
+            title: "Order fixture",
+            status: "OPEN",
+            evidence: ["EVD-0501"],
+            decision_basis: { corroboration_statement: "Corroboration statement." },
+            investigation: {
+              open_questions: [{ question: "An open question." }],
+              path: { initial_signal: { summary: "Initial signal summary." } },
+            },
+          },
+          ["EVD-0501"]
+        )}
+        problemId="PRB-0500"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Order fixture" });
+    const main = document.querySelector(".record-detail-main")!;
+    const sections = Array.from(main.querySelectorAll("section.problem-section")).map((section) => section.getAttribute("aria-label"));
+
+    expect(sections).toEqual([
+      "Estado atual",
+      "O que sustenta esta leitura",
+      "Evidência",
+      "O que ainda não sabemos — e o que estamos a fazer",
+      "Como chegámos a este problema",
+    ]);
+  });
+});
+
 const GENERATED_DIR = path.resolve(__dirname, "..", "..", "generated");
 const hasRealCorpus = fs.existsSync(path.join(GENERATED_DIR, "index.json"));
 

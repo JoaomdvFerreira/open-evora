@@ -151,6 +151,42 @@ function contradictionSearch(record: Record<string, unknown>): ContradictionSear
   return { performed, summary, evidenceIds };
 }
 
+/**
+ * PI-02E: `investigation.path.{initial_signal,development,delimitation}` —
+ * three independently authored stages, each with its own optional `summary`
+ * and `evidence[]`. `current_formulation` is a distinct field and is
+ * deliberately not read here. Absent stages are omitted, never inferred.
+ */
+const PATH_STAGE_KEYS = ["initial_signal", "development", "delimitation"] as const;
+type PathStageKey = (typeof PATH_STAGE_KEYS)[number];
+
+const PATH_STAGE_LABELS: Record<PathStageKey, string> = {
+  initial_signal: "Sinal inicial",
+  development: "Desenvolvimento da investigação",
+  delimitation: "Delimitação",
+};
+
+interface PathStage {
+  key: PathStageKey;
+  summary: string;
+  evidenceIds: string[];
+}
+
+function investigationPathStages(record: Record<string, unknown>): PathStage[] {
+  const investigation = recordValue(record.investigation);
+  const path = investigation ? recordValue(investigation.path) : null;
+  if (!path) return [];
+
+  const stages: PathStage[] = [];
+  for (const key of PATH_STAGE_KEYS) {
+    const stage = recordValue(path[key]);
+    const summary = stage ? fieldValue(stage, "summary") : null;
+    if (!stage || !summary) continue;
+    stages.push({ key, summary, evidenceIds: stringValues(stage.evidence) });
+  }
+  return stages;
+}
+
 interface EvidenceGroups {
   supporting: EvidenceWithSources[];
   boundary: EvidenceWithSources[];
@@ -767,6 +803,44 @@ function ProblemOpenQuestionsSection({
   );
 }
 
+/**
+ * PI-02E "Como chegámos a este problema": one block per authored
+ * `investigation.path` stage (initial_signal, development, delimitation),
+ * in that fixed order — never reordered or synthesized across stages. Reuses
+ * `OpenQuestionEvidenceRefs`'s compact EVD- reference treatment rather than
+ * introducing a second link pattern. Omitted entirely when no stage is
+ * authored.
+ */
+function ProblemPathSection({
+  record,
+  evidence,
+  onOpenGeneric,
+}: {
+  record: Record<string, unknown>;
+  evidence: EvidenceWithSources[];
+  onOpenGeneric: (id: string) => void;
+}) {
+  const stages = investigationPathStages(record);
+  if (stages.length === 0) return null;
+
+  const evidenceById = new Map(evidence.map((item) => [item.detail.id, item.detail]));
+
+  return (
+    <section id="problem-percurso" aria-label="Como chegámos a este problema" className="problem-section">
+      <h3 className="detail-panel-label">Como chegámos a este problema</h3>
+      <ul className="open-question-list">
+        {stages.map((stage) => (
+          <li key={stage.key} className="open-question-item">
+            <p className="open-question-question">{PATH_STAGE_LABELS[stage.key]}</p>
+            <p>{stage.summary}</p>
+            <OpenQuestionEvidenceRefs evidenceIds={stage.evidenceIds} evidenceById={evidenceById} onOpenGeneric={onOpenGeneric} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 interface ProblemContentProps {
   dataProvider: DataProvider;
   lookup: Map<string, RecordSummary>;
@@ -837,8 +911,6 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
 
           <ProblemSupportSection record={record} />
 
-          <ProblemOpenQuestionsSection record={record} evidence={evidence} onOpenGeneric={onOpenGeneric} />
-
           <section id="problem-evidencia" aria-label="Evidência" className="problem-section">
             <h3 className="detail-panel-label">Registos de evidência associados ({formatPublicCount(evidence.length)})</h3>
             <ContributionOccurrenceSummary evidence={evidence} />
@@ -857,6 +929,10 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
               })()
             )}
           </section>
+
+          <ProblemOpenQuestionsSection record={record} evidence={evidence} onOpenGeneric={onOpenGeneric} />
+
+          <ProblemPathSection record={record} evidence={evidence} onOpenGeneric={onOpenGeneric} />
         </div>
 
         <ProblemReadingRail />
