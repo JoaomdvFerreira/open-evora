@@ -502,12 +502,45 @@ describe("ProblemView — PI-02B header + Estado atual", () => {
     expect(within(stateSection).getByText("Município de Évora only.")).toBeTruthy();
     expect(within(stateSection).getByText("Residents dependent on the service.")).toBeTruthy();
     expect(within(stateSection).getByText("2022-2026.")).toBeTruthy();
-    expect(within(stateSection).getByText("Sim")).toBeTruthy();
+
+    // Human visual review correction: `bounded` (true/false) is never
+    // rendered publicly anywhere in Problem View, even though it is
+    // authored on this fixture — "Delimitado" and "Sim"/"Não" must not appear.
+    expect(within(stateSection).queryByText("Delimitado")).toBeNull();
+    expect(within(stateSection).queryByText("Sim")).toBeNull();
+    expect(screen.queryByText("Sim")).toBeNull();
 
     // The header's own currentness/scope indicators stay compact — the full
     // authored sentence appears exactly once, in "Estado atual", not twice.
     expect(screen.getAllByText("What the evidence shows is happening.").length).toBe(1);
     expect(screen.getAllByText(/2022-2026\./).length).toBe(1);
+  });
+
+  it("human review correction: omits 'Âmbito conhecido' entirely when decision_basis.scope authors only bounded, with no geography/population/temporal", async () => {
+    render(
+      <ProblemView
+        dataProvider={headerProvider({
+          title: "Bounded-only scope fixture",
+          status: "OPEN",
+          decision_basis: {
+            manifestation: { summary: "Manifestation summary so Estado atual still renders." },
+            scope: { bounded: false },
+          },
+        })}
+        problemId="PRB-0200"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Bounded-only scope fixture" });
+    const stateSection = screen.getByLabelText("Estado atual");
+    expect(within(stateSection).queryByText("Âmbito conhecido")).toBeNull();
+    expect(document.getElementById("problem-estado-ambito")).toBeNull();
+    expect(screen.queryByText("Delimitado")).toBeNull();
+    expect(screen.queryByText("Não")).toBeNull();
   });
 
   it("omits manifestation/consequence/currentness/scope items individually when decision_basis carries only some of them", async () => {

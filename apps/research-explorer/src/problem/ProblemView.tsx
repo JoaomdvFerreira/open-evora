@@ -46,15 +46,16 @@ function geographySummary(record: Record<string, unknown>): string | null {
 }
 
 /**
- * `decision_basis.scope` is authored prose per dimension (geography/population/temporal),
- * plus an explicit `bounded` boolean — never merged into a single derived sentence.
+ * `decision_basis.scope` is authored prose per dimension (geography/population/temporal).
+ * `bounded` is deliberately not surfaced here (human visual review: rendering
+ * it as "Delimitado"/"Sim"/"Não" was redundant and rejected) — it stays
+ * canonical data only, never read or presented anywhere in Problem View.
  * Returns only the dimensions actually present on record.
  */
 interface DecisionBasisScope {
   geography: string | null;
   population: string | null;
   temporal: string | null;
-  bounded: boolean | null;
 }
 
 function decisionBasisScope(record: Record<string, unknown>): DecisionBasisScope | null {
@@ -64,9 +65,8 @@ function decisionBasisScope(record: Record<string, unknown>): DecisionBasisScope
   const geography = fieldValue(scope, "geography");
   const population = fieldValue(scope, "population");
   const temporal = fieldValue(scope, "temporal");
-  const bounded = typeof scope.bounded === "boolean" ? scope.bounded : null;
-  if (!geography && !population && !temporal && bounded === null) return null;
-  return { geography, population, temporal, bounded };
+  if (!geography && !population && !temporal) return null;
+  return { geography, population, temporal };
 }
 
 function decisionBasisField(record: Record<string, unknown>, ...path: string[]): string | null {
@@ -616,12 +616,6 @@ function ProblemCurrentStateSection({ record }: { record: Record<string, unknown
               <div className="problem-scope-item">
                 <dt>Período</dt>
                 <dd>{scope.temporal}</dd>
-              </div>
-            )}
-            {scope.bounded !== null && (
-              <div className="problem-scope-item">
-                <dt>Delimitado</dt>
-                <dd>{scope.bounded ? "Sim" : "Não"}</dd>
               </div>
             )}
           </dl>
