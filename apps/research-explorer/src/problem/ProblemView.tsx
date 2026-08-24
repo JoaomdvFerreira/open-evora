@@ -126,17 +126,15 @@ function ProblemBreadcrumb({ problemId, onBackToOverview }: { problemId: string;
 }
 
 /**
- * Section anchors for Problem View's desktop reading rail (design-system.md
- * §3's ContextTabs sits above this; this is the "Nesta página" index the
- * rail links into) — kept as one ordered list so the rail and the section
- * `id`s below can never drift apart.
+ * Section anchors for Problem View's desktop reading rail (this is the
+ * "Nesta página" index the rail links into) — kept as one ordered list so
+ * the rail and the section `id`s below can never drift apart.
  */
 const PROBLEM_SECTIONS = [
   { id: "problem-estado-atual", label: "Estado atual" },
   { id: "problem-avaliacao", label: "Avaliação" },
   { id: "problem-evidencia", label: "Evidência" },
   { id: "problem-incertezas", label: "Incertezas e lacunas" },
-  { id: "problem-hipoteses", label: "Hipóteses" },
 ] as const;
 
 /**
@@ -297,7 +295,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
     );
   }
 
-  const { problem, assessments, evidence, hypotheses } = state.projection;
+  const { problem, assessments, evidence } = state.projection;
   const record = problem.record as Record<string, unknown>;
   const title = fieldValue(record, "title") ?? problem.id;
 
@@ -441,21 +439,6 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
               ))
             )}
           </section>
-
-          <section id="problem-hipoteses" aria-label="Hipóteses" className="problem-section">
-            <h3 className="detail-panel-label">Hipóteses</h3>
-            {hypotheses.length === 0 ? (
-              <p>Nenhuma hipótese associada.</p>
-            ) : (
-              <ul>
-                {hypotheses.map((hypothesis) => (
-                  <li key={hypothesis.id}>
-                    <TypedLinkButton detail={hypothesis} onOpenGeneric={onOpenGeneric} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
         </div>
 
         <ProblemReadingRail />
@@ -479,7 +462,7 @@ interface ProblemViewProps {
  * problem, why do we believe it, and what remains uncertain?" — a
  * presentation projection over the existing generic DataProvider (see
  * problemProjection.ts), not a new persistence model. Any future/unknown
- * record type reached from here (assessment, evidence, source, hypothesis)
+ * record type reached from here (assessment, evidence, source)
  * still opens through the same generic detail renderer via onOpenGeneric.
  */
 export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewInGraph }: ProblemViewProps) {

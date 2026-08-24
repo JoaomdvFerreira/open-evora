@@ -5,12 +5,10 @@ import { RecordDetailPanel } from "./RecordDetailPanel";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 
 /**
- * Slice 1 (docs/design/research-explorer-design-foundations.md): meaning
- * before metadata, compact provenance near the top, exhaustive technical
- * inspection closed-by-default but reachable, exact reference paths
- * preserved, no PRB context switcher on non-PRB records. EVD-000127 (the
- * REDUX-001/003 acceptance fixture named in the review) stands in for the
- * real corpus record of the same ID.
+ * Meaning before metadata, compact provenance near the top, exhaustive
+ * technical inspection closed-by-default but reachable, exact reference
+ * paths preserved, no PRB context switcher on non-PRB records. EVD-000127
+ * stands in for the real corpus record of the same ID.
  */
 const EVD_127_SUMMARY: RecordSummary = {
   id: "EVD-000127",
@@ -362,7 +360,7 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    // No title/name/hypothesis/problem_statement/observation.summary field
+    // No title/name/problem_statement/observation.summary field
     // exists on this fixture — the meaning zone must fall back honestly
     // (its own ID + an explicit "no meaning field" note) rather than
     // inventing content.

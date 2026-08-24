@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 /**
  * RE-00 architecture spike — proves the schema-driven node/edge read model
- * (ADR-001 D2/D3) against the real canonical corpus. Throwaway validation
- * code: RE-01 will productionize this into apps/research-explorer/scripts/
- * build-data.js with the full manifest/index/edges/record-detail split
- * (docs/architecture/research-explorer-read-model-spec.md). This script
+ * against the real canonical corpus. Throwaway validation code: RE-01 will
+ * productionize this into apps/research-explorer/scripts/build-data.js with
+ * the full manifest/index/edges/record-detail split. This script
  * intentionally stays small and generates a single combined graph.json
  * plus a stats summary, not the full v1 read model.
  *
@@ -24,7 +23,6 @@ const outDir = path.join(__dirname, "generated");
 const LABEL_FALLBACKS = [
   "title",
   "name",
-  "hypothesis",
   "problem_statement",
   "observation.summary",
 ];

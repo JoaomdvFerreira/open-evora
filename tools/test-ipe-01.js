@@ -2,7 +2,7 @@
 /**
  * Focused tests for IPE-01 (Investigation & Promotion Engine v0 contract foundation):
  * the optional PRB.decision_basis structure and the validator's empty-reference-entry
- * hardening (docs/discovery/investigation-promotion-engine.md).
+ * hardening (docs/investigationstrategy.md §6, Decision basis and Eligibility).
  *
  * Zero-dependency: uses only Node's built-in assert/fs/os/path, matching
  * tools/validate-research.js's no-external-dependency convention. Fixtures are
@@ -21,7 +21,7 @@ const path = require("path");
 const { validateResearchTree } = require("./validate-research.js");
 
 const REAL_SCHEMAS_DIR = path.resolve(__dirname, "..", "research", "schemas");
-const DIRS = ["sources", "evidence", "problems", "hypotheses", "assessments", "schemas"];
+const DIRS = ["sources", "evidence", "problems", "assessments", "schemas"];
 
 function makeFixtureRoot() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "evora-ipe01-"));
@@ -520,23 +520,52 @@ decision_basis:
   }
 });
 
-test("a non-list single reference field (e.g. HYP.problem) is unaffected by list-only hardening", () => {
+test("a non-list single reference field (e.g. ASM.problem) is unaffected by list-only hardening", () => {
   const root = makeFixtureRoot();
   try {
     write(root, "problems", "PRB-9001.yaml", minimalPrb());
     write(root, "evidence", "EVD-900101.yaml", minimalEvd());
     write(
       root,
-      "hypotheses",
-      "HYP-9001.yaml",
+      "assessments",
+      "ASM-9001.yaml",
       `
-hypothesis_id: HYP-9001
+assessment_id: ASM-9001
 problem: PRB-9001
-hypothesis: "Fixture hypothesis."
-mechanism: "Fixture mechanism."
-expected_outcome: "Fixture expected outcome."
-validation:
-  status: untested
+as_of: "2026-08-11"
+phase: fixture
+assessment_status: CURRENT
+evidence_confidence:
+  overall: NOT_ASSESSED
+  independence: NOT_ASSESSED
+  coherence: NOT_ASSESSED
+  adequacy: NOT_ASSESSED
+  relevance: NOT_ASSESSED
+  currentness: NOT_ASSESSED
+  contradiction_status: NOT_ASSESSED
+  stakeholder_validation: NOT_APPLICABLE
+civic_importance:
+  reach: NOT_ASSESSED
+  frequency: NOT_ASSESSED
+  severity: NOT_ASSESSED
+  persistence: NOT_ASSESSED
+  equity: NOT_ASSESSED
+journey_understanding: NOT_ASSESSED
+causal_understanding: NOT_ASSESSED
+existing_solution_understanding: NOT_ASSESSED
+remaining_gap: NOT_ASSESSED
+digital_leverage: not_assessed
+structure_action: KEEP
+decision_gates:
+  problem_real: NOT_ASSESSED
+  civic_importance: NOT_ASSESSED
+  journey_understood: NOT_ASSESSED
+  root_cause_understood: NOT_ASSESSED
+  remaining_gap_supported: NOT_ASSESSED
+  digital_causality: NOT_ASSESSED
+  operability: NOT_ASSESSED
+  testability: NOT_ASSESSED
+triage: WATCH
 `
     );
     const { errors } = validateResearchTree(root);

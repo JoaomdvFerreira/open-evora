@@ -18,7 +18,7 @@ function asDataLoadError(error: unknown): DataLoadError {
 
 /**
  * Lazy-loads the full Problem projection (problem + assessments + evidence +
- * sources + hypotheses) whenever `problemId` changes. A failure here is
+ * sources) whenever `problemId` changes. A failure here is
  * isolated to this hook's own state — it never affects the already-loaded
  * Records index or any other selection.
  */

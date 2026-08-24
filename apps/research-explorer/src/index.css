@@ -366,10 +366,9 @@ tr[aria-selected="true"] {
   font-style: italic;
 }
 
-/* Meaning zone (REDUX-001): the record's own canonical human-readable
-   content, read before any technical/schema inspection. Serif is reserved
-   for this role only — the rest of the app's chrome stays sans (see
-   docs/design/research-explorer-design-foundations.md §2). */
+/* Meaning zone: the record's own canonical human-readable content, read
+   before any technical/schema inspection. Serif is reserved for this role
+   only — the rest of the app's chrome stays sans. */
 .record-meaning-zone {
   max-width: 45rem;
 }
@@ -597,9 +596,8 @@ code {
    The Explorer remains a text-first research surface: warm paper, restrained
    borders, a readable editorial measure, and deliberately quieter technical
    identifiers. Page-specific Detail/Problem composition stays outside V1.
-   Values are canonical per docs/design/research-explorer/design-system.md
-   §1 (Foundations) — token names are this app's established naming, mapped
-   to that document's semantic names in its §6. */
+   See docs/explorerarchitecture.md for the Explorer's presentation
+   hierarchy and visual validation posture. */
 :root {
   --canvas: #faf8f3;
   --surface: #ffffff;

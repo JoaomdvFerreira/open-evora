@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Deterministic, zero-dependency analyzer over the canonical research/ corpus
- * (D3 Analytical Foundation — docs/discovery/d3-execution-protocol.md §6).
+ * Deterministic, zero-dependency analyzer over the canonical research/ corpus.
+ * See docs/datamodel.md for record semantics and docs/investigationstrategy.md
+ * for the analytical/decision rules this never itself makes.
  *
  * Allowed: counts, known-lineage counts, metadata completeness, state distributions,
  * explicit contradiction/gate/unknown reporting.
@@ -55,7 +56,6 @@ function loadCorpus(researchRoot) {
   const evidence = (parsedByDir.get("EVD-") || { parsed: [] }).parsed;
   const assessments = (parsedByDir.get("ASM-") || { parsed: [] }).parsed;
   const sources = (parsedByDir.get("SRC-") || { parsed: [] }).parsed;
-  const hypotheses = (parsedByDir.get("HYP-") || { parsed: [] }).parsed;
 
   const problemsById = new Map(problems.map((p) => [p.record.problem_id, p]));
   const evidenceById = new Map(evidence.map((e) => [e.record.evidence_id, e]));
@@ -72,7 +72,6 @@ function loadCorpus(researchRoot) {
     evidence,
     assessments,
     sources,
-    hypotheses,
     problemsById,
     evidenceById,
     assessmentsByProblem,
@@ -168,7 +167,7 @@ function printProblemReport(report) {
 
 function runAll(corpus) {
   console.log(
-    `Corpus: ${corpus.sources.length} SRC, ${corpus.evidence.length} EVD, ${corpus.problems.length} PRB, ${corpus.hypotheses.length} HYP, ${corpus.assessments.length} ASM (${corpus.totalRecords} total canonical records)`
+    `Corpus: ${corpus.sources.length} SRC, ${corpus.evidence.length} EVD, ${corpus.problems.length} PRB, ${corpus.assessments.length} ASM (${corpus.totalRecords} total canonical records)`
   );
   console.log("");
   const prbIds = [...corpus.problemsById.keys()].sort();

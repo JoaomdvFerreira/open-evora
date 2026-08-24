@@ -102,7 +102,7 @@ describe("ProblemView", () => {
     expect(onOpenGeneric).toHaveBeenCalledWith("EVD-0001");
   });
 
-  it("surfaces identity, current state, assessment, evidence, sources, unknowns, and (absent) hypotheses for a real problem shape", async () => {
+  it("surfaces identity, current state, assessment, evidence, sources, and unknowns for a real problem shape", async () => {
     render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
     await screen.findByRole("heading", { name: "Parking pressure" });
@@ -131,9 +131,6 @@ describe("ProblemView", () => {
     for (const raw of ["remaining_gap", "critical_unknowns", "PARTIAL", "HIGH", "MEDIUM", "decision_impact", "target_phase"]) {
       expect(within(unknownsSection).queryByText(raw)).toBeNull();
     }
-
-    const hypothesesSection = screen.getByLabelText("Hipóteses");
-    expect(within(hypothesesSection).getByText("Nenhuma hipótese associada.")).toBeTruthy();
   });
 
   it("only surfaces SRC- typed targets as Sources, and does not crash when evidence links a non-source future type", async () => {
@@ -344,7 +341,6 @@ describe("ProblemView", () => {
       { id: "problem-avaliacao", label: "Avaliação" },
       { id: "problem-evidencia", label: "Evidência" },
       { id: "problem-incertezas", label: "Incertezas e lacunas" },
-      { id: "problem-hipoteses", label: "Hipóteses" },
     ];
 
     for (const { id, label } of expectedSections) {
@@ -366,7 +362,6 @@ describe("ProblemView", () => {
     // link correctly regardless of which one compact/desktop actually shows.
     const compactIndex = screen.getByRole("navigation", { name: "Nesta página (versão compacta)" });
     expect(within(compactIndex).getByRole("link", { name: "Evidência" }).getAttribute("href")).toBe("#problem-evidencia");
-    expect(within(compactIndex).getByRole("link", { name: "Hipóteses" }).getAttribute("href")).toBe("#problem-hipoteses");
   });
 
   it("fails closed on a child-detail failure and retries the complete projection", async () => {

@@ -25,8 +25,7 @@ function contributionsOf(evidence: EvidenceWithSources): string[] {
  * evidence-item count, and not an invented score. One evidence record may
  * legitimately carry more than one contribution value, so occurrenceCount
  * can exceed itemCount; callers must present both explicitly rather than
- * implying they are the same number (docs/design/research-explorer-design-
- * foundations.md §6, prototype-rationale's "13 ocorrências" pattern).
+ * implying they are the same number.
  * Known canonical values are ordered first (schema order); any unrecognised
  * value that reaches here is still tallied and returned, appended after.
  */

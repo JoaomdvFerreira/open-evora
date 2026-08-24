@@ -27,7 +27,7 @@ export type ResearchGraph = MultiDirectedGraph<GraphNodeAttributes, GraphEdgeAtt
 /**
  * Builds the full in-memory Graphology model from the generated read model
  * (index.json + edges.json), exactly as delivered by the DataProvider — no
- * inferred/derived relationships (ADR-001 D4, development contract #8).
+ * inferred/derived relationships (see docs/explorerarchitecture.md's read-model role).
  * `MultiDirectedGraph` because two records can be linked by more than one
  * distinct reference (different field, or different list ordinal) — see
  * read-model-spec.md's edge-identity note; those must render as separate

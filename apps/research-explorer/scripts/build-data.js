@@ -12,9 +12,7 @@
  *     directory and aborts (leaving the previous generated/ untouched) if
  *     anything looks wrong on disk, not just in memory.
  *
- * See docs/architecture/research-explorer-read-model-spec.md for the
- * generated-file contract and docs/architecture/ADR-001-research-explorer-architecture.md
- * for the accepted design this implements.
+ * See docs/explorerarchitecture.md for the accepted design this implements.
  *
  * Usage: node apps/research-explorer/scripts/build-data.js
  */

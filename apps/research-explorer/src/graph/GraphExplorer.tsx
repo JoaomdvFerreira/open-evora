@@ -50,7 +50,7 @@ interface GraphExplorerProps {
   dataProvider: DataProvider;
   /** URL-synced: the currently focused/selected canonical record, or null before any selection. */
   focusId: string | null;
-  /** URL-synced: 1 or 2 hops around the focus (ADR-001 D7). Ignored while the full-corpus view is toggled on. */
+  /** URL-synced: 1 or 2 hops around the focus. Ignored while the full-corpus view is toggled on. */
   depth: GraphDepth;
   onFocusChange: (id: string) => void;
   onClearFocus: () => void;
@@ -62,8 +62,8 @@ interface GraphExplorerProps {
 /**
  * RE-04 Graph Explorer: a neighbourhood-first, supplementary visual
  * exploration mode over the same read model the Records/Problem views use —
- * never the sole route to a fact (development contract #8, ADR-001 D4). The
- * canvas (GraphCanvas.tsx) is the only Sigma-specific piece; everything here
+ * never the sole route to a fact (see docs/explorerarchitecture.md's primary
+ * navigation). The canvas (GraphCanvas.tsx) is the only Sigma-specific piece; everything here
  * is plain record/graph domain logic and ordinary HTML, so every capability
  * (inspect, filter, navigate) also works for a keyboard/screen-reader user
  * via the node/edge lists rendered below the canvas.

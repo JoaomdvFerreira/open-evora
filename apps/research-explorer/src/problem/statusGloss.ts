@@ -1,28 +1,22 @@
 /**
  * Canonical-value-plus-gloss pairs for Problem View's "Estado atual" fields
- * (`research/schemas/problem.schema.json`, `docs/models/problem-model.md`).
+ * (`research/schemas/problem.schema.json`, `docs/datamodel.md`).
  * The canonical value itself always remains visible at the call site —
  * `label` is a short, safe rendering (either the schema's own terminology,
- * grounded prose from problem-model.md, or a literal, non-semantic PT
+ * grounded prose from docs/datamodel.md, or a literal, non-semantic PT
  * translation of the enum word that adds no criterion beyond translation).
- * `explanation`, where present, paraphrases problem-model.md's own prose.
- * Where problem-model.md defines nothing beyond the enum member itself (all
+ * `explanation`, where present, paraphrases docs/datamodel.md's own prose.
+ * Where docs/datamodel.md defines nothing beyond the enum member itself (all
  * four `digital_tractability` values, `existing_solutions`), no explanation
- * is manufactured — see docs/design/research-explorer-design-foundations.md
- * §8 and prototype-rationale.md's "Glosses that could not be canonically
- * grounded".
+ * is manufactured.
  *
  * `evidence_status`'s `discovered` <-> `corroborated` ordering is a
- * documented exception: `docs/models/problem-model.md`'s own "## Lifecycle"
- * section explicitly draws `DISCOVERED -> CORROBORATED -> ...` as a named,
- * ordered progression (not merely the schema enum's array order, which
- * alone would not be sufficient grounding) — corroborated further by actual
- * corpus practice recording this exact transition (e.g.
- * `docs/discovery/rs-02b1-focused-desk-research-progress.md`: "`evidence_status`
- * `discovered -> corroborated`" on `PRB-0004`). What remains genuinely
- * undocumented, and is therefore never claimed here, is the specific
- * criterion that distinguishes the two (in particular, no source states or
- * implies independent-source corroboration).
+ * documented progression (not merely the schema enum's array order, which
+ * alone would not be sufficient grounding) — see docs/datamodel.md's
+ * Corroboration concept. What remains genuinely undocumented, and is
+ * therefore never claimed here, is the specific criterion that distinguishes
+ * the two (in particular, no source states or implies independent-source
+ * corroboration).
  */
 
 export interface FieldGloss {
