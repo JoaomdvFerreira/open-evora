@@ -313,7 +313,7 @@ interface ProblemSectionEntry {
 }
 
 const PROBLEM_SECTION_ENTRIES: readonly ProblemSectionEntry[] = [
-  { id: "problem-estado-atual", label: "Estado atual", present: () => true },
+  { id: "problem-estado-atual", label: "Estado atual", present: hasCurrentStateContent },
   {
     id: "problem-sustentacao",
     label: "O que sustenta esta leitura",
@@ -479,14 +479,35 @@ function ProblemHeader({
 }
 
 /**
+ * PI-02F1 follow-up: "Estado atual"'s entire content is derived from optional
+ * `decision_basis` fields (manifestation.summary, consequence.summary,
+ * currentness.assessment, scope) — the status/evidence_status/validation_status
+ * chip row is not itself sufficient reason to show the section. Shared by the
+ * section's own render and `PROBLEM_SECTION_ENTRIES` so the two can never
+ * disagree about presence.
+ */
+function hasCurrentStateContent(record: Record<string, unknown>): boolean {
+  return (
+    decisionBasisField(record, "manifestation", "summary") !== null ||
+    decisionBasisField(record, "consequence", "summary") !== null ||
+    decisionBasisField(record, "currentness", "assessment") !== null ||
+    decisionBasisScope(record) !== null
+  );
+}
+
+/**
  * PI-02B §"Estado atual": compact canonical investigation-state chips
  * (always rendered, same landmark/anchor as before) plus, conditionally,
  * one labelled item per authored `decision_basis` field — no synthesis
  * across them and no fallback conclusion when a field is absent. `scope`
  * renders each authored dimension (geography/population/temporal) plus the
- * explicit `bounded` boolean, exactly as authored.
+ * explicit `bounded` boolean, exactly as authored. The section itself is
+ * omitted when none of its supported `decision_basis` fields are authored
+ * (PI-02F1 follow-up) — the chip row alone does not justify the section.
  */
 function ProblemCurrentStateSection({ record }: { record: Record<string, unknown> }) {
+  if (!hasCurrentStateContent(record)) return null;
+
   const manifestationSummary = decisionBasisField(record, "manifestation", "summary");
   const consequenceSummary = decisionBasisField(record, "consequence", "summary");
   const currentnessAssessment = decisionBasisField(record, "currentness", "assessment");

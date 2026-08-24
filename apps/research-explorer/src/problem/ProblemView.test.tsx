@@ -18,7 +18,13 @@ const DETAILS: Record<string, RecordDetail> = {
     id: "PRB-0005",
     type: "PRB-",
     file: "research/problems/PRB-0005.yaml",
-    record: { title: "Parking pressure", status: "OPEN", problem_statement: "Traffic and parking conflict with pedestrian space.", evidence: ["EVD-0001"] },
+    record: {
+      title: "Parking pressure",
+      status: "OPEN",
+      problem_statement: "Traffic and parking conflict with pedestrian space.",
+      evidence: ["EVD-0001"],
+      decision_basis: { manifestation: { summary: "Parking pressure is observed near the historic centre." } },
+    },
     outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-0001" }],
     incomingEdges: [],
   },
@@ -417,6 +423,7 @@ describe("ProblemView — PI-02B header + Estado atual", () => {
           status: "OPEN",
           evidence_status: "corroborated",
           validation_status: "unvalidated",
+          decision_basis: { manifestation: { summary: "Manifestation summary for the header fixture." } },
         })}
         problemId="PRB-0200"
         onOpenGeneric={vi.fn()}
@@ -1106,7 +1113,10 @@ describe("ProblemView — PI-02E investigation path + final section order", () =
             title: "Order fixture",
             status: "OPEN",
             evidence: ["EVD-0501"],
-            decision_basis: { corroboration_statement: "Corroboration statement." },
+            decision_basis: {
+              manifestation: { summary: "Manifestation summary for the order fixture." },
+              corroboration_statement: "Corroboration statement.",
+            },
             investigation: {
               open_questions: [{ question: "An open question." }],
               path: { initial_signal: { summary: "Initial signal summary." } },
@@ -1166,7 +1176,7 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     return Array.from(screen.getByRole("navigation", { name: "Nesta página (versão compacta)" }).querySelectorAll("a")).map((a) => a.textContent);
   }
 
-  it("lists only Estado atual and Evidência when no optional section is authored, in canonical order, in both the rail and the compact index", async () => {
+  it("lists only Evidência when no section — including Estado atual — has authored content, in canonical order, in both the rail and the compact index", async () => {
     render(
       <ProblemView
         dataProvider={indexProvider({ title: "Minimal problem", status: "OPEN" })}
@@ -1179,15 +1189,39 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     );
     await screen.findByRole("heading", { name: "Minimal problem" });
 
-    expect(railLabels()).toEqual(["Estado atual", "Evidência"]);
-    expect(compactLabels()).toEqual(["Estado atual", "Evidência"]);
+    expect(railLabels()).toEqual(["Evidência"]);
+    expect(compactLabels()).toEqual(["Evidência"]);
+    expect(screen.queryByLabelText("Estado atual")).toBeNull();
+    expect(document.getElementById("problem-estado-atual")).toBeNull();
   });
 
-  it("adds 'O que sustenta esta leitura' to the index only when decision_basis authors corroboration_statement or independence_assessment", async () => {
+  it("PI-02F1 follow-up: adds 'Estado atual' to the index only when decision_basis authors manifestation.summary, consequence.summary, currentness.assessment, or scope — a partial decision_basis is enough", async () => {
     render(
       <ProblemView
         dataProvider={indexProvider({
-          title: "Support-only problem",
+          title: "Partial current-state problem",
+          status: "OPEN",
+          decision_basis: { consequence: { summary: "A documented downstream effect." } },
+        })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Partial current-state problem" });
+
+    expect(railLabels()).toEqual(["Estado atual", "Evidência"]);
+    const stateSection = screen.getByLabelText("Estado atual");
+    expect(within(stateSection).getByText("A documented downstream effect.")).toBeTruthy();
+  });
+
+  it("PI-02F1 follow-up: 'Estado atual' remains absent (section and index link) when decision_basis authors only fields it does not read, e.g. corroboration_statement alone", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({
+          title: "Support-only, no current-state problem",
           status: "OPEN",
           decision_basis: { corroboration_statement: "Corroborated by two threads." },
         })}
@@ -1198,9 +1232,11 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
         onViewInGraph={vi.fn()}
       />
     );
-    await screen.findByRole("heading", { name: "Support-only problem" });
+    await screen.findByRole("heading", { name: "Support-only, no current-state problem" });
 
-    expect(railLabels()).toEqual(["Estado atual", "O que sustenta esta leitura", "Evidência"]);
+    expect(railLabels()).toEqual(["O que sustenta esta leitura", "Evidência"]);
+    expect(screen.queryByLabelText("Estado atual")).toBeNull();
+    expect(document.getElementById("problem-estado-atual")).toBeNull();
   });
 
   it("adds 'O que ainda não sabemos — e o que estamos a fazer' to the index only when investigation.open_questions or decision_basis.contradiction_search is authored", async () => {
@@ -1220,7 +1256,7 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     );
     await screen.findByRole("heading", { name: "Open questions problem" });
 
-    expect(railLabels()).toEqual(["Estado atual", "Evidência", "O que ainda não sabemos — e o que estamos a fazer"]);
+    expect(railLabels()).toEqual(["Evidência", "O que ainda não sabemos — e o que estamos a fazer"]);
   });
 
   it("adds 'Como chegámos a este problema' to the index only when investigation.path has an authored stage", async () => {
@@ -1240,7 +1276,7 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     );
     await screen.findByRole("heading", { name: "Path problem" });
 
-    expect(railLabels()).toEqual(["Estado atual", "Evidência", "Como chegámos a este problema"]);
+    expect(railLabels()).toEqual(["Evidência", "Como chegámos a este problema"]);
   });
 
   it("lists every section, in canonical order, when all optional sections are authored, matching both index and body order", async () => {
@@ -1249,7 +1285,10 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
         dataProvider={indexProvider({
           title: "Full problem",
           status: "OPEN",
-          decision_basis: { corroboration_statement: "Corroborated." },
+          decision_basis: {
+            manifestation: { summary: "Manifestation summary for the full fixture." },
+            corroboration_statement: "Corroborated.",
+          },
           investigation: {
             open_questions: [{ question: "An open question." }],
             path: { initial_signal: { summary: "The first signal." } },
@@ -1295,9 +1334,11 @@ describe("ProblemView — PI-02F1 dynamic reading index", () => {
     );
     await screen.findByRole("heading", { name: "Minimal problem" });
 
+    expect(railLabels()).not.toContain("Estado atual");
     expect(railLabels()).not.toContain("O que sustenta esta leitura");
     expect(railLabels()).not.toContain("O que ainda não sabemos — e o que estamos a fazer");
     expect(railLabels()).not.toContain("Como chegámos a este problema");
+    expect(document.getElementById("problem-estado-atual")).toBeNull();
     expect(document.getElementById("problem-sustentacao")).toBeNull();
     expect(document.getElementById("problem-questoes-abertas")).toBeNull();
     expect(document.getElementById("problem-percurso")).toBeNull();
