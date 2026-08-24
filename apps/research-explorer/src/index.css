@@ -2489,6 +2489,68 @@ main.explorer-shell {
   font-size: 13px;
 }
 
+/* PI-02D "O que ainda não sabemos — e o que estamos a fazer" — each
+   open_questions[] item (plus contradiction_search) reuses the existing
+   .problem-current-state-item labelled-block pattern for its sub-fields;
+   only the item wrapper, question heading, and compact evidence-reference
+   row are new. */
+.open-question-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.open-question-item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.open-question-question {
+  margin: 0 0 var(--space-4);
+  color: var(--ink);
+  font-family: var(--recipe-editorial-body-family);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.open-question-evidence-refs {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.open-question-evidence-refs-label {
+  margin-right: var(--space-2);
+  color: var(--ink-faintest);
+  font-family: var(--ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.open-question-evidence-refs-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.open-question-evidence-refs-list li {
+  display: inline-flex;
+}
+
+.open-question-evidence-refs-list button {
+  font-family: var(--recipe-technical-id-family);
+  font-size: 12px;
+}
+
 /* "Estado atual" canonical-value-plus-gloss chips (REDUX-007/008 §8) —
    identical treatment for every field; the gloss label is a plain-language
    accompaniment, the canonical value in parentheses/monospace never omitted. */

@@ -92,6 +92,65 @@ function decisionBasisEvidenceIds(record: Record<string, unknown>, field: string
   return decisionBasis ? stringValues(decisionBasis[field]) : [];
 }
 
+/**
+ * PI-02D: `investigation.open_questions[]` — an array of independently
+ * authored items, each with its own optional fields. Only `question` is
+ * treated as required (it is the item's primary text); every other field is
+ * rendered conditionally and never fabricated when absent.
+ */
+interface OpenQuestion {
+  question: string;
+  whyOpen: string | null;
+  currentAction: string | null;
+  latestResult: string | null;
+  resolutionCondition: string | null;
+  evidenceIds: string[];
+}
+
+function openQuestions(record: Record<string, unknown>): OpenQuestion[] {
+  const investigation = recordValue(record.investigation);
+  const rawList = investigation ? investigation.open_questions : null;
+  if (!Array.isArray(rawList)) return [];
+
+  const items: OpenQuestion[] = [];
+  for (const raw of rawList) {
+    const item = recordValue(raw);
+    const question = item ? fieldValue(item, "question") : null;
+    if (!item || !question) continue;
+    items.push({
+      question,
+      whyOpen: fieldValue(item, "why_open"),
+      currentAction: fieldValue(item, "current_action"),
+      latestResult: fieldValue(item, "latest_result"),
+      resolutionCondition: fieldValue(item, "resolution_condition"),
+      evidenceIds: stringValues(item.evidence),
+    });
+  }
+  return items;
+}
+
+/**
+ * `decision_basis.contradiction_search` — authored `performed`/`summary`
+ * plus its own evidence list. `performed: false` is presented as-authored,
+ * never read or reframed as a negative finding.
+ */
+interface ContradictionSearch {
+  performed: boolean | null;
+  summary: string | null;
+  evidenceIds: string[];
+}
+
+function contradictionSearch(record: Record<string, unknown>): ContradictionSearch | null {
+  const decisionBasis = recordValue(record.decision_basis);
+  const search = decisionBasis ? recordValue(decisionBasis.contradiction_search) : null;
+  if (!search) return null;
+  const performed = typeof search.performed === "boolean" ? search.performed : null;
+  const summary = fieldValue(search, "summary");
+  const evidenceIds = stringValues(search.evidence);
+  if (performed === null && !summary && evidenceIds.length === 0) return null;
+  return { performed, summary, evidenceIds };
+}
+
 interface EvidenceGroups {
   supporting: EvidenceWithSources[];
   boundary: EvidenceWithSources[];
@@ -566,6 +625,148 @@ function ContributionOccurrenceSummary({ evidence }: { evidence: EvidenceWithSou
   );
 }
 
+/**
+ * PI-02D compact EVD- reference row — reuses the existing `TypedLinkButton`
+ * record-navigation behaviour, but never the full `EvidenceCard` (that stays
+ * exclusive to the Evidência section, per scope). Omitted entirely when no
+ * referenced ID resolves to an already-loaded evidence detail; an ID that
+ * cannot be resolved is silently skipped rather than shown as broken.
+ */
+function OpenQuestionEvidenceRefs({
+  evidenceIds,
+  evidenceById,
+  onOpenGeneric,
+}: {
+  evidenceIds: string[];
+  evidenceById: Map<string, RecordDetail>;
+  onOpenGeneric: (id: string) => void;
+}) {
+  const details = evidenceIds.map((id) => evidenceById.get(id)).filter((detail): detail is RecordDetail => detail !== undefined);
+  if (details.length === 0) return null;
+
+  return (
+    <div className="open-question-evidence-refs">
+      <span className="open-question-evidence-refs-label">Evidência relacionada:</span>
+      <ul className="open-question-evidence-refs-list">
+        {details.map((detail) => (
+          <li key={detail.id}>
+            <TypedLinkButton detail={detail} onOpenGeneric={onOpenGeneric} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** PI-02D one `investigation.open_questions[]` item — every field but `question` is conditional. */
+function OpenQuestionItem({
+  item,
+  evidenceById,
+  onOpenGeneric,
+}: {
+  item: OpenQuestion;
+  evidenceById: Map<string, RecordDetail>;
+  onOpenGeneric: (id: string) => void;
+}) {
+  return (
+    <li className="open-question-item">
+      <p className="open-question-question">{item.question}</p>
+      {item.whyOpen && (
+        <div className="problem-current-state-item">
+          <h4>Porque continua em aberto</h4>
+          <p>{item.whyOpen}</p>
+        </div>
+      )}
+      {item.currentAction && (
+        <div className="problem-current-state-item">
+          <h4>O que estamos a fazer</h4>
+          <p>{item.currentAction}</p>
+        </div>
+      )}
+      {item.latestResult && (
+        <div className="problem-current-state-item">
+          <h4>O que aprendemos mais recentemente</h4>
+          <p>{item.latestResult}</p>
+        </div>
+      )}
+      {item.resolutionCondition && (
+        <div className="problem-current-state-item">
+          <h4>O que permitiria esclarecer</h4>
+          <p>{item.resolutionCondition}</p>
+        </div>
+      )}
+      <OpenQuestionEvidenceRefs evidenceIds={item.evidenceIds} evidenceById={evidenceById} onOpenGeneric={onOpenGeneric} />
+    </li>
+  );
+}
+
+/** PI-02D "Procura de evidência contraditória" — authored status/summary only, never interpreted. */
+function ContradictionSearchItem({
+  search,
+  evidenceById,
+  onOpenGeneric,
+}: {
+  search: ContradictionSearch;
+  evidenceById: Map<string, RecordDetail>;
+  onOpenGeneric: (id: string) => void;
+}) {
+  return (
+    <li className="open-question-item">
+      <p className="open-question-question">Procura de evidência contraditória</p>
+      {search.performed !== null && (
+        <div className="problem-current-state-item">
+          <h4>Estado</h4>
+          <p>{search.performed ? "Realizada" : "Não realizada"}</p>
+        </div>
+      )}
+      {search.summary && (
+        <div className="problem-current-state-item">
+          <h4>Resumo</h4>
+          <p>{search.summary}</p>
+        </div>
+      )}
+      <OpenQuestionEvidenceRefs evidenceIds={search.evidenceIds} evidenceById={evidenceById} onOpenGeneric={onOpenGeneric} />
+    </li>
+  );
+}
+
+/**
+ * PI-02D "O que ainda não sabemos — e o que estamos a fazer": renders
+ * `investigation.open_questions[]` independently, each item optional-field by
+ * optional-field, plus `decision_basis.contradiction_search` as a final,
+ * separately labelled item. Omitted entirely when neither exists; no
+ * synthesis or fallback text is added when a problem has no active action or
+ * latest result.
+ */
+function ProblemOpenQuestionsSection({
+  record,
+  evidence,
+  onOpenGeneric,
+}: {
+  record: Record<string, unknown>;
+  evidence: EvidenceWithSources[];
+  onOpenGeneric: (id: string) => void;
+}) {
+  const questions = openQuestions(record);
+  const search = contradictionSearch(record);
+
+  if (questions.length === 0 && !search) return null;
+
+  const evidenceById = new Map(evidence.map((item) => [item.detail.id, item.detail]));
+
+  return (
+    <section id="problem-questoes-abertas" aria-label="O que ainda não sabemos — e o que estamos a fazer" className="problem-section">
+      <h3 className="detail-panel-label">O que ainda não sabemos — e o que estamos a fazer</h3>
+      <ul className="open-question-list">
+        {questions.map((item, index) => (
+          <OpenQuestionItem key={index} item={item} evidenceById={evidenceById} onOpenGeneric={onOpenGeneric} />
+        ))}
+        {search && <ContradictionSearchItem search={search} evidenceById={evidenceById} onOpenGeneric={onOpenGeneric} />}
+      </ul>
+    </section>
+  );
+}
+
 interface ProblemContentProps {
   dataProvider: DataProvider;
   lookup: Map<string, RecordSummary>;
@@ -635,6 +836,8 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
           <ProblemCurrentStateSection record={record} />
 
           <ProblemSupportSection record={record} />
+
+          <ProblemOpenQuestionsSection record={record} evidence={evidence} onOpenGeneric={onOpenGeneric} />
 
           <section id="problem-evidencia" aria-label="Evidência" className="problem-section">
             <h3 className="detail-panel-label">Registos de evidência associados ({formatPublicCount(evidence.length)})</h3>

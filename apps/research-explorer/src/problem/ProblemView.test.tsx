@@ -716,6 +716,239 @@ describe("ProblemView — PI-02C support section + evidence grouping", () => {
   });
 });
 
+describe("ProblemView — PI-02D open questions + contradiction search", () => {
+  const OQ_INDEX: RecordSummary[] = [
+    { id: "PRB-0400", type: "PRB-", label: "Open questions fixture", file: "research/problems/PRB-0400.yaml", summaryFields: {} },
+    { id: "EVD-0401", type: "EVD-", label: "Referenced evidence one", file: "research/evidence/EVD-0401.yaml", summaryFields: {} },
+    { id: "EVD-0402", type: "EVD-", label: "Referenced evidence two", file: "research/evidence/EVD-0402.yaml", summaryFields: {} },
+  ];
+
+  function oqEvidenceDetail(id: string): RecordDetail {
+    return {
+      id,
+      type: "EVD-",
+      file: `research/evidence/${id}.yaml`,
+      record: { evidence_id: id, type: "institutional", observation: { summary: `${id} observation.` } },
+      outgoingEdges: [],
+      incomingEdges: [{ field: "evidence", ordinal: 0, from: "PRB-0400" }],
+    };
+  }
+
+  function oqProvider(record: Record<string, unknown>, evidenceIds: string[]): DataProvider {
+    const problemDetail: RecordDetail = {
+      id: "PRB-0400",
+      type: "PRB-",
+      file: "research/problems/PRB-0400.yaml",
+      record,
+      outgoingEdges: evidenceIds.map((id, ordinal) => ({ field: "evidence", ordinal, to: id })),
+      incomingEdges: [],
+    };
+    const evidenceDetails: Record<string, RecordDetail> = {
+      "EVD-0401": oqEvidenceDetail("EVD-0401"),
+      "EVD-0402": oqEvidenceDetail("EVD-0402"),
+    };
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(OQ_INDEX),
+      getRecord: (id: string) => {
+        if (id === "PRB-0400") return Promise.resolve(problemDetail);
+        const detail = evidenceDetails[id];
+        return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
+      },
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  it("omits the entire section when there are no open questions and no authored contradiction_search", async () => {
+    render(
+      <ProblemView
+        dataProvider={oqProvider({ title: "No open questions", status: "OPEN" }, [])}
+        problemId="PRB-0400"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "No open questions" });
+    expect(screen.queryByLabelText("O que ainda não sabemos — e o que estamos a fazer")).toBeNull();
+  });
+
+  it("renders every open_questions[] field under its PT-PT label, omitting optional fields individually when absent", async () => {
+    render(
+      <ProblemView
+        dataProvider={oqProvider(
+          {
+            title: "Open questions fixture",
+            status: "OPEN",
+            evidence: ["EVD-0401"],
+            investigation: {
+              open_questions: [
+                {
+                  question: "Does the gap cause a material failure?",
+                  why_open: "No direct evidence exists yet.",
+                  current_action: "Field validation is underway.",
+                  latest_result: "A partial result was found.",
+                  resolution_condition: "Direct affected-journey evidence would resolve this.",
+                  evidence: ["EVD-0401"],
+                },
+                {
+                  question: "Second question with only why_open authored.",
+                  why_open: "Only this field is authored for this item.",
+                },
+              ],
+            },
+          },
+          ["EVD-0401"]
+        )}
+        problemId="PRB-0400"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Open questions fixture" });
+    const section = screen.getByLabelText("O que ainda não sabemos — e o que estamos a fazer");
+
+    expect(within(section).getByText("Does the gap cause a material failure?")).toBeTruthy();
+    expect(within(section).getAllByText("Porque continua em aberto").length).toBe(2);
+    expect(within(section).getByText("No direct evidence exists yet.")).toBeTruthy();
+    expect(within(section).getByText("O que estamos a fazer")).toBeTruthy();
+    expect(within(section).getByText("Field validation is underway.")).toBeTruthy();
+    expect(within(section).getByText("O que aprendemos mais recentemente")).toBeTruthy();
+    expect(within(section).getByText("A partial result was found.")).toBeTruthy();
+    expect(within(section).getByText("O que permitiria esclarecer")).toBeTruthy();
+    expect(within(section).getByText("Direct affected-journey evidence would resolve this.")).toBeTruthy();
+
+    // Second item renders independently and only shows the one field it authored.
+    expect(within(section).getByText("Second question with only why_open authored.")).toBeTruthy();
+    expect(within(section).getByText("Only this field is authored for this item.")).toBeTruthy();
+    // "O que estamos a fazer" heading appears only once (for item 1), not fabricated for item 2.
+    expect(within(section).getAllByText("O que estamos a fazer").length).toBe(1);
+  });
+
+  it("shows compact EVD- references for open_questions[].evidence via existing record navigation, without duplicating the full EvidenceCard", async () => {
+    const onOpenGeneric = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <ProblemView
+        dataProvider={oqProvider(
+          {
+            title: "Open questions fixture",
+            status: "OPEN",
+            evidence: ["EVD-0401"],
+            investigation: {
+              open_questions: [{ question: "Question with evidence.", evidence: ["EVD-0401"] }],
+            },
+          },
+          ["EVD-0401"]
+        )}
+        problemId="PRB-0400"
+        onOpenGeneric={onOpenGeneric}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Open questions fixture" });
+    const section = screen.getByLabelText("O que ainda não sabemos — e o que estamos a fazer");
+    const refButton = within(section).getByRole("button", { name: /EVD-0401/ });
+    // The compact reference must not carry the full EvidenceCard's observation text.
+    expect(within(section).queryByText("EVD-0401 observation.")).toBeNull();
+
+    await user.click(refButton);
+    expect(onOpenGeneric).toHaveBeenCalledWith("EVD-0401");
+  });
+
+  it("omits the evidence-reference row entirely when open_questions[].evidence is empty", async () => {
+    render(
+      <ProblemView
+        dataProvider={oqProvider(
+          {
+            title: "Open questions fixture",
+            status: "OPEN",
+            investigation: { open_questions: [{ question: "Question without evidence." }] },
+          },
+          []
+        )}
+        problemId="PRB-0400"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Open questions fixture" });
+    const section = screen.getByLabelText("O que ainda não sabemos — e o que estamos a fazer");
+    expect(within(section).queryByText("Evidência relacionada:")).toBeNull();
+  });
+
+  it("renders decision_basis.contradiction_search as a separate labelled item, stating authored status/summary without interpreting performed:false as a negative finding", async () => {
+    render(
+      <ProblemView
+        dataProvider={oqProvider(
+          {
+            title: "Contradiction search fixture",
+            status: "OPEN",
+            decision_basis: {
+              contradiction_search: {
+                performed: false,
+                summary: "No deliberate contradiction search has been carried out yet.",
+              },
+            },
+          },
+          []
+        )}
+        problemId="PRB-0400"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Contradiction search fixture" });
+    const section = screen.getByLabelText("O que ainda não sabemos — e o que estamos a fazer");
+    expect(within(section).getByText("Procura de evidência contraditória")).toBeTruthy();
+    expect(within(section).getByText("Não realizada")).toBeTruthy();
+    expect(within(section).getByText("No deliberate contradiction search has been carried out yet.")).toBeTruthy();
+    // No negative/derived language beyond the authored summary itself.
+    expect(within(section).queryByText(/nenhuma evidência contraditória foi encontrada/i)).toBeNull();
+  });
+
+  it("renders contradiction_search evidence references and keeps the section present even with zero open_questions", async () => {
+    render(
+      <ProblemView
+        dataProvider={oqProvider(
+          {
+            title: "Contradiction search fixture",
+            status: "OPEN",
+            evidence: ["EVD-0402"],
+            decision_basis: {
+              contradiction_search: { performed: true, summary: "A deliberate search was performed.", evidence: ["EVD-0402"] },
+            },
+          },
+          ["EVD-0402"]
+        )}
+        problemId="PRB-0400"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Contradiction search fixture" });
+    const section = screen.getByLabelText("O que ainda não sabemos — e o que estamos a fazer");
+    expect(within(section).getByText("Realizada")).toBeTruthy();
+    expect(within(section).getByRole("button", { name: /EVD-0402/ })).toBeTruthy();
+  });
+});
+
 const GENERATED_DIR = path.resolve(__dirname, "..", "..", "generated");
 const hasRealCorpus = fs.existsSync(path.join(GENERATED_DIR, "index.json"));
 
@@ -733,7 +966,8 @@ describe.skipIf(!hasRealCorpus)("ProblemView — real generated corpus regressio
   it("keeps EVD-000127's explicit CONTRADICTS contribution, observation, and source visible for PRB-0006", async () => {
     render(<ProblemView dataProvider={realCorpusProvider()} problemId="PRB-0006" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
-    const evidenceButton = await screen.findByRole("button", { name: /EVD-000127/ });
+    const evidenceSection = await screen.findByLabelText("Evidência");
+    const evidenceButton = await within(evidenceSection).findByRole("button", { name: /EVD-000127/ });
     const evidenceItem = evidenceButton.closest("li")!;
     expect(within(evidenceItem).getByText("Contradiz")).toBeTruthy();
     expect(within(evidenceItem).getByText("Os SASUE consideram plenamente operacional o atual processo de candidatura a alojamento em residência. Referem que as necessidades de esclarecimento ou de alteração do processo que envolvam estudantes ou pessoal institucional são encaminhadas para os serviços de informática da Universidade, para que seja prestado o apoio ou efetuada a alteração adequada.")).toBeTruthy();
