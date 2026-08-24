@@ -5,7 +5,7 @@ import { MIN_DEPTH, clampDepth, type GraphDepth } from "./graph/neighbourhood";
  * Pure URL <-> application-state mapping (RE-02C). Native URLSearchParams
  * only — no React Router: two views and four flat query params don't need
  * path matching/nested routing, and this keeps the base-path portability
- * (ADR-001 D9 follow-on) trivial since nothing here assumes a route prefix.
+ * (docs/explorerarchitecture.md) trivial since nothing here assumes a route prefix.
  *
  * Record-ID safety note: `selectedId` parsed here is NOT validated against
  * the generated index — it is handed to the existing DataProvider path
@@ -24,7 +24,7 @@ export interface ExplorerUrlState {
   selectedId: string | null;
   query: string;
   typeFilter: string;
-  /** RE-04: hops around the focused record shown in the Graph view (ADR-001 D7). Irrelevant to every other view. */
+  /** RE-04: hops around the focused record shown in the Graph view. Irrelevant to every other view. */
   graphDepth: GraphDepth;
 }
 
@@ -41,9 +41,9 @@ function isExplorerView(value: string | null): value is ExplorerView {
 }
 
 /**
- * UX-F: Graph is temporarily unavailable to public users (not removed — see
- * docs/design/research-explorer/visual-implementation-contract.md and the
- * UX-F work unit). A direct/bookmarked Graph URL must not render Graph, so
+ * Graph is temporarily unavailable to public users (not removed — see
+ * docs/explorerarchitecture.md §3, Graph capability). A direct/bookmarked
+ * Graph URL must not render Graph, so
  * `view=graph` is normalized away here — the one place both initial load and
  * popstate (browser Back/Forward, via useExplorerUrlState) already funnel
  * through — rather than patched separately in every caller. A PRB-shaped

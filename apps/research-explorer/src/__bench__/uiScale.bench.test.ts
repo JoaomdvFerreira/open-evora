@@ -112,7 +112,7 @@ describe.skipIf(!scale)("RE-05 scale benchmark", () => {
 
     // --- Graph: full-corpus model construction (stress observation) + a
     // neighbourhood-first 1-hop/2-hop query from the hub PRB (the supported,
-    // primary Graph workflow per ADR-001 D7). --------------------------------
+    // primary Graph workflow). --------------------------------
     const graphBuildMs = timeIt(() => buildGraphModel(records, edges), 3);
     const graph = buildGraphModel(records, edges);
 

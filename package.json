@@ -2,7 +2,7 @@
   "name": "open-evora",
   "private": true,
   "version": "0.0.0",
-  "description": "Root developer commands only. The repository itself stays dependency-free (tools/*.js, research/); the Research Explorer app (apps/research-explorer/) owns its own dependencies. See apps/research-explorer/README.md.",
+  "description": "Root developer commands only. The repository itself stays dependency-free (tools/*.js, research/); the Research Explorer app (apps/research-explorer/) owns its own dependencies.",
   "engines": {
     "node": "24.x"
   },

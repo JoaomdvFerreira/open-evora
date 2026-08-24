@@ -9,7 +9,6 @@ const INDEX: RecordSummary[] = [
   { id: "EVD-0001", type: "EVD-", label: "Evidence one", file: "research/evidence/EVD-0001.yaml", summaryFields: {} },
   { id: "EVD-0002", type: "EVD-", label: "Evidence two (linked only via analysis.related_problems)", file: "research/evidence/EVD-0002.yaml", summaryFields: {} },
   { id: "SRC-0001", type: "SRC-", label: "Source one", file: "research/sources/SRC-0001.yaml", summaryFields: {} },
-  { id: "HYP-0001", type: "HYP-", label: "Hypothesis one", file: "research/hypotheses/HYP-0001.yaml", summaryFields: {} },
 ];
 
 const DETAILS: Record<string, RecordDetail> = {
@@ -21,7 +20,6 @@ const DETAILS: Record<string, RecordDetail> = {
     outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-0001" }],
     incomingEdges: [
       { field: "problem", ordinal: null, from: "ASM-0005" },
-      { field: "problem", ordinal: null, from: "HYP-0001" },
       { field: "analysis.related_problems", ordinal: 0, from: "EVD-0002" },
     ],
   },
@@ -30,14 +28,6 @@ const DETAILS: Record<string, RecordDetail> = {
     type: "ASM-",
     file: "research/assessments/ASM-0005.yaml",
     record: { assessment_id: "ASM-0005", problem: "PRB-0005", triage: "DEEPEN" },
-    outgoingEdges: [{ field: "problem", ordinal: null, to: "PRB-0005" }],
-    incomingEdges: [],
-  },
-  "HYP-0001": {
-    id: "HYP-0001",
-    type: "HYP-",
-    file: "research/hypotheses/HYP-0001.yaml",
-    record: { hypothesis_id: "HYP-0001", problem: "PRB-0005" },
     outgoingEdges: [{ field: "problem", ordinal: null, to: "PRB-0005" }],
     incomingEdges: [],
   },
@@ -80,13 +70,12 @@ function fakeProvider(): DataProvider {
 }
 
 describe("loadProblemProjection", () => {
-  it("assembles the problem, its assessment, evidence (both directions), sources, and hypotheses", async () => {
+  it("assembles the problem, its assessment, evidence (both directions), and sources", async () => {
     const lookup = buildRecordLookup(INDEX);
     const projection = await loadProblemProjection(fakeProvider(), lookup, "PRB-0005");
 
     expect(projection.problem.id).toBe("PRB-0005");
     expect(projection.assessments.map((a) => a.id)).toEqual(["ASM-0005"]);
-    expect(projection.hypotheses.map((h) => h.id)).toEqual(["HYP-0001"]);
 
     // Evidence linked via PRB's own outgoing "evidence" AND via EVD's incoming
     // "analysis.related_problems" are both included, deduplicated.
@@ -106,11 +95,11 @@ describe("loadProblemProjection", () => {
 
     await loadProblemProjection(provider, lookup, "PRB-0005");
 
-    // 1 (problem) + 1 (assessment) + 1 (hypothesis) + 2 (evidence) + 1 (source) = 6
-    expect(getRecordSpy).toHaveBeenCalledTimes(6);
+    // 1 (problem) + 1 (assessment) + 2 (evidence) + 1 (source) = 5
+    expect(getRecordSpy).toHaveBeenCalledTimes(5);
   });
 
-  it("handles a problem with no assessments, hypotheses, or evidence gracefully", async () => {
+  it("handles a problem with no assessments or evidence gracefully", async () => {
     const soloIndex: RecordSummary[] = [
       { id: "PRB-9001", type: "PRB-", label: "Solo problem", file: "research/problems/PRB-9001.yaml", summaryFields: {} },
     ];
@@ -131,7 +120,6 @@ describe("loadProblemProjection", () => {
 
     const projection = await loadProblemProjection(provider, buildRecordLookup(soloIndex), "PRB-9001");
     expect(projection.assessments).toEqual([]);
-    expect(projection.hypotheses).toEqual([]);
     expect(projection.evidence).toEqual([]);
   });
 });

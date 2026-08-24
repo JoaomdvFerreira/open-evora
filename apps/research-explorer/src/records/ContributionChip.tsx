@@ -1,13 +1,10 @@
 /**
  * Presentation-only chip for one `analysis.contribution` value (Evidência's
  * canonical closed vocabulary, `research/schemas/evidence.schema.json`).
- * Structurally identical for every value — including CONTRADICTS — per
- * Owner Validation's binding reversal of an earlier exceptional emphasis
- * (docs/design/research-explorer-prototype/prototype-rationale.md, "Owner
- * Validation revisions" item 2): no per-value border weight, colour, or
- * background. The glyph is a purely decorative, non-semantic accompaniment
- * (docs/design/research-explorer-design-foundations.md §6) — the canonical
- * text label is what actually carries the distinction. Rendering never
+ * Structurally identical for every value — including CONTRADICTS — by
+ * design: no per-value border weight, colour, or background. The glyph is
+ * a purely decorative, non-semantic accompaniment — the canonical text
+ * label is what actually carries the distinction. Rendering never
  * depends on recognising the value: an unrecognised future value still
  * renders its own text, with no glyph and no crash.
  */

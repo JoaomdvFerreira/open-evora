@@ -1,6 +1,6 @@
 /**
- * Optional, presentation-only glossary of the current five canonical record
- * types (docs/models/*-model.md) — a specialised enhancement layered on top
+ * Optional, presentation-only glossary of the current four canonical record
+ * types (docs/datamodel.md) — a specialised enhancement layered on top
  * of the generic Explorer, never a structural dependency. Every generic
  * mechanism (node discovery, edge discovery, search, detail rendering)
  * already works for any schema-conforming type with no glossary entry;
@@ -11,7 +11,7 @@
 export interface TypeDescriptor {
   /** Short Portuguese label shown inline, e.g. "[Evidência]". */
   label: string;
-  /** One-sentence explanation, paraphrasing docs/models/*-model.md's own "Purpose" section. */
+  /** One-sentence explanation, paraphrasing docs/datamodel.md's own record semantics. */
   description: string;
 }
 
@@ -32,10 +32,6 @@ const KNOWN_TYPES: Record<string, TypeDescriptor> = {
     label: "Avaliação",
     description:
       "Regista o que o projeto sabe e não sabe atualmente sobre um Problema, e encaminha-o para uma decisão (STOP/WATCH/DEEPEN/PROCEED).",
-  },
-  "HYP-": {
-    label: "Hipótese",
-    description: "Descreve uma possível intervenção em separado do Problema, para não condicionar a investigação com a primeira solução proposta.",
   },
 };
 

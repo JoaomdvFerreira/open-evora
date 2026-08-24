@@ -2,12 +2,11 @@ import { describe, expect, it } from "vitest";
 import { describeType, formatTypedId, knownTypePrefixes } from "./typeGlossary";
 
 describe("describeType", () => {
-  it("describes each of the five current canonical types", () => {
+  it("describes each of the four current canonical types", () => {
     expect(describeType("SRC-").label).toBe("Fonte");
     expect(describeType("EVD-").label).toBe("Evidência");
     expect(describeType("PRB-").label).toBe("Problema");
     expect(describeType("ASM-").label).toBe("Avaliação");
-    expect(describeType("HYP-").label).toBe("Hipótese");
   });
 
   it("degrades gracefully for an unknown future type rather than omitting a label", () => {
@@ -28,7 +27,7 @@ describe("formatTypedId", () => {
 });
 
 describe("knownTypePrefixes", () => {
-  it("lists exactly the five current canonical prefixes", () => {
-    expect(knownTypePrefixes().sort()).toEqual(["ASM-", "EVD-", "HYP-", "PRB-", "SRC-"]);
+  it("lists exactly the four current canonical prefixes", () => {
+    expect(knownTypePrefixes().sort()).toEqual(["ASM-", "EVD-", "PRB-", "SRC-"]);
   });
 });

@@ -2,7 +2,7 @@
   "prefix": "SRC-",
   "directory": "sources",
   "idField": "source_id",
-  "sourceModel": "docs/models/data-source-model.md",
+  "sourceModel": "docs/datamodel.md",
   "optionalFields": [
     "canonical_reference"
   ],

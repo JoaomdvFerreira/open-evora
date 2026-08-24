@@ -1,7 +1,7 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 
-// Static deployment portability (ADR-001 D9 follow-on): `base` defaults to
+// Static deployment portability (docs/explorerarchitecture.md): `base` defaults to
 // "/" but can be overridden at build time (e.g. `VITE_BASE_PATH=/open-evora/
 // npm run build`) for a future sub-path deployment such as GitHub Pages,
 // without any application code change — see src/dataProvider/StaticDataProvider.ts,

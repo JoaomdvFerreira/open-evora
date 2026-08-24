@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Minimal, zero-dependency validator for research/{sources,evidence,problems,hypotheses,
+ * Minimal, zero-dependency validator for research/{sources,evidence,problems,
  * assessments} records. Parses a small YAML subset (nested maps, scalars, block/inline
  * lists of scalars) sufficient for the schemas in research/schemas/*.schema.json.
  *

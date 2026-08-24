@@ -30,7 +30,7 @@ const {
 } = require("./evaluate-research-decisions.js");
 
 const REAL_SCHEMAS_DIR = path.resolve(__dirname, "..", "research", "schemas");
-const DIRS = ["sources", "evidence", "problems", "hypotheses", "assessments", "schemas"];
+const DIRS = ["sources", "evidence", "problems", "assessments", "schemas"];
 
 function makeFixtureRoot() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "evora-ipe02-"));

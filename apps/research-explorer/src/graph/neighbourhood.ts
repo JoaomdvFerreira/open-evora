@@ -1,6 +1,6 @@
 import type { ResearchGraph } from "./buildGraphModel";
 
-/** ADR-001 D7: neighbourhood mode defaults to selected node ± 1–2 hops, never the full graph. */
+/** Neighbourhood mode defaults to selected node ± 1–2 hops, never the full graph. */
 export const MIN_DEPTH = 1;
 export const MAX_DEPTH = 2;
 export type GraphDepth = 1 | 2;

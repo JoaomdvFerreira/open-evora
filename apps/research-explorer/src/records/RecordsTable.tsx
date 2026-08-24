@@ -46,7 +46,7 @@ function DesktopRecordsList({ records, selectedId, onSelect }: { records: Record
 
 /**
  * The generic Records table: universal ID/Type/Label/Ficheiro columns only —
- * no SRC-/EVD-/PRB-/ASM-/HYP- specific columns (see columns.ts) — search,
+ * no SRC-/EVD-/PRB-/ASM- specific columns (see columns.ts) — search,
  * type filter, client-side sort/paginate via TanStack Table's own row
  * models. `query`/`typeFilter` are controlled by the caller (URL-synced,
  * RE-02C); sorting/pagination remain locally owned here (recordsController).

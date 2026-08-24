@@ -11,7 +11,7 @@ interface ReadingGuideProps {
  * record-type prefixes, relationship direction (Entradas/Saídas), and
  * canonical reference-path notation, and states explicitly that a reference
  * never implies support/contradiction/causality unless canonical data
- * encodes that meaning itself (ADR-001 D4 / development contract #8).
+ * encodes that meaning itself (see AGENTS.md's evidence-integrity safeguard).
  *
  * The type list is data-driven (schemaPrefixes, typically manifest.schemaPrefixes)
  * rather than hardcoded to the current five types, so an unknown future type

@@ -1,7 +1,6 @@
 /**
- * Types mirroring the RE-01 generated read model
- * (docs/architecture/research-explorer-read-model-spec.md). Kept intentionally
- * generic — no SRC-/EVD-/PRB-/ASM-/HYP- specific fields — because the read
+ * Types mirroring the generated read model (docs/explorerarchitecture.md).
+ * Kept intentionally generic — no SRC-/EVD-/PRB-/ASM- specific fields — because the read
  * model itself is schema-driven and must represent future record types
  * without a shape change here.
  */
@@ -33,9 +32,9 @@ export interface RecordEdgeRef {
 }
 
 /**
- * One resolved reference from edges.json (docs/architecture/research-explorer-read-model-spec.md)
+ * One resolved reference from edges.json (docs/explorerarchitecture.md)
  * — "record `from` references record `to` via schema field `field`", nothing
- * more (ADR-001 D4). Consumed by the Graph view (RE-04) only; never loaded
+ * more. Consumed by the Graph view only; never loaded
  * during application startup or by the Records/Problem views.
  */
 export interface RecordEdge {
@@ -64,7 +63,7 @@ export interface RecordDetail {
  * StaticDataProvider without any UI component changing its data-access code.
  *
  * Only the methods RE-02A needs (or RE-02B is already known to need) are
- * declared here — no graph-specific methods yet (ADR-001 D4/D6).
+ * declared here — no graph-specific methods yet.
  */
 export interface DataProvider {
   getManifest(): Promise<ReadModelManifest>;

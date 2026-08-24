@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * IPE-02 — deterministic decision verifier
- * (docs/discovery/investigation-promotion-engine.md).
+ * Deterministic decision verifier for PRB Eligibility/Corroboration
+ * readiness (docs/investigationstrategy.md §6, Decision basis and
+ * Eligibility).
  *
  * Evaluates the explicitly authored PRB.decision_basis and returns structured,
  * deterministic results for two independent questions:
@@ -13,7 +14,7 @@
  * internally consistent — never whether the problem is real, whether evidence is
  * sufficient, whether sources are independent, causality, prevalence, civic importance,
  * or whether promotion/corroboration should be approved. Those remain human judgement
- * recorded in PRB-* / ASM-* (see docs/discovery/investigation-promotion-engine.md §4.4).
+ * recorded in PRB-* / ASM-* (see docs/investigationstrategy.md §7, Corroboration and validation).
  *
  * Every PRB is evaluated the same way regardless of its current validation_status/
  * evidence_status: a PRB with no decision_basis is always REVIEW_REQUIRED /
@@ -93,8 +94,7 @@ function asList(v) {
  * Evidence is "linked to the target PRB" when its ID appears in that PRB's own
  * `evidence` list — the one existing, already-validated PRB<->EVD link. This does not
  * rely on EVD.analysis.related_problems, which stays optional/lazily-populated
- * (docs/discovery/d3-execution-protocol.md §4) and so cannot be relied on as a
- * completeness signal.
+ * and so cannot be relied on as a completeness signal.
  */
 function checkEvidenceRefs(fieldPath, evdIds, corpus, prbId, unknownCode, unlinkedCode, findings) {
   const prbEvidence = new Set(asList(corpus.problemsById.get(prbId).record.evidence));
@@ -264,8 +264,7 @@ function evaluateEligibility(prbId, corpus) {
 }
 
 /**
- * scope.bounded is an explicit human-authored boolean (IPE-02 contract clarification,
- * docs/discovery/investigation-promotion-engine.md §10) — never inferred from the
+ * scope.bounded is an explicit human-authored boolean — never inferred from the
  * wording of geography/population/temporal, from boundary_evidence, or from
  * contradiction_search. Its absence is itself REVIEW_REQUIRED (not a default-false
  * reading); when bounded is explicitly true, limitations must be authored. This gates
@@ -320,9 +319,8 @@ function checkContradictionEvidenceConsistency(contradictionSearch, corpus, prbI
 
 /**
  * Both Eligibility and Corroboration require at least one ASM-* record on file that
- * references the target PRB (docs/discovery/investigation-promotion-engine.md §4.6;
- * docs/models/assessment-model.md — "One active ASM-* is intended per canonical active
- * PRB-*"). This runs unconditionally for every evaluated PRB, regardless of its
+ * references the target PRB (see docs/datamodel.md's Assessment (ASM-*) section).
+ * This runs unconditionally for every evaluated PRB, regardless of its
  * validation_status/evidence_status — it is a structural-existence check only. It does
  * not require the ASM's assessment_status, triage, or any decision_gates value — those
  * remain human judgement.
@@ -461,9 +459,9 @@ function evaluateCorroboration(prbId, corpus) {
  * checks only that lineage data is structurally inspectable for the cited supporting
  * evidence: every valid, PRB-linked supporting_evidence ID must resolve to an EVD-* record
  * that exists (already true by this point) and, when it carries an analysis block, that
- * analysis.lineage_id is either absent (UNASSESSED — explicitly allowed,
- * docs/discovery/d3-execution-protocol.md §4.2) or a non-empty string — never a
- * malformed/empty-string placeholder that would silently break lineage-based counting.
+ * analysis.lineage_id is either absent (UNASSESSED — explicitly allowed) or a
+ * non-empty string — never a malformed/empty-string placeholder that would
+ * silently break lineage-based counting.
  * This never infers or asserts independence itself.
  */
 function checkLineageStructurallyAvailable(supportingEvidenceIds, corpus, findings) {

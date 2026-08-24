@@ -3,8 +3,8 @@
  * RE-05 synthetic scale-corpus generator.
  *
  * Produces a deterministic, disposable research-tree fixture (schemas/ +
- * sources/evidence/problems/assessments/hypotheses/notes YAML) shaped like
- * the real corpus's structural patterns (SRC/EVD/PRB/ASM/HYP proportions,
+ * sources/evidence/problems/assessments/notes YAML) shaped like
+ * the real corpus's structural patterns (SRC/EVD/PRB/ASM proportions,
  * shared-source hub nodes, high-degree problems, list/reference fields, one
  * schema-conforming future/unknown type: NOTE-) so the real adapter code
  * path (tools/validate-research.js + read-model.js) can be exercised at
@@ -72,18 +72,17 @@ function toYaml(record) {
 }
 
 // --- scale-proportional counts, matching the real corpus's SRC/EVD-heavy,
-// PRB/ASM-light shape (roughly 40/50/4.5/4.5/0 in the real 223-record
-// corpus), plus a small HYP and NOTE (future-type) slice the real corpus
-// doesn't yet exercise. ------------------------------------------------------
+// PRB/ASM-light shape (roughly 40/50/4.5/4.5 in the real 223-record
+// corpus), plus a small NOTE (future-type) slice the real corpus doesn't yet
+// exercise. ------------------------------------------------------
 function computeCounts(scale) {
   const prb = Math.max(5, Math.round(scale * 0.04));
   const asm = Math.max(3, Math.round(prb * 0.9));
-  const hyp = Math.max(2, Math.round(prb * 0.4));
   const note = Math.max(3, Math.round(scale * 0.012));
   const src = Math.max(10, Math.round(scale * 0.34));
-  const evd = scale - prb - asm - hyp - note - src;
+  const evd = scale - prb - asm - note - src;
   if (evd <= 0) throw new Error(`Scale ${scale} too small for proportional generation`);
-  return { src, evd, prb, asm, hyp, note };
+  return { src, evd, prb, asm, note };
 }
 
 const DOMAINS = ["MOB", "ACC", "SOC", "HOU", "HEA", "EMP", "ECO", "EDU"];
@@ -109,7 +108,6 @@ const GATE = ["PASS", "PARTIAL", "FAIL", "UNKNOWN", "NOT_ASSESSED"];
 const STRUCT_ACTION = ["KEEP", "SPLIT_CANDIDATE", "MERGE_CANDIDATE"];
 const TRIAGE = ["STOP", "WATCH", "DEEPEN", "PROCEED"];
 const CU_IMPACT = ["HIGH", "MEDIUM", "LOW"];
-const HYP_STATUS = ["untested", "testing", "supported", "rejected"];
 
 function pick(rng, arr) {
   return arr[Math.floor(rng() * arr.length)];
@@ -128,13 +126,12 @@ function pickN(rng, arr, n) {
 
 function generate(scale, outDir) {
   const rng = mulberry32(0xe5f7a5 ^ scale);
-  const { src, evd, prb, asm, hyp, note } = computeCounts(scale);
+  const { src, evd, prb, asm, note } = computeCounts(scale);
 
   const srcIds = Array.from({ length: src }, (_, i) => `SRC-${pad(i + 1, 4)}`);
   const evdIds = Array.from({ length: evd }, (_, i) => `EVD-${pad(i + 1, 6)}`);
   const prbIds = Array.from({ length: prb }, (_, i) => `PRB-${pad(i + 1, 4)}`);
   const asmIds = Array.from({ length: asm }, (_, i) => `ASM-${pad(i + 1, 4)}`);
-  const hypIds = Array.from({ length: hyp }, (_, i) => `HYP-${pad(i + 1, 4)}`);
   const noteIds = Array.from({ length: note }, (_, i) => `NOTE-${pad(i + 1, 4)}`);
 
   // A small hub of high-degree SRC/PRB nodes, per RE-05's "some higher-degree
@@ -142,7 +139,7 @@ function generate(scale, outDir) {
   const hubSrc = srcIds.slice(0, Math.max(2, Math.ceil(src * 0.03)));
   const hubPrb = prbIds.slice(0, Math.max(1, Math.ceil(prb * 0.05)));
 
-  for (const dir of ["schemas", "sources", "evidence", "problems", "assessments", "hypotheses", "notes"]) {
+  for (const dir of ["schemas", "sources", "evidence", "problems", "assessments", "notes"]) {
     fs.mkdirSync(path.join(outDir, dir), { recursive: true });
   }
 
@@ -161,7 +158,7 @@ function generate(scale, outDir) {
         prefix: "NOTE-",
         directory: "notes",
         idField: "note_id",
-        sourceModel: "docs/models/note-model.md",
+        sourceModel: "docs/datamodel.md",
         notes: "RE-05 synthetic-only future/unknown schema-conforming type: proves generic node/edge discovery needs no adapter change for a type the adapter has never seen.",
         requiredFields: ["note_id", "title"],
         enums: {},
@@ -306,21 +303,6 @@ function generate(scale, outDir) {
     fs.writeFileSync(path.join(outDir, "assessments", `${id}.yaml`), toYaml(rec));
   }
 
-  // --- HYP --------------------------------------------------------------
-  for (let i = 0; i < hypIds.length; i++) {
-    const id = hypIds[i];
-    const problemId = prbIds[i % prbIds.length];
-    const rec = {
-      hypothesis_id: id,
-      problem: problemId,
-      hypothesis: `Synthetic hypothesis body for ${id}.`,
-      mechanism: `Synthetic causal mechanism for ${id}.`,
-      expected_outcome: `Synthetic expected outcome for ${id}.`,
-      validation: { status: pick(rng, HYP_STATUS) },
-    };
-    fs.writeFileSync(path.join(outDir, "hypotheses", `${id}.yaml`), toYaml(rec));
-  }
-
   // --- NOTE (schema-conforming future/unknown type) ------------------------
   for (let i = 0; i < noteIds.length; i++) {
     const id = noteIds[i];
@@ -330,7 +312,7 @@ function generate(scale, outDir) {
     fs.writeFileSync(path.join(outDir, "notes", `${id}.yaml`), toYaml(rec));
   }
 
-  return { src, evd, prb, asm, hyp, note, total: src + evd + prb + asm + hyp + note };
+  return { src, evd, prb, asm, note, total: src + evd + prb + asm + note };
 }
 
 function main() {

@@ -1,8 +1,7 @@
 /**
  * Runtime compatibility rule between this application build and a generated
- * read model's `readModelVersion` (docs/architecture/research-explorer-read-model-spec.md,
- * "readModelVersion versions this read-model contract... independent of any
- * canonical schema question").
+ * read model's `readModelVersion` — this versions the read-model contract,
+ * independent of any canonical schema question (see docs/explorerarchitecture.md).
  *
  * Rule: the read model's major version must exactly match
  * SUPPORTED_READ_MODEL_MAJOR. Minor/patch differences are accepted (additive,

@@ -25,7 +25,7 @@ const { run } = require("./build-data.js");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const REAL_SCHEMAS_DIR = path.join(REPO_ROOT, "research", "schemas");
-const STANDARD_DIRS = ["sources", "evidence", "problems", "hypotheses", "assessments", "schemas"];
+const STANDARD_DIRS = ["sources", "evidence", "problems", "assessments", "schemas"];
 
 // ---- fixture helpers --------------------------------------------------------
 
