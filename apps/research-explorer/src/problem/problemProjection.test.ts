@@ -86,6 +86,57 @@ describe("loadProblemProjection", () => {
     expect(getRecordSpy).toHaveBeenCalledTimes(4);
   });
 
+  it("carries the canonical PI-01 Problem fields through untransformed (causal_reading, investigation.*, solution_landscape_status)", async () => {
+    const piIndex: RecordSummary[] = [
+      { id: "PRB-0100", type: "PRB-", label: "PI-01 fixture", file: "research/problems/PRB-0100.yaml", summaryFields: {} },
+    ];
+    const piRecord = {
+      problem_id: "PRB-0100",
+      title: "PI-01 fixture",
+      causal_reading: "A bounded, unvalidated causal reading.",
+      investigation: {
+        open_questions: [{ question: "What remains unresolved?", evidence: ["EVD-0001"] }],
+        path: {
+          initial_signal: { summary: "First signal.", evidence: ["EVD-0001"] },
+          development: { summary: "How it developed.", evidence: [] },
+          delimitation: { summary: "How it was bounded.", evidence: [] },
+        },
+      },
+      solution_landscape_status: "assessed",
+    };
+    const piDetail: RecordDetail = {
+      id: "PRB-0100",
+      type: "PRB-",
+      file: "research/problems/PRB-0100.yaml",
+      record: piRecord,
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    const provider: DataProvider = {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(piIndex),
+      getRecord: () => Promise.resolve(piDetail),
+      getEdges: () => Promise.resolve([]),
+    };
+
+    const projection = await loadProblemProjection(provider, buildRecordLookup(piIndex), "PRB-0100");
+
+    // No semantic transformation: the projection is a pass-through — the
+    // exact canonical object identity/shape is preserved on `problem.record`.
+    expect(projection.problem.record).toEqual(piRecord);
+    expect((projection.problem.record as typeof piRecord).causal_reading).toBe("A bounded, unvalidated causal reading.");
+    expect((projection.problem.record as typeof piRecord).investigation.open_questions[0].question).toBe("What remains unresolved?");
+    expect((projection.problem.record as typeof piRecord).investigation.path.initial_signal!.summary).toBe("First signal.");
+    expect((projection.problem.record as typeof piRecord).solution_landscape_status).toBe("assessed");
+
+    // Removed canonical fields carry no projection assumption: their absence
+    // from the canonical record must not be treated specially anywhere here.
+    expect("current_journey" in piRecord).toBe(false);
+    expect("reported_consequences" in piRecord).toBe(false);
+    expect("possible_root_causes" in piRecord).toBe(false);
+    expect("existing_solutions" in piRecord).toBe(false);
+  });
+
   it("handles a problem with no evidence gracefully", async () => {
     const soloIndex: RecordSummary[] = [
       { id: "PRB-9001", type: "PRB-", label: "Solo problem", file: "research/problems/PRB-9001.yaml", summaryFields: {} },

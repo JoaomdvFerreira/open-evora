@@ -1015,6 +1015,57 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     expect(within(panel).getByText("related_problems")).toBeTruthy();
   });
 
+  it("keeps the PI-01 canonical Problem fields (causal_reading, investigation.*, solution_landscape_status) inspectable in the generic technical disclosure, with no projection assumption tied to the removed fields", async () => {
+    const piDetail: RecordDetail = {
+      id: "PRB-0100",
+      type: "PRB-",
+      file: "research/problems/PRB-0100.yaml",
+      record: {
+        problem_id: "PRB-0100",
+        status: "OPEN",
+        causal_reading: "A bounded, unvalidated causal reading.",
+        investigation: {
+          open_questions: [{ question: "What remains unresolved?" }],
+          path: { initial_signal: { summary: "First signal." } },
+        },
+        solution_landscape_status: "assessed",
+      },
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    const piSummary: RecordSummary = {
+      id: "PRB-0100",
+      type: "PRB-",
+      label: "PI-01 fixture",
+      file: "research/problems/PRB-0100.yaml",
+      summaryFields: { status: "OPEN", solution_landscape_status: "assessed" },
+    };
+
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0100": piDetail })}
+        lookup={buildLookup(piSummary)}
+        selectedId="PRB-0100"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("Inspeção técnica completa — todos os campos canónicos");
+    // Raw canonical field paths for the new PI-01 fields remain inspectable, untranslated.
+    expect(within(panel).getByText("causal_reading")).toBeTruthy();
+    expect(within(panel).getByText("investigation")).toBeTruthy();
+    expect(within(panel).getByText("solution_landscape_status")).toBeTruthy();
+    // No leftover rendering assumption tied to the fields PI-01 removed.
+    expect(within(panel).queryByText("current_journey")).toBeNull();
+    expect(within(panel).queryByText("reported_consequences")).toBeNull();
+    expect(within(panel).queryByText("possible_root_causes")).toBeNull();
+    expect(within(panel).queryByText("existing_solutions")).toBeNull();
+  });
+
   it("does not add the EVD/SRC quick read for a PRB record, and leaves ContextTabs/navigation unchanged", async () => {
     render(
       <RecordDetailPanel
