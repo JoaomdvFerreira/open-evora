@@ -19,21 +19,21 @@ investigation:
         - "EVD-000118"
         - "EVD-000120"
         - "EVD-000121"
+    - question: "Quais as deslocações/percursos quotidianos concretos afetados pela descontinuidade da rede ciclável?"
+      why_open: "A cartografia oficial confirma a extensão e composição da rede, mas não identifica quais deslocações/percursos do dia a dia são concretamente afetados pela descontinuidade, nem em que medida esta reduz a utilidade prática da rede para quem se desloca diariamente de bicicleta."
+      current_action: "Observação direta, análise da rede de percursos e validação com partes interessadas/utilizadores permanecem a via de investigação para caracterizar as deslocações afetadas."
+      resolution_condition: "Validação, ao longo das dimensões de conectividade, segurança, manutenção, utilidade do destino e orientação/sinalética, que estabeleça quais as deslocações quotidianas concretas afetadas."
+      evidence:
+        - "EVD-000118"
   path:
     initial_signal:
       summary: "O planeamento institucional descreveu os percursos cicláveis como limitados, descontínuos e insuficientemente ligados a destinos importantes."
       evidence:
         - "EVD-000005"
-        - "EVD-000012"
-    development:
-      summary: "Infraestrutura pedonal/ciclável significativa foi acrescentada ou progrediu desde o diagnóstico original (obras associadas ao Rossio/PITE; a Ecopista Évora-Reguengos como corredor regional de mobilidade ativa), pelo que a persistência do diagnóstico original não pode ser assumida sem validação atual."
     delimitation:
       summary: "Não foi encontrado sinal público independente, recente e suficientemente forte para confirmar ou refinar PRB-0004 como problema de deslocação quotidiana urbana, apesar de pesquisa delimitada explícita; esta é uma lacuna de cobertura de sinal público, não evidência de ausência do problema. A cartografia oficial da rede ciclável existente confirma infraestrutura exclusivamente ciclável (~8,5km) e percursos pedonal-ciclável partilhados (~120km, maioritariamente recreativos), reiterando o diagnóstico de descontinuidade."
       evidence:
         - "EVD-000118"
-        - "EVD-000119"
-    current_formulation:
-      summary: "A formulação atual mantém a descontinuidade da rede ciclável como diagnóstico institucional, com a representação pública oficial da rede materialmente estabelecida; a questão remanescente é a existência e reutilização de uma camada operacional atual, e quais as deslocações quotidianas concretas afetadas."
 evidence:
   - "EVD-000005"
   - "EVD-000012"

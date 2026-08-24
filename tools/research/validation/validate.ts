@@ -91,7 +91,7 @@ function validateBooleanFields(file: string, record: RecordFields, schema: Recor
   }
 }
 
-const INVESTIGATION_PATH_STAGES = ["initial_signal", "development", "delimitation", "current_formulation"] as const;
+const INVESTIGATION_PATH_STAGES = ["initial_signal", "development", "delimitation"] as const;
 
 /**
  * Validates PRB.investigation's two optional parts. Not expressible via the

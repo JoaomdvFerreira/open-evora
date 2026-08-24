@@ -38,9 +38,6 @@ investigation:
       summary: "Figuras reportadas pela imprensa (quartos por cerca de 500€/mês, T2 por cerca de 1.000€/mês, cerca de 70% dos estudantes da UÉ deslocados para arrendamento) reforçaram a evidência atual de acomodação/exposição estudantil, mantidas como reportadas e não verificadas contra um conjunto de dados primário. A jornada de informação e transação orientada ao candidato foi explicitamente deixada por comprovar, não validada como subproblema."
       evidence:
         - "EVD-000099"
-        - "EVD-000100"
-    current_formulation:
-      summary: "A formulação atual mantém a pressão de habitação/acessibilidade documentada institucionalmente, com uma sub-pressão de alojamento estudantil mais fortemente evidenciada, mas com a jornada de navegação orientada ao candidato ainda por estabelecer como falha material."
 evidence:
   - "EVD-000031"
   - "EVD-000032"

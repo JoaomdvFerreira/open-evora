@@ -16,7 +16,7 @@ investigation:
   open_questions:
     - question: "Quais as competências ou profissões concretamente em falta especificamente em Évora, por oposição à região do Alentejo em geral?"
       why_open: "A lista regional de profissões em escassez do EURES (Alentejo) é mais forte do que as fotografias de vagas anunciadas do IEFP/Indeed porque nomeia profissões como estando em escassez, e não apenas anunciadas — mas é evidência ao nível regional, não municipal, e não deve ser generalizada para Évora sem corroboração local. O boletim do IEFP confirma que a área estatística do CTEF Évora abrange catorze municípios, pelo que os dados dos centros de emprego do IEFP também não conseguem fornecer uma lista específica de Évora."
-      current_action: "Via institucional através da NERE (rota D5-OP-006) permanece a via apropriada para esta questão residual."
+      current_action: "Validação institucional com a NERE permanece a via apropriada para esta questão residual."
       resolution_condition: "Dados ou validação institucional específicos do concelho de Évora (não regionais) sobre profissões/competências em escassez."
       evidence:
         - "EVD-000115"
@@ -40,8 +40,6 @@ investigation:
         - "EVD-000101"
         - "EVD-000102"
         - "EVD-000103"
-    current_formulation:
-      summary: "A formulação atual mantém o alinhamento de competências como preocupação institucional ativa e não resolvida, com o desfasamento específico em Évora — por oposição à região do Alentejo em geral, para a qual existe uma lista regional — ainda por caracterizar."
 evidence:
   - "EVD-000037"
   - "EVD-000040"

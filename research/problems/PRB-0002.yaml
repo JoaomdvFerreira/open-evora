@@ -16,7 +16,11 @@ investigation:
       resolution_condition: "Evidência sobre a viagem afetada do passageiro (affected-journey evidence) que estabeleça se e como estas lacunas de informação causam falha prática na viagem."
       evidence:
         - "EVD-000016"
-        - "EVD-000080"
+        - "EVD-000123"
+    - question: "Como se relacionam as afirmações institucionais de canais de informação municipal completos com a inconsistência diagnosticada da informação física nas paragens?"
+      why_open: "O plano de ação PMUSE confirma melhorias de informação ao passageiro planeadas (paragens, tempo real, aplicação/site multimodal), enquanto o diagnóstico ao nível da paragem do mesmo plano documenta inconsistência física atual (paragens não abrigadas com apenas uma placa; paragens abrigadas com painel mais completo mas sem elementos de acessibilidade como braille/áudio); a evidência atual não resolve esta tensão entre completude planeada e inconsistência física diagnosticada."
+      evidence:
+        - "EVD-000122"
         - "EVD-000123"
   path:
     initial_signal:
@@ -25,14 +29,12 @@ investigation:
         - "EVD-000010"
         - "EVD-000016"
     development:
-      summary: "Foi reconhecido que a questão continha pelo menos dois sub-gaps tecnicamente distintos: qualidade/completude da informação ao passageiro, e interoperabilidade/reutilização de dados para terceiros. Uma decisão estrutural (WU-D3-03) manteve este registo como um único problema, explicitamente restringido à informação orientada ao passageiro; a questão de interoperabilidade de dados para terceiros foi preservada como pista de fundação de dados abertos fora deste PRB, sem criar um segundo registo canónico."
+      summary: "Foi reconhecido que a questão continha pelo menos dois sub-gaps tecnicamente distintos: qualidade/completude da informação ao passageiro, e interoperabilidade/reutilização de dados para terceiros. Uma decisão estrutural manteve este registo como um único problema, explicitamente restringido à informação orientada ao passageiro; a questão de interoperabilidade de dados para terceiros foi preservada como pista de fundação de dados abertos fora deste PRB, sem criar um segundo registo canónico."
     delimitation:
       summary: "O plano de ação PMUSE propõe melhorias de informação ao passageiro (conforto/acessibilidade/informação nas paragens, informação em tempo real, aplicação/site multimodal), confirmando que estas estão identificadas e planeadas, não que estão entregues. O diagnóstico ao nível da paragem do PMUSE documenta inconsistência física (paragens não abrigadas têm apenas uma placa; paragens abrigadas têm um painel mais completo que ainda assim carece de elementos de acessibilidade como braille/áudio)."
       evidence:
         - "EVD-000122"
         - "EVD-000123"
-    current_formulation:
-      summary: "A formulação atual estabelece que existe capacidade significativa de informação digital e física planeada, pelo que o problema já não deve ser enquadrado como ausência de canais de informação; a incerteza remanescente é a consistência/acessibilidade/compreensão ao longo da viagem real do passageiro."
 evidence:
   - "EVD-000010"
   - "EVD-000011"

@@ -37,23 +37,23 @@ investigation:
         - "EVD-000044"
         - "EVD-000045"
     delimitation:
-      summary: "Um estudo com 68 cuidadores e 89 pessoas cuidadas apurou que 35% das pessoas cuidadas não utilizava qualquer serviço formal de apoio. Material de grupos focais de uma amostra distinta identificou burocracia e dificuldade em compreender direitos como fricção separada da sobrecarga geral do cuidar. Um terceiro inquérito a 133 cuidadores delimitou o problema: necessidades de apoio direto, descanso, apoio financeiro e apoio psicológico são reportadas com maior frequência do que necessidades de orientação, pelo que o problema não deve ser reduzido a uma questão de descoberta de informação."
+      summary: "Um estudo com 68 cuidadores e 89 pessoas cuidadas apurou que 35% das pessoas cuidadas não utilizava qualquer serviço formal de apoio. Material de grupos focais de uma amostra distinta identificou burocracia e dificuldade em compreender direitos como fricção separada da sobrecarga geral do cuidar. Um terceiro inquérito a 133 cuidadores delimitou o problema: necessidades de apoio direto, descanso, apoio financeiro e apoio psicológico são reportadas com maior frequência do que necessidades de orientação, pelo que o problema não deve ser reduzido a uma questão de descoberta de informação. As preocupações de saúde mental/capacidade permanecem distintas deste problema e não são absorvidas por ele."
       evidence:
         - "EVD-000089"
         - "EVD-000090"
         - "EVD-000091"
-        - "EVD-000092"
-    current_formulation:
-      summary: "A formulação atual mantém as necessidades de informação documentadas como componente do problema, delimitada por evidência que mostra que necessidades diretas de apoio no cuidar, descanso, apoio financeiro e psicológico podem ser mais prevalentes do que necessidades de orientação."
+        - "EVD-000035"
+        - "EVD-000046"
 evidence:
   - "EVD-000034"
+  - "EVD-000035"
   - "EVD-000036"
   - "EVD-000044"
   - "EVD-000045"
+  - "EVD-000046"
   - "EVD-000089"
   - "EVD-000090"
   - "EVD-000091"
-  - "EVD-000092"
   - "EVD-000124"
 evidence_status: discovered
 validation_status: unvalidated

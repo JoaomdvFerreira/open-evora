@@ -31,8 +31,6 @@ investigation:
       summary: "Um sinal público posterior (julho de 2026), relativo a uma localização específica (entrada da N114 em Évora), alegou persistência do problema; este sinal, de natureza social/comunitária, não está verificado e não é generalizado ao município."
       evidence:
         - "EVD-000084"
-    current_formulation:
-      summary: "A formulação atual mantém que estes elementos evidenciam um problema real de degradação do pavimento rodoviário e de fiabilidade da manutenção, embora a evidência disponível não permita estimar a prevalência atual em todo o município."
 evidence:
   - "EVD-000082"
   - "EVD-000083"

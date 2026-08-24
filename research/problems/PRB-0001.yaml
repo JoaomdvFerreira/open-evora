@@ -8,12 +8,12 @@ geography:
 affected_populations:
   - "residents who depend on public transport"
 problem_statement: "A cobertura dos transportes públicos em Évora é, em termos globais, ampla, mas a evidência institucional indica que a utilidade prática do serviço varia consoante o período horário, o tipo de deslocação e os locais de baixa procura, continuando a articulação entre horários e frequências a ser uma preocupação documentada."
-causal_reading: "A variância na utilidade prática do serviço está associada sobretudo ao desenho/capacidade do serviço (horários, frequências, resposta noturna/fim de semana/feriados) e não a uma lacuna de informação; esta leitura não está validada e não exclui outros mecanismos contributivos (ex.: fiabilidade operacional)."
+causal_reading: "A variância na utilidade prática do serviço está associada sobretudo ao desenho/capacidade do serviço, e não apenas a uma lacuna de informação; esta leitura não está validada e não exclui outros mecanismos operacionais contributivos."
 investigation:
   open_questions:
     - question: "Quais as linhas/corredores/períodos horários concretos que sofrem a maior redução de serviço, e em que medida?"
       why_open: "Nenhum conjunto de dados público ao nível da linha/corredor foi localizado; a evidência institucional disponível documenta o padrão a nível de rede (dia vs. noite/fim de semana/feriados), não a severidade por linha."
-      resolution_condition: "Dados operacionais ao nível da linha/corredor, ou validação direta com a autoridade de transportes, que identifiquem as linhas/corredores/períodos mais afetados."
+      current_action: "A plataforma de reclamações do TREVO permanece a via de validação disponível para reportar e caracterizar instâncias concretas de fricção por linha/corredor/período horário."
       evidence:
         - "EVD-000002"
         - "EVD-000117"
@@ -36,8 +36,6 @@ investigation:
         - "EVD-000079"
         - "EVD-000080"
         - "EVD-000117"
-    current_formulation:
-      summary: "A formulação atual mantém a cobertura global como ampla, mas identifica a utilidade prática do serviço — variando por período horário, tipo de deslocação e locais de baixa procura — como a preocupação documentada e ainda não resolvida ao nível de linha/corredor."
 evidence:
   - "EVD-000001"
   - "EVD-000002"

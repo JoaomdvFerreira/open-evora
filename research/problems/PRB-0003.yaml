@@ -11,13 +11,13 @@ affected_populations:
   - "people with reduced mobility"
   - "other vulnerable pedestrian groups"
 problem_statement: "Em Évora, estão documentadas barreiras pedonais e de acessibilidade e existe um programa estabelecido de planeamento da acessibilidade, mas as intervenções físicas em curso e os testes de percursos experimentais de 2026 exigem validar, face às condições vividas atuais, quais são exatamente as barreiras que ainda persistem."
-causal_reading: "As barreiras são predominantemente de infraestrutura física (pavimentos, degraus, acessos não conformes); uma intervenção digital só poderia endereçar problemas secundários de informação/coordenação, salvo se evidência futura estabelecer o contrário. Esta leitura não está validada."
+causal_reading: "Esta é uma interpretação não validada: as barreiras apontam sobretudo para infraestrutura física; a informação/coordenação digital é lida como secundária e contingente, dependente de evidência futura que a estabeleça."
 investigation:
   open_questions:
     - question: "Quais as barreiras concretas que persistem hoje, a nível de localização, face às intervenções físicas em curso e à correção parcial já reportada?"
       why_open: "A APCE confirma que apenas algumas barreiras identificadas foram corrigidas, sem fornecer um inventário ao nível da localização; o projeto corretivo da EB1 Azaruja é recente (2025-2026) e o seu estado pós-intervenção não foi verificado; as plataformas de turismo acessível têm atualidade desconhecida."
       current_action: "Testes de percursos experimentais de 2026 (4ª revisão do PUE) convidam o público a testar fisicamente percursos pedonais/de mobilidade suave e contribuir perceções sobre inclusão e acessibilidade."
-      resolution_condition: "Um inventário de barreiras ao nível da localização, ou validação direta com pessoas com mobilidade reduzida, que estabeleça quais as barreiras concretas que persistem hoje."
+      resolution_condition: "Um inventário de barreiras ao nível da localização/atual que estabeleça quais as barreiras concretas que persistem hoje."
       evidence:
         - "EVD-000029"
         - "EVD-000112"
@@ -40,8 +40,6 @@ investigation:
         - "EVD-000112"
         - "EVD-000113"
         - "EVD-000114"
-    current_formulation:
-      summary: "A formulação atual mantém que as barreiras estão documentadas e que existe um programa de planeamento estabelecido, mas que a persistência atual de barreiras específicas, face às intervenções físicas em curso e aos testes de 2026, ainda precisa de validação."
 evidence:
   - "EVD-000004"
   - "EVD-000006"

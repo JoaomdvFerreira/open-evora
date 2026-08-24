@@ -10,14 +10,21 @@ affected_populations:
   - "residents"
   - "urban parish councils"
 problem_statement: "A fiabilidade dos serviços de recolha de resíduos sólidos urbanos e de higiene urbana constitui um problema cívico atual reconhecido institucionalmente: o Município documentou uma interrupção do serviço de recolha em fevereiro de 2026, causada por avarias numa frota envelhecida, e, em julho-agosto de 2026, o Presidente da Câmara e o Município identificaram publicamente a higiene urbana como um dos desafios mais urgentes da gestão municipal, avançando com uma reestruturação substancial da frota, dos recursos humanos, dos modelos de recolha, da distribuição de responsabilidades e da monitorização, ao mesmo tempo que reconheceram explicitamente que persistem dificuldades em algumas zonas."
-causal_reading: "A causa dominante é substancialmente operacional/de capacidade — frota envelhecida/avariada, capacidade insuficiente de veículos de reserva, pessoal/logística, organização de rotas/serviço de recolha, e arranjos de responsabilidade entre entidades (Município, Gesamb, juntas de freguesia) — e não informacional ou digital. Esta leitura não está validada; a tratabilidade digital sobre esta causa dominante é avaliada como baixa."
+causal_reading: "A causa dominante é substancialmente operacional/de capacidade — frota envelhecida/avariada, capacidade insuficiente de veículos de reserva, pessoal/logística, organização de rotas/serviço de recolha, e arranjos de responsabilidade entre entidades (Município, Gesamb, juntas de freguesia). Esta leitura não está validada; a tratabilidade digital sobre este mecanismo dominante é avaliada como baixa, ainda que possam existir oportunidades mais estreitas de transparência/coordenação de informação, distintas do mecanismo operacional dominante."
 investigation:
   open_questions:
-    - question: "Qual é o desempenho operacional atual (tempo de resolução, atrasos, taxa de recolhas falhadas) após agosto de 2026, e existe uma subproblema mais estreito de transparência de estado/coordenação dentro da jornada do serviço de higiene?"
+    - question: "Qual é o desempenho operacional atual do serviço de higiene urbana e recolha de resíduos em Évora (tempo de resolução, atrasos, taxa de recolhas falhadas) após agosto de 2026?"
       why_open: "Não foi localizado nenhum conjunto de dados operacional público (tempo de resolução, atrasos, qualidade de encaminhamento) nesta revisão institucional delimitada; a verificação pós-julho no acesso público não encontrou um sinal comparável de colapso de recolha à escala da cidade, mas isto é um resultado de saturação de pesquisa, não prova de que o serviço é agora fiável."
-      resolution_condition: "Dados operacionais públicos pós-agosto de 2026, ou avaliação de jornada de utilizador/dados abertos (D2/D5), que estabeleçam o desempenho atual e se existe um subproblema de transparência de estado/coordenação."
+      resolution_condition: "Dados operacionais públicos pós-agosto de 2026, ou avaliação de jornada de utilizador/dados abertos, que estabeleçam o desempenho atual do serviço em Évora."
       evidence:
         - "EVD-000095"
+    - question: "Existe um subproblema material de transparência/coordenação/interação dentro da jornada do serviço de higiene, distinto do mecanismo operacional/de capacidade dominante?"
+      why_open: "Pistas locais (avaliação/monitorização do serviço) e evidência comparativa/de mecanismo de outros municípios sugerem que uma componente de transparência de estado/coordenação pode existir, mas não está estabelecido se constitui um subproblema material em Évora, distinto da causa operacional/de capacidade dominante."
+      resolution_condition: "Avaliação de jornada de utilizador/dados abertos que estabeleça se existe um subproblema material de transparência/coordenação/interação em Évora."
+      evidence:
+        - "EVD-000096"
+        - "EVD-000097"
+        - "EVD-000098"
         - "EVD-000108"
         - "EVD-000109"
         - "EVD-000110"
@@ -40,8 +47,6 @@ investigation:
         - "EVD-000093"
         - "EVD-000094"
         - "EVD-000095"
-    current_formulation:
-      summary: "A formulação atual mantém a fiabilidade dos serviços de recolha de resíduos e higiene urbana como problema cívico atual reconhecido institucionalmente, com uma reestruturação substancial em curso e dificuldades reconhecidas como persistentes em algumas zonas à data de julho-agosto de 2026."
 evidence:
   - "EVD-000065"
   - "EVD-000066"
