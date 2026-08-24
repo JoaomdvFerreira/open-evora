@@ -2,5 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run explorer:build",
   "outputDirectory": "apps/research-explorer/dist",
-  "installCommand": "npm ci --prefix apps/research-explorer"
+  "installCommand": "npm ci && npm ci --prefix apps/research-explorer"
 }
