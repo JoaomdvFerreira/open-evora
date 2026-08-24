@@ -18,7 +18,13 @@ const DETAILS: Record<string, RecordDetail> = {
     id: "PRB-0005",
     type: "PRB-",
     file: "research/problems/PRB-0005.yaml",
-    record: { title: "Parking pressure", status: "OPEN", problem_statement: "Traffic and parking conflict with pedestrian space." },
+    record: {
+      title: "Parking pressure",
+      status: "OPEN",
+      problem_statement: "Traffic and parking conflict with pedestrian space.",
+      evidence: ["EVD-0001"],
+      decision_basis: { manifestation: { summary: "Parking pressure is observed near the historic centre." } },
+    },
     outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-0001" }],
     incomingEdges: [],
   },
@@ -384,6 +390,1010 @@ describe("ProblemView", () => {
   });
 });
 
+describe("ProblemView — PI-02B header + Estado atual", () => {
+  const HEADER_INDEX: RecordSummary[] = [
+    { id: "PRB-0200", type: "PRB-", label: "Header fixture", file: "research/problems/PRB-0200.yaml", summaryFields: {} },
+  ];
+
+  function headerProvider(record: Record<string, unknown>): DataProvider {
+    const detail: RecordDetail = {
+      id: "PRB-0200",
+      type: "PRB-",
+      file: "research/problems/PRB-0200.yaml",
+      record,
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(HEADER_INDEX),
+      getRecord: () => Promise.resolve(detail),
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  it("renders title, problem_statement, geography, affected_populations, and compact status/evidence_status/validation_status chips from canonical data only", async () => {
+    render(
+      <ProblemView
+        dataProvider={headerProvider({
+          title: "Header fixture problem",
+          problem_statement: "A concise canonical statement.",
+          geography: { level: "municipality", area: "Município de Évora" },
+          affected_populations: ["students", "commuters"],
+          status: "OPEN",
+          evidence_status: "corroborated",
+          validation_status: "unvalidated",
+          decision_basis: { manifestation: { summary: "Manifestation summary for the header fixture." } },
+        })}
+        problemId="PRB-0200"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Header fixture problem" });
+    expect(screen.getByText("A concise canonical statement.")).toBeTruthy();
+    expect(screen.getByText(/Município de Évora/)).toBeTruthy();
+    expect(screen.getByText("students, commuters")).toBeTruthy();
+
+    const stateSection = screen.getByLabelText("Estado atual");
+    expect(within(stateSection).getByText(/Aberto/)).toBeTruthy();
+    expect(within(stateSection).getByText(/Evidência corroborada/)).toBeTruthy();
+    expect(within(stateSection).getByText(/Por validar/)).toBeTruthy();
+  });
+
+  it("omits geography, affected_populations, currentness, and scope entirely when the canonical fields are absent, without inventing a fallback", async () => {
+    render(
+      <ProblemView
+        dataProvider={headerProvider({ title: "No optional fields", status: "OPEN" })}
+        problemId="PRB-0200"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "No optional fields" });
+    expect(screen.queryByText("Onde")).toBeNull();
+    expect(screen.queryByText("Quem é afetado")).toBeNull();
+    expect(screen.queryByText("Atualidade da evidência")).toBeNull();
+    expect(screen.queryByText("Âmbito")).toBeNull();
+  });
+
+  it("renders 'Estado atual' from decision_basis (manifestation, consequence, currentness, scope) without repeating the header's compact indicators as full sentences", async () => {
+    render(
+      <ProblemView
+        dataProvider={headerProvider({
+          title: "Decision basis fixture",
+          status: "OPEN",
+          decision_basis: {
+            manifestation: { summary: "What the evidence shows is happening." },
+            consequence: { summary: "The documented downstream effect." },
+            currentness: { assessment: "HIGH — evidence remains current as of 2026." },
+            scope: {
+              geography: "Município de Évora only.",
+              population: "Residents dependent on the service.",
+              temporal: "2022-2026.",
+              bounded: true,
+            },
+          },
+        })}
+        problemId="PRB-0200"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Decision basis fixture" });
+    const stateSection = screen.getByLabelText("Estado atual");
+
+    expect(within(stateSection).getByText("O que observamos")).toBeTruthy();
+    expect(within(stateSection).getByText("What the evidence shows is happening.")).toBeTruthy();
+    expect(within(stateSection).getByText("Consequências conhecidas")).toBeTruthy();
+    expect(within(stateSection).getByText("The documented downstream effect.")).toBeTruthy();
+    expect(within(stateSection).getByText("Atualidade")).toBeTruthy();
+    expect(within(stateSection).getByText("HIGH — evidence remains current as of 2026.")).toBeTruthy();
+    expect(within(stateSection).getByText("Âmbito conhecido")).toBeTruthy();
+    expect(within(stateSection).getByText("Município de Évora only.")).toBeTruthy();
+    expect(within(stateSection).getByText("Residents dependent on the service.")).toBeTruthy();
+    expect(within(stateSection).getByText("2022-2026.")).toBeTruthy();
+
+    // Human visual review correction: `bounded` (true/false) is never
+    // rendered publicly anywhere in Problem View, even though it is
+    // authored on this fixture — "Delimitado" and "Sim"/"Não" must not appear.
+    expect(within(stateSection).queryByText("Delimitado")).toBeNull();
+    expect(within(stateSection).queryByText("Sim")).toBeNull();
+    expect(screen.queryByText("Sim")).toBeNull();
+
+    // The header's own currentness/scope indicators stay compact — the full
+    // authored sentence appears exactly once, in "Estado atual", not twice.
+    expect(screen.getAllByText("What the evidence shows is happening.").length).toBe(1);
+    expect(screen.getAllByText(/2022-2026\./).length).toBe(1);
+  });
+
+  it("human review correction: omits 'Âmbito conhecido' entirely when decision_basis.scope authors only bounded, with no geography/population/temporal", async () => {
+    render(
+      <ProblemView
+        dataProvider={headerProvider({
+          title: "Bounded-only scope fixture",
+          status: "OPEN",
+          decision_basis: {
+            manifestation: { summary: "Manifestation summary so Estado atual still renders." },
+            scope: { bounded: false },
+          },
+        })}
+        problemId="PRB-0200"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Bounded-only scope fixture" });
+    const stateSection = screen.getByLabelText("Estado atual");
+    expect(within(stateSection).queryByText("Âmbito conhecido")).toBeNull();
+    expect(document.getElementById("problem-estado-ambito")).toBeNull();
+    expect(screen.queryByText("Delimitado")).toBeNull();
+    expect(screen.queryByText("Não")).toBeNull();
+  });
+
+  it("omits manifestation/consequence/currentness/scope items individually when decision_basis carries only some of them", async () => {
+    render(
+      <ProblemView
+        dataProvider={headerProvider({
+          title: "Partial decision basis",
+          status: "OPEN",
+          decision_basis: {
+            manifestation: { summary: "Only manifestation is authored." },
+          },
+        })}
+        problemId="PRB-0200"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Partial decision basis" });
+    const stateSection = screen.getByLabelText("Estado atual");
+
+    expect(within(stateSection).getByText("O que observamos")).toBeTruthy();
+    expect(within(stateSection).queryByText("Consequências conhecidas")).toBeNull();
+    expect(within(stateSection).queryByText("Atualidade")).toBeNull();
+    expect(within(stateSection).queryByText("Âmbito conhecido")).toBeNull();
+  });
+});
+
+describe("ProblemView — PI-02C support section + evidence grouping", () => {
+  const SUPPORT_INDEX: RecordSummary[] = [
+    { id: "PRB-0300", type: "PRB-", label: "Support fixture", file: "research/problems/PRB-0300.yaml", summaryFields: {} },
+    { id: "EVD-0301", type: "EVD-", label: "Supporting evidence", file: "research/evidence/EVD-0301.yaml", summaryFields: {} },
+    { id: "EVD-0302", type: "EVD-", label: "Boundary evidence", file: "research/evidence/EVD-0302.yaml", summaryFields: {} },
+    { id: "EVD-0303", type: "EVD-", label: "Other related evidence", file: "research/evidence/EVD-0303.yaml", summaryFields: {} },
+  ];
+
+  function evidenceDetail(id: string, summary: string): RecordDetail {
+    return {
+      id,
+      type: "EVD-",
+      file: `research/evidence/${id}.yaml`,
+      record: { evidence_id: id, type: "institutional", observation: { summary } },
+      outgoingEdges: [],
+      incomingEdges: [{ field: "evidence", ordinal: 0, from: "PRB-0300" }],
+    };
+  }
+
+  function supportProvider(record: Record<string, unknown>, evidenceIds: string[]): DataProvider {
+    const problemDetail: RecordDetail = {
+      id: "PRB-0300",
+      type: "PRB-",
+      file: "research/problems/PRB-0300.yaml",
+      record,
+      outgoingEdges: evidenceIds.map((id, ordinal) => ({ field: "evidence", ordinal, to: id })),
+      incomingEdges: [],
+    };
+    const evidenceDetails: Record<string, RecordDetail> = {
+      "EVD-0301": evidenceDetail("EVD-0301", "Supporting evidence observation."),
+      "EVD-0302": evidenceDetail("EVD-0302", "Boundary evidence observation."),
+      "EVD-0303": evidenceDetail("EVD-0303", "Other related evidence observation."),
+    };
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(SUPPORT_INDEX),
+      getRecord: (id: string) => {
+        if (id === "PRB-0300") return Promise.resolve(problemDetail);
+        const detail = evidenceDetails[id];
+        return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
+      },
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  it("PI-02F3: renders independence_assessment as a conditional 'Independência da evidência' item inside Evidência, never in a separate 'O que sustenta esta leitura' section, and never renders corroboration_statement", async () => {
+    const { rerender } = render(
+      <ProblemView
+        dataProvider={supportProvider(
+          {
+            title: "Support fixture",
+            status: "OPEN",
+            evidence: ["EVD-0301"],
+            decision_basis: {
+              corroboration_statement: "The reading is corroborated by two institutional threads.",
+              independence_assessment: "Independence is assessed as MEDIUM.",
+            },
+          },
+          ["EVD-0301"]
+        )}
+        problemId="PRB-0300"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Support fixture" });
+    expect(screen.queryByLabelText("O que sustenta esta leitura")).toBeNull();
+    expect(screen.queryByText("The reading is corroborated by two institutional threads.")).toBeNull();
+
+    const evidenceSection = screen.getByLabelText("Evidência");
+    expect(within(evidenceSection).getByText("Independência da evidência")).toBeTruthy();
+    expect(within(evidenceSection).getByText("Independence is assessed as MEDIUM.")).toBeTruthy();
+
+    rerender(
+      <ProblemView
+        dataProvider={supportProvider({ title: "Support fixture", status: "OPEN", evidence: ["EVD-0301"] }, ["EVD-0301"])}
+        problemId="PRB-0300"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Support fixture" });
+    expect(screen.queryByLabelText("O que sustenta esta leitura")).toBeNull();
+    expect(screen.queryByText("Independência da evidência")).toBeNull();
+  });
+
+  it("partitions evidence into Evidência que suporta / que limita a conclusão / Outra evidência relacionada by decision_basis membership, deduplicated and category-exclusive", async () => {
+    render(
+      <ProblemView
+        dataProvider={supportProvider(
+          {
+            title: "Support fixture",
+            status: "OPEN",
+            evidence: ["EVD-0301", "EVD-0302", "EVD-0303"],
+            decision_basis: {
+              supporting_evidence: ["EVD-0301", "EVD-0301"],
+              boundary_evidence: ["EVD-0302"],
+            },
+          },
+          ["EVD-0301", "EVD-0302", "EVD-0303"]
+        )}
+        problemId="PRB-0300"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Support fixture" });
+    const evidenceSection = screen.getByLabelText("Evidência");
+
+    const supportingHeading = within(evidenceSection).getByText(/^Evidência que suporta/);
+    const boundaryHeading = within(evidenceSection).getByText(/^Evidência que limita a conclusão/);
+    const otherHeading = within(evidenceSection).getByText(/^Outra evidência relacionada/);
+
+    expect(supportingHeading.textContent).toContain("(1)");
+    expect(boundaryHeading.textContent).toContain("(1)");
+    expect(otherHeading.textContent).toContain("(1)");
+
+    const supportingGroup = supportingHeading.closest(".evidence-group") as HTMLElement;
+    expect(within(supportingGroup).getByText(/EVD-0301/)).toBeTruthy();
+    expect(within(supportingGroup).queryByText(/EVD-0302/)).toBeNull();
+
+    const boundaryGroup = boundaryHeading.closest(".evidence-group") as HTMLElement;
+    expect(within(boundaryGroup).getByText(/EVD-0302/)).toBeTruthy();
+    expect(within(boundaryGroup).queryByText(/EVD-0301/)).toBeNull();
+
+    const otherGroup = otherHeading.closest(".evidence-group") as HTMLElement;
+    expect(within(otherGroup).getByText(/EVD-0303/)).toBeTruthy();
+    expect(within(otherGroup).queryByText(/EVD-0301/)).toBeNull();
+    expect(within(otherGroup).queryByText(/EVD-0302/)).toBeNull();
+  });
+
+  it("omits empty evidence groups, e.g. when decision_basis carries no supporting_evidence/boundary_evidence at all", async () => {
+    render(
+      <ProblemView
+        dataProvider={supportProvider({ title: "Support fixture", status: "OPEN", evidence: ["EVD-0303"] }, ["EVD-0303"])}
+        problemId="PRB-0300"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Support fixture" });
+    const evidenceSection = screen.getByLabelText("Evidência");
+    expect(within(evidenceSection).queryByText(/^Evidência que suporta/)).toBeNull();
+    expect(within(evidenceSection).queryByText(/^Evidência que limita a conclusão/)).toBeNull();
+    expect(within(evidenceSection).getByText(/^Outra evidência relacionada/)).toBeTruthy();
+    expect(within(evidenceSection).getByText(/EVD-0303/)).toBeTruthy();
+  });
+
+  it("does not treat boundary evidence as negative or contradictory — it renders with the same EvidenceCard presentation as every other group", async () => {
+    render(
+      <ProblemView
+        dataProvider={supportProvider(
+          {
+            title: "Support fixture",
+            status: "OPEN",
+            evidence: ["EVD-0302"],
+            decision_basis: { boundary_evidence: ["EVD-0302"] },
+          },
+          ["EVD-0302"]
+        )}
+        problemId="PRB-0300"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Support fixture" });
+    const evidenceSection = screen.getByLabelText("Evidência");
+    const boundaryHeading = within(evidenceSection).getByText(/^Evidência que limita a conclusão/);
+    const boundaryGroup = boundaryHeading.closest(".evidence-group") as HTMLElement;
+    expect(within(boundaryGroup).getByText("Boundary evidence observation.")).toBeTruthy();
+    expect(within(boundaryGroup).queryByText(/contradiz|negativ/i)).toBeNull();
+  });
+});
+
+describe("ProblemView — PI-02D open questions + contradiction search", () => {
+  const OQ_INDEX: RecordSummary[] = [
+    { id: "PRB-0400", type: "PRB-", label: "Open questions fixture", file: "research/problems/PRB-0400.yaml", summaryFields: {} },
+    { id: "EVD-0401", type: "EVD-", label: "Referenced evidence one", file: "research/evidence/EVD-0401.yaml", summaryFields: {} },
+    { id: "EVD-0402", type: "EVD-", label: "Referenced evidence two", file: "research/evidence/EVD-0402.yaml", summaryFields: {} },
+  ];
+
+  function oqEvidenceDetail(id: string): RecordDetail {
+    return {
+      id,
+      type: "EVD-",
+      file: `research/evidence/${id}.yaml`,
+      record: { evidence_id: id, type: "institutional", observation: { summary: `${id} observation.` } },
+      outgoingEdges: [],
+      incomingEdges: [{ field: "evidence", ordinal: 0, from: "PRB-0400" }],
+    };
+  }
+
+  function oqProvider(record: Record<string, unknown>, evidenceIds: string[]): DataProvider {
+    const problemDetail: RecordDetail = {
+      id: "PRB-0400",
+      type: "PRB-",
+      file: "research/problems/PRB-0400.yaml",
+      record,
+      outgoingEdges: evidenceIds.map((id, ordinal) => ({ field: "evidence", ordinal, to: id })),
+      incomingEdges: [],
+    };
+    const evidenceDetails: Record<string, RecordDetail> = {
+      "EVD-0401": oqEvidenceDetail("EVD-0401"),
+      "EVD-0402": oqEvidenceDetail("EVD-0402"),
+    };
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(OQ_INDEX),
+      getRecord: (id: string) => {
+        if (id === "PRB-0400") return Promise.resolve(problemDetail);
+        const detail = evidenceDetails[id];
+        return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
+      },
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  it("omits the entire section when there are no open questions and no authored contradiction_search", async () => {
+    render(
+      <ProblemView
+        dataProvider={oqProvider({ title: "No open questions", status: "OPEN" }, [])}
+        problemId="PRB-0400"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "No open questions" });
+    expect(screen.queryByLabelText("O que ainda não sabemos — e o que estamos a fazer")).toBeNull();
+  });
+
+  it("renders every open_questions[] field under its PT-PT label, omitting optional fields individually when absent", async () => {
+    render(
+      <ProblemView
+        dataProvider={oqProvider(
+          {
+            title: "Open questions fixture",
+            status: "OPEN",
+            evidence: ["EVD-0401"],
+            investigation: {
+              open_questions: [
+                {
+                  question: "Does the gap cause a material failure?",
+                  why_open: "No direct evidence exists yet.",
+                  current_action: "Field validation is underway.",
+                  latest_result: "A partial result was found.",
+                  resolution_condition: "Direct affected-journey evidence would resolve this.",
+                  evidence: ["EVD-0401"],
+                },
+                {
+                  question: "Second question with only why_open authored.",
+                  why_open: "Only this field is authored for this item.",
+                },
+              ],
+            },
+          },
+          ["EVD-0401"]
+        )}
+        problemId="PRB-0400"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Open questions fixture" });
+    const section = screen.getByLabelText("O que ainda não sabemos — e o que estamos a fazer");
+
+    expect(within(section).getByText("Does the gap cause a material failure?")).toBeTruthy();
+    expect(within(section).getAllByText("Porque continua em aberto").length).toBe(2);
+    expect(within(section).getByText("No direct evidence exists yet.")).toBeTruthy();
+    expect(within(section).getByText("O que estamos a fazer")).toBeTruthy();
+    expect(within(section).getByText("Field validation is underway.")).toBeTruthy();
+    expect(within(section).getByText("O que aprendemos mais recentemente")).toBeTruthy();
+    expect(within(section).getByText("A partial result was found.")).toBeTruthy();
+    expect(within(section).getByText("O que permitiria esclarecer")).toBeTruthy();
+    expect(within(section).getByText("Direct affected-journey evidence would resolve this.")).toBeTruthy();
+
+    // Second item renders independently and only shows the one field it authored.
+    expect(within(section).getByText("Second question with only why_open authored.")).toBeTruthy();
+    expect(within(section).getByText("Only this field is authored for this item.")).toBeTruthy();
+    // "O que estamos a fazer" heading appears only once (for item 1), not fabricated for item 2.
+    expect(within(section).getAllByText("O que estamos a fazer").length).toBe(1);
+  });
+
+  it("shows compact EVD- references for open_questions[].evidence via existing record navigation, without duplicating the full EvidenceCard", async () => {
+    const onOpenGeneric = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <ProblemView
+        dataProvider={oqProvider(
+          {
+            title: "Open questions fixture",
+            status: "OPEN",
+            evidence: ["EVD-0401"],
+            investigation: {
+              open_questions: [{ question: "Question with evidence.", evidence: ["EVD-0401"] }],
+            },
+          },
+          ["EVD-0401"]
+        )}
+        problemId="PRB-0400"
+        onOpenGeneric={onOpenGeneric}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Open questions fixture" });
+    const section = screen.getByLabelText("O que ainda não sabemos — e o que estamos a fazer");
+    const refButton = within(section).getByRole("button", { name: /EVD-0401/ });
+    // The compact reference must not carry the full EvidenceCard's observation text.
+    expect(within(section).queryByText("EVD-0401 observation.")).toBeNull();
+
+    await user.click(refButton);
+    expect(onOpenGeneric).toHaveBeenCalledWith("EVD-0401");
+  });
+
+  it("omits the evidence-reference row entirely when open_questions[].evidence is empty", async () => {
+    render(
+      <ProblemView
+        dataProvider={oqProvider(
+          {
+            title: "Open questions fixture",
+            status: "OPEN",
+            investigation: { open_questions: [{ question: "Question without evidence." }] },
+          },
+          []
+        )}
+        problemId="PRB-0400"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Open questions fixture" });
+    const section = screen.getByLabelText("O que ainda não sabemos — e o que estamos a fazer");
+    expect(within(section).queryByText("Evidência relacionada:")).toBeNull();
+  });
+
+  it("renders decision_basis.contradiction_search as a separate labelled item, stating authored status/summary without interpreting performed:false as a negative finding", async () => {
+    render(
+      <ProblemView
+        dataProvider={oqProvider(
+          {
+            title: "Contradiction search fixture",
+            status: "OPEN",
+            decision_basis: {
+              contradiction_search: {
+                performed: false,
+                summary: "No deliberate contradiction search has been carried out yet.",
+              },
+            },
+          },
+          []
+        )}
+        problemId="PRB-0400"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Contradiction search fixture" });
+    const section = screen.getByLabelText("O que ainda não sabemos — e o que estamos a fazer");
+    expect(within(section).getByText("Procura de evidência contraditória")).toBeTruthy();
+    expect(within(section).getByText("Não realizada")).toBeTruthy();
+    expect(within(section).getByText("No deliberate contradiction search has been carried out yet.")).toBeTruthy();
+    // No negative/derived language beyond the authored summary itself.
+    expect(within(section).queryByText(/nenhuma evidência contraditória foi encontrada/i)).toBeNull();
+  });
+
+  it("renders contradiction_search evidence references and keeps the section present even with zero open_questions", async () => {
+    render(
+      <ProblemView
+        dataProvider={oqProvider(
+          {
+            title: "Contradiction search fixture",
+            status: "OPEN",
+            evidence: ["EVD-0402"],
+            decision_basis: {
+              contradiction_search: { performed: true, summary: "A deliberate search was performed.", evidence: ["EVD-0402"] },
+            },
+          },
+          ["EVD-0402"]
+        )}
+        problemId="PRB-0400"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Contradiction search fixture" });
+    const section = screen.getByLabelText("O que ainda não sabemos — e o que estamos a fazer");
+    expect(within(section).getByText("Realizada")).toBeTruthy();
+    expect(within(section).getByRole("button", { name: /EVD-0402/ })).toBeTruthy();
+  });
+});
+
+describe("ProblemView — PI-02E investigation path + final section order", () => {
+  const PATH_INDEX: RecordSummary[] = [
+    { id: "PRB-0500", type: "PRB-", label: "Path fixture", file: "research/problems/PRB-0500.yaml", summaryFields: {} },
+    { id: "EVD-0501", type: "EVD-", label: "Initial signal evidence", file: "research/evidence/EVD-0501.yaml", summaryFields: {} },
+    { id: "EVD-0502", type: "EVD-", label: "Development evidence", file: "research/evidence/EVD-0502.yaml", summaryFields: {} },
+  ];
+
+  function pathEvidenceDetail(id: string): RecordDetail {
+    return {
+      id,
+      type: "EVD-",
+      file: `research/evidence/${id}.yaml`,
+      record: { evidence_id: id, type: "institutional", observation: { summary: `${id} observation.` } },
+      outgoingEdges: [],
+      incomingEdges: [{ field: "evidence", ordinal: 0, from: "PRB-0500" }],
+    };
+  }
+
+  function pathProvider(record: Record<string, unknown>, evidenceIds: string[]): DataProvider {
+    const problemDetail: RecordDetail = {
+      id: "PRB-0500",
+      type: "PRB-",
+      file: "research/problems/PRB-0500.yaml",
+      record,
+      outgoingEdges: evidenceIds.map((id, ordinal) => ({ field: "evidence", ordinal, to: id })),
+      incomingEdges: [],
+    };
+    const evidenceDetails: Record<string, RecordDetail> = {
+      "EVD-0501": pathEvidenceDetail("EVD-0501"),
+      "EVD-0502": pathEvidenceDetail("EVD-0502"),
+    };
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(PATH_INDEX),
+      getRecord: (id: string) => {
+        if (id === "PRB-0500") return Promise.resolve(problemDetail);
+        const detail = evidenceDetails[id];
+        return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
+      },
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  it("omits the path section entirely when investigation.path has no authored stage", async () => {
+    render(
+      <ProblemView
+        dataProvider={pathProvider({ title: "No path", status: "OPEN" }, [])}
+        problemId="PRB-0500"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "No path" });
+    expect(screen.queryByLabelText("Como chegámos a este problema")).toBeNull();
+  });
+
+  it("renders initial_signal, development, and delimitation under their PT-PT labels with compact evidence references, omitting evidence rows when absent", async () => {
+    render(
+      <ProblemView
+        dataProvider={pathProvider(
+          {
+            title: "Path fixture",
+            status: "OPEN",
+            evidence: ["EVD-0501", "EVD-0502"],
+            investigation: {
+              path: {
+                initial_signal: { summary: "The first signal that surfaced this problem.", evidence: ["EVD-0501"] },
+                development: { summary: "How the investigation developed.", evidence: ["EVD-0502"] },
+                delimitation: { summary: "How the problem was bounded." },
+              },
+            },
+          },
+          ["EVD-0501", "EVD-0502"]
+        )}
+        problemId="PRB-0500"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Path fixture" });
+    const section = screen.getByLabelText("Como chegámos a este problema");
+
+    expect(within(section).getByText("Sinal inicial")).toBeTruthy();
+    expect(within(section).getByText("The first signal that surfaced this problem.")).toBeTruthy();
+    expect(within(section).getByText("Desenvolvimento da investigação")).toBeTruthy();
+    expect(within(section).getByText("How the investigation developed.")).toBeTruthy();
+    expect(within(section).getByText("Delimitação")).toBeTruthy();
+    expect(within(section).getByText("How the problem was bounded.")).toBeTruthy();
+
+    const items = within(section).getAllByRole("listitem");
+    const initialSignalItem = items.find((item) => within(item).queryByText("Sinal inicial"))!;
+    expect(within(initialSignalItem).getByRole("button", { name: /EVD-0501/ })).toBeTruthy();
+    const delimitationItem = items.find((item) => within(item).queryByText("Delimitação"))!;
+    expect(within(delimitationItem).queryByText("Evidência relacionada:")).toBeNull();
+  });
+
+  it("omits an individual stage when its summary is absent, without inferring or fabricating text", async () => {
+    render(
+      <ProblemView
+        dataProvider={pathProvider(
+          { title: "Partial path", status: "OPEN", investigation: { path: { development: { summary: "Only development is authored." } } } },
+          []
+        )}
+        problemId="PRB-0500"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Partial path" });
+    const section = screen.getByLabelText("Como chegámos a este problema");
+    expect(within(section).getByText("Desenvolvimento da investigação")).toBeTruthy();
+    expect(within(section).queryByText("Sinal inicial")).toBeNull();
+    expect(within(section).queryByText("Delimitação")).toBeNull();
+  });
+
+  it("does not render current_formulation anywhere in the path section", async () => {
+    render(
+      <ProblemView
+        dataProvider={pathProvider(
+          {
+            title: "Current formulation fixture",
+            status: "OPEN",
+            investigation: {
+              current_formulation: "This must never be rendered by PI-02E.",
+              path: { initial_signal: { summary: "Authored initial signal." } },
+            },
+          },
+          []
+        )}
+        problemId="PRB-0500"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Current formulation fixture" });
+    expect(screen.queryByText("This must never be rendered by PI-02E.")).toBeNull();
+  });
+
+  it("renders the final Problem View body section order: Estado atual, Evidência, O que ainda não sabemos, Como chegámos a este problema", async () => {
+    render(
+      <ProblemView
+        dataProvider={pathProvider(
+          {
+            title: "Order fixture",
+            status: "OPEN",
+            evidence: ["EVD-0501"],
+            decision_basis: {
+              manifestation: { summary: "Manifestation summary for the order fixture." },
+              corroboration_statement: "Corroboration statement.",
+            },
+            investigation: {
+              open_questions: [{ question: "An open question." }],
+              path: { initial_signal: { summary: "Initial signal summary." } },
+            },
+          },
+          ["EVD-0501"]
+        )}
+        problemId="PRB-0500"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Order fixture" });
+    const main = document.querySelector(".record-detail-main")!;
+    const sections = Array.from(main.querySelectorAll("section.problem-section")).map((section) => section.getAttribute("aria-label"));
+
+    expect(sections).toEqual([
+      "Estado atual",
+      "Evidência",
+      "O que ainda não sabemos — e o que estamos a fazer",
+      "Como chegámos a este problema",
+    ]);
+  });
+});
+
+describe("ProblemView — PI-02F1 dynamic reading index", () => {
+  const INDEX_FIXTURE: RecordSummary[] = [
+    { id: "PRB-0600", type: "PRB-", label: "Index fixture", file: "research/problems/PRB-0600.yaml", summaryFields: {} },
+  ];
+
+  function indexProvider(record: Record<string, unknown>): DataProvider {
+    const detail: RecordDetail = {
+      id: "PRB-0600",
+      type: "PRB-",
+      file: "research/problems/PRB-0600.yaml",
+      record,
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(INDEX_FIXTURE),
+      getRecord: () => Promise.resolve(detail),
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  function topLevelLabels(navName: string) {
+    return Array.from(screen.getByRole("navigation", { name: navName }).querySelectorAll(":scope > ul > li > a")).map((a) => a.textContent);
+  }
+
+  function railLabels() {
+    return topLevelLabels("Nesta página");
+  }
+
+  function compactLabels() {
+    return topLevelLabels("Nesta página (versão compacta)");
+  }
+
+  function subsectionLabels(navName: string, topLevelLabel: string) {
+    const nav = screen.getByRole("navigation", { name: navName });
+    const topLevelLink = within(nav).getByRole("link", { name: topLevelLabel });
+    const li = topLevelLink.closest("li")!;
+    const nestedList = li.querySelector(":scope > ul")!;
+    return Array.from(nestedList.querySelectorAll("a")).map((a) => a.textContent);
+  }
+
+  it("lists only Evidência when no section — including Estado atual — has authored content, in canonical order, in both the rail and the compact index", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({ title: "Minimal problem", status: "OPEN" })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Minimal problem" });
+
+    expect(railLabels()).toEqual(["Evidência"]);
+    expect(compactLabels()).toEqual(["Evidência"]);
+    expect(screen.queryByLabelText("Estado atual")).toBeNull();
+    expect(document.getElementById("problem-estado-atual")).toBeNull();
+  });
+
+  it("PI-02F1 follow-up: adds 'Estado atual' to the index only when decision_basis authors manifestation.summary, consequence.summary, currentness.assessment, or scope — a partial decision_basis is enough", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({
+          title: "Partial current-state problem",
+          status: "OPEN",
+          decision_basis: { consequence: { summary: "A documented downstream effect." } },
+        })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Partial current-state problem" });
+
+    expect(railLabels()).toEqual(["Estado atual", "Evidência"]);
+    expect(subsectionLabels("Nesta página", "Estado atual")).toEqual(["Consequências conhecidas"]);
+    const stateSection = screen.getByLabelText("Estado atual");
+    expect(within(stateSection).getByText("A documented downstream effect.")).toBeTruthy();
+  });
+
+  it("PI-02F3: 'O que sustenta esta leitura' no longer exists as a section or index entry, with or without corroboration_statement authored", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({
+          title: "Support-only, no current-state problem",
+          status: "OPEN",
+          decision_basis: { corroboration_statement: "Corroborated by two threads." },
+        })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Support-only, no current-state problem" });
+
+    expect(railLabels()).toEqual(["Evidência"]);
+    expect(screen.queryByLabelText("O que sustenta esta leitura")).toBeNull();
+    expect(document.getElementById("problem-sustentacao")).toBeNull();
+    expect(screen.queryByText("Corroborated by two threads.")).toBeNull();
+    expect(screen.queryByLabelText("Estado atual")).toBeNull();
+    expect(document.getElementById("problem-estado-atual")).toBeNull();
+  });
+
+  it("adds 'O que ainda não sabemos — e o que estamos a fazer' to the index only when investigation.open_questions or decision_basis.contradiction_search is authored, with a 'Perguntas em aberto' subsection entry", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({
+          title: "Open questions problem",
+          status: "OPEN",
+          investigation: { open_questions: [{ question: "An open question." }] },
+        })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Open questions problem" });
+
+    expect(railLabels()).toEqual(["Evidência", "O que ainda não sabemos — e o que estamos a fazer"]);
+    expect(subsectionLabels("Nesta página", "O que ainda não sabemos — e o que estamos a fazer")).toEqual(["Perguntas em aberto"]);
+  });
+
+  it("adds 'Como chegámos a este problema' to the index only when investigation.path has an authored stage, with a matching stage subsection entry", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({
+          title: "Path problem",
+          status: "OPEN",
+          investigation: { path: { initial_signal: { summary: "The first signal." } } },
+        })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Path problem" });
+
+    expect(railLabels()).toEqual(["Evidência", "Como chegámos a este problema"]);
+    expect(subsectionLabels("Nesta página", "Como chegámos a este problema")).toEqual(["Sinal inicial"]);
+  });
+
+  it("lists every top-level section, in canonical order, when all optional sections are authored, matching both index and body order", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({
+          title: "Full problem",
+          status: "OPEN",
+          decision_basis: {
+            manifestation: { summary: "Manifestation summary for the full fixture." },
+            corroboration_statement: "Corroborated.",
+          },
+          investigation: {
+            open_questions: [{ question: "An open question." }],
+            path: { initial_signal: { summary: "The first signal." } },
+          },
+        })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Full problem" });
+
+    const expected = ["Estado atual", "Evidência", "O que ainda não sabemos — e o que estamos a fazer", "Como chegámos a este problema"];
+    expect(railLabels()).toEqual(expected);
+    expect(compactLabels()).toEqual(expected);
+
+    // Every listed anchor id — top-level and subsection — must resolve to an actual rendered element in the document.
+    for (const href of Array.from(screen.getByRole("navigation", { name: "Nesta página" }).querySelectorAll("a")).map((a) =>
+      a.getAttribute("href")
+    )) {
+      expect(document.querySelector(href!)).toBeTruthy();
+    }
+  });
+
+  it("never links to an absent section — omitted-section labels are not present anywhere in the index", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({ title: "Minimal problem", status: "OPEN" })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Minimal problem" });
+
+    const rail = screen.getByRole("navigation", { name: "Nesta página" });
+    const allRailLabels = Array.from(rail.querySelectorAll("a")).map((a) => a.textContent);
+    expect(allRailLabels).not.toContain("Estado atual");
+    expect(allRailLabels).not.toContain("O que sustenta esta leitura");
+    expect(allRailLabels).not.toContain("O que ainda não sabemos — e o que estamos a fazer");
+    expect(allRailLabels).not.toContain("Como chegámos a este problema");
+    expect(document.getElementById("problem-estado-atual")).toBeNull();
+    expect(document.getElementById("problem-sustentacao")).toBeNull();
+    expect(document.getElementById("problem-questoes-abertas")).toBeNull();
+    expect(document.getElementById("problem-percurso")).toBeNull();
+  });
+});
+
 const GENERATED_DIR = path.resolve(__dirname, "..", "..", "generated");
 const hasRealCorpus = fs.existsSync(path.join(GENERATED_DIR, "index.json"));
 
@@ -401,7 +1411,8 @@ describe.skipIf(!hasRealCorpus)("ProblemView — real generated corpus regressio
   it("keeps EVD-000127's explicit CONTRADICTS contribution, observation, and source visible for PRB-0006", async () => {
     render(<ProblemView dataProvider={realCorpusProvider()} problemId="PRB-0006" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
-    const evidenceButton = await screen.findByRole("button", { name: /EVD-000127/ });
+    const evidenceSection = await screen.findByLabelText("Evidência");
+    const evidenceButton = await within(evidenceSection).findByRole("button", { name: /EVD-000127/ });
     const evidenceItem = evidenceButton.closest("li")!;
     expect(within(evidenceItem).getByText("Contradiz")).toBeTruthy();
     expect(within(evidenceItem).getByText("Os SASUE consideram plenamente operacional o atual processo de candidatura a alojamento em residência. Referem que as necessidades de esclarecimento ou de alteração do processo que envolvam estudantes ou pessoal institucional são encaminhadas para os serviços de informática da Universidade, para que seja prestado o apoio ou efetuada a alteração adequada.")).toBeTruthy();

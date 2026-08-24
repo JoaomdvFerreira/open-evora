@@ -519,6 +519,12 @@ code {
    CONTRADICTS, shares identical border weight/padding/background/font size.
    Never give any one value structural or colour emphasis over another.
    V3: restated on V1 tokens/IBM Plex Mono per Prototype B's chip anatomy. */
+.contribution-chip-wrap {
+  position: relative;
+  display: inline-flex;
+  margin-right: var(--space-2);
+}
+
 .contribution-chip {
   display: inline-flex;
   align-items: center;
@@ -529,12 +535,41 @@ code {
   background: var(--surface);
   font-family: var(--recipe-technical-id-family);
   font-size: 11px;
-  margin-right: var(--space-2);
 }
 
 .contribution-chip code {
   background: none;
   padding: 0;
+}
+
+/* PI-02F3: contribution-label help — same visible-on-hover/focus tooltip
+   pattern as .unavailable-note (UX-F), reused here so keyboard focus exposes
+   the explanation exactly as pointer hover does. */
+.contribution-chip-note {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 4px);
+  z-index: 1;
+  width: max-content;
+  max-width: 220px;
+  padding: 3px 8px;
+  color: var(--canvas);
+  background: var(--ink);
+  border-radius: var(--radius-sm);
+  font-family: var(--ui);
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+}
+
+.contribution-chip-wrap:hover .contribution-chip-note,
+.contribution-chip:focus-visible ~ .contribution-chip-note {
+  opacity: 1;
+  visibility: visible;
 }
 
 .evidence-item-header {
@@ -1616,6 +1651,18 @@ main.explorer-shell {
   text-underline-offset: 0.16em;
 }
 
+/* PI-02F3: hierarchical "Nesta página" — nested subsection links are indented
+   and slightly smaller, purely to signal structure (top-level vs. subsection),
+   never severity or ranking. */
+.problem-rail-nav li > ul {
+  margin-left: var(--space-3);
+}
+
+.problem-rail-nav li > ul a {
+  font-size: 12px;
+  color: var(--ink-faintest);
+}
+
 .detail-rail-file {
   display: block;
   padding: var(--space-2) var(--space-3);
@@ -2279,6 +2326,18 @@ main.explorer-shell {
   gap: var(--space-1) var(--space-3);
 }
 
+/* PI-02F3: subsection links stay in the same flex-wrap row group as their
+   top-level entry's siblings but read visually subordinate — no ranking
+   implied, purely a structural (top-level vs. subsection) distinction. */
+.problem-help-section-index li > ul a {
+  font-size: 12px;
+  color: var(--ink-faintest);
+}
+
+.problem-help-section-index li > ul a::before {
+  content: "› ";
+}
+
 .problem-identity {
   border: 1px solid var(--line-emphasis);
   border-radius: var(--radius-lg);
@@ -2333,6 +2392,122 @@ main.explorer-shell {
   line-height: var(--recipe-editorial-body-line-height);
 }
 
+.problem-header-statement {
+  margin-bottom: var(--space-5);
+}
+
+/* PI-02B header facts (Onde / Quem é afetado / Atualidade / Âmbito) — compact
+   dt/dd pairs, same visual register as the technical provenance grid rather
+   than a new pattern. */
+.problem-header-facts {
+  display: grid;
+  gap: var(--space-3) var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin: 0 0 var(--space-5);
+}
+
+.problem-header-fact dt {
+  margin-bottom: 2px;
+  color: var(--ink-faintest);
+  font-family: var(--ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.problem-header-fact dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* PI-02B "Estado atual" items — one labelled block per authored
+   decision_basis field, no shared card chrome beyond the existing
+   .problem-section rhythm. */
+.problem-current-state-item {
+  margin-bottom: var(--space-5);
+}
+
+.problem-current-state-item:last-child {
+  margin-bottom: 0;
+}
+
+.problem-current-state-item h4 {
+  margin: 0 0 var(--space-2);
+  color: var(--ink-faint);
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.problem-current-state-item p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.problem-scope-grid {
+  display: grid;
+  gap: var(--space-3) var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin: 0;
+}
+
+.problem-scope-item dt {
+  margin-bottom: 2px;
+  color: var(--ink-faintest);
+  font-family: var(--ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.problem-scope-item dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* PI-02C §2 "O que sustenta esta leitura" — corroboration_statement reuses
+   the editorial-body treatment of .problem-statement; independence_assessment
+   reuses the existing .problem-current-state-item labelled-block pattern. */
+.problem-support-statement {
+  max-width: none;
+  margin: 0 0 var(--space-5);
+  color: var(--ink);
+  font-family: var(--recipe-editorial-body-family);
+  font-size: var(--recipe-editorial-body-size);
+  font-weight: var(--recipe-editorial-body-weight);
+  line-height: var(--recipe-editorial-body-line-height);
+}
+
+/* PI-02C §3 evidence groups (Evidência que suporta / que limita a conclusão /
+   Outra evidência relacionada) — a labelled heading above the existing
+   .evidence-list, no per-group visual ranking beyond the heading text
+   itself. */
+.evidence-group {
+  margin-bottom: var(--space-6);
+}
+
+.evidence-group:last-child {
+  margin-bottom: 0;
+}
+
+.evidence-group h4 {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-faint);
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .evidence-list {
   list-style: none;
   margin: 0;
@@ -2371,6 +2546,68 @@ main.explorer-shell {
   margin: var(--space-2) 0 0;
   padding-left: var(--space-5);
   font-size: 13px;
+}
+
+/* PI-02D "O que ainda não sabemos — e o que estamos a fazer" — each
+   open_questions[] item (plus contradiction_search) reuses the existing
+   .problem-current-state-item labelled-block pattern for its sub-fields;
+   only the item wrapper, question heading, and compact evidence-reference
+   row are new. */
+.open-question-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.open-question-item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.open-question-question {
+  margin: 0 0 var(--space-4);
+  color: var(--ink);
+  font-family: var(--recipe-editorial-body-family);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.open-question-evidence-refs {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.open-question-evidence-refs-label {
+  margin-right: var(--space-2);
+  color: var(--ink-faintest);
+  font-family: var(--ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.open-question-evidence-refs-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.open-question-evidence-refs-list li {
+  display: inline-flex;
+}
+
+.open-question-evidence-refs-list button {
+  font-family: var(--recipe-technical-id-family);
+  font-size: 12px;
 }
 
 /* "Estado atual" canonical-value-plus-gloss chips (REDUX-007/008 §8) —

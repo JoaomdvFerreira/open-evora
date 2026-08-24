@@ -5,24 +5,24 @@ domain:
   - "URB"
 geography:
   level: city
-  area: "Évora city"
+  area: "Évora"
 affected_populations:
-  - "current and potential cyclists"
-problem_statement: "O planeamento institucional descreve os percursos cicláveis como limitados, descontínuos e insuficientemente ligados a destinos importantes. Não está ainda estabelecido quais as deslocações quotidianas concretas afetadas por esta descontinuidade, nem em que medida esta reduz, na prática, a utilidade da rede para quem se desloca diariamente de bicicleta."
-causal_reading: "O problema central é de infraestrutura física (descontinuidade e conectividade da rede ciclável), não de software de planeamento de rotas. Esta leitura não está validada."
+  - "ciclistas atuais e potenciais"
+problem_statement: "O planeamento institucional descreve os percursos cicláveis como limitados, descontínuos e insuficientemente ligados a destinos importantes. Não está ainda estabelecido quais as deslocações quotidianas concretas afetadas por esta descontinuidade, nem em que medida ela reduz, na prática, a utilidade da rede para quem se desloca diariamente de bicicleta."
+causal_reading: "O problema central é de infraestrutura física — descontinuidade e conectividade da rede ciclável — e não de aplicações de planeamento de percursos. Esta leitura não está validada."
 investigation:
   open_questions:
-    - question: "A Câmara mantém uma camada operacional de dados (GIS) atual da rede ciclável, em que formato, e pode ser reutilizada publicamente?"
-      why_open: "A cartografia oficial pública está datada de 2020; um regulamento municipal confirma capacidade de fornecimento em formato estruturado (SHP/DWG/ECW) mediante pedido formal, mas não a existência de um conjunto de dados aberto; uma notícia de março de 2025 confirma pelo menos uma ligação concluída desde a cartografia de 2020, pelo que a cartografia estática não deve ser lida como representando necessariamente a rede operacional atual."
-      resolution_condition: "Confirmação institucional (DAM) sobre a existência, formato e condições de reutilização pública de uma camada operacional atual."
+    - question: "A Câmara Municipal mantém uma camada operacional e atual de dados geográficos (SIG) sobre a rede ciclável? Em que formato e em que condições pode ser reutilizada publicamente?"
+      why_open: "A cartografia oficial pública está datada de 2020; um regulamento municipal confirma a capacidade de fornecimento de dados em formatos estruturados (SHP/DWG/ECW) mediante pedido formal, mas não a existência de um conjunto de dados aberto. Uma notícia de março de 2025 confirma pelo menos uma ligação concluída desde a cartografia de 2020, pelo que a cartografia estática não deve ser interpretada como representando necessariamente a rede operacional atual."
+      resolution_condition: "Confirmação institucional pela DAM sobre a existência de uma camada operacional atual, o seu formato e as respetivas condições de reutilização pública."
       evidence:
         - "EVD-000118"
         - "EVD-000120"
         - "EVD-000121"
-    - question: "Quais as deslocações/percursos quotidianos concretos afetados pela descontinuidade da rede ciclável?"
-      why_open: "A cartografia oficial confirma a extensão e composição da rede, mas não identifica quais deslocações/percursos do dia a dia são concretamente afetados pela descontinuidade, nem em que medida esta reduz a utilidade prática da rede para quem se desloca diariamente de bicicleta."
-      current_action: "Observação direta, análise da rede de percursos e validação com partes interessadas/utilizadores permanecem a via de investigação para caracterizar as deslocações afetadas."
-      resolution_condition: "Validação, ao longo das dimensões de conectividade, segurança, manutenção, utilidade do destino e orientação/sinalética, que estabeleça quais as deslocações quotidianas concretas afetadas."
+    - question: "Quais são as deslocações e os percursos quotidianos concretamente afetados pela descontinuidade da rede ciclável?"
+      why_open: "A cartografia oficial confirma a extensão e a composição da rede, mas não identifica quais as deslocações ou percursos do dia a dia concretamente afetados pela descontinuidade, nem em que medida esta reduz a utilidade prática da rede para quem se desloca diariamente de bicicleta."
+      current_action: "A observação direta, a análise da rede de percursos e a validação com partes interessadas e utilizadores continuam a ser as vias de investigação para caracterizar as deslocações afetadas."
+      resolution_condition: "Validação das dimensões de conectividade, segurança, manutenção, utilidade para os destinos e orientação/sinalética, de forma a estabelecer quais as deslocações quotidianas concretamente afetadas."
       evidence:
         - "EVD-000118"
   path:
@@ -31,7 +31,7 @@ investigation:
       evidence:
         - "EVD-000005"
     delimitation:
-      summary: "Não foi encontrado sinal público independente, recente e suficientemente forte para confirmar ou refinar PRB-0004 como problema de deslocação quotidiana urbana, apesar de pesquisa delimitada explícita; esta é uma lacuna de cobertura de sinal público, não evidência de ausência do problema. A cartografia oficial da rede ciclável existente confirma infraestrutura exclusivamente ciclável (~8,5km) e percursos pedonal-ciclável partilhados (~120km, maioritariamente recreativos), reiterando o diagnóstico de descontinuidade."
+      summary: "Não foi encontrado um sinal público independente, recente e suficientemente forte que permitisse confirmar ou refinar PRB-0004 como um problema de deslocação quotidiana urbana, apesar de ter sido realizada uma pesquisa explícita e delimitada. Trata-se de uma lacuna na cobertura de sinais públicos, e não de evidência da ausência do problema.\n\nA cartografia oficial da rede ciclável existente confirma cerca de 8,5 km de infraestrutura exclusivamente ciclável e cerca de 120 km de percursos pedonais e cicláveis partilhados, maioritariamente recreativos, reiterando o diagnóstico de descontinuidade."
       evidence:
         - "EVD-000118"
 evidence:
