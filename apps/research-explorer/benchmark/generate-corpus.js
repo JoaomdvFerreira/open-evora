@@ -3,12 +3,12 @@
  * RE-05 synthetic scale-corpus generator.
  *
  * Produces a deterministic, disposable research-tree fixture (schemas/ +
- * sources/evidence/problems/assessments/notes YAML) shaped like
- * the real corpus's structural patterns (SRC/EVD/PRB/ASM proportions,
- * shared-source hub nodes, high-degree problems, list/reference fields, one
- * schema-conforming future/unknown type: NOTE-) so the real adapter code
- * path (validate-research-bridge.js + read-model.js) can be exercised at
- * scale without touching canonical research/**.
+ * sources/evidence/problems/notes YAML) shaped like the real corpus's
+ * structural patterns (SRC/EVD/PRB proportions, shared-source hub nodes,
+ * high-degree problems, list/reference fields, one schema-conforming
+ * future/unknown type: NOTE-) so the real adapter code path
+ * (validate-research-bridge.js + read-model.js) can be exercised at scale
+ * without touching canonical research/**.
  *
  * Usage: node generate-corpus.js <scale> <outDir>
  */
@@ -74,17 +74,16 @@ function toYaml(record) {
 }
 
 // --- scale-proportional counts, matching the real corpus's SRC/EVD-heavy,
-// PRB/ASM-light shape (roughly 40/50/4.5/4.5 in the real 223-record
-// corpus), plus a small NOTE (future-type) slice the real corpus doesn't yet
-// exercise. ------------------------------------------------------
+// PRB-light shape (roughly 42/53/4 in the real 236-record corpus), plus a
+// small NOTE (future-type) slice the real corpus doesn't yet exercise.
+// ------------------------------------------------------
 function computeCounts(scale) {
   const prb = Math.max(5, Math.round(scale * 0.04));
-  const asm = Math.max(3, Math.round(prb * 0.9));
   const note = Math.max(3, Math.round(scale * 0.012));
   const src = Math.max(10, Math.round(scale * 0.34));
-  const evd = scale - prb - asm - note - src;
+  const evd = scale - prb - note - src;
   if (evd <= 0) throw new Error(`Scale ${scale} too small for proportional generation`);
-  return { src, evd, prb, asm, note };
+  return { src, evd, prb, note };
 }
 
 const DOMAINS = ["MOB", "ACC", "SOC", "HOU", "HEA", "EMP", "ECO", "EDU"];
@@ -103,13 +102,6 @@ const PRB_VALIDATION_STATUS = ["unvalidated", "partially_validated", "validated"
 const DIGITAL_TRACT = ["not_assessed", "low", "medium", "high"];
 const EXIST_SOL = ["not_assessed", "assessed"];
 const PRB_STATUS = ["OPEN", "REJECTED", "DUPLICATE", "NON_DIGITAL", "ALREADY_SOLVED", "INSUFFICIENT_EVIDENCE"];
-const HML = ["HIGH", "MEDIUM", "LOW", "UNKNOWN", "NOT_ASSESSED"];
-const STAKEHOLDER_VAL = ["PENDING", "PARTIAL", "CHALLENGED", "VALIDATED", "NOT_APPLICABLE"];
-const SPI = ["SUFFICIENT", "PARTIAL", "INSUFFICIENT", "UNKNOWN", "NOT_ASSESSED"];
-const GATE = ["PASS", "PARTIAL", "FAIL", "UNKNOWN", "NOT_ASSESSED"];
-const STRUCT_ACTION = ["KEEP", "SPLIT_CANDIDATE", "MERGE_CANDIDATE"];
-const TRIAGE = ["STOP", "WATCH", "DEEPEN", "PROCEED"];
-const CU_IMPACT = ["HIGH", "MEDIUM", "LOW"];
 
 function pick(rng, arr) {
   return arr[Math.floor(rng() * arr.length)];
@@ -128,12 +120,11 @@ function pickN(rng, arr, n) {
 
 function generate(scale, outDir) {
   const rng = mulberry32(0xe5f7a5 ^ scale);
-  const { src, evd, prb, asm, note } = computeCounts(scale);
+  const { src, evd, prb, note } = computeCounts(scale);
 
   const srcIds = Array.from({ length: src }, (_, i) => `SRC-${pad(i + 1, 4)}`);
   const evdIds = Array.from({ length: evd }, (_, i) => `EVD-${pad(i + 1, 6)}`);
   const prbIds = Array.from({ length: prb }, (_, i) => `PRB-${pad(i + 1, 4)}`);
-  const asmIds = Array.from({ length: asm }, (_, i) => `ASM-${pad(i + 1, 4)}`);
   const noteIds = Array.from({ length: note }, (_, i) => `NOTE-${pad(i + 1, 4)}`);
 
   // A small hub of high-degree SRC/PRB nodes, per RE-05's "some higher-degree
@@ -141,7 +132,7 @@ function generate(scale, outDir) {
   const hubSrc = srcIds.slice(0, Math.max(2, Math.ceil(src * 0.03)));
   const hubPrb = prbIds.slice(0, Math.max(1, Math.ceil(prb * 0.05)));
 
-  for (const dir of ["schemas", "sources", "evidence", "problems", "assessments", "notes"]) {
+  for (const dir of ["schemas", "sources", "evidence", "problems", "notes"]) {
     fs.mkdirSync(path.join(outDir, dir), { recursive: true });
   }
 
@@ -245,66 +236,6 @@ function generate(scale, outDir) {
     fs.writeFileSync(path.join(outDir, "problems", `${id}.yaml`), toYaml(rec));
   }
 
-  // --- ASM ------------------------------------------------------------------
-  for (let i = 0; i < asmIds.length; i++) {
-    const id = asmIds[i];
-    const problemId = prbIds[i % prbIds.length];
-    const rec = {
-      assessment_id: id,
-      problem: problemId,
-      as_of: "2026-08-11",
-      phase: "D3",
-      assessment_status: "CURRENT",
-      evidence_confidence: {
-        overall: pick(rng, HML),
-        independence: pick(rng, HML),
-        coherence: pick(rng, HML),
-        adequacy: pick(rng, HML),
-        relevance: pick(rng, HML),
-        currentness: pick(rng, HML),
-        contradiction_status: pick(rng, HML),
-        stakeholder_validation: pick(rng, STAKEHOLDER_VAL),
-      },
-      civic_importance: {
-        reach: pick(rng, HML),
-        frequency: pick(rng, HML),
-        severity: pick(rng, HML),
-        persistence: pick(rng, HML),
-        equity: pick(rng, HML),
-      },
-      journey_understanding: pick(rng, SPI),
-      causal_understanding: pick(rng, SPI),
-      existing_solution_understanding: pick(rng, SPI),
-      remaining_gap: pick(rng, SPI),
-      digital_leverage: pick(rng, DIGITAL_TRACT),
-      structure_action: pick(rng, STRUCT_ACTION),
-      decision_gates: {
-        problem_real: pick(rng, GATE),
-        civic_importance: pick(rng, GATE),
-        journey_understood: pick(rng, GATE),
-        root_cause_understood: pick(rng, GATE),
-        remaining_gap_supported: pick(rng, GATE),
-        digital_causality: pick(rng, GATE),
-        operability: pick(rng, GATE),
-        testability: pick(rng, GATE),
-      },
-      triage: pick(rng, TRIAGE),
-    };
-    if (rng() < 0.5) {
-      const cu = {};
-      const n = 1 + Math.floor(rng() * 3);
-      for (let u = 1; u <= n; u++) {
-        cu[`U${u}`] = {
-          question: `Synthetic critical unknown ${u} for ${id}?`,
-          decision_impact: pick(rng, CU_IMPACT),
-          target_phase: "D3",
-        };
-      }
-      rec.critical_unknowns = cu;
-    }
-    fs.writeFileSync(path.join(outDir, "assessments", `${id}.yaml`), toYaml(rec));
-  }
-
   // --- NOTE (schema-conforming future/unknown type) ------------------------
   for (let i = 0; i < noteIds.length; i++) {
     const id = noteIds[i];
@@ -314,7 +245,7 @@ function generate(scale, outDir) {
     fs.writeFileSync(path.join(outDir, "notes", `${id}.yaml`), toYaml(rec));
   }
 
-  return { src, evd, prb, asm, note, total: src + evd + prb + asm + note };
+  return { src, evd, prb, note, total: src + evd + prb + note };
 }
 
 function main() {

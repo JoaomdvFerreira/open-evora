@@ -8,7 +8,6 @@ import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/
 
 const INDEX: RecordSummary[] = [
   { id: "PRB-0005", type: "PRB-", label: "Parking pressure", file: "research/problems/PRB-0005.yaml", summaryFields: {} },
-  { id: "ASM-0005", type: "ASM-", label: "ASM-0005", file: "research/assessments/ASM-0005.yaml", summaryFields: {} },
   { id: "EVD-0001", type: "EVD-", label: "Evidence one", file: "research/evidence/EVD-0001.yaml", summaryFields: {} },
   { id: "SRC-0001", type: "SRC-", label: "Source one", file: "research/sources/SRC-0001.yaml", summaryFields: {} },
   { id: "WID-0001", type: "WID-", label: "Future widget", file: "research/widgets/WID-0001.yaml", summaryFields: {} },
@@ -21,21 +20,6 @@ const DETAILS: Record<string, RecordDetail> = {
     file: "research/problems/PRB-0005.yaml",
     record: { title: "Parking pressure", status: "OPEN", problem_statement: "Traffic and parking conflict with pedestrian space." },
     outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-0001" }],
-    incomingEdges: [{ field: "problem", ordinal: null, from: "ASM-0005" }],
-  },
-  "ASM-0005": {
-    id: "ASM-0005",
-    type: "ASM-",
-    file: "research/assessments/ASM-0005.yaml",
-    record: {
-      assessment_id: "ASM-0005",
-      problem: "PRB-0005",
-      triage: "DEEPEN",
-      assessment_status: "CURRENT",
-      remaining_gap: "PARTIAL",
-      critical_unknowns: { U1: { question: "Existe uma fricção significativa na procura?", decision_impact: "HIGH", target_phase: "D5", best_next_evidence: ["observação delimitada do percurso"] }, U2: { question: "A informação atual é suficiente?", decision_impact: "MEDIUM", target_phase: "D3", best_next_evidence: ["validação com utilizadores"] } },
-    },
-    outgoingEdges: [{ field: "problem", ordinal: null, to: "PRB-0005" }],
     incomingEdges: [],
   },
   "EVD-0001": {
@@ -102,35 +86,15 @@ describe("ProblemView", () => {
     expect(onOpenGeneric).toHaveBeenCalledWith("EVD-0001");
   });
 
-  it("surfaces identity, current state, assessment, evidence, sources, and unknowns for a real problem shape", async () => {
+  it("surfaces identity, current state, evidence, and sources for a real problem shape", async () => {
     render(<ProblemView dataProvider={fakeProvider()} problemId="PRB-0005" onOpenGeneric={vi.fn()} onBackToRecords={vi.fn()} onBackToOverview={vi.fn()} onViewInGraph={vi.fn()} />);
 
     await screen.findByRole("heading", { name: "Parking pressure" });
     expect(screen.getByText(/Traffic and parking conflict/)).toBeTruthy();
 
-    const assessmentSection = screen.getByLabelText("Avaliação");
-    expect(within(assessmentSection).getByText(/ASM-0005/)).toBeTruthy();
-    expect(within(assessmentSection).getByText("Aprofundar")).toBeTruthy();
-
     const evidenceSection = screen.getByLabelText("Evidência");
     expect(within(evidenceSection).getByText(/EVD-0001/)).toBeTruthy();
     expect(within(evidenceSection).getByText(/SRC-0001/)).toBeTruthy();
-
-    const unknownsSection = screen.getByLabelText("Incertezas e lacunas");
-    expect(within(unknownsSection).getByText("Lacuna remanescente:")).toBeTruthy();
-    expect(within(unknownsSection).getByText("Incertezas")).toBeTruthy();
-    expect(within(unknownsSection).getAllByText("Questão em aberto:").length).toBe(2);
-    expect(within(unknownsSection).getAllByText("Próxima evidência:").length).toBe(2);
-    expect(within(unknownsSection).getByText("Parcial")).toBeTruthy();
-    expect(within(unknownsSection).getByText("Elevado")).toBeTruthy();
-    expect(within(unknownsSection).getByText("Médio")).toBeTruthy();
-    expect(within(unknownsSection).getByText("D3")).toBeTruthy();
-    expect(within(unknownsSection).getByText("D5")).toBeTruthy();
-    expect(within(unknownsSection).getByText("Existe uma fricção significativa na procura?")).toBeTruthy();
-    expect(within(unknownsSection).getByText("observação delimitada do percurso")).toBeTruthy();
-    for (const raw of ["remaining_gap", "critical_unknowns", "PARTIAL", "HIGH", "MEDIUM", "decision_impact", "target_phase"]) {
-      expect(within(unknownsSection).queryByText(raw)).toBeNull();
-    }
   });
 
   it("only surfaces SRC- typed targets as Sources, and does not crash when evidence links a non-source future type", async () => {
@@ -338,9 +302,7 @@ describe("ProblemView", () => {
 
     const expectedSections = [
       { id: "problem-estado-atual", label: "Estado atual" },
-      { id: "problem-avaliacao", label: "Avaliação" },
       { id: "problem-evidencia", label: "Evidência" },
-      { id: "problem-incertezas", label: "Incertezas e lacunas" },
     ];
 
     for (const { id, label } of expectedSections) {

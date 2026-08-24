@@ -98,23 +98,6 @@ const WID_0001_DETAIL: RecordDetail = {
   incomingEdges: [{ field: "widgets", ordinal: 0, from: "PRB-0006" }],
 };
 
-const ASM_0001_SUMMARY: RecordSummary = {
-  id: "ASM-0001",
-  type: "ASM-",
-  label: "Avaliação de PRB-0006",
-  file: "research/assessments/ASM-0001.yaml",
-  summaryFields: { assessment_status: "CURRENT" },
-};
-
-const ASM_0001_DETAIL: RecordDetail = {
-  id: "ASM-0001",
-  type: "ASM-",
-  file: "research/assessments/ASM-0001.yaml",
-  record: { assessment_id: "ASM-0001", problem: "PRB-0006" },
-  outgoingEdges: [{ field: "problem", ordinal: null, to: "PRB-0006" }],
-  incomingEdges: [],
-};
-
 function buildLookup(...summaries: RecordSummary[]): Map<string, RecordSummary> {
   return new Map(summaries.map((s) => [s.id, s]));
 }
@@ -392,23 +375,6 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
     expect(within(panel).queryByRole("button", { name: /Ver como Problema/ })).toBeNull();
   });
 
-  it("offers 'Ver como Problema' for a non-EVD record via its own schema's canonical `problem` reference field", async () => {
-    render(
-      <RecordDetailPanel
-        dataProvider={fakeProvider({ "ASM-0001": ASM_0001_DETAIL })}
-        lookup={buildLookup(ASM_0001_SUMMARY, PRB_0006_SUMMARY)}
-        selectedId="ASM-0001"
-        onSelect={noop}
-        onBackToRecords={noop}
-        onViewAsProblem={noop}
-        onViewInGraph={noop}
-      />
-    );
-
-    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    expect(await within(panel).findByRole("button", { name: "Ver como Problema (PRB-0006)" })).toBeTruthy();
-  });
-
   it("moves focus onto the freshly-loaded detail content (no regression to existing focus behavior)", async () => {
     render(
       <RecordDetailPanel
@@ -533,13 +499,15 @@ describe("RecordDetailPanel — meaning-first hierarchy (REDUX-001/003)", () => 
 
 /**
  * PRB-0001 acceptance case (relationship semantics correction): 10 outgoing
- * PRB→EVD paths, 11 incoming paths (the same 10 EVDs → PRB, plus ASM-0001 →
- * PRB) = 21 exact paths total, but only 11 unique related records (10 EVDs +
- * 1 ASM, since every EVD is reciprocally referenced in both directions).
- * `edges.length` alone (10 or 11 or 21) must never be presented as "records".
+ * PRB→EVD paths, 11 incoming paths (the same 10 EVDs → PRB, plus one
+ * incoming-only EVD-000011 → PRB) = 21 exact paths total, but only 11
+ * unique related records (10 EVDs reciprocally referenced in both
+ * directions, plus 1 incoming-only EVD). `edges.length` alone (10 or 11 or
+ * 21) must never be presented as "records".
  */
 function buildPrb0001Fixture() {
   const evdIds = Array.from({ length: 10 }, (_, i) => `EVD-${String(i + 1).padStart(6, "0")}`);
+  const incomingOnlyId = "EVD-000011";
   const evdSummaries = evdIds.map(
     (id): RecordSummary => ({
       id,
@@ -549,12 +517,12 @@ function buildPrb0001Fixture() {
       summaryFields: {},
     })
   );
-  const asmSummary: RecordSummary = {
-    id: "ASM-0001",
-    type: "ASM-",
-    label: "Avaliação de PRB-0001",
-    file: "research/assessments/ASM-0001.yaml",
-    summaryFields: { assessment_status: "CURRENT" },
+  const incomingOnlySummary: RecordSummary = {
+    id: incomingOnlyId,
+    type: "EVD-",
+    label: "Evidência EVD-000011 (apenas entrada)",
+    file: "research/evidence/EVD-000011.yaml",
+    summaryFields: {},
   };
   const prbSummary: RecordSummary = {
     id: "PRB-0001",
@@ -567,7 +535,7 @@ function buildPrb0001Fixture() {
   const outgoingEdges = evdIds.map((id, index) => ({ field: "evidence", ordinal: index, to: id }));
   const incomingEdges = [
     ...evdIds.map((id) => ({ field: "analysis.related_problems", ordinal: 0, from: id })),
-    { field: "problem", ordinal: null, from: "ASM-0001" },
+    { field: "analysis.related_problems", ordinal: 0, from: incomingOnlyId },
   ];
 
   const prbDetail: RecordDetail = {
@@ -579,7 +547,7 @@ function buildPrb0001Fixture() {
     incomingEdges,
   };
 
-  return { prbDetail, lookup: buildLookup(prbSummary, asmSummary, ...evdSummaries) };
+  return { prbDetail, lookup: buildLookup(prbSummary, incomingOnlySummary, ...evdSummaries), incomingOnlyId };
 }
 
 describe("RecordDetailPanel — unique related-record cardinality (relationship semantics correction)", () => {
@@ -606,7 +574,7 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
 
     const relacoes = within(panel).getByLabelText("Relações");
     const relatedGroup = within(relacoes).getByLabelText("Registos relacionados");
-    // Exactly 11 related-record entries (10 EVDs + 1 ASM), each rendered once.
+    // Exactly 11 related-record entries (10 reciprocal EVDs + 1 incoming-only EVD), each rendered once.
     expect(within(relatedGroup).getAllByRole("button")).toHaveLength(11);
   });
 
@@ -641,8 +609,8 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
     expect(allEvd1Entries).toHaveLength(1);
   });
 
-  it("preserves the ASM-0001 (incoming-only) related record alongside the reciprocal EVDs, with its own exact path", async () => {
-    const { prbDetail, lookup } = buildPrb0001Fixture();
+  it("preserves the incoming-only EVD-000011 related record alongside the reciprocal EVDs, with its own exact path", async () => {
+    const { prbDetail, lookup, incomingOnlyId } = buildPrb0001Fixture();
     render(
       <RecordDetailPanel
         dataProvider={fakeProvider({ "PRB-0001": prbDetail })}
@@ -657,12 +625,12 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const relacoes = within(panel).getByLabelText("Relações");
-    const asmButton = await within(relacoes).findByRole("button", { name: /ASM-0001/ });
-    const asmEntry = asmButton.closest("li") as HTMLElement;
+    const incomingOnlyButton = await within(relacoes).findByRole("button", { name: new RegExp(incomingOnlyId) });
+    const incomingOnlyEntry = incomingOnlyButton.closest("li") as HTMLElement;
 
-    expect(asmEntry.textContent).toContain("Entrada");
-    expect(asmEntry.textContent).not.toContain("Saída");
-    expect(asmEntry.textContent).toContain("problem");
+    expect(incomingOnlyEntry.textContent).toContain("Entrada");
+    expect(incomingOnlyEntry.textContent).not.toContain("Saída");
+    expect(incomingOnlyEntry.textContent).toContain("analysis.related_problems");
   });
 
   it("still excludes generic connectivity from 'Ver como Problema' semantics — unrelated to the cardinality fix", async () => {

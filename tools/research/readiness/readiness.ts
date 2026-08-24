@@ -1,5 +1,5 @@
 /**
- * Pure readiness logic for the canonical SRC/EVD/PRB/ASM research corpus.
+ * Pure readiness logic for the canonical SRC/EVD/PRB research corpus.
  *
  * Built on the shared TC-01 loading/indexing layer (core/corpus.ts) instead
  * of independently loading/parsing/indexing YAML — this module consumes an
@@ -18,7 +18,7 @@
  * real, whether evidence is sufficient, whether sources are independent,
  * causality, prevalence, civic importance, or whether promotion/
  * corroboration should be approved. Those remain human judgement recorded
- * in PRB-* / ASM-* (docs/investigationstrategy.md §7, "Corroboration and
+ * on PRB-* (docs/investigationstrategy.md §7, "Corroboration and
  * validation"; AGENTS.md "Human-owned decisions"). No process/console/
  * exit-code handling here; see cli.ts for the CLI wrapper.
  *
@@ -29,14 +29,6 @@
  * to author, but once this engine is asked to evaluate a PRB, "no explicit
  * basis on record" is itself the review-required finding, not an
  * exemption from the question.
- *
- * ASM current-state selection below (checkRequiredAsmDependency) uses the
- * legacy "any ASM-* record referencing this PRB" existence check, not a
- * CURRENT-status selection. This preserves the disclosed transitional
- * PRB-current-state / ASM-immutable-snapshot compatibility boundary
- * (docs/datamodel.md §4, "Migration boundary"; §1's transition note) as-is
- * — migrating current-state ownership from ASM to PRB is explicit future
- * work, not this unit.
  */
 import type { CorpusIndex, RecordFields } from "../core/types.ts";
 
@@ -57,7 +49,6 @@ export type ReasonCode =
   | "BOUNDED_SCOPE_WITHOUT_LIMITATIONS"
   | "UNKNOWN_EVIDENCE_REFERENCE"
   | "EVIDENCE_NOT_LINKED_TO_PRB"
-  | "MISSING_REQUIRED_ASM"
   | "MISSING_MANIFESTATION_EVIDENCE"
   | "MISSING_CONSEQUENCE_EVIDENCE"
   | "MISSING_OVERLAP_CHECK_ELIGIBILITY"
@@ -92,7 +83,6 @@ export const REASON: { [K in ReasonCode]: K } = {
   BOUNDED_SCOPE_WITHOUT_LIMITATIONS: "BOUNDED_SCOPE_WITHOUT_LIMITATIONS",
   UNKNOWN_EVIDENCE_REFERENCE: "UNKNOWN_EVIDENCE_REFERENCE",
   EVIDENCE_NOT_LINKED_TO_PRB: "EVIDENCE_NOT_LINKED_TO_PRB",
-  MISSING_REQUIRED_ASM: "MISSING_REQUIRED_ASM",
   MISSING_MANIFESTATION_EVIDENCE: "MISSING_MANIFESTATION_EVIDENCE",
   MISSING_CONSEQUENCE_EVIDENCE: "MISSING_CONSEQUENCE_EVIDENCE",
   MISSING_OVERLAP_CHECK_ELIGIBILITY: "MISSING_OVERLAP_CHECK_ELIGIBILITY",
@@ -346,8 +336,6 @@ export function evaluateEligibility(prbId: string, index: CorpusIndex): Eligibil
     }
   }
 
-  checkRequiredAsmDependency(prbId, index, findings);
-
   return {
     result: findings.length === 0 ? READY.ELIGIBILITY : REVIEW_REQUIRED,
     reasons: findings,
@@ -411,31 +399,6 @@ function checkContradictionEvidenceConsistency(
       code: "CONTRADICTION_EVIDENCE_STRUCTURALLY_INCONSISTENT",
       field: "decision_basis.contradiction_search",
       detail: "performed=false but evidence is non-empty",
-    });
-  }
-}
-
-/**
- * Both Eligibility and Corroboration require at least one ASM-* record on
- * file that references the target PRB (docs/datamodel.md's Assessment
- * (ASM-*) section). This runs unconditionally for every evaluated PRB,
- * regardless of its validation_status/evidence_status — it is a
- * structural-existence check only. It does not require the ASM's
- * assessment_status, triage, or any decision_gates value — those remain
- * human judgement. See the module-level note on the disclosed
- * PRB-current-state / ASM-immutable-snapshot migration boundary: this is
- * "any ASM referencing the PRB", not a CURRENT-status selection.
- */
-function checkRequiredAsmDependency(prbId: string, index: CorpusIndex, findings: ReadinessFinding[]): void {
-  const asmRecordIndex = index.byPrefix.get("ASM-");
-  const hasAsm = asmRecordIndex
-    ? asmRecordIndex.records.some((r) => r.fields.problem === prbId)
-    : false;
-  if (!hasAsm) {
-    findings.push({
-      code: "MISSING_REQUIRED_ASM",
-      field: "assessments",
-      detail: `no ASM-* record references ${prbId}`,
     });
   }
 }
@@ -552,8 +515,6 @@ export function evaluateCorroboration(prbId: string, index: CorpusIndex): Corrob
   }
 
   checkScopeAndBoundedness(db, findings);
-
-  checkRequiredAsmDependency(prbId, index, findings);
 
   return {
     result: findings.length === 0 ? READY.CORROBORATION : REVIEW_REQUIRED,

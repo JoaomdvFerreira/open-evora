@@ -1,10 +1,9 @@
 /**
  * Focused tests for the typed validator (validate.ts), covering schema
  * validation, malformed records, duplicate IDs, invalid references, the
- * ASM-* critical_unknowns special case, the optional EVD.analysis and
- * ASM-* assessment contracts, and the PRB.decision_basis optional structure
- * (including its reference fields and the empty-reference-entry hardening).
- * Preserves the full validation rule set of the retired
+ * optional EVD.analysis contract, and the PRB.decision_basis optional
+ * structure (including its reference fields and the empty-reference-entry
+ * hardening). Preserves the full validation rule set of the retired
  * tools/validate-research.js, which this module and its behavioural-parity
  * testing (TC-02) fully superseded; the durable coverage previously split
  * across tools/test-analytical-foundation.js and tools/test-ipe-01.js has
@@ -25,7 +24,7 @@ import { validateCorpusIndex, validateResearchRoot } from "./validate.ts";
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const REAL_RESEARCH_ROOT = join(__dirname, "..", "..", "..", "research");
 const REAL_SCHEMAS_DIR = join(REAL_RESEARCH_ROOT, "schemas");
-const DIRS = ["sources", "evidence", "problems", "assessments", "schemas"];
+const DIRS = ["sources", "evidence", "problems", "schemas"];
 
 function makeFixtureRoot(): string {
   const root = mkdtempSync(join(tmpdir(), "evora-tc02-"));
@@ -96,51 +95,11 @@ existing_solutions: not_assessed
 status: OPEN
 `;
 
-const VALID_ASM = `
-assessment_id: ASM-9001
-problem: PRB-9001
-as_of: "2026-08-11"
-phase: D3
-assessment_status: CURRENT
-evidence_confidence:
-  overall: MEDIUM
-  independence: UNKNOWN
-  coherence: UNKNOWN
-  adequacy: UNKNOWN
-  relevance: UNKNOWN
-  currentness: UNKNOWN
-  contradiction_status: UNKNOWN
-  stakeholder_validation: PENDING
-civic_importance:
-  reach: UNKNOWN
-  frequency: UNKNOWN
-  severity: UNKNOWN
-  persistence: UNKNOWN
-  equity: UNKNOWN
-journey_understanding: PARTIAL
-causal_understanding: UNKNOWN
-existing_solution_understanding: UNKNOWN
-remaining_gap: UNKNOWN
-digital_leverage: not_assessed
-structure_action: KEEP
-decision_gates:
-  problem_real: PASS
-  civic_importance: UNKNOWN
-  journey_understood: UNKNOWN
-  root_cause_understood: UNKNOWN
-  remaining_gap_supported: UNKNOWN
-  digital_causality: NOT_ASSESSED
-  operability: NOT_ASSESSED
-  testability: NOT_ASSESSED
-triage: DEEPEN
-`;
-
 function baseFixture(): string {
   const root = makeFixtureRoot();
   write(root, "sources", "SRC-9001.yaml", VALID_SRC);
   write(root, "evidence", "EVD-900101.yaml", VALID_EVD);
   write(root, "problems", "PRB-9001.yaml", VALID_PRB);
-  write(root, "assessments", "ASM-9001.yaml", VALID_ASM);
   return root;
 }
 
@@ -154,7 +113,7 @@ describe("validateResearchRoot: valid corpus", () => {
   test("a fully valid fixture corpus reports zero errors", () => {
     const result = validateResearchRoot(root);
     assert.deepEqual(result.errors, []);
-    assert.equal(result.totalRecords, 4);
+    assert.equal(result.totalRecords, 3);
   });
 });
 
@@ -271,18 +230,6 @@ describe("validateResearchRoot: cross-reference integrity", () => {
     }
   });
 
-  test("a required reference field left empty is reported", () => {
-    const root = makeFixtureRoot();
-    try {
-      write(root, "problems", "PRB-9001.yaml", VALID_PRB);
-      write(root, "assessments", "ASM-9001.yaml", VALID_ASM.replace("problem: PRB-9001", "problem:"));
-      const result = validateResearchRoot(root);
-      assert.ok(result.errors.some((e) => e.includes("missing required reference field: problem")));
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-
   test("a valid reference produces no cross-reference error", () => {
     const root = baseFixture();
     try {
@@ -294,99 +241,12 @@ describe("validateResearchRoot: cross-reference integrity", () => {
   });
 });
 
-describe("validateResearchRoot: ASM-* critical_unknowns special case", () => {
-  test("absent critical_unknowns is valid", () => {
-    const root = baseFixture();
-    try {
-      const result = validateResearchRoot(root);
-      assert.deepEqual(result.errors, []);
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-
-  test("critical_unknowns not a keyed map is reported", () => {
-    const root = makeFixtureRoot();
-    try {
-      write(root, "problems", "PRB-9001.yaml", VALID_PRB);
-      write(root, "assessments", "ASM-9001.yaml", VALID_ASM + "critical_unknowns: [not, a, map]\n");
-      const result = validateResearchRoot(root);
-      assert.ok(
-        result.errors.some((e) => e.includes('field "critical_unknowns" must be a keyed map'))
-      );
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-
-  test("a critical_unknowns entry missing question/decision_impact/target_phase is reported", () => {
-    const root = makeFixtureRoot();
-    try {
-      write(root, "problems", "PRB-9001.yaml", VALID_PRB);
-      write(
-        root,
-        "assessments",
-        "ASM-9001.yaml",
-        VALID_ASM + "critical_unknowns:\n  U1:\n    decision_impact: BOGUS\n"
-      );
-      const result = validateResearchRoot(root);
-      assert.ok(result.errors.some((e) => e.includes('field "critical_unknowns.U1.question" is required')));
-      assert.ok(
-        result.errors.some((e) => e.includes('field "critical_unknowns.U1.decision_impact" has invalid value "BOGUS"'))
-      );
-      assert.ok(result.errors.some((e) => e.includes('field "critical_unknowns.U1.target_phase" is required')));
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-
-  test("a well-formed critical_unknowns entry is valid", () => {
-    const root = makeFixtureRoot();
-    try {
-      write(root, "sources", "SRC-9001.yaml", VALID_SRC);
-      write(root, "evidence", "EVD-900101.yaml", VALID_EVD);
-      write(root, "problems", "PRB-9001.yaml", VALID_PRB);
-      write(
-        root,
-        "assessments",
-        "ASM-9001.yaml",
-        VALID_ASM +
-          "critical_unknowns:\n  U1:\n    question: \"Is this resolved?\"\n    decision_impact: HIGH\n    target_phase: D4\n    best_next_evidence: [interview]\n"
-      );
-      const result = validateResearchRoot(root);
-      assert.deepEqual(result.errors, []);
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-
-  test("best_next_evidence must be a list of strings", () => {
-    const root = makeFixtureRoot();
-    try {
-      write(root, "problems", "PRB-9001.yaml", VALID_PRB);
-      write(
-        root,
-        "assessments",
-        "ASM-9001.yaml",
-        VALID_ASM +
-          'critical_unknowns:\n  U1:\n    question: "Q"\n    decision_impact: LOW\n    target_phase: D4\n    best_next_evidence: "not-a-list"\n'
-      );
-      const result = validateResearchRoot(root);
-      assert.ok(
-        result.errors.some((e) => e.includes('field "critical_unknowns.U1.best_next_evidence" must be a list'))
-      );
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-});
-
-// ---- EVD.analysis / ASM-* contract tests -----------------------------------
+// ---- EVD.analysis contract tests -------------------------------------------
 // Migrated from the retired tools/test-analytical-foundation.js (D3
 // analytical foundation, WU014/WU-D3-01): the optional EVD.analysis metadata
-// contract and the ASM-* assessment contract. Generic enum/reference/boolean
-// mechanics are already covered above; these exercise the specific
-// analysis.*/ASM-* fields and enum members that mechanism validates.
+// contract. Generic enum/reference/boolean mechanics are already covered
+// above; these exercise the specific analysis.* fields and enum members that
+// mechanism validates.
 
 function minimalPrbForAnalysis(): string {
   return `
@@ -444,53 +304,6 @@ analysis:
   verification: REPORTED
   temporal_relevance: CURRENT
 `;
-
-function minimalAsmForAnalysis({
-  triage = "DEEPEN",
-  criticalUnknowns = "",
-}: { triage?: string; criticalUnknowns?: string } = {}): string {
-  return `
-assessment_id: ASM-9001
-problem: PRB-9001
-as_of: "2026-08-11"
-phase: D3
-assessment_status: CURRENT
-evidence_confidence:
-  overall: MEDIUM
-  independence: UNKNOWN
-  coherence: UNKNOWN
-  adequacy: UNKNOWN
-  relevance: UNKNOWN
-  currentness: UNKNOWN
-  contradiction_status: UNKNOWN
-  stakeholder_validation: PENDING
-civic_importance:
-  reach: UNKNOWN
-  frequency: UNKNOWN
-  severity: UNKNOWN
-  persistence: UNKNOWN
-  equity: UNKNOWN
-journey_understanding: PARTIAL
-causal_understanding: UNKNOWN
-existing_solution_understanding: UNKNOWN
-remaining_gap: UNKNOWN
-digital_leverage: not_assessed
-structure_action: KEEP
-decision_gates:
-  problem_real: PASS
-  civic_importance: UNKNOWN
-  journey_understood: UNKNOWN
-  root_cause_understood: UNKNOWN
-  remaining_gap_supported: UNKNOWN
-  digital_causality: NOT_ASSESSED
-  operability: NOT_ASSESSED
-  testability: NOT_ASSESSED
-triage: ${triage}
-next_action: "Do targeted journey research."
-notes: "Fixture."
-${criticalUnknowns}
-`;
-}
 
 describe("validateResearchRoot: EVD.analysis optional contract", () => {
   test("valid optional EVD.analysis block passes", () => {
@@ -614,61 +427,6 @@ describe("validateResearchRoot: EVD.analysis optional contract", () => {
       );
       const result = validateResearchRoot(root);
       assert.ok(result.errors.some((e) => e.includes('field "analysis.contribution"')));
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-});
-
-describe("validateResearchRoot: ASM-* assessment contract", () => {
-  test("valid minimal ASM-Lite passes", () => {
-    const root = makeFixtureRoot();
-    try {
-      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
-      write(root, "evidence", "EVD-900101.yaml", minimalEvdForAnalysis());
-      write(root, "assessments", "ASM-9001.yaml", minimalAsmForAnalysis());
-      const result = validateResearchRoot(root);
-      assert.deepEqual(result.errors, []);
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-
-  test("ASM decision_gates accepts PARTIAL alongside PASS/FAIL/UNKNOWN/NOT_ASSESSED", () => {
-    const root = makeFixtureRoot();
-    try {
-      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
-      write(root, "evidence", "EVD-900101.yaml", minimalEvdForAnalysis());
-      const asm = minimalAsmForAnalysis().replace("problem_real: PASS", "problem_real: PARTIAL");
-      write(root, "assessments", "ASM-9001.yaml", asm);
-      const result = validateResearchRoot(root);
-      assert.deepEqual(result.errors, []);
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-
-  test("ASM with an invalid triage value is rejected", () => {
-    const root = makeFixtureRoot();
-    try {
-      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
-      write(root, "evidence", "EVD-900101.yaml", minimalEvdForAnalysis());
-      write(root, "assessments", "ASM-9001.yaml", minimalAsmForAnalysis({ triage: "SOMEDAY" }));
-      const result = validateResearchRoot(root);
-      assert.ok(result.errors.some((e) => e.includes('field "triage"')));
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-
-  test("empty assessments directory is valid (zero ASM records)", () => {
-    const root = makeFixtureRoot();
-    try {
-      write(root, "problems", "PRB-9001.yaml", minimalPrbForAnalysis());
-      write(root, "evidence", "EVD-900101.yaml", minimalEvdForAnalysis());
-      const result = validateResearchRoot(root);
-      assert.deepEqual(result.errors, []);
-      assert.equal(result.totalRecords, 2); // 1 PRB + 1 EVD, 0 ASM
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

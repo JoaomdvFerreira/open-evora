@@ -21,7 +21,6 @@ const KNOWN_TYPE_VISUALS: Record<string, TypeVisual> = {
   "SRC-": { color: "#2563eb" },
   "EVD-": { color: "#059669" },
   "PRB-": { color: "#dc2626" },
-  "ASM-": { color: "#d97706" },
 };
 
 export const GENERIC_TYPE_VISUAL: TypeVisual = { color: "#64748b" };

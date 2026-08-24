@@ -5,7 +5,6 @@ const LABELS: Record<string, Record<string, string>> = {
   status: { OPEN: "Aberto", REJECTED: "Rejeitado", DUPLICATE: "Duplicado", NON_DIGITAL: "Não digital", ALREADY_SOLVED: "Já resolvido", INSUFFICIENT_EVIDENCE: "Evidência insuficiente" },
   evidence_status: { discovered: "Evidência identificada", corroborated: "Evidência corroborada" },
   digital_tractability: { not_assessed: "Não avaliada", low: "Baixa", medium: "Média", high: "Alta" },
-  digital_leverage: { not_assessed: "Não avaliada", low: "Baixa", medium: "Média", high: "Alta" },
   strength: { "primary-authoritative": "Primária com autoridade", "primary-non-authoritative": "Primária sem autoridade sobre o facto", secondary: "Secundária", anecdotal: "Anecdótica" },
   evidence_nature: { fact: "Facto", "reported-experience": "Experiência relatada", opinion: "Opinião", claim: "Alegação", measurement: "Medição", recommendation: "Recomendação" },
   friction_types: { INFORMATION: "Informação", COORDINATION: "Coordenação", TRANSACTION: "Transação", OPERATIONAL: "Operacional", PHYSICAL: "Física", REGULATORY: "Regulatória", OTHER: "Outra" },
@@ -13,15 +12,6 @@ const LABELS: Record<string, Record<string, string>> = {
   contribution: { CONFIRMS: "Confirma", REFINES: "Refina", CONTRADICTS: "Contradiz", "CURRENT-STATE-UPDATE": "Atualização do estado atual", "EXISTING-SOLUTION": "Solução existente", "PLANNED-SOLUTION": "Solução planeada", "NEW-CANDIDATE": "Novo candidato" },
   representativeness: { UNKNOWN: "Desconhecida", LIMITED: "Limitada", DESIGNED_REPRESENTATIVE: "Concebida como representativa", NOT_APPLICABLE: "Não aplicável" },
   temporal_relevance: { CURRENT: "Atual", HISTORICAL: "Histórica", SUPERSEDED: "Substituída", UNKNOWN: "Desconhecida" },
-  assessment_status: { DRAFT: "Rascunho", CURRENT: "Atual", SUPERSEDED: "Substituída", ARCHIVED: "Arquivada" },
-  confidence: { HIGH: "Elevada", MEDIUM: "Média", LOW: "Baixa", UNKNOWN: "Desconhecida", NOT_ASSESSED: "Não avaliada" },
-  stakeholder_validation: { PENDING: "Pendente", PARTIAL: "Parcial", CHALLENGED: "Questionada", VALIDATED: "Validada", NOT_APPLICABLE: "Não aplicável" },
-  understanding: { SUFFICIENT: "Suficiente", PARTIAL: "Parcial", INSUFFICIENT: "Insuficiente", UNKNOWN: "Desconhecida", NOT_ASSESSED: "Não avaliada" },
-  structure_action: { KEEP: "Manter", SPLIT_CANDIDATE: "Candidata a divisão", MERGE_CANDIDATE: "Candidata a fusão" },
-  contradiction_status: { HIGH: "Elevado", MEDIUM: "Médio", LOW: "Baixo", UNKNOWN: "Desconhecido", NOT_ASSESSED: "Não avaliado" },
-  triage: { STOP: "Não prosseguir", WATCH: "Acompanhar", DEEPEN: "Aprofundar", PROCEED: "Prosseguir" },
-  decision_impact: { HIGH: "Elevado", MEDIUM: "Médio", LOW: "Baixo", UNKNOWN: "Desconhecido", NOT_ASSESSED: "Não avaliado" },
-  decision_gate: { PASS: "Cumpre", PARTIAL: "Cumpre parcialmente", FAIL: "Não cumpre", UNKNOWN: "Desconhecido", NOT_ASSESSED: "Não avaliado" },
   geography: { city: "Cidade", parish: "Freguesia", municipality: "Município", intermunicipal: "Intermunicipal", regional: "Regional" },
   source_type: { api: "API", dataset: "Conjunto de dados", gis: "Sistema de Informação Geográfica", web: "Página web", document: "Documento", database: "Base de dados", feed: "Fluxo de dados", unknown: "Desconhecido" },
   authority: { authoritative: "Com autoridade", "verified-third-party": "Terceiro verificado", community: "Comunitária", derived: "Derivada", estimated: "Estimada", unknown: "Desconhecida" },
@@ -41,7 +31,7 @@ const COMPACT_LABELS: Record<string, Record<string, string>> = {
 };
 
 const FIELD_CAPTIONS: Record<string, string> = {
-  status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", digital_leverage: "Alavancagem digital", existing_solutions: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", contribution: "Contribuição", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", assessment_status: "Estado da avaliação", contradiction_status: "Grau de contradição", stakeholder_validation: "Validação por intervenientes", structure_action: "Ação estrutural", triage: "Triagem", remaining_gap: "Lacuna remanescente", decision_impact: "Impacto na decisão", target_phase: "Fase prevista", decision_gate: "Critério de decisão", geography: "Âmbito geográfico", source_type: "Tipo de fonte", authority: "Autoridade", freshness: "Atualidade", licensing: "Licenciamento",
+  status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", existing_solutions: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", contribution: "Contribuição", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", geography: "Âmbito geográfico", source_type: "Tipo de fonte", authority: "Autoridade", freshness: "Atualidade", licensing: "Licenciamento",
 };
 
 const PS_LABELS: Record<string, string> = {
@@ -50,21 +40,13 @@ const PS_LABELS: Record<string, string> = {
 
 export function publicEnumLabel(field: string, value: string): string {
   const terminalField = field.split(".").at(-1) ?? field;
-  const labelField = field.startsWith("decision_gates.")
-    ? "decision_gate"
-    : field.startsWith("freshness.")
-      ? "freshness"
-      : field.startsWith("geography.")
-        ? "geography"
-        : field.startsWith("licensing.")
-          ? "licensing"
-          : field.startsWith("evidence_confidence.contradiction_status")
-            ? "contradiction_status"
-            : field.startsWith("evidence_confidence.") || field.startsWith("civic_importance.")
-              ? "confidence"
-              : field === "journey_understanding" || field === "causal_understanding" || field === "existing_solution_understanding" || field === "remaining_gap"
-                ? "understanding"
-                : terminalField;
+  const labelField = field.startsWith("freshness.")
+    ? "freshness"
+    : field.startsWith("geography.")
+      ? "geography"
+      : field.startsWith("licensing.")
+        ? "licensing"
+        : terminalField;
   const signalLabel = field === "analysis.public_signal_class" ? PS_LABELS[value] : undefined;
   return LABELS[labelField]?.[value] ?? (signalLabel ? `${value} — ${signalLabel}` : value);
 }
@@ -77,7 +59,7 @@ export function publicCompactEnumLabel(field: string, value: string): string {
 
 export function publicFieldCaption(field: string): string {
   const terminalField = field.split(".").at(-1) ?? field;
-  const captionField = field.startsWith("decision_gates.") ? "decision_gate" : field.startsWith("geography.") ? "geography" : field.startsWith("licensing.") ? "licensing" : field.startsWith("analysis.public_signal_class") ? "public_signal_class" : terminalField;
+  const captionField = field.startsWith("geography.") ? "geography" : field.startsWith("licensing.") ? "licensing" : field.startsWith("analysis.public_signal_class") ? "public_signal_class" : terminalField;
   return FIELD_CAPTIONS[captionField] ?? field;
 }
 

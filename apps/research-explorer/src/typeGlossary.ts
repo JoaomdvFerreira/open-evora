@@ -1,7 +1,7 @@
 /**
- * Optional, presentation-only glossary of the current four canonical record
- * types (docs/datamodel.md) — a specialised enhancement layered on top
- * of the generic Explorer, never a structural dependency. Every generic
+ * Optional, presentation-only glossary of the current three canonical
+ * record types (docs/datamodel.md) — a specialised enhancement layered on
+ * top of the generic Explorer, never a structural dependency. Every generic
  * mechanism (node discovery, edge discovery, search, detail rendering)
  * already works for any schema-conforming type with no glossary entry;
  * `describeType()` degrades gracefully to a generic entry for an unknown
@@ -11,12 +11,7 @@
 export interface TypeDescriptor {
   /** Short Portuguese label shown inline, e.g. "[Evidência]". */
   label: string;
-  /**
-   * One-sentence explanation. For SRC-/EVD-/PRB-, paraphrases docs/datamodel.md's
-   * own record semantics. For ASM-, describes the currently implemented legacy
-   * current-state presentation, not yet the immutable REVIEW/CORRECTION target
-   * model defined in docs/datamodel.md.
-   */
+  /** One-sentence explanation, paraphrasing docs/datamodel.md's own record semantics. */
   description: string;
 }
 
@@ -32,11 +27,6 @@ const KNOWN_TYPES: Record<string, TypeDescriptor> = {
   "PRB-": {
     label: "Problema",
     description: "Consolida várias evidências que descrevem a mesma fricção cívica subjacente — sem incluir soluções na descrição do problema.",
-  },
-  "ASM-": {
-    label: "Avaliação",
-    description:
-      "Regista o que o projeto sabe e não sabe atualmente sobre um Problema, e encaminha-o para uma decisão (STOP/WATCH/DEEPEN/PROCEED).",
   },
 };
 

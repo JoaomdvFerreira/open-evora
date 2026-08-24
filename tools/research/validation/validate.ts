@@ -1,5 +1,5 @@
 /**
- * Pure validation logic for the canonical SRC/EVD/PRB/ASM research corpus.
+ * Pure validation logic for the canonical SRC/EVD/PRB research corpus.
  *
  * Built on the shared TC-01 loading/indexing layer (corpus.ts) instead of
  * re-walking research/schemas/* or research/<dir>/*.yaml directly.
@@ -29,49 +29,6 @@ function getPath(fields: RecordFields, dotted: string): unknown {
     cur = (cur as Record<string, unknown>)[part];
   }
   return cur;
-}
-
-const CRITICAL_UNKNOWN_IMPACT_ENUM = ["HIGH", "MEDIUM", "LOW"];
-
-/**
- * Validates the ASM-* "critical_unknowns" keyed-map shape (dynamic keys,
- * e.g. U1, U2, ...), which the generic dotted-path requiredFields/enums
- * mechanism cannot express because the key names are not fixed. Structural
- * shape only — no semantic interpretation of question content.
- */
-function validateCriticalUnknowns(file: string, record: RecordFields, errors: string[]): void {
-  const cu = record.critical_unknowns;
-  if (cu === undefined || cu === null) return;
-  if (typeof cu !== "object" || Array.isArray(cu)) {
-    errors.push(`[${file}] field "critical_unknowns" must be a keyed map (e.g. U1, U2, ...)`);
-    return;
-  }
-  for (const [key, entryRaw] of Object.entries(cu as Record<string, unknown>)) {
-    const label = `critical_unknowns.${key}`;
-    if (entryRaw === null || typeof entryRaw !== "object" || Array.isArray(entryRaw)) {
-      errors.push(`[${file}] field "${label}" must be a map with question/decision_impact/target_phase`);
-      continue;
-    }
-    const entry = entryRaw as Record<string, unknown>;
-    if (typeof entry.question !== "string" || entry.question.trim() === "") {
-      errors.push(`[${file}] field "${label}.question" is required and must be a non-empty string`);
-    }
-    if (!CRITICAL_UNKNOWN_IMPACT_ENUM.includes(entry.decision_impact as string)) {
-      errors.push(
-        `[${file}] field "${label}.decision_impact" has invalid value "${entry.decision_impact}" (expected one of: ${CRITICAL_UNKNOWN_IMPACT_ENUM.join(", ")})`
-      );
-    }
-    if (typeof entry.target_phase !== "string" || entry.target_phase.trim() === "") {
-      errors.push(`[${file}] field "${label}.target_phase" is required and must be a non-empty string`);
-    }
-    if (entry.best_next_evidence !== undefined && entry.best_next_evidence !== null) {
-      if (!Array.isArray(entry.best_next_evidence)) {
-        errors.push(`[${file}] field "${label}.best_next_evidence" must be a list when present`);
-      } else if (entry.best_next_evidence.some((v) => typeof v !== "string")) {
-        errors.push(`[${file}] field "${label}.best_next_evidence" must be a list of strings`);
-      }
-    }
-  }
 }
 
 function validateIdAndFilename(
@@ -177,8 +134,7 @@ function validateReferences(recordIndexes: RecordIndex[], errors: string[]): voi
  * Validates an already-loaded CorpusIndex against its declared schemas.
  * Preserves the legacy tools/validate-research.js rule set exactly: ID
  * presence/prefix/filename match, duplicate-ID detection, required
- * fields, enums, boolean fields, the ASM-* critical_unknowns special case,
- * and cross-reference integrity.
+ * fields, enums, boolean fields, and cross-reference integrity.
  *
  * Note: byId dedupes silently on first-seen (see corpus.ts), so duplicate
  * detection here re-derives duplicates from `records` (insertion order),
@@ -195,9 +151,6 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
       validateRequiredFields(file, fields, schema, errors);
       validateEnums(file, fields, schema, errors);
       validateBooleanFields(file, fields, schema, errors);
-      if (schema.prefix === "ASM-") {
-        validateCriticalUnknowns(file, fields, errors);
-      }
     }
   }
 

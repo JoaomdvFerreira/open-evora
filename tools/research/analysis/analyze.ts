@@ -1,5 +1,5 @@
 /**
- * Pure analysis logic for the canonical SRC/EVD/PRB/ASM research corpus.
+ * Pure analysis logic for the canonical SRC/EVD/PRB research corpus.
  *
  * Built on the shared TC-01 loading/indexing layer (corpus.ts) instead of
  * re-walking research/schemas/* or research/<dir>/*.yaml directly. Reuses
@@ -9,16 +9,14 @@
  * No process/console/exit-code handling here; see cli.ts for the
  * CLI wrapper. This module is observational only: every value below is
  * either a raw count/distribution or a verbatim field already recorded on
- * a canonical PRB, EVD, or ASM record (docs/datamodel.md §6, AGENTS.md
+ * a canonical PRB or EVD record (docs/datamodel.md §6, AGENTS.md
  * "Human-owned decisions"). It never infers analytical metadata from
  * `notes`/free text, and never ranks or scores problems.
  *
- * Preserves the legacy tools/analyze-research.js analytical contract:
- * per-problem linked/analysed EVD counts, lineage known/missing counts,
- * EVD analysis-field distributions, the transitional legacy-ASM
- * `assessment_status=CURRENT` selection (docs/datamodel.md's disclosed
- * PRB-current-state / ASM-immutable-snapshot migration boundary), and the
- * explicit structural-gap detections.
+ * Preserves the legacy tools/analyze-research.js analytical contract for
+ * SRC/EVD/PRB: per-problem linked/analysed EVD counts, lineage
+ * known/missing counts, EVD analysis-field distributions, and the explicit
+ * structural-gap detections.
  */
 import type { CorpusIndex, RecordFields } from "../core/types.ts";
 
@@ -39,15 +37,12 @@ export interface ProblemAnalysis {
   temporalRelevanceDistribution: Distribution;
   representativenessDistribution: Distribution;
   publicSignalClassDistribution: Distribution;
-  asmRecords: RecordFields[];
-  currentAsm: RecordFields | null;
 }
 
 export interface CorpusSummary {
   sourceCount: number;
   evidenceCount: number;
   problemCount: number;
-  assessmentCount: number;
   totalRecords: number;
 }
 
@@ -103,7 +98,6 @@ function byId(index: CorpusIndex, prefix: string): ReadonlyMap<string, RecordFie
 export function computeProblemAnalysis(index: CorpusIndex, prbId: string): ProblemAnalysis | null {
   const problemsById = byId(index, "PRB-");
   const evidenceById = byId(index, "EVD-");
-  const assessments = recordsOf(index, "ASM-");
 
   const prb = problemsById.get(prbId);
   if (!prb) return null;
@@ -136,9 +130,6 @@ export function computeProblemAnalysis(index: CorpusIndex, prbId: string): Probl
     if (a.public_signal_class != null) signalClassAll.push(a.public_signal_class);
   }
 
-  const asmRecords = assessments.filter((a) => a.problem === prbId);
-  const currentAsm = asmRecords.find((a) => a.assessment_status === "CURRENT") || null;
-
   return {
     prbId,
     prb,
@@ -152,16 +143,13 @@ export function computeProblemAnalysis(index: CorpusIndex, prbId: string): Probl
     temporalRelevanceDistribution: tally(temporalAll),
     representativenessDistribution: tally(representativenessAll),
     publicSignalClassDistribution: tally(signalClassAll),
-    asmRecords,
-    currentAsm,
   };
 }
 
 /**
  * Explicit, machine-detectable structural/metadata gaps for active
- * (status=OPEN) problems and all assessments. Every entry restates an
- * already-authored field's absence or an already-authored UNKNOWN/
- * NOT_ASSESSED value; none of it is an inferred judgement.
+ * (status=OPEN) problems. Every entry restates an already-authored field's
+ * absence; none of it is an inferred judgement.
  */
 export function computeGaps(index: CorpusIndex, problems: Map<string, ProblemAnalysis>): string[] {
   const gaps: string[] = [];
@@ -174,42 +162,12 @@ export function computeGaps(index: CorpusIndex, problems: Map<string, ProblemAna
 
   for (const prbId of activePrbIds) {
     const analysis = problems.get(prbId);
-    const asmRecords = analysis ? analysis.asmRecords : [];
-    if (asmRecords.length === 0) {
-      gaps.push(`active ${prbId} has no ASM record`);
-    } else if (!asmRecords.some((a) => a.assessment_status === "CURRENT")) {
-      gaps.push(`active ${prbId} has ASM record(s) but none with assessment_status=CURRENT`);
-    }
-  }
-
-  for (const prbId of activePrbIds) {
-    const analysis = problems.get(prbId);
     if (!analysis) continue;
     const missing = analysis.linkedEvdCount - analysis.evdWithAnalysisCount;
     if (missing > 0) {
       gaps.push(
         `${prbId}: ${missing}/${analysis.linkedEvdCount} linked EVD missing analytical metadata (analysis block absent)`
       );
-    }
-  }
-
-  const assessments = recordsOf(index, "ASM-");
-  for (const asm of assessments) {
-    const gateEntries = Object.entries((asm.decision_gates as Record<string, unknown>) || {});
-    const unresolved = gateEntries.filter(([, v]) => v === "UNKNOWN" || v === "NOT_ASSESSED");
-    if (unresolved.length > 0) {
-      gaps.push(
-        `${asm.assessment_id}: ${unresolved.length} decision gate(s) UNKNOWN/NOT_ASSESSED (${unresolved
-          .map(([k, v]) => `${k}=${v}`)
-          .join(", ")})`
-      );
-    }
-    const unknownCount = Object.keys((asm.critical_unknowns as Record<string, unknown>) || {}).length;
-    if (unknownCount > 0) {
-      gaps.push(`${asm.assessment_id}: ${unknownCount} critical unknown(s) recorded`);
-    }
-    if (asm.triage === "DEEPEN" && (!asm.next_action || String(asm.next_action).trim() === "")) {
-      gaps.push(`${asm.assessment_id}: triage=DEEPEN without a usable next_action`);
     }
   }
 
@@ -226,7 +184,6 @@ export function analyzeCorpus(index: CorpusIndex): AnalysisResult {
   const sources = recordsOf(index, "SRC-");
   const evidence = recordsOf(index, "EVD-");
   const problemRecords = recordsOf(index, "PRB-");
-  const assessments = recordsOf(index, "ASM-");
 
   const problemIds = problemRecords.map((p) => p.problem_id as string).sort();
   const problems = new Map<string, ProblemAnalysis>();
@@ -242,7 +199,6 @@ export function analyzeCorpus(index: CorpusIndex): AnalysisResult {
       sourceCount: sources.length,
       evidenceCount: evidence.length,
       problemCount: problemRecords.length,
-      assessmentCount: assessments.length,
       totalRecords: index.totalRecords,
     },
     problemIds,

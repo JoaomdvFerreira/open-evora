@@ -25,7 +25,7 @@ const { run } = require("./build-data.js");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const REAL_SCHEMAS_DIR = path.join(REPO_ROOT, "research", "schemas");
-const STANDARD_DIRS = ["sources", "evidence", "problems", "assessments", "schemas"];
+const STANDARD_DIRS = ["sources", "evidence", "problems", "schemas"];
 
 // ---- fixture helpers --------------------------------------------------------
 
@@ -111,47 +111,6 @@ status: OPEN
 `;
 }
 
-function minimalAsm({ id = "ASM-9001", problem = "PRB-9001" } = {}) {
-  return `
-assessment_id: ${id}
-problem: ${problem}
-as_of: "2026-01-01"
-phase: D1
-assessment_status: DRAFT
-evidence_confidence:
-  overall: UNKNOWN
-  independence: UNKNOWN
-  coherence: UNKNOWN
-  adequacy: UNKNOWN
-  relevance: UNKNOWN
-  currentness: UNKNOWN
-  contradiction_status: UNKNOWN
-  stakeholder_validation: PENDING
-civic_importance:
-  reach: UNKNOWN
-  frequency: UNKNOWN
-  severity: UNKNOWN
-  persistence: UNKNOWN
-  equity: UNKNOWN
-journey_understanding: UNKNOWN
-causal_understanding: UNKNOWN
-existing_solution_understanding: UNKNOWN
-remaining_gap: UNKNOWN
-digital_leverage: not_assessed
-structure_action: KEEP
-decision_gates:
-  problem_real: UNKNOWN
-  civic_importance: UNKNOWN
-  journey_understood: UNKNOWN
-  root_cause_understood: UNKNOWN
-  remaining_gap_supported: UNKNOWN
-  digital_causality: UNKNOWN
-  operability: UNKNOWN
-  testability: UNKNOWN
-triage: WATCH
-`;
-}
-
 const WIDGET_SCHEMA = {
   prefix: "WID-",
   directory: "widgets",
@@ -194,10 +153,9 @@ test("valid minimal corpus builds a read model with matching counts", () => {
     write(root, "sources", "SRC-9001.yaml", minimalSrc());
     write(root, "evidence", "EVD-900101.yaml", minimalEvd({ sourceId: "SRC-9001" }));
     write(root, "problems", "PRB-9001.yaml", minimalPrb({ evidence: ["EVD-900101"] }));
-    write(root, "assessments", "ASM-9001.yaml", minimalAsm());
     const model = buildFor(root);
-    assert.strictEqual(model.manifest.totalRecords, 4);
-    assert.strictEqual(model.index.length, 4);
+    assert.strictEqual(model.manifest.totalRecords, 3);
+    assert.strictEqual(model.index.length, 3);
     assert.strictEqual(model.manifest.counts["SRC-"], 1);
     assert.strictEqual(model.manifest.counts["EVD-"], 1);
     assert.strictEqual(model.manifest.counts["PRB-"], 1);

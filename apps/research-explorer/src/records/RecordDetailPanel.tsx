@@ -108,15 +108,15 @@ function RelationshipList({ detail, lookup, onSelect }: RelationshipListProps) {
 }
 
 /**
- * The only edge field names any current schema declares specifically to
- * relate a record to the Problem it is about (research/schemas/{evidence,
- * assessment}.schema.json's own `references` entries — each
+ * The only edge field name any current schema declares specifically to
+ * relate a record to the Problem it is about
+ * (research/schemas/evidence.schema.json's own `references` entry —
  * declares `targetPrefix: "PRB-"` for exactly this field). Deliberately an
  * explicit allowlist, not a suffix/regex heuristic: an edge whose field is
- * *not* one of these never counts, even if it happens to resolve to a PRB-
+ * *not* this one never counts, even if it happens to resolve to a PRB-
  * record for some unrelated reason.
  */
-const PROBLEM_REFERENCE_FIELDS = ["problem", "analysis.related_problems"];
+const PROBLEM_REFERENCE_FIELDS = ["analysis.related_problems"];
 
 /**
  * Finds a related Problem to offer a "Ver como Problema" action for — but

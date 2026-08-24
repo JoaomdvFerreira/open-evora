@@ -21,7 +21,7 @@ import { analyzeCorpus, computeProblemAnalysis } from "./analyze.ts";
 import type { Distribution, ProblemAnalysis } from "./analyze.ts";
 import { loadCorpusIndex } from "../core/corpus.ts";
 import { validateCorpusIndex } from "../validation/validate.ts";
-import type { CorpusIndex, RecordFields } from "../core/types.ts";
+import type { CorpusIndex } from "../core/types.ts";
 
 function formatDistribution(entries: Distribution): string {
   if (entries.length === 0) return "(none recorded)";
@@ -42,36 +42,18 @@ function printProblemReport(report: ProblemAnalysis): void {
   console.log(`  temporal_relevance distribution: ${formatDistribution(report.temporalRelevanceDistribution)}`);
   console.log(`  representativeness distribution: ${formatDistribution(report.representativenessDistribution)}`);
   console.log(`  public_signal_class distribution: ${formatDistribution(report.publicSignalClassDistribution)}`);
-
-  if (report.asmRecords.length === 0) {
-    console.log("  ASM: none found");
-  } else if (report.currentAsm) {
-    const asm = report.currentAsm as RecordFields;
-    const gateEntries = Object.entries((asm.decision_gates as Record<string, unknown>) || {});
-    const gateSummary = gateEntries.map(([k, v]) => `${k}=${v}`).join(", ");
-    const unknownCount = Object.keys((asm.critical_unknowns as Record<string, unknown>) || {}).length;
-    console.log(`  ASM: ${asm.assessment_id} (CURRENT, as_of ${asm.as_of})`);
-    console.log(`    decision_gates: ${gateSummary || "(none)"}`);
-    console.log(`    critical_unknowns: ${unknownCount}`);
-    console.log(`    triage: ${asm.triage} | next_action: ${asm.next_action ? asm.next_action : "(empty)"}`);
-  } else {
-    const others = report.asmRecords.map((a) => `${a.assessment_id}(${a.assessment_status})`).join(", ");
-    console.log(`  ASM: ${report.asmRecords.length} record(s) found, none with assessment_status=CURRENT (${others})`);
-  }
 }
 
 function runAll(index: CorpusIndex): void {
   const result = analyzeCorpus(index);
   console.log(
-    `Corpus: ${result.summary.sourceCount} SRC, ${result.summary.evidenceCount} EVD, ${result.summary.problemCount} PRB, ${result.summary.assessmentCount} ASM (${result.summary.totalRecords} total canonical records)`
+    `Corpus: ${result.summary.sourceCount} SRC, ${result.summary.evidenceCount} EVD, ${result.summary.problemCount} PRB (${result.summary.totalRecords} total canonical records)`
   );
   console.log("");
   for (const prbId of result.problemIds) {
     const report = result.problems.get(prbId)!;
-    const currentAsm = report.currentAsm;
-    const triage = currentAsm ? currentAsm.triage : "—";
     console.log(
-      `${prbId} | status=${report.prb.status} | linked_evd=${report.linkedEvdCount} | evd_with_analysis=${report.evdWithAnalysisCount}/${report.linkedEvdCount} | current_asm=${currentAsm ? currentAsm.assessment_id : "no"} | triage=${triage}`
+      `${prbId} | status=${report.prb.status} | linked_evd=${report.linkedEvdCount} | evd_with_analysis=${report.evdWithAnalysisCount}/${report.linkedEvdCount}`
     );
   }
 }

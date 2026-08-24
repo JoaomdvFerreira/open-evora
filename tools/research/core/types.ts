@@ -4,7 +4,7 @@
  * These types describe the *shape of loading/indexing infrastructure*
  * (schema files, parsed record files, indexes) — never the canonical
  * research domain model. Field names, enums, and record semantics for
- * SRC/EVD/PRB/ASM remain owned by research/schemas/*.schema.json
+ * SRC/EVD/PRB remain owned by research/schemas/*.schema.json
  * (executable authority) and docs/datamodel.md (semantic authority).
  * See docs/datamodel.md §7 (Schema boundary).
  */
@@ -66,7 +66,7 @@ export interface RecordIndex {
   byId: ReadonlyMap<string, ParsedRecord>;
 }
 
-/** The four canonical record-type indexes, keyed by schema prefix (e.g. "SRC-"). */
+/** The three canonical record-type indexes, keyed by schema prefix (e.g. "SRC-"). */
 export interface CorpusIndex {
   researchRoot: string;
   byPrefix: ReadonlyMap<string, RecordIndex>;

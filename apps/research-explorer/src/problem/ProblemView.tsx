@@ -7,7 +7,7 @@ import { ContributionChip } from "../records/ContributionChip";
 import { summarizeContributions } from "./contributionSummary";
 import { DISCLOSURE_FIELDS, DISCLOSURE_FIELD_LABELS, FIELD_CAPTIONS, glossFor, type FieldGloss } from "./statusGloss";
 import { describeType, formatTypedId } from "../typeGlossary";
-import { formatPublicCount, publicEnumLabel, publicFieldCaption } from "../presentation";
+import { formatPublicCount, publicEnumLabel } from "../presentation";
 import { ContextTabs } from "../ContextTabs";
 
 const ERROR_TITLES: Record<string, string> = {
@@ -20,7 +20,6 @@ const ERROR_TITLES: Record<string, string> = {
 };
 
 const PROBLEM_STATE_FIELDS = ["status", "validation_status", "evidence_status", "digital_tractability", "existing_solutions"] as const;
-const ASSESSMENT_SUMMARY_FIELDS = ["assessment_status", "triage", "structure_action", "digital_leverage"] as const;
 
 function fieldValue(record: Record<string, unknown>, key: string): string | null {
   const value = record[key];
@@ -33,42 +32,6 @@ function recordValue(value: unknown): Record<string, unknown> | null {
 
 function stringValues(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
-}
-
-function AssessmentUnknowns({ record }: { record: Record<string, unknown> }) {
-  const remainingGap = fieldValue(record, "remaining_gap");
-  const unknowns = recordValue(record.critical_unknowns);
-  return (
-    <>
-      {remainingGap !== null && (
-        <p><strong>{publicFieldCaption("remaining_gap")}:</strong> {publicEnumLabel("remaining_gap", remainingGap)}</p>
-      )}
-      {unknowns && Object.keys(unknowns).length > 0 && (
-        <section aria-label="Incertezas">
-          <h5>Incertezas</h5>
-          {Object.entries(unknowns).map(([id, value]) => {
-            const unknown = recordValue(value);
-            if (!unknown) return null;
-            const question = fieldValue(unknown, "question");
-            const impact = fieldValue(unknown, "decision_impact");
-            const phase = fieldValue(unknown, "target_phase");
-            const nextEvidence = stringValues(unknown.best_next_evidence);
-            return (
-              <section key={id} aria-label={`Incerteza ${id}`}>
-                <h6>Incerteza {id}</h6>
-                {question && <p><strong>Questão em aberto:</strong> {question}</p>}
-                {impact && <p><strong>{publicFieldCaption("decision_impact")}:</strong> {publicEnumLabel("decision_impact", impact)}</p>}
-                {phase && <p><strong>{publicFieldCaption("target_phase")}:</strong> {phase}</p>}
-                {nextEvidence.length > 0 && (
-                  <><strong>Próxima evidência:</strong><ul>{nextEvidence.map((item, index) => <li key={index}>{item}</li>)}</ul></>
-                )}
-              </section>
-            );
-          })}
-        </section>
-      )}
-    </>
-  );
 }
 
 function evidenceSourceLabel(record: Record<string, unknown>): string | null {
@@ -132,9 +95,7 @@ function ProblemBreadcrumb({ problemId, onBackToOverview }: { problemId: string;
  */
 const PROBLEM_SECTIONS = [
   { id: "problem-estado-atual", label: "Estado atual" },
-  { id: "problem-avaliacao", label: "Avaliação" },
   { id: "problem-evidencia", label: "Evidência" },
-  { id: "problem-incertezas", label: "Incertezas e lacunas" },
 ] as const;
 
 /**
@@ -295,19 +256,9 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
     );
   }
 
-  const { problem, assessments, evidence } = state.projection;
+  const { problem, evidence } = state.projection;
   const record = problem.record as Record<string, unknown>;
   const title = fieldValue(record, "title") ?? problem.id;
-
-  const unknownsSections = assessments
-    .map((assessment) => {
-      const asmRecord = assessment.record as Record<string, unknown>;
-      const picked: Record<string, unknown> = {};
-      if (asmRecord.remaining_gap !== undefined) picked.remaining_gap = asmRecord.remaining_gap;
-      if (asmRecord.critical_unknowns !== undefined) picked.critical_unknowns = asmRecord.critical_unknowns;
-      return Object.keys(picked).length > 0 ? { assessment, picked } : null;
-    })
-    .filter((x): x is { assessment: RecordDetail; picked: Record<string, unknown> } => x !== null);
 
   return (
     <article aria-labelledby="problem-heading" className="problem-view shell-frame">
@@ -338,35 +289,6 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
               })}
             </div>
             {fieldValue(record, "problem_statement") && <p className="problem-statement">{fieldValue(record, "problem_statement")}</p>}
-          </section>
-
-          <section id="problem-avaliacao" aria-label="Avaliação" className="problem-section">
-            <h3 className="detail-panel-label">Avaliação</h3>
-            {assessments.length === 0 ? (
-              <p>Nenhuma avaliação associada.</p>
-            ) : (
-              <ul className="assessment-list">
-                {assessments.map((assessment) => {
-                  const asmRecord = assessment.record as Record<string, unknown>;
-                  return (
-                    <li key={assessment.id} className="assessment-card">
-                      <TypedLinkButton detail={assessment} onOpenGeneric={onOpenGeneric} />
-                      <dl className="assessment-fields">
-                        {ASSESSMENT_SUMMARY_FIELDS.map((key) => {
-                          const value = fieldValue(asmRecord, key);
-                          return value === null ? null : (
-                            <div key={key}>
-                              <dt>{publicFieldCaption(key)}</dt>
-                              <dd>{publicEnumLabel(key, value)}</dd>
-                            </div>
-                          );
-                        })}
-                      </dl>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
           </section>
 
           <section id="problem-evidencia" aria-label="Evidência" className="problem-section">
@@ -425,20 +347,6 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
               </ul>
             )}
           </section>
-
-          <section id="problem-incertezas" aria-label="Incertezas e lacunas" className="problem-section">
-            <h3 className="detail-panel-label">Incertezas e lacunas conhecidas</h3>
-            {unknownsSections.length === 0 ? (
-              <p>Nenhuma registada nas avaliações associadas.</p>
-            ) : (
-              unknownsSections.map(({ assessment, picked }) => (
-                <div key={assessment.id} className="unknowns-card">
-                  <h4>{formatTypedId(assessment.type, assessment.id)}</h4>
-                  <AssessmentUnknowns record={picked} />
-                </div>
-              ))
-            )}
-          </section>
         </div>
 
         <ProblemReadingRail />
@@ -462,8 +370,8 @@ interface ProblemViewProps {
  * problem, why do we believe it, and what remains uncertain?" — a
  * presentation projection over the existing generic DataProvider (see
  * problemProjection.ts), not a new persistence model. Any future/unknown
- * record type reached from here (assessment, evidence, source)
- * still opens through the same generic detail renderer via onOpenGeneric.
+ * record type reached from here (evidence, source) still opens through the
+ * same generic detail renderer via onOpenGeneric.
  */
 export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewInGraph }: ProblemViewProps) {
   const indexState = useRecordIndex(dataProvider);

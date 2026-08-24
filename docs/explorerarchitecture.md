@@ -69,18 +69,13 @@ Answers:
 Foreground:
 - current investigation state and decision posture;
 - provenance;
-- material Assessment history;
 - technical inspection where useful.
+
+Material historical-state presentation is deferred until historical snapshot storage exists (`docs/datamodel.md` §4); `Detalhe` currently has no Assessment/history surface to present.
 
 All research semantics come from `docs/datamodel.md`.
 
-## 4. Assessment and Records presentation
-
-Assessment is historical context for a Problem, not mutable current state or a primary browsing concept.
-
-Assessment records may remain directly inspectable for auditability. Current state must be presented from the Problem, and REVIEW/CORRECTION history belongs primarily in `Detalhe` once the target model is implemented.
-
-Until that migration lands, existing Explorer surfaces may still expose legacy current-ASM fields. Treat that as transitional compatibility; do not deepen the product's dependency on mutable-ASM semantics.
+## 4. Records presentation
 
 Records should be compact and scannable:
 - human-readable meaning before technical identity;
