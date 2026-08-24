@@ -2,12 +2,19 @@
   "name": "open-evora",
   "private": true,
   "version": "0.0.0",
-  "description": "Root developer commands only. The repository itself stays dependency-free (tools/*.js, research/); the Research Explorer app (apps/research-explorer/) owns its own dependencies.",
+  "description": "Root developer commands. tools/*.js (the current behavioural baseline) stays dependency-free; tools/research/ (TC-01 core foundation) is TypeScript with a minimal, justified dependency surface (yaml + TypeScript typechecking). The Research Explorer app (apps/research-explorer/) owns its own separate dependencies.",
   "engines": {
     "node": "24.x"
   },
   "scripts": {
     "explorer": "npm run build-data --prefix apps/research-explorer && npm run dev --prefix apps/research-explorer",
-    "explorer:build": "npm run build-data --prefix apps/research-explorer && npm run typecheck --prefix apps/research-explorer && npm run test --prefix apps/research-explorer && npm run build --prefix apps/research-explorer"
+    "explorer:build": "npm run build-data --prefix apps/research-explorer && npm run typecheck --prefix apps/research-explorer && npm run test --prefix apps/research-explorer && npm run build --prefix apps/research-explorer",
+    "research:typecheck": "tsc --noEmit",
+    "research:test": "node --test --experimental-strip-types tools/research/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.7.0",
+    "yaml": "^2.9.0"
   }
 }
