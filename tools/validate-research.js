@@ -7,8 +7,8 @@
  * Usage: node tools/validate-research.js [--dir <researchRoot>]
  * Exit code 0 = all records valid, 1 = at least one problem found.
  *
- * Core parsing/validation functions are exported for reuse by tools/analyze-research.js
- * and by tests; see module.exports at the bottom of this file.
+ * Core parsing/validation functions are exported for reuse by tests; see
+ * module.exports at the bottom of this file.
  */
 
 const fs = require("fs");

@@ -1,3 +1,5 @@
+export { analyzeCorpus, computeProblemAnalysis, computeGaps, tally } from "./analyze.ts";
+export type { AnalysisResult, CorpusSummary, Distribution, ProblemAnalysis } from "./analyze.ts";
 export { loadCorpusIndex } from "./corpus.ts";
 export type { MalformedRecordFile } from "./corpus.ts";
 export { loadSchemas } from "./schemas.ts";
