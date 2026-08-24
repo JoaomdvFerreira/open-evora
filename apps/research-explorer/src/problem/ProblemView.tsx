@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordIndex } from "../records/useRecordIndex";
 import { useProblemProjection } from "./useProblemProjection";
@@ -19,7 +19,8 @@ const ERROR_TITLES: Record<string, string> = {
   invalid_id: "Identificador de Problema inválido",
 };
 
-const PROBLEM_STATE_FIELDS = ["status", "validation_status", "evidence_status", "digital_tractability", "solution_landscape_status"] as const;
+/** PI-02B header: compact canonical investigation-state chips — status, evidence_status, validation_status only, per scope. */
+const HEADER_STATE_FIELDS = ["status", "evidence_status", "validation_status"] as const;
 
 function fieldValue(record: Record<string, unknown>, key: string): string | null {
   const value = record[key];
@@ -32,6 +33,48 @@ function recordValue(value: unknown): Record<string, unknown> | null {
 
 function stringValues(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
+/** `geography.area` (with `geography.level` as public-labelled context) — omitted entirely when either canonical part is absent, never inferred. */
+function geographySummary(record: Record<string, unknown>): string | null {
+  const geography = recordValue(record.geography);
+  if (!geography) return null;
+  const area = fieldValue(geography, "area");
+  const level = fieldValue(geography, "level");
+  if (!area) return null;
+  return level ? `${area} (${publicEnumLabel("geography", level)})` : area;
+}
+
+/**
+ * `decision_basis.scope` is authored prose per dimension (geography/population/temporal),
+ * plus an explicit `bounded` boolean — never merged into a single derived sentence.
+ * Returns only the dimensions actually present on record.
+ */
+interface DecisionBasisScope {
+  geography: string | null;
+  population: string | null;
+  temporal: string | null;
+  bounded: boolean | null;
+}
+
+function decisionBasisScope(record: Record<string, unknown>): DecisionBasisScope | null {
+  const decisionBasis = recordValue(record.decision_basis);
+  const scope = decisionBasis ? recordValue(decisionBasis.scope) : null;
+  if (!scope) return null;
+  const geography = fieldValue(scope, "geography");
+  const population = fieldValue(scope, "population");
+  const temporal = fieldValue(scope, "temporal");
+  const bounded = typeof scope.bounded === "boolean" ? scope.bounded : null;
+  if (!geography && !population && !temporal && bounded === null) return null;
+  return { geography, population, temporal, bounded };
+}
+
+function decisionBasisField(record: Record<string, unknown>, ...path: string[]): string | null {
+  let current: Record<string, unknown> | null = recordValue(record.decision_basis);
+  for (let i = 0; i < path.length - 1; i += 1) {
+    current = current ? recordValue(current[path[i]]) : null;
+  }
+  return current ? fieldValue(current, path[path.length - 1]) : null;
 }
 
 function evidenceSourceLabel(record: Record<string, unknown>): string | null {
@@ -178,6 +221,149 @@ function ProblemHelpDisclosure({ record }: { record: Record<string, unknown> }) 
 }
 
 /**
+ * PI-02B header: what/where/who at a glance, plus compact canonical
+ * investigation-state chips. Currentness/scope render only as a short,
+ * labelled presence indicator here — never the full authored sentence
+ * (that lives in `ProblemCurrentStateSection` below, so the two never repeat
+ * the same prose). Every item is omitted, not fabricated, when its
+ * canonical field is absent.
+ */
+function ProblemHeader({
+  problemId,
+  record,
+  headingRef,
+}: {
+  problemId: string;
+  record: Record<string, unknown>;
+  headingRef: RefObject<HTMLHeadingElement>;
+}) {
+  const title = fieldValue(record, "title") ?? problemId;
+  const problemStatement = fieldValue(record, "problem_statement");
+  const geography = geographySummary(record);
+  const affectedPopulations = stringValues(record.affected_populations);
+  const currentnessAssessment = decisionBasisField(record, "currentness", "assessment");
+  const scope = decisionBasisScope(record);
+
+  return (
+    <div className="problem-identity">
+      <div className="problem-identity-id">{problemId}</div>
+      <h2 ref={headingRef} id="problem-heading" tabIndex={-1} className="problem-identity-title">
+        {title}
+      </h2>
+      {problemStatement && <p className="problem-statement problem-header-statement">{problemStatement}</p>}
+
+      <dl className="problem-header-facts">
+        {geography && (
+          <div className="problem-header-fact">
+            <dt>Onde</dt>
+            <dd>{geography}</dd>
+          </div>
+        )}
+        {affectedPopulations.length > 0 && (
+          <div className="problem-header-fact">
+            <dt>Quem é afetado</dt>
+            <dd>{affectedPopulations.join(", ")}</dd>
+          </div>
+        )}
+        {currentnessAssessment && (
+          <div className="problem-header-fact">
+            <dt>Atualidade da evidência</dt>
+            <dd>Avaliação de atualidade disponível — ver &ldquo;Estado atual&rdquo; abaixo.</dd>
+          </div>
+        )}
+        {scope && (
+          <div className="problem-header-fact">
+            <dt>Âmbito</dt>
+            <dd>{scope.bounded === true ? "Delimitado" : scope.bounded === false ? "Não delimitado" : "Âmbito registado"} — ver &ldquo;Estado atual&rdquo; abaixo.</dd>
+          </div>
+        )}
+      </dl>
+    </div>
+  );
+}
+
+/**
+ * PI-02B §"Estado atual": compact canonical investigation-state chips
+ * (always rendered, same landmark/anchor as before) plus, conditionally,
+ * one labelled item per authored `decision_basis` field — no synthesis
+ * across them and no fallback conclusion when a field is absent. `scope`
+ * renders each authored dimension (geography/population/temporal) plus the
+ * explicit `bounded` boolean, exactly as authored.
+ */
+function ProblemCurrentStateSection({ record }: { record: Record<string, unknown> }) {
+  const manifestationSummary = decisionBasisField(record, "manifestation", "summary");
+  const consequenceSummary = decisionBasisField(record, "consequence", "summary");
+  const currentnessAssessment = decisionBasisField(record, "currentness", "assessment");
+  const scope = decisionBasisScope(record);
+
+  return (
+    <section id="problem-estado-atual" aria-label="Estado atual" className="problem-section">
+      <h3 className="detail-panel-label">Estado atual</h3>
+
+      <div className="status-chip-row">
+        {HEADER_STATE_FIELDS.map((key) => {
+          const value = fieldValue(record, key);
+          return value === null ? null : <StatusChip key={key} field={key} value={value} />;
+        })}
+      </div>
+
+      {manifestationSummary && (
+        <div className="problem-current-state-item">
+          <h4>O que observamos</h4>
+          <p>{manifestationSummary}</p>
+        </div>
+      )}
+
+      {consequenceSummary && (
+        <div className="problem-current-state-item">
+          <h4>Consequências conhecidas</h4>
+          <p>{consequenceSummary}</p>
+        </div>
+      )}
+
+      {currentnessAssessment && (
+        <div className="problem-current-state-item">
+          <h4>Atualidade</h4>
+          <p>{currentnessAssessment}</p>
+        </div>
+      )}
+
+      {scope && (
+        <div className="problem-current-state-item">
+          <h4>Âmbito conhecido</h4>
+          <dl className="problem-scope-grid">
+            {scope.geography && (
+              <div className="problem-scope-item">
+                <dt>Geografia</dt>
+                <dd>{scope.geography}</dd>
+              </div>
+            )}
+            {scope.population && (
+              <div className="problem-scope-item">
+                <dt>População</dt>
+                <dd>{scope.population}</dd>
+              </div>
+            )}
+            {scope.temporal && (
+              <div className="problem-scope-item">
+                <dt>Período</dt>
+                <dd>{scope.temporal}</dd>
+              </div>
+            )}
+            {scope.bounded !== null && (
+              <div className="problem-scope-item">
+                <dt>Delimitado</dt>
+                <dd>{scope.bounded ? "Sim" : "Não"}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/**
  * Scannable summary of contribution *occurrences* across the evidence list
  * (REDUX-002's aggregate-legend pattern) — never a ranking, score, or
  * inferred strength; a tally of already-explicit canonical values. Shown
@@ -258,7 +444,6 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
 
   const { problem, evidence } = state.projection;
   const record = problem.record as Record<string, unknown>;
-  const title = fieldValue(record, "title") ?? problem.id;
 
   return (
     <article aria-labelledby="problem-heading" className="problem-view shell-frame">
@@ -270,26 +455,12 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
 
       <div className="record-detail-columns problem-view-columns">
         <div className="record-detail-main">
-          <div className="problem-identity">
-            <div className="problem-identity-id">{problem.id}</div>
-            <h2 ref={headingRef} id="problem-heading" tabIndex={-1} className="problem-identity-title">
-              {title}
-            </h2>
-          </div>
+          <ProblemHeader problemId={problem.id} record={record} headingRef={headingRef} />
           <p className="problem-file-path">
             <code>{problem.file}</code>
           </p>
 
-          <section id="problem-estado-atual" aria-label="Estado atual" className="problem-section">
-            <h3 className="detail-panel-label">Estado atual</h3>
-            <div className="status-chip-row">
-              {PROBLEM_STATE_FIELDS.map((key) => {
-                const value = fieldValue(record, key);
-                return value === null ? null : <StatusChip key={key} field={key} value={value} />;
-              })}
-            </div>
-            {fieldValue(record, "problem_statement") && <p className="problem-statement">{fieldValue(record, "problem_statement")}</p>}
-          </section>
+          <ProblemCurrentStateSection record={record} />
 
           <section id="problem-evidencia" aria-label="Evidência" className="problem-section">
             <h3 className="detail-panel-label">Registos de evidência associados ({formatPublicCount(evidence.length)})</h3>

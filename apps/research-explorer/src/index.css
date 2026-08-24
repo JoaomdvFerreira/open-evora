@@ -2333,6 +2333,87 @@ main.explorer-shell {
   line-height: var(--recipe-editorial-body-line-height);
 }
 
+.problem-header-statement {
+  margin-bottom: var(--space-5);
+}
+
+/* PI-02B header facts (Onde / Quem é afetado / Atualidade / Âmbito) — compact
+   dt/dd pairs, same visual register as the technical provenance grid rather
+   than a new pattern. */
+.problem-header-facts {
+  display: grid;
+  gap: var(--space-3) var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin: 0 0 var(--space-5);
+}
+
+.problem-header-fact dt {
+  margin-bottom: 2px;
+  color: var(--ink-faintest);
+  font-family: var(--ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.problem-header-fact dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* PI-02B "Estado atual" items — one labelled block per authored
+   decision_basis field, no shared card chrome beyond the existing
+   .problem-section rhythm. */
+.problem-current-state-item {
+  margin-bottom: var(--space-5);
+}
+
+.problem-current-state-item:last-child {
+  margin-bottom: 0;
+}
+
+.problem-current-state-item h4 {
+  margin: 0 0 var(--space-2);
+  color: var(--ink-faint);
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.problem-current-state-item p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.problem-scope-grid {
+  display: grid;
+  gap: var(--space-3) var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin: 0;
+}
+
+.problem-scope-item dt {
+  margin-bottom: 2px;
+  color: var(--ink-faintest);
+  font-family: var(--ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.problem-scope-item dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .evidence-list {
   list-style: none;
   margin: 0;

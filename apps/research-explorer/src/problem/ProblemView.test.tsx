@@ -384,6 +384,153 @@ describe("ProblemView", () => {
   });
 });
 
+describe("ProblemView — PI-02B header + Estado atual", () => {
+  const HEADER_INDEX: RecordSummary[] = [
+    { id: "PRB-0200", type: "PRB-", label: "Header fixture", file: "research/problems/PRB-0200.yaml", summaryFields: {} },
+  ];
+
+  function headerProvider(record: Record<string, unknown>): DataProvider {
+    const detail: RecordDetail = {
+      id: "PRB-0200",
+      type: "PRB-",
+      file: "research/problems/PRB-0200.yaml",
+      record,
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(HEADER_INDEX),
+      getRecord: () => Promise.resolve(detail),
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  it("renders title, problem_statement, geography, affected_populations, and compact status/evidence_status/validation_status chips from canonical data only", async () => {
+    render(
+      <ProblemView
+        dataProvider={headerProvider({
+          title: "Header fixture problem",
+          problem_statement: "A concise canonical statement.",
+          geography: { level: "municipality", area: "Município de Évora" },
+          affected_populations: ["students", "commuters"],
+          status: "OPEN",
+          evidence_status: "corroborated",
+          validation_status: "unvalidated",
+        })}
+        problemId="PRB-0200"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Header fixture problem" });
+    expect(screen.getByText("A concise canonical statement.")).toBeTruthy();
+    expect(screen.getByText(/Município de Évora/)).toBeTruthy();
+    expect(screen.getByText("students, commuters")).toBeTruthy();
+
+    const stateSection = screen.getByLabelText("Estado atual");
+    expect(within(stateSection).getByText(/Aberto/)).toBeTruthy();
+    expect(within(stateSection).getByText(/Evidência corroborada/)).toBeTruthy();
+    expect(within(stateSection).getByText(/Por validar/)).toBeTruthy();
+  });
+
+  it("omits geography, affected_populations, currentness, and scope entirely when the canonical fields are absent, without inventing a fallback", async () => {
+    render(
+      <ProblemView
+        dataProvider={headerProvider({ title: "No optional fields", status: "OPEN" })}
+        problemId="PRB-0200"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "No optional fields" });
+    expect(screen.queryByText("Onde")).toBeNull();
+    expect(screen.queryByText("Quem é afetado")).toBeNull();
+    expect(screen.queryByText("Atualidade da evidência")).toBeNull();
+    expect(screen.queryByText("Âmbito")).toBeNull();
+  });
+
+  it("renders 'Estado atual' from decision_basis (manifestation, consequence, currentness, scope) without repeating the header's compact indicators as full sentences", async () => {
+    render(
+      <ProblemView
+        dataProvider={headerProvider({
+          title: "Decision basis fixture",
+          status: "OPEN",
+          decision_basis: {
+            manifestation: { summary: "What the evidence shows is happening." },
+            consequence: { summary: "The documented downstream effect." },
+            currentness: { assessment: "HIGH — evidence remains current as of 2026." },
+            scope: {
+              geography: "Município de Évora only.",
+              population: "Residents dependent on the service.",
+              temporal: "2022-2026.",
+              bounded: true,
+            },
+          },
+        })}
+        problemId="PRB-0200"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Decision basis fixture" });
+    const stateSection = screen.getByLabelText("Estado atual");
+
+    expect(within(stateSection).getByText("O que observamos")).toBeTruthy();
+    expect(within(stateSection).getByText("What the evidence shows is happening.")).toBeTruthy();
+    expect(within(stateSection).getByText("Consequências conhecidas")).toBeTruthy();
+    expect(within(stateSection).getByText("The documented downstream effect.")).toBeTruthy();
+    expect(within(stateSection).getByText("Atualidade")).toBeTruthy();
+    expect(within(stateSection).getByText("HIGH — evidence remains current as of 2026.")).toBeTruthy();
+    expect(within(stateSection).getByText("Âmbito conhecido")).toBeTruthy();
+    expect(within(stateSection).getByText("Município de Évora only.")).toBeTruthy();
+    expect(within(stateSection).getByText("Residents dependent on the service.")).toBeTruthy();
+    expect(within(stateSection).getByText("2022-2026.")).toBeTruthy();
+    expect(within(stateSection).getByText("Sim")).toBeTruthy();
+
+    // The header's own currentness/scope indicators stay compact — the full
+    // authored sentence appears exactly once, in "Estado atual", not twice.
+    expect(screen.getAllByText("What the evidence shows is happening.").length).toBe(1);
+    expect(screen.getAllByText(/2022-2026\./).length).toBe(1);
+  });
+
+  it("omits manifestation/consequence/currentness/scope items individually when decision_basis carries only some of them", async () => {
+    render(
+      <ProblemView
+        dataProvider={headerProvider({
+          title: "Partial decision basis",
+          status: "OPEN",
+          decision_basis: {
+            manifestation: { summary: "Only manifestation is authored." },
+          },
+        })}
+        problemId="PRB-0200"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Partial decision basis" });
+    const stateSection = screen.getByLabelText("Estado atual");
+
+    expect(within(stateSection).getByText("O que observamos")).toBeTruthy();
+    expect(within(stateSection).queryByText("Consequências conhecidas")).toBeNull();
+    expect(within(stateSection).queryByText("Atualidade")).toBeNull();
+    expect(within(stateSection).queryByText("Âmbito conhecido")).toBeNull();
+  });
+});
+
 const GENERATED_DIR = path.resolve(__dirname, "..", "..", "generated");
 const hasRealCorpus = fs.existsSync(path.join(GENERATED_DIR, "index.json"));
 
