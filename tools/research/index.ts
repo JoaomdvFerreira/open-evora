@@ -9,6 +9,24 @@ export { loadCorpusIndex, loadCorpusIndexTolerant } from "./core/corpus.ts";
 export type { CorpusLoadResult, MalformedRecordFile } from "./core/corpus.ts";
 export { loadSchemas } from "./core/schemas.ts";
 export { parseRecordYaml } from "./core/yaml.ts";
+export {
+  evaluateCorpus,
+  evaluateCorroboration,
+  evaluateEligibility,
+  evaluateProblem,
+  READY,
+  REASON,
+  REVIEW_REQUIRED,
+} from "./readiness/readiness.ts";
+export type {
+  CorroborationReadiness,
+  CorroborationResult,
+  EligibilityReadiness,
+  EligibilityResult,
+  ReadinessFinding,
+  ReadinessReport,
+  ReasonCode,
+} from "./readiness/readiness.ts";
 export { validateCorpusIndex, validateResearchRoot } from "./validation/validate.ts";
 export type { ValidationResult } from "./validation/validate.ts";
 export type {
