@@ -23,6 +23,12 @@ function collectRecordFiles(dir: string): string[] {
     .sort();
 }
 
+/** A record file that failed to parse as YAML, keyed by its research-root-relative path. */
+export interface MalformedRecordFile {
+  file: string;
+  message: string;
+}
+
 /**
  * Loads and parses every record file for one schema-declared record type,
  * then indexes it by the schema's declared idField. Deterministic: files
@@ -32,8 +38,17 @@ function collectRecordFiles(dir: string): string[] {
  * (research/<schema.directory>/*.yaml) without reusing its bespoke YAML
  * parser or its validation-rule interpretation — this loader only reads
  * and indexes; it makes no PASS/FAIL judgement about record shape.
+ *
+ * When `onMalformed` is given, a file that fails to parse is reported to it
+ * and skipped instead of throwing, so one bad file does not abort loading
+ * the rest of the record set (used by validators that must report every
+ * problem in one pass rather than stopping at the first one).
  */
-function loadRecordSet(researchRoot: string, schema: RecordSchema): RecordIndex {
+function loadRecordSet(
+  researchRoot: string,
+  schema: RecordSchema,
+  onMalformed?: (failure: MalformedRecordFile) => void
+): RecordIndex {
   const dir = join(researchRoot, schema.directory);
   const filenames = collectRecordFiles(dir);
 
@@ -44,7 +59,16 @@ function loadRecordSet(researchRoot: string, schema: RecordSchema): RecordIndex 
     const absPath = join(dir, filename);
     const file = relative(researchRoot, absPath).split("\\").join("/");
     const text = readFileSync(absPath, "utf8");
-    const fields = parseRecordYaml(text);
+
+    let fields;
+    try {
+      fields = parseRecordYaml(text);
+    } catch (e) {
+      if (!onMalformed) throw e;
+      onMalformed({ file, message: (e as Error).message });
+      continue;
+    }
+
     const record: ParsedRecord = { file, fields };
     records.push(record);
 
@@ -63,14 +87,21 @@ function loadRecordSet(researchRoot: string, schema: RecordSchema): RecordIndex 
  * loading/indexing layer for research tooling built on top of it (TC-01
  * scope) — this performs no validation and no semantic interpretation; it
  * only reads, parses, and indexes what research/schemas/* declares.
+ *
+ * By default a malformed record file throws. Pass `onMalformed` to instead
+ * collect parse failures and continue loading the rest of the corpus (the
+ * validator needs this to report every problem in one pass).
  */
-export function loadCorpusIndex(researchRoot: string): CorpusIndex {
+export function loadCorpusIndex(
+  researchRoot: string,
+  onMalformed?: (failure: MalformedRecordFile) => void
+): CorpusIndex {
   const schemas = loadSchemas(researchRoot);
   const byPrefix = new Map<string, RecordIndex>();
   let totalRecords = 0;
 
   for (const schema of schemas) {
-    const recordIndex = loadRecordSet(researchRoot, schema);
+    const recordIndex = loadRecordSet(researchRoot, schema, onMalformed);
     byPrefix.set(schema.prefix, recordIndex);
     totalRecords += recordIndex.records.length;
   }
