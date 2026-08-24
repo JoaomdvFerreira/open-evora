@@ -11,16 +11,33 @@ affected_populations:
   - "residents seeking adequate/affordable housing"
   - "students"
 problem_statement: "Os documentos de planeamento institucional identificam preços elevados de compra e arrendamento, uma oferta insuficiente de habitação a preços comportáveis, social e a custos controlados, degradação habitacional e uma escassez específica de alojamento estudantil, reconhecendo simultaneamente que já estão em curso ações de reabilitação habitacional, construção a custos controlados, reabilitação destinada ao arrendamento apoiado e medidas de alojamento estudantil."
-current_journey: null
-reported_consequences: []
-possible_root_causes:
-  - "Primary root cause is largely physical/economic supply and affordability; software leverage may be secondary (per WU-D1-03 Batch A interpretation, not yet validated)."
-  - "Student accommodation is preserved here as a documented sub-pressure within the housing cluster rather than a separate canonical problem, per the approved Round A cross-domain synthesis; it has strong overlap with WU-D1-04 talent/student attraction and retention and may be referenced there without duplicating this record. WU-D1-03 Batch B confirms student accommodation capacity is improving but still constrained (see EVD-000043) and keeps it as a subproblem, not a separate canonical problem."
-  - "Existing housing interventions (Local Housing Strategy rehabilitation, controlled-cost targets, supported-rental rehabilitation, temporary/shared accommodation, student-housing needs assessment) mean this is not an 'absence of institutional response' problem; Batch B confirms these interventions are large, funded and actively being delivered (EUR67.1M/459 homes plus concrete January 2026 deliveries), and that this active supply-side response does not by itself resolve unmet housing need (see EVD-000042). Digital intervention has low leverage over the dominant physical/economic cause."
-  - "D2-C Round A (WU-D2-05) strengthens current affordability/student-exposure evidence with press-reported figures (rooms around EUR500/month, T2 around EUR1,000/month, roughly 70% of UÉ students displaced into rental accommodation - EVD-000099); these are press-mediated figures, preserved as reported and not verified against a primary dataset, and are treated as current-state evidence, not proof of a digital/process gap. A May 2026 completion of the Residência Universitária Manuel Álvares renovation (EVD-000100) marks a specific recovery point in the 2025/2026 residence-capacity disruption already recorded in EVD-000043, but does not establish that the broader student-housing pressure is resolved."
-  - "D2-C Round A explicitly leaves the applicant-facing housing/UÉ-residence information and transaction journey UNPROVEN: it was not established that applicants cannot discover the correct programme, that eligibility is commonly misunderstood, that document submission is materially duplicated, that application/status tracking is materially deficient, that UÉ residence applications are confusing, or that a single digital housing navigator would materially change outcomes. The existence of multiple programmes/information surfaces is not itself evidence of navigation failure; these remain open D3/D5 questions, not a validated subproblem."
-  - "D2-C Round A also notes a programme-delivery bureaucracy boundary: reviewed housing material describing bureaucracy around national/European programme delivery is institutional delivery/process context, not applicant-facing transaction friction, unless direct applicant evidence says otherwise."
-  - "D5-OP-004 SASUE institutional response (2026-08-13; EVD-000125–EVD-000127) reports a structured online residence-application journey through SIIUE / Perfil de aluno, direct status consultation, result notification and an IT-supported change path, and assesses the process as fully operational. This materially challenges a strong systemic applicant information/status/process-failure framing on the institutional side. It does not establish affected-student usability, clarity, accessibility, waiting experience or absence of individual friction, and does not alter the dominant physical/economic supply and affordability mechanism. SASUE also confirms that aggregate application/capacity/unsuccessful-applicant/waiting-list/decision-time indicators exist internally, but provides no values, definitions, access conditions or reuse terms; indicator existence must not be treated as evidence of shortage magnitude or outcomes."
+causal_reading: "A causa dominante é sobretudo de oferta física/económica e de comportabilidade (preços, oferta insuficiente de habitação a preços comportáveis, degradação habitacional), pelo que a alavancagem de uma intervenção digital sobre esta causa dominante é provavelmente secundária. Esta leitura não está validada."
+investigation:
+  open_questions:
+    - question: "A jornada de informação e transação de habitação/residências da UÉ orientada ao candidato apresenta uma falha material de navegação (descoberta de programa, elegibilidade, duplicação documental, acompanhamento de estado) que um navegador digital de habitação mudaria materialmente?"
+      why_open: "A existência de múltiplos programas/superfícies de informação não é, por si só, evidência de falha de navegação; a resposta institucional direta da SASUE descreve um processo de candidatura online estruturado e totalmente operacional, o que desafia materialmente um enquadramento sistémico de falha de informação/processo do lado institucional, mas não estabelece usabilidade, clareza, acessibilidade ou experiência de espera do lado do estudante afetado."
+      latest_result: "A resposta institucional da SASUE (2026-08-13) relata uma jornada de candidatura online estruturada através do SIIUE/Perfil de aluno, consulta direta de estado, notificação de resultado e uma via de alteração com suporte de TI, avaliando o processo como totalmente operacional."
+      resolution_condition: "Evidência direta do lado do estudante (usabilidade, clareza, acessibilidade, experiência de espera, fricção individual) que estabeleça se existe falha de navegação material."
+      evidence:
+        - "EVD-000125"
+        - "EVD-000126"
+        - "EVD-000127"
+  path:
+    initial_signal:
+      summary: "Os documentos de planeamento institucional identificaram preços elevados, oferta insuficiente de habitação a preços comportáveis/social/custos controlados, degradação habitacional e uma escassez específica de alojamento estudantil."
+      evidence:
+        - "EVD-000031"
+        - "EVD-000033"
+    development:
+      summary: "Foi confirmado que já estão em curso intervenções habitacionais substanciais e financiadas (reabilitação, custos controlados, arrendamento apoiado, alojamento temporário/partilhado, avaliação de necessidades de alojamento estudantil), pelo que este não é um problema de ausência de resposta institucional; a resposta do lado da oferta não resolve, por si só, a necessidade habitacional não satisfeita. A pressão de acomodação estudantil foi mantida como sub-pressão documentada dentro do agregado de habitação, não como problema canónico separado."
+      evidence:
+        - "EVD-000032"
+        - "EVD-000042"
+        - "EVD-000043"
+    delimitation:
+      summary: "Figuras reportadas pela imprensa (quartos por cerca de 500€/mês, T2 por cerca de 1.000€/mês, cerca de 70% dos estudantes da UÉ deslocados para arrendamento) reforçaram a evidência atual de acomodação/exposição estudantil, mantidas como reportadas e não verificadas contra um conjunto de dados primário. A jornada de informação e transação orientada ao candidato foi explicitamente deixada por comprovar, não validada como subproblema."
+      evidence:
+        - "EVD-000099"
 evidence:
   - "EVD-000031"
   - "EVD-000032"
@@ -35,7 +52,7 @@ evidence:
 evidence_status: corroborated
 validation_status: unvalidated
 digital_tractability: not_assessed
-existing_solutions: not_assessed
+solution_landscape_status: not_assessed
 status: OPEN
 
 decision_basis:

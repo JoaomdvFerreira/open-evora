@@ -89,7 +89,7 @@ evidence: [EVD-900101]
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
-existing_solutions: not_assessed
+solution_landscape_status: not_assessed
 status: OPEN
 `;
 

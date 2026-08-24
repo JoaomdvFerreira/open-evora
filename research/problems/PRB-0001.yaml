@@ -8,14 +8,34 @@ geography:
 affected_populations:
   - "residents who depend on public transport"
 problem_statement: "A cobertura dos transportes públicos em Évora é, em termos globais, ampla, mas a evidência institucional indica que a utilidade prática do serviço varia consoante o período horário, o tipo de deslocação e os locais de baixa procura, continuando a articulação entre horários e frequências a ser uma preocupação documentada."
-current_journey: null
-reported_consequences: []
-possible_root_causes:
-  - "Likely primarily service design/capacity rather than information alone (per WU-D1-02 Batch A interpretation, not yet validated) - do not assume software is the solution."
-  - "Batch B update: current intermunicipal evidence shows substantial territorial coverage and use of flexible transport to cover some low-demand locations, so lack of coverage should not be generalized to all of Évora. The problem should continue to distinguish urban TREVO time-of-day/service-pattern issues, intermunicipal/rural network adequacy, and schedule alignment/frequency as separate sub-issues rather than one assumed root cause."
-  - "Batch C update: current urban ridership is materially recovering (876,148 passengers in 2025, up 90,522 over 2024, still 1.9% below pre-pandemic) with practically full daytime coverage but reduced night/weekend/holiday response, taxi-based flexible transport for named low-demand locations, and 94% intermunicipal TPAC/TPF coverage excluding the urban network. Do not interpret as general lack of geographic network coverage or as a confirmed digital problem. Next validation (D2/D5) should focus on evenings/weekends, low-demand areas, commuting/school journeys, and schedule alignment."
-  - "D2-A Round A update: a March 2026 student protest at Colégio Pedro da Fonseca (EVD-000079) provides a concrete journey where frequency/capacity/practical travel time make public transport unusable for a specific campus/industrial-zone commute, materially strengthening and refining this problem toward availability/frequency/capacity/practical-journey-time constraints rather than a generic transport-availability claim. Current TREVO complaint-surface incidents (EVD-000080) add operational reliability failure modes (delayed/no-show buses, service interruption). No PRB-0001 status/tractability change; evidence remains reported experience, not verified operational fact. Representativeness UNKNOWN."
-  - "RS-02A update (2026-08-12): the 2022 and 2023 municipal transport-authority annual reports (EVD-000117) confirm, in wording identical to the current 2026 report, that reduced night/weekend/holiday response is a multi-year documented pattern, not a newly observed or transient one. This is historical persistence corroboration only, from the same institutional report series already canonicalized (SRC-0018) — it does not add current (2026) line/corridor-level severity detail. The unresolved question remains which specific lines/corridors/time periods experience the strongest reduction and by how much, which is why WU022's TREVO route (D5-OP-001) stays open rather than being closed on the strength of this desk finding."
+causal_reading: "A variância na utilidade prática do serviço está associada sobretudo ao desenho/capacidade do serviço, e não apenas a uma lacuna de informação; esta leitura não está validada e não exclui outros mecanismos operacionais contributivos."
+investigation:
+  open_questions:
+    - question: "Quais as linhas/corredores/períodos horários concretos que sofrem a maior redução de serviço, e em que medida?"
+      why_open: "Nenhum conjunto de dados público ao nível da linha/corredor foi localizado; a evidência institucional disponível documenta o padrão a nível de rede (dia vs. noite/fim de semana/feriados), não a severidade por linha."
+      current_action: "A plataforma de reclamações do TREVO permanece a via de validação disponível para reportar e caracterizar instâncias concretas de fricção por linha/corredor/período horário."
+      evidence:
+        - "EVD-000002"
+        - "EVD-000117"
+  path:
+    initial_signal:
+      summary: "O plano de desenvolvimento social (PDS 2024-2027) e o relatório anual da autoridade de transportes municipal identificaram a conectividade efetiva de transportes públicos como uma preocupação para residentes dependentes do serviço, com cobertura diurna ampla mas resposta noturna/fim de semana/feriados reduzida."
+      evidence:
+        - "EVD-000001"
+        - "EVD-000002"
+    development:
+      summary: "Evidência intermunicipal (CIMAC/ATAC) confirmou que as comunicações relacionadas com horários são a maior categoria de reclamação, e que a experiência de acesso/espera é mais fraca do que a experiência a bordo, reforçando a leitura de variação temporal/territorial. Evidência de utilização crescente e cobertura territorial ampla (incluindo transporte flexível para locais de baixa procura) delimitou a reivindicação, afastando uma leitura de ausência geral de cobertura."
+      evidence:
+        - "EVD-000011"
+        - "EVD-000023"
+        - "EVD-000024"
+        - "EVD-000027"
+    delimitation:
+      summary: "Um protesto estudantil concreto (março de 2026) e incidentes reportados na plataforma de reclamações do TREVO forneceram instâncias práticas de fricção (frequência/capacidade/tempo de viagem, falhas operacionais), sem estabelecer prevalência ou representatividade. Os relatórios institucionais de 2022 e 2023 confirmaram que o padrão dia/noite-fim de semana-feriados é persistente ao longo de vários anos, não um achado novo ou transitório."
+      evidence:
+        - "EVD-000079"
+        - "EVD-000080"
+        - "EVD-000117"
 evidence:
   - "EVD-000001"
   - "EVD-000002"
@@ -30,7 +50,7 @@ evidence:
 evidence_status: corroborated
 validation_status: unvalidated
 digital_tractability: not_assessed
-existing_solutions: not_assessed
+solution_landscape_status: not_assessed
 status: OPEN
 
 decision_basis:

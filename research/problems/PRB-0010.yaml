@@ -10,10 +10,27 @@ affected_populations:
   - "residents"
   - "drivers"
 problem_statement: "Uma petição de janeiro de 2026 relatou a existência generalizada de buracos e pavimento degradado no município, com impactos na segurança e danos nos veículos; o Município reconheceu a necessidade de manutenção/requalificação e respondeu com reparações na ordem dos 1,5 milhões de euros. Um sinal público posterior, relativo a uma localização específica (entrada da N114 em Évora), alegou persistência do problema; este sinal, de natureza social/comunitária, não está verificado. Estes elementos evidenciam um problema real de degradação do pavimento rodoviário e de fiabilidade da manutenção, embora a evidência disponível — uma petição e um sinal público posterior não verificado — não permita estimar a prevalência atual em todo o município."
-current_journey: null
-reported_consequences: []
-possible_root_causes:
-  - "WU-D3-03 promotion (docs/milestones/D3-WU03-structure-review.md): promoted from the D2 road-surface-maintenance NEW-CANDIDATE (retained unlinked through D2 closure and the WU-D3-02 pilot) to this canonical PRB, per project-owner decision. The preserved evidence supports a distinct failure mechanism — physical road-surface degradation/potholes, maintenance/requalification service reliability, road-condition safety/vehicle-damage/mobility effects, and municipal acknowledgement and repair response — materially different from PRB-0005's traffic/parking-pressure-versus-pedestrian/public-space mechanism. Digital leverage over the core physical mechanism is expected to be low, but low digital leverage is not a reason to deny the existence of a civic problem. current_journey is deliberately left null; no user journey was manufactured for this promotion."
+causal_reading: "A degradação do pavimento rodoviário é um mecanismo físico de manutenção/infraestrutura, distinto do mecanismo de tráfego/pressão de estacionamento de PRB-0005. A alavancagem digital sobre este mecanismo físico central é esperada como baixa; esta leitura não está validada."
+investigation:
+  open_questions:
+    - question: "A degradação do pavimento rodoviário persiste hoje a uma escala comparável, ao nível de todo o município, após o programa de reparação?"
+      why_open: "Não existe nenhum registo que estabeleça se o programa de reparação está concluído ou se as condições da estrada são agora geralmente sólidas, nem nenhum registo que estabeleça que a degradação persiste amplamente hoje. O único sinal posterior (um relato não verificado sobre a N114) é uma localização específica, com representatividade desconhecida, e não pode ser generalizado ao município."
+      resolution_condition: "Um conjunto de dados público ou registo municipal que estabeleça a condição atual (agosto de 2026 em diante), ao nível de todo o município, do pavimento rodoviário após o programa de reparação."
+      evidence:
+        - "EVD-000084"
+  path:
+    initial_signal:
+      summary: "Uma petição de janeiro de 2026, com 1.394 assinaturas, relatou a existência generalizada de buracos e pavimento degradado no município, com impactos na segurança e danos nos veículos."
+      evidence:
+        - "EVD-000082"
+    development:
+      summary: "O Município reconheceu, através de cobertura jornalística independente, a necessidade de manutenção/requalificação — não atribuível apenas ao clima — e respondeu com um programa de reparações na ordem dos 1,5 milhões de euros."
+      evidence:
+        - "EVD-000083"
+    delimitation:
+      summary: "Um sinal público posterior (julho de 2026), relativo a uma localização específica (entrada da N114 em Évora), alegou persistência do problema; este sinal, de natureza social/comunitária, não está verificado e não é generalizado ao município."
+      evidence:
+        - "EVD-000084"
 evidence:
   - "EVD-000082"
   - "EVD-000083"
@@ -21,7 +38,7 @@ evidence:
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: low
-existing_solutions: assessed
+solution_landscape_status: assessed
 status: OPEN
 
 decision_basis:

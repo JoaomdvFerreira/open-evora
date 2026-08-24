@@ -10,26 +10,53 @@ affected_populations:
   - "informal caregivers"
   - "cared-for people"
 problem_statement: "Os cuidadores informais em Évora têm necessidades documentadas de informação que abrangem saúde, mobilidade, estruturas de apoio e apoio financeiro/social. Um estudo com 68 cuidadores e 89 pessoas cuidadas, integrado no Plano Concelhio dos Cuidadores Informais, apurou que 35% das pessoas cuidadas não utilizava qualquer serviço formal de apoio — um resultado específico dessa amostra, não generalizável ao conjunto dos cuidadores de Évora. Material de grupos focais do mesmo plano identifica, numa amostra distinta, a burocracia e a dificuldade em compreender os direitos dos cuidadores como uma fonte de sobrecarga separada da sobrecarga geral do cuidar; a evidência atual não estabelece uma relação causal entre esta fragmentação da informação e a não utilização de apoio formal reportada no estudo dos 68/89. Um terceiro inquérito, a 133 cuidadores, indica que as necessidades de apoio direto no cuidar, descanso, apoio financeiro e apoio psicológico são reportadas com maior frequência do que necessidades relacionadas com orientação, pelo que estas permanecem uma explicação alternativa, e possivelmente mais prevalente, para as dificuldades de acesso a apoios — apesar de Évora dispor de uma densa rede interinstitucional de apoio social (CLASE / Rede Social)."
-current_journey: null
-reported_consequences: []
-possible_root_causes:
-  - "Évora already has a dense social-support institutional network (roughly 120 CLASE-listed institutions), so the problem should not be assumed to be 'no organisations exist'; coordination, capacity, discoverability and eligibility/navigation need separate investigation (per WU-D1-03 Batch A interpretation, not yet validated)."
-  - "Existing services and user journeys must be mapped before any solution hypothesis, per the approved Round A cross-domain synthesis; this is not converted into a generic cross-domain 'information fragmentation' problem shared with other domains."
-  - "Mental-health support capacity is a related but distinct institutional concern (see EVD-000035, freshness caution pending) and is intentionally not merged into this problem; it remains open investigation rather than a canonical problem until current evidence is sufficient under the recording-protocol rules for problem creation. WU-D1-03 Batch B (EVD-000046) further weakens a broad mental-health-capacity claim, since ULSAC operates active psychiatry and community mental-health responses; this confirms the decision to keep mental-health capacity as evidence/validation-only rather than a canonical problem."
-  - "WU-D1-03 Batch B strengthens this problem with current-state evidence: the Municipality reports 262 people with official informal-caregiver status (January 2026) and is actively implementing a 2026-2027 caregiver plan (manual, systematisation of responses, simplified procedures, digital publication) that explicitly targets the information/navigation friction this problem describes (see EVD-000044). ULSAC and local partners already operate caregiver-oriented services (UCC, Cantinho do Cuidador, VIVAMENTE), confirming the remaining gap is navigation/coordination/awareness rather than absence of service (see EVD-000045). Institutional confidence: HIGH. Current-state confidence: HIGH."
-  - "D2-B Round A (WU-D2-03) strengthens the information/rights-navigation component with direct caregiver-derived evidence from a 133-caregiver questionnaire and focus groups within the same Plano Concelhio dos Cuidadores Informais lineage as EVD-000034/EVD-000044 (same SRC-0030 source; not an independent corroborating source; sample recruited via caregiver-support organisations and geographically concentrated, so representativeness is LIMITED / not population-representative — see EVD-000089). Caregiver focus-group material explicitly names bureaucracy and difficulty understanding rights as a distinct friction (EVD-000091), and caregivers themselves proposed centralised, simplified, multi-channel information access that the plan's 2026-2027 actions are already designed to address (EVD-000092). D2-B also constrains the problem: reported needs prioritise support in care (~40.8%), respite (~40.0%), financial support (~36.8%) and psychological support (~31.2%) above navigation-adjacent needs (EVD-000090), so PRB-0007 must not be reduced to an information-discovery problem — respite, direct-care capacity, financial and psychological support are major, often lower-digital-leverage needs outside this problem's navigation/coordination scope. Broad open-web caregiver public-signal discovery is treated as near-saturated for D2 (caregiving is privacy-sensitive and underrepresented in open channels; sparse public signal is a channel limitation, not evidence the problem is weak or absent). Remaining questions — awareness of Cantinho do Cuidador, whether the 2026-2027 manual/systematisation actions are delivered and effective, repeat-storytelling/documentation burden across institutions, and urban/rural barrier differences — are carried forward to D5 stakeholder validation rather than resolved here. validation_status remains unvalidated; no new PRB-*/HYP-* created."
+investigation:
+  open_questions:
+    - question: "Os cuidadores estão conscientes do Cantinho do Cuidador e de outros serviços já existentes, e as ações de manual/sistematização do plano 2026-2027 estão a ser entregues e são eficazes?"
+      why_open: "O plano municipal 2026-2027 (manual, sistematização de respostas, procedimentos simplificados, publicação digital) visa explicitamente a fricção de informação/navegação descrita neste problema, mas a sua entrega e eficácia ainda não foram verificadas."
+      resolution_condition: "Validação com partes interessadas (D5) sobre a consciência dos serviços existentes e sobre a entrega/eficácia das ações do plano 2026-2027."
+      evidence:
+        - "EVD-000044"
+        - "EVD-000045"
+    - question: "A burocracia e a dificuldade em compreender os direitos dos cuidadores (identificadas em grupos focais) explicam a não utilização de apoio formal reportada no estudo dos 68/89 cuidadores/pessoas cuidadas?"
+      why_open: "Os dois resultados provêm de amostras distintas dentro do mesmo Plano Concelhio dos Cuidadores Informais (mesma fonte SRC-0030); a evidência atual não estabelece uma relação causal entre a fragmentação de informação e a não utilização de apoio formal. Além disso, um terceiro inquérito a 133 cuidadores indica que necessidades de apoio direto no cuidar, descanso, apoio financeiro e apoio psicológico são reportadas com maior frequência do que necessidades de orientação, pelo que permanecem uma explicação alternativa e possivelmente mais prevalente."
+      resolution_condition: "Evidência que relacione diretamente a fragmentação de informação com a não utilização de apoio formal, ou que estabeleça a prevalência relativa das diferentes explicações."
+      evidence:
+        - "EVD-000089"
+        - "EVD-000090"
+        - "EVD-000091"
+  path:
+    initial_signal:
+      summary: "Foram identificadas necessidades de informação dos cuidadores informais em Évora, abrangendo saúde, mobilidade, estruturas de apoio e apoio financeiro/social, apesar de Évora dispor de uma rede interinstitucional densa de apoio social (CLASE/Rede Social, cerca de 120 instituições)."
+      evidence:
+        - "EVD-000034"
+        - "EVD-000036"
+    development:
+      summary: "Foi confirmado que a Câmara Municipal reconhece oficialmente 262 pessoas com estatuto de cuidador informal (janeiro de 2026) e implementa ativamente um plano de cuidadores 2026-2027 que visa a fricção de informação/navegação; serviços orientados a cuidadores já operam (UCC, Cantinho do Cuidador, VIVAMENTE), confirmando que a lacuna remanescente é de navegação/coordenação/consciência, não de ausência de serviço."
+      evidence:
+        - "EVD-000044"
+        - "EVD-000045"
+    delimitation:
+      summary: "Um estudo com 68 cuidadores e 89 pessoas cuidadas apurou que 35% das pessoas cuidadas não utilizava qualquer serviço formal de apoio. Material de grupos focais de uma amostra distinta identificou burocracia e dificuldade em compreender direitos como fricção separada da sobrecarga geral do cuidar. Um terceiro inquérito a 133 cuidadores delimitou o problema: necessidades de apoio direto, descanso, apoio financeiro e apoio psicológico são reportadas com maior frequência do que necessidades de orientação, pelo que o problema não deve ser reduzido a uma questão de descoberta de informação. As preocupações de saúde mental/capacidade permanecem distintas deste problema e não são absorvidas por ele."
+      evidence:
+        - "EVD-000089"
+        - "EVD-000090"
+        - "EVD-000091"
+        - "EVD-000035"
+        - "EVD-000046"
 evidence:
   - "EVD-000034"
+  - "EVD-000035"
   - "EVD-000036"
   - "EVD-000044"
   - "EVD-000045"
+  - "EVD-000046"
   - "EVD-000089"
   - "EVD-000090"
   - "EVD-000091"
-  - "EVD-000092"
   - "EVD-000124"
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
-existing_solutions: not_assessed
+solution_landscape_status: not_assessed
 status: OPEN

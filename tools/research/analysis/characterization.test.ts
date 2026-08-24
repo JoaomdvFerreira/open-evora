@@ -186,21 +186,20 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
     publicSignalClassDistribution: [],
   },
   "PRB-0007": {
-    linkedEvdCount: 9,
-    evdWithAnalysisCount: 9,
+    linkedEvdCount: 10,
+    evdWithAnalysisCount: 8,
     knownLineageCount: 2,
-    missingLineageCount: 2,
+    missingLineageCount: 4,
     contributionDistribution: [
-      ["CONFIRMS", 5],
+      ["CONFIRMS", 4],
       ["CURRENT-STATE-UPDATE", 1],
       ["EXISTING-SOLUTION", 3],
-      ["PLANNED-SOLUTION", 1],
       ["REFINES", 3],
     ],
-    frictionTypeDistribution: [["COORDINATION", 3], ["INFORMATION", 4], ["TRANSACTION", 2]],
-    verificationDistribution: [["REPORTED", 4], ["VERIFIED", 5]],
-    temporalRelevanceDistribution: [["CURRENT", 8], ["HISTORICAL", 1]],
-    representativenessDistribution: [["LIMITED", 6], ["NOT_APPLICABLE", 3]],
+    frictionTypeDistribution: [["COORDINATION", 2], ["INFORMATION", 3], ["TRANSACTION", 2]],
+    verificationDistribution: [["REPORTED", 3], ["VERIFIED", 5]],
+    temporalRelevanceDistribution: [["CURRENT", 7], ["HISTORICAL", 1]],
+    representativenessDistribution: [["LIMITED", 5], ["NOT_APPLICABLE", 3]],
     publicSignalClassDistribution: [],
   },
   "PRB-0008": {
@@ -253,6 +252,7 @@ const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[
 
 const CANONICAL_EXPECTED_GAPS = [
   "PRB-0003: 1/15 linked EVD missing analytical metadata (analysis block absent)",
+  "PRB-0007: 2/10 linked EVD missing analytical metadata (analysis block absent)",
 ];
 
 describe("characterization: canonical corpus", () => {
@@ -294,7 +294,7 @@ evidence: [EVD-900101]
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
-existing_solutions: not_assessed
+solution_landscape_status: not_assessed
 status: OPEN
 `;
 

@@ -9,15 +9,32 @@ geography:
 affected_populations:
   - "public-transport users"
 problem_statement: "Existem lacunas documentadas no ambiente de informação aos passageiros dos transportes públicos — nomeadamente heterogeneidade na informação disponível nas paragens e melhorias de informação em tempo real ainda planeadas, não confirmadas como concretizadas — apesar de existirem atualmente canais de informação destinados aos passageiros (TREVO, TPAC). Em que medida estas lacunas afetam realmente as viagens dos passageiros — a sua frequência, gravidade e os pontos concretos de falha — não está ainda estabelecido."
-current_journey: null
-reported_consequences: []
-possible_root_causes:
-  - "Batch B update: TPAC GTFS exists as structured backend data. The sub-gap here is not raw data availability but public information completeness at stops/digital channels, plus an unresolved public GTFS reuse endpoint and licence."
-  - "Batch B update: TREVO provides real-time passenger information, but third-party machine-readable access remains unresolved. This problem contains at least two distinct sub-gaps - passenger information quality/completeness, and developer/data interoperability and reuse - which should not be assumed to require the same solution."
-  - "Batch C update: flagged for likely split during D3 Problem Map consolidation into a passenger-information-quality sub-gap (TPAC/ATAC reports incomplete/outdated information at some stops/digital channels, while the Municipality describes TREVO's website as providing complete urban timetable/route/passenger information - a nuance requiring reconciliation) and a developer-interoperability/reuse sub-gap (TPAC GTFS exists; TREVO has structured real-time capability; public developer endpoints, licences, reuse conditions and stable data contracts remain unknown). No new canonical PRB-* record is created in Batch C; this remains a corroborated cluster requiring D3 normalization."
-  - "D2-A Round A update: current TREVO public surfaces (EVD-000016) already provide trip-planning/live-update passenger information; D2 must not frame this problem as 'transport information does not exist'. The TREVO complaint surface (EVD-000080, secondary relevance) shows some passengers still experience incomplete/unreliable real-time information at the point of failure. The remaining question is whether information is reliable, usable, consistent and interoperable across the actual traveller journey, not whether an information channel exists at all. No PRB-0002 status/tractability change."
-  - "WU-D3-03 owner decision (docs/milestones/D3-WU03-structure-review.md): KEEP PRB-0002 as one problem, explicitly NARROWED to passenger-facing information quality/completeness/reliability/usability. Reason: current evidence supports two technically distinct topics (passenger information vs. developer/data interoperability), but does not yet demonstrate that unclear public GTFS/API/licensing/reuse conditions independently create a material civic problem with an affected journey/consequence of their own — the project is problem-first, and an unresolved technical/open-data gap is not automatically a civic PRB. 'potential third-party data consumers' removed from affected_populations accordingly. The developer/data-interoperability question (public GTFS/GTFS-Realtime/API endpoint availability, licensing, reuse conditions, stable developer contracts) is preserved as an Open Data Foundation/data-reuse lead in the structure review, not as a standalone PRB, and may later be verified as an infrastructure/data gap, connected to another civic problem, or dropped. The developer/data-interoperability question's structuring recommendation was updated from a split candidate to being kept within this record accordingly; no second transport-data PRB created. Evidence links unchanged — EVD-000010/EVD-000016 remain linked because both also carry direct passenger-information-quality relevance (stop-level information completeness; existence/limits of the current TREVO passenger surface), not solely developer/interoperability relevance."
-  - "RS-02B1 update (2026-08-12): PMUSE's action plan (EVD-000122) explicitly proposes passenger-information improvements — stop comfort/accessibility/information, real-time information at principal stops, and a multimodal-information app/website — confirming these are identified and planned, not that they are delivered. PMUSE Volume I's own stop-level diagnosis (EVD-000123) documents that physical stop information is inconsistent (unsheltered stops carry only an operator/line plate; sheltered stops carry a fuller panel that itself lacks accessibility elements such as braille/audio). Together with TREVO's existing digital channel (EVD-000016) and TPAC's GTFS/Google Maps availability (EVD-000010), this materially establishes that meaningful digital and planned physical passenger-information capability exists — the problem should no longer be framed as simple absence of passenger-information channels. The remaining uncertainty is consistency/accessibility/comprehension across physical stops, TREVO web/app channels and the actual passenger journey, and whether any of this causes real passenger-journey failure — the latter requires affected-journey evidence and stays out of scope for WU023 until started. Do not infer user difficulty merely from the existence of multiple channels. TREVO's institutional route (WU022 D5-OP-001) remains useful for operational/channel clarification and stays open."
+investigation:
+  open_questions:
+    - question: "A informação é fiável, utilizável, consistente e interoperável ao longo da viagem real do passageiro, e isso causa falhas reais na viagem?"
+      why_open: "A evidência atual estabelece que existem canais de informação digitais e físicos (TREVO, TPAC/GTFS) e que a informação física nas paragens é inconsistente, mas não existe ainda evidência sobre a viagem afetada nem sobre se isso causa falhas reais para os passageiros."
+      resolution_condition: "Evidência sobre a viagem afetada do passageiro (affected-journey evidence) que estabeleça se e como estas lacunas de informação causam falha prática na viagem."
+      evidence:
+        - "EVD-000016"
+        - "EVD-000123"
+    - question: "Como se relacionam as afirmações institucionais de canais de informação municipal completos com a inconsistência diagnosticada da informação física nas paragens?"
+      why_open: "O plano de ação PMUSE confirma melhorias de informação ao passageiro planeadas (paragens, tempo real, aplicação/site multimodal), enquanto o diagnóstico ao nível da paragem do mesmo plano documenta inconsistência física atual (paragens não abrigadas com apenas uma placa; paragens abrigadas com painel mais completo mas sem elementos de acessibilidade como braille/áudio); a evidência atual não resolve esta tensão entre completude planeada e inconsistência física diagnosticada."
+      evidence:
+        - "EVD-000122"
+        - "EVD-000123"
+  path:
+    initial_signal:
+      summary: "Foi identificada heterogeneidade na informação disponível nas paragens e melhorias de informação em tempo real planeadas mas não confirmadas como concretizadas, apesar de já existirem canais de informação (TREVO, TPAC)."
+      evidence:
+        - "EVD-000010"
+        - "EVD-000016"
+    development:
+      summary: "Foi reconhecido que a questão continha pelo menos dois sub-gaps tecnicamente distintos: qualidade/completude da informação ao passageiro, e interoperabilidade/reutilização de dados para terceiros. Uma decisão estrutural manteve este registo como um único problema, explicitamente restringido à informação orientada ao passageiro; a questão de interoperabilidade de dados para terceiros foi preservada como pista de fundação de dados abertos fora deste PRB, sem criar um segundo registo canónico."
+    delimitation:
+      summary: "O plano de ação PMUSE propõe melhorias de informação ao passageiro (conforto/acessibilidade/informação nas paragens, informação em tempo real, aplicação/site multimodal), confirmando que estas estão identificadas e planeadas, não que estão entregues. O diagnóstico ao nível da paragem do PMUSE documenta inconsistência física (paragens não abrigadas têm apenas uma placa; paragens abrigadas têm um painel mais completo que ainda assim carece de elementos de acessibilidade como braille/áudio)."
+      evidence:
+        - "EVD-000122"
+        - "EVD-000123"
 evidence:
   - "EVD-000010"
   - "EVD-000011"
@@ -28,5 +45,5 @@ evidence:
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
-existing_solutions: not_assessed
+solution_landscape_status: not_assessed
 status: OPEN
