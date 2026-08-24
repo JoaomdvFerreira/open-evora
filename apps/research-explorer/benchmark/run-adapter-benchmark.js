@@ -23,7 +23,7 @@ const fs = require("fs");
 const path = require("path");
 
 const { generate } = require("./generate-corpus.js");
-const { validateResearchTree } = require("../../../tools/validate-research.js");
+const { validateResearchTree } = require("../scripts/validate-research-bridge.js");
 const { buildReadModel } = require("../scripts/read-model.js");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");

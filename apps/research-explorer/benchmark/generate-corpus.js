@@ -7,7 +7,7 @@
  * the real corpus's structural patterns (SRC/EVD/PRB/ASM proportions,
  * shared-source hub nodes, high-degree problems, list/reference fields, one
  * schema-conforming future/unknown type: NOTE-) so the real adapter code
- * path (tools/validate-research.js + read-model.js) can be exercised at
+ * path (validate-research-bridge.js + read-model.js) can be exercised at
  * scale without touching canonical research/**.
  *
  * Usage: node generate-corpus.js <scale> <outDir>
@@ -40,8 +40,10 @@ function quote(v) {
   return `"${String(v).replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 }
 
-/** Emits a value at YAML-subset-compatible 2-space indentation, matching
- * exactly what tools/validate-research.js#parseYaml can read back. */
+/** Emits a value at YAML-subset-compatible 2-space indentation — a subset
+ * readable by both the retired tools/validate-research.js#parseYaml and the
+ * current tools/research/core/yaml.ts (backed by the full `yaml` package, a
+ * strict superset of that subset). */
 function emitValue(key, value, indent, lines) {
   const p = "  ".repeat(indent);
   if (value === null || value === undefined) {

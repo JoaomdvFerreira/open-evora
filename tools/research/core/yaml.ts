@@ -4,10 +4,9 @@ import type { RecordFields } from "./types.ts";
 
 /**
  * Parses one canonical research record's YAML text using the mature `yaml`
- * package, replacing the bespoke YAML-subset parser in
- * tools/validate-research.js for this new core (TC-01 scope). Does not
- * change tools/validate-research.js itself, which remains the current
- * behavioural baseline.
+ * package, replacing the bespoke YAML-subset parser formerly in
+ * tools/validate-research.js (retired; see tools/research/validation/validate.ts,
+ * which now owns validation on this core).
  */
 export function parseRecordYaml(text: string): RecordFields {
   const parsed = parse(text);
