@@ -1136,6 +1136,174 @@ describe("ProblemView — PI-02E investigation path + final section order", () =
   });
 });
 
+describe("ProblemView — PI-02F1 dynamic reading index", () => {
+  const INDEX_FIXTURE: RecordSummary[] = [
+    { id: "PRB-0600", type: "PRB-", label: "Index fixture", file: "research/problems/PRB-0600.yaml", summaryFields: {} },
+  ];
+
+  function indexProvider(record: Record<string, unknown>): DataProvider {
+    const detail: RecordDetail = {
+      id: "PRB-0600",
+      type: "PRB-",
+      file: "research/problems/PRB-0600.yaml",
+      record,
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(INDEX_FIXTURE),
+      getRecord: () => Promise.resolve(detail),
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  function railLabels() {
+    return Array.from(screen.getByRole("navigation", { name: "Nesta página" }).querySelectorAll("a")).map((a) => a.textContent);
+  }
+
+  function compactLabels() {
+    return Array.from(screen.getByRole("navigation", { name: "Nesta página (versão compacta)" }).querySelectorAll("a")).map((a) => a.textContent);
+  }
+
+  it("lists only Estado atual and Evidência when no optional section is authored, in canonical order, in both the rail and the compact index", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({ title: "Minimal problem", status: "OPEN" })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Minimal problem" });
+
+    expect(railLabels()).toEqual(["Estado atual", "Evidência"]);
+    expect(compactLabels()).toEqual(["Estado atual", "Evidência"]);
+  });
+
+  it("adds 'O que sustenta esta leitura' to the index only when decision_basis authors corroboration_statement or independence_assessment", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({
+          title: "Support-only problem",
+          status: "OPEN",
+          decision_basis: { corroboration_statement: "Corroborated by two threads." },
+        })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Support-only problem" });
+
+    expect(railLabels()).toEqual(["Estado atual", "O que sustenta esta leitura", "Evidência"]);
+  });
+
+  it("adds 'O que ainda não sabemos — e o que estamos a fazer' to the index only when investigation.open_questions or decision_basis.contradiction_search is authored", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({
+          title: "Open questions problem",
+          status: "OPEN",
+          investigation: { open_questions: [{ question: "An open question." }] },
+        })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Open questions problem" });
+
+    expect(railLabels()).toEqual(["Estado atual", "Evidência", "O que ainda não sabemos — e o que estamos a fazer"]);
+  });
+
+  it("adds 'Como chegámos a este problema' to the index only when investigation.path has an authored stage", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({
+          title: "Path problem",
+          status: "OPEN",
+          investigation: { path: { initial_signal: { summary: "The first signal." } } },
+        })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Path problem" });
+
+    expect(railLabels()).toEqual(["Estado atual", "Evidência", "Como chegámos a este problema"]);
+  });
+
+  it("lists every section, in canonical order, when all optional sections are authored, matching both index and body order", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({
+          title: "Full problem",
+          status: "OPEN",
+          decision_basis: { corroboration_statement: "Corroborated." },
+          investigation: {
+            open_questions: [{ question: "An open question." }],
+            path: { initial_signal: { summary: "The first signal." } },
+          },
+        })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Full problem" });
+
+    const expected = [
+      "Estado atual",
+      "O que sustenta esta leitura",
+      "Evidência",
+      "O que ainda não sabemos — e o que estamos a fazer",
+      "Como chegámos a este problema",
+    ];
+    expect(railLabels()).toEqual(expected);
+    expect(compactLabels()).toEqual(expected);
+
+    // Every listed anchor id must resolve to an actual rendered section in the document.
+    for (const href of Array.from(screen.getByRole("navigation", { name: "Nesta página" }).querySelectorAll("a")).map((a) =>
+      a.getAttribute("href")
+    )) {
+      expect(document.querySelector(href!)).toBeTruthy();
+    }
+  });
+
+  it("never links to an absent section — omitted-section labels are not present anywhere in the index", async () => {
+    render(
+      <ProblemView
+        dataProvider={indexProvider({ title: "Minimal problem", status: "OPEN" })}
+        problemId="PRB-0600"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Minimal problem" });
+
+    expect(railLabels()).not.toContain("O que sustenta esta leitura");
+    expect(railLabels()).not.toContain("O que ainda não sabemos — e o que estamos a fazer");
+    expect(railLabels()).not.toContain("Como chegámos a este problema");
+    expect(document.getElementById("problem-sustentacao")).toBeNull();
+    expect(document.getElementById("problem-questoes-abertas")).toBeNull();
+    expect(document.getElementById("problem-percurso")).toBeNull();
+  });
+});
+
 const GENERATED_DIR = path.resolve(__dirname, "..", "..", "generated");
 const hasRealCorpus = fs.existsSync(path.join(GENERATED_DIR, "index.json"));
 

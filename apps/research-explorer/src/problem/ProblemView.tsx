@@ -296,14 +296,45 @@ function ProblemBreadcrumb({ problemId, onBackToOverview }: { problemId: string;
 }
 
 /**
- * Section anchors for Problem View's desktop reading rail (this is the
- * "Nesta página" index the rail links into) — kept as one ordered list so
- * the rail and the section `id`s below can never drift apart.
+ * PI-02F1: the "Nesta página" index (desktop rail + compact substitute) must
+ * list exactly the sections actually rendered for the current PRB, in the
+ * fixed canonical order — never a link to a section that PI-02B/C/D/E's own
+ * conditional render would omit. Each entry's `present` predicate mirrors
+ * that section component's own omission condition exactly; this is the one
+ * shared source of truth so the two can never drift apart. "Estado atual"
+ * and "Evidência" are unconditional (both sections always render — Evidência
+ * shows an explicit empty state rather than being omitted), so they are
+ * always present.
  */
-const PROBLEM_SECTIONS = [
-  { id: "problem-estado-atual", label: "Estado atual" },
-  { id: "problem-evidencia", label: "Evidência" },
+interface ProblemSectionEntry {
+  id: string;
+  label: string;
+  present: (record: Record<string, unknown>) => boolean;
+}
+
+const PROBLEM_SECTION_ENTRIES: readonly ProblemSectionEntry[] = [
+  { id: "problem-estado-atual", label: "Estado atual", present: () => true },
+  {
+    id: "problem-sustentacao",
+    label: "O que sustenta esta leitura",
+    present: (record) => decisionBasisText(record, "corroboration_statement") !== null || decisionBasisText(record, "independence_assessment") !== null,
+  },
+  { id: "problem-evidencia", label: "Evidência", present: () => true },
+  {
+    id: "problem-questoes-abertas",
+    label: "O que ainda não sabemos — e o que estamos a fazer",
+    present: (record) => openQuestions(record).length > 0 || contradictionSearch(record) !== null,
+  },
+  {
+    id: "problem-percurso",
+    label: "Como chegámos a este problema",
+    present: (record) => investigationPathStages(record).length > 0,
+  },
 ] as const;
+
+function problemSectionIndex(record: Record<string, unknown>): { id: string; label: string }[] {
+  return PROBLEM_SECTION_ENTRIES.filter((section) => section.present(record)).map(({ id, label }) => ({ id, label }));
+}
 
 /**
  * Desktop reading rail (scope §3/§4, UX-C §3): reuses Record Detail's
@@ -316,7 +347,8 @@ const PROBLEM_SECTIONS = [
  * `.record-detail-rail`); compact gets the equivalent index in-flow via
  * `ProblemHelpDisclosure` instead (Slice UX-B §4).
  */
-function ProblemReadingRail() {
+function ProblemReadingRail({ record }: { record: Record<string, unknown> }) {
+  const sections = problemSectionIndex(record);
   return (
     <aside className="record-detail-rail problem-reading-rail">
       <div className="detail-rail-type-note">
@@ -328,7 +360,7 @@ function ProblemReadingRail() {
       <nav aria-label="Nesta página" className="problem-rail-nav">
         <h4 className="detail-panel-label">Nesta página</h4>
         <ul>
-          {PROBLEM_SECTIONS.map((section) => (
+          {sections.map((section) => (
             <li key={section.id}>
               <a href={`#${section.id}`}>{section.label}</a>
             </li>
@@ -372,7 +404,7 @@ function ProblemHelpDisclosure({ record }: { record: Record<string, unknown> }) 
         <nav aria-label="Nesta página (versão compacta)" className="problem-help-section-index">
           <p className="problem-help-section-index-label">Nesta página:</p>
           <ul>
-            {PROBLEM_SECTIONS.map((section) => (
+            {problemSectionIndex(record).map((section) => (
               <li key={section.id}>
                 <a href={`#${section.id}`}>{section.label}</a>
               </li>
@@ -935,7 +967,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
           <ProblemPathSection record={record} evidence={evidence} onOpenGeneric={onOpenGeneric} />
         </div>
 
-        <ProblemReadingRail />
+        <ProblemReadingRail record={record} />
       </div>
     </article>
   );
