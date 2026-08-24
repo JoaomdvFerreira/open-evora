@@ -5,7 +5,7 @@
  * exit codes. All validation logic lives in validate.ts; this file owns
  * only process.argv parsing, console output, and process.exitCode.
  *
- * Usage: node --experimental-strip-types tools/research/validate-cli.ts [--dir <researchRoot>]
+ * Usage: node --experimental-strip-types tools/research/validation/cli.ts [--dir <researchRoot>]
  * Exit code 0 = all records valid, 1 = at least one problem found.
  */
 import { resolve } from "node:path";
@@ -19,7 +19,7 @@ function main(): void {
   const researchRoot =
     dirFlagIdx !== -1 && args[dirFlagIdx + 1]
       ? resolve(args[dirFlagIdx + 1])
-      : resolve(fileURLToPath(new URL(".", import.meta.url)), "..", "..", "research");
+      : resolve(fileURLToPath(new URL(".", import.meta.url)), "..", "..", "..", "research");
 
   const { errors, totalRecords } = validateResearchRoot(researchRoot);
 

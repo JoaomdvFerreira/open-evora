@@ -29,6 +29,12 @@ export interface MalformedRecordFile {
   message: string;
 }
 
+/** Result of a tolerant corpus load: the index built from every file that did parse, plus every one that didn't. */
+export interface CorpusLoadResult {
+  index: CorpusIndex;
+  issues: MalformedRecordFile[];
+}
+
 /**
  * Loads and parses every record file for one schema-declared record type,
  * then indexes it by the schema's declared idField. Deterministic: files
@@ -39,16 +45,11 @@ export interface MalformedRecordFile {
  * parser or its validation-rule interpretation — this loader only reads
  * and indexes; it makes no PASS/FAIL judgement about record shape.
  *
- * When `onMalformed` is given, a file that fails to parse is reported to it
- * and skipped instead of throwing, so one bad file does not abort loading
- * the rest of the record set (used by validators that must report every
- * problem in one pass rather than stopping at the first one).
+ * When `tolerant` is true, a file that fails to parse is collected into
+ * `issues` and skipped instead of thrown, so one bad file does not abort
+ * loading the rest of the record set.
  */
-function loadRecordSet(
-  researchRoot: string,
-  schema: RecordSchema,
-  onMalformed?: (failure: MalformedRecordFile) => void
-): RecordIndex {
+function loadRecordSet(researchRoot: string, schema: RecordSchema, tolerant: boolean, issues: MalformedRecordFile[]): RecordIndex {
   const dir = join(researchRoot, schema.directory);
   const filenames = collectRecordFiles(dir);
 
@@ -64,8 +65,8 @@ function loadRecordSet(
     try {
       fields = parseRecordYaml(text);
     } catch (e) {
-      if (!onMalformed) throw e;
-      onMalformed({ file, message: (e as Error).message });
+      if (!tolerant) throw e;
+      issues.push({ file, message: (e as Error).message });
       continue;
     }
 
@@ -81,6 +82,20 @@ function loadRecordSet(
   return { schema, records, byId };
 }
 
+function buildCorpusIndex(researchRoot: string, tolerant: boolean, issues: MalformedRecordFile[]): CorpusIndex {
+  const schemas = loadSchemas(researchRoot);
+  const byPrefix = new Map<string, RecordIndex>();
+  let totalRecords = 0;
+
+  for (const schema of schemas) {
+    const recordIndex = loadRecordSet(researchRoot, schema, tolerant, issues);
+    byPrefix.set(schema.prefix, recordIndex);
+    totalRecords += recordIndex.records.length;
+  }
+
+  return { researchRoot, byPrefix, totalRecords };
+}
+
 /**
  * Builds the deterministic SRC/EVD/PRB/ASM corpus index for researchRoot
  * (defaults to the repository's research/ directory). One shared
@@ -88,23 +103,22 @@ function loadRecordSet(
  * scope) — this performs no validation and no semantic interpretation; it
  * only reads, parses, and indexes what research/schemas/* declares.
  *
- * By default a malformed record file throws. Pass `onMalformed` to instead
- * collect parse failures and continue loading the rest of the corpus (the
- * validator needs this to report every problem in one pass).
+ * Strict: throws on the first malformed record file. See
+ * loadCorpusIndexTolerant to instead collect parse failures and continue
+ * loading the rest of the corpus.
  */
-export function loadCorpusIndex(
-  researchRoot: string,
-  onMalformed?: (failure: MalformedRecordFile) => void
-): CorpusIndex {
-  const schemas = loadSchemas(researchRoot);
-  const byPrefix = new Map<string, RecordIndex>();
-  let totalRecords = 0;
+export function loadCorpusIndex(researchRoot: string): CorpusIndex {
+  return buildCorpusIndex(researchRoot, false, []);
+}
 
-  for (const schema of schemas) {
-    const recordIndex = loadRecordSet(researchRoot, schema, onMalformed);
-    byPrefix.set(schema.prefix, recordIndex);
-    totalRecords += recordIndex.records.length;
-  }
-
-  return { researchRoot, byPrefix, totalRecords };
+/**
+ * Like loadCorpusIndex, but a record file that fails to parse is collected
+ * into `issues` and skipped instead of aborting the load — used by
+ * validators that must report every problem in one pass rather than
+ * stopping at the first one.
+ */
+export function loadCorpusIndexTolerant(researchRoot: string): CorpusLoadResult {
+  const issues: MalformedRecordFile[] = [];
+  const index = buildCorpusIndex(researchRoot, true, issues);
+  return { index, issues };
 }

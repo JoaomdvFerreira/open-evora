@@ -6,9 +6,9 @@
  * process.argv parsing, console output, and process.exitCode.
  *
  * Usage:
- *   node --experimental-strip-types tools/research/analyze-cli.ts --all
- *   node --experimental-strip-types tools/research/analyze-cli.ts --problem PRB-0007
- *   node --experimental-strip-types tools/research/analyze-cli.ts --gaps
+ *   node --experimental-strip-types tools/research/analysis/cli.ts --all
+ *   node --experimental-strip-types tools/research/analysis/cli.ts --problem PRB-0007
+ *   node --experimental-strip-types tools/research/analysis/cli.ts --gaps
  *   (optional: --dir <researchRoot> to point at a fixture tree instead of research/)
  *
  * Exit code 0 = report produced (even if it lists gaps); 1 = corpus fails
@@ -19,9 +19,9 @@ import { fileURLToPath } from "node:url";
 
 import { analyzeCorpus, computeProblemAnalysis } from "./analyze.ts";
 import type { Distribution, ProblemAnalysis } from "./analyze.ts";
-import { loadCorpusIndex } from "./corpus.ts";
-import { validateCorpusIndex } from "./validate.ts";
-import type { CorpusIndex, RecordFields } from "./types.ts";
+import { loadCorpusIndex } from "../core/corpus.ts";
+import { validateCorpusIndex } from "../validation/validate.ts";
+import type { CorpusIndex, RecordFields } from "../core/types.ts";
 
 function formatDistribution(entries: Distribution): string {
   if (entries.length === 0) return "(none recorded)";
@@ -102,7 +102,7 @@ function main(): void {
   const researchRoot =
     dirFlagIdx !== -1 && args[dirFlagIdx + 1]
       ? resolve(args[dirFlagIdx + 1])
-      : resolve(fileURLToPath(new URL(".", import.meta.url)), "..", "..", "research");
+      : resolve(fileURLToPath(new URL(".", import.meta.url)), "..", "..", "..", "research");
 
   const problemFlagIdx = args.indexOf("--problem");
   const hasAll = args.includes("--all");
@@ -119,7 +119,7 @@ function main(): void {
   const { errors } = validateCorpusIndex(index);
   if (errors.length > 0) {
     console.error(
-      `Cannot analyze: research corpus fails validation (${errors.length} problem(s)). Run node tools/research/validate-cli.ts for details.`
+      `Cannot analyze: research corpus fails validation (${errors.length} problem(s)). Run node tools/research/validation/cli.ts for details.`
     );
     process.exitCode = 1;
     return;

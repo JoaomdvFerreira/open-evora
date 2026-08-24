@@ -17,6 +17,6 @@
 
     "types": ["node"]
   },
-  "include": ["tools/research"],
-  "exclude": ["node_modules", "apps/research-explorer"]
+  "include": ["."],
+  "exclude": ["node_modules"]
 }

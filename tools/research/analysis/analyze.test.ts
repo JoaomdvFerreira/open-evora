@@ -4,7 +4,7 @@
  * tools/analyze-research.js analytical contract; see analyze.parity.test.ts
  * for direct legacy-vs-new comparisons on the canonical corpus.
  *
- * Run with Node's built-in test runner: node --test tools/research/*.test.ts
+ * Run with Node's built-in test runner: node --test tools/research (recursively)
  */
 import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync, readdirSync } from "node:fs";
@@ -14,10 +14,10 @@ import { after, describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { analyzeCorpus, computeProblemAnalysis, computeGaps, tally } from "./analyze.ts";
-import { loadCorpusIndex } from "./corpus.ts";
+import { loadCorpusIndex } from "../core/corpus.ts";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const REAL_RESEARCH_ROOT = join(__dirname, "..", "..", "research");
+const REAL_RESEARCH_ROOT = join(__dirname, "..", "..", "..", "research");
 const REAL_SCHEMAS_DIR = join(REAL_RESEARCH_ROOT, "schemas");
 const DIRS = ["sources", "evidence", "problems", "assessments", "schemas"];
 

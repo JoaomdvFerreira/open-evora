@@ -1,7 +1,7 @@
 /**
  * Focused tests for the TC-01 research tooling core foundation: the
  * shared corpus/schema loading and indexing layer under tools/research/.
- * Run with Node's built-in test runner: node --test tools/research/corpus.test.ts
+ * Run with Node's built-in test runner: node --test tools/research/core/corpus.test.ts
  *
  * Fixtures are generated into a temporary directory per test and discarded
  * — nothing here touches or reads the canonical research/ corpus, except
@@ -20,7 +20,7 @@ import { loadSchemas } from "./schemas.ts";
 import { parseRecordYaml } from "./yaml.ts";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const REAL_RESEARCH_ROOT = join(__dirname, "..", "..", "research");
+const REAL_RESEARCH_ROOT = join(__dirname, "..", "..", "..", "research");
 const REAL_SCHEMAS_DIR = join(REAL_RESEARCH_ROOT, "schemas");
 const DIRS = ["sources", "evidence", "problems", "assessments", "schemas"];
 

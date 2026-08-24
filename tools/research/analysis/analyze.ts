@@ -6,7 +6,7 @@
  * the already-loaded CorpusIndex; it does not perform its own filesystem
  * or YAML access and does not build an independent corpus index.
  *
- * No process/console/exit-code handling here; see analyze-cli.ts for the
+ * No process/console/exit-code handling here; see cli.ts for the
  * CLI wrapper. This module is observational only: every value below is
  * either a raw count/distribution or a verbatim field already recorded on
  * a canonical PRB, EVD, or ASM record (docs/datamodel.md §6, AGENTS.md
@@ -20,7 +20,7 @@
  * PRB-current-state / ASM-immutable-snapshot migration boundary), and the
  * explicit structural-gap detections.
  */
-import type { CorpusIndex, RecordFields } from "./types.ts";
+import type { CorpusIndex, RecordFields } from "../core/types.ts";
 
 const ACTIVE_STATUS = "OPEN";
 

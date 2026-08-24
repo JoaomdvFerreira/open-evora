@@ -9,8 +9,8 @@
   "scripts": {
     "explorer": "npm run build-data --prefix apps/research-explorer && npm run dev --prefix apps/research-explorer",
     "explorer:build": "npm run build-data --prefix apps/research-explorer && npm run typecheck --prefix apps/research-explorer && npm run test --prefix apps/research-explorer && npm run build --prefix apps/research-explorer",
-    "research:typecheck": "tsc --noEmit",
-    "research:test": "node --test --experimental-strip-types tools/research/*.test.ts"
+    "research:typecheck": "tsc --noEmit -p tools/research/tsconfig.json",
+    "research:test": "node --test --experimental-strip-types tools/research/**/*.test.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

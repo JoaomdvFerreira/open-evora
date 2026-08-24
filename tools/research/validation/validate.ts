@@ -12,8 +12,8 @@
  * no semantic research judgement (docs/datamodel.md §6, AGENTS.md
  * "Human-owned decisions").
  */
-import { loadCorpusIndex } from "./corpus.ts";
-import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex, RecordSchema } from "./types.ts";
+import { loadCorpusIndexTolerant } from "../core/corpus.ts";
+import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex, RecordSchema } from "../core/types.ts";
 
 export interface ValidationResult {
   errors: string[];
@@ -212,10 +212,8 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
  * matches the legacy validator's per-file try/catch) and validates it.
  */
 export function validateResearchRoot(researchRoot: string): ValidationResult {
-  const errors: string[] = [];
-  const index = loadCorpusIndex(researchRoot, (failure) => {
-    errors.push(`[${failure.file}] malformed YAML: ${failure.message}`);
-  });
+  const { index, issues } = loadCorpusIndexTolerant(researchRoot);
+  const errors = issues.map((failure) => `[${failure.file}] malformed YAML: ${failure.message}`);
   const result = validateCorpusIndex(index);
   return { errors: [...errors, ...result.errors], totalRecords: result.totalRecords };
 }
