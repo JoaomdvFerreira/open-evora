@@ -34,6 +34,10 @@ A rule should have one canonical documentary owner. Other documents may referenc
 
 These rules always apply.
 
+### Language
+
+User/public-facing Open Évora content uses PT-PT. Internal technical documentation and canonical schema/enums remain English unless their contract says otherwise. Localize technical values only at presentation. Preserve official published names.
+
 ### Publication boundary
 
 The repository is public. Treat commits, branches, pull requests, generated artifacts, and deployments as potential publication acts.
@@ -47,6 +51,8 @@ Do not publish:
 Public accessibility, machine readability, permission to reuse, and permission to republish are separate properties. Do not infer one from another.
 
 When publication safety is genuinely uncertain, stop and report the uncertainty.
+
+If potentially non-public material is encountered, stop the affected work. Do not reproduce that material in reports; report only relevant IDs/paths/categories. Seek authorization before remediation.
 
 ### Evidence integrity
 

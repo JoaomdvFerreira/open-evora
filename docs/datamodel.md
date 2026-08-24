@@ -14,7 +14,7 @@ The canonical research model contains exactly four record types:
 
 No Hypothesis (`HYP-*`) record type is part of the current process or target model.
 
-> **Transition:** the PRB-current-state / ASM-immutable-snapshot model below is the adopted target model. Until its schema/tooling migration is complete, implemented contracts may still expose legacy ASM current-state fields. Treat that mismatch as explicit migration work.
+> **Transition:** the PRB-current-state / ASM-immutable-snapshot model below is the adopted target model. Until its schema/tooling migration is complete, implemented contracts may still expose legacy ASM current-state fields. Treat that mismatch as explicit migration work. Pre-migration analyzers/verifiers may still require or select a legacy current ASM for a PRB. This is transitional runtime compatibility, not target state ownership.
 
 ## 1. Source (`SRC-*`)
 

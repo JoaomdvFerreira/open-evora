@@ -11,7 +11,12 @@
 export interface TypeDescriptor {
   /** Short Portuguese label shown inline, e.g. "[Evidência]". */
   label: string;
-  /** One-sentence explanation, paraphrasing docs/datamodel.md's own record semantics. */
+  /**
+   * One-sentence explanation. For SRC-/EVD-/PRB-, paraphrases docs/datamodel.md's
+   * own record semantics. For ASM-, describes the currently implemented legacy
+   * current-state presentation, not yet the immutable REVIEW/CORRECTION target
+   * model defined in docs/datamodel.md.
+   */
   description: string;
 }
 
