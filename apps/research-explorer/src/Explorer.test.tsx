@@ -23,7 +23,7 @@ const DETAILS: Record<string, RecordDetail> = {
     id: "PRB-0005",
     type: "PRB-",
     file: "research/problems/PRB-0005.yaml",
-    record: { title: "Pressão de estacionamento com uma descrição canónica completa que não pode ser truncada", domain: ["mobility"] },
+    record: { title: "Pressão de estacionamento com uma descrição canónica completa que não pode ser truncada", domain: ["mobility"], evidence: ["EVD-000105"] },
     outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-000105" }],
     incomingEdges: [],
   },

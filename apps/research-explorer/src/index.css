@@ -2414,6 +2414,41 @@ main.explorer-shell {
   line-height: 1.5;
 }
 
+/* PI-02C §2 "O que sustenta esta leitura" — corroboration_statement reuses
+   the editorial-body treatment of .problem-statement; independence_assessment
+   reuses the existing .problem-current-state-item labelled-block pattern. */
+.problem-support-statement {
+  max-width: none;
+  margin: 0 0 var(--space-5);
+  color: var(--ink);
+  font-family: var(--recipe-editorial-body-family);
+  font-size: var(--recipe-editorial-body-size);
+  font-weight: var(--recipe-editorial-body-weight);
+  line-height: var(--recipe-editorial-body-line-height);
+}
+
+/* PI-02C §3 evidence groups (Evidência que suporta / que limita a conclusão /
+   Outra evidência relacionada) — a labelled heading above the existing
+   .evidence-list, no per-group visual ranking beyond the heading text
+   itself. */
+.evidence-group {
+  margin-bottom: var(--space-6);
+}
+
+.evidence-group:last-child {
+  margin-bottom: 0;
+}
+
+.evidence-group h4 {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-faint);
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .evidence-list {
   list-style: none;
   margin: 0;

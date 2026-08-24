@@ -77,6 +77,75 @@ function decisionBasisField(record: Record<string, unknown>, ...path: string[]):
   return current ? fieldValue(current, path[path.length - 1]) : null;
 }
 
+/** `decision_basis.corroboration_statement` / `decision_basis.independence_assessment` — authored prose only, no derived score. */
+function decisionBasisText(record: Record<string, unknown>, field: string): string | null {
+  return decisionBasisField(record, field);
+}
+
+/**
+ * `decision_basis.supporting_evidence` / `decision_basis.boundary_evidence`
+ * — EVD-* reference lists, authored exactly as recorded. `getPath` on a
+ * missing/malformed field yields an empty list, never a fabricated one.
+ */
+function decisionBasisEvidenceIds(record: Record<string, unknown>, field: string): string[] {
+  const decisionBasis = recordValue(record.decision_basis);
+  return decisionBasis ? stringValues(decisionBasis[field]) : [];
+}
+
+interface EvidenceGroups {
+  supporting: EvidenceWithSources[];
+  boundary: EvidenceWithSources[];
+  other: EvidenceWithSources[];
+}
+
+/**
+ * PI-02C §3 partition: deterministic, category-exclusive, dedup by ID —
+ * `decision_basis.supporting_evidence` first, then `decision_basis.boundary_evidence`,
+ * then every remaining top-level `evidence` ID not already placed in either
+ * category. An item already claimed by "supporting" is never repeated under
+ * "boundary"/"other" even if it happens to also appear in those lists; this
+ * is a partition, not a set of overlapping tags. Membership is authored-list
+ * membership only — "boundary" carries no negative/contradictory meaning
+ * beyond that it was authored as boundary evidence.
+ */
+function groupEvidenceByDecisionBasis(record: Record<string, unknown>, evidence: EvidenceWithSources[]): EvidenceGroups {
+  const supportingIds = new Set(decisionBasisEvidenceIds(record, "supporting_evidence"));
+  const boundaryIds = new Set(decisionBasisEvidenceIds(record, "boundary_evidence"));
+  const topLevelEvidenceIds = new Set(stringValues(record.evidence));
+
+  const byId = new Map(evidence.map((item) => [item.detail.id, item]));
+  const placed = new Set<string>();
+
+  const supporting: EvidenceWithSources[] = [];
+  for (const id of supportingIds) {
+    const item = byId.get(id);
+    if (item && !placed.has(id)) {
+      supporting.push(item);
+      placed.add(id);
+    }
+  }
+
+  const boundary: EvidenceWithSources[] = [];
+  for (const id of boundaryIds) {
+    const item = byId.get(id);
+    if (item && !placed.has(id)) {
+      boundary.push(item);
+      placed.add(id);
+    }
+  }
+
+  const other: EvidenceWithSources[] = [];
+  for (const id of topLevelEvidenceIds) {
+    const item = byId.get(id);
+    if (item && !placed.has(id)) {
+      other.push(item);
+      placed.add(id);
+    }
+  }
+
+  return { supporting, boundary, other };
+}
+
 function evidenceSourceLabel(record: Record<string, unknown>): string | null {
   const source = recordValue(record.source);
   if (!source) return null;
@@ -364,6 +433,109 @@ function ProblemCurrentStateSection({ record }: { record: Record<string, unknown
 }
 
 /**
+ * PI-02B/C §2 "O que sustenta esta leitura": conditional on `decision_basis`
+ * authored prose only — `corroboration_statement` as the main explanatory
+ * text, `independence_assessment` as a secondary, explicitly labelled item.
+ * No confidence score, ranking, or extra interpretation is added; the
+ * section itself is omitted when neither field is authored.
+ */
+function ProblemSupportSection({ record }: { record: Record<string, unknown> }) {
+  const corroborationStatement = decisionBasisText(record, "corroboration_statement");
+  const independenceAssessment = decisionBasisText(record, "independence_assessment");
+
+  if (!corroborationStatement && !independenceAssessment) return null;
+
+  return (
+    <section id="problem-sustentacao" aria-label="O que sustenta esta leitura" className="problem-section">
+      <h3 className="detail-panel-label">O que sustenta esta leitura</h3>
+      {corroborationStatement && <p className="problem-support-statement">{corroborationStatement}</p>}
+      {independenceAssessment && (
+        <div className="problem-current-state-item">
+          <h4>Independência da evidência</h4>
+          <p>{independenceAssessment}</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/**
+ * One evidence item's card — canonical ID, existing-contribution chips
+ * (or the already-established "not registered" fallback), observation
+ * summary, and linked sources. Shared by every PI-02C evidence group so
+ * "supporting"/"boundary"/"other" render with identical presentation; only
+ * the grouping is new; the card itself carries no ranking beyond the
+ * already-authored contribution values.
+ */
+function EvidenceCard({ detail, sources, onOpenGeneric }: EvidenceWithSources & { onOpenGeneric: (id: string) => void }) {
+  const evidenceRecord = detail.record as Record<string, unknown>;
+  const analysis = recordValue(evidenceRecord.analysis);
+  const contributions = stringValues(analysis?.contribution);
+  const observation = recordValue(evidenceRecord.observation);
+  const observationSummary = observation ? fieldValue(observation, "summary") : null;
+  const provenance = evidenceSourceLabel(evidenceRecord);
+
+  return (
+    <li className="evidence-card">
+      <div className="evidence-item-header">
+        <TypedLinkButton
+          detail={detail}
+          onOpenGeneric={onOpenGeneric}
+          suffix={fieldValue(evidenceRecord, "type") ? publicEnumLabel("type", fieldValue(evidenceRecord, "type")!) : undefined}
+        />
+        <span className="evidence-item-contributions" aria-label="Contribuição canónica">
+          {contributions.length > 0 ? (
+            contributions.map((value, index) => <ContributionChip key={`${value}-${index}`} value={value} />)
+          ) : (
+            <span className="field-empty">contribuição não registada.</span>
+          )}
+        </span>
+      </div>
+      {observationSummary && (
+        <p className="evidence-observation">
+          <strong>Observação:</strong> {observationSummary}
+        </p>
+      )}
+      {(provenance || sources.length > 0) && (
+        <p className="evidence-provenance">
+          <strong>Origem:</strong> {provenance ?? "registo de fonte relacionado abaixo"}.
+        </p>
+      )}
+      {sources.length > 0 && (
+        <ul aria-label={`Registos de fonte relacionados com ${detail.id}`} className="evidence-sources">
+          {sources.map((source) => (
+            <li key={source.id}>
+              <TypedLinkButton detail={source} onOpenGeneric={onOpenGeneric} suffix={fieldValue(source.record as Record<string, unknown>, "publisher") ?? undefined} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}
+
+/**
+ * PI-02C §3 evidence group — one labelled `<ul>` per category, omitted when
+ * empty. Category order (supporting, boundary, other) matches the reading
+ * priority in the task spec, not a strength/confidence ranking.
+ */
+function EvidenceGroup({ label, items, onOpenGeneric }: { label: string; items: EvidenceWithSources[]; onOpenGeneric: (id: string) => void }) {
+  if (items.length === 0) return null;
+  return (
+    <div className="evidence-group">
+      <h4>
+        {label} ({formatPublicCount(items.length)})
+      </h4>
+      <ul className="evidence-list">
+        {items.map((item) => (
+          <EvidenceCard key={item.detail.id} {...item} onOpenGeneric={onOpenGeneric} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/**
  * Scannable summary of contribution *occurrences* across the evidence list
  * (REDUX-002's aggregate-legend pattern) — never a ranking, score, or
  * inferred strength; a tally of already-explicit canonical values. Shown
@@ -462,60 +634,24 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
 
           <ProblemCurrentStateSection record={record} />
 
+          <ProblemSupportSection record={record} />
+
           <section id="problem-evidencia" aria-label="Evidência" className="problem-section">
             <h3 className="detail-panel-label">Registos de evidência associados ({formatPublicCount(evidence.length)})</h3>
             <ContributionOccurrenceSummary evidence={evidence} />
             {evidence.length === 0 ? (
               <p>Nenhuma evidência associada.</p>
             ) : (
-              <ul className="evidence-list">
-                {evidence.map(({ detail, sources }) => {
-                  const evidenceRecord = detail.record as Record<string, unknown>;
-                  const analysis = recordValue(evidenceRecord.analysis);
-                  const contributions = stringValues(analysis?.contribution);
-                  const observation = recordValue(evidenceRecord.observation);
-                  const observationSummary = observation ? fieldValue(observation, "summary") : null;
-                  const provenance = evidenceSourceLabel(evidenceRecord);
-
-                  return (
-                    <li key={detail.id} className="evidence-card">
-                      <div className="evidence-item-header">
-                        <TypedLinkButton detail={detail} onOpenGeneric={onOpenGeneric} suffix={fieldValue(evidenceRecord, "type") ? publicEnumLabel("type", fieldValue(evidenceRecord, "type")!) : undefined} />
-                        <span className="evidence-item-contributions" aria-label="Contribuição canónica">
-                          {contributions.length > 0 ? (
-                            contributions.map((value, index) => <ContributionChip key={`${value}-${index}`} value={value} />)
-                          ) : (
-                            <span className="field-empty">contribuição não registada.</span>
-                          )}
-                        </span>
-                      </div>
-                      {observationSummary && (
-                        <p className="evidence-observation">
-                          <strong>Observação:</strong> {observationSummary}
-                        </p>
-                      )}
-                      {(provenance || sources.length > 0) && (
-                        <p className="evidence-provenance">
-                          <strong>Origem:</strong> {provenance ?? "registo de fonte relacionado abaixo"}.
-                        </p>
-                      )}
-                      {sources.length > 0 && (
-                        <ul aria-label={`Registos de fonte relacionados com ${detail.id}`} className="evidence-sources">
-                          {sources.map((source) => (
-                            <li key={source.id}>
-                              <TypedLinkButton
-                                detail={source}
-                                onOpenGeneric={onOpenGeneric}
-                                suffix={fieldValue(source.record as Record<string, unknown>, "publisher") ?? undefined}
-                              />
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
+              (() => {
+                const groups = groupEvidenceByDecisionBasis(record, evidence);
+                return (
+                  <>
+                    <EvidenceGroup label="Evidência que suporta" items={groups.supporting} onOpenGeneric={onOpenGeneric} />
+                    <EvidenceGroup label="Evidência que limita a conclusão" items={groups.boundary} onOpenGeneric={onOpenGeneric} />
+                    <EvidenceGroup label="Outra evidência relacionada" items={groups.other} onOpenGeneric={onOpenGeneric} />
+                  </>
+                );
+              })()
             )}
           </section>
         </div>

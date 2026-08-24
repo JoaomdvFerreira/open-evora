@@ -18,7 +18,7 @@ const DETAILS: Record<string, RecordDetail> = {
     id: "PRB-0005",
     type: "PRB-",
     file: "research/problems/PRB-0005.yaml",
-    record: { title: "Parking pressure", status: "OPEN", problem_statement: "Traffic and parking conflict with pedestrian space." },
+    record: { title: "Parking pressure", status: "OPEN", problem_statement: "Traffic and parking conflict with pedestrian space.", evidence: ["EVD-0001"] },
     outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-0001" }],
     incomingEdges: [],
   },
@@ -528,6 +528,191 @@ describe("ProblemView — PI-02B header + Estado atual", () => {
     expect(within(stateSection).queryByText("Consequências conhecidas")).toBeNull();
     expect(within(stateSection).queryByText("Atualidade")).toBeNull();
     expect(within(stateSection).queryByText("Âmbito conhecido")).toBeNull();
+  });
+});
+
+describe("ProblemView — PI-02C support section + evidence grouping", () => {
+  const SUPPORT_INDEX: RecordSummary[] = [
+    { id: "PRB-0300", type: "PRB-", label: "Support fixture", file: "research/problems/PRB-0300.yaml", summaryFields: {} },
+    { id: "EVD-0301", type: "EVD-", label: "Supporting evidence", file: "research/evidence/EVD-0301.yaml", summaryFields: {} },
+    { id: "EVD-0302", type: "EVD-", label: "Boundary evidence", file: "research/evidence/EVD-0302.yaml", summaryFields: {} },
+    { id: "EVD-0303", type: "EVD-", label: "Other related evidence", file: "research/evidence/EVD-0303.yaml", summaryFields: {} },
+  ];
+
+  function evidenceDetail(id: string, summary: string): RecordDetail {
+    return {
+      id,
+      type: "EVD-",
+      file: `research/evidence/${id}.yaml`,
+      record: { evidence_id: id, type: "institutional", observation: { summary } },
+      outgoingEdges: [],
+      incomingEdges: [{ field: "evidence", ordinal: 0, from: "PRB-0300" }],
+    };
+  }
+
+  function supportProvider(record: Record<string, unknown>, evidenceIds: string[]): DataProvider {
+    const problemDetail: RecordDetail = {
+      id: "PRB-0300",
+      type: "PRB-",
+      file: "research/problems/PRB-0300.yaml",
+      record,
+      outgoingEdges: evidenceIds.map((id, ordinal) => ({ field: "evidence", ordinal, to: id })),
+      incomingEdges: [],
+    };
+    const evidenceDetails: Record<string, RecordDetail> = {
+      "EVD-0301": evidenceDetail("EVD-0301", "Supporting evidence observation."),
+      "EVD-0302": evidenceDetail("EVD-0302", "Boundary evidence observation."),
+      "EVD-0303": evidenceDetail("EVD-0303", "Other related evidence observation."),
+    };
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(SUPPORT_INDEX),
+      getRecord: (id: string) => {
+        if (id === "PRB-0300") return Promise.resolve(problemDetail);
+        const detail = evidenceDetails[id];
+        return detail ? Promise.resolve(detail) : Promise.reject(new Error(`no fixture detail for ${id}`));
+      },
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  it("renders corroboration_statement and independence_assessment in 'O que sustenta esta leitura', and omits the section when decision_basis carries neither", async () => {
+    const { rerender } = render(
+      <ProblemView
+        dataProvider={supportProvider(
+          {
+            title: "Support fixture",
+            status: "OPEN",
+            evidence: ["EVD-0301"],
+            decision_basis: {
+              corroboration_statement: "The reading is corroborated by two institutional threads.",
+              independence_assessment: "Independence is assessed as MEDIUM.",
+            },
+          },
+          ["EVD-0301"]
+        )}
+        problemId="PRB-0300"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Support fixture" });
+    const supportSection = screen.getByLabelText("O que sustenta esta leitura");
+    expect(within(supportSection).getByText("The reading is corroborated by two institutional threads.")).toBeTruthy();
+    expect(within(supportSection).getByText("Independência da evidência")).toBeTruthy();
+    expect(within(supportSection).getByText("Independence is assessed as MEDIUM.")).toBeTruthy();
+
+    rerender(
+      <ProblemView
+        dataProvider={supportProvider({ title: "Support fixture", status: "OPEN", evidence: ["EVD-0301"] }, ["EVD-0301"])}
+        problemId="PRB-0300"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+    await screen.findByRole("heading", { name: "Support fixture" });
+    expect(screen.queryByLabelText("O que sustenta esta leitura")).toBeNull();
+  });
+
+  it("partitions evidence into Evidência que suporta / que limita a conclusão / Outra evidência relacionada by decision_basis membership, deduplicated and category-exclusive", async () => {
+    render(
+      <ProblemView
+        dataProvider={supportProvider(
+          {
+            title: "Support fixture",
+            status: "OPEN",
+            evidence: ["EVD-0301", "EVD-0302", "EVD-0303"],
+            decision_basis: {
+              supporting_evidence: ["EVD-0301", "EVD-0301"],
+              boundary_evidence: ["EVD-0302"],
+            },
+          },
+          ["EVD-0301", "EVD-0302", "EVD-0303"]
+        )}
+        problemId="PRB-0300"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Support fixture" });
+    const evidenceSection = screen.getByLabelText("Evidência");
+
+    const supportingHeading = within(evidenceSection).getByText(/^Evidência que suporta/);
+    const boundaryHeading = within(evidenceSection).getByText(/^Evidência que limita a conclusão/);
+    const otherHeading = within(evidenceSection).getByText(/^Outra evidência relacionada/);
+
+    expect(supportingHeading.textContent).toContain("(1)");
+    expect(boundaryHeading.textContent).toContain("(1)");
+    expect(otherHeading.textContent).toContain("(1)");
+
+    const supportingGroup = supportingHeading.closest(".evidence-group") as HTMLElement;
+    expect(within(supportingGroup).getByText(/EVD-0301/)).toBeTruthy();
+    expect(within(supportingGroup).queryByText(/EVD-0302/)).toBeNull();
+
+    const boundaryGroup = boundaryHeading.closest(".evidence-group") as HTMLElement;
+    expect(within(boundaryGroup).getByText(/EVD-0302/)).toBeTruthy();
+    expect(within(boundaryGroup).queryByText(/EVD-0301/)).toBeNull();
+
+    const otherGroup = otherHeading.closest(".evidence-group") as HTMLElement;
+    expect(within(otherGroup).getByText(/EVD-0303/)).toBeTruthy();
+    expect(within(otherGroup).queryByText(/EVD-0301/)).toBeNull();
+    expect(within(otherGroup).queryByText(/EVD-0302/)).toBeNull();
+  });
+
+  it("omits empty evidence groups, e.g. when decision_basis carries no supporting_evidence/boundary_evidence at all", async () => {
+    render(
+      <ProblemView
+        dataProvider={supportProvider({ title: "Support fixture", status: "OPEN", evidence: ["EVD-0303"] }, ["EVD-0303"])}
+        problemId="PRB-0300"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Support fixture" });
+    const evidenceSection = screen.getByLabelText("Evidência");
+    expect(within(evidenceSection).queryByText(/^Evidência que suporta/)).toBeNull();
+    expect(within(evidenceSection).queryByText(/^Evidência que limita a conclusão/)).toBeNull();
+    expect(within(evidenceSection).getByText(/^Outra evidência relacionada/)).toBeTruthy();
+    expect(within(evidenceSection).getByText(/EVD-0303/)).toBeTruthy();
+  });
+
+  it("does not treat boundary evidence as negative or contradictory — it renders with the same EvidenceCard presentation as every other group", async () => {
+    render(
+      <ProblemView
+        dataProvider={supportProvider(
+          {
+            title: "Support fixture",
+            status: "OPEN",
+            evidence: ["EVD-0302"],
+            decision_basis: { boundary_evidence: ["EVD-0302"] },
+          },
+          ["EVD-0302"]
+        )}
+        problemId="PRB-0300"
+        onOpenGeneric={vi.fn()}
+        onBackToRecords={vi.fn()}
+        onBackToOverview={vi.fn()}
+        onViewInGraph={vi.fn()}
+      />
+    );
+
+    await screen.findByRole("heading", { name: "Support fixture" });
+    const evidenceSection = screen.getByLabelText("Evidência");
+    const boundaryHeading = within(evidenceSection).getByText(/^Evidência que limita a conclusão/);
+    const boundaryGroup = boundaryHeading.closest(".evidence-group") as HTMLElement;
+    expect(within(boundaryGroup).getByText("Boundary evidence observation.")).toBeTruthy();
+    expect(within(boundaryGroup).queryByText(/contradiz|negativ/i)).toBeNull();
   });
 });
 
