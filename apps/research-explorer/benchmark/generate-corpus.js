@@ -3,10 +3,9 @@
  * RE-05 synthetic scale-corpus generator.
  *
  * Produces a deterministic, disposable research-tree fixture (schemas/ +
- * sources/evidence/problems/notes YAML) shaped like the real corpus's
- * structural patterns (SRC/EVD/PRB proportions, shared-source hub nodes,
- * high-degree problems, list/reference fields, one schema-conforming
- * future/unknown type: NOTE-) so the real adapter code path
+ * sources/evidence/problems YAML) shaped like the real corpus's structural
+ * patterns (SRC/EVD/PRB proportions, shared-source hub nodes, high-degree
+ * problems, list/reference fields) so the real adapter code path
  * (validate-research-bridge.js + read-model.js) can be exercised at scale
  * without touching canonical research/**.
  *
@@ -74,16 +73,17 @@ function toYaml(record) {
 }
 
 // --- scale-proportional counts, matching the real corpus's SRC/EVD-heavy,
-// PRB-light shape (roughly 42/53/4 in the real 236-record corpus), plus a
-// small NOTE (future-type) slice the real corpus doesn't yet exercise.
+// PRB-light shape (98/128/10 = ~41.5%/54.2%/4.2% in the real 236-record
+// corpus). PRB is floored first (smallest, most degree-sensitive category),
+// SRC is a fixed share of the remainder, and EVD absorbs the rest so the
+// three counts always sum exactly to `scale`.
 // ------------------------------------------------------
 function computeCounts(scale) {
-  const prb = Math.max(5, Math.round(scale * 0.04));
-  const note = Math.max(3, Math.round(scale * 0.012));
-  const src = Math.max(10, Math.round(scale * 0.34));
-  const evd = scale - prb - note - src;
+  const prb = Math.max(5, Math.round(scale * (10 / 236)));
+  const src = Math.max(10, Math.round(scale * (98 / 236)));
+  const evd = scale - prb - src;
   if (evd <= 0) throw new Error(`Scale ${scale} too small for proportional generation`);
-  return { src, evd, prb, note };
+  return { src, evd, prb };
 }
 
 const DOMAINS = ["MOB", "ACC", "SOC", "HOU", "HEA", "EMP", "ECO", "EDU"];
@@ -120,47 +120,28 @@ function pickN(rng, arr, n) {
 
 function generate(scale, outDir) {
   const rng = mulberry32(0xe5f7a5 ^ scale);
-  const { src, evd, prb, note } = computeCounts(scale);
+  const { src, evd, prb } = computeCounts(scale);
 
   const srcIds = Array.from({ length: src }, (_, i) => `SRC-${pad(i + 1, 4)}`);
   const evdIds = Array.from({ length: evd }, (_, i) => `EVD-${pad(i + 1, 6)}`);
   const prbIds = Array.from({ length: prb }, (_, i) => `PRB-${pad(i + 1, 4)}`);
-  const noteIds = Array.from({ length: note }, (_, i) => `NOTE-${pad(i + 1, 4)}`);
 
   // A small hub of high-degree SRC/PRB nodes, per RE-05's "some higher-degree
   // nodes" and "Evidence sharing Sources" requirements.
   const hubSrc = srcIds.slice(0, Math.max(2, Math.ceil(src * 0.03)));
   const hubPrb = prbIds.slice(0, Math.max(1, Math.ceil(prb * 0.05)));
 
-  for (const dir of ["schemas", "sources", "evidence", "problems", "notes"]) {
+  for (const dir of ["schemas", "sources", "evidence", "problems"]) {
     fs.mkdirSync(path.join(outDir, dir), { recursive: true });
   }
 
   // Reuse the real, canonical schemas verbatim (no UI/adapter behaviour
-  // difference should be introduced by the benchmark), plus one new
-  // schema-conforming "future/unknown" type the adapter has never seen.
+  // difference should be introduced by the benchmark).
   for (const f of fs.readdirSync(REAL_SCHEMAS_DIR)) {
     if (f.endsWith(".schema.json")) {
       fs.copyFileSync(path.join(REAL_SCHEMAS_DIR, f), path.join(outDir, "schemas", f));
     }
   }
-  fs.writeFileSync(
-    path.join(outDir, "schemas", "note.schema.json"),
-    JSON.stringify(
-      {
-        prefix: "NOTE-",
-        directory: "notes",
-        idField: "note_id",
-        sourceModel: "docs/datamodel.md",
-        notes: "RE-05 synthetic-only future/unknown schema-conforming type: proves generic node/edge discovery needs no adapter change for a type the adapter has never seen.",
-        requiredFields: ["note_id", "title"],
-        enums: {},
-        references: [{ field: "subject", isList: false, targetPrefix: "PRB-", targetDirectory: "problems", required: false }],
-      },
-      null,
-      2
-    ) + "\n"
-  );
 
   // --- SRC ------------------------------------------------------------------
   for (const id of srcIds) {
@@ -236,16 +217,7 @@ function generate(scale, outDir) {
     fs.writeFileSync(path.join(outDir, "problems", `${id}.yaml`), toYaml(rec));
   }
 
-  // --- NOTE (schema-conforming future/unknown type) ------------------------
-  for (let i = 0; i < noteIds.length; i++) {
-    const id = noteIds[i];
-    const rec = { note_id: id, title: `Synthetic future-type note ${id}` };
-    if (rng() < 0.6) rec.subject = pick(rng, prbIds);
-    if (rng() < 0.5) rec.tags = pickN(rng, DOMAINS, 1 + Math.floor(rng() * 2));
-    fs.writeFileSync(path.join(outDir, "notes", `${id}.yaml`), toYaml(rec));
-  }
-
-  return { src, evd, prb, note, total: src + evd + prb + note };
+  return { src, evd, prb, total: src + evd + prb };
 }
 
 function main() {
