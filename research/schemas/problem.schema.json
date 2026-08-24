@@ -3,7 +3,7 @@
   "directory": "problems",
   "idField": "problem_id",
   "sourceModel": "docs/datamodel.md",
-  "notes": "domain accepts either a single string or a list of domain codes; multi-domain problems are recorded as a list, consistent with the existing evidence.domain list convention. No enum is enforced on domain values. decision_basis is an OPTIONAL structure — see docs/investigationstrategy.md §6 (Decision basis and Eligibility). It is never required; some canonical PRB-* records are backfilled with it and others are not. contract_version is a free-form string, not enum-checked, so future decision_basis contract revisions do not require a schema/validator change merely to be recorded. decision_basis.scope.bounded is an explicit human-authored boolean, never inferred from scope.geography/population/temporal text; booleanFields enforces it is true|false when present, not merely truthy. decision_basis.contradiction_search.performed and decision_basis.overlap_check.performed are likewise explicit human-authored booleans enforced by booleanFields.",
+  "notes": "domain accepts either a single string or a list of domain codes; multi-domain problems are recorded as a list, consistent with the existing evidence.domain list convention. No enum is enforced on domain values. decision_basis is an OPTIONAL structure — see docs/investigationstrategy.md §6 (Decision basis and Eligibility). It is never required; some canonical PRB-* records are backfilled with it and others are not. contract_version is a free-form string, not enum-checked, so future decision_basis contract revisions do not require a schema/validator change merely to be recorded. decision_basis.scope.bounded is an explicit human-authored boolean, never inferred from scope.geography/population/temporal text; booleanFields enforces it is true|false when present, not merely truthy. decision_basis.contradiction_search.performed and decision_basis.overlap_check.performed are likewise explicit human-authored booleans enforced by booleanFields. causal_reading is OPTIONAL: the current bounded causal interpretation supported by the investigation, not a proven causal claim; omitted when no safe current causal reading exists. investigation is OPTIONAL and has two independent optional parts: investigation.open_questions (a list of current unresolved investigation questions; each authored entry requires `question`, all other fields — why_open, current_action, latest_result, resolution_condition, evidence — are optional and populated only when explicitly supported) and investigation.path (a concise public-facing synthesis of how the investigation arrived at the current PRB formulation, in four optional stages: initial_signal, development, delimitation, current_formulation, each with an optional summary and evidence list). investigation.open_questions[].evidence and investigation.path.*.evidence are EVD-* reference lists validated structurally by the validator (not expressible via the flat `references` array below, since they sit inside a list of objects / nested stage objects), but are documented here as part of the schema contract.",
   "requiredFields": [
     "problem_id",
     "title",
@@ -16,14 +16,14 @@
     "evidence_status",
     "validation_status",
     "digital_tractability",
-    "existing_solutions",
+    "solution_landscape_status",
     "status"
   ],
   "enums": {
     "evidence_status": ["discovered", "corroborated"],
     "validation_status": ["unvalidated", "partially_validated", "validated"],
     "digital_tractability": ["not_assessed", "low", "medium", "high"],
-    "existing_solutions": ["not_assessed", "assessed"],
+    "solution_landscape_status": ["not_assessed", "assessed"],
     "status": ["OPEN", "REJECTED", "DUPLICATE", "NON_DIGITAL", "ALREADY_SOLVED", "INSUFFICIENT_EVIDENCE"]
   },
   "booleanFields": [

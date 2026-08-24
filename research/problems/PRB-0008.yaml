@@ -12,17 +12,36 @@ affected_populations:
   - "employers"
   - "training/education providers"
 problem_statement: "O planeamento institucional local trata o alinhamento entre as competências da força de trabalho e as necessidades dos empregadores — através do mapeamento de competências, da adaptação da formação e de uma articulação mais forte entre educação e empregadores — como uma linha de trabalho atual e ativa, e não como uma preocupação resolvida, apesar da considerável infraestrutura existente de apoio económico/empresarial e das iniciativas de transição da educação para o emprego. Não está ainda estabelecido quais as competências ou profissões concretamente em falta especificamente em Évora, por oposição à região do Alentejo em geral, para a qual existe uma lista regional de profissões em escassez."
-current_journey: null
-reported_consequences: []
-possible_root_causes:
-  - "Possible components include visibility of skills demand, training adaptation, employer/education feedback loops, and inclusive employment for vulnerable groups (per WU-D1-04 Batch A interpretation, not yet validated). Do not assume a job-board solution."
-  - "Existing infrastructure (industrial/technology parks, incubation, aerospace-sector facilities, employability/training measures, UÉ labour-market integration work) means this is not an 'absence of institutional response' problem; infrastructure existence does not prove SMEs or workers can easily discover or navigate support opportunities. WU-D1-04 Batch B confirms existing employment-matching infrastructure is substantial (UÉ employment fairs, university career initiatives, IEFP listings, NERE/IEFP training mechanisms) - see EVD-000048 - so a generic job board or employment portal would duplicate existing infrastructure unless a specific user-journey failure is demonstrated."
-  - "Repeated claims across SRC-0002 and SRC-0028 share the same PDS/Rede Social institutional lineage and are not independent corroboration; UÉ's own planning (SRC-0010) provides a second, distinct institutional line on education-to-employment work."
-  - "WU-D1-04 Batch B Current-State Challenge result: the skills/employer-needs alignment problem survives (EVD-000047) - it is a current 2025/2026 institutional workstream, not merely historic strategy. However, public job listings alone cannot identify the actual skills shortage: the IEFP Évora snapshot (102 listings, EVD-000049) has no duration-to-fill, unsuccessful-recruitment, wage-constraint or employer-reported-shortage data, so the specific mismatch remains under-characterised. Graduate/talent retention (EVD-000050) and business-support fragmentation (EVD-000051) remain related but unresolved and unpromoted discovery questions - not merged into this problem and not created as separate PRB-* records."
-  - "D2-D Round A (WU-D2-05) adds a concrete specialised-demand signal: an Indeed snapshot of aerospace-sector listings in Évora (aeronautical engineering, EWIS, configuration management, airworthiness/quality, composites/materials manufacturing, avionics/aircraft design - EVD-000101), alongside the broader IEFP snapshot (EVD-000049); this does not establish actual shortage, vacancy duration, failed recruitment or wage mismatch, only advertised specialised demand."
-  - "D2-D Round A enriches EVD-000048's existing-matching-infrastructure conclusion with the UÉ Employment Portal (emprego.uevora.pt, SRC-0088), a specific candidate-employer matching platform distinct from SRC-0041 (Magma Talks), further strengthening the rejection of a generic local job-board/employment-portal hypothesis."
-  - "D2-D Round A REFINES the core problem with two skills-alignment/employer-feedback mechanisms already in place: PlaQuaR (EVD-000102), which explicitly aligns training supply with regional employer/institution needs, maps available training, and strengthens cooperation networks; and the UÉ / TE Connectivity annual action plan (EVD-000103), a concrete bilateral employer-training feedback loop. Neither establishes that such mechanisms are systematic or sufficient across Évora's wider economy/SME base, nor PlaQuaR's effective coverage/outcomes - the remaining diagnostic question is the effectiveness and coverage of skills-demand feedback/alignment, not absence of a job board or of alignment mechanisms. Housing-to-talent-retention causality is explicitly not inferred from this evidence."
-  - "RS-02A update (2026-08-12): EURES' Portugal labour-market page (EVD-000115) names a regional Alentejo shortage-occupation list (agronomists, software programmers, agricultural-machinery repairers/operators, seasonal agricultural workers, electromechanical/electrical maintenance technicians, chefs, meat cutters, construction workers) - materially stronger than the prior IEFP/Indeed vacancy-listing snapshots (EVD-000049, EVD-000101) because it names occupations as shortage-designated rather than merely advertised. This is Alentejo-region evidence, not Évora-municipality evidence, and must not be generalised onto Évora without local corroboration. IEFP's own Centros de Emprego bulletin (EVD-000116) confirms CTEF Évora's statistical catchment spans fourteen municípios, so IEFP employment-centre data cannot supply an Évora-specific shortage list either. Évora-specific occupational demand remains unresolved; WU022's NERE route (D5-OP-006) remains the appropriate institutional route for that residual question and stays open."
+investigation:
+  open_questions:
+    - question: "Quais as competências ou profissões concretamente em falta especificamente em Évora, por oposição à região do Alentejo em geral?"
+      why_open: "A lista regional de profissões em escassez do EURES (Alentejo) é mais forte do que as fotografias de vagas anunciadas do IEFP/Indeed porque nomeia profissões como estando em escassez, e não apenas anunciadas — mas é evidência ao nível regional, não municipal, e não deve ser generalizada para Évora sem corroboração local. O boletim do IEFP confirma que a área estatística do CTEF Évora abrange catorze municípios, pelo que os dados dos centros de emprego do IEFP também não conseguem fornecer uma lista específica de Évora."
+      current_action: "Via institucional através da NERE (rota D5-OP-006) permanece a via apropriada para esta questão residual."
+      resolution_condition: "Dados ou validação institucional específicos do concelho de Évora (não regionais) sobre profissões/competências em escassez."
+      evidence:
+        - "EVD-000115"
+        - "EVD-000116"
+  path:
+    initial_signal:
+      summary: "O planeamento institucional local tratou o alinhamento entre competências da força de trabalho e necessidades dos empregadores como uma linha de trabalho ativa, através do mapeamento de competências, adaptação da formação, e articulação mais forte entre educação e empregadores."
+      evidence:
+        - "EVD-000037"
+        - "EVD-000040"
+        - "EVD-000041"
+    development:
+      summary: "Foi confirmado que já existe infraestrutura substancial de correspondência emprego-candidato (feiras de emprego da UÉ, iniciativas de carreira universitária, listagens do IEFP, mecanismos de formação NERE/IEFP, Portal de Emprego da UÉ), pelo que uma bolsa de emprego genérica duplicaria infraestrutura existente sem uma falha de jornada de utilizador demonstrada. O problema de alinhamento sobrevive como um trabalho institucional atual de 2025/2026, não apenas estratégia histórica."
+      evidence:
+        - "EVD-000047"
+        - "EVD-000048"
+    delimitation:
+      summary: "Listagens de emprego público por si só não conseguem identificar a escassez real de competências: a fotografia do IEFP Évora (102 listagens) não tem dados de tempo-até-preenchimento, recrutamento falhado, restrição salarial ou escassez reportada pelo empregador. Um sinal de procura especializada (setor aeroespacial) foi acrescentado, sem estabelecer escassez real. Dois mecanismos de alinhamento de competências/feedback do empregador já em funcionamento (PlaQuaR; plano de ação anual UÉ/TE Connectivity) foram identificados, sem estabelecer se são sistemáticos ou suficientes em toda a economia de Évora."
+      evidence:
+        - "EVD-000049"
+        - "EVD-000101"
+        - "EVD-000102"
+        - "EVD-000103"
+    current_formulation:
+      summary: "A formulação atual mantém o alinhamento de competências como preocupação institucional ativa e não resolvida, com o desfasamento específico em Évora — por oposição à região do Alentejo em geral, para a qual existe uma lista regional — ainda por caracterizar."
 evidence:
   - "EVD-000037"
   - "EVD-000040"
@@ -38,5 +57,5 @@ evidence:
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
-existing_solutions: not_assessed
+solution_landscape_status: not_assessed
 status: OPEN

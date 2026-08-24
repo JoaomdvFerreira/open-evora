@@ -1,7 +1,7 @@
 /** Presentation-only PT-PT terminology. Canonical data remains unchanged. */
 const LABELS: Record<string, Record<string, string>> = {
   validation_status: { unvalidated: "Por validar", partially_validated: "Parcialmente validado", validated: "Validado" },
-  existing_solutions: { not_assessed: "Não avaliadas", assessed: "Avaliadas" },
+  solution_landscape_status: { not_assessed: "Não avaliadas", assessed: "Avaliadas" },
   status: { OPEN: "Aberto", REJECTED: "Rejeitado", DUPLICATE: "Duplicado", NON_DIGITAL: "Não digital", ALREADY_SOLVED: "Já resolvido", INSUFFICIENT_EVIDENCE: "Evidência insuficiente" },
   evidence_status: { discovered: "Evidência identificada", corroborated: "Evidência corroborada" },
   digital_tractability: { not_assessed: "Não avaliada", low: "Baixa", medium: "Média", high: "Alta" },
@@ -31,7 +31,7 @@ const COMPACT_LABELS: Record<string, Record<string, string>> = {
 };
 
 const FIELD_CAPTIONS: Record<string, string> = {
-  status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", existing_solutions: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", contribution: "Contribuição", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", geography: "Âmbito geográfico", source_type: "Tipo de fonte", authority: "Autoridade", freshness: "Atualidade", licensing: "Licenciamento",
+  status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", solution_landscape_status: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", contribution: "Contribuição", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", geography: "Âmbito geográfico", source_type: "Tipo de fonte", authority: "Autoridade", freshness: "Atualidade", licensing: "Licenciamento",
 };
 
 const PS_LABELS: Record<string, string> = {

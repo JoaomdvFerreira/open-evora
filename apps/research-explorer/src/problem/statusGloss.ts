@@ -7,8 +7,8 @@
  * translation of the enum word that adds no criterion beyond translation).
  * `explanation`, where present, paraphrases docs/datamodel.md's own prose.
  * Where docs/datamodel.md defines nothing beyond the enum member itself (all
- * four `digital_tractability` values, `existing_solutions`), no explanation
- * is manufactured.
+ * four `digital_tractability` values, `solution_landscape_status`), no
+ * explanation is manufactured.
  *
  * `evidence_status`'s `discovered` <-> `corroborated` ordering is a
  * documented progression (not merely the schema enum's array order, which
@@ -72,7 +72,7 @@ const DIGITAL_TRACTABILITY_GLOSS: FieldGlossMap = {
   high: { label: "Tratabilidade digital: alta" },
 };
 
-const EXISTING_SOLUTIONS_GLOSS: FieldGlossMap = {
+const SOLUTION_LANDSCAPE_STATUS_GLOSS: FieldGlossMap = {
   not_assessed: { label: "Soluções existentes: não avaliadas" },
   assessed: { label: "Soluções existentes: avaliadas" },
 };
@@ -82,7 +82,7 @@ const FIELD_GLOSSARIES: Record<string, FieldGlossMap> = {
   validation_status: VALIDATION_STATUS_GLOSS,
   evidence_status: EVIDENCE_STATUS_GLOSS,
   digital_tractability: DIGITAL_TRACTABILITY_GLOSS,
-  existing_solutions: EXISTING_SOLUTIONS_GLOSS,
+  solution_landscape_status: SOLUTION_LANDSCAPE_STATUS_GLOSS,
 };
 
 /** PT captions for every "Estado atual" field — used as the accessible field context for a status chip (screen readers otherwise lose the field-name context a `<dt>/<dd>` pair used to give). */
@@ -91,7 +91,7 @@ export const FIELD_CAPTIONS: Record<string, string> = {
   validation_status: "Estado de validação",
   evidence_status: "Estado da evidência",
   digital_tractability: "Tratabilidade digital",
-  existing_solutions: "Soluções existentes",
+  solution_landscape_status: "Soluções existentes",
 };
 
 /** PT captions for the four fields explained in the point-of-use Problem help disclosure. */
@@ -102,7 +102,7 @@ export const DISCLOSURE_FIELD_LABELS: Record<string, string> = {
   digital_tractability: "Tratabilidade digital",
 };
 
-/** Fields explained in the point-of-use disclosure, in Estado-atual order. `existing_solutions` is deliberately excluded — no grounded prose exists for it beyond the enum itself. */
+/** Fields explained in the point-of-use disclosure, in Estado-atual order. `solution_landscape_status` is deliberately excluded — no grounded prose exists for it beyond the enum itself. */
 export const DISCLOSURE_FIELDS = ["status", "validation_status", "evidence_status", "digital_tractability"] as const;
 
 /** Returns a safe label/explanation pair for a known field+value, or null when nothing safe exists — callers must still render the canonical value regardless of this result. */

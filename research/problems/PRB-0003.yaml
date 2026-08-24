@@ -11,16 +11,37 @@ affected_populations:
   - "people with reduced mobility"
   - "other vulnerable pedestrian groups"
 problem_statement: "Em Évora, estão documentadas barreiras pedonais e de acessibilidade e existe um programa estabelecido de planeamento da acessibilidade, mas as intervenções físicas em curso e os testes de percursos experimentais de 2026 exigem validar, face às condições vividas atuais, quais são exatamente as barreiras que ainda persistem."
-current_journey: null
-reported_consequences: []
-possible_root_causes:
-  - "Primarily physical infrastructure; a digital intervention could only address secondary information/coordination problems unless evidence later establishes otherwise (per WU-D1-02 Batch A interpretation, not yet validated)."
-  - "Batch B update: the R.A.M.P.A.-Évora accessibility plan was completed in 2022 for priority axes and its monitoring/extension is explicitly ongoing; major Rossio/Station works continue to change local conditions in 2026; a reusable public accessibility/obstacle dataset has not yet been located. Any digital opportunity depends on current/fresh accessibility data and a credible maintenance mechanism."
-  - "Batch C update: the Municipality launched Experimental Actions in June 2026 as part of the 4th PUE revision, inviting the public to physically test pedestrian/soft-mobility routes and contribute perceptions and proposals on inclusion, accessibility and sustainability. Institutional owners for remaining data/operational questions are identifiable (DAM, DORU). Next validation is D2/current observation plus later stakeholder validation, especially for people with reduced mobility."
-  - "D2-A Round A update: a public PRR project record (EVD-000081) documents a concrete pre-intervention accessibility barrier at EB1 Azaruja (narrow pavement, five steps at the main pedestrian entrance, non-compliant vehicle-gate access), confirming that PRB-0003 has had concrete local manifestations. This is factual corroboration, not an independent lived public signal, and the corrective project is current/recent (2025-2026), so the post-project condition must be re-checked before treating the described barrier as present-day reality. Round A did not find an equally strong independent lived public signal for accessibility more broadly; this remains a coverage gap on lived experience alongside the factual confirmation. No PRB-0003 status/tractability change."
-  - "D2-A Targeted Follow-up update: three distinct evidence classes must be kept separate. (1) Affected-user/stakeholder participation: APCE's Acesso Universal 1.3 programme (EVD-000085) documents active participation by people with disabilities in identifying/improving Historic Centre accessibility barriers — stronger than a generic institutional statement, but a current process, not a completed correction. (2) Institutional accessibility work already under way: APCE's continuing verification of municipal cultural facilities (EVD-000086) and Évora_27's 2026 accessibility plan with Acesso Cultura (EVD-000087) are both EXISTING-SOLUTION/CURRENT-STATE-UPDATE signals — some barriers are already inside an active assessment/improvement process and must not be counted as unresolved. (3) Actual unresolved present-day physical barriers: public accessible-tourism surfaces (EVD-000088) still describe barriers (steps, uneven/access-limited monuments, scarce tactile paving, limited fully adapted transport), but freshness is UNKNOWN on both cited surfaces, so this is a lead for a location-level audit, not a canonical current fact. Broad open-web research on PRB-0003 is now sufficiently advanced for D2; the next evidence route is affected-user validation and a location-level current-barrier audit, not further broad web search. No PRB-0003 status/tractability change."
-  - "WU018 (WU-D3-05) update: a December 2025 result (EVD-000104, SRC-0091) advances item (2) above — APCE and CME jointly completed a survey of accessibility present / accessibility missing / possible improvement solutions for municipal cultural facilities, superseding EVD-000086's 'verification continuing' claim with a completed-inventory result. This confirms residual barriers were still being identified in late 2025 and that the joint assessment/improvement process is real and operating; it does not establish exact current (August 2026) barrier locations or that identified deficits remain unaddressed. Exact residual barrier state at the location level still requires affected-user validation (D5). No PRB-0003 status/tractability change."
-  - "WU022 (WU-D5-01, D5-OP-003) update: APCE's direct institutional response (received 2026-08-12) adds EVD-000112 (public-space work is a CME partnership because public space is municipal competence; methodology is in-loco assessment with direct participation of people with reduced mobility), EVD-000113 (barrier factors — inclination and location — identified in accesses, some corrected, no location-level inventory provided), and EVD-000114 (a separate, ongoing shop-accessibility programme in the Historic Centre, run with Associação Comercial and later NERE, using accessibility-level seals). This partially validates and extends the operator/institutional side of PRB-0003 — it confirms methodology and names barrier factors and a second existing-solution track, but does not supply the location-level current-barrier detail needed to resolve the remaining gap. Detailed follow-up is available from APCE's technical project coordinator after return from leave (pending, not yet scheduled). No PRB-0003 evidence_status/validation_status/status change — validation_status remains a WU-D5-03/WU024 synthesis decision, not a WU022 action."
+causal_reading: "As barreiras são predominantemente de infraestrutura física (pavimentos, degraus, acessos não conformes); uma intervenção digital só poderia endereçar problemas secundários de informação/coordenação, salvo se evidência futura estabelecer o contrário. Esta leitura não está validada."
+investigation:
+  open_questions:
+    - question: "Quais as barreiras concretas que persistem hoje, a nível de localização, face às intervenções físicas em curso e à correção parcial já reportada?"
+      why_open: "A APCE confirma que apenas algumas barreiras identificadas foram corrigidas, sem fornecer um inventário ao nível da localização; o projeto corretivo da EB1 Azaruja é recente (2025-2026) e o seu estado pós-intervenção não foi verificado; as plataformas de turismo acessível têm atualidade desconhecida."
+      current_action: "Testes de percursos experimentais de 2026 (4ª revisão do PUE) convidam o público a testar fisicamente percursos pedonais/de mobilidade suave e contribuir perceções sobre inclusão e acessibilidade."
+      resolution_condition: "Um inventário de barreiras ao nível da localização, ou validação direta com pessoas com mobilidade reduzida, que estabeleça quais as barreiras concretas que persistem hoje."
+      evidence:
+        - "EVD-000029"
+        - "EVD-000112"
+        - "EVD-000113"
+  path:
+    initial_signal:
+      summary: "O relatório setorial de mobilidade do PUE documentou descontinuidade da infraestrutura pedonal, infraestrutura pedonal subdimensionada e numerosas barreiras arquitetónicas/urbanísticas na cidade, incluindo constrangimentos de acessibilidade em terminais/estação de autocarros."
+      evidence:
+        - "EVD-000004"
+        - "EVD-000006"
+    development:
+      summary: "Um registo de projeto PRR confirmou um conjunto concreto de barreiras pré-intervenção numa localização específica (EB1 Azaruja), corroborando que o diagnóstico documental teve manifestações locais concretas. O programa participativo Acesso Universal 1.3 da APCE documentou um processo ativo de identificação e melhoria de barreiras no Centro Histórico com participação direta de pessoas com deficiência, culminando num inventário conjunto concluído em dezembro de 2025 para equipamentos culturais municipais."
+      evidence:
+        - "EVD-000081"
+        - "EVD-000085"
+        - "EVD-000104"
+    delimitation:
+      summary: "A resposta institucional direta da APCE (agosto de 2026) confirmou a metodologia (avaliação in-loco com participação direta de pessoas com mobilidade reduzida) e nomeou fatores de barreira (inclinação, localização) em acessos, com correção parcial já realizada mas sem inventário ao nível da localização. Um programa distinto de acessibilidade em comércios do Centro Histórico foi identificado como uma segunda via de solução existente."
+      evidence:
+        - "EVD-000112"
+        - "EVD-000113"
+        - "EVD-000114"
+    current_formulation:
+      summary: "A formulação atual mantém que as barreiras estão documentadas e que existe um programa de planeamento estabelecido, mas que a persistência atual de barreiras específicas, face às intervenções físicas em curso e aos testes de 2026, ainda precisa de validação."
 evidence:
   - "EVD-000004"
   - "EVD-000006"
@@ -40,7 +61,7 @@ evidence:
 evidence_status: corroborated
 validation_status: unvalidated
 digital_tractability: not_assessed
-existing_solutions: not_assessed
+solution_landscape_status: not_assessed
 status: OPEN
 
 decision_basis:

@@ -211,7 +211,7 @@ function generate(scale, outDir) {
       evidence_status: pick(rng, PRB_EVIDENCE_STATUS),
       validation_status: pick(rng, PRB_VALIDATION_STATUS),
       digital_tractability: pick(rng, DIGITAL_TRACT),
-      existing_solutions: pick(rng, EXIST_SOL),
+      solution_landscape_status: pick(rng, EXIST_SOL),
       status: pick(rng, PRB_STATUS),
     };
     fs.writeFileSync(path.join(outDir, "problems", `${id}.yaml`), toYaml(rec));

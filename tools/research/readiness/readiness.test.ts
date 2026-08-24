@@ -109,7 +109,7 @@ evidence: [${evidenceIds.join(", ")}]
 evidence_status: ${evidenceStatus}
 validation_status: ${validationStatus}
 digital_tractability: not_assessed
-existing_solutions: not_assessed
+solution_landscape_status: not_assessed
 status: OPEN
 ${decisionBasis}
 `;

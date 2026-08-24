@@ -91,6 +91,79 @@ function validateBooleanFields(file: string, record: RecordFields, schema: Recor
   }
 }
 
+const INVESTIGATION_PATH_STAGES = ["initial_signal", "development", "delimitation", "current_formulation"] as const;
+
+/**
+ * Validates PRB.investigation's two optional parts. Not expressible via the
+ * generic schema-declared `references` array (which only walks flat dotted
+ * paths): open_questions is a list of objects and path is a fixed set of
+ * nested stage objects, each carrying its own `evidence` list. This
+ * performs the same two checks the generic mechanism performs elsewhere —
+ * EVD-* existence and PRB-linkage — plus the one schema-required structural
+ * rule (an authored open-question entry must have a non-empty `question`).
+ */
+function validateInvestigation(
+  file: string,
+  record: RecordFields,
+  evidenceById: ReadonlyMap<string, ParsedRecord>,
+  errors: string[]
+): void {
+  const investigation = getPath(record, "investigation");
+  if (investigation === undefined || investigation === null) return;
+  if (typeof investigation !== "object" || Array.isArray(investigation)) return;
+
+  const prbEvidence = new Set(
+    (Array.isArray((record as Record<string, unknown>).evidence) ? ((record as Record<string, unknown>).evidence as unknown[]) : []).filter(
+      (v): v is string => typeof v === "string"
+    )
+  );
+
+  function checkEvidenceList(fieldPath: string, val: unknown): void {
+    if (val === undefined || val === null) return;
+    const list = Array.isArray(val) ? val : [val];
+    for (const t of list) {
+      if (typeof t !== "string") continue;
+      if (t.trim() === "") {
+        errors.push(`[${file}] field "${fieldPath}" contains an empty reference entry (expected an EVD-* ID)`);
+        continue;
+      }
+      if (!evidenceById.has(t)) {
+        errors.push(`[${file}] field "${fieldPath}" references non-existent EVD-* record "${t}"`);
+        continue;
+      }
+      if (!prbEvidence.has(t)) {
+        errors.push(`[${file}] field "${fieldPath}" references "${t}" which is not linked to this problem (not present in its evidence list)`);
+      }
+    }
+  }
+
+  const openQuestions = (investigation as Record<string, unknown>).open_questions;
+  if (Array.isArray(openQuestions)) {
+    openQuestions.forEach((entry, i) => {
+      const fieldBase = `investigation.open_questions[${i}]`;
+      if (entry === null || typeof entry !== "object" || Array.isArray(entry)) {
+        errors.push(`[${file}] field "${fieldBase}" must be an object`);
+        return;
+      }
+      const question = (entry as Record<string, unknown>).question;
+      if (typeof question !== "string" || question.trim() === "") {
+        errors.push(`[${file}] missing required field: ${fieldBase}.question`);
+      }
+      checkEvidenceList(`${fieldBase}.evidence`, (entry as Record<string, unknown>).evidence);
+    });
+  }
+
+  const path = (investigation as Record<string, unknown>).path;
+  if (path !== undefined && path !== null && typeof path === "object" && !Array.isArray(path)) {
+    for (const stage of INVESTIGATION_PATH_STAGES) {
+      const stageVal = (path as Record<string, unknown>)[stage];
+      if (stageVal === undefined || stageVal === null) continue;
+      if (typeof stageVal !== "object" || Array.isArray(stageVal)) continue;
+      checkEvidenceList(`investigation.path.${stage}.evidence`, (stageVal as Record<string, unknown>).evidence);
+    }
+  }
+}
+
 function validateReferences(recordIndexes: RecordIndex[], errors: string[]): void {
   const idsByPrefix = new Map<string, ReadonlyMap<string, ParsedRecord>>();
   for (const { schema, byId } of recordIndexes) {
@@ -144,6 +217,7 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
   const errors: string[] = [];
   const seenIds = new Map<string, string>();
   const recordIndexes = [...index.byPrefix.values()];
+  const evidenceById = index.byPrefix.get("EVD-")?.byId ?? new Map<string, ParsedRecord>();
 
   for (const { schema, records } of recordIndexes) {
     for (const { file, fields } of records) {
@@ -151,6 +225,9 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
       validateRequiredFields(file, fields, schema, errors);
       validateEnums(file, fields, schema, errors);
       validateBooleanFields(file, fields, schema, errors);
+      if (schema.prefix === "PRB-") {
+        validateInvestigation(file, fields, evidenceById, errors);
+      }
     }
   }
 

@@ -4,7 +4,7 @@ import { formatPublicCount, formatPublicDateTime, publicCompactEnumLabel, public
 describe("PT-PT public presentation terminology", () => {
   it("uses field-aware PRB validation labels", () => {
     expect(publicEnumLabel("validation_status", "unvalidated")).toBe("Por validar");
-    expect(publicEnumLabel("existing_solutions", "not_assessed")).toBe("Não avaliadas");
+    expect(publicEnumLabel("solution_landscape_status", "not_assessed")).toBe("Não avaliadas");
   });
 
   it("uses a shorter field-aware label in compact problem status presentation, agreeing grammatically with its dimension noun", () => {

@@ -10,17 +10,38 @@ affected_populations:
   - "residents"
   - "urban parish councils"
 problem_statement: "A fiabilidade dos serviços de recolha de resíduos sólidos urbanos e de higiene urbana constitui um problema cívico atual reconhecido institucionalmente: o Município documentou uma interrupção do serviço de recolha em fevereiro de 2026, causada por avarias numa frota envelhecida, e, em julho-agosto de 2026, o Presidente da Câmara e o Município identificaram publicamente a higiene urbana como um dos desafios mais urgentes da gestão municipal, avançando com uma reestruturação substancial da frota, dos recursos humanos, dos modelos de recolha, da distribuição de responsabilidades e da monitorização, ao mesmo tempo que reconheceram explicitamente que persistem dificuldades em algumas zonas."
-current_journey: null
-reported_consequences: []
-possible_root_causes:
-  - "The dominant root cause is substantially operational/capacity-related, not informational or digital: ageing/broken collection fleet, insufficient reserve vehicle capacity, staffing/logistics, collection-route/service organisation, and cross-entity responsibility arrangements (Município, Gesamb, parish councils). Digital tractability over this dominant root cause is assessed as low/mixed - a digital product should not be assumed to resolve fleet age, staffing capacity or logistics."
-  - "The problem must be framed as service reliability/quality, not as 'lack of waste information' or 'need for a waste-reporting app'. A digital occurrence-reporting channel and Gesamb information infrastructure (schedules, ecocentre locations, service-quality reporting) already exist (see EVD-000067, EVD-000074, EVD-000075), so a generic reporting or information app would duplicate existing capability."
-  - "A narrower, currently unvalidated information/coordination subproblem may exist within the hygiene service journey - specifically around real-time service-status transparency, bulky-waste request routing, cross-entity ownership clarity (Município/Gesamb/parish councils), and citizen visibility into resolution timelines. No public dataset for resolution time, backlog or routing quality was located in this bounded institutional review (see EVD-000075), so this subproblem is not validated and should not be treated as a solution hypothesis. This is the most promising future digital-opportunity angle but requires D2/D5 user-journey or technical/open-data assessment, not further D1 institutional research."
-  - "D2-E Round A (WU-D2-04) strengthens the problem with direct lived public signals alongside the existing institutional diagnosis: a multi-day non-collection report (EVD-000093) and a geographically specific accumulation report in Canaviais (EVD-000094). Both are self-selected public-post signals with UNKNOWN representativeness and are not treated as prevalence evidence."
-  - "D2-E Round A corrects the current-state picture across February-to-August 2026: the February 2026 near-collapse (EVD-000071/EVD-000072) is important but must not be read as the assumed August operating state. A May 2026 normalisation step (EVD-000095) shows the procured vehicles entering service ahead of the July fleet reinforcement to 19 vehicles (SRC-0055, already canonical). A bounded post-July open-web check did not surface a comparably strong new signal of city-wide ordinary-collection collapse - this is a search/saturation result, not evidence that collection is now reliable, that PRB-0009 is solved, or that missed collections no longer occur. Current post-intervention reliability remains insufficiently measured and requires operational data / D5 validation, not a public-signal conclusion."
-  - "D2-E Round A adds two narrow, unvalidated leads without expanding them into new problems: (1) urban parish councils publicly clarifying their hygiene competencies after the July-August responsibility decentralisation (EVD-000096) is institutional coordination-complexity evidence, not proof that residents are commonly confused about responsibility; (2) the existing bulky/green-waste request journey (EVD-000097, EXISTING-SOLUTION) and a single August 2026 green-waste dumping enforcement case (EVD-000098) are transaction-friction leads about discoverability/predictability and the conditional-service boundary, not evidence of widespread confusion. Both remain carried to D5, not established here."
-  - "Core digital_tractability remains low: the dominant causal mechanism stays operational/capacity/service-organisation related. D2-E Round A does not create a software hypothesis for the core problem; validation_status remains unvalidated, since public-signal strength alone cannot validate PRB-0009."
-  - "WU-D4-02 update (docs/milestones/D4-WU02-PRB0009-progress.md): D4 residual-gap review confirmed the generic occurrence-reporting/status gap is NOT SUPPORTED (occurrence platform, Gesamb waste information, and the bulky/green-waste journey already exist and are already canonically recorded). Bounded comparative evidence was integrated for four distinct mechanisms: resident collection-state visibility (Havant, EVD-000108), request/operational-system integration (Oxford, EVD-000109), proactive known-delay/missed-route communication (North Norfolk, EVD-000110, selected as the single example of a pattern also seen at other UK councils), and performance/evaluation-readiness publication (Lisbon, EVD-000111). D4 residual-gap status: PARTIAL — a narrower residual gap may remain around proactive collection status, operational integration, special-waste request lifecycle and performance/evaluation data, but D4 does not establish that these gaps materially cause or resolve Évora's collection-reliability problem. No status/tractability/structure change; validation_status remains unvalidated."
+causal_reading: "A causa dominante é substancialmente operacional/de capacidade — frota envelhecida/avariada, capacidade insuficiente de veículos de reserva, pessoal/logística, organização de rotas/serviço de recolha, e arranjos de responsabilidade entre entidades (Município, Gesamb, juntas de freguesia) — e não informacional ou digital. Esta leitura não está validada; a tratabilidade digital sobre esta causa dominante é avaliada como baixa."
+investigation:
+  open_questions:
+    - question: "Qual é o desempenho operacional atual (tempo de resolução, atrasos, taxa de recolhas falhadas) após agosto de 2026, e existe uma subproblema mais estreito de transparência de estado/coordenação dentro da jornada do serviço de higiene?"
+      why_open: "Não foi localizado nenhum conjunto de dados operacional público (tempo de resolução, atrasos, qualidade de encaminhamento) nesta revisão institucional delimitada; a verificação pós-julho no acesso público não encontrou um sinal comparável de colapso de recolha à escala da cidade, mas isto é um resultado de saturação de pesquisa, não prova de que o serviço é agora fiável."
+      resolution_condition: "Dados operacionais públicos pós-agosto de 2026, ou avaliação de jornada de utilizador/dados abertos (D2/D5), que estabeleçam o desempenho atual e se existe um subproblema de transparência de estado/coordenação."
+      evidence:
+        - "EVD-000095"
+        - "EVD-000108"
+        - "EVD-000109"
+        - "EVD-000110"
+        - "EVD-000111"
+  path:
+    initial_signal:
+      summary: "O Município documentou uma interrupção do serviço de recolha em fevereiro de 2026, causada por avarias numa frota envelhecida."
+      evidence:
+        - "EVD-000071"
+        - "EVD-000072"
+    development:
+      summary: "Em julho-agosto de 2026, o Presidente da Câmara e o Município identificaram publicamente a higiene urbana como um dos desafios mais urgentes da gestão municipal, avançando com uma reestruturação substancial da frota, dos recursos humanos, dos modelos de recolha, da distribuição de responsabilidades e da monitorização, reconhecendo explicitamente que persistem dificuldades em algumas zonas."
+      evidence:
+        - "EVD-000065"
+        - "EVD-000066"
+        - "EVD-000073"
+    delimitation:
+      summary: "Sinais públicos diretos (um relato de não-recolha de vários dias, e um relato de acumulação geograficamente específico em Canaviais) confirmaram instâncias concretas, com representatividade desconhecida. Um passo de normalização em maio de 2026 e o reforço da frota para 19 veículos em julho mostraram mudança material desde fevereiro, corrigindo a imagem do estado atual para não assumir o quase-colapso de fevereiro como o estado operacional de agosto."
+      evidence:
+        - "EVD-000093"
+        - "EVD-000094"
+        - "EVD-000095"
+    current_formulation:
+      summary: "A formulação atual mantém a fiabilidade dos serviços de recolha de resíduos e higiene urbana como problema cívico atual reconhecido institucionalmente, com uma reestruturação substancial em curso e dificuldades reconhecidas como persistentes em algumas zonas à data de julho-agosto de 2026."
 evidence:
   - "EVD-000065"
   - "EVD-000066"
@@ -40,7 +61,7 @@ evidence:
 evidence_status: corroborated
 validation_status: unvalidated
 digital_tractability: low
-existing_solutions: assessed
+solution_landscape_status: assessed
 status: OPEN
 
 decision_basis:

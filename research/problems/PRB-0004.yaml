@@ -9,15 +9,31 @@ geography:
 affected_populations:
   - "current and potential cyclists"
 problem_statement: "O planeamento institucional descreve os percursos cicláveis como limitados, descontínuos e insuficientemente ligados a destinos importantes. Não está ainda estabelecido quais as deslocações quotidianas concretas afetadas por esta descontinuidade, nem em que medida esta reduz, na prática, a utilidade da rede para quem se desloca diariamente de bicicleta."
-current_journey: null
-reported_consequences: []
-possible_root_causes:
-  - "Core problem is infrastructure, not route-planning software (per WU-D1-02 Batch A interpretation, not yet validated)."
-  - "Batch B update: significant pedestrian/cycling infrastructure has been added or progressed since the original diagnosis (approximately 6 km associated with Rossio/PITE works; the Évora-Reguengos Ecopista also adds a major regional active-mobility corridor). D2/current-state validation should determine whether the remaining pain is still network discontinuity, destination connectivity, safety, wayfinding, maintenance, another issue, or some combination, rather than assuming the original diagnosis is still current."
-  - "Batch C update: the institutional record supports historical network discontinuity, but significant active-mobility interventions have occurred or are underway; this should not be upgraded to a fully corroborated current-state problem. Next validation (D2/current observation) should test connectivity, safety, maintenance, destination usefulness and wayfinding rather than assume the older diagnosis is unchanged."
-  - "D2-A Round A update: no sufficiently strong, recent, independent public signal was found to materially confirm or refine PRB-0004 as an everyday urban journey problem, despite an explicit bounded search (institutional cycling material and tourism-oriented cycling discussion were found, but not comparable lived-signal strength). This is an explicit public-signal coverage gap, not evidence that PRB-0004 is absent — broad open-web searching is currently a weak instrument for this problem; direct observation, route/network analysis, and D5 stakeholder validation are recommended over further broad web search. No PRB-0004 evidence added; no status/tractability change."
-  - "D2-A Targeted Follow-up update: a bounded targeted search (BikÉvora events, cycling promotion, municipal cycling policy, cycling associations/events, current international bicycle-advocacy activity) again did not produce a sufficiently strong, recent, Évora-specific lived signal showing which everyday origin-destination journeys are blocked by network discontinuity. Broad open-web public-signal discovery is now considered methodologically saturated for this PRB — the lack of stronger public signal must NOT be interpreted as absence or weakening of PRB-0004. Recommended next evidence routes: direct observation, network analysis, and cyclist/stakeholder validation in D5, potentially including an OpenStreetMap/municipal-network comparison if technically appropriate. No EVD-* record was created for this method-limit conclusion, per the handoff's explicit instruction not to manufacture evidence solely to satisfy PRB coverage. No PRB-0004 evidence added; no status/tractability change."
-  - "RS-02B1 update (2026-08-12): PMUSE Volume I (EVD-000118) confirms official municipal cartography of the existing cycling network publicly exists, distinguishing exclusively-cycling infrastructure (~8.5km) from shared pedestrian-cycling paths (~120km, mostly recreational), and reiterates the discontinuity diagnosis — but the underlying cartography is dated 2020. A 2017-based proposed network expansion (EVD-000119, ~18km new axes) is planned, not built. The Municipality's cartography-transfer regulation (EVD-000120) confirms structured-format (SHP/DWG/ECW) supply capability via a formal request process, not an open dataset. A March 2025 news item (EVD-000121) confirms at least one concrete cycling/pedestrian connection was completed since the 2020 map baseline, with a further phase in preparation — static plan cartography should not be read as necessarily representing the current operational network. Net: official public representation of the cycling network is now materially established; a current, open, machine-readable operational layer remains unresolved and is not claimed to be absent, only not publicly demonstrated. The residual question is institutional (does DAM maintain a current operational GIS layer, in what format, and can it be publicly reused) — WU022's DAM route (D5-OP-002) remains the appropriate route and stays open."
+causal_reading: "O problema central é de infraestrutura física (descontinuidade e conectividade da rede ciclável), não de software de planeamento de rotas. Esta leitura não está validada."
+investigation:
+  open_questions:
+    - question: "A Câmara mantém uma camada operacional de dados (GIS) atual da rede ciclável, em que formato, e pode ser reutilizada publicamente?"
+      why_open: "A cartografia oficial pública está datada de 2020; um regulamento municipal confirma capacidade de fornecimento em formato estruturado (SHP/DWG/ECW) mediante pedido formal, mas não a existência de um conjunto de dados aberto; uma notícia de março de 2025 confirma pelo menos uma ligação concluída desde a cartografia de 2020, pelo que a cartografia estática não deve ser lida como representando necessariamente a rede operacional atual."
+      resolution_condition: "Confirmação institucional (DAM) sobre a existência, formato e condições de reutilização pública de uma camada operacional atual."
+      evidence:
+        - "EVD-000118"
+        - "EVD-000120"
+        - "EVD-000121"
+  path:
+    initial_signal:
+      summary: "O planeamento institucional descreveu os percursos cicláveis como limitados, descontínuos e insuficientemente ligados a destinos importantes."
+      evidence:
+        - "EVD-000005"
+        - "EVD-000012"
+    development:
+      summary: "Infraestrutura pedonal/ciclável significativa foi acrescentada ou progrediu desde o diagnóstico original (obras associadas ao Rossio/PITE; a Ecopista Évora-Reguengos como corredor regional de mobilidade ativa), pelo que a persistência do diagnóstico original não pode ser assumida sem validação atual."
+    delimitation:
+      summary: "Não foi encontrado sinal público independente, recente e suficientemente forte para confirmar ou refinar PRB-0004 como problema de deslocação quotidiana urbana, apesar de pesquisa delimitada explícita; esta é uma lacuna de cobertura de sinal público, não evidência de ausência do problema. A cartografia oficial da rede ciclável existente confirma infraestrutura exclusivamente ciclável (~8,5km) e percursos pedonal-ciclável partilhados (~120km, maioritariamente recreativos), reiterando o diagnóstico de descontinuidade."
+      evidence:
+        - "EVD-000118"
+        - "EVD-000119"
+    current_formulation:
+      summary: "A formulação atual mantém a descontinuidade da rede ciclável como diagnóstico institucional, com a representação pública oficial da rede materialmente estabelecida; a questão remanescente é a existência e reutilização de uma camada operacional atual, e quais as deslocações quotidianas concretas afetadas."
 evidence:
   - "EVD-000005"
   - "EVD-000012"
@@ -28,5 +44,5 @@ evidence:
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
-existing_solutions: not_assessed
+solution_landscape_status: not_assessed
 status: OPEN

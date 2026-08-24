@@ -19,7 +19,7 @@ const ERROR_TITLES: Record<string, string> = {
   invalid_id: "Identificador de Problema inválido",
 };
 
-const PROBLEM_STATE_FIELDS = ["status", "validation_status", "evidence_status", "digital_tractability", "existing_solutions"] as const;
+const PROBLEM_STATE_FIELDS = ["status", "validation_status", "evidence_status", "digital_tractability", "solution_landscape_status"] as const;
 
 function fieldValue(record: Record<string, unknown>, key: string): string | null {
   const value = record[key];
