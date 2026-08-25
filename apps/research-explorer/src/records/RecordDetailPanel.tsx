@@ -621,6 +621,93 @@ function PrbFieldInspector({ detail }: { detail: RecordDetail }) {
   );
 }
 
+/**
+ * RD-01C: a single canonical-record reference found by walking the raw PRB
+ * object — `path` is the exact canonical field path (including array
+ * indexes) at which `targetId` was found, e.g.
+ * `decision_basis.manifestation.evidence[0]`. Deliberately not deduplicated
+ * by `targetId`: the same target referenced through two distinct paths is
+ * two distinct entries here (task's own "do not deduplicate" instruction).
+ */
+interface CanonicalReference {
+  path: string;
+  targetId: string;
+}
+
+/**
+ * A canonical record ID has the shape `<PREFIX>-<suffix>` where PREFIX is
+ * uppercase letters (mirrors every current schema prefix — SRC-, EVD-,
+ * PRB- — without hardcoding that specific list, so a future schema prefix
+ * is still recognised). Deliberately broader than any one type's ID pattern
+ * (e.g. `urlState.ts`'s PRB-only regex): this walk must recognise a
+ * reference to *any* canonical record type, not just PRB-.
+ */
+const CANONICAL_ID_PATTERN = /^[A-Z]{2,}-[A-Za-z0-9-]+$/;
+
+/**
+ * Walks the full raw PRB record (`detail.record`, the complete parsed-YAML
+ * object — not the edge projection, which is schema-`references`-driven and
+ * silently omits paths like `investigation.open_questions[].evidence` and
+ * `investigation.path.*.evidence`, see read-model.js / problem.schema.json)
+ * to recover every canonical-record-ID string value together with its exact
+ * field path. This is the only reliable source of path-faithful references.
+ */
+function collectCanonicalReferences(value: unknown, path: string, out: CanonicalReference[]): void {
+  if (typeof value === "string") {
+    if (CANONICAL_ID_PATTERN.test(value)) out.push({ path, targetId: value });
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => collectCanonicalReferences(item, `${path}[${index}]`, out));
+    return;
+  }
+  if (value !== null && typeof value === "object") {
+    for (const [key, entryValue] of Object.entries(value as Record<string, unknown>)) {
+      collectCanonicalReferences(entryValue, path ? `${path}.${key}` : key, out);
+    }
+  }
+}
+
+/**
+ * RD-01C: technical section owning canonical field path → referenced record
+ * ID → navigation. Deliberately separate from `RelationshipList` (which
+ * groups by related record and is driven by the edge projection): this
+ * section's primary information is the exact canonical path itself, one row
+ * per path, never grouped or deduplicated by target.
+ */
+/**
+ * `problem_id` is the record's own self-identification (already shown in
+ * Metadados/the breadcrumb), not a reference to another canonical record —
+ * excluded here so the record never "references" itself.
+ */
+const SELF_ID_FIELD = "problem_id";
+
+function PrbCanonicalReferences({ detail, onSelect }: { detail: RecordDetail; onSelect: (id: string) => void }) {
+  const references: CanonicalReference[] = [];
+  collectCanonicalReferences(detail.record, "", references);
+  const filteredReferences = references.filter((ref) => ref.path !== SELF_ID_FIELD);
+
+  return (
+    <section aria-label="Referências canónicas" className="record-prb-references">
+      <h3 className="detail-panel-label">Referências canónicas</h3>
+      {filteredReferences.length === 0 ? (
+        <p className="field-empty">Nenhuma referência canónica registada.</p>
+      ) : (
+        <ul className="prb-reference-list">
+          {filteredReferences.map((ref, index) => (
+            <li key={`${ref.path}-${index}`} className="prb-reference-item">
+              <code className="prb-reference-path">{ref.path}</code>
+              <button type="button" className="prb-reference-target" onClick={() => onSelect(ref.targetId)} aria-label={`Abrir ${ref.targetId} referenciado em ${ref.path}`}>
+                {ref.targetId}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 function ProvenancePanel({ detail }: { detail: RecordDetail }) {
   const uniqueRelatedCount = countUniqueRelatedRecords(detail);
   return (
@@ -732,6 +819,7 @@ function RecordDetailContent({
           {isPrb && <PrbMetadataPanel detail={detail} />}
           {isPrb && <PrbCanonicalStatePanel detail={detail} />}
           {isPrb && <PrbFieldInspector detail={detail} />}
+          {isPrb && <PrbCanonicalReferences detail={detail} onSelect={onSelect} />}
 
           <ProvenancePanel detail={detail} />
 

@@ -1390,3 +1390,110 @@ describe("RecordDetailPanel — RD-01B PRB canonical field inspector", () => {
     expect(within(panel).queryByLabelText("Campos canónicos")).toBeNull();
   });
 });
+
+describe("RecordDetailPanel — RD-01C PRB canonical references", () => {
+  const PRB_REFERENCES_DETAIL: RecordDetail = {
+    id: "PRB-0001",
+    type: "PRB-",
+    file: "research/problems/PRB-0001.yaml",
+    record: {
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      evidence: ["EVD-000001", "EVD-000002"],
+      investigation: {
+        open_questions: [{ question: "Quais as linhas mais afetadas?", evidence: ["EVD-000084"] }],
+        path: { initial_signal: { summary: "Primeiro sinal.", evidence: ["EVD-000001"] } },
+      },
+      decision_basis: {
+        contract_version: "0.1",
+        manifestation: { evidence: ["EVD-000082"] },
+        supporting_evidence: ["EVD-000001", "EVD-000083"],
+        boundary_evidence: [],
+      },
+      status: "OPEN",
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const PRB_REFERENCES_SUMMARY: RecordSummary = {
+    id: "PRB-0001",
+    type: "PRB-",
+    label: "PRB-0001",
+    file: "research/problems/PRB-0001.yaml",
+    summaryFields: { status: "OPEN" },
+  };
+
+  async function renderReferencesFixture(record: Record<string, unknown> = PRB_REFERENCES_DETAIL.record, onSelect: (id: string) => void = noop) {
+    const detail: RecordDetail = { ...PRB_REFERENCES_DETAIL, record };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": detail })}
+        lookup={buildLookup(PRB_REFERENCES_SUMMARY)}
+        selectedId="PRB-0001"
+        onSelect={onSelect}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    return within(panel).getByLabelText("Referências canónicas");
+  }
+
+  it("lists every canonical reference with its exact field path, including nested array indexes", async () => {
+    const section = await renderReferencesFixture();
+    expect(within(section).getByText("evidence[0]")).toBeTruthy();
+    expect(within(section).getByText("evidence[1]")).toBeTruthy();
+    expect(within(section).getByText("decision_basis.manifestation.evidence[0]")).toBeTruthy();
+    expect(within(section).getByText("decision_basis.supporting_evidence[1]")).toBeTruthy();
+    expect(within(section).getByText("investigation.open_questions[0].evidence[0]")).toBeTruthy();
+    expect(within(section).getByText("investigation.path.initial_signal.evidence[0]")).toBeTruthy();
+  });
+
+  it("does not deduplicate by target ID — the same target through different paths appears as separate rows", async () => {
+    const section = await renderReferencesFixture();
+    expect(within(section).getAllByText("EVD-000001").length).toBe(3);
+  });
+
+  it("does not surface the record's own problem_id as a self-reference", async () => {
+    const section = await renderReferencesFixture();
+    expect(within(section).queryByText("problem_id")).toBeNull();
+  });
+
+  it("renders each reference as a navigable control with a path-specific accessible name, calling onSelect with the target ID", async () => {
+    const onSelect = vi.fn();
+    const user = userEvent.setup();
+    const section = await renderReferencesFixture(PRB_REFERENCES_DETAIL.record, onSelect);
+    const button = within(section).getByRole("button", { name: "Abrir EVD-000082 referenciado em decision_basis.manifestation.evidence[0]" });
+    await user.click(button);
+    expect(onSelect).toHaveBeenCalledWith("EVD-000082");
+  });
+
+  it("gives repeated occurrences of the same target ID distinct accessible names", async () => {
+    const section = await renderReferencesFixture();
+    expect(within(section).getByRole("button", { name: "Abrir EVD-000001 referenciado em evidence[0]" })).toBeTruthy();
+    expect(within(section).getByRole("button", { name: "Abrir EVD-000001 referenciado em decision_basis.supporting_evidence[0]" })).toBeTruthy();
+    expect(within(section).getByRole("button", { name: "Abrir EVD-000001 referenciado em investigation.path.initial_signal.evidence[0]" })).toBeTruthy();
+  });
+
+  it("renders a deterministic empty state without hiding the section when no canonical references exist", async () => {
+    const section = await renderReferencesFixture({ problem_id: "PRB-0001", title: "Sem referências", status: "OPEN" });
+    expect(within(section).getByText("Nenhuma referência canónica registada.")).toBeTruthy();
+  });
+
+  it("does not render Referências canónicas for non-PRB records", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(within(panel).queryByLabelText("Referências canónicas")).toBeNull();
+  });
+});

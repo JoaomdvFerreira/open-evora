@@ -134,7 +134,8 @@ describe("Explorer — Records workflow (fake provider)", () => {
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
 
     let detailPanel = await getDetailPanel();
-    const outgoingButton = await within(detailPanel).findByRole("button", { name: /EVD-000105/ });
+    const relations = within(detailPanel).getByLabelText("Relações");
+    const outgoingButton = await within(relations).findByRole("button", { name: /EVD-000105/ });
     await user.click(outgoingButton);
 
     detailPanel = await getDetailPanel();
@@ -150,11 +151,11 @@ describe("Explorer — Records workflow (fake provider)", () => {
     await screen.findByText("Inspeção técnica completa — todos os campos canónicos");
 
     let detailPanel = await getDetailPanel();
-    await user.click(await within(detailPanel).findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await within(within(detailPanel).getByLabelText("Relações")).findByRole("button", { name: /EVD-000105/ }));
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
 
-    await user.click(await within(detailPanel).findByRole("button", { name: /SRC-0092/ }));
+    await user.click(await within(within(detailPanel).getByLabelText("Relações")).findByRole("button", { name: /SRC-0092/ }));
 
     detailPanel = await getDetailPanel();
     expect(within(detailPanel).getAllByText("SRC-0092").length).toBeGreaterThan(0);
@@ -367,7 +368,7 @@ describe("Explorer — URL-addressable state", () => {
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Inspeção técnica completa — todos os campos canónicos");
     let detailPanel = await getDetailPanel();
-    await user.click(await within(detailPanel).findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await within(within(detailPanel).getByLabelText("Relações")).findByRole("button", { name: /EVD-000105/ }));
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
     expect(window.location.search).toContain("id=EVD-000105");
@@ -844,7 +845,7 @@ describe("Explorer workflow — never loads edges.json or canonical YAML (real S
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Inspeção técnica completa — todos os campos canónicos");
     let detailPanel = await getDetailPanel();
-    await user.click(await within(detailPanel).findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await within(within(detailPanel).getByLabelText("Relações")).findByRole("button", { name: /EVD-000105/ }));
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
 

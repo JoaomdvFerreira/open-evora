@@ -1789,6 +1789,38 @@ main.explorer-shell {
   font-style: italic;
 }
 
+/* RD-01C: PRB canonical references — one compact row per exact canonical
+   field path, path visually distinct (monospace, faint) from the target ID
+   (rendered as the navigable element), no grouping/deduplication by target. */
+.record-prb-references {
+  margin: 0 0 var(--space-6);
+}
+
+.prb-reference-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prb-reference-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--line);
+}
+
+.prb-reference-path {
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+}
+
+.prb-reference-target {
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  font-size: 0.85rem;
+}
+
 .detail-panel-label {
   margin: 0 0 var(--space-3);
   color: var(--ink-faint);
