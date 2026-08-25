@@ -567,18 +567,23 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const provenance = await within(panel).findByText(/registo\(s\) relacionado\(s\)/);
-    // Unique-record cardinality (11) must differ from, and not be confused with, the raw edge counts (10 outgoing, 11 incoming, 21 total).
+    // Unique-record cardinality (11) must differ from, and not be confused with, the raw edge counts (10 outgoing, 11 incoming, 21 total). ProvenancePanel is unchanged by RD-01D.
     expect(provenance.textContent).toContain("11 registo(s) relacionado(s)");
     expect(provenance.textContent).toContain("11 caminho(s) de entrada");
     expect(provenance.textContent).toContain("10 caminho(s) de saída");
 
+    // RD-01D: PRB Relações no corpus groups by direction with unique IDs per direction — 10 unique outgoing (evidence[0..9] all reciprocated) + 11 unique incoming (10 reciprocal + 1 incoming-only).
     const relacoes = within(panel).getByLabelText("Relações");
-    const relatedGroup = within(relacoes).getByLabelText("Registos relacionados");
-    // Exactly 11 related-record entries (10 reciprocal EVDs + 1 incoming-only EVD), each rendered once.
-    expect(within(relatedGroup).getAllByRole("button")).toHaveLength(11);
+    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
+    const outgoingHeading = within(relationsBoundary).getByText("Referências de saída");
+    const incomingHeading = within(relationsBoundary).getByText("Referências de entrada");
+    const outgoingList = outgoingHeading.nextElementSibling as HTMLElement;
+    const incomingList = incomingHeading.nextElementSibling as HTMLElement;
+    expect(within(outgoingList).getAllByRole("button")).toHaveLength(10);
+    expect(within(incomingList).getAllByRole("button")).toHaveLength(11);
   });
 
-  it("groups reciprocal incoming+outgoing paths to the same ID into a single related-record entry, with both directions and exact field/ordinal preserved", async () => {
+  it("RD-01D: lists a record referenced through both directions once per direction, without repeating canonical field paths", async () => {
     const { prbDetail, lookup } = buildPrb0001Fixture();
     render(
       <RecordDetailPanel
@@ -594,22 +599,17 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const relacoes = within(panel).getByLabelText("Relações");
-    const evdButton = await within(relacoes).findByRole("button", { name: /EVD-000001/ });
-    const evdEntry = evdButton.closest("li") as HTMLElement;
+    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
 
-    // Both directions are visible beneath the single EVD-000001 entry.
-    expect(evdEntry.textContent).toContain("Saída");
-    expect(evdEntry.textContent).toContain("Entrada");
-    expect(evdEntry.textContent).toContain("evidence");
-    expect(evdEntry.textContent).toContain("[0]");
-    expect(evdEntry.textContent).toContain("analysis.related_problems");
-
-    // Only one <li> (one related-record group) exists for EVD-000001, not two.
-    const allEvd1Entries = within(relacoes).getAllByRole("button", { name: /EVD-000001/ });
-    expect(allEvd1Entries).toHaveLength(1);
+    // EVD-000001 is reciprocal (outgoing evidence[0] + incoming analysis.related_problems[0]) — appears exactly once in each direction's list, never with path notation.
+    expect(within(relationsBoundary).getAllByRole("button", { name: /EVD-000001/ })).toHaveLength(2);
+    expect(relationsBoundary.textContent).not.toContain("evidence[0]");
+    expect(relationsBoundary.textContent).not.toContain("analysis.related_problems");
+    expect(relationsBoundary.textContent).not.toContain("referencia através de");
+    expect(relationsBoundary.textContent).not.toContain("referenciado através de");
   });
 
-  it("preserves the incoming-only EVD-000011 related record alongside the reciprocal EVDs, with its own exact path", async () => {
+  it("RD-01D: preserves the incoming-only EVD-000011 related record in the incoming list only", async () => {
     const { prbDetail, lookup, incomingOnlyId } = buildPrb0001Fixture();
     render(
       <RecordDetailPanel
@@ -625,12 +625,14 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const relacoes = within(panel).getByLabelText("Relações");
-    const incomingOnlyButton = await within(relacoes).findByRole("button", { name: new RegExp(incomingOnlyId) });
-    const incomingOnlyEntry = incomingOnlyButton.closest("li") as HTMLElement;
+    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
+    const outgoingHeading = within(relationsBoundary).getByText("Referências de saída");
+    const incomingHeading = within(relationsBoundary).getByText("Referências de entrada");
+    const outgoingList = outgoingHeading.nextElementSibling as HTMLElement;
+    const incomingList = incomingHeading.nextElementSibling as HTMLElement;
 
-    expect(incomingOnlyEntry.textContent).toContain("Entrada");
-    expect(incomingOnlyEntry.textContent).not.toContain("Saída");
-    expect(incomingOnlyEntry.textContent).toContain("analysis.related_problems");
+    expect(within(incomingList).getByRole("button", { name: new RegExp(incomingOnlyId) })).toBeTruthy();
+    expect(within(outgoingList).queryByRole("button", { name: new RegExp(incomingOnlyId) })).toBeNull();
   });
 
   it("still excludes generic connectivity from 'Ver como Problema' semantics — unrelated to the cardinality fix", async () => {

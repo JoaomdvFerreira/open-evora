@@ -108,6 +108,77 @@ function RelationshipList({ detail, lookup, onSelect }: RelationshipListProps) {
 }
 
 /**
+ * RD-01D: unique related-record IDs for one direction only, deduplicated —
+ * a record referenced through more than one edge/canonical path in the same
+ * direction still appears exactly once. Unlike `groupPathsByRelatedRecord`
+ * (which preserves every distinct path, for `Referências canónicas`'s and
+ * the generic Relações section's own purposes), this deliberately discards
+ * path detail: RD-01D's Relações no corpus answers "which records", not
+ * "through which fields".
+ */
+function uniqueRelatedIds(edges: { to?: string; from?: string }[], key: "to" | "from"): string[] {
+  const seen = new Set<string>();
+  const ids: string[] = [];
+  for (const edge of edges) {
+    const id = edge[key]!;
+    if (!seen.has(id)) {
+      seen.add(id);
+      ids.push(id);
+    }
+  }
+  return ids;
+}
+
+function RelatedRecordButton({ id, lookup, onSelect }: { id: string; lookup: Map<string, RecordSummary>; onSelect: (id: string) => void }) {
+  const related = lookup.get(id);
+  return (
+    <li>
+      <button type="button" onClick={() => onSelect(id)}>
+        {related ? `${formatTypedId(related.type, related.id)} — ${related.label}` : id}
+      </button>
+    </li>
+  );
+}
+
+/**
+ * RD-01D: for PRB records, replaces the generic path-preserving Relações
+ * rendering with a corpus-connectivity view — "which records is this PRB
+ * connected to, and in which direction" — deliberately without repeating any
+ * canonical field path (that information belongs exclusively to
+ * `Referências canónicas` above). Each related record appears once per
+ * direction regardless of how many edges/paths connect it.
+ */
+function PrbRelationsBoundary({ detail, lookup, onSelect }: { detail: RecordDetail; lookup: Map<string, RecordSummary>; onSelect: (id: string) => void }) {
+  const outgoingIds = uniqueRelatedIds(detail.outgoingEdges, "to");
+  const incomingIds = uniqueRelatedIds(detail.incomingEdges, "from");
+
+  return (
+    <section aria-label="Relações no corpus">
+      <h4>Referências de saída</h4>
+      {outgoingIds.length === 0 ? (
+        <p>Nenhum registo relacionado.</p>
+      ) : (
+        <ul>
+          {outgoingIds.map((id) => (
+            <RelatedRecordButton key={id} id={id} lookup={lookup} onSelect={onSelect} />
+          ))}
+        </ul>
+      )}
+      <h4>Referências de entrada</h4>
+      {incomingIds.length === 0 ? (
+        <p>Nenhum registo relacionado.</p>
+      ) : (
+        <ul>
+          {incomingIds.map((id) => (
+            <RelatedRecordButton key={id} id={id} lookup={lookup} onSelect={onSelect} />
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+/**
  * The only edge field name any current schema declares specifically to
  * relate a record to the Problem it is about
  * (research/schemas/evidence.schema.json's own `references` entry —
@@ -831,8 +902,17 @@ function RecordDetailContent({
           </section>
 
           <section aria-label="Relações" id="relacoes" className="record-detail-relations">
-            <h3 className="detail-panel-label">Relações — por registo relacionado, com caminhos de referência exatos</h3>
-            <RelationshipList detail={detail} lookup={lookup} onSelect={onSelect} />
+            {isPrb ? (
+              <>
+                <h3 className="detail-panel-label">Relações no corpus</h3>
+                <PrbRelationsBoundary detail={detail} lookup={lookup} onSelect={onSelect} />
+              </>
+            ) : (
+              <>
+                <h3 className="detail-panel-label">Relações — por registo relacionado, com caminhos de referência exatos</h3>
+                <RelationshipList detail={detail} lookup={lookup} onSelect={onSelect} />
+              </>
+            )}
           </section>
         </div>
 
