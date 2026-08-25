@@ -86,3 +86,9 @@ export function formatPublicDateTime(isoValue: string): string {
   const date = new Date(isoValue);
   return Number.isNaN(date.valueOf()) ? isoValue : new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
+
+/** For date-only canonical values (e.g. `temporal.last_checked_at`, `YYYY-MM-DD`) — `formatPublicDateTime`'s `timeStyle` would fabricate a local-timezone time no canonical field carries. */
+export function formatPublicDate(isoValue: string): string {
+  const date = new Date(isoValue);
+  return Number.isNaN(date.valueOf()) ? isoValue : new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium" }).format(date);
+}
