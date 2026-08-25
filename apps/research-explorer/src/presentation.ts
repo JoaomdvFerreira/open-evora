@@ -13,6 +13,7 @@ const LABELS: Record<string, Record<string, string>> = {
   representativeness: { UNKNOWN: "Desconhecida", LIMITED: "Limitada", DESIGNED_REPRESENTATIVE: "Concebida como representativa", NOT_APPLICABLE: "Não aplicável" },
   temporal_relevance: { CURRENT: "Atual", HISTORICAL: "Histórica", SUPERSEDED: "Substituída", UNKNOWN: "Desconhecida" },
   geography: { city: "Cidade", parish: "Freguesia", municipality: "Município", intermunicipal: "Intermunicipal", regional: "Regional" },
+  "scope.geography.level": { site: "Local específico", local_area: "Área local", parish: "Freguesia", city: "Cidade", municipality: "Município", intermunicipal: "Intermunicipal", regional: "Regional", national: "Nacional", international: "Internacional", non_geographic: "Sem âmbito geográfico", unknown: "Desconhecido" },
   resource_type: { webpage: "Página web", document: "Documento", dataset: "Conjunto de dados", database: "Base de dados", service: "Serviço", correspondence: "Correspondência", other: "Outro", unknown: "Desconhecido" },
   level: { public: "Público", restricted: "Restrito", private: "Privado", unknown: "Desconhecido" },
   availability: { available: "Disponível", unavailable: "Indisponível", unknown: "Desconhecida" },
@@ -37,6 +38,8 @@ const COMPACT_LABELS: Record<string, Record<string, string>> = {
 const FIELD_CAPTIONS: Record<string, string> = {
   status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", solution_landscape_status: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", contribution: "Contribuição", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", geography: "Âmbito geográfico", authority: "Autoridade", freshness: "Atualidade", licensing: "Licenciamento",
   resource_type: "Tipo de recurso", "access.level": "Nível de acesso", "access.availability": "Disponibilidade", "access.method": "Forma de consulta", "access.format": "Formato", "access.machine_readable": "Leitura automática",
+  "scope.geography.level": "Âmbito geográfico", "scope.geography.area": "Área", "scope.temporal": "Cobertura temporal", "scope.domains": "Temas",
+  "scope.temporal.as_of": "Data de referência", "scope.temporal.start": "Início", "scope.temporal.end": "Fim",
 };
 
 const PS_LABELS: Record<string, string> = {
@@ -45,13 +48,15 @@ const PS_LABELS: Record<string, string> = {
 
 export function publicEnumLabel(field: string, value: string): string {
   const terminalField = field.split(".").at(-1) ?? field;
-  const labelField = field.startsWith("freshness.")
-    ? "freshness"
-    : field.startsWith("geography.")
-      ? "geography"
-      : field.startsWith("licensing.")
-        ? "licensing"
-        : terminalField;
+  const labelField = field === "scope.geography.level"
+    ? "scope.geography.level"
+    : field.startsWith("freshness.")
+      ? "freshness"
+      : field.startsWith("geography.")
+        ? "geography"
+        : field.startsWith("licensing.")
+          ? "licensing"
+          : terminalField;
   const signalLabel = field === "analysis.public_signal_class" ? PS_LABELS[value] : undefined;
   return LABELS[labelField]?.[value] ?? (signalLabel ? `${value} — ${signalLabel}` : value);
 }
@@ -63,7 +68,7 @@ export function publicCompactEnumLabel(field: string, value: string): string {
 }
 
 export function publicFieldCaption(field: string): string {
-  if (field.startsWith("access.") && FIELD_CAPTIONS[field]) return FIELD_CAPTIONS[field];
+  if ((field.startsWith("access.") || field.startsWith("scope.")) && FIELD_CAPTIONS[field]) return FIELD_CAPTIONS[field];
   const terminalField = field.split(".").at(-1) ?? field;
   const captionField = field.startsWith("geography.") ? "geography" : field.startsWith("licensing.") ? "licensing" : field.startsWith("analysis.public_signal_class") ? "public_signal_class" : terminalField;
   return FIELD_CAPTIONS[captionField] ?? field;

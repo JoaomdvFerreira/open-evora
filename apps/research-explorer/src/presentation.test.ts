@@ -108,4 +108,45 @@ describe("PT-PT public presentation terminology", () => {
     expect(publicEnumLabel("access.level", "future_level")).toBe("future_level");
     expect(publicFieldCaption("access.unmapped_field")).toBe("access.unmapped_field");
   });
+
+  it("maps all 11 scope.geography.level values", () => {
+    expect(publicEnumLabel("scope.geography.level", "site")).toBe("Local específico");
+    expect(publicEnumLabel("scope.geography.level", "local_area")).toBe("Área local");
+    expect(publicEnumLabel("scope.geography.level", "parish")).toBe("Freguesia");
+    expect(publicEnumLabel("scope.geography.level", "city")).toBe("Cidade");
+    expect(publicEnumLabel("scope.geography.level", "municipality")).toBe("Município");
+    expect(publicEnumLabel("scope.geography.level", "intermunicipal")).toBe("Intermunicipal");
+    expect(publicEnumLabel("scope.geography.level", "regional")).toBe("Regional");
+    expect(publicEnumLabel("scope.geography.level", "national")).toBe("Nacional");
+    expect(publicEnumLabel("scope.geography.level", "international")).toBe("Internacional");
+    expect(publicEnumLabel("scope.geography.level", "non_geographic")).toBe("Sem âmbito geográfico");
+    expect(publicEnumLabel("scope.geography.level", "unknown")).toBe("Desconhecido");
+  });
+
+  it("does not affect existing EVD geography label behavior", () => {
+    expect(publicEnumLabel("geography.level", "city")).toBe("Cidade");
+    expect(publicEnumLabel("geography.level", "parish")).toBe("Freguesia");
+    expect(publicEnumLabel("geography.level", "municipality")).toBe("Município");
+    expect(publicEnumLabel("geography.level", "intermunicipal")).toBe("Intermunicipal");
+    expect(publicEnumLabel("geography.level", "regional")).toBe("Regional");
+    expect(publicFieldCaption("geography.level")).toBe("Âmbito geográfico");
+  });
+
+  it("resolves field captions for the new coverage fields", () => {
+    expect(publicFieldCaption("scope.geography.level")).toBe("Âmbito geográfico");
+    expect(publicFieldCaption("scope.geography.area")).toBe("Área");
+    expect(publicFieldCaption("scope.temporal")).toBe("Cobertura temporal");
+    expect(publicFieldCaption("scope.domains")).toBe("Temas");
+    expect(publicFieldCaption("scope.temporal.as_of")).toBe("Data de referência");
+    expect(publicFieldCaption("scope.temporal.start")).toBe("Início");
+    expect(publicFieldCaption("scope.temporal.end")).toBe("Fim");
+  });
+
+  it("preserves the safe fallback for unmapped scope.geography.level values", () => {
+    expect(publicEnumLabel("scope.geography.level", "future_level")).toBe("future_level");
+  });
+
+  it("does not invent domain-code labels for scope.domains", () => {
+    expect(publicEnumLabel("scope.domains", "housing")).toBe("housing");
+  });
 });
