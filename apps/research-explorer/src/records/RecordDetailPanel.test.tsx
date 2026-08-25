@@ -991,7 +991,7 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
   });
 
-  it("exposes an SRC quick read with title, publisher, and freshness/access-status labels from existing canonical data", async () => {
+  it("exposes an SRC quick read with title and publisher from existing canonical data, and does not render retired v1 currentness/access-status rows or v2 access fields", async () => {
     const detail: RecordDetail = {
       id: "SRC-0002",
       type: "SRC-",
@@ -1000,8 +1000,7 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
         source_id: "SRC-0002",
         name: "Plano de Desenvolvimento Social de Évora 2024-2027",
         publisher: "Município de Évora",
-        access: { public: true, level: "public", availability: "available" },
-        freshness: { status: "UNKNOWN" },
+        access: { level: "public", availability: "available", machine_readable: true },
         canonical_reference: "https://www.cm-evora.pt/exemplo.pdf",
       },
       outgoingEdges: [],
@@ -1025,12 +1024,48 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     const quickRead = await within(panel).findByLabelText("Leitura rápida");
     expect(within(quickRead).getByText("Plano de Desenvolvimento Social de Évora 2024-2027")).toBeTruthy();
     expect(within(quickRead).getByText("Município de Évora")).toBeTruthy();
-    expect(within(quickRead).getByText("Desconhecida")).toBeTruthy();
-    expect(within(quickRead).getByText("Sim")).toBeTruthy();
+    // Retired SRC v1 rows must no longer appear.
+    expect(within(quickRead).queryByText("Atualidade")).toBeNull();
+    expect(within(quickRead).queryByText("Acesso público")).toBeNull();
+    // SRC v2 access fields (level/availability/machine_readable) must not
+    // accidentally produce a quick-read row yet — that is SUI-02C's job.
+    expect(within(quickRead).queryByText("public")).toBeNull();
+    expect(within(quickRead).queryByText("available")).toBeNull();
 
     // The existing "Abrir fonte" action still renders exactly once (in the
     // rail), not duplicated inside the quick read.
     expect(within(panel).getAllByRole("link", { name: /Abrir fonte/ })).toHaveLength(1);
+  });
+
+  it("does not render the SRC quick read at all when only a publisher-less v2 access block is present", async () => {
+    const detail: RecordDetail = {
+      id: "SRC-0004",
+      type: "SRC-",
+      file: "research/sources/SRC-0004.yaml",
+      record: {
+        source_id: "SRC-0004",
+        access: { level: "public", availability: "available", machine_readable: false },
+      },
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    const summary: RecordSummary = { id: "SRC-0004", type: "SRC-", label: "SRC-0004", file: detail.file, summaryFields: {} };
+
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0004": detail })}
+        lookup={buildLookup(summary)}
+        selectedId="SRC-0004"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("source_id");
+    expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
   });
 
   it("does not invent SRC quick-read fields that are absent from the canonical record", async () => {
