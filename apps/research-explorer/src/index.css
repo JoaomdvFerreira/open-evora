@@ -1738,6 +1738,57 @@ main.explorer-shell {
   margin: 0 0 var(--space-8);
 }
 
+/* RD-01B: PRB canonical field inspector — a plain technical object
+   inspector, deliberately unadorned (no editorial cards) so canonical keys
+   stay visually distinct from values without implying interpretation. */
+.record-prb-inspector {
+  margin: 0 0 var(--space-6);
+}
+
+.inspector-field {
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--line);
+}
+
+.inspector-field-name {
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+}
+
+.inspector-field-value {
+  margin-top: var(--space-1);
+}
+
+.inspector-object,
+.inspector-array {
+  margin: 0 0 0 var(--space-4);
+  padding: 0;
+}
+
+.inspector-array {
+  list-style: none;
+}
+
+.inspector-key {
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  margin-top: var(--space-2);
+}
+
+.inspector-index {
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+}
+
+.inspector-null,
+.inspector-empty {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
 .detail-panel-label {
   margin: 0 0 var(--space-3);
   color: var(--ink-faint);

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef, type ReactNode } from "react";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordDetail } from "./useRecordDetail";
 import { RecordFieldTree } from "./RecordFieldTree";
@@ -443,6 +443,184 @@ function PrbCanonicalStatePanel({ detail }: { detail: RecordDetail }) {
   );
 }
 
+/**
+ * RD-01B: the set of top-level PRB fields already owned by a dedicated
+ * section elsewhere (RD-01A Metadados / Estado canónico, or record identity
+ * already shown in the breadcrumb/meaning zone) — excluded from the
+ * inspector to avoid unnecessary duplication, per RD-01B's own instruction.
+ * `type`/`file` are read-model provenance, not canonical PRB record fields,
+ * so they never appear here regardless.
+ */
+const PRB_FIELDS_OWNED_ELSEWHERE = new Set(["problem_id", "title", "domain", "geography", "status", "evidence_status", "validation_status", "digital_tractability", "solution_landscape_status"]);
+
+/**
+ * RD-01B bounded field list: only PRB fields the task explicitly names as
+ * "known optional PRB contract field" get a `Não registado` placeholder when
+ * absent. Every other top-level field renders only if the record actually
+ * carries it — this deliberately does not walk the schema to invent a full
+ * theoretical field list (RD-01B's own "keep this bounded" instruction).
+ */
+const PRB_INSPECTOR_KNOWN_FIELDS = ["problem_statement", "affected_populations", "causal_reading", "evidence", "investigation", "decision_basis"];
+
+/**
+ * decision_basis's own known sub-keys, in canonical contract order (mirrors
+ * problem.schema.json's documented decision_basis shape) — rendered in this
+ * order when present so the inspector's nesting matches the task's own
+ * worked example, rather than object insertion order from YAML parsing.
+ */
+const DECISION_BASIS_KNOWN_KEYS = [
+  "contract_version",
+  "eligibility_basis",
+  "corroboration_basis",
+  "manifestation",
+  "consequence",
+  "scope",
+  "currentness",
+  "contradiction_search",
+  "overlap_check",
+  "corroboration_statement",
+  "supporting_evidence",
+  "boundary_evidence",
+  "independence_assessment",
+  "limitations",
+];
+
+/**
+ * RD-01B's own absent/null/empty contract: missing field, explicit `null`,
+ * empty array, and empty object are four visibly distinct states — never
+ * collapsed into one generic dash the way `RecordFieldTree` (the pre-existing
+ * complete disclosure) does. `isKnownField` gates the "missing" case: an
+ * unlisted, absent field renders nothing (never invents a placeholder row),
+ * per the task's "do not invent absent optional fields" instruction.
+ */
+function InspectorValue({ value }: { value: unknown }): ReactNode {
+  if (value === null) return <span className="inspector-null">null</span>;
+  if (typeof value === "boolean" || typeof value === "number") return <span className="detail-technical-field">{String(value)}</span>;
+  if (typeof value === "string") {
+    return <span className="detail-technical-field">{value}</span>;
+  }
+  if (Array.isArray(value)) {
+    if (value.length === 0) return <span className="inspector-empty">[ ] · 0 elementos</span>;
+    return (
+      <ol className="inspector-array">
+        {value.map((item, index) => (
+          <li key={index}>
+            <span className="inspector-index">[{index}]</span> <InspectorValue value={item} />
+          </li>
+        ))}
+      </ol>
+    );
+  }
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) return <span className="inspector-empty">{"{ } · 0 propriedades"}</span>;
+    return (
+      <dl className="inspector-object">
+        {entries.map(([key, entryValue]) => (
+          <Fragment key={key}>
+            <dt className="inspector-key">{key}</dt>
+            <dd>
+              <InspectorValue value={entryValue} />
+            </dd>
+          </Fragment>
+        ))}
+      </dl>
+    );
+  }
+  return <span className="detail-technical-field">{String(value)}</span>;
+}
+
+interface InspectorField {
+  key: string;
+  present: boolean;
+  value: unknown;
+}
+
+function resolveInspectorField(record: Record<string, unknown>, key: string): InspectorField {
+  return { key, present: key in record && record[key] !== undefined, value: record[key] };
+}
+
+/**
+ * decision_basis.scope is the one decision_basis sub-key RD-01B names
+ * explicitly as a "known optional PRB contract field" (alongside
+ * causal_reading/investigation at the top level) — so it renders a
+ * `Não registado` row when absent, unlike every other decision_basis
+ * sub-key, which is simply omitted from the entries list when the record
+ * doesn't carry it (bounded to the known contract shape, no deeper invented
+ * placeholders for sub-keys the task never named as known-optional).
+ */
+const DECISION_BASIS_KNOWN_ABSENT_KEYS = new Set(["scope"]);
+
+/** `decision_basis` gets its own field ordering (canonical contract order) rather than raw object insertion order, per RD-01B's structural example. */
+function decisionBasisFields(decisionBasis: Record<string, unknown>): InspectorField[] {
+  return DECISION_BASIS_KNOWN_KEYS.filter((key) => (key in decisionBasis && decisionBasis[key] !== undefined) || DECISION_BASIS_KNOWN_ABSENT_KEYS.has(key)).map((key) =>
+    resolveInspectorField(decisionBasis, key)
+  );
+}
+
+function InspectorFieldRow({ field }: { field: InspectorField }) {
+  return (
+    <div className="inspector-field">
+      <div className="inspector-field-name">{field.key}</div>
+      <div className="inspector-field-value">{field.present ? <InspectorValue value={field.value} /> : <span className="field-empty">Não registado</span>}</div>
+    </div>
+  );
+}
+
+/**
+ * RD-01B: technical object inspector for the canonical PRB fields not
+ * already owned by Metadados/Estado canónico — faithful structure, exact
+ * canonical field names and stored values, no editorial reinterpretation.
+ * Deliberately separate from `TechnicalDisclosure` (the pre-existing
+ * exhaustive raw tree), which this task must not change.
+ */
+function PrbFieldInspector({ detail }: { detail: RecordDetail }) {
+  const record = detail.record;
+
+  const knownFields = PRB_INSPECTOR_KNOWN_FIELDS.map((key) => resolveInspectorField(record, key));
+
+  const otherFields = Object.keys(record)
+    .filter((key) => !PRB_FIELDS_OWNED_ELSEWHERE.has(key) && !PRB_INSPECTOR_KNOWN_FIELDS.includes(key))
+    .map((key) => resolveInspectorField(record, key));
+
+  const decisionBasisField = knownFields.find((f) => f.key === "decision_basis")!;
+  const otherKnownFields = knownFields.filter((f) => f.key !== "decision_basis");
+
+  return (
+    <section aria-label="Campos canónicos" className="record-prb-inspector">
+      <h3 className="detail-panel-label">Campos canónicos</h3>
+      {otherKnownFields.map((field) => (
+        <InspectorFieldRow key={field.key} field={field} />
+      ))}
+      <div className="inspector-field">
+        <div className="inspector-field-name">decision_basis</div>
+        <div className="inspector-field-value">
+          {decisionBasisField.present ? (
+            (() => {
+              const decisionBasis = getObject(record, "decision_basis");
+              if (!decisionBasis) return <InspectorValue value={decisionBasisField.value} />;
+              const fields = decisionBasisFields(decisionBasis);
+              if (fields.length === 0) return <span className="inspector-empty">{"{ } · 0 propriedades"}</span>;
+              return (
+                <>
+                  {fields.map((field) => (
+                    <InspectorFieldRow key={field.key} field={field} />
+                  ))}
+                </>
+              );
+            })()
+          ) : (
+            <span className="field-empty">Não registado</span>
+          )}
+        </div>
+      </div>
+      {otherFields.map((field) => (
+        <InspectorFieldRow key={field.key} field={field} />
+      ))}
+    </section>
+  );
+}
+
 function ProvenancePanel({ detail }: { detail: RecordDetail }) {
   const uniqueRelatedCount = countUniqueRelatedRecords(detail);
   return (
@@ -553,6 +731,7 @@ function RecordDetailContent({
           {detail.type === "SRC-" && <SourceQuickRead detail={detail} />}
           {isPrb && <PrbMetadataPanel detail={detail} />}
           {isPrb && <PrbCanonicalStatePanel detail={detail} />}
+          {isPrb && <PrbFieldInspector detail={detail} />}
 
           <ProvenancePanel detail={detail} />
 

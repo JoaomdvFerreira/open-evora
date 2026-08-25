@@ -1216,5 +1216,177 @@ describe("RecordDetailPanel — RD-01A PRB Detail header + technical metadata", 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     expect(within(panel).queryByLabelText("Metadados")).toBeNull();
     expect(within(panel).queryByLabelText("Estado canónico")).toBeNull();
+    expect(within(panel).queryByLabelText("Campos canónicos")).toBeNull();
+  });
+});
+
+describe("RecordDetailPanel — RD-01B PRB canonical field inspector", () => {
+  const PRB_INSPECTOR_DETAIL: RecordDetail = {
+    id: "PRB-0001",
+    type: "PRB-",
+    file: "research/problems/PRB-0001.yaml",
+    record: {
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      domain: ["MOB"],
+      geography: { level: "municipality", area: "Évora" },
+      affected_populations: ["residentes que dependem dos transportes públicos"],
+      problem_statement: "A cobertura dos transportes públicos em Évora é ampla, mas varia.",
+      causal_reading: null,
+      evidence: ["EVD-000001", "EVD-000002"],
+      investigation: {
+        open_questions: [{ question: "Quais as linhas mais afetadas?", why_open: "Sem dados por linha." }],
+        path: { initial_signal: { summary: "Primeiro sinal.", evidence: ["EVD-000001"] } },
+      },
+      decision_basis: {
+        contract_version: "0.1",
+        eligibility_basis: "Texto de elegibilidade.",
+        supporting_evidence: ["EVD-000001", "EVD-000002"],
+        boundary_evidence: [],
+      },
+      evidence_status: "corroborated",
+      validation_status: "unvalidated",
+      digital_tractability: "not_assessed",
+      solution_landscape_status: "not_assessed",
+      status: "OPEN",
+      custom_extra_field: "valor extra não coberto por Metadados/Estado",
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const PRB_INSPECTOR_SUMMARY: RecordSummary = {
+    id: "PRB-0001",
+    type: "PRB-",
+    label: "PRB-0001",
+    file: "research/problems/PRB-0001.yaml",
+    summaryFields: { status: "OPEN" },
+  };
+  const EVD_REF_SUMMARY: RecordSummary = {
+    id: "EVD-000001",
+    type: "EVD-",
+    label: "EVD-000001",
+    file: "research/evidence/EVD-000001.yaml",
+    summaryFields: {},
+  };
+
+  async function renderInspectorFixture(record: Record<string, unknown> = PRB_INSPECTOR_DETAIL.record) {
+    const detail: RecordDetail = { ...PRB_INSPECTOR_DETAIL, record };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": detail })}
+        lookup={buildLookup(PRB_INSPECTOR_SUMMARY, EVD_REF_SUMMARY)}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    return within(panel).getByLabelText("Campos canónicos");
+  }
+
+  it("exposes problem_statement, affected_populations, causal_reading, evidence, investigation, and decision_basis by their exact canonical field names", async () => {
+    const inspector = await renderInspectorFixture();
+    expect(within(inspector).getByText("problem_statement")).toBeTruthy();
+    expect(within(inspector).getByText(/A cobertura dos transportes públicos em Évora é ampla/)).toBeTruthy();
+    expect(within(inspector).getByText("affected_populations")).toBeTruthy();
+    expect(within(inspector).getByText("residentes que dependem dos transportes públicos")).toBeTruthy();
+    expect(within(inspector).getByText("causal_reading")).toBeTruthy();
+    expect(within(inspector).getAllByText("evidence").length).toBeGreaterThan(0);
+    expect(within(inspector).getByText("investigation")).toBeTruthy();
+    expect(within(inspector).getByText("decision_basis")).toBeTruthy();
+  });
+
+  it("does not translate canonical labels into Problem View editorial headings", async () => {
+    const inspector = await renderInspectorFixture();
+    for (const editorialLabel of ["O que observamos", "Consequências conhecidas", "Atualidade", "Âmbito conhecido", "O que ainda não sabemos", "Como chegámos a este problema"]) {
+      expect(within(inspector).queryByText(editorialLabel)).toBeNull();
+    }
+  });
+
+  it("preserves array indexes and nested object hierarchy", async () => {
+    const inspector = await renderInspectorFixture();
+    expect(within(inspector).getAllByText("[0]").length).toBeGreaterThan(0);
+    expect(within(inspector).getByText("open_questions")).toBeTruthy();
+    expect(within(inspector).getByText("question")).toBeTruthy();
+    expect(within(inspector).getByText("Quais as linhas mais afetadas?")).toBeTruthy();
+    expect(within(inspector).getByText("why_open")).toBeTruthy();
+    expect(within(inspector).getByText("path")).toBeTruthy();
+    expect(within(inspector).getByText("initial_signal")).toBeTruthy();
+    expect(within(inspector).getByText("summary")).toBeTruthy();
+  });
+
+  it("renders decision_basis sub-fields in canonical contract order and only the sub-keys actually present", async () => {
+    const inspector = await renderInspectorFixture();
+    expect(within(inspector).getByText("contract_version")).toBeTruthy();
+    expect(within(inspector).getByText("eligibility_basis")).toBeTruthy();
+    expect(within(inspector).getByText("supporting_evidence")).toBeTruthy();
+    // corroboration_basis is a known decision_basis key but absent on this fixture's decision_basis object — not invented.
+    expect(within(inspector).queryByText("corroboration_basis")).toBeNull();
+  });
+
+  it("distinguishes missing field, explicit null, empty array, and empty object", async () => {
+    const inspector = await renderInspectorFixture();
+    // causal_reading: explicit null.
+    const causalRow = within(inspector).getByText("causal_reading").closest(".inspector-field") as HTMLElement;
+    expect(within(causalRow).getByText("null")).toBeTruthy();
+    // decision_basis.boundary_evidence: empty array.
+    expect(within(inspector).getByText("[ ] · 0 elementos")).toBeTruthy();
+    // decision_basis.scope: known optional field, absent -> Não registado.
+    const scopeRow = within(inspector).getByText("scope").closest(".inspector-field") as HTMLElement;
+    expect(within(scopeRow).getByText("Não registado")).toBeTruthy();
+  });
+
+  it("shows Não registado only for the bounded set of known-absent PRB fields, not for arbitrary theoretical schema properties", async () => {
+    const recordWithoutCausalOrInvestigation = { ...PRB_INSPECTOR_DETAIL.record };
+    delete (recordWithoutCausalOrInvestigation as Record<string, unknown>).causal_reading;
+    delete (recordWithoutCausalOrInvestigation as Record<string, unknown>).investigation;
+    delete (recordWithoutCausalOrInvestigation as Record<string, unknown>).decision_basis;
+    const inspector = await renderInspectorFixture(recordWithoutCausalOrInvestigation);
+    const causalRow = within(inspector).getByText("causal_reading").closest(".inspector-field") as HTMLElement;
+    expect(within(causalRow).getByText("Não registado")).toBeTruthy();
+    const investigationRow = within(inspector).getByText("investigation").closest(".inspector-field") as HTMLElement;
+    expect(within(investigationRow).getByText("Não registado")).toBeTruthy();
+    const decisionBasisRow = within(inspector).getByText("decision_basis").closest(".inspector-field") as HTMLElement;
+    expect(within(decisionBasisRow).getByText("Não registado")).toBeTruthy();
+    // A field the fixture never carries and that isn't a known PRB inspector field is never invented as a "Não registado" row.
+    expect(within(inspector).queryByText("nonexistent_hypothetical_field")).toBeNull();
+  });
+
+  it("exposes a top-level PRB field not owned by Metadados/Estado canónico, without duplicating fields those sections already show", async () => {
+    const inspector = await renderInspectorFixture();
+    expect(within(inspector).getByText("custom_extra_field")).toBeTruthy();
+    expect(within(inspector).getByText("valor extra não coberto por Metadados/Estado")).toBeTruthy();
+    // problem_id/title/domain/geography/status/evidence_status/etc. are owned by RD-01A sections — not duplicated here.
+    expect(within(inspector).queryByText("problem_id")).toBeNull();
+    expect(within(inspector).queryByText("title")).toBeNull();
+    expect(within(inspector).queryByText("domain")).toBeNull();
+    expect(within(inspector).queryByText("geography")).toBeNull();
+    expect(within(inspector).queryByText("status")).toBeNull();
+  });
+
+  it("renders EVD- record IDs inside a value as exact plain text, not a duplicate navigation control (Relações already owns record navigation)", async () => {
+    const inspector = await renderInspectorFixture();
+    expect(within(inspector).getAllByText("EVD-000001").length).toBeGreaterThan(0);
+    expect(within(inspector).getAllByText("EVD-000002").length).toBeGreaterThan(0);
+    expect(within(inspector).queryByRole("button", { name: "EVD-000001" })).toBeNull();
+    expect(within(inspector).queryByRole("button", { name: "EVD-000002" })).toBeNull();
+  });
+
+  it("does not render Campos canónicos for non-PRB records", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(within(panel).queryByLabelText("Campos canónicos")).toBeNull();
   });
 });
