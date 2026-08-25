@@ -1460,6 +1460,22 @@ describe("RecordDetailPanel — RD-01C PRB canonical references", () => {
     expect(within(section).queryByText("problem_id")).toBeNull();
   });
 
+  it("collects SRC-/EVD-/PRB- record IDs but not a non-record string with the same generic PREFIX-suffix shape (e.g. PT-PT)", async () => {
+    const section = await renderReferencesFixture({
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      language: "PT-PT",
+      evidence: ["EVD-000001"],
+      decision_basis: { supporting_evidence: ["PRB-0002"], boundary_evidence: ["SRC-0092"] },
+      status: "OPEN",
+    });
+    expect(within(section).getByText("EVD-000001")).toBeTruthy();
+    expect(within(section).getByText("PRB-0002")).toBeTruthy();
+    expect(within(section).getByText("SRC-0092")).toBeTruthy();
+    expect(within(section).queryByText("PT-PT")).toBeNull();
+    expect(within(section).queryByText("language")).toBeNull();
+  });
+
   it("renders each reference as a navigable control with a path-specific accessible name, calling onSelect with the target ID", async () => {
     const onSelect = vi.fn();
     const user = userEvent.setup();

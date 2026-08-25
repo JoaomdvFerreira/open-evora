@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef, type ReactNode } from "react";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordDetail } from "./useRecordDetail";
 import { RecordFieldTree } from "./RecordFieldTree";
-import { describeType, formatTypedId } from "../typeGlossary";
+import { describeType, formatTypedId, knownTypePrefixes } from "../typeGlossary";
 import { findMeaningField } from "./meaningField";
 import { ContributionChip } from "./ContributionChip";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation";
@@ -635,14 +635,17 @@ interface CanonicalReference {
 }
 
 /**
- * A canonical record ID has the shape `<PREFIX>-<suffix>` where PREFIX is
- * uppercase letters (mirrors every current schema prefix — SRC-, EVD-,
- * PRB- — without hardcoding that specific list, so a future schema prefix
- * is still recognised). Deliberately broader than any one type's ID pattern
- * (e.g. `urlState.ts`'s PRB-only regex): this walk must recognise a
- * reference to *any* canonical record type, not just PRB-.
+ * A generic `<PREFIX>-<suffix>` shape (the original RD-01C predicate) is too
+ * broad: it also matches non-record canonical strings such as the `PT-PT`
+ * language tag, misclassifying them as record references. Restrict instead
+ * to `typeGlossary.ts`'s own known record-type prefixes (SRC-/EVD-/PRB-) —
+ * the same narrowly scoped, already-in-use source `describeType`/
+ * `formatTypedId` above rely on — rather than inventing a new shared
+ * abstraction for this one field.
  */
-const CANONICAL_ID_PATTERN = /^[A-Z]{2,}-[A-Za-z0-9-]+$/;
+function isCanonicalRecordId(value: string): boolean {
+  return knownTypePrefixes().some((prefix) => value.startsWith(prefix) && value.length > prefix.length);
+}
 
 /**
  * Walks the full raw PRB record (`detail.record`, the complete parsed-YAML
@@ -654,7 +657,7 @@ const CANONICAL_ID_PATTERN = /^[A-Z]{2,}-[A-Za-z0-9-]+$/;
  */
 function collectCanonicalReferences(value: unknown, path: string, out: CanonicalReference[]): void {
   if (typeof value === "string") {
-    if (CANONICAL_ID_PATTERN.test(value)) out.push({ path, targetId: value });
+    if (isCanonicalRecordId(value)) out.push({ path, targetId: value });
     return;
   }
   if (Array.isArray(value)) {
