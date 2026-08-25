@@ -92,3 +92,33 @@ export function formatPublicDate(isoValue: string): string {
   const date = new Date(isoValue);
   return Number.isNaN(date.valueOf()) ? isoValue : new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium" }).format(date);
 }
+
+const YEAR_ONLY = /^\d{4}$/;
+const YEAR_MONTH = /^\d{4}-\d{2}$/;
+const YEAR_MONTH_DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * For canonical SRC scope temporal values, whose precision may be year, year-month, or full
+ * date. Unlike `formatPublicDate`, never routes partial values through `new Date`, which would
+ * fabricate a month/day no canonical field carries. Renders exactly the input's precision.
+ */
+export function formatPublicPartialDate(value: string): string {
+  if (YEAR_ONLY.test(value)) return value;
+
+  if (YEAR_MONTH.test(value)) {
+    const [year, month] = value.split("-").map(Number);
+    if (month < 1 || month > 12) return value;
+    const date = new Date(Date.UTC(year, month - 1, 1));
+    return new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric", timeZone: "UTC" }).format(date);
+  }
+
+  if (YEAR_MONTH_DAY.test(value)) {
+    const [year, month, day] = value.split("-").map(Number);
+    if (month < 1 || month > 12) return value;
+    const date = new Date(Date.UTC(year, month - 1, day));
+    if (date.getUTCMonth() !== month - 1) return value;
+    return new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(date);
+  }
+
+  return value;
+}

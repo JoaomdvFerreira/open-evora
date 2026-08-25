@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPublicCount, formatPublicDateTime, publicCompactEnumLabel, publicEnumLabel, publicFieldCaption } from "./presentation";
+import { formatPublicCount, formatPublicDate, formatPublicDateTime, formatPublicPartialDate, publicCompactEnumLabel, publicEnumLabel, publicFieldCaption } from "./presentation";
 
 describe("PT-PT public presentation terminology", () => {
   it("uses field-aware PRB validation labels", () => {
@@ -181,5 +181,47 @@ describe("PT-PT public presentation terminology", () => {
   it("preserves the safe fallback for unmapped licensing.status and licensing.reuse values", () => {
     expect(publicEnumLabel("licensing.status", "future_status")).toBe("future_status");
     expect(publicEnumLabel("licensing.reuse", "future_reuse")).toBe("future_reuse");
+  });
+});
+
+describe("formatPublicPartialDate", () => {
+  it("renders a year-only canonical value unchanged", () => {
+    expect(formatPublicPartialDate("2024")).toBe("2024");
+  });
+
+  it("renders a year-month canonical value as month of year, without inventing a day", () => {
+    expect(formatPublicPartialDate("2024-01")).toBe("janeiro de 2024");
+    expect(formatPublicPartialDate("2024-08")).toBe("agosto de 2024");
+    expect(formatPublicPartialDate("2024-12")).toBe("dezembro de 2024");
+  });
+
+  it("renders a full canonical date as day of month of year", () => {
+    expect(formatPublicPartialDate("2024-08-25")).toBe("25 de agosto de 2024");
+  });
+
+  it("never renders an invented day for partial (year or year-month) values", () => {
+    expect(formatPublicPartialDate("2024")).not.toMatch(/\d+ de/);
+    expect(formatPublicPartialDate("2024-08")).not.toMatch(/^\d+ de/);
+  });
+
+  it("never renders an invented month for year-only values", () => {
+    expect(formatPublicPartialDate("2024")).toBe("2024");
+    expect(formatPublicPartialDate("2024")).not.toMatch(/de \d{4}/);
+  });
+
+  it("returns the original authored value unchanged for an invalid/unexpected string", () => {
+    expect(formatPublicPartialDate("not-a-date")).toBe("not-a-date");
+    expect(formatPublicPartialDate("")).toBe("");
+    expect(formatPublicPartialDate("2024-13")).toBe("2024-13");
+    expect(formatPublicPartialDate("2024-02-30")).toBe("2024-02-30");
+  });
+
+  it("does not shift the day across a timezone boundary for a full canonical date", () => {
+    expect(formatPublicPartialDate("2024-01-01")).toBe("1 de janeiro de 2024");
+    expect(formatPublicPartialDate("2024-12-31")).toBe("31 de dezembro de 2024");
+  });
+
+  it("leaves formatPublicDate behavior unchanged for full date values", () => {
+    expect(formatPublicDate("2024-08-25")).not.toBe("");
   });
 });
