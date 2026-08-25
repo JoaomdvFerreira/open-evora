@@ -64,11 +64,76 @@ describe("allowedFields", () => {
     }
   });
 
-  test("declared parent object path is allowed without enumerating every leaf", () => {
+  test("every declared nested path (including deep leaves) is accepted", () => {
     const root = makeRoot();
     try {
+      writeSchema(root, {
+        ...BASE_SCHEMA,
+        allowedFields: ["thing_id", "scope", "scope.geography", "scope.geography.level", "scope.geography.area"],
+      });
+      writeThing(
+        root,
+        "TST-0001.yaml",
+        "thing_id: TST-0001\nscope:\n  geography:\n    level: municipality\n    area: Évora\n"
+      );
+      const result = validateResearchRoot(root);
+      assert.deepEqual(result.errors, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("an undeclared child beneath an allowed parent object is rejected", () => {
+    const root = makeRoot();
+    try {
+      writeSchema(root, {
+        ...BASE_SCHEMA,
+        allowedFields: ["thing_id", "scope", "scope.geography", "scope.geography.level"],
+      });
+      writeThing(
+        root,
+        "TST-0001.yaml",
+        "thing_id: TST-0001\nscope:\n  geography:\n    level: municipality\n    foo: 1\n"
+      );
+      const result = validateResearchRoot(root);
+      assert.ok(result.errors.some((e) => e.includes('field "scope.geography.foo" is not an allowed field')));
+      assert.equal(result.errors.length, 1);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("a declared parent object path does not behave as a wildcard for its subtree", () => {
+    const root = makeRoot();
+    try {
+      // Only "scope" and "scope.geography" declared — "scope.geography.level"
+      // (and anything else beneath it) is NOT implicitly authorized.
       writeSchema(root, { ...BASE_SCHEMA, allowedFields: ["thing_id", "scope", "scope.geography"] });
-      writeThing(root, "TST-0001.yaml", "thing_id: TST-0001\nscope:\n  geography: municipality\n");
+      writeThing(root, "TST-0001.yaml", "thing_id: TST-0001\nscope:\n  geography:\n    level: municipality\n");
+      const result = validateResearchRoot(root);
+      assert.ok(result.errors.some((e) => e.includes('field "scope.geography.level" is not an allowed field')));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("declaring only a top-level parent does not authorize any of its nested fields", () => {
+    const root = makeRoot();
+    try {
+      writeSchema(root, { ...BASE_SCHEMA, allowedFields: ["thing_id", "scope"] });
+      writeThing(root, "TST-0001.yaml", "thing_id: TST-0001\nscope:\n  other: 1\n");
+      const result = validateResearchRoot(root);
+      assert.ok(result.errors.some((e) => e.includes('field "scope.other" is not an allowed field')));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("arrays remain leaf values: an array field is checked at its own path, not walked item-by-item", () => {
+    const root = makeRoot();
+    try {
+      writeSchema(root, { ...BASE_SCHEMA, allowedFields: ["thing_id", "domains"] });
+      writeThing(root, "TST-0001.yaml", "thing_id: TST-0001\ndomains: [housing, mobility]\n");
       const result = validateResearchRoot(root);
       assert.deepEqual(result.errors, []);
     } finally {

@@ -92,13 +92,17 @@ function validateBooleanFields(file: string, record: RecordFields, schema: Recor
 }
 
 /**
- * Recursively collects every dotted field path present in `value`, plus
- * every parent-object path along the way (so a declared parent path such
- * as "scope" or "scope.geography" is satisfied by allowedFields without
- * needing every leaf enumerated separately by the caller). Arrays are
- * treated as leaf values at their own path — item shapes are not walked
- * (matches the documented "do not attempt arbitrary array-item schema
- * traversal in this slice").
+ * Recursively collects every dotted field path present in `value`,
+ * including every intermediate object path along the way (e.g. an object
+ * present at "scope.geography" contributes both "scope" and
+ * "scope.geography" to the set, in addition to each of its own fields).
+ * Each collected path is checked individually against `allowedFields` —
+ * declaring a parent path authorizes only that object field itself, never
+ * its descendants; every permitted nested field must be declared
+ * explicitly (exact dotted-path allowlist, no wildcard authorization).
+ * Arrays are treated as leaf values at their own path — item shapes are
+ * not walked (matches the documented "do not attempt arbitrary array-item
+ * schema traversal in this slice").
  */
 function collectFieldPaths(value: unknown, prefix: string, out: Set<string>): void {
   if (prefix !== "") out.add(prefix);
@@ -108,6 +112,13 @@ function collectFieldPaths(value: unknown, prefix: string, out: Set<string>): vo
   }
 }
 
+/**
+ * Rejects any field path present in `record` that is not exactly declared
+ * in `schema.allowedFields`. This is an exact allowlist: a declared
+ * object path (e.g. "scope.geography") does not implicitly authorize any
+ * undeclared descendant (e.g. "scope.geography.foo") — that descendant
+ * must be declared on its own.
+ */
 function validateAllowedFields(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
   if (!schema.allowedFields) return;
   const allowed = new Set(schema.allowedFields);
