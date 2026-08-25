@@ -576,8 +576,8 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
     // RD-01D: PRB Relações no corpus groups by direction with unique IDs per direction — 10 unique outgoing (evidence[0..9] all reciprocated) + 11 unique incoming (10 reciprocal + 1 incoming-only).
     const relacoes = within(panel).getByLabelText("Relações");
     const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
-    const outgoingHeading = within(relationsBoundary).getByText("Referências de saída");
-    const incomingHeading = within(relationsBoundary).getByText("Referências de entrada");
+    const outgoingHeading = within(relationsBoundary).getByText(/Referências de saída/);
+    const incomingHeading = within(relationsBoundary).getByText(/Referências de entrada/);
     const outgoingList = outgoingHeading.nextElementSibling as HTMLElement;
     const incomingList = incomingHeading.nextElementSibling as HTMLElement;
     expect(within(outgoingList).getAllByRole("button")).toHaveLength(10);
@@ -627,8 +627,8 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const relacoes = within(panel).getByLabelText("Relações");
     const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
-    const outgoingHeading = within(relationsBoundary).getByText("Referências de saída");
-    const incomingHeading = within(relationsBoundary).getByText("Referências de entrada");
+    const outgoingHeading = within(relationsBoundary).getByText(/Referências de saída/);
+    const incomingHeading = within(relationsBoundary).getByText(/Referências de entrada/);
     const outgoingList = outgoingHeading.nextElementSibling as HTMLElement;
     const incomingList = incomingHeading.nextElementSibling as HTMLElement;
 
@@ -1478,6 +1478,41 @@ describe("RecordDetailPanel — RD-01C PRB canonical references", () => {
     expect(within(section).getByText("SRC-0092")).toBeTruthy();
     expect(within(section).queryByText("PT-PT")).toBeNull();
     expect(within(section).queryByText("language")).toBeNull();
+  });
+
+  it("RD-01F/F03: rejects prose that begins with, or merely contains, a valid record ID — only an exact PREFIX-digits value is a reference", async () => {
+    const section = await renderReferencesFixture({
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      decision_basis: {
+        // Begins with a valid record ID, but the field's stored value is prose, not a reference.
+        eligibility_basis: "PRB-0006 constitui um problema de investigação distinto e bem definido.",
+        // Contains a valid record ID mid-sentence.
+        corroboration_statement: "A evidência EVD-000031 sustenta esta leitura, mas o campo continua a ser texto.",
+      },
+      // Merely starts with a known prefix without the PREFIX-digits shape.
+      note: "SRC-team reviewed this record",
+      status: "OPEN",
+    });
+    expect(within(section).queryByText(/PRB-0006 constitui/)).toBeNull();
+    expect(within(section).queryByText(/A evidência EVD-000031 sustenta/)).toBeNull();
+    expect(within(section).queryByText("SRC-team reviewed this record")).toBeNull();
+    expect(within(section).getByText("Nenhuma referência canónica registada.")).toBeTruthy();
+  });
+
+  it("RD-01F/F03: still accepts an exact record ID even when a sibling field in the same object is prose containing that same ID", async () => {
+    const section = await renderReferencesFixture({
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      decision_basis: {
+        eligibility_basis: "Ver EVD-000031 para detalhe.",
+        manifestation: { evidence: ["EVD-000031"] },
+      },
+      status: "OPEN",
+    });
+    expect(within(section).getByText("decision_basis.manifestation.evidence[0]")).toBeTruthy();
+    expect(within(section).getByText("EVD-000031")).toBeTruthy();
+    expect(within(section).queryByText("decision_basis.eligibility_basis")).toBeNull();
   });
 
   it("renders each reference as a navigable control with a path-specific accessible name, calling onSelect with the target ID", async () => {

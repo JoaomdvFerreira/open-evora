@@ -153,22 +153,22 @@ function PrbRelationsBoundary({ detail, lookup, onSelect }: { detail: RecordDeta
   const incomingIds = uniqueRelatedIds(detail.incomingEdges, "from");
 
   return (
-    <section aria-label="Relações no corpus">
-      <h4>Referências de saída</h4>
+    <section aria-label="Relações no corpus" className="record-prb-relations-boundary">
+      <h4>→ Referências de saída</h4>
       {outgoingIds.length === 0 ? (
         <p>Nenhum registo relacionado.</p>
       ) : (
-        <ul>
+        <ul className="prb-relations-list">
           {outgoingIds.map((id) => (
             <RelatedRecordButton key={id} id={id} lookup={lookup} onSelect={onSelect} />
           ))}
         </ul>
       )}
-      <h4>Referências de entrada</h4>
+      <h4>← Referências de entrada</h4>
       {incomingIds.length === 0 ? (
         <p>Nenhum registo relacionado.</p>
       ) : (
-        <ul>
+        <ul className="prb-relations-list">
           {incomingIds.map((id) => (
             <RelatedRecordButton key={id} id={id} lookup={lookup} onSelect={onSelect} />
           ))}
@@ -566,9 +566,9 @@ const DECISION_BASIS_KNOWN_KEYS = [
  */
 function InspectorValue({ value }: { value: unknown }): ReactNode {
   if (value === null) return <span className="inspector-null">null</span>;
-  if (typeof value === "boolean" || typeof value === "number") return <span className="detail-technical-field">{String(value)}</span>;
+  if (typeof value === "boolean" || typeof value === "number") return <span className="inspector-scalar-value">{String(value)}</span>;
   if (typeof value === "string") {
-    return <span className="detail-technical-field">{value}</span>;
+    return <span className="inspector-scalar-value">{value}</span>;
   }
   if (Array.isArray(value)) {
     if (value.length === 0) return <span className="inspector-empty">[ ] · 0 elementos</span>;
@@ -706,16 +706,17 @@ interface CanonicalReference {
 }
 
 /**
- * A generic `<PREFIX>-<suffix>` shape (the original RD-01C predicate) is too
- * broad: it also matches non-record canonical strings such as the `PT-PT`
- * language tag, misclassifying them as record references. Restrict instead
- * to `typeGlossary.ts`'s own known record-type prefixes (SRC-/EVD-/PRB-) —
- * the same narrowly scoped, already-in-use source `describeType`/
- * `formatTypedId` above rely on — rather than inventing a new shared
- * abstraction for this one field.
+ * RD-01F/F03: the field must contain *only* an exact canonical record ID
+ * (`^(?:SRC|EVD|PRB)-\d+$`), not merely start with or contain one — a
+ * `startsWith` check (the prior predicate) misclassifies prose fields such as
+ * `decision_basis.eligibility_basis` as references whenever their text
+ * happens to open with a record ID. Exact-match against
+ * `typeGlossary.ts`'s own known record-type prefixes (SRC-/EVD-/PRB-) — the
+ * same narrowly scoped source `describeType`/`formatTypedId` above rely on —
+ * rather than inventing a new shared abstraction for this one field.
  */
 function isCanonicalRecordId(value: string): boolean {
-  return knownTypePrefixes().some((prefix) => value.startsWith(prefix) && value.length > prefix.length);
+  return knownTypePrefixes().some((prefix) => new RegExp(`^${prefix}\\d+$`).test(value));
 }
 
 /**

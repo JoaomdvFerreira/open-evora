@@ -128,7 +128,7 @@ describe("Explorer — Records workflow (fake provider)", () => {
     const relacoes = within(detailPanel).getByLabelText("Relações");
     const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
     await within(relationsBoundary).findByText(/EVD-000105 — Via Verde Parking Buddy/);
-    expect(within(relationsBoundary).getByText("Referências de saída")).toBeTruthy();
+    expect(within(relationsBoundary).getByText(/Referências de saída/)).toBeTruthy();
   });
 
   it("resolves incoming relationships to related summary labels from the index", async () => {

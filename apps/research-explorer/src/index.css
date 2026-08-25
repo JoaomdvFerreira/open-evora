@@ -1738,11 +1738,29 @@ main.explorer-shell {
   margin: 0 0 var(--space-8);
 }
 
+/* RD-01F/F05: shared top separation + spacing for every PRB technical
+   section (Metadados, Estado canónico, Campos canónicos, Referências
+   canónicas) so each reads as a distinct section rather than a continuous
+   run of field rows — Relações no corpus/Proveniência/Estrutura técnica
+   completa already carry their own top border further below. */
+.record-prb-metadata,
+.record-prb-canonical-state,
+.record-prb-inspector,
+.record-prb-references {
+  margin: 0 0 var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line);
+}
+
+.record-prb-metadata {
+  padding-top: 0;
+  border-top: none;
+}
+
 /* RD-01B: PRB canonical field inspector — a plain technical object
    inspector, deliberately unadorned (no editorial cards) so canonical keys
    stay visually distinct from values without implying interpretation. */
 .record-prb-inspector {
-  margin: 0 0 var(--space-6);
 }
 
 .inspector-field {
@@ -1789,36 +1807,65 @@ main.explorer-shell {
   font-style: italic;
 }
 
-/* RD-01C: PRB canonical references — one compact row per exact canonical
-   field path, path visually distinct (monospace, faint) from the target ID
-   (rendered as the navigable element), no grouping/deduplication by target. */
-.record-prb-references {
-  margin: 0 0 var(--space-6);
+/* RD-01F/F04: stored scalar values (string/number/boolean leaves) read with
+   normal body typography, distinct from the monospace keys/indexes/structural
+   scaffolding around them — a presentation-only distinction, the exact
+   stored value is never altered. */
+.inspector-scalar-value {
+  font-family: var(--recipe-interface-body-family);
+  font-size: var(--recipe-interface-body-size);
+  line-height: var(--recipe-interface-body-line-height);
+  color: var(--ink);
 }
 
+/* RD-01C: PRB canonical references — one compact row per exact canonical
+   field path, path visually distinct (monospace, faint) from the target ID
+   (rendered as the navigable element), no grouping/deduplication by target.
+   Section-level spacing/border is set on .record-prb-references above. */
 .prb-reference-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
+/* RD-01F/F01: at compact widths the path column can no longer sit inline
+   with the target button without overflowing — stack path above button and
+   let the path wrap in place instead of truncating or forcing horizontal
+   scroll. min-width: 0 is required on the flex item so its monospace text
+   is actually allowed to wrap rather than forcing the row wider than the
+   column. */
 .prb-reference-item {
   display: flex;
   align-items: baseline;
-  gap: var(--space-3);
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
   padding: var(--space-2) 0;
   border-top: 1px solid var(--line);
+  min-width: 0;
 }
 
 .prb-reference-path {
   font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
   font-size: 0.85rem;
   color: var(--ink-faint);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .prb-reference-target {
   font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
   font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+  .prb-reference-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .prb-reference-path {
+    width: 100%;
+  }
 }
 
 .detail-panel-label {
@@ -1830,6 +1877,19 @@ main.explorer-shell {
   line-height: var(--recipe-section-label-line-height);
   letter-spacing: var(--recipe-section-label-letter-spacing);
   text-transform: var(--recipe-section-label-transform);
+}
+
+/* RD-01F/F05: PRB technical section headings get a touch more weight/color
+   than an ordinary field label (dt) beneath them, so the section-vs-field
+   hierarchy reads at a glance without introducing new containers/cards. */
+.record-prb-metadata > .detail-panel-label,
+.record-prb-canonical-state > .detail-panel-label,
+.record-prb-inspector > .detail-panel-label,
+.record-prb-references > .detail-panel-label,
+.record-detail-relations > .detail-panel-label,
+.record-provenance > .detail-panel-label {
+  color: var(--ink-soft);
+  font-weight: 700;
 }
 
 .detail-provenance-grid {
@@ -1961,6 +2021,50 @@ main.explorer-shell {
 
 .record-detail-relations .relationship-paths code {
   overflow-wrap: anywhere;
+}
+
+/* RD-01F/F02: Relações no corpus (PRB) — directional headings (arrow prefix
+   set on the heading text itself, in RecordDetailPanel.tsx) plus a visibly
+   lighter row treatment (plain list, no border) than Referências canónicas'
+   bordered path/button rows above it, so the two sections read as distinct
+   kinds of list rather than duplicates of each other. */
+.record-prb-relations-boundary h4 {
+  margin: var(--space-4) 0 var(--space-2);
+  color: var(--ink-faint);
+  font-family: var(--recipe-section-label-family);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: var(--recipe-section-label-letter-spacing);
+  text-transform: var(--recipe-section-label-transform);
+}
+
+.record-prb-relations-boundary h4:first-child {
+  margin-top: 0;
+}
+
+.prb-relations-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prb-relations-list li {
+  padding: var(--space-1) 0;
+}
+
+.prb-relations-list button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent-dark);
+  cursor: pointer;
+  text-decoration: underline;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.prb-relations-list button:hover {
+  color: var(--accent);
 }
 
 /* Compact-only substitute for the desktop reading rail's "Nesta página"
