@@ -112,10 +112,15 @@ describe("parseRecordYaml", () => {
 });
 
 describe("loadSchemas", () => {
-  test("loads all three canonical schema files with expected prefixes", () => {
+  test("loads the three canonical schema files plus the inactive SRC v2 candidate, with expected prefixes", () => {
     const schemas = loadSchemas(REAL_RESEARCH_ROOT);
     const prefixes = schemas.map((s) => s.prefix).sort();
-    assert.deepEqual(prefixes, ["EVD-", "PRB-", "SRC-"]);
+    // "SRC2-" is research/schemas/source-v2.schema.json (SRC-V2D1): an
+    // inactive executable candidate for the frozen SRC v2 contract. It is
+    // deliberately keyed by a non-"SRC-" prefix and a directory that does
+    // not exist under research/, so it loads alongside the three canonical
+    // schemas without matching any real record in research/sources.
+    assert.deepEqual(prefixes, ["EVD-", "PRB-", "SRC-", "SRC2-"]);
   });
 });
 
