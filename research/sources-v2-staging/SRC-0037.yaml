@@ -1,0 +1,25 @@
+source_id: SRC-0037
+publisher: "Universidade de Évora"
+name: "Universidade de Évora — Alojamento"
+resource_type: webpage
+scope:
+  geography:
+    level: city
+    area: "Évora"
+  domains:
+    - "HOU"
+    - "EDU"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.uevora.pt/estudar/estudantes-ue/Alojamento"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"

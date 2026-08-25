@@ -1,0 +1,25 @@
+source_id: SRC-0046
+publisher: "Município de Évora"
+name: "Município de Évora — Visitante"
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: "Évora"
+  domains:
+    - "TOU"
+    - "CUL"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/visitante/"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"

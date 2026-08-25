@@ -1,0 +1,27 @@
+source_id: SRC-0051
+publisher: "Município de Évora"
+name: "Plano Municipal de Adaptação às Alterações Climáticas de Évora (PMAAC)"
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: "Évora"
+  domains:
+    - "CLI"
+    - "ENV"
+    - "URB"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/plano-municipal-de-adaptacao-as-alteracoes-climaticas-de-evora/"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  updated_at: "2024"
+  last_checked_at: "2026-08-11"

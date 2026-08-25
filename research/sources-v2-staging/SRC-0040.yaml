@@ -1,0 +1,25 @@
+source_id: SRC-0040
+publisher: "Universidade de Évora"
+name: "Universidade de Évora — Feira do Emprego 2026"
+resource_type: webpage
+scope:
+  geography:
+    level: non_geographic
+  domains:
+    - "EMP"
+    - "EDU"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.feiradoemprego.uevora.pt/"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: "2026"
+  last_checked_at: "2026-08-11"
