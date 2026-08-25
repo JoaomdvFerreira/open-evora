@@ -813,6 +813,47 @@ function TechnicalDisclosure({ detail }: { detail: RecordDetail }) {
   );
 }
 
+/**
+ * RD-01E: for PRB records, a compact Proveniência limited to deterministic
+ * source metadata not already shown elsewhere (Ficheiro canónico already
+ * appears in Metadados as "Ficheiro canónico" but Proveniência is its own
+ * dedicated technical section per the task's own worked example, so it is
+ * repeated here rather than omitted — the task's "do not repeat" list is
+ * title/problem_statement/domain/geography/canonical states/relationship
+ * counts/reference paths, not the file path itself). No relationship count,
+ * no schema path/identifier is invented — the read model exposes none.
+ */
+function PrbProvenancePanel({ detail }: { detail: RecordDetail }) {
+  return (
+    <section aria-label="Proveniência" className="record-provenance">
+      <h3 className="detail-panel-label">Proveniência</h3>
+      <dl className="detail-provenance-grid">
+        <dt>Ficheiro canónico</dt>
+        <dd className="detail-technical-field">{detail.file}</dd>
+        <dt>Tipo de registo</dt>
+        <dd className="detail-technical-field">PRB</dd>
+      </dl>
+    </section>
+  );
+}
+
+/**
+ * RD-01E: for PRB records, the same exhaustive `RecordFieldTree` fallback
+ * as `TechnicalDisclosure`, reframed as "Estrutura técnica completa" — the
+ * final audit fallback, deliberately still exhaustive (never pruned to
+ * avoid duplicating Metadados/Estado canónico/Campos canónicos/Referências
+ * canónicas, per the task's explicit "do not remove fields" instruction).
+ */
+function PrbRawTechnicalDisclosure({ detail }: { detail: RecordDetail }) {
+  return (
+    <details className="technical-disclosure">
+      <summary>Estrutura técnica completa</summary>
+      <p className="technical-disclosure-caption">Objeto canónico completo, sem omissões.</p>
+      <RecordFieldTree data={detail.record} />
+    </details>
+  );
+}
+
 function RecordDetailContent({
   detail,
   lookup,
@@ -890,30 +931,39 @@ function RecordDetailContent({
 
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
           {detail.type === "SRC-" && <SourceQuickRead detail={detail} />}
-          {isPrb && <PrbMetadataPanel detail={detail} />}
-          {isPrb && <PrbCanonicalStatePanel detail={detail} />}
-          {isPrb && <PrbFieldInspector detail={detail} />}
-          {isPrb && <PrbCanonicalReferences detail={detail} onSelect={onSelect} />}
 
-          <ProvenancePanel detail={detail} />
+          {isPrb ? (
+            <>
+              <PrbMetadataPanel detail={detail} />
+              <PrbCanonicalStatePanel detail={detail} />
+              <PrbFieldInspector detail={detail} />
+              <PrbCanonicalReferences detail={detail} onSelect={onSelect} />
 
-          <section aria-label="Campos do registo" className="record-detail-technical">
-            <TechnicalDisclosure detail={detail} />
-          </section>
-
-          <section aria-label="Relações" id="relacoes" className="record-detail-relations">
-            {isPrb ? (
-              <>
+              <section aria-label="Relações" id="relacoes" className="record-detail-relations">
                 <h3 className="detail-panel-label">Relações no corpus</h3>
                 <PrbRelationsBoundary detail={detail} lookup={lookup} onSelect={onSelect} />
-              </>
-            ) : (
-              <>
+              </section>
+
+              <PrbProvenancePanel detail={detail} />
+
+              <section aria-label="Campos do registo" className="record-detail-technical">
+                <PrbRawTechnicalDisclosure detail={detail} />
+              </section>
+            </>
+          ) : (
+            <>
+              <ProvenancePanel detail={detail} />
+
+              <section aria-label="Campos do registo" className="record-detail-technical">
+                <TechnicalDisclosure detail={detail} />
+              </section>
+
+              <section aria-label="Relações" id="relacoes" className="record-detail-relations">
                 <h3 className="detail-panel-label">Relações — por registo relacionado, com caminhos de referência exatos</h3>
                 <RelationshipList detail={detail} lookup={lookup} onSelect={onSelect} />
-              </>
-            )}
-          </section>
+              </section>
+            </>
+          )}
         </div>
 
         <aside className="record-detail-rail" aria-label="Mais ações">

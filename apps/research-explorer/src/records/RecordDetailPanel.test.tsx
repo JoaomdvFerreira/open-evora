@@ -566,12 +566,13 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const provenance = await within(panel).findByText(/registo\(s\) relacionado\(s\)/);
-    // Unique-record cardinality (11) must differ from, and not be confused with, the raw edge counts (10 outgoing, 11 incoming, 21 total). ProvenancePanel is unchanged by RD-01D.
-    expect(provenance.textContent).toContain("11 registo(s) relacionado(s)");
-    expect(provenance.textContent).toContain("11 caminho(s) de entrada");
-    expect(provenance.textContent).toContain("10 caminho(s) de saída");
 
+    // RD-01E: PRB Proveniência no longer repeats relationship counts (that
+    // "1 registo(s) relacionado(s)" line only exists in the generic,
+    // non-PRB ProvenancePanel) — unique-record cardinality (11, distinct
+    // from the raw edge counts of 10 outgoing/11 incoming/21 total) is
+    // instead directly observable as the length of each Relações no corpus
+    // direction list below.
     // RD-01D: PRB Relações no corpus groups by direction with unique IDs per direction — 10 unique outgoing (evidence[0..9] all reciprocated) + 11 unique incoming (10 reciprocal + 1 incoming-only).
     const relacoes = within(panel).getByLabelText("Relações");
     const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
@@ -1056,8 +1057,9 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    await within(panel).findByText("Inspeção técnica completa — todos os campos canónicos");
-    const disclosure = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos").closest("details") as HTMLElement;
+    // RD-01E: PRB records label the raw fallback "Estrutura técnica completa" rather than the generic "Inspeção técnica completa — todos os campos canónicos".
+    await within(panel).findByText("Estrutura técnica completa");
+    const disclosure = within(panel).getByText("Estrutura técnica completa").closest("details") as HTMLElement;
     // Raw canonical field paths for the new PI-01 fields remain inspectable, untranslated.
     expect(within(disclosure).getByText("causal_reading")).toBeTruthy();
     expect(within(disclosure).getByText("investigation")).toBeTruthy();
@@ -1513,5 +1515,107 @@ describe("RecordDetailPanel — RD-01C PRB canonical references", () => {
     );
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     expect(within(panel).queryByLabelText("Referências canónicas")).toBeNull();
+  });
+});
+
+describe("RecordDetailPanel — RD-01E PRB provenance + raw technical boundary", () => {
+  const PRB_PROVENANCE_DETAIL: RecordDetail = {
+    id: "PRB-0001",
+    type: "PRB-",
+    file: "research/problems/PRB-0001.yaml",
+    record: {
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      domain: ["MOB"],
+      geography: { level: "municipality", area: "Évora" },
+      status: "OPEN",
+      evidence: ["EVD-000001"],
+    },
+    outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-000001" }],
+    incomingEdges: [],
+  };
+  const PRB_PROVENANCE_SUMMARY: RecordSummary = {
+    id: "PRB-0001",
+    type: "PRB-",
+    label: "PRB-0001",
+    file: "research/problems/PRB-0001.yaml",
+    summaryFields: { status: "OPEN" },
+  };
+
+  async function renderProvenanceFixture() {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": PRB_PROVENANCE_DETAIL })}
+        lookup={buildLookup(PRB_PROVENANCE_SUMMARY)}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    return (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+  }
+
+  it("renders a compact Proveniência limited to Ficheiro canónico and Tipo de registo, with no relationship count", async () => {
+    const panel = await renderProvenanceFixture();
+    const provenance = within(panel).getByLabelText("Proveniência");
+    expect(within(provenance).getByText("Ficheiro canónico")).toBeTruthy();
+    expect(within(provenance).getByText("research/problems/PRB-0001.yaml")).toBeTruthy();
+    expect(within(provenance).getByText("Tipo de registo")).toBeTruthy();
+    expect(within(provenance).getByText("PRB")).toBeTruthy();
+    // Not repeated: title/domain/geography/canonical state/relationship counts/reference paths.
+    expect(within(provenance).queryByText("Título canónico")).toBeNull();
+    expect(within(provenance).queryByText("MOB")).toBeNull();
+    expect(within(provenance).queryByText("Évora")).toBeNull();
+    expect(within(provenance).queryByText(/registo\(s\) relacionado\(s\)/)).toBeNull();
+    expect(within(provenance).queryByText(/evidence\[0\]/)).toBeNull();
+  });
+
+  it("labels the raw fallback 'Estrutura técnica completa' with the concise orientation sentence, collapsed by default", async () => {
+    const panel = await renderProvenanceFixture();
+    const summary = within(panel).getByText("Estrutura técnica completa");
+    const details = summary.closest("details") as HTMLDetailsElement;
+    expect(details.open).toBe(false);
+    expect(within(panel).getByText("Objeto canónico completo, sem omissões.")).toBeTruthy();
+    // Still exhaustive — the raw tree includes fields already shown structurally elsewhere.
+    expect(within(details).getByText("problem_id")).toBeTruthy();
+    expect(within(details).getByText("title")).toBeTruthy();
+    expect(within(details).getByText("status")).toBeTruthy();
+  });
+
+  it("orders PRB Detail sections as Metadados, Estado canónico, Campos canónicos, Referências canónicas, Relações no corpus, Proveniência, Estrutura técnica completa", async () => {
+    const panel = await renderProvenanceFixture();
+    const metadados = within(panel).getByLabelText("Metadados");
+    const estadoCanonico = within(panel).getByLabelText("Estado canónico");
+    const camposCanonicos = within(panel).getByLabelText("Campos canónicos");
+    const referenciasCanonicas = within(panel).getByLabelText("Referências canónicas");
+    const relacoes = within(panel).getByLabelText("Relações");
+    const provenance = within(panel).getByLabelText("Proveniência");
+    const rawDisclosure = within(panel).getByText("Estrutura técnica completa").closest("section") as HTMLElement;
+
+    const sections = [metadados, estadoCanonico, camposCanonicos, referenciasCanonicas, relacoes, provenance, rawDisclosure];
+    for (let i = 0; i < sections.length - 1; i++) {
+      expect(sections[i].compareDocumentPosition(sections[i + 1]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+  });
+
+  it("does not change non-PRB Proveniência/technical-disclosure behavior", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const provenance = within(panel).getByLabelText("Proveniência");
+    expect(within(provenance).getByText(/registo\(s\) relacionado\(s\)/)).toBeTruthy();
+    expect(within(panel).getByText("Inspeção técnica completa — todos os campos canónicos")).toBeTruthy();
+    expect(within(panel).queryByText("Estrutura técnica completa")).toBeNull();
   });
 });
