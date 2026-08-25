@@ -149,4 +149,37 @@ describe("PT-PT public presentation terminology", () => {
   it("does not invent domain-code labels for scope.domains", () => {
     expect(publicEnumLabel("scope.domains", "housing")).toBe("housing");
   });
+
+  it("maps licensing.status known/unknown", () => {
+    expect(publicEnumLabel("licensing.status", "known")).toBe("Conhecido");
+    expect(publicEnumLabel("licensing.status", "unknown")).toBe("Desconhecido");
+  });
+
+  it("maps licensing.reuse permitted/restricted/prohibited/unknown", () => {
+    expect(publicEnumLabel("licensing.reuse", "permitted")).toBe("Permitida");
+    expect(publicEnumLabel("licensing.reuse", "restricted")).toBe("Restrita");
+    expect(publicEnumLabel("licensing.reuse", "prohibited")).toBe("Proibida");
+    expect(publicEnumLabel("licensing.reuse", "unknown")).toBe("Desconhecida");
+  });
+
+  it("no longer accepts restricted as a licensing.status vocabulary value", () => {
+    expect(publicEnumLabel("licensing.status", "restricted")).toBe("restricted");
+  });
+
+  it("resolves field captions for the licensing fields", () => {
+    expect(publicFieldCaption("licensing.status")).toBe("Estado do licenciamento");
+    expect(publicFieldCaption("licensing.licence")).toBe("Licença");
+    expect(publicFieldCaption("licensing.reuse")).toBe("Reutilização");
+    expect(publicFieldCaption("licensing.attribution")).toBe("Atribuição");
+  });
+
+  it("does not transform licensing.licence or licensing.attribution values", () => {
+    expect(publicEnumLabel("licensing.licence", "CC-BY-4.0")).toBe("CC-BY-4.0");
+    expect(publicEnumLabel("licensing.attribution", "Câmara Municipal de Évora")).toBe("Câmara Municipal de Évora");
+  });
+
+  it("preserves the safe fallback for unmapped licensing.status and licensing.reuse values", () => {
+    expect(publicEnumLabel("licensing.status", "future_status")).toBe("future_status");
+    expect(publicEnumLabel("licensing.reuse", "future_reuse")).toBe("future_reuse");
+  });
 });
