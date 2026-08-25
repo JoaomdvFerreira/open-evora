@@ -1055,15 +1055,16 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     await within(panel).findByText("Inspeção técnica completa — todos os campos canónicos");
+    const disclosure = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos").closest("details") as HTMLElement;
     // Raw canonical field paths for the new PI-01 fields remain inspectable, untranslated.
-    expect(within(panel).getByText("causal_reading")).toBeTruthy();
-    expect(within(panel).getByText("investigation")).toBeTruthy();
-    expect(within(panel).getByText("solution_landscape_status")).toBeTruthy();
+    expect(within(disclosure).getByText("causal_reading")).toBeTruthy();
+    expect(within(disclosure).getByText("investigation")).toBeTruthy();
+    expect(within(disclosure).getByText("solution_landscape_status")).toBeTruthy();
     // No leftover rendering assumption tied to the fields PI-01 removed.
-    expect(within(panel).queryByText("current_journey")).toBeNull();
-    expect(within(panel).queryByText("reported_consequences")).toBeNull();
-    expect(within(panel).queryByText("possible_root_causes")).toBeNull();
-    expect(within(panel).queryByText("existing_solutions")).toBeNull();
+    expect(within(disclosure).queryByText("current_journey")).toBeNull();
+    expect(within(disclosure).queryByText("reported_consequences")).toBeNull();
+    expect(within(disclosure).queryByText("possible_root_causes")).toBeNull();
+    expect(within(disclosure).queryByText("existing_solutions")).toBeNull();
   });
 
   it("does not add the EVD/SRC quick read for a PRB record, and leaves ContextTabs/navigation unchanged", async () => {
@@ -1083,5 +1084,137 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     const switcher = within(panel).getByRole("navigation", { name: /PRB-0006/ });
     expect(within(switcher).getByRole("button", { name: "Detalhe" }).getAttribute("aria-current")).toBe("page");
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
+  });
+});
+
+describe("RecordDetailPanel — RD-01A PRB Detail header + technical metadata", () => {
+  const PRB_RD01A_DETAIL: RecordDetail = {
+    id: "PRB-0001",
+    type: "PRB-",
+    file: "research/problems/PRB-0001.yaml",
+    record: {
+      problem_id: "PRB-0001",
+      title: "A utilidade prática dos transportes públicos varia consoante os horários e os territórios",
+      domain: ["MOB"],
+      geography: { level: "municipality", area: "Évora" },
+      problem_statement: "A cobertura dos transportes públicos em Évora é, em termos globais, ampla...",
+      evidence_status: "corroborated",
+      validation_status: "unvalidated",
+      digital_tractability: "not_assessed",
+      solution_landscape_status: "not_assessed",
+      status: "OPEN",
+      decision_basis: { contract_version: "0.1" },
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const PRB_RD01A_SUMMARY: RecordSummary = {
+    id: "PRB-0001",
+    type: "PRB-",
+    label: "PRB-0001",
+    file: "research/problems/PRB-0001.yaml",
+    summaryFields: { status: "OPEN" },
+  };
+
+  async function renderPrb001() {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": PRB_RD01A_DETAIL })}
+        lookup={buildLookup(PRB_RD01A_SUMMARY)}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    return (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+  }
+
+  it("replaces the meaning-oriented hero with ID, canonical title, and the technical orientation sentence — never problem_statement", async () => {
+    const panel = await renderPrb001();
+    const meaning = within(panel).getByLabelText("Significado");
+    expect(within(meaning).getByText("Inspeção técnica do registo canónico.")).toBeTruthy();
+    expect(within(meaning).getByText(PRB_RD01A_DETAIL.record.title as string)).toBeTruthy();
+    expect(within(meaning).queryByText(/A cobertura dos transportes públicos/)).toBeNull();
+    // PRB ID is carried by the breadcrumb and the Metadados section, not duplicated here.
+    expect(within(panel).getAllByText("PRB-0001").length).toBeGreaterThan(0);
+  });
+
+  it("renders the compact Metadados section with canonical field/value fidelity", async () => {
+    const panel = await renderPrb001();
+    const metadata = within(panel).getByLabelText("Metadados");
+    expect(within(metadata).getByText("ID")).toBeTruthy();
+    expect(within(metadata).getByText("PRB-0001")).toBeTruthy();
+    expect(within(metadata).getByText("Tipo")).toBeTruthy();
+    expect(within(metadata).getByText("PRB")).toBeTruthy();
+    expect(within(metadata).getByText("Domínio")).toBeTruthy();
+    expect(within(metadata).getByText("MOB")).toBeTruthy();
+    expect(within(metadata).getByText("Nível geográfico")).toBeTruthy();
+    expect(within(metadata).getByText("municipality")).toBeTruthy();
+    expect(within(metadata).getByText("Área")).toBeTruthy();
+    expect(within(metadata).getByText("Évora")).toBeTruthy();
+    expect(within(metadata).getByText("Ficheiro canónico")).toBeTruthy();
+    expect(within(metadata).getByText("research/problems/PRB-0001.yaml")).toBeTruthy();
+    expect(within(metadata).getByText("Contrato")).toBeTruthy();
+    expect(within(metadata).getByText("0.1")).toBeTruthy();
+  });
+
+  it("omits Contrato when decision_basis.contract_version is absent, rather than inventing a value", async () => {
+    const detail: RecordDetail = {
+      ...PRB_RD01A_DETAIL,
+      record: { ...PRB_RD01A_DETAIL.record, decision_basis: undefined },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": detail })}
+        lookup={buildLookup(PRB_RD01A_SUMMARY)}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const metadata = within(panel).getByLabelText("Metadados");
+    expect(within(metadata).queryByText("Contrato")).toBeNull();
+  });
+
+  it("renders the compact Estado canónico section with PT-PT label, canonical field name, and exact stored value for each status dimension", async () => {
+    const panel = await renderPrb001();
+    const state = within(panel).getByLabelText("Estado canónico");
+    expect(within(state).getByText("Estado")).toBeTruthy();
+    expect(within(state).getByText("status")).toBeTruthy();
+    expect(within(state).getByText("OPEN")).toBeTruthy();
+    expect(within(state).getByText("Estado da evidência")).toBeTruthy();
+    expect(within(state).getByText("evidence_status")).toBeTruthy();
+    expect(within(state).getByText("corroborated")).toBeTruthy();
+    expect(within(state).getByText("Estado de validação")).toBeTruthy();
+    expect(within(state).getByText("validation_status")).toBeTruthy();
+    expect(within(state).getByText("unvalidated")).toBeTruthy();
+    expect(within(state).getByText("Tratabilidade digital")).toBeTruthy();
+    expect(within(state).getByText("digital_tractability")).toBeTruthy();
+    expect(within(state).getByText("Estado das soluções existentes")).toBeTruthy();
+    expect(within(state).getByText("solution_landscape_status")).toBeTruthy();
+    // digital_tractability and solution_landscape_status share the same stored value here.
+    expect(within(state).getAllByText("not_assessed")).toHaveLength(2);
+  });
+
+  it("does not render these PRB sections for non-PRB records (generic Record Detail unchanged)", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(within(panel).queryByLabelText("Metadados")).toBeNull();
+    expect(within(panel).queryByLabelText("Estado canónico")).toBeNull();
   });
 });

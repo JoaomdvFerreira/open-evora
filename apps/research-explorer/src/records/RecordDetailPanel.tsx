@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordDetail } from "./useRecordDetail";
 import { RecordFieldTree } from "./RecordFieldTree";
@@ -311,6 +311,138 @@ function SourceQuickRead({ detail }: { detail: RecordDetail }) {
   );
 }
 
+/**
+ * RD-01A: PRB Detail orientation sentence replacing the generic
+ * OrientationIntro for PRB records — the `Detalhe` tab is the technical
+ * inspection surface for a Problem, distinct from the meaning-oriented
+ * `Problema` tab, so it must not render `problem_statement` as hero text.
+ */
+function PrbOrientationIntro() {
+  return <p className="record-orientation-intro">Inspeção técnica do registo canónico.</p>;
+}
+
+function getString(record: Record<string, unknown>, key: string): string | null {
+  const value = record[key];
+  return typeof value === "string" && value.trim() !== "" ? value : null;
+}
+
+function getObject(record: Record<string, unknown>, key: string): Record<string, unknown> | null {
+  const value = record[key];
+  return value !== null && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
+}
+
+interface MetadataItem {
+  label: string;
+  field: string;
+  value: string;
+}
+
+/**
+ * RD-01A Section 1 (Metadados): every item here is either a canonical field
+ * value shown exactly as stored, or a record-provenance value the read model
+ * already exposes (`detail.file`). No schema identifier/path is included —
+ * the read model (read-model.js) does not expose a per-record schema path,
+ * only `research/schemas/problem.schema.json` at the type level, which is
+ * not record-provenance data — so it is deliberately omitted rather than
+ * invented.
+ */
+function prbMetadataItems(detail: RecordDetail): MetadataItem[] {
+  const record = detail.record;
+  const items: MetadataItem[] = [];
+
+  const problemId = getString(record, "problem_id");
+  items.push({ label: "ID", field: "problem_id", value: problemId ?? detail.id });
+
+  items.push({ label: "Tipo", field: "type", value: "PRB" });
+
+  const domain = record.domain;
+  const domainValue = Array.isArray(domain) ? domain.filter((d): d is string => typeof d === "string").join(", ") : typeof domain === "string" ? domain : null;
+  if (domainValue) items.push({ label: "Domínio", field: "domain", value: domainValue });
+
+  const geography = getObject(record, "geography");
+  const level = geography ? getString(geography, "level") : null;
+  if (level) items.push({ label: "Nível geográfico", field: "geography.level", value: level });
+
+  const area = geography ? getString(geography, "area") : null;
+  if (area) items.push({ label: "Área", field: "geography.area", value: area });
+
+  items.push({ label: "Ficheiro canónico", field: "file", value: detail.file });
+
+  const decisionBasis = getObject(record, "decision_basis");
+  const contractVersion = decisionBasis ? getString(decisionBasis, "contract_version") : null;
+  if (contractVersion) items.push({ label: "Contrato", field: "decision_basis.contract_version", value: contractVersion });
+
+  return items;
+}
+
+function PrbMetadataPanel({ detail }: { detail: RecordDetail }) {
+  const items = prbMetadataItems(detail);
+  return (
+    <section aria-label="Metadados" className="record-prb-metadata">
+      <h3 className="detail-panel-label">Metadados</h3>
+      <dl className="detail-provenance-grid">
+        {items.map((item) => (
+          <Fragment key={item.field}>
+            <dt>{item.label}</dt>
+            <dd className="detail-technical-field">{item.value}</dd>
+          </Fragment>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+interface CanonicalStateItem {
+  label: string;
+  field: string;
+  value: string;
+}
+
+/**
+ * RD-01A Section 2 (Estado canónico): stored canonical values only — no
+ * translated/reinterpreted value, no confidence/severity/editorial gloss.
+ * `publicFieldCaption`/`publicEnumLabel` are deliberately not used here: the
+ * requirement is the exact stored canonical value alongside the canonical
+ * field name, not the Problem-View-style public label substitution.
+ */
+const CANONICAL_STATE_FIELDS: { field: string; label: string }[] = [
+  { field: "status", label: "Estado" },
+  { field: "evidence_status", label: "Estado da evidência" },
+  { field: "validation_status", label: "Estado de validação" },
+  { field: "digital_tractability", label: "Tratabilidade digital" },
+  { field: "solution_landscape_status", label: "Estado das soluções existentes" },
+];
+
+function prbCanonicalStateItems(record: Record<string, unknown>): CanonicalStateItem[] {
+  const items: CanonicalStateItem[] = [];
+  for (const { field, label } of CANONICAL_STATE_FIELDS) {
+    const value = getString(record, field);
+    if (value) items.push({ label, field, value });
+  }
+  return items;
+}
+
+function PrbCanonicalStatePanel({ detail }: { detail: RecordDetail }) {
+  const items = prbCanonicalStateItems(detail.record);
+  if (items.length === 0) return null;
+
+  return (
+    <section aria-label="Estado canónico" className="record-prb-canonical-state">
+      <h3 className="detail-panel-label">Estado canónico</h3>
+      <dl className="detail-provenance-grid">
+        {items.map((item) => (
+          <Fragment key={item.field}>
+            <dt>{item.label}</dt>
+            <dd>
+              <code className="detail-technical-field">{item.field}</code> <span className="detail-technical-field">{item.value}</span>
+            </dd>
+          </Fragment>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
 function ProvenancePanel({ detail }: { detail: RecordDetail }) {
   const uniqueRelatedCount = countUniqueRelatedRecords(detail);
   return (
@@ -357,6 +489,7 @@ function RecordDetailContent({
   onViewAsProblem: (id: string) => void;
   onViewInGraph: (id: string) => void;
 }) {
+  const isPrb = detail.type === "PRB-";
   const meaning = findMeaningField(detail.record);
   const typeInfo = describeType(detail.type);
   const relatedProblemId = findRelatedProblemId(detail, lookup);
@@ -381,8 +514,17 @@ function RecordDetailContent({
         <div className="record-detail-main">
           <section aria-label="Significado" className="record-meaning-zone">
             <TypeBadge detail={detail} />
-            <OrientationIntro />
-            {meaning ? (
+            {isPrb ? <PrbOrientationIntro /> : <OrientationIntro />}
+            {isPrb ? (
+              (() => {
+                const title = getString(detail.record, "title");
+                return title ? (
+                  <p className="record-meaning">{title}</p>
+                ) : (
+                  <p className="record-meaning field-empty">{detail.id} — sem título canónico identificado para este registo.</p>
+                );
+              })()
+            ) : meaning ? (
               <p className="record-meaning">{meaning.value}</p>
             ) : (
               <p className="record-meaning field-empty">{detail.id} — sem campo de significado canónico identificado para este tipo de registo.</p>
@@ -409,6 +551,8 @@ function RecordDetailContent({
 
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
           {detail.type === "SRC-" && <SourceQuickRead detail={detail} />}
+          {isPrb && <PrbMetadataPanel detail={detail} />}
+          {isPrb && <PrbCanonicalStatePanel detail={detail} />}
 
           <ProvenancePanel detail={detail} />
 
