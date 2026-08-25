@@ -1718,6 +1718,260 @@ describe("RecordDetailPanel — SUI-03C2 Source View O que encontrámos integrat
   });
 });
 
+describe("RecordDetailPanel — SUI-03D2 Source View Cobertura integration", () => {
+  /** Mirrors research/sources/SRC-0093.yaml exactly (matches SourceCoverageSection.test.tsx's fixture). */
+  const SRC_0093_DETAIL: RecordDetail = {
+    id: "SRC-0093",
+    type: "SRC-",
+    file: "research/sources/SRC-0093.yaml",
+    record: {
+      source_id: "SRC-0093",
+      publisher: "Scientific Reports (Springer Nature)",
+      name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+      resource_type: "document",
+      scope: {
+        geography: { level: "local_area", area: "Belltown, Seattle, Washington, EUA" },
+        domains: ["MOB", "DIG"],
+      },
+      access: { level: "public", availability: "available", machine_readable: false },
+      canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z",
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const SRC_0093_SUMMARY: RecordSummary = {
+    id: "SRC-0093",
+    type: "SRC-",
+    label: SRC_0093_DETAIL.record.name as string,
+    file: SRC_0093_DETAIL.file,
+    summaryFields: {},
+  };
+
+  it("1. SRC detail renders 'Cobertura'", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Cobertura")).toBeTruthy();
+  });
+
+  it("2. section order is Visão geral, O que encontrámos, Cobertura", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const overview = await within(panel).findByLabelText("Visão geral");
+    const findings = await within(panel).findByLabelText("O que encontrámos");
+    const coverage = await within(panel).findByLabelText("Cobertura");
+
+    expect(overview.compareDocumentPosition(findings) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(findings.compareDocumentPosition(coverage) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("3. SRC-0093-shaped fixture renders Área local, Belltown Seattle Washington EUA, MOB, DIG", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const coverage = await within(panel).findByLabelText("Cobertura");
+    expect(within(coverage).getByText("Área local")).toBeTruthy();
+    expect(within(coverage).getByText("Belltown, Seattle, Washington, EUA")).toBeTruthy();
+    expect(within(coverage).getByText("MOB, DIG")).toBeTruthy();
+  });
+
+  it("4. no temporal coverage is invented for SRC-0093", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const coverage = await within(panel).findByLabelText("Cobertura");
+    expect(within(coverage).queryByText("Data de referência")).toBeNull();
+    expect(within(coverage).queryByText("Início")).toBeNull();
+    expect(within(coverage).queryByText("Fim")).toBeNull();
+  });
+
+  it("5. SRC fixture with scope.temporal.as_of renders the correct preserved-granularity value", async () => {
+    const srcWithAsOf: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        scope: { ...(SRC_0093_DETAIL.record.scope as Record<string, unknown>), temporal: { as_of: "2024-08" } },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcWithAsOf })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const coverage = await within(panel).findByLabelText("Cobertura");
+    expect(within(coverage).getByText("Data de referência")).toBeTruthy();
+    expect(within(coverage).getByText("agosto de 2024")).toBeTruthy();
+  });
+
+  it("6. SRC fixture with scope.temporal interval renders Início/Fim correctly", async () => {
+    const srcWithInterval: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        scope: { ...(SRC_0093_DETAIL.record.scope as Record<string, unknown>), temporal: { start: "2020", end: "2024-08-25" } },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcWithInterval })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const coverage = await within(panel).findByLabelText("Cobertura");
+    expect(within(coverage).getByText("Início")).toBeTruthy();
+    expect(within(coverage).getByText("2020")).toBeTruthy();
+    expect(within(coverage).getByText("Fim")).toBeTruthy();
+    expect(within(coverage).getByText(/25 de agosto de 2024/)).toBeTruthy();
+  });
+
+  it("7. EVD detail does not render SourceCoverageSection", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("evidence_id");
+    expect(within(panel).queryByLabelText("Cobertura")).toBeNull();
+  });
+
+  it("8. PRB detail does not render SourceCoverageSection", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await screen.findByText("Detalhes");
+    expect(within(panel).queryByLabelText("Cobertura")).toBeNull();
+  });
+
+  it("9. existing source action remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
+    expect(link.getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
+  });
+
+  it("10. existing findings loading/error behavior remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const findings = await within(panel).findByLabelText("O que encontrámos");
+    expect(within(findings).getByText("Ainda não existem observações da investigação ligadas explicitamente a esta fonte.")).toBeTruthy();
+  });
+
+  it("11. existing lower technical disclosure/relations remain present", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Proveniência")).toBeTruthy();
+    expect(within(panel).getByLabelText("Campos do registo")).toBeTruthy();
+    expect(within(panel).getByLabelText(/Relações/)).toBeTruthy();
+  });
+});
+
 describe("RecordDetailPanel — RD-01A PRB Detail header + technical metadata", () => {
   const PRB_RD01A_DETAIL: RecordDetail = {
     id: "PRB-0001",
