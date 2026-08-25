@@ -745,7 +745,7 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
   });
 });
 
-describe("RecordDetailPanel — SRC original-source action (UX-D §3)", () => {
+describe("RecordDetailPanel — SRC original-source action (SUI-02A, SRC v2 eligibility)", () => {
   const SRC_PUBLIC_SUMMARY: RecordSummary = {
     id: "SRC-0002",
     type: "SRC-",
@@ -755,6 +755,7 @@ describe("RecordDetailPanel — SRC original-source action (UX-D §3)", () => {
   };
 
   function srcDetail(overrides: Record<string, unknown>): RecordDetail {
+    const { access: accessOverride, ...rest } = overrides;
     return {
       id: "SRC-0002",
       type: "SRC-",
@@ -762,19 +763,19 @@ describe("RecordDetailPanel — SRC original-source action (UX-D §3)", () => {
       record: {
         source_id: "SRC-0002",
         publisher: "Município de Évora",
-        access: { public: true },
+        access: { level: "public", availability: "available", machine_readable: false, ...(accessOverride as Record<string, unknown> | undefined) },
         canonical_reference: "https://www.cm-evora.pt/exemplo.pdf",
-        ...overrides,
+        ...rest,
       },
       outgoingEdges: [],
       incomingEdges: [],
     };
   }
 
-  it("shows 'Abrir fonte' with a safe external link when the SRC is publicly accessible via HTTPS", async () => {
-    render(
+  function renderSrc(detail: RecordDetail) {
+    return render(
       <RecordDetailPanel
-        dataProvider={fakeProvider({ "SRC-0002": srcDetail({}) })}
+        dataProvider={fakeProvider({ "SRC-0002": detail })}
         lookup={buildLookup(SRC_PUBLIC_SUMMARY)}
         selectedId="SRC-0002"
         onSelect={noop}
@@ -783,6 +784,10 @@ describe("RecordDetailPanel — SRC original-source action (UX-D §3)", () => {
         onViewInGraph={noop}
       />
     );
+  }
+
+  it("shows 'Abrir fonte' with a safe external link when public + available + valid HTTPS", async () => {
+    renderSrc(srcDetail({}));
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const link = await within(panel).findByRole("link", { name: /Abrir fonte/ });
@@ -792,63 +797,83 @@ describe("RecordDetailPanel — SRC original-source action (UX-D §3)", () => {
     expect(link.getAttribute("rel")).toContain("noreferrer");
   });
 
-  it("does not show the action when access.public is false", async () => {
-    render(
-      <RecordDetailPanel
-        dataProvider={fakeProvider({ "SRC-0002": srcDetail({ access: { public: false } }) })}
-        lookup={buildLookup(SRC_PUBLIC_SUMMARY)}
-        selectedId="SRC-0002"
-        onSelect={noop}
-        onBackToRecords={noop}
-        onViewAsProblem={noop}
-        onViewInGraph={noop}
-      />
-    );
+  it("shows 'Abrir fonte' when public + available + valid HTTP", async () => {
+    renderSrc(srcDetail({ canonical_reference: "http://www.cm-evora.pt/exemplo.pdf" }));
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const link = await within(panel).findByRole("link", { name: /Abrir fonte/ });
+    expect(link.getAttribute("href")).toBe("http://www.cm-evora.pt/exemplo.pdf");
+  });
+
+  it("does not show the action when access.level is restricted, even if available", async () => {
+    renderSrc(srcDetail({ access: { level: "restricted", availability: "available" } }));
+
+    await screen.findByText("Detalhes");
+    expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+  });
+
+  it("does not show the action when access.level is public but availability is unavailable", async () => {
+    renderSrc(srcDetail({ access: { level: "public", availability: "unavailable" } }));
+
+    await screen.findByText("Detalhes");
+    expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+  });
+
+  it("does not show the action when access.level is public but availability is unknown", async () => {
+    renderSrc(srcDetail({ access: { level: "public", availability: "unknown" } }));
 
     await screen.findByText("Detalhes");
     expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
   });
 
   it("does not show the action when canonical_reference is missing", async () => {
-    render(
-      <RecordDetailPanel
-        dataProvider={fakeProvider({ "SRC-0002": srcDetail({ canonical_reference: undefined }) })}
-        lookup={buildLookup(SRC_PUBLIC_SUMMARY)}
-        selectedId="SRC-0002"
-        onSelect={noop}
-        onBackToRecords={noop}
-        onViewAsProblem={noop}
-        onViewInGraph={noop}
-      />
-    );
+    renderSrc(srcDetail({ canonical_reference: undefined }));
 
     await screen.findByText("Detalhes");
     expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
   });
 
   it("does not show the action for a non-HTTP(S) canonical_reference", async () => {
-    render(
-      <RecordDetailPanel
-        dataProvider={fakeProvider({ "SRC-0002": srcDetail({ canonical_reference: "ftp://internal/file.pdf" }) })}
-        lookup={buildLookup(SRC_PUBLIC_SUMMARY)}
-        selectedId="SRC-0002"
-        onSelect={noop}
-        onBackToRecords={noop}
-        onViewAsProblem={noop}
-        onViewInGraph={noop}
-      />
-    );
+    renderSrc(srcDetail({ canonical_reference: "ftp://internal/file.pdf" }));
 
     await screen.findByText("Detalhes");
     expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
   });
 
   it("does not show the action for a malformed canonical_reference string", async () => {
+    renderSrc(srcDetail({ canonical_reference: "not a url" }));
+
+    await screen.findByText("Detalhes");
+    expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+  });
+
+  it("renders the source link for an SRC-0093-shaped SRC v2 fixture", async () => {
+    const detail: RecordDetail = {
+      id: "SRC-0093",
+      type: "SRC-",
+      file: "research/sources/SRC-0093.yaml",
+      record: {
+        source_id: "SRC-0093",
+        publisher: "Câmara Municipal de Évora",
+        name: "Portal de Dados Abertos de Évora",
+        resource_type: "dataset",
+        scope: { geography: { level: "municipality", area: "Évora" }, domains: ["mobility"] },
+        access: { level: "public", availability: "available", machine_readable: true },
+        acquisition: { method: "public_web" },
+        canonical_reference: "https://dados.cm-evora.pt/dataset/exemplo",
+        licensing: { status: "known", licence: "CC-BY-4.0", reuse: "permitted" },
+        temporal: { last_checked_at: "2026-01-01" },
+      },
+      outgoingEdges: [],
+      incomingEdges: [],
+    };
+    const summary: RecordSummary = { id: "SRC-0093", type: "SRC-", label: "Portal de Dados Abertos de Évora", file: detail.file, summaryFields: {} };
+
     render(
       <RecordDetailPanel
-        dataProvider={fakeProvider({ "SRC-0002": srcDetail({ canonical_reference: "not a url" }) })}
-        lookup={buildLookup(SRC_PUBLIC_SUMMARY)}
-        selectedId="SRC-0002"
+        dataProvider={fakeProvider({ "SRC-0093": detail })}
+        lookup={buildLookup(summary)}
+        selectedId="SRC-0093"
         onSelect={noop}
         onBackToRecords={noop}
         onViewAsProblem={noop}
@@ -856,16 +881,21 @@ describe("RecordDetailPanel — SRC original-source action (UX-D §3)", () => {
       />
     );
 
-    await screen.findByText("Detalhes");
-    expect(screen.queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const link = await within(panel).findByRole("link", { name: /Abrir fonte/ });
+    expect(link.getAttribute("href")).toBe("https://dados.cm-evora.pt/dataset/exemplo");
   });
 
-  it("never shows the action on a non-SRC record, even with an HTTP(S)-shaped field of the same name", async () => {
+  it("never shows the action on a non-SRC record, even with an SRC v2-shaped access field of the same name", async () => {
     const evdDetail: RecordDetail = {
       id: "EVD-0001",
       type: "EVD-",
       file: "research/evidence/EVD-0001.yaml",
-      record: { evidence_id: "EVD-0001", access: { public: true }, canonical_reference: "https://example.org/not-a-source" },
+      record: {
+        evidence_id: "EVD-0001",
+        access: { level: "public", availability: "available" },
+        canonical_reference: "https://example.org/not-a-source",
+      },
       outgoingEdges: [],
       incomingEdges: [],
     };
@@ -970,7 +1000,7 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
         source_id: "SRC-0002",
         name: "Plano de Desenvolvimento Social de Évora 2024-2027",
         publisher: "Município de Évora",
-        access: { public: true },
+        access: { public: true, level: "public", availability: "available" },
         freshness: { status: "UNKNOWN" },
         canonical_reference: "https://www.cm-evora.pt/exemplo.pdf",
       },

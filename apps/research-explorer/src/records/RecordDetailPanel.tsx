@@ -235,18 +235,22 @@ function contributionTargetSentence(value: string, relatedProblemId: string): st
 }
 
 /**
- * UX-D §3: SRC-only public provenance-verification action. Only a canonical
- * external HTTP(S) reference that the source's own `access.public` marks as
- * valid for public access qualifies — this reuses existing SRC read-model
- * data (`canonical_reference`, `access.public`) rather than adding a schema
- * field. Anything else (missing reference, non-HTTP(S) scheme, or a source
- * not marked publicly accessible) renders no action: this is deliberately
+ * SUI-02A: SRC-only public provenance-verification action, restored to SRC
+ * v2 canonical eligibility semantics (`docs/datamodel.md` §1.1) — the
+ * retired v1 `access.public` field no longer governs this. A canonical
+ * external HTTP(S) reference qualifies only when the source's own
+ * `access.level` is `"public"` and `access.availability` is `"available"`;
+ * availability is never inferred from any other field. Anything else
+ * (missing reference, non-HTTP(S) scheme, non-public level, or
+ * unavailable/unknown availability) renders no action: this is deliberately
  * not a generic auto-linker for arbitrary strings.
  */
 function publicSourceReferenceUrl(record: Record<string, unknown>): string | null {
   const access = record.access;
-  const isPublic = access !== null && typeof access === "object" && !Array.isArray(access) && (access as Record<string, unknown>).public === true;
-  if (!isPublic) return null;
+  if (access === null || typeof access !== "object" || Array.isArray(access)) return null;
+  const accessRecord = access as Record<string, unknown>;
+  if (accessRecord.level !== "public") return null;
+  if (accessRecord.availability !== "available") return null;
   const reference = record.canonical_reference;
   if (typeof reference !== "string") return null;
   let url: URL;
