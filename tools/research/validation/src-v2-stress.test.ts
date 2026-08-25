@@ -1,15 +1,15 @@
 /**
- * SRC-V2C — executable stress test for the frozen SRC v2 candidate contract
- * (docs/datamodel.md §1.1-§1.2).
+ * SRC-V2C — executable stress test for the SRC v2 contract (docs/datamodel.md
+ * §1.1-§1.2), independent of the active research/schemas/source.schema.json.
  *
  * This encodes the documented SRC v2 shape as a synthetic "SXT-" schema
  * (never the real "SRC-" prefix) using only the five generic declarative
  * capabilities added in SRC-V2B (allowedFields, fieldTypes, patterns,
  * conditionalRequired, exclusiveFieldSets) plus the existing
- * requiredFields/enums mechanisms. The goal is to prove those generic
- * capabilities can express the full v2 contract before
- * research/schemas/source.schema.json or any real SRC-* record is
- * migrated. No real schema or record is read, written, or referenced here.
+ * requiredFields/enums mechanisms. This proves those generic capabilities
+ * can express the full v2 contract in isolation; source-v2-contract.test.ts
+ * separately proves the shipped active schema is wired correctly. No real
+ * schema or record is read, written, or referenced here.
  *
  * Run with Node's built-in test runner: node --test tools/research (recursively)
  */
