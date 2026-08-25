@@ -373,6 +373,32 @@ tr[aria-selected="true"] {
   max-width: 45rem;
 }
 
+/* SUI-03B3: Source original-source action, moved from the rail into the
+   Source identity/header area — same action-link visual language as
+   .detail-rail-actions a, scoped to its own inline placement. */
+.record-source-header-action {
+  margin: var(--space-4) 0 0;
+}
+
+.record-source-header-action a {
+  display: inline-block;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.record-source-header-action a:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
 .record-type-context {
   color: #555;
   font-size: 0.85rem;

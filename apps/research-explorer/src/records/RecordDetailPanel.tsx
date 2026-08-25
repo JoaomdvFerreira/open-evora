@@ -263,14 +263,22 @@ function publicSourceReferenceUrl(record: Record<string, unknown>): string | nul
   return url.protocol === "http:" || url.protocol === "https:" ? reference : null;
 }
 
+/**
+ * SUI-03B3: moved out of the rail into the Source identity/header area — the
+ * action stays visually tied to the Source itself rather than to
+ * investigation navigation. Eligibility (`publicSourceReferenceUrl`) is
+ * unchanged from SUI-02A; only placement and label moved.
+ */
 function SourceOriginalLinkAction({ detail }: { detail: RecordDetail }) {
   if (detail.type !== "SRC-") return null;
   const url = publicSourceReferenceUrl(detail.record);
   if (url === null) return null;
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer">
-      Abrir fonte ↗
-    </a>
+    <p className="record-source-header-action">
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        Abrir fonte original ↗
+      </a>
+    </p>
   );
 }
 
@@ -877,6 +885,8 @@ function RecordDetailContent({
             )}
           </section>
 
+          {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} />}
+
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
           {detail.type === "SRC-" && <SourceOverviewSection record={detail.record} />}
 
@@ -918,7 +928,6 @@ function RecordDetailContent({
             <p>{typeInfo.description}</p>
           </div>
           <div className="detail-rail-actions">
-            <SourceOriginalLinkAction detail={detail} />
             {relatedProblemId && (
               <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
                 Ver como Problema ({relatedProblemId})

@@ -786,11 +786,11 @@ describe("RecordDetailPanel — SRC original-source action (SUI-02A, SRC v2 elig
     );
   }
 
-  it("shows 'Abrir fonte' with a safe external link when public + available + valid HTTPS", async () => {
+  it("shows 'Abrir fonte original ↗' with a safe external link when public + available + valid HTTPS", async () => {
     renderSrc(srcDetail({}));
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const link = await within(panel).findByRole("link", { name: /Abrir fonte/ });
+    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
     expect(link.getAttribute("href")).toBe("https://www.cm-evora.pt/exemplo.pdf");
     expect(link.getAttribute("target")).toBe("_blank");
     expect(link.getAttribute("rel")).toContain("noopener");
@@ -882,8 +882,45 @@ describe("RecordDetailPanel — SRC original-source action (SUI-02A, SRC v2 elig
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const link = await within(panel).findByRole("link", { name: /Abrir fonte/ });
+    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
     expect(link.getAttribute("href")).toBe("https://dados.cm-evora.pt/dataset/exemplo");
+  });
+
+  it("renders the SRC external-source action in the main content, before 'Visão geral', and not in the rail", async () => {
+    renderSrc(srcDetail({}));
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
+    const overview = within(panel).getByLabelText("Visão geral");
+    const rail = within(panel).getByLabelText("Mais ações");
+
+    expect(link.compareDocumentPosition(overview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(rail.contains(link)).toBe(false);
+    expect(within(rail).queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+  });
+
+  it("renders exactly one external-source action for an eligible SRC", async () => {
+    renderSrc(srcDetail({}));
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
+    expect(within(panel).getAllByRole("link", { name: /Abrir fonte/ })).toHaveLength(1);
+  });
+
+  it("renders no external-source action anywhere (main content or rail) when ineligible", async () => {
+    renderSrc(srcDetail({ access: { level: "restricted", availability: "available" } }));
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Visão geral");
+    expect(within(panel).queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+  });
+
+  it("still renders the SRC type explanation card in the rail after the action moves out of it", async () => {
+    renderSrc(srcDetail({}));
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const rail = await within(panel).findByLabelText("Mais ações");
+    expect(rail.querySelector(".detail-rail-type-note")).toBeTruthy();
   });
 
   it("never shows the action on a non-SRC record, even with an SRC v2-shaped access field of the same name", async () => {
@@ -1031,8 +1068,9 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     const disclosure = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos").closest("details") as HTMLElement;
     expect(within(panel).getAllByText("Município de Évora").filter((el) => !disclosure.contains(el))).toHaveLength(1);
 
-    // The existing "Abrir fonte" action still renders exactly once (in the
-    // rail), unaffected by the overview integration.
+    // The existing "Abrir fonte original" action still renders exactly once
+    // (in the Source header area, before Visão geral), unaffected by the
+    // overview integration.
     expect(within(panel).getAllByRole("link", { name: /Abrir fonte/ })).toHaveLength(1);
   });
 
@@ -1289,8 +1327,9 @@ describe("RecordDetailPanel — SUI-03B2 Source View Visão geral integration", 
     // The retired SRC quick-read block no longer renders separately.
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
 
-    // Existing external-link action (SUI-02A eligibility) still renders.
-    const link = within(panel).getByRole("link", { name: /Abrir fonte/ });
+    // Existing external-link action (SUI-02A eligibility) still renders, now
+    // in the Source header area rather than the rail.
+    const link = within(panel).getByRole("link", { name: /Abrir fonte original/ });
     expect(link.getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
 
     // Existing breadcrumb/type/title/orientation content remains present.
