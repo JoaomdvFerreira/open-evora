@@ -1,0 +1,28 @@
+source_id: SRC-0096
+publisher: "Oxford City Council"
+name: "Oxford City Council — Report a missed bin collection"
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: "Oxford, Reino Unido"
+  domains:
+    - "ENV"
+    - "PUB"
+    - "DIG"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.oxford.gov.uk/recycling-waste/report-missed-bin-collection"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"
+caveats:
+  - "A origem descreve o funcionamento operacional do serviço, mas não apresenta uma avaliação dos seus resultados."

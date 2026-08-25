@@ -1,0 +1,26 @@
+source_id: SRC-0097
+publisher: "North Norfolk District Council"
+name: "North Norfolk District Council — serviço de estado das perturbações na recolha"
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: "North Norfolk District, Reino Unido"
+  domains:
+    - "ENV"
+    - "PUB"
+    - "DIG"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.north-norfolk.gov.uk/missedbin"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"

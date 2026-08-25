@@ -1,0 +1,32 @@
+source_id: SRC-0100
+publisher: "IEFP, I.P."
+name: "Centros de Emprego — Estatísticas Mensais (abril 2025)"
+resource_type: document
+scope:
+  geography:
+    level: national
+    area: "Portugal"
+  temporal:
+    as_of: "2025-04"
+  domains:
+    - "EMP"
+    - "ECO"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.iefp.pt/documents/10181/13015191/Centros%2Bde%2BEmprego%2Babril%2B2025.pdf/be0bef18-1f9d-4c9f-9121-139d062c44d1"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: "2025-04"
+  last_checked_at: "2026-08-12"
+  update_frequency: monthly
+caveats:
+  - "Os dados do CTEF Évora agregam uma área de atendimento composta por 14 municípios e não isolam o município de Évora."
+  - "O boletim apresenta indicadores agregados de desemprego, ofertas e colocações, mas não publica uma lista de profissões em escassez ou vagas de difícil preenchimento."

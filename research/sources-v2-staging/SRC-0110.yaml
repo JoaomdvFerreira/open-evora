@@ -1,0 +1,28 @@
+source_id: SRC-0110
+publisher: "Câmara Municipal de Évora"
+name: "Projecto Acesso Universal 1.0 e Projecto Acesso Universal 1.1"
+resource_type: webpage
+scope:
+  geography:
+    level: local_area
+    area: "Ruas da República, Raimundo e Serpa Pinto, Évora"
+  domains:
+    - "ACC"
+    - "URB"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/projecto-acesso-universal-1-0-e-projecto-acesso-universal-1-1/"
+licensing:
+  status: unknown
+  reuse: unknown
+  attribution: "Câmara Municipal de Évora"
+temporal:
+  published_at: "2021-03-12"
+  updated_at: "2021-07-06"
+  last_checked_at: "2026-08-20"

@@ -1,0 +1,24 @@
+source_id: SRC-0088
+publisher: "Universidade de Évora"
+name: "Portal de Emprego da Universidade de Évora (emprego.uevora.pt)"
+resource_type: service
+scope:
+  geography:
+    level: non_geographic
+  domains:
+    - "EMP"
+    - "EDU"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://emprego.uevora.pt/"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

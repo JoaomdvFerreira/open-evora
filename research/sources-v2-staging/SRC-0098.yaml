@@ -1,0 +1,28 @@
+source_id: SRC-0098
+publisher: "Câmara Municipal de Lisboa"
+name: "Câmara Municipal de Lisboa — Relatório Anual da Qualidade de Serviço 2024"
+resource_type: document
+scope:
+  geography:
+    level: municipality
+    area: "Lisboa, Portugal"
+  temporal:
+    start: "2024"
+    end: "2024"
+  domains:
+    - "ENV"
+    - "PUB"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://dev.lisboa.pt/fileadmin/portal/temas/higiene_urbana/avaliacao/CML_DMHU_DHU_Relat%C3%B3rio_RQS_2024.pdf"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"

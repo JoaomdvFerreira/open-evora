@@ -1,0 +1,31 @@
+source_id: SRC-0094
+publisher: "San Francisco Municipal Transportation Agency (SFMTA)"
+name: "SFpark Pilot Program Evaluation"
+resource_type: document
+scope:
+  geography:
+    level: local_area
+    area: "Áreas-piloto SFpark, San Francisco, California, EUA"
+  temporal:
+    start: "2011"
+    end: "2013"
+  domains:
+    - "MOB"
+    - "DIG"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.sfmta.com/reports/sfpark-pilot-project-evaluation-report"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: "2014-06-26"
+  last_checked_at: "2026-08-25"
+caveats:
+  - "A avaliação do SFpark abrange um pacote combinado de intervenções, incluindo sensores de ocupação, informação em tempo real, preços ajustados à procura e alterações nos parquímetros e pagamentos; os resultados não permitem isolar o efeito da disponibilização de informação."
