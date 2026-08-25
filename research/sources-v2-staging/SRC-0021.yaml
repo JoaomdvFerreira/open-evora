@@ -1,0 +1,25 @@
+source_id: SRC-0021
+publisher: "TREVO - urban public transport in Évora"
+name: "TREVO public transport website"
+resource_type: service
+scope:
+  geography:
+    level: city
+    area: "Évora"
+  domains:
+    - "MOB"
+    - "DIG"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.trevo.com.pt/"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-10"

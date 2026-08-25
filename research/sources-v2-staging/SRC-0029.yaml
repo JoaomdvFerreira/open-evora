@@ -1,0 +1,28 @@
+source_id: SRC-0029
+publisher: "Município de Évora"
+name: "PUE Sector Report: Habitação e Mercado Imobiliário"
+resource_type: document
+scope:
+  geography:
+    level: city
+    area: "Évora"
+  domains:
+    - "HOU"
+    - "EDU"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-10_Habitacao-e-mercado-imobiliario.pdf"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: "2025-02"
+  last_checked_at: "2026-08-10"
+caveats:
+  - "Parte da base quantitativa do diagnóstico utiliza dados dos Censos 2021 e séries anteriores."

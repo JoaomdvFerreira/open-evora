@@ -1,0 +1,37 @@
+source_id: SRC-0002
+publisher: "Município de Évora / Rede Social"
+name: "Plano de Desenvolvimento Social de Évora 2024-2027"
+resource_type: document
+scope:
+  geography:
+    level: municipality
+    area: "Évora"
+  temporal:
+    start: "2024"
+    end: "2027"
+  domains:
+    - "MOB"
+    - "ACC"
+    - "SOC"
+    - "HOU"
+    - "HEA"
+    - "EMP"
+    - "ECO"
+    - "EDU"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: "2024-01"
+  last_checked_at: "2026-08-10"
+caveats:
+  - "Parte da base quantitativa do diagnóstico utiliza medições anteriores ao período do plano."

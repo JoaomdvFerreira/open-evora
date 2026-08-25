@@ -1,0 +1,25 @@
+source_id: SRC-0033
+publisher: "Município de Évora"
+name: "Município de Évora - Desenvolvimento Económico"
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: "Évora"
+  domains:
+    - "ECO"
+    - "EMP"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/desenvolvimento-economico/"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-10"

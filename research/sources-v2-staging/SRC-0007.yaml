@@ -1,0 +1,26 @@
+source_id: SRC-0007
+publisher: CIMAC
+name: "CIMAC — GEOCIMAC"
+resource_type: webpage
+scope:
+  geography:
+    level: intermunicipal
+    area: "Alentejo Central"
+  domains:
+    - "GEO"
+    - "URB"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cimac.pt/geocimac/"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  updated_at: "2026"
+  last_checked_at: "2026-08-25"
