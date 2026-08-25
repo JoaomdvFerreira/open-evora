@@ -141,32 +141,22 @@ function RelatedRecordButton({ id, lookup, onSelect }: { id: string; lookup: Map
 }
 
 /**
- * RD-01D: for PRB records, replaces the generic path-preserving Relações
- * rendering with a corpus-connectivity view — "which records is this PRB
- * connected to, and in which direction" — deliberately without repeating any
- * canonical field path (that information belongs exclusively to
- * `Referências canónicas` above). Each related record appears once per
- * direction regardless of how many edges/paths connect it.
+ * RD-01G: for PRB records, Relações no corpus now shows only records that
+ * reference the current PRB (incoming direction) — outgoing references are
+ * already owned exclusively by `Referências canónicas` above (current PRB →
+ * other records, with the exact canonical field path). Relações no corpus
+ * answers the complementary question: which other records point at this one
+ * (other records → current PRB), deduplicated by record ID, no field path,
+ * no ordinal.
  */
 function PrbRelationsBoundary({ detail, lookup, onSelect }: { detail: RecordDetail; lookup: Map<string, RecordSummary>; onSelect: (id: string) => void }) {
-  const outgoingIds = uniqueRelatedIds(detail.outgoingEdges, "to");
   const incomingIds = uniqueRelatedIds(detail.incomingEdges, "from");
 
   return (
     <section aria-label="Relações no corpus" className="record-prb-relations-boundary">
-      <h4>→ Referências de saída</h4>
-      {outgoingIds.length === 0 ? (
-        <p>Nenhum registo relacionado.</p>
-      ) : (
-        <ul className="prb-relations-list">
-          {outgoingIds.map((id) => (
-            <RelatedRecordButton key={id} id={id} lookup={lookup} onSelect={onSelect} />
-          ))}
-        </ul>
-      )}
-      <h4>← Referências de entrada</h4>
+      <h4>← Referenciado por</h4>
       {incomingIds.length === 0 ? (
-        <p>Nenhum registo relacionado.</p>
+        <p>Nenhum registo referencia este PRB.</p>
       ) : (
         <ul className="prb-relations-list">
           {incomingIds.map((id) => (
@@ -815,30 +805,6 @@ function TechnicalDisclosure({ detail }: { detail: RecordDetail }) {
 }
 
 /**
- * RD-01E: for PRB records, a compact Proveniência limited to deterministic
- * source metadata not already shown elsewhere (Ficheiro canónico already
- * appears in Metadados as "Ficheiro canónico" but Proveniência is its own
- * dedicated technical section per the task's own worked example, so it is
- * repeated here rather than omitted — the task's "do not repeat" list is
- * title/problem_statement/domain/geography/canonical states/relationship
- * counts/reference paths, not the file path itself). No relationship count,
- * no schema path/identifier is invented — the read model exposes none.
- */
-function PrbProvenancePanel({ detail }: { detail: RecordDetail }) {
-  return (
-    <section aria-label="Proveniência" className="record-provenance">
-      <h3 className="detail-panel-label">Proveniência</h3>
-      <dl className="detail-provenance-grid">
-        <dt>Ficheiro canónico</dt>
-        <dd className="detail-technical-field">{detail.file}</dd>
-        <dt>Tipo de registo</dt>
-        <dd className="detail-technical-field">PRB</dd>
-      </dl>
-    </section>
-  );
-}
-
-/**
  * RD-01E: for PRB records, the same exhaustive `RecordFieldTree` fallback
  * as `TechnicalDisclosure`, reframed as "Estrutura técnica completa" — the
  * final audit fallback, deliberately still exhaustive (never pruned to
@@ -944,8 +910,6 @@ function RecordDetailContent({
                 <h3 className="detail-panel-label">Relações no corpus</h3>
                 <PrbRelationsBoundary detail={detail} lookup={lookup} onSelect={onSelect} />
               </section>
-
-              <PrbProvenancePanel detail={detail} />
 
               <section aria-label="Campos do registo" className="record-detail-technical">
                 <PrbRawTechnicalDisclosure detail={detail} />

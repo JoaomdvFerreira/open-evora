@@ -2023,11 +2023,12 @@ main.explorer-shell {
   overflow-wrap: anywhere;
 }
 
-/* RD-01F/F02: Relações no corpus (PRB) — directional headings (arrow prefix
-   set on the heading text itself, in RecordDetailPanel.tsx) plus a visibly
-   lighter row treatment (plain list, no border) than Referências canónicas'
-   bordered path/button rows above it, so the two sections read as distinct
-   kinds of list rather than duplicates of each other. */
+/* RD-01F/F02, RD-01G: Relações no corpus (PRB) — incoming-only heading
+   (arrow prefix set on the heading text itself, in RecordDetailPanel.tsx)
+   plus a visibly lighter row treatment (plain list, no border) than
+   Referências canónicas' bordered path/button rows above it, so the two
+   sections read as distinct kinds of list rather than duplicates of each
+   other. */
 .record-prb-relations-boundary h4 {
   margin: var(--space-4) 0 var(--space-2);
   color: var(--ink-faint);

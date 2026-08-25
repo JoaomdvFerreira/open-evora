@@ -118,17 +118,15 @@ describe("Explorer — Records workflow (fake provider)", () => {
     expect(getRecord).toHaveBeenCalledWith("PRB-0005");
   });
 
-  it("resolves outgoing relationships to related summary labels from the index", async () => {
+  it("resolves outgoing PRB references to related summary labels via Referências canónicas", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
 
     const detailPanel = (await screen.findByText("Detalhes")).closest("section")!;
-    // PRB Relações (RD-01D) groups by direction with unique record entries, without repeating field-path notation — the resolved label still appears under "Referências de saída".
-    const relacoes = within(detailPanel).getByLabelText("Relações");
-    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
-    await within(relationsBoundary).findByText(/EVD-000105 — Via Verde Parking Buddy/);
-    expect(within(relationsBoundary).getByText(/Referências de saída/)).toBeTruthy();
+    // RD-01G: PRB Relações no corpus now shows only incoming records — PRB-0005's outgoing evidence[0] -> EVD-000105 reference is owned exclusively by Referências canónicas.
+    const referenciasCanonicas = within(detailPanel).getByLabelText("Referências canónicas");
+    expect(within(referenciasCanonicas).getByRole("button", { name: /EVD-000105/ })).toBeTruthy();
   });
 
   it("resolves incoming relationships to related summary labels from the index", async () => {
@@ -137,8 +135,8 @@ describe("Explorer — Records workflow (fake provider)", () => {
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
 
     let detailPanel = await getDetailPanel();
-    const relations = within(detailPanel).getByLabelText("Relações");
-    const outgoingButton = await within(relations).findByRole("button", { name: /EVD-000105/ });
+    const referenciasCanonicas = within(detailPanel).getByLabelText("Referências canónicas");
+    const outgoingButton = await within(referenciasCanonicas).findByRole("button", { name: /EVD-000105/ });
     await user.click(outgoingButton);
 
     detailPanel = await getDetailPanel();
@@ -154,7 +152,8 @@ describe("Explorer — Records workflow (fake provider)", () => {
     await screen.findByText("Estrutura técnica completa");
 
     let detailPanel = await getDetailPanel();
-    await user.click(await within(within(detailPanel).getByLabelText("Relações")).findByRole("button", { name: /EVD-000105/ }));
+    // RD-01G: PRB-0005's outgoing reference to EVD-000105 is owned by Referências canónicas, not Relações no corpus.
+    await user.click(await within(within(detailPanel).getByLabelText("Referências canónicas")).findByRole("button", { name: /EVD-000105/ }));
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
 
@@ -371,7 +370,8 @@ describe("Explorer — URL-addressable state", () => {
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
     let detailPanel = await getDetailPanel();
-    await user.click(await within(within(detailPanel).getByLabelText("Relações")).findByRole("button", { name: /EVD-000105/ }));
+    // RD-01G: PRB-0005's outgoing reference to EVD-000105 is owned by Referências canónicas, not Relações no corpus.
+    await user.click(await within(within(detailPanel).getByLabelText("Referências canónicas")).findByRole("button", { name: /EVD-000105/ }));
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
     expect(window.location.search).toContain("id=EVD-000105");
@@ -848,7 +848,8 @@ describe("Explorer workflow — never loads edges.json or canonical YAML (real S
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
     let detailPanel = await getDetailPanel();
-    await user.click(await within(within(detailPanel).getByLabelText("Relações")).findByRole("button", { name: /EVD-000105/ }));
+    // RD-01G: PRB-0005's outgoing reference to EVD-000105 is owned by Referências canónicas, not Relações no corpus.
+    await user.click(await within(within(detailPanel).getByLabelText("Referências canónicas")).findByRole("button", { name: /EVD-000105/ }));
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
 

@@ -551,7 +551,7 @@ function buildPrb0001Fixture() {
 }
 
 describe("RecordDetailPanel — unique related-record cardinality (relationship semantics correction)", () => {
-  it("PRB-0001-equivalent fixture: 21 exact paths (10 outgoing + 11 incoming) resolve to 11 unique related records, not 10 or 21", async () => {
+  it("RD-01G: PRB-0001-equivalent fixture: 11 incoming paths resolve to 11 unique incoming-referencing records, and outgoing edges are not shown here", async () => {
     const { prbDetail, lookup } = buildPrb0001Fixture();
     render(
       <RecordDetailPanel
@@ -567,24 +567,18 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
 
-    // RD-01E: PRB Proveniência no longer repeats relationship counts (that
-    // "1 registo(s) relacionado(s)" line only exists in the generic,
-    // non-PRB ProvenancePanel) — unique-record cardinality (11, distinct
-    // from the raw edge counts of 10 outgoing/11 incoming/21 total) is
-    // instead directly observable as the length of each Relações no corpus
-    // direction list below.
-    // RD-01D: PRB Relações no corpus groups by direction with unique IDs per direction — 10 unique outgoing (evidence[0..9] all reciprocated) + 11 unique incoming (10 reciprocal + 1 incoming-only).
+    // RD-01G: PRB Relações no corpus now shows only the incoming direction
+    // (other records → this PRB) — outgoing references belong exclusively to
+    // Referências canónicas. 11 unique incoming records (10 reciprocal + 1
+    // incoming-only), deduplicated across their 11 raw incoming edges.
     const relacoes = within(panel).getByLabelText("Relações");
     const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
-    const outgoingHeading = within(relationsBoundary).getByText(/Referências de saída/);
-    const incomingHeading = within(relationsBoundary).getByText(/Referências de entrada/);
-    const outgoingList = outgoingHeading.nextElementSibling as HTMLElement;
+    const incomingHeading = within(relationsBoundary).getByText(/Referenciado por/);
     const incomingList = incomingHeading.nextElementSibling as HTMLElement;
-    expect(within(outgoingList).getAllByRole("button")).toHaveLength(10);
     expect(within(incomingList).getAllByRole("button")).toHaveLength(11);
   });
 
-  it("RD-01D: lists a record referenced through both directions once per direction, without repeating canonical field paths", async () => {
+  it("RD-01G: lists an incoming-referencing record once even if referenced through more than one incoming edge, without canonical field paths", async () => {
     const { prbDetail, lookup } = buildPrb0001Fixture();
     render(
       <RecordDetailPanel
@@ -602,15 +596,15 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
     const relacoes = within(panel).getByLabelText("Relações");
     const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
 
-    // EVD-000001 is reciprocal (outgoing evidence[0] + incoming analysis.related_problems[0]) — appears exactly once in each direction's list, never with path notation.
-    expect(within(relationsBoundary).getAllByRole("button", { name: /EVD-000001/ })).toHaveLength(2);
+    // EVD-000001 references this PRB via incoming analysis.related_problems[0] — appears exactly once, never with path notation.
+    expect(within(relationsBoundary).getAllByRole("button", { name: /EVD-000001/ })).toHaveLength(1);
     expect(relationsBoundary.textContent).not.toContain("evidence[0]");
     expect(relationsBoundary.textContent).not.toContain("analysis.related_problems");
     expect(relationsBoundary.textContent).not.toContain("referencia através de");
     expect(relationsBoundary.textContent).not.toContain("referenciado através de");
   });
 
-  it("RD-01D: preserves the incoming-only EVD-000011 related record in the incoming list only", async () => {
+  it("RD-01G: preserves the incoming-only EVD-000011 related record", async () => {
     const { prbDetail, lookup, incomingOnlyId } = buildPrb0001Fixture();
     render(
       <RecordDetailPanel
@@ -627,13 +621,73 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const relacoes = within(panel).getByLabelText("Relações");
     const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
-    const outgoingHeading = within(relationsBoundary).getByText(/Referências de saída/);
-    const incomingHeading = within(relationsBoundary).getByText(/Referências de entrada/);
-    const outgoingList = outgoingHeading.nextElementSibling as HTMLElement;
-    const incomingList = incomingHeading.nextElementSibling as HTMLElement;
 
-    expect(within(incomingList).getByRole("button", { name: new RegExp(incomingOnlyId) })).toBeTruthy();
-    expect(within(outgoingList).queryByRole("button", { name: new RegExp(incomingOnlyId) })).toBeNull();
+    expect(within(relationsBoundary).getByRole("button", { name: new RegExp(incomingOnlyId) })).toBeTruthy();
+  });
+
+  it("RD-01G: does not render an outgoing group or heading in Relações no corpus", async () => {
+    const { prbDetail, lookup } = buildPrb0001Fixture();
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": prbDetail })}
+        lookup={lookup}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const relacoes = within(panel).getByLabelText("Relações");
+    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
+
+    expect(within(relationsBoundary).queryByText(/Referências de saída/)).toBeNull();
+    expect(relationsBoundary.textContent).not.toContain("→");
+  });
+
+  it("RD-01G: an outgoing-only related record (no incoming edge) does not appear in Relações no corpus", async () => {
+    const outgoingOnlyDetail: RecordDetail = {
+      id: "PRB-0001",
+      type: "PRB-",
+      file: "research/problems/PRB-0001.yaml",
+      record: { problem_id: "PRB-0001" },
+      outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-000099" }],
+      incomingEdges: [],
+    };
+    const outgoingOnlySummary: RecordSummary = {
+      id: "EVD-000099",
+      type: "EVD-",
+      label: "Evidência EVD-000099 (apenas saída)",
+      file: "research/evidence/EVD-000099.yaml",
+      summaryFields: {},
+    };
+    const prbSummary: RecordSummary = {
+      id: "PRB-0001",
+      type: "PRB-",
+      label: "Problema PRB-0001",
+      file: "research/problems/PRB-0001.yaml",
+      summaryFields: { status: "OPEN" },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": outgoingOnlyDetail })}
+        lookup={buildLookup(prbSummary, outgoingOnlySummary)}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const relacoes = within(panel).getByLabelText("Relações");
+    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
+
+    expect(within(relationsBoundary).queryByRole("button", { name: /EVD-000099/ })).toBeNull();
+    expect(within(relationsBoundary).getByText("Nenhum registo referencia este PRB.")).toBeTruthy();
   });
 
   it("still excludes generic connectivity from 'Ver como Problema' semantics — unrelated to the cardinality fix", async () => {
@@ -1553,7 +1607,7 @@ describe("RecordDetailPanel — RD-01C PRB canonical references", () => {
   });
 });
 
-describe("RecordDetailPanel — RD-01E PRB provenance + raw technical boundary", () => {
+describe("RecordDetailPanel — RD-01E/RD-01G PRB raw technical boundary (Proveniência removed)", () => {
   const PRB_PROVENANCE_DETAIL: RecordDetail = {
     id: "PRB-0001",
     type: "PRB-",
@@ -1592,19 +1646,13 @@ describe("RecordDetailPanel — RD-01E PRB provenance + raw technical boundary",
     return (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
   }
 
-  it("renders a compact Proveniência limited to Ficheiro canónico and Tipo de registo, with no relationship count", async () => {
+  it("RD-01G: does not render a Proveniência section for PRB records — Ficheiro canónico/Tipo de registo are already in Metadados", async () => {
     const panel = await renderProvenanceFixture();
-    const provenance = within(panel).getByLabelText("Proveniência");
-    expect(within(provenance).getByText("Ficheiro canónico")).toBeTruthy();
-    expect(within(provenance).getByText("research/problems/PRB-0001.yaml")).toBeTruthy();
-    expect(within(provenance).getByText("Tipo de registo")).toBeTruthy();
-    expect(within(provenance).getByText("PRB")).toBeTruthy();
-    // Not repeated: title/domain/geography/canonical state/relationship counts/reference paths.
-    expect(within(provenance).queryByText("Título canónico")).toBeNull();
-    expect(within(provenance).queryByText("MOB")).toBeNull();
-    expect(within(provenance).queryByText("Évora")).toBeNull();
-    expect(within(provenance).queryByText(/registo\(s\) relacionado\(s\)/)).toBeNull();
-    expect(within(provenance).queryByText(/evidence\[0\]/)).toBeNull();
+    expect(within(panel).queryByLabelText("Proveniência")).toBeNull();
+    // The two values Proveniência used to repeat are already present in Metadados.
+    const metadados = within(panel).getByLabelText("Metadados");
+    expect(within(metadados).getByText("research/problems/PRB-0001.yaml")).toBeTruthy();
+    expect(within(metadados).getByText("PRB")).toBeTruthy();
   });
 
   it("labels the raw fallback 'Estrutura técnica completa' with the concise orientation sentence, collapsed by default", async () => {
@@ -1619,17 +1667,16 @@ describe("RecordDetailPanel — RD-01E PRB provenance + raw technical boundary",
     expect(within(details).getByText("status")).toBeTruthy();
   });
 
-  it("orders PRB Detail sections as Metadados, Estado canónico, Campos canónicos, Referências canónicas, Relações no corpus, Proveniência, Estrutura técnica completa", async () => {
+  it("orders PRB Detail sections as Metadados, Estado canónico, Campos canónicos, Referências canónicas, Relações no corpus, Estrutura técnica completa", async () => {
     const panel = await renderProvenanceFixture();
     const metadados = within(panel).getByLabelText("Metadados");
     const estadoCanonico = within(panel).getByLabelText("Estado canónico");
     const camposCanonicos = within(panel).getByLabelText("Campos canónicos");
     const referenciasCanonicas = within(panel).getByLabelText("Referências canónicas");
     const relacoes = within(panel).getByLabelText("Relações");
-    const provenance = within(panel).getByLabelText("Proveniência");
     const rawDisclosure = within(panel).getByText("Estrutura técnica completa").closest("section") as HTMLElement;
 
-    const sections = [metadados, estadoCanonico, camposCanonicos, referenciasCanonicas, relacoes, provenance, rawDisclosure];
+    const sections = [metadados, estadoCanonico, camposCanonicos, referenciasCanonicas, relacoes, rawDisclosure];
     for (let i = 0; i < sections.length - 1; i++) {
       expect(sections[i].compareDocumentPosition(sections[i + 1]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     }
