@@ -23,6 +23,183 @@ A Source establishes provenance. It is distinct from the Evidence extracted or r
 
 One Source may support multiple Evidence records.
 
+The three record types remain strictly separated by role:
+
+- **SRC** — identifiable origin/provenance.
+- **EVD** — observation extracted from that origin.
+- **PRB** — problem-level synthesis.
+
+A Source must not express what it proves, its evidential strength, its relevance to a Problem, or any research role. Those are EVD- and PRB-owned judgements.
+
+### 1.1 SRC v2 contract (frozen candidate)
+
+This section is the semantic authority for the frozen SRC v2 candidate. It documents the intended target contract for the Source record. It does not itself change `research/schemas/source.schema.json`, existing `SRC-*` records, or any executable validation; those remain governed by their own artifacts until a separate unit migrates them. Where this section and the current executable schema disagree, the disagreement is intentional and expected until that migration happens — see §1.5.
+
+#### Shape
+
+```
+source_id
+publisher?                  # optional
+creators[]?                 # optional
+name
+resource_type
+
+identity?:
+  persistent_identifier?:
+    scheme
+    value
+  version?
+  snapshot_reference?
+
+scope:
+  geography:
+    level
+    area?
+  temporal?:
+    as_of
+    OR
+    start
+    end
+  domains[]
+
+access:
+  level
+  availability
+  machine_readable
+  method?
+  format?
+
+acquisition:
+  method
+  obtained_at?
+
+canonical_reference?
+
+licensing:
+  status
+  licence?
+  reuse
+  attribution?
+
+temporal:
+  published_at?
+  updated_at?
+  last_checked_at
+  update_frequency?
+
+caveats[]?
+```
+
+#### Controlled values
+
+`resource_type`:
+`webpage`, `document`, `dataset`, `database`, `service`, `correspondence`, `other`, `unknown`.
+
+`scope.geography.level`:
+`site`, `local_area`, `parish`, `city`, `municipality`, `intermunicipal`, `regional`, `national`, `international`, `non_geographic`, `unknown`.
+
+`access.level`:
+`public`, `restricted`, `private`, `unknown`.
+
+`access.availability`:
+`available`, `unavailable`, `unknown`.
+
+`access.machine_readable`:
+`true`, `false`, `unknown`.
+
+`access.method`:
+`browser`, `download`, `api`, `feed`, `gis_service`, `direct`, `other`, `unknown`.
+
+`access.format`:
+`html`, `pdf`, `csv`, `json`, `xml`, `xlsx`, `kml`, `geojson`, `image`, `video`, `text`, `other`, `unknown`.
+
+`acquisition.method`:
+`public_web`, `direct_contact`, `direct_submission`, `api`, `archive`, `other`, `unknown`.
+
+`licensing.status`:
+`known`, `unknown`.
+
+`licensing.reuse`:
+`permitted`, `restricted`, `prohibited`, `unknown`.
+
+`temporal.update_frequency`:
+`one_off`, `daily`, `weekly`, `monthly`, `quarterly`, `annual`, `irregular`, `unknown`.
+
+#### Required fields
+
+Required at all times:
+- `source_id`
+- `name`
+- `resource_type`
+- `scope.geography.level`
+- `scope.domains`
+- `access.level`
+- `access.availability`
+- `access.machine_readable`
+- `acquisition.method`
+- `licensing.status`
+- `licensing.reuse`
+- `temporal.last_checked_at`
+
+`publisher` is optional.
+
+#### Conditional requirements
+
+`scope.geography.area` is required whenever `scope.geography.level` is not `non_geographic` and not `unknown`.
+
+`scope.temporal`, when present, must use exactly one of two mutually exclusive forms:
+- `as_of`, or
+- an interval expressed as `start` + `end`.
+
+Both forms must never be present simultaneously on the same `scope.temporal`.
+
+Partial-date fields may use only one of these three precisions:
+- `YYYY`
+- `YYYY-MM`
+- `YYYY-MM-DD`
+
+`temporal.last_checked_at` must always be a full `YYYY-MM-DD` date; partial precision is not permitted for this field.
+
+`acquisition.obtained_at` must be a full `YYYY-MM-DD` date, and is required whenever `acquisition.method` is one of:
+- `direct_contact`
+- `direct_submission`
+- `archive`
+
+#### Machine-readable semantics
+
+`access.machine_readable: true` means the relevant source content is available in a structured representation intended for programmatic consumption, without needing to extract information from a human-oriented document.
+
+Examples:
+- CSV, JSON, an API response, or GeoJSON → `true`.
+- Editorial HTML or a PDF meant for human reading → `false`.
+- Not yet established → `unknown`.
+
+#### Boundaries
+
+- `publisher` and `creators` describe provenance, not authority. SRC v2 carries no field expressing source authority/trust ranking.
+- Source publication and update dates (`temporal.published_at`, `temporal.updated_at`) are factual metadata, not a freshness judgement. SRC v2 carries no derived freshness status.
+- `access` and `licensing` are independent axes; a source's access level does not determine or imply its licensing status, and vice versa.
+- Publication governance (how/when the source itself was published or updated) is independent from both `access` and `licensing`.
+- `acquisition` records how Open Évora obtained the source (method and, where applicable, when). It does not record the surrounding engagement workflow, correspondence content, or process history.
+- `caveats[]` may contain only limitations or conditions of the source itself (e.g. incomplete coverage, self-reported data, known gaps). It must not contain research-process commentary.
+- The following do not belong in SRC, at any version: WU identifiers, batch identifiers, gates, research-process history, extracted observations, Problem-level conclusions, evidential-strength judgements, and research-role judgements (comparative/local/methodological). These remain EVD- and PRB-owned, per the SRC/EVD/PRB separation stated above.
+- SRC v2 does not author `evidence_ids`. Future SRC → EVD navigation is derived from existing EVD → SRC references, not authored on the Source record.
+- Comparative/local/methodological research role stays outside SRC v2 and will be reviewed together with EVD's contract, not decided here.
+
+#### 1.2 Fields retired from SRC v2
+
+The following fields exist in the current (v1) executable schema and current `SRC-*` records but do not belong in the SRC v2 contract:
+
+- `authority` — expresses a trust/authority ranking; provenance (`publisher`/`creators`) is not the same as authority, per the boundary above.
+- `freshness.status` — a derived freshness judgement; factual publication/update/check dates remain, but the derived status does not.
+- `canonical_source` — not part of the v2 shape.
+- `api_candidate` — not part of the v2 shape.
+- `notes` — free-text notes are not part of the v2 shape; any legitimate source-level limitation belongs in `caveats[]` under the boundary above.
+
+#### 1.3 Status of this contract
+
+SRC v2 as documented in §1.1–§1.2 is a frozen candidate contract. It does not yet supersede `research/schemas/source.schema.json`, the current `SRC-*` records, or any current validator, Explorer projection, or tooling behavior. A separate unit governs the migration of executable schema and existing records to this contract, per `AGENTS.md` §3's requirement that an adopted-but-not-yet-implemented target be stated explicitly.
+
 ## 2. Evidence (`EVD-*`)
 
 Evidence is a bounded observation with identifiable provenance.
