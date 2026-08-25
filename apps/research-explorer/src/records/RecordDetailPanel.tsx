@@ -7,7 +7,8 @@ import { findMeaningField } from "./meaningField";
 import { ContributionChip } from "./ContributionChip";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation";
 import { ContextTabs } from "../ContextTabs";
-import { evidenceQuickRead, sourceQuickRead, sourceName, type QuickReadItem } from "./recordOrientation";
+import { evidenceQuickRead, type QuickReadItem } from "./recordOrientation";
+import { SourceOverviewSection } from "./SourceOverviewSection";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -347,30 +348,6 @@ function EvidenceQuickRead({ detail }: { detail: RecordDetail }) {
   return (
     <section aria-label="Leitura rápida" className="record-quick-read">
       <h3 className="detail-panel-label">Leitura rápida</h3>
-      <QuickReadList items={items} />
-    </section>
-  );
-}
-
-/**
- * The `Abrir fonte ↗` action itself is deliberately not repeated here — it
- * already renders once, in the "Mais ações" rail, via `SourceOriginalLinkAction`.
- * Repeating the same link here would duplicate an action already present
- * (UX-E "Do not duplicate large blocks already presented more clearly
- * elsewhere") and would break the singular `getByRole("link", ...)`
- * accessibility contract existing UX-D tests rely on. This section notes
- * public-access availability as a fact (Sim/Não) without re-rendering the link.
- */
-function SourceQuickRead({ detail }: { detail: RecordDetail }) {
-  const items = sourceQuickRead(detail.record);
-  const name = sourceName(detail.record);
-
-  if (items.length === 0 && !name) return null;
-
-  return (
-    <section aria-label="Leitura rápida" className="record-quick-read">
-      <h3 className="detail-panel-label">Leitura rápida</h3>
-      {name && <p className="record-quick-read-title">{name}</p>}
       <QuickReadList items={items} />
     </section>
   );
@@ -901,7 +878,7 @@ function RecordDetailContent({
           </section>
 
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
-          {detail.type === "SRC-" && <SourceQuickRead detail={detail} />}
+          {detail.type === "SRC-" && <SourceOverviewSection record={detail.record} />}
 
           {isPrb ? (
             <>

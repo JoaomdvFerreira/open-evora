@@ -991,7 +991,7 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
   });
 
-  it("exposes an SRC quick read with title and publisher from existing canonical data, and does not render retired v1 currentness/access-status rows or v2 access fields", async () => {
+  it("renders the SRC Visão geral overview with publisher from existing canonical data, and does not render the retired SRC quick-read block", async () => {
     const detail: RecordDetail = {
       id: "SRC-0002",
       type: "SRC-",
@@ -1021,23 +1021,22 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const quickRead = await within(panel).findByLabelText("Leitura rápida");
-    expect(within(quickRead).getByText("Plano de Desenvolvimento Social de Évora 2024-2027")).toBeTruthy();
-    expect(within(quickRead).getByText("Município de Évora")).toBeTruthy();
-    // Retired SRC v1 rows must no longer appear.
-    expect(within(quickRead).queryByText("Atualidade")).toBeNull();
-    expect(within(quickRead).queryByText("Acesso público")).toBeNull();
-    // SRC v2 access fields (level/availability/machine_readable) must not
-    // accidentally produce a quick-read row yet — that is SUI-02C's job.
-    expect(within(quickRead).queryByText("public")).toBeNull();
-    expect(within(quickRead).queryByText("available")).toBeNull();
+    const overview = await within(panel).findByLabelText("Visão geral");
+    expect(within(overview).getByText("Município de Évora")).toBeTruthy();
+    // The retired SRC quick-read block no longer renders at all.
+    expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
+    // publisher appears exactly once outside the raw exhaustive technical
+    // disclosure (which independently echoes every canonical field verbatim,
+    // unaffected by this integration) — i.e. exactly once in Visão geral.
+    const disclosure = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos").closest("details") as HTMLElement;
+    expect(within(panel).getAllByText("Município de Évora").filter((el) => !disclosure.contains(el))).toHaveLength(1);
 
     // The existing "Abrir fonte" action still renders exactly once (in the
-    // rail), not duplicated inside the quick read.
+    // rail), unaffected by the overview integration.
     expect(within(panel).getAllByRole("link", { name: /Abrir fonte/ })).toHaveLength(1);
   });
 
-  it("does not render the SRC quick read at all when only a publisher-less v2 access block is present", async () => {
+  it("still renders Visão geral, without inventing rows, when only a publisher-less v2 access block is present", async () => {
     const detail: RecordDetail = {
       id: "SRC-0004",
       type: "SRC-",
@@ -1065,10 +1064,12 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     await within(panel).findByText("source_id");
+    expect(within(panel).getByLabelText("Visão geral")).toBeTruthy();
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
+    expect(within(panel).queryByText("Editor")).toBeNull();
   });
 
-  it("does not invent SRC quick-read fields that are absent from the canonical record", async () => {
+  it("still renders Visão geral without inventing rows when the SRC record has no overview-relevant fields", async () => {
     const detail: RecordDetail = {
       id: "SRC-0003",
       type: "SRC-",
@@ -1093,6 +1094,7 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     await within(panel).findByText("source_id");
+    expect(within(panel).getByLabelText("Visão geral")).toBeTruthy();
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
   });
 
@@ -1207,6 +1209,181 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     const switcher = within(panel).getByRole("navigation", { name: /PRB-0006/ });
     expect(within(switcher).getByRole("button", { name: "Detalhe" }).getAttribute("aria-current")).toBe("page");
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
+  });
+});
+
+describe("RecordDetailPanel — SUI-03B2 Source View Visão geral integration", () => {
+  /** Mirrors research/sources/SRC-0093.yaml exactly (matches SourceOverviewSection.test.tsx's fixture). */
+  const SRC_0093_DETAIL: RecordDetail = {
+    id: "SRC-0093",
+    type: "SRC-",
+    file: "research/sources/SRC-0093.yaml",
+    record: {
+      source_id: "SRC-0093",
+      publisher: "Scientific Reports (Springer Nature)",
+      creators: ["Giacomo Dalla Chiara", "Klaas Fiete Krutein", "Andisheh Ranjbari", "Anne Goodchild"],
+      name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+      resource_type: "document",
+      identity: {
+        persistent_identifier: { scheme: "doi", value: "10.1038/s41598-022-23987-z" },
+      },
+      scope: {
+        geography: { level: "local_area", area: "Belltown, Seattle, Washington, EUA" },
+        domains: ["MOB", "DIG"],
+      },
+      access: {
+        level: "public",
+        availability: "available",
+        machine_readable: false,
+        method: "browser",
+        format: "html",
+      },
+      acquisition: { method: "public_web" },
+      canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z",
+      licensing: {
+        status: "known",
+        licence: "CC BY 4.0",
+        reuse: "permitted",
+        attribution: "Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari e Anne Goodchild",
+      },
+      temporal: { published_at: "2022-11-11", last_checked_at: "2026-08-25" },
+      caveats: ["O estudo é um experimento controlado realizado numa área de 10 quarteirões em Belltown, Seattle, com 11 condutores, 33 rotas e 495 entregas simuladas."],
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const SRC_0093_SUMMARY: RecordSummary = {
+    id: "SRC-0093",
+    type: "SRC-",
+    label: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+    file: SRC_0093_DETAIL.file,
+    summaryFields: {},
+  };
+
+  it("renders Visão geral for an SRC-0093-shaped fixture with editor, document type, all creators, and the Open Évora verification date", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const overview = await within(panel).findByLabelText("Visão geral");
+    expect(within(overview).getByText("Scientific Reports (Springer Nature)")).toBeTruthy();
+    expect(within(overview).getByText("Documento")).toBeTruthy();
+    expect(within(overview).getByText("Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari, Anne Goodchild")).toBeTruthy();
+    expect(within(overview).getByText(/Verificada pela Open Évora em/)).toBeTruthy();
+
+    // publisher appears exactly once outside the raw exhaustive technical
+    // disclosure (which independently echoes every canonical field verbatim,
+    // unaffected by this integration) — i.e. exactly once in Visão geral.
+    const disclosure = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos").closest("details") as HTMLElement;
+    expect(within(panel).getAllByText("Scientific Reports (Springer Nature)").filter((el) => !disclosure.contains(el))).toHaveLength(1);
+
+    // The retired SRC quick-read block no longer renders separately.
+    expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
+
+    // Existing external-link action (SUI-02A eligibility) still renders.
+    const link = within(panel).getByRole("link", { name: /Abrir fonte/ });
+    expect(link.getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
+
+    // Existing breadcrumb/type/title/orientation content remains present.
+    const breadcrumb = within(panel).getByLabelText("Localização");
+    expect(within(breadcrumb).getByText("SRC-0093")).toBeTruthy();
+    const meaningZone = within(panel).getByLabelText("Significado");
+    expect(within(meaningZone).getByText(SRC_0093_SUMMARY.label)).toBeTruthy();
+    expect(within(meaningZone).getByText(/Este é um registo técnico da investigação/)).toBeTruthy();
+
+    // Existing technical disclosure remains present.
+    expect(within(panel).getByText("Inspeção técnica completa — todos os campos canónicos")).toBeTruthy();
+  });
+
+  it("positions Visão geral after the meaning zone and before the technical/relations content, for SRC", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    const overview = within(panel).getByLabelText("Visão geral");
+    const technicalSummary = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos");
+
+    expect(meaningZone.compareDocumentPosition(overview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(overview.compareDocumentPosition(technicalSummary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("keeps existing relations present for SRC when the fixture provides them", async () => {
+    const srcWithRelation: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      incomingEdges: [{ field: "analysis.related_problems", ordinal: 0, from: "EVD-000127" }],
+    };
+    const evdSummary: RecordSummary = { id: "EVD-000127", type: "EVD-", label: "Alguma evidência.", file: "research/evidence/EVD-000127.yaml", summaryFields: {} };
+
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcWithRelation })}
+        lookup={buildLookup(SRC_0093_SUMMARY, evdSummary)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const relations = await within(panel).findByLabelText("Relações");
+    expect(within(relations).getByRole("button", { name: new RegExp(evdSummary.label) })).toBeTruthy();
+  });
+
+  it("does not render Visão geral (SourceOverviewSection) for an EVD record", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("evidence_id");
+    expect(within(panel).queryByLabelText("Visão geral")).toBeNull();
+  });
+
+  it("does not render Visão geral (SourceOverviewSection) for a PRB record", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await screen.findByText("Detalhes");
+    expect(within(panel).queryByLabelText("Visão geral")).toBeNull();
   });
 });
 
