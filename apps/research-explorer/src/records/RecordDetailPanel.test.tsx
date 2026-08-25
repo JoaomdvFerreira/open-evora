@@ -551,7 +551,7 @@ function buildPrb0001Fixture() {
 }
 
 describe("RecordDetailPanel — unique related-record cardinality (relationship semantics correction)", () => {
-  it("PRB-0001-equivalent fixture: 21 exact paths (10 outgoing + 11 incoming) resolve to 11 unique related records, not 10 or 21", async () => {
+  it("RD-01G: PRB-0001-equivalent fixture: 11 incoming paths resolve to 11 unique incoming-referencing records, and outgoing edges are not shown here", async () => {
     const { prbDetail, lookup } = buildPrb0001Fixture();
     render(
       <RecordDetailPanel
@@ -566,19 +566,19 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const provenance = await within(panel).findByText(/registo\(s\) relacionado\(s\)/);
-    // Unique-record cardinality (11) must differ from, and not be confused with, the raw edge counts (10 outgoing, 11 incoming, 21 total).
-    expect(provenance.textContent).toContain("11 registo(s) relacionado(s)");
-    expect(provenance.textContent).toContain("11 caminho(s) de entrada");
-    expect(provenance.textContent).toContain("10 caminho(s) de saída");
 
+    // RD-01G: PRB Relações no corpus now shows only the incoming direction
+    // (other records → this PRB) — outgoing references belong exclusively to
+    // Referências canónicas. 11 unique incoming records (10 reciprocal + 1
+    // incoming-only), deduplicated across their 11 raw incoming edges.
     const relacoes = within(panel).getByLabelText("Relações");
-    const relatedGroup = within(relacoes).getByLabelText("Registos relacionados");
-    // Exactly 11 related-record entries (10 reciprocal EVDs + 1 incoming-only EVD), each rendered once.
-    expect(within(relatedGroup).getAllByRole("button")).toHaveLength(11);
+    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
+    const incomingHeading = within(relationsBoundary).getByText(/Referenciado por/);
+    const incomingList = incomingHeading.nextElementSibling as HTMLElement;
+    expect(within(incomingList).getAllByRole("button")).toHaveLength(11);
   });
 
-  it("groups reciprocal incoming+outgoing paths to the same ID into a single related-record entry, with both directions and exact field/ordinal preserved", async () => {
+  it("RD-01G: lists an incoming-referencing record once even if referenced through more than one incoming edge, without canonical field paths", async () => {
     const { prbDetail, lookup } = buildPrb0001Fixture();
     render(
       <RecordDetailPanel
@@ -594,22 +594,17 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const relacoes = within(panel).getByLabelText("Relações");
-    const evdButton = await within(relacoes).findByRole("button", { name: /EVD-000001/ });
-    const evdEntry = evdButton.closest("li") as HTMLElement;
+    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
 
-    // Both directions are visible beneath the single EVD-000001 entry.
-    expect(evdEntry.textContent).toContain("Saída");
-    expect(evdEntry.textContent).toContain("Entrada");
-    expect(evdEntry.textContent).toContain("evidence");
-    expect(evdEntry.textContent).toContain("[0]");
-    expect(evdEntry.textContent).toContain("analysis.related_problems");
-
-    // Only one <li> (one related-record group) exists for EVD-000001, not two.
-    const allEvd1Entries = within(relacoes).getAllByRole("button", { name: /EVD-000001/ });
-    expect(allEvd1Entries).toHaveLength(1);
+    // EVD-000001 references this PRB via incoming analysis.related_problems[0] — appears exactly once, never with path notation.
+    expect(within(relationsBoundary).getAllByRole("button", { name: /EVD-000001/ })).toHaveLength(1);
+    expect(relationsBoundary.textContent).not.toContain("evidence[0]");
+    expect(relationsBoundary.textContent).not.toContain("analysis.related_problems");
+    expect(relationsBoundary.textContent).not.toContain("referencia através de");
+    expect(relationsBoundary.textContent).not.toContain("referenciado através de");
   });
 
-  it("preserves the incoming-only EVD-000011 related record alongside the reciprocal EVDs, with its own exact path", async () => {
+  it("RD-01G: preserves the incoming-only EVD-000011 related record", async () => {
     const { prbDetail, lookup, incomingOnlyId } = buildPrb0001Fixture();
     render(
       <RecordDetailPanel
@@ -625,12 +620,74 @@ describe("RecordDetailPanel — unique related-record cardinality (relationship 
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const relacoes = within(panel).getByLabelText("Relações");
-    const incomingOnlyButton = await within(relacoes).findByRole("button", { name: new RegExp(incomingOnlyId) });
-    const incomingOnlyEntry = incomingOnlyButton.closest("li") as HTMLElement;
+    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
 
-    expect(incomingOnlyEntry.textContent).toContain("Entrada");
-    expect(incomingOnlyEntry.textContent).not.toContain("Saída");
-    expect(incomingOnlyEntry.textContent).toContain("analysis.related_problems");
+    expect(within(relationsBoundary).getByRole("button", { name: new RegExp(incomingOnlyId) })).toBeTruthy();
+  });
+
+  it("RD-01G: does not render an outgoing group or heading in Relações no corpus", async () => {
+    const { prbDetail, lookup } = buildPrb0001Fixture();
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": prbDetail })}
+        lookup={lookup}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const relacoes = within(panel).getByLabelText("Relações");
+    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
+
+    expect(within(relationsBoundary).queryByText(/Referências de saída/)).toBeNull();
+    expect(relationsBoundary.textContent).not.toContain("→");
+  });
+
+  it("RD-01G: an outgoing-only related record (no incoming edge) does not appear in Relações no corpus", async () => {
+    const outgoingOnlyDetail: RecordDetail = {
+      id: "PRB-0001",
+      type: "PRB-",
+      file: "research/problems/PRB-0001.yaml",
+      record: { problem_id: "PRB-0001" },
+      outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-000099" }],
+      incomingEdges: [],
+    };
+    const outgoingOnlySummary: RecordSummary = {
+      id: "EVD-000099",
+      type: "EVD-",
+      label: "Evidência EVD-000099 (apenas saída)",
+      file: "research/evidence/EVD-000099.yaml",
+      summaryFields: {},
+    };
+    const prbSummary: RecordSummary = {
+      id: "PRB-0001",
+      type: "PRB-",
+      label: "Problema PRB-0001",
+      file: "research/problems/PRB-0001.yaml",
+      summaryFields: { status: "OPEN" },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": outgoingOnlyDetail })}
+        lookup={buildLookup(prbSummary, outgoingOnlySummary)}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const relacoes = within(panel).getByLabelText("Relações");
+    const relationsBoundary = within(relacoes).getByLabelText("Relações no corpus");
+
+    expect(within(relationsBoundary).queryByRole("button", { name: /EVD-000099/ })).toBeNull();
+    expect(within(relationsBoundary).getByText("Nenhum registo referencia este PRB.")).toBeTruthy();
   });
 
   it("still excludes generic connectivity from 'Ver como Problema' semantics — unrelated to the cardinality fix", async () => {
@@ -1054,16 +1111,18 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    await within(panel).findByText("Inspeção técnica completa — todos os campos canónicos");
+    // RD-01E: PRB records label the raw fallback "Estrutura técnica completa" rather than the generic "Inspeção técnica completa — todos os campos canónicos".
+    await within(panel).findByText("Estrutura técnica completa");
+    const disclosure = within(panel).getByText("Estrutura técnica completa").closest("details") as HTMLElement;
     // Raw canonical field paths for the new PI-01 fields remain inspectable, untranslated.
-    expect(within(panel).getByText("causal_reading")).toBeTruthy();
-    expect(within(panel).getByText("investigation")).toBeTruthy();
-    expect(within(panel).getByText("solution_landscape_status")).toBeTruthy();
+    expect(within(disclosure).getByText("causal_reading")).toBeTruthy();
+    expect(within(disclosure).getByText("investigation")).toBeTruthy();
+    expect(within(disclosure).getByText("solution_landscape_status")).toBeTruthy();
     // No leftover rendering assumption tied to the fields PI-01 removed.
-    expect(within(panel).queryByText("current_journey")).toBeNull();
-    expect(within(panel).queryByText("reported_consequences")).toBeNull();
-    expect(within(panel).queryByText("possible_root_causes")).toBeNull();
-    expect(within(panel).queryByText("existing_solutions")).toBeNull();
+    expect(within(disclosure).queryByText("current_journey")).toBeNull();
+    expect(within(disclosure).queryByText("reported_consequences")).toBeNull();
+    expect(within(disclosure).queryByText("possible_root_causes")).toBeNull();
+    expect(within(disclosure).queryByText("existing_solutions")).toBeNull();
   });
 
   it("does not add the EVD/SRC quick read for a PRB record, and leaves ContextTabs/navigation unchanged", async () => {
@@ -1083,5 +1142,562 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     const switcher = within(panel).getByRole("navigation", { name: /PRB-0006/ });
     expect(within(switcher).getByRole("button", { name: "Detalhe" }).getAttribute("aria-current")).toBe("page");
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
+  });
+});
+
+describe("RecordDetailPanel — RD-01A PRB Detail header + technical metadata", () => {
+  const PRB_RD01A_DETAIL: RecordDetail = {
+    id: "PRB-0001",
+    type: "PRB-",
+    file: "research/problems/PRB-0001.yaml",
+    record: {
+      problem_id: "PRB-0001",
+      title: "A utilidade prática dos transportes públicos varia consoante os horários e os territórios",
+      domain: ["MOB"],
+      geography: { level: "municipality", area: "Évora" },
+      problem_statement: "A cobertura dos transportes públicos em Évora é, em termos globais, ampla...",
+      evidence_status: "corroborated",
+      validation_status: "unvalidated",
+      digital_tractability: "not_assessed",
+      solution_landscape_status: "not_assessed",
+      status: "OPEN",
+      decision_basis: { contract_version: "0.1" },
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const PRB_RD01A_SUMMARY: RecordSummary = {
+    id: "PRB-0001",
+    type: "PRB-",
+    label: "PRB-0001",
+    file: "research/problems/PRB-0001.yaml",
+    summaryFields: { status: "OPEN" },
+  };
+
+  async function renderPrb001() {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": PRB_RD01A_DETAIL })}
+        lookup={buildLookup(PRB_RD01A_SUMMARY)}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    return (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+  }
+
+  it("replaces the meaning-oriented hero with ID, canonical title, and the technical orientation sentence — never problem_statement", async () => {
+    const panel = await renderPrb001();
+    const meaning = within(panel).getByLabelText("Significado");
+    expect(within(meaning).getByText("Inspeção técnica do registo canónico.")).toBeTruthy();
+    expect(within(meaning).getByText(PRB_RD01A_DETAIL.record.title as string)).toBeTruthy();
+    expect(within(meaning).queryByText(/A cobertura dos transportes públicos/)).toBeNull();
+    // PRB ID is carried by the breadcrumb and the Metadados section, not duplicated here.
+    expect(within(panel).getAllByText("PRB-0001").length).toBeGreaterThan(0);
+  });
+
+  it("renders the compact Metadados section with canonical field/value fidelity", async () => {
+    const panel = await renderPrb001();
+    const metadata = within(panel).getByLabelText("Metadados");
+    expect(within(metadata).getByText("ID")).toBeTruthy();
+    expect(within(metadata).getByText("PRB-0001")).toBeTruthy();
+    expect(within(metadata).getByText("Tipo")).toBeTruthy();
+    expect(within(metadata).getByText("PRB")).toBeTruthy();
+    expect(within(metadata).getByText("Domínio")).toBeTruthy();
+    expect(within(metadata).getByText("MOB")).toBeTruthy();
+    expect(within(metadata).getByText("Nível geográfico")).toBeTruthy();
+    expect(within(metadata).getByText("municipality")).toBeTruthy();
+    expect(within(metadata).getByText("Área")).toBeTruthy();
+    expect(within(metadata).getByText("Évora")).toBeTruthy();
+    expect(within(metadata).getByText("Ficheiro canónico")).toBeTruthy();
+    expect(within(metadata).getByText("research/problems/PRB-0001.yaml")).toBeTruthy();
+    expect(within(metadata).getByText("Contrato")).toBeTruthy();
+    expect(within(metadata).getByText("0.1")).toBeTruthy();
+  });
+
+  it("omits Contrato when decision_basis.contract_version is absent, rather than inventing a value", async () => {
+    const detail: RecordDetail = {
+      ...PRB_RD01A_DETAIL,
+      record: { ...PRB_RD01A_DETAIL.record, decision_basis: undefined },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": detail })}
+        lookup={buildLookup(PRB_RD01A_SUMMARY)}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const metadata = within(panel).getByLabelText("Metadados");
+    expect(within(metadata).queryByText("Contrato")).toBeNull();
+  });
+
+  it("renders the compact Estado canónico section with PT-PT label, canonical field name, and exact stored value for each status dimension", async () => {
+    const panel = await renderPrb001();
+    const state = within(panel).getByLabelText("Estado canónico");
+    expect(within(state).getByText("Estado")).toBeTruthy();
+    expect(within(state).getByText("status")).toBeTruthy();
+    expect(within(state).getByText("OPEN")).toBeTruthy();
+    expect(within(state).getByText("Estado da evidência")).toBeTruthy();
+    expect(within(state).getByText("evidence_status")).toBeTruthy();
+    expect(within(state).getByText("corroborated")).toBeTruthy();
+    expect(within(state).getByText("Estado de validação")).toBeTruthy();
+    expect(within(state).getByText("validation_status")).toBeTruthy();
+    expect(within(state).getByText("unvalidated")).toBeTruthy();
+    expect(within(state).getByText("Tratabilidade digital")).toBeTruthy();
+    expect(within(state).getByText("digital_tractability")).toBeTruthy();
+    expect(within(state).getByText("Estado das soluções existentes")).toBeTruthy();
+    expect(within(state).getByText("solution_landscape_status")).toBeTruthy();
+    // digital_tractability and solution_landscape_status share the same stored value here.
+    expect(within(state).getAllByText("not_assessed")).toHaveLength(2);
+  });
+
+  it("does not render these PRB sections for non-PRB records (generic Record Detail unchanged)", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(within(panel).queryByLabelText("Metadados")).toBeNull();
+    expect(within(panel).queryByLabelText("Estado canónico")).toBeNull();
+    expect(within(panel).queryByLabelText("Campos canónicos")).toBeNull();
+  });
+});
+
+describe("RecordDetailPanel — RD-01B PRB canonical field inspector", () => {
+  const PRB_INSPECTOR_DETAIL: RecordDetail = {
+    id: "PRB-0001",
+    type: "PRB-",
+    file: "research/problems/PRB-0001.yaml",
+    record: {
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      domain: ["MOB"],
+      geography: { level: "municipality", area: "Évora" },
+      affected_populations: ["residentes que dependem dos transportes públicos"],
+      problem_statement: "A cobertura dos transportes públicos em Évora é ampla, mas varia.",
+      causal_reading: null,
+      evidence: ["EVD-000001", "EVD-000002"],
+      investigation: {
+        open_questions: [{ question: "Quais as linhas mais afetadas?", why_open: "Sem dados por linha." }],
+        path: { initial_signal: { summary: "Primeiro sinal.", evidence: ["EVD-000001"] } },
+      },
+      decision_basis: {
+        contract_version: "0.1",
+        eligibility_basis: "Texto de elegibilidade.",
+        supporting_evidence: ["EVD-000001", "EVD-000002"],
+        boundary_evidence: [],
+      },
+      evidence_status: "corroborated",
+      validation_status: "unvalidated",
+      digital_tractability: "not_assessed",
+      solution_landscape_status: "not_assessed",
+      status: "OPEN",
+      custom_extra_field: "valor extra não coberto por Metadados/Estado",
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const PRB_INSPECTOR_SUMMARY: RecordSummary = {
+    id: "PRB-0001",
+    type: "PRB-",
+    label: "PRB-0001",
+    file: "research/problems/PRB-0001.yaml",
+    summaryFields: { status: "OPEN" },
+  };
+  const EVD_REF_SUMMARY: RecordSummary = {
+    id: "EVD-000001",
+    type: "EVD-",
+    label: "EVD-000001",
+    file: "research/evidence/EVD-000001.yaml",
+    summaryFields: {},
+  };
+
+  async function renderInspectorFixture(record: Record<string, unknown> = PRB_INSPECTOR_DETAIL.record) {
+    const detail: RecordDetail = { ...PRB_INSPECTOR_DETAIL, record };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": detail })}
+        lookup={buildLookup(PRB_INSPECTOR_SUMMARY, EVD_REF_SUMMARY)}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    return within(panel).getByLabelText("Campos canónicos");
+  }
+
+  it("exposes problem_statement, affected_populations, causal_reading, evidence, investigation, and decision_basis by their exact canonical field names", async () => {
+    const inspector = await renderInspectorFixture();
+    expect(within(inspector).getByText("problem_statement")).toBeTruthy();
+    expect(within(inspector).getByText(/A cobertura dos transportes públicos em Évora é ampla/)).toBeTruthy();
+    expect(within(inspector).getByText("affected_populations")).toBeTruthy();
+    expect(within(inspector).getByText("residentes que dependem dos transportes públicos")).toBeTruthy();
+    expect(within(inspector).getByText("causal_reading")).toBeTruthy();
+    expect(within(inspector).getAllByText("evidence").length).toBeGreaterThan(0);
+    expect(within(inspector).getByText("investigation")).toBeTruthy();
+    expect(within(inspector).getByText("decision_basis")).toBeTruthy();
+  });
+
+  it("does not translate canonical labels into Problem View editorial headings", async () => {
+    const inspector = await renderInspectorFixture();
+    for (const editorialLabel of ["O que observamos", "Consequências conhecidas", "Atualidade", "Âmbito conhecido", "O que ainda não sabemos", "Como chegámos a este problema"]) {
+      expect(within(inspector).queryByText(editorialLabel)).toBeNull();
+    }
+  });
+
+  it("preserves array indexes and nested object hierarchy", async () => {
+    const inspector = await renderInspectorFixture();
+    expect(within(inspector).getAllByText("[0]").length).toBeGreaterThan(0);
+    expect(within(inspector).getByText("open_questions")).toBeTruthy();
+    expect(within(inspector).getByText("question")).toBeTruthy();
+    expect(within(inspector).getByText("Quais as linhas mais afetadas?")).toBeTruthy();
+    expect(within(inspector).getByText("why_open")).toBeTruthy();
+    expect(within(inspector).getByText("path")).toBeTruthy();
+    expect(within(inspector).getByText("initial_signal")).toBeTruthy();
+    expect(within(inspector).getByText("summary")).toBeTruthy();
+  });
+
+  it("renders decision_basis sub-fields in canonical contract order and only the sub-keys actually present", async () => {
+    const inspector = await renderInspectorFixture();
+    expect(within(inspector).getByText("contract_version")).toBeTruthy();
+    expect(within(inspector).getByText("eligibility_basis")).toBeTruthy();
+    expect(within(inspector).getByText("supporting_evidence")).toBeTruthy();
+    // corroboration_basis is a known decision_basis key but absent on this fixture's decision_basis object — not invented.
+    expect(within(inspector).queryByText("corroboration_basis")).toBeNull();
+  });
+
+  it("distinguishes missing field, explicit null, empty array, and empty object", async () => {
+    const inspector = await renderInspectorFixture();
+    // causal_reading: explicit null.
+    const causalRow = within(inspector).getByText("causal_reading").closest(".inspector-field") as HTMLElement;
+    expect(within(causalRow).getByText("null")).toBeTruthy();
+    // decision_basis.boundary_evidence: empty array.
+    expect(within(inspector).getByText("[ ] · 0 elementos")).toBeTruthy();
+    // decision_basis.scope: known optional field, absent -> Não registado.
+    const scopeRow = within(inspector).getByText("scope").closest(".inspector-field") as HTMLElement;
+    expect(within(scopeRow).getByText("Não registado")).toBeTruthy();
+  });
+
+  it("shows Não registado only for the bounded set of known-absent PRB fields, not for arbitrary theoretical schema properties", async () => {
+    const recordWithoutCausalOrInvestigation = { ...PRB_INSPECTOR_DETAIL.record };
+    delete (recordWithoutCausalOrInvestigation as Record<string, unknown>).causal_reading;
+    delete (recordWithoutCausalOrInvestigation as Record<string, unknown>).investigation;
+    delete (recordWithoutCausalOrInvestigation as Record<string, unknown>).decision_basis;
+    const inspector = await renderInspectorFixture(recordWithoutCausalOrInvestigation);
+    const causalRow = within(inspector).getByText("causal_reading").closest(".inspector-field") as HTMLElement;
+    expect(within(causalRow).getByText("Não registado")).toBeTruthy();
+    const investigationRow = within(inspector).getByText("investigation").closest(".inspector-field") as HTMLElement;
+    expect(within(investigationRow).getByText("Não registado")).toBeTruthy();
+    const decisionBasisRow = within(inspector).getByText("decision_basis").closest(".inspector-field") as HTMLElement;
+    expect(within(decisionBasisRow).getByText("Não registado")).toBeTruthy();
+    // A field the fixture never carries and that isn't a known PRB inspector field is never invented as a "Não registado" row.
+    expect(within(inspector).queryByText("nonexistent_hypothetical_field")).toBeNull();
+  });
+
+  it("exposes a top-level PRB field not owned by Metadados/Estado canónico, without duplicating fields those sections already show", async () => {
+    const inspector = await renderInspectorFixture();
+    expect(within(inspector).getByText("custom_extra_field")).toBeTruthy();
+    expect(within(inspector).getByText("valor extra não coberto por Metadados/Estado")).toBeTruthy();
+    // problem_id/title/domain/geography/status/evidence_status/etc. are owned by RD-01A sections — not duplicated here.
+    expect(within(inspector).queryByText("problem_id")).toBeNull();
+    expect(within(inspector).queryByText("title")).toBeNull();
+    expect(within(inspector).queryByText("domain")).toBeNull();
+    expect(within(inspector).queryByText("geography")).toBeNull();
+    expect(within(inspector).queryByText("status")).toBeNull();
+  });
+
+  it("renders EVD- record IDs inside a value as exact plain text, not a duplicate navigation control (Relações already owns record navigation)", async () => {
+    const inspector = await renderInspectorFixture();
+    expect(within(inspector).getAllByText("EVD-000001").length).toBeGreaterThan(0);
+    expect(within(inspector).getAllByText("EVD-000002").length).toBeGreaterThan(0);
+    expect(within(inspector).queryByRole("button", { name: "EVD-000001" })).toBeNull();
+    expect(within(inspector).queryByRole("button", { name: "EVD-000002" })).toBeNull();
+  });
+
+  it("does not render Campos canónicos for non-PRB records", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(within(panel).queryByLabelText("Campos canónicos")).toBeNull();
+  });
+});
+
+describe("RecordDetailPanel — RD-01C PRB canonical references", () => {
+  const PRB_REFERENCES_DETAIL: RecordDetail = {
+    id: "PRB-0001",
+    type: "PRB-",
+    file: "research/problems/PRB-0001.yaml",
+    record: {
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      evidence: ["EVD-000001", "EVD-000002"],
+      investigation: {
+        open_questions: [{ question: "Quais as linhas mais afetadas?", evidence: ["EVD-000084"] }],
+        path: { initial_signal: { summary: "Primeiro sinal.", evidence: ["EVD-000001"] } },
+      },
+      decision_basis: {
+        contract_version: "0.1",
+        manifestation: { evidence: ["EVD-000082"] },
+        supporting_evidence: ["EVD-000001", "EVD-000083"],
+        boundary_evidence: [],
+      },
+      status: "OPEN",
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const PRB_REFERENCES_SUMMARY: RecordSummary = {
+    id: "PRB-0001",
+    type: "PRB-",
+    label: "PRB-0001",
+    file: "research/problems/PRB-0001.yaml",
+    summaryFields: { status: "OPEN" },
+  };
+
+  async function renderReferencesFixture(record: Record<string, unknown> = PRB_REFERENCES_DETAIL.record, onSelect: (id: string) => void = noop) {
+    const detail: RecordDetail = { ...PRB_REFERENCES_DETAIL, record };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": detail })}
+        lookup={buildLookup(PRB_REFERENCES_SUMMARY)}
+        selectedId="PRB-0001"
+        onSelect={onSelect}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    return within(panel).getByLabelText("Referências canónicas");
+  }
+
+  it("lists every canonical reference with its exact field path, including nested array indexes", async () => {
+    const section = await renderReferencesFixture();
+    expect(within(section).getByText("evidence[0]")).toBeTruthy();
+    expect(within(section).getByText("evidence[1]")).toBeTruthy();
+    expect(within(section).getByText("decision_basis.manifestation.evidence[0]")).toBeTruthy();
+    expect(within(section).getByText("decision_basis.supporting_evidence[1]")).toBeTruthy();
+    expect(within(section).getByText("investigation.open_questions[0].evidence[0]")).toBeTruthy();
+    expect(within(section).getByText("investigation.path.initial_signal.evidence[0]")).toBeTruthy();
+  });
+
+  it("does not deduplicate by target ID — the same target through different paths appears as separate rows", async () => {
+    const section = await renderReferencesFixture();
+    expect(within(section).getAllByText("EVD-000001").length).toBe(3);
+  });
+
+  it("does not surface the record's own problem_id as a self-reference", async () => {
+    const section = await renderReferencesFixture();
+    expect(within(section).queryByText("problem_id")).toBeNull();
+  });
+
+  it("collects SRC-/EVD-/PRB- record IDs but not a non-record string with the same generic PREFIX-suffix shape (e.g. PT-PT)", async () => {
+    const section = await renderReferencesFixture({
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      language: "PT-PT",
+      evidence: ["EVD-000001"],
+      decision_basis: { supporting_evidence: ["PRB-0002"], boundary_evidence: ["SRC-0092"] },
+      status: "OPEN",
+    });
+    expect(within(section).getByText("EVD-000001")).toBeTruthy();
+    expect(within(section).getByText("PRB-0002")).toBeTruthy();
+    expect(within(section).getByText("SRC-0092")).toBeTruthy();
+    expect(within(section).queryByText("PT-PT")).toBeNull();
+    expect(within(section).queryByText("language")).toBeNull();
+  });
+
+  it("RD-01F/F03: rejects prose that begins with, or merely contains, a valid record ID — only an exact PREFIX-digits value is a reference", async () => {
+    const section = await renderReferencesFixture({
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      decision_basis: {
+        // Begins with a valid record ID, but the field's stored value is prose, not a reference.
+        eligibility_basis: "PRB-0006 constitui um problema de investigação distinto e bem definido.",
+        // Contains a valid record ID mid-sentence.
+        corroboration_statement: "A evidência EVD-000031 sustenta esta leitura, mas o campo continua a ser texto.",
+      },
+      // Merely starts with a known prefix without the PREFIX-digits shape.
+      note: "SRC-team reviewed this record",
+      status: "OPEN",
+    });
+    expect(within(section).queryByText(/PRB-0006 constitui/)).toBeNull();
+    expect(within(section).queryByText(/A evidência EVD-000031 sustenta/)).toBeNull();
+    expect(within(section).queryByText("SRC-team reviewed this record")).toBeNull();
+    expect(within(section).getByText("Nenhuma referência canónica registada.")).toBeTruthy();
+  });
+
+  it("RD-01F/F03: still accepts an exact record ID even when a sibling field in the same object is prose containing that same ID", async () => {
+    const section = await renderReferencesFixture({
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      decision_basis: {
+        eligibility_basis: "Ver EVD-000031 para detalhe.",
+        manifestation: { evidence: ["EVD-000031"] },
+      },
+      status: "OPEN",
+    });
+    expect(within(section).getByText("decision_basis.manifestation.evidence[0]")).toBeTruthy();
+    expect(within(section).getByText("EVD-000031")).toBeTruthy();
+    expect(within(section).queryByText("decision_basis.eligibility_basis")).toBeNull();
+  });
+
+  it("renders each reference as a navigable control with a path-specific accessible name, calling onSelect with the target ID", async () => {
+    const onSelect = vi.fn();
+    const user = userEvent.setup();
+    const section = await renderReferencesFixture(PRB_REFERENCES_DETAIL.record, onSelect);
+    const button = within(section).getByRole("button", { name: "Abrir EVD-000082 referenciado em decision_basis.manifestation.evidence[0]" });
+    await user.click(button);
+    expect(onSelect).toHaveBeenCalledWith("EVD-000082");
+  });
+
+  it("gives repeated occurrences of the same target ID distinct accessible names", async () => {
+    const section = await renderReferencesFixture();
+    expect(within(section).getByRole("button", { name: "Abrir EVD-000001 referenciado em evidence[0]" })).toBeTruthy();
+    expect(within(section).getByRole("button", { name: "Abrir EVD-000001 referenciado em decision_basis.supporting_evidence[0]" })).toBeTruthy();
+    expect(within(section).getByRole("button", { name: "Abrir EVD-000001 referenciado em investigation.path.initial_signal.evidence[0]" })).toBeTruthy();
+  });
+
+  it("renders a deterministic empty state without hiding the section when no canonical references exist", async () => {
+    const section = await renderReferencesFixture({ problem_id: "PRB-0001", title: "Sem referências", status: "OPEN" });
+    expect(within(section).getByText("Nenhuma referência canónica registada.")).toBeTruthy();
+  });
+
+  it("does not render Referências canónicas for non-PRB records", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(within(panel).queryByLabelText("Referências canónicas")).toBeNull();
+  });
+});
+
+describe("RecordDetailPanel — RD-01E/RD-01G PRB raw technical boundary (Proveniência removed)", () => {
+  const PRB_PROVENANCE_DETAIL: RecordDetail = {
+    id: "PRB-0001",
+    type: "PRB-",
+    file: "research/problems/PRB-0001.yaml",
+    record: {
+      problem_id: "PRB-0001",
+      title: "Título canónico",
+      domain: ["MOB"],
+      geography: { level: "municipality", area: "Évora" },
+      status: "OPEN",
+      evidence: ["EVD-000001"],
+    },
+    outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-000001" }],
+    incomingEdges: [],
+  };
+  const PRB_PROVENANCE_SUMMARY: RecordSummary = {
+    id: "PRB-0001",
+    type: "PRB-",
+    label: "PRB-0001",
+    file: "research/problems/PRB-0001.yaml",
+    summaryFields: { status: "OPEN" },
+  };
+
+  async function renderProvenanceFixture() {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0001": PRB_PROVENANCE_DETAIL })}
+        lookup={buildLookup(PRB_PROVENANCE_SUMMARY)}
+        selectedId="PRB-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    return (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+  }
+
+  it("RD-01G: does not render a Proveniência section for PRB records — Ficheiro canónico/Tipo de registo are already in Metadados", async () => {
+    const panel = await renderProvenanceFixture();
+    expect(within(panel).queryByLabelText("Proveniência")).toBeNull();
+    // The two values Proveniência used to repeat are already present in Metadados.
+    const metadados = within(panel).getByLabelText("Metadados");
+    expect(within(metadados).getByText("research/problems/PRB-0001.yaml")).toBeTruthy();
+    expect(within(metadados).getByText("PRB")).toBeTruthy();
+  });
+
+  it("labels the raw fallback 'Estrutura técnica completa' with the concise orientation sentence, collapsed by default", async () => {
+    const panel = await renderProvenanceFixture();
+    const summary = within(panel).getByText("Estrutura técnica completa");
+    const details = summary.closest("details") as HTMLDetailsElement;
+    expect(details.open).toBe(false);
+    expect(within(panel).getByText("Objeto canónico completo, sem omissões.")).toBeTruthy();
+    // Still exhaustive — the raw tree includes fields already shown structurally elsewhere.
+    expect(within(details).getByText("problem_id")).toBeTruthy();
+    expect(within(details).getByText("title")).toBeTruthy();
+    expect(within(details).getByText("status")).toBeTruthy();
+  });
+
+  it("orders PRB Detail sections as Metadados, Estado canónico, Campos canónicos, Referências canónicas, Relações no corpus, Estrutura técnica completa", async () => {
+    const panel = await renderProvenanceFixture();
+    const metadados = within(panel).getByLabelText("Metadados");
+    const estadoCanonico = within(panel).getByLabelText("Estado canónico");
+    const camposCanonicos = within(panel).getByLabelText("Campos canónicos");
+    const referenciasCanonicas = within(panel).getByLabelText("Referências canónicas");
+    const relacoes = within(panel).getByLabelText("Relações");
+    const rawDisclosure = within(panel).getByText("Estrutura técnica completa").closest("section") as HTMLElement;
+
+    const sections = [metadados, estadoCanonico, camposCanonicos, referenciasCanonicas, relacoes, rawDisclosure];
+    for (let i = 0; i < sections.length - 1; i++) {
+      expect(sections[i].compareDocumentPosition(sections[i + 1]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+  });
+
+  it("does not change non-PRB Proveniência/technical-disclosure behavior", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const provenance = within(panel).getByLabelText("Proveniência");
+    expect(within(provenance).getByText(/registo\(s\) relacionado\(s\)/)).toBeTruthy();
+    expect(within(panel).getByText("Inspeção técnica completa — todos os campos canónicos")).toBeTruthy();
+    expect(within(panel).queryByText("Estrutura técnica completa")).toBeNull();
   });
 });

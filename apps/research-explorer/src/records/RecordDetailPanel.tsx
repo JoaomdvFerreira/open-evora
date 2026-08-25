@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef, type ReactNode } from "react";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordDetail } from "./useRecordDetail";
 import { RecordFieldTree } from "./RecordFieldTree";
-import { describeType, formatTypedId } from "../typeGlossary";
+import { describeType, formatTypedId, knownTypePrefixes } from "../typeGlossary";
 import { findMeaningField } from "./meaningField";
 import { ContributionChip } from "./ContributionChip";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation";
@@ -101,6 +101,67 @@ function RelationshipList({ detail, lookup, onSelect }: RelationshipListProps) {
               </li>
             );
           })}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+/**
+ * RD-01D: unique related-record IDs for one direction only, deduplicated —
+ * a record referenced through more than one edge/canonical path in the same
+ * direction still appears exactly once. Unlike `groupPathsByRelatedRecord`
+ * (which preserves every distinct path, for `Referências canónicas`'s and
+ * the generic Relações section's own purposes), this deliberately discards
+ * path detail: RD-01D's Relações no corpus answers "which records", not
+ * "through which fields".
+ */
+function uniqueRelatedIds(edges: { to?: string; from?: string }[], key: "to" | "from"): string[] {
+  const seen = new Set<string>();
+  const ids: string[] = [];
+  for (const edge of edges) {
+    const id = edge[key]!;
+    if (!seen.has(id)) {
+      seen.add(id);
+      ids.push(id);
+    }
+  }
+  return ids;
+}
+
+function RelatedRecordButton({ id, lookup, onSelect }: { id: string; lookup: Map<string, RecordSummary>; onSelect: (id: string) => void }) {
+  const related = lookup.get(id);
+  return (
+    <li>
+      <button type="button" onClick={() => onSelect(id)}>
+        {related ? `${formatTypedId(related.type, related.id)} — ${related.label}` : id}
+      </button>
+    </li>
+  );
+}
+
+/**
+ * RD-01G: for PRB records, Relações no corpus now shows only records that
+ * reference the current PRB (incoming direction) — outgoing references are
+ * already owned exclusively by `Referências canónicas` above (current PRB →
+ * other records, with the exact canonical field path). Relações no corpus
+ * answers the complementary question: which other records point at this one
+ * (other records → current PRB), deduplicated by record ID, no field path,
+ * no ordinal.
+ */
+function PrbRelationsBoundary({ detail, lookup, onSelect }: { detail: RecordDetail; lookup: Map<string, RecordSummary>; onSelect: (id: string) => void }) {
+  const incomingIds = uniqueRelatedIds(detail.incomingEdges, "from");
+
+  return (
+    <section aria-label="Relações no corpus" className="record-prb-relations-boundary">
+      <h4>← Referenciado por</h4>
+      {incomingIds.length === 0 ? (
+        <p>Nenhum registo referencia este PRB.</p>
+      ) : (
+        <ul className="prb-relations-list">
+          {incomingIds.map((id) => (
+            <RelatedRecordButton key={id} id={id} lookup={lookup} onSelect={onSelect} />
+          ))}
         </ul>
       )}
     </section>
@@ -311,6 +372,407 @@ function SourceQuickRead({ detail }: { detail: RecordDetail }) {
   );
 }
 
+/**
+ * RD-01A: PRB Detail orientation sentence replacing the generic
+ * OrientationIntro for PRB records — the `Detalhe` tab is the technical
+ * inspection surface for a Problem, distinct from the meaning-oriented
+ * `Problema` tab, so it must not render `problem_statement` as hero text.
+ */
+function PrbOrientationIntro() {
+  return <p className="record-orientation-intro">Inspeção técnica do registo canónico.</p>;
+}
+
+function getString(record: Record<string, unknown>, key: string): string | null {
+  const value = record[key];
+  return typeof value === "string" && value.trim() !== "" ? value : null;
+}
+
+function getObject(record: Record<string, unknown>, key: string): Record<string, unknown> | null {
+  const value = record[key];
+  return value !== null && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
+}
+
+interface MetadataItem {
+  label: string;
+  field: string;
+  value: string;
+}
+
+/**
+ * RD-01A Section 1 (Metadados): every item here is either a canonical field
+ * value shown exactly as stored, or a record-provenance value the read model
+ * already exposes (`detail.file`). No schema identifier/path is included —
+ * the read model (read-model.js) does not expose a per-record schema path,
+ * only `research/schemas/problem.schema.json` at the type level, which is
+ * not record-provenance data — so it is deliberately omitted rather than
+ * invented.
+ */
+function prbMetadataItems(detail: RecordDetail): MetadataItem[] {
+  const record = detail.record;
+  const items: MetadataItem[] = [];
+
+  const problemId = getString(record, "problem_id");
+  items.push({ label: "ID", field: "problem_id", value: problemId ?? detail.id });
+
+  items.push({ label: "Tipo", field: "type", value: "PRB" });
+
+  const domain = record.domain;
+  const domainValue = Array.isArray(domain) ? domain.filter((d): d is string => typeof d === "string").join(", ") : typeof domain === "string" ? domain : null;
+  if (domainValue) items.push({ label: "Domínio", field: "domain", value: domainValue });
+
+  const geography = getObject(record, "geography");
+  const level = geography ? getString(geography, "level") : null;
+  if (level) items.push({ label: "Nível geográfico", field: "geography.level", value: level });
+
+  const area = geography ? getString(geography, "area") : null;
+  if (area) items.push({ label: "Área", field: "geography.area", value: area });
+
+  items.push({ label: "Ficheiro canónico", field: "file", value: detail.file });
+
+  const decisionBasis = getObject(record, "decision_basis");
+  const contractVersion = decisionBasis ? getString(decisionBasis, "contract_version") : null;
+  if (contractVersion) items.push({ label: "Contrato", field: "decision_basis.contract_version", value: contractVersion });
+
+  return items;
+}
+
+function PrbMetadataPanel({ detail }: { detail: RecordDetail }) {
+  const items = prbMetadataItems(detail);
+  return (
+    <section aria-label="Metadados" className="record-prb-metadata">
+      <h3 className="detail-panel-label">Metadados</h3>
+      <dl className="detail-provenance-grid">
+        {items.map((item) => (
+          <Fragment key={item.field}>
+            <dt>{item.label}</dt>
+            <dd className="detail-technical-field">{item.value}</dd>
+          </Fragment>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+interface CanonicalStateItem {
+  label: string;
+  field: string;
+  value: string;
+}
+
+/**
+ * RD-01A Section 2 (Estado canónico): stored canonical values only — no
+ * translated/reinterpreted value, no confidence/severity/editorial gloss.
+ * `publicFieldCaption`/`publicEnumLabel` are deliberately not used here: the
+ * requirement is the exact stored canonical value alongside the canonical
+ * field name, not the Problem-View-style public label substitution.
+ */
+const CANONICAL_STATE_FIELDS: { field: string; label: string }[] = [
+  { field: "status", label: "Estado" },
+  { field: "evidence_status", label: "Estado da evidência" },
+  { field: "validation_status", label: "Estado de validação" },
+  { field: "digital_tractability", label: "Tratabilidade digital" },
+  { field: "solution_landscape_status", label: "Estado das soluções existentes" },
+];
+
+function prbCanonicalStateItems(record: Record<string, unknown>): CanonicalStateItem[] {
+  const items: CanonicalStateItem[] = [];
+  for (const { field, label } of CANONICAL_STATE_FIELDS) {
+    const value = getString(record, field);
+    if (value) items.push({ label, field, value });
+  }
+  return items;
+}
+
+function PrbCanonicalStatePanel({ detail }: { detail: RecordDetail }) {
+  const items = prbCanonicalStateItems(detail.record);
+  if (items.length === 0) return null;
+
+  return (
+    <section aria-label="Estado canónico" className="record-prb-canonical-state">
+      <h3 className="detail-panel-label">Estado canónico</h3>
+      <dl className="detail-provenance-grid">
+        {items.map((item) => (
+          <Fragment key={item.field}>
+            <dt>{item.label}</dt>
+            <dd>
+              <code className="detail-technical-field">{item.field}</code> <span className="detail-technical-field">{item.value}</span>
+            </dd>
+          </Fragment>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+/**
+ * RD-01B: the set of top-level PRB fields already owned by a dedicated
+ * section elsewhere (RD-01A Metadados / Estado canónico, or record identity
+ * already shown in the breadcrumb/meaning zone) — excluded from the
+ * inspector to avoid unnecessary duplication, per RD-01B's own instruction.
+ * `type`/`file` are read-model provenance, not canonical PRB record fields,
+ * so they never appear here regardless.
+ */
+const PRB_FIELDS_OWNED_ELSEWHERE = new Set(["problem_id", "title", "domain", "geography", "status", "evidence_status", "validation_status", "digital_tractability", "solution_landscape_status"]);
+
+/**
+ * RD-01B bounded field list: only PRB fields the task explicitly names as
+ * "known optional PRB contract field" get a `Não registado` placeholder when
+ * absent. Every other top-level field renders only if the record actually
+ * carries it — this deliberately does not walk the schema to invent a full
+ * theoretical field list (RD-01B's own "keep this bounded" instruction).
+ */
+const PRB_INSPECTOR_KNOWN_FIELDS = ["problem_statement", "affected_populations", "causal_reading", "evidence", "investigation", "decision_basis"];
+
+/**
+ * decision_basis's own known sub-keys, in canonical contract order (mirrors
+ * problem.schema.json's documented decision_basis shape) — rendered in this
+ * order when present so the inspector's nesting matches the task's own
+ * worked example, rather than object insertion order from YAML parsing.
+ */
+const DECISION_BASIS_KNOWN_KEYS = [
+  "contract_version",
+  "eligibility_basis",
+  "corroboration_basis",
+  "manifestation",
+  "consequence",
+  "scope",
+  "currentness",
+  "contradiction_search",
+  "overlap_check",
+  "corroboration_statement",
+  "supporting_evidence",
+  "boundary_evidence",
+  "independence_assessment",
+  "limitations",
+];
+
+/**
+ * RD-01B's own absent/null/empty contract: missing field, explicit `null`,
+ * empty array, and empty object are four visibly distinct states — never
+ * collapsed into one generic dash the way `RecordFieldTree` (the pre-existing
+ * complete disclosure) does. `isKnownField` gates the "missing" case: an
+ * unlisted, absent field renders nothing (never invents a placeholder row),
+ * per the task's "do not invent absent optional fields" instruction.
+ */
+function InspectorValue({ value }: { value: unknown }): ReactNode {
+  if (value === null) return <span className="inspector-null">null</span>;
+  if (typeof value === "boolean" || typeof value === "number") return <span className="inspector-scalar-value">{String(value)}</span>;
+  if (typeof value === "string") {
+    return <span className="inspector-scalar-value">{value}</span>;
+  }
+  if (Array.isArray(value)) {
+    if (value.length === 0) return <span className="inspector-empty">[ ] · 0 elementos</span>;
+    return (
+      <ol className="inspector-array">
+        {value.map((item, index) => (
+          <li key={index}>
+            <span className="inspector-index">[{index}]</span> <InspectorValue value={item} />
+          </li>
+        ))}
+      </ol>
+    );
+  }
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) return <span className="inspector-empty">{"{ } · 0 propriedades"}</span>;
+    return (
+      <dl className="inspector-object">
+        {entries.map(([key, entryValue]) => (
+          <Fragment key={key}>
+            <dt className="inspector-key">{key}</dt>
+            <dd>
+              <InspectorValue value={entryValue} />
+            </dd>
+          </Fragment>
+        ))}
+      </dl>
+    );
+  }
+  return <span className="detail-technical-field">{String(value)}</span>;
+}
+
+interface InspectorField {
+  key: string;
+  present: boolean;
+  value: unknown;
+}
+
+function resolveInspectorField(record: Record<string, unknown>, key: string): InspectorField {
+  return { key, present: key in record && record[key] !== undefined, value: record[key] };
+}
+
+/**
+ * decision_basis.scope is the one decision_basis sub-key RD-01B names
+ * explicitly as a "known optional PRB contract field" (alongside
+ * causal_reading/investigation at the top level) — so it renders a
+ * `Não registado` row when absent, unlike every other decision_basis
+ * sub-key, which is simply omitted from the entries list when the record
+ * doesn't carry it (bounded to the known contract shape, no deeper invented
+ * placeholders for sub-keys the task never named as known-optional).
+ */
+const DECISION_BASIS_KNOWN_ABSENT_KEYS = new Set(["scope"]);
+
+/** `decision_basis` gets its own field ordering (canonical contract order) rather than raw object insertion order, per RD-01B's structural example. */
+function decisionBasisFields(decisionBasis: Record<string, unknown>): InspectorField[] {
+  return DECISION_BASIS_KNOWN_KEYS.filter((key) => (key in decisionBasis && decisionBasis[key] !== undefined) || DECISION_BASIS_KNOWN_ABSENT_KEYS.has(key)).map((key) =>
+    resolveInspectorField(decisionBasis, key)
+  );
+}
+
+function InspectorFieldRow({ field }: { field: InspectorField }) {
+  return (
+    <div className="inspector-field">
+      <div className="inspector-field-name">{field.key}</div>
+      <div className="inspector-field-value">{field.present ? <InspectorValue value={field.value} /> : <span className="field-empty">Não registado</span>}</div>
+    </div>
+  );
+}
+
+/**
+ * RD-01B: technical object inspector for the canonical PRB fields not
+ * already owned by Metadados/Estado canónico — faithful structure, exact
+ * canonical field names and stored values, no editorial reinterpretation.
+ * Deliberately separate from `TechnicalDisclosure` (the pre-existing
+ * exhaustive raw tree), which this task must not change.
+ */
+function PrbFieldInspector({ detail }: { detail: RecordDetail }) {
+  const record = detail.record;
+
+  const knownFields = PRB_INSPECTOR_KNOWN_FIELDS.map((key) => resolveInspectorField(record, key));
+
+  const otherFields = Object.keys(record)
+    .filter((key) => !PRB_FIELDS_OWNED_ELSEWHERE.has(key) && !PRB_INSPECTOR_KNOWN_FIELDS.includes(key))
+    .map((key) => resolveInspectorField(record, key));
+
+  const decisionBasisField = knownFields.find((f) => f.key === "decision_basis")!;
+  const otherKnownFields = knownFields.filter((f) => f.key !== "decision_basis");
+
+  return (
+    <section aria-label="Campos canónicos" className="record-prb-inspector">
+      <h3 className="detail-panel-label">Campos canónicos</h3>
+      {otherKnownFields.map((field) => (
+        <InspectorFieldRow key={field.key} field={field} />
+      ))}
+      <div className="inspector-field">
+        <div className="inspector-field-name">decision_basis</div>
+        <div className="inspector-field-value">
+          {decisionBasisField.present ? (
+            (() => {
+              const decisionBasis = getObject(record, "decision_basis");
+              if (!decisionBasis) return <InspectorValue value={decisionBasisField.value} />;
+              const fields = decisionBasisFields(decisionBasis);
+              if (fields.length === 0) return <span className="inspector-empty">{"{ } · 0 propriedades"}</span>;
+              return (
+                <>
+                  {fields.map((field) => (
+                    <InspectorFieldRow key={field.key} field={field} />
+                  ))}
+                </>
+              );
+            })()
+          ) : (
+            <span className="field-empty">Não registado</span>
+          )}
+        </div>
+      </div>
+      {otherFields.map((field) => (
+        <InspectorFieldRow key={field.key} field={field} />
+      ))}
+    </section>
+  );
+}
+
+/**
+ * RD-01C: a single canonical-record reference found by walking the raw PRB
+ * object — `path` is the exact canonical field path (including array
+ * indexes) at which `targetId` was found, e.g.
+ * `decision_basis.manifestation.evidence[0]`. Deliberately not deduplicated
+ * by `targetId`: the same target referenced through two distinct paths is
+ * two distinct entries here (task's own "do not deduplicate" instruction).
+ */
+interface CanonicalReference {
+  path: string;
+  targetId: string;
+}
+
+/**
+ * RD-01F/F03: the field must contain *only* an exact canonical record ID
+ * (`^(?:SRC|EVD|PRB)-\d+$`), not merely start with or contain one — a
+ * `startsWith` check (the prior predicate) misclassifies prose fields such as
+ * `decision_basis.eligibility_basis` as references whenever their text
+ * happens to open with a record ID. Exact-match against
+ * `typeGlossary.ts`'s own known record-type prefixes (SRC-/EVD-/PRB-) — the
+ * same narrowly scoped source `describeType`/`formatTypedId` above rely on —
+ * rather than inventing a new shared abstraction for this one field.
+ */
+function isCanonicalRecordId(value: string): boolean {
+  return knownTypePrefixes().some((prefix) => new RegExp(`^${prefix}\\d+$`).test(value));
+}
+
+/**
+ * Walks the full raw PRB record (`detail.record`, the complete parsed-YAML
+ * object — not the edge projection, which is schema-`references`-driven and
+ * silently omits paths like `investigation.open_questions[].evidence` and
+ * `investigation.path.*.evidence`, see read-model.js / problem.schema.json)
+ * to recover every canonical-record-ID string value together with its exact
+ * field path. This is the only reliable source of path-faithful references.
+ */
+function collectCanonicalReferences(value: unknown, path: string, out: CanonicalReference[]): void {
+  if (typeof value === "string") {
+    if (isCanonicalRecordId(value)) out.push({ path, targetId: value });
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => collectCanonicalReferences(item, `${path}[${index}]`, out));
+    return;
+  }
+  if (value !== null && typeof value === "object") {
+    for (const [key, entryValue] of Object.entries(value as Record<string, unknown>)) {
+      collectCanonicalReferences(entryValue, path ? `${path}.${key}` : key, out);
+    }
+  }
+}
+
+/**
+ * RD-01C: technical section owning canonical field path → referenced record
+ * ID → navigation. Deliberately separate from `RelationshipList` (which
+ * groups by related record and is driven by the edge projection): this
+ * section's primary information is the exact canonical path itself, one row
+ * per path, never grouped or deduplicated by target.
+ */
+/**
+ * `problem_id` is the record's own self-identification (already shown in
+ * Metadados/the breadcrumb), not a reference to another canonical record —
+ * excluded here so the record never "references" itself.
+ */
+const SELF_ID_FIELD = "problem_id";
+
+function PrbCanonicalReferences({ detail, onSelect }: { detail: RecordDetail; onSelect: (id: string) => void }) {
+  const references: CanonicalReference[] = [];
+  collectCanonicalReferences(detail.record, "", references);
+  const filteredReferences = references.filter((ref) => ref.path !== SELF_ID_FIELD);
+
+  return (
+    <section aria-label="Referências canónicas" className="record-prb-references">
+      <h3 className="detail-panel-label">Referências canónicas</h3>
+      {filteredReferences.length === 0 ? (
+        <p className="field-empty">Nenhuma referência canónica registada.</p>
+      ) : (
+        <ul className="prb-reference-list">
+          {filteredReferences.map((ref, index) => (
+            <li key={`${ref.path}-${index}`} className="prb-reference-item">
+              <code className="prb-reference-path">{ref.path}</code>
+              <button type="button" className="prb-reference-target" onClick={() => onSelect(ref.targetId)} aria-label={`Abrir ${ref.targetId} referenciado em ${ref.path}`}>
+                {ref.targetId}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 function ProvenancePanel({ detail }: { detail: RecordDetail }) {
   const uniqueRelatedCount = countUniqueRelatedRecords(detail);
   return (
@@ -342,6 +804,23 @@ function TechnicalDisclosure({ detail }: { detail: RecordDetail }) {
   );
 }
 
+/**
+ * RD-01E: for PRB records, the same exhaustive `RecordFieldTree` fallback
+ * as `TechnicalDisclosure`, reframed as "Estrutura técnica completa" — the
+ * final audit fallback, deliberately still exhaustive (never pruned to
+ * avoid duplicating Metadados/Estado canónico/Campos canónicos/Referências
+ * canónicas, per the task's explicit "do not remove fields" instruction).
+ */
+function PrbRawTechnicalDisclosure({ detail }: { detail: RecordDetail }) {
+  return (
+    <details className="technical-disclosure">
+      <summary>Estrutura técnica completa</summary>
+      <p className="technical-disclosure-caption">Objeto canónico completo, sem omissões.</p>
+      <RecordFieldTree data={detail.record} />
+    </details>
+  );
+}
+
 function RecordDetailContent({
   detail,
   lookup,
@@ -357,6 +836,7 @@ function RecordDetailContent({
   onViewAsProblem: (id: string) => void;
   onViewInGraph: (id: string) => void;
 }) {
+  const isPrb = detail.type === "PRB-";
   const meaning = findMeaningField(detail.record);
   const typeInfo = describeType(detail.type);
   const relatedProblemId = findRelatedProblemId(detail, lookup);
@@ -381,8 +861,17 @@ function RecordDetailContent({
         <div className="record-detail-main">
           <section aria-label="Significado" className="record-meaning-zone">
             <TypeBadge detail={detail} />
-            <OrientationIntro />
-            {meaning ? (
+            {isPrb ? <PrbOrientationIntro /> : <OrientationIntro />}
+            {isPrb ? (
+              (() => {
+                const title = getString(detail.record, "title");
+                return title ? (
+                  <p className="record-meaning">{title}</p>
+                ) : (
+                  <p className="record-meaning field-empty">{detail.id} — sem título canónico identificado para este registo.</p>
+                );
+              })()
+            ) : meaning ? (
               <p className="record-meaning">{meaning.value}</p>
             ) : (
               <p className="record-meaning field-empty">{detail.id} — sem campo de significado canónico identificado para este tipo de registo.</p>
@@ -410,16 +899,36 @@ function RecordDetailContent({
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
           {detail.type === "SRC-" && <SourceQuickRead detail={detail} />}
 
-          <ProvenancePanel detail={detail} />
+          {isPrb ? (
+            <>
+              <PrbMetadataPanel detail={detail} />
+              <PrbCanonicalStatePanel detail={detail} />
+              <PrbFieldInspector detail={detail} />
+              <PrbCanonicalReferences detail={detail} onSelect={onSelect} />
 
-          <section aria-label="Campos do registo" className="record-detail-technical">
-            <TechnicalDisclosure detail={detail} />
-          </section>
+              <section aria-label="Relações" id="relacoes" className="record-detail-relations">
+                <h3 className="detail-panel-label">Relações no corpus</h3>
+                <PrbRelationsBoundary detail={detail} lookup={lookup} onSelect={onSelect} />
+              </section>
 
-          <section aria-label="Relações" id="relacoes" className="record-detail-relations">
-            <h3 className="detail-panel-label">Relações — por registo relacionado, com caminhos de referência exatos</h3>
-            <RelationshipList detail={detail} lookup={lookup} onSelect={onSelect} />
-          </section>
+              <section aria-label="Campos do registo" className="record-detail-technical">
+                <PrbRawTechnicalDisclosure detail={detail} />
+              </section>
+            </>
+          ) : (
+            <>
+              <ProvenancePanel detail={detail} />
+
+              <section aria-label="Campos do registo" className="record-detail-technical">
+                <TechnicalDisclosure detail={detail} />
+              </section>
+
+              <section aria-label="Relações" id="relacoes" className="record-detail-relations">
+                <h3 className="detail-panel-label">Relações — por registo relacionado, com caminhos de referência exatos</h3>
+                <RelationshipList detail={detail} lookup={lookup} onSelect={onSelect} />
+              </section>
+            </>
+          )}
         </div>
 
         <aside className="record-detail-rail" aria-label="Mais ações">
