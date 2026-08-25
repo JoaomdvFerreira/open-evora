@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPublicCount, formatPublicDateTime, publicCompactEnumLabel, publicEnumLabel } from "./presentation";
+import { formatPublicCount, formatPublicDateTime, publicCompactEnumLabel, publicEnumLabel, publicFieldCaption } from "./presentation";
 
 describe("PT-PT public presentation terminology", () => {
   it("uses field-aware PRB validation labels", () => {
@@ -41,5 +41,71 @@ describe("PT-PT public presentation terminology", () => {
 
   it("uses the canonical value as the safe fallback for unknown future values", () => {
     expect(publicEnumLabel("status", "FUTURE_STATUS")).toBe("FUTURE_STATUS");
+  });
+
+  it("maps all SRC v2 resource_type values", () => {
+    expect(publicEnumLabel("resource_type", "webpage")).toBe("Página web");
+    expect(publicEnumLabel("resource_type", "document")).toBe("Documento");
+    expect(publicEnumLabel("resource_type", "dataset")).toBe("Conjunto de dados");
+    expect(publicEnumLabel("resource_type", "database")).toBe("Base de dados");
+    expect(publicEnumLabel("resource_type", "service")).toBe("Serviço");
+    expect(publicEnumLabel("resource_type", "correspondence")).toBe("Correspondência");
+    expect(publicEnumLabel("resource_type", "other")).toBe("Outro");
+    expect(publicEnumLabel("resource_type", "unknown")).toBe("Desconhecido");
+  });
+
+  it("maps all SRC v2 access.level values", () => {
+    expect(publicEnumLabel("access.level", "public")).toBe("Público");
+    expect(publicEnumLabel("access.level", "restricted")).toBe("Restrito");
+    expect(publicEnumLabel("access.level", "private")).toBe("Privado");
+    expect(publicEnumLabel("access.level", "unknown")).toBe("Desconhecido");
+  });
+
+  it("maps all SRC v2 access.availability values", () => {
+    expect(publicEnumLabel("access.availability", "available")).toBe("Disponível");
+    expect(publicEnumLabel("access.availability", "unavailable")).toBe("Indisponível");
+    expect(publicEnumLabel("access.availability", "unknown")).toBe("Desconhecida");
+  });
+
+  it("maps all SRC v2 access.method values", () => {
+    expect(publicEnumLabel("access.method", "browser")).toBe("Navegador");
+    expect(publicEnumLabel("access.method", "download")).toBe("Transferência");
+    expect(publicEnumLabel("access.method", "api")).toBe("API");
+    expect(publicEnumLabel("access.method", "feed")).toBe("Feed");
+    expect(publicEnumLabel("access.method", "gis_service")).toBe("Serviço GIS");
+    expect(publicEnumLabel("access.method", "direct")).toBe("Acesso direto");
+    expect(publicEnumLabel("access.method", "other")).toBe("Outro");
+    expect(publicEnumLabel("access.method", "unknown")).toBe("Desconhecido");
+  });
+
+  it("maps all SRC v2 access.format values", () => {
+    expect(publicEnumLabel("access.format", "html")).toBe("HTML");
+    expect(publicEnumLabel("access.format", "pdf")).toBe("PDF");
+    expect(publicEnumLabel("access.format", "csv")).toBe("CSV");
+    expect(publicEnumLabel("access.format", "json")).toBe("JSON");
+    expect(publicEnumLabel("access.format", "xml")).toBe("XML");
+    expect(publicEnumLabel("access.format", "xlsx")).toBe("XLSX");
+    expect(publicEnumLabel("access.format", "kml")).toBe("KML");
+    expect(publicEnumLabel("access.format", "geojson")).toBe("GeoJSON");
+    expect(publicEnumLabel("access.format", "image")).toBe("Imagem");
+    expect(publicEnumLabel("access.format", "video")).toBe("Vídeo");
+    expect(publicEnumLabel("access.format", "text")).toBe("Texto");
+    expect(publicEnumLabel("access.format", "other")).toBe("Outro");
+    expect(publicEnumLabel("access.format", "unknown")).toBe("Desconhecido");
+  });
+
+  it("resolves field captions for the new SRC v2 dotted access paths", () => {
+    expect(publicFieldCaption("resource_type")).toBe("Tipo de recurso");
+    expect(publicFieldCaption("access.level")).toBe("Nível de acesso");
+    expect(publicFieldCaption("access.availability")).toBe("Disponibilidade");
+    expect(publicFieldCaption("access.method")).toBe("Forma de consulta");
+    expect(publicFieldCaption("access.format")).toBe("Formato");
+    expect(publicFieldCaption("access.machine_readable")).toBe("Leitura automática");
+  });
+
+  it("preserves the safe fallback for unmapped SRC v2 values and fields", () => {
+    expect(publicEnumLabel("resource_type", "future_resource_type")).toBe("future_resource_type");
+    expect(publicEnumLabel("access.level", "future_level")).toBe("future_level");
+    expect(publicFieldCaption("access.unmapped_field")).toBe("access.unmapped_field");
   });
 });

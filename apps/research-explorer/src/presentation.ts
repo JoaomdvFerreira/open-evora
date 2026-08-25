@@ -13,7 +13,11 @@ const LABELS: Record<string, Record<string, string>> = {
   representativeness: { UNKNOWN: "Desconhecida", LIMITED: "Limitada", DESIGNED_REPRESENTATIVE: "Concebida como representativa", NOT_APPLICABLE: "Não aplicável" },
   temporal_relevance: { CURRENT: "Atual", HISTORICAL: "Histórica", SUPERSEDED: "Substituída", UNKNOWN: "Desconhecida" },
   geography: { city: "Cidade", parish: "Freguesia", municipality: "Município", intermunicipal: "Intermunicipal", regional: "Regional" },
-  source_type: { api: "API", dataset: "Conjunto de dados", gis: "Sistema de Informação Geográfica", web: "Página web", document: "Documento", database: "Base de dados", feed: "Fluxo de dados", unknown: "Desconhecido" },
+  resource_type: { webpage: "Página web", document: "Documento", dataset: "Conjunto de dados", database: "Base de dados", service: "Serviço", correspondence: "Correspondência", other: "Outro", unknown: "Desconhecido" },
+  level: { public: "Público", restricted: "Restrito", private: "Privado", unknown: "Desconhecido" },
+  availability: { available: "Disponível", unavailable: "Indisponível", unknown: "Desconhecida" },
+  method: { browser: "Navegador", download: "Transferência", api: "API", feed: "Feed", gis_service: "Serviço GIS", direct: "Acesso direto", other: "Outro", unknown: "Desconhecido" },
+  format: { html: "HTML", pdf: "PDF", csv: "CSV", json: "JSON", xml: "XML", xlsx: "XLSX", kml: "KML", geojson: "GeoJSON", image: "Imagem", video: "Vídeo", text: "Texto", other: "Outro", unknown: "Desconhecido" },
   authority: { authoritative: "Com autoridade", "verified-third-party": "Terceiro verificado", community: "Comunitária", derived: "Derivada", estimated: "Estimada", unknown: "Desconhecida" },
   freshness: { CURRENT: "Atual", STALE: "Desatualizada", UNKNOWN: "Desconhecida", UNAVAILABLE: "Indisponível" },
   licensing: { known: "Conhecida", unknown: "Desconhecida", restricted: "Restrita" },
@@ -31,7 +35,8 @@ const COMPACT_LABELS: Record<string, Record<string, string>> = {
 };
 
 const FIELD_CAPTIONS: Record<string, string> = {
-  status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", solution_landscape_status: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", contribution: "Contribuição", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", geography: "Âmbito geográfico", source_type: "Tipo de fonte", authority: "Autoridade", freshness: "Atualidade", licensing: "Licenciamento",
+  status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", solution_landscape_status: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", contribution: "Contribuição", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", geography: "Âmbito geográfico", authority: "Autoridade", freshness: "Atualidade", licensing: "Licenciamento",
+  resource_type: "Tipo de recurso", "access.level": "Nível de acesso", "access.availability": "Disponibilidade", "access.method": "Forma de consulta", "access.format": "Formato", "access.machine_readable": "Leitura automática",
 };
 
 const PS_LABELS: Record<string, string> = {
@@ -58,6 +63,7 @@ export function publicCompactEnumLabel(field: string, value: string): string {
 }
 
 export function publicFieldCaption(field: string): string {
+  if (field.startsWith("access.") && FIELD_CAPTIONS[field]) return FIELD_CAPTIONS[field];
   const terminalField = field.split(".").at(-1) ?? field;
   const captionField = field.startsWith("geography.") ? "geography" : field.startsWith("licensing.") ? "licensing" : field.startsWith("analysis.public_signal_class") ? "public_signal_class" : terminalField;
   return FIELD_CAPTIONS[captionField] ?? field;
