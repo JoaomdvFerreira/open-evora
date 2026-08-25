@@ -24,6 +24,7 @@ const LABELS: Record<string, Record<string, string>> = {
   "licensing.status": { known: "Conhecido", unknown: "Desconhecido" },
   "licensing.reuse": { permitted: "Permitida", restricted: "Restrita", prohibited: "Proibida", unknown: "Desconhecida" },
   type: { institutional: "Institucional", statistical: "Estatística", "formal-public": "Fonte pública formal", social: "Social", press: "Imprensa", stakeholder: "Interveniente", observation: "Observação" },
+  update_frequency: { one_off: "Pontual", daily: "Diária", weekly: "Semanal", monthly: "Mensal", quarterly: "Trimestral", annual: "Anual", irregular: "Irregular", unknown: "Desconhecida" },
 };
 
 /**
@@ -42,6 +43,8 @@ const FIELD_CAPTIONS: Record<string, string> = {
   "scope.geography.level": "Âmbito geográfico", "scope.geography.area": "Área", "scope.temporal": "Cobertura temporal", "scope.domains": "Temas",
   "scope.temporal.as_of": "Data de referência", "scope.temporal.start": "Início", "scope.temporal.end": "Fim",
   "licensing.status": "Estado do licenciamento", "licensing.licence": "Licença", "licensing.reuse": "Reutilização", "licensing.attribution": "Atribuição",
+  update_frequency: "Frequência de atualização", published_at: "Publicação", updated_at: "Última atualização da fonte", last_checked_at: "Última verificação pela Open Évora",
+  canonical_reference: "Referência original",
 };
 
 const PS_LABELS: Record<string, string> = {
@@ -76,6 +79,17 @@ export function publicFieldCaption(field: string): string {
   const terminalField = field.split(".").at(-1) ?? field;
   const captionField = field.startsWith("geography.") ? "geography" : field.startsWith("analysis.public_signal_class") ? "public_signal_class" : terminalField;
   return FIELD_CAPTIONS[captionField] ?? field;
+}
+
+const TRI_STATE_LABELS = { true: "Sim", false: "Não", unknown: "Desconhecida" } as const;
+
+/**
+ * For canonical tri-state fields like `access.machine_readable`, whose values are the booleans
+ * `true`/`false` plus the literal string `"unknown"`. Never treats `"unknown"` as `false` and
+ * never infers a value from any other field.
+ */
+export function publicTriStateLabel(value: boolean | "unknown"): string {
+  return TRI_STATE_LABELS[String(value) as "true" | "false" | "unknown"];
 }
 
 export function formatPublicCount(value: number): string {

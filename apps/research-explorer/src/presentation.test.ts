@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPublicCount, formatPublicDate, formatPublicDateTime, formatPublicPartialDate, publicCompactEnumLabel, publicEnumLabel, publicFieldCaption } from "./presentation";
+import { formatPublicCount, formatPublicDate, formatPublicDateTime, formatPublicPartialDate, publicCompactEnumLabel, publicEnumLabel, publicFieldCaption, publicTriStateLabel } from "./presentation";
 
 describe("PT-PT public presentation terminology", () => {
   it("uses field-aware PRB validation labels", () => {
@@ -181,6 +181,49 @@ describe("PT-PT public presentation terminology", () => {
   it("preserves the safe fallback for unmapped licensing.status and licensing.reuse values", () => {
     expect(publicEnumLabel("licensing.status", "future_status")).toBe("future_status");
     expect(publicEnumLabel("licensing.reuse", "future_reuse")).toBe("future_reuse");
+  });
+
+  it("maps all 8 temporal.update_frequency values", () => {
+    expect(publicEnumLabel("temporal.update_frequency", "one_off")).toBe("Pontual");
+    expect(publicEnumLabel("temporal.update_frequency", "daily")).toBe("Diária");
+    expect(publicEnumLabel("temporal.update_frequency", "weekly")).toBe("Semanal");
+    expect(publicEnumLabel("temporal.update_frequency", "monthly")).toBe("Mensal");
+    expect(publicEnumLabel("temporal.update_frequency", "quarterly")).toBe("Trimestral");
+    expect(publicEnumLabel("temporal.update_frequency", "annual")).toBe("Anual");
+    expect(publicEnumLabel("temporal.update_frequency", "irregular")).toBe("Irregular");
+    expect(publicEnumLabel("temporal.update_frequency", "unknown")).toBe("Desconhecida");
+  });
+
+  it("resolves temporal.update_frequency via field-scoped resolution without affecting unrelated enums", () => {
+    expect(publicEnumLabel("temporal.update_frequency", "unknown")).toBe("Desconhecida");
+    expect(publicEnumLabel("access.level", "unknown")).toBe("Desconhecido");
+    expect(publicEnumLabel("licensing.status", "unknown")).toBe("Desconhecido");
+    expect(publicEnumLabel("freshness.status", "UNKNOWN")).toBe("Desconhecida");
+  });
+
+  it("preserves the safe fallback for unmapped temporal.update_frequency values", () => {
+    expect(publicEnumLabel("temporal.update_frequency", "future_frequency")).toBe("future_frequency");
+  });
+
+  it("maps the machine-readable tri-state, never treating unknown as false", () => {
+    expect(publicTriStateLabel(true)).toBe("Sim");
+    expect(publicTriStateLabel(false)).toBe("Não");
+    expect(publicTriStateLabel("unknown")).toBe("Desconhecida");
+    expect(publicTriStateLabel("unknown")).not.toBe(publicTriStateLabel(false));
+  });
+
+  it("resolves the required date-field captions", () => {
+    expect(publicFieldCaption("temporal.published_at")).toBe("Publicação");
+    expect(publicFieldCaption("temporal.updated_at")).toBe("Última atualização da fonte");
+    expect(publicFieldCaption("temporal.last_checked_at")).toBe("Última verificação pela Open Évora");
+  });
+
+  it("resolves the temporal.update_frequency caption", () => {
+    expect(publicFieldCaption("temporal.update_frequency")).toBe("Frequência de atualização");
+  });
+
+  it("resolves the canonical_reference caption", () => {
+    expect(publicFieldCaption("canonical_reference")).toBe("Referência original");
   });
 });
 
