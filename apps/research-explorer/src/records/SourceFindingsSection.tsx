@@ -66,19 +66,27 @@ function evidenceFindingFacts(record: Record<string, unknown>): EvidenceFindingF
 }
 
 /**
- * Navigation is deliberately deferred: no Record Detail URL/route is
- * hardcoded here, and this isolated slice has no `onSelect`-style callback
- * wired in yet (that wiring is SRC-03C2's job when this component is mounted
- * inside RecordDetailPanel). The EVD ID renders as text only.
+ * SUI-03C2: EVD identifier becomes an actionable navigation element when
+ * `onSelect` is provided, using the same navigation semantics already used
+ * elsewhere in Record Detail (`RelatedRecordButton`/`RelationshipList`) — a
+ * plain button invoking the existing record-selection callback, no
+ * hardcoded URL/route construction. Falls back to plain text when no
+ * `onSelect` is passed, preserving the isolated-component contract.
  */
-function EvidenceFindingItem({ evidence }: { evidence: RecordDetail }) {
+function EvidenceFindingItem({ evidence, onSelect }: { evidence: RecordDetail; onSelect?: (id: string) => void }) {
   const observation = getObject(evidence.record, "observation");
   const summary = observation ? getString(observation, "summary") : null;
   const facts = evidenceFindingFacts(evidence.record);
 
   return (
     <li className="source-finding-item">
-      <span className="source-finding-id detail-technical-field">{evidence.id}</span>
+      {onSelect ? (
+        <button type="button" className="source-finding-id detail-technical-field" onClick={() => onSelect(evidence.id)}>
+          {evidence.id}
+        </button>
+      ) : (
+        <span className="source-finding-id detail-technical-field">{evidence.id}</span>
+      )}
       {summary && <p className="source-finding-summary">{summary}</p>}
       {facts.length > 0 && (
         <dl className="detail-provenance-grid">
@@ -94,21 +102,21 @@ function EvidenceFindingItem({ evidence }: { evidence: RecordDetail }) {
   );
 }
 
-function EvidenceFindingGroup({ heading, evidence }: { heading: string; evidence: RecordDetail[] }) {
+function EvidenceFindingGroup({ heading, evidence, onSelect }: { heading: string; evidence: RecordDetail[]; onSelect?: (id: string) => void }) {
   if (evidence.length === 0) return null;
   return (
     <div className="source-finding-group">
       <h4>{heading}</h4>
       <ul className="source-finding-list">
         {evidence.map((item) => (
-          <EvidenceFindingItem key={item.id} evidence={item} />
+          <EvidenceFindingItem key={item.id} evidence={item} onSelect={onSelect} />
         ))}
       </ul>
     </div>
   );
 }
 
-export function SourceFindingsSection({ relations }: { relations: SourceEvidenceRelations }) {
+export function SourceFindingsSection({ relations, onSelect }: { relations: SourceEvidenceRelations; onSelect?: (id: string) => void }) {
   const isEmpty = relations.primaryEvidence.length === 0 && relations.additionalEvidence.length === 0;
 
   return (
@@ -118,8 +126,8 @@ export function SourceFindingsSection({ relations }: { relations: SourceEvidence
         <p className="field-empty">Ainda não existem observações da investigação ligadas explicitamente a esta fonte.</p>
       ) : (
         <>
-          <EvidenceFindingGroup heading="Evidência retirada desta fonte" evidence={relations.primaryEvidence} />
-          <EvidenceFindingGroup heading="Evidência que também usa esta fonte" evidence={relations.additionalEvidence} />
+          <EvidenceFindingGroup heading="Evidência retirada desta fonte" evidence={relations.primaryEvidence} onSelect={onSelect} />
+          <EvidenceFindingGroup heading="Evidência que também usa esta fonte" evidence={relations.additionalEvidence} onSelect={onSelect} />
         </>
       )}
     </section>

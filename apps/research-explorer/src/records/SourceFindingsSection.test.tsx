@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { SourceFindingsSection } from "./SourceFindingsSection";
 import type { RecordDetail } from "../dataProvider/types";
 import type { SourceEvidenceRelations } from "./sourceEvidenceRelations";
@@ -145,5 +146,24 @@ describe("SourceFindingsSection", () => {
     render(<SourceFindingsSection relations={relations({ additionalEvidence: [additional], uniqueEvidenceCount: 1 })} />);
 
     expect(screen.queryByText("Evidência retirada desta fonte")).toBeNull();
+  });
+
+  it("10. SUI-03C2: EVD identifier renders as a button and invokes onSelect with the EVD id when provided", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    const evd = evidenceDetail("EVD-000106", { observation: { summary: "Resumo primário." } });
+    render(<SourceFindingsSection relations={relations({ primaryEvidence: [evd], uniqueEvidenceCount: 1 })} onSelect={onSelect} />);
+
+    const button = screen.getByRole("button", { name: "EVD-000106" });
+    await user.click(button);
+    expect(onSelect).toHaveBeenCalledWith("EVD-000106");
+  });
+
+  it("11. SUI-03C2: without onSelect, the EVD identifier renders as plain text, not a button", () => {
+    const evd = evidenceDetail("EVD-000106", { observation: { summary: "Resumo primário." } });
+    render(<SourceFindingsSection relations={relations({ primaryEvidence: [evd], uniqueEvidenceCount: 1 })} />);
+
+    expect(screen.queryByRole("button", { name: "EVD-000106" })).toBeNull();
+    expect(screen.getByText("EVD-000106")).toBeTruthy();
   });
 });

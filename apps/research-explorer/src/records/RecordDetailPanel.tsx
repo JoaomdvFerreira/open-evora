@@ -9,6 +9,8 @@ import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../prese
 import { ContextTabs } from "../ContextTabs";
 import { evidenceQuickRead, type QuickReadItem } from "./recordOrientation";
 import { SourceOverviewSection } from "./SourceOverviewSection";
+import { SourceFindingsSection } from "./SourceFindingsSection";
+import { useSourceEvidenceRelations } from "./useSourceEvidenceRelations";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -280,6 +282,47 @@ function SourceOriginalLinkAction({ detail }: { detail: RecordDetail }) {
       </a>
     </p>
   );
+}
+
+/**
+ * SUI-03C2: hosts the SRC → EVD relation load (`useSourceEvidenceRelations`,
+ * SUI-03A2's `loadSourceEvidenceRelations` as sole SRC→EVD relation
+ * authority) and renders `SourceFindingsSection` once it succeeds. Mirrors
+ * `useRecordDetail`'s own loading/error contract: while loading, nothing is
+ * rendered (never a fabricated empty-state conclusion); on failure, an
+ * inline retry affordance is shown instead of the zero-EVD empty state,
+ * which `SourceFindingsSection` itself only ever renders once relation
+ * loading has actually succeeded with zero backlinks.
+ */
+function SourceFindings({ dataProvider, sourceId, onSelect }: { dataProvider: DataProvider; sourceId: string; onSelect: (id: string) => void }) {
+  const state = useSourceEvidenceRelations(dataProvider, sourceId);
+
+  if (state.status === "loading" || state.status === "idle") {
+    return (
+      <section aria-label="O que encontrámos" className="source-findings-section">
+        <h3 className="detail-panel-label">O que encontrámos</h3>
+        <p role="status" aria-live="polite">
+          A carregar observações da investigação…
+        </p>
+      </section>
+    );
+  }
+
+  if (state.status === "error") {
+    return (
+      <section aria-label="O que encontrámos" className="source-findings-section">
+        <h3 className="detail-panel-label">O que encontrámos</h3>
+        <div role="alert">
+          <p>Não foi possível carregar as observações da investigação ligadas a esta fonte.</p>
+          <button type="button" onClick={state.retry}>
+            Tentar novamente
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  return <SourceFindingsSection relations={state.relations} onSelect={onSelect} />;
 }
 
 function Breadcrumb({ detail, onBackToRecords }: { detail: RecordDetail; onBackToRecords: () => void }) {
@@ -811,6 +854,7 @@ function PrbRawTechnicalDisclosure({ detail }: { detail: RecordDetail }) {
 }
 
 function RecordDetailContent({
+  dataProvider,
   detail,
   lookup,
   onSelect,
@@ -818,6 +862,7 @@ function RecordDetailContent({
   onViewAsProblem,
   onViewInGraph,
 }: {
+  dataProvider: DataProvider;
   detail: RecordDetail;
   lookup: Map<string, RecordSummary>;
   onSelect: (id: string) => void;
@@ -889,6 +934,7 @@ function RecordDetailContent({
 
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
           {detail.type === "SRC-" && <SourceOverviewSection record={detail.record} />}
+          {detail.type === "SRC-" && <SourceFindings dataProvider={dataProvider} sourceId={detail.id} onSelect={onSelect} />}
 
           {isPrb ? (
             <>
@@ -1010,6 +1056,7 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
       {state.status === "ready" && (
         <div ref={contentRef} tabIndex={-1} aria-label={`Detalhe de ${state.detail.id}`}>
           <RecordDetailContent
+            dataProvider={dataProvider}
             detail={state.detail}
             lookup={lookup}
             onSelect={onSelect}
