@@ -1,6 +1,6 @@
 source_id: SRC-0021
-publisher: "TREVO - urban public transport in Évora"
-name: "TREVO public transport website"
+publisher: "TREVO — transporte público urbano de Évora"
+name: "TREVO — site do transporte público urbano de Évora"
 resource_type: service
 scope:
   geography:

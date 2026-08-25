@@ -25,4 +25,4 @@ temporal:
   updated_at: "2025-12-30"
   last_checked_at: "2026-08-10"
 caveats:
-  - "A descrição pública da origem não enumera endpoints ou serviços públicos por camada nem condições de reutilização por camada."
+  - "A descrição pública da origem não enumera pontos de acesso ou serviços públicos por camada nem condições de reutilização por camada."
