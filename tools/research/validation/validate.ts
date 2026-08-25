@@ -13,7 +13,7 @@
  * "Human-owned decisions").
  */
 import { loadCorpusIndexTolerant } from "../core/corpus.ts";
-import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex, RecordSchema } from "../core/types.ts";
+import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex, RecordSchema, SchemaFieldType } from "../core/types.ts";
 
 export interface ValidationResult {
   errors: string[];
@@ -88,6 +88,123 @@ function validateBooleanFields(file: string, record: RecordFields, schema: Recor
     if (typeof val !== "boolean") {
       errors.push(`[${file}] field "${field}" must be a boolean (true|false), got "${val}"`);
     }
+  }
+}
+
+/**
+ * Recursively collects every dotted field path present in `value`, plus
+ * every parent-object path along the way (so a declared parent path such
+ * as "scope" or "scope.geography" is satisfied by allowedFields without
+ * needing every leaf enumerated separately by the caller). Arrays are
+ * treated as leaf values at their own path — item shapes are not walked
+ * (matches the documented "do not attempt arbitrary array-item schema
+ * traversal in this slice").
+ */
+function collectFieldPaths(value: unknown, prefix: string, out: Set<string>): void {
+  if (prefix !== "") out.add(prefix);
+  if (value === null || typeof value !== "object" || Array.isArray(value)) return;
+  for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
+    collectFieldPaths(v, prefix === "" ? key : `${prefix}.${key}`, out);
+  }
+}
+
+function validateAllowedFields(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
+  if (!schema.allowedFields) return;
+  const allowed = new Set(schema.allowedFields);
+  const present = new Set<string>();
+  collectFieldPaths(record, "", present);
+  for (const path of present) {
+    if (!allowed.has(path)) {
+      errors.push(`[${file}] field "${path}" is not an allowed field for this schema`);
+    }
+  }
+}
+
+const TYPE_NAMES: Record<string, SchemaFieldType> = {
+  string: "string",
+  boolean: "boolean",
+  object: "object",
+  array: "array",
+};
+
+function actualTypeName(val: unknown): string {
+  if (val === null) return "null";
+  if (Array.isArray(val)) return "array";
+  const t = typeof val;
+  if (t === "string" || t === "boolean" || t === "object") return TYPE_NAMES[t];
+  return t; // e.g. "number" — not a declarable SchemaFieldType, always a mismatch
+}
+
+function validateFieldTypes(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
+  for (const [field, allowedTypes] of Object.entries(schema.fieldTypes || {})) {
+    const val = getPath(record, field);
+    if (val === undefined) continue; // missing optional fields are not type errors
+    const actual = actualTypeName(val);
+    if (!(allowedTypes as string[]).includes(actual)) {
+      errors.push(
+        `[${file}] field "${field}" has type "${actual}" (expected one of: ${allowedTypes.join(", ")})`
+      );
+    }
+  }
+}
+
+function validatePatterns(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
+  for (const [field, patternSource] of Object.entries(schema.patterns || {})) {
+    let re: RegExp;
+    try {
+      re = new RegExp(`^(?:${patternSource})$`);
+    } catch (e) {
+      errors.push(`[${file}] field "${field}" declares an invalid pattern "${patternSource}": ${(e as Error).message}`);
+      continue;
+    }
+    const val = getPath(record, field);
+    if (val === undefined || val === null) continue;
+    if (typeof val !== "string") continue; // non-string values are fieldTypes' concern, not coerced here
+    if (!re.test(val)) {
+      errors.push(`[${file}] field "${field}" value "${val}" does not match required pattern`);
+    }
+  }
+}
+
+function validateConditionalRequired(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
+  for (const rule of schema.conditionalRequired || []) {
+    const val = getPath(record, rule.field);
+    if (val === undefined || val === null) continue;
+    const matches =
+      (rule.in !== undefined && rule.in.includes(val as string)) ||
+      (rule.notIn !== undefined && !rule.notIn.includes(val as string));
+    if (!matches) continue;
+    for (const req of rule.requires) {
+      const reqVal = getPath(record, req);
+      if (reqVal === undefined || reqVal === null || reqVal === "") {
+        errors.push(`[${file}] field "${req}" is required when "${rule.field}" is "${val}"`);
+      }
+    }
+  }
+}
+
+function validateExclusiveFieldSets(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
+  for (const rule of schema.exclusiveFieldSets || []) {
+    const obj = getPath(record, rule.path);
+    if (obj === undefined || obj === null) continue; // do not apply when the parent object is absent
+    if (typeof obj !== "object" || Array.isArray(obj)) continue;
+    const presentKeys = new Set(Object.keys(obj as Record<string, unknown>));
+
+    const matchingSets = rule.sets.filter((set) => set.every((f) => presentKeys.has(f)));
+    // A set only "matches" if every one of its fields is present AND no
+    // fields outside that set are present, so a partial authoring of one
+    // set (e.g. only "start") is never mistaken for a match.
+    const exactMatches = matchingSets.filter((set) => {
+      const setFields = new Set(set);
+      return [...presentKeys].every((k) => setFields.has(k));
+    });
+
+    if (exactMatches.length === 1) continue;
+    errors.push(
+      `[${file}] field "${rule.path}" must author exactly one of: ${rule.sets
+        .map((s) => `[${s.join(", ")}]`)
+        .join(" or ")}`
+    );
   }
 }
 
@@ -225,6 +342,11 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
       validateRequiredFields(file, fields, schema, errors);
       validateEnums(file, fields, schema, errors);
       validateBooleanFields(file, fields, schema, errors);
+      validateAllowedFields(file, fields, schema, errors);
+      validateFieldTypes(file, fields, schema, errors);
+      validatePatterns(file, fields, schema, errors);
+      validateConditionalRequired(file, fields, schema, errors);
+      validateExclusiveFieldSets(file, fields, schema, errors);
       if (schema.prefix === "PRB-") {
         validateInvestigation(file, fields, evidenceById, errors);
       }
