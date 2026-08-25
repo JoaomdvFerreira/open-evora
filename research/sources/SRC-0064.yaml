@@ -1,27 +1,24 @@
 source_id: SRC-0064
 publisher: "Gesamb"
-name: "Gesamb reception / ecocentre information"
+name: "Gesamb — informação de receção e ecocentro"
+resource_type: webpage
 scope:
-  geography: intermunicipal
+  geography:
+    level: intermunicipal
+    area: "Área de intervenção da Gesamb — 12 municípios"
   domains:
     - "ENV"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "Gesamb web page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://gesamb.pt/atividades/recebemos/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://gesamb.pt/atividades/recebemos/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-06 Batch B (provisional D1-06-B-S06). Public opening hours and reception infrastructure published; residents have direct disposal/reception options through the Environmental Management Park/ecocentre infrastructure. Responsibility split: Gesamb handles selective multimaterial collection, municipalities handle undifferentiated waste, bulky waste and bio-waste."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

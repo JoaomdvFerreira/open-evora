@@ -1,29 +1,27 @@
 source_id: SRC-0023
 publisher: "Município de Évora"
-name: "LVpDE (Laboratório Vivo para a Descarbonização de Évora) parking/traffic sensor infrastructure"
+name: "Laboratório Vivo para a Descarbonização de Évora — sensores de estacionamento e tráfego"
+resource_type: webpage
 scope:
-  geography: city
+  geography:
+    level: city
+    area: "Évora"
   domains:
     - "MOB"
     - "URB"
     - "DIG"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "municipal news page / activity report PDF"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/laboratorio-vivo-para-a-descarbonizacao-de-evora-lvpde-parceiros-apresentam-atividades-e-planeiam-futuro/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2023-05
-  last_checked: 2026-08-10
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/laboratorio-vivo-para-a-descarbonizacao-de-evora-lvpde-parceiros-apresentam-atividades-e-planeiam-futuro/"
-api_candidate:
-  potential: "unknown - no official public occupancy/API feed located in this bounded review"
-notes: "Supporting municipal activity report: https://www.cm-evora.pt/wp-content/uploads/2023/05/1_Relatorio_Atividade.pdf. Verified historic implementation: 75 parking sensors, 10 vehicle-count sensors, and digital support for monitoring and managing data. Current operational status in 2026 NOT ESTABLISHED by this batch. Reuse licence UNKNOWN."
+  reuse: unknown
+temporal:
+  updated_at: "2023-05"
+  last_checked_at: "2026-08-25"

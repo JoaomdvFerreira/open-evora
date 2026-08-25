@@ -1,36 +1,31 @@
 source_id: SRC-0094
 publisher: "San Francisco Municipal Transportation Agency (SFMTA)"
 name: "SFpark Pilot Program Evaluation"
-
+resource_type: document
 scope:
-  geography: municipality
+  geography:
+    level: local_area
+    area: "Áreas-piloto SFpark, San Francisco, California, EUA"
+  temporal:
+    start: "2011"
+    end: "2013"
   domains:
     - "MOB"
     - "DIG"
-
-source_type: document
-
 access:
-  public: true
-  machine_readable: unknown
-  method: "official pilot-programme evaluation report"
-
-authority: authoritative
-
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.sfmta.com/reports/sfpark-pilot-project-evaluation-report"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-
-freshness:
-  update_frequency: unknown
-  last_source_update: 2014
-  last_checked: 2026-08-11
-  status: CURRENT
-
-canonical_source: true
-
-api_candidate:
-  potential: "not applicable - programme evaluation report, not a reusable data source"
-
-notes: "SFMTA's official evaluation of the SFpark pilot, which bundled occupancy sensing, real-time availability information, demand-responsive pricing, and meter/payment changes in pilot areas versus untouched control areas. Used in WU-D4-01 as comparative outcome evidence for PRB-0005, not as Évora-specific evidence — see EVD-000107. The bundled design means the reported outcomes cannot be attributed to information/data publication alone."
+  reuse: unknown
+temporal:
+  published_at: "2014-06-26"
+  last_checked_at: "2026-08-25"
+caveats:
+  - "A avaliação do SFpark abrange um pacote combinado de intervenções, incluindo sensores de ocupação, informação em tempo real, preços ajustados à procura e alterações nos parquímetros e pagamentos; os resultados não permitem isolar o efeito da disponibilização de informação."

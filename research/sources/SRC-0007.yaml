@@ -1,28 +1,26 @@
 source_id: SRC-0007
 publisher: CIMAC
-name: "CIMAC / GEOCIMAC / IDE-CIMAC"
+name: "CIMAC — GEOCIMAC"
+resource_type: webpage
 scope:
-  geography: intermunicipal
+  geography:
+    level: intermunicipal
+    area: "Alentejo Central"
   domains:
     - "GEO"
     - "URB"
-source_type: gis
 access:
-  public: true
-  machine_readable: true
-  method: "WMS/WFS services (per CIMAC description)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cimac.pt/geocimac/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cimac.pt/geocimac/"
-api_candidate:
-  potential: "confirmed - IDE-CIMAC publishes geographic information through WMS and WFS services per CIMAC's own description; also confirmed via the national SNIG catalogue"
-notes: "CIMAC maintains a normalized geographic information database for Alentejo Central. Earlier canonical reference (still relevant): https://www.cimac.pt/cimac/info-a-tratar/unidade-de-ambiente-e-desenvolvimento/cartografia-e-sistemas-de-informacao-geografica/ - that descriptive page is dated 2020 and notes older cartography-update dates for some layers; dataset-level freshness must be checked individually before reuse. Batch B update: the GEOCIMAC page, current in 2026, describes ArcGIS Pro, ArcGIS Enterprise/Portal for ArcGIS, map services, WebGIS applications, and creation/management/update of intermunicipal geographic information, with an explicit objective of making territorial information more accessible and reusable by citizens, academia and businesses. The infrastructure gap is not that Évora lacks GIS; the remaining discovery question is developer-facing service discovery, metadata, layer freshness, licence clarity and convenient reuse. Batch C ownership note: for future clarification of GIS catalogue/WMS/WFS/metadata/reuse questions, CIMAC's general contact is `geral@cimac.pt`, +351 266 749 420, and GEOCIMAC/CIMAC contact pages are https://www.cimac.pt/geocimac/ and https://www.cimac.pt/cimac/contactos/."
+  reuse: unknown
+temporal:
+  updated_at: "2026"
+  last_checked_at: "2026-08-25"

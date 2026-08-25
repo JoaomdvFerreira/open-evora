@@ -1,29 +1,30 @@
 source_id: SRC-0028
 publisher: "Município de Évora / Rede Social"
 name: "Plano de Ação do PDS 2025"
+resource_type: document
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
+  temporal:
+    start: "2025"
+    end: "2025"
   domains:
     - "HOU"
     - "SOC"
     - "EMP"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/03/PA-PDS-2025-final.pdf"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2025-03
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/03/PA-PDS-2025-final.pdf"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-03 Batch A (provisional D1-03-A-S02). Records current interventions: housing rehabilitation under the Local Housing Strategy, controlled-cost housing targets, supported-rental rehabilitation, temporary/shared accommodation responses for vulnerable populations, and explicit student-housing needs assessment/funding application work. WU-D1-04 Batch A update (provisional D1-04-A-S02): also records current employment/skills actions - mapping competences required by the labour market, developing training based on identified needs, improving articulation between education/training institutions and employers, and employment-inclusion measures for vulnerable groups. Skills matching is an explicit current institutional workstream, not merely an inferred concern. WU-D1-04 Batch B update (provisional D1-04-B-S05): this action plan is the current-state anchor confirming the skills/employer-needs alignment problem survives the Current-State Challenge - it still requires competence mapping and training adapted to labour-market needs, and municipal reporting has explicitly referred to supporting companies with qualified-workforce needs."
+  reuse: unknown
+temporal:
+  published_at: "2025-03"
+  last_checked_at: "2026-08-10"

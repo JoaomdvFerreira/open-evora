@@ -1,28 +1,26 @@
 source_id: SRC-0105
 publisher: "Município de Évora"
 name: "Câmara continua a intervir na rede viária do concelho"
+resource_type: webpage
 scope:
-  geography: city
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "MOB"
     - "URB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "municipal news page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/camara-continua-a-intervir-na-rede-viaria-do-concelho/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: "2025-03-21"
-  last_checked: 2026-08-12
-  status: STALE
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/camara-continua-a-intervir-na-rede-viaria-do-concelho/"
-api_candidate:
-  potential: unknown
-notes: "RS-02B1. Verified by direct fetch 2026-08-12 (article:published_time meta tag confirms 2025-03-21). Primarily a road-pavement-maintenance announcement (a €200,000 cold-microaggregate pavement-repair contract, plus an extended intervention near Bairro de Santa Luzia), but also states that a completed first phase of a pedestrian/cycling connection between Bairro de Nª Srª da Saúde and the ponte do Xarrama (€90,000 investment) is done, and a second phase of that same connection (onward to Bairro de Santa Luzia) is being prepared, pending a stormwater-drainage infrastructure project. Framed explicitly as practical implementation of PMUSE. status STALE because this describes a March 2025 snapshot of an in-progress, multi-phase connection, not necessarily its August 2026 completion state."
+  reuse: unknown
+temporal:
+  published_at: "2025-03-21"
+  last_checked_at: "2026-08-12"

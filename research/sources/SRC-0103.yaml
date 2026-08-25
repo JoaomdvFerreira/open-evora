@@ -1,30 +1,31 @@
 source_id: SRC-0103
 publisher: "Município de Évora"
-name: "Plano de Mobilidade Urbana Sustentável de Évora - Volume I (diagnosis)"
+name: "Plano de Mobilidade Urbana Sustentável de Évora - Volume I (diagnóstico)"
+resource_type: document
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "MOB"
     - "ACC"
     - "URB"
     - "GEO"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/PMUSE_V.I.pdf"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2025-09
-  last_checked: 2026-08-12
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/PMUSE_V.I.pdf"
-api_candidate:
-  potential: unknown
-notes: "RS-02B1. Companion diagnosis volume to the already-canonical SRC-0016 (PMUSE Volume II, final strategy/proposals). Verified by direct download/text extraction 2026-08-12. Section 5.2.4.2 ('A rede ciclável existente') describes and maps (Figura 73) the current cycling network as reduced in extent and spatially discontinuous, complemented by ~120km of mostly recreational pedestrian-cycling (pedociclável) paths (Percursos de Monfurado ~88km, Ecopista do Ramal de Mora ~22km); Figura 74 maps ~8.5km of exclusively-cycling infrastructure across four named segments; Figura 78 distinguishes network typologies (unidirectional cycling corridor vs. bidirectional cycling track vs. shared pedestrian-cycling path). Figuras 73/78/85 are captioned 'Fonte: Câmara Municipal de Évora, 2020' even though the surrounding report was published 2025-09 — the underlying cartographic dataset is dated 2020, not necessarily current as of 2026. Section 5.2.4.3 ('A rede ciclável prevista') maps (Figura 85) a proposed network based on a 2017 municipal proposal (~18km new exclusively-cycling axes plus ~33km 'Grande Rota do Montado' pedociclável route) — explicitly a proposal, not built infrastructure. Section 5.3.2 documents physical bus-stop information heterogeneity: unsheltered stops carry only a blue/white plate with operator+line identification (Figura 99), while sheltered stops carry a panel with line/stop/timetable information (Figura 102) that the report itself flags as lacking accessibility elements (braille, audio announcements)."
+  reuse: unknown
+temporal:
+  published_at: "2025-09"
+  last_checked_at: "2026-08-12"
+caveats:
+  - "Algumas figuras cartográficas relativas à rede ciclável são atribuídas pelo próprio relatório a dados municipais de 2020, apesar de o relatório ter sido publicado em 2025."
+  - "A secção relativa à rede ciclável prevista baseia-se numa proposta municipal de 2017 e não representa, por si só, infraestrutura construída."

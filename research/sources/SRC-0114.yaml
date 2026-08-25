@@ -1,6 +1,6 @@
-source_id: SRC-0037
-publisher: "Universidade de Évora"
-name: "Universidade de Évora — Alojamento"
+source_id: SRC-0114
+publisher: "Universidade de Évora / SASUÉ"
+name: "UÉ alarga oferta de alojamento estudantil com candidaturas aprovadas no âmbito do PRR"
 resource_type: webpage
 scope:
   geography:
@@ -17,9 +17,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.uevora.pt/estudar/estudantes-ue/Alojamento"
+canonical_reference: "https://www.sas.uevora.pt/informacoes/avisos/%28item%29/35516"
 licensing:
   status: unknown
   reuse: unknown
 temporal:
+  published_at: "2022-08-08"
   last_checked_at: "2026-08-25"

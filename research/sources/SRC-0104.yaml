@@ -1,28 +1,30 @@
 source_id: SRC-0104
 publisher: "Município de Évora"
 name: "Regulamento Municipal de Cedência e Utilização de Cartografia Digital"
+resource_type: document
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "GEO"
     - "URB"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download, redirect from a query-string listing URL)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2020/07/regulamento-municipal-de-cedencia-e-utilizacao-de-cartografia-digital.pdf"
 licensing:
   status: known
-  licence: "Municipal regulation governing the request-based transfer/use of Câmara Municipal de Évora's digital cartography; not an open-data/reuse licence"
+  licence: "Regulamento Municipal de Cedência e Utilização de Cartografia Digital"
+  reuse: restricted
   attribution: "Município de Évora"
-freshness:
-  update_frequency: unknown
-  last_source_update: "2020-12"
-  last_checked: 2026-08-12
-  status: STALE
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2020/07/regulamento-municipal-de-cedencia-e-utilizacao-de-cartografia-digital.pdf"
-api_candidate:
-  potential: "no - this is a request-based cedência (transfer-on-request) regulation, not a public API or open-data endpoint"
-notes: "RS-02B1. Verified by direct download/text extraction 2026-08-12 (HTTP redirect confirmed the file's last-modified date as 2020-12-10). Article on 'Formato e suporte de fornecimento da informação' states: 'Os formatos de cedência de informação são: dwg; shp; ecw e pdf.' This establishes that the Municipality is capable of supplying structured geospatial data (including SHP/shapefile) on request, but the regulation describes a formal cedência (case-by-case transfer) process, not an open/self-service machine-readable dataset or API. The regulation is general-purpose (any municipal digital cartography, including but not limited to cycling infrastructure) and does not itself confirm that a cycling-network layer specifically has been requested, supplied, or kept current."
+temporal:
+  updated_at: "2020-12-10"
+  last_checked_at: "2026-08-12"
+caveats:
+  - "O regulamento aplica-se genericamente à cedência de cartografia digital municipal e não confirma a existência, disponibilização ou atualização de uma camada específica de rede ciclável."

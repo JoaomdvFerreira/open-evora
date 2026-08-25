@@ -1,29 +1,27 @@
 source_id: SRC-0052
 publisher: "Município de Évora"
-name: "Municipal climate-risk communication / youth climate-change awareness"
+name: "Comunicação municipal sobre riscos climáticos e sensibilização juvenil para as alterações climáticas"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "CLI"
     - "ENV"
     - "EDU"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "Municipal news page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/municipio-de-evora-sensibiliza-mais-novos-para-a-problematica-das-alteracoes-climaticas/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2025
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/municipio-de-evora-sensibiliza-mais-novos-para-a-problematica-das-alteracoes-climaticas/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-06 Batch A (provisional D1-06-A-S02). Identifies three principal projected climate risks for Évora: (1) more frequent/intense heat waves; (2) lower average precipitation and more frequent/severe drought; (3) more intense short-duration precipitation causing urban flooding."
+  reuse: unknown
+temporal:
+  published_at: "2025"
+  last_checked_at: "2026-08-11"

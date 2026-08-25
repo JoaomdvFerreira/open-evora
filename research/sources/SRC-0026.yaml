@@ -1,30 +1,30 @@
 source_id: SRC-0026
 publisher: "Município de Évora"
-name: "4th Revision of the Évora Urbanisation Plan - Experimental Mobility Actions 2026"
+name: "4.ª Revisão do Plano de Urbanização de Évora — Ações Experimentais de Mobilidade 2026"
+resource_type: webpage
 scope:
-  geography: city
+  geography:
+    level: city
+    area: "Évora"
   domains:
     - "MOB"
     - "ACC"
     - "GEO"
     - "URB"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web page"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/plano-de-urbanizacao-em-revisao/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-06
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/plano-de-urbanizacao-em-revisao/"
-api_candidate:
-  potential: unknown
-notes: "In June 2026 the Municipality moved the 4th PUE revision into an 'Experimental Actions' phase, inviting residents/entities to select and physically test pedestrian/soft-mobility routes and contribute perceptions and proposals for a more inclusive, accessible and sustainable city. This is current formal participatory activity, not a completed study; participant outputs require separate assessment before being treated as evidence."
+  reuse: unknown
+temporal:
+  published_at: "2026-06"
+  last_checked_at: "2026-08-10"
+caveats:
+  - "A origem descreve uma fase experimental e participativa em curso, não resultados finais do processo."

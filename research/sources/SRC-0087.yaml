@@ -1,28 +1,27 @@
 source_id: SRC-0087
 publisher: "Indeed"
-name: "Indeed job listings — aeronautical/aerospace roles, Évora"
+name: "Indeed — anúncios de emprego para funções aeronáuticas/aeroespaciais em Évora"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "EMP"
     - "ECO"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "public job-listing search results"
-authority: verified-third-party
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://pt.indeed.com/q-aeron%C3%A1utica-l-%C3%89vora-ofertas.html"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://pt.indeed.com/q-aeron%C3%A1utica-l-%C3%89vora-ofertas.html"
-api_candidate:
-  potential: unknown
-notes: "D2-D Round A (E-01). Snapshot of specialised/senior aerospace-sector listings in Évora (aeronautical engineering, EWIS, configuration management, airworthiness/quality, composites/materials manufacturing, avionics/aircraft design). Boundary: a listing snapshot measures advertised demand, not shortage, vacancy duration, failed recruitment, wage mismatch or local skills unavailability, consistent with the SRC-0039 boundary note."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"
+caveats:
+  - "A origem apresenta um retrato pontual de anúncios de emprego; não permite estabelecer escassez de competências, duração das vagas, recrutamento falhado ou indisponibilidade de trabalhadores."

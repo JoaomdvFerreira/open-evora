@@ -1,28 +1,26 @@
 source_id: SRC-0070
 publisher: "Rádio Campanário"
-name: "Rádio Campanário report: municipal €1.5M road-repair programme"
+name: "Rádio Campanário — programa municipal de reparação viária de 1,5 M€"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "URB"
     - "MOB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "public local-radio news article"
-authority: verified-third-party
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.radiocampanario.com/evora-investe-15me-no-arranjo-de-estradas-queremos-rapidamente-tapar-o-maximo-de-buracos-vice-presidente/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-02
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.radiocampanario.com/evora-investe-15me-no-arranjo-de-estradas-queremos-rapidamente-tapar-o-maximo-de-buracos-vice-presidente/"
-api_candidate:
-  potential: "none"
-notes: "D2-A Round A (D2-A-SIG-06). Local press report of a municipal repair programme valued at approximately €1.5 million, with municipal acknowledgement that degraded road conditions were not attributable only to weather and required maintenance/requalification. Independent of the SRC-0069 petition as an institutional/operational response, though triggered in the same public debate."
+  reuse: unknown
+temporal:
+  published_at: "2026-02"
+  last_checked_at: "2026-08-11"

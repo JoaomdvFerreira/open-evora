@@ -1,29 +1,27 @@
 source_id: SRC-0024
 publisher: "Município de Évora"
-name: "Current PMUSE implementation / pedestrian-cycling works"
+name: "Implementação atual do PMUSE — intervenções pedonais e cicláveis"
+resource_type: webpage
 scope:
-  geography: city
+  geography:
+    level: local_area
+    area: "Zona sul da cidade de Évora — Rossio de S. Brás / Variante ao PITE"
   domains:
     - "MOB"
     - "URB"
     - "ACC"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web page"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/pt/municipe/areas-de-acao/ambiente/conheca-alguns-dos-planos-e-projetos-do-municipio-na-area-ambiental/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2025-02-21
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/pt/municipe/areas-de-acao/ambiente/conheca-alguns-dos-planos-e-projetos-do-municipio-na-area-ambiental/"
-api_candidate:
-  potential: unknown
-notes: "The Municipality reported two PMUSE-related works in execution: Interface Modal do Rossio de S. Brás, and Beneficiação da Variante ao PITE. Stated to add approximately 6 km of pedestrian/cycling routes around the southern urban area. Boundary: this does not prove that the citywide cycling-network coherence problem has been solved."
+  reuse: unknown
+temporal:
+  published_at: "2025-02-21"
+  last_checked_at: "2026-08-10"

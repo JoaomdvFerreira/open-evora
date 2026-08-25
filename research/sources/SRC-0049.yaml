@@ -1,28 +1,27 @@
 source_id: SRC-0049
 publisher: "Município de Évora"
 name: "Guia da Semana"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "CUL"
     - "PUB"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "weekly email/paper distribution, linked from municipal media centre"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/municipe/agenda-e-noticias/media-center/guia-da-semana/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
+  reuse: unknown
+temporal:
+  updated_at: "2026"
+  last_checked_at: "2026-08-11"
   update_frequency: weekly
-  last_source_update: 2026
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/municipe/agenda-e-noticias/media-center/guia-da-semana/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-05 Batch B (provisional D1-05-B-S02). Current-State Challenge evidence: the Municipality distributes a weekly cultural guide by email and paper, directing users back to the Cultural Agenda (SRC-0048). Shows an additional, distinct current distribution surface alongside the agenda itself; relevant to the (unresolved) question of whether multiple event-information surfaces create user-facing fragmentation or are simply complementary."

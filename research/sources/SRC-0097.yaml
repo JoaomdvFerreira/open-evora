@@ -1,37 +1,26 @@
 source_id: SRC-0097
 publisher: "North Norfolk District Council"
-name: "North Norfolk District Council — proactive collection-disruption status listing"
-
+name: "North Norfolk District Council — serviço de estado das perturbações na recolha"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "North Norfolk District, Reino Unido"
   domains:
     - "ENV"
     - "PUB"
     - "DIG"
-
-source_type: web
-
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web page"
-
-authority: authoritative
-
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.north-norfolk.gov.uk/missedbin"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-11
-  status: UNKNOWN
-
-canonical_source: true
-
-api_candidate:
-  potential: "unknown - status-listing service description, no public dataset located in this bounded review"
-
-notes: "North Norfolk publishes a list of locations not collected on a given round, so residents in an already-known affected area are not required to submit an individual report. Selected as the single proactive-disruption-communication comparator (Mechanism A) out of several near-identical UK council examples reviewed (e.g. West Lancashire, West Lothian) — the others were not separately canonicalized because they describe the same operating pattern; see EVD-000110 and docs/milestones/D4-WU02-PRB0009-progress.md §3.3 for the selection rationale."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"

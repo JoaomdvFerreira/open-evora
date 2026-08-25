@@ -1,27 +1,24 @@
 source_id: SRC-0032
 publisher: "Universidade de Évora"
-name: "UÉ admission results 2025"
+name: "Universidade de Évora — resultados de admissão 2025"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: non_geographic
   domains:
     - "EDU"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web news article"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.uevora.pt/ue-media/noticias?item=44115"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2025
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.uevora.pt/ue-media/noticias?item=44115"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-04 Batch A (provisional D1-04-A-S04). Reports 1,193 of 1,371 first-phase national-access places filled in 2025 (87%); UÉ reports relatively strong attraction during a national decline; the new Aerospace Engineering course filled all first-phase places. Interpretation: the first institutional problem is not necessarily attraction to higher education - retention and local transition after study are separate questions."
+  reuse: unknown
+temporal:
+  published_at: "2025"
+  last_checked_at: "2026-08-10"

@@ -1,28 +1,25 @@
 source_id: SRC-0081
 publisher: "O Digital"
-name: "News report: Évora parish councils clarify urban-hygiene competencies"
+name: "O Digital — juntas de freguesia de Évora clarificam competências de higiene urbana"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "ENV"
     - "PUB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "online news article"
-authority: verified-third-party
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://odigital.sapo.pt/juntas-freguesia-evora-esclarecem-competencias-limpeza-urbana/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://odigital.sapo.pt/juntas-freguesia-evora-esclarecem-competencias-limpeza-urbana/"
-api_candidate:
-  potential: "none"
-notes: "D2-E Round A (E-06). Reports Évora urban parish councils publicly clarifying their urban-hygiene/cleaning competencies and boundaries relative to the Município, following the July-August 2026 responsibility decentralisation described in SRC-0053."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

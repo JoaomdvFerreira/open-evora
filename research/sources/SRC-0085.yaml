@@ -1,28 +1,25 @@
 source_id: SRC-0085
 publisher: "Tribuna do Alentejo"
-name: "News report: high housing costs displace students from Évora"
+name: "Tribuna do Alentejo — custos elevados de habitação afastam estudantes de Évora"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "HOU"
     - "EDU"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "online news article"
-authority: verified-third-party
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://tribunaalentejo.pt/artigos/habitacao-cara-afasta-estudantes-de-evora/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://tribunaalentejo.pt/artigos/habitacao-cara-afasta-estudantes-de-evora/"
-api_candidate:
-  potential: "none"
-notes: "D2-C Round A (H-01). Reports current student rental-cost pressure and displacement in Évora, corroborating and updating the housing/student-accommodation problem cluster (SRC-0035/SRC-0037) with current press-reported affordability figures."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

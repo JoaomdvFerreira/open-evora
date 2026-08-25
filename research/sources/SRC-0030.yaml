@@ -1,28 +1,28 @@
 source_id: SRC-0030
 publisher: "Município de Évora"
 name: "Plano Concelhio dos Cuidadores Informais de Évora"
+resource_type: document
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "SOC"
     - "HEA"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/Plano-Concelhio-Cuidadores-Informais_v4_Junho_2025-002_RELATORIO.pdf"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2025-06
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/Plano-Concelhio-Cuidadores-Informais_v4_Junho_2025-002_RELATORIO.pdf"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-03 Batch A (provisional D1-03-A-S04). Caregiver information needs include mobility, falls, disease, death, support structures, social/financial/health support, work-life balance and recognition. The underlying study interviewed 68 caregivers and 89 cared-for people; 35% of respondents reported the cared-for person used no support service. WU-D1-03 Batch B update (provisional D1-03-B-S04): the successor Plano Concelhio dos Cuidadores Informais 2026-2027 is now in implementation; the Municipality reported 262 people with official informal-caregiver status in the municipality as of January 2026; the plan includes creation of a caregiver manual, systematisation of existing responses, simplification of procedures, digital publication and reminders/communications. This is institutional self-recognition of the information/navigation friction identified in Batch A, materially strengthening PRB-0007. WU-D2-03 (D2-B Round A) integration: this same PDF also reports a dedicated plan-preparation questionnaire administered to 133 informal caregivers (recruited via caregiver-support organisations, anonymous/confidential, geographically concentrated sample — LIMITED representativeness) plus caregiver focus-group findings (bureaucracy/rights-understanding friction) and caregiver-proposed multi-channel information access (EVD-000089..EVD-000092). Treated as one lineage, not an independent corroborating source."
+  reuse: unknown
+temporal:
+  published_at: "2025-06"
+  last_checked_at: "2026-08-10"
+caveats:
+  - "O questionário de preparação do plano envolveu 133 cuidadores recrutados através de organizações de apoio e uma amostra geograficamente concentrada."

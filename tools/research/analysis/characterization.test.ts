@@ -81,9 +81,12 @@ function assertReportMatches(
 }
 
 // Captured from the legacy tools/analyze-research.js analyzer against the
-// canonical research/ corpus (10 PRB, 128 EVD, 98 SRC, 236 total records)
+// canonical research/ corpus (10 PRB, 128 EVD, 105 SRC, 243 total records)
 // prior to its removal in this change. ASM-specific expectations were
 // retired alongside the AR-01 removal of ASM from the canonical model.
+// SRC count updated 98 -> 105 (243 total) by SRC-V2D6A, the SRC v2
+// corpus activation cutover; PRB/EVD-linkage figures are unaffected since
+// only the Source corpus changed.
 const CANONICAL_EXPECTED: Record<string, Parameters<typeof assertReportMatches>[2]> = {
   "PRB-0001": {
     linkedEvdCount: 10,
@@ -259,10 +262,10 @@ describe("characterization: canonical corpus", () => {
   test("summary counts match the frozen canonical-corpus snapshot", () => {
     const index = loadCorpusIndex(REAL_RESEARCH_ROOT);
     const result = analyzeCorpus(index);
-    assert.strictEqual(result.summary.sourceCount, 98);
+    assert.strictEqual(result.summary.sourceCount, 105);
     assert.strictEqual(result.summary.evidenceCount, 128);
     assert.strictEqual(result.summary.problemCount, 10);
-    assert.strictEqual(result.summary.totalRecords, 236);
+    assert.strictEqual(result.summary.totalRecords, 243);
     assert.deepEqual(result.problemIds, Object.keys(CANONICAL_EXPECTED));
   });
 

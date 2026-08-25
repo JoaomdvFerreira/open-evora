@@ -1,29 +1,26 @@
 source_id: SRC-0068
 publisher: "República Portuguesa — PRR Transparência"
-name: "PRR project record: EB1 Azaruja accessibility correction"
+name: "PRR Transparência — registo de projeto: correção de acessibilidade na EB1 da Azaruja"
+resource_type: webpage
 scope:
-  geography: parish
+  geography:
+    level: site
+    area: "EB1 da Azaruja, Évora"
   domains:
     - "ACC"
     - "EDU"
     - "URB"
-source_type: document
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "public government transparency portal project page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://transparencia.gov.pt/pt/fundos-europeus/prr/beneficiarios-projetos/projeto/08/C03-i02/2024.P13691/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://transparencia.gov.pt/pt/fundos-europeus/prr/beneficiarios-projetos/projeto/08/C03-i02/2024.P13691/"
-api_candidate:
-  potential: "none"
-notes: "D2-A Round A (D2-A-SIG-04). Official PRR project record documenting concrete pre-intervention accessibility barriers at EB1 Azaruja: narrow pavement, five steps at the main pedestrian entrance, a vehicle gate on a secondary street without pavement, and non-compliant building access. Project period 2025-2026; post-project condition not yet re-checked."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

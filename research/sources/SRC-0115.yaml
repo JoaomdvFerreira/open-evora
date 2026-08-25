@@ -1,13 +1,13 @@
-source_id: SRC-0047
-publisher: "Município de Évora"
-name: "Município de Évora — Desporto"
+source_id: SRC-0115
+publisher: "Évora 2027"
+name: "Évora 2027 — Participação e Território"
 resource_type: webpage
 scope:
   geography:
-    level: municipality
-    area: "Évora"
+    level: regional
+    area: "Alentejo"
   domains:
-    - "SPO"
+    - "CUL"
     - "PUB"
 access:
   level: public
@@ -17,7 +17,7 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/desporto-e-lazer/desporto/"
+canonical_reference: "https://www.evora2027.com/participacao-e-territorio"
 licensing:
   status: unknown
   reuse: unknown

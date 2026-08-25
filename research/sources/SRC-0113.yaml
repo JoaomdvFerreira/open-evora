@@ -1,14 +1,14 @@
-source_id: SRC-0047
-publisher: "Município de Évora"
-name: "Município de Évora — Desporto"
+source_id: SRC-0113
+publisher: "Serviços de Ação Social da Universidade de Évora"
+name: "SASUÉ — Alojamento em Residências Universitárias"
 resource_type: webpage
 scope:
   geography:
-    level: municipality
+    level: city
     area: "Évora"
   domains:
-    - "SPO"
-    - "PUB"
+    - "HOU"
+    - "EDU"
 access:
   level: public
   availability: available
@@ -17,7 +17,7 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/desporto-e-lazer/desporto/"
+canonical_reference: "https://www.sas.uevora.pt/Alojamento/"
 licensing:
   status: unknown
   reuse: unknown

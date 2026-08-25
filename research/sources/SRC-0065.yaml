@@ -1,28 +1,25 @@
 source_id: SRC-0065
 publisher: "Município de Évora"
-name: "Municipal Proteção Civil alert channel"
+name: "Canal de alertas da Proteção Civil Municipal"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "CLI"
     - "PUB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "Municipal web page linking to national civil-protection/heat guidance"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/municipe/avisos-e-outras-informacoes/alertas-protecao-civil/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/municipe/avisos-e-outras-informacoes/alertas-protecao-civil/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-06 Batch B (provisional D1-06-B-S11). Municipality maintains a public alert surface and links to national civil-protection and heat guidance. The reviewed public page does not establish a machine-readable local alert feed/API."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

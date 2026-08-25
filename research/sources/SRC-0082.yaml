@@ -1,28 +1,25 @@
 source_id: SRC-0082
 publisher: "Município de Évora"
-name: "Municipal bulky-waste (monstros domésticos) online service page"
+name: "Município de Évora — serviço online de recolha de monstros domésticos"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "ENV"
     - "PUB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "Municipal online service page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/servicos/servicos-online/montros-domesticos/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/servicos/servicos-online/montros-domesticos/"
-api_candidate:
-  potential: unknown
-notes: "D2-E Round A (E-07). Describes the existing bulky/green-waste (monstros domésticos) request journey: Ecocentre self-delivery and home collection for eligible private residents."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

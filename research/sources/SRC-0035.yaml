@@ -1,28 +1,26 @@
 source_id: SRC-0035
 publisher: "Município de Évora"
-name: "Plano Local de Habitação de Évora — 67.1M€ agreement"
+name: "Plano Local de Habitação de Évora — acordo de 67,1 M€"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "HOU"
     - "SOC"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web page"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/plano-local-de-habitacao-de-evora/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/plano-local-de-habitacao-de-evora/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-03 Batch B (provisional D1-03-B-S01). Agreement confirms EUR67.1M for construction/rehabilitation of 459 homes; 40 homes planned in Bairro do Moinho for affordable rent; 122 new homes planned in Bairro do Escurinho; temporary/transitional accommodation centre with minimum capacity for 24 people; Municipality states the programme is intended to benefit approximately 500 families. Confirms active, funded, current supply-side housing intervention distinct from the 2025 planning documents (SRC-0028/SRC-0029)."
+  reuse: unknown
+temporal:
+  published_at: "2026"
+  last_checked_at: "2026-08-11"

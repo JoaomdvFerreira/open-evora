@@ -1,28 +1,27 @@
 source_id: SRC-0039
 publisher: "IEFP"
 name: "IEFP Online — ofertas de emprego, serviço de Évora"
+resource_type: service
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "EMP"
     - "ECO"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web filter/listing"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://iefponline.iefp.pt/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://iefponline.iefp.pt/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-04 Batch B (provisional D1-04-B-S01). Snapshot evidence: the Évora employment-service filter exposed 102 listings at review time, across varied occupations (assembly, heavy-vehicle driving, agriculture, social support, hospitality, commercial roles). Boundary: a listing snapshot measures advertised demand, not labour shortage or mismatch."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"
+caveats:
+  - "A origem apresenta um retrato pontual de ofertas de emprego e não disponibiliza métricas de duração das vagas, recrutamento falhado ou escassez de competências."

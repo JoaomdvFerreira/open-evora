@@ -1,28 +1,25 @@
 source_id: SRC-0041
 publisher: "Universidade de Évora"
-name: "UÉ employability initiatives (Magma Talks and related activities)"
+name: "Magma Talks | fevereiro 2026"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: non_geographic
   domains:
     - "EMP"
     - "EDU"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "named institutional source (no single canonical URL)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.uevora.pt/inovar/decpt/oportunidades?item=45552"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-11
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: null
-api_candidate:
-  potential: unknown
-notes: "WU-D1-04 Batch B (provisional D1-04-B-S03). Students/recent graduates already have structured opportunities to meet employers and receive career-development support (e.g. Magma Talks and other UÉ employability activities). No single canonical URL was supplied in the handoff; treated as a named institutional source pending a specific reference."
+  reuse: unknown
+temporal:
+  published_at: "2026-01-29"
+  last_checked_at: "2026-08-25"

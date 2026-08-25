@@ -1,28 +1,32 @@
 source_id: SRC-0100
 publisher: "IEFP, I.P."
 name: "Centros de Emprego — Estatísticas Mensais (abril 2025)"
+resource_type: document
 scope:
-  geography: regional
+  geography:
+    level: national
+    area: "Portugal"
+  temporal:
+    as_of: "2025-04"
   domains:
     - "EMP"
     - "ECO"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.iefp.pt/documents/10181/13015191/Centros%2Bde%2BEmprego%2Babril%2B2025.pdf/be0bef18-1f9d-4c9f-9121-139d062c44d1"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
+  reuse: unknown
+temporal:
+  published_at: "2025-04"
+  last_checked_at: "2026-08-12"
   update_frequency: monthly
-  last_source_update: "2025-04"
-  last_checked: 2026-08-12
-  status: STALE
-canonical_source: true
-canonical_reference: "https://www.iefp.pt/documents/10181/13015191/Centros%2Bde%2BEmprego%2Babril%2B2025.pdf/be0bef18-1f9d-4c9f-9121-139d062c44d1"
-api_candidate:
-  potential: unknown
-notes: "RS-02A. IEFP's national monthly Centros de Emprego (Employment Centre) statistics bulletin, April 2025 edition. Verified by direct fetch/text extraction 2026-08-12. The Delegação Regional do Alentejo table confirms CTEF Évora's territorial catchment spans fourteen municípios (Alandroal, Arraiolos, Borba, Estremoz, Évora, Montemor-o-Novo, Mora, Mourão, Portel, Redondo, Reguengos de Monsaraz, Vendas Novas, Viana do Alentejo, Vila Viçosa), not the Évora municipality alone. The document reports desemprego/oferta/colocação aggregate figures per employment-centre catchment; it does not publish an occupation-level shortage/hard-to-fill list at any geography. status STALE because this is a monthly-periodicity bulletin and a more recent monthly edition likely exists but was not sought (out of RS-02A's bounded scope)."
+caveats:
+  - "Os dados do CTEF Évora agregam uma área de atendimento composta por 14 municípios e não isolam o município de Évora."
+  - "O boletim apresenta indicadores agregados de desemprego, ofertas e colocações, mas não publica uma lista de profissões em escassez ou vagas de difícil preenchimento."

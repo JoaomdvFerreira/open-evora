@@ -1,37 +1,28 @@
 source_id: SRC-0096
 publisher: "Oxford City Council"
-name: "Oxford City Council — missed-collection report validated against live crew reporting system"
-
+name: "Oxford City Council — Report a missed bin collection"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Oxford, Reino Unido"
   domains:
     - "ENV"
     - "PUB"
     - "DIG"
-
-source_type: web
-
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web page"
-
-authority: authoritative
-
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.oxford.gov.uk/recycling-waste/report-missed-bin-collection"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-11
-  status: UNKNOWN
-
-canonical_source: true
-
-api_candidate:
-  potential: "unknown - operational-integration service description, no public dataset located in this bounded review"
-
-notes: "Oxford states that resident missed-bin reports are checked against a live reporting system fitted in collection vehicles, distinguishing a genuine missed collection from an issue already recorded by the crew or another reason for non-collection. Used in WU-D4-02 as a request/operational-integration comparator, not as Évora-specific evidence — see EVD-000109. Describes operating pattern, not measured outcome effect."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"
+caveats:
+  - "A origem descreve o funcionamento operacional do serviço, mas não apresenta uma avaliação dos seus resultados."

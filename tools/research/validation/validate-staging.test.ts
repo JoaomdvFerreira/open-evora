@@ -308,7 +308,7 @@ temporal:
     const realResearchRoot = join(dirname(REAL_CANDIDATE_SCHEMA_PATH), "..");
     const result = validateStaging(realResearchRoot);
     assert.deepEqual(result.errors, []);
-    // The active research/sources/ corpus (236 records) is validated separately
+    // The active research/sources/ corpus (243 records) is validated separately
     // by validateResearchRoot; this only counts staged SRC-V2 migration files.
   });
 });

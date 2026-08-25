@@ -1,28 +1,25 @@
 source_id: SRC-0033
 publisher: "Município de Évora"
 name: "Município de Évora - Desenvolvimento Económico"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "ECO"
     - "EMP"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web page"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/desenvolvimento-economico/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-10
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/desenvolvimento-economico/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-04 Batch A (provisional D1-04-A-S05). The Municipality reports significant growth in installed companies since 2013; strategy emphasizes investment attraction, industrial/technology parks, incubation and enterprise-support infrastructure."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-10"
