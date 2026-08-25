@@ -1,0 +1,25 @@
+source_id: SRC-0115
+publisher: "Évora 2027"
+name: "Évora 2027 — Participação e Território"
+resource_type: webpage
+scope:
+  geography:
+    level: regional
+    area: "Alentejo"
+  domains:
+    - "CUL"
+    - "PUB"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.evora2027.com/participacao-e-territorio"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"
