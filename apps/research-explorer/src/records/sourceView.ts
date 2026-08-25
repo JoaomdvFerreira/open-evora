@@ -179,14 +179,39 @@ export type SourceSectionPresence = "present" | "absent" | "deferred";
 export type SourceSectionPresenceMap = Record<SourceSectionId, SourceSectionPresence>;
 
 /**
+ * Relation context needed to resolve `findings`/`investigation` presence
+ * (SUI-03A2) — deliberately just the one number each needs, not the full
+ * `SourceEvidenceRelations` shape, so this module stays free of any
+ * dependency on the relation-loading module or DataProvider. Passing this
+ * is optional so this function keeps working standalone (SRC-owned presence
+ * only) for any caller that hasn't loaded relation context yet.
+ */
+export interface SourceSectionRelationContext {
+  /** Whether the Source Section presence model should treat `investigation` as present — true iff at least one PRB is explicitly reachable through a related EVD's `analysis.related_problems` edge. */
+  hasRelatedProblem: boolean;
+}
+
+/**
  * `overview` and `technical` are unconditional for any valid SRC record —
  * `technical` in particular per the task's own rule ("always available…
  * because the raw canonical record already exists"), not because any
  * specific field is present. The other owned sections are present only when
  * their extracted content is non-empty, so a later rail/index can skip
  * rendering an empty section without re-deriving this logic itself.
+ *
+ * `findings` and `investigation` are relation-owned (SUI-03A2), not
+ * SRC-owned: without `relationContext` they stay "deferred" (SUI-03A1
+ * behaviour, unchanged for any caller that hasn't loaded relations yet).
+ * With `relationContext` supplied, `findings` is always "present" — even
+ * with zero linked EVDs, so the later UI can show its informative empty
+ * state — and `investigation` is "present" only when `hasRelatedProblem` is
+ * true. This is the one shared section-index source for both desktop and
+ * mobile; do not add a second section-presence helper elsewhere.
  */
-export function computeSourceSectionPresence(record: Record<string, unknown>): SourceSectionPresenceMap {
+export function computeSourceSectionPresence(
+  record: Record<string, unknown>,
+  relationContext?: SourceSectionRelationContext
+): SourceSectionPresenceMap {
   const coverage = extractSourceCoverage(record);
   const datesAccess = extractSourceDatesAccess(record);
   const licensing = extractSourceLicensing(record);
@@ -217,7 +242,7 @@ export function computeSourceSectionPresence(record: Record<string, unknown>): S
     licensing: hasLicensing ? "present" : "absent",
     caveats: hasCaveats ? "present" : "absent",
     technical: "present",
-    findings: "deferred",
-    investigation: "deferred",
+    findings: relationContext ? "present" : "deferred",
+    investigation: relationContext ? (relationContext.hasRelatedProblem ? "present" : "absent") : "deferred",
   };
 }

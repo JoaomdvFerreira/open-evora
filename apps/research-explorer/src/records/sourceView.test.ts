@@ -202,4 +202,17 @@ describe("computeSourceSectionPresence", () => {
     expect(minimal.findings).toBe("deferred");
     expect(minimal.investigation).toBe("deferred");
   });
+
+  // SUI-03A2: findings/investigation presence once relation context is supplied.
+  it("14. marks findings present and investigation present when relation context reports a reachable PRB (SRC-0093 acceptance case)", () => {
+    const presence = computeSourceSectionPresence(SRC_0093, { hasRelatedProblem: true });
+    expect(presence.findings).toBe("present");
+    expect(presence.investigation).toBe("present");
+  });
+
+  it("14. marks findings present but investigation absent when relation context reports no reachable PRB (empty case)", () => {
+    const presence = computeSourceSectionPresence(MINIMAL_SRC, { hasRelatedProblem: false });
+    expect(presence.findings).toBe("present");
+    expect(presence.investigation).toBe("absent");
+  });
 });
