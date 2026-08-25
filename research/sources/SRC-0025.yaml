@@ -1,29 +1,27 @@
 source_id: SRC-0025
 publisher: "Município de Évora"
-name: "Rossio de S. Brás 2026 requalification programme"
+name: "Programa de requalificação do Rossio de S. Brás — 2026"
+resource_type: webpage
 scope:
-  geography: city
+  geography:
+    level: site
+    area: "Rossio de S. Brás, Évora"
   domains:
     - "MOB"
     - "URB"
     - "ACC"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web page (municipal public-meeting announcements)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/em-reuniao-publica-de-camara-de-5-de-fevereiro-de-2026-camara-de-evora-aprova-projeto-da-1a-fase-da-requalificacao-do-rossio-de-s-bras-um-investimento-de-41-milhoes-de-euros-assegurado-pelo-prr/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-05
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/em-reuniao-publica-de-camara-de-5-de-fevereiro-de-2026-camara-de-evora-aprova-projeto-da-1a-fase-da-requalificacao-do-rossio-de-s-bras-um-investimento-de-41-milhoes-de-euros-assegurado-pelo-prr/"
-api_candidate:
-  potential: unknown
-notes: "Second phase announcement: https://www.cm-evora.pt/em-reuniao-publica-de-camara-de-28-de-maio-de-2026-aprovado-o-projeto-da-segunda-fase-da-reabilitacao-do-rossio-de-s-bras-no-valor-de-3-milhoes-335-mil-euros/. Phase 1 approved February 2026, Phase 2 approved May 2026; the Municipality describes continuation of the earlier soft-mobility Station/Rossio interface, with further road reprofiling as a later phase. The Rossio/Station environment is actively changing in 2026; older accessibility/circulation diagnosis cannot be treated as a static current-state description without field/public validation."
+  reuse: unknown
+temporal:
+  published_at: "2026-02-05"
+  last_checked_at: "2026-08-10"

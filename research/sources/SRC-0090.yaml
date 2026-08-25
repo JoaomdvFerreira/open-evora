@@ -1,28 +1,24 @@
 source_id: SRC-0090
 publisher: "Universidade de Évora"
-name: "UÉ / TE Connectivity employer-training feedback mechanism"
+name: "Universidade de Évora / TE Connectivity — mecanismo de feedback entre empregadores e formação"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: non_geographic
   domains:
     - "EMP"
     - "EDU"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "public university news page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.uevora.pt/ue-media/noticias?item=43165"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.uevora.pt/ue-media/noticias?item=43165"
-api_candidate:
-  potential: unknown
-notes: "D2-D Round A (E-06). Describes an annual action plan between UÉ and TE Connectivity based on company-identified needs, including technical-skills/employability actions — a concrete bilateral employer-training feedback loop."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

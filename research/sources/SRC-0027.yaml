@@ -1,29 +1,26 @@
 source_id: SRC-0027
 publisher: "Município de Évora"
-name: "Municipality Service Ownership / Mobility Contacts"
+name: "Município de Évora — Serviços Municipais"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "MOB"
     - "URB"
     - "ACC"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "public web pages (services directory and staff contacts)"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/servicos/servicos-municipais/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-10
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/servicos/servicos-municipais/"
-api_candidate:
-  potential: unknown
-notes: "Stakeholder/data-owner map only; these contacts are not to be used automatically during D1. Identifies Divisão de Ambiente e Mobilidade (DAM) as the municipal mobility/environment operational owner (phone +351 266 777 154, email `cme.dam@cm-evora.pt`) and Divisão de Ordenamento e Reabilitação Urbana (DORU) as the urban planning/requalification owner relevant to PUE and physical urban interventions (phone +351 266 777 027, email `cme.doru@cm-evora.pt`). General municipal contact page: https://www.cm-evora.pt/municipe/camara-municipal/recursos-humanos/contatos/. General municipal contact remains available for routing formal requests."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"

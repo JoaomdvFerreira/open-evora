@@ -2,32 +2,183 @@
   "prefix": "SRC-",
   "directory": "sources",
   "idField": "source_id",
-  "sourceModel": "docs/datamodel.md",
-  "optionalFields": [
-    "canonical_reference"
-  ],
+  "sourceModel": "SRC_V2_CANONICAL_CONTRACT.md",
+
   "requiredFields": [
     "source_id",
-    "publisher",
     "name",
+    "resource_type",
     "scope",
     "scope.geography",
+    "scope.geography.level",
     "scope.domains",
-    "source_type",
     "access",
-    "access.public",
+    "access.level",
+    "access.availability",
     "access.machine_readable",
-    "authority",
+    "acquisition",
+    "acquisition.method",
     "licensing",
     "licensing.status",
-    "freshness",
-    "freshness.last_checked",
-    "freshness.status"
+    "licensing.reuse",
+    "temporal",
+    "temporal.last_checked_at"
   ],
+
+  "allowedFields": [
+    "source_id",
+    "publisher",
+    "creators",
+    "name",
+    "resource_type",
+
+    "identity",
+    "identity.persistent_identifier",
+    "identity.persistent_identifier.scheme",
+    "identity.persistent_identifier.value",
+    "identity.version",
+    "identity.snapshot_reference",
+
+    "scope",
+    "scope.geography",
+    "scope.geography.level",
+    "scope.geography.area",
+    "scope.temporal",
+    "scope.temporal.as_of",
+    "scope.temporal.start",
+    "scope.temporal.end",
+    "scope.domains",
+
+    "access",
+    "access.level",
+    "access.availability",
+    "access.machine_readable",
+    "access.method",
+    "access.format",
+
+    "acquisition",
+    "acquisition.method",
+    "acquisition.obtained_at",
+
+    "canonical_reference",
+
+    "licensing",
+    "licensing.status",
+    "licensing.licence",
+    "licensing.reuse",
+    "licensing.attribution",
+
+    "temporal",
+    "temporal.published_at",
+    "temporal.updated_at",
+    "temporal.last_checked_at",
+    "temporal.update_frequency",
+
+    "caveats"
+  ],
+
   "enums": {
-    "source_type": ["api", "dataset", "gis", "web", "document", "database", "feed", "unknown"],
-    "authority": ["authoritative", "verified-third-party", "community", "derived", "estimated", "unknown"],
-    "licensing.status": ["known", "unknown", "restricted"],
-    "freshness.status": ["CURRENT", "STALE", "UNKNOWN", "UNAVAILABLE"]
-  }
+    "resource_type": ["webpage", "document", "dataset", "database", "service", "correspondence", "other", "unknown"],
+    "scope.geography.level": [
+      "site",
+      "local_area",
+      "parish",
+      "city",
+      "municipality",
+      "intermunicipal",
+      "regional",
+      "national",
+      "international",
+      "non_geographic",
+      "unknown"
+    ],
+    "access.level": ["public", "restricted", "private", "unknown"],
+    "access.availability": ["available", "unavailable", "unknown"],
+    "access.method": ["browser", "download", "api", "feed", "gis_service", "direct", "other", "unknown"],
+    "access.format": ["html", "pdf", "csv", "json", "xml", "xlsx", "kml", "geojson", "image", "video", "text", "other", "unknown"],
+    "acquisition.method": ["public_web", "direct_contact", "direct_submission", "api", "archive", "other", "unknown"],
+    "licensing.status": ["known", "unknown"],
+    "licensing.reuse": ["permitted", "restricted", "prohibited", "unknown"],
+    "temporal.update_frequency": ["one_off", "daily", "weekly", "monthly", "quarterly", "annual", "irregular", "unknown"]
+  },
+
+  "fieldTypes": {
+    "source_id": ["string"],
+    "publisher": ["string"],
+    "creators": ["array"],
+    "name": ["string"],
+    "resource_type": ["string"],
+
+    "identity": ["object"],
+    "identity.persistent_identifier": ["object"],
+    "identity.persistent_identifier.scheme": ["string"],
+    "identity.persistent_identifier.value": ["string"],
+    "identity.version": ["string"],
+    "identity.snapshot_reference": ["string"],
+
+    "scope": ["object"],
+    "scope.geography": ["object"],
+    "scope.geography.level": ["string"],
+    "scope.geography.area": ["string"],
+    "scope.temporal": ["object"],
+    "scope.domains": ["array"],
+
+    "access": ["object"],
+    "access.level": ["string"],
+    "access.availability": ["string"],
+    "access.machine_readable": ["boolean", "string"],
+    "access.method": ["string"],
+    "access.format": ["string"],
+
+    "acquisition": ["object"],
+    "acquisition.method": ["string"],
+    "acquisition.obtained_at": ["string"],
+
+    "canonical_reference": ["string"],
+
+    "licensing": ["object"],
+    "licensing.status": ["string"],
+    "licensing.licence": ["string", "null"],
+    "licensing.reuse": ["string"],
+    "licensing.attribution": ["string", "null"],
+
+    "temporal": ["object"],
+    "temporal.published_at": ["string"],
+    "temporal.updated_at": ["string"],
+    "temporal.last_checked_at": ["string"],
+    "temporal.update_frequency": ["string"],
+
+    "caveats": ["array"]
+  },
+
+  "patterns": {
+    "access.machine_readable": "unknown",
+    "scope.temporal.as_of": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?",
+    "scope.temporal.start": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?",
+    "scope.temporal.end": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?",
+    "temporal.published_at": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?",
+    "temporal.updated_at": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?",
+    "temporal.last_checked_at": "\\d{4}-\\d{2}-\\d{2}",
+    "acquisition.obtained_at": "\\d{4}-\\d{2}-\\d{2}"
+  },
+
+  "conditionalRequired": [
+    {
+      "field": "scope.geography.level",
+      "notIn": ["non_geographic", "unknown"],
+      "requires": ["scope.geography.area"]
+    },
+    {
+      "field": "acquisition.method",
+      "in": ["direct_contact", "direct_submission", "archive"],
+      "requires": ["acquisition.obtained_at"]
+    }
+  ],
+
+  "exclusiveFieldSets": [
+    {
+      "path": "scope.temporal",
+      "sets": [["as_of"], ["start", "end"]]
+    }
+  ]
 }

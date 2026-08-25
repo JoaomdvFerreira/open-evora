@@ -1,28 +1,26 @@
 source_id: SRC-0083
 publisher: "O Digital"
-name: "News report: Évora green-waste dumping enforcement action (contraordenação)"
+name: "O Digital — atuação contra deposição de resíduos verdes em Évora"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: site
+    area: "Em frente à Escola Secundária Gabriel Pereira, Évora"
   domains:
     - "ENV"
     - "PUB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "online news article"
-authority: verified-third-party
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://odigital.sapo.pt/residuos-verdes-evora-contraordenacao/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-08
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://odigital.sapo.pt/residuos-verdes-evora-contraordenacao/"
-api_candidate:
-  potential: "none"
-notes: "D2-E Round A (E-08, primary). Reports a Município enforcement action (contraordenação/fine) for improper green/garden-waste dumping near a school in August 2026. Same underlying event as SRC-0084 (Diana FM); integrated as one evidence event via EVD-000098."
+  reuse: unknown
+temporal:
+  published_at: "2026-08"
+  last_checked_at: "2026-08-11"

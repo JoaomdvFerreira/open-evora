@@ -1,28 +1,29 @@
 source_id: SRC-0102
 publisher: "Município de Évora"
 name: "Relatório Anual de Atividade da Autoridade de Transportes - Município de Évora 2023"
+resource_type: document
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "MOB"
     - "ACC"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2023/06/Relatorio-anual-de-Autoridade-de-Transportes-CME-29-06-2023.pdf"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
+  reuse: unknown
+temporal:
+  published_at: "2023-06"
+  last_checked_at: "2026-08-12"
   update_frequency: annual
-  last_source_update: "2023-06"
-  last_checked: 2026-08-12
-  status: STALE
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2023/06/Relatorio-anual-de-Autoridade-de-Transportes-CME-29-06-2023.pdf"
-api_candidate:
-  potential: unknown
-notes: "RS-02A. Prior-year edition of the same municipal transport-authority annual report series as SRC-0018 (2026 edition) and SRC-0101 (2022 edition). Verified by direct fetch/text extraction 2026-08-12: contains the identical statement 'A rede abrange praticamente a totalidade do território urbano de Évora em período diurno, reduzindo a resposta em horários noturnos e fins de semana e feriados' found in both the 2022 and 2026 reports, plus per-line (carreira) frequency tables split by weekday/Saturday/Sunday-holiday (marks 2021 figures as provisional). status STALE — superseded by SRC-0018 for current-state purposes; retained only as historical corroboration of a multi-year pattern, not as current operational data."
+caveats:
+  - "Algumas tabelas do relatório identificam valores relativos a 2021 como provisórios."

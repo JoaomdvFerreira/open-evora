@@ -1,28 +1,26 @@
 source_id: SRC-0053
 publisher: "Município de Évora"
-name: "Municipal urban-hygiene structural response (July-August 2026)"
+name: "Resposta estrutural municipal de higiene urbana — julho/agosto de 2026"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "ENV"
     - "PUB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "Municipal news page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/camara-municipal-de-evora-reforca-resposta-estrutural-para-melhorar-a-limpeza-urbana-no-concelho/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-07
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/camara-municipal-de-evora-reforca-resposta-estrutural-para-melhorar-a-limpeza-urbana-no-concelho/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-06 Batch A (provisional D1-06-A-S03) merged with Batch B (provisional D1-06-B-S03) - same URL. Urban hygiene is explicitly described by the Municipality as one of the main municipal-management challenges. Measures: selective door-to-door collection expanding after a pilot; three specialised external hygiene teams begin 1 August 2026; responsibilities decentralised to urban parish councils; bulky-waste collection reorganised (faster response, shift work, longer delivery/collection windows); an internal monitoring team created. The Municipality explicitly states difficulties remain in some areas."
+  reuse: unknown
+temporal:
+  published_at: "2026-07"
+  last_checked_at: "2026-08-11"

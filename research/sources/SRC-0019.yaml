@@ -1,28 +1,31 @@
 source_id: SRC-0019
 publisher: "Autoridade de Transportes do Alentejo Central / CIMAC"
 name: "Avaliação Anual do Contrato de Serviço Público de Transporte de Passageiros do Alentejo Central"
+resource_type: document
 scope:
-  geography: intermunicipal
+  geography:
+    level: intermunicipal
+    area: "Alentejo Central"
+  temporal:
+    start: "2025"
+    end: "2025"
   domains:
     - "MOB"
     - "ACC"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cimac.pt/?listas_ficheiros=relatorio-avaliacao-anual-do-contrato-do-servico-publico-de-transporte-de-passageiros-do-alentejo-central"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-03
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cimac.pt/?listas_ficheiros=relatorio-avaliacao-anual-do-contrato-do-servico-publico-de-transporte-de-passageiros-do-alentejo-central"
-api_candidate:
-  potential: "confirmed - TPAC network data was converted to GTFS and made available via Google Maps in 2025 per this source; no official public GTFS download/API endpoint was identified in this batch"
-notes: "Current intermunicipal operational evidence: user communications, public-information deficiencies, satisfaction survey, and confirmation that TPAC network data was converted to GTFS in 2025. Availability and reuse conditions of the GTFS feed require direct verification with CIMAC/ATAC. Batch B update: a bounded public-source review did not locate a direct public GTFS download endpoint or explicit GTFS reuse licence; this must not be converted into a claim that no public endpoint exists. Public-information deficiencies persisted in 2025 (absent/outdated network maps, schedules and line identification at multiple stops/terminals; some digital concessionaire content incomplete or outdated), and the waiting/information experience remained weaker than the in-vehicle experience. Batch C update: ATAC's 2025 annual report records 844,173 passengers (up 3.2% versus 2024), 63.29% in the student/youth segment, and TPAC/TPF coverage for Évora municipality reported at 94% in both school and non-school periods, explicitly excluding the separate urban Évora network. CIMAC provides a dedicated transport-authority contact channel, `a.transportes@cimac.pt`."
+  reuse: unknown
+temporal:
+  published_at: "2026-03"
+  last_checked_at: "2026-08-10"
+caveats:
+  - "Os indicadores TPAC/TPF apresentados para Évora excluem a rede urbana de Évora, tratada separadamente."

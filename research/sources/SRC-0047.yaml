@@ -1,28 +1,25 @@
 source_id: SRC-0047
 publisher: "Município de Évora"
-name: "Município de Évora — desporto, complexo desportivo e associativismo desportivo"
+name: "Município de Évora — Desporto"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "SPO"
     - "PUB"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web pages"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/desporto-e-lazer/desporto/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/desporto-e-lazer/desporto/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-05 Batch A (provisional D1-05-A-S05), merged with Batch B's D1-05-B-S05 (same underlying municipal sports/Complexo Desportivo pages — not a separate source). Additional pages reviewed: https://www.cm-evora.pt/visitante/lazer-visitar/complexo-desportivo-de-evora/ and https://www.cm-evora.pt/municipe/areas-de-acao/desporto-e-lazer/associativismo-desportivo/publicacao-c-pdd-contrato-programa/. Relevance: municipal sports facilities, clubs/associations and development-programme (contrato-programa) mechanisms are already documented and publicly visible. Neither Batch A nor Batch B established a specific unmet digital problem (discovery, booking, or association-administration) for sports; sports remains an open research domain, not a canonical problem."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"

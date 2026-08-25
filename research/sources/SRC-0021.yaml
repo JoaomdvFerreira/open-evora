@@ -1,28 +1,25 @@
 source_id: SRC-0021
-publisher: "TREVO - urban public transport in Évora"
-name: "TREVO public transport website"
+publisher: "TREVO — transporte público urbano de Évora"
+name: "TREVO — site do transporte público urbano de Évora"
+resource_type: service
 scope:
-  geography: city
+  geography:
+    level: city
+    area: "Évora"
   domains:
     - "MOB"
     - "DIG"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public JavaScript web application"
-authority: verified-third-party
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.trevo.com.pt/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-10
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.trevo.com.pt/"
-api_candidate:
-  potential: "unknown - real-time passenger service strongly implies structured operational data exists internally, but this does not establish that third-party reuse is permitted or supported; no public GTFS/GTFS-Realtime endpoint located in bounded public search"
-notes: "Network and schedules page: https://www.trevo.com.pt/network-and-schedules. The public site advertises journey-planning information, notifications and real-time updates for routes. Machine-readable developer interface UNKNOWN; licence/reuse UNKNOWN. Batch C ownership note: the Municipality's 2026 transport-authority report corroborates TREVO/E-BUS, S.A. as the urban concession operator and lists further passenger-facing channels: customer support phone 266 106 923, email `geral@trevo.com.pt`, Terminal Rodoviário ticket/information channels, and the PICK ticketing/information application. These are operator contact paths, not confirmation of a public developer data interface."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-10"

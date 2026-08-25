@@ -1,29 +1,26 @@
 source_id: SRC-0042
 publisher: "NERE"
-name: "NERE / IEFP training activity 2026 — InovaSocial"
+name: "NERE / IEFP — atividade de formação InovaSocial 2026"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: non_geographic
   domains:
     - "EMP"
     - "ECO"
     - "EDU"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web article"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://nere.pt/blog/2026/02/09/nere-promove-formacao-em-inovacao-social-no-ambito-do-programa-innovasocial/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-02
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://nere.pt/blog/2026/02/09/nere-promove-formacao-em-inovacao-social-no-ambito-do-programa-innovasocial/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-04 Batch B (provisional D1-04-B-S04). NERE remains active in training/business-support activity and collaborates with IEFP (InovaSocial programme, February 2026), corroborating SRC-0011's stakeholder role with a current (2026) activity example."
+  reuse: unknown
+temporal:
+  published_at: "2026-02"
+  last_checked_at: "2026-08-11"

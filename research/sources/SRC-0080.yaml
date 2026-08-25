@@ -1,28 +1,26 @@
 source_id: SRC-0080
 publisher: "Município de Évora"
-name: "Municipal waste-collection normalisation update (May 2026)"
+name: "Município de Évora — atualização sobre normalização da recolha de resíduos (maio de 2026)"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "ENV"
     - "PUB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "Municipal news page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/municipio-de-evora-reforca-meios-para-normalizar-recolha-de-residuos-no-concelho/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-05
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/municipio-de-evora-reforca-meios-para-normalizar-recolha-de-residuos-no-concelho/"
-api_candidate:
-  potential: unknown
-notes: "D2-E Round A (E-04). Reports vehicles procured after the February 2026 disruption (SRC-0061/SRC-0062) entering service as part of a May 2026 normalisation step, ahead of the later July fleet reinforcement to 19 vehicles (SRC-0055). Same institutional fleet-recovery lineage as SRC-0061/SRC-0062/SRC-0055, not an independent corroborating source of a different claim; recorded as a distinct temporal milestone in the February-to-July fleet-recovery progression."
+  reuse: unknown
+temporal:
+  published_at: "2026-05"
+  last_checked_at: "2026-08-11"

@@ -112,7 +112,7 @@ describe("parseRecordYaml", () => {
 });
 
 describe("loadSchemas", () => {
-  test("loads all three canonical schema files with expected prefixes", () => {
+  test("loads the three canonical schema files, with expected prefixes", () => {
     const schemas = loadSchemas(REAL_RESEARCH_ROOT);
     const prefixes = schemas.map((s) => s.prefix).sort();
     assert.deepEqual(prefixes, ["EVD-", "PRB-", "SRC-"]);

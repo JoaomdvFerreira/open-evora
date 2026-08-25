@@ -1,28 +1,28 @@
 source_id: SRC-0029
 publisher: "Município de Évora"
-name: "PUE Sector Report: Habitação e Mercado Imobiliário"
+name: "Relatório Setorial do PUE — Habitação e Mercado Imobiliário"
+resource_type: document
 scope:
-  geography: municipality
+  geography:
+    level: city
+    area: "Évora"
   domains:
     - "HOU"
     - "EDU"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-10_Habitacao-e-mercado-imobiliario.pdf"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2025-02
-  last_checked: 2026-08-10
-  status: STALE
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-10_Habitacao-e-mercado-imobiliario.pdf"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-03 Batch A (provisional D1-03-A-S03). Growth in overcrowding/degradation indicators in parts of the housing stock; more than 200 local-accommodation units with capacity above 1,800 beds, concentrated especially in the Historic Centre; public student-residence capacity described as insufficient relative to displaced/international student demand; purchase-market prices show generalized growth; housing dynamics differ materially by part of the city. Freshness caution: much of the quantitative base uses Census 2021/earlier series - use as institutional diagnosis, not automatically as a 2026 measurement (freshness status recorded as STALE for that reason)."
+  reuse: unknown
+temporal:
+  published_at: "2025-02"
+  last_checked_at: "2026-08-10"
+caveats:
+  - "Parte da base quantitativa do diagnóstico utiliza dados dos Censos 2021 e séries anteriores."

@@ -43,19 +43,23 @@ const VALID_SRC = `
 source_id: SRC-9001
 publisher: "Fixture Publisher"
 name: "Fixture Source"
+resource_type: webpage
 scope:
-  geography: "Évora"
+  geography:
+    level: municipality
+    area: "Évora"
   domains: [example]
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-authority: unknown
+acquisition:
+  method: public_web
 licensing:
   status: unknown
-freshness:
-  last_checked: "2026-08-11"
-  status: CURRENT
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"
 `;
 
 const VALID_EVD = `
@@ -137,9 +141,9 @@ describe("validateResearchRoot: missing/invalid fields", () => {
   test("missing required field is reported", () => {
     const root = makeFixtureRoot();
     try {
-      write(root, "sources", "SRC-9001.yaml", VALID_SRC.replace('publisher: "Fixture Publisher"\n', ""));
+      write(root, "sources", "SRC-9001.yaml", VALID_SRC.replace('name: "Fixture Source"\n', ""));
       const result = validateResearchRoot(root);
-      assert.ok(result.errors.some((e) => e.includes("missing required field: publisher")));
+      assert.ok(result.errors.some((e) => e.includes("missing required field: name")));
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
@@ -148,10 +152,10 @@ describe("validateResearchRoot: missing/invalid fields", () => {
   test("invalid enum value is reported", () => {
     const root = makeFixtureRoot();
     try {
-      write(root, "sources", "SRC-9001.yaml", VALID_SRC.replace("source_type: web", "source_type: bogus"));
+      write(root, "sources", "SRC-9001.yaml", VALID_SRC.replace("resource_type: webpage", "resource_type: bogus"));
       const result = validateResearchRoot(root);
       assert.ok(
-        result.errors.some((e) => e.includes('field "source_type" has invalid value "bogus"'))
+        result.errors.some((e) => e.includes('field "resource_type" has invalid value "bogus"'))
       );
     } finally {
       rmSync(root, { recursive: true, force: true });

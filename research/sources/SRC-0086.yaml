@@ -1,28 +1,26 @@
 source_id: SRC-0086
 publisher: "Universidade de Évora"
-name: "Residência Universitária Manuel Álvares — renovation completion (May 2026)"
+name: "Residência Universitária Manuel Álvares — conclusão da renovação (maio de 2026)"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: site
+    area: "Residência Universitária Manuel Álvares, Évora"
   domains:
     - "HOU"
     - "EDU"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "public university news page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.uevora.pt/ue-media/noticias?item=46564"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-05
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.uevora.pt/ue-media/noticias?item=46564"
-api_candidate:
-  potential: unknown
-notes: "D2-C Round A (H-03). Reports completion, on 2026-05-06, of the renovation of Residência Universitária Manuel Álvares — one of the UÉ residences noted as closed for renovation during 2025/2026 in SRC-0037/EVD-000043. Adds a specific temporal recovery point to the capacity-disruption timeline; does not establish that the broader student-housing pressure is resolved."
+  reuse: unknown
+temporal:
+  published_at: "2026-05"
+  last_checked_at: "2026-08-11"

@@ -1,28 +1,25 @@
 source_id: SRC-0034
 publisher: "Município de Évora"
-name: "Áreas de Acolhimento Empresarial / Parque de Indústria Aeronáutica de Évora"
+name: "Parque de Indústria Aeronáutica de Évora"
+resource_type: webpage
 scope:
-  geography: city
+  geography:
+    level: site
+    area: "Parque de Indústria Aeronáutica de Évora"
   domains:
     - "ECO"
     - "EMP"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web pages"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/locais/parque-de-industria-aeronautica-de-evora/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-10
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/investidor/areas-de-acolhimento-empresarial/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-04 Batch A (provisional D1-04-A-S06). Related page: https://www.cm-evora.pt/locais/parque-de-industria-aeronautica-de-evora/. Évora has multiple established business/innovation locations and specialised aerospace infrastructure."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"

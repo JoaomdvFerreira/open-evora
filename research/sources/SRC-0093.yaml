@@ -1,36 +1,39 @@
 source_id: SRC-0093
 publisher: "Scientific Reports (Springer Nature)"
+creators:
+  - "Giacomo Dalla Chiara"
+  - "Klaas Fiete Krutein"
+  - "Andisheh Ranjbari"
+  - "Anne Goodchild"
 name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)"
-
+resource_type: document
+identity:
+  persistent_identifier:
+    scheme: doi
+    value: "10.1038/s41598-022-23987-z"
 scope:
-  geography: municipality
+  geography:
+    level: local_area
+    area: "Belltown, Seattle, Washington, EUA"
   domains:
     - "MOB"
     - "DIG"
-
-source_type: document
-
 access:
-  public: true
-  machine_readable: unknown
-  method: "peer-reviewed journal article"
-
-authority: verified-third-party
-
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z"
 licensing:
-  status: unknown
-  licence: null
-  attribution: null
-
-freshness:
-  update_frequency: unknown
-  last_source_update: 2022
-  last_checked: 2026-08-11
-  status: CURRENT
-
-canonical_source: true
-
-api_candidate:
-  potential: "not applicable - academic study, not a reusable data source"
-
-notes: "Peer-reviewed controlled real-world experiment in a 10-block Belltown, Seattle commercial/passenger loading study area (274 in-ground curb sensors feeding real-time availability into the OpenPark system; 11 drivers, 33 routes, 495 mock deliveries). Used in WU-D4-01 as comparative mechanism evidence for PRB-0005, not as Évora-specific evidence — see EVD-000106."
+  status: known
+  licence: "CC BY 4.0"
+  reuse: permitted
+  attribution: "Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari e Anne Goodchild"
+temporal:
+  published_at: "2022-11-11"
+  last_checked_at: "2026-08-25"
+caveats:
+  - "O estudo é um experimento controlado realizado numa área de 10 quarteirões em Belltown, Seattle, com 11 condutores, 33 rotas e 495 entregas simuladas."

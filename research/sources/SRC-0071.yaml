@@ -1,28 +1,26 @@
 source_id: SRC-0071
 publisher: "O Alentejo"
-name: "O Alentejo report: road-condition protest and collective-action debate"
+name: "O Alentejo — protesto sobre condições da rede viária e debate sobre ação coletiva"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "URB"
     - "MOB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "public regional-press news article"
-authority: verified-third-party
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://oalentejo.pt/buracos-nas-estradas-inflamam-protesto-digital-em-evora-e-abrem-debate-sobre-acao-coletiva/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-02
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://oalentejo.pt/buracos-nas-estradas-inflamam-protesto-digital-em-evora-e-abrem-debate-sobre-acao-coletiva/"
-api_candidate:
-  potential: "none"
-notes: "D2-A Round A (D2-A-SIG-06). Regional press coverage of the same public road-condition debate as SRC-0070/SRC-0069, describing digital-protest mobilisation and collective-action framing. Treated as corroborating institutional-response reporting, not as an independent lived-experience signal beyond the petition already recorded in SRC-0069."
+  reuse: unknown
+temporal:
+  published_at: "2026-02"
+  last_checked_at: "2026-08-11"

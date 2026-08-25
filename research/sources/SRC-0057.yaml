@@ -1,28 +1,25 @@
 source_id: SRC-0057
 publisher: "Município de Évora"
-name: "Municipal occurrence-management platform (Comunicação de Ocorrências)"
+name: "Município de Évora — plataforma Comunicação de Ocorrências"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "PUB"
     - "DIG"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "Municipal service web page (online/mobile occurrence reporting)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/servicos/comunicacao-de-ocorrencias/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/servicos/comunicacao-de-ocorrencias/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-06 Batch A (provisional D1-06-A-S07) merged with Batch B (provisional D1-06-B-S07) - same URL. Citizens can report public-space occurrences (e.g. water leaks, fallen signage) via web/mobile; reports are followable online through to conclusion; the platform is intended to route/accelerate municipal response. Batch B addendum: no public performance dataset for resolution time, backlog or routing quality was located in this bounded review."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

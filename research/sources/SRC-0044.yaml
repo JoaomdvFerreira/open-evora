@@ -1,28 +1,26 @@
 source_id: SRC-0044
 publisher: "Évora 2027"
-name: "Évora 2027 — programação, participação e território"
+name: "Évora 2027 — Programação"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: regional
+    area: "Alentejo"
   domains:
     - "CUL"
     - "PUB"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web pages"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.evora2027.com/programacao"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.evora2027.com/programacao"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-05 Batch A (provisional D1-05-A-S02). Additional pages reviewed: https://www.evora2027.com/participacao-e-territorio and https://www.evora2027.com/open-calls. Current 2026 evidence: a substantial national/international programme exists ahead of the 2027 European Capital of Culture year; the programme includes community-proximity work, participation, and cultural-sector capacity building; school/community co-creation initiatives are active. Interpretation: any civic-participation product hypothesis in this domain must account for these existing, actively expanding mechanisms rather than duplicate them."
+  reuse: unknown
+temporal:
+  updated_at: "2026"
+  last_checked_at: "2026-08-25"

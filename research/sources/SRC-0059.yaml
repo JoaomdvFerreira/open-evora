@@ -1,31 +1,28 @@
 source_id: SRC-0059
 publisher: "Município de Évora"
-name: "ePaper Atendimento Online (Phase 2) and municipal information-system strategy"
+name: "Câmara de Évora melhora procedimentos de gestão urbanística — 2.ª fase ePaper Atendimento Online"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "DIG"
     - "PUB"
     - "URB"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "Municipal news pages describing online-service platform"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/camara-de-evora-melhora-procedimentos-de-gestao-urbanistica-lancada-a-2-a-fase-da-plataforma-epaper-atendimento-online/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-05
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/municipio-de-evora-apresenta-nova-fase-da-plataforma-epaper-dedicada-ao-atendimento-online/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-06 Batch A (provisional D1-06-A-S09) merged with Batch B (provisional D1-06-B-S10), which adds a second URL: https://www.cm-evora.pt/camara-de-evora-melhora-procedimentos-de-gestao-urbanistica-lancada-a-2-a-fase-da-plataforma-epaper-atendimento-online/ (same event, additional coverage). Phase 2 presented May 2026; all urban-planning requests are now submittable online; part of an active administrative-modernisation/dematerialisation programme. Batch B addendum: in May 2026 the Municipality stated that a strategic plan for the design of its information system had been awarded and was about to begin."
-additional_references:
-  - "https://www.cm-evora.pt/camara-de-evora-melhora-procedimentos-de-gestao-urbanistica-lancada-a-2-a-fase-da-plataforma-epaper-atendimento-online/"
+  reuse: unknown
+temporal:
+  published_at: "2026-05-26"
+  updated_at: "2026-05-26"
+  last_checked_at: "2026-08-25"

@@ -1,28 +1,25 @@
 source_id: SRC-0078
-publisher: "Public Facebook group (Évora community group)"
-name: "Facebook group post — multi-day non-collection of waste"
+publisher: "Grupo público do Facebook (comunidade de Évora)"
+name: "Publicação em grupo do Facebook — ausência de recolha de resíduos durante vários dias"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "ENV"
     - "PUB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "public Facebook group post"
-authority: community
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.facebook.com/groups/253148126144341/posts/1475627717229703/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.facebook.com/groups/253148126144341/posts/1475627717229703/"
-api_candidate:
-  potential: "none"
-notes: "D2-E Round A (E-01). Public Facebook group post reporting multi-day non-collection of household waste at a residential location in Évora. Lived/service signal; representativeness UNKNOWN; one self-selected signal lineage, not corroborated prevalence."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

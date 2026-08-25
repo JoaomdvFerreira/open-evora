@@ -1,26 +1,28 @@
 source_id: SRC-0110
 publisher: "Câmara Municipal de Évora"
 name: "Projecto Acesso Universal 1.0 e Projecto Acesso Universal 1.1"
+resource_type: webpage
 scope:
-  geography: city
-  domains: ["ACC", "URB"]
-source_type: web
+  geography:
+    level: local_area
+    area: "Ruas da República, Raimundo e Serpa Pinto, Évora"
+  domains:
+    - "ACC"
+    - "URB"
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "Official municipal project page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/projecto-acesso-universal-1-0-e-projecto-acesso-universal-1-1/"
 licensing:
   status: unknown
-  licence: null
+  reuse: unknown
   attribution: "Câmara Municipal de Évora"
-freshness:
-  update_frequency: unknown
-  last_source_update: 2021-07-06
-  last_checked: 2026-08-20
-  status: STALE
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/projecto-acesso-universal-1-0-e-projecto-acesso-universal-1-1/"
-api_candidate:
-  potential: "none"
-notes: "Official CME page, published 2021-03-12 and updated 2021-07-06. For AU1.0 it reports that República, Raimundo and Serpa Pinto were surveyed with CME architects and that 56 mobility-limiting or facilitating points were identified. It is retained as provenance for the count discrepancy with the supplied APCE KML material; it does not resolve the discrepancy or establish current conditions."
+temporal:
+  published_at: "2021-03-12"
+  updated_at: "2021-07-06"
+  last_checked_at: "2026-08-20"

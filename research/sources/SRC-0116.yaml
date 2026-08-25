@@ -1,0 +1,25 @@
+source_id: SRC-0116
+publisher: ULSAC
+name: "ULSAC — ECSM-IA"
+resource_type: webpage
+scope:
+  geography:
+    level: non_geographic
+  domains:
+    - "HEA"
+    - "SOC"
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.ulsac.min-saude.pt/2025/01/16/ecsm-ia/"
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: "2025-01-16"
+  last_checked_at: "2026-08-25"

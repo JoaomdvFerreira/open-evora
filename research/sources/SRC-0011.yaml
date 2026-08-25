@@ -1,28 +1,24 @@
 source_id: SRC-0011
 publisher: "NERE - Associação Empresarial da Região de Évora"
-name: "NERE"
+name: NERE
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: non_geographic
   domains:
     - "ECO"
     - "EMP"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web page"
-authority: verified-third-party
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://nere.pt/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-10
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://nere.pt/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-04 Batch A (provisional D1-04-A-S07). Business association / training / enterprise-support stakeholder. Detailed business-needs evidence still needs targeted research; not yet a source of specific institutional findings beyond its role as a stakeholder."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-10"

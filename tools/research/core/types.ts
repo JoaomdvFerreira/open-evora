@@ -28,6 +28,23 @@ export interface SchemaReference {
   required?: boolean;
 }
 
+/** Primitive/container type names supported by a schema's declared `fieldTypes`. */
+export type SchemaFieldType = "string" | "boolean" | "object" | "array" | "null";
+
+/** A declarative conditional-requirement rule for a schema's `conditionalRequired`. */
+export interface ConditionalRequiredRule {
+  field: string;
+  in?: string[];
+  notIn?: string[];
+  requires: string[];
+}
+
+/** A declarative bounded-XOR rule for a schema's `exclusiveFieldSets`. */
+export interface ExclusiveFieldSetRule {
+  path: string;
+  sets: string[][];
+}
+
 /**
  * Shape of a research/schemas/*.schema.json file, as consumed by the
  * loader. Mirrors only the keys the loader/indexer reads; validation rule
@@ -46,6 +63,22 @@ export interface RecordSchema {
   booleanFields?: string[];
   enums?: Record<string, string[]>;
   references?: SchemaReference[];
+  /**
+   * Exhaustive list of allowed dotted field paths (leaf and parent-object
+   * paths alike). When present, any top-level or nested object field not
+   * declared here (directly or as a declared parent path) is rejected.
+   * When absent, no field-exhaustiveness check is performed (unchanged
+   * legacy behavior).
+   */
+  allowedFields?: string[];
+  /** Dotted field path -> allowed primitive/container type names (multiple allowed). */
+  fieldTypes?: Record<string, SchemaFieldType[]>;
+  /** Dotted string field path -> regex pattern string, applied only when the field is present. */
+  patterns?: Record<string, string>;
+  /** Declarative "when field is/isn't one of these values, these other fields are required" rules. */
+  conditionalRequired?: ConditionalRequiredRule[];
+  /** Declarative bounded-XOR rules: within an object path, exactly one declared field-set may be authored. */
+  exclusiveFieldSets?: ExclusiveFieldSetRule[];
 }
 
 /** All records of one schema-declared type, plus the schema that describes them. */

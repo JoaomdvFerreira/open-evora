@@ -1,27 +1,24 @@
 source_id: SRC-0031
 publisher: "Município de Évora"
 name: "CLASE / Rede Social"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "SOC"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web page"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/acao-social/rede-social-clase/clase/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-10
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/acao-social/rede-social-clase/clase/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-03 Batch A (provisional D1-03-A-S05). Évora has a large interinstitutional social-support network, with roughly 120 participating institutions listed by the Municipality. Interpretation: the social-support problem should not be assumed to be 'no organisations exist'; coordination, capacity, discoverability and eligibility/navigation need separate investigation. WU-D1-03 Batch B update (provisional D1-03-B-S04, CLASE portion): CLASE communicated the Plano Concelhio dos Cuidadores Informais 2026-2027 implementation update in January 2026, consistent with CLASE's role as the coordinating network for caregiver-related institutional responses (see SRC-0030)."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-10"

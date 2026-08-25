@@ -1,29 +1,26 @@
 source_id: SRC-0022
 publisher: "Município de Évora"
-name: "Évora Mobilidade / paid-parking service"
+name: "Évora Mobilidade — serviço de estacionamento pago"
+resource_type: webpage
 scope:
-  geography: city
+  geography:
+    level: local_area
+    area: "Centro Histórico de Évora"
   domains:
     - "MOB"
     - "DIG"
     - "URB"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "mobile application / public web page"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/municipe/aplicacoes-do-municipio/estacionamento-tarifado/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: 2026-08-10
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/municipe/aplicacoes-do-municipio/estacionamento-tarifado/"
-api_candidate:
-  potential: "unknown - machine-readable parking availability/occupancy feed not established by this source"
-notes: "Évora Mobilidade supports mobile payment for tariffed parking in the Historic Centre; Via Verde Estacionar is also supported. A new application whose main purpose is simply paying for tariffed parking would duplicate an existing service."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-10"

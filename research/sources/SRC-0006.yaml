@@ -1,28 +1,28 @@
 source_id: SRC-0006
 publisher: "Município de Évora"
 name: "Portal Geográfico do Município de Évora"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "GEO"
     - "URB"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web portal"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/servicos/servicos-online/portal-geografico-do-municipio-de-evora/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2025-12-30
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/servicos/servicos-online/portal-geografico-do-municipio-de-evora/"
-api_candidate:
-  potential: "unknown - public WMS/WFS/API endpoints not confirmed in this batch"
-notes: "Current municipal geographic portal, updated 2025-12-30, with thematic maps/data for land use, infrastructure and environment, analysis/navigation tools, location-plan generation, and PDM framing reports. Machine-readable/API status UNKNOWN from the public description reviewed in this batch. Batch B update: current municipal interactive geographic products use the geo.cimac.pt infrastructure - for example, 2026 school catchment/influence mapping is published as interactive content through geo.cimac.pt. Exact per-layer public API/service endpoints were not enumerated, and per-layer reuse licences remain UNKNOWN."
+  reuse: unknown
+temporal:
+  updated_at: "2025-12-30"
+  last_checked_at: "2026-08-10"
+caveats:
+  - "A descrição pública da origem não enumera pontos de acesso ou serviços públicos por camada nem condições de reutilização por camada."

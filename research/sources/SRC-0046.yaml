@@ -1,28 +1,25 @@
 source_id: SRC-0046
 publisher: "Município de Évora"
-name: "Município de Évora — informação ao visitante / turismo"
+name: "Município de Évora — Visitante"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "TOU"
     - "CUL"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web pages"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/visitante/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/visitante/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-05 Batch A (provisional D1-05-A-S04). Additional page reviewed: https://www.cm-evora.pt/visitante/posto-de-turismo/. Relevance: a mature municipal visitor-information surface already exists, including tourism office, heritage, routes, lodging, food, mobility and agenda links. Interpretation: a generic 'Évora tourist guide' would likely duplicate existing information unless a specific current gap is demonstrated; no such gap was established in Batch A or Batch B."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-25"

@@ -1,28 +1,26 @@
 source_id: SRC-0055
 publisher: "Município de Évora"
-name: "Municipal waste-collection fleet reinforcement (July 2026)"
+name: "Reforço da frota municipal de recolha de resíduos — julho de 2026"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "ENV"
     - "PUB"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "Municipal news page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/municipio-de-evora-reforca-frota-de-recolha-de-residuos-com-duas-novas-viaturas/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-07
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/municipio-de-evora-reforca-frota-de-recolha-de-residuos-com-duas-novas-viaturas/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-06 Batch A (provisional D1-06-A-S05) merged with Batch B (provisional D1-06-B-S04) - both describe the same underlying fact: two additional collection vehicles brought the dedicated fleet to 19 vehicles, intended to provide reserve/substitution capacity during breakdowns and to improve service continuity/reliability. Treated as a single record, not two, since both batches report the identical fleet-reinforcement event."
+  reuse: unknown
+temporal:
+  published_at: "2026-07"
+  last_checked_at: "2026-08-11"

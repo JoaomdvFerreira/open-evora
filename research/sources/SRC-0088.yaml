@@ -1,28 +1,24 @@
 source_id: SRC-0088
 publisher: "Universidade de Évora"
-name: "UÉ Employment Portal (emprego.uevora.pt)"
+name: "Portal de Emprego da Universidade de Évora (emprego.uevora.pt)"
+resource_type: service
 scope:
-  geography: municipality
+  geography:
+    level: non_geographic
   domains:
     - "EMP"
     - "EDU"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web platform"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://emprego.uevora.pt/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://emprego.uevora.pt/"
-api_candidate:
-  potential: unknown
-notes: "D2-D Round A (E-03). Distinct from SRC-0041 (Magma Talks/employability activities, no canonical URL): a specific candidate-employer matching platform where students/alumni publish CVs, receive matching notifications and apply, and employers publish vacancies and search profiles. Enriches EVD-000048's existing-matching-infrastructure conclusion rather than creating a new EVD; strengthens the negative finding against a generic local job-board hypothesis."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"

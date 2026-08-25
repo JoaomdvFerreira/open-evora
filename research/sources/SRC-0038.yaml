@@ -1,28 +1,26 @@
 source_id: SRC-0038
-publisher: "ULSAC (Unidade Local de Saúde do Alentejo Central)"
-name: "ULSAC mental-health and community-care responses"
+publisher: "ULSAC"
+name: "ULSAC — Unidade de Cuidados na Comunidade (UCC) Évora"
+resource_type: webpage
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "HEA"
     - "SOC"
-source_type: web
 access:
-  public: true
-  machine_readable: unknown
-  method: "public web pages"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.ulsac.min-saude.pt/2025/10/20/unidade-de-cuidados-na-comunidade-ucc-evora/"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2025-10
-  last_checked: 2026-08-11
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.ulsac.min-saude.pt/2025/10/20/unidade-de-cuidados-na-comunidade-ucc-evora/"
-api_candidate:
-  potential: unknown
-notes: "WU-D1-03 Batch B (provisional D1-03-B-S05). Additional pages: https://www.ulsac.min-saude.pt/2025/01/16/ecsm-ia/ ; https://www.ulsac.min-saude.pt/2020/01/08/psiquiatria-e-saude-mental/. Confirms new/community mental-health and community-care responses developed or strengthened since the older diagnostic evidence used by the PDS (see EVD-000035/SRC-0002). Also the publisher for the named but URL-less caregiver-oriented ULSAC responses referenced in the Batch B handoff (UCC, Cantinho do Cuidador, VIVAMENTE), which are treated as institutional programmes of this same publisher rather than separately sourced (provisional D1-03-B-S04 caregiver-programme portion)."
+  reuse: unknown
+temporal:
+  published_at: "2025-10-20"
+  last_checked_at: "2026-08-25"

@@ -1,28 +1,29 @@
 source_id: SRC-0018
 publisher: "Município de Évora"
 name: "Relatório Anual de Atividade da Autoridade de Transportes - Município de Évora 2026"
+resource_type: document
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
+  temporal:
+    start: "2025"
+    end: "2025"
   domains:
     - "MOB"
     - "ACC"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2026/07/Relatorio-anual-de-Autoridade-de-Transportes-CME-2026.pdf"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2026-07
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2026/07/Relatorio-anual-de-Autoridade-de-Transportes-CME-2026.pdf"
-api_candidate:
-  potential: unknown
-notes: "Current operational evidence for Évora's urban bus network: service coverage, Linha Azul, flexible transport, punctuality, complaints and public information. Batch C update: 2025 operational figures confirm 876,148 passengers (up 90,522 versus 2024, still 1.9% below pre-pandemic levels), daytime coverage of practically all urban Évora with reduced night/weekend/holiday response, taxi-based flexible transport for Chainha Berlim, Santo Antónico, Barraca de Pau and Garraia, 11 urban routes plus 2 LinhAzul routes, 99.5% service regularity, 84.4% IP-5 minute punctuality (delays attributed by the Municipality to congestion on principal routes to the Historic Centre and the Industrial Park circular), the TREVO website described by the Municipality as providing complete timetable/route/passenger information, and that E-BUS did not provide 2025 satisfaction-survey results to the Municipality."
+  reuse: unknown
+temporal:
+  published_at: "2026-07"
+  last_checked_at: "2026-08-10"

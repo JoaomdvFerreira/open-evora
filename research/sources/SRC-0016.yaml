@@ -1,30 +1,30 @@
 source_id: SRC-0016
 publisher: "Município de Évora"
-name: "Plano de Mobilidade Urbana Sustentável de Évora - Volume II (final plan)"
+name: "Plano de Mobilidade Urbana Sustentável de Évora — Volume II (plano final)"
+resource_type: document
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
   domains:
     - "MOB"
     - "ACC"
     - "URB"
     - "GEO"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/PMUSE_V.II_.pdf"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2025-09
-  last_checked: 2026-08-10
-  status: CURRENT
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/PMUSE_V.II_.pdf"
-api_candidate:
-  potential: unknown
-notes: "Strategic municipal mobility plan (final strategy and proposals). Includes pedestrian/accessibility policy, parking, public transport, cycling, intermodality, smart parking proposals, and the requirement to revisit the municipal accessibility plan. The plan includes proposals; proposed measures must not be recorded as if already implemented. Batch B update: confirms that the Local Accessibility Promotion Plan R.A.M.P.A.-Évora was prepared in 2022, covering the Historic Centre plus major access/exit axes, and should later be revisited to monitor implementation and expand coverage; also explicitly proposed a smart-parking system using sensors/management and real-time information. These are planning proposals and must not be confused with current implementation status. No public R.A.M.P.A. structured dataset was located in this bounded review; reuse licence UNKNOWN."
+  reuse: unknown
+temporal:
+  published_at: "2025-09"
+  last_checked_at: "2026-08-10"
+caveats:
+  - "O documento inclui medidas e intervenções propostas; a sua inclusão no plano não estabelece que tenham sido implementadas."

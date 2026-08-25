@@ -1,8 +1,14 @@
 source_id: SRC-0002
 publisher: "Município de Évora / Rede Social"
 name: "Plano de Desenvolvimento Social de Évora 2024-2027"
+resource_type: document
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Évora"
+  temporal:
+    start: "2024"
+    end: "2027"
   domains:
     - "MOB"
     - "ACC"
@@ -12,23 +18,20 @@ scope:
     - "EMP"
     - "ECO"
     - "EDU"
-source_type: document
 access:
-  public: true
-  machine_readable: unknown
-  method: "PDF document (public download)"
-authority: authoritative
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: 2024-01
-  last_checked: 2026-08-10
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf"
-api_candidate:
-  potential: unknown
-notes: "Institutional diagnosis and action plan for mobility/accessibility, including public-transport effectiveness, rural/urban connectivity, accessibility barriers, and planned interventions. Reuse/licence UNKNOWN unless explicitly established by later integration. WU-D1-03 Batch A update (provisional D1-03-A-S01): also the primary source for housing/social/health institutional diagnosis - housing degradation, high purchase/rental values, insufficient social/controlled-cost/affordable housing, rural housing needs, difficulty accessing supported residential/social responses, and student-accommodation shortage; local actors identify insufficient mental-health response capacity and insufficient primary-care capacity, linked to informal-caregiver burden and social isolation. Some underlying measurements are older and require freshness checks (see EVD-000035). WU-D1-04 Batch A update (provisional D1-04-A-S01): also the primary source for economy/employment/education institutional diagnosis - Évora is described as a major economic pole in Alentejo Central; CLASE identifies a mismatch between workforce qualifications and labour-market needs, framed as an alignment gap between training provision and employment demand; retention of university students after study is explicitly identified as a population-fixation challenge (causality with housing/other factors not established). WU-D1-04 Batch B update (provisional D1-04-B-S05): the 2025 action plan still requires competence mapping and training adapted to labour-market needs, and municipal reporting has explicitly referred to supporting companies with qualified-workforce needs, confirming the skills/employer-needs alignment problem is a current institutional workstream, not merely historic strategy."
+  reuse: unknown
+temporal:
+  published_at: "2024-01"
+  last_checked_at: "2026-08-10"
+caveats:
+  - "Parte da base quantitativa do diagnóstico utiliza medições anteriores ao período do plano."

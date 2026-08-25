@@ -1,28 +1,25 @@
 source_id: SRC-0089
 publisher: "Universidade de Évora"
-name: "PlaQuaR — regional training/employer-needs alignment mechanism"
+name: "PlaQuaR — mecanismo regional de alinhamento entre formação e necessidades dos empregadores"
+resource_type: webpage
 scope:
-  geography: regional
+  geography:
+    level: regional
+    area: "Alentejo"
   domains:
     - "EMP"
     - "EDU"
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "public university news page"
-authority: authoritative
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: "https://www.uevora.pt/ue-media/noticias?item=43736"
 licensing:
   status: unknown
-  licence: null
-  attribution: null
-freshness:
-  update_frequency: unknown
-  last_source_update: unknown
-  last_checked: 2026-08-11
-  status: UNKNOWN
-canonical_source: true
-canonical_reference: "https://www.uevora.pt/ue-media/noticias?item=43736"
-api_candidate:
-  potential: unknown
-notes: "D2-D Round A (E-05). PlaQuaR explicitly seeks to align training supply with actual regional employer/institution needs, map available training, maintain current information, and strengthen cooperation networks — a concrete, currently-developing skills-alignment mechanism."
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"
