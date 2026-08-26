@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { extractSourceOverview, type SourceOverview } from "./sourceView";
 import { publicEnumLabel, formatPublicPartialDate } from "../presentation";
+import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 
 interface OverviewRow {
   label: string;
@@ -40,7 +41,7 @@ export function SourceOverviewSection({ record }: { record: Record<string, unkno
   const rows = buildOverviewRows(overview);
 
   return (
-    <section aria-label="Visão geral" className="source-overview-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.overview} aria-label="Visão geral" className="source-overview-section">
       <h3 className="detail-panel-label">Visão geral</h3>
       {rows.length > 0 && (
         <dl className="detail-provenance-grid">

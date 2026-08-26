@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { extractSourceCoverage, type SourceCoverage } from "./sourceView";
 import { publicEnumLabel, formatPublicPartialDate } from "../presentation";
+import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 
 interface CoverageRow {
   label: string;
@@ -48,7 +49,7 @@ export function SourceCoverageSection({ record }: { record: Record<string, unkno
   const rows = buildCoverageRows(coverage);
 
   return (
-    <section aria-label="Cobertura" className="source-coverage-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.coverage} aria-label="Cobertura" className="source-coverage-section">
       <h3 className="detail-panel-label">Cobertura</h3>
       {rows.length > 0 && (
         <dl className="detail-provenance-grid">

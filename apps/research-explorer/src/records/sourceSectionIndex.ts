@@ -43,8 +43,14 @@ const SOURCE_SECTION_LABELS: Record<SourceSectionId, string> = {
   technical: "Informação técnica",
 };
 
-/** Deterministic Source-specific DOM anchor ids, for a later slice to apply to rendered sections. */
-const SOURCE_SECTION_ANCHOR_IDS: Record<SourceSectionId, string> = {
+/**
+ * Deterministic Source-specific DOM anchor ids — SUI-03J1A's single source of
+ * truth for the ids applied to rendered Source View sections. Exported (not
+ * just consumed internally by `sourceSectionIndex`) so section components in
+ * `RecordDetailPanel.tsx` reuse these exact literals instead of duplicating
+ * them independently.
+ */
+export const SOURCE_SECTION_ANCHOR_IDS: Record<SourceSectionId, string> = {
   overview: "source-overview",
   findings: "source-findings",
   coverage: "source-coverage",

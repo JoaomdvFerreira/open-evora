@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import type { RecordDetail } from "../dataProvider/types";
 import type { SourceEvidenceRelations } from "./sourceEvidenceRelations";
 import { publicEnumLabel, publicFieldCaption, formatPublicDate } from "../presentation";
+import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 
 /**
  * SUI-03C1: isolated presentation component for the Source View "O que
@@ -120,7 +121,7 @@ export function SourceFindingsSection({ relations, onSelect }: { relations: Sour
   const isEmpty = relations.primaryEvidence.length === 0 && relations.additionalEvidence.length === 0;
 
   return (
-    <section aria-label="O que encontrámos" className="source-findings-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="source-findings-section">
       <h3 className="detail-panel-label">O que encontrámos</h3>
       {isEmpty ? (
         <p className="field-empty">Ainda não existem observações da investigação ligadas explicitamente a esta fonte.</p>

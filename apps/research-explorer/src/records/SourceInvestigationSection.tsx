@@ -1,4 +1,5 @@
 import type { SourceEvidenceRelations, SourceRelatedProblem } from "./sourceEvidenceRelations";
+import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 
 /**
  * SUI-03H1/H2: isolated presentation component for the Source View "Na
@@ -34,7 +35,7 @@ export function SourceInvestigationSection({ relations, onSelect }: { relations:
   if (relations.relatedProblems.length === 0) return null;
 
   return (
-    <section aria-label="Na investigação" className="source-findings-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.investigation} aria-label="Na investigação" className="source-findings-section">
       <h3 className="detail-panel-label">Na investigação</h3>
       <dl className="detail-provenance-grid">
         <dt>Observações relacionadas</dt>

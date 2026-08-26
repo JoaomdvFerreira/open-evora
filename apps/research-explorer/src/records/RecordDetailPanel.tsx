@@ -18,6 +18,7 @@ import { SourceInvestigationSection } from "./SourceInvestigationSection";
 import { useSourceEvidenceRelations, type SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
 import { extractSourceCaveats } from "./sourceView";
 import { SourceTechnicalSection } from "./SourceTechnicalSection";
+import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -305,7 +306,7 @@ function SourceOriginalLinkAction({ detail }: { detail: RecordDetail }) {
 function SourceFindings({ state, onSelect }: { state: SourceEvidenceRelationsState & { retry: () => void }; onSelect: (id: string) => void }) {
   if (state.status === "loading" || state.status === "idle") {
     return (
-      <section aria-label="O que encontrámos" className="source-findings-section">
+      <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="source-findings-section">
         <h3 className="detail-panel-label">O que encontrámos</h3>
         <p role="status" aria-live="polite">
           A carregar observações da investigação…
@@ -316,7 +317,7 @@ function SourceFindings({ state, onSelect }: { state: SourceEvidenceRelationsSta
 
   if (state.status === "error") {
     return (
-      <section aria-label="O que encontrámos" className="source-findings-section">
+      <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="source-findings-section">
         <h3 className="detail-panel-label">O que encontrámos</h3>
         <div role="alert">
           <p>Não foi possível carregar as observações da investigação ligadas a esta fonte.</p>

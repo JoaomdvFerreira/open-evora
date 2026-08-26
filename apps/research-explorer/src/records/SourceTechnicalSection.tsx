@@ -1,4 +1,5 @@
 import { RecordFieldTree } from "./RecordFieldTree";
+import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 
 /**
  * SUI-03I1: SRC Source View's collapsed canonical-inspection surface —
@@ -12,7 +13,7 @@ import { RecordFieldTree } from "./RecordFieldTree";
  */
 export function SourceTechnicalSection({ record }: { record: Record<string, unknown> }) {
   return (
-    <section aria-label="Informação técnica" className="source-technical-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.technical} aria-label="Informação técnica" className="source-technical-section">
       <h3 className="detail-panel-label">Informação técnica</h3>
       <details className="technical-disclosure">
         <summary>Inspeção completa do registo canónico</summary>

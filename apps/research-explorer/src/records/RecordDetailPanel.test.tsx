@@ -4419,3 +4419,345 @@ describe("RecordDetailPanel — RD-01E/RD-01G PRB raw technical boundary (Proven
     expect(within(panel).queryByText("Estrutura técnica completa")).toBeNull();
   });
 });
+
+describe("RecordDetailPanel — SUI-03J1A Source View anchor IDs", () => {
+  /** Full SRC-0093-shaped fixture: every optional section present (coverage, dates-access, licensing, caveats, investigation via related PRB). */
+  const SRC_FULL_DETAIL: RecordDetail = {
+    id: "SRC-0093",
+    type: "SRC-",
+    file: "research/sources/SRC-0093.yaml",
+    record: {
+      source_id: "SRC-0093",
+      publisher: "Scientific Reports (Springer Nature)",
+      name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+      resource_type: "document",
+      scope: {
+        geography: { level: "local_area", area: "Belltown, Seattle, Washington, EUA" },
+        domains: ["MOB", "DIG"],
+      },
+      access: { level: "public", availability: "available", machine_readable: false },
+      canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z",
+      licensing: { status: "known", licence: "CC BY 4.0", reuse: "permitted", attribution: "Autores" },
+      temporal: { published_at: "2022-11-11", last_checked_at: "2026-08-25" },
+      caveats: ["Limitação canónica registada para SRC-0093."],
+    },
+    outgoingEdges: [],
+    incomingEdges: [{ field: "source.source_id", ordinal: null, from: "EVD-000106" }],
+  };
+  const SRC_FULL_SUMMARY: RecordSummary = {
+    id: "SRC-0093",
+    type: "SRC-",
+    label: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+    file: SRC_FULL_DETAIL.file,
+    summaryFields: {},
+  };
+  const EVD_106_DETAIL: RecordDetail = {
+    id: "EVD-000106",
+    type: "EVD-",
+    file: "research/evidence/EVD-000106.yaml",
+    record: {
+      evidence_id: "EVD-000106",
+      source: { source_id: "SRC-0093" },
+      observation: { summary: "Observação ligada a SRC-0093." },
+      analysis: { related_problems: ["PRB-0005"] },
+    },
+    outgoingEdges: [{ field: "analysis.related_problems", ordinal: 0, to: "PRB-0005" }],
+    incomingEdges: [],
+  };
+  const EVD_106_SUMMARY: RecordSummary = {
+    id: "EVD-000106",
+    type: "EVD-",
+    label: "Observação ligada a SRC-0093.",
+    file: EVD_106_DETAIL.file,
+    summaryFields: {},
+  };
+
+  /** Minimal SRC: no caveats field, no incoming EVD edges (no related PRB) — every optional section absent. */
+  const SRC_MINIMAL_DETAIL: RecordDetail = {
+    id: "SRC-0001",
+    type: "SRC-",
+    file: "research/sources/SRC-0001.yaml",
+    record: {
+      source_id: "SRC-0001",
+      name: "Minimal source",
+      resource_type: "webpage",
+      access: { level: "unknown", availability: "unknown", machine_readable: "unknown" },
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const SRC_MINIMAL_SUMMARY: RecordSummary = {
+    id: "SRC-0001",
+    type: "SRC-",
+    label: "Minimal source",
+    file: SRC_MINIMAL_DETAIL.file,
+    summaryFields: {},
+  };
+
+  const ALL_SOURCE_ANCHOR_IDS = [
+    "source-overview",
+    "source-findings",
+    "source-coverage",
+    "source-dates-access",
+    "source-licensing",
+    "source-caveats",
+    "source-investigation",
+    "source-technical",
+  ];
+
+  it("1+2+3+13. SRC-0093-shaped full case exposes all eight unique anchor IDs, each once, in canonical order — matching sourceSectionIndex()", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+
+    const foundElements = ALL_SOURCE_ANCHOR_IDS.map((id) => {
+      const matches = panel.querySelectorAll(`#${id}`);
+      expect(matches.length).toBe(1);
+      return matches[0] as HTMLElement;
+    });
+
+    for (let i = 0; i < foundElements.length - 1; i++) {
+      expect(foundElements[i].compareDocumentPosition(foundElements[i + 1]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+  });
+
+  it("4. findings ready-with-evidence: source-findings exists", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const evdId = await within(panel).findByText("EVD-000106");
+    const findings = evdId.closest("section") as HTMLElement;
+    expect(findings.id).toBe("source-findings");
+  });
+
+  it("5. findings ready-empty: source-findings exists", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0001": SRC_MINIMAL_DETAIL })}
+        lookup={buildLookup(SRC_MINIMAL_SUMMARY)}
+        selectedId="SRC-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const emptyState = await within(panel).findByText(/Ainda não existem observações/);
+    const findings = emptyState.closest("section") as HTMLElement;
+    expect(findings.id).toBe("source-findings");
+  });
+
+  it("6. findings loading: source-findings still exists, loading status unchanged", async () => {
+    const pendingProvider: DataProvider = {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.reject(new Error("not used")),
+      getRecord: (id: string) => (id === "SRC-0093" ? Promise.resolve(SRC_FULL_DETAIL) : new Promise<RecordDetail>(() => {})),
+      getEdges: () => Promise.reject(new Error("not used")),
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={pendingProvider}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const status = await within(panel).findByText("A carregar observações da investigação…");
+    const findings = status.closest("section") as HTMLElement;
+    expect(findings.id).toBe("source-findings");
+    expect(within(findings).getByRole("status")).toBeTruthy();
+  });
+
+  it("7. findings error: source-findings still exists, error/retry behavior unchanged", async () => {
+    const failingProvider: DataProvider = {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.reject(new Error("not used")),
+      getRecord: (id: string) => (id === "SRC-0093" ? Promise.resolve(SRC_FULL_DETAIL) : Promise.reject(new Error("relation load failed"))),
+      getEdges: () => Promise.reject(new Error("not used")),
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={failingProvider}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const alert = await within(panel).findByRole("alert");
+    const findings = alert.closest("section") as HTMLElement;
+    expect(findings.id).toBe("source-findings");
+    expect(within(findings).getByRole("button", { name: "Tentar novamente" })).toBeTruthy();
+  });
+
+  it("8. caveats absent: source-caveats absent", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0001": SRC_MINIMAL_DETAIL })}
+        lookup={buildLookup(SRC_MINIMAL_SUMMARY)}
+        selectedId="SRC-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Informação técnica");
+    expect(panel.querySelector("#source-caveats")).toBeNull();
+  });
+
+  it("9. caveats present: source-caveats present", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    expect(panel.querySelector("#source-caveats")).not.toBeNull();
+  });
+
+  it("10. investigation absent: source-investigation absent", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0001": SRC_MINIMAL_DETAIL })}
+        lookup={buildLookup(SRC_MINIMAL_SUMMARY)}
+        selectedId="SRC-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Informação técnica");
+    expect(panel.querySelector("#source-investigation")).toBeNull();
+  });
+
+  it("11. investigation present: source-investigation present", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const investigation = await within(panel).findByLabelText("Na investigação");
+    expect(investigation.id).toBe("source-investigation");
+  });
+
+  it("12. technical always present for SRC", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0001": SRC_MINIMAL_DETAIL })}
+        lookup={buildLookup(SRC_MINIMAL_SUMMARY)}
+        selectedId="SRC-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const technical = await within(panel).findByLabelText("Informação técnica");
+    expect(technical.id).toBe("source-technical");
+  });
+
+  it("14. EVD detail receives none of the source-* anchor IDs", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Proveniência");
+    for (const id of ALL_SOURCE_ANCHOR_IDS) {
+      expect(panel.querySelector(`#${id}`)).toBeNull();
+    }
+  });
+
+  it("15. PRB detail receives none of the source-* anchor IDs", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY, EVD_127_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Metadados");
+    for (const id of ALL_SOURCE_ANCHOR_IDS) {
+      expect(panel.querySelector(`#${id}`)).toBeNull();
+    }
+  });
+
+  it("16. no Source section headings/copy change as a consequence of adding IDs", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    for (const label of ["Visão geral", "O que encontrámos", "Cobertura", "Datas e acesso", "Licenciamento", "Limitações", "Na investigação", "Informação técnica"]) {
+      expect(within(panel).getByLabelText(label)).toBeTruthy();
+      expect(within(panel).getByRole("heading", { name: label, level: 3 })).toBeTruthy();
+    }
+  });
+});
