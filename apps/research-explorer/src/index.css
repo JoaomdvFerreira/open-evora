@@ -1653,7 +1653,8 @@ main.explorer-shell {
 
 /* Problem View reading rail (UX-B §3/§4) — lightweight contextual
    orientation and a "Nesta página" index, inside the reused
-   `.record-detail-rail` shell. */
+   `.record-detail-rail` shell. SUI-03J1B reuses this same nav treatment for
+   the SRC rail's "Nesta fonte" index — no separate Source-specific class. */
 .problem-rail-nav ul {
   list-style: none;
   margin: 0;

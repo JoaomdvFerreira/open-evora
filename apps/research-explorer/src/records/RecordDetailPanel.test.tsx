@@ -935,14 +935,14 @@ describe("RecordDetailPanel — SRC original-source action (SUI-02A, SRC v2 elig
    * a SRC detail regardless of its edges.
    */
   describe("SUI-03I3: SRC rail cleanup", () => {
-    it("renders only the SRC type explanatory card in the rail — no action controls", async () => {
+    it("renders only the SRC type explanatory card and the Nesta fonte index in the rail — no action buttons", async () => {
       renderSrc(srcDetail({}));
 
       const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
       const rail = await within(panel).findByLabelText("Mais ações");
       expect(rail.querySelector(".detail-rail-type-note")).toBeTruthy();
       expect(rail.querySelectorAll("button")).toHaveLength(0);
-      expect(rail.querySelectorAll("a")).toHaveLength(0);
+      expect(within(rail).getByLabelText("Nesta fonte")).toBeTruthy();
     });
 
     it("does not render 'Ver no Grafo' in the SRC rail", async () => {
@@ -4759,5 +4759,401 @@ describe("RecordDetailPanel — SUI-03J1A Source View anchor IDs", () => {
       expect(within(panel).getByLabelText(label)).toBeTruthy();
       expect(within(panel).getByRole("heading", { name: label, level: 3 })).toBeTruthy();
     }
+  });
+});
+
+describe("RecordDetailPanel — SUI-03J1B desktop Source View 'Nesta fonte' rail index", () => {
+  /** Full SRC-0093-shaped fixture: every optional section present (coverage, dates-access, licensing, caveats, investigation via related PRB). */
+  const SRC_FULL_DETAIL: RecordDetail = {
+    id: "SRC-0093",
+    type: "SRC-",
+    file: "research/sources/SRC-0093.yaml",
+    record: {
+      source_id: "SRC-0093",
+      publisher: "Scientific Reports (Springer Nature)",
+      name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+      resource_type: "document",
+      scope: {
+        geography: { level: "local_area", area: "Belltown, Seattle, Washington, EUA" },
+        domains: ["MOB", "DIG"],
+      },
+      access: { level: "public", availability: "available", machine_readable: false },
+      canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z",
+      licensing: { status: "known", licence: "CC BY 4.0", reuse: "permitted", attribution: "Autores" },
+      temporal: { published_at: "2022-11-11", last_checked_at: "2026-08-25" },
+      caveats: ["Limitação canónica registada para SRC-0093."],
+    },
+    outgoingEdges: [],
+    incomingEdges: [{ field: "source.source_id", ordinal: null, from: "EVD-000106" }],
+  };
+  const SRC_FULL_SUMMARY: RecordSummary = {
+    id: "SRC-0093",
+    type: "SRC-",
+    label: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+    file: SRC_FULL_DETAIL.file,
+    summaryFields: {},
+  };
+  const EVD_106_DETAIL: RecordDetail = {
+    id: "EVD-000106",
+    type: "EVD-",
+    file: "research/evidence/EVD-000106.yaml",
+    record: {
+      evidence_id: "EVD-000106",
+      source: { source_id: "SRC-0093" },
+      observation: { summary: "Observação ligada a SRC-0093." },
+      analysis: { related_problems: ["PRB-0005"] },
+    },
+    outgoingEdges: [{ field: "analysis.related_problems", ordinal: 0, to: "PRB-0005" }],
+    incomingEdges: [],
+  };
+  const EVD_106_SUMMARY: RecordSummary = {
+    id: "EVD-000106",
+    type: "EVD-",
+    label: "Observação ligada a SRC-0093.",
+    file: EVD_106_DETAIL.file,
+    summaryFields: {},
+  };
+
+  /** Same EVD backlink as EVD_106_DETAIL, but without a related-Problem edge — ready relations, zero related PRB. */
+  const EVD_106_NO_PRB_DETAIL: RecordDetail = {
+    ...EVD_106_DETAIL,
+    record: { ...EVD_106_DETAIL.record, analysis: undefined },
+    outgoingEdges: [],
+  };
+
+  /** Minimal SRC: no caveats field, no incoming EVD edges (no related PRB) — every optional section absent. */
+  const SRC_MINIMAL_DETAIL: RecordDetail = {
+    id: "SRC-0001",
+    type: "SRC-",
+    file: "research/sources/SRC-0001.yaml",
+    record: {
+      source_id: "SRC-0001",
+      name: "Minimal source",
+      resource_type: "webpage",
+      access: { level: "unknown", availability: "unknown", machine_readable: "unknown" },
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const SRC_MINIMAL_SUMMARY: RecordSummary = {
+    id: "SRC-0001",
+    type: "SRC-",
+    label: "Minimal source",
+    file: SRC_MINIMAL_DETAIL.file,
+    summaryFields: {},
+  };
+
+  const FULL_SRC_LABELS_IN_ORDER = ["Visão geral", "O que encontrámos", "Cobertura", "Datas e acesso", "Licenciamento", "Limitações", "Na investigação", "Informação técnica"];
+
+  function renderFull() {
+    return render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+  }
+
+  function renderMinimal() {
+    return render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0001": SRC_MINIMAL_DETAIL })}
+        lookup={buildLookup(SRC_MINIMAL_SUMMARY)}
+        selectedId="SRC-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+  }
+
+  it("1. renders the existing SRC type explanatory card", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const rail = await within(panel).findByLabelText("Mais ações");
+    await within(panel).findByLabelText("Na investigação");
+    expect(rail.querySelector(".detail-rail-type-note")).toBeTruthy();
+  });
+
+  it("2. renders a 'Nesta fonte' nav", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = within(rail).getByLabelText("Nesta fonte");
+    expect(nav.tagName).toBe("NAV");
+  });
+
+  it("3. full SRC-0093 case renders exactly the 8 expected index labels in canonical order", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = within(rail).getByLabelText("Nesta fonte");
+    const links = within(nav).getAllByRole("link");
+    expect(links.map((link) => link.textContent)).toEqual(FULL_SRC_LABELS_IN_ORDER);
+  });
+
+  it("4. every index link href matches the corresponding anchor from sourceSectionIndex()", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = within(rail).getByLabelText("Nesta fonte");
+    const links = within(nav).getAllByRole("link");
+    expect(links.map((link) => link.getAttribute("href"))).toEqual([
+      "#source-overview",
+      "#source-findings",
+      "#source-coverage",
+      "#source-dates-access",
+      "#source-licensing",
+      "#source-caveats",
+      "#source-investigation",
+      "#source-technical",
+    ]);
+  });
+
+  it("5. no duplicate index entries", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = within(rail).getByLabelText("Nesta fonte");
+    const hrefs = within(nav).getAllByRole("link").map((link) => link.getAttribute("href"));
+    expect(new Set(hrefs).size).toBe(hrefs.length);
+  });
+
+  it("6. caveats absent: Limitações absent from the index", async () => {
+    renderMinimal();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Informação técnica");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = within(rail).getByLabelText("Nesta fonte");
+    expect(within(nav).queryByRole("link", { name: "Limitações" })).toBeNull();
+  });
+
+  it("7. caveats present: Limitações present in the index, in the correct position", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = within(rail).getByLabelText("Nesta fonte");
+    const links = within(nav).getAllByRole("link");
+    const labels = links.map((link) => link.textContent);
+    expect(labels.indexOf("Limitações")).toBe(labels.indexOf("Licenciamento") + 1);
+    expect(labels.indexOf("Limitações")).toBe(labels.indexOf("Na investigação") - 1);
+  });
+
+  it("8. relation state loading: O que encontrámos present, Na investigação absent", async () => {
+    const pendingProvider: DataProvider = {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.reject(new Error("not used")),
+      getRecord: (id: string) => (id === "SRC-0093" ? Promise.resolve(SRC_FULL_DETAIL) : new Promise<RecordDetail>(() => {})),
+      getEdges: () => Promise.reject(new Error("not used")),
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={pendingProvider}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const rail = await within(panel).findByLabelText("Mais ações");
+    const nav = await within(rail).findByLabelText("Nesta fonte");
+    expect(within(nav).getByRole("link", { name: "O que encontrámos" })).toBeTruthy();
+    expect(within(nav).queryByRole("link", { name: "Na investigação" })).toBeNull();
+  });
+
+  it("9. relation state error: O que encontrámos present, Na investigação absent", async () => {
+    const failingProvider: DataProvider = {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.reject(new Error("not used")),
+      getRecord: (id: string) => (id === "SRC-0093" ? Promise.resolve(SRC_FULL_DETAIL) : Promise.reject(new Error("relation load failed"))),
+      getEdges: () => Promise.reject(new Error("not used")),
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={failingProvider}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByRole("alert");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = within(rail).getByLabelText("Nesta fonte");
+    expect(within(nav).getByRole("link", { name: "O que encontrámos" })).toBeTruthy();
+    expect(within(nav).queryByRole("link", { name: "Na investigação" })).toBeNull();
+  });
+
+  it("10. ready with EVD but no related PRB: Na investigação absent", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_NO_PRB_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("EVD-000106");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = await within(rail).findByLabelText("Nesta fonte");
+    expect(within(nav).queryByRole("link", { name: "Na investigação" })).toBeNull();
+  });
+
+  it("11. ready with related PRB: Na investigação present", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = within(rail).getByLabelText("Nesta fonte");
+    expect(within(nav).getByRole("link", { name: "Na investigação" })).toBeTruthy();
+  });
+
+  it("12. Informação técnica always present in the index", async () => {
+    renderMinimal();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Informação técnica");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = within(rail).getByLabelText("Nesta fonte");
+    expect(within(nav).getByRole("link", { name: "Informação técnica" })).toBeTruthy();
+  });
+
+  it("13. every rendered rail href resolves to exactly one matching DOM id in a full ready Source detail", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const nav = within(rail).getByLabelText("Nesta fonte");
+    const hrefs = within(nav).getAllByRole("link").map((link) => link.getAttribute("href")!);
+    for (const href of hrefs) {
+      const id = href.slice(1);
+      expect(panel.querySelectorAll(`#${id}`).length).toBe(1);
+    }
+  });
+
+  it("14. no legacy SRC rail items return: no 'Ver no Grafo', 'Ver como Problema', repository/YAML path, or 'Abrir fonte original' inside the rail", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    expect(within(rail).queryByRole("button", { name: /Ver no Grafo/ })).toBeNull();
+    expect(within(rail).queryByRole("button", { name: /Ver como Problema/ })).toBeNull();
+    expect(rail.querySelector(".detail-rail-file")).toBeNull();
+    expect(within(rail).queryByRole("link", { name: /Abrir fonte original/ })).toBeNull();
+    expect(within(rail).queryByText("research/sources/SRC-0093.yaml")).toBeNull();
+  });
+
+  it("15. 'Abrir fonte original' remains exactly once in the main Source content", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const links = within(panel).getAllByRole("link", { name: "Abrir fonte original ↗" });
+    expect(links).toHaveLength(1);
+    const rail = within(panel).getByLabelText("Mais ações");
+    expect(rail.contains(links[0])).toBe(false);
+  });
+
+  it("16. no second SourceEvidenceRelations load occurs because of the index — EVD backlink fetched exactly once", async () => {
+    // SRC-0093 itself is legitimately fetched twice regardless of this
+    // index: once by useRecordDetail (the record's own detail load) and once
+    // by loadSourceEvidenceRelations (to read its incomingEdges) — both
+    // pre-existing, unrelated to the rail. The invariant this index must not
+    // break is that EVD-000106 (fetched only by the one shared relations
+    // load "O que encontrámos"/"Na investigação" already consume) is never
+    // fetched a second time for the rail's own sake.
+    const getRecordSpy = vi.fn((id: string) => {
+      if (id === "SRC-0093") return Promise.resolve(SRC_FULL_DETAIL);
+      if (id === "EVD-000106") return Promise.resolve(EVD_106_DETAIL);
+      return Promise.reject(new Error(`no fixture for ${id}`));
+    });
+    const spiedProvider: DataProvider = {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.reject(new Error("not used")),
+      getRecord: getRecordSpy,
+      getEdges: () => Promise.reject(new Error("not used")),
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={spiedProvider}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const calledIds = getRecordSpy.mock.calls.map((call) => call[0]);
+    expect(calledIds.filter((id) => id === "EVD-000106").length).toBe(1);
+  });
+
+  it("17. EVD rail behavior remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const rail = await within(panel).findByLabelText("Mais ações");
+    expect(within(rail).getByRole("button", { name: "Ver no Grafo" })).toBeTruthy();
+    expect(within(rail).getByRole("button", { name: "Ver como Problema (PRB-0006)" })).toBeTruthy();
+    expect(rail.querySelector(".detail-rail-file")).toBeTruthy();
+    expect(within(rail).queryByLabelText("Nesta fonte")).toBeNull();
+  });
+
+  it("18. PRB rail behavior remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const rail = await within(panel).findByLabelText("Mais ações");
+    expect(within(rail).queryByRole("button", { name: /Ver no Grafo/ })).toBeNull();
+    expect(rail.querySelector(".detail-rail-file")).toBeTruthy();
+    expect(within(rail).queryByLabelText("Nesta fonte")).toBeNull();
+  });
+
+  it("19. no mobile/compact Source index is introduced in this slice", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    expect(within(panel).queryByLabelText("Nesta fonte (versão compacta)")).toBeNull();
+    // Exactly one "Nesta fonte" nav exists — the desktop rail's, no compact duplicate.
+    expect(within(panel).getAllByLabelText("Nesta fonte")).toHaveLength(1);
   });
 });

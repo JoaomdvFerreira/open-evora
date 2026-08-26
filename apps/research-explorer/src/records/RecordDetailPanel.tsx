@@ -18,7 +18,8 @@ import { SourceInvestigationSection } from "./SourceInvestigationSection";
 import { useSourceEvidenceRelations, type SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
 import { extractSourceCaveats } from "./sourceView";
 import { SourceTechnicalSection } from "./SourceTechnicalSection";
-import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
+import { SOURCE_SECTION_ANCHOR_IDS, sourceSectionIndex } from "./sourceSectionIndex";
+import { toSourceSectionRelationContext } from "./sourceEvidenceRelations";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -289,6 +290,34 @@ function SourceOriginalLinkAction({ detail }: { detail: RecordDetail }) {
         Abrir fonte original ↗
       </a>
     </p>
+  );
+}
+
+/**
+ * SUI-03J1B: "Nesta fonte" desktop rail index — the SRC-only counterpart to
+ * `ProblemReadingRail`'s "Nesta página" nav (`ProblemView.tsx`), reusing the
+ * same `.problem-rail-nav` treatment. `sourceSectionIndex` (SUI-03J0) is the
+ * sole order/label/anchor/filtering authority; this component never
+ * hardcodes a duplicate section list. The relation context is derived from
+ * the already-loaded `sourceRelationsState` via `toSourceSectionRelationContext`
+ * (SUI-03A2) — passed only once that state is `"ready"`, so `investigation`
+ * stays correctly "deferred" (excluded) while loading/idle/error, per
+ * `computeSourceSectionPresence`'s own contract.
+ */
+function SourceReadingRailIndex({ record, relationsState }: { record: Record<string, unknown>; relationsState: SourceEvidenceRelationsState }) {
+  const relationContext = relationsState.status === "ready" ? toSourceSectionRelationContext(relationsState.relations) : undefined;
+  const sections = sourceSectionIndex(record, relationContext);
+  return (
+    <nav aria-label="Nesta fonte" className="problem-rail-nav">
+      <h4 className="detail-panel-label">Nesta fonte</h4>
+      <ul>
+        {sections.map((section) => (
+          <li key={section.sectionId}>
+            <a href={`#${section.anchorId}`}>{section.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
@@ -1010,6 +1039,7 @@ function RecordDetailContent({
             <code>{detail.type}</code>
             <p>{typeInfo.description}</p>
           </div>
+          {isSrc && <SourceReadingRailIndex record={detail.record} relationsState={sourceRelationsState} />}
           {!isSrc && (
             <div className="detail-rail-actions">
               {relatedProblemId && (
