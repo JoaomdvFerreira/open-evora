@@ -1,0 +1,28 @@
+evidence_id: EVD-000139
+provenance:
+  sources:
+    - SRC-0018
+  extracted_at: 2026-08-10
+observation:
+  summary: O relatório municipal atribui atrasos recorrentes do serviço urbano a
+    tráfego lento nas principais vias, em especial nos acessos ao Centro
+    Histórico e na circular que serve o Parque Industrial durante os períodos de
+    ponta.
+scope:
+  geography:
+    level: city
+    area: Évora
+  temporal:
+    as_of: "2025"
+  populations:
+    - utilizadores do transporte público urbano
+domains:
+  - MOB
+  - URB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - A causa dos atrasos é atribuída pelo Município; a Observation não isola
+    causalmente a contribuição relativa do tráfego face a outros fatores
+    operacionais.
+lineage_id: MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT

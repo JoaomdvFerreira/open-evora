@@ -1,27 +1,29 @@
 evidence_id: EVD-000022
-type: institutional
-source:
-  source_id: SRC-0023
-  publisher: "Município de Évora"
-  title: "LVpDE (Laboratório Vivo para a Descarbonização de Évora) parking/traffic sensor infrastructure"
-  source_reference: "https://www.cm-evora.pt/laboratorio-vivo-para-a-descarbonizacao-de-evora-lvpde-parceiros-apresentam-atividades-e-planeiam-futuro/"
-  published_at: 2023-05
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "strategic city locations / Historic Centre project context"
-population:
-  - "municipal mobility management"
-  - "potential data consumers"
-domain:
-  - "MOB"
-  - "URB"
-  - "DIG"
+provenance:
+  sources:
+    - SRC-0023
+  extracted_at: 2026-08-10
 observation:
-  summary: "O programa municipal LVpDE comunicou a instalação de 75 sensores de estacionamento e 10 sensores de contagem de veículos, juntamente com uma plataforma digital de apoio à monitorização e gestão da informação de mobilidade e estacionamento daí resultante."
+  summary: O programa municipal LVpDE comunicou a instalação de 75 sensores de
+    estacionamento e 10 sensores de contagem de veículos, juntamente com uma
+    plataforma digital de apoio à monitorização e gestão da informação de
+    mobilidade e estacionamento daí resultante.
+scope:
+  geography:
+    level: city
+    area: strategic city locations / Historic Centre project context
+  populations:
+    - municipal mobility management
+    - potential data consumers
+  temporal:
+    as_of: 2026-08-10
+domains:
+  - MOB
+  - URB
+  - DIG
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Current-state caveat: this evidence establishes deployment under the project but does not establish that every sensor/platform component is still operational in 2026. Public-data caveat: no official public live-occupancy API/feed was located in this bounded review."
+claim_authority: authoritative
+inference_limits:
+  - O deployment comunicado em 2023 não estabelece que sensores ou plataforma
+    permaneçam operacionais em 2026 nem que os dados estejam publicamente
+    acessíveis ou reutilizáveis.

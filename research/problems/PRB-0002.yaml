@@ -1,53 +1,120 @@
 problem_id: PRB-0002
-title: "A informação dos transportes públicos apresenta lacunas documentadas, com impacto nas viagens ainda por caracterizar"
+title: A informação dos transportes públicos apresenta lacunas documentadas, com
+  impacto nas viagens ainda por caracterizar
 domain:
-  - "MOB"
-  - "DIG"
+  - MOB
+  - DIG
 geography:
   level: intermunicipal
-  area: "Alentejo Central; Évora urbana a investigar separadamente"
+  area: Alentejo Central; Évora urbana a investigar separadamente
 affected_populations:
-  - "utilizadores dos transportes públicos"
-problem_statement: "Existem lacunas documentadas no ambiente de informação aos passageiros dos transportes públicos — nomeadamente heterogeneidade na informação disponível nas paragens e melhorias de informação em tempo real ainda planeadas, não confirmadas como concretizadas — apesar de existirem atualmente canais de informação destinados aos passageiros (TREVO, TPAC). Em que medida estas lacunas afetam realmente as viagens dos passageiros — a sua frequência, gravidade e os pontos concretos de falha — não está ainda estabelecido."
+  - utilizadores dos transportes públicos
+problem_statement: Existem lacunas documentadas no ambiente de informação aos
+  passageiros dos transportes públicos — nomeadamente heterogeneidade na
+  informação disponível nas paragens e melhorias de informação em tempo real
+  ainda planeadas, não confirmadas como concretizadas — apesar de existirem
+  atualmente canais de informação destinados aos passageiros (TREVO, TPAC). Em
+  que medida estas lacunas afetam realmente as viagens dos passageiros — a sua
+  frequência, gravidade e os pontos concretos de falha — não está ainda
+  estabelecido.
 investigation:
   open_questions:
-    - question: "A informação é fiável, utilizável, consistente e interoperável ao longo da viagem real do passageiro, e isso causa falhas reais na viagem?"
-      why_open: "A evidência atual estabelece que existem canais de informação digitais e físicos (TREVO, TPAC/GTFS) e que a informação física nas paragens é inconsistente, mas não existe ainda evidência sobre as viagens afetadas nem sobre se estas lacunas causam falhas reais para os passageiros."
-      resolution_condition: "Evidência sobre as viagens afetadas dos passageiros que permita estabelecer se e como estas lacunas de informação causam falhas práticas nas deslocações."
+    - question: A informação é fiável, utilizável, consistente e interoperável ao
+        longo da viagem real do passageiro, e isso causa falhas reais na viagem?
+      why_open: A evidência atual estabelece que existem canais de informação digitais
+        e físicos (TREVO, TPAC/GTFS) e que a informação física nas paragens é
+        inconsistente, mas não existe ainda evidência sobre as viagens afetadas
+        nem sobre se estas lacunas causam falhas reais para os passageiros.
+      resolution_condition: Evidência sobre as viagens afetadas dos passageiros que
+        permita estabelecer se e como estas lacunas de informação causam falhas
+        práticas nas deslocações.
       evidence:
-        - "EVD-000016"
-        - "EVD-000123"
-    - question: "Como se relacionam as afirmações institucionais de que existem canais municipais de informação completos com a inconsistência diagnosticada na informação física disponível nas paragens?"
-      why_open: "O plano de ação PMUSE confirma melhorias planeadas na informação ao passageiro — nas paragens, em tempo real e através de uma aplicação/sítio Web multimodal —, enquanto o diagnóstico ao nível das paragens do mesmo plano documenta inconsistências físicas atuais: paragens sem abrigo com apenas uma placa e paragens com abrigo com um painel mais completo, mas ainda sem elementos de acessibilidade como braille ou informação áudio. A evidência atual não resolve esta tensão entre a completude pretendida dos canais de informação e a inconsistência física diagnosticada."
+        - EVD-000016
+        - EVD-000123
+    - question: Como se relacionam as afirmações institucionais de que existem canais
+        municipais de informação completos com a inconsistência diagnosticada na
+        informação física disponível nas paragens?
+      why_open: "O plano de ação PMUSE confirma melhorias planeadas na informação ao
+        passageiro — nas paragens, em tempo real e através de uma
+        aplicação/sítio Web multimodal —, enquanto o diagnóstico ao nível das
+        paragens do mesmo plano documenta inconsistências físicas atuais:
+        paragens sem abrigo com apenas uma placa e paragens com abrigo com um
+        painel mais completo, mas ainda sem elementos de acessibilidade como
+        braille ou informação áudio. A evidência atual não resolve esta tensão
+        entre a completude pretendida dos canais de informação e a
+        inconsistência física diagnosticada."
       evidence:
-        - "EVD-000122"
-        - "EVD-000123"
+        - EVD-000122
+        - EVD-000123
   path:
     initial_signal:
-      summary: "Foi identificada heterogeneidade na informação disponível nas paragens e estavam planeadas melhorias na informação em tempo real cuja concretização ainda não foi confirmada, apesar de já existirem canais de informação destinados aos passageiros, como TREVO e TPAC."
+      summary: Foi identificada heterogeneidade na informação disponível nas paragens
+        e estavam planeadas melhorias na informação em tempo real cuja
+        concretização ainda não foi confirmada, apesar de já existirem canais de
+        informação destinados aos passageiros, como TREVO e TPAC.
       evidence:
-        - "EVD-000010"
-        - "EVD-000016"
+        - EVD-000010
+        - EVD-000016
     development:
-      summary: |-
-        Foi reconhecido que a questão continha pelo menos duas lacunas tecnicamente distintas: a qualidade e completude da informação destinada ao passageiro e a interoperabilidade/reutilização de dados por terceiros.
+      summary: >-
+        Foi reconhecido que a questão continha pelo menos duas lacunas
+        tecnicamente distintas: a qualidade e completude da informação destinada
+        ao passageiro e a interoperabilidade/reutilização de dados por
+        terceiros.
 
-        Uma decisão de delimitação manteve este registo como um único problema, explicitamente restringido à informação orientada ao passageiro. A questão da interoperabilidade e reutilização de dados por terceiros foi preservada como uma linha distinta de investigação sobre dados abertos, fora deste PRB, sem criar um segundo registo canónico.
+
+        Uma decisão de delimitação manteve este registo como um único problema,
+        explicitamente restringido à informação orientada ao passageiro. A
+        questão da interoperabilidade e reutilização de dados por terceiros foi
+        preservada como uma linha distinta de investigação sobre dados abertos,
+        fora deste PRB, sem criar um segundo registo canónico.
     delimitation:
-      summary: |-
-        O plano de ação PMUSE propõe melhorias na informação ao passageiro — conforto, acessibilidade e informação nas paragens, informação em tempo real e uma aplicação/sítio Web multimodal —, confirmando que estas necessidades estão identificadas e que existem intervenções planeadas, não que já tenham sido concretizadas.
+      summary: >-
+        O plano de ação PMUSE propõe melhorias na informação ao passageiro —
+        conforto, acessibilidade e informação nas paragens, informação em tempo
+        real e uma aplicação/sítio Web multimodal —, confirmando que estas
+        necessidades estão identificadas e que existem intervenções planeadas,
+        não que já tenham sido concretizadas.
 
-        O diagnóstico do PMUSE ao nível das paragens documenta inconsistência física: as paragens sem abrigo dispõem apenas de uma placa, enquanto as paragens com abrigo têm um painel mais completo que, ainda assim, não inclui elementos de acessibilidade como braille ou informação áudio.
+
+        O diagnóstico do PMUSE ao nível das paragens documenta inconsistência
+        física: as paragens sem abrigo dispõem apenas de uma placa, enquanto as
+        paragens com abrigo têm um painel mais completo que, ainda assim, não
+        inclui elementos de acessibilidade como braille ou informação áudio.
       evidence:
-        - "EVD-000122"
-        - "EVD-000123"
+        - EVD-000122
+        - EVD-000123
 evidence:
-  - "EVD-000010"
-  - "EVD-000011"
-  - "EVD-000016"
-  - "EVD-000080"
-  - "EVD-000122"
-  - "EVD-000123"
+  - evidence_id: EVD-000010
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000011
+    effects:
+      - REFINES
+    research_roles:
+      - CONTEXTUAL
+  - evidence_id: EVD-000016
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000122
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000123
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed

@@ -1,37 +1,27 @@
 evidence_id: EVD-000029
-type: institutional
-source:
-  source_id: SRC-0026
-  publisher: "Município de Évora"
-  title: "4th Revision of the Évora Urbanisation Plan - Experimental Mobility Actions 2026"
-  source_reference: "https://www.cm-evora.pt/plano-de-urbanizacao-em-revisao/"
-  published_at: 2026-06
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "residents and interested entities participating in the PUE process"
-domain:
-  - "MOB"
-  - "ACC"
-  - "URB"
+provenance:
+  sources:
+    - SRC-0026
+  extracted_at: 2026-08-10
 observation:
-  summary: "No âmbito da 4.ª revisão do PUE, o Município lançou as Experimental Actions em junho de 2026 e convidou o público a selecionar e testar fisicamente percursos pedonais/de mobilidade suave, para contribuir com perceções e propostas sobre inclusão, acessibilidade e sustentabilidade."
+  summary: No âmbito da 4.ª revisão do PUE, o Município lançou as Experimental
+    Actions em junho de 2026 e convidou o público a selecionar e testar
+    fisicamente percursos pedonais/de mobilidade suave, para contribuir com
+    perceções e propostas sobre inclusão, acessibilidade e sustentabilidade.
+scope:
+  geography:
+    level: city
+    area: Évora city
+  populations:
+    - residents and interested entities participating in the PUE process
+  temporal:
+    as_of: 2026-06
+domains:
+  - MOB
+  - ACC
+  - URB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Strength applies to the activity itself; participant outputs require separate assessment. Current pedestrian/accessibility conditions are explicitly being treated as something requiring contemporary lived testing. D1 should therefore stop attempting to settle residual accessibility conditions solely through documentary research."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "CURRENT-STATE-UPDATE"
-  friction_types:
-    - "PHYSICAL"
-  representativeness: "UNKNOWN"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A realização das ações experimentais não valida as perceções ou propostas
+    dos participantes nem mede a prevalência de barreiras atuais.

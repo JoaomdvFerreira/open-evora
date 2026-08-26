@@ -198,7 +198,7 @@ The following fields exist in the current (v1) executable schema and current `SR
 
 #### 1.3 Status of this contract
 
-SRC v2 as documented in §1.1–§1.2 is a frozen candidate contract. It does not yet supersede `research/schemas/source.schema.json`, the current `SRC-*` records, or any current validator, Explorer projection, or tooling behavior. A separate unit governs the migration of executable schema and existing records to this contract, per `AGENTS.md` §3's requirement that an adopted-but-not-yet-implemented target be stated explicitly.
+SRC v2 is implemented by `research/schemas/source.schema.json`, the canonical `SRC-*` corpus and the deterministic validators.
 
 ## 2. Evidence (`EVD-*`)
 
@@ -210,13 +210,17 @@ Its meaning includes the observation itself and the context needed to interpret 
 
 Evidence may contribute to more than one Problem.
 
-### Contribution
+### EVD vNext contract
 
-Contribution describes the analytical role Evidence plays in a Problem reading. It is not a truth, prevalence, or importance score.
+The executable EVD contract has only the following canonical concepts: provenance (`provenance.sources[]`, `provenance.extracted_at`), bounded Observation (`observation.summary`), scope, domains, `evidence_nature`, `claim_authority`, optional `lineage_id`, and explicit `inference_limits[]`.
 
-Contradictory Evidence may challenge only part of a Problem and does not automatically invalidate it.
+EVD does not own a strength/confidence score, a primary-versus-additional Source hierarchy, a Problem relationship, research role, analysis block, personal-data workflow fields, or free-form process notes. `evidence_nature` describes the proposition; it is not a verdict.
 
-Evidence describing an existing solution and Evidence describing a planned solution are semantically distinct. Neither establishes effectiveness by existence alone.
+### PRB → EVD relationships
+
+Each PRB owns its `evidence[]` relationships. A relationship names an `evidence_id` and has non-empty `effects[]` (`SUPPORTS`, `REFINES`, `BOUNDS`, `CONTRADICTS`) and `research_roles[]` (`LOCAL_OBSERVATION`, `CONTEXTUAL`, `COMPARATIVE_MECHANISM`, `COMPARATIVE_RESPONSE`, `EXISTING_RESPONSE`, `PLANNED_RESPONSE`). Effects and roles describe this Problem's use of the Evidence; neither changes the Evidence itself.
+
+Contradictory Evidence may challenge only part of a Problem and does not automatically invalidate it. Existing and planned responses are distinct research roles and neither establishes effectiveness.
 
 ### Lineage and independence
 

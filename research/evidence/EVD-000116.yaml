@@ -1,37 +1,32 @@
 evidence_id: EVD-000116
-type: institutional
-source:
-  source_id: SRC-0100
-  publisher: "IEFP, I.P."
-  title: "Centros de Emprego — Estatísticas Mensais (abril 2025)"
-  source_reference: "https://www.iefp.pt/documents/10181/13015191/Centros%2Bde%2BEmprego%2Babril%2B2025.pdf/be0bef18-1f9d-4c9f-9121-139d062c44d1"
-  published_at: "2025-04"
-  retrieved_at: 2026-08-12
-geography:
-  level: intermunicipal
-  area: "CTEF Évora catchment (Alandroal, Arraiolos, Borba, Estremoz, Évora, Montemor-o-Novo, Mora, Mourão, Portel, Redondo, Reguengos de Monsaraz, Vendas Novas, Viana do Alentejo, Vila Viçosa)"
-population:
-  - "job seekers"
-  - "employers"
-domain:
-  - "EMP"
-  - "ECO"
+provenance:
+  sources:
+    - SRC-0100
+  extracted_at: 2026-08-12
 observation:
-  summary: "O boletim estatístico mensal nacional dos centros de emprego do IEFP comunica valores de desemprego, vagas e colocações ao nível da área de abrangência do Centro de Emprego (CTEF). A área de abrangência do CTEF Évora cobre catorze municípios, e não apenas o concelho de Évora, e o boletim não publica, para nenhuma escala geográfica, uma lista discriminada por profissão que identifique situações de escassez ou profissões de difícil recrutamento."
+  summary: O boletim estatístico mensal nacional dos centros de emprego do IEFP
+    comunica valores de desemprego, vagas e colocações ao nível da área de
+    abrangência do Centro de Emprego (CTEF). A área de abrangência do CTEF Évora
+    cobre catorze municípios, e não apenas o concelho de Évora, e o boletim não
+    publica, para nenhuma escala geográfica, uma lista discriminada por
+    profissão que identifique situações de escassez ou profissões de difícil
+    recrutamento.
+scope:
+  geography:
+    level: intermunicipal
+    area: área de abrangência do CTEF Évora — 14 municípios
+  populations:
+    - job seekers
+    - employers
+  temporal:
+    status: unknown
+domains:
+  - EMP
+  - ECO
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "RS-02A. Confirms and bounds a limitation flagged in docs/discovery/rs-01-evidence-gap-review.md (Gap 17): IEFP employment-centre statistics for the Évora catchment are useful labour-market activity context but cannot be read as an Évora-municipality-specific shortage-occupation source, because the territorial unit (CTEF Évora) is intermunicipal, not municipal. Does not itself confirm or refute any occupation as hard-to-fill."
-
-analysis:
-  related_problems:
-    - "PRB-0008"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "INFORMATION"
-  representativeness: "LIMITED"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A unidade territorial do CTEF Évora abrange 14 municípios e não permite uma
+    leitura municipal isolada.
+  - O boletim não confirma nem refuta profissões específicas como difíceis de
+    recrutar no Município de Évora.

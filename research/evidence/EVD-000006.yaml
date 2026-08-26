@@ -1,41 +1,31 @@
 evidence_id: EVD-000006
-type: institutional
-source:
-  source_id: SRC-0017
-  publisher: "Município de Évora"
-  title: "PUE Sector Report: Mobilidade"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-6_Mobilidade.pdf"
-  published_at: 2025-02
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "bus passengers"
-  - "people with reduced mobility"
-  - "pedestrians"
-  - "cyclists"
-domain:
-  - "MOB"
-  - "ACC"
+lineage_id: MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT
+provenance:
+  sources:
+    - SRC-0017
+  extracted_at: 2026-08-10
 observation:
-  summary: "O diagnóstico de mobilidade do PUE refere que o terminal rodoviário de Évora apresenta constrangimentos para pessoas com mobilidade reduzida, ligações pedonais deficientes/degradadas e fraca integração com a mobilidade ciclável, enquanto a estação ferroviária é descrita como tendo melhores condições de acesso para pessoas com mobilidade reduzida."
+  summary: O diagnóstico de mobilidade do PUE refere que o terminal rodoviário de
+    Évora apresenta constrangimentos para pessoas com mobilidade reduzida,
+    ligações pedonais deficientes/degradadas e fraca integração com a mobilidade
+    ciclável, enquanto a estação ferroviária é descrita como tendo melhores
+    condições de acesso para pessoas com mobilidade reduzida.
+scope:
+  geography:
+    level: city
+    area: Évora city
+  populations:
+    - bus passengers
+    - people with reduced mobility
+    - pedestrians
+    - cyclists
+  temporal:
+    status: unknown
+domains:
+  - MOB
+  - ACC
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: ""
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "CONFIRMS"
-    - "REFINES"
-  friction_types:
-    - "PHYSICAL"
-  lineage_id: "MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - O diagnóstico dos terminais e estações não estabelece a experiência atual de
+    todos os utilizadores nem o estado após intervenções posteriores.

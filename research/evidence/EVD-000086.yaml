@@ -1,38 +1,29 @@
 evidence_id: EVD-000086
-type: stakeholder
-source:
-  source_id: SRC-0074
-  publisher: "APCE"
-  title: "APCE Facebook post — continuing accessibility verification of municipal cultural facilities"
-  source_reference: "https://www.facebook.com/apcevora/posts/1305263874975704/"
-  published_at: 2025-10
-  retrieved_at: 2026-08-11
-geography:
-  level: city
-  area: "Évora city — municipal cultural facilities"
-population:
-  - "people with disabilities"
-domain:
-  - "ACC"
-  - "CUL"
+lineage_id: ACC-2025-APCE-ACESSO-UNIVERSAL-1.3
+provenance:
+  sources:
+    - SRC-0074
+  extracted_at: 2026-08-11
 observation:
-  summary: "A APCE comunicou publicamente a continuação da verificação de acessibilidade de equipamentos culturais geridos pelo município, no âmbito do programa Acesso Universal 1.3."
+  summary: A APCE comunicou publicamente a continuação da verificação de
+    acessibilidade de equipamentos culturais geridos pelo município, no âmbito
+    do programa Acesso Universal 1.3.
+scope:
+  geography:
+    level: city
+    area: Évora city — municipal cultural facilities
+  populations:
+    - people with disabilities
+  temporal:
+    as_of: 2025-10
+domains:
+  - ACC
+  - CUL
 evidence_nature: claim
-strength: primary-non-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-A Targeted Follow-up (A-FU-SIG-02). CURRENT-STATE-UPDATE; EXISTING-SOLUTION. Some accessibility problems are already inside an active assessment/improvement process — this must be distinguished from unresolved barriers, not merged with them. WU018 (WU-D3-05) update: lineage_id retrofitted to record this record's Acesso Universal 1.3 programme lineage, shared with EVD-000085 and the new EVD-000104 (December 2025 completed-inventory result, which supersedes this record's 'verification continuing' claim with a completed-inventory result) — no other field changed; independence accounting for PRB-0003 now correctly treats these three as one evidentiary thread rather than three."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "CURRENT-STATE-UPDATE"
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "PHYSICAL"
-  lineage_id: "ACC-2025-APCE-ACESSO-UNIVERSAL-1.3"
-  representativeness: "UNKNOWN"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - O estado de «verificação em curso» é histórico e foi posteriormente
+    ultrapassado por uma comunicação de inventário concluído em dezembro de
+    2025.
+  - A Observation não estabelece o estado atual das barreiras nem outcomes de
+    correção.

@@ -1,39 +1,33 @@
 evidence_id: EVD-000109
-type: institutional
-source:
-  source_id: SRC-0096
-  publisher: "Oxford City Council"
-  title: "Oxford City Council — missed-collection report validated against live crew reporting system"
-  source_reference: "Oxford City Council public web page (missed-collection reporting)"
-  published_at: null
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Oxford, United Kingdom"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
-  - "DIG"
+lineage_id: ENV-2026-08-OXFORD-MISSED-COLLECTION-VALIDATION
+provenance:
+  sources:
+    - SRC-0096
+  extracted_at: 2026-08-11
 observation:
-  summary: "O Oxford City Council afirma que as comunicações dos residentes sobre contentores não recolhidos são verificadas com base num sistema de registo em tempo real instalado nos veículos de recolha, distinguindo uma recolha efetivamente falhada de uma ocorrência já registada pela equipa ou de outro motivo para a não recolha — o mecanismo de comunicação de ocorrências pelos residentes está integrado com dados operacionais de recolha, em vez de constituir uma fila separada de reclamações não verificadas."
+  summary: O Oxford City Council afirma que as comunicações dos residentes sobre
+    contentores não recolhidos são verificadas com base num sistema de registo
+    em tempo real instalado nos veículos de recolha, distinguindo uma recolha
+    efetivamente falhada de uma ocorrência já registada pela equipa ou de outro
+    motivo para a não recolha — o mecanismo de comunicação de ocorrências pelos
+    residentes está integrado com dados operacionais de recolha, em vez de
+    constituir uma fila separada de reclamações não verificadas.
+scope:
+  geography:
+    level: municipality
+    area: Oxford, Reino Unido
+  populations:
+    - residents
+  temporal:
+    status: unknown
+domains:
+  - ENV
+  - PUB
+  - DIG
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Comparator/mechanism evidence, not Évora-specific. Describes an operating pattern (request/operations integration), not measured outcome effect. If Évora's occurrence platform is not connected to collection-operation data, the relevant residual gap may be integration/routing rather than another front-end reporting tool — this must be verified with the municipal operator (D5-P9-02), not assumed (WU-D4-02 Mechanism B)."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "COORDINATION"
-    - "OPERATIONAL"
-  lineage_id: "ENV-2026-08-OXFORD-MISSED-COLLECTION-VALIDATION"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A Source descreve um padrão operacional de integração entre pedidos e dados
+    da recolha, não um efeito medido.
+  - A Observation não estabelece que Évora possua ou necessite do mesmo
+    mecanismo.

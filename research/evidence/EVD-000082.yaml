@@ -1,37 +1,28 @@
 evidence_id: EVD-000082
-type: formal-public
-source:
-  source_id: SRC-0069
-  publisher: "Petição Pública"
-  title: "Public petition: urgent road-surface requalification in Município de Évora"
-  source_reference: "https://peticaopublica.com/?pi=PT129561"
-  published_at: 2026-01-28
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-  - "drivers"
-domain:
-  - "URB"
-  - "MOB"
+provenance:
+  sources:
+    - SRC-0069
+  extracted_at: 2026-08-11
 observation:
-  summary: "Uma petição pública (criada em 2026-01-28, com 1 394 assinaturas à data da investigação) apela à requalificação urgente das estradas do concelho, citando a existência generalizada de buracos e pavimento degradado, preocupações de segurança, danos em veículos e efeitos na mobilidade e na qualidade de vida."
+  summary: Uma petição pública criada em 28 de janeiro de 2026 apela à
+    requalificação urgente das estradas do Município de Évora, alegando a
+    existência generalizada de buracos e pavimento degradado e referindo
+    preocupações de segurança, danos em veículos e efeitos na mobilidade e
+    qualidade de vida.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residents
+    - drivers
+  temporal:
+    as_of: 2026-01-28
+domains:
+  - URB
+  - MOB
 evidence_nature: claim
-strength: secondary
-personal_data:
-  present: false
-  retained: false
-notes: "D2-A Round A (D2-A-SIG-05). NEW-CANDIDATE; LOW-DIGITAL-LEVERAGE. Strongest Round A blind-spot finding: road-surface maintenance/service reliability is not cleanly represented by PRB-0001..PRB-0005; may overlap PRB-0005 through public-realm/safety effects, but its causal mechanism is maintenance/infrastructure condition, not traffic/parking modal conflict. Not promoted to a PRB; carried into cross-track synthesis for a project-owner decision. Signatory count is not representative of prevalence. WU-D3-03: promoted to canonical PRB-0010 (docs/milestones/D3-WU03-structure-review.md); this record now supports PRB-0010 directly, superseding the earlier NEW-CANDIDATE/no-PRB status of this note."
-
-analysis:
-  related_problems:
-    - "PRB-0010"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "PHYSICAL"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "HISTORICAL"
+claim_authority: non_authoritative
+inference_limits:
+  - A petição resulta de adesão voluntária e as alegações não constituem uma
+    medição representativa da condição das vias no Município.

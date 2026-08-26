@@ -1,34 +1,25 @@
 evidence_id: EVD-000023
-type: institutional
-source:
-  source_id: SRC-0018
-  publisher: "Município de Évora"
-  title: "Relatório Anual de Atividade da Autoridade de Transportes - Município de Évora 2026"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2026/07/Relatorio-anual-de-Autoridade-de-Transportes-CME-2026.pdf"
-  published_at: 2026-07
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "Évora urban network"
-population:
-  - "urban transport passengers"
-domain:
-  - "MOB"
+lineage_id: MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT
+provenance:
+  sources:
+    - SRC-0018
+  extracted_at: 2026-08-10
 observation:
-  summary: "A rede municipal de transportes urbanos transportou 876 148 passageiros em 2025, um aumento de 90 522 face a 2024, mantendo-se 1,9% abaixo do nível de utilização anterior à pandemia."
+  summary: A rede municipal de transportes urbanos transportou 876 148 passageiros
+    em 2025, um aumento de 90 522 face a 2024, mantendo-se 1,9% abaixo do nível
+    de utilização anterior à pandemia.
+scope:
+  geography:
+    level: city
+    area: Évora urban network
+  populations:
+    - urban transport passengers
+  temporal:
+    as_of: "2025"
+domains:
+  - MOB
 evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Urban public transport is a materially used service with recovering demand. Discovery should focus on quality and residual access gaps rather than assuming lack of adoption."
-
-analysis:
-  related_problems:
-    - "PRB-0001"
-  contribution:
-    - "CURRENT-STATE-UPDATE"
-  lineage_id: "MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT"
-  representativeness: "DESIGNED_REPRESENTATIVE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - O crescimento da utilização não estabelece adequação do serviço, satisfação
+    dos passageiros ou ausência de lacunas de acesso.

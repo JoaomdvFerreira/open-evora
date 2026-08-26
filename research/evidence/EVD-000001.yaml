@@ -1,36 +1,32 @@
 evidence_id: EVD-000001
-type: institutional
-source:
-  source_id: SRC-0002
-  publisher: "Município de Évora / Rede Social"
-  title: "Plano de Desenvolvimento Social de Évora 2024-2027"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf"
-  published_at: 2024-01
-  retrieved_at: 2026-08-10
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents, especially people dependent on public transport and rural/urban connections"
-domain:
-  - "MOB"
+lineage_id: SOC-2024-01-PDS-EVORA
+provenance:
+  sources:
+    - SRC-0002
+  extracted_at: 2026-08-10
 observation:
-  summary: "O Plano de Desenvolvimento Social de Évora 2024-2027 refere a falta de uma rede de transportes públicos eficaz, citando especificamente as linhas e os horários, e indica que os agentes locais identificam dificuldades de deslocação dentro do município quando dependem dos transportes públicos. Enquadra a conectividade rural-urbana como um desafio fundamental para a igualdade no acesso aos serviços."
+  summary: O Plano de Desenvolvimento Social de Évora 2024-2027 refere a falta de
+    uma rede de transportes públicos eficaz, citando especificamente as linhas e
+    os horários, e indica que os agentes locais identificam dificuldades de
+    deslocação dentro do município quando dependem dos transportes públicos.
+    Enquadra a conectividade rural-urbana como um desafio fundamental para a
+    igualdade no acesso aos serviços.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residents, especially people dependent on public transport and rural/urban
+      connections
+  temporal:
+    start: "2024"
+    end: "2027"
+domains:
+  - MOB
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Important boundary: this establishes institutional concern; it does not measure current prevalence or user satisfaction."
-
-analysis:
-  related_problems:
-    - "PRB-0001"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "OPERATIONAL"
-  lineage_id: "SOC-2024-01-PDS-EVORA"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - A formulação constitui uma preocupação de planeamento institucional e não
+    mede a prevalência nem a experiência de todos os utilizadores.
+  - O período do PDS não permite, por si só, concluir que todas as condições
+    descritas se mantêm inalteradas em 2026.

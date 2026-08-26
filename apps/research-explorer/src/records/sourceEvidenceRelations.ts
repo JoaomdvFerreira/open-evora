@@ -26,7 +26,7 @@
 
 import type { DataProvider, RecordDetail } from "../dataProvider/types";
 
-const PRIMARY_SOURCE_FIELD = "source.source_id";
+const PRIMARY_SOURCE_FIELD = "provenance.sources";
 const ADDITIONAL_SOURCE_FIELD = "additional_sources";
 const RELATED_PROBLEMS_FIELD = "analysis.related_problems";
 
@@ -56,7 +56,7 @@ export interface SourceEvidenceRelations {
  * the primary-wins precedence rule before any EVD detail is fetched.
  */
 function classifyIncomingEvidenceIds(sourceDetail: RecordDetail): { primaryIds: string[]; additionalIds: string[] } {
-  const primaryIds = uniqueIds(sourceDetail.incomingEdges.filter((edge) => edge.field === PRIMARY_SOURCE_FIELD).map((edge) => edge.from));
+  const primaryIds = uniqueIds(sourceDetail.incomingEdges.filter((edge) => edge.field === PRIMARY_SOURCE_FIELD || edge.field === "source.source_id").map((edge) => edge.from));
   const primarySet = new Set(primaryIds);
 
   const additionalIds = uniqueIds(
@@ -68,7 +68,10 @@ function classifyIncomingEvidenceIds(sourceDetail: RecordDetail): { primaryIds: 
 
 /** This EVD's directly-reachable related PRB IDs, via `analysis.related_problems` outgoing edges only. */
 function relatedProblemIdsFor(evidenceDetail: RecordDetail): string[] {
-  return uniqueIds(evidenceDetail.outgoingEdges.filter((edge) => edge.field === RELATED_PROBLEMS_FIELD).map((edge) => edge.to));
+  return uniqueIds([
+    ...evidenceDetail.incomingEdges.filter((edge) => edge.field === "evidence").map((edge) => edge.from),
+    ...evidenceDetail.outgoingEdges.filter((edge) => edge.field === RELATED_PROBLEMS_FIELD).map((edge) => edge.to),
+  ]);
 }
 
 /**

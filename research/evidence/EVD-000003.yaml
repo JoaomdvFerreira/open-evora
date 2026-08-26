@@ -1,37 +1,25 @@
 evidence_id: EVD-000003
-type: institutional
-source:
-  source_id: SRC-0018
-  publisher: "Município de Évora"
-  title: "Relatório Anual de Atividade da Autoridade de Transportes - Município de Évora 2026"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2026/07/Relatorio-anual-de-Autoridade-de-Transportes-CME-2026.pdf"
-  published_at: 2026-07
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "urban bus users"
-domain:
-  - "MOB"
-  - "URB"
+lineage_id: MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT
+provenance:
+  sources:
+    - SRC-0018
+  extracted_at: 2026-08-10
 observation:
-  summary: "No período em análise, a regularidade do serviço foi de 99,5%, enquanto o índice de pontualidade IP-5min foi de 84,4%. O relatório municipal atribui os atrasos recorrentes ao tráfego lento nas principais artérias, especialmente nos acessos ao Centro Histórico e na circular que serve o Parque Industrial durante as horas de ponta da manhã e da tarde."
+  summary: Em 2025, a regularidade do serviço urbano foi de 99,5 % e o índice de
+    pontualidade IP-5min foi de 84,4 %.
+scope:
+  geography:
+    level: city
+    area: Évora city
+  populations:
+    - urban bus users
+  temporal:
+    as_of: "2025"
+domains:
+  - MOB
+  - URB
 evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: ""
-
-analysis:
-  related_problems:
-    - "PRB-0005"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "OPERATIONAL"
-  lineage_id: "MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT"
-  representativeness: "DESIGNED_REPRESENTATIVE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - Os indicadores agregados da rede não identificam as linhas, corredores ou
+    períodos horários concretos com pior desempenho.

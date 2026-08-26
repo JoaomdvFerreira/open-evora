@@ -1,38 +1,33 @@
 evidence_id: EVD-000107
-type: institutional
-source:
-  source_id: SRC-0094
-  publisher: "San Francisco Municipal Transportation Agency (SFMTA)"
-  title: "SFpark Pilot Program Evaluation"
-  source_reference: "SFMTA official pilot evaluation"
-  published_at: 2014
-  retrieved_at: 2026-08-11
-geography:
-  level: city
-  area: "San Francisco, CA — SFpark pilot areas vs control areas"
-population:
-  - "drivers"
-domain:
-  - "MOB"
-  - "DIG"
+lineage_id: MOB-2014-SFPARK-SFMTA-PILOT-EVALUATION
+provenance:
+  sources:
+    - SRC-0094
+  extracted_at: 2026-08-11
 observation:
-  summary: "A avaliação oficial do piloto SFpark da SFMTA indicou uma redução de 43 % no tempo de procura de estacionamento nas zonas-piloto, face a 13 % nas zonas de controlo; os quarteirões foram classificados como «too full» com uma frequência 16 % inferior nas zonas-piloto, enquanto nas zonas de controlo essa frequência aumentou 51 %; e as milhas percorridas por veículos à procura de estacionamento e as emissões de gases com efeito de estufa associadas a essa procura diminuíram 30 % nas zonas-piloto, face a 6 % nas zonas de controlo."
+  summary: A avaliação oficial do piloto SFpark da SFMTA indicou uma redução de 43
+    % no tempo de procura de estacionamento nas zonas-piloto, face a 13 % nas
+    zonas de controlo; os quarteirões foram classificados como «too full» com
+    uma frequência 16 % inferior nas zonas-piloto, enquanto nas zonas de
+    controlo essa frequência aumentou 51 %; e as milhas percorridas por veículos
+    à procura de estacionamento e as emissões de gases com efeito de estufa
+    associadas a essa procura diminuíram 30 % nas zonas-piloto, face a 6 % nas
+    zonas de controlo.
+scope:
+  geography:
+    level: local_area
+    area: zonas-piloto e zonas de controlo do SFpark, São Francisco, Califórnia, EUA
+  populations:
+    - drivers
+  temporal:
+    status: unknown
+domains:
+  - MOB
+  - DIG
 evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Comparator/mechanism evidence, not Évora-specific. The pilot bundled occupancy sensing, real-time availability information, demand-responsive pricing, and meter/payment changes, so the reported outcomes cannot be attributed to information/data publication alone. Do not cite as evidence that exposing occupancy data by itself would produce similar results in Évora; if PRB-0005's underlying issue is scarcity/high occupancy, information alone may only redistribute search behaviour (WU-D4-01 Model B)."
-
-analysis:
-  related_problems:
-    - "PRB-0005"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "INFORMATION"
-    - "OPERATIONAL"
-  lineage_id: "MOB-2014-SFPARK-SFMTA-PILOT-EVALUATION"
-  representativeness: "LIMITED"
-  verification: "VERIFIED"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - O piloto combinou sensing, informação em tempo real, preços ajustados à
+    procura e alterações de pagamento, pelo que o efeito da informação isolada
+    não é identificado.
+  - Os resultados não estabelecem transferibilidade causal para Évora.

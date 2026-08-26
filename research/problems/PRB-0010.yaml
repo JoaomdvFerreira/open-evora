@@ -1,92 +1,277 @@
 problem_id: PRB-0010
-title: "Degradação do pavimento rodoviário em Évora, com extensão atual ainda por confirmar"
+title: Degradação do pavimento rodoviário em Évora, com extensão atual ainda por
+  confirmar
 domain:
-  - "URB"
-  - "MOB"
+  - URB
+  - MOB
 geography:
   level: municipality
-  area: "Évora"
+  area: Évora
 affected_populations:
-  - "residentes"
-  - "condutores"
-problem_statement: "Uma petição de janeiro de 2026 relatou a existência generalizada de buracos e pavimento degradado no município, com impactos na segurança e danos nos veículos; o Município reconheceu a necessidade de manutenção/requalificação e respondeu com reparações na ordem dos 1,5 milhões de euros. Um sinal público posterior, relativo a uma localização específica (entrada da N114 em Évora), alegou persistência do problema; este sinal, de natureza social/comunitária, não está verificado. Estes elementos evidenciam um problema real de degradação do pavimento rodoviário e de fiabilidade da manutenção, embora a evidência disponível — uma petição e um sinal público posterior não verificado — não permita estimar a prevalência atual em todo o município."
-causal_reading: "A degradação do pavimento rodoviário é um mecanismo físico de manutenção/infraestrutura, distinto do mecanismo de tráfego/pressão de estacionamento de PRB-0005. A alavancagem digital sobre este mecanismo físico central é esperada como baixa; esta leitura não está validada."
+  - residentes
+  - condutores
+problem_statement: Uma petição de janeiro de 2026 relatou a existência
+  generalizada de buracos e pavimento degradado no município, com impactos na
+  segurança e danos nos veículos; o Município reconheceu a necessidade de
+  manutenção/requalificação e respondeu com reparações na ordem dos 1,5 milhões
+  de euros. Um sinal público posterior, relativo a uma localização específica
+  (entrada da N114 em Évora), alegou persistência do problema; este sinal, de
+  natureza social/comunitária, não está verificado. Estes elementos evidenciam
+  um problema real de degradação do pavimento rodoviário e de fiabilidade da
+  manutenção, embora a evidência disponível — uma petição e um sinal público
+  posterior não verificado — não permita estimar a prevalência atual em todo o
+  município.
+causal_reading: A degradação do pavimento rodoviário é um mecanismo físico de
+  manutenção/infraestrutura, distinto do mecanismo de tráfego/pressão de
+  estacionamento de PRB-0005. A alavancagem digital sobre este mecanismo físico
+  central é esperada como baixa; esta leitura não está validada.
 investigation:
   open_questions:
-    - question: "A degradação do pavimento rodoviário persiste hoje a uma escala comparável, ao nível de todo o município, após o programa de reparação?"
-      why_open: "Não existe nenhum registo que estabeleça se o programa de reparação está concluído ou se as condições da estrada são agora geralmente sólidas, nem nenhum registo que estabeleça que a degradação persiste amplamente hoje. O único sinal posterior (um relato não verificado sobre a N114) é uma localização específica, com representatividade desconhecida, e não pode ser generalizado ao município."
-      resolution_condition: "Um conjunto de dados público ou registo municipal que estabeleça a condição atual (agosto de 2026 em diante), ao nível de todo o município, do pavimento rodoviário após o programa de reparação."
+    - question: A degradação do pavimento rodoviário persiste hoje a uma escala
+        comparável, ao nível de todo o município, após o programa de reparação?
+      why_open: Não existe nenhum registo que estabeleça se o programa de reparação
+        está concluído ou se as condições da estrada são agora geralmente
+        sólidas, nem nenhum registo que estabeleça que a degradação persiste
+        amplamente hoje. O único sinal posterior (um relato não verificado sobre
+        a N114) é uma localização específica, com representatividade
+        desconhecida, e não pode ser generalizado ao município.
+      resolution_condition: Um conjunto de dados público ou registo municipal que
+        estabeleça a condição atual (agosto de 2026 em diante), ao nível de todo
+        o município, do pavimento rodoviário após o programa de reparação.
       evidence:
-        - "EVD-000084"
+        - EVD-000084
   path:
     initial_signal:
-      summary: "Uma petição de janeiro de 2026, com 1.394 assinaturas, relatou a existência generalizada de buracos e pavimento degradado no município, com impactos na segurança e danos nos veículos."
+      summary: Uma petição de janeiro de 2026, com 1.394 assinaturas, relatou a
+        existência generalizada de buracos e pavimento degradado no município,
+        com impactos na segurança e danos nos veículos.
       evidence:
-        - "EVD-000082"
+        - EVD-000082
     development:
-      summary: "O Município reconheceu, através de cobertura jornalística independente, a necessidade de manutenção/requalificação — não atribuível apenas ao clima — e respondeu com um programa de reparações na ordem dos 1,5 milhões de euros."
+      summary: O Município reconheceu, através de cobertura jornalística independente,
+        a necessidade de manutenção/requalificação — não atribuível apenas ao
+        clima — e respondeu com um programa de reparações na ordem dos 1,5
+        milhões de euros.
       evidence:
-        - "EVD-000083"
+        - EVD-000083
     delimitation:
-      summary: "Um sinal público posterior (julho de 2026), relativo a uma localização específica (entrada da N114 em Évora), alegou persistência do problema; este sinal, de natureza social/comunitária, não está verificado e não é generalizado ao município."
+      summary: Um sinal público posterior (julho de 2026), relativo a uma localização
+        específica (entrada da N114 em Évora), alegou persistência do problema;
+        este sinal, de natureza social/comunitária, não está verificado e não é
+        generalizado ao município.
       evidence:
-        - "EVD-000084"
+        - EVD-000084
 evidence:
-  - "EVD-000082"
-  - "EVD-000083"
-  - "EVD-000084"
+  - evidence_id: EVD-000082
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000083
+    effects:
+      - SUPPORTS
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000084
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: low
 solution_landscape_status: assessed
 status: OPEN
-
 decision_basis:
   contract_version: "0.1"
-
-  eligibility_basis: "PRB-0010 is a distinct, well-formed problem of investigation: it names a specific physical-infrastructure failure mechanism (road-surface degradation / pothole condition and the reliability of the municipal maintenance response), a bounded geography (Município de Évora), a named affected population (residents, drivers), an institutionally acknowledged manifestation (EVD-000082, a January 2026 public petition; EVD-000083, the Município's own acknowledgement that surface degradation required maintenance/requalification, not just weather), and a concrete resident/driver-facing consequence documented in the petition itself (EVD-000082 — safety concerns and vehicle damage). It is not framed as a solution ('need for a road-reporting app') and, per the WU-D3-03 structural review, does not overlap PRB-0005's traffic/parking-versus-pedestrian mechanism or any other canonical PRB-*."
-
-  corroboration_basis: "Corroboration is SUPPORTED only for a temporally bounded historical claim, not for current municipality-wide persistence. EVD-000082 (SRC-0069, a January 2026 public petition, 1,394 signatures) and EVD-000083 (SRC-0070, Rádio Campanário reporting on the Município's own acknowledgement and its ~EUR1.5M repair programme, additional_sources SRC-0071) are materially distinct source/event units — a citizen-petition process and independent press coverage of an institutional response — that converge on the same claim: road-surface degradation was real and widespread enough in early 2026 to prompt petition, public acknowledgement, and a funded municipal repair programme. EVD-000084 (SRC-0072, an unverified July 2026 Instagram post about the N114 entrance to Évora) is retained as a boundary/current-state lead, not as corroborating evidence of continued municipality-wide degradation: it is a single, unverified, geographically specific report (contribution REFINES only, representativeness UNKNOWN) and cannot be generalized to the municipality. Whether the degradation documented in January-February 2026 persists at a comparable scale today, after the repair programme, is not established by any record on file — this is the open question the human Corroboration gate has marked HOLD."
-
+  eligibility_basis: "PRB-0010 is a distinct, well-formed problem of
+    investigation: it names a specific physical-infrastructure failure mechanism
+    (road-surface degradation / pothole condition and the reliability of the
+    municipal maintenance response), a bounded geography (Município de Évora), a
+    named affected population (residents, drivers), an institutionally
+    acknowledged manifestation (EVD-000082, a January 2026 public petition;
+    EVD-000083, the Município's own acknowledgement that surface degradation
+    required maintenance/requalification, not just weather), and a concrete
+    resident/driver-facing consequence documented in the petition itself
+    (EVD-000082 — safety concerns and vehicle damage). It is not framed as a
+    solution ('need for a road-reporting app') and, per the WU-D3-03 structural
+    review, does not overlap PRB-0005's traffic/parking-versus-pedestrian
+    mechanism or any other canonical PRB-*."
+  corroboration_basis: "Corroboration is SUPPORTED only for a temporally bounded
+    historical claim, not for current municipality-wide persistence. EVD-000082
+    (SRC-0069, a January 2026 public petition, 1,394 signatures) and EVD-000083
+    (SRC-0070, Rádio Campanário reporting on the Município's own acknowledgement
+    and its ~EUR1.5M repair programme, additional_sources SRC-0071) are
+    materially distinct source/event units — a citizen-petition process and
+    independent press coverage of an institutional response — that converge on
+    the same claim: road-surface degradation was real and widespread enough in
+    early 2026 to prompt petition, public acknowledgement, and a funded
+    municipal repair programme. EVD-000084 (SRC-0072, an unverified July 2026
+    Instagram post about the N114 entrance to Évora) is retained as a
+    boundary/current-state lead, not as corroborating evidence of continued
+    municipality-wide degradation: it is a single, unverified, geographically
+    specific report (contribution REFINES only, representativeness UNKNOWN) and
+    cannot be generalized to the municipality. Whether the degradation
+    documented in January-February 2026 persists at a comparable scale today,
+    after the repair programme, is not established by any record on file — this
+    is the open question the human Corroboration gate has marked HOLD."
   manifestation:
-    kind: "physical infrastructure / road-surface degradation"
-    summary: "Uma petição pública de janeiro de 2026 (EVD-000082) relatou a existência generalizada de buracos e pavimento rodoviário degradado no Município de Évora.\n\nO reconhecimento do próprio Município, documentado através de cobertura jornalística independente (EVD-000083), confirmou que a degradação não era atribuível apenas às condições meteorológicas, que exigia manutenção/requalificação e que seria objeto de um programa de reparações na ordem dos 1,5 milhões de euros."
-    evidence:
-      - "EVD-000082"
-      - "EVD-000083"
+    kind: physical infrastructure / road-surface degradation
+    summary: >-
+      Uma petição pública de janeiro de 2026 (EVD-000082) relatou a existência
+      generalizada de buracos e pavimento rodoviário degradado no Município de
+      Évora.
 
+
+      O reconhecimento do próprio Município, documentado através de cobertura
+      jornalística independente (EVD-000083), confirmou que a degradação não era
+      atribuível apenas às condições meteorológicas, que exigia
+      manutenção/requalificação e que seria objeto de um programa de reparações
+      na ordem dos 1,5 milhões de euros.
+    evidence:
+      - EVD-000082
+      - EVD-000083
   consequence:
-    summary: "A própria petição (EVD-000082) documenta consequências concretas reportadas por residentes e condutores: preocupações de segurança associadas à degradação do pavimento, danos em veículos e impactos na mobilidade e na qualidade de vida.\n\nTrata-se de evidência sobre as consequências associadas à manifestação do problema, e não sobre a resposta municipal. O programa de reparações (EVD-000083) é tratado como evidência da resposta institucional e da alteração do estado do problema, e não como evidência das consequências, pelo que não é citado aqui."
-    evidence:
-      - "EVD-000082"
+    summary: >-
+      A própria petição (EVD-000082) documenta consequências concretas
+      reportadas por residentes e condutores: preocupações de segurança
+      associadas à degradação do pavimento, danos em veículos e impactos na
+      mobilidade e na qualidade de vida.
 
+
+      Trata-se de evidência sobre as consequências associadas à manifestação do
+      problema, e não sobre a resposta municipal. O programa de reparações
+      (EVD-000083) é tratado como evidência da resposta institucional e da
+      alteração do estado do problema, e não como evidência das consequências,
+      pelo que não é citado aqui.
+    evidence:
+      - EVD-000082
   currentness:
-    assessment: "ALTA. O registo canónico inclui evidência relativa ao estado do problema até julho de 2026. Esta classificação diz respeito à recência temporal da evidência, e não à sua suficiência para estabelecer que a degradação persiste atualmente, após as reparações, à escala de todo o município.\n\nA petição de janeiro de 2026 (EVD-000082) documenta o problema histórico que deu origem ao registo. O programa municipal de reparações de fevereiro de 2026 (EVD-000083) constitui uma resposta institucional confirmada e representa uma alteração material do estado desde a petição: atividade de reparação reconhecida e financiada.\n\nO relato de julho de 2026 relativo à entrada da N114 em Évora (EVD-000084) é atual pela data, mas continua a ser um sinal não verificado, geograficamente limitado a uma única localização e de representatividade desconhecida. A sua recência não o torna suficiente para sustentar uma afirmação de persistência atual em todo o município.\n\nNenhum registo disponível estabelece o estado atual, em agosto de 2026, do pavimento rodoviário em todo o município após o programa de reparações."
-    evidence:
-      - "EVD-000082"
-      - "EVD-000083"
-      - "EVD-000084"
+    assessment: >-
+      ALTA. O registo canónico inclui evidência relativa ao estado do problema
+      até julho de 2026. Esta classificação diz respeito à recência temporal da
+      evidência, e não à sua suficiência para estabelecer que a degradação
+      persiste atualmente, após as reparações, à escala de todo o município.
 
+
+      A petição de janeiro de 2026 (EVD-000082) documenta o problema histórico
+      que deu origem ao registo. O programa municipal de reparações de fevereiro
+      de 2026 (EVD-000083) constitui uma resposta institucional confirmada e
+      representa uma alteração material do estado desde a petição: atividade de
+      reparação reconhecida e financiada.
+
+
+      O relato de julho de 2026 relativo à entrada da N114 em Évora (EVD-000084)
+      é atual pela data, mas continua a ser um sinal não verificado,
+      geograficamente limitado a uma única localização e de representatividade
+      desconhecida. A sua recência não o torna suficiente para sustentar uma
+      afirmação de persistência atual em todo o município.
+
+
+      Nenhum registo disponível estabelece o estado atual, em agosto de 2026, do
+      pavimento rodoviário em todo o município após o programa de reparações.
+    evidence:
+      - EVD-000082
+      - EVD-000083
+      - EVD-000084
   contradiction_search:
     performed: true
-    summary: "Foi realizada uma procura deliberada de evidência que pudesse contradizer ou ultrapassar a manifestação histórica documentada, ou que permitisse estabelecer, num sentido ou noutro, se o problema persiste atualmente à escala de todo o município.\n\nNão foi encontrado nenhum registo que demonstre que o programa de reparações está concluído ou que o pavimento se encontra agora, de forma geral, em boas condições. Também não foi encontrado nenhum registo que estabeleça que a degradação continua atualmente de forma generalizada.\n\nO único sinal posterior, EVD-000084, restringe a conclusão em vez de resolver a questão: trata-se de um relato não verificado relativo a uma única localização, a entrada da N114 em Évora, sem corroboração através de dados operacionais ou municipais. Por isso, não é tratado como evidência de persistência da degradação em todo o município.\n\nA ausência simultânea de evidência que confirme ou contrarie a persistência atual é precisamente a razão pela qual esta questão permanece em aberto."
-    evidence:
-      - "EVD-000084"
+    summary: >-
+      Foi realizada uma procura deliberada de evidência que pudesse contradizer
+      ou ultrapassar a manifestação histórica documentada, ou que permitisse
+      estabelecer, num sentido ou noutro, se o problema persiste atualmente à
+      escala de todo o município.
 
+
+      Não foi encontrado nenhum registo que demonstre que o programa de
+      reparações está concluído ou que o pavimento se encontra agora, de forma
+      geral, em boas condições. Também não foi encontrado nenhum registo que
+      estabeleça que a degradação continua atualmente de forma generalizada.
+
+
+      O único sinal posterior, EVD-000084, restringe a conclusão em vez de
+      resolver a questão: trata-se de um relato não verificado relativo a uma
+      única localização, a entrada da N114 em Évora, sem corroboração através de
+      dados operacionais ou municipais. Por isso, não é tratado como evidência
+      de persistência da degradação em todo o município.
+
+
+      A ausência simultânea de evidência que confirme ou contrarie a
+      persistência atual é precisamente a razão pela qual esta questão permanece
+      em aberto.
+    evidence:
+      - EVD-000084
   overlap_check:
     performed: true
-    summary: "Per the WU-D3-03 structural review (docs/milestones/D3-WU03-structure-review.md), PRB-0010's causal mechanism — physical road-surface degradation and maintenance/requalification service reliability — is materially distinct from PRB-0005's traffic/parking-pressure-versus-pedestrian/public-space mechanism, and from every other canonical PRB-*. No other canonical PRB-* addresses road-surface degradation; PRB-0010 does not duplicate or overlap another record."
+    summary: Per the WU-D3-03 structural review
+      (docs/milestones/D3-WU03-structure-review.md), PRB-0010's causal mechanism
+      — physical road-surface degradation and maintenance/requalification
+      service reliability — is materially distinct from PRB-0005's
+      traffic/parking-pressure-versus-pedestrian/public-space mechanism, and
+      from every other canonical PRB-*. No other canonical PRB-* addresses
+      road-surface degradation; PRB-0010 does not duplicate or overlap another
+      record.
     related_problems: []
-
-  corroboration_statement: "Uma petição de janeiro de 2026 relatou a existência generalizada de buracos e pavimento degradado no município, com impactos na segurança e danos nos veículos; o Município reconheceu a necessidade de manutenção/requalificação e respondeu com reparações na ordem dos 1,5 milhões de euros. Um sinal público posterior, relativo a uma localização específica (entrada da N114 em Évora), alegou persistência do problema; este sinal, de natureza social/comunitária, não está verificado. Estes elementos evidenciam um problema real de degradação do pavimento rodoviário e de fiabilidade da manutenção, embora a evidência disponível — uma petição e um sinal público posterior não verificado — não permita estimar a prevalência atual em todo o município."
-
+  corroboration_statement: Uma petição de janeiro de 2026 relatou a existência
+    generalizada de buracos e pavimento degradado no município, com impactos na
+    segurança e danos nos veículos; o Município reconheceu a necessidade de
+    manutenção/requalificação e respondeu com reparações na ordem dos 1,5
+    milhões de euros. Um sinal público posterior, relativo a uma localização
+    específica (entrada da N114 em Évora), alegou persistência do problema; este
+    sinal, de natureza social/comunitária, não está verificado. Estes elementos
+    evidenciam um problema real de degradação do pavimento rodoviário e de
+    fiabilidade da manutenção, embora a evidência disponível — uma petição e um
+    sinal público posterior não verificado — não permita estimar a prevalência
+    atual em todo o município.
   supporting_evidence:
-    - "EVD-000082"
-    - "EVD-000083"
-
+    - EVD-000082
+    - EVD-000083
   boundary_evidence:
-    - "EVD-000084"
+    - EVD-000084
+  independence_assessment: >-
+    EVD-000082 (SRC-0069, a petição pública) e EVD-000083 (SRC-0070, cobertura
+    jornalística independente da Rádio Campanário, com SRC-0071 como fonte
+    adicional) assentam em fontes primárias distintas, sem uma linhagem comum:
+    um processo de petição cidadã e a cobertura jornalística independente da
+    resposta institucional do Município são processos materialmente diferentes
+    de geração de evidência, e não a repetição da mesma voz.
 
-  independence_assessment: "EVD-000082 (SRC-0069, a petição pública) e EVD-000083 (SRC-0070, cobertura jornalística independente da Rádio Campanário, com SRC-0071 como fonte adicional) assentam em fontes primárias distintas, sem uma linhagem comum: um processo de petição cidadã e a cobertura jornalística independente da resposta institucional do Município são processos materialmente diferentes de geração de evidência, e não a repetição da mesma voz.\n\nIsto sustenta a manifestação histórica através de duas linhas de evidência independentes.\n\nEVD-000084 (SRC-0072) constitui uma terceira unidade de fonte/evento independente, mas essa independência não se traduz em força corroborativa para uma afirmação de persistência atual. Trata-se de um único relato não verificado em redes sociais, de representatividade desconhecida e relativo a uma localização específica. Por si só, não permite estabelecer que a degradação persiste atualmente à escala de todo o município.\n\nÉ mantido como evidência de limite precisamente por essa razão: a independência da fonte não é suficiente para transformar um sinal não verificado e geograficamente restrito em corroboração do âmbito atual."
 
-  limitations: "The corroborated claim is SUPPORTED only as follows: in January-February 2026, Évora experienced a material, petitioned and institutionally acknowledged road-surface degradation problem, which the Município met with a funded (~EUR1.5M) repair programme. It is NOT SUPPORTED as a claim that road-surface degradation currently persists at a comparable, municipality-wide scale today. EVD-000084's July 2026 N114 report is retained as a boundary/current-state lead, not as confirmation: it is unverified, geographically specific to one location, and its own record explicitly cautions against generalizing it to the municipality. No public dataset or municipal record establishing the current (August 2026), municipality-wide condition of road surfaces after the repair programme was located. This basis deliberately does not author a `scope`/`scope.bounded` judgement for the current-persistence claim: the canonical evidence does not support an honestly bounded present-day geography/population/temporal scope for continued degradation, only the historical January-February 2026 episode and one unverified, location-specific later lead. Authoring a bounded current-scope claim here would overstate what EVD-000084 supports; the human Corroboration gate is HOLD for exactly this reason, and this decision_basis leaves that structural dimension incomplete rather than manufacture a scope claim the evidence does not carry."
+    Isto sustenta a manifestação histórica através de duas linhas de evidência
+    independentes.
+
+
+    EVD-000084 (SRC-0072) constitui uma terceira unidade de fonte/evento
+    independente, mas essa independência não se traduz em força corroborativa
+    para uma afirmação de persistência atual. Trata-se de um único relato não
+    verificado em redes sociais, de representatividade desconhecida e relativo a
+    uma localização específica. Por si só, não permite estabelecer que a
+    degradação persiste atualmente à escala de todo o município.
+
+
+    É mantido como evidência de limite precisamente por essa razão: a
+    independência da fonte não é suficiente para transformar um sinal não
+    verificado e geograficamente restrito em corroboração do âmbito atual.
+  limitations: "The corroborated claim is SUPPORTED only as follows: in
+    January-February 2026, Évora experienced a material, petitioned and
+    institutionally acknowledged road-surface degradation problem, which the
+    Município met with a funded (~EUR1.5M) repair programme. It is NOT SUPPORTED
+    as a claim that road-surface degradation currently persists at a comparable,
+    municipality-wide scale today. EVD-000084's July 2026 N114 report is
+    retained as a boundary/current-state lead, not as confirmation: it is
+    unverified, geographically specific to one location, and its own record
+    explicitly cautions against generalizing it to the municipality. No public
+    dataset or municipal record establishing the current (August 2026),
+    municipality-wide condition of road surfaces after the repair programme was
+    located. This basis deliberately does not author a `scope`/`scope.bounded`
+    judgement for the current-persistence claim: the canonical evidence does not
+    support an honestly bounded present-day geography/population/temporal scope
+    for continued degradation, only the historical January-February 2026 episode
+    and one unverified, location-specific later lead. Authoring a bounded
+    current-scope claim here would overstate what EVD-000084 supports; the human
+    Corroboration gate is HOLD for exactly this reason, and this decision_basis
+    leaves that structural dimension incomplete rather than manufacture a scope
+    claim the evidence does not carry."

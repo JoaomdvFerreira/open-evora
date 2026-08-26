@@ -1,39 +1,30 @@
 evidence_id: EVD-000088
-type: institutional
-source:
-  source_id: SRC-0076
-  publisher: "Turismo de Portugal — Visit Portugal"
-  title: "Visit Portugal — Évora destination page (accessibility-relevant description)"
-  source_reference: "https://www.visitportugal.com/pt-pt/destinos/alentejo/329141"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0077"
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "people with disabilities"
-  - "visitors and residents"
-domain:
-  - "ACC"
-  - "TOU"
+provenance:
+  sources:
+    - SRC-0076
+    - SRC-0077
+  extracted_at: 2026-08-11
 observation:
-  summary: "As atuais plataformas públicas de turismo acessível (Visit Portugal; Tur4all) descrevem barreiras de acessibilidade, como degraus, monumentos com desníveis ou acesso limitado, escassez de pavimento tátil e oferta limitada de transporte totalmente adaptado, sem uma data visível de última verificação em nenhuma das plataformas."
+  summary: As atuais plataformas públicas de turismo acessível (Visit Portugal;
+    Tur4all) descrevem barreiras de acessibilidade, como degraus, monumentos com
+    desníveis ou acesso limitado, escassez de pavimento tátil e oferta limitada
+    de transporte totalmente adaptado, sem uma data visível de última
+    verificação em nenhuma das plataformas.
+scope:
+  geography:
+    level: city
+    area: Évora
+  populations:
+    - people with disabilities
+    - visitors and residents
+  temporal:
+    status: unknown
+domains:
+  - ACC
+  - TOU
 evidence_nature: claim
-strength: secondary
-personal_data:
-  present: false
-  retained: false
-notes: "D2-A Targeted Follow-up (A-FU-SIG-04). POSSIBLE-CURRENT-STATE LEAD; FRESHNESS-UNKNOWN. Useful as a route/accessibility-audit lead, not canonicalised as a current fact — freshness of the underlying assessment is unclear on both surfaces."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "PHYSICAL"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "UNKNOWN"
+claim_authority: unknown
+inference_limits:
+  - A data das avaliações subjacentes não é visível, pelo que as descrições não
+    podem ser tratadas como verificação do estado atual.
+  - As plataformas não estabelecem prevalência de barreiras à escala da cidade.

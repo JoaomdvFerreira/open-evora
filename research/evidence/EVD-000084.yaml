@@ -1,37 +1,27 @@
 evidence_id: EVD-000084
-type: social
-source:
-  source_id: SRC-0072
-  publisher: "Public Instagram account (identity not retained)"
-  title: "Public social post: reported N114 pothole persistence at entrance to Évora"
-  source_reference: "https://www.instagram.com/reel/DbSgZnkCXUj/"
-  published_at: 2026-07
-  retrieved_at: 2026-08-11
-geography:
-  level: city
-  area: "N114, entrance to Évora city"
-population:
-  - "drivers"
-domain:
-  - "URB"
-  - "MOB"
+provenance:
+  sources:
+    - SRC-0072
+  extracted_at: 2026-08-11
 observation:
-  summary: "Uma publicação pública nas redes sociais alegou que um buraco na entrada de Évora, na N114, persistia há cerca de oito meses apesar de reconhecimento institucional anterior, citando sinalização insuficiente e manobras evasivas repetidas por parte dos condutores."
+  summary: Uma publicação pública nas redes sociais alegou que um buraco na
+    entrada de Évora, na N114, persistia há cerca de oito meses apesar de
+    reconhecimento institucional anterior, citando sinalização insuficiente e
+    manobras evasivas repetidas por parte dos condutores.
+scope:
+  geography:
+    level: local_area
+    area: N114, entrada de Évora
+  populations:
+    - condutores
+  temporal:
+    as_of: 2026-07
+domains:
+  - URB
+  - MOB
 evidence_nature: reported-experience
-strength: anecdotal
-personal_data:
-  present: false
-  retained: false
-notes: "D2-A Round A (D2-A-SIG-07). REFINES the EVD-000082/EVD-000083 road-maintenance NEW-CANDIDATE with a persistence/location lead; CURRENT-STATE-UPDATE. Unverified reported claim; not converted into an operational fact without direct verification. Representativeness UNKNOWN. No account identity retained. WU-D3-03: promoted to canonical PRB-0010; this record now supports PRB-0010 directly."
-
-analysis:
-  related_problems:
-    - "PRB-0010"
-  contribution:
-    - "REFINES"
-    - "CURRENT-STATE-UPDATE"
-  friction_types:
-    - "PHYSICAL"
-  representativeness: "UNKNOWN"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: non_authoritative
+inference_limits:
+  - Trata-se de um relato único e não verificado numa rede social, sem
+    capacidade para estabelecer prevalência ou o estado atual de outras
+    localizações.

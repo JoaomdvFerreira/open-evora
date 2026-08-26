@@ -1,28 +1,29 @@
 evidence_id: EVD-000018
-type: institutional
-source:
-  source_id: SRC-0016
-  publisher: "Município de Évora"
-  title: "Plano de Mobilidade Urbana Sustentável de Évora - Volume II (final plan)"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/PMUSE_V.II_.pdf"
-  published_at: 2025-09
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "Évora city (Historic Centre plus major access/exit axes)"
-population:
-  - "people with reduced mobility"
-  - "pedestrians"
-  - "potential accessibility-data consumers"
-domain:
-  - "ACC"
-  - "GEO"
-  - "MOB"
+provenance:
+  sources:
+    - SRC-0016
+  extracted_at: 2026-08-10
 observation:
-  summary: "O PMUSE afirma que o Local Accessibility Promotion Plan R.A.M.P.A.-Évora foi elaborado em 2022, abrangendo o Centro Histórico e importantes eixos de entrada/saída da cidade, e recomenda a sua revisão para acompanhar a implementação e alargar a área analisada. Uma revisão delimitada de fontes públicas não localizou um conjunto de dados oficial, descarregável e estruturado/geoespacial de obstáculos/acessibilidade associado ao plano."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Boundary: dataset existence, owner, internal format and reuse rights remain UNKNOWN."
+  summary: O PMUSE refere que o Plano Local de Promoção da Acessibilidade
+    R.A.M.P.A.-Évora foi elaborado em 2022, abrangendo o Centro Histórico e
+    importantes eixos de entrada e saída da cidade.
+scope:
+  geography:
+    level: city
+    area: Évora city (Historic Centre plus major access/exit axes)
+  populations:
+    - people with reduced mobility
+    - pedestrians
+    - potential accessibility-data consumers
+  temporal:
+    as_of: "2022"
+domains:
+  - ACC
+  - GEO
+  - MOB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A existência e o âmbito do R.A.M.P.A.-Évora não estabelecem o estado atual
+    das barreiras nem a existência ou disponibilidade de um dataset público
+    associado.

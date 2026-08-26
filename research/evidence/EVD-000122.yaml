@@ -1,38 +1,30 @@
 evidence_id: EVD-000122
-type: institutional
-source:
-  source_id: SRC-0016
-  publisher: "Município de Évora"
-  title: "Plano de Mobilidade Urbana Sustentável de Évora - Volume II (final plan)"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/PMUSE_V.II_.pdf"
-  published_at: 2025-09
-  retrieved_at: 2026-08-12
-additional_sources:
-  - "SRC-0103"
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "public-transport users"
-domain:
-  - "MOB"
-  - "DIG"
+provenance:
+  sources:
+    - SRC-0016
+    - SRC-0103
+  extracted_at: 2026-08-12
 observation:
-  summary: "O plano de ação do PMUSE enumera explicitamente melhorias na informação ao passageiro como intervenções propostas: melhorar as condições de conforto, acessibilidade e informação nas paragens; implementar sistemas de informação em tempo real nas principais paragens de transportes públicos; e criar uma aplicação e um sítio web para divulgar informação multimodal sobre os diferentes modos de transporte — estando cada intervenção associada, na tabela de ações do plano, a uma medida/custo indicativo."
+  summary: "O plano de ação do PMUSE enumera explicitamente melhorias na
+    informação ao passageiro como intervenções propostas: melhorar as condições
+    de conforto, acessibilidade e informação nas paragens; implementar sistemas
+    de informação em tempo real nas principais paragens de transportes públicos;
+    e criar uma aplicação e um sítio web para divulgar informação multimodal
+    sobre os diferentes modos de transporte — estando cada intervenção
+    associada, na tabela de ações do plano, a uma medida/custo indicativo."
+scope:
+  geography:
+    level: city
+    area: Évora city
+  populations:
+    - public-transport users
+  temporal:
+    as_of: 2025-09
+domains:
+  - MOB
+  - DIG
 evidence_nature: recommendation
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "RS-02B1 (docs/discovery/rs-01-evidence-gap-review.md Gap 5). These are proposed/planned action-plan items, not evidence that real-time stop information or a multimodal information app/website currently exist or operate — do not read alongside TREVO's existing web capability (EVD-000016) as if the plan's proposals are already delivered. Materially changes the problem's framing from 'no passenger-information improvement is planned' to 'improvements are identified and planned, delivery status unverified.'"
-
-analysis:
-  related_problems:
-    - "PRB-0002"
-  contribution:
-    - "PLANNED-SOLUTION"
-  friction_types:
-    - "INFORMATION"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - As intervenções são propostas do plano e não estabelecem implementação,
+    operação ou eficácia.

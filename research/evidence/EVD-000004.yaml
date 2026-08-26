@@ -1,44 +1,32 @@
 evidence_id: EVD-000004
-type: institutional
-source:
-  source_id: SRC-0017
-  publisher: "Município de Évora"
-  title: "PUE Sector Report: Mobilidade"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-6_Mobilidade.pdf"
-  published_at: 2025-02
-  retrieved_at: 2026-08-10
-additional_sources:
-  - "SRC-0002"
-geography:
-  level: city
-  area: "city, especially outside and within access to the Historic Centre"
-population:
-  - "pedestrians"
-  - "people with disabilities"
-  - "older people"
-  - "children"
-  - "people using pushchairs"
-domain:
-  - "MOB"
-  - "ACC"
-  - "URB"
+lineage_id: MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT
+provenance:
+  sources:
+    - SRC-0017
+  extracted_at: 2026-08-10
 observation:
-  summary: "O diagnóstico de mobilidade do PUE identifica descontinuidade, infraestruturas pedonais subdimensionadas e numerosas barreiras arquitetónicas/urbanísticas em toda a cidade. O Social Development Plan estabelece separadamente a atualização do inventário de obstáculos e a melhoria do acesso aos edifícios públicos como uma ação explícita para 2024-2027."
+  summary: O diagnóstico de mobilidade do PUE identifica descontinuidades,
+    infraestruturas pedonais subdimensionadas e numerosas barreiras
+    arquitetónicas e urbanísticas na cidade, incluindo condicionantes relevantes
+    para pessoas com mobilidade reduzida.
+scope:
+  geography:
+    level: city
+    area: city, especially outside and within access to the Historic Centre
+  populations:
+    - pedestrians
+    - people with disabilities
+    - older people
+    - children
+    - people using pushchairs
+  temporal:
+    status: unknown
+domains:
+  - MOB
+  - ACC
+  - URB
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Independently corroborated by two separate municipal planning documents (SRC-0017 and SRC-0002)."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "PHYSICAL"
-  lineage_id: "MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - O diagnóstico não estabelece que as barreiras descritas permaneçam
+    inalteradas após intervenções posteriores.

@@ -1,40 +1,31 @@
 evidence_id: EVD-000007
-type: institutional
-source:
-  source_id: SRC-0017
-  publisher: "Município de Évora"
-  title: "PUE Sector Report: Mobilidade"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-6_Mobilidade.pdf"
-  published_at: 2025-02
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "city / Historic Centre"
-population:
-  - "pedestrians"
-  - "residents"
-  - "road users"
-domain:
-  - "MOB"
-  - "URB"
-  - "ACC"
+lineage_id: MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT
+provenance:
+  sources:
+    - SRC-0017
+  extracted_at: 2026-08-10
 observation:
-  summary: "O diagnóstico de mobilidade do PUE regista congestionamento no sistema viário em torno das muralhas e da circular sul, velocidades excessivas de veículos em corredores com forte presença pedonal, um problema significativo de sinistralidade, incluindo no Centro Histórico, e ruído associado à circulação motorizada."
+  summary: O diagnóstico de mobilidade do PUE regista congestionamento no sistema
+    viário em torno das muralhas e da circular sul, velocidades excessivas de
+    veículos em corredores com forte presença pedonal, um problema significativo
+    de sinistralidade, incluindo no Centro Histórico, e ruído associado à
+    circulação motorizada.
+scope:
+  geography:
+    level: city
+    area: city / Historic Centre
+  populations:
+    - pedestrians
+    - residents
+    - road users
+  temporal:
+    status: unknown
+domains:
+  - MOB
+  - URB
+  - ACC
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: ""
-
-analysis:
-  related_problems:
-    - "PRB-0005"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "PHYSICAL"
-  lineage_id: "MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - O diagnóstico institucional não quantifica a contribuição relativa de cada
+    fator nem estabelece que a situação se mantenha inalterada em 2026.

@@ -1,37 +1,26 @@
 evidence_id: EVD-000111
-type: institutional
-source:
-  source_id: SRC-0098
-  publisher: "Câmara Municipal de Lisboa"
-  title: "Lisbon annual urban-waste service quality report"
-  source_reference: "Câmara Municipal de Lisboa annual urban-waste service quality report"
-  published_at: null
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Lisboa"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
+lineage_id: ENV-2026-08-LISBON-WASTE-QUALITY-REPORT
+provenance:
+  sources:
+    - SRC-0098
+  extracted_at: 2026-08-11
 observation:
-  summary: "Lisboa publica um relatório anual sobre a qualidade do serviço de resíduos urbanos que contém indicadores como acessibilidade física, continuidade do serviço de recolha e informação sobre o serviço, demonstrando que, no contexto institucional português, o desempenho municipal dos serviços de resíduos pode ser publicado como informação estruturada de prestação de contas ao público."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Comparator/mechanism evidence, not Évora-specific. A governance/evaluation-readiness comparator supporting transparency, service monitoring, trend evaluation and accountability — publication alone does not prove that collection performance improves (WU-D4-02 Mechanism C)."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "INFORMATION"
-  lineage_id: "ENV-2026-08-LISBON-WASTE-QUALITY-REPORT"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+  summary: Lisboa publica um relatório anual de qualidade do serviço de resíduos
+    urbanos com indicadores que incluem acessibilidade física, continuidade do
+    serviço de recolha e informação sobre o serviço.
+scope:
+  geography:
+    level: municipality
+    area: Lisboa
+  populations:
+    - residents
+  temporal:
+    status: unknown
+domains:
+  - ENV
+  - PUB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A publicação de indicadores não demonstra, por si só, melhoria do desempenho
+    do serviço nem transferibilidade para Évora.

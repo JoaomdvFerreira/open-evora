@@ -1,116 +1,508 @@
 problem_id: PRB-0001
-title: "A utilidade prática dos transportes públicos varia consoante os horários e os territórios"
+title: A utilidade prática dos transportes públicos varia consoante os horários
+  e os territórios
 domain:
-  - "MOB"
+  - MOB
 geography:
   level: municipality
-  area: "Évora"
+  area: Évora
 affected_populations:
-  - "residentes que dependem dos transportes públicos"
-problem_statement: "A cobertura dos transportes públicos em Évora é, em termos globais, ampla, mas a evidência institucional indica que a utilidade prática do serviço varia consoante o período horário, o tipo de deslocação e os locais de baixa procura, continuando a articulação entre horários e frequências a ser uma preocupação documentada."
-causal_reading: "A variação na utilidade prática do serviço está associada sobretudo ao desenho e à capacidade do serviço, e não apenas a uma lacuna de informação; esta leitura não está validada e não exclui outros fatores operacionais que possam contribuir para o problema."
+  - residentes que dependem dos transportes públicos
+problem_statement: A cobertura dos transportes públicos em Évora é, em termos
+  globais, ampla, mas a evidência institucional indica que a utilidade prática
+  do serviço varia consoante o período horário, o tipo de deslocação e os locais
+  de baixa procura, continuando a articulação entre horários e frequências a ser
+  uma preocupação documentada.
+causal_reading: A variação na utilidade prática do serviço está associada
+  sobretudo ao desenho e à capacidade do serviço, e não apenas a uma lacuna de
+  informação; esta leitura não está validada e não exclui outros fatores
+  operacionais que possam contribuir para o problema.
 investigation:
   open_questions:
-    - question: "Quais as linhas/corredores/períodos horários concretos que sofrem a maior redução de serviço, e em que medida?"
-      why_open: "Nenhum conjunto de dados público ao nível de linha ou corredor foi localizado; a evidência institucional disponível documenta o padrão ao nível da rede — serviço diurno face a serviço noturno, de fim de semana e de feriados —, mas não a severidade por linha."
-      current_action: "A plataforma de reclamações do TREVO continua a ser uma via disponível para recolher e caracterizar situações concretas de dificuldade por linha, corredor e período horário."
+    - question: Quais as linhas/corredores/períodos horários concretos que sofrem a
+        maior redução de serviço, e em que medida?
+      why_open: Nenhum conjunto de dados público ao nível de linha ou corredor foi
+        localizado; a evidência institucional disponível documenta o padrão ao
+        nível da rede — serviço diurno face a serviço noturno, de fim de semana
+        e de feriados —, mas não a severidade por linha.
+      current_action: A plataforma de reclamações do TREVO continua a ser uma via
+        disponível para recolher e caracterizar situações concretas de
+        dificuldade por linha, corredor e período horário.
       evidence:
-        - "EVD-000002"
-        - "EVD-000117"
+        - EVD-000002
+        - EVD-000117
   path:
     initial_signal:
-      summary: "O Plano de Desenvolvimento Social (PDS 2024-2027) e o relatório anual da Autoridade de Transportes municipal identificaram a conectividade efetiva dos transportes públicos como uma preocupação para residentes que dependem do serviço, num contexto de cobertura diurna ampla e oferta reduzida à noite, aos fins de semana e nos feriados."
+      summary: O Plano de Desenvolvimento Social (PDS 2024-2027) e o relatório anual
+        da Autoridade de Transportes municipal identificaram a conectividade
+        efetiva dos transportes públicos como uma preocupação para residentes
+        que dependem do serviço, num contexto de cobertura diurna ampla e oferta
+        reduzida à noite, aos fins de semana e nos feriados.
       evidence:
-        - "EVD-000001"
-        - "EVD-000002"
+        - EVD-000001
+        - EVD-000002
     development:
-      summary: "A evidência intermunicipal (CIMAC/ATAC) confirmou que as comunicações relacionadas com horários constituem a maior categoria de reclamação e que a experiência de acesso e espera é menos favorável do que a experiência a bordo, reforçando a leitura de variação temporal e territorial. A utilização crescente e a cobertura territorial ampla, incluindo transporte flexível para locais de baixa procura, delimitaram a afirmação e afastaram uma leitura de ausência geral de cobertura."
+      summary: A evidência intermunicipal (CIMAC/ATAC) confirmou que as comunicações
+        relacionadas com horários constituem a maior categoria de reclamação e
+        que a experiência de acesso e espera é menos favorável do que a
+        experiência a bordo, reforçando a leitura de variação temporal e
+        territorial. A utilização crescente e a cobertura territorial ampla,
+        incluindo transporte flexível para locais de baixa procura, delimitaram
+        a afirmação e afastaram uma leitura de ausência geral de cobertura.
       evidence:
-        - "EVD-000011"
-        - "EVD-000023"
-        - "EVD-000024"
-        - "EVD-000027"
+        - EVD-000011
+        - EVD-000023
+        - EVD-000002
+        - EVD-000027
     delimitation:
-      summary: "Um protesto estudantil concreto (março de 2026) e incidentes reportados na plataforma de reclamações do TREVO forneceram exemplos práticos de dificuldades relacionadas com frequência, capacidade, tempo de viagem e falhas operacionais, sem estabelecer prevalência ou representatividade. Os relatórios institucionais de 2022 e 2023 confirmaram que o padrão de redução do serviço à noite, aos fins de semana e nos feriados persiste ao longo de vários anos e não constitui uma observação nova ou transitória."
+      summary: Um protesto estudantil concreto (março de 2026) e incidentes reportados
+        na plataforma de reclamações do TREVO forneceram exemplos práticos de
+        dificuldades relacionadas com frequência, capacidade, tempo de viagem e
+        falhas operacionais, sem estabelecer prevalência ou representatividade.
+        Os relatórios institucionais de 2022 e 2023 confirmaram que o padrão de
+        redução do serviço à noite, aos fins de semana e nos feriados persiste
+        ao longo de vários anos e não constitui uma observação nova ou
+        transitória.
       evidence:
-        - "EVD-000079"
-        - "EVD-000080"
-        - "EVD-000117"
+        - EVD-000079
+        - EVD-000080
+        - EVD-000117
 evidence:
-  - "EVD-000001"
-  - "EVD-000002"
-  - "EVD-000011"
-  - "EVD-000023"
-  - "EVD-000024"
-  - "EVD-000027"
-  - "EVD-000028"
-  - "EVD-000079"
-  - "EVD-000080"
-  - "EVD-000117"
+  - evidence_id: EVD-000001
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000002
+    effects:
+      - SUPPORTS
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000011
+    effects:
+      - REFINES
+    research_roles:
+      - CONTEXTUAL
+  - evidence_id: EVD-000023
+    effects:
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000027
+    effects:
+      - BOUNDS
+    research_roles:
+      - CONTEXTUAL
+  - evidence_id: EVD-000028
+    effects:
+      - REFINES
+    research_roles:
+      - CONTEXTUAL
+  - evidence_id: EVD-000079
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000080
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000117
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
 evidence_status: corroborated
 validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
-
 decision_basis:
   contract_version: "0.1"
+  eligibility_basis: >-
+    PRB-0001 constitui um problema de investigação distinto e bem definido:
+    identifica uma preocupação cívica específica e delimitada relativa a um
+    serviço público — a utilidade prática dos transportes públicos varia
+    consoante o período e o contexto territorial e do serviço —, com uma
+    geografia delimitada (Município de Évora), uma população afetada
+    identificada (residentes que dependem dos transportes públicos) e uma
+    manifestação documentada institucionalmente (EVD-000001, EVD-000002,
+    EVD-000011, EVD-000117), mostrando que esta variação é uma característica
+    reconhecida e recorrente do serviço, e não uma suposição.
 
-  eligibility_basis: "PRB-0001 constitui um problema de investigação distinto e bem definido: identifica uma preocupação cívica específica e delimitada relativa a um serviço público — a utilidade prática dos transportes públicos varia consoante o período e o contexto territorial e do serviço —, com uma geografia delimitada (Município de Évora), uma população afetada identificada (residentes que dependem dos transportes públicos) e uma manifestação documentada institucionalmente (EVD-000001, EVD-000002, EVD-000011, EVD-000117), mostrando que esta variação é uma característica reconhecida e recorrente do serviço, e não uma suposição.\n\nEvidência de experiência vivida fraca e anedótica (EVD-000079, EVD-000080) acrescenta situações concretas, embora não verificadas, de deslocações e incidentes operacionais compatíveis com essa variação documentada institucionalmente. Esta evidência não é utilizada para estabelecer prevalência ou desigualdade à escala da população, mas apenas para demonstrar que a manifestação possui situações concretas com impacto nos utilizadores.\n\nEVD-000024 documenta uma solução existente de transporte flexível para locais identificados de baixa procura e não é deliberadamente utilizado como evidência da manifestação. Mostra que uma formulação mais forte de «ausência de serviço ou de resposta nos territórios de baixa procura» seria incorreta; a lacuna que permanece documentada diz respeito à utilidade prática, à variação consoante horários e territórios e à eficácia ainda por esclarecer, e não à ausência de qualquer resposta. O problema não é formulado como uma solução («é necessária uma aplicação») e não duplica nem se sobrepõe a outro PRB-* canónico."
 
-  corroboration_basis: "A corroboração assenta em evidência institucional que documenta de forma consistente e repetida que a utilidade prática dos transportes públicos varia consoante o período, o contexto da deslocação ou do serviço e os territórios de menor procura, apesar de a cobertura global da rede permanecer ampla.\n\nEVD-000001 (PDS 2024-2027, SRC-0002) constitui uma linha distinta de planeamento institucional que identifica de forma independente a conectividade efetiva dos transportes públicos como uma preocupação para residentes que dependem do serviço.\n\nEVD-000002 (relatório anual de 2026 da Autoridade de Transportes municipal, SRC-0018) é a fonte primária e oficial mais atual, indicando que a rede urbana cobre praticamente toda a cidade de Évora durante o dia, mas reduz o serviço à noite, aos fins de semana e nos feriados.\n\nEVD-000117 (edições de 2022 e 2023 da mesma série de relatórios) confirma, com formulação equivalente à do relatório atual de 2026, que este padrão de variação entre dia, noite, fins de semana e feriados não constitui uma observação nova ou transitória, mas uma característica documentada da rede ao longo de vários anos. Isto reforça a atualidade e persistência da leitura sem acrescentar uma nova voz institucional independente, por pertencer à mesma linhagem documental de SRC-0018.\n\nEVD-000011 (avaliação anual CIMAC/ATAC de 2026, SRC-0019) contribui como CONFIRMA + REFINA ao nível intermunicipal: o conjunto de reclamações mostra que as comunicações relacionadas com horários constituem a maior categoria e que a experiência de acesso e espera é menos favorável do que a experiência a bordo. É tratado como contexto e refinamento coerente com a mesma afirmação de variação temporal e do contexto do serviço, e não, por si só, como uma linha independente de suporte direto com o mesmo peso das fontes primárias da manifestação. A existência de uma fonte e linhagem distintas (SRC-0019) não é suficiente para a tornar equivalente às fontes primárias e oficiais de corroboração direta.\n\nA evidência de experiência vivida fraca e anedótica (EVD-000079, EVD-000080) estabelece situações e consequências concretas compatíveis com a afirmação institucional, mas não é utilizada para estabelecer prevalência ou desigualdade à escala da população, nem é contabilizada como corroboração institucional independente adicional.\n\nEVD-000024, que documenta transporte flexível existente em locais de baixa procura, em conjunto com o crescimento da utilização (EVD-000023) e a ampla cobertura TPAC/TPF (EVD-000027), constitui evidência de limite e de estado atual que restringe a afirmação: mostra que a rede é materialmente utilizada, tem presença territorial ampla e já oferece alguma resposta a territórios de baixa procura. Por essa razão, estes registos são deliberadamente excluídos da corroboração direta e da evidência de suporte da manifestação."
+    Evidência de experiência vivida fraca e anedótica (EVD-000079, EVD-000080)
+    acrescenta situações concretas, embora não verificadas, de deslocações e
+    incidentes operacionais compatíveis com essa variação documentada
+    institucionalmente. Esta evidência não é utilizada para estabelecer
+    prevalência ou desigualdade à escala da população, mas apenas para
+    demonstrar que a manifestação possui situações concretas com impacto nos
+    utilizadores.
 
+
+    EVD-000024 documenta uma solução existente de transporte flexível para
+    locais identificados de baixa procura e não é deliberadamente utilizado como
+    evidência da manifestação. Mostra que uma formulação mais forte de «ausência
+    de serviço ou de resposta nos territórios de baixa procura» seria incorreta;
+    a lacuna que permanece documentada diz respeito à utilidade prática, à
+    variação consoante horários e territórios e à eficácia ainda por esclarecer,
+    e não à ausência de qualquer resposta. O problema não é formulado como uma
+    solução («é necessária uma aplicação») e não duplica nem se sobrepõe a outro
+    PRB-* canónico.
+  corroboration_basis: >-
+    A corroboração assenta em evidência institucional que documenta de forma
+    consistente e repetida que a utilidade prática dos transportes públicos
+    varia consoante o período, o contexto da deslocação ou do serviço e os
+    territórios de menor procura, apesar de a cobertura global da rede
+    permanecer ampla.
+
+
+    EVD-000001 (PDS 2024-2027, SRC-0002) constitui uma linha distinta de
+    planeamento institucional que identifica de forma independente a
+    conectividade efetiva dos transportes públicos como uma preocupação para
+    residentes que dependem do serviço.
+
+
+    EVD-000002 (relatório anual de 2026 da Autoridade de Transportes municipal,
+    SRC-0018) é a fonte primária e oficial mais atual, indicando que a rede
+    urbana cobre praticamente toda a cidade de Évora durante o dia, mas reduz o
+    serviço à noite, aos fins de semana e nos feriados.
+
+
+    EVD-000117 (edições de 2022 e 2023 da mesma série de relatórios) confirma,
+    com formulação equivalente à do relatório atual de 2026, que este padrão de
+    variação entre dia, noite, fins de semana e feriados não constitui uma
+    observação nova ou transitória, mas uma característica documentada da rede
+    ao longo de vários anos. Isto reforça a atualidade e persistência da leitura
+    sem acrescentar uma nova voz institucional independente, por pertencer à
+    mesma linhagem documental de SRC-0018.
+
+
+    EVD-000011 (avaliação anual CIMAC/ATAC de 2026, SRC-0019) contribui como
+    CONFIRMA + REFINA ao nível intermunicipal: o conjunto de reclamações mostra
+    que as comunicações relacionadas com horários constituem a maior categoria e
+    que a experiência de acesso e espera é menos favorável do que a experiência
+    a bordo. É tratado como contexto e refinamento coerente com a mesma
+    afirmação de variação temporal e do contexto do serviço, e não, por si só,
+    como uma linha independente de suporte direto com o mesmo peso das fontes
+    primárias da manifestação. A existência de uma fonte e linhagem distintas
+    (SRC-0019) não é suficiente para a tornar equivalente às fontes primárias e
+    oficiais de corroboração direta.
+
+
+    A evidência de experiência vivida fraca e anedótica (EVD-000079, EVD-000080)
+    estabelece situações e consequências concretas compatíveis com a afirmação
+    institucional, mas não é utilizada para estabelecer prevalência ou
+    desigualdade à escala da população, nem é contabilizada como corroboração
+    institucional independente adicional.
+
+
+    EVD-000024, que documenta transporte flexível existente em locais de baixa
+    procura, em conjunto com o crescimento da utilização (EVD-000023) e a ampla
+    cobertura TPAC/TPF (EVD-000027), constitui evidência de limite e de estado
+    atual que restringe a afirmação: mostra que a rede é materialmente
+    utilizada, tem presença territorial ampla e já oferece alguma resposta a
+    territórios de baixa procura. Por essa razão, estes registos são
+    deliberadamente excluídos da corroboração direta e da evidência de suporte
+    da manifestação.
   manifestation:
-    kind: "variação da utilidade do serviço / lacuna de adequação temporal-territorial"
-    summary: "A evidência institucional estabelece que a utilidade prática dos transportes públicos em Évora não é uniforme. O relatório anual atual da Autoridade de Transportes municipal (EVD-000002) indica que a rede urbana cobre praticamente toda a cidade de Évora durante o dia, mas reduz o serviço à noite, aos fins de semana e nos feriados. As edições de 2022 e 2023 do mesmo relatório (EVD-000117) confirmam que este é um padrão documentado ao longo de vários anos, e não uma observação nova ou transitória.\n\nO Plano de Desenvolvimento Social municipal (EVD-000001) identifica, de forma independente, a conectividade efetiva dos transportes públicos como uma preocupação para residentes que dependem do serviço, incluindo referências a linhas e horários específicos.\n\nA avaliação intermunicipal CIMAC/ATAC (EVD-000011) acrescenta contexto e detalhe: as comunicações relacionadas com horários constituem a maior categoria de reclamação e a experiência de acesso e espera é avaliada de forma menos favorável do que a experiência a bordo. Esta evidência é consistente com a mesma variação temporal e de contexto do serviço, mas não é tratada, por si só, como uma demonstração independente de igual peso.\n\nA existência de transporte flexível para locais de baixa procura (EVD-000024) não é utilizada como evidência da manifestação do problema. Documenta uma resposta já existente e é considerada evidência que delimita a conclusão."
-    evidence:
-      - "EVD-000001"
-      - "EVD-000002"
-      - "EVD-000011"
-      - "EVD-000117"
+    kind: variação da utilidade do serviço / lacuna de adequação temporal-territorial
+    summary: >-
+      A evidência institucional estabelece que a utilidade prática dos
+      transportes públicos em Évora não é uniforme. O relatório anual atual da
+      Autoridade de Transportes municipal (EVD-000002) indica que a rede urbana
+      cobre praticamente toda a cidade de Évora durante o dia, mas reduz o
+      serviço à noite, aos fins de semana e nos feriados. As edições de 2022 e
+      2023 do mesmo relatório (EVD-000117) confirmam que este é um padrão
+      documentado ao longo de vários anos, e não uma observação nova ou
+      transitória.
 
+
+      O Plano de Desenvolvimento Social municipal (EVD-000001) identifica, de
+      forma independente, a conectividade efetiva dos transportes públicos como
+      uma preocupação para residentes que dependem do serviço, incluindo
+      referências a linhas e horários específicos.
+
+
+      A avaliação intermunicipal CIMAC/ATAC (EVD-000011) acrescenta contexto e
+      detalhe: as comunicações relacionadas com horários constituem a maior
+      categoria de reclamação e a experiência de acesso e espera é avaliada de
+      forma menos favorável do que a experiência a bordo. Esta evidência é
+      consistente com a mesma variação temporal e de contexto do serviço, mas
+      não é tratada, por si só, como uma demonstração independente de igual
+      peso.
+
+
+      A existência de transporte flexível para locais de baixa procura
+      (EVD-000024) não é utilizada como evidência da manifestação do problema.
+      Documenta uma resposta já existente e é considerada evidência que delimita
+      a conclusão.
+    evidence:
+      - EVD-000001
+      - EVD-000002
+      - EVD-000011
+      - EVD-000117
   consequence:
-    summary: "Evidência de experiência vivida, de natureza anedótica e autosselecionada, documenta situações concretas em que esta variação afetou deslocações específicas, sem permitir generalizar para a população.\n\nEVD-000079 relata que estudantes universitários de um campus específico participaram, em março de 2026, num protesto relacionado com opções de transporte pouco utilizáveis na prática, autocarros cheios e tempos efetivos de viagem elevados numa deslocação específica entre o campus e a zona industrial. Trata-se de experiência reportada num único evento, de representatividade desconhecida.\n\nEVD-000080 documenta reclamações individuais na plataforma pública do TREVO: um autocarro atrasado, uma interrupção do serviço e um autocarro que não parou após sinalização. São incidentes distintos publicados numa plataforma de reclamações, e não dados sobre a frequência destas ocorrências no conjunto da rede.\n\nEsta evidência demonstra apenas que existem situações concretas com impacto nas deslocações. Não estabelece a frequência ou prevalência dessas falhas entre residentes, nem permite concluir pela existência de um efeito generalizado ou de uma desigualdade à escala da população."
-    evidence:
-      - "EVD-000079"
-      - "EVD-000080"
+    summary: >-
+      Evidência de experiência vivida, de natureza anedótica e autosselecionada,
+      documenta situações concretas em que esta variação afetou deslocações
+      específicas, sem permitir generalizar para a população.
 
+
+      EVD-000079 relata que estudantes universitários de um campus específico
+      participaram, em março de 2026, num protesto relacionado com opções de
+      transporte pouco utilizáveis na prática, autocarros cheios e tempos
+      efetivos de viagem elevados numa deslocação específica entre o campus e a
+      zona industrial. Trata-se de experiência reportada num único evento, de
+      representatividade desconhecida.
+
+
+      EVD-000080 documenta reclamações individuais na plataforma pública do
+      TREVO: um autocarro atrasado, uma interrupção do serviço e um autocarro
+      que não parou após sinalização. São incidentes distintos publicados numa
+      plataforma de reclamações, e não dados sobre a frequência destas
+      ocorrências no conjunto da rede.
+
+
+      Esta evidência demonstra apenas que existem situações concretas com
+      impacto nas deslocações. Não estabelece a frequência ou prevalência dessas
+      falhas entre residentes, nem permite concluir pela existência de um efeito
+      generalizado ou de uma desigualdade à escala da população.
+    evidence:
+      - EVD-000079
+      - EVD-000080
   currentness:
-    assessment: "ALTA para a manifestação institucional documentada. EVD-000002, relativo ao relatório de 2026 da Autoridade de Transportes municipal, é a fonte institucional mais recente no registo e confirma a variação entre o serviço diurno e o serviço noturno, de fim de semana e de feriados.\n\nAs edições de 2022 e 2023 do mesmo relatório (EVD-000117) confirmam que este padrão está documentado ao longo de vários anos, reforçando a sua persistência sem constituir uma voz institucional independente adicional.\n\nEVD-000079 e EVD-000080 acrescentam sinais de experiência vivida relativos a 2025-2026 que são consistentes com a manifestação institucional.\n\nNão foi localizado nenhum conjunto de dados atual que permita comparar a severidade do problema por linha, corredor ou período horário. Por isso, esta avaliação de atualidade aplica-se à manifestação nos termos em que está delimitada e não permite concluir quais as linhas ou períodos atualmente mais afetados."
-    evidence:
-      - "EVD-000002"
-      - "EVD-000117"
+    assessment: >-
+      ALTA para a manifestação institucional documentada. EVD-000002, relativo
+      ao relatório de 2026 da Autoridade de Transportes municipal, é a fonte
+      institucional mais recente no registo e confirma a variação entre o
+      serviço diurno e o serviço noturno, de fim de semana e de feriados.
 
+
+      As edições de 2022 e 2023 do mesmo relatório (EVD-000117) confirmam que
+      este padrão está documentado ao longo de vários anos, reforçando a sua
+      persistência sem constituir uma voz institucional independente adicional.
+
+
+      EVD-000079 e EVD-000080 acrescentam sinais de experiência vivida relativos
+      a 2025-2026 que são consistentes com a manifestação institucional.
+
+
+      Não foi localizado nenhum conjunto de dados atual que permita comparar a
+      severidade do problema por linha, corredor ou período horário. Por isso,
+      esta avaliação de atualidade aplica-se à manifestação nos termos em que
+      está delimitada e não permite concluir quais as linhas ou períodos
+      atualmente mais afetados.
+    evidence:
+      - EVD-000002
+      - EVD-000117
   contradiction_search:
     performed: true
-    summary: "Foi realizada uma procura deliberada de evidência que pudesse contradizer ou ultrapassar a leitura institucional de que a utilidade do serviço varia consoante o período e o contexto.\n\nForam verificadas diretamente as edições de 2022 e 2023 dos relatórios anuais da Autoridade de Transportes municipal (EVD-000117), bem como os horários públicos do TREVO e a existência de transporte flexível para locais de baixa procura.\n\nNão foi encontrada evidência que contradiga a manifestação delimitada. Pelo contrário, EVD-000117 confirma que o mesmo padrão de variação está documentado ao longo de vários anos.\n\nO crescimento da utilização da rede (EVD-000023), a cobertura territorial ampla (EVD-000027) e a existência de transporte flexível (EVD-000024) foram considerados como evidência que restringe uma leitura mais abrangente do problema. Estes elementos mostram que não estamos perante uma ausência generalizada de serviço, mas não demonstram que a variação da sua utilidade prática esteja resolvida."
-    evidence:
-      - "EVD-000117"
+    summary: >-
+      Foi realizada uma procura deliberada de evidência que pudesse contradizer
+      ou ultrapassar a leitura institucional de que a utilidade do serviço varia
+      consoante o período e o contexto.
 
+
+      Foram verificadas diretamente as edições de 2022 e 2023 dos relatórios
+      anuais da Autoridade de Transportes municipal (EVD-000117), bem como os
+      horários públicos do TREVO e a existência de transporte flexível para
+      locais de baixa procura.
+
+
+      Não foi encontrada evidência que contradiga a manifestação delimitada.
+      Pelo contrário, EVD-000117 confirma que o mesmo padrão de variação está
+      documentado ao longo de vários anos.
+
+
+      O crescimento da utilização da rede (EVD-000023), a cobertura territorial
+      ampla (EVD-000027) e a existência de transporte flexível (EVD-000024)
+      foram considerados como evidência que restringe uma leitura mais
+      abrangente do problema. Estes elementos mostram que não estamos perante
+      uma ausência generalizada de serviço, mas não demonstram que a variação da
+      sua utilidade prática esteja resolvida.
+    evidence:
+      - EVD-000117
   overlap_check:
     performed: true
-    summary: "Nenhum outro PRB-* canónico aborda a utilidade prática do serviço de transporte público e a sua adequação temporal-territorial em Évora; PRB-0001 não duplica nem se sobrepõe a outro registo.\n\nEVD-000011 e EVD-000080 estão também associados a PRB-0002 por uma questão distinta relacionada com informação e interoperabilidade, e não pela afirmação de variação da utilidade do serviço que define PRB-0001."
+    summary: >-
+      Nenhum outro PRB-* canónico aborda a utilidade prática do serviço de
+      transporte público e a sua adequação temporal-territorial em Évora;
+      PRB-0001 não duplica nem se sobrepõe a outro registo.
+
+
+      EVD-000011 e EVD-000080 estão também associados a PRB-0002 por uma questão
+      distinta relacionada com informação e interoperabilidade, e não pela
+      afirmação de variação da utilidade do serviço que define PRB-0001.
     related_problems: []
-
-  corroboration_statement: "A cobertura dos transportes públicos em Évora é, em termos globais, ampla, mas a evidência institucional indica que a utilidade prática do serviço varia consoante o período horário, o tipo de deslocação e os locais de baixa procura, continuando a articulação entre horários e frequências a ser uma preocupação documentada."
-
+  corroboration_statement: A cobertura dos transportes públicos em Évora é, em
+    termos globais, ampla, mas a evidência institucional indica que a utilidade
+    prática do serviço varia consoante o período horário, o tipo de deslocação e
+    os locais de baixa procura, continuando a articulação entre horários e
+    frequências a ser uma preocupação documentada.
   supporting_evidence:
-    - "EVD-000001"
-    - "EVD-000002"
-    - "EVD-000011"
-    - "EVD-000117"
-
+    - EVD-000001
+    - EVD-000002
+    - EVD-000011
+    - EVD-000117
   boundary_evidence:
-    - "EVD-000023"
-    - "EVD-000024"
-    - "EVD-000027"
+    - EVD-000023
+    - EVD-000002
+    - EVD-000027
+  independence_assessment: >-
+    A base institucional que sustenta diretamente esta leitura assenta, na
+    prática, em duas vozes institucionais materialmente distintas, e não em
+    quatro fontes independentes.
 
-  independence_assessment: "A base institucional que sustenta diretamente esta leitura assenta, na prática, em duas vozes institucionais materialmente distintas, e não em quatro fontes independentes.\n\nEVD-000002 e EVD-000117 (SRC-0018 e os seus antecedentes de 2022/2023, SRC-0101/SRC-0102) pertencem à mesma linhagem — a série de relatórios anuais da Autoridade de Transportes municipal — e são tratados como uma única família de voz institucional para efeitos de independência, apesar de cada edição possuir um identificador de fonte distinto. O papel de EVD-000117 é corroborar a persistência da mesma afirmação ao longo de várias edições, e não acrescentar uma segunda voz independente.\n\nEVD-000011 (SRC-0019, avaliação anual CIMAC/ATAC) provém de uma instituição materialmente distinta ao nível intermunicipal, mas a sua contribuição canónica é de CONFIRMA + REFINA e de contexto, e não uma afirmação primária e oficial autónoma sobre a variação entre serviço diurno, noturno, de fim de semana e de feriados na rede urbana. Uma fonte e linhagem distintas de SRC-0018 não tornam, por si só, esta evidência numa linha equivalente de suporte direto; é mantida como contexto corroborativo, e não como um segundo pilar independente com o mesmo peso.\n\nEVD-000001 (SRC-0002, PDS 2024-2027) constitui uma linha de planeamento institucional genuinamente distinta e a segunda voz materialmente independente que sustenta a manifestação.\n\nEVD-000079 (SRC-0066) e EVD-000080 (SRC-0067) constituem duas linhas independentes de experiência vivida, distintas das comunicações institucionais. Contudo, não são contabilizadas como evidência de prevalência ou desigualdade à escala da população. Em particular, EVD-000080 não é tratado como evidência representativa da experiência vivida; o seu papel limita-se a corroborar a existência de incidentes operacionais concretos com impacto nos utilizadores e compatíveis com a afirmação institucional, mantendo representatividade DESCONHECIDA.\n\nEVD-000024 é totalmente excluído desta avaliação de independência: documenta uma resposta existente de transporte flexível e funciona como evidência de limite e de estado atual, não como uma linha de corroboração da afirmação sobre a variação da utilidade do serviço.\n\nEm síntese, a corroboração institucional da afirmação delimitada assenta em duas vozes institucionalmente distintas — a família de relatórios da Autoridade de Transportes municipal, corroborada ao longo de várias edições, e a fonte de planeamento institucional do PDS —, sendo complementada pela avaliação intermunicipal CIMAC/ATAC como contexto de suporte, e não como um terceiro pilar de igual peso. Isto não estabelece materialidade à escala da população nem uma desigualdade generalizada. A independência da evidência é, por isso, avaliada como MÉDIA."
 
+    EVD-000002 e EVD-000117 (SRC-0018 e os seus antecedentes de 2022/2023,
+    SRC-0101/SRC-0102) pertencem à mesma linhagem — a série de relatórios anuais
+    da Autoridade de Transportes municipal — e são tratados como uma única
+    família de voz institucional para efeitos de independência, apesar de cada
+    edição possuir um identificador de fonte distinto. O papel de EVD-000117 é
+    corroborar a persistência da mesma afirmação ao longo de várias edições, e
+    não acrescentar uma segunda voz independente.
+
+
+    EVD-000011 (SRC-0019, avaliação anual CIMAC/ATAC) provém de uma instituição
+    materialmente distinta ao nível intermunicipal, mas a sua contribuição
+    canónica é de CONFIRMA + REFINA e de contexto, e não uma afirmação primária
+    e oficial autónoma sobre a variação entre serviço diurno, noturno, de fim de
+    semana e de feriados na rede urbana. Uma fonte e linhagem distintas de
+    SRC-0018 não tornam, por si só, esta evidência numa linha equivalente de
+    suporte direto; é mantida como contexto corroborativo, e não como um segundo
+    pilar independente com o mesmo peso.
+
+
+    EVD-000001 (SRC-0002, PDS 2024-2027) constitui uma linha de planeamento
+    institucional genuinamente distinta e a segunda voz materialmente
+    independente que sustenta a manifestação.
+
+
+    EVD-000079 (SRC-0066) e EVD-000080 (SRC-0067) constituem duas linhas
+    independentes de experiência vivida, distintas das comunicações
+    institucionais. Contudo, não são contabilizadas como evidência de
+    prevalência ou desigualdade à escala da população. Em particular, EVD-000080
+    não é tratado como evidência representativa da experiência vivida; o seu
+    papel limita-se a corroborar a existência de incidentes operacionais
+    concretos com impacto nos utilizadores e compatíveis com a afirmação
+    institucional, mantendo representatividade DESCONHECIDA.
+
+
+    EVD-000024 é totalmente excluído desta avaliação de independência: documenta
+    uma resposta existente de transporte flexível e funciona como evidência de
+    limite e de estado atual, não como uma linha de corroboração da afirmação
+    sobre a variação da utilidade do serviço.
+
+
+    Em síntese, a corroboração institucional da afirmação delimitada assenta em
+    duas vozes institucionalmente distintas — a família de relatórios da
+    Autoridade de Transportes municipal, corroborada ao longo de várias edições,
+    e a fonte de planeamento institucional do PDS —, sendo complementada pela
+    avaliação intermunicipal CIMAC/ATAC como contexto de suporte, e não como um
+    terceiro pilar de igual peso. Isto não estabelece materialidade à escala da
+    população nem uma desigualdade generalizada. A independência da evidência é,
+    por isso, avaliada como MÉDIA.
   scope:
-    geography: "Município de Évora. EVD-000011 e EVD-000027 incluem também evidência à escala intermunicipal do Alentejo Central/CIMAC, utilizada apenas quando ajuda a interpretar a situação específica de Évora e não como fundamento para uma afirmação regional mais ampla.\n\nEVD-000028 não é utilizado para delimitar este âmbito. O próprio registo alerta que a distribuição regional de estudantes e jovens passageiros da ATAC não deve ser interpretada como representativa dos passageiros da rede urbana TREVO em Évora."
-    population: "Residentes que dependem dos transportes públicos no Município de Évora, incluindo subpopulações concretas e delimitadas identificadas no registo: estudantes que se deslocam para um campus específico, utilizadores dependentes do serviço noturno, de fim de semana ou de feriados e residentes de locais de baixa procura abrangidos por respostas específicas.\n\nA evidência não permite generalizar a conclusão para toda a população do município."
-    temporal: "Circunscrito ao período documentado no registo. A evidência institucional abrange 2022-2026 e mostra a persistência do padrão de redução do serviço à noite, aos fins de semana e nos feriados (EVD-000117, EVD-000002).\n\nA evidência de experiência vivida inclui o protesto estudantil de março de 2026 (EVD-000079) e incidentes individuais reportados entre fevereiro e outubro de 2025 (EVD-000080).\n\nA conclusão não se estende a uma comparação atual, em 2026, da severidade por linha, corredor ou período horário. Essa questão continua em aberto."
-    bounded: true
+    geography: >-
+      Município de Évora. EVD-000011 e EVD-000027 incluem também evidência à
+      escala intermunicipal do Alentejo Central/CIMAC, utilizada apenas quando
+      ajuda a interpretar a situação específica de Évora e não como fundamento
+      para uma afirmação regional mais ampla.
 
-  limitations: "A afirmação corroborada é SUPORTADA apenas nos seguintes termos: a evidência institucional mostra de forma consistente que a utilidade prática dos transportes públicos em Évora varia consoante o período, o contexto da deslocação ou do serviço e os territórios de menor procura, apesar de a cobertura global permanecer ampla.\n\nNÃO É SUPORTADA como: uma afirmação de impacto material à escala de toda a população; uma desigualdade geral demonstrada; uma afirmação de deficiência atual grave numa linha ou corredor específico; uma afirmação sobre a frequência ou prevalência das falhas sentidas pelos residentes; ou uma afirmação de que os transportes públicos estão, em termos gerais, ausentes ou em declínio.\n\nO crescimento da utilização (EVD-000023), a ampla cobertura TPAC/TPF (EVD-000027) e a existência de transporte flexível (EVD-000024) são incluídos como evidência de limite e de estado atual que restringe a afirmação. Mostram que uma formulação mais forte de «ausência de serviço ou de resposta nos territórios de baixa procura» seria incorreta e que a lacuna documentada que permanece diz respeito à utilidade prática, à variação consoante horários e territórios e à eficácia ainda por esclarecer, e não à ausência de qualquer resposta. Estes registos são deliberadamente excluídos da manifestação e da evidência de suporte direto e não devem ser interpretados como demonstrando que a lacuna de utilidade prática está resolvida.\n\nA contribuição canónica de EVD-000011 é CONFIRMA + REFINA e de contexto ao nível intermunicipal. É mantido como contexto corroborativo da mesma afirmação de variação e não é tratado, por si só, como uma linha independente de suporte direto com igual peso, uma vez que uma fonte ou linhagem distinta não estabelece automaticamente corroboração direta equivalente.\n\nEVD-000028 é excluído de `boundary_evidence`: o próprio registo alerta explicitamente contra a interpretação da proporção regional de estudantes e jovens passageiros da ATAC como se fosse a distribuição demográfica dos passageiros da rede urbana TREVO em Évora. Por isso, não delimita de forma válida a geografia ou a população desta afirmação e é mantido apenas como contexto, conforme descrito em `scope.geography`.\n\nEVD-000079 e EVD-000080 suportam apenas a existência de situações concretas e incidentes operacionais. São evidência anedótica, autosselecionada e de representatividade DESCONHECIDA e não são tratados, nem devem ser reforçados, como evidência de prevalência ou de desigualdade à escala da população. Em particular, EVD-000080 não é considerado evidência representativa da experiência vivida.\n\nNão está estabelecido quais as linhas, corredores ou períodos horários que sofrem a maior redução de serviço, nem em que medida. Estas continuam a ser questões críticas em aberto e não é feita qualquer inferência sobre a severidade atual ao nível da linha. O número de `lineage_id` não é interpretado como independência semântica: registos de diferentes edições anuais provenientes da mesma voz institucional (SRC-0018 e os seus antecedentes de 2022/2023, EVD-000117) são agrupados para efeitos de avaliação da independência apesar de possuírem diferentes `source_id`."
+
+      EVD-000028 não é utilizado para delimitar este âmbito. O próprio registo
+      alerta que a distribuição regional de estudantes e jovens passageiros da
+      ATAC não deve ser interpretada como representativa dos passageiros da rede
+      urbana TREVO em Évora.
+    population: >-
+      Residentes que dependem dos transportes públicos no Município de Évora,
+      incluindo subpopulações concretas e delimitadas identificadas no registo:
+      estudantes que se deslocam para um campus específico, utilizadores
+      dependentes do serviço noturno, de fim de semana ou de feriados e
+      residentes de locais de baixa procura abrangidos por respostas
+      específicas.
+
+
+      A evidência não permite generalizar a conclusão para toda a população do
+      município.
+    temporal: >-
+      Circunscrito ao período documentado no registo. A evidência institucional
+      abrange 2022-2026 e mostra a persistência do padrão de redução do serviço
+      à noite, aos fins de semana e nos feriados (EVD-000117, EVD-000002).
+
+
+      A evidência de experiência vivida inclui o protesto estudantil de março de
+      2026 (EVD-000079) e incidentes individuais reportados entre fevereiro e
+      outubro de 2025 (EVD-000080).
+
+
+      A conclusão não se estende a uma comparação atual, em 2026, da severidade
+      por linha, corredor ou período horário. Essa questão continua em aberto.
+    bounded: true
+  limitations: >-
+    A afirmação corroborada é SUPORTADA apenas nos seguintes termos: a evidência
+    institucional mostra de forma consistente que a utilidade prática dos
+    transportes públicos em Évora varia consoante o período, o contexto da
+    deslocação ou do serviço e os territórios de menor procura, apesar de a
+    cobertura global permanecer ampla.
+
+
+    NÃO É SUPORTADA como: uma afirmação de impacto material à escala de toda a
+    população; uma desigualdade geral demonstrada; uma afirmação de deficiência
+    atual grave numa linha ou corredor específico; uma afirmação sobre a
+    frequência ou prevalência das falhas sentidas pelos residentes; ou uma
+    afirmação de que os transportes públicos estão, em termos gerais, ausentes
+    ou em declínio.
+
+
+    O crescimento da utilização (EVD-000023), a ampla cobertura TPAC/TPF
+    (EVD-000027) e a existência de transporte flexível (EVD-000024) são
+    incluídos como evidência de limite e de estado atual que restringe a
+    afirmação. Mostram que uma formulação mais forte de «ausência de serviço ou
+    de resposta nos territórios de baixa procura» seria incorreta e que a lacuna
+    documentada que permanece diz respeito à utilidade prática, à variação
+    consoante horários e territórios e à eficácia ainda por esclarecer, e não à
+    ausência de qualquer resposta. Estes registos são deliberadamente excluídos
+    da manifestação e da evidência de suporte direto e não devem ser
+    interpretados como demonstrando que a lacuna de utilidade prática está
+    resolvida.
+
+
+    A contribuição canónica de EVD-000011 é CONFIRMA + REFINA e de contexto ao
+    nível intermunicipal. É mantido como contexto corroborativo da mesma
+    afirmação de variação e não é tratado, por si só, como uma linha
+    independente de suporte direto com igual peso, uma vez que uma fonte ou
+    linhagem distinta não estabelece automaticamente corroboração direta
+    equivalente.
+
+
+    EVD-000028 é excluído de `boundary_evidence`: o próprio registo alerta
+    explicitamente contra a interpretação da proporção regional de estudantes e
+    jovens passageiros da ATAC como se fosse a distribuição demográfica dos
+    passageiros da rede urbana TREVO em Évora. Por isso, não delimita de forma
+    válida a geografia ou a população desta afirmação e é mantido apenas como
+    contexto, conforme descrito em `scope.geography`.
+
+
+    EVD-000079 e EVD-000080 suportam apenas a existência de situações concretas
+    e incidentes operacionais. São evidência anedótica, autosselecionada e de
+    representatividade DESCONHECIDA e não são tratados, nem devem ser
+    reforçados, como evidência de prevalência ou de desigualdade à escala da
+    população. Em particular, EVD-000080 não é considerado evidência
+    representativa da experiência vivida.
+
+
+    Não está estabelecido quais as linhas, corredores ou períodos horários que
+    sofrem a maior redução de serviço, nem em que medida. Estas continuam a ser
+    questões críticas em aberto e não é feita qualquer inferência sobre a
+    severidade atual ao nível da linha. O número de `lineage_id` não é
+    interpretado como independência semântica: registos de diferentes edições
+    anuais provenientes da mesma voz institucional (SRC-0018 e os seus
+    antecedentes de 2022/2023, EVD-000117) são agrupados para efeitos de
+    avaliação da independência apesar de possuírem diferentes `source_id`.

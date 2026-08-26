@@ -1,37 +1,29 @@
 evidence_id: EVD-000101
-type: observation
-source:
-  source_id: SRC-0087
-  publisher: "Indeed"
-  title: "Indeed job listings — aeronautical/aerospace roles, Évora"
-  source_reference: "https://pt.indeed.com/q-aeron%C3%A1utica-l-%C3%89vora-ofertas.html"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "job seekers"
-  - "employers"
-domain:
-  - "EMP"
-  - "ECO"
+provenance:
+  sources:
+    - SRC-0087
+  extracted_at: 2026-08-11
 observation:
-  summary: "Um retrato pontual das ofertas do Indeed para funções no setor aeronáutico e aeroespacial em Évora mostra requisitos especializados, frequentemente de nível sénior, abrangendo engenharia aeronáutica, EWIS, gestão de configuração, aeronavegabilidade e qualidade, fabrico de compósitos e materiais, e aviónica e conceção de aeronaves."
-evidence_nature: measurement
-strength: primary-non-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-D Round A (E-01). Concrete specialised-demand signal alongside the broader IEFP snapshot (EVD-000049); does not establish actual shortage, vacancy duration, failed recruitment, wage mismatch, or inability to source these skills locally — a listing snapshot measures advertised demand only."
-
-analysis:
-  related_problems:
-    - "PRB-0008"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "INFORMATION"
-  representativeness: "LIMITED"
-  verification: "UNKNOWN"
-  temporal_relevance: "CURRENT"
+  summary: Um retrato pontual das ofertas do Indeed para funções no setor
+    aeronáutico e aeroespacial em Évora mostra requisitos especializados,
+    frequentemente de nível sénior, abrangendo engenharia aeronáutica, EWIS,
+    gestão de configuração, aeronavegabilidade e qualidade, fabrico de
+    compósitos e materiais, e aviónica e conceção de aeronaves.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - job seekers
+    - employers
+  temporal:
+    as_of: 2026-08-11
+domains:
+  - EMP
+  - ECO
+evidence_nature: fact
+claim_authority: non_authoritative
+inference_limits:
+  - O snapshot de anúncios mede requisitos publicitados e não demonstra
+    escassez, duração das vagas, recrutamento falhado ou incapacidade de
+    encontrar competências localmente.

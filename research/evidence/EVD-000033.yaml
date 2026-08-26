@@ -1,39 +1,32 @@
 evidence_id: EVD-000033
-type: institutional
-source:
-  source_id: SRC-0029
-  publisher: "Município de Évora"
-  title: "PUE Sector Report: Habitação e Mercado Imobiliário"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-10_Habitacao-e-mercado-imobiliario.pdf"
-  published_at: 2025-02
-  retrieved_at: 2026-08-10
-additional_sources:
-  - "SRC-0002"
-  - "SRC-0028"
-geography:
-  level: municipality
-  area: "Évora city, especially Historic Centre"
-population:
-  - "students"
-domain:
-  - "HOU"
-  - "EDU"
+provenance:
+  sources:
+    - SRC-0029
+    - SRC-0002
+    - SRC-0028
+  extracted_at: 2026-08-10
 observation:
-  summary: "A escassez de alojamento estudantil surge repetidamente no planeamento social e habitacional, e o relatório de habitação do PUE identifica a capacidade das residências públicas como insuficiente face à procura de estudantes deslocados e internacionais, coexistindo com mais de 200 unidades de alojamento local concentradas no Centro Histórico."
+  summary: A escassez de alojamento estudantil surge repetidamente no planeamento
+    social e habitacional, e o relatório de habitação do PUE identifica a
+    capacidade das residências públicas como insuficiente face à procura de
+    estudantes deslocados e internacionais, coexistindo com mais de 200 unidades
+    de alojamento local concentradas no Centro Histórico.
+scope:
+  geography:
+    level: municipality
+    area: Évora city, especially Historic Centre
+  populations:
+    - students
+  temporal:
+    start: "2024"
+    end: "2025"
+domains:
+  - HOU
+  - EDU
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-03-A-E03. Boundary: do not infer exact 2026 shortage magnitude yet. Repeated institutional claims across SRC-0002/SRC-0028/SRC-0029 are not automatically independent corroboration, since SRC-0002 and SRC-0028 share the same PDS/Rede Social institutional lineage."
-
-analysis:
-  related_problems:
-    - "PRB-0006"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "OTHER"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - A evidência não quantifica a dimensão da escassez de alojamento estudantil
+    em 2026.
+  - A repetição da preocupação em documentos relacionados não demonstra
+    automaticamente corroboração independente.

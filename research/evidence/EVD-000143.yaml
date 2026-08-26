@@ -1,0 +1,29 @@
+evidence_id: EVD-000143
+provenance:
+  sources:
+    - SRC-0030
+  extracted_at: 2026-08-10
+observation:
+  summary: No estudo integrado no Plano Concelhio dos Cuidadores Informais, com 68
+    cuidadores e 89 pessoas cuidadas entrevistadas, 35 % dos inquiridos
+    indicaram que a pessoa de quem cuidavam não utilizava qualquer serviço
+    formal de apoio.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: "2025"
+  populations:
+    - cuidadores informais e pessoas cuidadas incluídos no estudo
+domains:
+  - SOC
+  - HEA
+evidence_nature: measurement
+claim_authority: authoritative
+inference_limits:
+  - O resultado aplica-se à amostra específica do estudo e não pode ser
+    generalizado ao conjunto dos cuidadores de Évora.
+  - A medição não estabelece uma relação causal entre dificuldades de informação
+    e não utilização de apoio formal.
+lineage_id: SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS

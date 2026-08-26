@@ -1,29 +1,29 @@
 evidence_id: EVD-000068
-type: institutional
-source:
-  source_id: SRC-0058
-  publisher: "Município de Évora"
-  title: "Municipality mobile app"
-  source_reference: "https://www.cm-evora.pt/municipe/aplicacoes-do-municipio/app-do-municipio/"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0059"
-  - "SRC-0060"
-  - "SRC-0057"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "DIG"
-  - "PUB"
+provenance:
+  sources:
+    - SRC-0058
+    - SRC-0059
+    - SRC-0060
+    - SRC-0057
+  extracted_at: 2026-08-11
 observation:
-  summary: "A infraestrutura municipal de serviços digitais é mais ampla e mais atual do que sugere uma simples formulação de «lacuna de digitalização»: coexistem o Balcão Online, serviços dedicados de água, ePaper para urbanismo, um portal geográfico, uma aplicação móvel, uma plataforma de ocorrências e outros canais digitais especializados."
+  summary: O ecossistema municipal inclui uma aplicação móvel, o Balcão Online, a
+    plataforma de Comunicação de Ocorrências, o ePaper, serviços digitais de
+    água, serviços geográficos e outros canais digitais especializados.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residents
+  temporal:
+    as_of: 2026-08
+domains:
+  - DIG
+  - PUB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-06-A-E06. Interpretation: do not create a canonical 'municipal services are not digital' problem from institutional evidence."
+claim_authority: authoritative
+inference_limits:
+  - A existência de vários canais digitais não estabelece integração entre eles,
+    usabilidade, acessibilidade, ausência de fragmentação ou cobertura
+    suficiente das necessidades.

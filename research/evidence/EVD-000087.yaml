@@ -1,38 +1,25 @@
 evidence_id: EVD-000087
-type: institutional
-source:
-  source_id: SRC-0075
-  publisher: "Évora 2027 — Capital Europeia da Cultura"
-  title: "Évora_27 Facebook post — accessibility plan development with Acesso Cultura"
-  source_reference: "https://www.facebook.com/Evora2027.CapitalEuropeiadaCultura/posts/1933931730887871/"
-  published_at: 2026-05
-  retrieved_at: 2026-08-11
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "people with disabilities"
-  - "cultural-programme visitors and residents"
-domain:
-  - "ACC"
-  - "CUL"
+provenance:
+  sources:
+    - SRC-0075
+  extracted_at: 2026-08-11
 observation:
-  summary: "A Évora_27 comunicou que está a desenvolver, em 2026, um plano de acessibilidade em conjunto com a Acesso Cultura."
+  summary: A Évora_27 comunicou que está a desenvolver, em 2026, um plano de
+    acessibilidade em conjunto com a Acesso Cultura.
+scope:
+  geography:
+    level: city
+    area: Évora city
+  populations:
+    - people with disabilities
+    - cultural-programme visitors and residents
+  temporal:
+    as_of: 2026-05
+domains:
+  - ACC
+  - CUL
 evidence_nature: claim
-strength: primary-non-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-A Targeted Follow-up (A-FU-SIG-03). CURRENT-STATE-UPDATE; PLANNED-SOLUTION (corrected from an earlier EXISTING-SOLUTION framing — the accessibility plan is described as being developed during 2026, not yet delivered or operating). Does not resolve street/pedestrian accessibility directly; reinforces that present-day residual barriers must be tested rather than assuming older accessibility descriptions remain an unchanged baseline."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "CURRENT-STATE-UPDATE"
-    - "PLANNED-SOLUTION"
-  friction_types:
-    - "PHYSICAL"
-  representativeness: "UNKNOWN"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - O desenvolvimento do plano não estabelece a sua entrega, operação ou
+    eficácia e não resolve diretamente a acessibilidade do espaço público.

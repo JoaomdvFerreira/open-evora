@@ -1,37 +1,28 @@
 evidence_id: EVD-000049
-type: institutional
-source:
-  source_id: SRC-0039
-  publisher: "IEFP"
-  title: "IEFP Online — ofertas de emprego, serviço de Évora"
-  source_reference: "https://iefponline.iefp.pt/"
-  published_at: null
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "job seekers"
-  - "employers"
-domain:
-  - "EMP"
-  - "ECO"
+provenance:
+  sources:
+    - SRC-0039
+  extracted_at: 2026-08-11
 observation:
-  summary: "As ofertas públicas de emprego não permitem, por si só, identificar a escassez efetiva de competências: o retrato pontual do IEFP Évora contém 102 ofertas em várias profissões, incluindo tipos de funções repetidos, mas não inclui dados sobre o tempo necessário para preencher as vagas, recrutamentos sem sucesso, restrições salariais ou situações de escassez comunicadas por empregadores."
+  summary: Num retrato pontual do serviço de Évora do IEFP Online foram observadas
+    102 ofertas de emprego distribuídas por várias profissões, incluindo tipos
+    de funções repetidos.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - job seekers
+    - employers
+  temporal:
+    as_of: 2026-08-11
+domains:
+  - EMP
+  - ECO
 evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-04-B-E03. Interpretation: the specific skills mismatch remains under-characterised; a listing snapshot measures advertised demand, not labour shortage or mismatch (see SRC-0039 boundary note)."
-
-analysis:
-  related_problems:
-    - "PRB-0008"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "INFORMATION"
-  representativeness: "LIMITED"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - Um retrato de ofertas anunciadas mede procura publicitada e não escassez
+    efetiva de competências.
+  - O snapshot não informa sobre duração das vagas, recrutamentos falhados,
+    restrições salariais ou dificuldade de contratação.

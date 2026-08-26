@@ -1,39 +1,28 @@
 evidence_id: EVD-000080
-type: social
-source:
-  source_id: SRC-0067
-  publisher: "Portal da Queixa"
-  title: "Portal da Queixa — TREVO public complaint surface"
-  source_reference: "https://portaldaqueixa.com/brands/trevo/complaints"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-geography:
-  level: city
-  area: "Évora city (urban TREVO network)"
-population:
-  - "TREVO passengers"
-domain:
-  - "MOB"
-  - "DIG"
+provenance:
+  sources:
+    - SRC-0067
+  extracted_at: 2026-08-11
 observation:
-  summary: "A listagem atual de reclamações sobre a TREVO mostra incidentes recorrentes relacionados com a operação e a fiabilidade do serviço: uma reclamação de outubro de 2025 relativa à Linha Azul Norte, na Escola Gabriel Pereira, que menciona um autocarro já atrasado; uma reclamação de agosto de 2025 sobre um motorista que interrompeu o serviço por motivo pessoal; e um relato de fevereiro de 2025 de que um autocarro da Linha Azul não parou depois de lhe ter sido feito sinal."
+  summary: "A listagem pública de reclamações sobre a TREVO contém três incidentes
+    individuais de 2025: um relato de atraso na Linha Azul Norte junto à Escola
+    Gabriel Pereira, um relato de interrupção do serviço por um motorista e um
+    relato de um autocarro da Linha Azul que não parou depois de lhe ter sido
+    feito sinal."
+scope:
+  geography:
+    level: city
+    area: Évora city (urban TREVO network)
+  populations:
+    - TREVO passengers
+  temporal:
+    start: 2025-02
+    end: 2025-10
+domains:
+  - MOB
+  - DIG
 evidence_nature: reported-experience
-strength: anecdotal
-personal_data:
-  present: false
-  retained: false
-notes: "D2-A Round A (D2-A-SIG-02). CONFIRMS + REFINES PRB-0001 (secondary relevance to PRB-0002 on information/interoperability). Self-selected complaint platform; representativeness UNKNOWN. Distinct complaints are separate incident lineages sharing one platform, not system-wide rate evidence. No usernames retained."
-
-analysis:
-  related_problems:
-    - "PRB-0001"
-    - "PRB-0002"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "OPERATIONAL"
-    - "INFORMATION"
-  public_signal_class: "PS3"
-  representativeness: "UNKNOWN"
-  verification: "REPORTED"
-  temporal_relevance: "HISTORICAL"
+claim_authority: non_authoritative
+inference_limits:
+  - As três reclamações são autosselecionadas e não permitem inferir
+    recorrência, prevalência ou uma taxa de falha da rede.

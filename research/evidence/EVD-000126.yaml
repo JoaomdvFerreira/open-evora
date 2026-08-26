@@ -1,36 +1,28 @@
 evidence_id: EVD-000126
-type: stakeholder
-source:
-  publisher: "Open Évora"
-  title: "D5 stakeholder engagement — university student-support operator (SASUE)"
-  source_reference: "D5-ENG-OP-004 — private research note, not public"
-  published_at: null
-  retrieved_at: "2026-08-13"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "students applying for University of Évora residence accommodation"
-domain:
-  - "HOU"
-  - "EDU"
+lineage_id: D5-ENG-OP-004
+provenance:
+  sources:
+    - SRC-0119
+  extracted_at: 2026-08-13
 observation:
-  summary: "Os SASUE referem dispor de informação operacional agregada sobre candidaturas a alojamento em residência, vagas disponíveis, candidatos não colocados, informação sobre listas de espera e informação sobre tempos de decisão. A resposta não forneceu valores de indicadores, definições, cobertura histórica, condições de acesso nem condições de reutilização."
+  summary: Os SASUÉ referem dispor de informação operacional agregada sobre
+    candidaturas a alojamento em residência, vagas disponíveis, candidatos não
+    colocados, listas de espera e tempos de decisão.
+scope:
+  geography:
+    level: city
+    area: Évora
+  populations:
+    - estudantes que se candidatam a alojamento em residência da Universidade de
+      Évora
+  temporal:
+    as_of: 2026-08-13
+domains:
+  - HOU
+  - EDU
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D5-OP-004 (WU022) response, received 2026-08-13. Confirms indicator existence only. It does not establish the magnitude of accommodation shortage, waiting outcomes, process performance, indicator quality, historical depth, public availability, access, or data-reuse rights; no values were requested or retained in this integration. primary-authoritative applies to SASUE's statement about operational information it holds. Shares analysis.lineage_id D5-ENG-OP-004 with EVD-000125 and EVD-000127; same engagement, not independent corroboration. This is a future evidence/data lead only if a later decision requires the data; it does not start Open Data Foundation work or justify outreach."
-
-analysis:
-  related_problems:
-    - "PRB-0006"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "OPERATIONAL"
-  lineage_id: "D5-ENG-OP-004"
-  representativeness: "NOT_APPLICABLE"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A resposta estabelece apenas a existência de informação operacional
+    agregada; não fornece valores, definições, qualidade, profundidade
+    histórica, acesso público ou condições de reutilização.

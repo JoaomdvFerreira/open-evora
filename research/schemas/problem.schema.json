@@ -35,6 +35,7 @@
     {
       "field": "evidence",
       "isList": true,
+      "itemField": "evidence_id",
       "targetPrefix": "EVD-",
       "targetDirectory": "evidence",
       "required": false

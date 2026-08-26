@@ -1,29 +1,30 @@
 evidence_id: EVD-000131
-type: stakeholder
-source:
-  publisher: "Open Évora"
-  title: "D5 stakeholder engagement — accessibility programme actor (APCE), follow-up"
-  source_reference: "D5-ENG-OP-003 — private research note, not public"
-  published_at: null
-  retrieved_at: 2026-08-20
-geography:
-  level: city
-  area: "Évora city and Historic Centre"
-population: ["people with reduced mobility", "people with disabilities"]
-domain: ["ACC", "URB", "ECO"]
+lineage_id: D5-ENG-OP-003
+provenance:
+  sources:
+    - SRC-0118
+  extracted_at: 2026-08-20
 observation:
-  summary: "Num seguimento direto com a APCE, esta descreve o Acesso Universal 1.0–1.3; refere que algumas barreiras identificadas nas versões 1.0/1.1 foram posteriormente alvo de intervenção, sem um mapeamento entre diagnóstico e intervenção; refere que cerca de 30 estabelecimentos comerciais foram avaliados no âmbito da versão 1.2; e refere participação adicional de estabelecimentos comerciais na versão 1.3. As listas/formulários de estabelecimentos que constituem documentação de suporte, bem como a autorização de reutilização, continuam pendentes."
+  summary: Num seguimento direto, a APCE refere que algumas barreiras
+    identificadas nas versões 1.0 e 1.1 do Acesso Universal foram posteriormente
+    alvo de intervenção, sem disponibilizar um mapeamento entre cada diagnóstico
+    e a intervenção correspondente.
+scope:
+  geography:
+    level: city
+    area: Évora
+  populations:
+    - people with reduced mobility
+    - people with disabilities
+  temporal:
+    as_of: 2026-08-20
+domains:
+  - ACC
+  - URB
+  - ECO
 evidence_nature: claim
-strength: primary-non-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D5-OP-003 follow-up, received 2026-08-20. This is a distinct material update within the same direct-engagement lineage as EVD-000112–000114. It supports neither a specific location-level correction nor a present-day barrier state, and the approximate shop count is not a representative prevalence measure. No personal correspondence, named respondent, or shop-level data is retained."
-analysis:
-  related_problems: ["PRB-0003"]
-  contribution: ["REFINES", "EXISTING-SOLUTION"]
-  friction_types: ["PHYSICAL"]
-  lineage_id: "D5-ENG-OP-003"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: non_authoritative
+inference_limits:
+  - A APCE não disponibilizou um mapeamento diagnóstico-intervenção por
+    localização, uma discriminação entre situações concluídas e pendentes nem
+    datas suficientes para estabelecer o estado atual das barreiras.

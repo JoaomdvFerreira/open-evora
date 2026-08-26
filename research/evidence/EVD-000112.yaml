@@ -1,38 +1,30 @@
 evidence_id: EVD-000112
-type: stakeholder
-source:
-  publisher: "Open Évora"
-  title: "D5 stakeholder engagement — accessibility programme actor (APCE)"
-  source_reference: "D5-ENG-OP-003 — private research note, not public"
-  published_at: null
-  retrieved_at: "2026-08-12"
-geography:
-  level: city
-  area: "Évora city — public space"
-population:
-  - "people with reduced mobility"
-domain:
-  - "ACC"
-  - "URB"
+lineage_id: D5-ENG-OP-003
+provenance:
+  sources:
+    - SRC-0118
+  extracted_at: 2026-08-12
 observation:
-  summary: "A APCE refere que o seu trabalho de acessibilidade no espaço público é realizado em parceria com a Câmara Municipal de Évora, porque a intervenção no espaço público é da competência municipal; o papel da própria APCE consiste na avaliação de acessibilidade in loco, com a participação direta de pessoas com mobilidade reduzida, que partem das dificuldades que experienciam para ajudar a identificar problemas e correções adequadas."
+  summary: A APCE refere que o seu trabalho de acessibilidade no espaço público é
+    realizado em parceria com a Câmara Municipal de Évora, porque a intervenção
+    no espaço público é da competência municipal; o papel da própria APCE
+    consiste na avaliação de acessibilidade in loco, com a participação direta
+    de pessoas com mobilidade reduzida, que partem das dificuldades que
+    experienciam para ajudar a identificar problemas e correções adequadas.
+scope:
+  geography:
+    level: city
+    area: Évora city — public space
+  populations:
+    - people with reduced mobility
+  temporal:
+    as_of: 2026-08-12
+domains:
+  - ACC
+  - URB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D5-OP-003 (WU022) response, received 2026-08-12 via direct institutional outreach. Respondent role-labelled only (APCE technical project coordinator, occupational therapist) — no personal name, email, or raw correspondence retained in this repository, per docs/discovery/research-ethics.md §11. Governance/methodology fact about APCE's own operating practice (why CME co-partners, and how in-loco assessment works) — strength primary-authoritative is used specifically for this operational fact APCE owns as the assessing actor, per docs/models/evidence-model.md's D5 rule; it does not extend to prevalence/coverage claims about residents. CONFIRMS/REFINES the participatory basis already partially documented in EVD-000085 (Acesso Universal 1.3, a distinct earlier lineage), now with an explicit governance rationale (public space = municipal competence) that was not previously canonicalized. Shares analysis.lineage_id D5-ENG-OP-003 with EVD-000113 and EVD-000114 (same engagement); do not treat this trio as independent corroboration of each other or of the separate ACC-2025-APCE-ACESSO-UNIVERSAL-1.3 lineage (EVD-000085/086/104) — same institutional voice (APCE) across both lineages."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "CONFIRMS"
-    - "REFINES"
-  friction_types:
-    - "PHYSICAL"
-    - "COORDINATION"
-  lineage_id: "D5-ENG-OP-003"
-  representativeness: "NOT_APPLICABLE"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A Observation descreve o método e a governação do trabalho da APCE; não
+    estabelece prevalência de barreiras, cobertura territorial nem confirmação
+    independente pela Câmara Municipal.

@@ -1,40 +1,29 @@
 evidence_id: EVD-000081
-type: institutional
-source:
-  source_id: SRC-0068
-  publisher: "República Portuguesa — PRR Transparência"
-  title: "PRR project record: EB1 Azaruja accessibility correction"
-  source_reference: "https://transparencia.gov.pt/pt/fundos-europeus/prr/beneficiarios-projetos/projeto/08/C03-i02/2024.P13691/"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-geography:
-  level: parish
-  area: "Azaruja (freguesia)"
-population:
-  - "people with reduced mobility"
-  - "schoolchildren and school staff at EB1 Azaruja"
-domain:
-  - "ACC"
-  - "MOB"
-  - "URB"
+lineage_id: ACC-2025-2026-PRR-EB1-AZARUJA-PROJECT
+provenance:
+  sources:
+    - SRC-0068
+  extracted_at: 2026-08-11
 observation:
-  summary: "O registo público do projeto PRR documenta barreiras concretas de acessibilidade prévias à intervenção na EB1 Azaruja: um passeio estreito, cinco degraus na entrada pedonal principal, utilização de um portão para veículos numa rua secundária sem passeio e um acesso ao edifício que não cumpria os requisitos de acessibilidade. O projeto foi concebido para corrigir estas barreiras durante 2025-2026."
+  summary: "O registo público do projeto PRR documenta, antes da intervenção
+    prevista, barreiras concretas na EB1 de Azaruja: um passeio estreito, cinco
+    degraus na entrada pedonal principal, utilização de um portão para veículos
+    numa rua secundária sem passeio e um acesso ao edifício que não cumpria os
+    requisitos de acessibilidade."
+scope:
+  geography:
+    level: site
+    area: EB1 de Azaruja, Évora
+  populations:
+    - utilizadores da EB1 de Azaruja, incluindo pessoas com mobilidade reduzida
+  temporal:
+    status: unknown
+domains:
+  - ACC
+  - MOB
+  - URB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-A Round A (D2-A-SIG-04). CONFIRMS PRB-0003 with a concrete factual barrier; CURRENT-STATE-UPDATE required — because the corrective project is current/recent, the post-project condition must be checked before treating the described barrier as present-day reality. This is factual corroboration, not an independent lived public signal."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "CONFIRMS"
-    - "CURRENT-STATE-UPDATE"
-  friction_types:
-    - "PHYSICAL"
-  lineage_id: "ACC-2025-2026-PRR-EB1-AZARUJA-PROJECT"
-  representativeness: "LIMITED"
-  verification: "VERIFIED"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - As barreiras descritas são anteriores à intervenção corretiva e não devem
+    ser tratadas como estado atual do local.

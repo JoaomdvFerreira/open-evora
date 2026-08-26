@@ -1,39 +1,29 @@
 evidence_id: EVD-000103
-type: institutional
-source:
-  source_id: SRC-0090
-  publisher: "Universidade de Évora"
-  title: "UÉ / TE Connectivity employer-training feedback mechanism"
-  source_reference: "https://www.uevora.pt/ue-media/noticias?item=43165"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "employers"
-  - "training/education providers"
-  - "workers and job seekers"
-domain:
-  - "EMP"
-  - "EDU"
+provenance:
+  sources:
+    - SRC-0090
+  extracted_at: 2026-08-11
 observation:
-  summary: "A Universidade de Évora e a TE Connectivity descrevem um plano de ação anual assente em necessidades identificadas pela empresa, incluindo ações relacionadas com competências técnicas e empregabilidade — um mecanismo bilateral concreto de retorno de informação entre empregador e formação."
+  summary: A Universidade de Évora e a TE Connectivity descrevem um plano de ação
+    anual assente em necessidades identificadas pela empresa, incluindo ações
+    relacionadas com competências técnicas e empregabilidade — um mecanismo
+    bilateral concreto de retorno de informação entre empregador e formação.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - employers
+    - training/education providers
+    - workers and job seekers
+  temporal:
+    status: unknown
+domains:
+  - EMP
+  - EDU
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-D Round A (E-06). EXISTING-SOLUTION; REFINES PRB-0008. Shows at least one concrete bilateral employer-training feedback mechanism exists; does not establish that such mechanisms are systematic or sufficient across Évora's wider economy/SME base — carried forward as a D5/data question."
-
-analysis:
-  related_problems:
-    - "PRB-0008"
-  contribution:
-    - "EXISTING-SOLUTION"
-    - "REFINES"
-  friction_types:
-    - "OTHER"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "UNKNOWN"
+claim_authority: authoritative
+inference_limits:
+  - Um mecanismo bilateral documentado não estabelece que mecanismos
+    equivalentes sejam sistemáticos ou suficientes no conjunto da economia de
+    Évora.

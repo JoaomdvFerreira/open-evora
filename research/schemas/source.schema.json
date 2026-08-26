@@ -2,7 +2,7 @@
   "prefix": "SRC-",
   "directory": "sources",
   "idField": "source_id",
-  "sourceModel": "SRC_V2_CANONICAL_CONTRACT.md",
+  "sourceModel": "docs/datamodel.md",
 
   "requiredFields": [
     "source_id",

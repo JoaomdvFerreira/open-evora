@@ -13,6 +13,7 @@ export interface ContributionSummary {
 }
 
 function contributionsOf(evidence: EvidenceWithSources): string[] {
+  if (evidence.effects?.length) return evidence.effects;
   const record = evidence.detail.record as Record<string, unknown>;
   const analysis = record.analysis;
   if (analysis === null || typeof analysis !== "object" || Array.isArray(analysis)) return [];

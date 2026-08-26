@@ -1,41 +1,29 @@
 evidence_id: EVD-000092
-type: institutional
-source:
-  source_id: SRC-0030
-  publisher: "Município de Évora"
-  title: "Plano Concelhio dos Cuidadores Informais de Évora — caregiver-proposed information access"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/Plano-Concelhio-Cuidadores-Informais_v4_Junho_2025-002_RELATORIO.pdf"
-  published_at: 2025-06
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0031"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "informal caregivers"
-domain:
-  - "SOC"
-  - "HEA"
+lineage_id: SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS
+provenance:
+  sources:
+    - SRC-0030
+  extracted_at: 2026-08-11
 observation:
-  summary: "Os próprios cuidadores propuseram um acesso centralizado, simplificado e multicanal à informação — presencial, virtual e telefónico; um manual ou fluxograma simplificado e centralizado; e lembretes para dispositivos móveis sobre prazos e novidades. O plano municipal já inclui ações para 2026-2027 destinadas a sistematizar e simplificar procedimentos e a publicar digitalmente informação para cuidadores, em linha com a resposta institucional registada na EVD-000044."
+  summary: Os cuidadores participantes no estudo propuseram acesso mais
+    centralizado, simplificado e multicanal à informação, incluindo atendimento
+    presencial, virtual e telefónico, um manual ou fluxograma simplificado e
+    centralizado e lembretes em dispositivos móveis sobre prazos e novidades.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - cuidadores informais participantes no estudo
+  temporal:
+    as_of: "2025"
+domains:
+  - SOC
+  - HEA
 evidence_nature: recommendation
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-B Round A (D2-B-SIG-04). CONFIRMS PRB-0007; INFORMATION-FRICTION, COORDINATION-FRICTION, EXISTING-SOLUTION-PLANNED. The navigation need is caregiver-originated, but a response is already being designed/implemented per EVD-000044 — D2 therefore frames the open question as whether the current implementation removes the friction, not as grounds for a new standalone portal/app hypothesis (docs/discovery/d2-execution-protocol.md D2-B boundary). No HYP-* created. Same SRC-0030 lineage as EVD-000089..EVD-000091; not an independent corroborating source."
-
-analysis:
-  related_problems:
-    - "PRB-0007"
-  contribution:
-    - "CONFIRMS"
-    - "PLANNED-SOLUTION"
-  friction_types:
-    - "INFORMATION"
-    - "COORDINATION"
-  lineage_id: "SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: non_authoritative
+inference_limits:
+  - As recomendações refletem participantes do estudo e não constituem uma
+    preferência representativa do conjunto dos cuidadores.
+  - A recomendação de um mecanismo de informação não demonstra a sua eficácia
+    nem que a informação seja a causa principal das dificuldades de acesso.

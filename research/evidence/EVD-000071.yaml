@@ -1,40 +1,26 @@
 evidence_id: EVD-000071
-type: institutional
-source:
-  source_id: SRC-0061
-  publisher: "Município de Évora"
-  title: "Comunicado - recolha de resíduos sólidos urbanos (disruption, February 2026)"
-  source_reference: "https://www.cm-evora.pt/comunicado-recolha-de-residuos-solidos-urbanos/"
-  published_at: 2026-02
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0062"
-  - "SRC-0053"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
+lineage_id: ENV-2026-02-RSU-DISRUPTION-COMMUNICADO
+provenance:
+  sources:
+    - SRC-0061
+  extracted_at: 2026-08-11
 observation:
-  summary: "O problema de higiene urbana e fiabilidade do serviço mantém-se fortemente sustentado após o Desafio do Estado Atual: em fevereiro de 2026 há evidência operacional direta de interrupção do serviço (indisponibilidade grave de veículos e atrasos na recolha); em julho/agosto de 2026 é documentada uma resposta municipal estrutural centrada na frota, pessoal, logística, modelos de recolha e monitorização."
+  summary: Em fevereiro de 2026, o Município comunicou uma perturbação na recolha
+    de resíduos urbanos associada a indisponibilidade grave de veículos e
+    atrasos na recolha.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residents
+  temporal:
+    as_of: 2026-02
+domains:
+  - ENV
+  - PUB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-06-B-E01. Interpretation: not merely a strategic-plan concern - a documented current service-reliability problem."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "OPERATIONAL"
-  lineage_id: "ENV-2026-02-RSU-DISRUPTION-COMMUNICADO"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - A perturbação de fevereiro de 2026 não estabelece a frequência histórica das
+    interrupções nem o estado do serviço após as medidas posteriores.

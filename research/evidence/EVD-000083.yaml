@@ -1,40 +1,29 @@
 evidence_id: EVD-000083
-type: press
-source:
-  source_id: SRC-0070
-  publisher: "Rádio Campanário"
-  title: "Rádio Campanário report: municipal €1.5M road-repair programme"
-  source_reference: "https://www.radiocampanario.com/evora-investe-15me-no-arranjo-de-estradas-queremos-rapidamente-tapar-o-maximo-de-buracos-vice-presidente/"
-  published_at: 2026-02
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0071"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-  - "drivers"
-domain:
-  - "URB"
-  - "MOB"
+provenance:
+  sources:
+    - SRC-0070
+    - SRC-0071
+  extracted_at: 2026-08-11
 observation:
-  summary: "A cobertura jornalística pública descreve um programa municipal de reparação avaliado em aproximadamente 1,5 milhões de euros e regista o reconhecimento pelo Município de que a degradação das vias não era atribuível apenas às condições meteorológicas e exigia manutenção ou requalificação."
+  summary: A cobertura jornalística pública descreve um programa municipal de
+    reparação avaliado em aproximadamente 1,5 milhões de euros e regista o
+    reconhecimento pelo Município de que a degradação das vias não era
+    atribuível apenas às condições meteorológicas e exigia manutenção ou
+    requalificação.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residents
+    - drivers
+  temporal:
+    as_of: 2026-02
+domains:
+  - URB
+  - MOB
 evidence_nature: claim
-strength: secondary
-personal_data:
-  present: false
-  retained: false
-notes: "D2-A Round A (D2-A-SIG-06). CONFIRMS EVD-000082/SRC-0069 blind-spot finding; CURRENT-STATE-UPDATE; LOW-DIGITAL-LEVERAGE. Independent of the petition as an institutional/operational response, although triggered in the same public debate. Materially strengthens the road-maintenance NEW-CANDIDATE while weakening any framing of it as primarily an information/software problem. Not promoted to a PRB. WU-D3-03: promoted to canonical PRB-0010; this record now supports PRB-0010 directly."
-
-analysis:
-  related_problems:
-    - "PRB-0010"
-  contribution:
-    - "CONFIRMS"
-    - "CURRENT-STATE-UPDATE"
-  friction_types:
-    - "PHYSICAL"
-  representativeness: "UNKNOWN"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: non_authoritative
+inference_limits:
+  - A cobertura jornalística não estabelece a execução ou eficácia do programa
+    de reparação nem mede diretamente o estado das vias.

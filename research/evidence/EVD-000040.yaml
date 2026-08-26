@@ -1,41 +1,30 @@
 evidence_id: EVD-000040
-type: institutional
-source:
-  source_id: SRC-0028
-  publisher: "Município de Évora / Rede Social"
-  title: "Plano de Ação do PDS 2025"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/03/PA-PDS-2025-final.pdf"
-  published_at: 2025-03
-  retrieved_at: 2026-08-10
-additional_sources:
-  - "SRC-0010"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "students"
-  - "job seekers"
-  - "vulnerable groups seeking employment"
-domain:
-  - "EMP"
-  - "EDU"
+lineage_id: SOC-2025-03-PA-PDS-2025
+provenance:
+  sources:
+    - SRC-0028
+    - SRC-0010
+  extracted_at: 2026-08-10
 observation:
-  summary: "As iniciativas atuais incluem medidas de empregabilidade e formação, iniciativas universitárias de integração no mercado de trabalho, envolvimento de empregadores, apoio ao empreendedorismo e programas relacionados com o emprego."
+  summary: As iniciativas atuais incluem medidas de empregabilidade e formação,
+    iniciativas universitárias de integração no mercado de trabalho,
+    envolvimento de empregadores, apoio ao empreendedorismo e programas
+    relacionados com o emprego.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - students
+    - job seekers
+    - vulnerable groups seeking employment
+  temporal:
+    as_of: "2025"
+domains:
+  - EMP
+  - EDU
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-04-A-E04. Interpretation: a future digital product cannot start from the assumption that no matching/support mechanisms exist."
-
-analysis:
-  related_problems:
-    - "PRB-0008"
-  contribution:
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "OTHER"
-  lineage_id: "SOC-2025-03-PA-PDS-2025"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - As iniciativas documentadas no plano de 2025 não devem ser tratadas como
+    comprovadamente operacionais ou eficazes em 2026 sem evidência adicional.

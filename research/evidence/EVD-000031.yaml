@@ -1,38 +1,29 @@
 evidence_id: EVD-000031
-type: institutional
-source:
-  source_id: SRC-0002
-  publisher: "Município de Évora / Rede Social"
-  title: "Plano de Desenvolvimento Social de Évora 2024-2027"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf"
-  published_at: 2024-01
-  retrieved_at: 2026-08-10
-additional_sources:
-  - "SRC-0029"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents seeking adequate/affordable housing"
-domain:
-  - "HOU"
-  - "SOC"
+provenance:
+  sources:
+    - SRC-0002
+    - SRC-0029
+  extracted_at: 2026-08-10
 observation:
-  summary: "Documentos locais de planeamento identificam preços elevados de compra e arrendamento, oferta insuficiente de habitação a preços comportáveis, de habitação social e de habitação a custos controlados, degradação habitacional e escassez de alojamento estudantil como obstáculos à fixação da população e ao acesso a habitação adequada."
+  summary: Documentos locais de planeamento identificam preços elevados de compra
+    e arrendamento, oferta insuficiente de habitação a preços comportáveis, de
+    habitação social e de habitação a custos controlados, degradação
+    habitacional e escassez de alojamento estudantil como obstáculos à fixação
+    da população e ao acesso a habitação adequada.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residents seeking adequate/affordable housing
+  temporal:
+    start: "2024"
+    end: "2025"
+domains:
+  - HOU
+  - SOC
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-03-A-E01. Housing affordability and supply are institutionally linked to population fixation."
-
-analysis:
-  related_problems:
-    - "PRB-0006"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "OTHER"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - As afirmações dos documentos de planeamento não quantificam a dimensão da
+    necessidade habitacional não satisfeita em 2026.

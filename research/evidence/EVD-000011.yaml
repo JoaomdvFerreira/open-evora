@@ -1,40 +1,34 @@
 evidence_id: EVD-000011
-type: institutional
-source:
-  source_id: SRC-0019
-  publisher: "Autoridade de Transportes do Alentejo Central / CIMAC"
-  title: "Avaliação Anual do Contrato de Serviço Público de Transporte de Passageiros do Alentejo Central"
-  source_reference: "https://www.cimac.pt/?listas_ficheiros=relatorio-avaliacao-anual-do-contrato-do-servico-publico-de-transporte-de-passageiros-do-alentejo-central"
-  published_at: 2026-03
-  retrieved_at: 2026-08-10
-geography:
-  level: intermunicipal
-  area: "Alentejo Central"
-population:
-  - "TPAC users"
-domain:
-  - "MOB"
-  - "ACC"
+lineage_id: MOB-2026-03-CIMAC-TPAC-ANNUAL-EVALUATION
+provenance:
+  sources:
+    - SRC-0019
+  extracted_at: 2026-08-10
 observation:
-  summary: "O conjunto de dados de comunicações de 2023-2025 regista 92 comunicações relativas a horários, 52 relativas às condições dos veículos, 24 a atrasos, 8 a paragens e números inferiores relativos a passes, bilhética, sobrelotação e alterações de linhas. O relatório afirma que 43% das comunicações estavam relacionadas com horários e que muitas diziam respeito a pedidos para criar ou sincronizar horários, e não a incumprimentos do serviço. A sua avaliação de satisfação de 2025 conclui que a experiência a bordo é mais positiva do que a experiência de espera e de acesso à informação."
+  summary: O conjunto de dados de comunicações de 2023-2025 regista 92
+    comunicações relativas a horários, 52 relativas às condições dos veículos,
+    24 a atrasos, 8 a paragens e números inferiores relativos a passes,
+    bilhética, sobrelotação e alterações de linhas. O relatório afirma que 43%
+    das comunicações estavam relacionadas com horários e que muitas diziam
+    respeito a pedidos para criar ou sincronizar horários, e não a
+    incumprimentos do serviço. A sua avaliação de satisfação de 2025 conclui que
+    a experiência a bordo é mais positiva do que a experiência de espera e de
+    acesso à informação.
+scope:
+  geography:
+    level: intermunicipal
+    area: Alentejo Central
+  populations:
+    - TPAC users
+  temporal:
+    as_of: "2025"
+domains:
+  - MOB
+  - ACC
 evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Boundary: this is intermunicipal evidence and should not be silently attributed to the urban TREVO network."
-
-analysis:
-  related_problems:
-    - "PRB-0001"
-    - "PRB-0002"
-  contribution:
-    - "CONFIRMS"
-    - "REFINES"
-  friction_types:
-    - "INFORMATION"
-    - "OPERATIONAL"
-  lineage_id: "MOB-2026-03-CIMAC-TPAC-ANNUAL-EVALUATION"
-  representativeness: "UNKNOWN"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - Os resultados referem-se ao serviço intermunicipal TPAC e não ao serviço
+    urbano TREVO.
+  - As reclamações e respostas do inquérito não estabelecem, por si só, a
+    prevalência de falhas em viagens específicas no Município de Évora.

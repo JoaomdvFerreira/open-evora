@@ -1,29 +1,31 @@
 evidence_id: EVD-000064
-type: institutional
-source:
-  source_id: SRC-0052
-  publisher: "Município de Évora"
-  title: "Municipal climate-risk communication"
-  source_reference: "https://www.cm-evora.pt/municipio-de-evora-sensibiliza-mais-novos-para-a-problematica-das-alteracoes-climaticas/"
-  published_at: 2025
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0051"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-  - "vulnerable populations"
-domain:
-  - "CLI"
-  - "MOB"
-  - "HEA"
+provenance:
+  sources:
+    - SRC-0052
+    - SRC-0051
+  extracted_at: 2026-08-11
 observation:
-  summary: "O calor e o stresse hídrico têm consequências diretas no quotidiano: o trabalho municipal sobre o clima relaciona o calor projetado com dificuldades nas deslocações a pé e de bicicleta e a diminuição da precipitação com pressão sobre a gestão da água."
+  summary: "O calor e o stresse hídrico têm consequências diretas no quotidiano: o
+    trabalho municipal sobre o clima relaciona o calor projetado com
+    dificuldades nas deslocações a pé e de bicicleta e a diminuição da
+    precipitação com pressão sobre a gestão da água."
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residents
+    - vulnerable populations
+  temporal:
+    status: unknown
+domains:
+  - CLI
+  - MOB
+  - HEA
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-06-A-E02. Interpretation: legitimate cross-domain links to mobility/health/public space/water exist, but software leverage over root causes is likely limited unless a specific information/coordination gap is found."
+claim_authority: authoritative
+inference_limits:
+  - A Observation descreve consequências projetadas e não outcomes observados no
+    período atual.
+  - A Source não permite, neste registo, fixar com segurança o horizonte
+    temporal específico das projeções.

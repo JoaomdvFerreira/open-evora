@@ -1,39 +1,42 @@
 evidence_id: EVD-000124
-type: institutional
-source:
-  source_id: SRC-0106
-  publisher: "CAPP / ISCSP / Universidade de Lisboa"
-  title: "Estudo sobre o Perfil do Cuidador Familiar/Informal da Pessoa Sénior em Portugal"
-  source_reference: "https://repositorio.ulisboa.pt/bitstreams/120f5040-e93f-4a6e-a28c-b8f1ed88e8c3/download"
-  published_at: 2021-07
-  retrieved_at: 2026-08-12
-geography:
-  level: regional
-  area: "Portugal, with NUTS II coverage including Alentejo; not Évora-specific"
-population:
-  - "family/informal caregivers of older people"
-domain:
-  - "SOC"
-  - "HEA"
+lineage_id: SOC-2021-CAPP-ISCSP-CAREGIVER-PROFILE-STUDY
+provenance:
+  sources:
+    - SRC-0106
+  extracted_at: 2026-08-12
 observation:
-  summary: "Num questionário de âmbito nacional a 400 cuidadores familiares/informais de pessoas idosas (incluindo 27 inquiridos no Alentejo), 280 (70,0 %) referiram não ter recebido informação nem formação para prestar cuidados. Nas recomendações, que permitiam respostas múltiplas, incluíram-se acesso mais fácil aos serviços públicos (284; 71,0 %), maior coordenação entre a família e os cuidados formais (231; 57,8 %) e tempos de espera mais curtos pelos serviços formais (229; 57,3 %); 248 (62,0 %) selecionaram a opção de um profissional de referência da saúde ou da segurança social capaz de mobilizar recursos, informar, encaminhar, aconselhar e acompanhar. As respostas abertas qualitativas, posteriormente codificadas, identificam também burocracia no acesso a serviços públicos ou prestações e falta de informação ou formação; contudo, as percentagens reportadas para essas categorias usam como denominador o subconjunto de 118 inquiridos com respostas abertas codificadas, e não a amostra total."
+  summary: Num questionário de âmbito nacional a 400 cuidadores
+    familiares/informais de pessoas idosas (incluindo 27 inquiridos no
+    Alentejo), 280 (70,0 %) referiram não ter recebido informação nem formação
+    para prestar cuidados. Nas recomendações, que permitiam respostas múltiplas,
+    incluíram-se acesso mais fácil aos serviços públicos (284; 71,0 %), maior
+    coordenação entre a família e os cuidados formais (231; 57,8 %) e tempos de
+    espera mais curtos pelos serviços formais (229; 57,3 %); 248 (62,0 %)
+    selecionaram a opção de um profissional de referência da saúde ou da
+    segurança social capaz de mobilizar recursos, informar, encaminhar,
+    aconselhar e acompanhar. As respostas abertas qualitativas, posteriormente
+    codificadas, identificam também burocracia no acesso a serviços públicos ou
+    prestações e falta de informação ou formação; contudo, as percentagens
+    reportadas para essas categorias usam como denominador o subconjunto de 118
+    inquiridos com respostas abertas codificadas, e não a amostra total.
+scope:
+  geography:
+    level: national
+    area: Portugal
+  populations:
+    - cuidadores familiares ou informais de pessoas idosas
+  temporal:
+    as_of: "2021"
+domains:
+  - SOC
+  - HEA
 evidence_nature: measurement
-strength: primary-non-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "RS-02B2. This independently and directionally corroborates the local PRB-0007 information/access/orientation/bureaucracy framing at broader Portuguese context, but does NOT establish prevalence, a first-contact journey, or service performance in Évora. The study explicitly used non-probability convenience sampling; its authors state results cannot be generalised to the population/universe. The report is from 2021 and is historical context, not a current municipal-state measurement. Multiple-response percentages are sample responses, not mutually exclusive needs. Open-response coded-category percentages must retain their 118-response denominator/context and must not be read as prevalence among all caregivers. It neither identifies an appropriate portal/app response nor establishes that information availability alone resolves support-navigation difficulty."
-analysis:
-  related_problems:
-    - "PRB-0007"
-  contribution:
-    - "CONFIRMS"
-    - "REFINES"
-  friction_types:
-    - "INFORMATION"
-    - "COORDINATION"
-    - "TRANSACTION"
-  lineage_id: "SOC-2021-CAPP-ISCSP-CAREGIVER-PROFILE-STUDY"
-  representativeness: "LIMITED"
-  verification: "VERIFIED"
-  temporal_relevance: "HISTORICAL"
+claim_authority: non_authoritative
+inference_limits:
+  - O estudo usa amostragem de conveniência não probabilística e os autores
+    indicam que os resultados não podem ser generalizados à população.
+  - Os 27 inquiridos do Alentejo não constituem Evidence específica de Évora.
+  - As percentagens de respostas múltiplas não representam categorias mutuamente
+    exclusivas e as categorias das respostas abertas usam um denominador de 118,
+    não 400.
+  - O estudo é histórico e não mede o desempenho atual dos serviços municipais.

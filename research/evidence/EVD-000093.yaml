@@ -1,37 +1,25 @@
 evidence_id: EVD-000093
-type: social
-source:
-  source_id: SRC-0078
-  publisher: "Public Facebook group (Évora community group)"
-  title: "Facebook group post — multi-day non-collection of waste"
-  source_reference: "https://www.facebook.com/groups/253148126144341/posts/1475627717229703/"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
+provenance:
+  sources:
+    - SRC-0078
+  extracted_at: 2026-08-11
 observation:
-  summary: "Uma publicação num grupo público de Facebook relata a não recolha de resíduos domésticos durante vários dias num local residencial em Évora, descrevendo resíduos acumulados ao longo de vários dias sem recolha."
+  summary: Uma publicação num grupo público de Facebook relata a não recolha de
+    resíduos domésticos durante vários dias num local residencial em Évora,
+    descrevendo resíduos acumulados ao longo de vários dias sem recolha.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residents
+  temporal:
+    status: unknown
+domains:
+  - ENV
+  - PUB
 evidence_nature: reported-experience
-strength: anecdotal
-personal_data:
-  present: false
-  retained: false
-notes: "D2-E Round A (E-01). CONFIRMS PRB-0009 with a direct lived/service signal alongside the existing institutional operational diagnosis (EVD-000065/EVD-000066/EVD-000071/EVD-000072). Representativeness UNKNOWN; one self-selected public-post signal, not corroborated frequency/prevalence."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "OPERATIONAL"
-  public_signal_class: "PS2"
-  representativeness: "UNKNOWN"
-  verification: "REPORTED"
-  temporal_relevance: "UNKNOWN"
+claim_authority: non_authoritative
+inference_limits:
+  - Trata-se de um único relato autosselecionado; a data factual da ocorrência e
+    a frequência do problema não estão estabelecidas.

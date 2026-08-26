@@ -32,7 +32,9 @@ function recordValue(value: unknown): Record<string, unknown> | null {
 }
 
 function stringValues(value: unknown): string[] {
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+  return Array.isArray(value)
+    ? value.map((item) => typeof item === "string" ? item : recordValue(item)?.evidence_id).filter((item): item is string => typeof item === "string")
+    : [];
 }
 
 /** `geography.area` (with `geography.level` as public-labelled context) — omitted entirely when either canonical part is absent, never inferred. */
@@ -633,10 +635,9 @@ function ProblemCurrentStateSection({ record }: { record: Record<string, unknown
  * the grouping is new; the card itself carries no ranking beyond the
  * already-authored contribution values.
  */
-function EvidenceCard({ detail, sources, onOpenGeneric }: EvidenceWithSources & { onOpenGeneric: (id: string) => void }) {
+function EvidenceCard({ detail, sources, effects = [], onOpenGeneric }: EvidenceWithSources & { onOpenGeneric: (id: string) => void }) {
   const evidenceRecord = detail.record as Record<string, unknown>;
-  const analysis = recordValue(evidenceRecord.analysis);
-  const contributions = stringValues(analysis?.contribution);
+  const contributions = effects.length > 0 ? effects : stringValues(recordValue(evidenceRecord.analysis)?.contribution);
   const observation = recordValue(evidenceRecord.observation);
   const observationSummary = observation ? fieldValue(observation, "summary") : null;
   const provenance = evidenceSourceLabel(evidenceRecord);
@@ -649,9 +650,9 @@ function EvidenceCard({ detail, sources, onOpenGeneric }: EvidenceWithSources & 
           onOpenGeneric={onOpenGeneric}
           suffix={fieldValue(evidenceRecord, "type") ? publicEnumLabel("type", fieldValue(evidenceRecord, "type")!) : undefined}
         />
-        <span className="evidence-item-contributions" aria-label="Contribuição canónica">
+        <span className="evidence-item-contributions" aria-label="Efeito canónico no Problema">
           {contributions.length > 0 ? (
-            contributions.map((value, index) => <ContributionChip key={`${value}-${index}`} value={value} />)
+            contributions.map((value, index) => <span key={`${value}-${index}`} className="contribution-chip">{value === "CONTRADICTS" ? "Contradiz" : value === "SUPPORTS" ? "Sustenta" : value === "REFINES" ? "Refina" : "Delimita"}</span>)
           ) : (
             <span className="field-empty">contribuição não registada.</span>
           )}

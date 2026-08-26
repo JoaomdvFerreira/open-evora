@@ -1,0 +1,26 @@
+evidence_id: EVD-000140
+provenance:
+  sources:
+    - SRC-0017
+  extracted_at: 2026-08-10
+observation:
+  summary: O diagnóstico subjacente ao relatório de mobilidade do PUE regista a
+    bicicleta como representando aproximadamente 0,5 % das deslocações dos
+    residentes no período analisado.
+scope:
+  geography:
+    level: city
+    area: Évora
+  temporal:
+    as_of: "2020"
+  populations:
+    - residentes de Évora
+domains:
+  - MOB
+  - URB
+evidence_nature: measurement
+claim_authority: authoritative
+inference_limits:
+  - O valor provém do diagnóstico subjacente ao PUE e não deve ser tratado como
+    uma medição de 2026.
+lineage_id: MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT

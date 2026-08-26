@@ -18,30 +18,18 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { analyzeCorpus, computeProblemAnalysis } from "./analyze.ts";
-import type { Distribution, ProblemAnalysis } from "./analyze.ts";
+import type { ProblemAnalysis } from "./analyze.ts";
 import { loadCorpusIndex } from "../core/corpus.ts";
 import { validateCorpusIndex } from "../validation/validate.ts";
 import type { CorpusIndex } from "../core/types.ts";
-
-function formatDistribution(entries: Distribution): string {
-  if (entries.length === 0) return "(none recorded)";
-  return entries.map(([k, n]) => `${k}=${n}`).join(", ");
-}
 
 function printProblemReport(report: ProblemAnalysis): void {
   const { prbId, prb } = report;
   console.log(`${prbId} — ${prb.title}`);
   console.log(`  status: ${prb.status} | validation_status: ${prb.validation_status}`);
   console.log(`  linked EVD: ${report.linkedEvdCount}`);
-  console.log(`  EVD with analysis metadata: ${report.evdWithAnalysisCount}/${report.linkedEvdCount}`);
   console.log(`  known unique lineage_id count: ${report.knownLineageCount}`);
   console.log(`  linked EVD with lineage unassessed: ${report.missingLineageCount}`);
-  console.log(`  contribution distribution: ${formatDistribution(report.contributionDistribution)}`);
-  console.log(`  friction_types distribution: ${formatDistribution(report.frictionTypeDistribution)}`);
-  console.log(`  verification distribution: ${formatDistribution(report.verificationDistribution)}`);
-  console.log(`  temporal_relevance distribution: ${formatDistribution(report.temporalRelevanceDistribution)}`);
-  console.log(`  representativeness distribution: ${formatDistribution(report.representativenessDistribution)}`);
-  console.log(`  public_signal_class distribution: ${formatDistribution(report.publicSignalClassDistribution)}`);
 }
 
 function runAll(index: CorpusIndex): void {
@@ -53,7 +41,7 @@ function runAll(index: CorpusIndex): void {
   for (const prbId of result.problemIds) {
     const report = result.problems.get(prbId)!;
     console.log(
-      `${prbId} | status=${report.prb.status} | linked_evd=${report.linkedEvdCount} | evd_with_analysis=${report.evdWithAnalysisCount}/${report.linkedEvdCount}`
+      `${prbId} | status=${report.prb.status} | linked_evd=${report.linkedEvdCount} | lineage_known=${report.knownLineageCount}`
     );
   }
 }

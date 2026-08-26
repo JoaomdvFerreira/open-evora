@@ -1,60 +1,195 @@
 problem_id: PRB-0007
-title: "Os cuidadores informais em Évora enfrentam dificuldades no acesso a apoios, incluindo necessidades de informação e orientação"
+title: Os cuidadores informais em Évora enfrentam dificuldades no acesso a
+  apoios, incluindo necessidades de informação e orientação
 domain:
-  - "SOC"
-  - "HEA"
+  - SOC
+  - HEA
 geography:
   level: municipality
-  area: "Évora"
+  area: Évora
 affected_populations:
-  - "cuidadores informais"
-  - "pessoas cuidadas"
-problem_statement: "Os cuidadores informais em Évora têm necessidades documentadas de informação que abrangem saúde, mobilidade, estruturas de apoio e apoio financeiro e social. Um estudo com 68 cuidadores e 89 pessoas cuidadas, integrado no Plano Concelhio dos Cuidadores Informais, apurou que 35% das pessoas cuidadas não utilizavam qualquer serviço formal de apoio — um resultado específico dessa amostra, que não pode ser generalizado ao conjunto dos cuidadores de Évora.\n\nMaterial de grupos focais do mesmo plano identifica, numa amostra distinta, a burocracia e a dificuldade em compreender os direitos dos cuidadores como uma fonte de sobrecarga separada da sobrecarga geral associada ao ato de cuidar. A evidência atual não estabelece uma relação causal entre estas dificuldades de informação e orientação e a não utilização de apoio formal reportada no estudo com 68 cuidadores e 89 pessoas cuidadas.\n\nUm terceiro inquérito, realizado junto de 133 cuidadores, indica que as necessidades de apoio direto no cuidar, descanso, apoio financeiro e apoio psicológico são reportadas com maior frequência do que as necessidades relacionadas com orientação. Estas permanecem, por isso, explicações alternativas e possivelmente mais prevalentes para as dificuldades de acesso a apoios, apesar de Évora dispor de uma densa rede interinstitucional de apoio social (CLASE/Rede Social)."
+  - cuidadores informais
+  - pessoas cuidadas
+problem_statement: >-
+  Os cuidadores informais em Évora têm necessidades documentadas de informação
+  que abrangem saúde, mobilidade, estruturas de apoio e apoio financeiro e
+  social. Um estudo com 68 cuidadores e 89 pessoas cuidadas, integrado no Plano
+  Concelhio dos Cuidadores Informais, apurou que 35% das pessoas cuidadas não
+  utilizavam qualquer serviço formal de apoio — um resultado específico dessa
+  amostra, que não pode ser generalizado ao conjunto dos cuidadores de Évora.
+
+
+  Material de grupos focais do mesmo plano identifica, numa amostra distinta, a
+  burocracia e a dificuldade em compreender os direitos dos cuidadores como uma
+  fonte de sobrecarga separada da sobrecarga geral associada ao ato de cuidar. A
+  evidência atual não estabelece uma relação causal entre estas dificuldades de
+  informação e orientação e a não utilização de apoio formal reportada no estudo
+  com 68 cuidadores e 89 pessoas cuidadas.
+
+
+  Um terceiro inquérito, realizado junto de 133 cuidadores, indica que as
+  necessidades de apoio direto no cuidar, descanso, apoio financeiro e apoio
+  psicológico são reportadas com maior frequência do que as necessidades
+  relacionadas com orientação. Estas permanecem, por isso, explicações
+  alternativas e possivelmente mais prevalentes para as dificuldades de acesso a
+  apoios, apesar de Évora dispor de uma densa rede interinstitucional de apoio
+  social (CLASE/Rede Social).
 investigation:
   open_questions:
-    - question: "Os cuidadores conhecem o Cantinho do Cuidador e outros serviços já existentes, e as medidas de criação de um manual e de sistematização das respostas previstas no plano 2026-2027 estão a ser executadas e são eficazes?"
-      why_open: "O plano municipal 2026-2027 — que prevê um manual, a sistematização das respostas, procedimentos simplificados e publicação digital — procura responder explicitamente às dificuldades de informação e orientação descritas neste problema, mas a execução e eficácia dessas medidas ainda não foram verificadas."
-      resolution_condition: "Validação junto das partes interessadas sobre o conhecimento dos serviços existentes e sobre a execução e eficácia das medidas previstas no plano 2026-2027."
+    - question: Os cuidadores conhecem o Cantinho do Cuidador e outros serviços já
+        existentes, e as medidas de criação de um manual e de sistematização das
+        respostas previstas no plano 2026-2027 estão a ser executadas e são
+        eficazes?
+      why_open: O plano municipal 2026-2027 — que prevê um manual, a sistematização
+        das respostas, procedimentos simplificados e publicação digital —
+        procura responder explicitamente às dificuldades de informação e
+        orientação descritas neste problema, mas a execução e eficácia dessas
+        medidas ainda não foram verificadas.
+      resolution_condition: Validação junto das partes interessadas sobre o
+        conhecimento dos serviços existentes e sobre a execução e eficácia das
+        medidas previstas no plano 2026-2027.
       evidence:
-        - "EVD-000044"
-        - "EVD-000045"
-    - question: "A burocracia e a dificuldade em compreender os direitos dos cuidadores, identificadas em grupos focais, explicam a não utilização de apoio formal reportada no estudo com 68 cuidadores e 89 pessoas cuidadas?"
-      why_open: "Os dois resultados provêm de amostras distintas dentro do mesmo Plano Concelhio dos Cuidadores Informais e da mesma fonte (SRC-0030). A evidência atual não estabelece uma relação causal entre as dificuldades de informação e orientação e a não utilização de apoio formal.\n\nAlém disso, um terceiro inquérito realizado junto de 133 cuidadores indica que as necessidades de apoio direto no cuidar, descanso, apoio financeiro e apoio psicológico são reportadas com maior frequência do que as necessidades de orientação, pelo que permanecem explicações alternativas e possivelmente mais prevalentes."
-      resolution_condition: "Evidência que relacione diretamente as dificuldades de informação e orientação com a não utilização de apoio formal ou que permita estabelecer a importância relativa das diferentes explicações."
+        - EVD-000044
+        - EVD-000045
+    - question: A burocracia e a dificuldade em compreender os direitos dos
+        cuidadores, identificadas em grupos focais, explicam a não utilização de
+        apoio formal reportada no estudo com 68 cuidadores e 89 pessoas
+        cuidadas?
+      why_open: >-
+        Os dois resultados provêm de amostras distintas dentro do mesmo Plano
+        Concelhio dos Cuidadores Informais e da mesma fonte (SRC-0030). A
+        evidência atual não estabelece uma relação causal entre as dificuldades
+        de informação e orientação e a não utilização de apoio formal.
+
+
+        Além disso, um terceiro inquérito realizado junto de 133 cuidadores
+        indica que as necessidades de apoio direto no cuidar, descanso, apoio
+        financeiro e apoio psicológico são reportadas com maior frequência do
+        que as necessidades de orientação, pelo que permanecem explicações
+        alternativas e possivelmente mais prevalentes.
+      resolution_condition: Evidência que relacione diretamente as dificuldades de
+        informação e orientação com a não utilização de apoio formal ou que
+        permita estabelecer a importância relativa das diferentes explicações.
       evidence:
-        - "EVD-000089"
-        - "EVD-000090"
-        - "EVD-000091"
+        - EVD-000143
+        - EVD-000090
+        - EVD-000091
   path:
     initial_signal:
-      summary: "Foram identificadas necessidades de informação dos cuidadores informais em Évora, abrangendo saúde, mobilidade, estruturas de apoio e apoio financeiro e social, apesar de Évora dispor de uma densa rede interinstitucional de apoio social — CLASE/Rede Social, com cerca de 120 instituições."
+      summary: Foram identificadas necessidades de informação dos cuidadores informais
+        em Évora, abrangendo saúde, mobilidade, estruturas de apoio e apoio
+        financeiro e social, apesar de Évora dispor de uma densa rede
+        interinstitucional de apoio social — CLASE/Rede Social, com cerca de 120
+        instituições.
       evidence:
-        - "EVD-000034"
-        - "EVD-000036"
+        - EVD-000034
+        - EVD-000036
     development:
-      summary: "Foi confirmado que a Câmara Municipal reconhece oficialmente 262 pessoas com estatuto de cuidador informal, em janeiro de 2026, e está a implementar um plano para cuidadores para 2026-2027 que procura responder às dificuldades de informação e orientação. Já existem também serviços dirigidos aos cuidadores — UCC, Cantinho do Cuidador e VIVAMENTE.\n\nA evidência disponível afasta, por isso, uma leitura de ausência de serviços e mantém em aberto questões relacionadas com o conhecimento das respostas existentes, a orientação e a coordenação entre apoios."
+      summary: >-
+        Foi confirmado que a Câmara Municipal reconhece oficialmente 262 pessoas
+        com estatuto de cuidador informal, em janeiro de 2026, e está a
+        implementar um plano para cuidadores para 2026-2027 que procura
+        responder às dificuldades de informação e orientação. Já existem também
+        serviços dirigidos aos cuidadores — UCC, Cantinho do Cuidador e
+        VIVAMENTE.
+
+
+        A evidência disponível afasta, por isso, uma leitura de ausência de
+        serviços e mantém em aberto questões relacionadas com o conhecimento das
+        respostas existentes, a orientação e a coordenação entre apoios.
       evidence:
-        - "EVD-000044"
-        - "EVD-000045"
+        - EVD-000044
+        - EVD-000146
+        - EVD-000045
     delimitation:
-      summary: "Um estudo com 68 cuidadores e 89 pessoas cuidadas apurou que 35% das pessoas cuidadas não utilizavam qualquer serviço formal de apoio. Material de grupos focais, relativo a uma amostra distinta, identificou a burocracia e a dificuldade em compreender os direitos como dificuldades separadas da sobrecarga geral associada ao ato de cuidar.\n\nUm terceiro inquérito realizado junto de 133 cuidadores delimitou adicionalmente o problema: as necessidades de apoio direto no cuidar, descanso, apoio financeiro e apoio psicológico são reportadas com maior frequência do que as necessidades de orientação. O problema não deve, por isso, ser reduzido a uma questão de descoberta de informação.\n\nAs preocupações relativas à saúde mental e à capacidade de resposta permanecem distintas deste problema e não são absorvidas por ele."
+      summary: >-
+        Um estudo com 68 cuidadores e 89 pessoas cuidadas apurou que 35% das
+        pessoas cuidadas não utilizavam qualquer serviço formal de apoio.
+        Material de grupos focais, relativo a uma amostra distinta, identificou
+        a burocracia e a dificuldade em compreender os direitos como
+        dificuldades separadas da sobrecarga geral associada ao ato de cuidar.
+
+
+        Um terceiro inquérito realizado junto de 133 cuidadores delimitou
+        adicionalmente o problema: as necessidades de apoio direto no cuidar,
+        descanso, apoio financeiro e apoio psicológico são reportadas com maior
+        frequência do que as necessidades de orientação. O problema não deve,
+        por isso, ser reduzido a uma questão de descoberta de informação.
+
+
+        As preocupações relativas à saúde mental e à capacidade de resposta
+        permanecem distintas deste problema e não são absorvidas por ele.
       evidence:
-        - "EVD-000089"
-        - "EVD-000090"
-        - "EVD-000091"
-        - "EVD-000035"
-        - "EVD-000046"
+        - EVD-000143
+        - EVD-000090
+        - EVD-000091
+        - EVD-000035
+        - EVD-000046
 evidence:
-  - "EVD-000034"
-  - "EVD-000035"
-  - "EVD-000036"
-  - "EVD-000044"
-  - "EVD-000045"
-  - "EVD-000046"
-  - "EVD-000089"
-  - "EVD-000090"
-  - "EVD-000091"
-  - "EVD-000124"
+  - evidence_id: EVD-000034
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000143
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000035
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000036
+    effects:
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000044
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000146
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000045
+    effects:
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000046
+    effects:
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000090
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000091
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000124
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - CONTEXTUAL
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed

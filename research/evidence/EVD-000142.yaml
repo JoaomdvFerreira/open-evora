@@ -1,0 +1,27 @@
+evidence_id: EVD-000142
+provenance:
+  sources:
+    - SRC-0017
+  extracted_at: 2026-08-10
+observation:
+  summary: O relatório de mobilidade do PUE recomenda que a distribuição
+    territorial da oferta de estacionamento, as condições de acesso e as tarifas
+    sejam imediatamente compreensíveis para os utilizadores.
+scope:
+  geography:
+    level: city
+    area: Évora
+  temporal:
+    status: unknown
+  populations:
+    - utilizadores de estacionamento
+domains:
+  - MOB
+  - URB
+evidence_nature: recommendation
+claim_authority: authoritative
+inference_limits:
+  - A recomendação de legibilidade da política de estacionamento não estabelece
+    que essa necessidade permaneça por satisfazer nem que uma aplicação seja a
+    resposta adequada.
+lineage_id: MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT

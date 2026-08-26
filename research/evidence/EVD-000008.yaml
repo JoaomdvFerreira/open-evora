@@ -1,41 +1,29 @@
 evidence_id: EVD-000008
-type: institutional
-source:
-  source_id: SRC-0017
-  publisher: "Município de Évora"
-  title: "PUE Sector Report: Mobilidade"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-6_Mobilidade.pdf"
-  published_at: 2025-02
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "city / Historic Centre"
-population:
-  - "residents"
-  - "drivers"
-  - "pedestrians"
-domain:
-  - "MOB"
-  - "URB"
+lineage_id: MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT
+provenance:
+  sources:
+    - SRC-0017
+  extracted_at: 2026-08-10
 observation:
-  summary: "O diagnóstico de mobilidade do PUE identifica pressão de estacionamento em partes da cidade, estacionamento abusivo/ilegal e falta de uma lógica coerente na política de estacionamento. Defende especificamente que a distribuição territorial da oferta, as condições de acesso e as tarifas devem ser imediatamente compreensíveis para os utilizadores."
+  summary: O diagnóstico de mobilidade do PUE identifica pressão de estacionamento
+    em partes da cidade, estacionamento abusivo ou ilegal e falta de uma lógica
+    coerente na política de estacionamento.
+scope:
+  geography:
+    level: city
+    area: city / Historic Centre
+  populations:
+    - residents
+    - drivers
+    - pedestrians
+  temporal:
+    status: unknown
+domains:
+  - MOB
+  - URB
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Important boundary: this does not establish that a new parking application is needed. Existing municipal parking systems must be assessed later under Existing Solutions & Gap Analysis."
-
-analysis:
-  related_problems:
-    - "PRB-0005"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "PHYSICAL"
-    - "REGULATORY"
-    - "INFORMATION"
-  lineage_id: "MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - O diagnóstico institucional não quantifica a prevalência nem a severidade
+    das situações de pressão ou estacionamento ilegal e não demonstra que uma
+    nova aplicação seja necessária.

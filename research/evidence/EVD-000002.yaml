@@ -1,38 +1,32 @@
 evidence_id: EVD-000002
-type: institutional
-source:
-  source_id: SRC-0018
-  publisher: "Município de Évora"
-  title: "Relatório Anual de Atividade da Autoridade de Transportes - Município de Évora 2026"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2026/07/Relatorio-anual-de-Autoridade-de-Transportes-CME-2026.pdf"
-  published_at: 2026-07
-  retrieved_at: 2026-08-10
-geography:
-  level: municipality
-  area: "city / municipality"
-population:
-  - "urban public-transport users"
-  - "residents of lower-demand settlements"
-domain:
-  - "MOB"
+lineage_id: MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT
+provenance:
+  sources:
+    - SRC-0018
+  extracted_at: 2026-08-10
 observation:
-  summary: "O relatório de 2026 da autoridade municipal de transportes afirma que a rede urbana cobre praticamente toda a zona urbana de Évora durante o dia, mas reduz a oferta de serviço à noite, aos fins de semana e nos feriados. Desde 2023, várias localidades de baixa procura passaram do serviço de linhas fixas para transporte público flexível baseado em táxi. A rede urbana é composta por 11 linhas urbanas regulares e duas linhas da Linha Azul."
+  summary: O relatório de 2026 da Autoridade de Transportes municipal indica que a
+    rede urbana cobre praticamente toda a zona urbana de Évora durante o dia,
+    reduzindo a oferta à noite, aos fins de semana e nos feriados. Desde 2023,
+    as localidades de baixa procura de Chainha Berlim, Santo Antónico, Barraca
+    de Pau e Garraia passaram a dispor de transporte público flexível baseado em
+    táxi em substituição de linhas fixas. A rede urbana integra 11 linhas
+    urbanas regulares e duas linhas da Linha Azul.
+scope:
+  geography:
+    level: municipality
+    area: city / municipality
+  populations:
+    - urban public-transport users
+    - residents of lower-demand settlements
+  temporal:
+    as_of: "2025"
+domains:
+  - MOB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: ""
-
-analysis:
-  related_problems:
-    - "PRB-0001"
-  contribution:
-    - "REFINES"
-    - "CURRENT-STATE-UPDATE"
-  friction_types:
-    - "OPERATIONAL"
-  lineage_id: "MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT"
-  representativeness: "DESIGNED_REPRESENTATIVE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A cobertura diurna ampla e o transporte flexível não estabelecem a adequação
+    prática do serviço em todas as linhas, horários ou deslocações.
+  - A existência do transporte flexível não demonstra a sua eficácia ou
+    conveniência para todos os residentes das localidades abrangidas.

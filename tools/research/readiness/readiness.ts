@@ -205,7 +205,7 @@ export function evaluateEligibility(prbId: string, index: CorpusIndex): Eligibil
     return { result: REVIEW_REQUIRED, reasons: findings };
   }
 
-  const prbEvidence = new Set(asList(prb.evidence).filter(isNonEmptyString) as string[]);
+  const prbEvidence = new Set(asList(prb.evidence).map((entry) => entry && typeof entry === "object" && !Array.isArray(entry) ? (entry as Record<string, unknown>).evidence_id : undefined).filter(isNonEmptyString) as string[]);
 
   if (!isNonEmptyString(db.contract_version)) {
     findings.push({ code: "MISSING_CONTRACT_VERSION", field: "decision_basis.contract_version" });
@@ -417,7 +417,7 @@ export function evaluateCorroboration(prbId: string, index: CorpusIndex): Corrob
     return { result: REVIEW_REQUIRED, reasons: findings };
   }
 
-  const prbEvidence = new Set(asList(prb.evidence).filter(isNonEmptyString) as string[]);
+  const prbEvidence = new Set(asList(prb.evidence).map((entry) => entry && typeof entry === "object" && !Array.isArray(entry) ? (entry as Record<string, unknown>).evidence_id : undefined).filter(isNonEmptyString) as string[]);
 
   if (!isNonEmptyString(db.contract_version)) {
     findings.push({ code: "MISSING_CONTRACT_VERSION", field: "decision_basis.contract_version" });
@@ -529,7 +529,7 @@ export function evaluateCorroboration(prbId: string, index: CorpusIndex): Corrob
  * structurally inspectable for the cited supporting evidence: every valid,
  * PRB-linked supporting_evidence ID must resolve to an EVD-* record that
  * exists (already true by this point) and, when it carries an analysis
- * block, that analysis.lineage_id is either absent (UNASSESSED —
+ * record, that lineage_id is either absent (UNASSESSED —
  * explicitly allowed) or a non-empty string — never a malformed/empty-
  * string placeholder that would silently break lineage-based counting.
  * This never infers or asserts independence itself.
@@ -542,14 +542,12 @@ function checkLineageStructurallyAvailable(
   for (const evdId of supportingEvidenceIds) {
     const evd = evidenceById.get(evdId);
     if (!evd) continue; // already reported as UNKNOWN_EVIDENCE_REFERENCE
-    const analysis = evd.analysis as Record<string, unknown> | undefined;
-    if (!analysis) continue;
-    const lineageId = analysis.lineage_id;
+    const lineageId = evd.lineage_id;
     if (lineageId !== undefined && lineageId !== null && !isNonEmptyString(lineageId)) {
       findings.push({
         code: "LINEAGE_REQUIREMENT_NOT_STRUCTURALLY_AVAILABLE",
         field: "decision_basis.supporting_evidence",
-        detail: `${evdId}.analysis.lineage_id is present but empty/whitespace-only`,
+        detail: `${evdId}.lineage_id is present but empty/whitespace-only`,
       });
     }
   }

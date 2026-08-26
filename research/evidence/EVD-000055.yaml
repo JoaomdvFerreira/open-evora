@@ -1,30 +1,31 @@
 evidence_id: EVD-000055
-type: institutional
-source:
-  source_id: SRC-0044
-  publisher: "Évora 2027"
-  title: "Évora 2027 — programação, participação e território"
-  source_reference: "https://www.evora2027.com/participacao-e-territorio"
-  published_at: 2026
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0045"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "schools and students"
-  - "community and resident associations"
-  - "cultural and sports associations"
-  - "multicultural communities"
-domain:
-  - "CUL"
-  - "SOC"
+provenance:
+  sources:
+    - SRC-0115
+    - SRC-0045
+  extracted_at: 2026-08-11
 observation:
-  summary: "Os mecanismos de participação comunitária estão a ser ativamente alargados em 2026. Évora 2027 dispõe de mecanismos ativos que envolvem escolas, associações, comunidades e cocriação intersetorial, incluindo a convocatória de participação comunitária “A Nossa Vez”, que incentiva explicitamente jovens, comunidades multiculturais, associações culturais/desportivas/de moradores e centros sociais a cocriar."
+  summary: Évora 2027 mantém mecanismos de participação e cocriação com escolas,
+    associações e comunidades no Alentejo; a convocatória «A Nossa Vez» convida
+    explicitamente jovens, comunidades multiculturais, associações culturais,
+    desportivas e de moradores e centros sociais a participar na cocriação.
+scope:
+  geography:
+    level: regional
+    area: Alentejo
+  populations:
+    - schools and students
+    - community and resident associations
+    - cultural and sports associations
+    - multicultural communities
+  temporal:
+    as_of: "2026"
+domains:
+  - CUL
+  - SOC
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-05-A-E04. Interpretation: any civic-participation product hypothesis must account for these existing mechanisms rather than duplicate them."
+claim_authority: authoritative
+inference_limits:
+  - A existência de mecanismos de participação não estabelece alcance,
+    representatividade, participação efetiva ou qualidade da inclusão dos
+    diferentes grupos.

@@ -1,36 +1,25 @@
 evidence_id: EVD-000095
-type: institutional
-source:
-  source_id: SRC-0080
-  publisher: "Município de Évora"
-  title: "Municipal waste-collection normalisation update (May 2026)"
-  source_reference: "https://www.cm-evora.pt/municipio-de-evora-reforca-meios-para-normalizar-recolha-de-residuos-no-concelho/"
-  published_at: 2026-05
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0061"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
+provenance:
+  sources:
+    - SRC-0080
+  extracted_at: 2026-08-11
 observation:
-  summary: "Em maio de 2026, o Município referiu a entrada em serviço de quatro veículos de recolha como parte de uma etapa de normalização da recolha de resíduos, após a aquisição de veículos anunciada durante a interrupção de fevereiro de 2026 (SRC-0061) e antes do posterior reforço da frota para 19 veículos referido em julho (SRC-0055)."
+  summary: Em maio de 2026, o Município comunicou a entrada em serviço de quatro
+    veículos de recolha de resíduos como parte de uma etapa de normalização do
+    serviço.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residents
+  temporal:
+    as_of: 2026-05
+domains:
+  - ENV
+  - PUB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-E Round A (E-04). CURRENT-STATE-UPDATE. Fills a material temporal gap between the February collapse and the July/August 19-vehicle state; recorded as a fleet-recovery progression step, not proof that service reliability was restored — see PRB-0009's preserved current-state correction."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "CURRENT-STATE-UPDATE"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A entrada em serviço de quatro veículos não estabelece que a fiabilidade da
+    recolha tenha sido restaurada nem que a capacidade da frota seja suficiente.

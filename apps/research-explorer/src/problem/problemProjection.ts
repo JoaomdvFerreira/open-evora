@@ -18,6 +18,8 @@ import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/
 export interface EvidenceWithSources {
   detail: RecordDetail;
   sources: RecordDetail[];
+  effects?: string[];
+  researchRoles?: string[];
 }
 
 export interface ProblemProjection {
@@ -60,11 +62,17 @@ export async function loadProblemProjection(
 
   const evidenceDetails = await Promise.all(evidenceIds.map((id) => provider.getRecord(id)));
 
+  const relationships = new Map(
+    (Array.isArray(problem.record.evidence) ? problem.record.evidence : [])
+      .filter((entry): entry is Record<string, unknown> => !!entry && typeof entry === "object" && !Array.isArray(entry))
+      .map((entry) => [entry.evidence_id, { effects: Array.isArray(entry.effects) ? entry.effects.filter((v): v is string => typeof v === "string") : [], researchRoles: Array.isArray(entry.research_roles) ? entry.research_roles.filter((v): v is string => typeof v === "string") : [] }])
+  );
   const evidence = await Promise.all(
     evidenceDetails.map(async (evidenceDetail): Promise<EvidenceWithSources> => {
       const sourceIds = outgoingIdsByType(evidenceDetail, "SRC-", lookup);
       const sources = await Promise.all(sourceIds.map((id) => provider.getRecord(id)));
-      return { detail: evidenceDetail, sources };
+      const relationship = relationships.get(evidenceDetail.id) ?? { effects: [], researchRoles: [] };
+      return { detail: evidenceDetail, sources, ...relationship };
     })
   );
 

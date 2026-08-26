@@ -1,34 +1,26 @@
 evidence_id: EVD-000027
-type: institutional
-source:
-  source_id: SRC-0019
-  publisher: "Autoridade de Transportes do Alentejo Central / CIMAC"
-  title: "Avaliação Anual do Contrato de Serviço Público de Transporte de Passageiros do Alentejo Central"
-  source_reference: "https://www.cimac.pt/?listas_ficheiros=relatorio-avaliacao-anual-do-contrato-do-servico-publico-de-transporte-de-passageiros-do-alentejo-central"
-  published_at: 2026-03
-  retrieved_at: 2026-08-10
-geography:
-  level: intermunicipal
-  area: "Município de Évora (TPAC/TPF coverage figure)"
-population:
-  - "population served by TPAC/TPF"
-domain:
-  - "MOB"
+lineage_id: MOB-2026-03-CIMAC-TPAC-ANNUAL-EVALUATION
+provenance:
+  sources:
+    - SRC-0019
+  extracted_at: 2026-08-10
 observation:
-  summary: "A ATAC refere que os serviços TPAC/TPF cobrem 94% da população do município de Évora, tanto em períodos escolares como não escolares. O cálculo exclui explicitamente o serviço distinto de transportes urbanos de Évora."
+  summary: A ATAC refere que os serviços TPAC/TPF cobrem 94% da população do
+    município de Évora, tanto em períodos escolares como não escolares. O
+    cálculo exclui explicitamente o serviço distinto de transportes urbanos de
+    Évora.
+scope:
+  geography:
+    level: intermunicipal
+    area: Município de Évora (TPAC/TPF coverage figure)
+  populations:
+    - population served by TPAC/TPF
+  temporal:
+    as_of: "2025"
+domains:
+  - MOB
 evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "This weakens a broad 'Évora lacks public transport coverage' claim while leaving frequency, schedule alignment, low-demand journeys and lived practicality open for validation."
-
-analysis:
-  related_problems:
-    - "PRB-0001"
-  contribution:
-    - "REFINES"
-  lineage_id: "MOB-2026-03-CIMAC-TPAC-ANNUAL-EVALUATION"
-  representativeness: "DESIGNED_REPRESENTATIVE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - O cálculo exclui o serviço urbano TREVO e a cobertura populacional não
+    estabelece frequência, qualidade ou utilidade prática das ligações.

@@ -1,136 +1,462 @@
 problem_id: PRB-0009
-title: "Fiabilidade e qualidade dos serviços de higiene urbana e de recolha de resíduos"
+title: Fiabilidade e qualidade dos serviços de higiene urbana e de recolha de resíduos
 domain:
-  - "ENV"
-  - "PUB"
+  - ENV
+  - PUB
 geography:
   level: municipality
-  area: "Évora"
+  area: Évora
 affected_populations:
-  - "residentes"
-  - "juntas de freguesia urbanas"
-problem_statement: "A fiabilidade dos serviços de recolha de resíduos sólidos urbanos e de higiene urbana constitui um problema cívico atual reconhecido institucionalmente: o Município documentou uma interrupção do serviço de recolha em fevereiro de 2026, causada por avarias numa frota envelhecida, e, em julho-agosto de 2026, o Presidente da Câmara e o Município identificaram publicamente a higiene urbana como um dos desafios mais urgentes da gestão municipal, avançando com uma reestruturação substancial da frota, dos recursos humanos, dos modelos de recolha, da distribuição de responsabilidades e da monitorização, ao mesmo tempo que reconheceram explicitamente que persistem dificuldades em algumas zonas."
-causal_reading: "A causa dominante é sobretudo operacional e de capacidade — frota envelhecida ou avariada, capacidade insuficiente de veículos de reserva, pessoal e logística, organização das rotas e do serviço de recolha e distribuição de responsabilidades entre entidades, incluindo Município, Gesamb e juntas de freguesia. Esta leitura não está validada; o potencial de intervenção digital sobre este mecanismo dominante é avaliado como baixo, embora possam existir oportunidades mais estreitas relacionadas com transparência, coordenação e informação, distintas do mecanismo operacional dominante."
+  - residentes
+  - juntas de freguesia urbanas
+problem_statement: "A fiabilidade dos serviços de recolha de resíduos sólidos
+  urbanos e de higiene urbana constitui um problema cívico atual reconhecido
+  institucionalmente: o Município documentou uma interrupção do serviço de
+  recolha em fevereiro de 2026, causada por avarias numa frota envelhecida, e,
+  em julho-agosto de 2026, o Presidente da Câmara e o Município identificaram
+  publicamente a higiene urbana como um dos desafios mais urgentes da gestão
+  municipal, avançando com uma reestruturação substancial da frota, dos recursos
+  humanos, dos modelos de recolha, da distribuição de responsabilidades e da
+  monitorização, ao mesmo tempo que reconheceram explicitamente que persistem
+  dificuldades em algumas zonas."
+causal_reading: A causa dominante é sobretudo operacional e de capacidade —
+  frota envelhecida ou avariada, capacidade insuficiente de veículos de reserva,
+  pessoal e logística, organização das rotas e do serviço de recolha e
+  distribuição de responsabilidades entre entidades, incluindo Município, Gesamb
+  e juntas de freguesia. Esta leitura não está validada; o potencial de
+  intervenção digital sobre este mecanismo dominante é avaliado como baixo,
+  embora possam existir oportunidades mais estreitas relacionadas com
+  transparência, coordenação e informação, distintas do mecanismo operacional
+  dominante.
 investigation:
   open_questions:
-    - question: "Qual é o desempenho operacional atual do serviço de higiene urbana e recolha de resíduos em Évora — tempos de resolução, atrasos e recolhas falhadas — após agosto de 2026?"
-      why_open: "Não foi localizado nenhum conjunto de dados operacional público sobre tempos de resolução, atrasos, recolhas falhadas ou qualidade do encaminhamento. A verificação de sinais públicos posteriores a julho não encontrou um sinal comparável de colapso da recolha à escala da cidade, mas este resultado traduz apenas o limite da pesquisa realizada e não constitui prova de que o serviço seja atualmente fiável."
-      resolution_condition: "Dados operacionais públicos posteriores a agosto de 2026 que permitam estabelecer o desempenho atual do serviço em Évora."
+    - question: Qual é o desempenho operacional atual do serviço de higiene urbana e
+        recolha de resíduos em Évora — tempos de resolução, atrasos e recolhas
+        falhadas — após agosto de 2026?
+      why_open: Não foi localizado nenhum conjunto de dados operacional público sobre
+        tempos de resolução, atrasos, recolhas falhadas ou qualidade do
+        encaminhamento. A verificação de sinais públicos posteriores a julho não
+        encontrou um sinal comparável de colapso da recolha à escala da cidade,
+        mas este resultado traduz apenas o limite da pesquisa realizada e não
+        constitui prova de que o serviço seja atualmente fiável.
+      resolution_condition: Dados operacionais públicos posteriores a agosto de 2026
+        que permitam estabelecer o desempenho atual do serviço em Évora.
       evidence:
-        - "EVD-000095"
-    - question: "Existe um subproblema material de transparência, coordenação ou interação com o serviço de higiene urbana, distinto do mecanismo operacional e de capacidade dominante?"
-      why_open: "Existem pistas locais relacionadas com avaliação, monitorização e coordenação do serviço, bem como evidência comparativa sobre mecanismos utilizados noutros municípios, que sugerem a possível existência de uma componente de transparência, acompanhamento do estado ou coordenação. A evidência atual não estabelece, contudo, que essa componente constitua um subproblema material em Évora distinto da causa operacional e de capacidade dominante."
-      resolution_condition: "Análise da experiência dos utilizadores e dos dados disponíveis que permita estabelecer se existe, em Évora, um subproblema material de transparência, coordenação ou interação com o serviço."
+        - EVD-000095
+    - question: Existe um subproblema material de transparência, coordenação ou
+        interação com o serviço de higiene urbana, distinto do mecanismo
+        operacional e de capacidade dominante?
+      why_open: Existem pistas locais relacionadas com avaliação, monitorização e
+        coordenação do serviço, bem como evidência comparativa sobre mecanismos
+        utilizados noutros municípios, que sugerem a possível existência de uma
+        componente de transparência, acompanhamento do estado ou coordenação. A
+        evidência atual não estabelece, contudo, que essa componente constitua
+        um subproblema material em Évora distinto da causa operacional e de
+        capacidade dominante.
+      resolution_condition: Análise da experiência dos utilizadores e dos dados
+        disponíveis que permita estabelecer se existe, em Évora, um subproblema
+        material de transparência, coordenação ou interação com o serviço.
       evidence:
-        - "EVD-000096"
-        - "EVD-000097"
-        - "EVD-000098"
-        - "EVD-000108"
-        - "EVD-000109"
-        - "EVD-000110"
-        - "EVD-000111"
+        - EVD-000096
+        - EVD-000097
+        - EVD-000098
+        - EVD-000108
+        - EVD-000109
+        - EVD-000110
+        - EVD-000111
   path:
     initial_signal:
-      summary: "O Município documentou uma interrupção do serviço de recolha em fevereiro de 2026, causada por avarias numa frota envelhecida."
+      summary: O Município documentou uma interrupção do serviço de recolha em
+        fevereiro de 2026, causada por avarias numa frota envelhecida.
       evidence:
-        - "EVD-000071"
-        - "EVD-000072"
+        - EVD-000071
+        - EVD-000072
     development:
-      summary: "Em julho e agosto de 2026, o Presidente da Câmara e o Município identificaram publicamente a higiene urbana como um dos desafios mais urgentes da gestão municipal e avançaram com uma reestruturação substancial da frota, dos recursos humanos, dos modelos de recolha, da distribuição de responsabilidades e da monitorização, reconhecendo simultaneamente que persistiam dificuldades em algumas zonas."
+      summary: Em julho e agosto de 2026, o Presidente da Câmara e o Município
+        identificaram publicamente a higiene urbana como um dos desafios mais
+        urgentes da gestão municipal e avançaram com uma reestruturação
+        substancial da frota, dos recursos humanos, dos modelos de recolha, da
+        distribuição de responsabilidades e da monitorização, reconhecendo
+        simultaneamente que persistiam dificuldades em algumas zonas.
       evidence:
-        - "EVD-000065"
-        - "EVD-000066"
-        - "EVD-000073"
+        - EVD-000065
+        - EVD-000066
     delimitation:
-      summary: "Sinais públicos diretos — um relato de vários dias sem recolha e um relato geograficamente específico de acumulação de resíduos em Canaviais — confirmaram situações concretas, mas com representatividade desconhecida.\n\nUma normalização parcial da frota em maio de 2026 e o reforço para 19 veículos em julho demonstraram uma alteração material desde fevereiro. Esta evolução impede que a situação próxima de colapso documentada em fevereiro seja tratada como representando automaticamente o estado operacional existente em agosto."
+      summary: >-
+        Sinais públicos diretos — um relato de vários dias sem recolha e um
+        relato geograficamente específico de acumulação de resíduos em Canaviais
+        — confirmaram situações concretas, mas com representatividade
+        desconhecida.
+
+
+        Uma normalização parcial da frota em maio de 2026 e o reforço para 19
+        veículos em julho demonstraram uma alteração material desde fevereiro.
+        Esta evolução impede que a situação próxima de colapso documentada em
+        fevereiro seja tratada como representando automaticamente o estado
+        operacional existente em agosto.
       evidence:
-        - "EVD-000093"
-        - "EVD-000094"
-        - "EVD-000095"
+        - EVD-000093
+        - EVD-000094
+        - EVD-000095
 evidence:
-  - "EVD-000065"
-  - "EVD-000066"
-  - "EVD-000071"
-  - "EVD-000072"
-  - "EVD-000073"
-  - "EVD-000093"
-  - "EVD-000094"
-  - "EVD-000095"
-  - "EVD-000096"
-  - "EVD-000097"
-  - "EVD-000098"
-  - "EVD-000108"
-  - "EVD-000109"
-  - "EVD-000110"
-  - "EVD-000111"
+  - evidence_id: EVD-000065
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000066
+    effects:
+      - SUPPORTS
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000071
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000072
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000093
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000094
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000095
+    effects:
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000096
+    effects:
+      - REFINES
+      - BOUNDS
+    research_roles:
+      - CONTEXTUAL
+  - evidence_id: EVD-000097
+    effects:
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000098
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000108
+    effects:
+      - REFINES
+    research_roles:
+      - COMPARATIVE_RESPONSE
+  - evidence_id: EVD-000109
+    effects:
+      - REFINES
+    research_roles:
+      - COMPARATIVE_MECHANISM
+      - COMPARATIVE_RESPONSE
+  - evidence_id: EVD-000110
+    effects:
+      - REFINES
+    research_roles:
+      - COMPARATIVE_RESPONSE
+  - evidence_id: EVD-000111
+    effects:
+      - REFINES
+    research_roles:
+      - CONTEXTUAL
+      - COMPARATIVE_RESPONSE
 evidence_status: corroborated
 validation_status: unvalidated
 digital_tractability: low
 solution_landscape_status: assessed
 status: OPEN
-
 decision_basis:
   contract_version: "0.1"
+  eligibility_basis: >-
+    PRB-0009 constitui um problema de investigação distinto e bem definido:
+    identifica uma falha específica de fiabilidade de um serviço público —
+    higiene urbana municipal e recolha de resíduos sólidos urbanos —, com uma
+    geografia delimitada ao Município de Évora, uma população afetada
+    identificada e uma manifestação documentada institucionalmente (EVD-000065,
+    EVD-000066, EVD-000071, EVD-000072, EVD-000073).
 
-  eligibility_basis: "PRB-0009 constitui um problema de investigação distinto e bem definido: identifica uma falha específica de fiabilidade de um serviço público — higiene urbana municipal e recolha de resíduos sólidos urbanos —, com uma geografia delimitada ao Município de Évora, uma população afetada identificada e uma manifestação documentada institucionalmente (EVD-000065, EVD-000066, EVD-000071, EVD-000072, EVD-000073).\n\nExistem também consequências concretas para residentes documentadas através de situações específicas de não recolha e acumulação de resíduos (EVD-000093, EVD-000094).\n\nO registo não é formulado como uma solução — por exemplo, «é necessária uma aplicação» — e não duplica nem se sobrepõe a outro PRB-* canónico."
 
-  corroboration_basis: "A corroboração assenta em evidência institucional primária e oficial proveniente de três unidades de fonte ou evento materialmente distintas, todas pertencentes, contudo, à mesma voz institucional — o Município de Évora — e, por isso, não tratadas como instituições independentes.\n\n(1) EVD-000071 e EVD-000072, associados a SRC-0061, documentam uma interrupção do serviço em fevereiro de 2026 causada por uma frota envelhecida e sujeita a avarias.\n\n(2) EVD-000066 e EVD-000073, associados a SRC-0053, documentam o reconhecimento municipal, em julho e agosto de 2026, de que a higiene urbana constituía um desafio urgente de gestão e descrevem uma resposta estrutural abrangendo frota, recursos humanos, modelos de recolha, distribuição de responsabilidades e monitorização.\n\n(3) EVD-000065, associado a SRC-0054, corresponde a um registo distinto de uma reunião pública de julho de 2026 e documenta a mesma urgência institucional através de um evento documental separado.\n\nA existência de fontes primárias distintas demonstra que se trata de unidades documentais e de evento diferentes, mas não transforma automaticamente estas três unidades em vozes institucionalmente independentes: todas continuam a representar o Município de Évora.\n\nEVD-000093 e EVD-000094 acrescentam uma classe de evidência genuinamente independente do processo de comunicação institucional: relatos públicos e autosselecionados de cidadãos que documentam situações concretas de não recolha e acumulação de resíduos.\n\nEstes relatos têm representatividade DESCONHECIDA e não são utilizados como evidência de prevalência, nem são contabilizados como linhas institucionais independentes de igual força. O seu papel limita-se a confirmar que ocorreram situações concretas compatíveis com a falha de serviço reconhecida institucionalmente."
+    Existem também consequências concretas para residentes documentadas através
+    de situações específicas de não recolha e acumulação de resíduos
+    (EVD-000093, EVD-000094).
 
+
+    O registo não é formulado como uma solução — por exemplo, «é necessária uma
+    aplicação» — e não duplica nem se sobrepõe a outro PRB-* canónico.
+  corroboration_basis: >-
+    A corroboração assenta em evidência institucional primária e oficial
+    proveniente de três unidades de fonte ou evento materialmente distintas,
+    todas pertencentes, contudo, à mesma voz institucional — o Município de
+    Évora — e, por isso, não tratadas como instituições independentes.
+
+
+    (1) EVD-000071 e EVD-000072, associados a SRC-0061, documentam uma
+    interrupção do serviço em fevereiro de 2026 causada por uma frota
+    envelhecida e sujeita a avarias.
+
+
+    (2) EVD-000066 e EVD-000073, associados a SRC-0053, documentam o
+    reconhecimento municipal, em julho e agosto de 2026, de que a higiene urbana
+    constituía um desafio urgente de gestão e descrevem uma resposta estrutural
+    abrangendo frota, recursos humanos, modelos de recolha, distribuição de
+    responsabilidades e monitorização.
+
+
+    (3) EVD-000065, associado a SRC-0054, corresponde a um registo distinto de
+    uma reunião pública de julho de 2026 e documenta a mesma urgência
+    institucional através de um evento documental separado.
+
+
+    A existência de fontes primárias distintas demonstra que se trata de
+    unidades documentais e de evento diferentes, mas não transforma
+    automaticamente estas três unidades em vozes institucionalmente
+    independentes: todas continuam a representar o Município de Évora.
+
+
+    EVD-000093 e EVD-000094 acrescentam uma classe de evidência genuinamente
+    independente do processo de comunicação institucional: relatos públicos e
+    autosselecionados de cidadãos que documentam situações concretas de não
+    recolha e acumulação de resíduos.
+
+
+    Estes relatos têm representatividade DESCONHECIDA e não são utilizados como
+    evidência de prevalência, nem são contabilizados como linhas institucionais
+    independentes de igual força. O seu papel limita-se a confirmar que
+    ocorreram situações concretas compatíveis com a falha de serviço reconhecida
+    institucionalmente.
   manifestation:
-    kind: "falha operacional / de fiabilidade do serviço"
-    summary: "O Município documentou diretamente uma interrupção do serviço de recolha em fevereiro de 2026, causada por uma frota envelhecida e sujeita a avarias (EVD-000071, EVD-000072).\n\nEm julho de 2026, o Município identificou publicamente a higiene urbana como um dos desafios mais urgentes da gestão municipal e descreveu uma reestruturação substancial em curso da frota, dos recursos humanos, dos modelos de recolha, da distribuição de responsabilidades e da monitorização (EVD-000065, EVD-000066, EVD-000073).\n\nEstes elementos estabelecem uma manifestação institucionalmente reconhecida de falha de fiabilidade e capacidade operacional do serviço."
-    evidence:
-      - "EVD-000065"
-      - "EVD-000066"
-      - "EVD-000071"
-      - "EVD-000072"
-      - "EVD-000073"
+    kind: falha operacional / de fiabilidade do serviço
+    summary: >-
+      O Município documentou diretamente uma interrupção do serviço de recolha
+      em fevereiro de 2026, causada por uma frota envelhecida e sujeita a
+      avarias (EVD-000071, EVD-000072).
 
+
+      Em julho de 2026, o Município identificou publicamente a higiene urbana
+      como um dos desafios mais urgentes da gestão municipal e descreveu uma
+      reestruturação substancial em curso da frota, dos recursos humanos, dos
+      modelos de recolha, da distribuição de responsabilidades e da
+      monitorização (EVD-000065, EVD-000066, EVD-000073).
+
+
+      Estes elementos estabelecem uma manifestação institucionalmente
+      reconhecida de falha de fiabilidade e capacidade operacional do serviço.
+    evidence:
+      - EVD-000065
+      - EVD-000066
+      - EVD-000071
+      - EVD-000072
   consequence:
-    summary: "A consequência concreta para residentes documentada no registo é a não recolha direta de resíduos.\n\nEVD-000093 relata uma situação de vários dias sem recolha, com resíduos acumulados numa localização residencial, e EVD-000094 relata uma situação geograficamente específica de acumulação de resíduos em Canaviais.\n\nAmbos são relatos públicos anedóticos e autosselecionados, com representatividade DESCONHECIDA. Estabelecem que ocorreram situações concretas de não recolha ou acumulação, mas não permitem determinar a frequência, prevalência ou extensão dessas situações à escala de todo o município."
-    evidence:
-      - "EVD-000093"
-      - "EVD-000094"
+    summary: >-
+      A consequência concreta para residentes documentada no registo é a não
+      recolha direta de resíduos.
 
+
+      EVD-000093 relata uma situação de vários dias sem recolha, com resíduos
+      acumulados numa localização residencial, e EVD-000094 relata uma situação
+      geograficamente específica de acumulação de resíduos em Canaviais.
+
+
+      Ambos são relatos públicos anedóticos e autosselecionados, com
+      representatividade DESCONHECIDA. Estabelecem que ocorreram situações
+      concretas de não recolha ou acumulação, mas não permitem determinar a
+      frequência, prevalência ou extensão dessas situações à escala de todo o
+      município.
+    evidence:
+      - EVD-000093
+      - EVD-000094
   currentness:
-    assessment: "MÉDIA. A situação próxima de colapso documentada em fevereiro de 2026 (EVD-000071, EVD-000072) é histórica e não deve ser tratada como representando automaticamente o estado operacional atual.\n\nUma normalização parcial da frota em maio de 2026 (EVD-000095) e o reforço para 19 veículos em julho de 2026, documentado através de EVD-000066, demonstram uma alteração material desde fevereiro.\n\nAs declarações institucionais de julho e agosto de 2026 (EVD-000065, EVD-000066, EVD-000073) constituem a evidência primária e oficial mais recente e sustentam a afirmação corroborada: o próprio Município reconhecia, nesse período, que persistiam dificuldades em algumas zonas apesar da reestruturação em curso.\n\nNão foi localizado nenhum conjunto de dados público sobre o desempenho operacional do serviço após agosto de 2026."
-    evidence:
-      - "EVD-000065"
-      - "EVD-000066"
-      - "EVD-000073"
-      - "EVD-000095"
+    assessment: >-
+      MÉDIA. A situação próxima de colapso documentada em fevereiro de 2026
+      (EVD-000071, EVD-000072) é histórica e não deve ser tratada como
+      representando automaticamente o estado operacional atual.
 
+
+      Uma normalização parcial da frota em maio de 2026 (EVD-000095) e o reforço
+      para 19 veículos em julho de 2026, documentado através de EVD-000066,
+      demonstram uma alteração material desde fevereiro.
+
+
+      As declarações institucionais de julho e agosto de 2026 (EVD-000065,
+      EVD-000066, EVD-000073) constituem a evidência primária e oficial mais
+      recente e sustentam a afirmação corroborada: o próprio Município
+      reconhecia, nesse período, que persistiam dificuldades em algumas zonas
+      apesar da reestruturação em curso.
+
+
+      Não foi localizado nenhum conjunto de dados público sobre o desempenho
+      operacional do serviço após agosto de 2026.
+    evidence:
+      - EVD-000065
+      - EVD-000066
+      - EVD-000095
   contradiction_search:
     performed: true
-    summary: "Foi realizada uma procura delimitada de evidência pública posterior a julho de 2026 que pudesse contradizer ou ultrapassar a afirmação corroborada — quer demonstrando que a recolha se tinha tornado, de forma geral, fiável, quer demonstrando que persistia uma situação de colapso à escala da cidade.\n\nNão foi encontrado um novo sinal público de força comparável que sustentasse qualquer dessas conclusões. Este resultado representa apenas o limite e a saturação da pesquisa realizada; não constitui evidência de que o serviço seja agora fiável nem de que PRB-0009 esteja resolvido.\n\nO registo de normalização parcial de maio de 2026 (EVD-000095) foi incorporado explicitamente como uma correção ao estado atual, em vez de ser ignorado.\n\nDo mesmo modo, foi preservado o reconhecimento do próprio Município, em julho e agosto de 2026, de que persistiam dificuldades em algumas zonas (EVD-000065, EVD-000066, EVD-000073), em vez de se assumir que a reestruturação já tinha resolvido o problema."
-    evidence:
-      - "EVD-000095"
+    summary: >-
+      Foi realizada uma procura delimitada de evidência pública posterior a
+      julho de 2026 que pudesse contradizer ou ultrapassar a afirmação
+      corroborada — quer demonstrando que a recolha se tinha tornado, de forma
+      geral, fiável, quer demonstrando que persistia uma situação de colapso à
+      escala da cidade.
 
+
+      Não foi encontrado um novo sinal público de força comparável que
+      sustentasse qualquer dessas conclusões. Este resultado representa apenas o
+      limite e a saturação da pesquisa realizada; não constitui evidência de que
+      o serviço seja agora fiável nem de que PRB-0009 esteja resolvido.
+
+
+      O registo de normalização parcial de maio de 2026 (EVD-000095) foi
+      incorporado explicitamente como uma correção ao estado atual, em vez de
+      ser ignorado.
+
+
+      Do mesmo modo, foi preservado o reconhecimento do próprio Município, em
+      julho e agosto de 2026, de que persistiam dificuldades em algumas zonas
+      (EVD-000065, EVD-000066, EVD-000073), em vez de se assumir que a
+      reestruturação já tinha resolvido o problema.
+    evidence:
+      - EVD-000095
   overlap_check:
     performed: true
-    summary: "Nenhum outro PRB-* canónico aborda a fiabilidade dos serviços municipais de higiene urbana e recolha de resíduos; PRB-0009 não duplica nem se sobrepõe a outro registo."
+    summary: Nenhum outro PRB-* canónico aborda a fiabilidade dos serviços
+      municipais de higiene urbana e recolha de resíduos; PRB-0009 não duplica
+      nem se sobrepõe a outro registo.
     related_problems: []
-
-  corroboration_statement: "A fiabilidade dos serviços de recolha de resíduos sólidos urbanos e de higiene urbana constitui um problema cívico atual reconhecido institucionalmente: o Município documentou uma interrupção do serviço de recolha em fevereiro de 2026, causada por avarias numa frota envelhecida, e, em julho-agosto de 2026, o Presidente da Câmara e o Município identificaram publicamente a higiene urbana como um dos desafios mais urgentes da gestão municipal, avançando com uma reestruturação substancial da frota, dos recursos humanos, dos modelos de recolha, da distribuição de responsabilidades e da monitorização, ao mesmo tempo que reconheceram explicitamente que persistem dificuldades em algumas zonas."
-
+  corroboration_statement: "A fiabilidade dos serviços de recolha de resíduos
+    sólidos urbanos e de higiene urbana constitui um problema cívico atual
+    reconhecido institucionalmente: o Município documentou uma interrupção do
+    serviço de recolha em fevereiro de 2026, causada por avarias numa frota
+    envelhecida, e, em julho-agosto de 2026, o Presidente da Câmara e o
+    Município identificaram publicamente a higiene urbana como um dos desafios
+    mais urgentes da gestão municipal, avançando com uma reestruturação
+    substancial da frota, dos recursos humanos, dos modelos de recolha, da
+    distribuição de responsabilidades e da monitorização, ao mesmo tempo que
+    reconheceram explicitamente que persistem dificuldades em algumas zonas."
   supporting_evidence:
-    - "EVD-000065"
-    - "EVD-000066"
-    - "EVD-000071"
-    - "EVD-000072"
-    - "EVD-000073"
-    - "EVD-000093"
-    - "EVD-000094"
-
+    - EVD-000065
+    - EVD-000066
+    - EVD-000071
+    - EVD-000072
+    - EVD-000093
+    - EVD-000094
   boundary_evidence:
-    - "EVD-000095"
+    - EVD-000095
+  independence_assessment: >-
+    Três unidades de fonte ou evento materialmente distintas sustentam a
+    afirmação delimitada: SRC-0061, relativo à interrupção do serviço de
+    fevereiro de 2026 e subjacente a EVD-000071/EVD-000072; SRC-0053, relativo
+    ao anúncio municipal de resposta estrutural de julho de 2026 e subjacente a
+    EVD-000066/EVD-000073; e SRC-0054, um registo distinto da reunião pública de
+    9 de julho e subjacente a EVD-000065.
 
-  independence_assessment: "Três unidades de fonte ou evento materialmente distintas sustentam a afirmação delimitada: SRC-0061, relativo à interrupção do serviço de fevereiro de 2026 e subjacente a EVD-000071/EVD-000072; SRC-0053, relativo ao anúncio municipal de resposta estrutural de julho de 2026 e subjacente a EVD-000066/EVD-000073; e SRC-0054, um registo distinto da reunião pública de 9 de julho e subjacente a EVD-000065.\n\nEstas três unidades são documentalmente distintas, mas essa distinção não equivale a independência institucional: todas representam a mesma voz, o Município de Évora. O número de fontes ou de registos EVD não é, por isso, utilizado para aumentar artificialmente a avaliação de independência.\n\nEVD-000093 e EVD-000094 constituem a classe de evidência efetivamente independente no sentido relevante. Resultam de um processo de produção de evidência materialmente diferente — relatos públicos e autosselecionados de cidadãos, em vez de comunicação institucional — e fornecem confirmação secundária de que ocorreram situações concretas de não recolha e acumulação de resíduos.\n\nEstes dois relatos não são contabilizados como duas linhas adicionais de corroboração forte ao mesmo nível das fontes institucionais e não estabelecem prevalência nem uma falha atual à escala de todo o município. O seu papel limita-se a confirmar a existência de situações concretas observáveis compatíveis com a falha reconhecida institucionalmente, com representatividade DESCONHECIDA para além desses casos.\n\nEVD-000095, relativo a maio de 2026 e associado a SRC-0080, é uma fonte primária adicional e distinta utilizada como evidência de limite e de estado atual. Documenta uma normalização parcial da frota e restringe a utilização da situação de fevereiro como referência para o estado posterior, não sendo utilizada como evidência adicional de suporte da falha."
 
+    Estas três unidades são documentalmente distintas, mas essa distinção não
+    equivale a independência institucional: todas representam a mesma voz, o
+    Município de Évora. O número de fontes ou de registos EVD não é, por isso,
+    utilizado para aumentar artificialmente a avaliação de independência.
+
+
+    EVD-000093 e EVD-000094 constituem a classe de evidência efetivamente
+    independente no sentido relevante. Resultam de um processo de produção de
+    evidência materialmente diferente — relatos públicos e autosselecionados de
+    cidadãos, em vez de comunicação institucional — e fornecem confirmação
+    secundária de que ocorreram situações concretas de não recolha e acumulação
+    de resíduos.
+
+
+    Estes dois relatos não são contabilizados como duas linhas adicionais de
+    corroboração forte ao mesmo nível das fontes institucionais e não
+    estabelecem prevalência nem uma falha atual à escala de todo o município. O
+    seu papel limita-se a confirmar a existência de situações concretas
+    observáveis compatíveis com a falha reconhecida institucionalmente, com
+    representatividade DESCONHECIDA para além desses casos.
+
+
+    EVD-000095, relativo a maio de 2026 e associado a SRC-0080, é uma fonte
+    primária adicional e distinta utilizada como evidência de limite e de estado
+    atual. Documenta uma normalização parcial da frota e restringe a utilização
+    da situação de fevereiro como referência para o estado posterior, não sendo
+    utilizada como evidência adicional de suporte da falha.
   scope:
-    geography: "Município de Évora. EVD-000094 identifica adicionalmente Canaviais como uma situação específica ao nível de freguesia, mas esse caso não constitui o fundamento da afirmação à escala municipal."
-    population: "Os residentes do Município de Évora constituem a população diretamente afetada.\n\nAs juntas de freguesia urbanas são atores de coordenação e responsabilidade identificados no registo, no contexto da distribuição de competências de higiene urbana após a descentralização, e não uma população diretamente afetada com evidência própria de consequências."
-    temporal: "Circunscrito ao período documentado no registo: uma interrupção do serviço em fevereiro de 2026, uma normalização parcial da frota em maio de 2026 e o reconhecimento institucional, em julho e agosto de 2026, de que a higiene urbana continuava a constituir um desafio urgente e de que persistiam dificuldades em algumas zonas.\n\nA afirmação não se estende a qualquer estado operacional posterior a agosto de 2026, para o qual não existe corroboração no registo."
-    bounded: true
+    geography: Município de Évora. EVD-000094 identifica adicionalmente Canaviais
+      como uma situação específica ao nível de freguesia, mas esse caso não
+      constitui o fundamento da afirmação à escala municipal.
+    population: >-
+      Os residentes do Município de Évora constituem a população diretamente
+      afetada.
 
-  limitations: "A afirmação corroborada é SUPORTADA apenas nos seguintes termos: durante 2026, Évora registou uma falha material e institucionalmente documentada na fiabilidade dos serviços de recolha de resíduos e higiene urbana, seguida de uma intervenção municipal substancial, mantendo o próprio Município, em julho e agosto de 2026, o reconhecimento de dificuldades persistentes em algumas zonas.\n\nNÃO É SUPORTADA como uma afirmação de que o serviço continua atualmente a falhar de forma generalizada em todo o Município de Évora.\n\nEVD-000095 é mantido como evidência de limite e de estado atual: documenta uma normalização parcial da frota em maio de 2026 e impede que a situação de fevereiro seja utilizada como referência automática para o estado posterior.\n\nO reconhecimento institucional de julho e agosto de 2026 (EVD-000065, EVD-000066, EVD-000073) constitui evidência de suporte e de atualidade para a afirmação delimitada, e não evidência de limite.\n\nOs relatos anedóticos de cidadãos (EVD-000093, EVD-000094) suportam apenas a existência de situações concretas de não recolha ou acumulação de resíduos. Têm representatividade DESCONHECIDA e não são tratados como evidência de prevalência.\n\nNão foi localizado nenhum conjunto de dados público posterior a agosto de 2026 sobre tempos de resolução, taxa de recolhas falhadas, atrasos ou acumulação de ocorrências. O desempenho operacional posterior a agosto não é inferido num sentido ou noutro.\n\nEVD-000108, EVD-000109, EVD-000110 e EVD-000111 são evidência comparativa ou de mecanismo proveniente de outros municípios. Não são específicos de Évora e descrevem práticas ou padrões operacionais noutros contextos, pelo que são explicitamente excluídos da base de corroboração da afirmação sobre o problema de Évora. Podem apenas informar a investigação de um eventual subproblema mais estreito de transparência, coordenação ou interação."
+
+      As juntas de freguesia urbanas são atores de coordenação e
+      responsabilidade identificados no registo, no contexto da distribuição de
+      competências de higiene urbana após a descentralização, e não uma
+      população diretamente afetada com evidência própria de consequências.
+    temporal: >-
+      Circunscrito ao período documentado no registo: uma interrupção do serviço
+      em fevereiro de 2026, uma normalização parcial da frota em maio de 2026 e
+      o reconhecimento institucional, em julho e agosto de 2026, de que a
+      higiene urbana continuava a constituir um desafio urgente e de que
+      persistiam dificuldades em algumas zonas.
+
+
+      A afirmação não se estende a qualquer estado operacional posterior a
+      agosto de 2026, para o qual não existe corroboração no registo.
+    bounded: true
+  limitations: >-
+    A afirmação corroborada é SUPORTADA apenas nos seguintes termos: durante
+    2026, Évora registou uma falha material e institucionalmente documentada na
+    fiabilidade dos serviços de recolha de resíduos e higiene urbana, seguida de
+    uma intervenção municipal substancial, mantendo o próprio Município, em
+    julho e agosto de 2026, o reconhecimento de dificuldades persistentes em
+    algumas zonas.
+
+
+    NÃO É SUPORTADA como uma afirmação de que o serviço continua atualmente a
+    falhar de forma generalizada em todo o Município de Évora.
+
+
+    EVD-000095 é mantido como evidência de limite e de estado atual: documenta
+    uma normalização parcial da frota em maio de 2026 e impede que a situação de
+    fevereiro seja utilizada como referência automática para o estado posterior.
+
+
+    O reconhecimento institucional de julho e agosto de 2026 (EVD-000065,
+    EVD-000066, EVD-000073) constitui evidência de suporte e de atualidade para
+    a afirmação delimitada, e não evidência de limite.
+
+
+    Os relatos anedóticos de cidadãos (EVD-000093, EVD-000094) suportam apenas a
+    existência de situações concretas de não recolha ou acumulação de resíduos.
+    Têm representatividade DESCONHECIDA e não são tratados como evidência de
+    prevalência.
+
+
+    Não foi localizado nenhum conjunto de dados público posterior a agosto de
+    2026 sobre tempos de resolução, taxa de recolhas falhadas, atrasos ou
+    acumulação de ocorrências. O desempenho operacional posterior a agosto não é
+    inferido num sentido ou noutro.
+
+
+    EVD-000108, EVD-000109, EVD-000110 e EVD-000111 são evidência comparativa ou
+    de mecanismo proveniente de outros municípios. Não são específicos de Évora
+    e descrevem práticas ou padrões operacionais noutros contextos, pelo que são
+    explicitamente excluídos da base de corroboração da afirmação sobre o
+    problema de Évora. Podem apenas informar a investigação de um eventual
+    subproblema mais estreito de transparência, coordenação ou interação.

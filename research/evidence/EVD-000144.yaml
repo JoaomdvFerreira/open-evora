@@ -1,0 +1,29 @@
+evidence_id: EVD-000144
+provenance:
+  sources:
+    - SRC-0028
+  extracted_at: 2026-08-11
+observation:
+  summary: O Plano de Ação do PDS 2025 prevê o mapeamento de competências, a
+    adaptação da formação às necessidades do mercado de trabalho e o reforço da
+    articulação entre educação, formação e empregadores.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: "2025"
+  populations:
+    - trabalhadores
+    - empregadores
+    - entidades de educação e formação
+domains:
+  - EMP
+  - EDU
+  - ECO
+evidence_nature: recommendation
+claim_authority: authoritative
+inference_limits:
+  - As ações previstas não estabelecem implementação, cobertura ou eficácia no
+    alinhamento entre competências e necessidades dos empregadores.
+lineage_id: SOC-2024-01-PDS-EVORA

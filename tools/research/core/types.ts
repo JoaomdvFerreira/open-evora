@@ -23,6 +23,7 @@ export interface ParsedRecord {
 export interface SchemaReference {
   field: string;
   isList?: boolean;
+  itemField?: string;
   targetPrefix: string;
   targetDirectory: string;
   required?: boolean;

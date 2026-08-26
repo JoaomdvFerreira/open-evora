@@ -1,29 +1,30 @@
 evidence_id: EVD-000060
-type: institutional
-source:
-  source_id: SRC-0050
-  publisher: "Município de Évora"
-  title: "Plataforma Évora Associativismo"
-  source_reference: "https://associativismo.cm-evora.pt/"
-  published_at: 2026
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0043"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "cultural and civic associations"
-  - "municipal cultural staff"
-domain:
-  - "CUL"
-  - "PUB"
-  - "DIG"
+provenance:
+  sources:
+    - SRC-0050
+    - SRC-0043
+  extracted_at: 2026-08-11
 observation:
-  summary: "A implementação da plataforma de associativismo progrediu de forma significativa: o Município disponibiliza atualmente uma ligação para a plataforma dedicada Évora Associativismo, e as convocatórias de apoio de 2025 referem documentos aí alojados."
+  summary: "A implementação da plataforma de associativismo progrediu de forma
+    significativa: o Município disponibiliza atualmente uma ligação para a
+    plataforma dedicada Évora Associativismo, e as convocatórias de apoio de
+    2025 referem documentos aí alojados."
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - cultural and civic associations
+    - municipal cultural staff
+  temporal:
+    start: "2025"
+    end: "2026"
+domains:
+  - CUL
+  - PUB
+  - DIG
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-05-B-E03. Interpretation: the old PECE strategic proposal for a 'Portal do Associativismo' (EVD-000054) should NOT be recorded as an unimplemented digital gap. Directly resolves Batch A's D1-05-A-E03/P02 uncertainty. Whether associations experience friction inside this existing workflow is unresolved and carried forward as a next research question requiring direct actor evidence."
+claim_authority: authoritative
+inference_limits:
+  - A existência da plataforma não estabelece a experiência dos utilizadores, a
+    completude dos processos ou a sua eficácia para as associações.

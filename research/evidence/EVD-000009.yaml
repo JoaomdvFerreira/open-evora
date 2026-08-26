@@ -1,40 +1,32 @@
 evidence_id: EVD-000009
-type: institutional
-source:
-  source_id: SRC-0016
-  publisher: "Município de Évora"
-  title: "Plano de Mobilidade Urbana Sustentável de Évora - Volume II (final plan)"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/PMUSE_V.II_.pdf"
-  published_at: 2025-09
-  retrieved_at: 2026-08-10
-additional_sources:
-  - "SRC-0002"
-geography:
-  level: city
-  area: "city / Historic Centre and other centralities"
-population:
-  - "people with reduced mobility"
-  - "the wider pedestrian population"
-domain:
-  - "ACC"
-  - "MOB"
-  - "URB"
+provenance:
+  sources:
+    - SRC-0016
+    - SRC-0002
+  extracted_at: 2026-08-10
 observation:
-  summary: "O PMUSE afirma que o plano local de acessibilidade de 2022 deve ser revisto para acompanhar a implementação e alargar a análise a outras centralidades. O Social Development Plan 2024-2027 preconiza um levantamento atualizado de obstáculos, intervenções no espaço público para acesso a edifícios públicos, melhoria do acesso Terminal Rodoviário–Praça do Giraldo e medidas para a mobilidade pedonal e o transporte público em torno das escolas."
+  summary: O PMUSE afirma que o plano local de acessibilidade de 2022 deve ser
+    revisto para acompanhar a implementação e alargar a análise a outras
+    centralidades. O Social Development Plan 2024-2027 preconiza um levantamento
+    atualizado de obstáculos, intervenções no espaço público para acesso a
+    edifícios públicos, melhoria do acesso Terminal Rodoviário–Praça do Giraldo
+    e medidas para a mobilidade pedonal e o transporte público em torno das
+    escolas.
+scope:
+  geography:
+    level: city
+    area: city / Historic Centre and other centralities
+  populations:
+    - people with reduced mobility
+    - the wider pedestrian population
+  temporal:
+    as_of: "2022"
+domains:
+  - ACC
+  - MOB
+  - URB
 evidence_nature: recommendation
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Important boundary: these are planned/required actions, not evidence that every action remains unimplemented."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "PHYSICAL"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - As ações previstas ou recomendadas não estabelecem que permaneçam por
+    executar nem que tenham sido concluídas ou eficazes.

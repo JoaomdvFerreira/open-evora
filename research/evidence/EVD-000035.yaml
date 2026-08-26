@@ -1,26 +1,29 @@
 evidence_id: EVD-000035
-type: institutional
-source:
-  source_id: SRC-0002
-  publisher: "Município de Évora / Rede Social"
-  title: "Plano de Desenvolvimento Social de Évora 2024-2027"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf"
-  published_at: 2024-01
-  retrieved_at: 2026-08-10
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "people needing mental-health support"
-  - "informal caregivers"
-domain:
-  - "HEA"
-  - "SOC"
+provenance:
+  sources:
+    - SRC-0002
+  extracted_at: 2026-08-10
 observation:
-  summary: "Os intervenientes locais identificam insuficiência da capacidade de resposta em saúde mental e nos cuidados de saúde primários, e o documento relaciona a pressão sobre a saúde mental com a sobrecarga dos cuidadores informais e o isolamento social."
+  summary: Os intervenientes locais identificam insuficiência da capacidade de
+    resposta em saúde mental e nos cuidados de saúde primários, e o documento
+    relaciona a pressão sobre a saúde mental com a sobrecarga dos cuidadores
+    informais e o isolamento social.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - people needing mental-health support
+    - informal caregivers
+  temporal:
+    start: "2024"
+    end: "2027"
+domains:
+  - HEA
+  - SOC
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-03-A-E05. Freshness caution: the PDS remains current for 2024-2027, but some underlying health measurements are older; Batch B requires a current-state challenge before treating this as an unchanged 2026 diagnosis."
+claim_authority: authoritative
+inference_limits:
+  - Alguns dados subjacentes ao diagnóstico são anteriores ao período do PDS; a
+    Observation não estabelece que a capacidade de resposta se mantenha
+    inalterada em 2026.

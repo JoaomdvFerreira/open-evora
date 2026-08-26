@@ -1,27 +1,30 @@
 evidence_id: EVD-000058
-type: institutional
-source:
-  source_id: SRC-0048
-  publisher: "Município de Évora"
-  title: "Agenda do Município de Évora (current)"
-  source_reference: "https://www.cm-evora.pt/agenda-do-municipio-de-evora/"
-  published_at: 2026
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "event organisers"
-  - "municipal cultural staff"
-  - "event/agenda users"
-domain:
-  - "CUL"
-  - "DIG"
+provenance:
+  sources:
+    - SRC-0048
+  extracted_at: 2026-08-11
 observation:
-  summary: "O Município já dispõe de um modelo estruturado de recolha de informação sobre eventos. O formulário atual de submissão de eventos inclui campos estruturados para categoria/subcategoria, datas/horas, público-alvo, idioma, local, acessibilidade para pessoas com mobilidade reduzida, acessibilidade comunicacional, inscrição, preço, organizador/contacto e ligações/canais sociais."
+  summary: O formulário municipal de submissão de eventos recolhe informação
+    estruturada sobre categoria e subcategoria, datas e horários, público-alvo,
+    idioma, local, inscrição, preço, organização e contactos, ligações e canais
+    sociais; inclui também campos obrigatórios sobre acessibilidade para pessoas
+    com mobilidade reduzida e acessibilidade comunicacional.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - event organisers
+    - municipal cultural staff
+    - event/agenda users
+  temporal:
+    as_of: 2026-08-11
+domains:
+  - CUL
+  - DIG
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-05-B-E01. Interpretation: the opportunity here is not simply 'create event metadata' — much of the important schema already exists institutionally. Weakens Batch A's provisional D1-05-A-P01 concern about discoverability/access. Whether this data is publicly reusable/machine-readable is unresolved and carried forward as a next research question."
+claim_authority: authoritative
+inference_limits:
+  - A recolha estruturada de metadados não estabelece a sua completude nos
+    eventos publicados, reutilização pública, legibilidade por máquina ou
+    qualidade para descoberta.

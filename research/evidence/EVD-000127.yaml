@@ -1,39 +1,32 @@
 evidence_id: EVD-000127
-type: stakeholder
-source:
-  publisher: "Open Évora"
-  title: "D5 stakeholder engagement — university student-support operator (SASUE)"
-  source_reference: "D5-ENG-OP-004 — private research note, not public"
-  published_at: null
-  retrieved_at: "2026-08-13"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "students applying for University of Évora residence accommodation"
-domain:
-  - "HOU"
-  - "EDU"
-  - "DIG"
+lineage_id: D5-ENG-OP-004
+provenance:
+  sources:
+    - SRC-0119
+  extracted_at: 2026-08-13
 observation:
-  summary: "Os SASUE consideram plenamente operacional o atual processo de candidatura a alojamento em residência. Referem que as necessidades de esclarecimento ou de alteração do processo que envolvam estudantes ou pessoal institucional são encaminhadas para os serviços de informática da Universidade, para que seja prestado o apoio ou efetuada a alteração adequada."
+  summary: Os SASUÉ consideram plenamente operacional o atual processo de
+    candidatura a alojamento em residência e referem que necessidades de
+    esclarecimento ou de alteração do processo que envolvam estudantes ou
+    pessoal institucional são encaminhadas para os serviços de informática da
+    Universidade.
+scope:
+  geography:
+    level: city
+    area: Évora
+  populations:
+    - estudantes que se candidatam a alojamento em residência da Universidade de
+      Évora
+  temporal:
+    as_of: 2026-08-13
+domains:
+  - HOU
+  - EDU
+  - DIG
 evidence_nature: opinion
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D5-OP-004 (WU022) response, received 2026-08-13. This is SASUE's institutional assessment of the process it operates and a negative-case response to the applicant-process hypothesis; it is not independent outcome evidence and does not prove usability, accessibility, absence of individual friction, or that notification/waiting experiences meet student expectations. It materially challenges a strong systemic information/status/process-failure framing on the institutional side, while leaving affected-student experience for WU023 only if later decision rules require it. Shares analysis.lineage_id D5-ENG-OP-004 with EVD-000125 and EVD-000126; same engagement, not independent corroboration."
-
-analysis:
-  related_problems:
-    - "PRB-0006"
-  contribution:
-    - "CONTRADICTS"
-  friction_types:
-    - "TRANSACTION"
-    - "INFORMATION"
-    - "OPERATIONAL"
-  lineage_id: "D5-ENG-OP-004"
-  representativeness: "NOT_APPLICABLE"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A avaliação de que o processo é plenamente operacional é uma opinião
+    institucional e não Evidence de outcomes dos utilizadores.
+  - Não estabelece usabilidade, acessibilidade, ausência de fricção individual
+    nem satisfação das expectativas dos estudantes.

@@ -1,37 +1,31 @@
 evidence_id: EVD-000115
-type: institutional
-source:
-  source_id: SRC-0099
-  publisher: "EURES / European Commission"
-  title: "EURES — Labour Market Information: Portugal"
-  source_reference: "https://eures.europa.eu/living-and-working/labour-market-information/labour-market-information-portugal_en"
-  published_at: unknown
-  retrieved_at: 2026-08-12
-geography:
-  level: regional
-  area: "Alentejo region"
-population:
-  - "employers"
-  - "job seekers"
-domain:
-  - "EMP"
-  - "ECO"
+provenance:
+  sources:
+    - SRC-0099
+  extracted_at: 2026-08-12
 observation:
-  summary: "A página de informação sobre o mercado de trabalho em Portugal da EURES identifica, para a região do Alentejo, profissões associadas a necessidades de recrutamento ou situações de escassez: agrónomos, programadores de software, reparadores e operadores de maquinaria agrícola, trabalhadores agrícolas sazonais (colheita de fruta), técnicos de manutenção eletromecânica e elétrica, cozinheiros, trabalhadores de corte de carne e trabalhadores da construção. Essas necessidades de recrutamento ou situações de escassez são atribuídas à atividade nos setores da agricultura, turismo, energias renováveis e indústria transformadora em toda a região."
+  summary: A EURES identifica, para a região do Alentejo, profissões associadas a
+    necessidades de recrutamento ou situações de escassez, incluindo agrónomos,
+    programadores de software, reparadores e operadores de maquinaria agrícola,
+    trabalhadores agrícolas sazonais, técnicos de manutenção eletromecânica e
+    elétrica, cozinheiros, trabalhadores de corte de carne e trabalhadores da
+    construção.
+scope:
+  geography:
+    level: regional
+    area: Alentejo
+  populations:
+    - employers
+    - job seekers
+  temporal:
+    status: unknown
+domains:
+  - EMP
+  - ECO
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "RS-02A (docs/discovery/rs-01-evidence-gap-review.md Gap 17). This is regional-level (Alentejo, ~35% of national territory, ~4.5% of national population) shortage-occupation evidence, materially stronger than the prior IEFP vacancy-snapshot evidence (EVD-000049, EVD-000101) because it is a named shortage list rather than an advertised-listing count. It does NOT establish that these occupations are hard-to-fill specifically within the Évora municipality — the page does not isolate municipality-level data, and Alentejo spans many municípios with materially different economies (e.g. coastal tourism, Baixo Alentejo agriculture) from Évora's own mix. Do not generalise these occupations onto Évora without municipality-specific corroboration."
-
-analysis:
-  related_problems:
-    - "PRB-0008"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "INFORMATION"
-  representativeness: "LIMITED"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A Evidence é regional e não permite afirmar que estas profissões estejam em
+    escassez especificamente no Município de Évora.
+  - O Alentejo abrange economias locais heterogéneas e a página não isola dados
+    municipais.

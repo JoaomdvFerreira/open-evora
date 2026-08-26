@@ -1,55 +1,148 @@
 problem_id: PRB-0005
-title: "O tráfego automóvel e a pressão de estacionamento entram em conflito com a qualidade, a segurança e a legibilidade do espaço pedonal em zonas urbanas-chave"
+title: O tráfego automóvel e a pressão de estacionamento entram em conflito com
+  a qualidade, a segurança e a legibilidade do espaço pedonal em zonas
+  urbanas-chave
 domain:
-  - "MOB"
-  - "URB"
-  - "ACC"
+  - MOB
+  - URB
+  - ACC
 geography:
   level: city
-  area: "Évora, incluindo o Centro Histórico"
+  area: Évora, incluindo o Centro Histórico
 affected_populations:
-  - "residentes"
-  - "condutores"
-  - "peões"
-problem_statement: "Em zonas-chave de Évora, o volume de tráfego, a velocidade dos veículos, a pressão de estacionamento e o estacionamento ilegal geram congestionamento, conflitos de segurança e uma redução da qualidade do espaço pedonal, enquanto o próprio sistema de estacionamento tem sido descrito como pouco legível."
-causal_reading: "Esta é uma leitura deliberadamente delimitada: os mecanismos físicos e operacionais — tráfego, pressão de estacionamento e estacionamento ilegal — permanecem distintos de possíveis lacunas de informação. A evidência atual não estabelece que a falta ou inadequação de informação sobre a ocupação e disponibilidade de estacionamento seja uma causa material dos resultados observados."
+  - residentes
+  - condutores
+  - peões
+problem_statement: Em zonas-chave de Évora, o volume de tráfego, a velocidade
+  dos veículos, a pressão de estacionamento e o estacionamento ilegal geram
+  congestionamento, conflitos de segurança e uma redução da qualidade do espaço
+  pedonal; paralelamente, o PUE recomenda que a distribuição da oferta de
+  estacionamento, as condições de acesso e as tarifas sejam imediatamente
+  compreensíveis para os utilizadores.
+causal_reading: "Esta é uma leitura deliberadamente delimitada: os mecanismos
+  físicos e operacionais — tráfego, pressão de estacionamento e estacionamento
+  ilegal — permanecem distintos de possíveis lacunas de informação. A evidência
+  atual não estabelece que a falta ou inadequação de informação sobre a ocupação
+  e disponibilidade de estacionamento seja uma causa material dos resultados
+  observados."
 investigation:
   open_questions:
-    - question: "A falta ou inadequação de informação sobre a ocupação e disponibilidade de estacionamento é uma causa material dos resultados observados em PRB-0005 — congestionamento, conflitos de segurança e redução da qualidade do espaço pedonal?"
-      why_open: "Évora já dispõe de infraestrutura significativa de informação, pagamento e sensores de estacionamento e pode já disponibilizar funcionalidade de previsão de disponibilidade através do Parking Buddy da Via Verde Estacionar. A evidência atual não estabelece, contudo, que a falta de informação sobre a ocupação do estacionamento seja uma causa material dos resultados observados."
-      latest_result: "A revisão da lacuna residual classificou o resultado como PARCIAL: a evidência comparativa — Seattle OpenPark e SFpark — demonstra a existência de um mecanismo credível baseado em informação sobre disponibilidade de estacionamento, mas não estabelece que esse mecanismo tenha causalidade material no caso de Évora."
-      current_action: "A validação ao nível da deslocação e da localização continua a ser a via de investigação para estabelecer se a disponibilidade e visibilidade da informação sobre ocupação de estacionamento contribui materialmente para os resultados observados."
+    - question: A falta ou inadequação de informação sobre a ocupação e
+        disponibilidade de estacionamento é uma causa material dos resultados
+        observados em PRB-0005 — congestionamento, conflitos de segurança e
+        redução da qualidade do espaço pedonal?
+      why_open: Évora já dispõe de infraestrutura significativa de informação,
+        pagamento e sensores de estacionamento e pode já disponibilizar
+        funcionalidade de previsão de disponibilidade através do Parking Buddy
+        da Via Verde Estacionar. A evidência atual não estabelece, contudo, que
+        a falta de informação sobre a ocupação do estacionamento seja uma causa
+        material dos resultados observados.
+      latest_result: "A revisão da lacuna residual classificou o resultado como
+        PARCIAL: a evidência comparativa — Seattle OpenPark e SFpark — demonstra
+        a existência de um mecanismo credível baseado em informação sobre
+        disponibilidade de estacionamento, mas não estabelece que esse mecanismo
+        tenha causalidade material no caso de Évora."
+      current_action: A validação ao nível da deslocação e da localização continua a
+        ser a via de investigação para estabelecer se a disponibilidade e
+        visibilidade da informação sobre ocupação de estacionamento contribui
+        materialmente para os resultados observados.
       evidence:
-        - "EVD-000105"
-        - "EVD-000106"
-        - "EVD-000107"
+        - EVD-000105
+        - EVD-000106
+        - EVD-000107
   path:
     initial_signal:
-      summary: "Em zonas-chave de Évora, o volume de tráfego, a velocidade dos veículos, a pressão de estacionamento e o estacionamento ilegal foram associados a congestionamento, conflitos de segurança e redução da qualidade do espaço pedonal, tendo o próprio sistema de estacionamento sido descrito como pouco legível."
+      summary: O planeamento institucional documentou congestionamento, velocidades
+        excessivas em corredores com forte presença pedonal, pressão de
+        estacionamento e estacionamento abusivo ou ilegal, e recomendou maior
+        legibilidade da oferta, acessos e tarifas de estacionamento.
       evidence:
-        - "EVD-000003"
-        - "EVD-000007"
-        - "EVD-000008"
+        - EVD-000007
+        - EVD-000008
+        - EVD-000142
     development:
-      summary: "Foi confirmado que já existem intervenções digitais e técnicas relacionadas com estacionamento e mobilidade — pagamento através de Évora Mobilidade e Via Verde Estacionar, sensores de estacionamento e contagem de tráfego no âmbito da LVpDÉ e uma plataforma de monitorização e gestão. Por isso, a ausência de tecnologia relacionada com estacionamento não é o problema atualmente sustentado pela evidência.\n\nA evidência de 2025 (EVD-000025) mostrou também que o congestionamento rodoviário afeta materialmente a pontualidade dos autocarros urbanos, corroborando a componente de tráfego deste problema."
+      summary: O relatório municipal de 2026 mede, para 2025, uma regularidade de 99,5
+        % e um índice de pontualidade IP-5min de 84,4 % no serviço urbano, e
+        atribui atrasos recorrentes a tráfego lento nas principais vias,
+        nomeadamente nos acessos ao Centro Histórico e na circular do Parque
+        Industrial em períodos de ponta. O processo de revisão do PUE registou
+        também participações formais sobre circulação e estacionamento. Estes
+        elementos reforçam a componente de tráfego sem estabelecer que a
+        informação sobre disponibilidade de estacionamento seja uma causa
+        material do problema.
       evidence:
-        - "EVD-000012"
-        - "EVD-000025"
+        - EVD-000003
+        - EVD-000139
+        - EVD-000012
     delimitation:
-      summary: "Foi identificado um problema distinto relativo à degradação e manutenção do pavimento rodoviário, mantido deliberadamente separado deste registo e posteriormente promovido a PRB-0010. Esta decisão preservou em PRB-0005 o enquadramento específico do conflito entre tráfego, pressão de estacionamento e espaço pedonal.\n\nA funcionalidade de previsão de disponibilidade de estacionamento, através do Parking Buddy, e a evidência comparativa proveniente de outros municípios foram integradas na investigação sem que daí se tenha estabelecido causalidade material para Évora."
+      summary: >-
+        Foi identificado um problema distinto relativo à degradação e manutenção
+        do pavimento rodoviário, mantido deliberadamente separado deste registo
+        e posteriormente promovido a PRB-0010. Esta decisão preservou em
+        PRB-0005 o enquadramento específico do conflito entre tráfego, pressão
+        de estacionamento e espaço pedonal.
+
+
+        A funcionalidade de previsão de disponibilidade de estacionamento,
+        através do Parking Buddy, e a evidência comparativa proveniente de
+        outros municípios foram integradas na investigação sem que daí se tenha
+        estabelecido causalidade material para Évora.
       evidence:
-        - "EVD-000105"
-        - "EVD-000106"
-        - "EVD-000107"
+        - EVD-000105
+        - EVD-000106
+        - EVD-000107
 evidence:
-  - "EVD-000003"
-  - "EVD-000007"
-  - "EVD-000008"
-  - "EVD-000012"
-  - "EVD-000025"
-  - "EVD-000105"
-  - "EVD-000106"
-  - "EVD-000107"
+  - evidence_id: EVD-000003
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000139
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000007
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000008
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000142
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000012
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000105
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000106
+    effects:
+      - REFINES
+    research_roles:
+      - COMPARATIVE_MECHANISM
+  - evidence_id: EVD-000107
+    effects:
+      - REFINES
+      - BOUNDS
+    research_roles:
+      - COMPARATIVE_MECHANISM
+      - COMPARATIVE_RESPONSE
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed

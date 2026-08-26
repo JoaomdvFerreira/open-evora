@@ -1,38 +1,31 @@
 evidence_id: EVD-000114
-type: stakeholder
-source:
-  publisher: "Open Évora"
-  title: "D5 stakeholder engagement — accessibility programme actor (APCE)"
-  source_reference: "D5-ENG-OP-003 — private research note, not public"
-  published_at: null
-  retrieved_at: "2026-08-12"
-geography:
-  level: city
-  area: "Évora Historic Centre"
-population:
-  - "people with disabilities"
-domain:
-  - "ACC"
-  - "ECO"
+lineage_id: D5-ENG-OP-003
+provenance:
+  sources:
+    - SRC-0118
+  extracted_at: 2026-08-12
 observation:
-  summary: "A APCE refere um programa distinto e em curso para a acessibilidade dos estabelecimentos comerciais no Centro Histórico de Évora, desenvolvido inicialmente com a Associação Comercial e posteriormente continuado com o NERE, utilizando selos que representam o nível de acessibilidade de cada estabelecimento no âmbito de uma abordagem de melhoria contínua. A APCE afirma que a atividade começou como projeto e continua como trabalho em curso, em vez de constituir uma iniciativa pontual já concluída. Esta é a descrição da própria APCE sobre o envolvimento do NERE; não constitui confirmação por parte do NERE, cuja resposta ao contacto D5 (D5-OP-006) continua pendente."
+  summary: A APCE descreve um programa continuado de acessibilidade dirigido a
+    estabelecimentos comerciais no Centro Histórico de Évora, iniciado com a
+    Associação Comercial e posteriormente continuado com o NERE, utilizando
+    selos graduados de acessibilidade; num seguimento, refere que cerca de 30
+    estabelecimentos foram avaliados na versão 1.2 e que houve participação
+    adicional de estabelecimentos na versão 1.3.
+scope:
+  geography:
+    level: local_area
+    area: Centro Histórico de Évora
+  populations:
+    - people with disabilities
+  temporal:
+    as_of: 2026-08-20
+domains:
+  - ACC
+  - ECO
 evidence_nature: fact
-strength: primary-non-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D5-OP-003 (WU022) response, received 2026-08-12. Distinct programme from Acesso Universal 1.3 (municipal public space / cultural facilities, lineage ACC-2025-APCE-ACESSO-UNIVERSAL-1.3, EVD-000085/086/104): this one targets private commercial premises (shops) in the Historic Centre and uses a graded-seal continuous-improvement mechanism rather than a location-by-location municipal inventory — a second, EXISTING-SOLUTION track for PRB-0003, not a duplicate of the municipal-facilities work. Shares analysis.lineage_id D5-ENG-OP-003 with EVD-000112 and EVD-000113 (same engagement). NERE triangulation note: this is the first corpus record connecting NERE to accessibility/PRB-0003 — all prior NERE-referencing records (EVD-000048, EVD-000051, EVD-000101/102, ASM-0008) concern PRB-0008 (employment/skills alignment) and are unrelated in domain. This finding is reported by APCE only and must not be read as NERE confirming or describing its own role; NERE's D5-OP-006 outreach (docs/milestones/D5-WU01-operator-challenge-progress.md) remains SENT/pending response. No coverage, uptake, or effectiveness data for the seal programme was provided — do not treat this as evidence that the seals measurably improve shop accessibility, only that the programme exists and is ongoing."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "EXISTING-SOLUTION"
-    - "CURRENT-STATE-UPDATE"
-  friction_types:
-    - "PHYSICAL"
-    - "INFORMATION"
-  lineage_id: "D5-ENG-OP-003"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A descrição do envolvimento do NERE é feita pela APCE e não constitui
+    confirmação independente pelo NERE.
+  - O número aproximado de estabelecimentos não é uma medida de prevalência nem
+    estabelece cobertura, adesão ou eficácia do programa.
