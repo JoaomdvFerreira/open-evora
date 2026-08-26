@@ -166,11 +166,11 @@ export function extractSourceCaveats(record: Record<string, unknown>): string[] 
 // ---------------------------------------------------------------------------
 
 /**
- * Candidate Source View section IDs (task-provided). `findings` and
- * `investigation` are deliberately typed as members here so SUI-03A2 can
- * extend `computeSourceSectionPresence` to decide them without changing this
- * union or any caller's shape — but this slice must never mark either of
- * them present from SRC metadata alone, so both resolve to `"deferred"`.
+ * Candidate Source View section IDs. `findings` is always `"present"`
+ * (SUI-03J0 — the Source View's "O que encontrámos" area always renders
+ * something, so it is never deferred or absent). `investigation` is
+ * relation-owned: `"deferred"` without `relationContext`, else `"present"`
+ * or `"absent"` depending on `hasRelatedProblem` (SUI-03A2).
  */
 export type SourceSectionId = "overview" | "findings" | "coverage" | "dates-access" | "licensing" | "caveats" | "investigation" | "technical";
 
@@ -179,8 +179,8 @@ export type SourceSectionPresence = "present" | "absent" | "deferred";
 export type SourceSectionPresenceMap = Record<SourceSectionId, SourceSectionPresence>;
 
 /**
- * Relation context needed to resolve `findings`/`investigation` presence
- * (SUI-03A2) — deliberately just the one number each needs, not the full
+ * Relation context needed to resolve `investigation` presence (SUI-03A2) —
+ * deliberately just the one boolean it needs, not the full
  * `SourceEvidenceRelations` shape, so this module stays free of any
  * dependency on the relation-loading module or DataProvider. Passing this
  * is optional so this function keeps working standalone (SRC-owned presence
@@ -199,14 +199,17 @@ export interface SourceSectionRelationContext {
  * their extracted content is non-empty, so a later rail/index can skip
  * rendering an empty section without re-deriving this logic itself.
  *
- * `findings` and `investigation` are relation-owned (SUI-03A2), not
- * SRC-owned: without `relationContext` they stay "deferred" (SUI-03A1
- * behaviour, unchanged for any caller that hasn't loaded relations yet).
- * With `relationContext` supplied, `findings` is always "present" — even
- * with zero linked EVDs, so the later UI can show its informative empty
- * state — and `investigation` is "present" only when `hasRelatedProblem` is
- * true. This is the one shared section-index source for both desktop and
- * mobile; do not add a second section-presence helper elsewhere.
+ * `investigation` is relation-owned (SUI-03A2): without `relationContext` it
+ * stays "deferred" (SUI-03A1 behaviour, unchanged for any caller that hasn't
+ * loaded relations yet); with `relationContext` supplied, it is "present"
+ * only when `hasRelatedProblem` is true, else "absent".
+ *
+ * `findings` (SUI-03J0) is always "present", regardless of `relationContext`
+ * — the actual Source View's "O que encontrámos" area always renders
+ * something (loading, error/retry, evidence, or an explicit empty state), so
+ * it never makes sense to defer or hide it from the section index. This is
+ * the one shared section-index source for both desktop and mobile; do not
+ * add a second section-presence helper elsewhere.
  */
 export function computeSourceSectionPresence(
   record: Record<string, unknown>,
@@ -242,7 +245,7 @@ export function computeSourceSectionPresence(
     licensing: hasLicensing ? "present" : "absent",
     caveats: hasCaveats ? "present" : "absent",
     technical: "present",
-    findings: relationContext ? "present" : "deferred",
+    findings: "present",
     investigation: relationContext ? (relationContext.hasRelatedProblem ? "present" : "absent") : "deferred",
   };
 }

@@ -194,12 +194,12 @@ describe("computeSourceSectionPresence", () => {
     expect(presence["dates-access"]).toBe("present");
   });
 
-  it("never declares findings or investigation present from SRC metadata alone, for either fixture", () => {
+  it("always marks findings present (even without relationContext) but defers investigation until relation context resolves it, for either fixture", () => {
     const complete = computeSourceSectionPresence(SRC_0093);
     const minimal = computeSourceSectionPresence(MINIMAL_SRC);
-    expect(complete.findings).toBe("deferred");
+    expect(complete.findings).toBe("present");
     expect(complete.investigation).toBe("deferred");
-    expect(minimal.findings).toBe("deferred");
+    expect(minimal.findings).toBe("present");
     expect(minimal.investigation).toBe("deferred");
   });
 
