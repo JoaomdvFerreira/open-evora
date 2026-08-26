@@ -5148,12 +5148,330 @@ describe("RecordDetailPanel — SUI-03J1B desktop Source View 'Nesta fonte' rail
     expect(within(rail).queryByLabelText("Nesta fonte")).toBeNull();
   });
 
-  it("19. no mobile/compact Source index is introduced in this slice", async () => {
+  it("19. compact Source index is present in the DOM alongside the desktop rail index (SUI-03J2B integrates it; CSS governs visibility)", async () => {
     renderFull();
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     await within(panel).findByLabelText("Na investigação");
-    expect(within(panel).queryByLabelText("Nesta fonte (versão compacta)")).toBeNull();
-    // Exactly one "Nesta fonte" nav exists — the desktop rail's, no compact duplicate.
+    expect(within(panel).getByLabelText("Nesta fonte (versão compacta)")).toBeTruthy();
+    // Both the desktop rail nav and the compact nav render — CSS decides which is visible.
     expect(within(panel).getAllByLabelText("Nesta fonte")).toHaveLength(1);
+  });
+});
+
+describe("RecordDetailPanel — SUI-03J2B compact Source View 'Nesta fonte' index integration", () => {
+  const SRC_FULL_DETAIL: RecordDetail = {
+    id: "SRC-0093",
+    type: "SRC-",
+    file: "research/sources/SRC-0093.yaml",
+    record: {
+      source_id: "SRC-0093",
+      publisher: "Scientific Reports (Springer Nature)",
+      name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+      resource_type: "document",
+      scope: {
+        geography: { level: "local_area", area: "Belltown, Seattle, Washington, EUA" },
+        domains: ["MOB", "DIG"],
+      },
+      access: { level: "public", availability: "available", machine_readable: false },
+      canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z",
+      licensing: { status: "known", licence: "CC BY 4.0", reuse: "permitted", attribution: "Autores" },
+      temporal: { published_at: "2022-11-11", last_checked_at: "2026-08-25" },
+      caveats: ["Limitação canónica registada para SRC-0093."],
+    },
+    outgoingEdges: [],
+    incomingEdges: [{ field: "source.source_id", ordinal: null, from: "EVD-000106" }],
+  };
+  const SRC_FULL_SUMMARY: RecordSummary = {
+    id: "SRC-0093",
+    type: "SRC-",
+    label: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+    file: SRC_FULL_DETAIL.file,
+    summaryFields: {},
+  };
+  const EVD_106_DETAIL: RecordDetail = {
+    id: "EVD-000106",
+    type: "EVD-",
+    file: "research/evidence/EVD-000106.yaml",
+    record: {
+      evidence_id: "EVD-000106",
+      source: { source_id: "SRC-0093" },
+      observation: { summary: "Observação ligada a SRC-0093." },
+      analysis: { related_problems: ["PRB-0005"] },
+    },
+    outgoingEdges: [{ field: "analysis.related_problems", ordinal: 0, to: "PRB-0005" }],
+    incomingEdges: [],
+  };
+  const EVD_106_SUMMARY: RecordSummary = {
+    id: "EVD-000106",
+    type: "EVD-",
+    label: "Observação ligada a SRC-0093.",
+    file: EVD_106_DETAIL.file,
+    summaryFields: {},
+  };
+  const EVD_106_NO_PRB_DETAIL: RecordDetail = {
+    ...EVD_106_DETAIL,
+    record: { ...EVD_106_DETAIL.record, analysis: undefined },
+    outgoingEdges: [],
+  };
+  const SRC_MINIMAL_DETAIL: RecordDetail = {
+    id: "SRC-0001",
+    type: "SRC-",
+    file: "research/sources/SRC-0001.yaml",
+    record: {
+      source_id: "SRC-0001",
+      name: "Minimal source",
+      resource_type: "webpage",
+      access: { level: "unknown", availability: "unknown", machine_readable: "unknown" },
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const SRC_MINIMAL_SUMMARY: RecordSummary = {
+    id: "SRC-0001",
+    type: "SRC-",
+    label: "Minimal source",
+    file: SRC_MINIMAL_DETAIL.file,
+    summaryFields: {},
+  };
+
+  const FULL_SRC_LABELS_IN_ORDER = ["Visão geral", "O que encontrámos", "Cobertura", "Datas e acesso", "Licenciamento", "Limitações", "Na investigação", "Informação técnica"];
+
+  function renderFull() {
+    return render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+  }
+
+  function renderMinimal() {
+    return render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0001": SRC_MINIMAL_DETAIL })}
+        lookup={buildLookup(SRC_MINIMAL_SUMMARY)}
+        selectedId="SRC-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+  }
+
+  it("1. renders the desktop SourceReadingRailIndex structure", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    expect(within(rail).getByLabelText("Nesta fonte").tagName).toBe("NAV");
+  });
+
+  it("2. renders the compact SourceCompactSectionIndex structure", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const details = within(panel).getByText("Nesta fonte", { selector: "summary" }).closest("details");
+    expect(details).not.toBeNull();
+    expect(details!.className).toContain("source-compact-section-index");
+  });
+
+  it("3. both indexes are driven from equivalent sourceSectionIndex inputs (same labels, same order)", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const desktopNav = within(rail).getByLabelText("Nesta fonte");
+    const compactNav = within(panel).getByLabelText("Nesta fonte (versão compacta)");
+    const desktopLabels = within(desktopNav).getAllByRole("link").map((l) => l.textContent);
+    const compactLabels = within(compactNav).getAllByRole("link").map((l) => l.textContent);
+    expect(compactLabels).toEqual(desktopLabels);
+    expect(desktopLabels).toEqual(FULL_SRC_LABELS_IN_ORDER);
+  });
+
+  it("4. both receive the same resolved relation context (related PRB present in both)", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const desktopNav = within(rail).getByLabelText("Nesta fonte");
+    const compactNav = within(panel).getByLabelText("Nesta fonte (versão compacta)");
+    expect(within(desktopNav).getByRole("link", { name: "Na investigação" })).toBeTruthy();
+    expect(within(compactNav).getByRole("link", { name: "Na investigação" })).toBeTruthy();
+  });
+
+  it("5. no second SourceEvidenceRelations load occurs — EVD backlink fetched exactly once with both indexes rendered", async () => {
+    const getRecordSpy = vi.fn((id: string) => {
+      if (id === "SRC-0093") return Promise.resolve(SRC_FULL_DETAIL);
+      if (id === "EVD-000106") return Promise.resolve(EVD_106_DETAIL);
+      return Promise.reject(new Error(`no fixture for ${id}`));
+    });
+    const spiedProvider: DataProvider = {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.reject(new Error("not used")),
+      getRecord: getRecordSpy,
+      getEdges: () => Promise.reject(new Error("not used")),
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={spiedProvider}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    within(panel).getByLabelText("Nesta fonte (versão compacta)");
+    const calledIds = getRecordSpy.mock.calls.map((call) => call[0]);
+    expect(calledIds.filter((id) => id === "EVD-000106").length).toBe(1);
+  });
+
+  it("6. compact index is placed before 'Visão geral' in DOM order", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const main = panel.querySelector(".record-detail-main") as HTMLElement;
+    const compactDetails = within(main).getByText("Nesta fonte", { selector: "summary" }).closest("details")!;
+    const overviewHeading = within(main).getByRole("heading", { name: "Visão geral" });
+    const position = compactDetails.compareDocumentPosition(overviewHeading);
+    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("7. compact index remains outside SourceOverviewSection", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const overviewSection = within(panel).getByLabelText("Visão geral");
+    expect(within(overviewSection).queryByText("Nesta fonte", { selector: "summary" })).toBeNull();
+  });
+
+  it("8. full SRC-0093 case produces identical 8 entries in desktop and compact indexes", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const desktopHrefs = within(within(rail).getByLabelText("Nesta fonte"))
+      .getAllByRole("link")
+      .map((l) => l.getAttribute("href"));
+    const compactHrefs = within(within(panel).getByLabelText("Nesta fonte (versão compacta)"))
+      .getAllByRole("link")
+      .map((l) => l.getAttribute("href"));
+    expect(desktopHrefs).toHaveLength(8);
+    expect(compactHrefs).toEqual(desktopHrefs);
+  });
+
+  it("9. caveats absent: both omit Limitações", async () => {
+    renderMinimal();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Informação técnica");
+    const rail = within(panel).getByLabelText("Mais ações");
+    expect(within(within(rail).getByLabelText("Nesta fonte")).queryByRole("link", { name: "Limitações" })).toBeNull();
+    expect(within(within(panel).getByLabelText("Nesta fonte (versão compacta)")).queryByRole("link", { name: "Limitações" })).toBeNull();
+  });
+
+  it("10. related PRB absent: both omit Na investigação", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_NO_PRB_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("EVD-000106");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const desktopNav = await within(rail).findByLabelText("Nesta fonte");
+    expect(within(desktopNav).queryByRole("link", { name: "Na investigação" })).toBeNull();
+    expect(within(within(panel).getByLabelText("Nesta fonte (versão compacta)")).queryByRole("link", { name: "Na investigação" })).toBeNull();
+  });
+
+  it("11. related PRB present: both include Na investigação", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    expect(within(within(rail).getByLabelText("Nesta fonte")).getByRole("link", { name: "Na investigação" })).toBeTruthy();
+    expect(within(within(panel).getByLabelText("Nesta fonte (versão compacta)")).getByRole("link", { name: "Na investigação" })).toBeTruthy();
+  });
+
+  it("12. compact links resolve to the same Source anchors as desktop links", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    const rail = within(panel).getByLabelText("Mais ações");
+    const desktopHrefs = within(within(rail).getByLabelText("Nesta fonte"))
+      .getAllByRole("link")
+      .map((l) => l.getAttribute("href")!);
+    for (const href of desktopHrefs) {
+      const id = href.slice(1);
+      expect(panel.querySelectorAll(`#${id}`).length).toBe(1);
+    }
+    const compactHrefs = within(within(panel).getByLabelText("Nesta fonte (versão compacta)"))
+      .getAllByRole("link")
+      .map((l) => l.getAttribute("href")!);
+    expect(compactHrefs).toEqual(desktopHrefs);
+  });
+
+  it("13. 'Abrir fonte original' remains exactly once", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    expect(within(panel).getAllByRole("link", { name: "Abrir fonte original ↗" })).toHaveLength(1);
+  });
+
+  it("14. no legacy Source rail actions/path reappear", async () => {
+    renderFull();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    expect(within(panel).queryByRole("button", { name: /Ver no Grafo/ })).toBeNull();
+    expect(within(panel).queryByRole("button", { name: /Ver como Problema/ })).toBeNull();
+    expect(within(panel).queryByText("research/sources/SRC-0093.yaml")).toBeNull();
+  });
+
+  it("15. EVD does not render SourceCompactSectionIndex", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Mais ações");
+    expect(within(panel).queryByLabelText("Nesta fonte (versão compacta)")).toBeNull();
+  });
+
+  it("16. PRB does not render SourceCompactSectionIndex", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Mais ações");
+    expect(within(panel).queryByLabelText("Nesta fonte (versão compacta)")).toBeNull();
   });
 });

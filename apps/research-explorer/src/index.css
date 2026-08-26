@@ -2105,6 +2105,17 @@ main.explorer-shell {
   margin: 0 0 var(--space-3);
 }
 
+/* SUI-03J2B: SRC's own compact "Nesta fonte" index reuses the exact same
+   hidden-by-default/compact-visible contract as `.problem-help-section-index`
+   above — unlike Problem View's disclosure (which stays visible for its
+   own explanatory content beyond the index), the entire SRC compact
+   disclosure *is* the index, so the whole wrapper is gated, not just an
+   inner nav. Same breakpoints, same pattern, no new Source-specific
+   breakpoint. */
+.source-compact-section-index {
+  display: none;
+}
+
 /* F1 intermediate reading-layout recomposition (768px-1059px): the
    canonical 720 main + 44 gap + 216 rail composition cannot fit in this
    band without destructively compressing the 720px reading column. Reuse
@@ -2134,6 +2145,10 @@ main.explorer-shell {
   }
 
   .problem-help-section-index {
+    display: block;
+  }
+
+  .source-compact-section-index {
     display: block;
   }
 }
@@ -2895,6 +2910,10 @@ main.explorer-shell {
   }
 
   .problem-help-section-index {
+    display: block;
+  }
+
+  .source-compact-section-index {
     display: block;
   }
 }

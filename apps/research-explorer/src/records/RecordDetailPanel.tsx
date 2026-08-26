@@ -20,6 +20,8 @@ import { extractSourceCaveats } from "./sourceView";
 import { SourceTechnicalSection } from "./SourceTechnicalSection";
 import { SOURCE_SECTION_ANCHOR_IDS, sourceSectionIndex } from "./sourceSectionIndex";
 import { toSourceSectionRelationContext } from "./sourceEvidenceRelations";
+import { SourceCompactSectionIndex } from "./SourceCompactSectionIndex";
+import type { SourceSectionRelationContext } from "./sourceView";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -298,17 +300,21 @@ function SourceOriginalLinkAction({ detail }: { detail: RecordDetail }) {
  * `ProblemReadingRail`'s "Nesta página" nav (`ProblemView.tsx`), reusing the
  * same `.problem-rail-nav` treatment. `sourceSectionIndex` (SUI-03J0) is the
  * sole order/label/anchor/filtering authority; this component never
- * hardcodes a duplicate section list. The relation context is derived from
- * the already-loaded `sourceRelationsState` via `toSourceSectionRelationContext`
- * (SUI-03A2) — passed only once that state is `"ready"`, so `investigation`
- * stays correctly "deferred" (excluded) while loading/idle/error, per
- * `computeSourceSectionPresence`'s own contract.
+ * hardcodes a duplicate section list.
+ *
+ * SUI-03J2B: `relationContext` is now derived once by the caller
+ * (`RecordDetailContent`) and passed in, rather than recomputed here — the
+ * same resolved value also reaches the compact `SourceCompactSectionIndex`,
+ * so both indexes are driven from one `toSourceSectionRelationContext` call.
+ * Wrapped in `.problem-reading-rail`-equivalent visibility: reuses the exact
+ * Problem View responsive class (`.problem-reading-rail`) so it hides at the
+ * same breakpoint the desktop reading rail already hides at, with no new
+ * Source-specific breakpoint.
  */
-function SourceReadingRailIndex({ record, relationsState }: { record: Record<string, unknown>; relationsState: SourceEvidenceRelationsState }) {
-  const relationContext = relationsState.status === "ready" ? toSourceSectionRelationContext(relationsState.relations) : undefined;
+function SourceReadingRailIndex({ record, relationContext }: { record: Record<string, unknown>; relationContext?: SourceSectionRelationContext }) {
   const sections = sourceSectionIndex(record, relationContext);
   return (
-    <nav aria-label="Nesta fonte" className="problem-rail-nav">
+    <nav aria-label="Nesta fonte" className="problem-rail-nav problem-reading-rail">
       <h4 className="detail-panel-label">Nesta fonte</h4>
       <ul>
         {sections.map((section) => (
@@ -932,6 +938,13 @@ function RecordDetailContent({
   // same detail. `sourceId` is `null` for non-SRC records, which is this
   // hook's own no-op contract (see `useSourceEvidenceRelations.ts`).
   const sourceRelationsState = useSourceEvidenceRelations(dataProvider, isSrc ? detail.id : null);
+  // SUI-03J2B: the one `toSourceSectionRelationContext` derivation shared by
+  // both the desktop `SourceReadingRailIndex` and the compact
+  // `SourceCompactSectionIndex` — resolved only once `sourceRelationsState`
+  // is `"ready"`, so `investigation` stays correctly "deferred" (excluded)
+  // while loading/idle/error, matching `computeSourceSectionPresence`'s own
+  // contract. Never recomputed per-index.
+  const sourceRelationContext = isSrc && sourceRelationsState.status === "ready" ? toSourceSectionRelationContext(sourceRelationsState.relations) : undefined;
   const hasCaveats = isSrc ? extractSourceCaveats(detail.record) !== null : false;
   // Already-explicit, schema-driven classification/status fields (RE-01's
   // `buildSummaryFields()` — every enum-constrained field the record's own
@@ -989,6 +1002,7 @@ function RecordDetailContent({
           </section>
 
           {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} />}
+          {isSrc && <SourceCompactSectionIndex record={detail.record} relationContext={sourceRelationContext} />}
 
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
           {isSrc && <SourceOverviewSection record={detail.record} />}
@@ -1039,7 +1053,7 @@ function RecordDetailContent({
             <code>{detail.type}</code>
             <p>{typeInfo.description}</p>
           </div>
-          {isSrc && <SourceReadingRailIndex record={detail.record} relationsState={sourceRelationsState} />}
+          {isSrc && <SourceReadingRailIndex record={detail.record} relationContext={sourceRelationContext} />}
           {!isSrc && (
             <div className="detail-rail-actions">
               {relatedProblemId && (
