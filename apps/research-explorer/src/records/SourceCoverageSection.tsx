@@ -49,7 +49,7 @@ export function SourceCoverageSection({ record }: { record: Record<string, unkno
   const rows = buildCoverageRows(coverage);
 
   return (
-    <section id={SOURCE_SECTION_ANCHOR_IDS.coverage} aria-label="Cobertura" className="source-coverage-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.coverage} aria-label="Cobertura" className="record-editorial-section source-coverage-section">
       <h3 className="detail-panel-label">Cobertura</h3>
       {rows.length > 0 && (
         <dl className="detail-provenance-grid">

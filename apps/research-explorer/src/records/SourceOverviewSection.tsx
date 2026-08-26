@@ -41,7 +41,7 @@ export function SourceOverviewSection({ record }: { record: Record<string, unkno
   const rows = buildOverviewRows(overview);
 
   return (
-    <section id={SOURCE_SECTION_ANCHOR_IDS.overview} aria-label="Visão geral" className="source-overview-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.overview} aria-label="Visão geral" className="record-editorial-section source-overview-section">
       <h3 className="detail-panel-label">Visão geral</h3>
       {rows.length > 0 && (
         <dl className="detail-provenance-grid">

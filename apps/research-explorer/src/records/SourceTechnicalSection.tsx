@@ -13,7 +13,7 @@ import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
  */
 export function SourceTechnicalSection({ record }: { record: Record<string, unknown> }) {
   return (
-    <section id={SOURCE_SECTION_ANCHOR_IDS.technical} aria-label="Informação técnica" className="source-technical-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.technical} aria-label="Informação técnica" className="record-editorial-section source-technical-section">
       <h3 className="detail-panel-label">Informação técnica</h3>
       <details className="technical-disclosure">
         <summary>Inspeção completa do registo canónico</summary>

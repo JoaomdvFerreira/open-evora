@@ -71,7 +71,7 @@ export function SourceDatesAccessSection({ record }: { record: Record<string, un
   const rows = buildDatesAccessRows(datesAccess);
 
   return (
-    <section id={SOURCE_SECTION_ANCHOR_IDS["dates-access"]} aria-label="Datas e acesso" className="source-dates-access-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS["dates-access"]} aria-label="Datas e acesso" className="record-editorial-section source-dates-access-section">
       <h3 className="detail-panel-label">Datas e acesso</h3>
       {rows.length > 0 && (
         <dl className="detail-provenance-grid">

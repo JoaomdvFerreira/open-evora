@@ -121,7 +121,7 @@ export function SourceFindingsSection({ relations, onSelect }: { relations: Sour
   const isEmpty = relations.primaryEvidence.length === 0 && relations.additionalEvidence.length === 0;
 
   return (
-    <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="source-findings-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="record-editorial-section source-findings-section">
       <h3 className="detail-panel-label">O que encontrámos</h3>
       {isEmpty ? (
         <p className="field-empty">Ainda não existem observações da investigação ligadas explicitamente a esta fonte.</p>

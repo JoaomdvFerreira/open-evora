@@ -45,7 +45,7 @@ export function SourceLicensingSection({ record }: { record: Record<string, unkn
   const rows = buildLicensingRows(licensing);
 
   return (
-    <section id={SOURCE_SECTION_ANCHOR_IDS.licensing} aria-label="Licenciamento" className="source-licensing-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.licensing} aria-label="Licenciamento" className="record-editorial-section source-licensing-section">
       <h3 className="detail-panel-label">Licenciamento</h3>
       {rows.length > 0 && (
         <dl className="detail-provenance-grid">

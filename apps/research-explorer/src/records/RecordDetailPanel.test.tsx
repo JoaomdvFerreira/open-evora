@@ -4760,6 +4760,123 @@ describe("RecordDetailPanel — SUI-03J1A Source View anchor IDs", () => {
       expect(within(panel).getByRole("heading", { name: label, level: 3 })).toBeTruthy();
     }
   });
+
+  it("4. all 8 Source top-level sections carry the shared record-editorial-section class", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Na investigação");
+    for (const id of ALL_SOURCE_ANCHOR_IDS) {
+      const section = panel.querySelector(`#${id}`) as HTMLElement;
+      expect(section.classList.contains("record-editorial-section")).toBe(true);
+    }
+  });
+
+  it("5+6+7. findings ready/loading/error states all carry record-editorial-section", async () => {
+    const { unmount: unmountReady } = render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_FULL_DETAIL, "EVD-000106": EVD_106_DETAIL })}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const readyPanel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const evdId = await within(readyPanel).findByText("EVD-000106");
+    expect((evdId.closest("section") as HTMLElement).classList.contains("record-editorial-section")).toBe(true);
+    unmountReady();
+
+    const pendingProvider: DataProvider = {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.reject(new Error("not used")),
+      getRecord: (id: string) => (id === "SRC-0093" ? Promise.resolve(SRC_FULL_DETAIL) : new Promise<RecordDetail>(() => {})),
+      getEdges: () => Promise.reject(new Error("not used")),
+    };
+    const { unmount: unmountLoading } = render(
+      <RecordDetailPanel
+        dataProvider={pendingProvider}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const loadingPanel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const status = await within(loadingPanel).findByText("A carregar observações da investigação…");
+    expect((status.closest("section") as HTMLElement).classList.contains("record-editorial-section")).toBe(true);
+    unmountLoading();
+
+    const failingProvider: DataProvider = {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.reject(new Error("not used")),
+      getRecord: (id: string) => (id === "SRC-0093" ? Promise.resolve(SRC_FULL_DETAIL) : Promise.reject(new Error("relation load failed"))),
+      getEdges: () => Promise.reject(new Error("not used")),
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={failingProvider}
+        lookup={buildLookup(SRC_FULL_SUMMARY, EVD_106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const errorPanel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const alert = await within(errorPanel).findByRole("alert");
+    expect((alert.closest("section") as HTMLElement).classList.contains("record-editorial-section")).toBe(true);
+  });
+
+  it("8. caveats absent: no empty record-editorial-section wrapper for source-caveats", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0001": SRC_MINIMAL_DETAIL })}
+        lookup={buildLookup(SRC_MINIMAL_SUMMARY)}
+        selectedId="SRC-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Informação técnica");
+    expect(panel.querySelector("#source-caveats")).toBeNull();
+    expect(panel.querySelectorAll(".record-editorial-section").length).toBe(panel.querySelectorAll("[id^='source-']").length);
+  });
+
+  it("9. investigation absent: no empty record-editorial-section wrapper for source-investigation", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0001": SRC_MINIMAL_DETAIL })}
+        lookup={buildLookup(SRC_MINIMAL_SUMMARY)}
+        selectedId="SRC-0001"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Informação técnica");
+    expect(panel.querySelector("#source-investigation")).toBeNull();
+    expect(panel.querySelectorAll(".record-editorial-section").length).toBe(panel.querySelectorAll("[id^='source-']").length);
+  });
 });
 
 describe("RecordDetailPanel — SUI-03J1B desktop Source View 'Nesta fonte' rail index", () => {

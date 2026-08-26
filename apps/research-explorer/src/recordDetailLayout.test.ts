@@ -158,3 +158,56 @@ describe("Source View 'Nesta fonte' index responsive contract (SUI-03J2B, reuses
     // Outside those bands (desktop, >=1060px): rail visible by default, compact hidden by default (asserted above).
   });
 });
+
+/**
+ * SUI-03K2B: Source View top-level sections reuse the exact PRB editorial
+ * section rhythm (`.problem-section` — SUI-03K2A's confirmed root cause of
+ * the compressed Source rhythm) via one neutral shared class,
+ * `.record-editorial-section`, rather than a Source-specific spacing rule or
+ * direct coupling to the PRB-branded `.problem-section` class name. Parses
+ * the actual rule bodies out of the production stylesheet — no pixel
+ * geometry assertions, matching this file's existing characterization style.
+ */
+describe("shared editorial-section rhythm (.record-editorial-section, SUI-03K2B)", () => {
+  const css = readFileSync(CSS_PATH, "utf-8");
+
+  function ruleBodiesForRawPattern(pattern: RegExp): string[] {
+    return [...css.matchAll(pattern)].map((match) => match[1]);
+  }
+
+  it("1+2. .record-editorial-section shares .problem-section's exact margin-bottom: var(--space-8) rule", () => {
+    const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0]).toMatch(/margin-bottom\s*:\s*var\(--space-8\)\s*;/);
+  });
+
+  it("3. .record-editorial-section .detail-panel-label shares .problem-section .detail-panel-label's exact margin-bottom: var(--space-3) rule", () => {
+    const bodies = ruleBodiesForRawPattern(/\.problem-section \.detail-panel-label,\s*\n?\s*\.record-editorial-section \.detail-panel-label\s*\{([^}]*)\}/g);
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0]).toMatch(/margin-bottom\s*:\s*var\(--space-3\)\s*;/);
+  });
+
+  it("10. .problem-section's own rule/value is unchanged (still exactly margin-bottom: var(--space-8))", () => {
+    const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0].trim()).toBe("margin-bottom: var(--space-8);");
+  });
+
+  it("11. no Source-specific margin value was introduced for these sections (no .source-*-section margin/margin-bottom rule outside .record-editorial-section)", () => {
+    const sourceSectionClasses = [
+      "source-overview-section",
+      "source-findings-section",
+      "source-coverage-section",
+      "source-dates-access-section",
+      "source-licensing-section",
+      "source-caveats-section",
+      "source-technical-section",
+    ];
+    for (const className of sourceSectionClasses) {
+      const bodies = ruleBodiesFor(css, `\\.${className}`);
+      for (const body of bodies) {
+        expect(body).not.toMatch(/margin(-bottom)?\s*:/);
+      }
+    }
+  });
+});

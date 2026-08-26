@@ -16,7 +16,7 @@ export function SourceCaveatsSection({ record }: { record: Record<string, unknow
   if (!caveats) return null;
 
   return (
-    <section id={SOURCE_SECTION_ANCHOR_IDS.caveats} aria-label="Limitações" className="source-caveats-section">
+    <section id={SOURCE_SECTION_ANCHOR_IDS.caveats} aria-label="Limitações" className="record-editorial-section source-caveats-section">
       <h3 className="detail-panel-label">Limitações</h3>
       <ul>
         {caveats.map((caveat) => (

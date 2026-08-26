@@ -2604,11 +2604,13 @@ main.explorer-shell {
   font-family: inherit;
 }
 
-.problem-section {
+.problem-section,
+.record-editorial-section {
   margin-bottom: var(--space-8);
 }
 
-.problem-section .detail-panel-label {
+.problem-section .detail-panel-label,
+.record-editorial-section .detail-panel-label {
   margin-bottom: var(--space-3);
 }
 

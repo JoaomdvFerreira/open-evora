@@ -341,7 +341,7 @@ function SourceReadingRailIndex({ record, relationContext }: { record: Record<st
 function SourceFindings({ state, onSelect }: { state: SourceEvidenceRelationsState & { retry: () => void }; onSelect: (id: string) => void }) {
   if (state.status === "loading" || state.status === "idle") {
     return (
-      <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="source-findings-section">
+      <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="record-editorial-section source-findings-section">
         <h3 className="detail-panel-label">O que encontrámos</h3>
         <p role="status" aria-live="polite">
           A carregar observações da investigação…
@@ -352,7 +352,7 @@ function SourceFindings({ state, onSelect }: { state: SourceEvidenceRelationsSta
 
   if (state.status === "error") {
     return (
-      <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="source-findings-section">
+      <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="record-editorial-section source-findings-section">
         <h3 className="detail-panel-label">O que encontrámos</h3>
         <div role="alert">
           <p>Não foi possível carregar as observações da investigação ligadas a esta fonte.</p>
