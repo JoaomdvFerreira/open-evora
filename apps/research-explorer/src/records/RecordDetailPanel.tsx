@@ -952,7 +952,12 @@ function RecordDetailContent({
   // record-type-specific field for special presentation. `analysis.contribution`
   // is excluded: it already has its own authoritative rendering via
   // ContributionChip above, so including it here would render it twice.
-  const roleFields = Object.entries(lookup.get(detail.id)?.summaryFields ?? {}).filter(([field]) => field !== "analysis.contribution");
+  // SUI-03K1: SRC never renders this generic chip row — its schema-declared
+  // enum fields (acquisition.method, access.*, licensing.*, scope.geography.level,
+  // …) are already presented via the dedicated Source View sections (Visão
+  // geral, Cobertura, Datas e acesso, Licenciamento), so surfacing them again
+  // here would be redundant and, at compact width, delay the Source content.
+  const roleFields = isSrc ? [] : Object.entries(lookup.get(detail.id)?.summaryFields ?? {}).filter(([field]) => field !== "analysis.contribution");
 
   return (
     <div className="record-detail-layout shell-frame">

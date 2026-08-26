@@ -5475,3 +5475,250 @@ describe("RecordDetailPanel — SUI-03J2B compact Source View 'Nesta fonte' inde
     expect(within(panel).queryByLabelText("Nesta fonte (versão compacta)")).toBeNull();
   });
 });
+
+describe("RecordDetailPanel — SUI-03K1 suppress obsolete SRC roleFields chip row", () => {
+  /** Mirrors research/sources/SRC-0093.yaml, with summaryFields populated exactly as real read-model.js buildSummaryFields() output (SUI-03K0's 9-chip case). */
+  const SRC_0093_DETAIL: RecordDetail = {
+    id: "SRC-0093",
+    type: "SRC-",
+    file: "research/sources/SRC-0093.yaml",
+    record: {
+      source_id: "SRC-0093",
+      publisher: "Scientific Reports (Springer Nature)",
+      creators: ["Giacomo Dalla Chiara", "Klaas Fiete Krutein", "Andisheh Ranjbari", "Anne Goodchild"],
+      name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+      resource_type: "document",
+      scope: {
+        geography: { level: "local_area", area: "Belltown, Seattle, Washington, EUA" },
+        domains: ["MOB", "DIG"],
+      },
+      access: {
+        level: "public",
+        availability: "available",
+        machine_readable: false,
+        method: "browser",
+        format: "html",
+      },
+      acquisition: { method: "public_web" },
+      canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z",
+      licensing: {
+        status: "known",
+        licence: "CC BY 4.0",
+        reuse: "permitted",
+        attribution: "Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari e Anne Goodchild",
+      },
+      temporal: { published_at: "2022-11-11", last_checked_at: "2026-08-25" },
+      caveats: ["O estudo é um experimento controlado realizado numa área de 10 quarteirões em Belltown, Seattle, com 11 condutores, 33 rotas e 495 entregas simuladas."],
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  /** SUI-03K0's exact 9-chip reproduction: every schema-declared enum field buildSummaryFields() would surface for this record. */
+  const SRC_0093_SUMMARY: RecordSummary = {
+    id: "SRC-0093",
+    type: "SRC-",
+    label: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+    file: SRC_0093_DETAIL.file,
+    summaryFields: {
+      "resource_type": "document",
+      "scope.geography.level": "local_area",
+      "access.level": "public",
+      "access.availability": "available",
+      "access.method": "browser",
+      "access.format": "html",
+      "acquisition.method": "public_web",
+      "licensing.status": "known",
+      "licensing.reuse": "permitted",
+    },
+  };
+
+  /** Sparse SRC-0113-shaped fixture: fewer optional sections, but still a 7-field summaryFields set (SUI-03K0's second reproduction). */
+  const SRC_0113_DETAIL: RecordDetail = {
+    id: "SRC-0113",
+    type: "SRC-",
+    file: "research/sources/SRC-0113.yaml",
+    record: {
+      source_id: "SRC-0113",
+      name: "Minimal municipal webpage",
+      resource_type: "webpage",
+      access: { level: "public", availability: "available", machine_readable: false },
+      acquisition: { method: "public_web" },
+      licensing: { status: "known", reuse: "permitted" },
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const SRC_0113_SUMMARY: RecordSummary = {
+    id: "SRC-0113",
+    type: "SRC-",
+    label: "Minimal municipal webpage",
+    file: SRC_0113_DETAIL.file,
+    summaryFields: {
+      "resource_type": "webpage",
+      "access.level": "public",
+      "access.availability": "available",
+      "acquisition.method": "public_web",
+      "licensing.status": "known",
+      "licensing.reuse": "permitted",
+      "access.machine_readable": "false",
+    },
+  };
+
+  const FORMER_SRC_CHIP_VALUES = ["document", "local_area", "public", "available", "browser", "html", "public_web", "known", "permitted"];
+
+  function renderSrc0093() {
+    return render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+  }
+
+  function renderSrc0113() {
+    return render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0113": SRC_0113_DETAIL })}
+        lookup={buildLookup(SRC_0113_SUMMARY)}
+        selectedId="SRC-0113"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+  }
+
+  it("1. SRC-0093 detail renders no generic roleFields chip row", async () => {
+    renderSrc0093();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    expect(meaningZone.querySelector(".record-role-fields")).toBeNull();
+    expect(within(meaningZone).queryAllByText((_, el) => el?.classList.contains("record-role-chip") ?? false)).toHaveLength(0);
+  });
+
+  it("2. former SRC chip values are not rendered in the header role-fields surface", async () => {
+    renderSrc0093();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    for (const value of FORMER_SRC_CHIP_VALUES) {
+      expect(within(meaningZone).queryByText(new RegExp(value, "i"))).toBeNull();
+    }
+  });
+
+  it("3. SRC-0113-shaped sparse record also renders no generic roleFields row", async () => {
+    renderSrc0113();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    expect(meaningZone.querySelector(".record-role-fields")).toBeNull();
+  });
+
+  it("4. no raw acquisition.method / public_web presentation appears in the SRC header", async () => {
+    renderSrc0093();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    expect(within(meaningZone).queryByText(/acquisition\.method/)).toBeNull();
+    expect(within(meaningZone).queryByText(/public_web/)).toBeNull();
+  });
+
+  it("5. Source title remains present", async () => {
+    renderSrc0093();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    expect(within(meaningZone).getByText(SRC_0093_SUMMARY.label)).toBeTruthy();
+  });
+
+  it("6. SRC type identity treatment remains present", async () => {
+    renderSrc0093();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const breadcrumb = within(panel).getByLabelText("Localização");
+    expect(within(breadcrumb).getByText("SRC-0093")).toBeTruthy();
+  });
+
+  it("7. Abrir fonte original remains present exactly once", async () => {
+    renderSrc0093();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Visão geral");
+    expect(within(panel).getAllByRole("link", { name: "Abrir fonte original ↗" })).toHaveLength(1);
+  });
+
+  it("8. Visão geral remains present", async () => {
+    renderSrc0093();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Visão geral")).toBeTruthy();
+  });
+
+  it("9. compact Source index integration remains unchanged (renders before Visão geral)", async () => {
+    renderSrc0093();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Visão geral");
+    const main = panel.querySelector(".record-detail-main") as HTMLElement;
+    const compactDetails = within(main).getByText("Nesta fonte", { selector: "summary" }).closest("details")!;
+    const overviewHeading = within(main).getByRole("heading", { name: "Visão geral" });
+    const position = compactDetails.compareDocumentPosition(overviewHeading);
+    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("10. desktop Source rail/index remains unchanged", async () => {
+    renderSrc0093();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Visão geral");
+    const rail = within(panel).getByLabelText("Mais ações");
+    expect(within(rail).getByLabelText("Nesta fonte")).toBeTruthy();
+  });
+
+  it("11. EVD roleFields rendering remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    expect(within(meaningZone).getByText(/Força da evidência/)).toBeTruthy();
+    expect(meaningZone.querySelector(".record-role-fields")).toBeTruthy();
+  });
+
+  it("12. PRB behavior remains unchanged (still uses status summary field)", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const meaningZone = await within(panel).findByLabelText("Significado");
+    expect(meaningZone.querySelector(".record-role-fields")).toBeTruthy();
+  });
+
+  it("13. no Source section metadata was removed from its dedicated human-readable section (Visão geral still shows resource_type)", async () => {
+    renderSrc0093();
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const overview = await within(panel).findByLabelText("Visão geral");
+    expect(within(overview).getByText("Documento")).toBeTruthy();
+  });
+
+  it("14. no presentation vocabulary was added for acquisition.method", async () => {
+    const presentation = await import("../presentation");
+    expect(() => presentation.publicFieldCaption("acquisition.method")).not.toThrow();
+    // Falls back to the raw field string — no dedicated caption/enum mapping exists for it.
+    expect(presentation.publicFieldCaption("acquisition.method")).toBe("acquisition.method");
+    expect(presentation.publicEnumLabel("acquisition.method", "public_web")).toBe("public_web");
+  });
+});
