@@ -17,6 +17,7 @@ import { SourceCaveatsSection } from "./SourceCaveatsSection";
 import { SourceInvestigationSection } from "./SourceInvestigationSection";
 import { useSourceEvidenceRelations, type SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
 import { extractSourceCaveats } from "./sourceView";
+import { SourceTechnicalSection } from "./SourceTechnicalSection";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -969,6 +970,8 @@ function RecordDetailContent({
           {isSrc && <SourceCaveatsSection record={detail.record} />}
           {isSrc && hasCaveats && <SourceInvestigation state={sourceRelationsState} onSelect={onSelect} />}
 
+          {isSrc && <SourceTechnicalSection record={detail.record} />}
+
           {isPrb ? (
             <>
               <PrbMetadataPanel detail={detail} />
@@ -985,7 +988,7 @@ function RecordDetailContent({
                 <PrbRawTechnicalDisclosure detail={detail} />
               </section>
             </>
-          ) : (
+          ) : isSrc ? null : (
             <>
               <ProvenancePanel detail={detail} />
 

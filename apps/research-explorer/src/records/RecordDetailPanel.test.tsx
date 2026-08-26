@@ -1063,10 +1063,11 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     expect(within(overview).getByText("Município de Évora")).toBeTruthy();
     // The retired SRC quick-read block no longer renders at all.
     expect(within(panel).queryByLabelText("Leitura rápida")).toBeNull();
-    // publisher appears exactly once outside the raw exhaustive technical
-    // disclosure (which independently echoes every canonical field verbatim,
-    // unaffected by this integration) — i.e. exactly once in Visão geral.
-    const disclosure = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos").closest("details") as HTMLElement;
+    // publisher appears exactly once outside SourceTechnicalSection's raw
+    // exhaustive disclosure (which independently echoes every canonical
+    // field verbatim, unaffected by this integration) — i.e. exactly once
+    // in Visão geral.
+    const disclosure = within(panel).getByText("Inspeção completa do registo canónico").closest("details") as HTMLElement;
     expect(within(panel).getAllByText("Município de Évora").filter((el) => !disclosure.contains(el))).toHaveLength(1);
 
     // The existing "Abrir fonte original" action still renders exactly once
@@ -1319,10 +1320,11 @@ describe("RecordDetailPanel — SUI-03B2 Source View Visão geral integration", 
     expect(within(overview).getByText("Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari, Anne Goodchild")).toBeTruthy();
     expect(within(overview).getByText(/Verificada pela Open Évora em/)).toBeTruthy();
 
-    // publisher appears exactly once outside the raw exhaustive technical
-    // disclosure (which independently echoes every canonical field verbatim,
-    // unaffected by this integration) — i.e. exactly once in Visão geral.
-    const disclosure = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos").closest("details") as HTMLElement;
+    // publisher appears exactly once outside SourceTechnicalSection's raw
+    // exhaustive disclosure (which independently echoes every canonical
+    // field verbatim, unaffected by this integration) — i.e. exactly once
+    // in Visão geral.
+    const disclosure = within(panel).getByText("Inspeção completa do registo canónico").closest("details") as HTMLElement;
     expect(within(panel).getAllByText("Scientific Reports (Springer Nature)").filter((el) => !disclosure.contains(el))).toHaveLength(1);
 
     // The retired SRC quick-read block no longer renders separately.
@@ -1340,11 +1342,11 @@ describe("RecordDetailPanel — SUI-03B2 Source View Visão geral integration", 
     expect(within(meaningZone).getByText(SRC_0093_SUMMARY.label)).toBeTruthy();
     expect(within(meaningZone).getByText(/Este é um registo técnico da investigação/)).toBeTruthy();
 
-    // Existing technical disclosure remains present.
-    expect(within(panel).getByText("Inspeção técnica completa — todos os campos canónicos")).toBeTruthy();
+    // SourceTechnicalSection's disclosure remains present.
+    expect(within(panel).getByText("Inspeção completa do registo canónico")).toBeTruthy();
   });
 
-  it("positions Visão geral after the meaning zone and before the technical/relations content, for SRC", async () => {
+  it("positions Visão geral after the meaning zone and before the technical content, for SRC", async () => {
     render(
       <RecordDetailPanel
         dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
@@ -1360,13 +1362,13 @@ describe("RecordDetailPanel — SUI-03B2 Source View Visão geral integration", 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const meaningZone = await within(panel).findByLabelText("Significado");
     const overview = within(panel).getByLabelText("Visão geral");
-    const technicalSummary = within(panel).getByText("Inspeção técnica completa — todos os campos canónicos");
+    const technicalSection = within(panel).getByLabelText("Informação técnica");
 
     expect(meaningZone.compareDocumentPosition(overview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(overview.compareDocumentPosition(technicalSummary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(overview.compareDocumentPosition(technicalSection) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it("keeps existing relations present for SRC when the fixture provides them", async () => {
+  it("SRC no longer renders the generic Relações section, even when the fixture provides edges", async () => {
     const srcWithRelation: RecordDetail = {
       ...SRC_0093_DETAIL,
       incomingEdges: [{ field: "analysis.related_problems", ordinal: 0, from: "EVD-000127" }],
@@ -1386,8 +1388,8 @@ describe("RecordDetailPanel — SUI-03B2 Source View Visão geral integration", 
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const relations = await within(panel).findByLabelText("Relações");
-    expect(within(relations).getByRole("button", { name: new RegExp(evdSummary.label) })).toBeTruthy();
+    await within(panel).findByLabelText("Visão geral");
+    expect(within(panel).queryByLabelText("Relações")).toBeNull();
   });
 
   it("does not render Visão geral (SourceOverviewSection) for an EVD record", async () => {
@@ -1967,9 +1969,9 @@ describe("RecordDetailPanel — SUI-03D2 Source View Cobertura integration", () 
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    expect(await within(panel).findByLabelText("Proveniência")).toBeTruthy();
-    expect(within(panel).getByLabelText("Campos do registo")).toBeTruthy();
-    expect(within(panel).getByLabelText(/Relações/)).toBeTruthy();
+    expect(await within(panel).findByLabelText("Informação técnica")).toBeTruthy();
+    expect(within(panel).queryByLabelText("Proveniência")).toBeNull();
+    expect(within(panel).queryByLabelText("Campos do registo")).toBeNull();
   });
 });
 
@@ -2315,9 +2317,9 @@ describe("RecordDetailPanel — SUI-03E2 Source View Datas e acesso integration"
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    expect(await within(panel).findByLabelText("Proveniência")).toBeTruthy();
-    expect(within(panel).getByLabelText("Campos do registo")).toBeTruthy();
-    expect(within(panel).getByLabelText(/Relações/)).toBeTruthy();
+    expect(await within(panel).findByLabelText("Informação técnica")).toBeTruthy();
+    expect(within(panel).queryByLabelText("Proveniência")).toBeNull();
+    expect(within(panel).queryByLabelText("Campos do registo")).toBeNull();
   });
 });
 
@@ -2618,9 +2620,9 @@ describe("RecordDetailPanel — SUI-03F2 Source View Licenciamento integration",
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    expect(await within(panel).findByLabelText("Proveniência")).toBeTruthy();
-    expect(within(panel).getByLabelText("Campos do registo")).toBeTruthy();
-    expect(within(panel).getByLabelText(/Relações/)).toBeTruthy();
+    expect(await within(panel).findByLabelText("Informação técnica")).toBeTruthy();
+    expect(within(panel).queryByLabelText("Proveniência")).toBeNull();
+    expect(within(panel).queryByLabelText("Campos do registo")).toBeNull();
   });
 });
 
@@ -2942,7 +2944,7 @@ describe("RecordDetailPanel — SUI-03G2 Source View Limitações integration", 
     expect(within(findings).getByText("Ainda não existem observações da investigação ligadas explicitamente a esta fonte.")).toBeTruthy();
   });
 
-  it("13. existing lower ProvenancePanel/TechnicalDisclosure/RelationshipList remain untouched", async () => {
+  it("13. lower ProvenancePanel/TechnicalDisclosure/RelationshipList are absent for SRC, replaced by SourceTechnicalSection", async () => {
     render(
       <RecordDetailPanel
         dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
@@ -2956,9 +2958,9 @@ describe("RecordDetailPanel — SUI-03G2 Source View Limitações integration", 
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    expect(await within(panel).findByLabelText("Proveniência")).toBeTruthy();
-    expect(within(panel).getByLabelText("Campos do registo")).toBeTruthy();
-    expect(within(panel).getByLabelText(/Relações/)).toBeTruthy();
+    expect(await within(panel).findByLabelText("Informação técnica")).toBeTruthy();
+    expect(within(panel).queryByLabelText("Proveniência")).toBeNull();
+    expect(within(panel).queryByLabelText("Campos do registo")).toBeNull();
   });
 });
 
@@ -3311,6 +3313,410 @@ describe("RecordDetailPanel — SUI-03H2 Source View Na investigação integrati
     expect(within(investigation).queryByText(/Comparator\/mechanism/)).toBeNull();
     expect(within(investigation).queryByText(/research_role/)).toBeNull();
     expect(within(investigation).queryByText(/PRB-0005 —/)).toBeNull();
+  });
+});
+
+describe("RecordDetailPanel — SUI-03I2 Source View Informação técnica integration", () => {
+  /** Mirrors research/sources/SRC-0093.yaml and research/evidence/EVD-000106.yaml exactly (acceptance case). */
+  const SRC_0093_DETAIL: RecordDetail = {
+    id: "SRC-0093",
+    type: "SRC-",
+    file: "research/sources/SRC-0093.yaml",
+    record: {
+      source_id: "SRC-0093",
+      publisher: "Scientific Reports (Springer Nature)",
+      name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+      resource_type: "document",
+      scope: {
+        geography: { level: "local_area", area: "Belltown, Seattle, Washington, EUA" },
+        domains: ["MOB", "DIG"],
+      },
+      access: { level: "public", availability: "available", machine_readable: false, method: "browser", format: "html" },
+      canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z",
+      licensing: {
+        status: "known",
+        licence: "CC BY 4.0",
+        reuse: "permitted",
+        attribution: "Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari e Anne Goodchild",
+      },
+      temporal: { published_at: "2022-11-11", last_checked_at: "2026-08-25" },
+    },
+    outgoingEdges: [],
+    incomingEdges: [{ field: "source.source_id", ordinal: null, from: "EVD-000106" }],
+  };
+  const SRC_0093_SUMMARY: RecordSummary = {
+    id: "SRC-0093",
+    type: "SRC-",
+    label: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+    file: SRC_0093_DETAIL.file,
+    summaryFields: {},
+  };
+  const SRC_0093_WITH_CAVEATS: RecordDetail = {
+    ...SRC_0093_DETAIL,
+    record: { ...SRC_0093_DETAIL.record, caveats: ["Limitação canónica."] },
+  };
+  const EVD_000106_DETAIL: RecordDetail = {
+    id: "EVD-000106",
+    type: "EVD-",
+    file: "research/evidence/EVD-000106.yaml",
+    record: {
+      evidence_id: "EVD-000106",
+      source: { source_id: "SRC-0093" },
+      observation: {
+        summary: "A apresentação de informação sobre disponibilidade junto ao passeio reduziu o tempo de circulação à procura de estacionamento.",
+      },
+      evidence_nature: "measurement",
+      analysis: { related_problems: ["PRB-0005"] },
+    },
+    outgoingEdges: [{ field: "analysis.related_problems", ordinal: 0, to: "PRB-0005" }],
+    incomingEdges: [],
+  };
+  const EVD_000106_SUMMARY: RecordSummary = {
+    id: "EVD-000106",
+    type: "EVD-",
+    label: "A apresentação de informação sobre disponibilidade junto ao passeio reduziu o tempo de circulação à procura de estacionamento.",
+    file: EVD_000106_DETAIL.file,
+    summaryFields: {},
+  };
+
+  it("1. SRC renders 'Informação técnica'", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Informação técnica")).toBeTruthy();
+  });
+
+  it("2. section order ends with Limitações, Na investigação, Informação técnica (caveats present)", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_WITH_CAVEATS, "EVD-000106": EVD_000106_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY, EVD_000106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const caveats = await within(panel).findByLabelText("Limitações");
+    const investigation = await within(panel).findByLabelText("Na investigação");
+    const technical = await within(panel).findByLabelText("Informação técnica");
+
+    expect(caveats.compareDocumentPosition(investigation) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(investigation.compareDocumentPosition(technical) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("2b. section order ends with Na investigação, Informação técnica (no caveats)", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL, "EVD-000106": EVD_000106_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY, EVD_000106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(within(panel).queryByLabelText("Limitações")).toBeNull();
+    const investigation = await within(panel).findByLabelText("Na investigação");
+    const technical = await within(panel).findByLabelText("Informação técnica");
+
+    expect(investigation.compareDocumentPosition(technical) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("3. SourceTechnicalSection disclosure is collapsed by default", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const technical = await within(panel).findByLabelText("Informação técnica");
+    const details = within(technical).getByText("Inspeção completa do registo canónico").closest("details") as HTMLDetailsElement;
+    expect(details.open).toBe(false);
+  });
+
+  it("4. opening it reveals the canonical record tree", async () => {
+    const user = userEvent.setup();
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const technical = await within(panel).findByLabelText("Informação técnica");
+    const summary = within(technical).getByText("Inspeção completa do registo canónico");
+    await user.click(summary);
+    const details = summary.closest("details") as HTMLDetailsElement;
+    expect(details.open).toBe(true);
+    expect(within(technical).getByText("SRC-0093")).toBeTruthy();
+    expect(within(technical).getByText("publisher")).toBeTruthy();
+  });
+
+  it("5. SRC no longer renders the generic 'Proveniência' section", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Visão geral");
+    expect(within(panel).queryByLabelText("Proveniência")).toBeNull();
+  });
+
+  it("6. SRC no longer renders the generic 'Relações' section", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Visão geral");
+    expect(within(panel).queryByLabelText("Relações")).toBeNull();
+  });
+
+  it("7+8. SRC no longer renders the generic TechnicalDisclosure summary, and does render the new SourceTechnicalSection summary", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Visão geral");
+    expect(within(panel).queryByText("Inspeção técnica completa — todos os campos canónicos")).toBeNull();
+    expect(within(panel).getByText("Inspeção completa do registo canónico")).toBeTruthy();
+  });
+
+  it("9. detail.file / repository YAML path is not introduced into the main Source content", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const main = await within(panel).findByLabelText("Visão geral");
+    const content = main.closest(".record-detail-main") as HTMLElement;
+    expect(within(content).queryByText(/\.yaml/)).toBeNull();
+    expect(within(content).queryByText("research/sources/SRC-0093.yaml")).toBeNull();
+  });
+
+  it("10. generic relation count is absent from SRC", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Visão geral");
+    expect(within(panel).queryByText(/registo\(s\) relacionado\(s\)/)).toBeNull();
+  });
+
+  it("11. raw edge/path syntax is absent from SRC", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Visão geral");
+    expect(within(panel).queryByText(/caminho\(s\) de entrada/)).toBeNull();
+    expect(within(panel).queryByLabelText("Registos relacionados")).toBeNull();
+  });
+
+  it("12. 'O que encontrámos' remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL, "EVD-000106": EVD_000106_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY, EVD_000106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const findings = await within(panel).findByLabelText("O que encontrámos");
+    expect(within(findings).getByText("EVD-000106")).toBeTruthy();
+  });
+
+  it("13. 'Na investigação' remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL, "EVD-000106": EVD_000106_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY, EVD_000106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const investigation = await within(panel).findByLabelText("Na investigação");
+    expect(within(investigation).getByText("PRB-0005")).toBeTruthy();
+    expect(within(investigation).getByText("Através de: EVD-000106")).toBeTruthy();
+  });
+
+  it("14. SRC-0093 renders EVD-000106 in findings, PRB-0005 in investigation, and the full canonical SRC record inside Informação técnica", async () => {
+    const user = userEvent.setup();
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL, "EVD-000106": EVD_000106_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY, EVD_000106_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const findings = await within(panel).findByLabelText("O que encontrámos");
+    expect(within(findings).getByText("EVD-000106")).toBeTruthy();
+
+    const investigation = await within(panel).findByLabelText("Na investigação");
+    expect(within(investigation).getByText("PRB-0005")).toBeTruthy();
+
+    const technical = await within(panel).findByLabelText("Informação técnica");
+    await user.click(within(technical).getByText("Inspeção completa do registo canónico"));
+    expect(within(technical).getByText("SRC-0093")).toBeTruthy();
+    expect(within(technical).getByText("canonical_reference")).toBeTruthy();
+    expect(within(technical).getByText("licensing")).toBeTruthy();
+  });
+
+  it("15. EVD detail still renders its existing generic ProvenancePanel, TechnicalDisclosure, and RelationshipList", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Proveniência")).toBeTruthy();
+    expect(within(panel).getByText("Inspeção técnica completa — todos os campos canónicos")).toBeTruthy();
+    const relacoes = within(panel).getByLabelText("Relações");
+    expect(within(relacoes).getByText(/PRB-0006/)).toBeTruthy();
+    expect(within(panel).queryByLabelText("Informação técnica")).toBeNull();
+  });
+
+  it("16. PRB behavior remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await screen.findByText("Detalhes");
+    expect(within(panel).queryByLabelText("Proveniência")).toBeNull();
+    expect(within(panel).getByLabelText("Metadados")).toBeTruthy();
+    expect(within(panel).getByText("Estrutura técnica completa")).toBeTruthy();
+    expect(within(panel).queryByLabelText("Informação técnica")).toBeNull();
+  });
+
+  it("17. no duplicate raw technical disclosure appears for SRC", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Visão geral");
+    expect(within(panel).getAllByText(/^Inspeção/).length).toBe(1);
   });
 });
 
