@@ -14,6 +14,12 @@ import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
  * `source-finding-id` neutral record-ID button treatment `SourceFindingsSection`
  * already uses for EVD ids — a button when `onSelect` is supplied, plain
  * text otherwise (mirrors that section's own `onSelect`-optional contract).
+ *
+ * SUI-03K3: "Observações relacionadas" (the `uniqueEvidenceCount` metric)
+ * moved to `SourceFindingsSection` ("O que encontrámos") — that count
+ * describes related evidence, not PRB-level investigation context, so it no
+ * longer renders here. This section is now PRB-only: presence still keys off
+ * `relatedProblems.length === 0`, unaffected by the count's removal.
  */
 
 function RelatedProblemItem({ problem, onSelect }: { problem: SourceRelatedProblem; onSelect?: (id: string) => void }) {
@@ -37,10 +43,6 @@ export function SourceInvestigationSection({ relations, onSelect }: { relations:
   return (
     <section id={SOURCE_SECTION_ANCHOR_IDS.investigation} aria-label="Na investigação" className="record-editorial-section source-findings-section">
       <h3 className="detail-panel-label">Na investigação</h3>
-      <dl className="detail-provenance-grid">
-        <dt>Observações relacionadas</dt>
-        <dd>{relations.uniqueEvidenceCount}</dd>
-      </dl>
       <div className="source-finding-group">
         <h4 className="record-editorial-subheading">Problemas relacionados</h4>
         <ul className="source-finding-list">

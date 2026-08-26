@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { extractSourceDatesAccess, type SourceDatesAccess } from "./sourceView";
+import { extractSourceDatesAccess, isHttpUrl, type SourceDatesAccess } from "./sourceView";
 import { publicEnumLabel, publicTriStateLabel, formatPublicPartialDate } from "../presentation";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 
@@ -7,6 +7,7 @@ interface DatesAccessRow {
   label: string;
   field: string;
   value: string;
+  href?: string;
 }
 
 /**
@@ -16,9 +17,11 @@ interface DatesAccessRow {
  * freshness. `temporal.last_checked_at` is rendered as a plain public date
  * with no "current/recent/validated" framing — it only records when Open
  * Évora checked the Source. `scope.temporal` (coverage) is out of scope
- * here; it belongs to "Cobertura". `canonical_reference` renders as plain
- * text — the actionable "Abrir fonte original" CTA and its eligibility rule
- * belong to the Source header action, not duplicated here.
+ * here; it belongs to "Cobertura". `canonical_reference` is a factual
+ * reference: it renders as a clickable link whenever it is itself a valid
+ * HTTP(S) URL (`isHttpUrl`), independent of the "Abrir fonte original" CTA's
+ * `access.level`/`access.availability` eligibility (SUI-03K3) — those govern
+ * the header action only, never whether this factual field links out.
  */
 function buildDatesAccessRows(datesAccess: SourceDatesAccess): DatesAccessRow[] {
   const rows: DatesAccessRow[] = [];
@@ -60,7 +63,12 @@ function buildDatesAccessRows(datesAccess: SourceDatesAccess): DatesAccessRow[] 
   }
 
   if (datesAccess.canonicalReference) {
-    rows.push({ label: "Referência original", field: "canonical_reference", value: datesAccess.canonicalReference });
+    rows.push({
+      label: "Referência original",
+      field: "canonical_reference",
+      value: datesAccess.canonicalReference,
+      href: isHttpUrl(datesAccess.canonicalReference) ? datesAccess.canonicalReference : undefined,
+    });
   }
 
   return rows;
@@ -78,7 +86,15 @@ export function SourceDatesAccessSection({ record }: { record: Record<string, un
           {rows.map((row) => (
             <Fragment key={row.field}>
               <dt>{row.label}</dt>
-              <dd>{row.value}</dd>
+              <dd>
+                {row.href ? (
+                  <a href={row.href} target="_blank" rel="noopener noreferrer">
+                    {row.value}
+                  </a>
+                ) : (
+                  row.value
+                )}
+              </dd>
             </Fragment>
           ))}
         </dl>

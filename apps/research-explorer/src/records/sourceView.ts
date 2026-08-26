@@ -17,6 +17,24 @@ function getString(record: Record<string, unknown>, key: string): string | null 
   return typeof value === "string" && value.trim() !== "" ? value : null;
 }
 
+/**
+ * SUI-03K3: pure HTTP(S)-URL-validity check, extracted so both the header
+ * "Abrir fonte original" CTA eligibility (`publicSourceReferenceUrl` in
+ * `RecordDetailPanel.tsx`, which additionally requires `access.level` ===
+ * "public" and `access.availability` === "available") and the factual
+ * "Referência original" link rendering (`SourceDatesAccessSection`, which
+ * must NOT depend on access/publication eligibility) share one definition of
+ * "is this string a valid HTTP(S) URL" instead of two independent parsers.
+ */
+export function isHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function getStringArray(record: Record<string, unknown>, key: string): string[] | null {
   const value = record[key];
   if (!Array.isArray(value)) return null;

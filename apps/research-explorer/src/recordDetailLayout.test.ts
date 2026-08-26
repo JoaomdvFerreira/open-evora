@@ -160,6 +160,87 @@ describe("Source View 'Nesta fonte' index responsive contract (SUI-03J2B, reuses
 });
 
 /**
+ * SUI-03K3: characterizes the CSS-driven (never JS/viewport) responsive
+ * contract governing the "Abrir fonte original ↗" desktop rail copy
+ * (`.source-original-link-rail`) vs. the compact in-flow copy
+ * (`.source-original-link-inline`), reusing the exact same media queries as
+ * the "Nesta fonte" rail/compact-index pair above.
+ */
+describe("Source View 'Abrir fonte original' responsive contract (SUI-03K3)", () => {
+  const css = readFileSync(CSS_PATH, "utf-8");
+
+  function bodiesInMediaBlock(mediaSelector: string, ruleSelector: string): string[] {
+    const escapedMedia = mediaSelector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const mediaPattern = new RegExp(`@media\\s*${escapedMedia}\\s*\\{`, "g");
+    const bodies: string[] = [];
+    for (const match of css.matchAll(mediaPattern)) {
+      const start = match.index! + match[0].length;
+      let depth = 1;
+      let i = start;
+      while (i < css.length && depth > 0) {
+        if (css[i] === "{") depth++;
+        else if (css[i] === "}") depth--;
+        i++;
+      }
+      const blockBody = css.slice(start, i - 1);
+      bodies.push(...ruleBodiesFor(blockBody, ruleSelector));
+    }
+    return bodies;
+  }
+
+  it("no JS viewport detection is used to drive this visibility (window.innerWidth/matchMedia/resize) in RecordDetailPanel", () => {
+    const source = readFileSync(path.join(__dirname, "records", "RecordDetailPanel.tsx"), "utf-8");
+    expect(source).not.toMatch(/window\.innerWidth/);
+    expect(source).not.toMatch(/matchMedia/);
+    expect(source).not.toMatch(/addEventListener\(\s*["']resize["']/);
+  });
+
+  it("desktop-band (>=1060px, no override media query applies): the rail copy is visible by default and the inline copy is hidden by default", () => {
+    const baseInlineBodies = ruleBodiesFor(css, ".source-original-link-inline");
+    expect(baseInlineBodies.length).toBeGreaterThan(0);
+    expect(baseInlineBodies[0]).toMatch(/display\s*:\s*none/);
+
+    const allRailBodies = ruleBodiesFor(css, ".source-original-link-rail");
+    const outsideMediaBodies = allRailBodies.filter(
+      (body) =>
+        !bodiesInMediaBlock("(min-width: 768px) and (max-width: 1059px)", ".source-original-link-rail").includes(body) &&
+        !bodiesInMediaBlock("(max-width: 767px)", ".source-original-link-rail").includes(body)
+    );
+    expect(outsideMediaBodies.length).toBe(0);
+  });
+
+  it("compact/non-lateral-rail bands (768-1059px and <=767px): the rail copy is hidden and the inline copy is shown", () => {
+    for (const mediaSelector of ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"]) {
+      const railBodies = bodiesInMediaBlock(mediaSelector, ".source-original-link-rail");
+      expect(railBodies.some((body) => /display\s*:\s*none/.test(body))).toBe(true);
+
+      const inlineBodies = bodiesInMediaBlock(mediaSelector, ".source-original-link-inline");
+      expect(inlineBodies.some((body) => /display\s*:\s*block/.test(body))).toBe(true);
+    }
+  });
+
+  it("reuses the exact same media queries as the 'Nesta fonte' rail/compact-index pair — no new Source-specific breakpoint", () => {
+    for (const mediaSelector of ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"]) {
+      const railIndexBodies = bodiesInMediaBlock(mediaSelector, ".problem-reading-rail");
+      const ctaRailBodies = bodiesInMediaBlock(mediaSelector, ".source-original-link-rail");
+      expect(railIndexBodies.length).toBeGreaterThan(0);
+      expect(ctaRailBodies.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("no declared band shows both the rail copy and the inline copy simultaneously", () => {
+    const bands = ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"];
+    for (const mediaSelector of bands) {
+      const railBodies = bodiesInMediaBlock(mediaSelector, ".source-original-link-rail");
+      const inlineBodies = bodiesInMediaBlock(mediaSelector, ".source-original-link-inline");
+      const railHiddenHere = railBodies.some((body) => /display\s*:\s*none/.test(body));
+      const inlineShownHere = inlineBodies.some((body) => /display\s*:\s*block/.test(body));
+      expect(railHiddenHere && inlineShownHere).toBe(true);
+    }
+  });
+});
+
+/**
  * SUI-03K2B: Source View top-level sections reuse the exact PRB editorial
  * section rhythm (`.problem-section` — SUI-03K2A's confirmed root cause of
  * the compressed Source rhythm) via one neutral shared class,

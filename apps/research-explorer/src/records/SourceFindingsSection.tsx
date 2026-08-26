@@ -10,6 +10,13 @@ import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
  * `SourceEvidenceRelations` (SUI-03A2) — no data fetching, no SRC → EVD
  * relation classification of its own. `primaryEvidence` / `additionalEvidence`
  * are trusted as already deduplicated/precedence-resolved by that module.
+ *
+ * SUI-03K3: "Observações relacionadas" (`relations.uniqueEvidenceCount`)
+ * moved here from `SourceInvestigationSection` — it describes related
+ * evidence, not PRB-level investigation context. Rendered immediately after
+ * the heading, before the evidence groups, and only when evidence exists;
+ * the empty state keeps its exact existing copy with no misleading
+ * zero-count block alongside it.
  */
 
 function getString(record: Record<string, unknown>, key: string): string | null {
@@ -127,6 +134,10 @@ export function SourceFindingsSection({ relations, onSelect }: { relations: Sour
         <p className="field-empty">Ainda não existem observações da investigação ligadas explicitamente a esta fonte.</p>
       ) : (
         <>
+          <dl className="detail-provenance-grid">
+            <dt>Observações relacionadas</dt>
+            <dd>{relations.uniqueEvidenceCount}</dd>
+          </dl>
           <EvidenceFindingGroup heading="Evidência retirada desta fonte" evidence={relations.primaryEvidence} onSelect={onSelect} />
           <EvidenceFindingGroup heading="Evidência que também usa esta fonte" evidence={relations.additionalEvidence} onSelect={onSelect} />
         </>

@@ -16,7 +16,7 @@ import { SourceLicensingSection } from "./SourceLicensingSection";
 import { SourceCaveatsSection } from "./SourceCaveatsSection";
 import { SourceInvestigationSection } from "./SourceInvestigationSection";
 import { useSourceEvidenceRelations, type SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
-import { extractSourceCaveats } from "./sourceView";
+import { extractSourceCaveats, isHttpUrl } from "./sourceView";
 import { SourceTechnicalSection } from "./SourceTechnicalSection";
 import { SOURCE_SECTION_ANCHOR_IDS, sourceSectionIndex } from "./sourceSectionIndex";
 import { toSourceSectionRelationContext } from "./sourceEvidenceRelations";
@@ -267,27 +267,26 @@ function publicSourceReferenceUrl(record: Record<string, unknown>): string | nul
   if (accessRecord.availability !== "available") return null;
   const reference = record.canonical_reference;
   if (typeof reference !== "string") return null;
-  let url: URL;
-  try {
-    url = new URL(reference);
-  } catch {
-    return null;
-  }
-  return url.protocol === "http:" || url.protocol === "https:" ? reference : null;
+  return isHttpUrl(reference) ? reference : null;
 }
 
 /**
- * SUI-03B3: moved out of the rail into the Source identity/header area — the
- * action stays visually tied to the Source itself rather than to
- * investigation navigation. Eligibility (`publicSourceReferenceUrl`) is
- * unchanged from SUI-02A; only placement and label moved.
+ * SUI-03K3: rendered twice — once for the desktop rail, once for the compact
+ * in-flow position — with CSS (`.problem-reading-rail` /
+ * `.source-compact-section-index`-style exclusive visibility, reusing the
+ * exact same responsive class contract as `SourceReadingRailIndex` /
+ * `SourceCompactSectionIndex`) guaranteeing exactly one is ever visible.
+ * Eligibility (`publicSourceReferenceUrl`) is unchanged from SUI-02A; only
+ * placement/variant selection is new here.
  */
-function SourceOriginalLinkAction({ detail }: { detail: RecordDetail }) {
+function SourceOriginalLinkAction({ detail, variant }: { detail: RecordDetail; variant: "rail" | "inline" }) {
   if (detail.type !== "SRC-") return null;
   const url = publicSourceReferenceUrl(detail.record);
   if (url === null) return null;
+  const className =
+    variant === "rail" ? "record-source-header-action source-original-link-rail" : "record-source-header-action source-original-link-inline";
   return (
-    <p className="record-source-header-action">
+    <p className={className}>
       <a href={url} target="_blank" rel="noopener noreferrer">
         Abrir fonte original ↗
       </a>
@@ -1006,7 +1005,7 @@ function RecordDetailContent({
             )}
           </section>
 
-          {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} />}
+          {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} variant="inline" />}
           {isSrc && <SourceCompactSectionIndex record={detail.record} relationContext={sourceRelationContext} />}
 
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
@@ -1058,6 +1057,7 @@ function RecordDetailContent({
             <code>{detail.type}</code>
             <p>{typeInfo.description}</p>
           </div>
+          {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} variant="rail" />}
           {isSrc && <SourceReadingRailIndex record={detail.record} relationContext={sourceRelationContext} />}
           {!isSrc && (
             <div className="detail-rail-actions">

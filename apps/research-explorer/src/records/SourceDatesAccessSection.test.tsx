@@ -155,6 +155,49 @@ describe("SourceDatesAccessSection", () => {
     expect(screen.queryByText(/25 de agosto de 2024/)).toBeNull();
   });
 
+  it("renders canonical_reference as a clickable link when it is a valid https URL", () => {
+    render(<SourceDatesAccessSection record={SRC_0093} />);
+
+    const link = screen.getByRole("link", { name: "https://doi.org/10.1038/s41598-022-23987-z" });
+    expect(link.tagName).toBe("A");
+    expect(link.getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
+    expect(link.textContent).toBe("https://doi.org/10.1038/s41598-022-23987-z");
+  });
+
+  it("renders canonical_reference as a clickable link when it is a valid http URL", () => {
+    const record = { ...MINIMAL_SRC, canonical_reference: "http://example.org/source" };
+    render(<SourceDatesAccessSection record={record} />);
+
+    const link = screen.getByRole("link", { name: "http://example.org/source" });
+    expect(link.getAttribute("href")).toBe("http://example.org/source");
+  });
+
+  it("renders canonical_reference as plain text when it is not a valid HTTP(S) URL", () => {
+    const record = { ...MINIMAL_SRC, canonical_reference: "não é um URL" };
+    render(<SourceDatesAccessSection record={record} />);
+
+    expect(screen.queryByRole("link", { name: "não é um URL" })).toBeNull();
+    expect(screen.getByText("não é um URL")).toBeTruthy();
+  });
+
+  it("canonical_reference link rendering does not depend on access.level or access.availability", () => {
+    const record = {
+      ...MINIMAL_SRC,
+      access: { level: "restricted", availability: "unavailable", machine_readable: "unknown" },
+      canonical_reference: "https://example.org/restricted-but-linkable",
+    };
+    render(<SourceDatesAccessSection record={record} />);
+
+    const link = screen.getByRole("link", { name: "https://example.org/restricted-but-linkable" });
+    expect(link).toBeTruthy();
+  });
+
+  it("does not introduce a duplicate 'Referência original' field", () => {
+    render(<SourceDatesAccessSection record={SRC_0093} />);
+
+    expect(screen.getAllByText("Referência original")).toHaveLength(1);
+  });
+
   it("renders no licensing/geography/EVD/PRB content", () => {
     render(<SourceDatesAccessSection record={SRC_0093} />);
 

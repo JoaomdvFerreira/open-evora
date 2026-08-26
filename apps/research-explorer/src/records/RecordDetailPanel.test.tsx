@@ -791,7 +791,9 @@ describe("RecordDetailPanel — SRC original-source action (SUI-02A, SRC v2 elig
     renderSrc(srcDetail({}));
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
+    const links = await within(panel).findAllByRole("link", { name: "Abrir fonte original ↗" });
+    expect(links).toHaveLength(2);
+    const link = links[0];
     expect(link.getAttribute("href")).toBe("https://www.cm-evora.pt/exemplo.pdf");
     expect(link.getAttribute("target")).toBe("_blank");
     expect(link.getAttribute("rel")).toContain("noopener");
@@ -802,8 +804,9 @@ describe("RecordDetailPanel — SRC original-source action (SUI-02A, SRC v2 elig
     renderSrc(srcDetail({ canonical_reference: "http://www.cm-evora.pt/exemplo.pdf" }));
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const link = await within(panel).findByRole("link", { name: /Abrir fonte/ });
-    expect(link.getAttribute("href")).toBe("http://www.cm-evora.pt/exemplo.pdf");
+    const links = await within(panel).findAllByRole("link", { name: /Abrir fonte/ });
+    expect(links).toHaveLength(2);
+    expect(links[0].getAttribute("href")).toBe("http://www.cm-evora.pt/exemplo.pdf");
   });
 
   it("does not show the action when access.level is restricted, even if available", async () => {
@@ -883,29 +886,33 @@ describe("RecordDetailPanel — SRC original-source action (SUI-02A, SRC v2 elig
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
-    expect(link.getAttribute("href")).toBe("https://dados.cm-evora.pt/dataset/exemplo");
+    const links = await within(panel).findAllByRole("link", { name: "Abrir fonte original ↗" });
+    expect(links).toHaveLength(2);
+    expect(links[0].getAttribute("href")).toBe("https://dados.cm-evora.pt/dataset/exemplo");
   });
 
-  it("renders the SRC external-source action in the main content, before 'Visão geral', and not in the rail", async () => {
+  it("renders the SRC external-source action in the main content, before 'Visão geral', with a responsive rail copy also present", async () => {
     renderSrc(srcDetail({}));
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
+    const links = await within(panel).findAllByRole("link", { name: "Abrir fonte original ↗" });
+    expect(links).toHaveLength(2);
     const overview = within(panel).getByLabelText("Visão geral");
     const rail = within(panel).getByLabelText("Mais ações");
+    const inlineLink = links.find((l) => !rail.contains(l)) as HTMLElement;
+    const railLink = links.find((l) => rail.contains(l)) as HTMLElement;
 
-    expect(link.compareDocumentPosition(overview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(rail.contains(link)).toBe(false);
-    expect(within(rail).queryByRole("link", { name: /Abrir fonte/ })).toBeNull();
+    expect(inlineLink).toBeTruthy();
+    expect(railLink).toBeTruthy();
+    expect(inlineLink.compareDocumentPosition(overview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it("renders exactly one external-source action for an eligible SRC", async () => {
+  it("renders exactly two external-source actions (rail + inline) for an eligible SRC", async () => {
     renderSrc(srcDetail({}));
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
-    expect(within(panel).getAllByRole("link", { name: /Abrir fonte/ })).toHaveLength(1);
+    await within(panel).findAllByRole("link", { name: "Abrir fonte original ↗" });
+    expect(within(panel).getAllByRole("link", { name: /Abrir fonte/ })).toHaveLength(2);
   });
 
   it("renders no external-source action anywhere (main content or rail) when ineligible", async () => {
@@ -981,14 +988,17 @@ describe("RecordDetailPanel — SRC original-source action (SUI-02A, SRC v2 elig
       expect(rail.querySelector(".detail-rail-actions")).toBeNull();
     });
 
-    it("keeps 'Abrir fonte original ↗' present exactly once in the main Source content, not the rail", async () => {
+    it("renders 'Abrir fonte original ↗' once in the rail and once in the main content (responsive split)", async () => {
       renderSrc(srcDetail({}));
 
       const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
       const rail = await within(panel).findByLabelText("Mais ações");
       const links = within(panel).getAllByRole("link", { name: "Abrir fonte original ↗" });
-      expect(links).toHaveLength(1);
-      expect(rail.contains(links[0])).toBe(false);
+      expect(links).toHaveLength(2);
+      const inRail = links.filter((l) => rail.contains(l));
+      const outsideRail = links.filter((l) => !rail.contains(l));
+      expect(inRail).toHaveLength(1);
+      expect(outsideRail).toHaveLength(1);
     });
 
     it("does not affect EVD rail behavior — graph action, file path, and 'Ver como Problema' remain available", async () => {
@@ -1213,10 +1223,10 @@ describe("RecordDetailPanel — UX-E record orientation & quick-read", () => {
     const disclosure = within(panel).getByText("Inspeção completa do registo canónico").closest("details") as HTMLElement;
     expect(within(panel).getAllByText("Município de Évora").filter((el) => !disclosure.contains(el))).toHaveLength(1);
 
-    // The existing "Abrir fonte original" action still renders exactly once
-    // (in the Source header area, before Visão geral), unaffected by the
-    // overview integration.
-    expect(within(panel).getAllByRole("link", { name: /Abrir fonte/ })).toHaveLength(1);
+    // The existing "Abrir fonte original" action still renders exactly twice
+    // (rail copy + inline copy in the Source header area, before Visão
+    // geral), unaffected by the overview integration.
+    expect(within(panel).getAllByRole("link", { name: /Abrir fonte/ })).toHaveLength(2);
   });
 
   it("still renders Visão geral, without inventing rows, when only a publisher-less v2 access block is present", async () => {
@@ -1475,8 +1485,9 @@ describe("RecordDetailPanel — SUI-03B2 Source View Visão geral integration", 
 
     // Existing external-link action (SUI-02A eligibility) still renders, now
     // in the Source header area rather than the rail.
-    const link = within(panel).getByRole("link", { name: /Abrir fonte original/ });
-    expect(link.getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
+    const links = within(panel).getAllByRole("link", { name: /Abrir fonte original/ });
+    expect(links).toHaveLength(2);
+    expect(links[0].getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
 
     // Existing breadcrumb/type/title/orientation content remains present.
     const breadcrumb = within(panel).getByLabelText("Localização");
@@ -1858,8 +1869,9 @@ describe("RecordDetailPanel — SUI-03C2 Source View O que encontrámos integrat
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
-    expect(link.getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
+    const links = await within(panel).findAllByRole("link", { name: "Abrir fonte original ↗" });
+    expect(links).toHaveLength(2);
+    expect(links[0].getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
     expect(within(panel).getByLabelText("Visão geral")).toBeTruthy();
   });
 });
@@ -2076,8 +2088,9 @@ describe("RecordDetailPanel — SUI-03D2 Source View Cobertura integration", () 
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
-    expect(link.getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
+    const links = await within(panel).findAllByRole("link", { name: "Abrir fonte original ↗" });
+    expect(links).toHaveLength(2);
+    expect(links[0].getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
   });
 
   it("10. existing findings loading/error behavior remains unchanged", async () => {
@@ -2421,8 +2434,9 @@ describe("RecordDetailPanel — SUI-03E2 Source View Datas e acesso integration"
     );
 
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
-    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
-    expect(link.getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
+    const links = await within(panel).findAllByRole("link", { name: "Abrir fonte original ↗" });
+    expect(links).toHaveLength(2);
+    expect(links[0].getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
     expect(within(panel).getByLabelText("Visão geral")).toBeTruthy();
     expect(within(panel).getByLabelText("O que encontrámos")).toBeTruthy();
     expect(within(panel).getByLabelText("Cobertura")).toBeTruthy();
@@ -3221,11 +3235,13 @@ describe("RecordDetailPanel — SUI-03H2 Source View Na investigação integrati
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     const findings = await within(panel).findByLabelText("O que encontrámos");
     expect(within(findings).getByText("EVD-000106")).toBeTruthy();
+    expect(within(findings).getByText("Observações relacionadas")).toBeTruthy();
+    expect(within(findings).getByText("1")).toBeTruthy();
 
     const investigation = await within(panel).findByLabelText("Na investigação");
-    expect(within(investigation).getByText("1")).toBeTruthy();
     expect(within(investigation).getByText("PRB-0005")).toBeTruthy();
     expect(within(investigation).getByText("Através de: EVD-000106")).toBeTruthy();
+    expect(within(investigation).queryByText("Observações relacionadas")).toBeNull();
 
     // 2. no duplicate relation load: getRecord("EVD-000106") — fetched only by
     // loadSourceEvidenceRelations, never by useRecordDetail itself — is called
@@ -5168,7 +5184,7 @@ describe("RecordDetailPanel — SUI-03J1B desktop Source View 'Nesta fonte' rail
     }
   });
 
-  it("14. no legacy SRC rail items return: no 'Ver no Grafo', 'Ver como Problema', repository/YAML path, or 'Abrir fonte original' inside the rail", async () => {
+  it("14. no legacy SRC rail items return: no 'Ver no Grafo', 'Ver como Problema', repository/YAML path", async () => {
     renderFull();
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     await within(panel).findByLabelText("Na investigação");
@@ -5176,18 +5192,18 @@ describe("RecordDetailPanel — SUI-03J1B desktop Source View 'Nesta fonte' rail
     expect(within(rail).queryByRole("button", { name: /Ver no Grafo/ })).toBeNull();
     expect(within(rail).queryByRole("button", { name: /Ver como Problema/ })).toBeNull();
     expect(rail.querySelector(".detail-rail-file")).toBeNull();
-    expect(within(rail).queryByRole("link", { name: /Abrir fonte original/ })).toBeNull();
     expect(within(rail).queryByText("research/sources/SRC-0093.yaml")).toBeNull();
   });
 
-  it("15. 'Abrir fonte original' remains exactly once in the main Source content", async () => {
+  it("15. 'Abrir fonte original' remains exactly twice (rail + inline) in the Source content", async () => {
     renderFull();
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     await within(panel).findByLabelText("Na investigação");
     const links = within(panel).getAllByRole("link", { name: "Abrir fonte original ↗" });
-    expect(links).toHaveLength(1);
+    expect(links).toHaveLength(2);
     const rail = within(panel).getByLabelText("Mais ações");
-    expect(rail.contains(links[0])).toBe(false);
+    const inRail = links.filter((l) => rail.contains(l));
+    expect(inRail).toHaveLength(1);
   });
 
   it("16. no second SourceEvidenceRelations load occurs because of the index — EVD backlink fetched exactly once", async () => {
@@ -5542,11 +5558,11 @@ describe("RecordDetailPanel — SUI-03J2B compact Source View 'Nesta fonte' inde
     expect(compactHrefs).toEqual(desktopHrefs);
   });
 
-  it("13. 'Abrir fonte original' remains exactly once", async () => {
+  it("13. 'Abrir fonte original' remains exactly twice (rail + inline)", async () => {
     renderFull();
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     await within(panel).findByLabelText("Na investigação");
-    expect(within(panel).getAllByRole("link", { name: "Abrir fonte original ↗" })).toHaveLength(1);
+    expect(within(panel).getAllByRole("link", { name: "Abrir fonte original ↗" })).toHaveLength(2);
   });
 
   it("14. no legacy Source rail actions/path reappear", async () => {
@@ -5757,11 +5773,11 @@ describe("RecordDetailPanel — SUI-03K1 suppress obsolete SRC roleFields chip r
     expect(within(breadcrumb).getByText("SRC-0093")).toBeTruthy();
   });
 
-  it("7. Abrir fonte original remains present exactly once", async () => {
+  it("7. Abrir fonte original remains present exactly twice (rail + inline)", async () => {
     renderSrc0093();
     const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
     await within(panel).findByLabelText("Visão geral");
-    expect(within(panel).getAllByRole("link", { name: "Abrir fonte original ↗" })).toHaveLength(1);
+    expect(within(panel).getAllByRole("link", { name: "Abrir fonte original ↗" })).toHaveLength(2);
   });
 
   it("8. Visão geral remains present", async () => {

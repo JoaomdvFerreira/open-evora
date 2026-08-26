@@ -2116,6 +2116,15 @@ main.explorer-shell {
   display: none;
 }
 
+/* SUI-03K3: "Abrir fonte original" desktop-rail copy vs. compact in-flow
+   copy — same exclusive-visibility contract as the rail/compact index pair
+   above (`.problem-reading-rail` / `.source-compact-section-index`). Both
+   copies exist in the DOM (SourceOriginalLinkAction rendered twice); CSS
+   alone decides which one is visible at a given width. */
+.source-original-link-inline {
+  display: none;
+}
+
 /* F1 intermediate reading-layout recomposition (768px-1059px): the
    canonical 720 main + 44 gap + 216 rail composition cannot fit in this
    band without destructively compressing the 720px reading column. Reuse
@@ -2149,6 +2158,14 @@ main.explorer-shell {
   }
 
   .source-compact-section-index {
+    display: block;
+  }
+
+  .source-original-link-rail {
+    display: none;
+  }
+
+  .source-original-link-inline {
     display: block;
   }
 }
@@ -2917,6 +2934,14 @@ main.explorer-shell {
   }
 
   .source-compact-section-index {
+    display: block;
+  }
+
+  .source-original-link-rail {
+    display: none;
+  }
+
+  .source-original-link-inline {
     display: block;
   }
 }

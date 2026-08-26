@@ -101,6 +101,27 @@ describe("SourceFindingsSection", () => {
     expect(screen.queryByText(/Não existe evidência associada/)).toBeNull();
   });
 
+  it("4b. zero-EVD case does not render a misleading zero-count 'Observações relacionadas' block", () => {
+    render(<SourceFindingsSection relations={relations({})} />);
+
+    expect(screen.queryByText("Observações relacionadas")).toBeNull();
+  });
+
+  it("14. SUI-03K3: related evidence renders 'Observações relacionadas' with uniqueEvidenceCount before the first evidence-group heading", () => {
+    const primary = evidenceDetail("EVD-1", { observation: { summary: "Resumo primário." } });
+    render(<SourceFindingsSection relations={relations({ primaryEvidence: [primary], uniqueEvidenceCount: 1 })} />);
+
+    expect(screen.getByText("Observações relacionadas")).toBeTruthy();
+    expect(screen.getByText("1")).toBeTruthy();
+
+    const section = screen.getByRole("heading", { name: "O que encontrámos" }).closest("section")!;
+    const countLabel = screen.getByText("Observações relacionadas");
+    const groupHeading = screen.getByRole("heading", { name: "Evidência retirada desta fonte" });
+    expect(section.contains(countLabel)).toBe(true);
+    const position = countLabel.compareDocumentPosition(groupHeading);
+    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("5. SRC-0093 acceptance-shaped relation renders EVD-000106 as primary with expected fields", () => {
     const evd = evidenceDetail("EVD-000106", EVD_000106);
     render(<SourceFindingsSection relations={relations({ primaryEvidence: [evd], uniqueEvidenceCount: 1 })} />);

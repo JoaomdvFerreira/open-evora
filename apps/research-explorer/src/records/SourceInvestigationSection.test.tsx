@@ -56,7 +56,7 @@ const EVD_000106: Record<string, unknown> = {
 };
 
 describe("SourceInvestigationSection", () => {
-  it("1. one related problem renders section, count, PRB id and via-EVD id", () => {
+  it("1. one related problem renders section, PRB id and via-EVD id (no evidence count)", () => {
     render(
       <SourceInvestigationSection
         relations={relations({ uniqueEvidenceCount: 1, relatedProblems: [{ problemId: "PRB-0001", viaEvidenceIds: ["EVD-1"] }] })}
@@ -64,8 +64,7 @@ describe("SourceInvestigationSection", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Na investigação" })).toBeTruthy();
-    expect(screen.getByText("Observações relacionadas")).toBeTruthy();
-    expect(screen.getByText("1")).toBeTruthy();
+    expect(screen.queryByText("Observações relacionadas")).toBeNull();
     expect(screen.getByText("PRB-0001")).toBeTruthy();
     expect(screen.getByText("Através de: EVD-1")).toBeTruthy();
   });
@@ -115,14 +114,13 @@ describe("SourceInvestigationSection", () => {
     expect(screen.queryByRole("heading", { name: "Na investigação" })).toBeNull();
   });
 
-  it("6. SRC-0093 acceptance shape: count 1, PRB-0005, EVD-000106", () => {
+  it("6. SRC-0093 acceptance shape: PRB-0005, EVD-000106", () => {
     render(
       <SourceInvestigationSection
         relations={relations({ uniqueEvidenceCount: 1, relatedProblems: [{ problemId: "PRB-0005", viaEvidenceIds: ["EVD-000106"] }] })}
       />
     );
 
-    expect(screen.getByText("1")).toBeTruthy();
     expect(screen.getByText("PRB-0005")).toBeTruthy();
     expect(screen.getByText("Através de: EVD-000106")).toBeTruthy();
   });
@@ -189,7 +187,7 @@ describe("SourceInvestigationSection", () => {
     expect(screen.queryByText("Problemas relacionados")).toBeNull();
   });
 
-  it("11. uniqueEvidenceCount is rendered exactly as supplied, not recalculated", () => {
+  it("11. uniqueEvidenceCount no longer renders in this section regardless of value", () => {
     render(
       <SourceInvestigationSection
         relations={relations({
@@ -199,6 +197,7 @@ describe("SourceInvestigationSection", () => {
       />
     );
 
-    expect(screen.getByText("42")).toBeTruthy();
+    expect(screen.queryByText("42")).toBeNull();
+    expect(screen.queryByText("Observações relacionadas")).toBeNull();
   });
 });
