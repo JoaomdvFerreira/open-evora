@@ -107,7 +107,7 @@ function EvidenceFindingGroup({ heading, evidence, onSelect }: { heading: string
   if (evidence.length === 0) return null;
   return (
     <div className="source-finding-group">
-      <h4>{heading}</h4>
+      <h4 className="record-editorial-subheading">{heading}</h4>
       <ul className="source-finding-list">
         {evidence.map((item) => (
           <EvidenceFindingItem key={item.id} evidence={item} onSelect={onSelect} />

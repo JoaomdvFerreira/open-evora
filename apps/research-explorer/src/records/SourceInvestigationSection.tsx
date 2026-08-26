@@ -42,7 +42,7 @@ export function SourceInvestigationSection({ relations, onSelect }: { relations:
         <dd>{relations.uniqueEvidenceCount}</dd>
       </dl>
       <div className="source-finding-group">
-        <h4>Problemas relacionados</h4>
+        <h4 className="record-editorial-subheading">Problemas relacionados</h4>
         <ul className="source-finding-list">
           {relations.relatedProblems.map((problem) => (
             <RelatedProblemItem key={problem.problemId} problem={problem} onSelect={onSelect} />

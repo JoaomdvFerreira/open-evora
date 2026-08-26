@@ -211,3 +211,61 @@ describe("shared editorial-section rhythm (.record-editorial-section, SUI-03K2B)
     }
   });
 });
+
+/**
+ * SUI-03K2C: Source nested `<h4>` headings (SourceFindingsSection's evidence
+ * group headings, SourceInvestigationSection's "Problemas relacionados")
+ * reuse the exact PRB nested-heading visual contract
+ * (`.problem-current-state-item h4`) via one neutral shared class,
+ * `.record-editorial-subheading`, rather than a Source-specific rule or
+ * direct coupling to the PRB-branded `.problem-current-state-item` class.
+ * Parses the actual rule bodies out of the production stylesheet — no pixel
+ * geometry assertions, matching this file's existing characterization style.
+ */
+describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K2C)", () => {
+  const css = readFileSync(CSS_PATH, "utf-8");
+
+  function ruleBodiesForRawPattern(pattern: RegExp): string[] {
+    return [...css.matchAll(pattern)].map((match) => match[1]);
+  }
+
+  const SHARED_RULE_PATTERN = /\.problem-current-state-item h4,\s*\n?\s*\.record-editorial-subheading\s*\{([^}]*)\}/g;
+
+  it("1+5+6. .record-editorial-subheading shares .problem-current-state-item h4's exact typography values", () => {
+    const bodies = ruleBodiesForRawPattern(SHARED_RULE_PATTERN);
+    expect(bodies.length).toBeGreaterThan(0);
+    const body = bodies[0];
+    expect(body).toMatch(/margin\s*:\s*0 0 var\(--space-2\)\s*;/);
+    expect(body).toMatch(/color\s*:\s*var\(--ink-faint\)\s*;/);
+    expect(body).toMatch(/font-family\s*:\s*var\(--ui\)\s*;/);
+    expect(body).toMatch(/font-size\s*:\s*12px\s*;/);
+    expect(body).toMatch(/font-weight\s*:\s*600\s*;/);
+    expect(body).toMatch(/text-transform\s*:\s*uppercase\s*;/);
+    expect(body).toMatch(/letter-spacing\s*:\s*0\.03em\s*;/);
+  });
+
+  it("2. SourceFindingsSection group h4 headings use .record-editorial-subheading", () => {
+    const source = readFileSync(path.join(__dirname, "records", "SourceFindingsSection.tsx"), "utf-8");
+    expect(source).toMatch(/<h4 className="record-editorial-subheading">\{heading\}<\/h4>/);
+  });
+
+  it("3+4. SourceInvestigationSection 'Problemas relacionados' uses .record-editorial-subheading as an h4 under the h3 'Na investigação' section", () => {
+    const source = readFileSync(path.join(__dirname, "records", "SourceInvestigationSection.tsx"), "utf-8");
+    expect(source).toMatch(/<h4 className="record-editorial-subheading">Problemas relacionados<\/h4>/);
+    expect(source).toMatch(/<h3 className="detail-panel-label">Na investigação<\/h3>/);
+  });
+
+  it("7. no Source top-level h3 (.detail-panel-label) receives the nested-heading class", () => {
+    expect(css).not.toMatch(/\.detail-panel-label[^{]*\.record-editorial-subheading/);
+    const findingsSource = readFileSync(path.join(__dirname, "records", "SourceFindingsSection.tsx"), "utf-8");
+    const investigationSource = readFileSync(path.join(__dirname, "records", "SourceInvestigationSection.tsx"), "utf-8");
+    expect(findingsSource).not.toMatch(/<h3 className="[^"]*record-editorial-subheading/);
+    expect(investigationSource).not.toMatch(/<h3 className="[^"]*record-editorial-subheading/);
+  });
+
+  it("12. .record-editorial-section spacing rule is unchanged (still exactly margin-bottom: var(--space-8))", () => {
+    const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0].trim()).toBe("margin-bottom: var(--space-8);");
+  });
+});

@@ -2665,7 +2665,8 @@ main.explorer-shell {
   margin-bottom: 0;
 }
 
-.problem-current-state-item h4 {
+.problem-current-state-item h4,
+.record-editorial-subheading {
   margin: 0 0 var(--space-2);
   color: var(--ink-faint);
   font-family: var(--ui);

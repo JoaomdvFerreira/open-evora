@@ -166,4 +166,25 @@ describe("SourceFindingsSection", () => {
     expect(screen.queryByRole("button", { name: "EVD-000106" })).toBeNull();
     expect(screen.getByText("EVD-000106")).toBeTruthy();
   });
+
+  it("12. SUI-03K2C: both group headings use the shared neutral nested-heading class", () => {
+    const primary = evidenceDetail("EVD-1", { observation: { summary: "Resumo primário." } });
+    const additional = evidenceDetail("EVD-2", { observation: { summary: "Resumo adicional." } });
+    render(<SourceFindingsSection relations={relations({ primaryEvidence: [primary], additionalEvidence: [additional], uniqueEvidenceCount: 2 })} />);
+
+    const primaryHeading = screen.getByRole("heading", { name: "Evidência retirada desta fonte" });
+    const additionalHeading = screen.getByRole("heading", { name: "Evidência que também usa esta fonte" });
+    expect(primaryHeading.tagName).toBe("H4");
+    expect(primaryHeading.className).toBe("record-editorial-subheading");
+    expect(additionalHeading.tagName).toBe("H4");
+    expect(additionalHeading.className).toBe("record-editorial-subheading");
+  });
+
+  it("13. SUI-03K2C: an absent group renders no empty heading for that group", () => {
+    const primary = evidenceDetail("EVD-1", { observation: { summary: "Resumo primário." } });
+    render(<SourceFindingsSection relations={relations({ primaryEvidence: [primary], uniqueEvidenceCount: 1 })} />);
+
+    expect(screen.queryByText("Evidência que também usa esta fonte")).toBeNull();
+    expect(screen.getAllByRole("heading", { level: 4 })).toHaveLength(1);
+  });
 });

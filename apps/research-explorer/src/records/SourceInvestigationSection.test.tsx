@@ -171,6 +171,24 @@ describe("SourceInvestigationSection", () => {
     expect(heading.textContent).toBe("PRB-0005");
   });
 
+  it("12. SUI-03K2C: 'Problemas relacionados' heading uses the shared neutral nested-heading class", () => {
+    render(
+      <SourceInvestigationSection
+        relations={relations({ uniqueEvidenceCount: 1, relatedProblems: [{ problemId: "PRB-0005", viaEvidenceIds: ["EVD-000106"] }] })}
+      />
+    );
+
+    const heading = screen.getByRole("heading", { name: "Problemas relacionados" });
+    expect(heading.tagName).toBe("H4");
+    expect(heading.className).toBe("record-editorial-subheading");
+  });
+
+  it("13. SUI-03K2C: no related problems means no nested heading is rendered at all", () => {
+    render(<SourceInvestigationSection relations={relations({})} />);
+
+    expect(screen.queryByText("Problemas relacionados")).toBeNull();
+  });
+
   it("11. uniqueEvidenceCount is rendered exactly as supplied, not recalculated", () => {
     render(
       <SourceInvestigationSection
