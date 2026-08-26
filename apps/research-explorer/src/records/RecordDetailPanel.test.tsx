@@ -2321,6 +2321,309 @@ describe("RecordDetailPanel — SUI-03E2 Source View Datas e acesso integration"
   });
 });
 
+describe("RecordDetailPanel — SUI-03F2 Source View Licenciamento integration", () => {
+  /** Mirrors research/sources/SRC-0093.yaml exactly (matches SourceLicensingSection.test.tsx's fixture). */
+  const SRC_0093_DETAIL: RecordDetail = {
+    id: "SRC-0093",
+    type: "SRC-",
+    file: "research/sources/SRC-0093.yaml",
+    record: {
+      source_id: "SRC-0093",
+      publisher: "Scientific Reports (Springer Nature)",
+      name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+      resource_type: "document",
+      scope: {
+        geography: { level: "local_area", area: "Belltown, Seattle, Washington, EUA" },
+        domains: ["MOB", "DIG"],
+      },
+      access: { level: "public", availability: "available", machine_readable: false, method: "browser", format: "html" },
+      canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z",
+      licensing: {
+        status: "known",
+        licence: "CC BY 4.0",
+        reuse: "permitted",
+        attribution: "Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari e Anne Goodchild",
+      },
+      temporal: { published_at: "2022-11-11", last_checked_at: "2026-08-25" },
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const SRC_0093_SUMMARY: RecordSummary = {
+    id: "SRC-0093",
+    type: "SRC-",
+    label: SRC_0093_DETAIL.record.name as string,
+    file: SRC_0093_DETAIL.file,
+    summaryFields: {},
+  };
+
+  it("1. SRC detail renders 'Licenciamento'", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Licenciamento")).toBeTruthy();
+  });
+
+  it("2. section order is Visão geral, O que encontrámos, Cobertura, Datas e acesso, Licenciamento", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const overview = await within(panel).findByLabelText("Visão geral");
+    const findings = await within(panel).findByLabelText("O que encontrámos");
+    const coverage = await within(panel).findByLabelText("Cobertura");
+    const datesAccess = await within(panel).findByLabelText("Datas e acesso");
+    const licensing = await within(panel).findByLabelText("Licenciamento");
+
+    expect(overview.compareDocumentPosition(findings) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(findings.compareDocumentPosition(coverage) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(coverage.compareDocumentPosition(datesAccess) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(datesAccess.compareDocumentPosition(licensing) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("3. SRC-0093-shaped fixture renders Estado do licenciamento, Licença, Reutilização, and canonical attribution", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const licensing = await within(panel).findByLabelText("Licenciamento");
+    expect(within(licensing).getByText("Estado do licenciamento")).toBeTruthy();
+    expect(within(licensing).getByText("Conhecido")).toBeTruthy();
+    expect(within(licensing).getByText("Licença")).toBeTruthy();
+    expect(within(licensing).getByText("CC BY 4.0")).toBeTruthy();
+    expect(within(licensing).getByText("Reutilização")).toBeTruthy();
+    expect(within(licensing).getByText("Permitida")).toBeTruthy();
+    expect(within(licensing).getByText("Atribuição")).toBeTruthy();
+    expect(within(licensing).getByText("Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari e Anne Goodchild")).toBeTruthy();
+  });
+
+  it("4. unknown licensing values render Desconhecido / Desconhecida", async () => {
+    const srcUnknownLicensing: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        licensing: { status: "unknown", reuse: "unknown" },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcUnknownLicensing })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const licensing = await within(panel).findByLabelText("Licenciamento");
+    expect(within(licensing).getByText("Estado do licenciamento")).toBeTruthy();
+    expect(within(licensing).getByText("Desconhecido")).toBeTruthy();
+    expect(within(licensing).getByText("Reutilização")).toBeTruthy();
+    expect(within(licensing).getByText("Desconhecida")).toBeTruthy();
+  });
+
+  it("5. unknown reuse is not presented as prohibited", async () => {
+    const srcUnknownLicensing: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        licensing: { status: "unknown", reuse: "unknown" },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcUnknownLicensing })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const licensing = await within(panel).findByLabelText("Licenciamento");
+    expect(within(licensing).queryByText("Proibida")).toBeNull();
+  });
+
+  it("6. restricted reuse renders 'Restrita'", async () => {
+    const srcRestrictedReuse: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        licensing: { ...(SRC_0093_DETAIL.record.licensing as Record<string, unknown>), reuse: "restricted" },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcRestrictedReuse })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const licensing = await within(panel).findByLabelText("Licenciamento");
+    expect(within(licensing).getByText("Reutilização")).toBeTruthy();
+    expect(within(licensing).getByText("Restrita")).toBeTruthy();
+  });
+
+  it("7. absent licence/attribution rows remain omitted", async () => {
+    const srcNoLicenceOrAttribution: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        licensing: { status: "known", reuse: "permitted" },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcNoLicenceOrAttribution })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const licensing = await within(panel).findByLabelText("Licenciamento");
+    expect(within(licensing).queryByText("Licença")).toBeNull();
+    expect(within(licensing).queryByText("Atribuição")).toBeNull();
+  });
+
+  it("8. EVD detail does not render SourceLicensingSection", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("evidence_id");
+    expect(within(panel).queryByLabelText("Licenciamento")).toBeNull();
+  });
+
+  it("9. PRB detail does not render SourceLicensingSection", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await screen.findByText("Detalhes");
+    expect(within(panel).queryByLabelText("Licenciamento")).toBeNull();
+  });
+
+  it("10. existing Visão geral, O que encontrámos, Cobertura, Datas e acesso remain unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(within(panel).getByLabelText("Visão geral")).toBeTruthy();
+    expect(within(panel).getByLabelText("O que encontrámos")).toBeTruthy();
+    expect(within(panel).getByLabelText("Cobertura")).toBeTruthy();
+    expect(within(panel).getByLabelText("Datas e acesso")).toBeTruthy();
+  });
+
+  it("11. existing findings loading/error behavior remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const findings = await within(panel).findByLabelText("O que encontrámos");
+    expect(within(findings).getByText("Ainda não existem observações da investigação ligadas explicitamente a esta fonte.")).toBeTruthy();
+  });
+
+  it("12. existing lower technical disclosure/relations remain present", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Proveniência")).toBeTruthy();
+    expect(within(panel).getByLabelText("Campos do registo")).toBeTruthy();
+    expect(within(panel).getByLabelText(/Relações/)).toBeTruthy();
+  });
+});
+
 describe("RecordDetailPanel — RD-01A PRB Detail header + technical metadata", () => {
   const PRB_RD01A_DETAIL: RecordDetail = {
     id: "PRB-0001",
