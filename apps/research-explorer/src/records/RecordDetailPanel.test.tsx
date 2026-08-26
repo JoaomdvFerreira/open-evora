@@ -924,6 +924,149 @@ describe("RecordDetailPanel — SRC original-source action (SUI-02A, SRC v2 elig
     expect(rail.querySelector(".detail-rail-type-note")).toBeTruthy();
   });
 
+  /**
+   * SUI-03I3: SRC rail cleanup — the agreed final SRC rail is only the type
+   * explanatory card (+ a future "Nesta fonte" index, not built in this
+   * slice). "Ver como Problema" is not covered by a dedicated removal here:
+   * it is already structurally unreachable for SRC, since its only source,
+   * `PROBLEM_REFERENCE_FIELDS` (`analysis.related_problems`), is an EVD-only
+   * schema field (research/schemas/evidence.schema.json) that always targets
+   * PRB-, never SRC- — `findRelatedProblemId` can therefore never resolve for
+   * a SRC detail regardless of its edges.
+   */
+  describe("SUI-03I3: SRC rail cleanup", () => {
+    it("renders only the SRC type explanatory card in the rail — no action controls", async () => {
+      renderSrc(srcDetail({}));
+
+      const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+      const rail = await within(panel).findByLabelText("Mais ações");
+      expect(rail.querySelector(".detail-rail-type-note")).toBeTruthy();
+      expect(rail.querySelectorAll("button")).toHaveLength(0);
+      expect(rail.querySelectorAll("a")).toHaveLength(0);
+    });
+
+    it("does not render 'Ver no Grafo' in the SRC rail", async () => {
+      renderSrc(srcDetail({}));
+
+      const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+      const rail = await within(panel).findByLabelText("Mais ações");
+      expect(within(rail).queryByRole("button", { name: /Ver no Grafo/ })).toBeNull();
+    });
+
+    it("does not render the repository YAML path (detail.file) in the SRC rail", async () => {
+      renderSrc(srcDetail({}));
+
+      const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+      const rail = await within(panel).findByLabelText("Mais ações");
+      expect(rail.querySelector(".detail-rail-file")).toBeNull();
+      expect(within(rail).queryByText("research/sources/SRC-0002.yaml")).toBeNull();
+    });
+
+    it("never renders 'Ver como Problema' for SRC — already structurally impossible (analysis.related_problems is EVD-only and always targets PRB-)", async () => {
+      const srcWithIncomingProblemLikeEdge = srcDetail({});
+      srcWithIncomingProblemLikeEdge.incomingEdges = [{ from: "PRB-0006", field: "analysis.related_problems", ordinal: null }];
+
+      renderSrc(srcWithIncomingProblemLikeEdge);
+
+      const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+      const rail = await within(panel).findByLabelText("Mais ações");
+      expect(within(rail).queryByRole("button", { name: /Ver como Problema/ })).toBeNull();
+    });
+
+    it("renders no empty .detail-rail-actions wrapper for SRC once all actions are absent", async () => {
+      renderSrc(srcDetail({}));
+
+      const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+      const rail = await within(panel).findByLabelText("Mais ações");
+      expect(rail.querySelector(".detail-rail-actions")).toBeNull();
+    });
+
+    it("keeps 'Abrir fonte original ↗' present exactly once in the main Source content, not the rail", async () => {
+      renderSrc(srcDetail({}));
+
+      const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+      const rail = await within(panel).findByLabelText("Mais ações");
+      const links = within(panel).getAllByRole("link", { name: "Abrir fonte original ↗" });
+      expect(links).toHaveLength(1);
+      expect(rail.contains(links[0])).toBe(false);
+    });
+
+    it("does not affect EVD rail behavior — graph action, file path, and 'Ver como Problema' remain available", async () => {
+      render(
+        <RecordDetailPanel
+          dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+          lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+          selectedId="EVD-000127"
+          onSelect={noop}
+          onBackToRecords={noop}
+          onViewAsProblem={noop}
+          onViewInGraph={noop}
+        />
+      );
+
+      const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+      const rail = await within(panel).findByLabelText("Mais ações");
+      expect(within(rail).getByRole("button", { name: "Ver no Grafo" })).toBeTruthy();
+      expect(within(rail).getByRole("button", { name: "Ver como Problema (PRB-0006)" })).toBeTruthy();
+      expect(rail.querySelector(".detail-rail-file")).toBeTruthy();
+    });
+
+    it("does not affect PRB rail behavior — no graph action (unchanged), file path still renders", async () => {
+      render(
+        <RecordDetailPanel
+          dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+          lookup={buildLookup(PRB_0006_SUMMARY)}
+          selectedId="PRB-0006"
+          onSelect={noop}
+          onBackToRecords={noop}
+          onViewAsProblem={noop}
+          onViewInGraph={noop}
+        />
+      );
+
+      const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+      const rail = await within(panel).findByLabelText("Mais ações");
+      expect(within(rail).queryByRole("button", { name: /Ver no Grafo/ })).toBeNull();
+      expect(rail.querySelector(".detail-rail-file")).toBeTruthy();
+    });
+
+    it("keeps onViewInGraph available/functional outside the SRC rail (EVD)", async () => {
+      const onViewInGraph = vi.fn();
+      render(
+        <RecordDetailPanel
+          dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+          lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+          selectedId="EVD-000127"
+          onSelect={noop}
+          onBackToRecords={noop}
+          onViewAsProblem={noop}
+          onViewInGraph={onViewInGraph}
+        />
+      );
+
+      const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+      const rail = await within(panel).findByLabelText("Mais ações");
+      const button = within(rail).getByRole("button", { name: "Ver no Grafo" });
+      button.click();
+      expect(onViewInGraph).toHaveBeenCalledWith("EVD-000127");
+    });
+
+    it("does not change any Source View main-content sections", async () => {
+      renderSrc(srcDetail({}));
+
+      const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+      await within(panel).findByLabelText("Visão geral");
+      expect(await within(panel).findByLabelText("O que encontrámos")).toBeTruthy();
+      expect(within(panel).getByLabelText("Cobertura")).toBeTruthy();
+      expect(within(panel).getByLabelText("Datas e acesso")).toBeTruthy();
+      expect(within(panel).getByLabelText("Licenciamento")).toBeTruthy();
+      // "Limitações" only renders when the record carries caveats — this
+      // fixture has none, matching SourceCaveatsSection's own contract; not
+      // asserted here since this slice does not touch that section.
+      expect(within(panel).getByLabelText("Informação técnica")).toBeTruthy();
+    });
+  });
+
   it("never shows the action on a non-SRC record, even with an SRC v2-shaped access field of the same name", async () => {
     const evdDetail: RecordDetail = {
       id: "EVD-0001",

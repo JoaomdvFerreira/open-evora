@@ -1009,19 +1009,21 @@ function RecordDetailContent({
             <code>{detail.type}</code>
             <p>{typeInfo.description}</p>
           </div>
-          <div className="detail-rail-actions">
-            {relatedProblemId && (
-              <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
-                Ver como Problema ({relatedProblemId})
-              </button>
-            )}
-            {detail.type !== "PRB-" && (
-              <button type="button" onClick={() => onViewInGraph(detail.id)}>
-                Ver no Grafo
-              </button>
-            )}
-            <span className="detail-rail-file">{detail.file}</span>
-          </div>
+          {!isSrc && (
+            <div className="detail-rail-actions">
+              {relatedProblemId && (
+                <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
+                  Ver como Problema ({relatedProblemId})
+                </button>
+              )}
+              {detail.type !== "PRB-" && (
+                <button type="button" onClick={() => onViewInGraph(detail.id)}>
+                  Ver no Grafo
+                </button>
+              )}
+              <span className="detail-rail-file">{detail.file}</span>
+            </div>
+          )}
         </aside>
       </div>
     </div>
