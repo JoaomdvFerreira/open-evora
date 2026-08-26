@@ -11,6 +11,7 @@ import { evidenceQuickRead, type QuickReadItem } from "./recordOrientation";
 import { SourceOverviewSection } from "./SourceOverviewSection";
 import { SourceFindingsSection } from "./SourceFindingsSection";
 import { SourceCoverageSection } from "./SourceCoverageSection";
+import { SourceDatesAccessSection } from "./SourceDatesAccessSection";
 import { useSourceEvidenceRelations } from "./useSourceEvidenceRelations";
 
 const ERROR_TITLES: Record<string, string> = {
@@ -937,6 +938,7 @@ function RecordDetailContent({
           {detail.type === "SRC-" && <SourceOverviewSection record={detail.record} />}
           {detail.type === "SRC-" && <SourceFindings dataProvider={dataProvider} sourceId={detail.id} onSelect={onSelect} />}
           {detail.type === "SRC-" && <SourceCoverageSection record={detail.record} />}
+          {detail.type === "SRC-" && <SourceDatesAccessSection record={detail.record} />}
 
           {isPrb ? (
             <>

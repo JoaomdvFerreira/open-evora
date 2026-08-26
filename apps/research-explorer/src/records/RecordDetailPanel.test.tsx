@@ -3,6 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RecordDetailPanel } from "./RecordDetailPanel";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
+import { formatPublicDate } from "../presentation";
 
 /**
  * Meaning before metadata, compact provenance near the top, exhaustive
@@ -1953,6 +1954,353 @@ describe("RecordDetailPanel — SUI-03D2 Source View Cobertura integration", () 
   });
 
   it("11. existing lower technical disclosure/relations remain present", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Proveniência")).toBeTruthy();
+    expect(within(panel).getByLabelText("Campos do registo")).toBeTruthy();
+    expect(within(panel).getByLabelText(/Relações/)).toBeTruthy();
+  });
+});
+
+describe("RecordDetailPanel — SUI-03E2 Source View Datas e acesso integration", () => {
+  /** Mirrors research/sources/SRC-0093.yaml exactly (matches SourceDatesAccessSection.test.tsx's fixture). */
+  const SRC_0093_DETAIL: RecordDetail = {
+    id: "SRC-0093",
+    type: "SRC-",
+    file: "research/sources/SRC-0093.yaml",
+    record: {
+      source_id: "SRC-0093",
+      publisher: "Scientific Reports (Springer Nature)",
+      name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+      resource_type: "document",
+      scope: {
+        geography: { level: "local_area", area: "Belltown, Seattle, Washington, EUA" },
+        domains: ["MOB", "DIG"],
+      },
+      access: { level: "public", availability: "available", machine_readable: false, method: "browser", format: "html" },
+      canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z",
+      temporal: { published_at: "2022-11-11", last_checked_at: "2026-08-25" },
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const SRC_0093_SUMMARY: RecordSummary = {
+    id: "SRC-0093",
+    type: "SRC-",
+    label: SRC_0093_DETAIL.record.name as string,
+    file: SRC_0093_DETAIL.file,
+    summaryFields: {},
+  };
+
+  it("1. SRC detail renders 'Datas e acesso'", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Datas e acesso")).toBeTruthy();
+  });
+
+  it("2. section order is Visão geral, O que encontrámos, Cobertura, Datas e acesso", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const overview = await within(panel).findByLabelText("Visão geral");
+    const findings = await within(panel).findByLabelText("O que encontrámos");
+    const coverage = await within(panel).findByLabelText("Cobertura");
+    const datesAccess = await within(panel).findByLabelText("Datas e acesso");
+
+    expect(overview.compareDocumentPosition(findings) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(findings.compareDocumentPosition(coverage) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(coverage.compareDocumentPosition(datesAccess) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("3. SRC-0093-shaped fixture renders publication, last-checked, access, and canonical_reference rows", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const datesAccess = await within(panel).findByLabelText("Datas e acesso");
+    expect(within(datesAccess).getByText("Publicação")).toBeTruthy();
+    expect(within(datesAccess).getByText(/11 de novembro de 2022/)).toBeTruthy();
+    expect(within(datesAccess).getByText("Última verificação pela Open Évora")).toBeTruthy();
+    expect(within(datesAccess).getByText(formatPublicDate("2026-08-25"))).toBeTruthy();
+    expect(within(datesAccess).getByText("Nível de acesso")).toBeTruthy();
+    expect(within(datesAccess).getByText("Público")).toBeTruthy();
+    expect(within(datesAccess).getByText("Disponibilidade")).toBeTruthy();
+    expect(within(datesAccess).getByText("Disponível")).toBeTruthy();
+    expect(within(datesAccess).getByText("Leitura automática")).toBeTruthy();
+    expect(within(datesAccess).getByText("Não")).toBeTruthy();
+    expect(within(datesAccess).getByText("Forma de consulta")).toBeTruthy();
+    expect(within(datesAccess).getByText("Navegador")).toBeTruthy();
+    expect(within(datesAccess).getByText("Formato")).toBeTruthy();
+    expect(within(datesAccess).getByText("HTML")).toBeTruthy();
+    expect(within(datesAccess).getByText("https://doi.org/10.1038/s41598-022-23987-z")).toBeTruthy();
+  });
+
+  it("4. no updated_at or update_frequency row is invented for SRC-0093", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const datesAccess = await within(panel).findByLabelText("Datas e acesso");
+    expect(within(datesAccess).queryByText("Última atualização da fonte")).toBeNull();
+    expect(within(datesAccess).queryByText("Frequência de atualização")).toBeNull();
+  });
+
+  it("5. year-only published_at preserves year precision", async () => {
+    const srcYearOnly: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        temporal: { ...(SRC_0093_DETAIL.record.temporal as Record<string, unknown>), published_at: "2022" },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcYearOnly })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const datesAccess = await within(panel).findByLabelText("Datas e acesso");
+    expect(within(datesAccess).getByText("2022")).toBeTruthy();
+  });
+
+  it("6. year-month updated_at preserves month precision", async () => {
+    const srcYearMonthUpdated: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        temporal: { ...(SRC_0093_DETAIL.record.temporal as Record<string, unknown>), updated_at: "2022-11" },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcYearMonthUpdated })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const datesAccess = await within(panel).findByLabelText("Datas e acesso");
+    expect(within(datesAccess).getByText("Última atualização da fonte")).toBeTruthy();
+    expect(within(datesAccess).getByText("novembro de 2022")).toBeTruthy();
+  });
+
+  it("7. update_frequency renders through existing vocabulary", async () => {
+    const srcWithFrequency: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        temporal: { ...(SRC_0093_DETAIL.record.temporal as Record<string, unknown>), update_frequency: "quarterly" },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcWithFrequency })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const datesAccess = await within(panel).findByLabelText("Datas e acesso");
+    expect(within(datesAccess).getByText("Frequência de atualização")).toBeTruthy();
+    expect(within(datesAccess).getByText("Trimestral")).toBeTruthy();
+  });
+
+  it("8. machine_readable 'unknown' renders 'Desconhecida', not 'Não'", async () => {
+    const srcUnknownMachineReadable: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        access: { ...(SRC_0093_DETAIL.record.access as Record<string, unknown>), machine_readable: "unknown" },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcUnknownMachineReadable })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const datesAccess = await within(panel).findByLabelText("Datas e acesso");
+    expect(within(datesAccess).getByText("Desconhecida")).toBeTruthy();
+    expect(within(datesAccess).queryByText("Não")).toBeNull();
+  });
+
+  it("9. scope.temporal remains exclusive to Cobertura and is not duplicated in Datas e acesso", async () => {
+    const srcWithScopeTemporal: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        scope: { ...(SRC_0093_DETAIL.record.scope as Record<string, unknown>), temporal: { as_of: "2024-08-25" } },
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcWithScopeTemporal })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const coverage = await within(panel).findByLabelText("Cobertura");
+    const datesAccess = await within(panel).findByLabelText("Datas e acesso");
+    expect(within(coverage).getByText("Data de referência")).toBeTruthy();
+    expect(within(datesAccess).queryByText("Data de referência")).toBeNull();
+  });
+
+  it("10. EVD detail does not render SourceDatesAccessSection", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("evidence_id");
+    expect(within(panel).queryByLabelText("Datas e acesso")).toBeNull();
+  });
+
+  it("11. PRB detail does not render SourceDatesAccessSection", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await screen.findByText("Detalhes");
+    expect(within(panel).queryByLabelText("Datas e acesso")).toBeNull();
+  });
+
+  it("12. existing Abrir fonte original, Visão geral, O que encontrámos, Cobertura remain unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const link = await within(panel).findByRole("link", { name: "Abrir fonte original ↗" });
+    expect(link.getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
+    expect(within(panel).getByLabelText("Visão geral")).toBeTruthy();
+    expect(within(panel).getByLabelText("O que encontrámos")).toBeTruthy();
+    expect(within(panel).getByLabelText("Cobertura")).toBeTruthy();
+  });
+
+  it("13. existing findings loading/error behavior remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const findings = await within(panel).findByLabelText("O que encontrámos");
+    expect(within(findings).getByText("Ainda não existem observações da investigação ligadas explicitamente a esta fonte.")).toBeTruthy();
+  });
+
+  it("14. existing lower technical disclosure/relations remain present", async () => {
     render(
       <RecordDetailPanel
         dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
