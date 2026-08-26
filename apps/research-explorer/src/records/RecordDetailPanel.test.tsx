@@ -2624,6 +2624,344 @@ describe("RecordDetailPanel — SUI-03F2 Source View Licenciamento integration",
   });
 });
 
+describe("RecordDetailPanel — SUI-03G2 Source View Limitações integration", () => {
+  /** Mirrors research/sources/SRC-0093.yaml exactly (matches SourceCaveatsSection.test.tsx's fixture). */
+  const SRC_0093_DETAIL: RecordDetail = {
+    id: "SRC-0093",
+    type: "SRC-",
+    file: "research/sources/SRC-0093.yaml",
+    record: {
+      source_id: "SRC-0093",
+      publisher: "Scientific Reports (Springer Nature)",
+      name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)",
+      resource_type: "document",
+      scope: {
+        geography: { level: "local_area", area: "Belltown, Seattle, Washington, EUA" },
+        domains: ["MOB", "DIG"],
+      },
+      access: { level: "public", availability: "available", machine_readable: false, method: "browser", format: "html" },
+      canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z",
+      licensing: {
+        status: "known",
+        licence: "CC BY 4.0",
+        reuse: "permitted",
+        attribution: "Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari e Anne Goodchild",
+      },
+      temporal: { published_at: "2022-11-11", last_checked_at: "2026-08-25" },
+      caveats: ["O estudo é um experimento controlado realizado numa área de 10 quarteirões em Belltown, Seattle, com 11 condutores, 33 rotas e 495 entregas simuladas."],
+    },
+    outgoingEdges: [],
+    incomingEdges: [],
+  };
+  const SRC_0093_SUMMARY: RecordSummary = {
+    id: "SRC-0093",
+    type: "SRC-",
+    label: SRC_0093_DETAIL.record.name as string,
+    file: SRC_0093_DETAIL.file,
+    summaryFields: {},
+  };
+
+  it("1. SRC with caveats renders 'Limitações'", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Limitações")).toBeTruthy();
+  });
+
+  it("2. section order is Visão geral, O que encontrámos, Cobertura, Datas e acesso, Licenciamento, Limitações", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const overview = await within(panel).findByLabelText("Visão geral");
+    const findings = await within(panel).findByLabelText("O que encontrámos");
+    const coverage = await within(panel).findByLabelText("Cobertura");
+    const datesAccess = await within(panel).findByLabelText("Datas e acesso");
+    const licensing = await within(panel).findByLabelText("Licenciamento");
+    const caveats = await within(panel).findByLabelText("Limitações");
+
+    expect(overview.compareDocumentPosition(findings) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(findings.compareDocumentPosition(coverage) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(coverage.compareDocumentPosition(datesAccess) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(datesAccess.compareDocumentPosition(licensing) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(licensing.compareDocumentPosition(caveats) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("3. SRC-0093 canonical caveat renders verbatim", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const caveats = await within(panel).findByLabelText("Limitações");
+    expect(
+      within(caveats).getByText(
+        "O estudo é um experimento controlado realizado numa área de 10 quarteirões em Belltown, Seattle, com 11 condutores, 33 rotas e 495 entregas simuladas."
+      )
+    ).toBeTruthy();
+  });
+
+  it("4. multiple caveats preserve order", async () => {
+    const srcMultipleCaveats: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        caveats: ["Primeira limitação.", "Segunda limitação.", "Terceira limitação."],
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcMultipleCaveats })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const caveats = await within(panel).findByLabelText("Limitações");
+    const items = within(caveats).getAllByRole("listitem");
+    expect(items.map((item) => item.textContent)).toEqual(["Primeira limitação.", "Segunda limitação.", "Terceira limitação."]);
+  });
+
+  it("5. empty caveats array: no 'Limitações' heading", async () => {
+    const srcEmptyCaveats: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        caveats: [],
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcEmptyCaveats })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Licenciamento");
+    expect(within(panel).queryByLabelText("Limitações")).toBeNull();
+    expect(within(panel).queryByRole("heading", { name: "Limitações" })).toBeNull();
+  });
+
+  it("6. absent caveats: no 'Limitações' heading", async () => {
+    const srcNoCaveatsField: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: (() => {
+        const { caveats: _caveats, ...rest } = SRC_0093_DETAIL.record;
+        return rest;
+      })(),
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcNoCaveatsField })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Licenciamento");
+    expect(within(panel).queryByLabelText("Limitações")).toBeNull();
+    expect(within(panel).queryByRole("heading", { name: "Limitações" })).toBeNull();
+  });
+
+  it("7. no placeholder or 'sem limitações' wording appears", async () => {
+    const srcNoCaveatsField: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: (() => {
+        const { caveats: _caveats, ...rest } = SRC_0093_DETAIL.record;
+        return rest;
+      })(),
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcNoCaveatsField })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByLabelText("Licenciamento");
+    expect(within(panel).queryByText(/Sem limitações/i)).toBeNull();
+    expect(within(panel).queryByText(/Nenhuma limitação conhecida/i)).toBeNull();
+    expect(within(panel).queryByText(/Não foram identificadas limitações/i)).toBeNull();
+  });
+
+  it("8. EVD notes / research-role-like fields do not leak into the section", async () => {
+    const srcWithNoiseFields: RecordDetail = {
+      ...SRC_0093_DETAIL,
+      record: {
+        ...SRC_0093_DETAIL.record,
+        caveats: ["Limitação canónica."],
+        notes: "Nota de evidência que não deve aparecer aqui.",
+        representativeness: "low",
+        verification: "unverified",
+        temporal_relevance: "current",
+        research_role: "primary",
+      },
+    };
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": srcWithNoiseFields })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const caveats = await within(panel).findByLabelText("Limitações");
+    expect(within(caveats).queryByText("Nota de evidência que não deve aparecer aqui.")).toBeNull();
+    expect(within(caveats).queryByText(/representativeness/i)).toBeNull();
+    expect(within(caveats).queryByText(/verification/i)).toBeNull();
+    expect(within(caveats).queryByText(/temporal_relevance/i)).toBeNull();
+    expect(within(caveats).queryByText(/research_role/i)).toBeNull();
+  });
+
+  it("9. EVD detail does not render SourceCaveatsSection", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "EVD-000127": EVD_127_DETAIL })}
+        lookup={buildLookup(EVD_127_SUMMARY, PRB_0006_SUMMARY)}
+        selectedId="EVD-000127"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await within(panel).findByText("evidence_id");
+    expect(within(panel).queryByLabelText("Limitações")).toBeNull();
+  });
+
+  it("10. PRB detail does not render SourceCaveatsSection", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "PRB-0006": PRB_0006_DETAIL })}
+        lookup={buildLookup(PRB_0006_SUMMARY)}
+        selectedId="PRB-0006"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    await screen.findByText("Detalhes");
+    expect(within(panel).queryByLabelText("Limitações")).toBeNull();
+  });
+
+  it("11. existing Visão geral, O que encontrámos, Cobertura, Datas e acesso, Licenciamento remain unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(within(panel).getByLabelText("Visão geral")).toBeTruthy();
+    expect(within(panel).getByLabelText("O que encontrámos")).toBeTruthy();
+    expect(within(panel).getByLabelText("Cobertura")).toBeTruthy();
+    expect(within(panel).getByLabelText("Datas e acesso")).toBeTruthy();
+    expect(within(panel).getByLabelText("Licenciamento")).toBeTruthy();
+  });
+
+  it("12. existing findings loading/error behavior remains unchanged", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    const findings = await within(panel).findByLabelText("O que encontrámos");
+    expect(within(findings).getByText("Ainda não existem observações da investigação ligadas explicitamente a esta fonte.")).toBeTruthy();
+  });
+
+  it("13. existing lower ProvenancePanel/TechnicalDisclosure/RelationshipList remain untouched", async () => {
+    render(
+      <RecordDetailPanel
+        dataProvider={fakeProvider({ "SRC-0093": SRC_0093_DETAIL })}
+        lookup={buildLookup(SRC_0093_SUMMARY)}
+        selectedId="SRC-0093"
+        onSelect={noop}
+        onBackToRecords={noop}
+        onViewAsProblem={noop}
+        onViewInGraph={noop}
+      />
+    );
+
+    const panel = (await screen.findByText("Detalhes")).closest("section") as HTMLElement;
+    expect(await within(panel).findByLabelText("Proveniência")).toBeTruthy();
+    expect(within(panel).getByLabelText("Campos do registo")).toBeTruthy();
+    expect(within(panel).getByLabelText(/Relações/)).toBeTruthy();
+  });
+});
+
 describe("RecordDetailPanel — RD-01A PRB Detail header + technical metadata", () => {
   const PRB_RD01A_DETAIL: RecordDetail = {
     id: "PRB-0001",

@@ -13,6 +13,7 @@ import { SourceFindingsSection } from "./SourceFindingsSection";
 import { SourceCoverageSection } from "./SourceCoverageSection";
 import { SourceDatesAccessSection } from "./SourceDatesAccessSection";
 import { SourceLicensingSection } from "./SourceLicensingSection";
+import { SourceCaveatsSection } from "./SourceCaveatsSection";
 import { useSourceEvidenceRelations } from "./useSourceEvidenceRelations";
 
 const ERROR_TITLES: Record<string, string> = {
@@ -941,6 +942,7 @@ function RecordDetailContent({
           {detail.type === "SRC-" && <SourceCoverageSection record={detail.record} />}
           {detail.type === "SRC-" && <SourceDatesAccessSection record={detail.record} />}
           {detail.type === "SRC-" && <SourceLicensingSection record={detail.record} />}
+          {detail.type === "SRC-" && <SourceCaveatsSection record={detail.record} />}
 
           {isPrb ? (
             <>
