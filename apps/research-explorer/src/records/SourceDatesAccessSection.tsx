@@ -1,0 +1,104 @@
+import { Fragment } from "react";
+import { extractSourceDatesAccess, isHttpUrl, type SourceDatesAccess } from "./sourceView";
+import { publicEnumLabel, publicTriStateLabel, formatPublicPartialDate } from "../presentation";
+import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
+
+interface DatesAccessRow {
+  label: string;
+  field: string;
+  value: string;
+  href?: string;
+}
+
+/**
+ * SUI-03E1: SRC-owned dates/access facts only (`extractSourceDatesAccess`) —
+ * publication/update dates, Open Évora's own last_checked_at, and access
+ * status. `temporal.update_frequency` describes cadence only, never
+ * freshness. `temporal.last_checked_at` is rendered as a plain public date
+ * with no "current/recent/validated" framing — it only records when Open
+ * Évora checked the Source. `scope.temporal` (coverage) is out of scope
+ * here; it belongs to "Cobertura". `canonical_reference` is a factual
+ * reference: it renders as a clickable link whenever it is itself a valid
+ * HTTP(S) URL (`isHttpUrl`), independent of the "Abrir fonte original" CTA's
+ * `access.level`/`access.availability` eligibility (SUI-03K3) — those govern
+ * the header action only, never whether this factual field links out.
+ */
+function buildDatesAccessRows(datesAccess: SourceDatesAccess): DatesAccessRow[] {
+  const rows: DatesAccessRow[] = [];
+
+  if (datesAccess.publishedAt) {
+    rows.push({ label: "Publicação", field: "published_at", value: formatPublicPartialDate(datesAccess.publishedAt) });
+  }
+
+  if (datesAccess.updatedAt) {
+    rows.push({ label: "Última atualização da fonte", field: "updated_at", value: formatPublicPartialDate(datesAccess.updatedAt) });
+  }
+
+  if (datesAccess.lastCheckedAt) {
+    rows.push({ label: "Última verificação pela Open Évora", field: "last_checked_at", value: formatPublicPartialDate(datesAccess.lastCheckedAt) });
+  }
+
+  if (datesAccess.updateFrequency) {
+    rows.push({ label: "Frequência de atualização", field: "update_frequency", value: publicEnumLabel("temporal.update_frequency", datesAccess.updateFrequency) });
+  }
+
+  if (datesAccess.accessLevel) {
+    rows.push({ label: "Nível de acesso", field: "access.level", value: publicEnumLabel("access.level", datesAccess.accessLevel) });
+  }
+
+  if (datesAccess.accessAvailability) {
+    rows.push({ label: "Disponibilidade", field: "access.availability", value: publicEnumLabel("access.availability", datesAccess.accessAvailability) });
+  }
+
+  if (datesAccess.accessMachineReadable !== null) {
+    rows.push({ label: "Leitura automática", field: "access.machine_readable", value: publicTriStateLabel(datesAccess.accessMachineReadable) });
+  }
+
+  if (datesAccess.accessMethod) {
+    rows.push({ label: "Forma de consulta", field: "access.method", value: publicEnumLabel("access.method", datesAccess.accessMethod) });
+  }
+
+  if (datesAccess.accessFormat) {
+    rows.push({ label: "Formato", field: "access.format", value: publicEnumLabel("access.format", datesAccess.accessFormat) });
+  }
+
+  if (datesAccess.canonicalReference) {
+    rows.push({
+      label: "Referência original",
+      field: "canonical_reference",
+      value: datesAccess.canonicalReference,
+      href: isHttpUrl(datesAccess.canonicalReference) ? datesAccess.canonicalReference : undefined,
+    });
+  }
+
+  return rows;
+}
+
+export function SourceDatesAccessSection({ record }: { record: Record<string, unknown> }) {
+  const datesAccess = extractSourceDatesAccess(record);
+  const rows = buildDatesAccessRows(datesAccess);
+
+  return (
+    <section id={SOURCE_SECTION_ANCHOR_IDS["dates-access"]} aria-label="Datas e acesso" className="record-editorial-section source-dates-access-section">
+      <h3 className="detail-panel-label">Datas e acesso</h3>
+      {rows.length > 0 && (
+        <dl className="detail-provenance-grid">
+          {rows.map((row) => (
+            <Fragment key={row.field}>
+              <dt>{row.label}</dt>
+              <dd>
+                {row.href ? (
+                  <a href={row.href} target="_blank" rel="noopener noreferrer">
+                    {row.value}
+                  </a>
+                ) : (
+                  row.value
+                )}
+              </dd>
+            </Fragment>
+          ))}
+        </dl>
+      )}
+    </section>
+  );
+}

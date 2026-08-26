@@ -373,6 +373,32 @@ tr[aria-selected="true"] {
   max-width: 45rem;
 }
 
+/* SUI-03B3: Source original-source action, moved from the rail into the
+   Source identity/header area — same action-link visual language as
+   .detail-rail-actions a, scoped to its own inline placement. */
+.record-source-header-action {
+  margin: var(--space-4) 0 0;
+}
+
+.record-source-header-action a {
+  display: inline-block;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.record-source-header-action a:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
 .record-type-context {
   color: #555;
   font-size: 0.85rem;
@@ -1627,7 +1653,8 @@ main.explorer-shell {
 
 /* Problem View reading rail (UX-B §3/§4) — lightweight contextual
    orientation and a "Nesta página" index, inside the reused
-   `.record-detail-rail` shell. */
+   `.record-detail-rail` shell. SUI-03J1B reuses this same nav treatment for
+   the SRC rail's "Nesta fonte" index — no separate Source-specific class. */
 .problem-rail-nav ul {
   list-style: none;
   margin: 0;
@@ -2078,6 +2105,26 @@ main.explorer-shell {
   margin: 0 0 var(--space-3);
 }
 
+/* SUI-03J2B: SRC's own compact "Nesta fonte" index reuses the exact same
+   hidden-by-default/compact-visible contract as `.problem-help-section-index`
+   above — unlike Problem View's disclosure (which stays visible for its
+   own explanatory content beyond the index), the entire SRC compact
+   disclosure *is* the index, so the whole wrapper is gated, not just an
+   inner nav. Same breakpoints, same pattern, no new Source-specific
+   breakpoint. */
+.source-compact-section-index {
+  display: none;
+}
+
+/* SUI-03K3: "Abrir fonte original" desktop-rail copy vs. compact in-flow
+   copy — same exclusive-visibility contract as the rail/compact index pair
+   above (`.problem-reading-rail` / `.source-compact-section-index`). Both
+   copies exist in the DOM (SourceOriginalLinkAction rendered twice); CSS
+   alone decides which one is visible at a given width. */
+.source-original-link-inline {
+  display: none;
+}
+
 /* F1 intermediate reading-layout recomposition (768px-1059px): the
    canonical 720 main + 44 gap + 216 rail composition cannot fit in this
    band without destructively compressing the 720px reading column. Reuse
@@ -2107,6 +2154,18 @@ main.explorer-shell {
   }
 
   .problem-help-section-index {
+    display: block;
+  }
+
+  .source-compact-section-index {
+    display: block;
+  }
+
+  .source-original-link-rail {
+    display: none;
+  }
+
+  .source-original-link-inline {
     display: block;
   }
 }
@@ -2562,11 +2621,13 @@ main.explorer-shell {
   font-family: inherit;
 }
 
-.problem-section {
+.problem-section,
+.record-editorial-section {
   margin-bottom: var(--space-8);
 }
 
-.problem-section .detail-panel-label {
+.problem-section .detail-panel-label,
+.record-editorial-section .detail-panel-label {
   margin-bottom: var(--space-3);
 }
 
@@ -2621,7 +2682,8 @@ main.explorer-shell {
   margin-bottom: 0;
 }
 
-.problem-current-state-item h4 {
+.problem-current-state-item h4,
+.record-editorial-subheading {
   margin: 0 0 var(--space-2);
   color: var(--ink-faint);
   font-family: var(--ui);
@@ -2868,6 +2930,18 @@ main.explorer-shell {
   }
 
   .problem-help-section-index {
+    display: block;
+  }
+
+  .source-compact-section-index {
+    display: block;
+  }
+
+  .source-original-link-rail {
+    display: none;
+  }
+
+  .source-original-link-inline {
     display: block;
   }
 }

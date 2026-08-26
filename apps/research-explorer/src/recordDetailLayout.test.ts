@@ -71,3 +71,282 @@ describe("record-detail layout (shell-frame ownership, UX-C)", () => {
     }
   });
 });
+
+/**
+ * SUI-03J2B: characterizes the CSS-driven (never JS/viewport) responsive
+ * contract governing the SRC "Nesta fonte" desktop rail index
+ * (`.problem-reading-rail`, reused verbatim from Problem View's own desktop
+ * reading rail) vs. the compact in-flow index (`.source-compact-section-index`,
+ * following the same pattern as `.problem-help-section-index`). Parses raw
+ * rule bodies rather than asserting pixel geometry, mirroring the layout
+ * characterization style above.
+ */
+describe("Source View 'Nesta fonte' index responsive contract (SUI-03J2B, reuses Problem View pattern)", () => {
+  const css = readFileSync(CSS_PATH, "utf-8");
+
+  function bodiesInMediaBlock(mediaSelector: string, ruleSelector: string): string[] {
+    const escapedMedia = mediaSelector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const mediaPattern = new RegExp(`@media\\s*${escapedMedia}\\s*\\{`, "g");
+    const bodies: string[] = [];
+    for (const match of css.matchAll(mediaPattern)) {
+      const start = match.index! + match[0].length;
+      // Find the matching closing brace for this @media block by depth count.
+      let depth = 1;
+      let i = start;
+      while (i < css.length && depth > 0) {
+        if (css[i] === "{") depth++;
+        else if (css[i] === "}") depth--;
+        i++;
+      }
+      const blockBody = css.slice(start, i - 1);
+      bodies.push(...ruleBodiesFor(blockBody, ruleSelector));
+    }
+    return bodies;
+  }
+
+  it("no JS viewport detection is used to drive this visibility (window.innerWidth/matchMedia/resize) in RecordDetailPanel", () => {
+    const source = readFileSync(path.join(__dirname, "records", "RecordDetailPanel.tsx"), "utf-8");
+    expect(source).not.toMatch(/window\.innerWidth/);
+    expect(source).not.toMatch(/matchMedia/);
+    expect(source).not.toMatch(/addEventListener\(\s*["']resize["']/);
+  });
+
+  it("desktop-band (>=1060px, no override media query applies): the rail nav is visible by default and the compact index is hidden by default", () => {
+    // Base (non-media) rule for `.source-compact-section-index` hides it.
+    const baseCompactBodies = ruleBodiesFor(css, ".source-compact-section-index");
+    expect(baseCompactBodies.length).toBeGreaterThan(0);
+    expect(baseCompactBodies[0]).toMatch(/display\s*:\s*none/);
+
+    // `.problem-reading-rail` (reused by the SRC rail nav) carries no rule at
+    // all outside the two narrower-band overrides below — it is visible by
+    // ordinary flow/flex display at >=1060px purely because nothing hides it
+    // there, matching Problem View's own precedent.
+    const allRailBodies = ruleBodiesFor(css, ".problem-reading-rail");
+    const outsideMediaBodies = allRailBodies.filter((body) => !bodiesInMediaBlock("(min-width: 768px) and (max-width: 1059px)", ".problem-reading-rail").includes(body) && !bodiesInMediaBlock("(max-width: 767px)", ".problem-reading-rail").includes(body));
+    expect(outsideMediaBodies.length).toBe(0);
+  });
+
+  it("compact/non-lateral-rail bands (768-1059px and <=767px): the rail nav is hidden and the compact index is shown", () => {
+    for (const mediaSelector of ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"]) {
+      const railBodies = bodiesInMediaBlock(mediaSelector, ".problem-reading-rail");
+      expect(railBodies.some((body) => /display\s*:\s*none/.test(body))).toBe(true);
+
+      const compactBodies = bodiesInMediaBlock(mediaSelector, ".source-compact-section-index");
+      expect(compactBodies.some((body) => /display\s*:\s*block/.test(body))).toBe(true);
+    }
+  });
+
+  it("the compact index visibility rules reuse the exact same media queries as .problem-help-section-index (Problem View's own compact-index pattern) — no new Source-specific breakpoint", () => {
+    for (const mediaSelector of ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"]) {
+      const problemHelpBodies = bodiesInMediaBlock(mediaSelector, ".problem-help-section-index");
+      const sourceCompactBodies = bodiesInMediaBlock(mediaSelector, ".source-compact-section-index");
+      expect(problemHelpBodies.length).toBeGreaterThan(0);
+      expect(sourceCompactBodies.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("no declared band shows both the rail nav and the compact index simultaneously", () => {
+    const bands = ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"];
+    for (const mediaSelector of bands) {
+      const railBodies = bodiesInMediaBlock(mediaSelector, ".problem-reading-rail");
+      const compactBodies = bodiesInMediaBlock(mediaSelector, ".source-compact-section-index");
+      const railHiddenHere = railBodies.some((body) => /display\s*:\s*none/.test(body));
+      const compactShownHere = compactBodies.some((body) => /display\s*:\s*block/.test(body));
+      // In every band this index appears in, exactly one of the two is visible.
+      expect(railHiddenHere && compactShownHere).toBe(true);
+    }
+    // Outside those bands (desktop, >=1060px): rail visible by default, compact hidden by default (asserted above).
+  });
+});
+
+/**
+ * SUI-03K3: characterizes the CSS-driven (never JS/viewport) responsive
+ * contract governing the "Abrir fonte original ↗" desktop rail copy
+ * (`.source-original-link-rail`) vs. the compact in-flow copy
+ * (`.source-original-link-inline`), reusing the exact same media queries as
+ * the "Nesta fonte" rail/compact-index pair above.
+ */
+describe("Source View 'Abrir fonte original' responsive contract (SUI-03K3)", () => {
+  const css = readFileSync(CSS_PATH, "utf-8");
+
+  function bodiesInMediaBlock(mediaSelector: string, ruleSelector: string): string[] {
+    const escapedMedia = mediaSelector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const mediaPattern = new RegExp(`@media\\s*${escapedMedia}\\s*\\{`, "g");
+    const bodies: string[] = [];
+    for (const match of css.matchAll(mediaPattern)) {
+      const start = match.index! + match[0].length;
+      let depth = 1;
+      let i = start;
+      while (i < css.length && depth > 0) {
+        if (css[i] === "{") depth++;
+        else if (css[i] === "}") depth--;
+        i++;
+      }
+      const blockBody = css.slice(start, i - 1);
+      bodies.push(...ruleBodiesFor(blockBody, ruleSelector));
+    }
+    return bodies;
+  }
+
+  it("no JS viewport detection is used to drive this visibility (window.innerWidth/matchMedia/resize) in RecordDetailPanel", () => {
+    const source = readFileSync(path.join(__dirname, "records", "RecordDetailPanel.tsx"), "utf-8");
+    expect(source).not.toMatch(/window\.innerWidth/);
+    expect(source).not.toMatch(/matchMedia/);
+    expect(source).not.toMatch(/addEventListener\(\s*["']resize["']/);
+  });
+
+  it("desktop-band (>=1060px, no override media query applies): the rail copy is visible by default and the inline copy is hidden by default", () => {
+    const baseInlineBodies = ruleBodiesFor(css, ".source-original-link-inline");
+    expect(baseInlineBodies.length).toBeGreaterThan(0);
+    expect(baseInlineBodies[0]).toMatch(/display\s*:\s*none/);
+
+    const allRailBodies = ruleBodiesFor(css, ".source-original-link-rail");
+    const outsideMediaBodies = allRailBodies.filter(
+      (body) =>
+        !bodiesInMediaBlock("(min-width: 768px) and (max-width: 1059px)", ".source-original-link-rail").includes(body) &&
+        !bodiesInMediaBlock("(max-width: 767px)", ".source-original-link-rail").includes(body)
+    );
+    expect(outsideMediaBodies.length).toBe(0);
+  });
+
+  it("compact/non-lateral-rail bands (768-1059px and <=767px): the rail copy is hidden and the inline copy is shown", () => {
+    for (const mediaSelector of ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"]) {
+      const railBodies = bodiesInMediaBlock(mediaSelector, ".source-original-link-rail");
+      expect(railBodies.some((body) => /display\s*:\s*none/.test(body))).toBe(true);
+
+      const inlineBodies = bodiesInMediaBlock(mediaSelector, ".source-original-link-inline");
+      expect(inlineBodies.some((body) => /display\s*:\s*block/.test(body))).toBe(true);
+    }
+  });
+
+  it("reuses the exact same media queries as the 'Nesta fonte' rail/compact-index pair — no new Source-specific breakpoint", () => {
+    for (const mediaSelector of ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"]) {
+      const railIndexBodies = bodiesInMediaBlock(mediaSelector, ".problem-reading-rail");
+      const ctaRailBodies = bodiesInMediaBlock(mediaSelector, ".source-original-link-rail");
+      expect(railIndexBodies.length).toBeGreaterThan(0);
+      expect(ctaRailBodies.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("no declared band shows both the rail copy and the inline copy simultaneously", () => {
+    const bands = ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"];
+    for (const mediaSelector of bands) {
+      const railBodies = bodiesInMediaBlock(mediaSelector, ".source-original-link-rail");
+      const inlineBodies = bodiesInMediaBlock(mediaSelector, ".source-original-link-inline");
+      const railHiddenHere = railBodies.some((body) => /display\s*:\s*none/.test(body));
+      const inlineShownHere = inlineBodies.some((body) => /display\s*:\s*block/.test(body));
+      expect(railHiddenHere && inlineShownHere).toBe(true);
+    }
+  });
+});
+
+/**
+ * SUI-03K2B: Source View top-level sections reuse the exact PRB editorial
+ * section rhythm (`.problem-section` — SUI-03K2A's confirmed root cause of
+ * the compressed Source rhythm) via one neutral shared class,
+ * `.record-editorial-section`, rather than a Source-specific spacing rule or
+ * direct coupling to the PRB-branded `.problem-section` class name. Parses
+ * the actual rule bodies out of the production stylesheet — no pixel
+ * geometry assertions, matching this file's existing characterization style.
+ */
+describe("shared editorial-section rhythm (.record-editorial-section, SUI-03K2B)", () => {
+  const css = readFileSync(CSS_PATH, "utf-8");
+
+  function ruleBodiesForRawPattern(pattern: RegExp): string[] {
+    return [...css.matchAll(pattern)].map((match) => match[1]);
+  }
+
+  it("1+2. .record-editorial-section shares .problem-section's exact margin-bottom: var(--space-8) rule", () => {
+    const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0]).toMatch(/margin-bottom\s*:\s*var\(--space-8\)\s*;/);
+  });
+
+  it("3. .record-editorial-section .detail-panel-label shares .problem-section .detail-panel-label's exact margin-bottom: var(--space-3) rule", () => {
+    const bodies = ruleBodiesForRawPattern(/\.problem-section \.detail-panel-label,\s*\n?\s*\.record-editorial-section \.detail-panel-label\s*\{([^}]*)\}/g);
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0]).toMatch(/margin-bottom\s*:\s*var\(--space-3\)\s*;/);
+  });
+
+  it("10. .problem-section's own rule/value is unchanged (still exactly margin-bottom: var(--space-8))", () => {
+    const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0].trim()).toBe("margin-bottom: var(--space-8);");
+  });
+
+  it("11. no Source-specific margin value was introduced for these sections (no .source-*-section margin/margin-bottom rule outside .record-editorial-section)", () => {
+    const sourceSectionClasses = [
+      "source-overview-section",
+      "source-findings-section",
+      "source-coverage-section",
+      "source-dates-access-section",
+      "source-licensing-section",
+      "source-caveats-section",
+      "source-technical-section",
+    ];
+    for (const className of sourceSectionClasses) {
+      const bodies = ruleBodiesFor(css, `\\.${className}`);
+      for (const body of bodies) {
+        expect(body).not.toMatch(/margin(-bottom)?\s*:/);
+      }
+    }
+  });
+});
+
+/**
+ * SUI-03K2C: Source nested `<h4>` headings (SourceFindingsSection's evidence
+ * group headings, SourceInvestigationSection's "Problemas relacionados")
+ * reuse the exact PRB nested-heading visual contract
+ * (`.problem-current-state-item h4`) via one neutral shared class,
+ * `.record-editorial-subheading`, rather than a Source-specific rule or
+ * direct coupling to the PRB-branded `.problem-current-state-item` class.
+ * Parses the actual rule bodies out of the production stylesheet — no pixel
+ * geometry assertions, matching this file's existing characterization style.
+ */
+describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K2C)", () => {
+  const css = readFileSync(CSS_PATH, "utf-8");
+
+  function ruleBodiesForRawPattern(pattern: RegExp): string[] {
+    return [...css.matchAll(pattern)].map((match) => match[1]);
+  }
+
+  const SHARED_RULE_PATTERN = /\.problem-current-state-item h4,\s*\n?\s*\.record-editorial-subheading\s*\{([^}]*)\}/g;
+
+  it("1+5+6. .record-editorial-subheading shares .problem-current-state-item h4's exact typography values", () => {
+    const bodies = ruleBodiesForRawPattern(SHARED_RULE_PATTERN);
+    expect(bodies.length).toBeGreaterThan(0);
+    const body = bodies[0];
+    expect(body).toMatch(/margin\s*:\s*0 0 var\(--space-2\)\s*;/);
+    expect(body).toMatch(/color\s*:\s*var\(--ink-faint\)\s*;/);
+    expect(body).toMatch(/font-family\s*:\s*var\(--ui\)\s*;/);
+    expect(body).toMatch(/font-size\s*:\s*12px\s*;/);
+    expect(body).toMatch(/font-weight\s*:\s*600\s*;/);
+    expect(body).toMatch(/text-transform\s*:\s*uppercase\s*;/);
+    expect(body).toMatch(/letter-spacing\s*:\s*0\.03em\s*;/);
+  });
+
+  it("2. SourceFindingsSection group h4 headings use .record-editorial-subheading", () => {
+    const source = readFileSync(path.join(__dirname, "records", "SourceFindingsSection.tsx"), "utf-8");
+    expect(source).toMatch(/<h4 className="record-editorial-subheading">\{heading\}<\/h4>/);
+  });
+
+  it("3+4. SourceInvestigationSection 'Problemas relacionados' uses .record-editorial-subheading as an h4 under the h3 'Na investigação' section", () => {
+    const source = readFileSync(path.join(__dirname, "records", "SourceInvestigationSection.tsx"), "utf-8");
+    expect(source).toMatch(/<h4 className="record-editorial-subheading">Problemas relacionados<\/h4>/);
+    expect(source).toMatch(/<h3 className="detail-panel-label">Na investigação<\/h3>/);
+  });
+
+  it("7. no Source top-level h3 (.detail-panel-label) receives the nested-heading class", () => {
+    expect(css).not.toMatch(/\.detail-panel-label[^{]*\.record-editorial-subheading/);
+    const findingsSource = readFileSync(path.join(__dirname, "records", "SourceFindingsSection.tsx"), "utf-8");
+    const investigationSource = readFileSync(path.join(__dirname, "records", "SourceInvestigationSection.tsx"), "utf-8");
+    expect(findingsSource).not.toMatch(/<h3 className="[^"]*record-editorial-subheading/);
+    expect(investigationSource).not.toMatch(/<h3 className="[^"]*record-editorial-subheading/);
+  });
+
+  it("12. .record-editorial-section spacing rule is unchanged (still exactly margin-bottom: var(--space-8))", () => {
+    const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0].trim()).toBe("margin-bottom: var(--space-8);");
+  });
+});

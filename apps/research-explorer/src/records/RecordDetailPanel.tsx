@@ -7,7 +7,21 @@ import { findMeaningField } from "./meaningField";
 import { ContributionChip } from "./ContributionChip";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation";
 import { ContextTabs } from "../ContextTabs";
-import { evidenceQuickRead, sourceQuickRead, sourceName, type QuickReadItem } from "./recordOrientation";
+import { evidenceQuickRead, type QuickReadItem } from "./recordOrientation";
+import { SourceOverviewSection } from "./SourceOverviewSection";
+import { SourceFindingsSection } from "./SourceFindingsSection";
+import { SourceCoverageSection } from "./SourceCoverageSection";
+import { SourceDatesAccessSection } from "./SourceDatesAccessSection";
+import { SourceLicensingSection } from "./SourceLicensingSection";
+import { SourceCaveatsSection } from "./SourceCaveatsSection";
+import { SourceInvestigationSection } from "./SourceInvestigationSection";
+import { useSourceEvidenceRelations, type SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
+import { extractSourceCaveats, isHttpUrl } from "./sourceView";
+import { SourceTechnicalSection } from "./SourceTechnicalSection";
+import { SOURCE_SECTION_ANCHOR_IDS, sourceSectionIndex } from "./sourceSectionIndex";
+import { toSourceSectionRelationContext } from "./sourceEvidenceRelations";
+import { SourceCompactSectionIndex } from "./SourceCompactSectionIndex";
+import type { SourceSectionRelationContext } from "./sourceView";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -235,38 +249,134 @@ function contributionTargetSentence(value: string, relatedProblemId: string): st
 }
 
 /**
- * UX-D §3: SRC-only public provenance-verification action. Only a canonical
- * external HTTP(S) reference that the source's own `access.public` marks as
- * valid for public access qualifies — this reuses existing SRC read-model
- * data (`canonical_reference`, `access.public`) rather than adding a schema
- * field. Anything else (missing reference, non-HTTP(S) scheme, or a source
- * not marked publicly accessible) renders no action: this is deliberately
+ * SUI-02A: SRC-only public provenance-verification action, restored to SRC
+ * v2 canonical eligibility semantics (`docs/datamodel.md` §1.1) — the
+ * retired v1 `access.public` field no longer governs this. A canonical
+ * external HTTP(S) reference qualifies only when the source's own
+ * `access.level` is `"public"` and `access.availability` is `"available"`;
+ * availability is never inferred from any other field. Anything else
+ * (missing reference, non-HTTP(S) scheme, non-public level, or
+ * unavailable/unknown availability) renders no action: this is deliberately
  * not a generic auto-linker for arbitrary strings.
  */
 function publicSourceReferenceUrl(record: Record<string, unknown>): string | null {
   const access = record.access;
-  const isPublic = access !== null && typeof access === "object" && !Array.isArray(access) && (access as Record<string, unknown>).public === true;
-  if (!isPublic) return null;
+  if (access === null || typeof access !== "object" || Array.isArray(access)) return null;
+  const accessRecord = access as Record<string, unknown>;
+  if (accessRecord.level !== "public") return null;
+  if (accessRecord.availability !== "available") return null;
   const reference = record.canonical_reference;
   if (typeof reference !== "string") return null;
-  let url: URL;
-  try {
-    url = new URL(reference);
-  } catch {
-    return null;
-  }
-  return url.protocol === "http:" || url.protocol === "https:" ? reference : null;
+  return isHttpUrl(reference) ? reference : null;
 }
 
-function SourceOriginalLinkAction({ detail }: { detail: RecordDetail }) {
+/**
+ * SUI-03K3: rendered twice — once for the desktop rail, once for the compact
+ * in-flow position — with CSS (`.problem-reading-rail` /
+ * `.source-compact-section-index`-style exclusive visibility, reusing the
+ * exact same responsive class contract as `SourceReadingRailIndex` /
+ * `SourceCompactSectionIndex`) guaranteeing exactly one is ever visible.
+ * Eligibility (`publicSourceReferenceUrl`) is unchanged from SUI-02A; only
+ * placement/variant selection is new here.
+ */
+function SourceOriginalLinkAction({ detail, variant }: { detail: RecordDetail; variant: "rail" | "inline" }) {
   if (detail.type !== "SRC-") return null;
   const url = publicSourceReferenceUrl(detail.record);
   if (url === null) return null;
+  const className =
+    variant === "rail" ? "record-source-header-action source-original-link-rail" : "record-source-header-action source-original-link-inline";
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer">
-      Abrir fonte ↗
-    </a>
+    <p className={className}>
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        Abrir fonte original ↗
+      </a>
+    </p>
   );
+}
+
+/**
+ * SUI-03J1B: "Nesta fonte" desktop rail index — the SRC-only counterpart to
+ * `ProblemReadingRail`'s "Nesta página" nav (`ProblemView.tsx`), reusing the
+ * same `.problem-rail-nav` treatment. `sourceSectionIndex` (SUI-03J0) is the
+ * sole order/label/anchor/filtering authority; this component never
+ * hardcodes a duplicate section list.
+ *
+ * SUI-03J2B: `relationContext` is now derived once by the caller
+ * (`RecordDetailContent`) and passed in, rather than recomputed here — the
+ * same resolved value also reaches the compact `SourceCompactSectionIndex`,
+ * so both indexes are driven from one `toSourceSectionRelationContext` call.
+ * Wrapped in `.problem-reading-rail`-equivalent visibility: reuses the exact
+ * Problem View responsive class (`.problem-reading-rail`) so it hides at the
+ * same breakpoint the desktop reading rail already hides at, with no new
+ * Source-specific breakpoint.
+ */
+function SourceReadingRailIndex({ record, relationContext }: { record: Record<string, unknown>; relationContext?: SourceSectionRelationContext }) {
+  const sections = sourceSectionIndex(record, relationContext);
+  return (
+    <nav aria-label="Nesta fonte" className="problem-rail-nav problem-reading-rail">
+      <h4 className="detail-panel-label">Nesta fonte</h4>
+      <ul>
+        {sections.map((section) => (
+          <li key={section.sectionId}>
+            <a href={`#${section.anchorId}`}>{section.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+/**
+ * SUI-03C2/H2: `SourceFindingsSection` ("O que encontrámos") half of the one
+ * shared SRC → EVD relation state (`SourceRelationsState`, owned by
+ * `RecordDetailContent` via `useSourceEvidenceRelations` —
+ * SUI-03A2's `loadSourceEvidenceRelations` as sole SRC→EVD relation
+ * authority). Mirrors `useRecordDetail`'s own loading/error contract: while
+ * loading, a loading placeholder renders; on failure, an inline retry
+ * affordance renders instead of the zero-EVD empty state, which
+ * `SourceFindingsSection` itself only ever renders once relation loading has
+ * actually succeeded with zero backlinks.
+ */
+function SourceFindings({ state, onSelect }: { state: SourceEvidenceRelationsState & { retry: () => void }; onSelect: (id: string) => void }) {
+  if (state.status === "loading" || state.status === "idle") {
+    return (
+      <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="record-editorial-section source-findings-section">
+        <h3 className="detail-panel-label">O que encontrámos</h3>
+        <p role="status" aria-live="polite">
+          A carregar observações da investigação…
+        </p>
+      </section>
+    );
+  }
+
+  if (state.status === "error") {
+    return (
+      <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="record-editorial-section source-findings-section">
+        <h3 className="detail-panel-label">O que encontrámos</h3>
+        <div role="alert">
+          <p>Não foi possível carregar as observações da investigação ligadas a esta fonte.</p>
+          <button type="button" onClick={state.retry}>
+            Tentar novamente
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  return <SourceFindingsSection relations={state.relations} onSelect={onSelect} />;
+}
+
+/**
+ * SUI-03H2: `SourceInvestigationSection` ("Na investigação") half of the
+ * same shared `SourceRelationsState` `SourceFindings` above consumes — no
+ * second relation load. Renders only once relation state is `"ready"`;
+ * absent during loading, on error, and (via `SourceInvestigationSection`'s
+ * own `relatedProblems.length === 0` check) when ready with no related
+ * Problem — never a second loading/error message.
+ */
+function SourceInvestigation({ state, onSelect }: { state: SourceEvidenceRelationsState; onSelect: (id: string) => void }) {
+  if (state.status !== "ready") return null;
+  return <SourceInvestigationSection relations={state.relations} onSelect={onSelect} />;
 }
 
 function Breadcrumb({ detail, onBackToRecords }: { detail: RecordDetail; onBackToRecords: () => void }) {
@@ -343,30 +453,6 @@ function EvidenceQuickRead({ detail }: { detail: RecordDetail }) {
   return (
     <section aria-label="Leitura rápida" className="record-quick-read">
       <h3 className="detail-panel-label">Leitura rápida</h3>
-      <QuickReadList items={items} />
-    </section>
-  );
-}
-
-/**
- * The `Abrir fonte ↗` action itself is deliberately not repeated here — it
- * already renders once, in the "Mais ações" rail, via `SourceOriginalLinkAction`.
- * Repeating the same link here would duplicate an action already present
- * (UX-E "Do not duplicate large blocks already presented more clearly
- * elsewhere") and would break the singular `getByRole("link", ...)`
- * accessibility contract existing UX-D tests rely on. This section notes
- * public-access availability as a fact (Sim/Não) without re-rendering the link.
- */
-function SourceQuickRead({ detail }: { detail: RecordDetail }) {
-  const items = sourceQuickRead(detail.record);
-  const name = sourceName(detail.record);
-
-  if (items.length === 0 && !name) return null;
-
-  return (
-    <section aria-label="Leitura rápida" className="record-quick-read">
-      <h3 className="detail-panel-label">Leitura rápida</h3>
-      {name && <p className="record-quick-read-title">{name}</p>}
       <QuickReadList items={items} />
     </section>
   );
@@ -822,6 +908,7 @@ function PrbRawTechnicalDisclosure({ detail }: { detail: RecordDetail }) {
 }
 
 function RecordDetailContent({
+  dataProvider,
   detail,
   lookup,
   onSelect,
@@ -829,6 +916,7 @@ function RecordDetailContent({
   onViewAsProblem,
   onViewInGraph,
 }: {
+  dataProvider: DataProvider;
   detail: RecordDetail;
   lookup: Map<string, RecordSummary>;
   onSelect: (id: string) => void;
@@ -837,17 +925,38 @@ function RecordDetailContent({
   onViewInGraph: (id: string) => void;
 }) {
   const isPrb = detail.type === "PRB-";
+  const isSrc = detail.type === "SRC-";
   const meaning = findMeaningField(detail.record);
   const typeInfo = describeType(detail.type);
   const relatedProblemId = findRelatedProblemId(detail, lookup);
   const contributions = contributionValues(detail.record);
+  // SUI-03H2: the one SRC → EVD relation load/state owner for this rendered
+  // SRC detail, shared by `SourceFindings` ("O que encontrámos") and
+  // `SourceInvestigation` ("Na investigação") below — never a second
+  // `useSourceEvidenceRelations`/`loadSourceEvidenceRelations` call for the
+  // same detail. `sourceId` is `null` for non-SRC records, which is this
+  // hook's own no-op contract (see `useSourceEvidenceRelations.ts`).
+  const sourceRelationsState = useSourceEvidenceRelations(dataProvider, isSrc ? detail.id : null);
+  // SUI-03J2B: the one `toSourceSectionRelationContext` derivation shared by
+  // both the desktop `SourceReadingRailIndex` and the compact
+  // `SourceCompactSectionIndex` — resolved only once `sourceRelationsState`
+  // is `"ready"`, so `investigation` stays correctly "deferred" (excluded)
+  // while loading/idle/error, matching `computeSourceSectionPresence`'s own
+  // contract. Never recomputed per-index.
+  const sourceRelationContext = isSrc && sourceRelationsState.status === "ready" ? toSourceSectionRelationContext(sourceRelationsState.relations) : undefined;
+  const hasCaveats = isSrc ? extractSourceCaveats(detail.record) !== null : false;
   // Already-explicit, schema-driven classification/status fields (RE-01's
   // `buildSummaryFields()` — every enum-constrained field the record's own
   // schema declares), reused here rather than singling out any one
   // record-type-specific field for special presentation. `analysis.contribution`
   // is excluded: it already has its own authoritative rendering via
   // ContributionChip above, so including it here would render it twice.
-  const roleFields = Object.entries(lookup.get(detail.id)?.summaryFields ?? {}).filter(([field]) => field !== "analysis.contribution");
+  // SUI-03K1: SRC never renders this generic chip row — its schema-declared
+  // enum fields (acquisition.method, access.*, licensing.*, scope.geography.level,
+  // …) are already presented via the dedicated Source View sections (Visão
+  // geral, Cobertura, Datas e acesso, Licenciamento), so surfacing them again
+  // here would be redundant and, at compact width, delay the Source content.
+  const roleFields = isSrc ? [] : Object.entries(lookup.get(detail.id)?.summaryFields ?? {}).filter(([field]) => field !== "analysis.contribution");
 
   return (
     <div className="record-detail-layout shell-frame">
@@ -896,8 +1005,20 @@ function RecordDetailContent({
             )}
           </section>
 
+          {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} variant="inline" />}
+          {isSrc && <SourceCompactSectionIndex record={detail.record} relationContext={sourceRelationContext} />}
+
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
-          {detail.type === "SRC-" && <SourceQuickRead detail={detail} />}
+          {isSrc && <SourceOverviewSection record={detail.record} />}
+          {isSrc && <SourceFindings state={sourceRelationsState} onSelect={onSelect} />}
+          {isSrc && <SourceCoverageSection record={detail.record} />}
+          {isSrc && <SourceDatesAccessSection record={detail.record} />}
+          {isSrc && <SourceLicensingSection record={detail.record} />}
+          {isSrc && !hasCaveats && <SourceInvestigation state={sourceRelationsState} onSelect={onSelect} />}
+          {isSrc && <SourceCaveatsSection record={detail.record} />}
+          {isSrc && hasCaveats && <SourceInvestigation state={sourceRelationsState} onSelect={onSelect} />}
+
+          {isSrc && <SourceTechnicalSection record={detail.record} />}
 
           {isPrb ? (
             <>
@@ -915,7 +1036,7 @@ function RecordDetailContent({
                 <PrbRawTechnicalDisclosure detail={detail} />
               </section>
             </>
-          ) : (
+          ) : isSrc ? null : (
             <>
               <ProvenancePanel detail={detail} />
 
@@ -936,20 +1057,23 @@ function RecordDetailContent({
             <code>{detail.type}</code>
             <p>{typeInfo.description}</p>
           </div>
-          <div className="detail-rail-actions">
-            <SourceOriginalLinkAction detail={detail} />
-            {relatedProblemId && (
-              <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
-                Ver como Problema ({relatedProblemId})
-              </button>
-            )}
-            {detail.type !== "PRB-" && (
-              <button type="button" onClick={() => onViewInGraph(detail.id)}>
-                Ver no Grafo
-              </button>
-            )}
-            <span className="detail-rail-file">{detail.file}</span>
-          </div>
+          {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} variant="rail" />}
+          {isSrc && <SourceReadingRailIndex record={detail.record} relationContext={sourceRelationContext} />}
+          {!isSrc && (
+            <div className="detail-rail-actions">
+              {relatedProblemId && (
+                <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
+                  Ver como Problema ({relatedProblemId})
+                </button>
+              )}
+              {detail.type !== "PRB-" && (
+                <button type="button" onClick={() => onViewInGraph(detail.id)}>
+                  Ver no Grafo
+                </button>
+              )}
+              <span className="detail-rail-file">{detail.file}</span>
+            </div>
+          )}
         </aside>
       </div>
     </div>
@@ -1020,6 +1144,7 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
       {state.status === "ready" && (
         <div ref={contentRef} tabIndex={-1} aria-label={`Detalhe de ${state.detail.id}`}>
           <RecordDetailContent
+            dataProvider={dataProvider}
             detail={state.detail}
             lookup={lookup}
             onSelect={onSelect}

@@ -41,21 +41,11 @@ export function evidenceQuickRead(record: Record<string, unknown>): QuickReadIte
   return items;
 }
 
-/** SRC quick-read: identity/publisher/currentness/access are already-canonical fields — no derived "trust score" or similar is computed. */
+/** SRC quick-read: identity/publisher are already-canonical fields — no derived "trust score" or similar is computed. */
 export function sourceQuickRead(record: Record<string, unknown>): QuickReadItem[] {
   const items: QuickReadItem[] = [];
   const publisher = getString(record, "publisher");
   if (publisher) items.push({ field: "publisher", label: "Editor", value: publisher });
-
-  const freshness = getObject(record, "freshness");
-  const freshnessStatus = freshness ? getString(freshness, "status") : null;
-  if (freshnessStatus) items.push({ field: "freshness.status", label: "Atualidade", value: publicEnumLabel("freshness.status", freshnessStatus) });
-
-  const access = getObject(record, "access");
-  const isPublic = access ? access.public : undefined;
-  if (typeof isPublic === "boolean") {
-    items.push({ field: "access.public", label: "Acesso público", value: isPublic ? "Sim" : "Não" });
-  }
   return items;
 }
 

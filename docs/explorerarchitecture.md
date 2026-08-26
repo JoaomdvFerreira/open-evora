@@ -110,6 +110,8 @@ Approved references own the intended rendered composition, hierarchy, typography
 
 Minor non-visual changes do not require a full visual-review cycle.
 
+Source View (SRC) functional/product presentation reached closure at commit `cfd0347`. Visual polish, typography/surface refinement, and optional styling of actionable EVD/PRB identifiers remain intentionally deferred to a future Claude Design pass; the closure did not refresh approved visual-review snapshots, so no final visual approval should be inferred from it.
+
 ## 7. Performance posture
 
 The static client-side architecture has been validated at corpus sizes materially above the current dataset without a demonstrated architectural cliff in supported workflows.
