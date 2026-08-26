@@ -14,7 +14,9 @@ import { SourceCoverageSection } from "./SourceCoverageSection";
 import { SourceDatesAccessSection } from "./SourceDatesAccessSection";
 import { SourceLicensingSection } from "./SourceLicensingSection";
 import { SourceCaveatsSection } from "./SourceCaveatsSection";
-import { useSourceEvidenceRelations } from "./useSourceEvidenceRelations";
+import { SourceInvestigationSection } from "./SourceInvestigationSection";
+import { useSourceEvidenceRelations, type SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
+import { extractSourceCaveats } from "./sourceView";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -289,18 +291,17 @@ function SourceOriginalLinkAction({ detail }: { detail: RecordDetail }) {
 }
 
 /**
- * SUI-03C2: hosts the SRC → EVD relation load (`useSourceEvidenceRelations`,
+ * SUI-03C2/H2: `SourceFindingsSection` ("O que encontrámos") half of the one
+ * shared SRC → EVD relation state (`SourceRelationsState`, owned by
+ * `RecordDetailContent` via `useSourceEvidenceRelations` —
  * SUI-03A2's `loadSourceEvidenceRelations` as sole SRC→EVD relation
- * authority) and renders `SourceFindingsSection` once it succeeds. Mirrors
- * `useRecordDetail`'s own loading/error contract: while loading, nothing is
- * rendered (never a fabricated empty-state conclusion); on failure, an
- * inline retry affordance is shown instead of the zero-EVD empty state,
- * which `SourceFindingsSection` itself only ever renders once relation
- * loading has actually succeeded with zero backlinks.
+ * authority). Mirrors `useRecordDetail`'s own loading/error contract: while
+ * loading, a loading placeholder renders; on failure, an inline retry
+ * affordance renders instead of the zero-EVD empty state, which
+ * `SourceFindingsSection` itself only ever renders once relation loading has
+ * actually succeeded with zero backlinks.
  */
-function SourceFindings({ dataProvider, sourceId, onSelect }: { dataProvider: DataProvider; sourceId: string; onSelect: (id: string) => void }) {
-  const state = useSourceEvidenceRelations(dataProvider, sourceId);
-
+function SourceFindings({ state, onSelect }: { state: SourceEvidenceRelationsState & { retry: () => void }; onSelect: (id: string) => void }) {
   if (state.status === "loading" || state.status === "idle") {
     return (
       <section aria-label="O que encontrámos" className="source-findings-section">
@@ -327,6 +328,19 @@ function SourceFindings({ dataProvider, sourceId, onSelect }: { dataProvider: Da
   }
 
   return <SourceFindingsSection relations={state.relations} onSelect={onSelect} />;
+}
+
+/**
+ * SUI-03H2: `SourceInvestigationSection` ("Na investigação") half of the
+ * same shared `SourceRelationsState` `SourceFindings` above consumes — no
+ * second relation load. Renders only once relation state is `"ready"`;
+ * absent during loading, on error, and (via `SourceInvestigationSection`'s
+ * own `relatedProblems.length === 0` check) when ready with no related
+ * Problem — never a second loading/error message.
+ */
+function SourceInvestigation({ state, onSelect }: { state: SourceEvidenceRelationsState; onSelect: (id: string) => void }) {
+  if (state.status !== "ready") return null;
+  return <SourceInvestigationSection relations={state.relations} onSelect={onSelect} />;
 }
 
 function Breadcrumb({ detail, onBackToRecords }: { detail: RecordDetail; onBackToRecords: () => void }) {
@@ -875,10 +889,19 @@ function RecordDetailContent({
   onViewInGraph: (id: string) => void;
 }) {
   const isPrb = detail.type === "PRB-";
+  const isSrc = detail.type === "SRC-";
   const meaning = findMeaningField(detail.record);
   const typeInfo = describeType(detail.type);
   const relatedProblemId = findRelatedProblemId(detail, lookup);
   const contributions = contributionValues(detail.record);
+  // SUI-03H2: the one SRC → EVD relation load/state owner for this rendered
+  // SRC detail, shared by `SourceFindings` ("O que encontrámos") and
+  // `SourceInvestigation` ("Na investigação") below — never a second
+  // `useSourceEvidenceRelations`/`loadSourceEvidenceRelations` call for the
+  // same detail. `sourceId` is `null` for non-SRC records, which is this
+  // hook's own no-op contract (see `useSourceEvidenceRelations.ts`).
+  const sourceRelationsState = useSourceEvidenceRelations(dataProvider, isSrc ? detail.id : null);
+  const hasCaveats = isSrc ? extractSourceCaveats(detail.record) !== null : false;
   // Already-explicit, schema-driven classification/status fields (RE-01's
   // `buildSummaryFields()` — every enum-constrained field the record's own
   // schema declares), reused here rather than singling out any one
@@ -937,12 +960,14 @@ function RecordDetailContent({
           {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} />}
 
           {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
-          {detail.type === "SRC-" && <SourceOverviewSection record={detail.record} />}
-          {detail.type === "SRC-" && <SourceFindings dataProvider={dataProvider} sourceId={detail.id} onSelect={onSelect} />}
-          {detail.type === "SRC-" && <SourceCoverageSection record={detail.record} />}
-          {detail.type === "SRC-" && <SourceDatesAccessSection record={detail.record} />}
-          {detail.type === "SRC-" && <SourceLicensingSection record={detail.record} />}
-          {detail.type === "SRC-" && <SourceCaveatsSection record={detail.record} />}
+          {isSrc && <SourceOverviewSection record={detail.record} />}
+          {isSrc && <SourceFindings state={sourceRelationsState} onSelect={onSelect} />}
+          {isSrc && <SourceCoverageSection record={detail.record} />}
+          {isSrc && <SourceDatesAccessSection record={detail.record} />}
+          {isSrc && <SourceLicensingSection record={detail.record} />}
+          {isSrc && !hasCaveats && <SourceInvestigation state={sourceRelationsState} onSelect={onSelect} />}
+          {isSrc && <SourceCaveatsSection record={detail.record} />}
+          {isSrc && hasCaveats && <SourceInvestigation state={sourceRelationsState} onSelect={onSelect} />}
 
           {isPrb ? (
             <>
