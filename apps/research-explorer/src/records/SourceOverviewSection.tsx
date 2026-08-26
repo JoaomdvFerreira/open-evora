@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { extractSourceOverview, type SourceOverview } from "./sourceView";
-import { publicEnumLabel, formatPublicDate } from "../presentation";
+import { publicEnumLabel, formatPublicPartialDate } from "../presentation";
 
 interface OverviewRow {
   label: string;
@@ -29,7 +29,7 @@ function buildOverviewRows(overview: SourceOverview): OverviewRow[] {
   }
 
   if (overview.lastCheckedAt) {
-    rows.push({ label: "Última verificação pela Open Évora", field: "temporal.last_checked_at", value: `Verificada pela Open Évora em ${formatPublicDate(overview.lastCheckedAt)}` });
+    rows.push({ label: "Última verificação pela Open Évora", field: "temporal.last_checked_at", value: `Verificada pela Open Évora em ${formatPublicPartialDate(overview.lastCheckedAt)}` });
   }
 
   return rows;

@@ -3,7 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RecordDetailPanel } from "./RecordDetailPanel";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
-import { formatPublicDate } from "../presentation";
+import { formatPublicPartialDate } from "../presentation";
 
 /**
  * Meaning before metadata, compact provenance near the top, exhaustive
@@ -2062,7 +2062,8 @@ describe("RecordDetailPanel — SUI-03E2 Source View Datas e acesso integration"
     expect(within(datesAccess).getByText("Publicação")).toBeTruthy();
     expect(within(datesAccess).getByText(/11 de novembro de 2022/)).toBeTruthy();
     expect(within(datesAccess).getByText("Última verificação pela Open Évora")).toBeTruthy();
-    expect(within(datesAccess).getByText(formatPublicDate("2026-08-25"))).toBeTruthy();
+    expect(within(datesAccess).getByText(formatPublicPartialDate("2026-08-25"))).toBeTruthy();
+    expect(within(datesAccess).queryByText("25/08/2026")).toBeNull();
     expect(within(datesAccess).getByText("Nível de acesso")).toBeTruthy();
     expect(within(datesAccess).getByText("Público")).toBeTruthy();
     expect(within(datesAccess).getByText("Disponibilidade")).toBeTruthy();

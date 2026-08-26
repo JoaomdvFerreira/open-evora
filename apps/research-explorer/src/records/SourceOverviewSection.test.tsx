@@ -58,8 +58,8 @@ describe("SourceOverviewSection", () => {
     expect(screen.getByText("Scientific Reports (Springer Nature)")).toBeTruthy();
     expect(screen.getByText("Documento")).toBeTruthy();
     expect(screen.getByText("Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari, Anne Goodchild")).toBeTruthy();
-    expect(screen.getByText(/Verificada pela Open Évora em/)).toBeTruthy();
-    expect(screen.getByText(/25 de ago(\.|osto) de 2026|25\/08\/2026/)).toBeTruthy();
+    expect(screen.getByText("Verificada pela Open Évora em 25 de agosto de 2026")).toBeTruthy();
+    expect(screen.queryByText(/25\/08\/2026/)).toBeNull();
   });
 
   it("still renders the section for a minimal SRC, omitting absent optional rows without inventing placeholders", () => {

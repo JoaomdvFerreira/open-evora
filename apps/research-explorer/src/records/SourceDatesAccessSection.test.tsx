@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { SourceDatesAccessSection } from "./SourceDatesAccessSection";
-import { formatPublicDate, formatPublicPartialDate } from "../presentation";
+import { formatPublicPartialDate } from "../presentation";
 
 /** Mirrors research/sources/SRC-0093.yaml exactly (matches sourceView.test.ts's fixture). */
 const SRC_0093: Record<string, unknown> = {
@@ -67,7 +67,8 @@ describe("SourceDatesAccessSection", () => {
     expect(screen.getByText("Publicação")).toBeTruthy();
     expect(screen.getByText(/11 de novembro de 2022/)).toBeTruthy();
     expect(screen.getByText("Última verificação pela Open Évora")).toBeTruthy();
-    expect(screen.getByText(formatPublicDate("2026-08-25"))).toBeTruthy();
+    expect(screen.getByText(formatPublicPartialDate("2026-08-25"))).toBeTruthy();
+    expect(screen.queryByText("25/08/2026")).toBeNull();
     expect(screen.getByText("Público")).toBeTruthy();
     expect(screen.getByText("Disponível")).toBeTruthy();
     expect(screen.getByText("Não")).toBeTruthy();

@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { extractSourceDatesAccess, type SourceDatesAccess } from "./sourceView";
-import { publicEnumLabel, publicTriStateLabel, formatPublicPartialDate, formatPublicDate } from "../presentation";
+import { publicEnumLabel, publicTriStateLabel, formatPublicPartialDate } from "../presentation";
 
 interface DatesAccessRow {
   label: string;
@@ -31,7 +31,7 @@ function buildDatesAccessRows(datesAccess: SourceDatesAccess): DatesAccessRow[] 
   }
 
   if (datesAccess.lastCheckedAt) {
-    rows.push({ label: "Última verificação pela Open Évora", field: "last_checked_at", value: formatPublicDate(datesAccess.lastCheckedAt) });
+    rows.push({ label: "Última verificação pela Open Évora", field: "last_checked_at", value: formatPublicPartialDate(datesAccess.lastCheckedAt) });
   }
 
   if (datesAccess.updateFrequency) {
