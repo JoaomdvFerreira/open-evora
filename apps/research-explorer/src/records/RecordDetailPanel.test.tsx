@@ -7,6 +7,7 @@ const index: RecordSummary[] = [
   { id: "EVD-1", type: "EVD-", label: "Evidência", file: "", summaryFields: {} },
   { id: "SRC-1", type: "SRC-", label: "Fonte", file: "", summaryFields: {} },
   { id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} },
+  { id: "PRB-2", type: "PRB-", label: "Problema relacionado", file: "", summaryFields: {} },
 ];
 const evd: RecordDetail = {
   id: "EVD-1", type: "EVD-", file: "", outgoingEdges: [{ field: "provenance.sources", ordinal: 0, to: "SRC-1" }],
@@ -22,12 +23,13 @@ const records: Record<string, RecordDetail> = {
   "EVD-1": evd,
   "SRC-1": { id: "SRC-1", type: "SRC-", file: "", record: { name: "Fonte" }, outgoingEdges: [], incomingEdges: [] },
   "PRB-1": { id: "PRB-1", type: "PRB-", file: "", record: { title: "Problema", evidence: [{ evidence_id: "EVD-1", effects: ["SUPPORTS"], research_roles: ["LOCAL_OBSERVATION"] }] }, outgoingEdges: [], incomingEdges: [] },
+  "PRB-2": { id: "PRB-2", type: "PRB-", file: "", record: { title: "Problema relacionado" }, outgoingEdges: [], incomingEdges: [] },
 };
 const provider: DataProvider = { getManifest: async () => { throw Error("unused"); }, listRecords: async () => index, getEdges: async () => [], getRecord: async (id) => records[id] };
 const lookup = new Map(index.map((item) => [item.id, item]));
-const renderDetail = (detail = evd, onSelect = vi.fn(), onViewAsProblem = vi.fn()) => {
-  const fixture: DataProvider = { ...provider, getRecord: async (id) => id === "EVD-1" ? detail : records[id] };
-  render(<RecordDetailPanel dataProvider={fixture} lookup={lookup} selectedId="EVD-1" onBackToRecords={vi.fn()} onSelect={onSelect} onViewAsProblem={onViewAsProblem} onViewInGraph={vi.fn()} />);
+const renderDetail = (detail = evd, onSelect = vi.fn(), onViewAsProblem = vi.fn(), selectedId = "EVD-1") => {
+  const fixture: DataProvider = { ...provider, getRecord: async (id) => id === selectedId ? detail : records[id] };
+  render(<RecordDetailPanel dataProvider={fixture} lookup={lookup} selectedId={selectedId} onBackToRecords={vi.fn()} onSelect={onSelect} onViewAsProblem={onViewAsProblem} onViewInGraph={vi.fn()} />);
   return { onSelect, onViewAsProblem };
 };
 
@@ -60,5 +62,31 @@ describe("RecordDetailPanel vNext", () => {
     expect((await screen.findAllByText("Só observação.")).length).toBeGreaterThan(0);
     expect(screen.queryByText("pessoas residentes")).toBeNull();
     expect(screen.queryByText("Sem inferência adicional.")).toBeNull();
+  });
+
+  it("omits the PRB corpus-relations section when no incoming records exist", async () => {
+    renderDetail(records["PRB-1"], vi.fn(), vi.fn(), "PRB-1");
+    await screen.findByText("Estrutura técnica completa");
+    expect(screen.queryByText("Relações no corpus")).toBeNull();
+    expect(screen.queryByText("← Referenciado por")).toBeNull();
+  });
+
+  it("renders deduplicated incoming PRB relations and preserves their navigation target", async () => {
+    const prbWithDuplicateIncomingPaths: RecordDetail = {
+      ...records["PRB-1"],
+      incomingEdges: [
+        { field: "decision_basis.overlap_check.related_problems", ordinal: 0, from: "PRB-2" },
+        { field: "decision_basis.overlap_check.related_problems", ordinal: 1, from: "PRB-2" },
+      ],
+    };
+    const onSelect = vi.fn();
+    renderDetail(prbWithDuplicateIncomingPaths, onSelect, vi.fn(), "PRB-1");
+
+    expect(await screen.findByText("Relações no corpus")).toBeTruthy();
+    expect(screen.getByText("← Referenciado por")).toBeTruthy();
+    const relatedButton = screen.getByRole("button", { name: /PRB-2.*Problema relacionado/ });
+    fireEvent.click(relatedButton);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledWith("PRB-2");
   });
 });

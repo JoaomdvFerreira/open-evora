@@ -6,7 +6,6 @@ import { describeType, formatTypedId, knownTypePrefixes } from "../typeGlossary"
 import { findMeaningField } from "./meaningField";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation";
 import { ContextTabs } from "../ContextTabs";
-import { evidenceQuickRead, type QuickReadItem } from "./recordOrientation";
 import { SourceOverviewSection } from "./SourceOverviewSection";
 import { SourceFindingsSection } from "./SourceFindingsSection";
 import { SourceCoverageSection } from "./SourceCoverageSection";
@@ -170,27 +169,20 @@ function PrbRelationsBoundary({ detail, lookup, onSelect }: { detail: RecordDeta
   return (
     <section aria-label="Relações no corpus" className="record-prb-relations-boundary">
       <h4>← Referenciado por</h4>
-      {incomingIds.length === 0 ? (
-        <p>Nenhum registo referencia este PRB.</p>
-      ) : (
-        <ul className="prb-relations-list">
-          {incomingIds.map((id) => (
-            <RelatedRecordButton key={id} id={id} lookup={lookup} onSelect={onSelect} />
-          ))}
-        </ul>
-      )}
+      <ul className="prb-relations-list">
+        {incomingIds.map((id) => (
+          <RelatedRecordButton key={id} id={id} lookup={lookup} onSelect={onSelect} />
+        ))}
+      </ul>
     </section>
   );
 }
 
 /**
- * The only edge field name any current schema declares specifically to
- * relate a record to the Problem it is about
- * (research/schemas/evidence.schema.json's own `references` entry —
- * declares `targetPrefix: "PRB-"` for exactly this field). Deliberately an
- * explicit allowlist, not a suffix/regex heuristic: an edge whose field is
- * *not* this one never counts, even if it happens to resolve to a PRB-
- * record for some unrelated reason.
+ * The PRB schema owns `evidence[]` references to EVD records. In the derived
+ * graph, each resulting incoming edge on an EVD retains `evidence` as the
+ * source-side canonical field name; this allowlist deliberately matches that
+ * field rather than inferring a Problem relation from arbitrary connectivity.
  */
 const PROBLEM_REFERENCE_FIELDS = ["evidence"];
 
@@ -218,24 +210,6 @@ function findRelatedProblemId(detail: RecordDetail, lookup: Map<string, RecordSu
   return null;
 }
 
-/**
- * Historical relationship metadata is not read from individual records.
- * carries them (currently EVD- only) — rendered as the same uniform
- * effect chip used in Problem View (no exceptional emphasis for any
- * value, including CONTRADICTS), plus its related-Problem link, matching
- * Prototype A's meaning-zone relationship row.
- */
-/**
- * Approved Prototype A only pairs a relationship sentence with CONTRADICTS
- * ("desafia a leitura de [Problema] PRB-0006" — its own inline title attribute
- * spells out this is specifically a contradiction/contest of the Problem's
- * current reading). No neutral wording for any other canonical effect
- * value appears in the approved reference or the prototype rationale, so
- * none is invented here: every other value renders its effect chip with
- * no accompanying sentence, per the semantic-constraint rule (do not invent
- * missing canonical prose; the chip + relations elsewhere already surface
- * the relationship neutrally).
- */
 /**
  * SUI-02A: SRC-only public provenance-verification action, restored to SRC
  * v2 canonical eligibility semantics (`docs/datamodel.md` §1.1) — the
@@ -404,43 +378,6 @@ function OrientationIntro() {
     <p className="record-orientation-intro">
       Este é um registo técnico da investigação. Mostra a informação guardada e as suas ligações para que possa ser consultada e verificada.
     </p>
-  );
-}
-
-/** UX-E §2: bounded "Leitura rápida" — only fields recordOrientation.ts found present on this exact record; never a fallback/invented value. */
-function QuickReadList({ items }: { items: QuickReadItem[] }) {
-  if (items.length === 0) return null;
-  return (
-    <dl className="record-quick-read-grid">
-      {items.map((item) => (
-        <div key={item.field} className="record-quick-read-item">
-          <dt>{item.label}</dt>
-          <dd>{item.value}</dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
-
-/**
- * Source/related-problem relationship navigation is deliberately not
- * repeated here: `RelationshipList` below already renders every related
- * record (SRC/PRB included) as its own single navigable entry with the
- * exact reference path, and duplicating that as a second, differently-worded
- * button for the same record would both add a second click target for the
- * same destination and (per UX-E's "no duplicate blocks" rule) restate
- * content already presented more clearly. The quick read stays limited to
- * data fields the record carries but the meaning zone does not already show.
- */
-function EvidenceQuickRead({ detail }: { detail: RecordDetail }) {
-  const items = evidenceQuickRead(detail.record);
-  if (items.length === 0) return null;
-
-  return (
-    <section aria-label="Leitura rápida" className="record-quick-read">
-      <h3 className="detail-panel-label">Leitura rápida</h3>
-      <QuickReadList items={items} />
-    </section>
   );
 }
 
@@ -989,7 +926,6 @@ function RecordDetailContent({
           {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} variant="inline" />}
           {isSrc && <SourceCompactSectionIndex record={detail.record} relationContext={sourceRelationContext} />}
 
-          {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
           {isSrc && <SourceOverviewSection record={detail.record} />}
           {isSrc && <SourceFindings state={sourceRelationsState} onSelect={onSelect} />}
           {isSrc && <SourceCoverageSection record={detail.record} />}
@@ -1008,10 +944,12 @@ function RecordDetailContent({
               <PrbFieldInspector detail={detail} />
               <PrbCanonicalReferences detail={detail} onSelect={onSelect} />
 
-              <section aria-label="Relações" id="relacoes" className="record-detail-relations">
-                <h3 className="detail-panel-label">Relações no corpus</h3>
-                <PrbRelationsBoundary detail={detail} lookup={lookup} onSelect={onSelect} />
-              </section>
+              {uniqueRelatedIds(detail.incomingEdges, "from").length > 0 && (
+                <section aria-label="Relações" id="relacoes" className="record-detail-relations">
+                  <h3 className="detail-panel-label">Relações no corpus</h3>
+                  <PrbRelationsBoundary detail={detail} lookup={lookup} onSelect={onSelect} />
+                </section>
+              )}
 
               <section aria-label="Campos do registo" className="record-detail-technical">
                 <PrbRawTechnicalDisclosure detail={detail} />
