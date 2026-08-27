@@ -5,7 +5,6 @@ const LABELS: Record<string, Record<string, string>> = {
   status: { OPEN: "Aberto", REJECTED: "Rejeitado", DUPLICATE: "Duplicado", NON_DIGITAL: "Não digital", ALREADY_SOLVED: "Já resolvido", INSUFFICIENT_EVIDENCE: "Evidência insuficiente" },
   evidence_status: { discovered: "Evidência identificada", corroborated: "Evidência corroborada" },
   digital_tractability: { not_assessed: "Não avaliada", low: "Baixa", medium: "Média", high: "Alta" },
-  strength: { "primary-authoritative": "Primária com autoridade", "primary-non-authoritative": "Primária sem autoridade sobre o facto", secondary: "Secundária", anecdotal: "Anecdótica" },
   evidence_nature: { fact: "Facto", "reported-experience": "Experiência relatada", opinion: "Opinião", claim: "Alegação", measurement: "Medição", recommendation: "Recomendação" },
   claim_authority: { authoritative: "Com autoridade", non_authoritative: "Sem autoridade sobre a alegação", unknown: "Desconhecida" },
   effects: { SUPPORTS: "Sustenta", REFINES: "Refina", BOUNDS: "Delimita", CONTRADICTS: "Contradiz" },
@@ -17,10 +16,6 @@ const LABELS: Record<string, Record<string, string>> = {
     EXISTING_RESPONSE: "Resposta existente",
     PLANNED_RESPONSE: "Resposta planeada",
   },
-  friction_types: { INFORMATION: "Informação", COORDINATION: "Coordenação", TRANSACTION: "Transação", OPERATIONAL: "Operacional", PHYSICAL: "Física", REGULATORY: "Regulatória", OTHER: "Outra" },
-  verification: { REPORTED: "Reportada", CORROBORATED: "Corroborada", VERIFIED: "Verificada", UNKNOWN: "Desconhecida", NOT_APPLICABLE: "Não aplicável" },
-  representativeness: { UNKNOWN: "Desconhecida", LIMITED: "Limitada", DESIGNED_REPRESENTATIVE: "Concebida como representativa", NOT_APPLICABLE: "Não aplicável" },
-  temporal_relevance: { CURRENT: "Atual", HISTORICAL: "Histórica", SUPERSEDED: "Substituída", UNKNOWN: "Desconhecida" },
   geography: { city: "Cidade", parish: "Freguesia", municipality: "Município", intermunicipal: "Intermunicipal", regional: "Regional" },
   "scope.geography.level": { site: "Local específico", local_area: "Área local", parish: "Freguesia", city: "Cidade", municipality: "Município", intermunicipal: "Intermunicipal", regional: "Regional", national: "Nacional", international: "Internacional", non_geographic: "Sem âmbito geográfico", unknown: "Desconhecido" },
   resource_type: { webpage: "Página web", document: "Documento", dataset: "Conjunto de dados", database: "Base de dados", service: "Serviço", correspondence: "Correspondência", other: "Outro", unknown: "Desconhecido" },
@@ -28,11 +23,8 @@ const LABELS: Record<string, Record<string, string>> = {
   availability: { available: "Disponível", unavailable: "Indisponível", unknown: "Desconhecida" },
   method: { browser: "Navegador", download: "Transferência", api: "API", feed: "Feed", gis_service: "Serviço GIS", direct: "Acesso direto", other: "Outro", unknown: "Desconhecido" },
   format: { html: "HTML", pdf: "PDF", csv: "CSV", json: "JSON", xml: "XML", xlsx: "XLSX", kml: "KML", geojson: "GeoJSON", image: "Imagem", video: "Vídeo", text: "Texto", other: "Outro", unknown: "Desconhecido" },
-  authority: { authoritative: "Com autoridade", "verified-third-party": "Terceiro verificado", community: "Comunitária", derived: "Derivada", estimated: "Estimada", unknown: "Desconhecida" },
-  freshness: { CURRENT: "Atual", STALE: "Desatualizada", UNKNOWN: "Desconhecida", UNAVAILABLE: "Indisponível" },
   "licensing.status": { known: "Conhecido", unknown: "Desconhecido" },
   "licensing.reuse": { permitted: "Permitida", restricted: "Restrita", prohibited: "Proibida", unknown: "Desconhecida" },
-  type: { institutional: "Institucional", statistical: "Estatística", "formal-public": "Fonte pública formal", social: "Social", press: "Imprensa", stakeholder: "Interveniente", observation: "Observação" },
   update_frequency: { one_off: "Pontual", daily: "Diária", weekly: "Semanal", monthly: "Mensal", quarterly: "Trimestral", annual: "Anual", irregular: "Irregular", unknown: "Desconhecida" },
 };
 
@@ -47,17 +39,13 @@ const COMPACT_LABELS: Record<string, Record<string, string>> = {
 };
 
 const FIELD_CAPTIONS: Record<string, string> = {
-  status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", solution_landscape_status: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", geography: "Âmbito geográfico", authority: "Autoridade", freshness: "Atualidade",
+  status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", solution_landscape_status: "Soluções existentes", evidence_nature: "Natureza da evidência", geography: "Âmbito geográfico",
   resource_type: "Tipo de recurso", "access.level": "Nível de acesso", "access.availability": "Disponibilidade", "access.method": "Forma de consulta", "access.format": "Formato", "access.machine_readable": "Leitura automática",
   "scope.geography.level": "Âmbito geográfico", "scope.geography.area": "Área", "scope.temporal": "Cobertura temporal", "scope.domains": "Temas",
   "scope.temporal.as_of": "Data de referência", "scope.temporal.start": "Início", "scope.temporal.end": "Fim",
   "licensing.status": "Estado do licenciamento", "licensing.licence": "Licença", "licensing.reuse": "Reutilização", "licensing.attribution": "Atribuição",
   update_frequency: "Frequência de atualização", published_at: "Publicação", updated_at: "Última atualização da fonte", last_checked_at: "Última verificação pela Open Évora",
   canonical_reference: "Referência original",
-};
-
-const PS_LABELS: Record<string, string> = {
-  PS1: "Jornalismo local / notícias públicas", PS2: "Discussão pública social/comunitária", PS3: "Avaliações e superfícies públicas de feedback", PS4: "Petições públicas / intervenções cívicas / participações em reuniões", PS5: "Sínteses públicas institucionais de reclamações/participação", PS6: "Sinais operacionais abertos",
 };
 
 export function publicEnumLabel(field: string, value: string): string {
@@ -68,13 +56,10 @@ export function publicEnumLabel(field: string, value: string): string {
       ? "licensing.status"
       : field === "licensing.reuse"
         ? "licensing.reuse"
-        : field.startsWith("freshness.")
-          ? "freshness"
-          : field.startsWith("geography.")
-            ? "geography"
-            : terminalField;
-  const signalLabel = field === "analysis.public_signal_class" ? PS_LABELS[value] : undefined;
-  return LABELS[labelField]?.[value] ?? (signalLabel ? `${value} — ${signalLabel}` : value);
+        : field.startsWith("geography.")
+          ? "geography"
+          : terminalField;
+  return LABELS[labelField]?.[value] ?? value;
 }
 
 /** Compact, field-aware labels for dense presentation surfaces. */
@@ -86,7 +71,7 @@ export function publicCompactEnumLabel(field: string, value: string): string {
 export function publicFieldCaption(field: string): string {
   if ((field.startsWith("access.") || field.startsWith("scope.") || field.startsWith("licensing.")) && FIELD_CAPTIONS[field]) return FIELD_CAPTIONS[field];
   const terminalField = field.split(".").at(-1) ?? field;
-  const captionField = field.startsWith("geography.") ? "geography" : field.startsWith("analysis.public_signal_class") ? "public_signal_class" : terminalField;
+  const captionField = field.startsWith("geography.") ? "geography" : terminalField;
   return FIELD_CAPTIONS[captionField] ?? field;
 }
 

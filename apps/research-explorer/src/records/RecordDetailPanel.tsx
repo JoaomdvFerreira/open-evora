@@ -170,27 +170,20 @@ function PrbRelationsBoundary({ detail, lookup, onSelect }: { detail: RecordDeta
   return (
     <section aria-label="Relações no corpus" className="record-prb-relations-boundary">
       <h4>← Referenciado por</h4>
-      {incomingIds.length === 0 ? (
-        <p>Nenhum registo referencia este PRB.</p>
-      ) : (
-        <ul className="prb-relations-list">
-          {incomingIds.map((id) => (
-            <RelatedRecordButton key={id} id={id} lookup={lookup} onSelect={onSelect} />
-          ))}
-        </ul>
-      )}
+      <ul className="prb-relations-list">
+        {incomingIds.map((id) => (
+          <RelatedRecordButton key={id} id={id} lookup={lookup} onSelect={onSelect} />
+        ))}
+      </ul>
     </section>
   );
 }
 
 /**
- * The only edge field name any current schema declares specifically to
- * relate a record to the Problem it is about
- * (research/schemas/evidence.schema.json's own `references` entry —
- * declares `targetPrefix: "PRB-"` for exactly this field). Deliberately an
- * explicit allowlist, not a suffix/regex heuristic: an edge whose field is
- * *not* this one never counts, even if it happens to resolve to a PRB-
- * record for some unrelated reason.
+ * The PRB schema owns `evidence[]` references to EVD records. In the derived
+ * graph, each resulting incoming edge on an EVD retains `evidence` as the
+ * source-side canonical field name; this allowlist deliberately matches that
+ * field rather than inferring a Problem relation from arbitrary connectivity.
  */
 const PROBLEM_REFERENCE_FIELDS = ["evidence"];
 
@@ -1008,10 +1001,12 @@ function RecordDetailContent({
               <PrbFieldInspector detail={detail} />
               <PrbCanonicalReferences detail={detail} onSelect={onSelect} />
 
-              <section aria-label="Relações" id="relacoes" className="record-detail-relations">
-                <h3 className="detail-panel-label">Relações no corpus</h3>
-                <PrbRelationsBoundary detail={detail} lookup={lookup} onSelect={onSelect} />
-              </section>
+              {uniqueRelatedIds(detail.incomingEdges, "from").length > 0 && (
+                <section aria-label="Relações" id="relacoes" className="record-detail-relations">
+                  <h3 className="detail-panel-label">Relações no corpus</h3>
+                  <PrbRelationsBoundary detail={detail} lookup={lookup} onSelect={onSelect} />
+                </section>
+              )}
 
               <section aria-label="Campos do registo" className="record-detail-technical">
                 <PrbRawTechnicalDisclosure detail={detail} />

@@ -6,11 +6,6 @@
  */
 import { publicEnumLabel, publicFieldCaption } from "../presentation";
 
-function getObject(record: Record<string, unknown>, key: string): Record<string, unknown> | null {
-  const value = record[key];
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
-}
-
 function getString(record: Record<string, unknown>, key: string): string | null {
   const value = record[key];
   return typeof value === "string" && value.trim() !== "" ? value : null;
@@ -32,12 +27,6 @@ export function evidenceQuickRead(record: Record<string, unknown>): QuickReadIte
   const items: QuickReadItem[] = [];
   const nature = getString(record, "evidence_nature");
   if (nature) items.push({ field: "evidence_nature", label: publicFieldCaption("evidence_nature"), value: publicEnumLabel("evidence_nature", nature) });
-
-  const analysis = getObject(record, "analysis");
-  const representativeness = analysis ? getString(analysis, "representativeness") : null;
-  if (representativeness) {
-    items.push({ field: "analysis.representativeness", label: publicFieldCaption("representativeness"), value: publicEnumLabel("representativeness", representativeness) });
-  }
   return items;
 }
 

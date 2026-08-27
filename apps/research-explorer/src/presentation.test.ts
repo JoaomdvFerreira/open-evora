@@ -19,11 +19,6 @@ describe("PT-PT public presentation terminology", () => {
     expect(publicEnumLabel("validation_status", "validated")).toBe("Validado");
   });
 
-  it("distinguishes evidential authority from publication permission", () => {
-    expect(publicEnumLabel("strength", "primary-authoritative")).toBe("Primária com autoridade");
-    expect(publicEnumLabel("authority", "authoritative")).toBe("Com autoridade");
-  });
-
   it("maps EVD vNext relationship and claim-authority values centrally", () => {
     expect(publicEnumLabel("claim_authority", "authoritative")).toBe("Com autoridade");
     expect(publicEnumLabel("effects", "SUPPORTS")).toBe("Sustenta");
@@ -34,19 +29,9 @@ describe("PT-PT public presentation terminology", () => {
     expect(publicEnumLabel("research_roles", "PLANNED_RESPONSE")).toBe("Resposta planeada");
   });
 
-  it("keeps SUPERSEDED distinct from STALE", () => {
-    expect(publicEnumLabel("analysis.temporal_relevance", "SUPERSEDED")).toBe("Substituída");
-    expect(publicEnumLabel("freshness.status", "STALE")).toBe("Desatualizada");
-  });
-
   it("formats public counts and timestamps for Portugal", () => {
     expect(formatPublicCount(12345)).toMatch(/12/);
     expect(formatPublicDateTime("2026-08-21T14:30:00Z")).not.toBe("2026-08-21T14:30:00Z");
-  });
-
-  it("preserves a public-signal code while using its reviewed label", () => {
-    expect(publicEnumLabel("analysis.public_signal_class", "PS1")).toBe("PS1 — Jornalismo local / notícias públicas");
-    expect(publicEnumLabel("some_unrelated_field", "PS1")).toBe("PS1");
   });
 
   it("uses the canonical value as the safe fallback for unknown future values", () => {
@@ -208,7 +193,6 @@ describe("PT-PT public presentation terminology", () => {
     expect(publicEnumLabel("temporal.update_frequency", "unknown")).toBe("Desconhecida");
     expect(publicEnumLabel("access.level", "unknown")).toBe("Desconhecido");
     expect(publicEnumLabel("licensing.status", "unknown")).toBe("Desconhecido");
-    expect(publicEnumLabel("freshness.status", "UNKNOWN")).toBe("Desconhecida");
   });
 
   it("preserves the safe fallback for unmapped temporal.update_frequency values", () => {

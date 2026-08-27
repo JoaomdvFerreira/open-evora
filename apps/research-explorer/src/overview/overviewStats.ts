@@ -62,7 +62,7 @@ export function computePublicOverviewData(records: RecordSummary[]): PublicOverv
 }
 
 // Tuned to surface a handful of genuinely informative distributions (e.g. a
-// PRB's validation_status, an EVD's strength) without hardcoding any field
+// PRB's validation_status, an EVD's evidence_nature) without hardcoding any field
 // name — every schema-conforming record type is treated identically.
 const MIN_PRESENCE_RATIO = 0.5;
 const MIN_DISTINCT_VALUES = 2;
