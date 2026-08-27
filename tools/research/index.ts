@@ -8,7 +8,7 @@ export type { AnalysisResult, CorpusSummary, ProblemAnalysis } from "./analysis/
 export { loadCorpusIndex, loadCorpusIndexTolerant } from "./core/corpus.ts";
 export type { CorpusLoadResult, MalformedRecordFile } from "./core/corpus.ts";
 export { loadSchemas } from "./core/schemas.ts";
-export { parseRecordYaml } from "./core/yaml.ts";
+export { parseRecordYaml, stringifyRecordYaml } from "./core/yaml.ts";
 export {
   evaluateCorpus,
   evaluateCorroboration,
@@ -35,6 +35,13 @@ export { buildProspectiveCorpusIndex, validateCandidateSet } from "./prospective
 export type { CandidateSetValidationResult, ProspectiveCorpusOverlay } from "./prospective-validation.ts";
 export { prepareCanonicalIntegrationReview } from "./canonical-integration-review.ts";
 export type { CanonicalIntegrationReadiness, CanonicalIntegrationReview } from "./canonical-integration-review.ts";
+export { prepareCanonicalIntegrationPlan } from "./canonical-integration-plan.ts";
+export type {
+  CanonicalIntegrationPlan,
+  CanonicalIntegrationNoChangeOperation,
+  CanonicalIntegrationPlanOperation,
+  CanonicalIntegrationWriteOperation,
+} from "./canonical-integration-plan.ts";
 export type {
   CorpusIndex,
   ParsedRecord,

@@ -47,7 +47,7 @@ For new research:
 
 Gate 1 — Canonical Integration is the human decision that authorizes a reviewed candidate interpretation to enter canonical Open Évora research and, under the current public-repository model, confirms that the material is safe enough to enter the public repository under the safeguards in `AGENTS.md`.
 
-Deterministic tooling may prepare the review unit and report structural readiness only. It cannot make the Gate 1 decision or establish research truth, corroboration, validation, acceptance, or publication safety. Gate 1 does not publish material in the Research Explorer; Explorer publication is a separate future Gate 2. An approved Gate 1 decision must be tied to the specific canonical Git base and candidate delta reviewed.
+Deterministic tooling may prepare the review unit and report structural readiness only. It cannot make the Gate 1 decision or establish research truth, corroboration, validation, acceptance, or publication safety. Gate 1 does not publish material in the Research Explorer; Explorer publication is a separate future Gate 2. An approved Gate 1 decision must be tied to the exact canonical integration plan and candidate delta reviewed against its specific canonical Git base.
 
 ## 4. Integrating Sources
 
