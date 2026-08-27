@@ -6,7 +6,6 @@ import { describeType, formatTypedId, knownTypePrefixes } from "../typeGlossary"
 import { findMeaningField } from "./meaningField";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation";
 import { ContextTabs } from "../ContextTabs";
-import { evidenceQuickRead, type QuickReadItem } from "./recordOrientation";
 import { SourceOverviewSection } from "./SourceOverviewSection";
 import { SourceFindingsSection } from "./SourceFindingsSection";
 import { SourceCoverageSection } from "./SourceCoverageSection";
@@ -212,24 +211,6 @@ function findRelatedProblemId(detail: RecordDetail, lookup: Map<string, RecordSu
 }
 
 /**
- * Historical relationship metadata is not read from individual records.
- * carries them (currently EVD- only) — rendered as the same uniform
- * effect chip used in Problem View (no exceptional emphasis for any
- * value, including CONTRADICTS), plus its related-Problem link, matching
- * Prototype A's meaning-zone relationship row.
- */
-/**
- * Approved Prototype A only pairs a relationship sentence with CONTRADICTS
- * ("desafia a leitura de [Problema] PRB-0006" — its own inline title attribute
- * spells out this is specifically a contradiction/contest of the Problem's
- * current reading). No neutral wording for any other canonical effect
- * value appears in the approved reference or the prototype rationale, so
- * none is invented here: every other value renders its effect chip with
- * no accompanying sentence, per the semantic-constraint rule (do not invent
- * missing canonical prose; the chip + relations elsewhere already surface
- * the relationship neutrally).
- */
-/**
  * SUI-02A: SRC-only public provenance-verification action, restored to SRC
  * v2 canonical eligibility semantics (`docs/datamodel.md` §1.1) — the
  * retired v1 `access.public` field no longer governs this. A canonical
@@ -397,43 +378,6 @@ function OrientationIntro() {
     <p className="record-orientation-intro">
       Este é um registo técnico da investigação. Mostra a informação guardada e as suas ligações para que possa ser consultada e verificada.
     </p>
-  );
-}
-
-/** UX-E §2: bounded "Leitura rápida" — only fields recordOrientation.ts found present on this exact record; never a fallback/invented value. */
-function QuickReadList({ items }: { items: QuickReadItem[] }) {
-  if (items.length === 0) return null;
-  return (
-    <dl className="record-quick-read-grid">
-      {items.map((item) => (
-        <div key={item.field} className="record-quick-read-item">
-          <dt>{item.label}</dt>
-          <dd>{item.value}</dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
-
-/**
- * Source/related-problem relationship navigation is deliberately not
- * repeated here: `RelationshipList` below already renders every related
- * record (SRC/PRB included) as its own single navigable entry with the
- * exact reference path, and duplicating that as a second, differently-worded
- * button for the same record would both add a second click target for the
- * same destination and (per UX-E's "no duplicate blocks" rule) restate
- * content already presented more clearly. The quick read stays limited to
- * data fields the record carries but the meaning zone does not already show.
- */
-function EvidenceQuickRead({ detail }: { detail: RecordDetail }) {
-  const items = evidenceQuickRead(detail.record);
-  if (items.length === 0) return null;
-
-  return (
-    <section aria-label="Leitura rápida" className="record-quick-read">
-      <h3 className="detail-panel-label">Leitura rápida</h3>
-      <QuickReadList items={items} />
-    </section>
   );
 }
 
@@ -982,7 +926,6 @@ function RecordDetailContent({
           {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} variant="inline" />}
           {isSrc && <SourceCompactSectionIndex record={detail.record} relationContext={sourceRelationContext} />}
 
-          {detail.type === "EVD-" && <EvidenceQuickRead detail={detail} />}
           {isSrc && <SourceOverviewSection record={detail.record} />}
           {isSrc && <SourceFindings state={sourceRelationsState} onSelect={onSelect} />}
           {isSrc && <SourceCoverageSection record={detail.record} />}
