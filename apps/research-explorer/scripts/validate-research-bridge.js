@@ -51,10 +51,9 @@ function validateResearchTree(researchRoot) {
 /**
  * Same dotted-path getter as the legacy tools/validate-research.js#getPath.
  * Pure plumbing (no validation/research semantics) — tools/research/'s own
- * modules each keep an identical private copy of this helper rather than
- * sharing one (see core/corpus.ts, validation/validate.ts, analysis/analyze.ts);
- * this mirrors that existing convention instead of introducing a new shared
- * export.
+ * modules share an internal field accessor, while this CommonJS bridge retains
+ * its local compatibility helper because that accessor is not part of the
+ * public tools/research/ API.
  */
 function getPath(record, dotted) {
   let cur = record;

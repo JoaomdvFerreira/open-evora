@@ -8,7 +8,7 @@ import test from "node:test";
 import {
   applyCanonicalIntegrationPlan,
   type CanonicalIntegrationPlan,
-} from "./index.ts";
+} from "../index.ts";
 import {
   applyCanonicalIntegrationPlanWithTestWriter,
   CanonicalIntegrationPromotionError,

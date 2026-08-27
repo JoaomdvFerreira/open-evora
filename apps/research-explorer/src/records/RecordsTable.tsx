@@ -4,10 +4,10 @@ import type { RecordSummary } from "../dataProvider/types";
 import { recordColumns } from "./columns";
 import { ALL_TYPES, availableRecordTypes, filterRecords } from "./recordIndex";
 import { initialRecordsControllerState, recordsControllerReducer } from "./recordsController";
-import { describeType } from "../typeGlossary";
+import { describeType } from "../presentation/typeGlossary";
 import { useNarrowViewport } from "./useNarrowViewport";
 import { NarrowRecordsList } from "./NarrowRecordsList";
-import { formatPublicCount } from "../presentation";
+import { formatPublicCount } from "../presentation/presentation";
 
 interface RecordsTableProps {
   records: RecordSummary[];

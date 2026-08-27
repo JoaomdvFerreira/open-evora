@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DataProvider } from "../dataProvider/types";
-import { describeType, formatTypedId } from "../typeGlossary";
+import { describeType, formatTypedId } from "../presentation/typeGlossary";
 import { normalizeForSearch } from "../records/normalize";
 import { recordMatchesQuery, recordSearchText } from "../records/recordIndex";
 import { useGraphData } from "./useGraphData";
@@ -18,7 +18,7 @@ import { buildRenderGraph } from "./renderGraph";
 import { GraphCanvas, type GraphCanvasHandle } from "./GraphCanvas";
 import { FOCUS_NODE_COLOR, typeVisual } from "./typeVisuals";
 import type { ResearchGraph } from "./buildGraphModel";
-import { ContextTabs } from "../ContextTabs";
+import { ContextTabs } from "../navigation/ContextTabs";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",

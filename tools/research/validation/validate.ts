@@ -13,22 +13,12 @@
  * "Human-owned decisions").
  */
 import { loadCorpusIndexTolerant } from "../core/corpus.ts";
+import { getRecordField } from "../core/record-fields.ts";
 import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex, RecordSchema, SchemaFieldType } from "../core/types.ts";
 
 export interface ValidationResult {
   errors: string[];
   totalRecords: number;
-}
-
-function getPath(fields: RecordFields, dotted: string): unknown {
-  let cur: unknown = fields;
-  for (const part of dotted.split(".")) {
-    if (cur === null || typeof cur !== "object" || Array.isArray(cur) || !(part in cur)) {
-      return undefined;
-    }
-    cur = (cur as Record<string, unknown>)[part];
-  }
-  return cur;
 }
 
 function validateIdAndFilename(
@@ -38,7 +28,7 @@ function validateIdAndFilename(
   seenIds: Map<string, string>,
   errors: string[]
 ): void {
-  const id = getPath(record, schema.idField);
+  const id = getRecordField(record, schema.idField);
   if (typeof id !== "string" || id.trim() === "") {
     errors.push(`[${file}] missing required field: ${schema.idField}`);
     return;
@@ -59,7 +49,7 @@ function validateIdAndFilename(
 
 function validateRequiredFields(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
   for (const reqField of schema.requiredFields || []) {
-    const val = getPath(record, reqField);
+    const val = getRecordField(record, reqField);
     if (val === undefined || val === null || val === "") {
       errors.push(`[${file}] missing required field: ${reqField}`);
     }
@@ -68,7 +58,7 @@ function validateRequiredFields(file: string, record: RecordFields, schema: Reco
 
 function validateEnums(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
   for (const [field, allowed] of Object.entries(schema.enums || {})) {
-    const val = getPath(record, field);
+    const val = getRecordField(record, field);
     if (val === undefined || val === null) continue;
     const values = Array.isArray(val) ? val : [val];
     for (const v of values) {
@@ -83,7 +73,7 @@ function validateEnums(file: string, record: RecordFields, schema: RecordSchema,
 
 function validateBooleanFields(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
   for (const field of schema.booleanFields || []) {
-    const val = getPath(record, field);
+    const val = getRecordField(record, field);
     if (val === undefined || val === null) continue;
     if (typeof val !== "boolean") {
       errors.push(`[${file}] field "${field}" must be a boolean (true|false), got "${val}"`);
@@ -148,7 +138,7 @@ function actualTypeName(val: unknown): string {
 
 function validateFieldTypes(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
   for (const [field, allowedTypes] of Object.entries(schema.fieldTypes || {})) {
-    const val = getPath(record, field);
+    const val = getRecordField(record, field);
     if (val === undefined) continue; // missing optional fields are not type errors
     const actual = actualTypeName(val);
     if (!(allowedTypes as string[]).includes(actual)) {
@@ -168,7 +158,7 @@ function validatePatterns(file: string, record: RecordFields, schema: RecordSche
       errors.push(`[${file}] field "${field}" declares an invalid pattern "${patternSource}": ${(e as Error).message}`);
       continue;
     }
-    const val = getPath(record, field);
+    const val = getRecordField(record, field);
     if (val === undefined || val === null) continue;
     if (typeof val !== "string") continue; // non-string values are fieldTypes' concern, not coerced here
     if (!re.test(val)) {
@@ -179,14 +169,14 @@ function validatePatterns(file: string, record: RecordFields, schema: RecordSche
 
 function validateConditionalRequired(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
   for (const rule of schema.conditionalRequired || []) {
-    const val = getPath(record, rule.field);
+    const val = getRecordField(record, rule.field);
     if (val === undefined || val === null) continue;
     const matches =
       (rule.in !== undefined && rule.in.includes(val as string)) ||
       (rule.notIn !== undefined && !rule.notIn.includes(val as string));
     if (!matches) continue;
     for (const req of rule.requires) {
-      const reqVal = getPath(record, req);
+      const reqVal = getRecordField(record, req);
       if (reqVal === undefined || reqVal === null || reqVal === "") {
         errors.push(`[${file}] field "${req}" is required when "${rule.field}" is "${val}"`);
       }
@@ -196,7 +186,7 @@ function validateConditionalRequired(file: string, record: RecordFields, schema:
 
 function validateExclusiveFieldSets(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
   for (const rule of schema.exclusiveFieldSets || []) {
-    const obj = getPath(record, rule.path);
+    const obj = getRecordField(record, rule.path);
     if (obj === undefined || obj === null) continue; // do not apply when the parent object is absent
     if (typeof obj !== "object" || Array.isArray(obj)) continue;
     const presentKeys = new Set(Object.keys(obj as Record<string, unknown>));
@@ -282,9 +272,9 @@ function validatePrbDeclaredListItems(file: string, record: RecordFields, errors
     "decision_basis.supporting_evidence",
     "decision_basis.boundary_evidence",
   ]) {
-    validatePrbStringList(file, path, getPath(record, path), errors);
+    validatePrbStringList(file, path, getRecordField(record, path), errors);
   }
-  const domain = getPath(record, "domain");
+  const domain = getRecordField(record, "domain");
   if (Array.isArray(domain)) validatePrbStringList(file, "domain", domain, errors);
 }
 
@@ -293,7 +283,7 @@ function validateNestedPrbEvidenceMembership(file: string, record: RecordFields,
     (Array.isArray(record.evidence) ? record.evidence : []).map((entry) => entry && typeof entry === "object" && !Array.isArray(entry) ? (entry as Record<string, unknown>).evidence_id : undefined).filter((id): id is string => typeof id === "string")
   );
   const paths = ["decision_basis.manifestation.evidence", "decision_basis.consequence.evidence", "decision_basis.currentness.evidence", "decision_basis.contradiction_search.evidence", "decision_basis.supporting_evidence", "decision_basis.boundary_evidence"];
-  for (const path of paths) for (const id of (Array.isArray(getPath(record, path)) ? getPath(record, path) as unknown[] : [])) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at ${path} is not linked in PRB.evidence`);
+  for (const path of paths) for (const id of (Array.isArray(getRecordField(record, path)) ? getRecordField(record, path) as unknown[] : [])) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at ${path} is not linked in PRB.evidence`);
   const investigation = record.investigation as Record<string, unknown> | undefined;
   for (const item of Array.isArray(investigation?.open_questions) ? investigation.open_questions : []) for (const id of (item && typeof item === "object" && !Array.isArray(item) && Array.isArray((item as Record<string, unknown>).evidence) ? (item as Record<string, unknown>).evidence as unknown[] : [])) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at investigation.open_questions is not linked in PRB.evidence`);
   const path = investigation?.path as Record<string, unknown> | undefined;
@@ -315,7 +305,7 @@ function validateInvestigation(
   evidenceById: ReadonlyMap<string, ParsedRecord>,
   errors: string[]
 ): void {
-  const investigation = getPath(record, "investigation");
+  const investigation = getRecordField(record, "investigation");
   if (investigation === undefined || investigation === null) return;
   if (typeof investigation !== "object" || Array.isArray(investigation)) return;
 
@@ -396,7 +386,7 @@ function validateReferences(recordIndexes: RecordIndex[], errors: string[]): voi
     for (const ref of schema.references || []) {
       const targetIds = idsByPrefix.get(ref.targetPrefix);
       for (const { file, fields } of records) {
-        const val = getPath(fields, ref.field);
+        const val = getRecordField(fields, ref.field);
         if (val === undefined || val === null) {
           if (ref.required) {
             errors.push(`[${file}] missing required reference field: ${ref.field}`);
@@ -406,7 +396,7 @@ function validateReferences(recordIndexes: RecordIndex[], errors: string[]): voi
         const targets = ref.isList ? (Array.isArray(val) ? val : [val]) : [val];
         for (const t of targets) {
           const target = ref.itemField && t && typeof t === "object" && !Array.isArray(t)
-            ? getPath(t as RecordFields, ref.itemField)
+            ? getRecordField(t as RecordFields, ref.itemField)
             : t;
           if (typeof target !== "string") continue;
           if (target.trim() === "") {

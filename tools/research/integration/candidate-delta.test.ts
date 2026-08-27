@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { classifyCandidateDelta, type CandidateRecord, type CorpusIndex, type RecordFields, type RecordSchema } from "./index.ts";
+import { classifyCandidateDelta, type CandidateRecord, type CorpusIndex, type RecordFields, type RecordSchema } from "../index.ts";
 
 const SCHEMA: RecordSchema = {
   prefix: "TST-",

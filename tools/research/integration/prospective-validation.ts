@@ -6,8 +6,9 @@
  * every structural and cross-reference decision to validateCorpusIndex().
  */
 import { classifyCandidateDelta, type CandidateDelta, type CandidateRecord } from "./candidate-delta.ts";
-import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex } from "./core/types.ts";
-import { validateCorpusIndex, type ValidationResult } from "./validation/validate.ts";
+import { getRecordField } from "../core/record-fields.ts";
+import type { CorpusIndex, ParsedRecord, RecordIndex } from "../core/types.ts";
+import { validateCorpusIndex, type ValidationResult } from "../validation/validate.ts";
 
 /** The prospective index and deterministic deltas used to construct it. */
 export interface ProspectiveCorpusOverlay {
@@ -24,17 +25,6 @@ export interface CandidateSetValidationResult {
 interface ClassifiedCandidate {
   candidate: CandidateRecord;
   delta: CandidateDelta;
-}
-
-function getPath(fields: RecordFields, dotted: string): unknown {
-  let current: unknown = fields;
-  for (const part of dotted.split(".")) {
-    if (current === null || typeof current !== "object" || Array.isArray(current) || !(part in current)) {
-      return undefined;
-    }
-    current = (current as Record<string, unknown>)[part];
-  }
-  return current;
 }
 
 function compareTargets(left: ClassifiedCandidate, right: ClassifiedCandidate): number {
@@ -61,7 +51,7 @@ function canonicalRecord(record: ParsedRecord): ParsedRecord {
 function indexRecords(recordIndex: RecordIndex, records: ParsedRecord[]): ReadonlyMap<string, ParsedRecord> {
   const byId = new Map<string, ParsedRecord>();
   for (const record of records) {
-    const id = getPath(record.fields, recordIndex.schema.idField);
+    const id = getRecordField(record.fields, recordIndex.schema.idField);
     if (typeof id === "string" && id.trim() !== "" && !byId.has(id)) byId.set(id, record);
   }
   return byId;
@@ -100,7 +90,7 @@ function buildOverlay(index: CorpusIndex, candidates: readonly CandidateRecord[]
   for (const [prefix, canonicalIndex] of index.byPrefix) {
     const familyCandidates = candidatesByFamily.get(prefix);
     const records = canonicalIndex.records.map((canonical) => {
-      const id = getPath(canonical.fields, canonicalIndex.schema.idField);
+      const id = getRecordField(canonical.fields, canonicalIndex.schema.idField);
       const replacement = typeof id === "string" ? familyCandidates?.get(id) : undefined;
       return replacement?.delta.action === "UPDATE"
         ? candidateRecord(canonicalIndex, replacement.candidate, replacement.delta.id)

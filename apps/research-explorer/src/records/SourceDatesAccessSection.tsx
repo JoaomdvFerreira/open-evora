@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { extractSourceDatesAccess, isHttpUrl, type SourceDatesAccess } from "./sourceView";
-import { publicEnumLabel, publicTriStateLabel, formatPublicPartialDate } from "../presentation";
+import { publicEnumLabel, publicTriStateLabel, formatPublicPartialDate } from "../presentation/presentation";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 
 interface DatesAccessRow {

@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { extractSourceCoverage, type SourceCoverage } from "./sourceView";
-import { publicEnumLabel, formatPublicPartialDate } from "../presentation";
+import { publicEnumLabel, formatPublicPartialDate } from "../presentation/presentation";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 
 interface CoverageRow {

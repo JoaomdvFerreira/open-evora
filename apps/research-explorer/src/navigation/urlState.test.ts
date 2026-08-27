@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_URL_STATE, parseUrlState, serializeUrlState } from "./urlState";
-import { ALL_TYPES } from "./records/recordIndex";
+import { ALL_TYPES } from "../records/recordIndex";
 
 describe("parseUrlState", () => {
   it("returns defaults for an empty search string", () => {

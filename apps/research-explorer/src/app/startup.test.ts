@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadExplorerStartupState } from "./startup";
-import { DataLoadError, type DataProvider, type ReadModelManifest, type RecordDetail, type RecordSummary } from "./dataProvider/types";
+import { DataLoadError, type DataProvider, type ReadModelManifest, type RecordDetail, type RecordSummary } from "../dataProvider/types";
 
 const VALID_MANIFEST: ReadModelManifest = {
   readModelVersion: "1.0.0",

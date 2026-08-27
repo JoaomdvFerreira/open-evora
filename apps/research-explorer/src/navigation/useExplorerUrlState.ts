@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { parseUrlState, serializeUrlState, type ExplorerUrlState, type ExplorerView } from "./urlState";
-import type { GraphDepth } from "./graph/neighbourhood";
+import type { GraphDepth } from "../graph/neighbourhood";
 
 /**
  * Bridges ExplorerUrlState to the real address bar via native History API —

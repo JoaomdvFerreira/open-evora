@@ -2,7 +2,7 @@
   "name": "open-evora",
   "private": true,
   "version": "0.0.0",
-  "description": "Root developer commands. tools/*.js (the current behavioural baseline) stays dependency-free; tools/research/ (TC-01 core foundation) is TypeScript with a minimal, justified dependency surface (yaml + TypeScript typechecking). The Research Explorer app (apps/research-explorer/) owns its own separate dependencies.",
+  "description": "Root developer commands and typed tools/research/ tooling. The Research Explorer app (apps/research-explorer/) owns its own separate dependencies.",
   "engines": {
     "node": "24.x"
   },

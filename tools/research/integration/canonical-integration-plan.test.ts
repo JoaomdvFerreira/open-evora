@@ -12,7 +12,7 @@ import {
   type RecordFields,
   type RecordIndex,
   type RecordSchema,
-} from "./index.ts";
+} from "../index.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 

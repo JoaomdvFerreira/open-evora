@@ -13,7 +13,7 @@ import path from "node:path";
  * rather than asserting any pixel position (which the implementation
  * contract explicitly asks unit tests not to do).
  */
-const CSS_PATH = path.join(__dirname, "index.css");
+const CSS_PATH = path.join(__dirname, "..", "index.css");
 
 function ruleBodiesFor(css: string, selector: string): string[] {
   const bodies: string[] = [];

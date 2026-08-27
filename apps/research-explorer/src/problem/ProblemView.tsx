@@ -5,9 +5,9 @@ import { useProblemProjection } from "./useProblemProjection";
 import type { EvidenceWithSources } from "./problemProjection";
 import { summarizeEffects } from "./effectSummary";
 import { DISCLOSURE_FIELDS, DISCLOSURE_FIELD_LABELS, FIELD_CAPTIONS, glossFor, type FieldGloss } from "./statusGloss";
-import { describeType, formatTypedId } from "../typeGlossary";
-import { formatPublicCount, publicEnumLabel } from "../presentation";
-import { ContextTabs } from "../ContextTabs";
+import { describeType, formatTypedId } from "../presentation/typeGlossary";
+import { formatPublicCount, publicEnumLabel } from "../presentation/presentation";
+import { ContextTabs } from "../navigation/ContextTabs";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",

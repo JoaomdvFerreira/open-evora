@@ -1,5 +1,5 @@
-import { ALL_TYPES } from "./records/recordIndex";
-import { MIN_DEPTH, clampDepth, type GraphDepth } from "./graph/neighbourhood";
+import { ALL_TYPES } from "../records/recordIndex";
+import { MIN_DEPTH, clampDepth, type GraphDepth } from "../graph/neighbourhood";
 
 /**
  * Pure URL <-> application-state mapping (RE-02C). Native URLSearchParams

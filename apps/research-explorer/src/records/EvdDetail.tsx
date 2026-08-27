@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
-import { formatPublicDate, formatPublicPartialDate, publicEnumLabel } from "../presentation";
-import { describeType } from "../typeGlossary";
+import { formatPublicDate, formatPublicPartialDate, publicEnumLabel } from "../presentation/presentation";
+import { describeType } from "../presentation/typeGlossary";
 import { RecordFieldTree } from "./RecordFieldTree";
 import { CompactSectionIndex, type CompactSectionIndexEntry } from "./CompactSectionIndex";
 import type { EVDProblemUsesState } from "./useEvdProblemUses";

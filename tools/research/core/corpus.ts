@@ -1,20 +1,10 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
+import { getRecordField } from "./record-fields.ts";
 import { loadSchemas } from "./schemas.ts";
 import type { CorpusIndex, ParsedRecord, RecordIndex, RecordSchema } from "./types.ts";
 import { parseRecordYaml } from "./yaml.ts";
-
-function getPath(fields: Record<string, unknown>, dotted: string): unknown {
-  let cur: unknown = fields;
-  for (const part of dotted.split(".")) {
-    if (cur === null || typeof cur !== "object" || Array.isArray(cur) || !(part in cur)) {
-      return undefined;
-    }
-    cur = (cur as Record<string, unknown>)[part];
-  }
-  return cur;
-}
 
 function collectRecordFiles(dir: string): string[] {
   if (!existsSync(dir)) return [];
@@ -73,7 +63,7 @@ function loadRecordSet(researchRoot: string, schema: RecordSchema, tolerant: boo
     const record: ParsedRecord = { file, fields };
     records.push(record);
 
-    const id = getPath(fields, schema.idField);
+    const id = getRecordField(fields, schema.idField);
     if (typeof id === "string" && id.trim() !== "" && !byId.has(id)) {
       byId.set(id, record);
     }
