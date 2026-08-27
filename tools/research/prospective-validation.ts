@@ -112,6 +112,7 @@ function buildOverlay(index: CorpusIndex, candidates: readonly CandidateRecord[]
         records.push(candidateRecord(canonicalIndex, item.candidate, item.delta.id));
       }
     }
+    records.sort((left, right) => left.file < right.file ? -1 : left.file > right.file ? 1 : 0);
 
     byPrefix.set(prefix, {
       schema: canonicalIndex.schema,

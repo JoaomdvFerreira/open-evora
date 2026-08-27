@@ -183,6 +183,23 @@ test("candidate order does not change prospective validation or deltas", () => {
   assert.deepEqual(reversed, forward);
 });
 
+test("prospective records and byId retain filename order independently of candidate order", () => {
+  const canonical = fixtureIndex({ sources: [source("SRC-Z")] });
+  const candidates = [
+    candidate("SRC-", source("SRC-A")),
+    candidate("SRC-", source("SRC-M")),
+  ];
+  const forward = buildProspectiveCorpusIndex(canonical, candidates).byPrefix.get("SRC-")!;
+  const reversed = buildProspectiveCorpusIndex(canonical, [...candidates].reverse()).byPrefix.get("SRC-")!;
+  const expectedFiles = ["sources/SRC-A.yaml", "sources/SRC-M.yaml", "sources/SRC-Z.yaml"];
+  const expectedIds = ["SRC-A", "SRC-M", "SRC-Z"];
+
+  assert.deepEqual(forward.records.map(({ file }) => file), expectedFiles);
+  assert.deepEqual([...forward.byId.keys()], expectedIds);
+  assert.deepEqual(reversed.records.map(({ file }) => file), expectedFiles);
+  assert.deepEqual([...reversed.byId.keys()], expectedIds);
+});
+
 test("canonical and candidate inputs remain unchanged", () => {
   const canonical = fixtureIndex({ sources: [source("SRC-ONE")] });
   const candidates = [candidate("SRC-", source("SRC-ONE", "Updated source"))];
