@@ -41,40 +41,43 @@ const MINIMAL_SRC = `
 source_id: SRC-9001
 publisher: "Fixture Publisher"
 name: "Fixture Source"
+resource_type: webpage
 scope:
-  geography: "Évora"
+  geography:
+    level: municipality
+    area: "Fixture area"
   domains: [example]
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-authority: unknown
+acquisition:
+  method: public_web
 licensing:
   status: unknown
-freshness:
-  last_checked: "2026-08-11"
-  status: CURRENT
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-08-11"
 `;
 
 const MINIMAL_EVD = `
 evidence_id: EVD-900101
-type: observation
-source:
-  publisher: "Fixture Publisher"
-  title: "Fixture Source"
-  source_id: SRC-9001
-  retrieved_at: "2026-08-11"
-geography:
-  level: municipality
-population: [example-population]
-domain: [example]
+provenance:
+  sources: [SRC-9001]
+  extracted_at: "2026-08-11"
 observation:
   summary: "Fixture observation."
+scope:
+  geography:
+    level: municipality
+    area: "Fixture area"
+  temporal:
+    status: unknown
+domains: [example]
 evidence_nature: claim
-strength: anecdotal
-personal_data:
-  present: false
-  retained: false
+claim_authority: unknown
+inference_limits:
+  - "Synthetic fixture only; it is not research evidence."
 `;
 
 const MINIMAL_PRB = `

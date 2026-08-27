@@ -13,7 +13,7 @@
     "research:analyze": "node tools/research/analysis/cli.ts --all",
     "research:readiness": "node tools/research/readiness/cli.ts --all",
     "research:typecheck": "tsc --noEmit -p tools/research/tsconfig.json",
-    "research:test": "node --test --experimental-strip-types tools/research/**/*.test.ts",
+    "research:test": "node --test --experimental-strip-types tools/research/**/*.test.ts apps/research-explorer/benchmark/generator-contract.test.js",
     "research:check": "npm run research:typecheck && npm run research:test && npm run research:validate"
   },
   "devDependencies": {

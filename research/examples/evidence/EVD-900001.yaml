@@ -3,33 +3,25 @@
 
 evidence_id: EVD-900001
 
-type: observation
-
-source:
-  source_id: SRC-9001
-  publisher: "Fixture Publisher"
-  title: "Fixture Source for Validator Testing"
-  source_reference: "https://example.invalid/fixture"
-  published_at: null
-  retrieved_at: "2026-08-10"
-
-geography:
-  level: municipality
-  area: "Fixture area"
-
-population: [example-population]
-
-domain: [example]
+provenance:
+  sources: [SRC-9001]
+  extracted_at: "2026-08-10"
 
 observation:
   summary: "Synthetic observation used only to validate schema and validator behavior."
 
+scope:
+  geography:
+    level: municipality
+    area: "Fixture area"
+  temporal:
+    status: unknown
+
+domains: [example]
+
 evidence_nature: claim
 
-strength: anecdotal
+claim_authority: unknown
 
-personal_data:
-  present: false
-  retained: false
-
-notes: "Synthetic fixture only — created during WU-D1-01 to prove schema/validator behavior."
+inference_limits:
+  - "Synthetic fixture only; it does not substantiate a real observation about Évora."

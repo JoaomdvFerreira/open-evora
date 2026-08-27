@@ -6,33 +6,25 @@ source_id: SRC-9001
 publisher: "Fixture Publisher"
 name: "Fixture Source for Validator Testing"
 
+resource_type: document
+
 scope:
-  geography: municipality
+  geography:
+    level: municipality
+    area: "Fixture area"
   domains: [example]
 
-source_type: document
-
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-  method: "manual review"
 
-authority: unknown
+acquisition:
+  method: public_web
 
 licensing:
   status: unknown
-  licence: null
-  attribution: null
+  reuse: unknown
 
-freshness:
-  update_frequency: unknown
-  last_source_update: null
-  last_checked: "2026-08-10"
-  status: UNKNOWN
-
-canonical_source: true
-
-api_candidate:
-  potential: unknown
-
-notes: "Synthetic fixture only — created during WU-D1-01 to prove schema/validator behavior."
+temporal:
+  last_checked_at: "2026-08-10"
