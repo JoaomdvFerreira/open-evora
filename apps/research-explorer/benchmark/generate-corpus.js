@@ -17,6 +17,8 @@ const path = require("path");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const REAL_SCHEMAS_DIR = path.join(REPO_ROOT, "research", "schemas");
+const CANONICAL_RESEARCH_DIR = path.join(REPO_ROOT, "research");
+const { loadCorpusIndex } = require(path.join(REPO_ROOT, "tools", "research", "index.ts"));
 
 // --- deterministic PRNG (mulberry32) -- fixed seed so every run of a given
 // scale is byte-for-byte reproducible. -------------------------------------
@@ -39,10 +41,7 @@ function quote(v) {
   return `"${String(v).replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 }
 
-/** Emits a value at YAML-subset-compatible 2-space indentation — a subset
- * readable by both the retired tools/validate-research.js#parseYaml and the
- * current tools/research/core/yaml.ts (backed by the full `yaml` package, a
- * strict superset of that subset). */
+/** Emits a value at YAML-compatible 2-space indentation. */
 function emitValue(key, value, indent, lines) {
   const p = "  ".repeat(indent);
   if (value === null || value === undefined) {
@@ -58,7 +57,14 @@ function emitValue(key, value, indent, lines) {
     }
     lines.push(`${p}${key}:`);
     for (const item of value) {
-      lines.push(`${p}  - ${typeof item === "string" ? quote(item) : item}`);
+      if (item && typeof item === "object" && !Array.isArray(item)) {
+        lines.push(`${p}  -`);
+        for (const [itemKey, itemValue] of Object.entries(item)) {
+          emitValue(itemKey, itemValue, indent + 2, lines);
+        }
+      } else {
+        lines.push(`${p}  - ${typeof item === "string" ? quote(item) : item}`);
+      }
     }
   } else if (typeof value === "object") {
     lines.push(`${p}${key}:`);
@@ -72,36 +78,32 @@ function toYaml(record) {
   return lines.join("\n") + "\n";
 }
 
-// --- scale-proportional counts, matching the real corpus's SRC/EVD-heavy,
-// PRB-light shape (98/128/10 = ~41.5%/54.2%/4.2% in the real 236-record
-// corpus). PRB is floored first (smallest, most degree-sensitive category),
-// SRC is a fixed share of the remainder, and EVD absorbs the rest so the
-// three counts always sum exactly to `scale`.
+// --- Scale-proportional counts use the current canonical SRC/EVD/PRB corpus
+// as their baseline. PRB is floored first (smallest, most degree-sensitive
+// category), SRC is a fixed share of the remainder, and EVD absorbs the rest
+// so the three counts always sum exactly to `scale`.
 // ------------------------------------------------------
+function canonicalCounts() {
+  const index = loadCorpusIndex(CANONICAL_RESEARCH_DIR);
+  const count = (prefix) => index.byPrefix.get(prefix)?.records.length ?? 0;
+  const src = count("SRC-");
+  const evd = count("EVD-");
+  const prb = count("PRB-");
+  const total = src + evd + prb;
+  if (total === 0) throw new Error("Canonical SRC/EVD/PRB corpus is empty");
+  return { src, evd, prb, total };
+}
+
 function computeCounts(scale) {
-  const prb = Math.max(5, Math.round(scale * (10 / 236)));
-  const src = Math.max(10, Math.round(scale * (98 / 236)));
+  const baseline = canonicalCounts();
+  const prb = Math.max(5, Math.round(scale * (baseline.prb / baseline.total)));
+  const src = Math.max(10, Math.round(scale * (baseline.src / baseline.total)));
   const evd = scale - prb - src;
   if (evd <= 0) throw new Error(`Scale ${scale} too small for proportional generation`);
   return { src, evd, prb };
 }
 
 const DOMAINS = ["MOB", "ACC", "SOC", "HOU", "HEA", "EMP", "ECO", "EDU"];
-const GEO_LEVELS = ["city", "parish", "municipality", "intermunicipal", "regional"];
-const EVD_TYPES = ["institutional", "statistical", "formal-public", "social", "press", "stakeholder", "observation"];
-const EVD_NATURE = ["fact", "reported-experience", "opinion", "claim", "measurement", "recommendation"];
-const EVD_STRENGTH = ["primary-authoritative", "primary-non-authoritative", "secondary", "anecdotal"];
-const CONTRIBUTION = ["CONFIRMS", "REFINES", "CONTRADICTS", "CURRENT-STATE-UPDATE", "EXISTING-SOLUTION", "PLANNED-SOLUTION", "NEW-CANDIDATE"];
-const FRICTION = ["INFORMATION", "COORDINATION", "TRANSACTION", "OPERATIONAL", "PHYSICAL", "REGULATORY", "OTHER"];
-const SRC_TYPE = ["api", "dataset", "gis", "web", "document", "database", "feed", "unknown"];
-const AUTHORITY = ["authoritative", "verified-third-party", "community", "derived", "estimated", "unknown"];
-const LIC_STATUS = ["known", "unknown", "restricted"];
-const FRESH_STATUS = ["CURRENT", "STALE", "UNKNOWN", "UNAVAILABLE"];
-const PRB_EVIDENCE_STATUS = ["discovered", "corroborated"];
-const PRB_VALIDATION_STATUS = ["unvalidated", "partially_validated", "validated"];
-const DIGITAL_TRACT = ["not_assessed", "low", "medium", "high"];
-const EXIST_SOL = ["not_assessed", "assessed"];
-const PRB_STATUS = ["OPEN", "REJECTED", "DUPLICATE", "NON_DIGITAL", "ALREADY_SOLVED", "INSUFFICIENT_EVIDENCE"];
 
 function pick(rng, arr) {
   return arr[Math.floor(rng() * arr.length)];
@@ -149,12 +151,15 @@ function generate(scale, outDir) {
       source_id: id,
       publisher: `Synthetic Publisher ${pick(rng, ["A", "B", "C", "D"])}`,
       name: `Synthetic dataset ${id}`,
-      scope: { geography: pick(rng, GEO_LEVELS), domains: pickN(rng, DOMAINS, 1 + Math.floor(rng() * 3)) },
-      source_type: pick(rng, SRC_TYPE),
-      access: { public: rng() > 0.2, machine_readable: pick(rng, ["true", "false", "unknown"]) },
-      authority: pick(rng, AUTHORITY),
-      licensing: { status: pick(rng, LIC_STATUS) },
-      freshness: { last_checked: "2026-08-10", status: pick(rng, FRESH_STATUS) },
+      resource_type: "dataset",
+      scope: {
+        geography: { level: "municipality", area: "Synthetic benchmark area" },
+        domains: pickN(rng, DOMAINS, 1 + Math.floor(rng() * 3)),
+      },
+      access: { level: "public", availability: "available", machine_readable: pick(rng, [true, false, "unknown"]) },
+      acquisition: { method: "public_web" },
+      licensing: { status: "unknown", reuse: "unknown" },
+      temporal: { last_checked_at: "2026-08-10" },
     };
     fs.writeFileSync(path.join(outDir, "sources", `${id}.yaml`), toYaml(rec));
   }
@@ -164,35 +169,21 @@ function generate(scale, outDir) {
     const useHub = rng() < 0.4;
     const sourceId = useHub ? pick(rng, hubSrc) : pick(rng, srcIds);
     const additional = rng() < 0.3 ? pickN(rng, srcIds, 1 + Math.floor(rng() * 2)) : [];
-    const hasAnalysis = rng() < 0.85;
-    const relatedProblems = hasAnalysis
-      ? rng() < 0.2
-        ? []
-        : rng() < 0.3
-          ? pickN(rng, hubPrb, 1)
-          : pickN(rng, prbIds, 1 + Math.floor(rng() * 2))
-      : [];
+    const sourceIds = [...new Set([sourceId, ...additional])];
 
     const rec = {
       evidence_id: id,
-      type: pick(rng, EVD_TYPES),
-      source: { publisher: "Synthetic Publisher", title: `Synthetic source document for ${id}`, source_id: sourceId, retrieved_at: "2026-08-10" },
-      geography: { level: pick(rng, GEO_LEVELS) },
-      population: [`synthetic population group ${1 + Math.floor(rng() * 5)}`],
-      domain: pickN(rng, DOMAINS, 1 + Math.floor(rng() * 2)),
+      provenance: { sources: sourceIds, extracted_at: "2026-08-10" },
       observation: { summary: `Synthetic observation summary for ${id}, generated deterministically for RE-05 scale benchmarking.` },
-      evidence_nature: pick(rng, EVD_NATURE),
-      strength: pick(rng, EVD_STRENGTH),
-      personal_data: { present: false, retained: false },
+      scope: {
+        geography: { level: "municipality", area: "Synthetic benchmark area" },
+        temporal: { as_of: "2026-08-10" },
+      },
+      domains: pickN(rng, DOMAINS, 1 + Math.floor(rng() * 2)),
+      evidence_nature: "claim",
+      claim_authority: "unknown",
+      inference_limits: ["Synthetic benchmark fixture; not evidence about Évora."],
     };
-    if (additional.length > 0) rec.additional_sources = additional;
-    if (hasAnalysis) {
-      rec.analysis = {
-        related_problems: relatedProblems,
-        contribution: [pick(rng, CONTRIBUTION)],
-        friction_types: [pick(rng, FRICTION)],
-      };
-    }
     fs.writeFileSync(path.join(outDir, "evidence", `${id}.yaml`), toYaml(rec));
   }
 
@@ -204,15 +195,19 @@ function generate(scale, outDir) {
       problem_id: id,
       title: `Synthetic problem statement for ${id}`,
       domain: pickN(rng, DOMAINS, 1 + Math.floor(rng() * 2)),
-      geography: { level: pick(rng, GEO_LEVELS) },
+      geography: { level: "municipality" },
       affected_populations: [`synthetic affected population ${1 + Math.floor(rng() * 4)}`],
       problem_statement: `Synthetic problem statement body for ${id}, deterministically generated for RE-05 scale benchmarking.`,
-      evidence: pickN(rng, evdIds, evCount),
-      evidence_status: pick(rng, PRB_EVIDENCE_STATUS),
-      validation_status: pick(rng, PRB_VALIDATION_STATUS),
-      digital_tractability: pick(rng, DIGITAL_TRACT),
-      solution_landscape_status: pick(rng, EXIST_SOL),
-      status: pick(rng, PRB_STATUS),
+      evidence: pickN(rng, evdIds, evCount).map((evidence_id) => ({
+        evidence_id,
+        effects: ["SUPPORTS"],
+        research_roles: ["LOCAL_OBSERVATION"],
+      })),
+      evidence_status: "discovered",
+      validation_status: "unvalidated",
+      digital_tractability: "not_assessed",
+      solution_landscape_status: "not_assessed",
+      status: "OPEN",
     };
     fs.writeFileSync(path.join(outDir, "problems", `${id}.yaml`), toYaml(rec));
   }

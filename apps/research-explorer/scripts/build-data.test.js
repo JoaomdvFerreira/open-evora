@@ -51,46 +51,46 @@ function minimalSrc({ id = "SRC-9001" } = {}) {
 source_id: ${id}
 publisher: "Fixture Publisher"
 name: "Fixture Source"
+resource_type: webpage
 scope:
-  geography: [city]
+  geography:
+    level: city
+    area: "Fixture area"
   domains: [example]
-source_type: web
 access:
-  public: true
+  level: public
+  availability: available
   machine_readable: false
-authority: unknown
+acquisition:
+  method: public_web
 licensing:
   status: unknown
-freshness:
-  last_checked: "2026-01-01"
-  status: CURRENT
+  reuse: unknown
+temporal:
+  last_checked_at: "2026-01-01"
 `;
 }
 
-function minimalEvd({ id = "EVD-900101", sourceId = "", additionalSources = "", relatedProblems = "" } = {}) {
+function minimalEvd({ id = "EVD-900101", sourceIds = ["SRC-9001"] } = {}) {
   return `
 evidence_id: ${id}
-type: observation
-source:
-  publisher: "Fixture Publisher"
-  title: "Fixture Evidence"
-  retrieved_at: "2026-01-01"
-${sourceId ? `  source_id: ${sourceId}\n` : ""}geography:
-  level: city
-population: residents
-domain: [example]
+provenance:
+  sources: [${sourceIds.join(", ")}]
+  extracted_at: "2026-01-01"
 observation:
   summary: "Fixture observation summary."
+scope:
+  geography:
+    level: city
+    area: "Fixture area"
+  temporal:
+    status: unknown
+domains: [example]
 evidence_nature: fact
-strength: secondary
-personal_data:
-  present: false
-  retained: false
-${additionalSources ? `additional_sources: [${additionalSources}]\n` : ""}${
-    relatedProblems
-      ? `analysis:\n  related_problems: [${relatedProblems}]\n`
-      : ""
-  }`;
+claim_authority: unknown
+inference_limits:
+  - "Synthetic fixture only; it is not research evidence."
+`;
 }
 
 function minimalPrb({ id = "PRB-9001", evidence = [] } = {}) {
@@ -102,7 +102,7 @@ geography:
   level: city
 affected_populations: [residents]
 problem_statement: "Fixture statement for adapter testing."
-evidence: [${evidence.join(", ")}]
+evidence:${evidence.length ? `\n${evidence.map((evidenceId) => `  - evidence_id: ${evidenceId}\n    effects: [SUPPORTS]\n    research_roles: [LOCAL_OBSERVATION]`).join("\n")}` : " []"}
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
@@ -151,7 +151,7 @@ test("valid minimal corpus builds a read model with matching counts", () => {
   const root = makeFixtureRoot();
   try {
     write(root, "sources", "SRC-9001.yaml", minimalSrc());
-    write(root, "evidence", "EVD-900101.yaml", minimalEvd({ sourceId: "SRC-9001" }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
     write(root, "problems", "PRB-9001.yaml", minimalPrb({ evidence: ["EVD-900101"] }));
     const model = buildFor(root);
     assert.strictEqual(model.manifest.totalRecords, 3);
@@ -195,14 +195,16 @@ test("a reference to a non-existent record fails closed via validateResearchTree
 
 // ---- 4. optional reference absent remains valid --------------------------------
 
-test("an evidence record with no source.source_id is valid and produces no source edge", () => {
+test("an evidence provenance source produces the canonical source edge", () => {
   const root = makeFixtureRoot();
   try {
-    write(root, "evidence", "EVD-900101.yaml", minimalEvd()); // no sourceId
+    write(root, "sources", "SRC-9001.yaml", minimalSrc());
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
     write(root, "problems", "PRB-9001.yaml", minimalPrb({ evidence: ["EVD-900101"] }));
     const model = buildFor(root);
-    const sourceEdges = model.edges.filter((e) => e.field === "source.source_id");
-    assert.strictEqual(sourceEdges.length, 0);
+    const sourceEdges = model.edges.filter((e) => e.field === "provenance.sources");
+    assert.strictEqual(sourceEdges.length, 1);
+    assert.strictEqual(sourceEdges[0].to, "SRC-9001");
   } finally {
     cleanup(root);
   }
@@ -213,6 +215,7 @@ test("an evidence record with no source.source_id is valid and produces no sourc
 test("a 3-item evidence list on a problem produces exactly 3 edges", () => {
   const root = makeFixtureRoot();
   try {
+    write(root, "sources", "SRC-9001.yaml", minimalSrc());
     write(root, "evidence", "EVD-900101.yaml", minimalEvd({ id: "EVD-900101" }));
     write(root, "evidence", "EVD-900102.yaml", minimalEvd({ id: "EVD-900102" }));
     write(root, "evidence", "EVD-900103.yaml", minimalEvd({ id: "EVD-900103" }));
@@ -229,9 +232,9 @@ test("a 3-item evidence list on a problem produces exactly 3 edges", () => {
   }
 });
 
-// ---- 6. same source/target through different reference fields is distinguishable --
+// ---- 6. repeated provenance references retain their list position ---------
 
-test("two edges between the same pair via different fields are not deduplicated", () => {
+test("two provenance references to the same source are not deduplicated", () => {
   const root = makeFixtureRoot();
   try {
     write(root, "sources", "SRC-9001.yaml", minimalSrc());
@@ -239,13 +242,13 @@ test("two edges between the same pair via different fields are not deduplicated"
       root,
       "evidence",
       "EVD-900101.yaml",
-      minimalEvd({ sourceId: "SRC-9001", additionalSources: "SRC-9001" })
+      minimalEvd({ sourceIds: ["SRC-9001", "SRC-9001"] })
     );
     const model = buildFor(root);
     const toSameSource = model.edges.filter((e) => e.from === "EVD-900101" && e.to === "SRC-9001");
-    assert.strictEqual(toSameSource.length, 2, "expected one edge per distinct reference field");
+    assert.strictEqual(toSameSource.length, 2, "expected one edge per list position");
     const fields = toSameSource.map((e) => e.field).sort();
-    assert.deepStrictEqual(fields, ["additional_sources", "source.source_id"]);
+    assert.deepStrictEqual(fields, ["provenance.sources", "provenance.sources"]);
     const ids = new Set(toSameSource.map((e) => e.id));
     assert.strictEqual(ids.size, 2, "edge ids must be distinct");
   } finally {
@@ -282,9 +285,9 @@ test("structural output (index/edges order) is deterministic across repeated bui
   const root = makeFixtureRoot();
   try {
     write(root, "sources", "SRC-9001.yaml", minimalSrc({ id: "SRC-9001" }));
-    write(root, "evidence", "EVD-900103.yaml", minimalEvd({ id: "EVD-900103", sourceId: "SRC-9001" }));
-    write(root, "evidence", "EVD-900101.yaml", minimalEvd({ id: "EVD-900101", sourceId: "SRC-9001" }));
-    write(root, "evidence", "EVD-900102.yaml", minimalEvd({ id: "EVD-900102", sourceId: "SRC-9001" }));
+    write(root, "evidence", "EVD-900103.yaml", minimalEvd({ id: "EVD-900103" }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd({ id: "EVD-900101" }));
+    write(root, "evidence", "EVD-900102.yaml", minimalEvd({ id: "EVD-900102" }));
     write(
       root,
       "problems",
@@ -380,14 +383,14 @@ test("buildReadModel throws rather than publish a model with a dangling edge", (
   const root = makeFixtureRoot();
   try {
     write(root, "sources", "SRC-9001.yaml", minimalSrc());
-    write(root, "evidence", "EVD-900101.yaml", minimalEvd({ sourceId: "SRC-9001" }));
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
     const validation = validateResearchTree(root);
     assert.deepStrictEqual(validation.errors, []);
 
-    // Tamper: point the evidence's source_id at an ID that no longer exists
+    // Tamper: point the evidence's provenance source at an ID that no longer exists
     // in parsedByDir, bypassing validateResearchTree's own check.
     const evdEntry = validation.parsedByDir.get("EVD-").parsed[0];
-    evdEntry.record.source.source_id = "SRC-9999";
+    evdEntry.record.provenance.sources[0] = "SRC-9999";
 
     assert.throws(
       () =>

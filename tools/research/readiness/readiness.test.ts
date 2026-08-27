@@ -16,7 +16,7 @@ function codes(result: { reasons: Array<{ code: string }> }): string[] {
 test("readiness preserves human-owned corroboration and validation decisions", () => {
   const index = loadCorpusIndex(root);
   const reports = evaluateCorpus(index);
-  assert.equal(reports.length, 10);
+  assert.equal(reports.length, index.byPrefix.get("PRB-")!.records.length);
   const report = evaluateProblem("PRB-0001", index)!;
   assert.equal(typeof report.eligibility.result, "string");
   assert.equal(typeof report.corroboration.result, "string");
