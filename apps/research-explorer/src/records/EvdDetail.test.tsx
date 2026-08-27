@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { EvdDetail } from "./EvdDetail";
+import { evdSectionIndex, EvdDetail, EvdReadingRail } from "./EvdDetail";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import type { EVDProblemUsesState } from "./useEvdProblemUses";
 import type { EVDProblemUse } from "./evdRelations";
@@ -50,6 +50,12 @@ describe.skipIf(!hasGeneratedData)("EVD Detail vNext — canonical regression ca
     expect(screen.getAllByText("Belltown, Seattle, Washington, EUA").length).toBeGreaterThan(0);
     expect(screen.getAllByText("O estudo não demonstra uma redução proporcional da distância total percorrida ou das emissões e não estabelece um efeito equivalente em Évora.").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Refina").length).toBeGreaterThan(0); expect(screen.getAllByText("Mecanismo comparativo").length).toBeGreaterThan(0);
+    const extractedAt = screen.getByText(/Extraída pela Open Évora em/);
+    expect(extractedAt.querySelector("time")?.dateTime).toBe("2026-08-11");
+    expect(extractedAt.textContent).toBe("Extraída pela Open Évora em 11/08/2026");
+    fireEvent.click(screen.getByText("Inspeção técnica completa"));
+    expect(screen.getByText("provenance.sources[0] → SRC-0093")).toBeTruthy();
+    expect(screen.getByText("PRB-0005 → evidence[7]")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Ver Problema →" })); expect(onSelect).toHaveBeenCalledWith("PRB-0005");
   });
 
@@ -65,5 +71,26 @@ describe.skipIf(!hasGeneratedData)("EVD Detail vNext — canonical regression ca
     expect(screen.getAllByRole("button", { name: "Ver Problema →" })).toHaveLength(2);
     expect(screen.getByText("Inspeção técnica completa")).toBeTruthy();
     expect(screen.queryByText(/representativeness|analysis\./i)).toBeNull();
+  });
+});
+
+describe("EVD section index", () => {
+  const emptyLimits: RecordDetail = {
+    id: "EVD-EMPTY-LIMITS",
+    type: "EVD-",
+    file: "research/evidence/EVD-EMPTY-LIMITS.yaml",
+    outgoingEdges: [],
+    incomingEdges: [],
+    record: {
+      observation: { summary: "Observação sem limites redigidos." },
+      provenance: { sources: [] },
+      inference_limits: [],
+    },
+  };
+
+  it("omits an unrendered limits section from the shared compact and rail index", () => {
+    expect(evdSectionIndex(emptyLimits.record).map((section) => section.sectionId)).not.toContain("limits");
+    render(<><EvdDetail detail={emptyLimits} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} /><EvdReadingRail detail={emptyLimits} /></>);
+    expect(screen.queryByRole("link", { name: "O que não permite concluir" })).toBeNull();
   });
 });

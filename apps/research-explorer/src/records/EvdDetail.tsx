@@ -14,6 +14,12 @@ const EVD_SECTIONS: CompactSectionIndexEntry[] = [
   { sectionId: "technical", anchorId: "evd-technical", label: "Inspeção técnica" },
 ];
 
+/** One EVD section-presence authority shared by the compact and rail indexes. */
+export function evdSectionIndex(record: Record<string, unknown>): CompactSectionIndexEntry[] {
+  const hasLimits = strings(record.inference_limits).length > 0;
+  return EVD_SECTIONS.filter((section) => section.sectionId !== "limits" || hasLimits);
+}
+
 function objectValue(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
 }
@@ -37,8 +43,8 @@ function EvdIdentity({ detail }: { detail: RecordDetail }) {
     <div className="evd-type-row"><span className="detail-type-badge"><code>{detail.type}</code> {describeType(detail.type).label}</span>{lineageId && <span className="evd-secondary-id">Linagem: <code>{lineageId}</code></span>}</div>
     <h1>{text(observation?.summary) ?? detail.id}</h1>
     <div className="evd-identity-facts">
-      {nature && <span>Natureza: <b>{publicEnumLabel("evidence_nature", nature)}</b></span>}
-      {authority && <span>Autoridade da alegação: <b>{publicEnumLabel("claim_authority", authority)}</b></span>}
+      {nature && <span className="evd-identity-fact">Natureza: <b>{publicEnumLabel("evidence_nature", nature)}</b></span>}
+      {authority && <span className="evd-identity-fact">Autoridade da alegação: <b>{publicEnumLabel("claim_authority", authority)}</b></span>}
     </div>
   </header>;
 }
@@ -86,15 +92,15 @@ function EvdSources({ record, lookup, onSelect }: { record: Record<string, unkno
   const provenance = objectValue(record.provenance); const sourceIds = strings(provenance?.sources); const extractedAt = text(provenance?.extracted_at);
   return <section id="evd-sources" aria-label="De onde vem esta evidência" className="record-editorial-section evd-section">
     <h2 className="detail-panel-label">De onde vem esta evidência</h2>
-    {extractedAt && <p className="evd-extracted-at">Extraída em <time dateTime={extractedAt}>{formatPublicDate(extractedAt)}</time></p>}
+    {extractedAt && <p className="evd-extracted-at">Extraída pela Open Évora em <time dateTime={extractedAt}>{formatPublicDate(extractedAt)}</time></p>}
     <ul className="evd-source-list">{sourceIds.map((id) => <li key={id}><code>{id}</code><button type="button" onClick={() => onSelect(id)}>{lookup.get(id)?.label ?? "Abrir fonte"}</button></li>)}</ul>
   </section>;
 }
 
 function EvdTechnical({ detail }: { detail: RecordDetail }) {
   const paths = [
-    ...detail.outgoingEdges.map((edge) => `Saída: ${edge.field}${edge.ordinal === null ? "" : `[${edge.ordinal}]`}`),
-    ...detail.incomingEdges.map((edge) => `Entrada: ${edge.field}${edge.ordinal === null ? "" : `[${edge.ordinal}]`}`),
+    ...detail.outgoingEdges.map((edge) => edge.to ? `${edge.field}${edge.ordinal === null ? "" : `[${edge.ordinal}]`} → ${edge.to}` : edge.field),
+    ...detail.incomingEdges.map((edge) => edge.from ? `${edge.from} → ${edge.field}${edge.ordinal === null ? "" : `[${edge.ordinal}]`}` : edge.field),
   ];
   return <section id="evd-technical" aria-label="Inspeção técnica" className="record-editorial-section evd-section">
     <h2 className="detail-panel-label">Inspeção técnica</h2>
@@ -107,9 +113,11 @@ function EvdTechnical({ detail }: { detail: RecordDetail }) {
 }
 
 export function EvdDetail({ detail, lookup, problemUses, onSelect }: { detail: RecordDetail; lookup: Map<string, RecordSummary>; problemUses: EVDProblemUsesState & { retry: () => void }; onSelect: (id: string) => void }) {
-  return <><EvdIdentity detail={detail} /><CompactSectionIndex label="Nesta evidência" sections={EVD_SECTIONS} className="evd-compact-section-index" /><EvdScope record={detail.record} /><EvdLimits record={detail.record} /><EvdInvestigation state={problemUses} onSelect={onSelect} /><EvdSources record={detail.record} lookup={lookup} onSelect={onSelect} /><EvdTechnical detail={detail} /></>;
+  const sections = evdSectionIndex(detail.record);
+  return <><EvdIdentity detail={detail} /><CompactSectionIndex label="Nesta evidência" sections={sections} className="evd-compact-section-index" /><EvdScope record={detail.record} /><EvdLimits record={detail.record} /><EvdInvestigation state={problemUses} onSelect={onSelect} /><EvdSources record={detail.record} lookup={lookup} onSelect={onSelect} /><EvdTechnical detail={detail} /></>;
 }
 
 export function EvdReadingRail({ detail }: { detail: RecordDetail }) {
-  return <><nav aria-label="Nesta evidência" className="problem-rail-nav problem-reading-rail"><h2 className="detail-panel-label">Nesta evidência</h2><ul>{EVD_SECTIONS.map((section) => <li key={section.sectionId}><a href={`#${section.anchorId}`}>{section.label}</a></li>)}</ul></nav><span className="detail-rail-file">{detail.file}</span></>;
+  const sections = evdSectionIndex(detail.record);
+  return <><nav aria-label="Nesta evidência" className="problem-rail-nav problem-reading-rail"><h2 className="detail-panel-label">Nesta evidência</h2><ul>{sections.map((section) => <li key={section.sectionId}><a href={`#${section.anchorId}`}>{section.label}</a></li>)}</ul></nav><span className="detail-rail-file">{detail.file}</span></>;
 }

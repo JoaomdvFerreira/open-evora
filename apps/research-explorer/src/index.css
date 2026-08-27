@@ -2643,9 +2643,6 @@ main.explorer-shell {
    disclosure and rail; these rules only supply EVD-owned composition. */
 .evd-identity {
   margin: 0 0 var(--space-6);
-  border: 1px solid var(--line-emphasis);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5) var(--space-6);
 }
 
 .evd-type-row, .evd-identity-facts, .evd-problem-heading, .evd-source-list li, .evd-relation-facts dd {
@@ -2654,13 +2651,16 @@ main.explorer-shell {
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+.evd-type-row { margin-bottom: var(--space-4); }
 .evd-secondary-id { color: var(--ink-faintest); font-family: var(--recipe-technical-meta-family); font-size: 11px; }
-.evd-identity h1 { margin: var(--space-4) 0; color: var(--ink); font-family: var(--recipe-editorial-h1-family); font-size: var(--recipe-editorial-h1-size); font-weight: var(--recipe-editorial-h1-weight); line-height: var(--recipe-editorial-h1-line-height); }
-.evd-identity-facts { color: var(--ink-soft); font-size: 14px; }
+.evd-identity h1 { margin: 0; color: var(--ink); font-family: var(--recipe-editorial-h1-family); font-size: var(--recipe-editorial-h1-size); font-weight: var(--recipe-editorial-h1-weight); line-height: var(--recipe-editorial-h1-line-height); }
+.evd-identity-facts { margin-top: var(--space-4); color: var(--ink-soft); font-size: 12px; }
+.evd-identity-fact { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: var(--space-1) var(--space-2); background: var(--surface); font-family: var(--ui); }
 .evd-identity-facts b { color: var(--ink); }
 .evd-scope-grid small { display: block; margin-top: 2px; color: var(--ink-faintest); font-size: 12px; }
-.evd-limits { margin: 0; padding-left: var(--space-5); color: var(--ink); line-height: 1.6; }
-.evd-limits li + li { margin-top: var(--space-3); }
+.evd-limits { margin: 0; padding: 0; border-top: 1px solid var(--line); color: var(--ink); list-style: none; }
+.evd-limits li { position: relative; padding: var(--space-3) 0 var(--space-3) var(--space-5); border-bottom: 1px solid var(--line); line-height: 1.6; }
+.evd-limits li::before { position: absolute; left: 0; color: var(--ink-faintest); content: "—"; }
 .evd-problem-list, .evd-source-list { list-style: none; margin: 0; padding: 0; }
 .evd-problem-list { display: grid; gap: var(--space-4); }
 .evd-problem-card { border: 1px solid var(--line); border-radius: var(--radius-lg); padding: var(--space-4); }
@@ -2964,10 +2964,6 @@ main.explorer-shell {
   }
 
   .problem-identity {
-    padding: var(--space-4);
-  }
-
-  .evd-identity {
     padding: var(--space-4);
   }
 

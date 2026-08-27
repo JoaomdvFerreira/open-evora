@@ -32,6 +32,11 @@ const renderDetail = (detail = evd, onSelect = vi.fn(), onViewAsProblem = vi.fn(
 };
 
 describe("RecordDetailPanel vNext", () => {
+  it("uses the approved neutral EVD description in the desktop rail", async () => {
+    renderDetail();
+    expect(await screen.findByText("Evidência é um registo com proveniência e limites explícitos.")).toBeTruthy();
+  });
+
   it("renders bounded observation, scope, inference limits and provenance", async () => {
     renderDetail();
     expect((await screen.findAllByText("Observação delimitada.")).length).toBeGreaterThan(0);
