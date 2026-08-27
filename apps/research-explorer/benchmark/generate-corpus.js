@@ -77,14 +77,14 @@ function toYaml(record) {
 }
 
 // --- scale-proportional counts, matching the real corpus's SRC/EVD-heavy,
-// PRB-light shape (98/128/10 = ~41.5%/54.2%/4.2% in the real 236-record
+// PRB-light shape (105/128/10 = ~43.2%/52.7%/4.1% in the current 243-record
 // corpus). PRB is floored first (smallest, most degree-sensitive category),
 // SRC is a fixed share of the remainder, and EVD absorbs the rest so the
 // three counts always sum exactly to `scale`.
 // ------------------------------------------------------
 function computeCounts(scale) {
-  const prb = Math.max(5, Math.round(scale * (10 / 236)));
-  const src = Math.max(10, Math.round(scale * (98 / 236)));
+  const prb = Math.max(5, Math.round(scale * (10 / 243)));
+  const src = Math.max(10, Math.round(scale * (105 / 243)));
   const evd = scale - prb - src;
   if (evd <= 0) throw new Error(`Scale ${scale} too small for proportional generation`);
   return { src, evd, prb };

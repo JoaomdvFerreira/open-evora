@@ -15,6 +15,7 @@ const path = require("node:path");
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const RESEARCH_ROOT = path.join(REPO_ROOT, "research");
 const GENERATOR = path.join(__dirname, "generate-corpus.js");
+const { computeCounts } = require("./generate-corpus.js");
 
 function validateCorpus(root) {
   return require(path.join(REPO_ROOT, "tools", "research", "index.ts")).validateResearchRoot(root);
@@ -64,13 +65,17 @@ function run(name, fn) {
   }
 }
 
+run("RE-05 count proportions match the current 243-record canonical baseline", () => {
+  assert.deepEqual(computeCounts(243), { src: 105, evd: 128, prb: 10 });
+});
+
 run("RE-05 generator emits a deterministic small corpus accepted by the canonical validator", () => {
   const parent = fixtureRoot("evora-generator-contract-");
   const first = path.join(parent, "first");
   const second = path.join(parent, "second");
   const scale = 25;
   try {
-    const expected = { src: 10, evd: 10, prb: 5 };
+    const expected = computeCounts(scale);
     generateCorpus(scale, first);
     const validation = validateCorpus(first);
 
