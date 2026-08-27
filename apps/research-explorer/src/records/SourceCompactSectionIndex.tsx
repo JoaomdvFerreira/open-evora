@@ -14,6 +14,7 @@
 
 import { sourceSectionIndex } from "./sourceSectionIndex";
 import type { SourceSectionRelationContext } from "./sourceView";
+import { CompactSectionIndex } from "./CompactSectionIndex";
 
 export function SourceCompactSectionIndex({
   record,
@@ -24,18 +25,5 @@ export function SourceCompactSectionIndex({
 }) {
   const sections = sourceSectionIndex(record, relationContext);
 
-  return (
-    <details className="problem-help source-compact-section-index">
-      <summary>Nesta fonte</summary>
-      <nav aria-label="Nesta fonte (versão compacta)" className="problem-help-section-index">
-        <ul>
-          {sections.map((section) => (
-            <li key={section.sectionId}>
-              <a href={`#${section.anchorId}`}>{section.label}</a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </details>
-  );
+  return <CompactSectionIndex label="Nesta fonte" sections={sections} className="source-compact-section-index" />;
 }

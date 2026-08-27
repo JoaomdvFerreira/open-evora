@@ -23,7 +23,7 @@ const DETAILS: Record<string, RecordDetail> = {
     id: "PRB-0005",
     type: "PRB-",
     file: "research/problems/PRB-0005.yaml",
-    record: { title: "Pressão de estacionamento com uma descrição canónica completa que não pode ser truncada", domain: ["mobility"], evidence: ["EVD-000105"] },
+    record: { title: "Pressão de estacionamento com uma descrição canónica completa que não pode ser truncada", domain: ["mobility"], evidence: [{ evidence_id: "EVD-000105", effects: ["REFINES"], research_roles: ["COMPARATIVE_MECHANISM"] }] },
     outgoingEdges: [{ field: "evidence", ordinal: 0, to: "EVD-000105" }],
     incomingEdges: [],
   },
@@ -31,8 +31,8 @@ const DETAILS: Record<string, RecordDetail> = {
     id: "EVD-000105",
     type: "EVD-",
     file: "research/evidence/EVD-000105.yaml",
-    record: { type: "institutional", observation: { summary: "Fixture" } },
-    outgoingEdges: [{ field: "source.source_id", ordinal: null, to: "SRC-0092" }],
+    record: { observation: { summary: "Fixture" }, provenance: { sources: ["SRC-0092"], extracted_at: "2026-08-11" }, scope: { geography: { level: "city", area: "Évora" }, populations: [], temporal: { as_of: "2026" } }, domains: ["MOB"], evidence_nature: "fact", claim_authority: "authoritative", inference_limits: ["Limite de fixture."] },
+    outgoingEdges: [{ field: "provenance.sources", ordinal: 0, to: "SRC-0092" }],
     incomingEdges: [{ field: "evidence", ordinal: 0, from: "PRB-0005" }],
   },
   "SRC-0092": {
@@ -41,7 +41,7 @@ const DETAILS: Record<string, RecordDetail> = {
     file: "research/sources/SRC-0092.yaml",
     record: { publisher: "Via Verde", name: "Estacionar" },
     outgoingEdges: [],
-    incomingEdges: [{ field: "source.source_id", ordinal: null, from: "EVD-000105" }],
+    incomingEdges: [{ field: "provenance.sources", ordinal: 0, from: "EVD-000105" }],
   },
   "WID-0001": {
     id: "WID-0001",
@@ -140,8 +140,8 @@ describe("Explorer — Records workflow (fake provider)", () => {
     await user.click(outgoingButton);
 
     detailPanel = await getDetailPanel();
-    await within(detailPanel).findByText(/PRB-0005 — Pressão de estacionamento/);
-    expect(within(detailPanel).getByText(/referenciado através de/)).toBeTruthy();
+    await within(detailPanel).findByText(/Pressão de estacionamento/);
+    expect(within(detailPanel).getByText("Mecanismo comparativo")).toBeTruthy();
   });
 
   it("navigates PRB-0005 -> EVD-000105 -> SRC-0092, each step reachable back to Registos via the breadcrumb", async () => {
@@ -157,7 +157,7 @@ describe("Explorer — Records workflow (fake provider)", () => {
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
 
-    await user.click(await within(within(detailPanel).getByLabelText("Relações")).findByRole("button", { name: /SRC-0092/ }));
+    await user.click(await within(detailPanel).findByRole("button", { name: "Via Verde Estacionar" }));
 
     detailPanel = await getDetailPanel();
     expect(within(detailPanel).getAllByText("SRC-0092").length).toBeGreaterThan(0);

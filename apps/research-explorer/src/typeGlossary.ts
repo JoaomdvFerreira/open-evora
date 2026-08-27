@@ -22,7 +22,7 @@ const KNOWN_TYPES: Record<string, TypeDescriptor> = {
   },
   "EVD-": {
     label: "Evidência",
-    description: "Uma observação individual, com a sua proveniência — não representa, por si só, um facto validado à escala da cidade.",
+    description: "Evidência é um registo com proveniência e limites explícitos.",
   },
   "PRB-": {
     label: "Problema",

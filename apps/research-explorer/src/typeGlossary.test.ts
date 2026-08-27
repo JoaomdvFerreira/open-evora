@@ -8,6 +8,10 @@ describe("describeType", () => {
     expect(describeType("PRB-").label).toBe("Problema");
   });
 
+  it("uses the approved neutral EVD public description", () => {
+    expect(describeType("EVD-").description).toBe("Evidência é um registo com proveniência e limites explícitos.");
+  });
+
   it("degrades gracefully for an unknown future type rather than omitting a label", () => {
     const descriptor = describeType("WID-");
     expect(descriptor.label).toBe("WID");
