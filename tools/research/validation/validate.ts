@@ -361,8 +361,13 @@ function validateInvestigation(
         const value = (entry as Record<string, unknown>)[field];
         if (value !== undefined && typeof value !== "string") errors.push(`[${file}] field "${fieldBase}.${field}" must be a string`);
       }
-      validatePrbStringList(file, `${fieldBase}.evidence`, (entry as Record<string, unknown>).evidence, errors);
-      checkEvidenceList(`${fieldBase}.evidence`, (entry as Record<string, unknown>).evidence);
+      const evidence = (entry as Record<string, unknown>).evidence;
+      if (evidence !== undefined && !Array.isArray(evidence)) {
+        errors.push(`[${file}] field "${fieldBase}.evidence" must be an array`);
+      } else {
+        validatePrbStringList(file, `${fieldBase}.evidence`, evidence, errors);
+      }
+      checkEvidenceList(`${fieldBase}.evidence`, evidence);
     });
   }
 

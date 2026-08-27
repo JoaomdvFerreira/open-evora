@@ -146,6 +146,15 @@ test("PRB authored relationship, investigation and decision-basis structures are
   assert.match(investigation, /field "investigation\.open_questions\[0\]\.invented" is not an allowed field/);
   assert.match(investigation, /field "investigation\.open_questions\[0\]\.evidence\[0\]" must be a string/);
 
+  const investigationContainers = errorsAfter((index) => {
+    prb(index).investigation.open_questions = [
+      { question: "Questão escalar", evidence: "EVD-000001" },
+      { question: "Questão objecto", evidence: { evidence_id: "EVD-000001" } },
+    ];
+  });
+  assert.match(investigationContainers, /field "investigation\.open_questions\[0\]\.evidence" must be an array/);
+  assert.match(investigationContainers, /field "investigation\.open_questions\[1\]\.evidence" must be an array/);
+
   const decisionBasis = errorsAfter((index) => {
     prb(index).decision_basis.manifestation = { summary: "Forma inválida", evidence: [42], invented: true };
   });
