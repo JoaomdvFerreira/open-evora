@@ -85,7 +85,10 @@ geography:
   level: municipality
 affected_populations: [residents]
 problem_statement: "Fixture statement for loader/indexer testing."
-evidence: [EVD-900101]
+evidence:
+  - evidence_id: EVD-900101
+    effects: [SUPPORTS]
+    research_roles: [LOCAL_OBSERVATION]
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
