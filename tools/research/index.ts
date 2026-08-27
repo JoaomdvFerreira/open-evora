@@ -33,6 +33,8 @@ export { classifyCandidateDelta } from "./candidate-delta.ts";
 export type { CandidateDelta, CandidateDeltaAction, CandidateRecord } from "./candidate-delta.ts";
 export { buildProspectiveCorpusIndex, validateCandidateSet } from "./prospective-validation.ts";
 export type { CandidateSetValidationResult, ProspectiveCorpusOverlay } from "./prospective-validation.ts";
+export { prepareCanonicalIntegrationReview } from "./canonical-integration-review.ts";
+export type { CanonicalIntegrationReadiness, CanonicalIntegrationReview } from "./canonical-integration-review.ts";
 export type {
   CorpusIndex,
   ParsedRecord,
