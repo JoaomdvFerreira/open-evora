@@ -3,7 +3,7 @@ import type { DataProvider } from "../dataProvider/types";
 import { useRecordIndex } from "../records/useRecordIndex";
 import { findMeaningField } from "../records/meaningField";
 import { computePublicOverviewData, formatEvidenceCount, formatProblemCount } from "./overviewStats";
-import { formatPublicCount, publicCompactEnumLabel, publicEnumLabel } from "../presentation";
+import { formatPublicCount, publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",

@@ -9,7 +9,7 @@ import "@fontsource/source-serif-4/latin-ext-600.css";
 import "@fontsource/source-serif-4/latin-ext-700.css";
 import "@fontsource/ibm-plex-mono/latin-ext-400.css";
 import "@fontsource/ibm-plex-mono/latin-ext-500.css";
-import { App } from "./App";
+import { App } from "./app/App";
 import "./index.css";
 
 const container = document.getElementById("root");

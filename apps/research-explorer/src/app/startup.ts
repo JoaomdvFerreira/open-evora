@@ -1,4 +1,4 @@
-import { DataLoadError, type DataProvider, type ReadModelManifest } from "./dataProvider/types";
+import { DataLoadError, type DataProvider, type ReadModelManifest } from "../dataProvider/types";
 
 /**
  * The Explorer's startup sequence, extracted from React so it is testable as

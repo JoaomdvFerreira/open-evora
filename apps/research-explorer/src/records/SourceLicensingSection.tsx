@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { extractSourceLicensing, type SourceLicensing } from "./sourceView";
-import { publicEnumLabel } from "../presentation";
+import { publicEnumLabel } from "../presentation/presentation";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 
 interface LicensingRow {

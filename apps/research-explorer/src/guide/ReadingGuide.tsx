@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { describeType, knownTypePrefixes } from "../typeGlossary";
+import { describeType, knownTypePrefixes } from "../presentation/typeGlossary";
 
 interface ReadingGuideProps {
   /** manifest.schemaPrefixes — the types actually present in the loaded corpus, so a future schema-conforming type appears here automatically with no code change. Falls back to the known-type list if the manifest isn't loaded yet. */

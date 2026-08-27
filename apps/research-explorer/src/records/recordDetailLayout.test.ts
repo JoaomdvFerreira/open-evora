@@ -13,7 +13,7 @@ import path from "node:path";
  * holds, rather than asserting any pixel position (which the implementation
  * contract explicitly asks unit tests not to do).
  */
-const CSS_PATH = path.join(__dirname, "index.css");
+const CSS_PATH = path.join(__dirname, "..", "index.css");
 
 function ruleBodiesFor(css: string, selector: string): string[] {
   const bodies: string[] = [];
@@ -39,7 +39,7 @@ function hasWidthCap(body: string): boolean {
 
 describe("record-detail layout (shell-frame ownership, UX-C)", () => {
   it("RecordDetailContent's top-level wrapper carries shell-frame, the single owner of the 980px outer frame", () => {
-    const source = readFileSync(path.join(__dirname, "records", "RecordDetailPanel.tsx"), "utf-8");
+    const source = readFileSync(path.join(__dirname, "RecordDetailPanel.tsx"), "utf-8");
     expect(source).toMatch(/className="record-detail-layout shell-frame"/);
   });
 
@@ -105,7 +105,7 @@ describe("Source View 'Nesta fonte' index responsive contract (SUI-03J2B, reuses
   }
 
   it("no JS viewport detection is used to drive this visibility (window.innerWidth/matchMedia/resize) in RecordDetailPanel", () => {
-    const source = readFileSync(path.join(__dirname, "records", "RecordDetailPanel.tsx"), "utf-8");
+    const source = readFileSync(path.join(__dirname, "RecordDetailPanel.tsx"), "utf-8");
     expect(source).not.toMatch(/window\.innerWidth/);
     expect(source).not.toMatch(/matchMedia/);
     expect(source).not.toMatch(/addEventListener\(\s*["']resize["']/);
@@ -189,7 +189,7 @@ describe("Source View 'Abrir fonte original' responsive contract (SUI-03K3)", ()
   }
 
   it("no JS viewport detection is used to drive this visibility (window.innerWidth/matchMedia/resize) in RecordDetailPanel", () => {
-    const source = readFileSync(path.join(__dirname, "records", "RecordDetailPanel.tsx"), "utf-8");
+    const source = readFileSync(path.join(__dirname, "RecordDetailPanel.tsx"), "utf-8");
     expect(source).not.toMatch(/window\.innerWidth/);
     expect(source).not.toMatch(/matchMedia/);
     expect(source).not.toMatch(/addEventListener\(\s*["']resize["']/);
@@ -326,20 +326,20 @@ describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K
   });
 
   it("2. SourceFindingsSection group h4 headings use .record-editorial-subheading", () => {
-    const source = readFileSync(path.join(__dirname, "records", "SourceFindingsSection.tsx"), "utf-8");
+    const source = readFileSync(path.join(__dirname, "SourceFindingsSection.tsx"), "utf-8");
     expect(source).toMatch(/<h4 className="record-editorial-subheading">Observações com esta fonte de proveniência<\/h4>/);
   });
 
   it("3+4. SourceInvestigationSection 'Problemas relacionados' uses .record-editorial-subheading as an h4 under the h3 'Na investigação' section", () => {
-    const source = readFileSync(path.join(__dirname, "records", "SourceInvestigationSection.tsx"), "utf-8");
+    const source = readFileSync(path.join(__dirname, "SourceInvestigationSection.tsx"), "utf-8");
     expect(source).toMatch(/<h4 className="record-editorial-subheading">Problemas relacionados<\/h4>/);
     expect(source).toMatch(/<h3 className="detail-panel-label">Na investigação<\/h3>/);
   });
 
   it("7. no Source top-level h3 (.detail-panel-label) receives the nested-heading class", () => {
     expect(css).not.toMatch(/\.detail-panel-label[^{]*\.record-editorial-subheading/);
-    const findingsSource = readFileSync(path.join(__dirname, "records", "SourceFindingsSection.tsx"), "utf-8");
-    const investigationSource = readFileSync(path.join(__dirname, "records", "SourceInvestigationSection.tsx"), "utf-8");
+    const findingsSource = readFileSync(path.join(__dirname, "SourceFindingsSection.tsx"), "utf-8");
+    const investigationSource = readFileSync(path.join(__dirname, "SourceInvestigationSection.tsx"), "utf-8");
     expect(findingsSource).not.toMatch(/<h3 className="[^"]*record-editorial-subheading/);
     expect(investigationSource).not.toMatch(/<h3 className="[^"]*record-editorial-subheading/);
   });

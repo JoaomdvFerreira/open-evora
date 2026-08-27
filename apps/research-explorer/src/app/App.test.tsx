@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
-import { DataLoadError, type DataProvider, type ReadModelManifest } from "./dataProvider/types";
+import { DataLoadError, type DataProvider, type ReadModelManifest } from "../dataProvider/types";
 
 const manifest: ReadModelManifest = {
   readModelVersion: "1.0.0",

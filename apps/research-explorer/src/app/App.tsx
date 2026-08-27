@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import type { DataProvider } from "./dataProvider/types";
-import { StaticDataProvider } from "./dataProvider/StaticDataProvider";
+import type { DataProvider } from "../dataProvider/types";
+import { StaticDataProvider } from "../dataProvider/StaticDataProvider";
 import { loadExplorerStartupState, type ExplorerStartupState } from "./startup";
 import { Explorer } from "./Explorer";
-import { formatPublicCount, formatPublicDateTime } from "./presentation";
+import { formatPublicCount, formatPublicDateTime } from "../presentation/presentation";
 
 const defaultProvider: DataProvider = new StaticDataProvider();
 

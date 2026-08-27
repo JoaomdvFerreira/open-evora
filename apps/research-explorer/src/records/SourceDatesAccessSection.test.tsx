@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { SourceDatesAccessSection } from "./SourceDatesAccessSection";
-import { formatPublicPartialDate } from "../presentation";
+import { formatPublicPartialDate } from "../presentation/presentation";
 
 /** Mirrors research/sources/SRC-0093.yaml exactly (matches sourceView.test.ts's fixture). */
 const SRC_0093: Record<string, unknown> = {

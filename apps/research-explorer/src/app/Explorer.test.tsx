@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Explorer } from "./Explorer";
-import { StaticDataProvider } from "./dataProvider/StaticDataProvider";
-import type { DataProvider, RecordDetail, RecordSummary } from "./dataProvider/types";
+import { StaticDataProvider } from "../dataProvider/StaticDataProvider";
+import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 
 const INDEX: RecordSummary[] = [
   { id: "PRB-0005", type: "PRB-", label: "Pressão de estacionamento com uma descrição…", file: "research/problems/PRB-0005.yaml", summaryFields: { status: "OPEN" } },

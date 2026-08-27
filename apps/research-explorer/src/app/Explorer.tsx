@@ -1,11 +1,11 @@
 import { Suspense, lazy, useEffect } from "react";
-import type { DataProvider } from "./dataProvider/types";
-import { useExplorerUrlState } from "./useExplorerUrlState";
-import { Overview } from "./overview/Overview";
-import { RecordsExplorer } from "./records/RecordsExplorer";
-import { ProblemView } from "./problem/ProblemView";
-import { ReadingGuide } from "./guide/ReadingGuide";
-import { useUnavailableNote } from "./UnavailableNote";
+import type { DataProvider } from "../dataProvider/types";
+import { useExplorerUrlState } from "../navigation/useExplorerUrlState";
+import { Overview } from "../overview/Overview";
+import { RecordsExplorer } from "../records/RecordsExplorer";
+import { ProblemView } from "../problem/ProblemView";
+import { ReadingGuide } from "../guide/ReadingGuide";
+import { useUnavailableNote } from "../presentation/UnavailableNote";
 
 // RE-05: lazily imported, not just GraphCanvas's Sigma module inside it —
 // GraphExplorer's own module graph (Graphology + buildGraphModel/neighbourhood/
@@ -13,7 +13,7 @@ import { useUnavailableNote } from "./UnavailableNote";
 // by this static import alone, even though nothing in it ever runs before the
 // Graph view is opened. Measured: ~17 KB gzip moved out of the initial chunk
 // into its own lazy chunk by this change alone (see RE-05 closure report).
-const GraphExplorer = lazy(() => import("./graph/GraphExplorer").then((m) => ({ default: m.GraphExplorer })));
+const GraphExplorer = lazy(() => import("../graph/GraphExplorer").then((m) => ({ default: m.GraphExplorer })));
 
 interface ExplorerProps {
   dataProvider: DataProvider;

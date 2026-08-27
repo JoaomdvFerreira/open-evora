@@ -1,4 +1,4 @@
-import { useUnavailableNote } from "./UnavailableNote";
+import { useUnavailableNote } from "../presentation/UnavailableNote";
 
 export type ContextTabsActive = "detail" | "problem" | "graph";
 
