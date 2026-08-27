@@ -67,7 +67,7 @@ function update(id: string, yaml = sourceYaml(id, "Updated")) {
   return { recordFamily: "SRC-", id, action: "UPDATE" as const, targetFile: `sources/${id}.yaml`, yaml };
 }
 
-test("matching HEAD, clean repository, and valid CREATE promotes exact approved bytes", () => {
+test("a valid canonical target passes platform-neutral containment and promotes exact approved bytes", () => {
   const current = fixture();
   try {
     const operation = create("SRC-CREATED", sourceYaml("SRC-CREATED", "Exact approved"));
@@ -142,6 +142,25 @@ test("tampered targets, duplicate targets, and mismatched YAML IDs are rejected"
     assert.throws(() => applyCanonicalIntegrationPlan(current.research, plan(current.head(), [{ ...update("SRC-BASE"), targetFile: "sources/not-base.yaml" }])), /target does not match/);
     assert.throws(() => applyCanonicalIntegrationPlan(current.research, plan(current.head(), [create("SRC-ONE"), { ...create("SRC-TWO"), targetFile: "sources/SRC-ONE.yaml" }])), /duplicate write target/);
     assert.throws(() => applyCanonicalIntegrationPlan(current.research, plan(current.head(), [create("SRC-ID", sourceYaml("SRC-OTHER"))])), /canonical ID/);
+  } finally { current.cleanup(); }
+});
+
+test("unsupported runtime operation action is rejected before canonical writes", () => {
+  const current = fixture();
+  try {
+    const before = readFileSync(join(current.research, "sources", "SRC-BASE.yaml"));
+    const invalid = plan(current.head(), [create("SRC-DELETE")]) as unknown as {
+      deltas: Array<{ action: string }>;
+      operations: Array<{ action: string }>;
+    };
+    invalid.deltas[0]!.action = "DELETE";
+    invalid.operations[0]!.action = "DELETE";
+    assert.throws(
+      () => applyCanonicalIntegrationPlan(current.research, invalid as unknown as CanonicalIntegrationPlan),
+      /unsupported canonical integration operation action: DELETE/
+    );
+    assert.deepEqual(readFileSync(join(current.research, "sources", "SRC-BASE.yaml")), before);
+    assert.equal(existsSync(join(current.research, "sources", "SRC-DELETE.yaml")), false);
   } finally { current.cleanup(); }
 });
 

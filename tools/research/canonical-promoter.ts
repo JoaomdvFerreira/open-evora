@@ -6,7 +6,7 @@
  * the plan supplied by the caller without interpreting candidate research.
  */
 import { cpSync, existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
-import { join, posix as path, resolve } from "node:path";
+import { isAbsolute, join, posix as path, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 
@@ -116,6 +116,9 @@ function prepareWrites(researchRoot: string, plan: CanonicalIntegrationPlan): Pr
   const writes: PreparedWrite[] = [];
 
   plan.operations.forEach((operation, position) => {
+    if (operation.action !== "CREATE" && operation.action !== "UPDATE" && operation.action !== "NO_CHANGE") {
+      throw new CanonicalIntegrationPromotionError(`unsupported canonical integration operation action: ${String(operation.action)}`);
+    }
     const delta = plan.deltas[position];
     if (!delta || delta.recordFamily !== operation.recordFamily || delta.id !== operation.id || delta.action !== operation.action) {
       throw new CanonicalIntegrationPromotionError("plan deltas and operations must have matching deterministic identities/actions");
@@ -149,7 +152,13 @@ function prepareWrites(researchRoot: string, plan: CanonicalIntegrationPlan): Pr
 
     const targetPath = resolve(researchRoot, ...write.targetFile.split("/"));
     const schemaDirectory = resolve(researchRoot, ...recordIndex.schema.directory.split("/"));
-    if (!targetPath.startsWith(`${schemaDirectory}\\`) && targetPath !== schemaDirectory) {
+    const fromSchemaDirectory = relative(schemaDirectory, targetPath);
+    if (
+      fromSchemaDirectory === ""
+      || fromSchemaDirectory === ".."
+      || fromSchemaDirectory.startsWith(`..${sep}`)
+      || isAbsolute(fromSchemaDirectory)
+    ) {
       throw new CanonicalIntegrationPromotionError(`write target escapes schema directory: ${write.targetFile}`);
     }
     if (operation.action === "CREATE" ? existsSync(targetPath) : !existsSync(targetPath)) {
