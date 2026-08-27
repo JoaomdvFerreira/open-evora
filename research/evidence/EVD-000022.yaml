@@ -11,10 +11,10 @@ observation:
 scope:
   geography:
     level: city
-    area: strategic city locations / Historic Centre project context
+    area: strategic cidade locations / Centro Histórico project context
   populations:
     - municipal mobility management
-    - potential data consumers
+    - potenciais utilizadores de dados
   temporal:
     as_of: 2026-08-10
 domains:

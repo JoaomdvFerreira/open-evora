@@ -18,7 +18,7 @@ scope:
     level: local_area
     area: zonas-piloto e zonas de controlo do SFpark, São Francisco, Califórnia, EUA
   populations:
-    - drivers
+    - condutores
   temporal:
     status: unknown
 domains:

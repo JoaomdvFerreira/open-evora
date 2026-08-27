@@ -17,10 +17,10 @@ observation:
 scope:
   geography:
     level: municipality
-    area: city / municipality
+    area: cidade / município
   populations:
-    - urban public-transport users
-    - residents of lower-demand settlements
+    - urbana transporte público utilizadores
+    - residentes de lower-demand settlements
   temporal:
     start: "2022"
     end: "2023"
@@ -29,7 +29,7 @@ domains:
 evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
-  - A Evidence é histórica e pertence à mesma família institucional de
+  - A Evidência é histórica e pertence à mesma família institucional de
     relatórios municipais, não constituindo uma voz independente adicional.
   - Os relatórios de 2022-2023 não estabelecem a severidade atual por linha ou
     corredor em 2026.

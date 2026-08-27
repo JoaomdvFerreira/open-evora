@@ -15,7 +15,7 @@ scope:
   populations:
     - citizens
     - planners
-    - potential developers/data consumers
+    - potenciais promotores/utilizadores de dados
   temporal:
     status: unknown
 domains:

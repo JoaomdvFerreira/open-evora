@@ -1,14 +1,14 @@
 source_id: SRC-0044
-publisher: "Évora 2027"
-name: "Évora 2027 — Programação"
+publisher: Évora 2027
+name: Évora 2027 — Programação
 resource_type: webpage
 scope:
   geography:
     level: regional
-    area: "Alentejo"
+    area: Alentejo
   domains:
-    - "CUL"
-    - "PUB"
+    - CUL
+    - PUB
 access:
   level: public
   availability: available
@@ -17,10 +17,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.evora2027.com/programacao"
+canonical_reference: https://www.evora2027.com/programacao
 licensing:
   status: unknown
   reuse: unknown
 temporal:
   updated_at: "2026"
-  last_checked_at: "2026-08-25"
+  last_checked_at: 2026-08-25

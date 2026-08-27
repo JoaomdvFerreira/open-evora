@@ -19,7 +19,7 @@ scope:
     level: city
     area: Évora
   populations:
-    - drivers
+    - condutores
   temporal:
     as_of: 2026-08-12
 domains:

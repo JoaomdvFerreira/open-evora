@@ -72,7 +72,7 @@ Prefer discovery, documentation, supported reuse, and federation before local re
 Apply four checks before integrating Evidence:
 
 1. **Observation** — what is directly supported?
-2. **Provenance** — which Source or governed direct engagement supports it?
+2. **Provenance** — which canonical Source supports it? Governed direct engagement must first be represented by a sanitised canonical Source; it is never cited directly as Evidence provenance.
 3. **Scope** — for which place, population, and time does it apply?
 4. **Inference limit** — what does it not establish?
 

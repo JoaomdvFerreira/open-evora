@@ -14,7 +14,7 @@ scope:
     level: city
     area: Bairro de Nª Srª da Saúde / ponte do Xarrama / Bairro de Santa Luzia
   populations:
-    - pedestrians
+    - peões
     - cyclists
   temporal:
     as_of: 2025-03-21

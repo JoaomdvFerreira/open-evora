@@ -13,7 +13,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - residents and visitors seeking cultural/event information
+    - residentes e visitantes à procura de informação cultural/sobre eventos
   temporal:
     as_of: "2026"
 domains:

@@ -31,12 +31,6 @@ function uniqueIds(ids: (string | undefined)[]): string[] {
   return [...new Set(ids.filter((id): id is string => typeof id === "string"))];
 }
 
-function incomingIdsByFieldAndType(detail: RecordDetail, field: string, type: string, lookup: Map<string, RecordSummary>): string[] {
-  return uniqueIds(
-    detail.incomingEdges.filter((edge) => edge.field === field && lookup.get(edge.from ?? "")?.type === type).map((edge) => edge.from)
-  );
-}
-
 function outgoingIdsByType(detail: RecordDetail, type: string, lookup: Map<string, RecordSummary>): string[] {
   return uniqueIds(detail.outgoingEdges.filter((edge) => lookup.get(edge.to ?? "")?.type === type).map((edge) => edge.to));
 }
@@ -44,8 +38,7 @@ function outgoingIdsByType(detail: RecordDetail, type: string, lookup: Map<strin
 /**
  * Loads and assembles the full Problem projection for one PRB-* ID.
  * Fetches: the problem itself, its linked evidence (both the problem's own
- * outgoing `evidence` list and any EVD- pointing back at it via
- * `analysis.related_problems`, unioned/deduplicated), and each evidence
+ * outgoing `evidence` list, and each evidence
  * item's own linked sources (SRC-). All independent fetches run in parallel.
  */
 export async function loadProblemProjection(
@@ -55,10 +48,7 @@ export async function loadProblemProjection(
 ): Promise<ProblemProjection> {
   const problem = await provider.getRecord(problemId);
 
-  const evidenceIds = uniqueIds([
-    ...outgoingIdsByType(problem, "EVD-", lookup),
-    ...incomingIdsByFieldAndType(problem, "analysis.related_problems", "EVD-", lookup),
-  ]);
+  const evidenceIds = outgoingIdsByType(problem, "EVD-", lookup);
 
   const evidenceDetails = await Promise.all(evidenceIds.map((id) => provider.getRecord(id)));
 

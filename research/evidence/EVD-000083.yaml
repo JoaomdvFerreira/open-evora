@@ -15,8 +15,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - residents
-    - drivers
+    - residentes
+    - condutores
   temporal:
     as_of: 2026-02
 domains:

@@ -9,10 +9,10 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora city
+    area: Évora cidade
   populations:
-    - people with disabilities
-    - cultural-programme visitors and residents
+    - pessoas com deficiência
+    - programa cultural visitantes e residentes
   temporal:
     as_of: 2026-05
 domains:

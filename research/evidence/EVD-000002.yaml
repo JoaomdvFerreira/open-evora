@@ -15,10 +15,10 @@ observation:
 scope:
   geography:
     level: municipality
-    area: city / municipality
+    area: cidade / município
   populations:
-    - urban public-transport users
-    - residents of lower-demand settlements
+    - urbana transporte público utilizadores
+    - residentes de lower-demand settlements
   temporal:
     as_of: "2025"
 domains:

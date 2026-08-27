@@ -1,14 +1,15 @@
 source_id: SRC-0089
-publisher: "Universidade de Évora"
-name: "PlaQuaR — mecanismo regional de alinhamento entre formação e necessidades dos empregadores"
+publisher: Universidade de Évora
+name: PlaQuaR — mecanismo regional de alinhamento entre formação e necessidades
+  dos empregadores
 resource_type: webpage
 scope:
   geography:
     level: regional
-    area: "Alentejo"
+    area: Alentejo
   domains:
-    - "EMP"
-    - "EDU"
+    - EMP
+    - EDU
 access:
   level: public
   availability: available
@@ -17,9 +18,9 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.uevora.pt/ue-media/noticias?item=43736"
+canonical_reference: https://www.uevora.pt/ue-media/noticias?item=43736
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-11"
+  last_checked_at: 2026-08-11

@@ -15,7 +15,7 @@ scope:
   populations:
     - employers
     - training/education providers
-    - workers and job seekers
+    - trabalhadores e pessoas à procura de emprego
   temporal:
     status: unknown
 domains:

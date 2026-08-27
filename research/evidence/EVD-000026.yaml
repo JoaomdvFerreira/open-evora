@@ -10,7 +10,7 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora urban network
+    area: Évora urbana rede
   populations:
     - TREVO passengers
   temporal:

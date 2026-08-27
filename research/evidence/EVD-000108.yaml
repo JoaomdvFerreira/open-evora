@@ -5,7 +5,7 @@ provenance:
     - SRC-0095
   extracted_at: 2026-08-11
 observation:
-  summary: O portal do Havant Borough Council apresenta estados operacionais da
+  summary: O portal do Havant Distrito Conselho apresenta estados operacionais da
     recolha, datas de recolha reagendada e problemas registados pela equipa e
     condiciona a comunicação de um contentor não recolhido ao estado registado
     para a recolha.
@@ -14,7 +14,7 @@ scope:
     level: municipality
     area: Havant, Reino Unido
   populations:
-    - residents
+    - residentes
   temporal:
     status: unknown
 domains:
@@ -24,7 +24,7 @@ domains:
 evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
-  - A Observation descreve o desenho e funcionamento do serviço, não um efeito
+  - A Observação descreve o desenho e funcionamento do serviço, não um efeito
     medido sobre fiabilidade, reclamações ou satisfação.
   - O contexto de Havant não estabelece que o mesmo mecanismo produza resultados
     equivalentes em Évora.

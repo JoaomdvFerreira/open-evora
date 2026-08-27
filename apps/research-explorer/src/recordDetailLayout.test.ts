@@ -327,7 +327,7 @@ describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K
 
   it("2. SourceFindingsSection group h4 headings use .record-editorial-subheading", () => {
     const source = readFileSync(path.join(__dirname, "records", "SourceFindingsSection.tsx"), "utf-8");
-    expect(source).toMatch(/<h4 className="record-editorial-subheading">\{heading\}<\/h4>/);
+    expect(source).toMatch(/<h4 className="record-editorial-subheading">Observações com esta fonte de proveniência<\/h4>/);
   });
 
   it("3+4. SourceInvestigationSection 'Problemas relacionados' uses .record-editorial-subheading as an h4 under the h3 'Na investigação' section", () => {

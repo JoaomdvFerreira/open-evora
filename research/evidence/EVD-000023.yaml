@@ -11,9 +11,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora urban network
+    area: Évora urbana rede
   populations:
-    - urban transport passengers
+    - urbana transport passengers
   temporal:
     as_of: "2025"
 domains:

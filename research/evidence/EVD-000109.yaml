@@ -5,19 +5,20 @@ provenance:
     - SRC-0096
   extracted_at: 2026-08-11
 observation:
-  summary: O Oxford City Council afirma que as comunicações dos residentes sobre
-    contentores não recolhidos são verificadas com base num sistema de registo
-    em tempo real instalado nos veículos de recolha, distinguindo uma recolha
-    efetivamente falhada de uma ocorrência já registada pela equipa ou de outro
-    motivo para a não recolha — o mecanismo de comunicação de ocorrências pelos
-    residentes está integrado com dados operacionais de recolha, em vez de
-    constituir uma fila separada de reclamações não verificadas.
+  summary: O Oxford cidade Conselho afirma que as comunicações dos residentes
+    sobre contentores não recolhidos são verificadas com base num sistema de
+    registo em tempo real instalado nos veículos de recolha, distinguindo uma
+    recolha efetivamente falhada de uma ocorrência já registada pela equipa ou
+    de outro motivo para a não recolha — o mecanismo de comunicação de
+    ocorrências pelos residentes está integrado com dados operacionais de
+    recolha, em vez de constituir uma fila separada de reclamações não
+    verificadas.
 scope:
   geography:
     level: municipality
     area: Oxford, Reino Unido
   populations:
-    - residents
+    - residentes
   temporal:
     status: unknown
 domains:
@@ -29,5 +30,4 @@ claim_authority: authoritative
 inference_limits:
   - A Source descreve um padrão operacional de integração entre pedidos e dados
     da recolha, não um efeito medido.
-  - A Observation não estabelece que Évora possua ou necessite do mesmo
-    mecanismo.
+  - A Observação não estabelece que Évora possua ou necessite do mesmo mecanismo.

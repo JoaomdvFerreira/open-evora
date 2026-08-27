@@ -1,14 +1,14 @@
 source_id: SRC-0049
-publisher: "Município de Évora"
-name: "Guia da Semana"
+publisher: Município de Évora
+name: Guia da Semana
 resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "CUL"
-    - "PUB"
+    - CUL
+    - PUB
 access:
   level: public
   availability: available
@@ -17,11 +17,11 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/municipe/agenda-e-noticias/media-center/guia-da-semana/"
+canonical_reference: https://www.cm-evora.pt/municipe/agenda-e-noticias/media-center/guia-da-semana/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
   updated_at: "2026"
-  last_checked_at: "2026-08-11"
+  last_checked_at: 2026-08-11
   update_frequency: weekly

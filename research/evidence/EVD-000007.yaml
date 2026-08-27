@@ -13,11 +13,11 @@ observation:
 scope:
   geography:
     level: city
-    area: city / Historic Centre
+    area: cidade / Centro Histórico
   populations:
-    - pedestrians
-    - residents
-    - road users
+    - peões
+    - residentes
+    - road utilizadores
   temporal:
     status: unknown
 domains:

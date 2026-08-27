@@ -7,18 +7,18 @@ provenance:
 observation:
   summary: O diagnóstico de mobilidade do PUE identifica descontinuidades,
     infraestruturas pedonais subdimensionadas e numerosas barreiras
-    arquitetónicas e urbanísticas na cidade, incluindo condicionantes relevantes
-    para pessoas com mobilidade reduzida.
+    arquitetónicas e urbanaísticas na cidade, incluindo condicionantes
+    relevantes para pessoas com mobilidade reduzida.
 scope:
   geography:
     level: city
-    area: city, especially outside and within access to the Historic Centre
+    area: cidade, especialmente no exterior e no interior do Centro Histórico
   populations:
-    - pedestrians
-    - people with disabilities
-    - older people
-    - children
-    - people using pushchairs
+    - peões
+    - pessoas com deficiência
+    - pessoas idosas
+    - crianças
+    - pessoas que utilizam carrinhos de bebé
   temporal:
     status: unknown
 domains:

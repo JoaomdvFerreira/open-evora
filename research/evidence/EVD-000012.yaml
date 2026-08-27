@@ -12,9 +12,9 @@ observation:
 scope:
   geography:
     level: city
-    area: city and surrounding urban structure
+    area: cidade e envolvente urbana estrutura
   populations:
-    - formal participants in the 2026 PUE process
+    - participantes formais no processo PUE de 2026
   temporal:
     as_of: "2026"
 domains:

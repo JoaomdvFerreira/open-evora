@@ -13,7 +13,7 @@ scope:
     level: municipality
     area: Lisboa
   populations:
-    - residents
+    - residentes
   temporal:
     status: unknown
 domains:

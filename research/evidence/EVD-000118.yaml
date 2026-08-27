@@ -16,7 +16,7 @@ scope:
     level: city
     area: Évora
   populations:
-    - current and potential cyclists
+    - ciclistas atuais e potenciais
   temporal:
     as_of: "2020"
 domains:

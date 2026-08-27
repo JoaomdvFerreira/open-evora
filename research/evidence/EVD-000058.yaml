@@ -15,8 +15,8 @@ scope:
     area: Município de Évora
   populations:
     - event organisers
-    - municipal cultural staff
-    - event/agenda users
+    - equipas culturais municipais
+    - event/agenda utilizadores
   temporal:
     as_of: 2026-08-11
 domains:

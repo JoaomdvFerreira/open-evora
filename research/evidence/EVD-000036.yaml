@@ -12,8 +12,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - residents seeking social support
-    - social/institutional actors
+    - residentes à procura de apoio social
+    - agentes sociais/institucionais
   temporal:
     status: unknown
 domains:

@@ -14,7 +14,7 @@ observation:
 scope:
   geography:
     level: municipality
-    area: Évora city, especially Historic Centre
+    area: Évora cidade, especialmente Centro Histórico
   populations:
     - students
   temporal:

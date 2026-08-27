@@ -14,7 +14,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - people needing mental-health support
+    - pessoas que necessitam de apoio de saúde mental
   temporal:
     status: unknown
 domains:

@@ -11,9 +11,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora city
+    area: Évora cidade
   populations:
-    - residents and interested entities participating in the PUE process
+    - residentes e entidades interessadas participantes no processo PUE
   temporal:
     as_of: 2026-06
 domains:

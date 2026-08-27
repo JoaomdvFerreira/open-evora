@@ -5,16 +5,16 @@ provenance:
     - SRC-0097
   extracted_at: 2026-08-11
 observation:
-  summary: O North Norfolk District Council publica uma lista de locais onde uma
-    recolha prevista não foi efetuada e indica que os residentes de zonas já
+  summary: O Norfolk do Norte Distrito Conselho publica uma lista de locais onde
+    uma recolha prevista não foi efetuada e indica que os residentes de zonas já
     identificadas como afetadas não necessitam de apresentar uma comunicação
     individual sobre essa ocorrência.
 scope:
   geography:
     level: municipality
-    area: North Norfolk, Reino Unido
+    area: Norfolk do Norte, Reino Unido
   populations:
-    - residents
+    - residentes
   temporal:
     status: unknown
 domains:
@@ -26,4 +26,5 @@ claim_authority: authoritative
 inference_limits:
   - A publicação proativa de estados não contém uma medição do efeito sobre
     reclamações, satisfação ou fiabilidade do serviço.
-  - O contexto de North Norfolk não estabelece resultados equivalentes em Évora.
+  - O contexto de Norfolk do Norte não estabelece resultados equivalentes em
+    Évora.

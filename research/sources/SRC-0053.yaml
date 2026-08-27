@@ -1,14 +1,14 @@
 source_id: SRC-0053
-publisher: "Município de Évora"
-name: "Resposta estrutural municipal de higiene urbana — julho/agosto de 2026"
+publisher: Município de Évora
+name: Resposta estrutural municipal de higiene urbana — julho/agosto de 2026
 resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "ENV"
-    - "PUB"
+    - ENV
+    - PUB
 access:
   level: public
   availability: available
@@ -17,10 +17,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/camara-municipal-de-evora-reforca-resposta-estrutural-para-melhorar-a-limpeza-urbana-no-concelho/"
+canonical_reference: https://www.cm-evora.pt/camara-municipal-de-evora-reforca-resposta-estrutural-para-melhorar-a-limpeza-urbana-no-concelho/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2026-07"
-  last_checked_at: "2026-08-11"
+  published_at: 2026-07
+  last_checked_at: 2026-08-11

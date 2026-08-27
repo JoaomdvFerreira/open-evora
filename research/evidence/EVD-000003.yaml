@@ -10,9 +10,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora city
+    area: Évora cidade
   populations:
-    - urban bus users
+    - urbana bus utilizadores
   temporal:
     as_of: "2025"
 domains:

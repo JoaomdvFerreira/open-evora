@@ -14,8 +14,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - residents
-    - urban parish councils
+    - residentes
+    - urbana parish councils
   temporal:
     start: 2026-07
     end: 2026-08

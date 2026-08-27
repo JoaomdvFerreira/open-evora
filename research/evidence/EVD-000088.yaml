@@ -15,8 +15,8 @@ scope:
     level: city
     area: Évora
   populations:
-    - people with disabilities
-    - visitors and residents
+    - pessoas com deficiência
+    - visitantes e residentes
   temporal:
     status: unknown
 domains:

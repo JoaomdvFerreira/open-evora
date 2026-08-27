@@ -12,7 +12,7 @@ observation:
 scope:
   geography:
     level: intermunicipal
-    area: Município de Évora (TPAC/TPF coverage figure)
+    area: Município de Évora (TPAC/TPF valor de cobertura)
   populations:
     - population served by TPAC/TPF
   temporal:

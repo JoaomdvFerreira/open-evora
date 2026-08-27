@@ -1,14 +1,15 @@
 source_id: SRC-0061
-publisher: "Município de Évora"
-name: "Comunicado — recolha de resíduos sólidos urbanos — perturbação do serviço, fevereiro de 2026"
+publisher: Município de Évora
+name: Comunicado — recolha de resíduos sólidos urbanos — perturbação do serviço,
+  fevereiro de 2026
 resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "ENV"
-    - "PUB"
+    - ENV
+    - PUB
 access:
   level: public
   availability: available
@@ -17,10 +18,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/comunicado-recolha-de-residuos-solidos-urbanos/"
+canonical_reference: https://www.cm-evora.pt/comunicado-recolha-de-residuos-solidos-urbanos/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2026-02"
-  last_checked_at: "2026-08-11"
+  published_at: 2026-02
+  last_checked_at: 2026-08-11

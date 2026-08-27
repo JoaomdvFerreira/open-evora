@@ -15,7 +15,7 @@ scope:
     area: Município de Évora
   populations:
     - students
-    - residents seeking adequate/affordable housing
+    - residentes à procura de adequate/affordable housing
   temporal:
     status: unknown
 domains:
@@ -26,5 +26,5 @@ claim_authority: non_authoritative
 inference_limits:
   - Os valores são mediados por imprensa e a metodologia subjacente não está
     estabelecida neste registo.
-  - A Observation não constitui uma medição representativa dos preços, da
-    procura ou da população estudantil do Município.
+  - A Observação não constitui uma medição representativa dos preços, da procura
+    ou da população estudantil do Município.

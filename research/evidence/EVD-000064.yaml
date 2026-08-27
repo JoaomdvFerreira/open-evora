@@ -14,8 +14,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - residents
-    - vulnerable populations
+    - residentes
+    - populações vulneráveis
   temporal:
     status: unknown
 domains:
@@ -25,7 +25,7 @@ domains:
 evidence_nature: claim
 claim_authority: authoritative
 inference_limits:
-  - A Observation descreve consequências projetadas e não outcomes observados no
-    período atual.
+  - A Observação descreve consequências projetadas e não resultados observados
+    no período atual.
   - A Source não permite, neste registo, fixar com segurança o horizonte
     temporal específico das projeções.

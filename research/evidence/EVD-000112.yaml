@@ -14,9 +14,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora city — public space
+    area: Évora cidade — espaço público
   populations:
-    - people with reduced mobility
+    - pessoas com mobilidade reduzida
   temporal:
     as_of: 2026-08-12
 domains:
@@ -25,6 +25,6 @@ domains:
 evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
-  - A Observation descreve o método e a governação do trabalho da APCE; não
+  - A Observação descreve o método e a governação do trabalho da APCE; não
     estabelece prevalência de barreiras, cobertura territorial nem confirmação
     independente pela Câmara Municipal.

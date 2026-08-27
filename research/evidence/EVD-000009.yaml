@@ -15,10 +15,10 @@ observation:
 scope:
   geography:
     level: city
-    area: city / Historic Centre and other centralities
+    area: cidade / Centro Histórico e outras centralidades
   populations:
-    - people with reduced mobility
-    - the wider pedestrian population
+    - pessoas com mobilidade reduzida
+    - o wider pedestrian population
   temporal:
     as_of: "2022"
 domains:

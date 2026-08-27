@@ -13,7 +13,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - cartography/data requesters (professionals, institutions, general public)
+    - pessoas que solicitam cartografia/dados (profissionais, instituições,
+      público em geral)
   temporal:
     as_of: 2020-12
 domains:

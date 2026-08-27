@@ -11,9 +11,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora city
+    area: Évora cidade
   populations:
-    - people with reduced mobility
+    - pessoas com mobilidade reduzida
   temporal:
     as_of: 2026-08-12
 domains:
@@ -25,4 +25,4 @@ inference_limits:
   - A resposta não fornece inventário por localização, discriminação entre
     situações corrigidas e pendentes nem datas que permitam estabelecer o estado
     atual das barreiras.
-  - A Observation não estabelece prevalência à escala da cidade.
+  - A Observação não estabelece prevalência à escala da cidade.

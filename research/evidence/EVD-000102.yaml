@@ -16,7 +16,7 @@ scope:
   populations:
     - training/education providers
     - employers
-    - workers and job seekers
+    - trabalhadores e pessoas à procura de emprego
   temporal:
     status: unknown
 domains:
@@ -26,4 +26,4 @@ evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
   - A conceção/desenvolvimento do PlaQuaR não estabelece cobertura efetiva,
-    utilização, outcomes ou suficiência do mecanismo na região.
+    utilização, resultados ou suficiência do mecanismo na região.

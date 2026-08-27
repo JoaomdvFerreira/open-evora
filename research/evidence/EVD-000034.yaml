@@ -14,7 +14,7 @@ scope:
     area: Município de Évora
   populations:
     - informal caregivers
-    - cared-for people
+    - cared-para pessoas
   temporal:
     as_of: "2025"
 domains:

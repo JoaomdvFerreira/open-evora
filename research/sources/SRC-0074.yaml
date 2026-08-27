@@ -1,14 +1,15 @@
 source_id: SRC-0074
-publisher: "APCE"
-name: "Publicação da APCE no Facebook — continuidade da verificação de acessibilidade dos equipamentos culturais municipais"
+publisher: APCE
+name: Publicação da APCE no Facebook — continuidade da verificação de
+  acessibilidade dos equipamentos culturais municipais
 resource_type: webpage
 scope:
   geography:
     level: city
-    area: "Évora"
+    area: Évora
   domains:
-    - "ACC"
-    - "CUL"
+    - ACC
+    - CUL
 access:
   level: public
   availability: available
@@ -17,10 +18,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.facebook.com/apcevora/posts/1305263874975704/"
+canonical_reference: https://www.facebook.com/apcevora/posts/1305263874975704/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2025-10"
-  last_checked_at: "2026-08-11"
+  published_at: 2025-10
+  last_checked_at: 2026-08-11

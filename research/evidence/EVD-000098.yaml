@@ -12,9 +12,9 @@ observation:
 scope:
   geography:
     level: municipality
-    area: Évora — near a school
+    area: Évora — perto de uma escola
   populations:
-    - residents
+    - residentes
   temporal:
     as_of: 2026-08
 domains:

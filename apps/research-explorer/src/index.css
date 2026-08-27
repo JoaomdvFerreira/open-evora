@@ -545,13 +545,13 @@ code {
    CONTRADICTS, shares identical border weight/padding/background/font size.
    Never give any one value structural or colour emphasis over another.
    V3: restated on V1 tokens/IBM Plex Mono per Prototype B's chip anatomy. */
-.contribution-chip-wrap {
+.effect-chip-wrap {
   position: relative;
   display: inline-flex;
   margin-right: var(--space-2);
 }
 
-.contribution-chip {
+.effect-chip {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--line-emphasis);
@@ -563,15 +563,15 @@ code {
   font-size: 11px;
 }
 
-.contribution-chip code {
+.effect-chip code {
   background: none;
   padding: 0;
 }
 
-/* PI-02F3: contribution-label help — same visible-on-hover/focus tooltip
+/* PI-02F3: effect-label help — same visible-on-hover/focus tooltip
    pattern as .unavailable-note (UX-F), reused here so keyboard focus exposes
    the explanation exactly as pointer hover does. */
-.contribution-chip-note {
+.effect-chip-note {
   position: absolute;
   top: 100%;
   left: 50%;
@@ -592,8 +592,8 @@ code {
   transition: opacity 0.1s ease;
 }
 
-.contribution-chip-wrap:hover .contribution-chip-note,
-.contribution-chip:focus-visible ~ .contribution-chip-note {
+.effect-chip-wrap:hover .effect-chip-note,
+.effect-chip:focus-visible ~ .effect-chip-note {
   opacity: 1;
   visibility: visible;
 }
@@ -607,7 +607,7 @@ code {
   margin-bottom: var(--space-2);
 }
 
-.evidence-item-contributions {
+.evidence-item-effects {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
@@ -615,7 +615,7 @@ code {
 
 /* Contribution occurrence summary (REDUX-002) — a tally of already-explicit
    canonical values, explicitly labelled as occurrences, never a score. */
-.contribution-summary {
+.effect-summary {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: var(--surface-muted);
@@ -623,32 +623,32 @@ code {
   margin: 0 0 var(--space-4);
 }
 
-.contribution-summary-caption {
+.effect-summary-caption {
   color: var(--ink-faint);
   font-weight: 600;
   font-size: 11px;
   margin: 0 0 2px;
 }
 
-.contribution-summary-counts {
+.effect-summary-counts {
   color: var(--ink-faintest);
   font-size: 11px;
   margin: 0 0 var(--space-2);
 }
 
-.contribution-summary-chips {
+.effect-summary-chips {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-.contribution-summary-chip {
+.effect-summary-chip {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
 }
 
-.contribution-count {
+.effect-count {
   color: var(--ink-faintest);
   font-size: 11px;
 }
@@ -1752,7 +1752,7 @@ main.explorer-shell {
   gap: var(--space-3);
 }
 
-.detail-contribution-target {
+.detail-effect-target {
   color: var(--ink-faint);
   font-size: 13px;
 }

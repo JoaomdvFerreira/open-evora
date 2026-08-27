@@ -30,3 +30,21 @@ test("split, merge and nested PRB reference migrations leave no legacy EVD refer
   const prb1 = computeProblemAnalysis(index, "PRB-0001")!;
   assert.equal(prb1.linkedEvdCount, 9);
 });
+
+test("authored EVD and SRC prose has no known English migration residue", () => {
+  const index = loadCorpusIndex(root);
+  const authored: string[] = [];
+  for (const { fields } of index.byPrefix.get("EVD-")!.records) {
+    const observation = fields.observation as Record<string, unknown>;
+    const scope = fields.scope as Record<string, unknown>;
+    const geography = scope.geography as Record<string, unknown>;
+    authored.push(String(observation.summary ?? ""), String(geography.area ?? ""), ...((scope.populations as string[]) ?? []), ...((fields.inference_limits as string[]) ?? []));
+  }
+  for (const { fields } of index.byPrefix.get("SRC-")!.records) {
+    const scope = fields.scope as Record<string, unknown>;
+    const geography = scope.geography as Record<string, unknown>;
+    authored.push(String(geography.area ?? ""), ...((fields.caveats as string[]) ?? []));
+  }
+  const residue = /\b(people|residents|drivers|pedestrians|users|using|seeking|developers|consumers|vulnerable|accommodation|associations|sports|facilities|participants|surrounding|outside|within|parking|collection|council|connections)\b/i;
+  assert.deepEqual(authored.filter((value) => residue.test(value.replaceAll("Parking Buddy", ""))), []);
+});

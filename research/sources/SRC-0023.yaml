@@ -1,15 +1,16 @@
 source_id: SRC-0023
-publisher: "Município de Évora"
-name: "Laboratório Vivo para a Descarbonização de Évora — sensores de estacionamento e tráfego"
+publisher: Município de Évora
+name: Laboratório Vivo para a Descarbonização de Évora — sensores de
+  estacionamento e tráfego
 resource_type: webpage
 scope:
   geography:
     level: city
-    area: "Évora"
+    area: Évora
   domains:
-    - "MOB"
-    - "URB"
-    - "DIG"
+    - MOB
+    - URB
+    - DIG
 access:
   level: public
   availability: available
@@ -18,10 +19,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/laboratorio-vivo-para-a-descarbonizacao-de-evora-lvpde-parceiros-apresentam-atividades-e-planeiam-futuro/"
+canonical_reference: https://www.cm-evora.pt/laboratorio-vivo-para-a-descarbonizacao-de-evora-lvpde-parceiros-apresentam-atividades-e-planeiam-futuro/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  updated_at: "2023-05"
-  last_checked_at: "2026-08-25"
+  updated_at: 2023-05
+  last_checked_at: 2026-08-25

@@ -13,7 +13,7 @@ scope:
     area: Alentejo Central
   populations:
     - students
-    - young people
+    - pessoas jovens
   temporal:
     as_of: "2025"
 domains:

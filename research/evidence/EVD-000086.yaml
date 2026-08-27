@@ -11,9 +11,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora city — municipal cultural facilities
+    area: Évora cidade — equipamentos culturais municipais
   populations:
-    - people with disabilities
+    - pessoas com deficiência
   temporal:
     as_of: 2025-10
 domains:
@@ -25,5 +25,5 @@ inference_limits:
   - O estado de «verificação em curso» é histórico e foi posteriormente
     ultrapassado por uma comunicação de inventário concluído em dezembro de
     2025.
-  - A Observation não estabelece o estado atual das barreiras nem outcomes de
+  - A Observação não estabelece o estado atual das barreiras nem resultados de
     correção.

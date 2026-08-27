@@ -29,11 +29,11 @@ The three record types remain strictly separated by role:
 - **EVD** — observation extracted from that origin.
 - **PRB** — problem-level synthesis.
 
-A Source must not express what it proves, its evidential strength, its relevance to a Problem, or any research role. Those are EVD- and PRB-owned judgements.
+A Source must not express what it proves, its evidential strength, its relevance to a Problem, or any research role. Research roles are owned exclusively by PRB→EVD relationships.
 
-### 1.1 SRC v2 contract (frozen candidate)
+### 1.1 SRC v2 contract
 
-This section is the semantic authority for the frozen SRC v2 candidate. It documents the intended target contract for the Source record. It does not itself change `research/schemas/source.schema.json`, existing `SRC-*` records, or any executable validation; those remain governed by their own artifacts until a separate unit migrates them. Where this section and the current executable schema disagree, the disagreement is intentional and expected until that migration happens — see §1.5.
+This section is the semantic authority for the implemented SRC v2 contract. `research/schemas/source.schema.json` and deterministic validation implement its executable shape.
 
 #### Shape
 
@@ -182,13 +182,13 @@ Examples:
 - Publication governance (how/when the source itself was published or updated) is independent from both `access` and `licensing`.
 - `acquisition` records how Open Évora obtained the source (method and, where applicable, when). It does not record the surrounding engagement workflow, correspondence content, or process history.
 - `caveats[]` may contain only limitations or conditions of the source itself (e.g. incomplete coverage, self-reported data, known gaps). It must not contain research-process commentary.
-- The following do not belong in SRC, at any version: WU identifiers, batch identifiers, gates, research-process history, extracted observations, Problem-level conclusions, evidential-strength judgements, and research-role judgements (comparative/local/methodological). These remain EVD- and PRB-owned, per the SRC/EVD/PRB separation stated above.
+- The following do not belong in SRC, at any version: WU identifiers, batch identifiers, gates, research-process history, extracted observations, Problem-level conclusions, evidential-strength judgements, and PRB→EVD research-role judgements. Research roles remain owned exclusively by PRB→EVD relationships.
 - SRC v2 does not author `evidence_ids`. Future SRC → EVD navigation is derived from existing EVD → SRC references, not authored on the Source record.
-- Comparative/local/methodological research role stays outside SRC v2 and will be reviewed together with EVD's contract, not decided here.
+- Research roles are owned only by PRB→EVD relationships.
 
 #### 1.2 Fields retired from SRC v2
 
-The following fields exist in the current (v1) executable schema and current `SRC-*` records but do not belong in the SRC v2 contract:
+The following fields belonged to the pre-v2 executable schema and pre-v2 `SRC-*` corpus; they do not belong in the SRC v2 contract:
 
 - `authority` — expresses a trust/authority ranking; provenance (`publisher`/`creators`) is not the same as authority, per the boundary above.
 - `freshness.status` — a derived freshness judgement; factual publication/update/check dates remain, but the derived status does not.

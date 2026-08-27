@@ -12,8 +12,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - cultural sector actors
-    - residents with accessibility barriers
+    - agentes do setor cultural
+    - residentes com accessibility barriers
     - underrepresented population groups
   temporal:
     start: "2022"

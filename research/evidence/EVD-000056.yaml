@@ -13,7 +13,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - tourists and visitors
+    - tourists e visitantes
   temporal:
     status: unknown
 domains:

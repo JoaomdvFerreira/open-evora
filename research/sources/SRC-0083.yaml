@@ -1,14 +1,14 @@
 source_id: SRC-0083
-publisher: "O Digital"
-name: "O Digital — atuação contra deposição de resíduos verdes em Évora"
+publisher: O Digital
+name: O Digital — atuação contra deposição de resíduos verdes em Évora
 resource_type: webpage
 scope:
   geography:
     level: site
-    area: "Em frente à Escola Secundária Gabriel Pereira, Évora"
+    area: Em frente à Escola Secundária Gabriel Pereira, Évora
   domains:
-    - "ENV"
-    - "PUB"
+    - ENV
+    - PUB
 access:
   level: public
   availability: available
@@ -17,10 +17,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://odigital.sapo.pt/residuos-verdes-evora-contraordenacao/"
+canonical_reference: https://odigital.sapo.pt/residuos-verdes-evora-contraordenacao/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2026-08"
-  last_checked_at: "2026-08-11"
+  published_at: 2026-08
+  last_checked_at: 2026-08-11

@@ -22,7 +22,7 @@ domains:
 evidence_nature: claim
 claim_authority: authoritative
 inference_limits:
-  - A causa dos atrasos é atribuída pelo Município; a Observation não isola
+  - A causa dos atrasos é atribuída pelo Município; a Observação não isola
     causalmente a contribuição relativa do tráfego face a outros fatores
     operacionais.
 lineage_id: MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT

@@ -16,8 +16,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - residents, especially people dependent on public transport and rural/urban
-      connections
+    - residentes, especialmente pessoas dependentes de transporte público e
+      ligações entre zonas rurais e urbanas
   temporal:
     start: "2024"
     end: "2027"

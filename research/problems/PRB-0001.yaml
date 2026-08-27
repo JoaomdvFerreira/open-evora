@@ -145,7 +145,7 @@ decision_basis:
     utilizadores.
 
 
-    EVD-000024 documenta uma solução existente de transporte flexível para
+    EVD-000002 documenta uma solução existente de transporte flexível para
     locais identificados de baixa procura e não é deliberadamente utilizado como
     evidência da manifestação. Mostra que uma formulação mais forte de «ausência
     de serviço ou de resposta nos territórios de baixa procura» seria incorreta;
@@ -184,7 +184,7 @@ decision_basis:
 
 
     EVD-000011 (avaliação anual CIMAC/ATAC de 2026, SRC-0019) contribui como
-    CONFIRMA + REFINA ao nível intermunicipal: o conjunto de reclamações mostra
+    sustenta e refina a leitura ao nível intermunicipal: o conjunto de reclamações mostra
     que as comunicações relacionadas com horários constituem a maior categoria e
     que a experiência de acesso e espera é menos favorável do que a experiência
     a bordo. É tratado como contexto e refinamento coerente com a mesma
@@ -202,7 +202,7 @@ decision_basis:
     institucional independente adicional.
 
 
-    EVD-000024, que documenta transporte flexível existente em locais de baixa
+    EVD-000002, que documenta transporte flexível existente em locais de baixa
     procura, em conjunto com o crescimento da utilização (EVD-000023) e a ampla
     cobertura TPAC/TPF (EVD-000027), constitui evidência de limite e de estado
     atual que restringe a afirmação: mostra que a rede é materialmente
@@ -239,7 +239,7 @@ decision_basis:
 
 
       A existência de transporte flexível para locais de baixa procura
-      (EVD-000024) não é utilizada como evidência da manifestação do problema.
+      (EVD-000002) não é utilizada como evidência da manifestação do problema.
       Documenta uma resposta já existente e é considerada evidência que delimita
       a conclusão.
     evidence:
@@ -321,7 +321,7 @@ decision_basis:
 
 
       O crescimento da utilização da rede (EVD-000023), a cobertura territorial
-      ampla (EVD-000027) e a existência de transporte flexível (EVD-000024)
+      ampla (EVD-000027) e a existência de transporte flexível (EVD-000002)
       foram considerados como evidência que restringe uma leitura mais
       abrangente do problema. Estes elementos mostram que não estamos perante
       uma ausência generalizada de serviço, mas não demonstram que a variação da
@@ -371,7 +371,7 @@ decision_basis:
 
     EVD-000011 (SRC-0019, avaliação anual CIMAC/ATAC) provém de uma instituição
     materialmente distinta ao nível intermunicipal, mas a sua contribuição
-    canónica é de CONFIRMA + REFINA e de contexto, e não uma afirmação primária
+    canónica é de suporte, refinamento e contexto, e não uma afirmação primária
     e oficial autónoma sobre a variação entre serviço diurno, noturno, de fim de
     semana e de feriados na rede urbana. Uma fonte e linhagem distintas de
     SRC-0018 não tornam, por si só, esta evidência numa linha equivalente de
@@ -394,7 +394,7 @@ decision_basis:
     institucional, mantendo representatividade DESCONHECIDA.
 
 
-    EVD-000024 é totalmente excluído desta avaliação de independência: documenta
+    EVD-000002 é totalmente excluído desta avaliação de independência: documenta
     uma resposta existente de transporte flexível e funciona como evidência de
     limite e de estado atual, não como uma linha de corroboração da afirmação
     sobre a variação da utilidade do serviço.
@@ -462,7 +462,7 @@ decision_basis:
 
 
     O crescimento da utilização (EVD-000023), a ampla cobertura TPAC/TPF
-    (EVD-000027) e a existência de transporte flexível (EVD-000024) são
+    (EVD-000027) e a existência de transporte flexível (EVD-000002) são
     incluídos como evidência de limite e de estado atual que restringe a
     afirmação. Mostram que uma formulação mais forte de «ausência de serviço ou
     de resposta nos territórios de baixa procura» seria incorreta e que a lacuna
@@ -474,7 +474,7 @@ decision_basis:
     resolvida.
 
 
-    A contribuição canónica de EVD-000011 é CONFIRMA + REFINA e de contexto ao
+    O uso canónico de EVD-000011 é de suporte, refinamento e contexto ao
     nível intermunicipal. É mantido como contexto corroborativo da mesma
     afirmação de variação e não é tratado, por si só, como uma linha
     independente de suporte direto com igual peso, uma vez que uma fonte ou

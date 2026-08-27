@@ -19,7 +19,7 @@ scope:
     level: intermunicipal
     area: Alentejo Central
   populations:
-    - TPAC users
+    - TPAC utilizadores
   temporal:
     as_of: "2025"
 domains:

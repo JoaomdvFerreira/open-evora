@@ -4,7 +4,6 @@ import { useRecordDetail } from "./useRecordDetail";
 import { RecordFieldTree } from "./RecordFieldTree";
 import { describeType, formatTypedId, knownTypePrefixes } from "../typeGlossary";
 import { findMeaningField } from "./meaningField";
-import { ContributionChip } from "./ContributionChip";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation";
 import { ContextTabs } from "../ContextTabs";
 import { evidenceQuickRead, type QuickReadItem } from "./recordOrientation";
@@ -191,7 +190,7 @@ function PrbRelationsBoundary({ detail, lookup, onSelect }: { detail: RecordDeta
  * *not* this one never counts, even if it happens to resolve to a PRB-
  * record for some unrelated reason.
  */
-const PROBLEM_REFERENCE_FIELDS = ["analysis.related_problems"];
+const PROBLEM_REFERENCE_FIELDS = ["evidence"];
 
 /**
  * Finds a related Problem to offer a "Ver como Problema" action for — but
@@ -218,36 +217,23 @@ function findRelatedProblemId(detail: RecordDetail, lookup: Map<string, RecordSu
 }
 
 /**
- * The record's own `analysis.contribution` value(s), if this record type
+ * Historical relationship metadata is not read from individual records.
  * carries them (currently EVD- only) — rendered as the same uniform
- * ContributionChip used in Problem View (no exceptional emphasis for any
+ * effect chip used in Problem View (no exceptional emphasis for any
  * value, including CONTRADICTS), plus its related-Problem link, matching
- * Prototype A's meaning-zone contribution row.
+ * Prototype A's meaning-zone relationship row.
  */
-function contributionValues(record: Record<string, unknown>): string[] {
-  const analysis = record.analysis;
-  if (analysis === null || typeof analysis !== "object" || Array.isArray(analysis)) return [];
-  const contribution = (analysis as Record<string, unknown>).contribution;
-  if (typeof contribution === "string") return [contribution];
-  if (Array.isArray(contribution)) return contribution.filter((value): value is string => typeof value === "string");
-  return [];
-}
-
 /**
  * Approved Prototype A only pairs a relationship sentence with CONTRADICTS
  * ("desafia a leitura de [Problema] PRB-0006" — its own inline title attribute
  * spells out this is specifically a contradiction/contest of the Problem's
- * current reading). No neutral wording for any other canonical contribution
+ * current reading). No neutral wording for any other canonical effect
  * value appears in the approved reference or the prototype rationale, so
- * none is invented here: every other value renders its ContributionChip with
+ * none is invented here: every other value renders its effect chip with
  * no accompanying sentence, per the semantic-constraint rule (do not invent
  * missing canonical prose; the chip + relations elsewhere already surface
  * the relationship neutrally).
  */
-function contributionTargetSentence(value: string, relatedProblemId: string): string | null {
-  return value === "CONTRADICTS" ? `desafia a leitura de ${formatTypedId("PRB-", relatedProblemId)}` : null;
-}
-
 /**
  * SUI-02A: SRC-only public provenance-verification action, restored to SRC
  * v2 canonical eligibility semantics (`docs/datamodel.md` §1.1) — the
@@ -396,13 +382,11 @@ function Breadcrumb({ detail, onBackToRecords }: { detail: RecordDetail; onBackT
 /** TechnicalID / TypeBadge row above the meaning sentence. */
 function TypeBadge({ detail }: { detail: RecordDetail }) {
   const typeInfo = describeType(detail.type);
-  const kind = typeof detail.record.type === "string" ? detail.record.type : null;
   return (
     <div className="detail-type-row">
       <span className="detail-type-badge">
         <code>{detail.type}</code> {typeInfo.label}
       </span>
-      {kind && <span className="detail-type-kind">{kind}</span>}
     </div>
   );
 }
@@ -928,8 +912,6 @@ function RecordDetailContent({
   const isSrc = detail.type === "SRC-";
   const meaning = findMeaningField(detail.record);
   const typeInfo = describeType(detail.type);
-  const relatedProblemId = findRelatedProblemId(detail, lookup);
-  const contributions = contributionValues(detail.record);
   // SUI-03H2: the one SRC → EVD relation load/state owner for this rendered
   // SRC detail, shared by `SourceFindings` ("O que encontrámos") and
   // `SourceInvestigation` ("Na investigação") below — never a second
@@ -948,15 +930,15 @@ function RecordDetailContent({
   // Already-explicit, schema-driven classification/status fields (RE-01's
   // `buildSummaryFields()` — every enum-constrained field the record's own
   // schema declares), reused here rather than singling out any one
-  // record-type-specific field for special presentation. `analysis.contribution`
-  // is excluded: it already has its own authoritative rendering via
-  // ContributionChip above, so including it here would render it twice.
+  // record-type-specific field for special presentation. PRB→EVD effects
+  // are rendered in Problem View, so they are not duplicated in this row.
   // SUI-03K1: SRC never renders this generic chip row — its schema-declared
   // enum fields (acquisition.method, access.*, licensing.*, scope.geography.level,
   // …) are already presented via the dedicated Source View sections (Visão
   // geral, Cobertura, Datas e acesso, Licenciamento), so surfacing them again
   // here would be redundant and, at compact width, delay the Source content.
-  const roleFields = isSrc ? [] : Object.entries(lookup.get(detail.id)?.summaryFields ?? {}).filter(([field]) => field !== "analysis.contribution");
+  const roleFields = isSrc ? [] : Object.entries(lookup.get(detail.id)?.summaryFields ?? {});
+  const relatedProblemId = findRelatedProblemId(detail, lookup);
 
   return (
     <div className="record-detail-layout shell-frame">
@@ -985,17 +967,8 @@ function RecordDetailContent({
             ) : (
               <p className="record-meaning field-empty">{detail.id} — sem campo de significado canónico identificado para este tipo de registo.</p>
             )}
-            {(contributions.length > 0 || roleFields.length > 0) && (
+            {roleFields.length > 0 && (
               <div className="record-role-fields">
-                {contributions.map((value, index) => {
-                  const sentence = relatedProblemId ? contributionTargetSentence(value, relatedProblemId) : null;
-                  return (
-                    <span key={`${value}-${index}`}>
-                      <ContributionChip value={value} />
-                      {sentence && <span className="detail-contribution-target"> {sentence}</span>}
-                    </span>
-                  );
-                })}
                 {roleFields.map(([field, value]) => (
                   <span key={field} className="record-role-chip">
                     {publicFieldCaption(field)}: {publicEnumLabel(field, String(value))}

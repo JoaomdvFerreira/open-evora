@@ -14,9 +14,9 @@ scope:
     level: regional
     area: Alentejo
   populations:
-    - schools and students
-    - community and resident associations
-    - cultural and sports associations
+    - schools e students
+    - community e resident associações
+    - cultural e desportivas associações
     - multicultural communities
   temporal:
     as_of: "2026"

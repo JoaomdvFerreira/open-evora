@@ -11,8 +11,8 @@ scope:
     level: intermunicipal
     area: Alentejo Central
   populations:
-    - public-transport users
-    - developers/data consumers
+    - transporte público utilizadores
+    - promotores/utilizadores de dados
   temporal:
     as_of: "2025"
 domains:

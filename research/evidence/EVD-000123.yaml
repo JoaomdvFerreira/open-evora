@@ -15,10 +15,10 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora city
+    area: Évora cidade
   populations:
-    - public-transport users
-    - people with reduced mobility / sensory impairments
+    - transporte público utilizadores
+    - pessoas com mobilidade reduzida / sensory impairments
   temporal:
     status: unknown
 domains:

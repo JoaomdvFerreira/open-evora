@@ -11,9 +11,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora city
+    area: Évora cidade
   populations:
-    - current and potential cyclists
+    - ciclistas atuais e potenciais
   temporal:
     status: unknown
 domains:

@@ -1,14 +1,14 @@
 source_id: SRC-0111
 publisher: CIMAC
-name: "CIMAC — Cartografia e Sistemas de Informação Geográfica (página histórica)"
+name: CIMAC — Cartografia e Sistemas de Informação Geográfica (página histórica)
 resource_type: webpage
 scope:
   geography:
     level: intermunicipal
-    area: "Alentejo Central"
+    area: Alentejo Central
   domains:
-    - "GEO"
-    - "URB"
+    - GEO
+    - URB
 access:
   level: public
   availability: available
@@ -17,12 +17,13 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cimac.pt/cimac/info-a-tratar/unidade-de-ambiente-e-desenvolvimento/cartografia-e-sistemas-de-informacao-geografica/"
+canonical_reference: https://www.cimac.pt/cimac/info-a-tratar/unidade-de-ambiente-e-desenvolvimento/cartografia-e-sistemas-de-informacao-geografica/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
   published_at: "2020"
-  last_checked_at: "2026-08-25"
+  last_checked_at: 2026-08-25
 caveats:
-  - "Página descritiva datada de 2020; as datas de atualização das camadas referidas variam e devem ser verificadas por recurso."
+  - Página descritiva datada de 2020; as datas de atualização das camadas
+    referidas variam e devem ser verificadas por recurso.

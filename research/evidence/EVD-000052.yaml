@@ -14,9 +14,9 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - cultural sector actors
-    - residents
-    - visitors
+    - agentes do setor cultural
+    - residentes
+    - visitantes
   temporal:
     start: "2022"
     end: "2030"

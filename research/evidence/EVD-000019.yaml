@@ -17,9 +17,9 @@ scope:
     level: local_area
     area: zona sul de Évora — Rossio de S. Brás / Variante ao PITE
   populations:
-    - pedestrians
+    - peões
     - cyclists
-    - people with reduced mobility
+    - pessoas com mobilidade reduzida
   temporal:
     start: 2025-02-21
     end: 2026-05-28

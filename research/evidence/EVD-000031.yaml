@@ -15,7 +15,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - residents seeking adequate/affordable housing
+    - residentes à procura de adequate/affordable housing
   temporal:
     start: "2024"
     end: "2025"

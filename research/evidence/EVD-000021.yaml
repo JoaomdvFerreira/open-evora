@@ -10,9 +10,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Historic Centre / tariffed parking areas
+    area: Centro Histórico / zonas de estacionamento tarifado
   populations:
-    - drivers
+    - condutores
   temporal:
     as_of: 2026-08-10
 domains:

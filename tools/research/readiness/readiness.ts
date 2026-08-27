@@ -162,7 +162,6 @@ function byId(index: CorpusIndex, prefix: string): ReadonlyMap<string, RecordFie
 /**
  * Evidence is "linked to the target PRB" when its ID appears in that PRB's
  * own `evidence` list — the one existing, already-validated PRB<->EVD link.
- * This does not rely on EVD.analysis.related_problems, which stays
  * optional/lazily-populated and so cannot be relied on as a completeness
  * signal.
  */

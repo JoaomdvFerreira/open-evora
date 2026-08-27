@@ -17,7 +17,7 @@ scope:
   populations:
     - students
     - job seekers
-    - vulnerable groups seeking employment
+    - grupos vulneráveis à procura de emprego
   temporal:
     as_of: "2025"
 domains:

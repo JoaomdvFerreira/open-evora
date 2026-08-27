@@ -226,6 +226,7 @@ const PRB_RESEARCH_ROLES = new Set(["LOCAL_OBSERVATION", "CONTEXTUAL", "COMPARAT
 function validatePrbEvidenceRelations(file: string, record: RecordFields, errors: string[]): void {
   const evidence = record.evidence;
   if (!Array.isArray(evidence)) return;
+  const seenEvidenceIds = new Set<string>();
   for (const [i, entry] of evidence.entries()) {
     const field = `evidence[${i}]`;
     if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
@@ -233,13 +234,32 @@ function validatePrbEvidenceRelations(file: string, record: RecordFields, errors
     }
     const relation = entry as Record<string, unknown>;
     if (typeof relation.evidence_id !== "string" || relation.evidence_id.trim() === "") errors.push(`[${file}] missing required field: ${field}.evidence_id`);
+    else if (seenEvidenceIds.has(relation.evidence_id)) errors.push(`[${file}] duplicate PRB evidence relationship: ${relation.evidence_id}`);
+    else seenEvidenceIds.add(relation.evidence_id);
     for (const [name, allowed] of [["effects", PRB_EFFECTS], ["research_roles", PRB_RESEARCH_ROLES]] as const) {
       if (!Array.isArray(relation[name]) || relation[name].length === 0) {
         errors.push(`[${file}] missing required non-empty field: ${field}.${name}`); continue;
       }
-      for (const value of relation[name]) if (typeof value !== "string" || !allowed.has(value)) errors.push(`[${file}] field "${field}.${name}" has invalid value "${value}"`);
+      const seen = new Set<string>();
+      for (const value of relation[name]) {
+        if (typeof value !== "string" || !allowed.has(value)) errors.push(`[${file}] field "${field}.${name}" has invalid value "${value}"`);
+        else if (seen.has(value)) errors.push(`[${file}] field "${field}.${name}" contains duplicate value "${value}"`);
+        else seen.add(value);
+      }
     }
   }
+}
+
+function validateNestedPrbEvidenceMembership(file: string, record: RecordFields, errors: string[]): void {
+  const linked = new Set(
+    (Array.isArray(record.evidence) ? record.evidence : []).map((entry) => entry && typeof entry === "object" && !Array.isArray(entry) ? (entry as Record<string, unknown>).evidence_id : undefined).filter((id): id is string => typeof id === "string")
+  );
+  const paths = ["decision_basis.manifestation.evidence", "decision_basis.consequence.evidence", "decision_basis.currentness.evidence", "decision_basis.contradiction_search.evidence", "decision_basis.supporting_evidence", "decision_basis.boundary_evidence"];
+  for (const path of paths) for (const id of (getPath(record, path) as unknown[] | undefined) || []) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at ${path} is not linked in PRB.evidence`);
+  const investigation = record.investigation as Record<string, unknown> | undefined;
+  for (const item of Array.isArray(investigation?.open_questions) ? investigation.open_questions : []) for (const id of ((item as Record<string, unknown>)?.evidence as unknown[] || [])) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at investigation.open_questions is not linked in PRB.evidence`);
+  const path = investigation?.path as Record<string, unknown> | undefined;
+  for (const stage of INVESTIGATION_PATH_STAGES) for (const id of (((path?.[stage] as Record<string, unknown> | undefined)?.evidence as unknown[]) || [])) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at investigation.path.${stage} is not linked in PRB.evidence`);
 }
 
 /**
@@ -384,6 +404,7 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
       validateExclusiveFieldSets(file, fields, schema, errors);
       if (schema.prefix === "PRB-") {
         validatePrbEvidenceRelations(file, fields, errors);
+        validateNestedPrbEvidenceMembership(file, fields, errors);
         validateInvestigation(file, fields, evidenceById, errors);
       }
     }

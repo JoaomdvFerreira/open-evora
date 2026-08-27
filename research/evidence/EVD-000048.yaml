@@ -19,7 +19,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - students and recent graduates
+    - estudantes e diplomados recentes
     - employers
     - job seekers
   temporal:
@@ -31,6 +31,6 @@ domains:
 evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
-  - A existência de mecanismos de matching, emprego e formação não estabelece
-    cobertura, utilização, eficácia nem resolução do desajustamento de
-    competências.
+  - A existência de mecanismos de correspondência, emprego e formação não
+    estabelece cobertura, utilização, eficácia nem resolução do desajustamento
+    de competências.

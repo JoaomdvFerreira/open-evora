@@ -1,13 +1,13 @@
 source_id: SRC-0031
-publisher: "Município de Évora"
-name: "CLASE / Rede Social"
+publisher: Município de Évora
+name: CLASE / Rede Social
 resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "SOC"
+    - SOC
 access:
   level: public
   availability: available
@@ -16,9 +16,9 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/acao-social/rede-social-clase/clase/"
+canonical_reference: https://www.cm-evora.pt/municipe/areas-de-acao/acao-social/rede-social-clase/clase/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-10"
+  last_checked_at: 2026-08-10

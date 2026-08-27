@@ -14,7 +14,7 @@ scope:
     level: intermunicipal
     area: área de intervenção da Gesamb, incluindo o Município de Évora
   populations:
-    - residents
+    - residentes
   temporal:
     start: "2025"
     end: "2026"

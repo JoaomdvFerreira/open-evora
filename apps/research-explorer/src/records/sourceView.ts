@@ -205,7 +205,7 @@ export type SourceSectionPresenceMap = Record<SourceSectionId, SourceSectionPres
  * only) for any caller that hasn't loaded relation context yet.
  */
 export interface SourceSectionRelationContext {
-  /** Whether the Source Section presence model should treat `investigation` as present — true iff at least one PRB is explicitly reachable through a related EVD's `analysis.related_problems` edge. */
+  /** Whether the Source Section presence model should treat `investigation` as present — true iff at least one PRB explicitly uses a related EVD in `evidence[]`. */
   hasRelatedProblem: boolean;
 }
 

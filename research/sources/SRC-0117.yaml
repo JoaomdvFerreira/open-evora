@@ -1,13 +1,13 @@
 source_id: SRC-0117
 publisher: ULSAC
-name: "ULSAC — Psiquiatria e Saúde Mental"
+name: ULSAC — Psiquiatria e Saúde Mental
 resource_type: webpage
 scope:
   geography:
     level: non_geographic
   domains:
-    - "HEA"
-    - "SOC"
+    - HEA
+    - SOC
 access:
   level: public
   availability: available
@@ -16,10 +16,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.ulsac.min-saude.pt/2020/01/08/psiquiatria-e-saude-mental/"
+canonical_reference: https://www.ulsac.min-saude.pt/2020/01/08/psiquiatria-e-saude-mental/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2020-01-08"
-  last_checked_at: "2026-08-25"
+  published_at: 2020-01-08
+  last_checked_at: 2026-08-25

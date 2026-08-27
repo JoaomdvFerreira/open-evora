@@ -14,9 +14,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora Historic Centre
+    area: Évora Centro Histórico
   populations:
-    - people with disabilities
+    - pessoas com deficiência
   temporal:
     as_of: "2025"
 domains:

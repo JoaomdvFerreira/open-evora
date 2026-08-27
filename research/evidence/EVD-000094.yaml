@@ -12,7 +12,7 @@ scope:
     level: parish
     area: Canaviais, Évora
   populations:
-    - residents
+    - residentes
   temporal:
     status: unknown
 domains:

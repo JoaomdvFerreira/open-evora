@@ -1,14 +1,14 @@
 source_id: SRC-0085
-publisher: "Tribuna do Alentejo"
-name: "Tribuna do Alentejo — custos elevados de habitação afastam estudantes de Évora"
+publisher: Tribuna do Alentejo
+name: Tribuna do Alentejo — custos elevados de habitação afastam estudantes de Évora
 resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "HOU"
-    - "EDU"
+    - HOU
+    - EDU
 access:
   level: public
   availability: available
@@ -17,9 +17,9 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://tribunaalentejo.pt/artigos/habitacao-cara-afasta-estudantes-de-evora/"
+canonical_reference: https://tribunaalentejo.pt/artigos/habitacao-cara-afasta-estudantes-de-evora/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-11"
+  last_checked_at: 2026-08-11

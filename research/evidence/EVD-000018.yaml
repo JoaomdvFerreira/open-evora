@@ -10,11 +10,11 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora city (Historic Centre plus major access/exit axes)
+    area: Évora cidade (Centro Histórico e principais access/exit axes)
   populations:
-    - people with reduced mobility
-    - pedestrians
-    - potential accessibility-data consumers
+    - pessoas com mobilidade reduzida
+    - peões
+    - potenciais utilizadores de dados de acessibilidade
   temporal:
     as_of: "2022"
 domains:

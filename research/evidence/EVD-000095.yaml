@@ -12,7 +12,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - residents
+    - residentes
   temporal:
     as_of: 2026-05
 domains:
