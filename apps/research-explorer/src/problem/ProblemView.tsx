@@ -642,7 +642,7 @@ function EvidenceCard({ detail, sources, effects = [], onOpenGeneric }: Evidence
         />
         <span className="evidence-item-effects" aria-label="Efeito canónico no Problema">
           {relationshipEffects.length > 0 ? (
-            relationshipEffects.map((value, index) => <span key={`${value}-${index}`} className="effect-chip">{value === "CONTRADICTS" ? "Contradiz" : value === "SUPPORTS" ? "Sustenta" : value === "REFINES" ? "Refina" : "Delimita"}</span>)
+            relationshipEffects.map((value, index) => <span key={`${value}-${index}`} className="effect-chip">{publicEnumLabel("effects", value)}</span>)
           ) : (
             <span className="field-empty">efeito não registado.</span>
           )}

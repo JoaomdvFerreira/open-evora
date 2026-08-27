@@ -21,6 +21,8 @@ import { SOURCE_SECTION_ANCHOR_IDS, sourceSectionIndex } from "./sourceSectionIn
 import { toSourceSectionRelationContext } from "./sourceEvidenceRelations";
 import { SourceCompactSectionIndex } from "./SourceCompactSectionIndex";
 import type { SourceSectionRelationContext } from "./sourceView";
+import { EvdDetail, EvdReadingRail } from "./EvdDetail";
+import { useEvdProblemUses } from "./useEvdProblemUses";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -910,6 +912,7 @@ function RecordDetailContent({
 }) {
   const isPrb = detail.type === "PRB-";
   const isSrc = detail.type === "SRC-";
+  const isEvd = detail.type === "EVD-";
   const meaning = findMeaningField(detail.record);
   const typeInfo = describeType(detail.type);
   // SUI-03H2: the one SRC → EVD relation load/state owner for this rendered
@@ -919,6 +922,7 @@ function RecordDetailContent({
   // same detail. `sourceId` is `null` for non-SRC records, which is this
   // hook's own no-op contract (see `useSourceEvidenceRelations.ts`).
   const sourceRelationsState = useSourceEvidenceRelations(dataProvider, isSrc ? detail.id : null);
+  const evdProblemUses = useEvdProblemUses(dataProvider, isEvd ? detail.id : null);
   // SUI-03J2B: the one `toSourceSectionRelationContext` derivation shared by
   // both the desktop `SourceReadingRailIndex` and the compact
   // `SourceCompactSectionIndex` — resolved only once `sourceRelationsState`
@@ -950,6 +954,10 @@ function RecordDetailContent({
 
       <div className="record-detail-columns">
         <div className="record-detail-main">
+          {isEvd ? (
+            <EvdDetail detail={detail} lookup={lookup} problemUses={evdProblemUses} onSelect={onSelect} />
+          ) : (
+            <>
           <section aria-label="Significado" className="record-meaning-zone">
             <TypeBadge detail={detail} />
             {isPrb ? <PrbOrientationIntro /> : <OrientationIntro />}
@@ -1023,6 +1031,8 @@ function RecordDetailContent({
               </section>
             </>
           )}
+            </>
+          )}
         </div>
 
         <aside className="record-detail-rail" aria-label="Mais ações">
@@ -1030,9 +1040,10 @@ function RecordDetailContent({
             <code>{detail.type}</code>
             <p>{typeInfo.description}</p>
           </div>
+          {isEvd && <EvdReadingRail detail={detail} />}
           {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} variant="rail" />}
           {isSrc && <SourceReadingRailIndex record={detail.record} relationContext={sourceRelationContext} />}
-          {!isSrc && (
+          {!isSrc && !isEvd && (
             <div className="detail-rail-actions">
               {relatedProblemId && (
                 <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>

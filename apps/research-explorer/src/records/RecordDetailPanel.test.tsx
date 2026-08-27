@@ -21,7 +21,7 @@ const evd: RecordDetail = {
 const records: Record<string, RecordDetail> = {
   "EVD-1": evd,
   "SRC-1": { id: "SRC-1", type: "SRC-", file: "", record: { name: "Fonte" }, outgoingEdges: [], incomingEdges: [] },
-  "PRB-1": { id: "PRB-1", type: "PRB-", file: "", record: { title: "Problema" }, outgoingEdges: [], incomingEdges: [] },
+  "PRB-1": { id: "PRB-1", type: "PRB-", file: "", record: { title: "Problema", evidence: [{ evidence_id: "EVD-1", effects: ["SUPPORTS"], research_roles: ["LOCAL_OBSERVATION"] }] }, outgoingEdges: [], incomingEdges: [] },
 };
 const provider: DataProvider = { getManifest: async () => { throw Error("unused"); }, listRecords: async () => index, getEdges: async () => [], getRecord: async (id) => records[id] };
 const lookup = new Map(index.map((item) => [item.id, item]));
@@ -35,18 +35,18 @@ describe("RecordDetailPanel vNext", () => {
   it("renders bounded observation, scope, inference limits and provenance", async () => {
     renderDetail();
     expect((await screen.findAllByText("Observação delimitada.")).length).toBeGreaterThan(0);
-    expect(screen.getByText("Évora")).toBeTruthy();
-    expect(screen.getByText("pessoas residentes")).toBeTruthy();
-    expect(screen.getByText("Sem inferência adicional.")).toBeTruthy();
-    expect(screen.getByRole("button", { name: /SRC-1/ })).toBeTruthy();
+    expect(screen.getAllByText("Évora").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("pessoas residentes").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Sem inferência adicional.").length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "Fonte" })).toBeTruthy();
   });
 
   it("navigates to the resolved Source and incoming Problem relationship", async () => {
-    const { onSelect, onViewAsProblem } = renderDetail();
-    fireEvent.click(await screen.findByRole("button", { name: /SRC-1/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Ver como Problema \(PRB-1\)/ }));
+    const { onSelect } = renderDetail();
+    fireEvent.click(await screen.findByRole("button", { name: "Fonte" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Ver Problema →" }));
     expect(onSelect).toHaveBeenCalledWith("SRC-1");
-    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-1");
+    expect(onSelect).toHaveBeenCalledWith("PRB-1");
   });
 
   it("omits absent optional vNext fields without fabricating a value", async () => {

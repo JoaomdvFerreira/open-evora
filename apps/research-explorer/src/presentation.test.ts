@@ -24,6 +24,16 @@ describe("PT-PT public presentation terminology", () => {
     expect(publicEnumLabel("authority", "authoritative")).toBe("Com autoridade");
   });
 
+  it("maps EVD vNext relationship and claim-authority values centrally", () => {
+    expect(publicEnumLabel("claim_authority", "authoritative")).toBe("Com autoridade");
+    expect(publicEnumLabel("effects", "SUPPORTS")).toBe("Sustenta");
+    expect(publicEnumLabel("effects", "REFINES")).toBe("Refina");
+    expect(publicEnumLabel("effects", "BOUNDS")).toBe("Delimita");
+    expect(publicEnumLabel("effects", "CONTRADICTS")).toBe("Contradiz");
+    expect(publicEnumLabel("research_roles", "COMPARATIVE_MECHANISM")).toBe("Mecanismo comparativo");
+    expect(publicEnumLabel("research_roles", "PLANNED_RESPONSE")).toBe("Resposta planeada");
+  });
+
   it("keeps SUPERSEDED distinct from STALE", () => {
     expect(publicEnumLabel("analysis.temporal_relevance", "SUPERSEDED")).toBe("Substituída");
     expect(publicEnumLabel("freshness.status", "STALE")).toBe("Desatualizada");

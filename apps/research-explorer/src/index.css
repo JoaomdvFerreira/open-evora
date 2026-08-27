@@ -2116,6 +2116,10 @@ main.explorer-shell {
   display: none;
 }
 
+.evd-compact-section-index {
+  display: none;
+}
+
 /* SUI-03K3: "Abrir fonte original" desktop-rail copy vs. compact in-flow
    copy — same exclusive-visibility contract as the rail/compact index pair
    above (`.problem-reading-rail` / `.source-compact-section-index`). Both
@@ -2158,6 +2162,10 @@ main.explorer-shell {
   }
 
   .source-compact-section-index {
+    display: block;
+  }
+
+  .evd-compact-section-index {
     display: block;
   }
 
@@ -2631,6 +2639,40 @@ main.explorer-shell {
   margin-bottom: var(--space-3);
 }
 
+/* EVD Detail vNext reuses the established reading column, fact grid,
+   disclosure and rail; these rules only supply EVD-owned composition. */
+.evd-identity {
+  margin: 0 0 var(--space-6);
+  border: 1px solid var(--line-emphasis);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+}
+
+.evd-type-row, .evd-identity-facts, .evd-problem-heading, .evd-source-list li, .evd-relation-facts dd {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.evd-secondary-id { color: var(--ink-faintest); font-family: var(--recipe-technical-meta-family); font-size: 11px; }
+.evd-identity h1 { margin: var(--space-4) 0; color: var(--ink); font-family: var(--recipe-editorial-h1-family); font-size: var(--recipe-editorial-h1-size); font-weight: var(--recipe-editorial-h1-weight); line-height: var(--recipe-editorial-h1-line-height); }
+.evd-identity-facts { color: var(--ink-soft); font-size: 14px; }
+.evd-identity-facts b { color: var(--ink); }
+.evd-scope-grid small { display: block; margin-top: 2px; color: var(--ink-faintest); font-size: 12px; }
+.evd-limits { margin: 0; padding-left: var(--space-5); color: var(--ink); line-height: 1.6; }
+.evd-limits li + li { margin-top: var(--space-3); }
+.evd-problem-list, .evd-source-list { list-style: none; margin: 0; padding: 0; }
+.evd-problem-list { display: grid; gap: var(--space-4); }
+.evd-problem-card { border: 1px solid var(--line); border-radius: var(--radius-lg); padding: var(--space-4); }
+.evd-problem-heading code, .evd-source-list code { color: var(--ink-faintest); font-family: var(--recipe-technical-id-family); font-size: 12px; }
+.evd-problem-heading span { color: var(--ink); font-size: 14px; font-weight: 600; }
+.evd-relation-facts { display: grid; grid-template-columns: 60px 1fr; gap: var(--space-2) var(--space-3); margin: var(--space-4) 0; }
+.evd-relation-facts dt { color: var(--ink-faintest); font-family: var(--ui); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+.evd-relation-facts dd { margin: 0; }
+.evd-problem-action, .evd-source-list button { padding: 0; border: 0; background: none; color: var(--link); font: inherit; cursor: pointer; text-align: left; }
+.evd-extracted-at { margin: 0 0 var(--space-3); color: var(--ink-faint); font-size: 13px; }
+.evd-source-list { display: grid; gap: var(--space-2); }
+
 .problem-statement {
   max-width: none;
   margin: 0;
@@ -2925,6 +2967,14 @@ main.explorer-shell {
     padding: var(--space-4);
   }
 
+  .evd-identity {
+    padding: var(--space-4);
+  }
+
+  .evd-identity h1 {
+    font-size: var(--recipe-editorial-h1-size-compact);
+  }
+
   .problem-identity-title {
     font-size: var(--recipe-editorial-h1-size-compact);
   }
@@ -2934,6 +2984,10 @@ main.explorer-shell {
   }
 
   .source-compact-section-index {
+    display: block;
+  }
+
+  .evd-compact-section-index {
     display: block;
   }
 

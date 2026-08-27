@@ -1,0 +1,69 @@
+import fs from "node:fs";
+import path from "node:path";
+import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { EvdDetail } from "./EvdDetail";
+import type { RecordDetail, RecordSummary } from "../dataProvider/types";
+import type { EVDProblemUsesState } from "./useEvdProblemUses";
+import type { EVDProblemUse } from "./evdRelations";
+
+const GENERATED = path.resolve(__dirname, "..", "..", "generated", "record-detail");
+const hasGeneratedData = fs.existsSync(GENERATED);
+const detail = (id: string): RecordDetail => JSON.parse(fs.readFileSync(path.join(GENERATED, `${id}.json`), "utf8"));
+const ready = (uses: EVDProblemUse[]): EVDProblemUsesState & { retry: () => void } => ({ status: "ready", uses, retry: vi.fn() });
+const lookup = new Map<string, RecordSummary>([
+  ["SRC-0002", { id: "SRC-0002", type: "SRC-", label: "Plano de Desenvolvimento Social de Évora 2024-2027", file: "", summaryFields: {} }],
+  ["SRC-0093", { id: "SRC-0093", type: "SRC-", label: "Estudo OpenPark", file: "", summaryFields: {} }],
+]);
+
+describe.skipIf(!hasGeneratedData)("EVD Detail vNext — canonical regression cases", () => {
+  it("EVD-000001 renders observation, scope, limits, source navigation and extracted date", () => {
+    const onSelect = vi.fn(); const item = detail("EVD-000001");
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([])} onSelect={onSelect} />);
+    expect(screen.getByRole("heading", { name: (item.record.observation as Record<string, unknown>).summary as string })).toBeTruthy();
+    expect(screen.getAllByText("Município de Évora").length).toBeGreaterThan(0);
+    expect(screen.getByText("2024 — 2027")).toBeTruthy();
+    expect(screen.getAllByText((item.record.inference_limits as string[])[0]).length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole("button", { name: /Plano de Desenvolvimento Social/ }));
+    expect(onSelect).toHaveBeenCalledWith("SRC-0002");
+  });
+
+  it("EVD-000114 exposes direct-engagement facts and claim authority", () => {
+    const item = detail("EVD-000114");
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} />);
+    expect(screen.getAllByText("Facto").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Com autoridade").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("pessoas com deficiência").length).toBeGreaterThan(0);
+  });
+
+  it("EVD-000096 renders its multiple canonical Sources as peers and omits absent lineage", () => {
+    const item = detail("EVD-000096");
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} />);
+    expect(screen.getAllByText("SRC-0081").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("SRC-0053").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Linagem:/)).toBeNull();
+  });
+
+  it("EVD-000106 preserves comparative Seattle scope and shows only the PRB-owned mechanism role/effect", () => {
+    const item = detail("EVD-000106"); const problem = detail("PRB-0005"); const onSelect = vi.fn();
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([{ detail: problem, effects: ["REFINES"], researchRoles: ["COMPARATIVE_MECHANISM"], relationshipPath: "evidence[7]" }])} onSelect={onSelect} />);
+    expect(screen.getAllByText("Belltown, Seattle, Washington, EUA").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("O estudo não demonstra uma redução proporcional da distância total percorrida ou das emissões e não estabelece um efeito equivalente em Évora.").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Refina").length).toBeGreaterThan(0); expect(screen.getAllByText("Mecanismo comparativo").length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole("button", { name: "Ver Problema →" })); expect(onSelect).toHaveBeenCalledWith("PRB-0005");
+  });
+
+  it("EVD-000147 preserves month precision and the planned-response relationship", () => {
+    const item = detail("EVD-000147"); const problem = detail("PRB-0008");
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([{ detail: problem, effects: ["BOUNDS", "REFINES"], researchRoles: ["LOCAL_OBSERVATION", "PLANNED_RESPONSE"], relationshipPath: "evidence[5]" }])} onSelect={vi.fn()} />);
+    expect(screen.getByText("outubro de 2026")).toBeTruthy(); expect(screen.getByText("Resposta planeada")).toBeTruthy();
+  });
+
+  it("EVD-000012 supports independently rendered multiple Problem uses and keeps technical inspection available", () => {
+    const item = detail("EVD-000012"); const first = detail("PRB-0004"); const second = detail("PRB-0005");
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([{ detail: first, effects: ["REFINES"], researchRoles: ["LOCAL_OBSERVATION"], relationshipPath: "evidence[3]" }, { detail: second, effects: ["BOUNDS", "REFINES"], researchRoles: ["LOCAL_OBSERVATION", "EXISTING_RESPONSE"], relationshipPath: "evidence[5]" }])} onSelect={vi.fn()} />);
+    expect(screen.getAllByRole("button", { name: "Ver Problema →" })).toHaveLength(2);
+    expect(screen.getByText("Inspeção técnica completa")).toBeTruthy();
+    expect(screen.queryByText(/representativeness|analysis\./i)).toBeNull();
+  });
+});
