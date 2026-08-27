@@ -2642,7 +2642,7 @@ main.explorer-shell {
 /* EVD Detail vNext reuses the established reading column, fact grid,
    disclosure and rail; these rules only supply EVD-owned composition. */
 .evd-identity {
-  margin: 0 0 var(--space-6);
+  margin: 0 0 var(--space-8);
 }
 
 .evd-type-row, .evd-identity-facts, .evd-problem-heading, .evd-source-list li, .evd-relation-facts dd {
@@ -2968,7 +2968,7 @@ main.explorer-shell {
   }
 
   .evd-identity h1 {
-    font-size: var(--recipe-editorial-h1-size-compact);
+    font-size: var(--recipe-editorial-intro-size);
   }
 
   .problem-identity-title {
