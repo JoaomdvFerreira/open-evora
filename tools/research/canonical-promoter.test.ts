@@ -9,7 +9,11 @@ import {
   applyCanonicalIntegrationPlan,
   type CanonicalIntegrationPlan,
 } from "./index.ts";
-import { rollbackCanonicalPromotion } from "./canonical-promoter.ts";
+import {
+  applyCanonicalIntegrationPlanWithTestWriter,
+  CanonicalIntegrationPromotionError,
+  rollbackCanonicalPromotion,
+} from "./canonical-promoter.ts";
 
 
 function sourceYaml(id: string, name = "Synthetic source"): string {
@@ -170,6 +174,41 @@ test("a prospective staged validation failure leaves canonical files unchanged",
     const before = readFileSync(join(current.research, "sources", "SRC-BASE.yaml"));
     assert.throws(() => applyCanonicalIntegrationPlan(current.research, plan(current.head(), [update("SRC-BASE", "source_id: SRC-BASE\n")])), /would produce/);
     assert.deepEqual(readFileSync(join(current.research, "sources", "SRC-BASE.yaml")), before);
+  } finally { current.cleanup(); }
+});
+
+test("a write that mutates then throws rolls back itself and earlier writes", () => {
+  const current = fixture();
+  try {
+    const basePath = join(current.research, "sources", "SRC-BASE.yaml");
+    const unrelatedPath = join(current.research, "sources", "SRC-UNRELATED.yaml");
+    writeFileSync(unrelatedPath, sourceYaml("SRC-UNRELATED", "Unrelated"));
+    current.commit("add unrelated source");
+    const originalBase = readFileSync(basePath);
+    const originalUnrelated = readFileSync(unrelatedPath);
+    const failedCreate = create("SRC-FAILS");
+    let caught: unknown;
+    try {
+      applyCanonicalIntegrationPlanWithTestWriter(
+        current.research,
+        plan(current.head(), [update("SRC-BASE", sourceYaml("SRC-BASE", "Changed before failure")), failedCreate]),
+        (write) => {
+          if (write.action === "CREATE") {
+            writeFileSync(write.targetPath, write.yaml, { encoding: "utf8", flag: "wx" });
+            throw new Error("injected write failure after create");
+          }
+          writeFileSync(write.targetPath, write.yaml, "utf8");
+        }
+      );
+      assert.fail("the injected write failure should have thrown");
+    } catch (error) {
+      caught = error;
+    }
+    assert.ok(caught instanceof CanonicalIntegrationPromotionError);
+    assert.equal(caught.rollbackSucceeded, true);
+    assert.deepEqual(readFileSync(basePath), originalBase);
+    assert.equal(existsSync(join(current.research, failedCreate.targetFile)), false);
+    assert.deepEqual(readFileSync(unrelatedPath), originalUnrelated);
   } finally { current.cleanup(); }
 });
 

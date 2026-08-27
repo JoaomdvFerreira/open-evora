@@ -29,6 +29,8 @@ interface PreparedWrite extends CanonicalIntegrationWriteOperation {
   targetPath: string;
 }
 
+type PromotionWriter = (write: PreparedWrite) => void;
+
 /** The minimal local state needed to undo writes from one promotion attempt. */
 export interface CanonicalPromotionRollbackEntry {
   action: "CREATE" | "UPDATE";
@@ -174,11 +176,14 @@ function prepareWrites(researchRoot: string, plan: CanonicalIntegrationPlan): Pr
   return writes;
 }
 
+function writeApprovedPlanContent(write: PreparedWrite): void {
+  if (write.action === "CREATE") writeFileSync(write.targetPath, write.yaml, { encoding: "utf8", flag: "wx" });
+  else writeFileSync(write.targetPath, write.yaml, "utf8");
+}
+
 function applyWrites(writes: readonly PreparedWrite[], root: string): void {
   for (const write of writes) {
-    const targetPath = join(root, ...write.targetFile.split("/"));
-    if (write.action === "CREATE") writeFileSync(targetPath, write.yaml, { encoding: "utf8", flag: "wx" });
-    else writeFileSync(targetPath, write.yaml, "utf8");
+    writeApprovedPlanContent({ ...write, targetPath: join(root, ...write.targetFile.split("/")) });
   }
 }
 
@@ -207,7 +212,11 @@ function assertFinalBytes(writes: readonly PreparedWrite[]): void {
  * Applies only the supplied, externally human-approved Gate 1 plan. It makes
  * no Gate 1 decision, stores no approval, and performs no Git mutation.
  */
-export function applyCanonicalIntegrationPlan(researchRoot: string, plan: CanonicalIntegrationPlan): CanonicalIntegrationPromotionResult {
+function applyCanonicalIntegrationPlanWithWriter(
+  researchRoot: string,
+  plan: CanonicalIntegrationPlan,
+  writer: PromotionWriter
+): CanonicalIntegrationPromotionResult {
   const state = assertCanonicalRepositoryState(researchRoot, plan.baseGitSha);
   assertExistingCorpusValid(state.researchRoot);
   const writes = prepareWrites(state.researchRoot, plan);
@@ -235,9 +244,10 @@ export function applyCanonicalIntegrationPlan(researchRoot: string, plan: Canoni
     for (let index = 0; index < writes.length; index += 1) {
       const write = writes[index]!;
       const entry = rollbackEntries[index]!;
-      if (write.action === "CREATE") writeFileSync(write.targetPath, write.yaml, { encoding: "utf8", flag: "wx" });
-      else writeFileSync(write.targetPath, write.yaml, "utf8");
+      // Register before writing: a filesystem call may modify its target and
+      // still throw, so the in-flight operation must be eligible for rollback.
       touched.push(entry);
+      writer(write);
     }
     const postWriteValidation = validateResearchRoot(state.researchRoot);
     if (postWriteValidation.errors.length > 0) {
@@ -256,4 +266,18 @@ export function applyCanonicalIntegrationPlan(researchRoot: string, plan: Canoni
     const message = error instanceof Error ? error.message : "canonical promotion failed";
     throw new CanonicalIntegrationPromotionError(message, rollbackSucceeded);
   }
+}
+
+/** Applies the exact approved plan using the production filesystem writer. */
+export function applyCanonicalIntegrationPlan(researchRoot: string, plan: CanonicalIntegrationPlan): CanonicalIntegrationPromotionResult {
+  return applyCanonicalIntegrationPlanWithWriter(researchRoot, plan, writeApprovedPlanContent);
+}
+
+/** @internal Narrow deterministic seam for rollback regression tests only. */
+export function applyCanonicalIntegrationPlanWithTestWriter(
+  researchRoot: string,
+  plan: CanonicalIntegrationPlan,
+  writer: PromotionWriter
+): CanonicalIntegrationPromotionResult {
+  return applyCanonicalIntegrationPlanWithWriter(researchRoot, plan, writer);
 }
