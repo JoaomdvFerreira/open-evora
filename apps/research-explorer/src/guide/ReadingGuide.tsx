@@ -65,7 +65,7 @@ export function ReadingGuide({ schemaPrefixes }: ReadingGuideProps) {
       <h3>Entradas e Saídas</h3>
       <p>
         <strong>Saídas</strong> são referências que este registo faz a outros registos (ex.: um Problema que lista a sua Evidência).{" "}
-        <strong>Entradas</strong> são referências que outros registos fazem a este (ex.: uma Avaliação que aponta para o Problema que avalia).
+        <strong>Entradas</strong> são referências que outros registos fazem a este (ex.: uma Evidência que aponta para a Fonte de onde foi extraída).
       </p>
 
       <h3>Registos relacionados e caminhos de referência canónica</h3>

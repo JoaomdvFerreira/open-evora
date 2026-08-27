@@ -370,7 +370,7 @@ function TypeBadge({ detail }: { detail: RecordDetail }) {
 /**
  * UX-E §1: one concise, plain-language sentence orienting a first-time
  * visitor to Record Detail. TypeBadge already identifies the record kind
- * (Evidência/Fonte/Avaliação/etc.), so this sentence stays generic rather
+ * (Evidência/Fonte/Problema), so this sentence stays generic rather
  * than duplicating that per-type.
  */
 function OrientationIntro() {
