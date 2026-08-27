@@ -29,6 +29,8 @@ export type {
 } from "./readiness/readiness.ts";
 export { validateCorpusIndex, validateResearchRoot } from "./validation/validate.ts";
 export type { ValidationResult } from "./validation/validate.ts";
+export { classifyCandidateDelta } from "./candidate-delta.ts";
+export type { CandidateDelta, CandidateDeltaAction, CandidateRecord } from "./candidate-delta.ts";
 export type {
   CorpusIndex,
   ParsedRecord,
