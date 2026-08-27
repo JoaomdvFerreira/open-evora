@@ -12,7 +12,7 @@ import { spawnSync } from "node:child_process";
 
 import type { CanonicalIntegrationPlan, CanonicalIntegrationWriteOperation } from "./canonical-integration-plan.ts";
 import { loadCorpusIndex } from "../core/corpus.ts";
-import type { RecordFields } from "../core/types.ts";
+import { getRecordField } from "../core/record-fields.ts";
 import { parseRecordYaml } from "../core/yaml.ts";
 import { validateResearchRoot } from "../validation/validate.ts";
 import type { ValidationResult } from "../validation/validate.ts";
@@ -54,15 +54,6 @@ function runGit(repoPath: string, args: string[]): string {
     throw new CanonicalIntegrationPromotionError(`Git safety check failed: ${(result.stderr || result.error?.message || "unknown Git error").trim()}`);
   }
   return result.stdout.trim();
-}
-
-function getPath(fields: RecordFields, dotted: string): unknown {
-  let value: unknown = fields;
-  for (const part of dotted.split(".")) {
-    if (value === null || typeof value !== "object" || Array.isArray(value) || !(part in value)) return undefined;
-    value = (value as Record<string, unknown>)[part];
-  }
-  return value;
 }
 
 function isWithinDirectory(directory: string, target: string): boolean {
@@ -167,7 +158,7 @@ function prepareWrites(researchRoot: string, plan: CanonicalIntegrationPlan): Pr
       throw new CanonicalIntegrationPromotionError(`${operation.action} target has unexpected filesystem state: ${write.targetFile}`);
     }
     const fields = parseRecordYaml(write.yaml);
-    if (getPath(fields, recordIndex.schema.idField) !== operation.id) {
+    if (getRecordField(fields, recordIndex.schema.idField) !== operation.id) {
       throw new CanonicalIntegrationPromotionError(`write YAML canonical ID does not match operation ID: ${operation.id}`);
     }
     writes.push({ ...write, targetPath });

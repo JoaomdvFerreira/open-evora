@@ -18,6 +18,7 @@
  * known/missing counts, EVD analysis-field distributions, and the explicit
  * structural-gap detections.
  */
+import { getRecordField } from "../core/record-fields.ts";
 import type { CorpusIndex, RecordFields } from "../core/types.ts";
 
 export interface ProblemAnalysis {
@@ -40,17 +41,6 @@ export interface AnalysisResult {
   problemIds: string[];
   problems: Map<string, ProblemAnalysis>;
   gaps: string[];
-}
-
-function getPath(fields: RecordFields, dotted: string): unknown {
-  let cur: unknown = fields;
-  for (const part of dotted.split(".")) {
-    if (cur === null || typeof cur !== "object" || Array.isArray(cur) || !(part in cur)) {
-      return undefined;
-    }
-    cur = (cur as Record<string, unknown>)[part];
-  }
-  return cur;
 }
 
 function recordsOf(index: CorpusIndex, prefix: string): RecordFields[] {
@@ -88,7 +78,7 @@ export function computeProblemAnalysis(index: CorpusIndex, prbId: string): Probl
     .filter((e): e is RecordFields => e !== undefined);
 
   const lineageIds = linkedEvds
-    .map((e) => getPath(e, "lineage_id"))
+    .map((e) => getRecordField(e, "lineage_id"))
     .filter((v): v is string => typeof v === "string" && v.trim() !== "");
   const knownLineageCount = new Set(lineageIds).size;
   const missingLineageCount = linkedEvds.length - lineageIds.length;

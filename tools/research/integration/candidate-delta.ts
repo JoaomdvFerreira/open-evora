@@ -4,6 +4,7 @@
  * responsibility; this module only requires enough well-formed input to
  * identify the schema-declared record family and its canonical ID.
  */
+import { getRecordField } from "../core/record-fields.ts";
 import type { CorpusIndex, RecordFields } from "../core/types.ts";
 
 /** The only possible observations for a candidate relative to canonical state. */
@@ -22,17 +23,6 @@ export interface CandidateDelta {
   recordFamily: string;
   id: string;
   action: CandidateDeltaAction;
-}
-
-function getPath(fields: RecordFields, dotted: string): unknown {
-  let current: unknown = fields;
-  for (const part of dotted.split(".")) {
-    if (current === null || typeof current !== "object" || Array.isArray(current) || !(part in current)) {
-      return undefined;
-    }
-    current = (current as Record<string, unknown>)[part];
-  }
-  return current;
 }
 
 /**
@@ -88,7 +78,7 @@ export function classifyCandidateDelta(index: CorpusIndex, candidate: CandidateR
     throw new Error(`record family ${candidate.recordFamily} declares no usable idField`);
   }
 
-  const id = getPath(candidate.fields, recordIndex.schema.idField);
+  const id = getRecordField(candidate.fields, recordIndex.schema.idField);
   if (typeof id !== "string" || id.trim() === "") {
     throw new Error(`candidate record lacks a usable canonical ID at ${recordIndex.schema.idField}`);
   }
