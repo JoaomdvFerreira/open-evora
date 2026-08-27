@@ -10,7 +10,7 @@ import {
   type RecordIndex,
   type RecordSchema,
   validateCandidateSet,
-} from "./index.ts";
+} from "../index.ts";
 
 const SOURCE_SCHEMA: RecordSchema = {
   prefix: "SRC-",

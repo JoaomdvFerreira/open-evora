@@ -4,9 +4,9 @@
  * never approves, applies, or otherwise changes canonical research.
  */
 import { classifyCandidateDelta, type CandidateDelta, type CandidateRecord } from "./candidate-delta.ts";
-import type { CorpusIndex, RecordFields } from "./core/types.ts";
+import type { CorpusIndex, RecordFields } from "../core/types.ts";
 import { validateCandidateSet, type CandidateSetValidationResult } from "./prospective-validation.ts";
-import type { ValidationResult } from "./validation/validate.ts";
+import type { ValidationResult } from "../validation/validate.ts";
 
 /** Structural outcome for a prepared Gate 1 review unit, never a human decision. */
 export type CanonicalIntegrationReadiness = "READY_FOR_INTEGRATION_GATE" | "REVIEW_REQUIRED";

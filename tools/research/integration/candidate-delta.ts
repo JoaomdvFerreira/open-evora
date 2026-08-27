@@ -4,7 +4,7 @@
  * responsibility; this module only requires enough well-formed input to
  * identify the schema-declared record family and its canonical ID.
  */
-import type { CorpusIndex, RecordFields } from "./core/types.ts";
+import type { CorpusIndex, RecordFields } from "../core/types.ts";
 
 /** The only possible observations for a candidate relative to canonical state. */
 export type CandidateDeltaAction = "CREATE" | "UPDATE" | "NO_CHANGE";

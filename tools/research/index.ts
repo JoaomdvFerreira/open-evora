@@ -29,21 +29,21 @@ export type {
 } from "./readiness/readiness.ts";
 export { validateCorpusIndex, validateResearchRoot } from "./validation/validate.ts";
 export type { ValidationResult } from "./validation/validate.ts";
-export { classifyCandidateDelta } from "./candidate-delta.ts";
-export type { CandidateDelta, CandidateDeltaAction, CandidateRecord } from "./candidate-delta.ts";
-export { buildProspectiveCorpusIndex, validateCandidateSet } from "./prospective-validation.ts";
-export type { CandidateSetValidationResult, ProspectiveCorpusOverlay } from "./prospective-validation.ts";
-export { prepareCanonicalIntegrationReview } from "./canonical-integration-review.ts";
-export type { CanonicalIntegrationReadiness, CanonicalIntegrationReview } from "./canonical-integration-review.ts";
-export { prepareCanonicalIntegrationPlan } from "./canonical-integration-plan.ts";
+export { classifyCandidateDelta } from "./integration/candidate-delta.ts";
+export type { CandidateDelta, CandidateDeltaAction, CandidateRecord } from "./integration/candidate-delta.ts";
+export { buildProspectiveCorpusIndex, validateCandidateSet } from "./integration/prospective-validation.ts";
+export type { CandidateSetValidationResult, ProspectiveCorpusOverlay } from "./integration/prospective-validation.ts";
+export { prepareCanonicalIntegrationReview } from "./integration/canonical-integration-review.ts";
+export type { CanonicalIntegrationReadiness, CanonicalIntegrationReview } from "./integration/canonical-integration-review.ts";
+export { prepareCanonicalIntegrationPlan } from "./integration/canonical-integration-plan.ts";
 export type {
   CanonicalIntegrationPlan,
   CanonicalIntegrationNoChangeOperation,
   CanonicalIntegrationPlanOperation,
   CanonicalIntegrationWriteOperation,
-} from "./canonical-integration-plan.ts";
-export { applyCanonicalIntegrationPlan } from "./canonical-promoter.ts";
-export type { CanonicalIntegrationPromotionResult } from "./canonical-promoter.ts";
+} from "./integration/canonical-integration-plan.ts";
+export { applyCanonicalIntegrationPlan } from "./integration/canonical-promoter.ts";
+export type { CanonicalIntegrationPromotionResult } from "./integration/canonical-promoter.ts";
 export type {
   CorpusIndex,
   ParsedRecord,

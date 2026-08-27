@@ -6,8 +6,8 @@
  * every structural and cross-reference decision to validateCorpusIndex().
  */
 import { classifyCandidateDelta, type CandidateDelta, type CandidateRecord } from "./candidate-delta.ts";
-import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex } from "./core/types.ts";
-import { validateCorpusIndex, type ValidationResult } from "./validation/validate.ts";
+import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex } from "../core/types.ts";
+import { validateCorpusIndex, type ValidationResult } from "../validation/validate.ts";
 
 /** The prospective index and deterministic deltas used to construct it. */
 export interface ProspectiveCorpusOverlay {

@@ -6,8 +6,8 @@ import { posix as path } from "node:path";
 
 import type { CandidateDelta, CandidateRecord } from "./candidate-delta.ts";
 import type { CanonicalIntegrationReview } from "./canonical-integration-review.ts";
-import type { CorpusIndex, RecordFields, RecordIndex } from "./core/types.ts";
-import { stringifyRecordYaml } from "./core/yaml.ts";
+import type { CorpusIndex, RecordFields, RecordIndex } from "../core/types.ts";
+import { stringifyRecordYaml } from "../core/yaml.ts";
 import { validateCandidateSet } from "./prospective-validation.ts";
 
 /** One prospective canonical write, including its complete replacement content. */

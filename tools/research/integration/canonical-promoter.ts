@@ -11,11 +11,11 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 
 import type { CanonicalIntegrationPlan, CanonicalIntegrationWriteOperation } from "./canonical-integration-plan.ts";
-import { loadCorpusIndex } from "./core/corpus.ts";
-import type { RecordFields } from "./core/types.ts";
-import { parseRecordYaml } from "./core/yaml.ts";
-import { validateResearchRoot } from "./validation/validate.ts";
-import type { ValidationResult } from "./validation/validate.ts";
+import { loadCorpusIndex } from "../core/corpus.ts";
+import type { RecordFields } from "../core/types.ts";
+import { parseRecordYaml } from "../core/yaml.ts";
+import { validateResearchRoot } from "../validation/validate.ts";
+import type { ValidationResult } from "../validation/validate.ts";
 
 export interface CanonicalIntegrationPromotionResult {
   baseGitSha: string;
