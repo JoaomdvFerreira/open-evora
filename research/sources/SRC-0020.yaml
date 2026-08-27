@@ -1,14 +1,14 @@
 source_id: SRC-0020
-publisher: "TPAC / TAC - Transportes do Alentejo Central"
-name: "TPAC — site público de informação ao passageiro"
+publisher: TPAC / TAC - Transportes do Alentejo Central
+name: TPAC — site público de informação ao passageiro
 resource_type: service
 scope:
   geography:
     level: intermunicipal
-    area: "Alentejo Central"
+    area: Alentejo Central
   domains:
-    - "MOB"
-    - "DIG"
+    - MOB
+    - DIG
 access:
   level: public
   availability: available
@@ -17,9 +17,9 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.tpac.pt/"
+canonical_reference: https://www.tpac.pt/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-10"
+  last_checked_at: 2026-08-10

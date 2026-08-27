@@ -1,37 +1,26 @@
 evidence_id: EVD-000005
-type: institutional
-source:
-  source_id: SRC-0017
-  publisher: "Município de Évora"
-  title: "PUE Sector Report: Mobilidade"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-6_Mobilidade.pdf"
-  published_at: 2025-02
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "current and potential cyclists"
-domain:
-  - "MOB"
-  - "URB"
+lineage_id: MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT
+provenance:
+  sources:
+    - SRC-0017
+  extracted_at: 2026-08-10
 observation:
-  summary: "O relatório de mobilidade do PUE regista que a bicicleta representa aproximadamente 0,5 % das deslocações dos residentes no diagnóstico subjacente e descreve a rede ciclável como limitada em extensão, espacialmente descontínua e sem ligação a muitos equipamentos, serviços e zonas residenciais importantes. Entre as preocupações referidas pelos ciclistas contam-se a falta de infraestrutura dedicada, a velocidade dos veículos, o estado do pavimento e o comportamento dos condutores."
-evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Freshness caution: the numeric modal-share value originates in the underlying mobility diagnosis and should not be treated as a 2026 measurement."
-
-analysis:
-  related_problems:
-    - "PRB-0004"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "PHYSICAL"
-  lineage_id: "MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+  summary: O relatório de mobilidade do PUE descreve a rede ciclável como limitada
+    em extensão, espacialmente descontínua e sem ligação a vários equipamentos,
+    serviços e zonas residenciais relevantes.
+scope:
+  geography:
+    level: city
+    area: Évora cidade
+  populations:
+    - ciclistas atuais e potenciais
+  temporal:
+    status: unknown
+domains:
+  - MOB
+  - URB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - O diagnóstico da rede não estabelece a topologia nem o estado físico atual
+    da rede em 2026.

@@ -1,14 +1,14 @@
 source_id: SRC-0034
-publisher: "Município de Évora"
-name: "Parque de Indústria Aeronáutica de Évora"
+publisher: Município de Évora
+name: Parque de Indústria Aeronáutica de Évora
 resource_type: webpage
 scope:
   geography:
     level: site
-    area: "Parque de Indústria Aeronáutica de Évora"
+    area: Parque de Indústria Aeronáutica de Évora
   domains:
-    - "ECO"
-    - "EMP"
+    - ECO
+    - EMP
 access:
   level: public
   availability: available
@@ -17,9 +17,9 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/locais/parque-de-industria-aeronautica-de-evora/"
+canonical_reference: https://www.cm-evora.pt/locais/parque-de-industria-aeronautica-de-evora/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-25"
+  last_checked_at: 2026-08-25

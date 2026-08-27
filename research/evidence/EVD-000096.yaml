@@ -1,40 +1,30 @@
 evidence_id: EVD-000096
-type: press
-source:
-  source_id: SRC-0081
-  publisher: "O Digital"
-  title: "News report: Évora parish councils clarify urban-hygiene competencies"
-  source_reference: "https://odigital.sapo.pt/juntas-freguesia-evora-esclarecem-competencias-limpeza-urbana/"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0053"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-  - "urban parish councils"
-domain:
-  - "ENV"
-  - "PUB"
+provenance:
+  sources:
+    - SRC-0081
+    - SRC-0053
+  extracted_at: 2026-08-11
 observation:
-  summary: "Após a descentralização, entre julho e agosto de 2026, das responsabilidades de higiene para as juntas de freguesia urbanas (SRC-0053), notícias de imprensa mostram as juntas de freguesia a esclarecerem publicamente as suas competências e limites em matéria de limpeza urbana relativamente ao Município."
-evidence_nature: claim
-strength: secondary
-personal_data:
-  present: false
-  retained: false
-notes: "D2-E Round A (E-06). Institutional responsibility-boundary/coordination-complexity signal, not proof that residents are commonly confused about who is responsible; user-facing routing confusion remains unvalidated and is carried to D5 as a narrow lead, not established here."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "COORDINATION"
-  public_signal_class: "PS1"
-  representativeness: "NOT_APPLICABLE"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+  summary: Entre julho e agosto de 2026, o Município documentou a descentralização
+    de responsabilidades de higiene urbana para juntas de freguesia urbanas,
+    enquanto cobertura jornalística registou juntas de freguesia a esclarecer
+    publicamente as suas competências e limites face ao Município.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes
+    - urbana parish councils
+  temporal:
+    start: 2026-07
+    end: 2026-08
+domains:
+  - ENV
+  - PUB
+evidence_nature: fact
+claim_authority: unknown
+inference_limits:
+  - A combinação de uma Source municipal e cobertura jornalística não estabelece
+    que os residentes estejam confusos sobre responsabilidades nem a prevalência
+    de problemas de encaminhamento.

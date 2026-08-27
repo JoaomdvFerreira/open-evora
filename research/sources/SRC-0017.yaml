@@ -1,16 +1,16 @@
 source_id: SRC-0017
-publisher: "Município de Évora"
-name: "Relatório Setorial do PUE — Mobilidade"
+publisher: Município de Évora
+name: Relatório Setorial do PUE — Mobilidade
 resource_type: document
 scope:
   geography:
     level: city
-    area: "Évora"
+    area: Évora
   domains:
-    - "MOB"
-    - "ACC"
-    - "URB"
-    - "GEO"
+    - MOB
+    - ACC
+    - URB
+    - GEO
 access:
   level: public
   availability: available
@@ -19,12 +19,13 @@ access:
   format: pdf
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-6_Mobilidade.pdf"
+canonical_reference: https://www.cm-evora.pt/wp-content/uploads/2025/02/Relatorio-6_Mobilidade.pdf
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2025-02"
-  last_checked_at: "2026-08-10"
+  published_at: 2025-02
+  last_checked_at: 2026-08-10
 caveats:
-  - "O relatório setorial publicado em 2026 reutiliza diagnóstico e material anterior e não deve ser tratado como uma medição inteiramente nova de 2026."
+  - O relatório setorial publicado em 2026 reutiliza diagnóstico e material
+    anterior e não deve ser tratado como uma medição inteiramente nova de 2026.

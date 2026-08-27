@@ -1,39 +1,29 @@
 evidence_id: EVD-000102
-type: institutional
-source:
-  source_id: SRC-0089
-  publisher: "Universidade de Évora"
-  title: "PlaQuaR — regional training/employer-needs alignment mechanism"
-  source_reference: "https://www.uevora.pt/ue-media/noticias?item=43736"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-geography:
-  level: regional
-  area: "Alentejo region (including Município de Évora)"
-population:
-  - "training/education providers"
-  - "employers"
-  - "workers and job seekers"
-domain:
-  - "EMP"
-  - "EDU"
+provenance:
+  sources:
+    - SRC-0089
+  extracted_at: 2026-08-11
 observation:
-  summary: "O PlaQuaR é um mecanismo explicitamente concebido para alinhar a oferta de formação com as necessidades efetivas dos empregadores e instituições da região, através do mapeamento da formação disponível, da manutenção de informação atualizada e do reforço das redes de cooperação entre prestadores de educação/formação e empregadores."
+  summary: O PlaQuaR é um mecanismo explicitamente concebido para alinhar a oferta
+    de formação com as necessidades efetivas dos empregadores e instituições da
+    região, através do mapeamento da formação disponível, da manutenção de
+    informação atualizada e do reforço das redes de cooperação entre prestadores
+    de educação/formação e empregadores.
+scope:
+  geography:
+    level: regional
+    area: Alentejo
+  populations:
+    - training/education providers
+    - employers
+    - trabalhadores e pessoas à procura de emprego
+  temporal:
+    status: unknown
+domains:
+  - EMP
+  - EDU
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-D Round A (E-05). EXISTING-SOLUTION; REFINES PRB-0008. Important current-state correction: a skills-alignment mechanism is already being developed institutionally; Évora Digital should not propose a duplicate. PlaQuaR's effective coverage/outcomes are not established by this source and remain a D5/data question."
-
-analysis:
-  related_problems:
-    - "PRB-0008"
-  contribution:
-    - "EXISTING-SOLUTION"
-    - "REFINES"
-  friction_types:
-    - "OTHER"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "UNKNOWN"
+claim_authority: authoritative
+inference_limits:
+  - A conceção/desenvolvimento do PlaQuaR não estabelece cobertura efetiva,
+    utilização, resultados ou suficiência do mecanismo na região.

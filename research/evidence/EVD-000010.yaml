@@ -1,39 +1,32 @@
 evidence_id: EVD-000010
-type: institutional
-source:
-  source_id: SRC-0019
-  publisher: "Autoridade de Transportes do Alentejo Central / CIMAC"
-  title: "Avaliação Anual do Contrato de Serviço Público de Transporte de Passageiros do Alentejo Central"
-  source_reference: "https://www.cimac.pt/?listas_ficheiros=relatorio-avaliacao-anual-do-contrato-do-servico-publico-de-transporte-de-passageiros-do-alentejo-central"
-  published_at: 2026-03
-  retrieved_at: 2026-08-10
-geography:
-  level: intermunicipal
-  area: "Alentejo Central"
-population:
-  - "public-transport users"
-  - "potential third-party data consumers"
-domain:
-  - "MOB"
-  - "DIG"
+lineage_id: MOB-2026-03-CIMAC-TPAC-ANNUAL-EVALUATION
+provenance:
+  sources:
+    - SRC-0019
+  extracted_at: 2026-08-10
 observation:
-  summary: "A CIMAC refere que os dados da rede TPAC foram convertidos para GTFS e disponibilizados através do Google Maps em 2025. O mesmo relatório afirma que a informação estática nas paragens continua incompleta em alguns locais e identifica a informação pública como uma não conformidade operacional significativa que afeta a utilização autónoma do sistema."
+  summary: A CIMAC refere que os dados da rede TPAC foram convertidos para GTFS e
+    disponibilizados através do Google Maps em 2025. O mesmo relatório afirma
+    que a informação estática nas paragens continua incompleta em alguns locais
+    e identifica a informação pública como uma não conformidade operacional
+    significativa que afeta a utilização autónoma do sistema.
+scope:
+  geography:
+    level: intermunicipal
+    area: Alentejo Central
+  populations:
+    - transporte público utilizadores
+    - potenciais utilizadores terceiros de dados
+  temporal:
+    status: unknown
+domains:
+  - MOB
+  - DIG
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Open-data relevance: a machine-readable transport dataset demonstrably exists. Open question: no official public GTFS download/API endpoint was identified in this research batch; availability and reuse conditions require direct verification with CIMAC/ATAC."
-
-analysis:
-  related_problems:
-    - "PRB-0002"
-  contribution:
-    - "CONFIRMS"
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "INFORMATION"
-  lineage_id: "MOB-2026-03-CIMAC-TPAC-ANNUAL-EVALUATION"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A evidência é intermunicipal e não deve ser atribuída ao serviço urbano
+    TREVO sem suporte específico.
+  - A existência de GTFS e de canais de informação não demonstra, por si só, que
+    a informação ao passageiro seja completa, atualizada ou acessível em todas
+    as paragens.

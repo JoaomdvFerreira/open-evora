@@ -1,42 +1,33 @@
 evidence_id: EVD-000125
-type: stakeholder
-source:
-  publisher: "Open Évora"
-  title: "D5 stakeholder engagement — university student-support operator (SASUE)"
-  source_reference: "D5-ENG-OP-004 — private research note, not public"
-  published_at: null
-  retrieved_at: "2026-08-13"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "students applying for University of Évora residence accommodation"
-domain:
-  - "HOU"
-  - "EDU"
-  - "DIG"
+lineage_id: D5-ENG-OP-004
+provenance:
+  sources:
+    - SRC-0119
+    - SRC-0113
+  extracted_at: 2026-08-13
 observation:
-  summary: "Os SASUE referem que os estudantes matriculados se candidatam online a alojamento em residência através do SIIUE / Perfil de aluno; após análise, são notificados do resultado, os estudantes colocados recebem os procedimentos para entrada e os candidatos podem consultar diretamente o estado da candidatura e a informação associada. Os SASUE encaminham também os estudantes para a sua página pública de informação sobre alojamento."
+  summary: Os SASUÉ referem que os estudantes matriculados se candidatam em linha
+    a alojamento em residência através do SIIUE / Perfil de aluno; após análise
+    são notificados do resultado, os estudantes colocados recebem os
+    procedimentos de entrada e os candidatos podem consultar o estado da
+    candidatura e a informação associada. Os SASUÉ encaminham também os
+    estudantes para a sua página pública de informação sobre alojamento.
+scope:
+  geography:
+    level: city
+    area: Évora
+  populations:
+    - estudantes que se candidatam a alojamento em residência da Universidade de
+      Évora
+  temporal:
+    as_of: 2026-08-13
+domains:
+  - HOU
+  - EDU
+  - DIG
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-additional_sources:
-  - "SRC-0037"
-notes: "D5-OP-004 (WU022) response, received 2026-08-13 through direct institutional outreach. Respondent role-labelled only (SASUE housing/student-support operator); no personal name, email, raw correspondence or student data retained, per docs/discovery/research-ethics.md §11. The public accommodation-information page cited by SASUE is already canonicalized as SRC-0037; this record does not create or duplicate a public source. primary-authoritative applies to SASUE's description of the process it operates. This establishes an institutional account of a structured digital application, notification and status-consultation journey; it does not establish student usability, clarity, accessibility, notification/waiting expectations, or the absence of individual friction. Shares analysis.lineage_id D5-ENG-OP-004 with EVD-000126 and EVD-000127; do not treat the three records as independent corroboration."
-
-analysis:
-  related_problems:
-    - "PRB-0006"
-  contribution:
-    - "REFINES"
-    - "CURRENT-STATE-UPDATE"
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "TRANSACTION"
-    - "INFORMATION"
-  lineage_id: "D5-ENG-OP-004"
-  representativeness: "NOT_APPLICABLE"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A Observação é uma descrição institucional do processo e não estabelece
+    usabilidade, clareza, acessibilidade, expectativas de notificação/espera ou
+    ausência de fricção na experiência dos estudantes.

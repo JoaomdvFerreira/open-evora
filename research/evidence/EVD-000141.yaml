@@ -1,0 +1,26 @@
+evidence_id: EVD-000141
+provenance:
+  sources:
+    - SRC-0017
+  extracted_at: 2026-08-10
+observation:
+  summary: No diagnóstico de mobilidade do PUE, ciclistas referem como
+    preocupações a falta de infraestrutura dedicada, a velocidade dos veículos,
+    o estado do pavimento e o comportamento dos condutores.
+scope:
+  geography:
+    level: city
+    area: Évora
+  temporal:
+    status: unknown
+  populations:
+    - ciclistas
+domains:
+  - MOB
+  - URB
+evidence_nature: reported-experience
+claim_authority: non_authoritative
+inference_limits:
+  - As preocupações reportadas não permitem estimar prevalência, severidade ou
+    representatividade entre todos os ciclistas.
+lineage_id: MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT

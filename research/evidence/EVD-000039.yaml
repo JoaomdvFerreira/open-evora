@@ -1,27 +1,28 @@
 evidence_id: EVD-000039
-type: institutional
-source:
-  source_id: SRC-0002
-  publisher: "Município de Évora / Rede Social"
-  title: "Plano de Desenvolvimento Social de Évora 2024-2027"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf"
-  published_at: 2024-01
-  retrieved_at: 2026-08-10
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "university students and recent graduates"
-domain:
-  - "EMP"
-  - "EDU"
-  - "HOU"
-  - "ECO"
+provenance:
+  sources:
+    - SRC-0002
+  extracted_at: 2026-08-10
 observation:
-  summary: "O PDS descreve explicitamente o desafio como a passagem da atração de jovens à sua fixação (retenção) no concelho."
+  summary: O PDS descreve explicitamente o desafio como a passagem da atração de
+    jovens à sua fixação (retenção) no concelho.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - university estudantes e diplomados recentes
+  temporal:
+    start: "2024"
+    end: "2027"
+domains:
+  - EMP
+  - EDU
+  - HOU
+  - ECO
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-04-A-E03. Cross-domain dependencies: housing, career opportunities, mobility, quality of life and social/cultural factors may all contribute. Causality: NOT ESTABLISHED - do not encode a Housing -> Talent Retention or Culture -> Talent Retention relationship as fact. See PRB-0006 (housing) for the related, not merged, housing-side documentation."
+claim_authority: authoritative
+inference_limits:
+  - A formulação estratégica sobre retenção não estabelece as causas do fenómeno
+    nem a contribuição relativa de habitação, emprego, mobilidade ou outros
+    fatores.

@@ -1,37 +1,28 @@
 evidence_id: EVD-000113
-type: stakeholder
-source:
-  publisher: "Open Évora"
-  title: "D5 stakeholder engagement — accessibility programme actor (APCE)"
-  source_reference: "D5-ENG-OP-003 — private research note, not public"
-  published_at: null
-  retrieved_at: "2026-08-12"
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "people with reduced mobility"
-domain:
-  - "ACC"
-  - "URB"
+lineage_id: D5-ENG-OP-003
+provenance:
+  sources:
+    - SRC-0118
+  extracted_at: 2026-08-12
 observation:
-  summary: "A APCE refere que as suas avaliações de acessibilidade in loco identificaram problemas de acessibilidade nos acessos (entradas/percursos de acesso), devido a fatores que incluem a inclinação e a localização, e que alguns dos problemas identificados exigiram correção e foram alvo dessa correção. A APCE não forneceu um inventário por localização que identifique os acessos específicos avaliados, os que permanecem por corrigir, nem uma data para a conclusão das correções."
+  summary: A APCE refere que as suas avaliações de acessibilidade in loco
+    identificaram problemas nos acessos, associados, entre outros fatores, à
+    inclinação e à localização.
+scope:
+  geography:
+    level: city
+    area: Évora cidade
+  populations:
+    - pessoas com mobilidade reduzida
+  temporal:
+    as_of: 2026-08-12
+domains:
+  - ACC
+  - URB
 evidence_nature: claim
-strength: primary-non-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D5-OP-003 (WU022) response, received 2026-08-12. Answers validation question Q1/Q2 (docs/milestones/D5-WU01-operator-challenge-progress.md) only partially: it names barrier factors (inclination, location) and confirms some corrections occurred, but does not give the location-level inventory or completed-vs-outstanding breakdown originally asked for — treat as a partial, not full, resolution of the remaining gap. strength kept primary-non-authoritative (not authoritative) because the correction outcome is co-owned with Câmara Municipal de Évora (see EVD-000112) and is not independently verified by this project. Shares analysis.lineage_id D5-ENG-OP-003 with EVD-000112 and EVD-000114 (same engagement) — same institutional voice, not independent corroboration. Complements rather than duplicates the December 2025 municipal-cultural-facilities inventory (EVD-000104, lineage ACC-2025-APCE-ACESSO-UNIVERSAL-1.3): that record covers municipal cultural facilities specifically, while this one is APCE's general description of access-related barrier factors and partial correction across its in-loco assessment work. Does not establish city-wide prevalence or an August 2026 current state at the location level; affected-user/location-level validation (WU023) remains necessary."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "CONFIRMS"
-    - "CURRENT-STATE-UPDATE"
-  friction_types:
-    - "PHYSICAL"
-  lineage_id: "D5-ENG-OP-003"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A resposta não fornece inventário por localização, discriminação entre
+    situações corrigidas e pendentes nem datas que permitam estabelecer o estado
+    atual das barreiras.
+  - A Observação não estabelece prevalência à escala da cidade.

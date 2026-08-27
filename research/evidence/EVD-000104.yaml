@@ -1,39 +1,33 @@
 evidence_id: EVD-000104
-type: stakeholder
-source:
-  source_id: SRC-0091
-  publisher: "APCE"
-  title: "Acesso Universal 1.3 — completed joint accessibility inventory (December 2025 result, syndicated by Sector3)"
-  source_reference: "https://diretorio.sector3.pt/Publications/Details/15648-projeto-acesso-universal-13"
-  published_at: 2025-12-15
-  retrieved_at: 2026-08-11
-geography:
-  level: city
-  area: "Évora city — municipal cultural facilities"
-population:
-  - "people with disabilities"
-domain:
-  - "ACC"
-  - "CUL"
+lineage_id: ACC-2025-APCE-ACESSO-UNIVERSAL-1.3
+provenance:
+  sources:
+    - SRC-0091
+  extracted_at: 2026-08-11
 observation:
-  summary: "A APCE e a Câmara Municipal de Évora comunicam que, na sequência da verificação de equipamentos culturais geridos pelo município, produziram conjuntamente um levantamento que identifica condições de acessibilidade existentes, condições de acessibilidade em falta e possíveis soluções de melhoria para o conjunto de equipamentos avaliado. O texto público não enumera os equipamentos específicos nem as barreiras específicas em formato legível por máquina ou em forma textual detalhada, nem estabelece que cada défice identificado ainda estivesse presente em agosto de 2026."
+  summary: A APCE e a Câmara Municipal de Évora comunicam que, na sequência da
+    verificação de equipamentos culturais geridos pelo município, produziram
+    conjuntamente um levantamento que identifica condições de acessibilidade
+    existentes, condições de acessibilidade em falta e possíveis soluções de
+    melhoria para o conjunto de equipamentos avaliado. O texto público não
+    enumera os equipamentos específicos nem as barreiras específicas em formato
+    legível por máquina ou em forma textual detalhada, nem estabelece que cada
+    défice identificado ainda estivesse presente em agosto de 2026.
+scope:
+  geography:
+    level: city
+    area: Évora cidade — equipamentos culturais municipais
+  populations:
+    - pessoas com deficiência
+  temporal:
+    as_of: 2025-12-15
+domains:
+  - ACC
+  - CUL
 evidence_nature: claim
-strength: primary-non-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "WU018 (WU-D3-05). Materially stronger than EVD-000086 (October 2025, 'verification continuing' claim only): this record reports a completed joint inventory result, not merely an ongoing process. Same Acesso Universal 1.3 programme lineage as EVD-000085 (SRC-0073) and EVD-000086 (SRC-0074) — assigned lineage_id ACC-2025-APCE-ACESSO-UNIVERSAL-1.3, also retrofitted onto EVD-000085/EVD-000086 for consistent independence accounting (see their own notes fields, unchanged otherwise). Do not count as independent corroboration of EVD-000085/EVD-000086 merely because it is a later publication — same publisher/programme, distinct primary source_id only. Does not claim barriers are fixed; does not claim city-wide prevalence."
-
-analysis:
-  related_problems:
-    - "PRB-0003"
-  contribution:
-    - "CONFIRMS"
-    - "CURRENT-STATE-UPDATE"
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "PHYSICAL"
-  lineage_id: "ACC-2025-APCE-ACESSO-UNIVERSAL-1.3"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: non_authoritative
+inference_limits:
+  - O texto público não enumera em detalhe os equipamentos e barreiras avaliados
+    nem disponibiliza essa informação de forma estruturada.
+  - O inventário não estabelece que cada défice identificado permanecesse
+    presente em agosto de 2026 nem a prevalência de barreiras na cidade.

@@ -1,14 +1,15 @@
 source_id: SRC-0092
-publisher: "Via Verde Estacionar"
-name: "Via Verde Estacionar — Parking Buddy, funcionalidade preditiva de disponibilidade de estacionamento"
+publisher: Via Verde Estacionar
+name: Via Verde Estacionar — Parking Buddy, funcionalidade preditiva de
+  disponibilidade de estacionamento
 resource_type: webpage
 scope:
   geography:
     level: national
-    area: "Portugal"
+    area: Portugal
   domains:
-    - "MOB"
-    - "DIG"
+    - MOB
+    - DIG
 access:
   level: public
   availability: available
@@ -17,9 +18,9 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.viaverde.pt/particulares/via-verde/servicos/estacionar/parking-buddy"
+canonical_reference: https://www.viaverde.pt/particulares/via-verde/servicos/estacionar/parking-buddy
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-25"
+  last_checked_at: 2026-08-25

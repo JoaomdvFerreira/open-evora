@@ -1,14 +1,14 @@
 source_id: SRC-0079
-publisher: "Grupo público do Facebook (comunidade de Évora)"
-name: "Publicação em grupo do Facebook — acumulação de resíduos em Canaviais"
+publisher: Grupo público do Facebook (comunidade de Évora)
+name: Publicação em grupo do Facebook — acumulação de resíduos em Canaviais
 resource_type: webpage
 scope:
   geography:
     level: parish
-    area: "Canaviais, Évora"
+    area: Canaviais, Évora
   domains:
-    - "ENV"
-    - "PUB"
+    - ENV
+    - PUB
 access:
   level: public
   availability: available
@@ -17,9 +17,9 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.facebook.com/groups/253148126144341/posts/1592719528853854/"
+canonical_reference: https://www.facebook.com/groups/253148126144341/posts/1592719528853854/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-11"
+  last_checked_at: 2026-08-11

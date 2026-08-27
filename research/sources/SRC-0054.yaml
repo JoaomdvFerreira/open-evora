@@ -1,14 +1,14 @@
 source_id: SRC-0054
-publisher: "Município de Évora"
-name: "Registo da reunião pública de 9 de julho — prioridade à higiene urbana"
+publisher: Município de Évora
+name: Registo da reunião pública de 9 de julho — prioridade à higiene urbana
 resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "ENV"
-    - "PUB"
+    - ENV
+    - PUB
 access:
   level: public
   availability: available
@@ -17,10 +17,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/em-reuniao-publica-de-9-de-julho-requalificacao-e-renaturalizacao-do-rossio-de-s-bras-obteve-financiamento-a-100-e-as-verbas-nao-poderiam-ser-aplicadas-noutro-projeto-ou-intervencao-camararia/"
+canonical_reference: https://www.cm-evora.pt/em-reuniao-publica-de-9-de-julho-requalificacao-e-renaturalizacao-do-rossio-de-s-bras-obteve-financiamento-a-100-e-as-verbas-nao-poderiam-ser-aplicadas-noutro-projeto-ou-intervencao-camararia/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2026-07"
-  last_checked_at: "2026-08-11"
+  published_at: 2026-07
+  last_checked_at: 2026-08-11

@@ -1,38 +1,24 @@
 evidence_id: EVD-000065
-type: institutional
-source:
-  source_id: SRC-0054
-  publisher: "Município de Évora"
-  title: "Public meeting record (9 July) - urban-hygiene priority statement"
-  source_reference: "https://www.cm-evora.pt/em-reuniao-publica-de-9-de-julho-requalificacao-e-renaturalizacao-do-rossio-de-s-bras-obteve-financiamento-a-100-e-as-verbas-nao-poderiam-ser-aplicadas-noutro-projeto-ou-intervencao-camararia/"
-  published_at: 2026-07
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0053"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
+provenance:
+  sources:
+    - SRC-0054
+  extracted_at: 2026-08-11
 observation:
-  summary: "A higiene urbana constitui um problema cívico atual com elevado grau de confiança: em julho de 2026, o próprio Município descreve a higiene urbana como um grande desafio de gestão e um problema urgente, enquanto procede a uma reestruturação substancial de pessoal, modelos de recolha, frota, responsabilidades e monitorização."
-evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-06-A-E03. Interpretation: the problem is current and strong enough to map canonically if repository criteria are satisfied."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "OPERATIONAL"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+  summary: Em julho de 2026, o Município descreveu a higiene urbana como um grande
+    desafio de gestão e um problema urgente.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes
+  temporal:
+    as_of: 2026-07
+domains:
+  - ENV
+  - PUB
+evidence_nature: opinion
+claim_authority: authoritative
+inference_limits:
+  - A avaliação institucional de urgência não mede prevalência, desempenho do
+    serviço ou experiência da população.

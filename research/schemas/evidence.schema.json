@@ -3,62 +3,21 @@
   "directory": "evidence",
   "idField": "evidence_id",
   "sourceModel": "docs/datamodel.md",
-  "requiredFields": [
-    "evidence_id",
-    "type",
-    "source",
-    "source.publisher",
-    "source.title",
-    "source.retrieved_at",
-    "geography",
-    "geography.level",
-    "population",
-    "domain",
-    "observation",
-    "observation.summary",
-    "evidence_nature",
-    "strength",
-    "personal_data",
-    "personal_data.present",
-    "personal_data.retained"
-  ],
-  "optionalReferenceFields": [
-    "source.source_id",
-    "additional_sources"
-  ],
+  "requiredFields": ["evidence_id", "provenance.sources", "provenance.extracted_at", "observation.summary", "scope.geography.level", "scope.temporal", "domains", "evidence_nature", "claim_authority", "inference_limits"],
+  "allowedFields": ["evidence_id", "lineage_id", "provenance", "provenance.sources", "provenance.extracted_at", "observation", "observation.summary", "scope", "scope.geography", "scope.geography.level", "scope.geography.area", "scope.populations", "scope.temporal", "scope.temporal.as_of", "scope.temporal.start", "scope.temporal.end", "scope.temporal.status", "domains", "evidence_nature", "claim_authority", "inference_limits"],
   "enums": {
-    "type": ["institutional", "statistical", "formal-public", "social", "press", "stakeholder", "observation"],
-    "geography.level": ["city", "parish", "municipality", "intermunicipal", "regional"],
+    "scope.geography.level": ["site", "local_area", "parish", "city", "municipality", "intermunicipal", "regional", "national", "international", "non_geographic", "unknown"],
+    "scope.temporal.status": ["unknown"],
     "evidence_nature": ["fact", "reported-experience", "opinion", "claim", "measurement", "recommendation"],
-    "strength": ["primary-authoritative", "primary-non-authoritative", "secondary", "anecdotal"],
-    "analysis.contribution": ["CONFIRMS", "REFINES", "CONTRADICTS", "CURRENT-STATE-UPDATE", "EXISTING-SOLUTION", "PLANNED-SOLUTION", "NEW-CANDIDATE"],
-    "analysis.friction_types": ["INFORMATION", "COORDINATION", "TRANSACTION", "OPERATIONAL", "PHYSICAL", "REGULATORY", "OTHER"],
-    "analysis.public_signal_class": ["PS1", "PS2", "PS3", "PS4", "PS5", "PS6"],
-    "analysis.representativeness": ["UNKNOWN", "LIMITED", "DESIGNED_REPRESENTATIVE", "NOT_APPLICABLE"],
-    "analysis.verification": ["REPORTED", "CORROBORATED", "VERIFIED", "UNKNOWN", "NOT_APPLICABLE"],
-    "analysis.temporal_relevance": ["CURRENT", "HISTORICAL", "SUPERSEDED", "UNKNOWN"]
+    "claim_authority": ["authoritative", "non_authoritative", "unknown"]
   },
-  "notes": "analysis is an optional metadata block; every analysis.* field remains optional even when the analysis block itself is present. Deliberately excluded from analysis: per-EVD independence (relational — use analysis.lineage_id; independence itself remains a substantive human judgement, not an EVD-level field), directness (assessed per-problem, not per-EVD), and COVERAGE-GAP / LOW-DIGITAL-LEVERAGE as contribution values (these are problem-level synthesis findings, not atomic evidence). contribution includes PLANNED-SOLUTION, distinct from EXISTING-SOLUTION: EXISTING-SOLUTION means an operating/delivered solution or service already exists; PLANNED-SOLUTION means a formally planned/committed/in-delivery response that is not yet established as operating and available to the affected journey. Neither value implies effectiveness — whether a solution (existing or planned) actually closes the gap is a problem-level synthesis question, not an EVD contribution. Target ownership of these synthesis concepts is defined in docs/datamodel.md, not here.",
-  "references": [
-    {
-      "field": "source.source_id",
-      "targetPrefix": "SRC-",
-      "targetDirectory": "sources",
-      "required": false
-    },
-    {
-      "field": "additional_sources",
-      "isList": true,
-      "targetPrefix": "SRC-",
-      "targetDirectory": "sources",
-      "required": false
-    },
-    {
-      "field": "analysis.related_problems",
-      "isList": true,
-      "targetPrefix": "PRB-",
-      "targetDirectory": "problems",
-      "required": false
-    }
-  ]
+  "fieldTypes": {
+    "evidence_id": ["string"], "lineage_id": ["string"], "provenance": ["object"], "provenance.sources": ["array"], "provenance.extracted_at": ["string"], "observation": ["object"], "observation.summary": ["string"], "scope": ["object"], "scope.geography": ["object"], "scope.geography.level": ["string"], "scope.geography.area": ["string"], "scope.populations": ["array"], "scope.temporal": ["object"], "scope.temporal.as_of": ["string"], "scope.temporal.start": ["string"], "scope.temporal.end": ["string"], "scope.temporal.status": ["string"], "domains": ["array"], "evidence_nature": ["string"], "claim_authority": ["string"], "inference_limits": ["array"]
+  },
+  "patterns": {
+    "provenance.extracted_at": "\\d{4}-\\d{2}-\\d{2}", "scope.temporal.as_of": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?", "scope.temporal.start": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?", "scope.temporal.end": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?"
+  },
+  "conditionalRequired": [{"field":"scope.geography.level","notIn":["non_geographic","unknown"],"requires":["scope.geography.area"]}],
+  "exclusiveFieldSets": [{"path":"scope.temporal","sets":[["as_of"],["start","end"],["status"]]}],
+  "references": [{"field":"provenance.sources","isList":true,"targetPrefix":"SRC-","targetDirectory":"sources","required":true}]
 }

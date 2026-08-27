@@ -1,42 +1,30 @@
 evidence_id: EVD-000037
-type: institutional
-source:
-  source_id: SRC-0002
-  publisher: "Município de Évora / Rede Social"
-  title: "Plano de Desenvolvimento Social de Évora 2024-2027"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf"
-  published_at: 2024-01
-  retrieved_at: 2026-08-10
-additional_sources:
-  - "SRC-0028"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "workers"
-  - "employers"
-  - "training/education providers"
-domain:
-  - "EMP"
-  - "EDU"
-  - "ECO"
+lineage_id: SOC-2024-01-PDS-EVORA
+provenance:
+  sources:
+    - SRC-0002
+    - SRC-0028
+  extracted_at: 2026-08-10
 observation:
-  summary: "O planeamento institucional local identifica um desajustamento entre as qualificações da força de trabalho e as necessidades dos empregadores, apelando explicitamente ao mapeamento de competências, à adaptação da formação e a uma articulação mais forte entre educação e empregadores; o plano de ação de 2025 trata esta matéria como uma linha de trabalho atual, e não apenas como um diagnóstico."
+  summary: O planeamento institucional local identifica um desajustamento entre as
+    qualificações da paraça de trabalho e as necessidades dos empregadores.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - workers
+    - employers
+    - training/education providers
+  temporal:
+    start: "2024"
+    end: "2025"
+domains:
+  - EMP
+  - EDU
+  - ECO
 evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-04-A-E01. Confidence: HIGH institutionally. SRC-0002 and SRC-0028 share the same PDS/Rede Social institutional lineage, so this is not independent corroboration."
-
-analysis:
-  related_problems:
-    - "PRB-0008"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "OTHER"
-  lineage_id: "SOC-2024-01-PDS-EVORA"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - O diagnóstico institucional não quantifica a dimensão do desajustamento nem
+    identifica, por si só, quais as competências em falta no Município.

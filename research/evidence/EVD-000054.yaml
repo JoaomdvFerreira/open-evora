@@ -1,26 +1,29 @@
 evidence_id: EVD-000054
-type: institutional
-source:
-  source_id: SRC-0043
-  publisher: "Município de Évora"
-  title: "Plano Estratégico para a Cultura de Évora 2022-2030 (PECE)"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/06/PECE_VF.pdf"
-  published_at: 2022
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "cultural and creative-ecosystem actors"
-  - "municipal cultural staff"
-domain:
-  - "CUL"
-  - "PUB"
+provenance:
+  sources:
+    - SRC-0043
+  extracted_at: 2026-08-11
 observation:
-  summary: "A coordenação e a partilha de informação entre o Município e os agentes culturais e associativos constituem uma necessidade institucional reconhecida. A estratégia descreve a necessidade de melhorar instrumentos que clarifiquem e simplifiquem as relações entre o Município e o ecossistema cultural e criativo, com maior transparência e informação partilhada, incluindo um conceito de «Portal do Associativismo»."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-05-A-E03. Interpretation: potential coordination/transaction-cost issue, but implementation status must be checked before treating as a current gap. RESOLVED by Batch B: EVD-000060 (SRC-0050) confirms a dedicated associativism platform already exists and is materially implemented, so this should NOT be recorded as an unimplemented digital gap."
+  summary: A estratégia cultural municipal propõe melhorar instrumentos de relação
+    entre o Município e o ecossistema cultural e associativo, com maior
+    transparência e partilha de informação, incluindo o conceito de «Portal do
+    Associativismo».
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - cultural e agentes do ecossistema criativo
+    - equipas culturais municipais
+  temporal:
+    start: "2022"
+    end: "2030"
+domains:
+  - CUL
+  - PUB
+evidence_nature: recommendation
+claim_authority: authoritative
+inference_limits:
+  - A recomendação estratégica não estabelece que o instrumento permanecesse por
+    implementar; a EVD-000060 documenta posteriormente a existência de uma
+    plataforma dedicada.

@@ -1,14 +1,15 @@
 source_id: SRC-0106
-publisher: "CAPP / ISCSP / Universidade de Lisboa"
-name: "Estudo sobre o Perfil do Cuidador Familiar/Informal da Pessoa Sénior em Portugal"
+publisher: CAPP / ISCSP / Universidade de Lisboa
+name: Estudo sobre o Perfil do Cuidador Familiar/Informal da Pessoa Sénior em
+  Portugal
 resource_type: document
 scope:
   geography:
     level: national
-    area: "Portugal"
+    area: Portugal
   domains:
-    - "SOC"
-    - "HEA"
+    - SOC
+    - HEA
 access:
   level: public
   availability: available
@@ -17,13 +18,15 @@ access:
   format: pdf
 acquisition:
   method: public_web
-canonical_reference: "https://repositorio.ulisboa.pt/bitstreams/120f5040-e93f-4a6e-a28c-b8f1ed88e8c3/download"
+canonical_reference: https://repositorio.ulisboa.pt/bitstreams/120f5040-e93f-4a6e-a28c-b8f1ed88e8c3/download
 licensing:
   status: unknown
   reuse: unknown
-  attribution: "CAPP / ISCSP / Universidade de Lisboa"
+  attribution: CAPP / ISCSP / Universidade de Lisboa
 temporal:
-  published_at: "2021-07"
-  last_checked_at: "2026-08-12"
+  published_at: 2021-07
+  last_checked_at: 2026-08-12
 caveats:
-  - "O estudo utiliza uma amostra de conveniência não probabilística; o próprio relatório indica que os resultados não podem ser generalizados à população em estudo."
+  - O estudo utiliza uma amostra de conveniência não probabilística; o próprio
+    relatório indica que os resultados não podem ser generalizados à população
+    em estudo.

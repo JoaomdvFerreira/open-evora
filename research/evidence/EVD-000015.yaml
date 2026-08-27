@@ -1,26 +1,32 @@
 evidence_id: EVD-000015
-type: institutional
-source:
-  source_id: SRC-0019
-  publisher: "Autoridade de Transportes do Alentejo Central / CIMAC"
-  title: "Avaliação Anual do Contrato de Serviço Público de Transporte de Passageiros do Alentejo Central"
-  source_reference: "https://www.cimac.pt/?listas_ficheiros=relatorio-avaliacao-anual-do-contrato-do-servico-publico-de-transporte-de-passageiros-do-alentejo-central"
-  published_at: 2026-03
-  retrieved_at: 2026-08-10
-geography:
-  level: intermunicipal
-  area: "Alentejo Central"
-population:
-  - "TPAC passengers"
-domain:
-  - "MOB"
-  - "DIG"
-  - "ACC"
+provenance:
+  sources:
+    - SRC-0019
+  extracted_at: 2026-08-10
 observation:
-  summary: "O relatório de avaliação contratual da ATAC de 2026 identifica não conformidades significativas na informação pública durante 2025, incluindo mapas, horários e identificação de linhas ausentes ou desatualizados em várias paragens e terminais, e refere que a informação digital apresentava conteúdo incompleto ou desatualizado. O relatório conclui também que a experiência de espera e de acesso à informação é menos positiva do que a experiência a bordo."
+  summary: O relatório de avaliação contratual da ATAC de 2026 identifica não
+    conformidades significativas na informação pública durante 2025, incluindo
+    mapas, horários e identificação de linhas ausentes ou desatualizados em
+    várias paragens e terminais, e refere que a informação digital apresentava
+    conteúdo incompleto ou desatualizado. O relatório conclui também que a
+    experiência de espera e de acesso à informação é menos positiva do que a
+    experiência a bordo.
+scope:
+  geography:
+    level: intermunicipal
+    area: Alentejo Central
+  populations:
+    - TPAC passengers
+  temporal:
+    as_of: "2025"
+domains:
+  - MOB
+  - DIG
+  - ACC
 evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Interpretation: standardized backend data and satisfactory passenger information are different problems."
+claim_authority: authoritative
+inference_limits:
+  - A avaliação refere-se ao TPAC no Alentejo Central e não deve ser
+    generalizada ao serviço urbano TREVO.
+  - A existência de dados normalizados no backend não implica informação
+    satisfatória ou acessível para o passageiro.

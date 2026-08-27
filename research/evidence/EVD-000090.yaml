@@ -1,35 +1,33 @@
 evidence_id: EVD-000090
-type: institutional
-source:
-  source_id: SRC-0030
-  publisher: "Município de Évora"
-  title: "Plano Concelhio dos Cuidadores Informais de Évora — reported caregiver needs"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/Plano-Concelhio-Cuidadores-Informais_v4_Junho_2025-002_RELATORIO.pdf"
-  published_at: 2025-06
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "informal caregivers"
-domain:
-  - "SOC"
-  - "HEA"
+lineage_id: SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS
+provenance:
+  sources:
+    - SRC-0030
+  extracted_at: 2026-08-11
 observation:
-  summary: "No questionário a 133 cuidadores, as necessidades referidas deram prioridade ao apoio na prestação de cuidados (aprox. 40,8 %), ao descanso do cuidador (aprox. 40,0 %), ao apoio financeiro (aprox. 36,8 %) e ao apoio psicológico (aprox. 31,2 %), com valores superiores aos de várias necessidades relacionadas com orientação; quando lhes foi pedido que indicassem uma única necessidade mais importante, o descanso do cuidador e o apoio na prestação de cuidados foram os mais destacados."
+  summary: No questionário a 133 cuidadores, as necessidades referidas deram
+    prioridade ao apoio na prestação de cuidados (aprox. 40,8 %), ao descanso do
+    cuidador (aprox. 40,0 %), ao apoio financeiro (aprox. 36,8 %) e ao apoio
+    psicológico (aprox. 31,2 %), com valores superiores aos de várias
+    necessidades relacionadas com orientação; quando lhes foi pedido que
+    indicassem uma única necessidade mais importante, o descanso do cuidador e o
+    apoio na prestação de cuidados foram os mais destacados.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - cuidadores informais incluídos no questionário
+  temporal:
+    as_of: "2025"
+domains:
+  - SOC
+  - HEA
 evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-B Round A (D2-B-SIG-02). REFINES PRB-0007; LOW-DIGITAL-LEVERAGE for the highest-ranked needs. Establishes that PRB-0007 must not be reduced to 'information is hard to find' — capacity, respite, direct support and financial/psychological needs are reported as more consequential than pure navigation friction and are not converted into a digital-navigation problem. Same SRC-0030 lineage as EVD-000089; not an independent corroborating source."
-
-analysis:
-  related_problems:
-    - "PRB-0007"
-  contribution:
-    - "REFINES"
-  lineage_id: "SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS"
-  representativeness: "LIMITED"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - O questionário foi recrutado através de organizações/projetos de apoio a
+    cuidadores e a amostra é geograficamente concentrada, não sendo
+    representativa do conjunto dos cuidadores do Município.
+  - As prioridades reportadas não estabelecem relações causais nem a eficácia de
+    respostas específicas.

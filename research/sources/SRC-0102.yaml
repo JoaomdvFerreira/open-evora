@@ -1,14 +1,15 @@
 source_id: SRC-0102
-publisher: "Município de Évora"
-name: "Relatório Anual de Atividade da Autoridade de Transportes - Município de Évora 2023"
+publisher: Município de Évora
+name: Relatório Anual de Atividade da Autoridade de Transportes - Município de
+  Évora 2023
 resource_type: document
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "MOB"
-    - "ACC"
+    - MOB
+    - ACC
 access:
   level: public
   availability: available
@@ -17,13 +18,14 @@ access:
   format: pdf
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2023/06/Relatorio-anual-de-Autoridade-de-Transportes-CME-29-06-2023.pdf"
+canonical_reference: https://www.cm-evora.pt/wp-content/uploads/2023/06/Relatorio-anual-de-Autoridade-de-Transportes-CME-29-06-2023.pdf
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2023-06"
-  last_checked_at: "2026-08-12"
+  published_at: 2023-06
+  last_checked_at: 2026-08-12
   update_frequency: annual
 caveats:
-  - "Algumas tabelas do relatório identificam valores relativos a 2021 como provisórios."
+  - Algumas tabelas do relatório identificam valores relativos a 2021 como
+    provisórios.

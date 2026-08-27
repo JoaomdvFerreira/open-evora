@@ -1,14 +1,14 @@
 source_id: SRC-0038
-publisher: "ULSAC"
-name: "ULSAC — Unidade de Cuidados na Comunidade (UCC) Évora"
+publisher: ULSAC
+name: ULSAC — Unidade de Cuidados na Comunidade (UCC) Évora
 resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "HEA"
-    - "SOC"
+    - HEA
+    - SOC
 access:
   level: public
   availability: available
@@ -17,10 +17,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.ulsac.min-saude.pt/2025/10/20/unidade-de-cuidados-na-comunidade-ucc-evora/"
+canonical_reference: https://www.ulsac.min-saude.pt/2025/10/20/unidade-de-cuidados-na-comunidade-ucc-evora/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2025-10-20"
-  last_checked_at: "2026-08-25"
+  published_at: 2025-10-20
+  last_checked_at: 2026-08-25

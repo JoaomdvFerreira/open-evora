@@ -1,29 +1,28 @@
 evidence_id: EVD-000051
-type: institutional
-source:
-  source_id: SRC-0033
-  publisher: "Município de Évora"
-  title: "Município de Évora - Desenvolvimento Económico"
-  source_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/desenvolvimento-economico/"
-  published_at: null
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0042"
-  - "SRC-0011"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "businesses"
-  - "SMEs"
-domain:
-  - "ECO"
-  - "EMP"
+provenance:
+  sources:
+    - SRC-0033
+    - SRC-0042
+    - SRC-0011
+  extracted_at: 2026-08-11
 observation:
-  summary: "A fragmentação do apoio às empresas continua a ser plausível, mas não comprovada: vários prestadores (Município, NERE, PACT, IEFP, UÉ) disponibilizam programas e canais de apoio empresarial e económico, mas a multiplicidade de prestadores, por si só, não constitui evidência de que as empresas enfrentem dificuldades de orientação."
-evidence_nature: opinion
-strength: secondary
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-04-B-E05. Interpretation: remains a discovery question only; do not create a canonical problem record for business-support fragmentation. Extends EVD-000041's boundary that infrastructure existence does not prove SMEs can easily discover or navigate support opportunities."
+  summary: As Sources associadas documentam a existência de vários prestadores
+    institucionais com programas e canais próprios de apoio empresarial e
+    económico em Évora.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - businesses
+    - SMEs
+  temporal:
+    status: unknown
+domains:
+  - ECO
+  - EMP
+evidence_nature: fact
+claim_authority: unknown
+inference_limits:
+  - A multiplicidade de prestadores não estabelece que empresas ou utilizadores
+    enfrentem dificuldades de orientação entre apoios.

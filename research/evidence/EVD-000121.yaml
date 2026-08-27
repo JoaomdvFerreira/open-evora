@@ -1,38 +1,28 @@
 evidence_id: EVD-000121
-type: institutional
-source:
-  source_id: SRC-0105
-  publisher: "Município de Évora"
-  title: "Câmara continua a intervir na rede viária do concelho"
-  source_reference: "https://www.cm-evora.pt/camara-continua-a-intervir-na-rede-viaria-do-concelho/"
-  published_at: "2025-03-21"
-  retrieved_at: 2026-08-12
-geography:
-  level: city
-  area: "Bairro de Nª Srª da Saúde / ponte do Xarrama / Bairro de Santa Luzia"
-population:
-  - "pedestrians"
-  - "cyclists"
-domain:
-  - "MOB"
-  - "URB"
+provenance:
+  sources:
+    - SRC-0105
+  extracted_at: 2026-08-12
 observation:
-  summary: "Em março de 2025, estava concluída uma primeira fase (90 000 euros) de uma ligação pedonal/ciclável entre o Bairro de Nª Srª da Saúde e a ponte do Xarrama, estando uma segunda fase em direção ao Bairro de Santa Luzia em preparação, dependente de um projeto de drenagem de águas pluviais. O Município enquadra isto explicitamente como concretização prática do PMUSE."
+  summary: Em março de 2025, estava concluída uma primeira fase (90 000 euros) de
+    uma ligação pedonal/ciclável entre o Bairro de Nª Srª da Saúde e a ponte do
+    Xarrama, estando uma segunda fase em direção ao Bairro de Santa Luzia em
+    preparação, dependente de um projeto de drenagem de águas pluviais. O
+    Município enquadra isto explicitamente como concretização prática do PMUSE.
+scope:
+  geography:
+    level: city
+    area: Bairro de Nª Srª da Saúde / ponte do Xarrama / Bairro de Santa Luzia
+  populations:
+    - peões
+    - cyclists
+  temporal:
+    as_of: 2025-03-21
+domains:
+  - MOB
+  - URB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "RS-02B1. Demonstrates that the physical cycling/pedestrian network has changed since the 2020-dated cartography underlying PMUSE Volume I's existing-network figures (EVD-000118) — supports treating that cartography as a snapshot rather than a necessarily current topology, without itself establishing what the full current network looks like."
-
-analysis:
-  related_problems:
-    - "PRB-0004"
-  contribution:
-    - "CURRENT-STATE-UPDATE"
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "PHYSICAL"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - A informação de março de 2025 não estabelece o estado posterior da segunda
+    fase nem a topologia completa atual da rede pedonal/ciclável.

@@ -1,38 +1,25 @@
 evidence_id: EVD-000094
-type: social
-source:
-  source_id: SRC-0079
-  publisher: "Public Facebook group (Évora community group)"
-  title: "Facebook group post — waste accumulation in Canaviais"
-  source_reference: "https://www.facebook.com/groups/253148126144341/posts/1592719528853854/"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-geography:
-  level: parish
-  area: "Canaviais, Évora"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
+provenance:
+  sources:
+    - SRC-0079
+  extracted_at: 2026-08-11
 observation:
-  summary: "Uma publicação num grupo público de Facebook relata acumulação de resíduos especificamente na zona dos Canaviais, em Évora, descrevendo uma ocorrência geograficamente localizada de resíduos por recolher e acumulados."
+  summary: Uma publicação num grupo público de Facebook relata acumulação de
+    resíduos especificamente na zona dos Canaviais, em Évora, descrevendo uma
+    ocorrência geograficamente localizada de resíduos por recolher e acumulados.
+scope:
+  geography:
+    level: parish
+    area: Canaviais, Évora
+  populations:
+    - residentes
+  temporal:
+    status: unknown
+domains:
+  - ENV
+  - PUB
 evidence_nature: reported-experience
-strength: anecdotal
-personal_data:
-  present: false
-  retained: false
-notes: "D2-E Round A (E-02). CONFIRMS + REFINES PRB-0009 toward a geographically specific instance (Canaviais) rather than a purely city-wide claim. Representativeness UNKNOWN; one self-selected public-post signal lineage, distinct from EVD-000093 (different location/date)."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "CONFIRMS"
-    - "REFINES"
-  friction_types:
-    - "OPERATIONAL"
-  public_signal_class: "PS2"
-  representativeness: "UNKNOWN"
-  verification: "REPORTED"
-  temporal_relevance: "UNKNOWN"
+claim_authority: non_authoritative
+inference_limits:
+  - Trata-se de um único relato autosselecionado nos Canaviais e não permite
+    estimar frequência ou prevalência.

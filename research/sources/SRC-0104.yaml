@@ -1,14 +1,14 @@
 source_id: SRC-0104
-publisher: "Município de Évora"
-name: "Regulamento Municipal de Cedência e Utilização de Cartografia Digital"
+publisher: Município de Évora
+name: Regulamento Municipal de Cedência e Utilização de Cartografia Digital
 resource_type: document
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "GEO"
-    - "URB"
+    - GEO
+    - URB
 access:
   level: public
   availability: available
@@ -17,14 +17,16 @@ access:
   format: pdf
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2020/07/regulamento-municipal-de-cedencia-e-utilizacao-de-cartografia-digital.pdf"
+canonical_reference: https://www.cm-evora.pt/wp-content/uploads/2020/07/regulamento-municipal-de-cedencia-e-utilizacao-de-cartografia-digital.pdf
 licensing:
   status: known
-  licence: "Regulamento Municipal de Cedência e Utilização de Cartografia Digital"
+  licence: Regulamento Municipal de Cedência e Utilização de Cartografia Digital
   reuse: restricted
-  attribution: "Município de Évora"
+  attribution: Município de Évora
 temporal:
-  updated_at: "2020-12-10"
-  last_checked_at: "2026-08-12"
+  updated_at: 2020-12-10
+  last_checked_at: 2026-08-12
 caveats:
-  - "O regulamento aplica-se genericamente à cedência de cartografia digital municipal e não confirma a existência, disponibilização ou atualização de uma camada específica de rede ciclável."
+  - O regulamento aplica-se genericamente à cedência de cartografia digital
+    municipal e não confirma a existência, disponibilização ou atualização de
+    uma camada específica de rede ciclável.

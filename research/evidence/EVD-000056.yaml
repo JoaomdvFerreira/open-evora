@@ -1,24 +1,26 @@
 evidence_id: EVD-000056
-type: institutional
-source:
-  source_id: SRC-0046
-  publisher: "Município de Évora"
-  title: "Município de Évora — informação ao visitante / turismo"
-  source_reference: "https://www.cm-evora.pt/visitante/"
-  published_at: 2026
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "tourists and visitors"
-domain:
-  - "TOU"
+provenance:
+  sources:
+    - SRC-0046
+  extracted_at: 2026-08-11
 observation:
-  summary: "Já existem canais municipais de informação para visitantes e de turismo, abrangendo património, roteiros, alojamento, restauração, mobilidade e agenda, através de uma secção municipal de informação ao visitante já estabelecida, que inclui um posto de turismo."
+  summary: Já existem canais municipais de informação para visitantes e de
+    turismo, abrangendo património, roteiros, alojamento, restauração,
+    mobilidade e agenda, através de uma secção municipal de informação ao
+    visitante já estabelecida, que inclui um posto de turismo.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - tourists e visitantes
+  temporal:
+    status: unknown
+domains:
+  - TOU
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-05-A-E05. Interpretation: a generic 'Évora tourist guide' would likely duplicate existing information unless a specific current gap is demonstrated. No such gap was established in Batch A or Batch B; findings not promoted to a canonical problem."
+claim_authority: authoritative
+inference_limits:
+  - A existência dos canais de turismo não estabelece a sua completude,
+    usabilidade, acessibilidade ou ausência de lacunas específicas para
+    visitantes.

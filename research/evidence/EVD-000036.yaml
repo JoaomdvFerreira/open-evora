@@ -1,34 +1,25 @@
 evidence_id: EVD-000036
-type: institutional
-source:
-  source_id: SRC-0031
-  publisher: "Município de Évora"
-  title: "CLASE / Rede Social"
-  source_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/acao-social/rede-social-clase/clase/"
-  published_at: null
-  retrieved_at: 2026-08-10
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents seeking social support"
-  - "social/institutional actors"
-domain:
-  - "SOC"
+provenance:
+  sources:
+    - SRC-0031
+  extracted_at: 2026-08-10
 observation:
-  summary: "A rede CLASE inclui um grande número de organizações (cerca de 120 instituições participantes listadas pelo Município) e estruturas de coordenação temáticas."
+  summary: A rede CLASE inclui um grande número de organizações (cerca de 120
+    instituições participantes listadas pelo Município) e estruturas de
+    coordenação temáticas.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes à procura de apoio social
+    - agentes sociais/institucionais
+  temporal:
+    status: unknown
+domains:
+  - SOC
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-03-A-E06. A later digital opportunity, if any, is more likely to concern navigation, coordination, referral, eligibility or information quality than simply publishing a list of organisations."
-
-analysis:
-  related_problems:
-    - "PRB-0007"
-  contribution:
-    - "EXISTING-SOLUTION"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A dimensão e estrutura da rede CLASE não demonstram que os residentes
+    consigam navegar, compreender ou aceder facilmente às respostas disponíveis.

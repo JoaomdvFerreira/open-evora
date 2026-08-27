@@ -1,26 +1,26 @@
 evidence_id: EVD-000046
-type: institutional
-source:
-  source_id: SRC-0038
-  publisher: "ULSAC (Unidade Local de Saúde do Alentejo Central)"
-  title: "ULSAC mental-health and community-care responses"
-  source_reference: "https://www.ulsac.min-saude.pt/2025/01/16/ecsm-ia/"
-  published_at: 2025-01
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0002"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "people needing mental-health support"
-domain:
-  - "HEA"
+provenance:
+  sources:
+    - SRC-0116
+    - SRC-0038
+    - SRC-0117
+  extracted_at: 2026-08-11
 observation:
-  summary: "A evidência atual enfraquece uma alegação ampla de insuficiência não resolvida da capacidade de resposta em saúde mental: a ULSAC mantém iniciativas ativas de psiquiatria, cuidados na comunidade e saúde mental comunitária (ECSM-IA, Unidade de Cuidados na Comunidade, Psiquiatria e Saude Mental). A preocupação institucional mais antiga registada na EVD-000035 mantém-se válida como evidência histórica, mas a Ronda B NÃO sustenta tratar a «insuficiência da capacidade de resposta em saúde mental» como problema canónico atual sem dados sobre utilização, tempos de espera ou capacidade dos serviços."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-03-B-E05. Candidate problem decision: mental-health capacity is NOT created as a canonical problem; retained as evidence/validation question only, referenced from PRB-0007's possible_root_causes."
+  summary: A ULSAC documenta respostas de saúde mental e cuidados na comunidade
+    relevantes para Évora, incluindo a ECSM-IA, a Unidade de Cuidados na
+    Comunidade de Évora e serviços de Psiquiatria e Saúde Mental.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - pessoas que necessitam de apoio de saúde mental
+  temporal:
+    status: unknown
+domains:
+  - HEA
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A existência dos serviços não estabelece capacidade disponível, tempos de
+    espera, utilização, resultados ou suficiência da resposta em saúde mental.

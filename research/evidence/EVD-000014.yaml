@@ -1,28 +1,26 @@
 evidence_id: EVD-000014
-type: institutional
-source:
-  source_id: SRC-0019
-  publisher: "Autoridade de Transportes do Alentejo Central / CIMAC"
-  title: "Avaliação Anual do Contrato de Serviço Público de Transporte de Passageiros do Alentejo Central"
-  source_reference: "https://www.cimac.pt/?listas_ficheiros=relatorio-avaliacao-anual-do-contrato-do-servico-publico-de-transporte-de-passageiros-do-alentejo-central"
-  published_at: 2026-03
-  retrieved_at: 2026-08-10
-additional_sources:
-  - "SRC-0020"
-geography:
-  level: intermunicipal
-  area: "Alentejo Central"
-population:
-  - "public-transport users"
-  - "developers/data consumers"
-domain:
-  - "MOB"
-  - "DIG"
+provenance:
+  sources:
+    - SRC-0019
+  extracted_at: 2026-08-10
 observation:
-  summary: "A CIMAC confirma que a rede TPAC foi convertida em ficheiros GTFS e disponibilizada através do Google Maps em 2025. Numa análise delimitada de materiais oficiais/públicos da TPAC e da CIMAC, não foi localizado nenhum ponto de acesso público direto para descarregamento de GTFS nem uma licença explícita de reutilização de GTFS."
+  summary: A CIMAC documenta que a rede TPAC foi convertida em ficheiros GTFS e
+    disponibilizada através do Google Maps em 2025.
+scope:
+  geography:
+    level: intermunicipal
+    area: Alentejo Central
+  populations:
+    - transporte público utilizadores
+    - promotores/utilizadores de dados
+  temporal:
+    as_of: "2025"
+domains:
+  - MOB
+  - DIG
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Boundary: do not encode 'no public feed exists'. Endpoint/licence remain UNKNOWN (not located in this bounded review, not confirmed absent)."
+claim_authority: authoritative
+inference_limits:
+  - A disponibilização de GTFS através do Google Maps não estabelece a
+    existência de um endpoint público de descarga nem condições explícitas de
+    reutilização do GTFS.

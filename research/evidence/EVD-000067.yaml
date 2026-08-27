@@ -1,25 +1,27 @@
 evidence_id: EVD-000067
-type: institutional
-source:
-  source_id: SRC-0057
-  publisher: "Município de Évora"
-  title: "Municipal occurrence-management platform (Comunicação de Ocorrências)"
-  source_reference: "https://www.cm-evora.pt/servicos/comunicacao-de-ocorrencias/"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "PUB"
-  - "DIG"
+provenance:
+  sources:
+    - SRC-0057
+  extracted_at: 2026-08-11
 observation:
-  summary: "Já existe um canal digital de comunicação de ocorrências: os cidadãos podem comunicar e acompanhar digitalmente problemas no espaço público (por exemplo, fugas de água e sinalização caída), com acompanhamento online até à conclusão."
+  summary: A plataforma municipal de Comunicação de Ocorrências permite aos
+    residentes comunicar problemas no espaço público através da Web ou de
+    dispositivos móveis e acompanhar em linha o estado das ocorrências até ao
+    encerramento.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes
+  temporal:
+    as_of: 2026-08-11
+domains:
+  - PUB
+  - DIG
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-06-A-E05. Interpretation: a generic 'report a problem' app would duplicate existing municipal capability; any digital opportunity would need evidence of routing, transparency, usability, data interoperability or follow-through gaps in the existing system."
+claim_authority: authoritative
+inference_limits:
+  - A existência da plataforma e do acompanhamento de estado não estabelece
+    tempos de resposta, qualidade do encaminhamento, resolução, satisfação ou
+    desempenho operacional.

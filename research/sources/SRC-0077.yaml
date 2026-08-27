@@ -1,14 +1,14 @@
 source_id: SRC-0077
-publisher: "Tur4all"
-name: "Tur4all — página da experiência de turismo acessível Évora Histórica"
+publisher: Tur4all
+name: Tur4all — página da experiência de turismo acessível Évora Histórica
 resource_type: webpage
 scope:
   geography:
     level: local_area
-    area: "Centro Histórico de Évora"
+    area: Centro Histórico de Évora
   domains:
-    - "ACC"
-    - "TOU"
+    - ACC
+    - TOU
 access:
   level: public
   availability: available
@@ -17,9 +17,9 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.tur4all.com/experiences/evora-historica"
+canonical_reference: https://www.tur4all.com/experiences/evora-historica
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-11"
+  last_checked_at: 2026-08-11

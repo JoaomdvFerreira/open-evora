@@ -1,0 +1,38 @@
+source_id: SRC-0118
+publisher: APCE
+name: APCE — contacto institucional D5 sobre programas de acessibilidade
+  (D5-ENG-OP-003)
+resource_type: correspondence
+scope:
+  geography:
+    level: city
+    area: Évora
+  domains:
+    - ACC
+    - URB
+    - ECO
+access:
+  level: private
+  availability: available
+  machine_readable: false
+  method: direct
+  format: text
+acquisition:
+  method: direct_contact
+  obtained_at: 2026-08-12
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  updated_at: 2026-08-20
+  last_checked_at: 2026-08-20
+  update_frequency: one_off
+caveats:
+  - Registo canónico sanitizado de um único fio de contacto institucional que
+    inclui a resposta inicial de 12 de agosto de 2026 e o seguimento de 20 de
+    agosto de 2026.
+  - Não contém nomes pessoais, endereços de correio eletrónico, correspondência
+    bruta nem listas de estabelecimentos; a identidade individual do
+    interlocutor não é publicada.
+  - A existência de várias Observations extraídas deste fio não constitui
+    corroboração independente.

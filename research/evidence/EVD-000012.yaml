@@ -1,38 +1,29 @@
 evidence_id: EVD-000012
-type: formal-public
-source:
-  source_id: SRC-0003
-  publisher: "Município de Évora"
-  title: "Plano de Urbanização de Évora - 4th revision material (2026 preventive public-participation report)"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2026/06/Relatorio-PP-PUE_MAIO_026-V2-1.pdf"
-  published_at: 2026-06
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "city and surrounding urban structure"
-population:
-  - "formal participants in the 2026 PUE process"
-domain:
-  - "MOB"
-  - "GEO"
-  - "URB"
+provenance:
+  sources:
+    - SRC-0003
+  extracted_at: 2026-08-10
 observation:
-  summary: "O relatório de participação preventiva do PUE de 2026 regista participações formais relativas a transporte público dedicado, à viabilidade e ao faseamento do Metrobus, à programação da rede ciclável, a espaços intermodais, à integração ferroviária, a zonas de baixas emissões e à circulação e ao estacionamento na envolvente de uma escola."
+  summary: O relatório de participação preventiva do PUE de 2026 regista
+    participações formais relativas a transporte público dedicado, à viabilidade
+    e ao faseamento do Metrobus, à programação da rede ciclável, a espaços
+    intermodais, à integração ferroviária, a zonas de baixas emissões e à
+    circulação e ao estacionamento na envolvente de uma escola.
+scope:
+  geography:
+    level: city
+    area: cidade e envolvente urbana estrutura
+  populations:
+    - participantes formais no processo PUE de 2026
+  temporal:
+    as_of: "2026"
+domains:
+  - MOB
+  - GEO
+  - URB
 evidence_nature: claim
-strength: primary-non-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Strength nuance: primary-non-authoritative for the claim content, while the fact that the participation occurred is itself an authoritative record. Boundary: this is evidence of current public concern/questions, not proof that the proposals are technically correct or representative of residents generally."
-
-analysis:
-  related_problems:
-    - "PRB-0004"
-    - "PRB-0005"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "PHYSICAL"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - O registo oficial estabelece que estas participações foram apresentadas, não
+    que as propostas dos participantes sejam factualmente corretas,
+    representativas ou aprovadas.

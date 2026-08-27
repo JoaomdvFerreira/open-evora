@@ -1,126 +1,557 @@
 problem_id: PRB-0003
-title: "Barreiras pedonais e de acessibilidade em partes de Évora, com persistência atual ainda por validar"
+title: Barreiras pedonais e de acessibilidade em partes de Évora, com
+  persistência atual ainda por validar
 domain:
-  - "ACC"
-  - "MOB"
-  - "URB"
+  - ACC
+  - MOB
+  - URB
 geography:
   level: city
-  area: "Évora"
+  area: Évora
 affected_populations:
-  - "pessoas com mobilidade reduzida"
-  - "outros grupos de peões vulneráveis"
-problem_statement: "Em Évora, estão documentadas barreiras pedonais e de acessibilidade e existe um programa estabelecido de planeamento da acessibilidade, mas as intervenções físicas em curso e os testes de percursos experimentais de 2026 exigem validar, face às condições vividas atuais, quais são exatamente as barreiras que ainda persistem."
-causal_reading: "Esta é uma interpretação não validada: as barreiras apontam sobretudo para infraestrutura física; a informação/coordenação digital é lida como secundária e contingente, dependente de evidência futura que a estabeleça."
+  - pessoas com mobilidade reduzida
+  - outros grupos de peões vulneráveis
+problem_statement: Em Évora, estão documentadas barreiras pedonais e de
+  acessibilidade e existe um programa estabelecido de planeamento da
+  acessibilidade, mas as intervenções físicas em curso e os testes de percursos
+  experimentais de 2026 exigem validar, face às condições vividas atuais, quais
+  são exatamente as barreiras que ainda persistem.
+causal_reading: "Esta é uma interpretação não validada: as barreiras apontam
+  sobretudo para infraestrutura física; a informação/coordenação digital é lida
+  como secundária e contingente, dependente de evidência futura que a
+  estabeleça."
 investigation:
   open_questions:
-    - question: "Quais as barreiras concretas que persistem hoje, a nível de localização, face às intervenções físicas em curso e à correção parcial já reportada?"
-      why_open: "A APCE confirma que apenas algumas barreiras identificadas foram corrigidas, sem fornecer um inventário ao nível da localização; o projeto corretivo da EB1 Azaruja é recente (2025-2026) e o seu estado pós-intervenção não foi verificado; as plataformas de turismo acessível têm atualidade desconhecida."
-      current_action: "Testes de percursos experimentais de 2026 (4ª revisão do PUE) convidam o público a testar fisicamente percursos pedonais/de mobilidade suave e contribuir perceções sobre inclusão e acessibilidade."
-      resolution_condition: "Um inventário de barreiras ao nível da localização/atual que estabeleça quais as barreiras concretas que persistem hoje."
+    - question: Quais as barreiras concretas que persistem hoje, a nível de
+        localização, face às intervenções físicas em curso e à correção parcial
+        já reportada?
+      why_open: A APCE confirma que apenas algumas barreiras identificadas foram
+        corrigidas, sem fornecer um inventário ao nível da localização; o
+        projeto corretivo da EB1 Azaruja é recente (2025-2026) e o seu estado
+        pós-intervenção não foi verificado; as plataformas de turismo acessível
+        têm atualidade desconhecida.
+      current_action: Testes de percursos experimentais de 2026 (4ª revisão do PUE)
+        convidam o público a testar fisicamente percursos pedonais/de mobilidade
+        suave e contribuir perceções sobre inclusão e acessibilidade.
+      resolution_condition: Um inventário de barreiras ao nível da localização/atual
+        que estabeleça quais as barreiras concretas que persistem hoje.
       evidence:
-        - "EVD-000029"
-        - "EVD-000112"
-        - "EVD-000113"
+        - EVD-000029
+        - EVD-000112
+        - EVD-000113
+        - EVD-000148
   path:
     initial_signal:
-      summary: "O relatório setorial de mobilidade do PUE documentou descontinuidade da infraestrutura pedonal, infraestrutura pedonal subdimensionada e numerosas barreiras arquitetónicas/urbanísticas na cidade, incluindo constrangimentos de acessibilidade em terminais/estação de autocarros."
+      summary: O relatório setorial de mobilidade do PUE documentou descontinuidade da
+        infraestrutura pedonal, infraestrutura pedonal subdimensionada e
+        numerosas barreiras arquitetónicas/urbanísticas na cidade, incluindo
+        constrangimentos de acessibilidade em terminais/estação de autocarros.
       evidence:
-        - "EVD-000004"
-        - "EVD-000006"
+        - EVD-000004
+        - EVD-000006
     development:
-      summary: "Um registo de projeto PRR confirmou um conjunto concreto de barreiras pré-intervenção numa localização específica (EB1 Azaruja), corroborando que o diagnóstico documental teve manifestações locais concretas. O programa participativo Acesso Universal 1.3 da APCE documentou um processo ativo de identificação e melhoria de barreiras no Centro Histórico com participação direta de pessoas com deficiência, culminando num inventário conjunto concluído em dezembro de 2025 para equipamentos culturais municipais."
+      summary: Um registo de projeto PRR confirmou um conjunto concreto de barreiras
+        pré-intervenção numa localização específica (EB1 Azaruja), corroborando
+        que o diagnóstico documental teve manifestações locais concretas. O
+        programa participativo Acesso Universal 1.3 da APCE documentou um
+        processo ativo de identificação e melhoria de barreiras no Centro
+        Histórico com participação direta de pessoas com deficiência, culminando
+        num inventário conjunto concluído em dezembro de 2025 para equipamentos
+        culturais municipais.
       evidence:
-        - "EVD-000081"
-        - "EVD-000085"
-        - "EVD-000104"
+        - EVD-000081
+        - EVD-000085
+        - EVD-000104
     delimitation:
-      summary: "A resposta institucional direta da APCE (agosto de 2026) confirmou a metodologia (avaliação in-loco com participação direta de pessoas com mobilidade reduzida) e nomeou fatores de barreira (inclinação, localização) em acessos, com correção parcial já realizada mas sem inventário ao nível da localização. Um programa distinto de acessibilidade em comércios do Centro Histórico foi identificado como uma segunda via de solução existente."
+      summary: A resposta institucional direta da APCE (agosto de 2026) confirmou a
+        metodologia (avaliação in-loco com participação direta de pessoas com
+        mobilidade reduzida) e nomeou fatores de barreira (inclinação,
+        localização) em acessos, com correção parcial já realizada mas sem
+        inventário ao nível da localização. Um programa distinto de
+        acessibilidade em comércios do Centro Histórico foi identificado como
+        uma segunda via de solução existente.
       evidence:
-        - "EVD-000112"
-        - "EVD-000113"
-        - "EVD-000114"
+        - EVD-000112
+        - EVD-000113
+        - EVD-000114
 evidence:
-  - "EVD-000004"
-  - "EVD-000006"
-  - "EVD-000009"
-  - "EVD-000029"
-  - "EVD-000030"
-  - "EVD-000081"
-  - "EVD-000085"
-  - "EVD-000086"
-  - "EVD-000087"
-  - "EVD-000088"
-  - "EVD-000104"
-  - "EVD-000112"
-  - "EVD-000113"
-  - "EVD-000114"
-  - "EVD-000131"
+  - evidence_id: EVD-000004
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000006
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000009
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000029
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000081
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000148
+    effects:
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000085
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000086
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000087
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000088
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000104
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000112
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000113
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000114
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000131
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
 evidence_status: corroborated
 validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
-
 decision_basis:
   contract_version: "0.1"
+  eligibility_basis: >-
+    PRB-0003 está suficientemente documentado quanto à existência de uma
 
-  eligibility_basis: "PRB-0003 is sufficiently documented as a real, bounded manifestation to be a distinct problem of investigation, but Eligibility is NOT asserted as PASS: it remains HOLD. Pedestrian/accessibility barriers are documented across materially distinct sources — institutional planning diagnosis (EVD-000004, EVD-000006), a concrete confirmed pre-intervention barrier set at EB1 Azaruja (EVD-000081), and APCE's in-loco assessment work naming barrier factors in accesses (EVD-000113) — so the existence of a bounded physical-accessibility manifestation is not the open question. What remains unresolved, and is the specific reason Eligibility stays HOLD, is that current/boundary evidence (EVD-000081's own current/recent corrective-project status; EVD-000112/EVD-000113's confirmation that only some identified problems have been corrected, without a location-level completed/outstanding breakdown; EVD-000029's 2026 Experimental Actions explicitly treating present-day conditions as requiring contemporary lived testing rather than settled documentary fact) means present-day persistence of specific barriers at exact locations is not established. No concrete, resident-facing consequence or journey evidence — what affected residents actually experience as a result of these barriers today — is characterized on record; the resident journey remains only partially understood, the remaining gap is only partially supported by evidence, and digital causality fails for exactly this reason. This basis records why the manifestation side of Eligibility is documented, not why Eligibility should be promoted."
+    manifestação física delimitada para constituir um problema de investigação
 
-  corroboration_basis: "Corroboration is SUPPORTED only for a geographically/temporally bounded claim: pedestrian/accessibility barriers are documented in parts of Évora, not that they currently persist everywhere identified historically and not at municipality-wide prevalence. Institutional planning diagnosis (EVD-000004, EVD-000006 — PUE Sector Report: Mobilidade, SRC-0017) documents pedestrian-infrastructure discontinuity, undersized pedestrian infrastructure, and numerous architectural/urbanistic barriers across the city, plus specific terminal/bus-station accessibility constraints. A materially distinct primary source (EVD-000081 — PRR project record, SRC-0068) confirms a concrete, factual pre-intervention barrier set at EB1 Azaruja (narrow pavement, five steps, non-compliant vehicle-gate access), corroborating that the planning-document diagnosis has had at least one concrete local manifestation, not only institutional description. The Acesso Universal 1.3 participatory programme (EVD-000085, CONFIRMS + REFINES participatory evidence, and EVD-000104, the stronger completed-inventory CONFIRMS/current-state record that supersedes EVD-000086's earlier 'verification continuing' claim — one shared lineage, APCE/SRC-0073/SRC-0091) documents an active, affected-user-participatory barrier-identification and improvement process in the Historic Centre, culminating in a December 2025 completed joint accessibility inventory (present/missing conditions and possible improvements) for municipal cultural facilities. EVD-000086 itself is retained only as boundary/current-state evidence (its own canonical contribution is CURRENT-STATE-UPDATE + EXISTING-SOLUTION, superseded in substance by EVD-000104) and is not counted as adding independent corroborative weight. APCE's direct D5 institutional response (EVD-000112, EVD-000113 — D5-ENG-OP-003) adds a materially distinct engagement confirming, as of August 2026, that in-loco accessibility assessments identified barrier factors (inclination, location) in accesses and that some identified problems were corrected — without a location-level inventory or a completed/outstanding breakdown. Together these converge on the bounded claim that pedestrian/accessibility barriers are documented, with concrete confirmed instances, in specific parts of Évora (EB1 Azaruja; Historic Centre; municipal cultural facilities; general city-level planning diagnosis). This basis does NOT establish municipality-wide prevalence, quantified frequency or severity, that barriers identified historically still persist today at every documented location, a fully characterized resident journey/consequence, or any causal/population-scale generalization — those remain open: the resident journey and the remaining gap are only partially understood/supported by evidence, and this record continues to require deepening rather than closure."
+    distinto, mas a Eligibility não é promovida: permanece HOLD. As barreiras
 
+    pedonais e de acessibilidade estão documentadas através de linhas de
+    evidência
+
+    materialmente distintas — o diagnóstico institucional de planeamento
+
+    (EVD-000004, EVD-000006), um conjunto concreto de barreiras pré-intervenção
+    na
+
+    EB1 da Azaruja (EVD-000081) e o trabalho de avaliação in loco da APCE, que
+
+    identificou fatores de barreira nos acessos (EVD-000113). Assim, a
+    existência
+
+    de uma manifestação física delimitada não é a questão em aberto.
+
+
+    Persistem, contudo, duas limitações distintas. Em primeiro lugar, a
+    evidência
+
+    mais recente não permite estabelecer quais as barreiras específicas que
+
+    continuam hoje por corrigir em cada localização: EVD-000148 documenta uma
+
+    resposta corretiva recente; EVD-000112 e EVD-000113 confirmam que algumas
+
+    barreiras foram corrigidas sem fornecer uma discriminação completa por
+
+    localização; e EVD-000029 mantém a necessidade de teste contemporâneo das
+
+    condições vividas. Esta é uma limitação de atualidade e persistência da
+
+    manifestação.
+
+
+    Em segundo lugar, não existe ainda evidência concreta suficiente sobre a
+
+    consequência ou percurso vivido pelos residentes afetados — isto é, sobre o
+
+    que experienciam atualmente em resultado destas barreiras. Esta lacuna de
+
+    consequência/percurso é a razão pela qual a Eligibility permanece HOLD /
+
+    REVIEW_REQUIRED por MISSING_CONSEQUENCE. A limitação relativa à persistência
+
+    atual das barreiras delimita a Corroboration, mas não substitui nem explica
+
+    esta lacuna distinta de consequência.
+  corroboration_basis: >-
+    A Corroboration é sustentada apenas para uma afirmação geográfica e
+
+    temporalmente delimitada: existem barreiras pedonais e de acessibilidade
+
+    documentadas em partes específicas de Évora. A evidência disponível não
+
+    estabelece prevalência à escala de todo o município nem que todas as
+    barreiras
+
+    identificadas historicamente continuem hoje presentes nas mesmas
+    localizações.
+
+
+    O diagnóstico institucional de planeamento (EVD-000004, EVD-000006;
+
+    SRC-0017) documenta descontinuidades e subdimensionamento da infraestrutura
+
+    pedonal, numerosas barreiras arquitetónicas e urbanísticas e
+    constrangimentos
+
+    específicos de acessibilidade. Uma fonte primária materialmente distinta
+
+    (EVD-000081; SRC-0068) documenta um conjunto concreto de barreiras
+
+    pré-intervenção na EB1 da Azaruja, estabelecendo pelo menos uma manifestação
+
+    local específica para além da caracterização geral de planeamento.
+
+
+    O programa participativo Acesso Universal 1.3 acrescenta evidência de
+    suporte
+
+    e delimitação. EVD-000085 e EVD-000104 documentam um processo participativo
+
+    de identificação e melhoria das condições de acessibilidade no Centro
+
+    Histórico, incluindo um inventário conjunto concluído em dezembro de 2025
+
+    para equipamentos culturais municipais. EVD-000086 documenta um estado
+
+    anterior desse mesmo processo e é mantido como evidência de limite e de
+
+    resposta existente; não acrescenta uma nova linha independente de
+
+    corroboração.
+
+
+    A resposta institucional direta da APCE de agosto de 2026
+
+    (EVD-000112, EVD-000113; SRC-0118) acrescenta uma atualização da mesma voz
+
+    institucional: confirma avaliações in loco, identifica fatores de barreira
+    como
+
+    inclinação e localização dos acessos e refere que algumas barreiras foram
+
+    corrigidas, mas não fornece um inventário completo das situações corrigidas
+    e
+
+    por corrigir ao nível da localização.
+
+
+    Em conjunto, estas linhas sustentam a afirmação delimitada de que existem
+
+    barreiras pedonais e de acessibilidade documentadas em partes específicas de
+
+    Évora. Não estabelecem prevalência municipal, frequência ou severidade
+
+    quantificadas, persistência atual de todas as barreiras historicamente
+
+    documentadas, uma consequência atual plenamente caracterizada para os
+
+    residentes nem uma generalização causal ou populacional para além do âmbito
+    da
+
+    evidência disponível.
   manifestation:
-    kind: "physical accessibility / pedestrian-infrastructure barrier"
-    summary: "O diagnóstico institucional de planeamento (EVD-000004, EVD-000006 — Relatório Setorial do PUE: Mobilidade) documenta descontinuidade e subdimensionamento da infraestrutura pedonal, numerosas barreiras arquitetónicas e urbanísticas na cidade e constrangimentos específicos de acessibilidade no terminal e na estação rodoviária para pessoas com mobilidade reduzida.\n\nUma fonte primária materialmente distinta (EVD-000081 — registo do projeto PRR para a EB1 da Azaruja) confirma um conjunto concreto e factual de barreiras pré-intervenção numa localização específica: um passeio estreito, cinco degraus na entrada pedonal principal e um acesso pelo portão de veículos não conforme. A resposta institucional direta da APCE (EVD-000113) identifica ainda fatores de barreira — inclinação e localização — detetados nos acessos através do seu trabalho de avaliação in loco.\n\nEm conjunto, estes elementos estabelecem que as barreiras físicas pedonais e de acessibilidade constituem uma manifestação documentada e concreta, e não uma suposição. Por si só, não estabelecem consequências atuais vividas pelos residentes nem um inventário exaustivo e atual das barreiras por localização."
-    evidence:
-      - "EVD-000004"
-      - "EVD-000006"
-      - "EVD-000081"
-      - "EVD-000113"
+    kind: barreiras físicas de acessibilidade e infraestrutura pedonal
+    summary: >-
+      O diagnóstico institucional de planeamento (EVD-000004, EVD-000006 —
+      Relatório Setorial do PUE: Mobilidade) documenta descontinuidade e
+      subdimensionamento da infraestrutura pedonal, numerosas barreiras
+      arquitetónicas e urbanísticas na cidade e constrangimentos específicos de
+      acessibilidade no terminal e na estação rodoviária para pessoas com
+      mobilidade reduzida.
 
+
+      Uma fonte primária materialmente distinta (EVD-000081 — registo do projeto
+      PRR para a EB1 da Azaruja) confirma um conjunto concreto e factual de
+      barreiras pré-intervenção numa localização específica: um passeio
+      estreito, cinco degraus na entrada pedonal principal e um acesso pelo
+      portão de veículos não conforme. A resposta institucional direta da APCE
+      (EVD-000113) identifica ainda fatores de barreira — inclinação e
+      localização — detetados nos acessos através do seu trabalho de avaliação
+      in loco.
+
+
+      Em conjunto, estes elementos estabelecem que as barreiras físicas pedonais
+      e de acessibilidade constituem uma manifestação documentada e concreta, e
+      não uma suposição. Por si só, não estabelecem consequências atuais vividas
+      pelos residentes nem um inventário exaustivo e atual das barreiras por
+      localização.
+    evidence:
+      - EVD-000004
+      - EVD-000006
+      - EVD-000081
+      - EVD-000113
   overlap_check:
     performed: true
-    summary: "No other canonical PRB-* addresses pedestrian/accessibility barriers in Évora; PRB-0003 does not duplicate or overlap another record. This reflects the existing canonical corpus structure (no other PRB-* record shares this domain/claim) rather than a new assessment performed for this decision_basis."
+    summary: >-
+      Não existe outro PRB canónico que trate especificamente as barreiras
+      pedonais
+
+      e de acessibilidade em Évora; PRB-0003 não duplica nem se sobrepõe
+
+      materialmente a outro registo. Esta conclusão reflete a estrutura canónica
+      já
+
+      estabelecida e não constitui uma nova avaliação produzida nesta migração.
     related_problems: []
-
   currentness:
-    assessment: "MÉDIA. EVD-000004 e EVD-000006 (Relatório Setorial do PUE de fevereiro de 2025) e a descrição pré-intervenção de EVD-000081 são históricos face a agosto de 2026. O próprio projeto corretivo associado a EVD-000081 é atual/recente (2025-2026), pelo que a descrição das barreiras antes da intervenção não deve ser assumida como necessariamente ainda válida hoje sem a verificação do estado atual prevista na própria investigação.\n\nA evidência mais recente disponível é a resposta direta da APCE de agosto de 2026 (EVD-000112, EVD-000113). Confirma que continuam a ser identificados fatores de barreira em avaliações in loco e que algumas correções já foram realizadas, mas não fornece um inventário por localização que permita saber quais as barreiras específicas que permanecem por corrigir.\n\nNenhum conjunto de dados ou registo estabelece um estado exaustivo e atual das barreiras para todo o âmbito deste problema."
-    evidence:
-      - "EVD-000081"
-      - "EVD-000112"
-      - "EVD-000113"
+    assessment: >-
+      MÉDIA. EVD-000004 e EVD-000006 (Relatório Setorial do PUE de fevereiro de
+      2025) e a descrição pré-intervenção de EVD-000081 são históricos face a
+      agosto de 2026. O projeto corretivo documentado em EVD-000148 é
+      atual/recente (2025-2026), pelo que a descrição das barreiras antes da
+      intervenção não deve ser assumida como necessariamente ainda válida hoje
+      sem a verificação do estado atual prevista na própria investigação.
 
+
+      A evidência mais recente disponível é a resposta direta da APCE de agosto
+      de 2026 (EVD-000112, EVD-000113). Confirma que continuam a ser
+      identificados fatores de barreira em avaliações in loco e que algumas
+      correções já foram realizadas, mas não fornece um inventário por
+      localização que permita saber quais as barreiras específicas que
+      permanecem por corrigir.
+
+
+      Nenhum conjunto de dados ou registo estabelece um estado exaustivo e atual
+      das barreiras para todo o âmbito deste problema.
+    evidence:
+      - EVD-000081
+      - EVD-000112
+      - EVD-000113
+      - EVD-000148
   contradiction_search:
     performed: true
-    summary: "Foi realizada uma procura deliberada de evidência que pudesse contradizer ou restringir a leitura corroborada, sobretudo através do contacto institucional direto com a APCE (EVD-000112, EVD-000113) e da verificação explícita de se a descrição pré-intervenção de EVD-000081 poderia ser tratada como um facto atual.\n\nA procura não encontrou evidência de que as barreiras documentadas estejam hoje totalmente resolvidas. A própria resposta da APCE descreve apenas uma correção parcial, sem detalhe por localização, e nenhum registo estabelece que o estado pós-intervenção do projeto corretivo da EB1 da Azaruja tenha sido verificado.\n\nTambém não foi encontrada evidência que suporte uma afirmação mais abrangente, como prevalência em todo o município ou uma medida quantificada de severidade ou frequência. Nenhuma dessas afirmações é feita neste problema."
+    summary: >-
+      Foi realizada uma procura deliberada de evidência que pudesse contradizer
+      ou restringir a leitura corroborada, sobretudo através do contacto
+      institucional direto com a APCE (EVD-000112, EVD-000113) e da verificação
+      explícita de se a descrição pré-intervenção de EVD-000081 poderia ser
+      tratada como um facto atual.
+
+
+      A procura não encontrou evidência de que as barreiras documentadas estejam
+      hoje totalmente resolvidas. A própria resposta da APCE descreve apenas uma
+      correção parcial, sem detalhe por localização, e nenhum registo estabelece
+      que o estado pós-intervenção do projeto corretivo da EB1 da Azaruja tenha
+      sido verificado.
+
+
+      Também não foi encontrada evidência que suporte uma afirmação mais
+      abrangente, como prevalência em todo o município ou uma medida
+      quantificada de severidade ou frequência. Nenhuma dessas afirmações é
+      feita neste problema.
     evidence:
-      - "EVD-000112"
-      - "EVD-000113"
-
-  corroboration_statement: "Em Évora, estão documentadas barreiras pedonais e de acessibilidade e existe um programa estabelecido de planeamento da acessibilidade, mas as intervenções físicas em curso e os testes de percursos experimentais de 2026 exigem validar, face às condições vividas atuais, quais são exatamente as barreiras que ainda persistem."
-
+      - EVD-000112
+      - EVD-000113
+  corroboration_statement: Em Évora, estão documentadas barreiras pedonais e de
+    acessibilidade e existe um programa estabelecido de planeamento da
+    acessibilidade, mas as intervenções físicas em curso e os testes de
+    percursos experimentais de 2026 exigem validar, face às condições vividas
+    atuais, quais são exatamente as barreiras que ainda persistem.
   supporting_evidence:
-    - "EVD-000004"
-    - "EVD-000006"
-    - "EVD-000081"
-    - "EVD-000085"
-    - "EVD-000104"
-    - "EVD-000112"
-    - "EVD-000113"
-
+    - EVD-000004
+    - EVD-000006
+    - EVD-000081
+    - EVD-000085
+    - EVD-000104
+    - EVD-000112
+    - EVD-000113
   boundary_evidence:
-    - "EVD-000029"
-    - "EVD-000086"
-    - "EVD-000088"
-    - "EVD-000114"
-    - "EVD-000131"
+    - EVD-000029
+    - EVD-000086
+    - EVD-000088
+    - EVD-000114
+    - EVD-000131
+    - EVD-000148
+  independence_assessment: >-
+    A independência da evidência é MÉDIA e não é artificialmente reforçada pelo
+    número bruto de registos EVD.
 
-  independence_assessment: "A independência da evidência é MÉDIA e não é artificialmente reforçada pelo número bruto de registos EVD.\n\nEstão documentadas linhas de proveniência e fontes materialmente distintas: (1) MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT (EVD-000004, EVD-000006; SRC-0017), um único documento municipal de planeamento e uma única voz institucional — Município de Évora; (2) o registo autónomo do projeto PRR da EB1 da Azaruja (EVD-000081; SRC-0068), publicado através do PRR Transparência, uma fonte pública oficial materialmente distinta da família de documentos de planeamento do Município e que fornece corroboração factual forte de um conjunto concreto de barreiras pré-intervenção numa localização; (3) ACC-2025-APCE-ACESSO-UNIVERSAL-1.3 (EVD-000085 e EVD-000104 como evidência de suporte; EVD-000086 apenas como evidência de limite/estado entretanto ultrapassado; SRC-0073/SRC-0091), tratado como uma única linha de evidência da APCE e não como várias linhas independentes; e (4) o contacto institucional direto com a APCE (EVD-000112, EVD-000113), que corresponde à mesma voz institucional da linha anterior e, por isso, não é contado como uma instituição independente adicional, mas como uma manifestação mais recente da mesma voz.\n\nA linha (2) é materialmente distinta da linha (1) pela entidade publicadora e pela origem documental. Essa distinção reforça a afirmação delimitada para além da caracterização existente nos documentos de planeamento, através de detalhe factual concreto e verificado. No entanto, uma fonte ou publicação distinta não demonstra, por si só, a existência de uma segunda instituição que tenha observado independentemente a barreira: o corpus não estabelece que o PRR Transparência corresponda a uma instituição independente que tenha avaliado a situação por iniciativa própria, em vez de constituir o canal oficial de publicação da informação do próprio projeto.\n\nIsto não reduz a força probatória de EVD-000081, que continua a constituir corroboração factual primária e oficial da ocorrência concreta e delimitada que documenta. Significa apenas que essa linha não é contabilizada como uma segunda voz institucional plenamente independente face à linha municipal. Do mesmo modo, as duas linhas ligadas à APCE representam uma única voz institucional, e não duas.\n\nEm síntese, esta avaliação assenta em linhas de fonte materialmente distintas — planeamento municipal/PUE, registo de projeto PRR e APCE —, uma base mais fraca do que a existência confirmada de várias instituições observadoras independentes. Por essa razão, a independência permanece MÉDIA e não ALTA."
 
+    Estão documentadas linhas de proveniência e fontes materialmente distintas:
+    (1) MOB-2025-02-PUE-MOBILIDADE-SECTOR-REPORT (EVD-000004, EVD-000006;
+    SRC-0017), um único documento municipal de planeamento e uma única voz
+    institucional — Município de Évora; (2) o registo autónomo do projeto PRR da
+    EB1 da Azaruja (EVD-000081; SRC-0068), publicado através do PRR
+    Transparência, uma fonte pública oficial materialmente distinta da família
+    de documentos de planeamento do Município e que fornece corroboração factual
+    forte de um conjunto concreto de barreiras pré-intervenção numa localização;
+    (3) ACC-2025-APCE-ACESSO-UNIVERSAL-1.3 (EVD-000085 e EVD-000104 como
+    evidência de suporte; EVD-000086 apenas como evidência de limite/estado
+    entretanto ultrapassado; SRC-0073/SRC-0091), tratado como uma única linha de
+    evidência da APCE e não como várias linhas independentes; e (4) o contacto
+    institucional direto com a APCE (EVD-000112, EVD-000113), que corresponde à
+    mesma voz institucional da linha anterior e, por isso, não é contado como
+    uma instituição independente adicional, mas como uma manifestação mais
+    recente da mesma voz.
+
+
+    A linha (2) é materialmente distinta da linha (1) pela entidade publicadora
+    e pela origem documental. Essa distinção reforça a afirmação delimitada para
+    além da caracterização existente nos documentos de planeamento, através de
+    detalhe factual concreto e verificado. No entanto, uma fonte ou publicação
+    distinta não demonstra, por si só, a existência de uma segunda instituição
+    que tenha observado independentemente a barreira: o corpus não estabelece
+    que o PRR Transparência corresponda a uma instituição independente que tenha
+    avaliado a situação por iniciativa própria, em vez de constituir o canal
+    oficial de publicação da informação do próprio projeto.
+
+
+    Isto não reduz a força probatória de EVD-000081, que continua a constituir
+    corroboração factual primária e oficial da ocorrência concreta e delimitada
+    que documenta. Significa apenas que essa linha não é contabilizada como uma
+    segunda voz institucional plenamente independente face à linha municipal. Do
+    mesmo modo, as duas linhas ligadas à APCE representam uma única voz
+    institucional, e não duas.
+
+
+    Em síntese, esta avaliação assenta em linhas de fonte materialmente
+    distintas — planeamento municipal/PUE, registo de projeto PRR e APCE —, uma
+    base mais fraca do que a existência confirmada de várias instituições
+    observadoras independentes. Por essa razão, a independência permanece MÉDIA
+    e não ALTA.
   scope:
-    geography: "Circunscrito a partes específicas e documentadas de Évora: o Centro Histórico e equipamentos culturais municipais no âmbito do Acesso Universal 1.3, as instalações da EB1 da Azaruja documentadas pelo PRR e descrições gerais ao nível da cidade constantes do Relatório Setorial do PUE. Não está corroborado como uma condição uniforme em todo o município."
-    population: "Pessoas com mobilidade reduzida e outros grupos de peões vulneráveis. A evidência da APCE diz respeito especificamente a pessoas com deficiência ou mobilidade reduzida envolvidas nos seus processos participativos e de avaliação in loco, e não à população em geral."
-    temporal: "Circunscrito aos períodos documentados: o diagnóstico de planeamento de fevereiro de 2025 (EVD-000004, EVD-000006), o período pré-intervenção e de intervenção corretiva de 2025-2026 na EB1 da Azaruja (EVD-000081), o programa Acesso Universal 1.3 de 2025, incluindo o inventário concluído em dezembro de 2025 (EVD-000085, EVD-000104), e o contacto direto com a APCE em agosto de 2026 (EVD-000112, EVD-000113).\n\nA afirmação não se estende a um estado das barreiras plenamente verificado, em agosto de 2026, para todas as localizações documentadas."
-    bounded: true
+    geography: "Circunscrito a partes específicas e documentadas de Évora: o Centro
+      Histórico e equipamentos culturais municipais no âmbito do Acesso
+      Universal 1.3, as instalações da EB1 da Azaruja documentadas pelo PRR e
+      descrições gerais ao nível da cidade constantes do Relatório Setorial do
+      PUE. Não está corroborado como uma condição uniforme em todo o município."
+    population: Pessoas com mobilidade reduzida e outros grupos de peões
+      vulneráveis. A evidência da APCE diz respeito especificamente a pessoas
+      com deficiência ou mobilidade reduzida envolvidas nos seus processos
+      participativos e de avaliação in loco, e não à população em geral.
+    temporal: >-
+      Circunscrito aos períodos documentados: o diagnóstico de planeamento de
+      fevereiro de 2025 (EVD-000004, EVD-000006), o período pré-intervenção e de
+      intervenção corretiva de 2025-2026 na EB1 da Azaruja (EVD-000081), o
+      programa Acesso Universal 1.3 de 2025, incluindo o inventário concluído em
+      dezembro de 2025 (EVD-000085, EVD-000104), e o contacto direto com a APCE
+      em agosto de 2026 (EVD-000112, EVD-000113).
 
-  limitations: "The corroborated claim is SUPPORTED only as follows: pedestrian/accessibility barriers are documented, with at least one concrete confirmed local manifestation, in specific parts of Évora (EB1 Azaruja; Historic Centre; municipal cultural facilities; general city-level planning diagnosis), and an active institutional/participatory process continues to identify and partially correct such barriers as of August 2026. It is NOT SUPPORTED as: a municipality-wide prevalence claim; a quantified frequency or severity measure; a claim that barriers documented historically (e.g. EVD-000004/EVD-000006's 2025 diagnosis, or EVD-000081's pre-intervention description) still persist unchanged today at every identified location; a fully characterized resident journey or concrete population-scale consequence sufficient for the promotion gate — that characterization remains open (the resident journey and the remaining gap are only partially understood/supported by evidence, digital causality fails, and this record continues to require deepening); or any causal or population-scale generalization beyond the bounded evidence cited above. EVD-000088 (accessible-tourism platform descriptions) is retained only as a boundary/possible-current-state lead — its freshness is explicitly UNKNOWN and it is not used as supporting evidence. EVD-000086 (APCE's earlier 'verification continuing' claim, superseded in substance by EVD-000104's completed inventory), EVD-000114 and EVD-000131 (shop-accessibility seal programme), and EVD-000029 (2026 Experimental Actions) are retained as boundary/existing-solution/current-state-update evidence, not as confirmation of specific present-day barriers and not counted as adding corroborative weight. Two distinct open gaps exist and must not be conflated: (1) no location-level, present-day inventory of which specific documented barriers remain uncorrected was located — this limits currentness and any claim about which barriers presently persist, and is the reason this Corroboration basis is bounded rather than a claim of current universal persistence; (2) no concrete, resident-facing consequence or journey evidence — what affected residents actually experience as a result of these barriers — is characterized on record, which is the actual, separate reason Eligibility remains REVIEW_REQUIRED / MISSING_CONSEQUENCE. Gap (1) does not cause or explain gap (2): the absence of a present-day location-level barrier inventory is a currentness/persistence limitation on the Corroboration claim, not the reason consequence/journey evidence is missing from the Eligibility basis."
+
+      A afirmação não se estende a um estado das barreiras plenamente
+      verificado, em agosto de 2026, para todas as localizações documentadas.
+    bounded: true
+  limitations: >-
+    A afirmação corroborada está limitada à existência documentada de barreiras
+
+    pedonais e de acessibilidade em partes específicas de Évora, incluindo pelo
+
+    menos uma manifestação local concreta, e à existência de processos
+
+    institucionais e participativos que continuaram a identificar e a corrigir
+
+    parcialmente essas barreiras até agosto de 2026.
+
+
+    A evidência não sustenta uma afirmação de prevalência à escala de todo o
+
+    município, uma medida quantificada de frequência ou severidade, nem a
+    conclusão
+
+    de que todas as barreiras identificadas historicamente permanecem hoje
+
+    inalteradas em cada localização. Também não caracteriza ainda de forma
+
+    suficiente o percurso ou a consequência concreta atualmente vivida pela
+
+    população afetada.
+
+
+    EVD-000088 é mantida apenas como evidência de limite relativa a plataformas
+    de
+
+    turismo acessível cuja atualidade não está estabelecida. EVD-000086
+    documenta
+
+    um estado anterior do processo Acesso Universal 1.3 e é delimitada pelo
+
+    inventário posteriormente concluído em EVD-000104. EVD-000114 e EVD-000131
+
+    documentam respostas existentes relacionadas com acessibilidade em
+
+    estabelecimentos comerciais, não a persistência atual de barreiras
+    específicas.
+
+    EVD-000029 documenta uma via contemporânea de teste e participação, não uma
+
+    confirmação das barreiras atualmente existentes. EVD-000148 documenta uma
+
+    resposta corretiva recente e, por isso, impede que a descrição
+
+    pré-intervenção de EVD-000081 seja assumida automaticamente como estado
+    atual.
+
+
+    Mantêm-se duas lacunas distintas. A primeira é de atualidade e persistência:
+
+    não existe um inventário atual, ao nível da localização, que determine quais
+
+    das barreiras documentadas continuam por corrigir. Esta lacuna limita a
+
+    Corroboration quanto ao estado presente. A segunda é de
+    consequência/percurso:
+
+    não existe ainda evidência concreta suficiente sobre o que os residentes
+
+    afetados experienciam atualmente em resultado dessas barreiras. Esta segunda
+
+    lacuna é a razão pela qual a Eligibility permanece REVIEW_REQUIRED por
+
+    MISSING_CONSEQUENCE. Uma lacuna não deve ser usada para explicar a outra.

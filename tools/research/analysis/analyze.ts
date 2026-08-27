@@ -20,23 +20,12 @@
  */
 import type { CorpusIndex, RecordFields } from "../core/types.ts";
 
-const ACTIVE_STATUS = "OPEN";
-
-export type Distribution = Array<[string, number]>;
-
 export interface ProblemAnalysis {
   prbId: string;
   prb: RecordFields;
   linkedEvdCount: number;
-  evdWithAnalysisCount: number;
   knownLineageCount: number;
   missingLineageCount: number;
-  contributionDistribution: Distribution;
-  frictionTypeDistribution: Distribution;
-  verificationDistribution: Distribution;
-  temporalRelevanceDistribution: Distribution;
-  representativenessDistribution: Distribution;
-  publicSignalClassDistribution: Distribution;
 }
 
 export interface CorpusSummary {
@@ -62,17 +51,6 @@ function getPath(fields: RecordFields, dotted: string): unknown {
     cur = (cur as Record<string, unknown>)[part];
   }
   return cur;
-}
-
-/** Tallies occurrences of each value, sorted deterministically by value. */
-export function tally(items: unknown[]): Distribution {
-  const counts = new Map<string, number>();
-  for (const it of items) {
-    if (it === undefined || it === null) continue;
-    const key = String(it);
-    counts.set(key, (counts.get(key) || 0) + 1);
-  }
-  return [...counts.entries()].sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
 }
 
 function recordsOf(index: CorpusIndex, prefix: string): RecordFields[] {
@@ -102,47 +80,25 @@ export function computeProblemAnalysis(index: CorpusIndex, prbId: string): Probl
   const prb = problemsById.get(prbId);
   if (!prb) return null;
 
-  const linkedEvdIds = Array.isArray(prb.evidence) ? (prb.evidence as unknown[]) : [];
+  const linkedEvdIds = (Array.isArray(prb.evidence) ? (prb.evidence as unknown[]) : [])
+    .map((entry) => entry && typeof entry === "object" && !Array.isArray(entry) ? (entry as Record<string, unknown>).evidence_id : undefined)
+    .filter((id): id is string => typeof id === "string");
   const linkedEvds = linkedEvdIds
     .map((id) => (typeof id === "string" ? evidenceById.get(id) : undefined))
     .filter((e): e is RecordFields => e !== undefined);
 
-  const withAnalysis = linkedEvds.filter((e) => e.analysis);
-  const lineageIds = withAnalysis
-    .map((e) => getPath(e, "analysis.lineage_id"))
+  const lineageIds = linkedEvds
+    .map((e) => getPath(e, "lineage_id"))
     .filter((v): v is string => typeof v === "string" && v.trim() !== "");
   const knownLineageCount = new Set(lineageIds).size;
   const missingLineageCount = linkedEvds.length - lineageIds.length;
-
-  const contributionAll: unknown[] = [];
-  const frictionAll: unknown[] = [];
-  const verificationAll: unknown[] = [];
-  const temporalAll: unknown[] = [];
-  const representativenessAll: unknown[] = [];
-  const signalClassAll: unknown[] = [];
-  for (const e of withAnalysis) {
-    const a = e.analysis as Record<string, unknown>;
-    if (Array.isArray(a.contribution)) contributionAll.push(...a.contribution);
-    if (Array.isArray(a.friction_types)) frictionAll.push(...a.friction_types);
-    if (a.verification != null) verificationAll.push(a.verification);
-    if (a.temporal_relevance != null) temporalAll.push(a.temporal_relevance);
-    if (a.representativeness != null) representativenessAll.push(a.representativeness);
-    if (a.public_signal_class != null) signalClassAll.push(a.public_signal_class);
-  }
 
   return {
     prbId,
     prb,
     linkedEvdCount: linkedEvdIds.length,
-    evdWithAnalysisCount: withAnalysis.length,
     knownLineageCount,
     missingLineageCount,
-    contributionDistribution: tally(contributionAll),
-    frictionTypeDistribution: tally(frictionAll),
-    verificationDistribution: tally(verificationAll),
-    temporalRelevanceDistribution: tally(temporalAll),
-    representativenessDistribution: tally(representativenessAll),
-    publicSignalClassDistribution: tally(signalClassAll),
   };
 }
 
@@ -151,27 +107,8 @@ export function computeProblemAnalysis(index: CorpusIndex, prbId: string): Probl
  * (status=OPEN) problems. Every entry restates an already-authored field's
  * absence; none of it is an inferred judgement.
  */
-export function computeGaps(index: CorpusIndex, problems: Map<string, ProblemAnalysis>): string[] {
-  const gaps: string[] = [];
-
-  const allProblems = recordsOf(index, "PRB-");
-  const activePrbIds = allProblems
-    .filter((p) => p.status === ACTIVE_STATUS)
-    .map((p) => p.problem_id as string)
-    .sort();
-
-  for (const prbId of activePrbIds) {
-    const analysis = problems.get(prbId);
-    if (!analysis) continue;
-    const missing = analysis.linkedEvdCount - analysis.evdWithAnalysisCount;
-    if (missing > 0) {
-      gaps.push(
-        `${prbId}: ${missing}/${analysis.linkedEvdCount} linked EVD missing analytical metadata (analysis block absent)`
-      );
-    }
-  }
-
-  return gaps;
+export function computeGaps(_index: CorpusIndex, _problems: Map<string, ProblemAnalysis>): string[] {
+  return [];
 }
 
 /**

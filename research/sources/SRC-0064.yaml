@@ -1,13 +1,13 @@
 source_id: SRC-0064
-publisher: "Gesamb"
-name: "Gesamb — informação de receção e ecocentro"
+publisher: Gesamb
+name: Gesamb — informação de receção e ecocentro
 resource_type: webpage
 scope:
   geography:
     level: intermunicipal
-    area: "Área de intervenção da Gesamb — 12 municípios"
+    area: Área de intervenção da Gesamb — 12 municípios
   domains:
-    - "ENV"
+    - ENV
 access:
   level: public
   availability: available
@@ -16,9 +16,9 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://gesamb.pt/atividades/recebemos/"
+canonical_reference: https://gesamb.pt/atividades/recebemos/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-11"
+  last_checked_at: 2026-08-11

@@ -1,25 +1,26 @@
 evidence_id: EVD-000057
-type: institutional
-source:
-  source_id: SRC-0047
-  publisher: "Município de Évora"
-  title: "Município de Évora — desporto, complexo desportivo e associativismo desportivo"
-  source_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/desporto-e-lazer/desporto/"
-  published_at: 2026
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents using sports facilities"
-  - "sports clubs and associations"
-domain:
-  - "SPO"
+provenance:
+  sources:
+    - SRC-0047
+  extracted_at: 2026-08-11
 observation:
-  summary: "As infraestruturas desportivas e o associativismo organizado já dispõem de canais municipais: estão publicamente documentados os equipamentos, as regras de acesso e os mecanismos associativos e de programas de desenvolvimento (contrato-programa). Ainda não surgiu evidência institucional forte de um problema digital específico no desporto."
+  summary: O Município disponibiliza informação pública sobre equipamentos
+    desportivos, regras de acesso e mecanismos de associativismo e de programas
+    de desenvolvimento desportivo.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes que utilizam equipamentos desportivos
+    - desportivas clubs e associações
+  temporal:
+    as_of: "2026"
+domains:
+  - SPO
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-05-A-E06. Current-evidence gap acknowledged explicitly. CONFIRMED by Batch B (EVD-000062, SRC-0047 enrichment): no sports digital pain point emerged from the current-state challenge either; sports should not be forced into a canonical problem during D1."
+claim_authority: authoritative
+inference_limits:
+  - A existência de informação e mecanismos municipais não estabelece qualidade
+    de descoberta, reserva, utilização ou administração dos serviços
+    desportivos.

@@ -1,39 +1,28 @@
 evidence_id: EVD-000044
-type: institutional
-source:
-  source_id: SRC-0030
-  publisher: "Município de Évora"
-  title: "Plano Concelhio dos Cuidadores Informais de Évora 2026-2027 (implementation update)"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/Plano-Concelhio-Cuidadores-Informais_v4_Junho_2025-002_RELATORIO.pdf"
-  published_at: 2026-01
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0031"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "informal caregivers"
-domain:
-  - "SOC"
-  - "HEA"
+lineage_id: SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS
+provenance:
+  sources:
+    - SRC-0030
+  extracted_at: 2026-08-11
 observation:
-  summary: "O problema de informação e orientação dos cuidadores é explicitamente reconhecido pelas próprias instituições: o Município referiu 262 pessoas com estatuto oficial de cuidador informal em janeiro de 2026 (comunicado através da CLASE), e o programa para 2026-2027 prevê sistematizar as respostas existentes, simplificar procedimentos, elaborar um manual do cuidador, publicá-lo em formato digital e disponibilizar lembretes e atualizações. Isto reforça de forma significativa o problema candidato da Ronda A segundo o qual os cuidadores enfrentam dificuldades no acesso à informação e na orientação entre apoios."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-03-B-E03. Candidate problem decision: STRENGTHEN PRB-0007 (refine, do not duplicate). Institutional confidence HIGH, current-state confidence HIGH."
-
-analysis:
-  related_problems:
-    - "PRB-0007"
-  contribution:
-    - "CONFIRMS"
-    - "CURRENT-STATE-UPDATE"
-    - "EXISTING-SOLUTION"
-  lineage_id: "SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS"
-  representativeness: "NOT_APPLICABLE"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+  summary: O plano municipal para 2026-2027 prevê sistematizar as respostas
+    existentes para cuidadores, simplificar procedimentos, elaborar um manual do
+    cuidador, publicá-lo em formato digital e disponibilizar lembretes e
+    atualizações.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - informal caregivers
+  temporal:
+    start: "2026"
+    end: "2027"
+domains:
+  - SOC
+  - HEA
+evidence_nature: recommendation
+claim_authority: authoritative
+inference_limits:
+  - As medidas previstas para 2026-2027 não estabelecem que tenham sido
+    implementadas nem que reduzam as dificuldades de informação e orientação.

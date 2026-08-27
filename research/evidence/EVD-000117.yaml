@@ -1,39 +1,35 @@
 evidence_id: EVD-000117
-type: institutional
-source:
-  source_id: SRC-0102
-  publisher: "Município de Évora"
-  title: "Relatório Anual de Atividade da Autoridade de Transportes - Município de Évora 2023"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2023/06/Relatorio-anual-de-Autoridade-de-Transportes-CME-29-06-2023.pdf"
-  published_at: "2023-06"
-  retrieved_at: 2026-08-12
-additional_sources:
-  - "SRC-0101"
-geography:
-  level: municipality
-  area: "city / municipality"
-population:
-  - "urban public-transport users"
-  - "residents of lower-demand settlements"
-domain:
-  - "MOB"
+lineage_id: MOB-2022-2023-CME-TRANSPORT-AUTHORITY-HISTORICAL-REPORTS
+provenance:
+  sources:
+    - SRC-0102
+    - SRC-0101
+  extracted_at: 2026-08-12
 observation:
-  summary: "Os relatórios anuais de 2022 e 2023 da autoridade municipal de transportes afirmam ambos, com formulação idêntica à do relatório atual de 2026 (EVD-000002/EVD-000024), que a rede urbana cobre praticamente toda a zona urbana de Évora durante o dia, mas reduz a oferta de serviço à noite, aos fins de semana e nos feriados. Isto estabelece esse padrão temporal de redução do serviço como uma característica documentada da rede ao longo de vários anos (pelo menos de 2022 a 2026), e não como uma condição observada apenas recentemente ou transitória."
+  summary: Os relatórios anuais de 2022 e 2023 da autoridade municipal de
+    transportes afirmam ambos, com formulação idêntica à do relatório atual de
+    2026 (EVD-000002/EVD-000024), que a rede urbana cobre praticamente toda a
+    zona urbana de Évora durante o dia, mas reduz a oferta de serviço à noite,
+    aos fins de semana e nos feriados. Isto estabelece esse padrão temporal de
+    redução do serviço como uma característica documentada da rede ao longo de
+    vários anos (pelo menos de 2022 a 2026), e não como uma condição observada
+    apenas recentemente ou transitória.
+scope:
+  geography:
+    level: municipality
+    area: cidade / município
+  populations:
+    - urbana transporte público utilizadores
+    - residentes de lower-demand settlements
+  temporal:
+    start: "2022"
+    end: "2023"
+domains:
+  - MOB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "RS-02A (docs/discovery/rs-01-evidence-gap-review.md Gap 1). Directly verified by text extraction from both PDFs 2026-08-12 (SRC-0101, SRC-0102) — not merely relying on the RS-02A finding description. Historical corroboration only: this record supports the persistence dimension of PRB-0001's civic importance and the existence of the temporal gap across years, but does NOT establish current (2026) line/corridor-level severity — the 2022/2023 reports' per-line frequency tables are themselves period-specific and are not canonicalized here as current data. Same institutional voice/report series as EVD-000002/EVD-000023/EVD-000024/EVD-000027/EVD-000028 (lineage MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT, SRC-0018) — treat as the same institutional-source family for independence purposes, not a newly independent thread, even though source_id differs year-to-year per the schema's matching-primary-source_id lineage rule."
-
-analysis:
-  related_problems:
-    - "PRB-0001"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "OPERATIONAL"
-  lineage_id: "MOB-2022-2023-CME-TRANSPORT-AUTHORITY-HISTORICAL-REPORTS"
-  representativeness: "DESIGNED_REPRESENTATIVE"
-  verification: "VERIFIED"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - A Evidência é histórica e pertence à mesma família institucional de
+    relatórios municipais, não constituindo uma voz independente adicional.
+  - Os relatórios de 2022-2023 não estabelecem a severidade atual por linha ou
+    corredor em 2026.

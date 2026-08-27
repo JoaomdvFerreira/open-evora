@@ -1,14 +1,15 @@
 source_id: SRC-0072
-publisher: "Conta pública de Instagram (identidade não retida)"
-name: "Publicação em rede social — persistência reportada de buraco na N114 à entrada de Évora"
+publisher: Conta pública de Instagram (identidade não retida)
+name: Publicação em rede social — persistência reportada de buraco na N114 à
+  entrada de Évora
 resource_type: webpage
 scope:
   geography:
     level: site
-    area: "Entrada de Évora pela N114"
+    area: Entrada de Évora pela N114
   domains:
-    - "URB"
-    - "MOB"
+    - URB
+    - MOB
 access:
   level: public
   availability: available
@@ -17,12 +18,13 @@ access:
   format: video
 acquisition:
   method: public_web
-canonical_reference: "https://www.instagram.com/reel/DbSgZnkCXUj/"
+canonical_reference: https://www.instagram.com/reel/DbSgZnkCXUj/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2026-07"
-  last_checked_at: "2026-08-11"
+  published_at: 2026-07
+  last_checked_at: 2026-08-11
 caveats:
-  - "A origem é uma publicação individual numa rede social; a identidade da conta não é preservada no corpus por razões de privacidade."
+  - A origem é uma publicação individual numa rede social; a identidade da conta
+    não é preservada no corpus por razões de privacidade.

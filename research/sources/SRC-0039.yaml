@@ -1,14 +1,14 @@
 source_id: SRC-0039
-publisher: "IEFP"
-name: "IEFP Online — ofertas de emprego, serviço de Évora"
+publisher: IEFP
+name: IEFP Online — ofertas de emprego, serviço de Évora
 resource_type: service
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "EMP"
-    - "ECO"
+    - EMP
+    - ECO
 access:
   level: public
   availability: available
@@ -17,11 +17,13 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://iefponline.iefp.pt/"
+canonical_reference: https://iefponline.iefp.pt/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-11"
+  last_checked_at: 2026-08-11
 caveats:
-  - "A origem apresenta um retrato pontual de ofertas de emprego e não disponibiliza métricas de duração das vagas, recrutamento falhado ou escassez de competências."
+  - A origem apresenta um retrato pontual de ofertas de emprego e não
+    disponibiliza métricas de duração das vagas, recrutamento falhado ou
+    escassez de competências.

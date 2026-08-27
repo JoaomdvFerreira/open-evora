@@ -1,39 +1,31 @@
 evidence_id: EVD-000042
-type: institutional
-source:
-  source_id: SRC-0035
-  publisher: "Município de Évora"
-  title: "Plano Local de Habitação de Évora — 67.1M€ agreement"
-  source_reference: "https://www.cm-evora.pt/plano-local-de-habitacao-de-evora/"
-  published_at: 2026
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0036"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents seeking adequate/affordable housing"
-  - "vulnerable populations needing temporary accommodation"
-domain:
-  - "HOU"
+provenance:
+  sources:
+    - SRC-0035
+    - SRC-0036
+  extracted_at: 2026-08-11
 observation:
-  summary: "A intervenção habitacional é ampla e está ativa (financiamento de 67,1 milhões de euros para 459 habitações, 40 habitações para arrendamento acessível no Bairro do Moinho, 122 novas habitações no Bairro do Escurinho, um centro de acolhimento transitório para pelo menos 24 pessoas, previsão de beneficiar cerca de 500 famílias, além de 12 habitações para arrendamento apoiado já entregues na Malagueira em janeiro de 2026), mas isto, por si só, não demonstra que as necessidades habitacionais não satisfeitas estejam resolvidas. O problema habitacional da Ronda A continua a ser estruturalmente credível; a futura formulação do problema deve reconhecer esta intervenção ativa do lado da oferta. Considera-se que a intervenção digital tem baixa capacidade de influência sobre a causa dominante, que é a oferta física/económica."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-03-B-E01. Current-state challenge result for PRB-0006: housing structural problem survives challenge because major interventions are acknowledged but do not close the gap; retained as canonical structural problem cluster, not duplicated."
-
-analysis:
-  related_problems:
-    - "PRB-0006"
-  contribution:
-    - "CURRENT-STATE-UPDATE"
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "OTHER"
-  representativeness: "UNKNOWN"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+  summary: O Município documenta uma intervenção habitacional que inclui
+    financiamento de 67,1 milhões de euros para 459 habitações, 40 habitações
+    para arrendamento acessível no Bairro do Moinho, 122 novas habitações no
+    Bairro do Escurinho, um centro de acolhimento transitório para pelo menos 24
+    pessoas, previsão de beneficiar cerca de 500 famílias e 12 habitações para
+    arrendamento apoiado entregues na Malagueira em janeiro de 2026.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes à procura de adequate/affordable housing
+    - populações vulneráveis que necessitam de alojamento temporário
+  temporal:
+    as_of: "2026"
+domains:
+  - HOU
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - Financiamento, metas e projetos não equivalem a habitações entregues ou
+    respostas plenamente operacionais.
+  - A escala da intervenção não estabelece a dimensão da necessidade
+    habitacional residual nem que essa necessidade esteja resolvida.

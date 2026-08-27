@@ -1,29 +1,29 @@
 evidence_id: EVD-000020
-type: institutional
-source:
-  source_id: SRC-0025
-  publisher: "Município de Évora"
-  title: "Rossio de S. Brás 2026 requalification programme"
-  source_reference: "https://www.cm-evora.pt/em-reuniao-publica-de-camara-de-5-de-fevereiro-de-2026-camara-de-evora-aprova-projeto-da-1a-fase-da-requalificacao-do-rossio-de-s-bras-um-investimento-de-41-milhoes-de-euros-assegurado-pelo-prr/"
-  published_at: 2026-05
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "Rossio de S. Brás / Station interface"
-population:
-  - "pedestrians"
-  - "drivers"
-  - "people with reduced mobility"
-  - "visitors/residents"
-domain:
-  - "ACC"
-  - "MOB"
-  - "URB"
+provenance:
+  sources:
+    - SRC-0025
+    - SRC-0112
+  extracted_at: 2026-08-10
 observation:
-  summary: "O Município aprovou novas fases de requalificação do Rossio em fevereiro e maio de 2026, incluindo acessos pedonais e viários, medidas para uma acessibilidade mais segura, funções de estacionamento e multiusos e a continuação da interface de mobilidade suave Estação/Rossio, sendo descrita uma nova redefinição do perfil viário como fase posterior."
+  summary: O Município aprovou novas fases de requalificação do Rossio em
+    fevereiro e maio de 2026, incluindo acessos pedonais e viários, medidas para
+    uma acessibilidade mais segura, funções de estacionamento e multiusos e a
+    continuação da interface de mobilidade suave Estação/Rossio, sendo descrita
+    uma nova redefinição do perfil viário como fase posterior.
+scope:
+  geography:
+    level: site
+    area: Rossio de S. Brás e interface Estação/Rossio, Évora
+  temporal:
+    start: 2026-02-05
+    end: 2026-05-28
+domains:
+  - ACC
+  - MOB
+  - URB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Interpretation: this location should not be assessed solely from pre-project or early-project documents; D2/current observation is needed after works evolve."
+claim_authority: authoritative
+inference_limits:
+  - A aprovação e descrição das fases de requalificação não estabelecem o estado
+    atual das obras nem a resolução das questões de acessibilidade e circulação
+    anteriormente identificadas.

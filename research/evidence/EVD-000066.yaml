@@ -1,39 +1,31 @@
 evidence_id: EVD-000066
-type: institutional
-source:
-  source_id: SRC-0053
-  publisher: "Município de Évora"
-  title: "Municipal urban-hygiene structural response (July-August 2026)"
-  source_reference: "https://www.cm-evora.pt/camara-municipal-de-evora-reforca-resposta-estrutural-para-melhorar-a-limpeza-urbana-no-concelho/"
-  published_at: 2026-07
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0055"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
+lineage_id: ENV-2026-07-MUNICIPAL-STRUCTURAL-RESPONSE
+provenance:
+  sources:
+    - SRC-0053
+    - SRC-0055
+  extracted_at: 2026-08-11
 observation:
-  summary: "As causas dominantes do problema de higiene urbana parecem estar relacionadas com aspetos operacionais e de capacidade: força de trabalho, veículos, horários e modelos de recolha, instalações logísticas, responsabilidade organizacional e monitorização do serviço."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-06-A-E04. Interpretation: this is precisely the type of civic problem that must not automatically become a digital-product hypothesis."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "OPERATIONAL"
-  lineage_id: "ENV-2026-07-MUNICIPAL-STRUCTURAL-RESPONSE"
-  representativeness: "NOT_APPLICABLE"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+  summary: Entre julho e agosto de 2026, o Município documentou uma resposta de
+    reorganização da higiene urbana que incluiu reforço de pessoal e veículos,
+    alterações nos horários e modelos de recolha, medidas logísticas, alterações
+    de responsabilidades, monitorização interna e intenção de responder mais
+    rapidamente aos pedidos dos munícipes relativos a resíduos volumosos.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes
+  temporal:
+    start: 2026-07
+    end: 2026-08
+domains:
+  - ENV
+  - PUB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - As medidas e prioridades da resposta municipal não demonstram que esses
+    fatores sejam as causas dominantes nem que a reorganização tenha sido
+    plenamente executada ou restaurado a fiabilidade do serviço.

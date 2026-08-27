@@ -1,27 +1,26 @@
 evidence_id: EVD-000063
-type: institutional
-source:
-  source_id: SRC-0051
-  publisher: "Município de Évora"
-  title: "Plano Municipal de Adaptação às Alterações Climáticas de Évora (PMAAC)"
-  source_reference: "https://www.cm-evora.pt/plano-municipal-de-adaptacao-as-alteracoes-climaticas-de-evora/"
-  published_at: 2024
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0052"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "CLI"
-  - "ENV"
+provenance:
+  sources:
+    - SRC-0051
+    - SRC-0052
+  extracted_at: 2026-08-11
 observation:
-  summary: "O risco climático é atual, específico e está traduzido em instrumentos institucionais operacionais: as ondas de calor, a seca e o stresse hídrico, bem como o risco de precipitação intensa e inundação urbana, são explicitamente reconhecidos, e o Município dispõe de um plano operacional de adaptação aprovado (PMAAC), de um modelo de monitorização e de uma síntese espacial WebSIG."
-evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-06-A-E01. Interpretation: climate resilience is a strong civic problem domain, but the existence of a mature PMAAC means Évora Digital should not create a generic climate dashboard or duplicate current GIS/planning infrastructure."
+  summary: O PMAAC identifica para o Município de Évora riscos associados a ondas
+    de calor, seca e stresse hídrico, bem como a precipitação intensa e
+    inundação urbana.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes
+  temporal:
+    as_of: "2024"
+domains:
+  - CLI
+  - ENV
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - A identificação institucional de riscos e projeções não constitui medição de
+    impactos atuais nem quantifica a severidade presente de cada risco.

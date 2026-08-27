@@ -1,38 +1,30 @@
 evidence_id: EVD-000099
-type: press
-source:
-  source_id: SRC-0085
-  publisher: "Tribuna do Alentejo"
-  title: "News report: high housing costs displace students from Évora"
-  source_reference: "https://tribunaalentejo.pt/artigos/habitacao-cara-afasta-estudantes-de-evora/"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "students"
-  - "residents seeking adequate/affordable housing"
-domain:
-  - "HOU"
-  - "EDU"
+provenance:
+  sources:
+    - SRC-0085
+  extracted_at: 2026-08-11
 observation:
-  summary: "A cobertura jornalística atual descreve quartos em Évora a atingir cerca de 500 €/mês e alojamentos T2 em torno de 1 000 €/mês, sendo referido que a procura excede a oferta disponível; a mesma cobertura indica que aproximadamente 70 % dos estudantes da Universidade de Évora são deslocados e dependem de alojamento arrendado."
+  summary: A cobertura jornalística atual descreve quartos em Évora a atingir
+    cerca de 500 €/mês e alojamentos T2 em torno de 1 000 €/mês, sendo referido
+    que a procura excede a oferta disponível; a mesma cobertura indica que
+    aproximadamente 70 % dos estudantes da Universidade de Évora são deslocados
+    e dependem de alojamento arrendado.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - students
+    - residentes à procura de adequate/affordable housing
+  temporal:
+    status: unknown
+domains:
+  - HOU
+  - EDU
 evidence_nature: claim
-strength: secondary
-personal_data:
-  present: false
-  retained: false
-notes: "D2-C Round A (H-01). CONFIRMS + CURRENT-STATE-UPDATE PRB-0006. Press-mediated figures (rental prices, displacement percentage) are preserved as reported, not verified against a primary dataset; treated as current affordability/student-exposure evidence, not proof of a digital/process gap. Representativeness of the underlying reporting methodology is not established."
-
-analysis:
-  related_problems:
-    - "PRB-0006"
-  contribution:
-    - "CONFIRMS"
-    - "CURRENT-STATE-UPDATE"
-  friction_types:
-    - "OTHER"
-  representativeness: "UNKNOWN"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: non_authoritative
+inference_limits:
+  - Os valores são mediados por imprensa e a metodologia subjacente não está
+    estabelecida neste registo.
+  - A Observação não constitui uma medição representativa dos preços, da procura
+    ou da população estudantil do Município.

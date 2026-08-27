@@ -1,15 +1,16 @@
 source_id: SRC-0059
-publisher: "Município de Évora"
-name: "Câmara de Évora melhora procedimentos de gestão urbanística — 2.ª fase ePaper Atendimento Online"
+publisher: Município de Évora
+name: Câmara de Évora melhora procedimentos de gestão urbanística — 2.ª fase
+  ePaper Atendimento Online
 resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "DIG"
-    - "PUB"
-    - "URB"
+    - DIG
+    - PUB
+    - URB
 access:
   level: public
   availability: available
@@ -18,11 +19,11 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/camara-de-evora-melhora-procedimentos-de-gestao-urbanistica-lancada-a-2-a-fase-da-plataforma-epaper-atendimento-online/"
+canonical_reference: https://www.cm-evora.pt/camara-de-evora-melhora-procedimentos-de-gestao-urbanistica-lancada-a-2-a-fase-da-plataforma-epaper-atendimento-online/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2026-05-26"
-  updated_at: "2026-05-26"
-  last_checked_at: "2026-08-25"
+  published_at: 2026-05-26
+  updated_at: 2026-05-26
+  last_checked_at: 2026-08-25

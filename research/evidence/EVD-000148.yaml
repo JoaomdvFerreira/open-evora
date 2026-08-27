@@ -1,0 +1,28 @@
+evidence_id: EVD-000148
+provenance:
+  sources:
+    - SRC-0068
+  extracted_at: 2026-08-11
+observation:
+  summary: O registo público do projeto PRR descreve uma intervenção prevista para
+    2025-2026 destinada a corrigir as barreiras de acessibilidade identificadas
+    na EB1 de Azaruja.
+scope:
+  geography:
+    level: site
+    area: EB1 de Azaruja, Évora
+  temporal:
+    start: "2025"
+    end: "2026"
+  populations:
+    - utilizadores da EB1 de Azaruja, incluindo pessoas com mobilidade reduzida
+domains:
+  - ACC
+  - MOB
+  - URB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A descrição do projeto corretivo não estabelece a conclusão da obra nem o
+    estado de acessibilidade após a intervenção.
+lineage_id: ACC-2025-2026-PRR-EB1-AZARUJA-PROJECT

@@ -1,27 +1,26 @@
 evidence_id: EVD-000070
-type: institutional
-source:
-  source_id: SRC-0051
-  publisher: "Município de Évora"
-  title: "Plano Municipal de Adaptação às Alterações Climáticas de Évora (PMAAC)"
-  source_reference: "https://www.cm-evora.pt/plano-municipal-de-adaptacao-as-alteracoes-climaticas-de-evora/"
-  published_at: 2024
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0056"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "CLI"
+provenance:
+  sources:
+    - SRC-0051
+  extracted_at: 2026-08-11
 observation:
-  summary: "Os sistemas de ambiente e resíduos já incluem infraestrutura de dados públicos potencialmente reutilizável: o PMAAC dispõe de um WebSIG e a Gesamb publica informação quantitativa sobre o desempenho na gestão de resíduos."
+  summary: O Plano Municipal de Adaptação às Alterações Climáticas de Évora inclui
+    um WebSIG e mecanismos de monitorização e disponibilização pública de
+    informação climática.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes
+  temporal:
+    as_of: "2024"
+domains:
+  - ENV
+  - CLI
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-06-A-E08. Interpretation: candidates for the Open Data Foundation/source catalogue; public technical interfaces, licensing, machine-readability and update cadence still need verification. See docs/milestones/D1-WU06-progress.md Open-data observations section for the full six-item list."
+claim_authority: authoritative
+inference_limits:
+  - A existência do WebSIG e da monitorização não estabelece atualidade das
+    camadas, interfaces técnicas públicas, condições de reutilização ou eficácia
+    da comunicação.

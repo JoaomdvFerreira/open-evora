@@ -1,39 +1,30 @@
 evidence_id: EVD-000041
-type: institutional
-source:
-  source_id: SRC-0033
-  publisher: "Município de Évora"
-  title: "Município de Évora - Desenvolvimento Económico"
-  source_reference: "https://www.cm-evora.pt/municipe/areas-de-acao/desenvolvimento-economico/"
-  published_at: null
-  retrieved_at: 2026-08-10
-additional_sources:
-  - "SRC-0034"
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "businesses"
-  - "investors"
-domain:
-  - "ECO"
-  - "EMP"
+provenance:
+  sources:
+    - SRC-0033
+    - SRC-0034
+  extracted_at: 2026-08-10
 observation:
-  summary: "O Município refere um crescimento significativo das empresas instaladas desde 2013, com uma estratégia que privilegia a atração de investimento, parques industriais e tecnológicos, incubação e infraestruturas de apoio empresarial especializadas por setor, incluindo o aeroespacial."
+  summary: O Município refere um crescimento significativo das empresas instaladas
+    desde 2013, com uma estratégia que privilegia a atração de investimento,
+    parques industriais e tecnológicos, incubação e infraestruturas de apoio
+    empresarial especializadas por setor, incluindo o aeroespacial.
+scope:
+  geography:
+    level: city
+    area: Évora cidade
+  populations:
+    - businesses
+    - investors
+  temporal:
+    start: "2013"
+    end: "2026"
+domains:
+  - ECO
+  - EMP
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-04-A-E05. Boundary: infrastructure existence does not prove SMEs or workers can easily discover or navigate support opportunities."
-
-analysis:
-  related_problems:
-    - "PRB-0008"
-  contribution:
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "OTHER"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "UNKNOWN"
+claim_authority: authoritative
+inference_limits:
+  - O crescimento empresarial e a existência de infraestruturas de apoio não
+    estabelecem facilidade de descoberta, navegação ou eficácia dos apoios para
+    empresas e trabalhadores.

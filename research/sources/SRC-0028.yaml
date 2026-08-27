@@ -1,18 +1,18 @@
 source_id: SRC-0028
-publisher: "Município de Évora / Rede Social"
-name: "Plano de Ação do PDS 2025"
+publisher: Município de Évora / Rede Social
+name: Plano de Ação do PDS 2025
 resource_type: document
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   temporal:
     start: "2025"
     end: "2025"
   domains:
-    - "HOU"
-    - "SOC"
-    - "EMP"
+    - HOU
+    - SOC
+    - EMP
 access:
   level: public
   availability: available
@@ -21,10 +21,10 @@ access:
   format: pdf
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/03/PA-PDS-2025-final.pdf"
+canonical_reference: https://www.cm-evora.pt/wp-content/uploads/2025/03/PA-PDS-2025-final.pdf
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2025-03"
-  last_checked_at: "2026-08-10"
+  published_at: 2025-03
+  last_checked_at: 2026-08-10

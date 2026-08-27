@@ -9,7 +9,6 @@ const LABELS: Record<string, Record<string, string>> = {
   evidence_nature: { fact: "Facto", "reported-experience": "Experiência relatada", opinion: "Opinião", claim: "Alegação", measurement: "Medição", recommendation: "Recomendação" },
   friction_types: { INFORMATION: "Informação", COORDINATION: "Coordenação", TRANSACTION: "Transação", OPERATIONAL: "Operacional", PHYSICAL: "Física", REGULATORY: "Regulatória", OTHER: "Outra" },
   verification: { REPORTED: "Reportada", CORROBORATED: "Corroborada", VERIFIED: "Verificada", UNKNOWN: "Desconhecida", NOT_APPLICABLE: "Não aplicável" },
-  contribution: { CONFIRMS: "Confirma", REFINES: "Refina", CONTRADICTS: "Contradiz", "CURRENT-STATE-UPDATE": "Atualização do estado atual", "EXISTING-SOLUTION": "Solução existente", "PLANNED-SOLUTION": "Solução planeada", "NEW-CANDIDATE": "Novo candidato" },
   representativeness: { UNKNOWN: "Desconhecida", LIMITED: "Limitada", DESIGNED_REPRESENTATIVE: "Concebida como representativa", NOT_APPLICABLE: "Não aplicável" },
   temporal_relevance: { CURRENT: "Atual", HISTORICAL: "Histórica", SUPERSEDED: "Substituída", UNKNOWN: "Desconhecida" },
   geography: { city: "Cidade", parish: "Freguesia", municipality: "Município", intermunicipal: "Intermunicipal", regional: "Regional" },
@@ -38,7 +37,7 @@ const COMPACT_LABELS: Record<string, Record<string, string>> = {
 };
 
 const FIELD_CAPTIONS: Record<string, string> = {
-  status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", solution_landscape_status: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", contribution: "Contribuição", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", geography: "Âmbito geográfico", authority: "Autoridade", freshness: "Atualidade",
+  status: "Estado", validation_status: "Estado de validação", evidence_status: "Estado da evidência", digital_tractability: "Tratabilidade digital", solution_landscape_status: "Soluções existentes", strength: "Força da evidência", type: "Tipo", evidence_nature: "Natureza da evidência", friction_types: "Tipos de fricção", verification: "Verificação", public_signal_class: "Classe de sinal público", representativeness: "Representatividade", temporal_relevance: "Relevância temporal", geography: "Âmbito geográfico", authority: "Autoridade", freshness: "Atualidade",
   resource_type: "Tipo de recurso", "access.level": "Nível de acesso", "access.availability": "Disponibilidade", "access.method": "Forma de consulta", "access.format": "Formato", "access.machine_readable": "Leitura automática",
   "scope.geography.level": "Âmbito geográfico", "scope.geography.area": "Área", "scope.temporal": "Cobertura temporal", "scope.domains": "Temas",
   "scope.temporal.as_of": "Data de referência", "scope.temporal.start": "Início", "scope.temporal.end": "Fim",

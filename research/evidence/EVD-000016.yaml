@@ -1,37 +1,26 @@
 evidence_id: EVD-000016
-type: institutional
-source:
-  source_id: SRC-0021
-  publisher: "TREVO - urban public transport in Évora"
-  title: "TREVO public transport website"
-  source_reference: "https://www.trevo.com.pt/"
-  published_at: null
-  retrieved_at: 2026-08-10
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "TREVO passengers"
-  - "potential data consumers"
-domain:
-  - "MOB"
-  - "DIG"
+provenance:
+  sources:
+    - SRC-0021
+  extracted_at: 2026-08-10
 observation:
-  summary: "A aplicação web pública atual da TREVO anuncia informação sobre a rede e os horários, notificações e atualizações de percursos em tempo real. Uma pesquisa delimitada dos materiais públicos do operador não localizou um ponto de acesso público documentado para GTFS, GTFS-Realtime ou uma API para programadores."
+  summary: O sítio Web público da TREVO disponibiliza informação sobre a rede e os
+    horários, notificações e atualizações de percursos em tempo real.
+scope:
+  geography:
+    level: city
+    area: Évora cidade
+  populations:
+    - TREVO passengers
+    - potenciais utilizadores de dados
+  temporal:
+    as_of: 2026-08-10
+domains:
+  - MOB
+  - DIG
 evidence_nature: fact
-strength: primary-non-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Boundary: do not infer that a feed does not exist internally or that third-party access is impossible."
-
-analysis:
-  related_problems:
-    - "PRB-0002"
-  contribution:
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "INFORMATION"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A página pública não permite concluir se existem ou não feeds
+    GTFS/GTFS-Realtime, API ou outros acessos para terceiros fora do que nela é
+    documentado.

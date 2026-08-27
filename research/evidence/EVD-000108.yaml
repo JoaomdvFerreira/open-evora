@@ -1,38 +1,30 @@
 evidence_id: EVD-000108
-type: institutional
-source:
-  source_id: SRC-0095
-  publisher: "Havant Borough Council"
-  title: "Havant Borough Council — resident collection-status customer portal"
-  source_reference: "Havant Borough Council customer portal (bin-collection status)"
-  published_at: null
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Havant, United Kingdom"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
-  - "DIG"
+lineage_id: ENV-2026-08-HAVANT-COLLECTION-STATUS-PORTAL
+provenance:
+  sources:
+    - SRC-0095
+  extracted_at: 2026-08-11
 observation:
-  summary: "O portal do munícipe do Havant Borough Council apresenta estados de recolha como “not started”, “closed-complete”, datas de recolha reagendada e problemas registados pela equipa, permitindo que um residente comunique um contentor não recolhido apenas quando o estado da recolha torna essa comunicação válida — reduzindo a ambiguidade entre “the round has not reached me yet”, “the collection was completed but my bin was missed”, “the crew recorded a reason” e “the collection was rescheduled”."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Comparator/mechanism evidence, not Évora-specific. The public material describes service design and operating workflow, not measured outcome effect — it does not establish that the portal itself improves collection reliability. Use as a service-journey comparator only (WU-D4-02 Mechanism A)."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "INFORMATION"
-  lineage_id: "ENV-2026-08-HAVANT-COLLECTION-STATUS-PORTAL"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+  summary: O portal do Havant Distrito Conselho apresenta estados operacionais da
+    recolha, datas de recolha reagendada e problemas registados pela equipa e
+    condiciona a comunicação de um contentor não recolhido ao estado registado
+    para a recolha.
+scope:
+  geography:
+    level: municipality
+    area: Havant, Reino Unido
+  populations:
+    - residentes
+  temporal:
+    status: unknown
+domains:
+  - ENV
+  - PUB
+  - DIG
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A Observação descreve o desenho e funcionamento do serviço, não um efeito
+    medido sobre fiabilidade, reclamações ou satisfação.
+  - O contexto de Havant não estabelece que o mesmo mecanismo produza resultados
+    equivalentes em Évora.

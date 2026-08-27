@@ -29,11 +29,11 @@ The three record types remain strictly separated by role:
 - **EVD** — observation extracted from that origin.
 - **PRB** — problem-level synthesis.
 
-A Source must not express what it proves, its evidential strength, its relevance to a Problem, or any research role. Those are EVD- and PRB-owned judgements.
+A Source must not express what it proves, its evidential strength, its relevance to a Problem, or any research role. Research roles are owned exclusively by PRB→EVD relationships.
 
-### 1.1 SRC v2 contract (frozen candidate)
+### 1.1 SRC v2 contract
 
-This section is the semantic authority for the frozen SRC v2 candidate. It documents the intended target contract for the Source record. It does not itself change `research/schemas/source.schema.json`, existing `SRC-*` records, or any executable validation; those remain governed by their own artifacts until a separate unit migrates them. Where this section and the current executable schema disagree, the disagreement is intentional and expected until that migration happens — see §1.5.
+This section is the semantic authority for the implemented SRC v2 contract. `research/schemas/source.schema.json` and deterministic validation implement its executable shape.
 
 #### Shape
 
@@ -182,13 +182,13 @@ Examples:
 - Publication governance (how/when the source itself was published or updated) is independent from both `access` and `licensing`.
 - `acquisition` records how Open Évora obtained the source (method and, where applicable, when). It does not record the surrounding engagement workflow, correspondence content, or process history.
 - `caveats[]` may contain only limitations or conditions of the source itself (e.g. incomplete coverage, self-reported data, known gaps). It must not contain research-process commentary.
-- The following do not belong in SRC, at any version: WU identifiers, batch identifiers, gates, research-process history, extracted observations, Problem-level conclusions, evidential-strength judgements, and research-role judgements (comparative/local/methodological). These remain EVD- and PRB-owned, per the SRC/EVD/PRB separation stated above.
+- The following do not belong in SRC, at any version: WU identifiers, batch identifiers, gates, research-process history, extracted observations, Problem-level conclusions, evidential-strength judgements, and PRB→EVD research-role judgements. Research roles remain owned exclusively by PRB→EVD relationships.
 - SRC v2 does not author `evidence_ids`. Future SRC → EVD navigation is derived from existing EVD → SRC references, not authored on the Source record.
-- Comparative/local/methodological research role stays outside SRC v2 and will be reviewed together with EVD's contract, not decided here.
+- Research roles are owned only by PRB→EVD relationships.
 
 #### 1.2 Fields retired from SRC v2
 
-The following fields exist in the current (v1) executable schema and current `SRC-*` records but do not belong in the SRC v2 contract:
+The following fields belonged to the pre-v2 executable schema and pre-v2 `SRC-*` corpus; they do not belong in the SRC v2 contract:
 
 - `authority` — expresses a trust/authority ranking; provenance (`publisher`/`creators`) is not the same as authority, per the boundary above.
 - `freshness.status` — a derived freshness judgement; factual publication/update/check dates remain, but the derived status does not.
@@ -198,7 +198,7 @@ The following fields exist in the current (v1) executable schema and current `SR
 
 #### 1.3 Status of this contract
 
-SRC v2 as documented in §1.1–§1.2 is a frozen candidate contract. It does not yet supersede `research/schemas/source.schema.json`, the current `SRC-*` records, or any current validator, Explorer projection, or tooling behavior. A separate unit governs the migration of executable schema and existing records to this contract, per `AGENTS.md` §3's requirement that an adopted-but-not-yet-implemented target be stated explicitly.
+SRC v2 is implemented by `research/schemas/source.schema.json`, the canonical `SRC-*` corpus and the deterministic validators.
 
 ## 2. Evidence (`EVD-*`)
 
@@ -210,13 +210,17 @@ Its meaning includes the observation itself and the context needed to interpret 
 
 Evidence may contribute to more than one Problem.
 
-### Contribution
+### EVD vNext contract
 
-Contribution describes the analytical role Evidence plays in a Problem reading. It is not a truth, prevalence, or importance score.
+The executable EVD contract has only the following canonical concepts: provenance (`provenance.sources[]`, `provenance.extracted_at`), bounded Observation (`observation.summary`), scope, domains, `evidence_nature`, `claim_authority`, optional `lineage_id`, and explicit `inference_limits[]`.
 
-Contradictory Evidence may challenge only part of a Problem and does not automatically invalidate it.
+EVD does not own a strength/confidence score, a primary-versus-additional Source hierarchy, a Problem relationship, research role, analysis block, personal-data workflow fields, or free-form process notes. `evidence_nature` describes the proposition; it is not a verdict.
 
-Evidence describing an existing solution and Evidence describing a planned solution are semantically distinct. Neither establishes effectiveness by existence alone.
+### PRB → EVD relationships
+
+Each PRB owns its `evidence[]` relationships. A relationship names an `evidence_id` and has non-empty `effects[]` (`SUPPORTS`, `REFINES`, `BOUNDS`, `CONTRADICTS`) and `research_roles[]` (`LOCAL_OBSERVATION`, `CONTEXTUAL`, `COMPARATIVE_MECHANISM`, `COMPARATIVE_RESPONSE`, `EXISTING_RESPONSE`, `PLANNED_RESPONSE`). Effects and roles describe this Problem's use of the Evidence; neither changes the Evidence itself.
+
+Contradictory Evidence may challenge only part of a Problem and does not automatically invalidate it. Existing and planned responses are distinct research roles and neither establishes effectiveness.
 
 ### Lineage and independence
 

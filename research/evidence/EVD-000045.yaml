@@ -1,37 +1,28 @@
 evidence_id: EVD-000045
-type: institutional
-source:
-  source_id: SRC-0038
-  publisher: "ULSAC (Unidade Local de Saúde do Alentejo Central)"
-  title: "ULSAC caregiver/community/dementia responses (UCC, Cantinho do Cuidador, VIVAMENTE)"
-  source_reference: "https://www.ulsac.min-saude.pt/2025/10/20/unidade-de-cuidados-na-comunidade-ucc-evora/"
-  published_at: 2025-10
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0030"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "informal caregivers"
-  - "cared-for people"
-domain:
-  - "SOC"
-  - "HEA"
+provenance:
+  sources:
+    - SRC-0038
+    - SRC-0030
+  extracted_at: 2026-08-11
 observation:
-  summary: "O apoio aos cuidadores já está em funcionamento: a ULSAC e parceiros locais desenvolvem iniciativas orientadas para cuidadores, comunidade e demência (Unidade de Cuidados na Comunidade, Cantinho do Cuidador, VIVAMENTE). Assim, o problema remanescente não é a «inexistência de serviços» para cuidadores; deverá incidir na orientação, no conhecimento dos apoios existentes, na elegibilidade, na coordenação e nos encaminhamentos entre serviços, bem como na completude da informação, e não na duplicação de um serviço já existente."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-03-B-E04. Reinforces PRB-0007's existing possible_root_causes note that this is a navigation/coordination problem, not an absence-of-service problem."
-
-analysis:
-  related_problems:
-    - "PRB-0007"
-  contribution:
-    - "EXISTING-SOLUTION"
-  representativeness: "NOT_APPLICABLE"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+  summary: A ULSAC e parceiros locais mantêm iniciativas dirigidas a cuidadores,
+    comunidade e demência, incluindo a Unidade de Cuidados na Comunidade, o
+    Cantinho do Cuidador e o VIVAMENTE.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - informal caregivers
+    - cared-para pessoas
+  temporal:
+    start: "2025"
+    end: "2026"
+domains:
+  - SOC
+  - HEA
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A existência das respostas não estabelece conhecimento, elegibilidade,
+    facilidade de encaminhamento, utilização ou eficácia para os cuidadores.

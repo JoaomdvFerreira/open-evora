@@ -1,30 +1,35 @@
 evidence_id: EVD-000019
-type: institutional
-source:
-  source_id: SRC-0024
-  publisher: "Município de Évora"
-  title: "Current PMUSE implementation / pedestrian-cycling works"
-  source_reference: "https://www.cm-evora.pt/pt/municipe/areas-de-acao/ambiente/conheca-alguns-dos-planos-e-projetos-do-municipio-na-area-ambiental/"
-  published_at: 2025-02-21
-  retrieved_at: 2026-08-10
-additional_sources:
-  - "SRC-0025"
-geography:
-  level: city
-  area: "city / southern urban area"
-population:
-  - "pedestrians"
-  - "cyclists"
-  - "people with reduced mobility"
-domain:
-  - "MOB"
-  - "ACC"
-  - "URB"
+provenance:
+  sources:
+    - SRC-0024
+    - SRC-0025
+    - SRC-0112
+  extracted_at: 2026-08-10
 observation:
-  summary: "Em fevereiro de 2025, o Município comunicou que estavam em curso obras do PMUSE na interface do Rossio e na Variante/PITE, prevendo-se que acrescentassem cerca de 6 km de percursos pedonais/cicláveis na zona sul da cidade. Em 2026, a área do Rossio entrou numa requalificação adicional, em várias fases, dando explicitamente continuidade à anterior interface de mobilidade suave Estação/Rossio."
+  summary: Em fevereiro de 2025, o Município comunicou que estavam em curso obras
+    do PMUSE na interface do Rossio e na Variante/PITE, prevendo-se que
+    acrescentassem cerca de 6 km de percursos pedonais/cicláveis na zona sul da
+    cidade. Em 2026, a área do Rossio entrou numa requalificação adicional, em
+    várias fases, dando explicitamente continuidade à anterior interface de
+    mobilidade suave Estação/Rossio.
+scope:
+  geography:
+    level: local_area
+    area: zona sul de Évora — Rossio de S. Brás / Variante ao PITE
+  populations:
+    - peões
+    - cyclists
+    - pessoas com mobilidade reduzida
+  temporal:
+    start: 2025-02-21
+    end: 2026-05-28
+domains:
+  - MOB
+  - ACC
+  - URB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Interpretation: older institutional findings about network discontinuity remain useful historical/problem evidence, but must not be treated as proof that the exact physical network is unchanged in 2026."
+claim_authority: authoritative
+inference_limits:
+  - As intervenções comunicadas não permitem reconstruir a topologia completa da
+    rede pedonal/ciclável nem estabelecer o estado atual de execução de todas as
+    fases.

@@ -3,8 +3,7 @@ import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/
 import { useRecordIndex } from "../records/useRecordIndex";
 import { useProblemProjection } from "./useProblemProjection";
 import type { EvidenceWithSources } from "./problemProjection";
-import { ContributionChip } from "../records/ContributionChip";
-import { summarizeContributions } from "./contributionSummary";
+import { summarizeEffects } from "./effectSummary";
 import { DISCLOSURE_FIELDS, DISCLOSURE_FIELD_LABELS, FIELD_CAPTIONS, glossFor, type FieldGloss } from "./statusGloss";
 import { describeType, formatTypedId } from "../typeGlossary";
 import { formatPublicCount, publicEnumLabel } from "../presentation";
@@ -32,7 +31,9 @@ function recordValue(value: unknown): Record<string, unknown> | null {
 }
 
 function stringValues(value: unknown): string[] {
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+  return Array.isArray(value)
+    ? value.map((item) => typeof item === "string" ? item : recordValue(item)?.evidence_id).filter((item): item is string => typeof item === "string")
+    : [];
 }
 
 /** `geography.area` (with `geography.level` as public-labelled context) — omitted entirely when either canonical part is absent, never inferred. */
@@ -245,14 +246,6 @@ function groupEvidenceByDecisionBasis(record: Record<string, unknown>, evidence:
   }
 
   return { supporting, boundary, other };
-}
-
-function evidenceSourceLabel(record: Record<string, unknown>): string | null {
-  const source = recordValue(record.source);
-  if (!source) return null;
-  const publisher = fieldValue(source, "publisher");
-  const title = fieldValue(source, "title");
-  return [publisher, title].filter((value): value is string => value !== null).join(" — ") || null;
 }
 
 function TypedLinkButton({ detail, onOpenGeneric, suffix }: { detail: RecordDetail; onOpenGeneric: (id: string) => void; suffix?: string }) {
@@ -626,20 +619,18 @@ function ProblemCurrentStateSection({ record }: { record: Record<string, unknown
 }
 
 /**
- * One evidence item's card — canonical ID, existing-contribution chips
+ * One evidence item's card — canonical ID, PRB-owned effect chips
  * (or the already-established "not registered" fallback), observation
  * summary, and linked sources. Shared by every PI-02C evidence group so
  * "supporting"/"boundary"/"other" render with identical presentation; only
  * the grouping is new; the card itself carries no ranking beyond the
- * already-authored contribution values.
+ * already-authored effects.
  */
-function EvidenceCard({ detail, sources, onOpenGeneric }: EvidenceWithSources & { onOpenGeneric: (id: string) => void }) {
+function EvidenceCard({ detail, sources, effects = [], onOpenGeneric }: EvidenceWithSources & { onOpenGeneric: (id: string) => void }) {
   const evidenceRecord = detail.record as Record<string, unknown>;
-  const analysis = recordValue(evidenceRecord.analysis);
-  const contributions = stringValues(analysis?.contribution);
+  const relationshipEffects = effects;
   const observation = recordValue(evidenceRecord.observation);
   const observationSummary = observation ? fieldValue(observation, "summary") : null;
-  const provenance = evidenceSourceLabel(evidenceRecord);
 
   return (
     <li className="evidence-card">
@@ -649,11 +640,11 @@ function EvidenceCard({ detail, sources, onOpenGeneric }: EvidenceWithSources & 
           onOpenGeneric={onOpenGeneric}
           suffix={fieldValue(evidenceRecord, "type") ? publicEnumLabel("type", fieldValue(evidenceRecord, "type")!) : undefined}
         />
-        <span className="evidence-item-contributions" aria-label="Contribuição canónica">
-          {contributions.length > 0 ? (
-            contributions.map((value, index) => <ContributionChip key={`${value}-${index}`} value={value} />)
+        <span className="evidence-item-effects" aria-label="Efeito canónico no Problema">
+          {relationshipEffects.length > 0 ? (
+            relationshipEffects.map((value, index) => <span key={`${value}-${index}`} className="effect-chip">{value === "CONTRADICTS" ? "Contradiz" : value === "SUPPORTS" ? "Sustenta" : value === "REFINES" ? "Refina" : "Delimita"}</span>)
           ) : (
-            <span className="field-empty">contribuição não registada.</span>
+            <span className="field-empty">efeito não registado.</span>
           )}
         </span>
       </div>
@@ -662,9 +653,9 @@ function EvidenceCard({ detail, sources, onOpenGeneric }: EvidenceWithSources & 
           <strong>Observação:</strong> {observationSummary}
         </p>
       )}
-      {(provenance || sources.length > 0) && (
+      {sources.length > 0 && (
         <p className="evidence-provenance">
-          <strong>Origem:</strong> {provenance ?? "registo de fonte relacionado abaixo"}.
+          <strong>Origem:</strong> registos de fonte de proveniência relacionados abaixo.
         </p>
       )}
       {sources.length > 0 && (
@@ -712,29 +703,29 @@ function EvidenceGroup({
 }
 
 /**
- * Scannable summary of contribution *occurrences* across the evidence list
+ * Scannable summary of effect occurrences across the evidence list
  * (REDUX-002's aggregate-legend pattern) — never a ranking, score, or
  * inferred strength; a tally of already-explicit canonical values. Shown
- * only when at least one evidence item carries a recorded contribution.
+ * only when at least one evidence item carries a recorded effect.
  */
-function ContributionOccurrenceSummary({ evidence }: { evidence: EvidenceWithSources[] }) {
-  const summary = summarizeContributions(evidence);
+function EffectOccurrenceSummary({ evidence }: { evidence: EvidenceWithSources[] }) {
+  const summary = summarizeEffects(evidence);
   if (summary.occurrences.length === 0) return null;
 
   return (
-    <div className="contribution-summary" aria-label="Papel destes registos nesta leitura">
-      <p className="contribution-summary-caption">
+    <div className="effect-summary" aria-label="Papel destes registos nesta leitura">
+      <p className="effect-summary-caption">
         Papel destes registos nesta leitura — os papéis indicados não representam força, confiança ou classificação.
       </p>
-      <p className="contribution-summary-counts">
+      <p className="effect-summary-counts">
         {summary.itemCount} {summary.itemCount === 1 ? "registo" : "registos"} · {summary.occurrenceCount}{" "}
         {summary.occurrenceCount === 1 ? "papel registado" : "papéis registados"}
         {summary.occurrenceCount !== summary.itemCount ? " (um registo pode ter mais do que um papel nesta leitura)" : ""}
       </p>
-      <div className="contribution-summary-chips">
+      <div className="effect-summary-chips">
         {summary.occurrences.map(({ value, count }) => (
-          <span key={value} className="contribution-summary-chip">
-            <ContributionChip value={value} /> <span className="contribution-count">{count} {count === 1 ? "ocorrência" : "ocorrências"}</span>
+          <span key={value} className="effect-summary-chip">
+            <span className="effect-chip">{value === "CONTRADICTS" ? "Contradiz" : value === "SUPPORTS" ? "Sustenta" : value === "REFINES" ? "Refina" : "Delimita"}</span> <span className="effect-count">{count} {count === 1 ? "ocorrência" : "ocorrências"}</span>
           </span>
         ))}
       </div>
@@ -999,7 +990,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
                 <p>{independenceAssessment}</p>
               </div>
             )}
-            <ContributionOccurrenceSummary evidence={evidence} />
+            <EffectOccurrenceSummary evidence={evidence} />
             {evidence.length === 0 ? (
               <p>Nenhuma evidência associada.</p>
             ) : (

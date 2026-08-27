@@ -1,0 +1,34 @@
+source_id: SRC-0119
+publisher: Serviços de Ação Social da Universidade de Évora (SASUÉ)
+name: SASUÉ — contacto institucional D5 sobre alojamento estudantil (D5-ENG-OP-004)
+resource_type: correspondence
+scope:
+  geography:
+    level: city
+    area: Évora
+  domains:
+    - HOU
+    - EDU
+    - DIG
+access:
+  level: private
+  availability: available
+  machine_readable: false
+  method: direct
+  format: text
+acquisition:
+  method: direct_contact
+  obtained_at: 2026-08-13
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: 2026-08-13
+  update_frequency: one_off
+caveats:
+  - Registo canónico sanitizado do contacto institucional D5; não contém nomes
+    pessoais, endereços de correio eletrónico, correspondência bruta nem dados
+    de estudantes.
+  - As Observations extraídas deste fio representam a mesma voz e o mesmo
+    processo de envolvimento e não constituem corroboração independente entre
+    si.

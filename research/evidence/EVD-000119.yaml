@@ -1,37 +1,31 @@
 evidence_id: EVD-000119
-type: institutional
-source:
-  source_id: SRC-0103
-  publisher: "Município de Évora"
-  title: "Plano de Mobilidade Urbana Sustentável de Évora - Volume I (diagnosis)"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/PMUSE_V.I.pdf"
-  published_at: 2025-09
-  retrieved_at: 2026-08-12
-geography:
-  level: city
-  area: "Évora city"
-population:
-  - "current and potential cyclists"
-domain:
-  - "MOB"
-  - "URB"
+lineage_id: MOB-2025-09-PMUSE-DIAGNOSIS-STRATEGY
+provenance:
+  sources:
+    - SRC-0103
+  extracted_at: 2026-08-12
 observation:
-  summary: "O Volume I do PMUSE representa cartograficamente (Figura 85) uma expansão proposta da rede ciclável, baseada numa proposta municipal de 2017, de aproximadamente 18 km de novos eixos exclusivamente cicláveis, acrescidos de 33 km do percurso partilhado por peões e ciclistas «Grande Rota do Montado». O próprio texto do plano assinala que a zona nascente da cidade, incluindo a ligação à Escola 2,3 André de Resende, permanece fora da proposta e exigiria estudo adicional."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "RS-02B1. Proposed, not built, infrastructure — must not be read as current network extent. The proposal itself dates to 2017 and is represented in cartography sourced to 2020; no evidence in this record establishes how much of it has since been delivered."
-
-analysis:
-  related_problems:
-    - "PRB-0004"
-  contribution:
-    - "PLANNED-SOLUTION"
-  friction_types:
-    - "PHYSICAL"
-  lineage_id: "MOB-2025-09-PMUSE-DIAGNOSIS-STRATEGY"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "HISTORICAL"
+  summary: O Volume I do PMUSE representa cartograficamente (Figura 85) uma
+    expansão proposta da rede ciclável, baseada numa proposta municipal de 2017,
+    de aproximadamente 18 km de novos eixos exclusivamente cicláveis, acrescidos
+    de 33 km do percurso partilhado por peões e ciclistas «Grande Rota do
+    Montado». O próprio texto do plano assinala que a zona nascente da cidade,
+    incluindo a ligação à Escola 2,3 André de Resende, permanece fora da
+    proposta e exigiria estudo adicional.
+scope:
+  geography:
+    level: city
+    area: Évora cidade
+  populations:
+    - ciclistas atuais e potenciais
+  temporal:
+    as_of: "2017"
+domains:
+  - MOB
+  - URB
+evidence_nature: recommendation
+claim_authority: authoritative
+inference_limits:
+  - A expansão é uma proposta e não infraestrutura entregue.
+  - A proposta remonta a 2017 e a sua representação cartográfica não estabelece
+    quanto foi executado posteriormente.

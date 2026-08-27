@@ -1,27 +1,25 @@
 evidence_id: EVD-000078
-type: institutional
-source:
-  source_id: SRC-0065
-  publisher: "Município de Évora"
-  title: "Municipal Proteção Civil alert channel"
-  source_reference: "https://www.cm-evora.pt/municipe/avisos-e-outras-informacoes/alertas-protecao-civil/"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0051"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "CLI"
-  - "PUB"
+provenance:
+  sources:
+    - SRC-0065
+  extracted_at: 2026-08-11
 observation:
-  summary: "Existe infraestrutura para informação climática e avisos públicos, mas a interoperabilidade técnica pública continua desconhecida: existem páginas municipais de alertas de proteção civil e infraestrutura de planeamento climático, mas a página pública analisada não estabelece a existência de um feed ou API local de alertas legível por máquina."
-evidence_nature: claim
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-06-B-E08. Interpretation: the open-data question remains technically relevant, but there is insufficient evidence for a canonical 'climate information gap' problem."
+  summary: O Município mantém uma página pública de alertas de Proteção Civil; a
+    página analisada não documenta um feed ou API local de alertas legível por
+    máquina.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes
+  temporal:
+    as_of: 2026-08-11
+domains:
+  - CLI
+  - PUB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A ausência de documentação de um feed ou API nesta página não demonstra que
+    tal interface não exista noutro local ou internamente.

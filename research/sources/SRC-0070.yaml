@@ -1,14 +1,14 @@
 source_id: SRC-0070
-publisher: "Rádio Campanário"
-name: "Rádio Campanário — programa municipal de reparação viária de 1,5 M€"
+publisher: Rádio Campanário
+name: Rádio Campanário — programa municipal de reparação viária de 1,5 M€
 resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "URB"
-    - "MOB"
+    - URB
+    - MOB
 access:
   level: public
   availability: available
@@ -17,10 +17,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.radiocampanario.com/evora-investe-15me-no-arranjo-de-estradas-queremos-rapidamente-tapar-o-maximo-de-buracos-vice-presidente/"
+canonical_reference: https://www.radiocampanario.com/evora-investe-15me-no-arranjo-de-estradas-queremos-rapidamente-tapar-o-maximo-de-buracos-vice-presidente/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2026-02"
-  last_checked_at: "2026-08-11"
+  published_at: 2026-02
+  last_checked_at: 2026-08-11

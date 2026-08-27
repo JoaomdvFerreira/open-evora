@@ -1,6 +1,6 @@
 source_id: SRC-0010
-publisher: "Universidade de Évora"
-name: "Universidade de Évora, Plano de Atividades 2025"
+publisher: Universidade de Évora
+name: Universidade de Évora, Plano de Atividades 2025
 resource_type: document
 scope:
   geography:
@@ -9,9 +9,9 @@ scope:
     start: "2025"
     end: "2025"
   domains:
-    - "EDU"
-    - "EMP"
-    - "ECO"
+    - EDU
+    - EMP
+    - ECO
 access:
   level: public
   availability: available
@@ -20,10 +20,10 @@ access:
   format: pdf
 acquisition:
   method: public_web
-canonical_reference: "https://gdoc.uevora.pt/929816"
+canonical_reference: https://gdoc.uevora.pt/929816
 licensing:
   status: unknown
   reuse: unknown
 temporal:
   published_at: "2025"
-  last_checked_at: "2026-08-10"
+  last_checked_at: 2026-08-10

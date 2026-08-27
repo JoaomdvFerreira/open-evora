@@ -1,38 +1,25 @@
 evidence_id: EVD-000100
-type: institutional
-source:
-  source_id: SRC-0086
-  publisher: "Universidade de Évora"
-  title: "Residência Universitária Manuel Álvares — renovation completion (May 2026)"
-  source_reference: "https://www.uevora.pt/ue-media/noticias?item=46564"
-  published_at: 2026-05
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0037"
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "students"
-domain:
-  - "HOU"
-  - "EDU"
+provenance:
+  sources:
+    - SRC-0086
+  extracted_at: 2026-08-11
 observation:
-  summary: "Em 06-05-2026, a Universidade de Évora comunicou a conclusão da reabilitação da Residência Universitária Manuel Álvares, uma das três residências assinaladas como encerradas para obras durante 2025/2026 em SRC-0037/EVD-000043."
+  summary: Em 6 de maio de 2026, a Universidade de Évora comunicou a conclusão da
+    reabilitação da Residência Universitária Manuel Álvares.
+scope:
+  geography:
+    level: site
+    area: Residência Universitária Manuel Álvares, Évora
+  populations:
+    - estudantes da Universidade de Évora
+  temporal:
+    as_of: 2026-05-06
+domains:
+  - HOU
+  - EDU
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-C Round A (H-03). CURRENT-STATE-UPDATE. Marks a specific recovery point within the 2025/2026 residence-capacity disruption already recorded in EVD-000043; must not be read as evidence that the broader student-accommodation/affordability pressure (EVD-000043, EVD-000099) is resolved."
-
-analysis:
-  related_problems:
-    - "PRB-0006"
-  contribution:
-    - "CURRENT-STATE-UPDATE"
-  friction_types:
-    - "OTHER"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A conclusão da obra numa residência não estabelece a capacidade total
+    disponível, a procura não satisfeita nem a resolução das pressões de
+    alojamento estudantil.

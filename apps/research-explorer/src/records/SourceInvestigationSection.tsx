@@ -7,7 +7,7 @@ import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
  * `SourceEvidenceRelations` (SUI-03A2) — no data fetching, no re-traversal
  * of SRC/EVD/PRB records, no recomputation of `uniqueEvidenceCount` or the
  * `relatedProblems` dedup path. Renders only the SRC → EVD →
- * `analysis.related_problems` → PRB path already resolved by that module.
+ * canonical `evidence[]` → PRB path already resolved by that module.
  * EVD ids under "Através de" stay text-only to avoid duplicating the EVD
  * navigation already available in "O que encontrámos"
  * (`SourceFindingsSection.tsx`). PRB navigation reuses the same

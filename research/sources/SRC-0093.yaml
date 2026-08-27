@@ -1,23 +1,24 @@
 source_id: SRC-0093
-publisher: "Scientific Reports (Springer Nature)"
+publisher: Scientific Reports (Springer Nature)
 creators:
-  - "Giacomo Dalla Chiara"
-  - "Klaas Fiete Krutein"
-  - "Andisheh Ranjbari"
-  - "Anne Goodchild"
-name: "Providing curb availability information to delivery drivers reduces cruising for parking (2022)"
+  - Giacomo Dalla Chiara
+  - Klaas Fiete Krutein
+  - Andisheh Ranjbari
+  - Anne Goodchild
+name: Providing curb availability information to delivery drivers reduces
+  cruising for parking (2022)
 resource_type: document
 identity:
   persistent_identifier:
     scheme: doi
-    value: "10.1038/s41598-022-23987-z"
+    value: 10.1038/s41598-022-23987-z
 scope:
   geography:
     level: local_area
-    area: "Belltown, Seattle, Washington, EUA"
+    area: Belltown, Seattle, Washington, EUA
   domains:
-    - "MOB"
-    - "DIG"
+    - MOB
+    - DIG
 access:
   level: public
   availability: available
@@ -26,14 +27,15 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://doi.org/10.1038/s41598-022-23987-z"
+canonical_reference: https://doi.org/10.1038/s41598-022-23987-z
 licensing:
   status: known
-  licence: "CC BY 4.0"
+  licence: CC BY 4.0
   reuse: permitted
-  attribution: "Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari e Anne Goodchild"
+  attribution: Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari e Anne Goodchild
 temporal:
-  published_at: "2022-11-11"
-  last_checked_at: "2026-08-25"
+  published_at: 2022-11-11
+  last_checked_at: 2026-08-25
 caveats:
-  - "O estudo é um experimento controlado realizado numa área de 10 quarteirões em Belltown, Seattle, com 11 condutores, 33 rotas e 495 entregas simuladas."
+  - O estudo é um experimento controlado realizado numa área de 10 quarteirões
+    em Belltown, Seattle, com 11 condutores, 33 rotas e 495 entregas simuladas.

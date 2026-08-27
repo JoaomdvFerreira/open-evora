@@ -1,16 +1,17 @@
 source_id: SRC-0026
-publisher: "Município de Évora"
-name: "4.ª Revisão do Plano de Urbanização de Évora — Ações Experimentais de Mobilidade 2026"
+publisher: Município de Évora
+name: 4.ª Revisão do Plano de Urbanização de Évora — Ações Experimentais de
+  Mobilidade 2026
 resource_type: webpage
 scope:
   geography:
     level: city
-    area: "Évora"
+    area: Évora
   domains:
-    - "MOB"
-    - "ACC"
-    - "GEO"
-    - "URB"
+    - MOB
+    - ACC
+    - GEO
+    - URB
 access:
   level: public
   availability: available
@@ -19,12 +20,13 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/plano-de-urbanizacao-em-revisao/"
+canonical_reference: https://www.cm-evora.pt/plano-de-urbanizacao-em-revisao/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2026-06"
-  last_checked_at: "2026-08-10"
+  published_at: 2026-06
+  last_checked_at: 2026-08-10
 caveats:
-  - "A origem descreve uma fase experimental e participativa em curso, não resultados finais do processo."
+  - A origem descreve uma fase experimental e participativa em curso, não
+    resultados finais do processo.

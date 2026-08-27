@@ -1,36 +1,26 @@
 evidence_id: EVD-000097
-type: institutional
-source:
-  source_id: SRC-0082
-  publisher: "Município de Évora"
-  title: "Municipal bulky-waste (monstros domésticos) online service page"
-  source_reference: "https://www.cm-evora.pt/servicos/servicos-online/montros-domesticos/"
-  published_at: unknown
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
+provenance:
+  sources:
+    - SRC-0082
+  extracted_at: 2026-08-11
 observation:
-  summary: "Já existe um percurso de serviço específico para resíduos volumosos/verdes (monstros domésticos): os residentes podem entregar os resíduos no Ecocentro ou solicitar recolha ao domicílio, caso sejam elegíveis, através de uma página municipal de serviços em linha."
+  summary: "Já existe um percurso de serviço específico para resíduos
+    volumosos/verdes (monstros domésticos): os residentes podem entregar os
+    resíduos no Ecocentro ou solicitar recolha ao domicílio, caso sejam
+    elegíveis, através de uma página municipal de serviços em linha."
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes
+  temporal:
+    as_of: 2026-08-11
+domains:
+  - ENV
+  - PUB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-E Round A (E-07). EXISTING-SOLUTION; TRANSACTION-FRICTION-LEAD. The bulky/green-waste service exists; the remaining open question is discoverability, completion and predictability of the request journey, not absence of a service — carried to D5 as a narrow lead, not established as a validated problem here."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "TRANSACTION"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+claim_authority: authoritative
+inference_limits:
+  - A existência do serviço não estabelece a sua descoberta, previsibilidade,
+    conclusão ou facilidade de utilização pelos residentes.

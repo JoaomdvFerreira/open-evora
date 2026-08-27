@@ -1,14 +1,14 @@
 source_id: SRC-0030
-publisher: "Município de Évora"
-name: "Plano Concelhio dos Cuidadores Informais de Évora"
+publisher: Município de Évora
+name: Plano Concelhio dos Cuidadores Informais de Évora
 resource_type: document
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "SOC"
-    - "HEA"
+    - SOC
+    - HEA
 access:
   level: public
   availability: available
@@ -17,12 +17,13 @@ access:
   format: pdf
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/Plano-Concelhio-Cuidadores-Informais_v4_Junho_2025-002_RELATORIO.pdf"
+canonical_reference: https://www.cm-evora.pt/wp-content/uploads/2025/09/Plano-Concelhio-Cuidadores-Informais_v4_Junho_2025-002_RELATORIO.pdf
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2025-06"
-  last_checked_at: "2026-08-10"
+  published_at: 2025-06
+  last_checked_at: 2026-08-10
 caveats:
-  - "O questionário de preparação do plano envolveu 133 cuidadores recrutados através de organizações de apoio e uma amostra geograficamente concentrada."
+  - O questionário de preparação do plano envolveu 133 cuidadores recrutados
+    através de organizações de apoio e uma amostra geograficamente concentrada.

@@ -1,24 +1,25 @@
 evidence_id: EVD-000038
-type: institutional
-source:
-  source_id: SRC-0032
-  publisher: "Universidade de Évora"
-  title: "UÉ admission results 2025"
-  source_reference: "https://www.uevora.pt/ue-media/noticias?item=44115"
-  published_at: 2025
-  retrieved_at: 2026-08-10
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "prospective and admitted university students"
-domain:
-  - "EDU"
+provenance:
+  sources:
+    - SRC-0032
+  extracted_at: 2026-08-10
 observation:
-  summary: "A UÉ preencheu 1 193 das 1 371 vagas da primeira fase de acesso nacional em 2025 (87 %), referindo uma atração relativamente forte num contexto de redução a nível nacional; o novo curso de Engenharia Aeroespacial preencheu todas as vagas da primeira fase."
+  summary: A UÉ preencheu 1 193 das 1 371 vagas da primeira fase de acesso
+    nacional em 2025 (87 %), referindo uma atração relativamente forte num
+    contexto de redução a nível nacional; o novo curso de Engenharia
+    Aeroespacial preencheu todas as vagas da primeira fase.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - prospective e admitted university students
+  temporal:
+    as_of: "2025"
+domains:
+  - EDU
 evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-04-A-E02. Interpretation: student attraction and student retention must not be treated as the same problem."
+claim_authority: authoritative
+inference_limits:
+  - O preenchimento de vagas mede atração/admissão e não retenção dos estudantes
+    após os estudos.

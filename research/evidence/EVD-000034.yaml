@@ -1,39 +1,28 @@
 evidence_id: EVD-000034
-type: institutional
-source:
-  source_id: SRC-0030
-  publisher: "Município de Évora"
-  title: "Plano Concelhio dos Cuidadores Informais de Évora"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/Plano-Concelhio-Cuidadores-Informais_v4_Junho_2025-002_RELATORIO.pdf"
-  published_at: 2025-06
-  retrieved_at: 2026-08-10
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "informal caregivers"
-  - "cared-for people"
-domain:
-  - "SOC"
-  - "HEA"
+lineage_id: SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS
+provenance:
+  sources:
+    - SRC-0030
+  extracted_at: 2026-08-10
 observation:
-  summary: "O plano para cuidadores de 2025 identifica necessidades de informação nas áreas da saúde, mobilidade, estruturas de apoio e apoios financeiros e sociais; o estudo subjacente (68 cuidadores e 89 pessoas cuidadas entrevistadas) refere que 35 % dos inquiridos indicaram que a pessoa de quem cuidavam não utilizava qualquer serviço formal de apoio."
-evidence_nature: measurement
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-03-A-E04. One of the clearest information/coordination problems found in Round A."
-
-analysis:
-  related_problems:
-    - "PRB-0007"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "INFORMATION"
-    - "COORDINATION"
-  lineage_id: "SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS"
-  representativeness: "LIMITED"
-  verification: "VERIFIED"
-  temporal_relevance: "CURRENT"
+  summary: O Plano Concelhio dos Cuidadores Informais identifica necessidades de
+    informação dos cuidadores nas áreas da saúde, mobilidade, estruturas de
+    apoio e apoios financeiros e sociais.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - informal caregivers
+    - cared-para pessoas
+  temporal:
+    as_of: "2025"
+domains:
+  - SOC
+  - HEA
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - A identificação de necessidades no plano não estabelece a sua prevalência no
+    conjunto dos cuidadores do Município nem uma relação causal com a não
+    utilização de apoio formal.

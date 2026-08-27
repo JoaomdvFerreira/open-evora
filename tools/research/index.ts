@@ -3,8 +3,8 @@
  * should import from here rather than reaching into core/, validation/, or
  * analysis/ directly.
  */
-export { analyzeCorpus, computeProblemAnalysis, computeGaps, tally } from "./analysis/analyze.ts";
-export type { AnalysisResult, CorpusSummary, Distribution, ProblemAnalysis } from "./analysis/analyze.ts";
+export { analyzeCorpus, computeProblemAnalysis, computeGaps } from "./analysis/analyze.ts";
+export type { AnalysisResult, CorpusSummary, ProblemAnalysis } from "./analysis/analyze.ts";
 export { loadCorpusIndex, loadCorpusIndexTolerant } from "./core/corpus.ts";
 export type { CorpusLoadResult, MalformedRecordFile } from "./core/corpus.ts";
 export { loadSchemas } from "./core/schemas.ts";

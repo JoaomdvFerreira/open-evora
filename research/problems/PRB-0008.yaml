@@ -1,71 +1,178 @@
 problem_id: PRB-0008
-title: "O alinhamento entre competências e necessidades dos empregadores é uma preocupação institucional ativa, mas o desfasamento específico em Évora ainda não está caracterizado"
+title: O alinhamento entre competências e necessidades dos empregadores é uma
+  preocupação institucional ativa, mas o desfasamento específico em Évora ainda
+  não está caracterizado
 domain:
-  - "EMP"
-  - "EDU"
-  - "ECO"
+  - EMP
+  - EDU
+  - ECO
 geography:
   level: municipality
-  area: "Évora"
+  area: Évora
 affected_populations:
-  - "trabalhadores e pessoas à procura de emprego"
-  - "empregadores"
-  - "entidades de formação e ensino"
-problem_statement: |-
-  O planeamento institucional local trata o alinhamento entre as competências da força de trabalho e as necessidades dos empregadores — através do mapeamento de competências, da adaptação da formação e de uma articulação mais forte entre entidades de ensino e empregadores — como uma linha de trabalho atual e ativa, e não como uma preocupação resolvida, apesar da considerável infraestrutura existente de apoio económico e empresarial e das iniciativas de transição entre ensino e emprego.
+  - trabalhadores e pessoas à procura de emprego
+  - empregadores
+  - entidades de formação e ensino
+problem_statement: >-
+  O planeamento institucional local trata o alinhamento entre as competências da
+  força de trabalho e as necessidades dos empregadores — através do mapeamento
+  de competências, da adaptação da formação e de uma articulação mais forte
+  entre entidades de ensino e empregadores — como uma linha de trabalho atual e
+  ativa, e não como uma preocupação resolvida, apesar da considerável
+  infraestrutura existente de apoio económico e empresarial e das iniciativas de
+  transição entre ensino e emprego.
 
-  Ainda não está estabelecido quais as competências ou profissões concretamente em falta no concelho de Évora, por oposição à região do Alentejo em geral, para a qual existe uma lista regional de profissões em escassez.
+
+  Ainda não está estabelecido quais as competências ou profissões concretamente
+  em falta no concelho de Évora, por oposição à região do Alentejo em geral,
+  para a qual existe uma lista regional de profissões em escassez.
 investigation:
   open_questions:
-    - question: "Quais são as competências ou profissões concretamente em falta no concelho de Évora, por oposição à região do Alentejo em geral?"
-      why_open: |-
-        A lista regional de profissões em escassez do EURES para o Alentejo é mais informativa do que simples listagens pontuais de ofertas de emprego do IEFP ou Indeed, porque identifica profissões em situação de escassez e não apenas vagas anunciadas. No entanto, trata-se de evidência à escala regional, não municipal, e não deve ser generalizada para Évora sem corroboração local.
+    - question: Quais são as competências ou profissões concretamente em falta no
+        concelho de Évora, por oposição à região do Alentejo em geral?
+      why_open: >-
+        A lista regional de profissões em escassez do EURES para o Alentejo é
+        mais informativa do que simples listagens pontuais de ofertas de emprego
+        do IEFP ou Indeed, porque identifica profissões em situação de escassez
+        e não apenas vagas anunciadas. No entanto, trata-se de evidência à
+        escala regional, não municipal, e não deve ser generalizada para Évora
+        sem corroboração local.
 
-        O boletim do IEFP confirma ainda que a área estatística do CTEF Évora abrange catorze municípios, pelo que os dados dos centros de emprego do IEFP também não permitem obter uma lista específica para o concelho de Évora.
-      current_action: "A validação institucional junto da NERE continua a ser a via de investigação adequada para esta questão."
-      resolution_condition: "Dados ou validação institucional específicos do concelho de Évora, e não apenas regionais, sobre profissões ou competências em situação de escassez."
+
+        O boletim do IEFP confirma ainda que a área estatística do CTEF Évora
+        abrange catorze municípios, pelo que os dados dos centros de emprego do
+        IEFP também não permitem obter uma lista específica para o concelho de
+        Évora.
+      current_action: A validação institucional junto da NERE continua a ser a via de
+        investigação adequada para esta questão.
+      resolution_condition: Dados ou validação institucional específicos do concelho
+        de Évora, e não apenas regionais, sobre profissões ou competências em
+        situação de escassez.
       evidence:
-        - "EVD-000115"
-        - "EVD-000116"
+        - EVD-000115
+        - EVD-000116
   path:
     initial_signal:
-      summary: "O planeamento institucional local identificou o alinhamento entre as competências da força de trabalho e as necessidades dos empregadores como uma linha de trabalho ativa, através do mapeamento de competências, da adaptação da formação e de uma articulação mais forte entre entidades de ensino e empregadores."
+      summary: O planeamento institucional local identificou o alinhamento entre as
+        competências da força de trabalho e as necessidades dos empregadores
+        como uma linha de trabalho ativa, através do mapeamento de competências,
+        da adaptação da formação e de uma articulação mais forte entre entidades
+        de ensino e empregadores.
       evidence:
-        - "EVD-000037"
-        - "EVD-000040"
-        - "EVD-000041"
+        - EVD-000037
+        - EVD-000144
+        - EVD-000040
+        - EVD-000041
     development:
-      summary: |-
-        Foi confirmado que já existe uma infraestrutura substancial de intermediação entre ofertas de emprego e candidatos — feiras de emprego da Universidade de Évora, iniciativas universitárias de carreira, ofertas do IEFP, mecanismos de formação NERE/IEFP e o Portal de Emprego da Universidade de Évora. Por isso, uma bolsa de emprego genérica duplicaria infraestrutura existente sem que esteja demonstrada uma falha concreta no percurso dos utilizadores.
-
-        O problema de alinhamento entre competências e necessidades dos empregadores permanece, contudo, uma linha de trabalho institucional ativa em 2025/2026, e não apenas uma preocupação estratégica histórica.
+      summary: Foi confirmado que já existe uma infraestrutura substancial de
+        intermediação entre ofertas de emprego e candidatos — iniciativas
+        universitárias de carreira e empregabilidade, ofertas do IEFP,
+        mecanismos de formação e o Portal de Emprego da Universidade de Évora.
+        Os instrumentos institucionais preveem também mapeamento de
+        competências, adaptação da formação e articulação educação-empregadores,
+        e a Universidade anunciou uma terceira edição da Feira do Emprego para
+        outubro de 2026. Assim, o foco permanece no alinhamento e na sua
+        eficácia, não na ausência de uma bolsa de emprego genérica.
       evidence:
-        - "EVD-000047"
-        - "EVD-000048"
+        - EVD-000048
+        - EVD-000144
+        - EVD-000147
     delimitation:
-      summary: |-
-        As listagens públicas de ofertas de emprego, por si só, não permitem identificar uma escassez real de competências. O levantamento do IEFP Évora, com 102 ofertas, não contém dados sobre o tempo necessário para preencher as vagas, tentativas de recrutamento sem sucesso, limitações salariais ou escassez reportada pelos empregadores.
+      summary: >-
+        As listagens públicas de ofertas de emprego, por si só, não permitem
+        identificar uma escassez real de competências. O levantamento do IEFP
+        Évora, com 102 ofertas, não contém dados sobre o tempo necessário para
+        preencher as vagas, tentativas de recrutamento sem sucesso, limitações
+        salariais ou escassez reportada pelos empregadores.
 
-        Foi também identificado um sinal de procura especializada no setor aeroespacial, sem que este permita estabelecer, por si só, uma situação real de escassez.
 
-        Foram ainda identificados dois mecanismos já em funcionamento para alinhamento de competências e recolha de informação junto dos empregadores — PlaQuaR e o plano de ação anual UÉ/TE Connectivity —, sem que a evidência disponível permita concluir que estes mecanismos são sistemáticos ou suficientes para o conjunto da economia de Évora.
+        Foi também identificado um sinal de procura especializada no setor
+        aeroespacial, sem que este permita estabelecer, por si só, uma situação
+        real de escassez.
+
+
+        Foram ainda identificados dois mecanismos já em funcionamento para
+        alinhamento de competências e recolha de informação junto dos
+        empregadores — PlaQuaR e o plano de ação anual UÉ/TE Connectivity —, sem
+        que a evidência disponível permita concluir que estes mecanismos são
+        sistemáticos ou suficientes para o conjunto da economia de Évora.
       evidence:
-        - "EVD-000049"
-        - "EVD-000101"
-        - "EVD-000102"
-        - "EVD-000103"
+        - EVD-000049
+        - EVD-000101
+        - EVD-000102
+        - EVD-000103
 evidence:
-  - "EVD-000037"
-  - "EVD-000040"
-  - "EVD-000041"
-  - "EVD-000047"
-  - "EVD-000048"
-  - "EVD-000049"
-  - "EVD-000101"
-  - "EVD-000102"
-  - "EVD-000103"
-  - "EVD-000115"
-  - "EVD-000116"
+  - evidence_id: EVD-000037
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000144
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000040
+    effects:
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000041
+    effects:
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000048
+    effects:
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000147
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000049
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000101
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000102
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000103
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000115
+    effects:
+      - REFINES
+    research_roles:
+      - CONTEXTUAL
+  - evidence_id: EVD-000116
+    effects:
+      - BOUNDS
+    research_roles:
+      - CONTEXTUAL
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed

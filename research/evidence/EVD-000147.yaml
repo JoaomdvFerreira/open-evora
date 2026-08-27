@@ -1,0 +1,26 @@
+evidence_id: EVD-000147
+provenance:
+  sources:
+    - SRC-0040
+  extracted_at: 2026-08-11
+observation:
+  summary: A Universidade de Évora anunciou uma terceira edição da Feira do
+    Emprego prevista para outubro de 2026.
+scope:
+  geography:
+    level: city
+    area: Évora
+  temporal:
+    as_of: 2026-10
+  populations:
+    - estudantes e recém-diplomados da Universidade de Évora
+    - empregadores
+domains:
+  - EMP
+  - EDU
+  - ECO
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A realização prevista da feira não estabelece que o evento tenha ocorrido
+    nem resultados de emprego ou correspondência.

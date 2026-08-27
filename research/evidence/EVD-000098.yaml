@@ -1,39 +1,29 @@
 evidence_id: EVD-000098
-type: press
-source:
-  source_id: SRC-0083
-  publisher: "O Digital"
-  title: "News report: Évora green-waste dumping enforcement action (contraordenação)"
-  source_reference: "https://odigital.sapo.pt/residuos-verdes-evora-contraordenacao/"
-  published_at: 2026-08
-  retrieved_at: 2026-08-11
-additional_sources:
-  - "SRC-0084"
-geography:
-  level: municipality
-  area: "Évora — near a school"
-population:
-  - "residents"
-domain:
-  - "ENV"
-  - "PUB"
+provenance:
+  sources:
+    - SRC-0083
+    - SRC-0084
+  extracted_at: 2026-08-11
 observation:
-  summary: "Em agosto de 2026, o Município instaurou um processo de contraordenação por deposição inadequada de resíduos verdes/de jardim junto de uma escola, noticiado por dois órgãos de comunicação social que cobriram o mesmo acontecimento subjacente."
+  summary: Em agosto de 2026, o Município instaurou um processo de contraordenação
+    por deposição inadequada de resíduos verdes/de jardim junto de uma escola,
+    noticiado por dois órgãos de comunicação social que cobriram o mesmo
+    acontecimento subjacente.
+scope:
+  geography:
+    level: municipality
+    area: Évora — perto de uma escola
+  populations:
+    - residentes
+  temporal:
+    as_of: 2026-08
+domains:
+  - ENV
+  - PUB
 evidence_nature: claim
-strength: secondary
-personal_data:
-  present: false
-  retained: false
-notes: "D2-E Round A (E-08). TRANSACTION-FRICTION-LEAD; CURRENT-STATE-UPDATE. One enforcement case does not establish widespread resident confusion about the green-waste journey (see EVD-000097); preserved as a D5 journey question ('what happens when municipal green-waste collection cannot be provided'), not a new PRB. One evidence event/lineage integrated once despite two publications reporting it (SRC-0083 primary, SRC-0084 corroborating, same event)."
-
-analysis:
-  related_problems:
-    - "PRB-0009"
-  contribution:
-    - "CURRENT-STATE-UPDATE"
-  friction_types:
-    - "TRANSACTION"
-  public_signal_class: "PS1"
-  representativeness: "NOT_APPLICABLE"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: non_authoritative
+inference_limits:
+  - As duas publicações reportam o mesmo acontecimento e não constituem duas
+    observações independentes.
+  - Um único processo de contraordenação não estabelece confusão generalizada
+    sobre o percurso de resíduos verdes.

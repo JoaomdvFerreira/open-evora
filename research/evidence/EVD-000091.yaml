@@ -1,38 +1,29 @@
 evidence_id: EVD-000091
-type: institutional
-source:
-  source_id: SRC-0030
-  publisher: "Município de Évora"
-  title: "Plano Concelhio dos Cuidadores Informais de Évora — caregiver focus-group findings"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/09/Plano-Concelhio-Cuidadores-Informais_v4_Junho_2025-002_RELATORIO.pdf"
-  published_at: 2025-06
-  retrieved_at: 2026-08-11
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "informal caregivers"
-domain:
-  - "SOC"
-  - "HEA"
+lineage_id: SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS
+provenance:
+  sources:
+    - SRC-0030
+  extracted_at: 2026-08-11
 observation:
-  summary: "O material dos grupos focais de cuidadores incluído no plano identifica explicitamente a burocracia e a dificuldade em conhecer/compreender os direitos dos cuidadores como uma fonte distinta de sobrecarga, separada da sobrecarga geral associada à prestação de cuidados."
+  summary: O material dos grupos focais de cuidadores incluído no plano identifica
+    explicitamente a burocracia e a dificuldade em conhecer/compreender os
+    direitos dos cuidadores como uma fonte distinta de sobrecarga, separada da
+    sobrecarga geral associada à prestação de cuidados.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - cuidadores informais participantes nos grupos focais
+  temporal:
+    as_of: "2025"
+domains:
+  - SOC
+  - HEA
 evidence_nature: reported-experience
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "D2-B Round A (D2-B-SIG-03). CONFIRMS PRB-0007; INFORMATION-FRICTION, TRANSACTION-FRICTION. One of the clearest direct caregiver-voiced confirmations of the D1 navigation framing found in D2 — a separable information/transaction-cost component rather than merely general caregiver burden. Same SRC-0030 lineage as EVD-000089/EVD-000090; not an independent corroborating source."
-
-analysis:
-  related_problems:
-    - "PRB-0007"
-  contribution:
-    - "CONFIRMS"
-  friction_types:
-    - "INFORMATION"
-    - "TRANSACTION"
-  lineage_id: "SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS"
-  representativeness: "LIMITED"
-  verification: "REPORTED"
-  temporal_relevance: "CURRENT"
+claim_authority: non_authoritative
+inference_limits:
+  - Os resultados provêm de grupos focais e não permitem estimar a prevalência
+    das dificuldades no conjunto dos cuidadores.
+  - Esta amostra/processo é distinto do questionário a 133 cuidadores e não deve
+    ser fundido como se fosse a mesma medição.

@@ -1,14 +1,14 @@
 source_id: SRC-0065
-publisher: "Município de Évora"
-name: "Canal de alertas da Proteção Civil Municipal"
+publisher: Município de Évora
+name: Canal de alertas da Proteção Civil Municipal
 resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: "Évora"
+    area: Évora
   domains:
-    - "CLI"
-    - "PUB"
+    - CLI
+    - PUB
 access:
   level: public
   availability: available
@@ -17,9 +17,9 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/municipe/avisos-e-outras-informacoes/alertas-protecao-civil/"
+canonical_reference: https://www.cm-evora.pt/municipe/avisos-e-outras-informacoes/alertas-protecao-civil/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: "2026-08-11"
+  last_checked_at: 2026-08-11

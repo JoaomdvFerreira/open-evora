@@ -1,13 +1,14 @@
 source_id: SRC-0036
-publisher: "Município de Évora"
-name: "Entrega de 12 habitações em regime de renda apoiada — Malagueira, janeiro de 2026"
+publisher: Município de Évora
+name: Entrega de 12 habitações em regime de renda apoiada — Malagueira, janeiro
+  de 2026
 resource_type: webpage
 scope:
   geography:
     level: local_area
-    area: "Bairro da Malagueira, Évora"
+    area: Bairro da Malagueira, Évora
   domains:
-    - "HOU"
+    - HOU
 access:
   level: public
   availability: available
@@ -16,10 +17,10 @@ access:
   format: html
 acquisition:
   method: public_web
-canonical_reference: "https://www.cm-evora.pt/camara-de-evora-entregou-mais-12-casas-em-regime-de-arrendamento-apoiado/"
+canonical_reference: https://www.cm-evora.pt/camara-de-evora-entregou-mais-12-casas-em-regime-de-arrendamento-apoiado/
 licensing:
   status: unknown
   reuse: unknown
 temporal:
-  published_at: "2026-01"
-  last_checked_at: "2026-08-11"
+  published_at: 2026-01
+  last_checked_at: 2026-08-11

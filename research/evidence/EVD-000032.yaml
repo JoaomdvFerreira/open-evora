@@ -1,38 +1,30 @@
 evidence_id: EVD-000032
-type: institutional
-source:
-  source_id: SRC-0028
-  publisher: "Município de Évora / Rede Social"
-  title: "Plano de Ação do PDS 2025"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2025/03/PA-PDS-2025-final.pdf"
-  published_at: 2025-03
-  retrieved_at: 2026-08-10
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "residents affected by housing shortage"
-  - "vulnerable populations needing temporary accommodation"
-  - "students"
-domain:
-  - "HOU"
-  - "SOC"
+provenance:
+  sources:
+    - SRC-0028
+  extracted_at: 2026-08-10
 observation:
-  summary: "O plano de ação social de 2025 inclui reabilitação habitacional ao abrigo da Estratégia Local de Habitação, metas de habitação a custos controlados, reabilitação para arrendamento apoiado, respostas de alojamento temporário ou partilhado para populações vulneráveis, bem como trabalho explícito de avaliação das necessidades de alojamento estudantil e de candidatura a financiamento."
-evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "Provisional ID: D1-03-A-E02. The evidence-backed problem is not 'the Municipality is doing nothing'; Batch B must determine implementation progress and residual unmet need."
-
-analysis:
-  related_problems:
-    - "PRB-0006"
-  contribution:
-    - "EXISTING-SOLUTION"
-  friction_types:
-    - "OTHER"
-  representativeness: "UNKNOWN"
-  verification: "UNKNOWN"
-  temporal_relevance: "HISTORICAL"
+  summary: O plano de ação social de 2025 inclui reabilitação habitacional ao
+    abrigo da Estratégia Local de Habitação, metas de habitação a custos
+    controlados, reabilitação para arrendamento apoiado, respostas de alojamento
+    temporário ou partilhado para populações vulneráveis, bem como trabalho
+    explícito de avaliação das necessidades de alojamento estudantil e de
+    candidatura a financiamento.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes affected by housing shortage
+    - populações vulneráveis que necessitam de alojamento temporário
+    - students
+  temporal:
+    as_of: "2025"
+domains:
+  - HOU
+  - SOC
+evidence_nature: recommendation
+claim_authority: authoritative
+inference_limits:
+  - As ações e metas constantes do plano não estabelecem a sua execução, entrega
+    ou eficácia.

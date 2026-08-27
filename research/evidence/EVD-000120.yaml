@@ -1,36 +1,30 @@
 evidence_id: EVD-000120
-type: institutional
-source:
-  source_id: SRC-0104
-  publisher: "Município de Évora"
-  title: "Regulamento Municipal de Cedência e Utilização de Cartografia Digital"
-  source_reference: "https://www.cm-evora.pt/wp-content/uploads/2020/07/regulamento-municipal-de-cedencia-e-utilizacao-de-cartografia-digital.pdf"
-  published_at: "2020-12"
-  retrieved_at: 2026-08-12
-geography:
-  level: municipality
-  area: "Município de Évora"
-population:
-  - "cartography/data requesters (professionals, institutions, general public)"
-domain:
-  - "GEO"
-  - "URB"
+provenance:
+  sources:
+    - SRC-0104
+  extracted_at: 2026-08-12
 observation:
-  summary: "O Regulamento Municipal de Cedência e Utilização de Cartografia Digital declara que a informação é fornecida nos formatos dwg, shp, ecw e pdf. Isto confirma a existência de capacidade para fornecer informação geoespacial estruturada (SHP), através de um processo formal de cedência mediante pedido e analisado caso a caso, e não através de um conjunto de dados disponibilizado abertamente ou em regime de autosserviço, nem de uma API pública."
+  summary: O Regulamento Municipal de Cedência e Utilização de Cartografia Digital
+    estabelece o fornecimento de informação nos formatos DWG, SHP, ECW e PDF
+    através de um processo formal de cedência mediante pedido e análise caso a
+    caso.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - pessoas que solicitam cartografia/dados (profissionais, instituições,
+      público em geral)
+  temporal:
+    as_of: 2020-12
+domains:
+  - GEO
+  - URB
 evidence_nature: fact
-strength: primary-authoritative
-personal_data:
-  present: false
-  retained: false
-notes: "RS-02B1 (docs/discovery/rs-01-evidence-gap-review.md Gap 7). General-purpose municipal cartography-supply capability, not specific to the cycling network — does not itself confirm that a current cycling-network SHP layer exists, is current, or has ever been requested/supplied. Complements SRC-0006/SRC-0007 (municipal/CIMAC geographic-portal and GIS infrastructure), which already establish municipal GIS capability at the infrastructure level; this record adds the specific, request-based format/licensing mechanism."
-
-analysis:
-  related_problems:
-    - "PRB-0004"
-  contribution:
-    - "REFINES"
-  friction_types:
-    - "INFORMATION"
-  representativeness: "NOT_APPLICABLE"
-  verification: "VERIFIED"
-  temporal_relevance: "HISTORICAL"
+claim_authority: authoritative
+inference_limits:
+  - O regulamento descreve capacidade geral de cedência de cartografia e não
+    confirma a existência ou atualidade de uma camada SHP específica da rede
+    ciclável.
+  - O processo de cedência não permite concluir, por si só, se existem outras
+    formas de acesso, incluindo API ou open data.

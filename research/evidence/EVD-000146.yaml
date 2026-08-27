@@ -1,0 +1,25 @@
+evidence_id: EVD-000146
+provenance:
+  sources:
+    - SRC-0031
+  extracted_at: 2026-08-11
+observation:
+  summary: Em janeiro de 2026, a informação municipal/CLASE referiu 262 pessoas
+    com estatuto oficial de cuidador informal no Município de Évora.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: 2026-01
+  populations:
+    - pessoas com estatuto oficial de cuidador informal
+domains:
+  - SOC
+  - HEA
+evidence_nature: measurement
+claim_authority: authoritative
+inference_limits:
+  - O número de pessoas com estatuto oficial não representa necessariamente o
+    total de cuidadores informais existentes no Município.
+lineage_id: SOC-2025-PLANO-CONCELHIO-CUIDADORES-INFORMAIS
