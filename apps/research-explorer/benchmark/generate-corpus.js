@@ -17,6 +17,8 @@ const path = require("path");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const REAL_SCHEMAS_DIR = path.join(REPO_ROOT, "research", "schemas");
+const CANONICAL_RESEARCH_DIR = path.join(REPO_ROOT, "research");
+const { loadCorpusIndex } = require(path.join(REPO_ROOT, "tools", "research", "index.ts"));
 
 // --- deterministic PRNG (mulberry32) -- fixed seed so every run of a given
 // scale is byte-for-byte reproducible. -------------------------------------
@@ -76,15 +78,26 @@ function toYaml(record) {
   return lines.join("\n") + "\n";
 }
 
-// --- scale-proportional counts, matching the real corpus's SRC/EVD-heavy,
-// PRB-light shape (105/128/10 = ~43.2%/52.7%/4.1% in the current 243-record
-// corpus). PRB is floored first (smallest, most degree-sensitive category),
-// SRC is a fixed share of the remainder, and EVD absorbs the rest so the
-// three counts always sum exactly to `scale`.
+// --- Scale-proportional counts use the current canonical SRC/EVD/PRB corpus
+// as their baseline. PRB is floored first (smallest, most degree-sensitive
+// category), SRC is a fixed share of the remainder, and EVD absorbs the rest
+// so the three counts always sum exactly to `scale`.
 // ------------------------------------------------------
+function canonicalCounts() {
+  const index = loadCorpusIndex(CANONICAL_RESEARCH_DIR);
+  const count = (prefix) => index.byPrefix.get(prefix)?.records.length ?? 0;
+  const src = count("SRC-");
+  const evd = count("EVD-");
+  const prb = count("PRB-");
+  const total = src + evd + prb;
+  if (total === 0) throw new Error("Canonical SRC/EVD/PRB corpus is empty");
+  return { src, evd, prb, total };
+}
+
 function computeCounts(scale) {
-  const prb = Math.max(5, Math.round(scale * (10 / 243)));
-  const src = Math.max(10, Math.round(scale * (105 / 243)));
+  const baseline = canonicalCounts();
+  const prb = Math.max(5, Math.round(scale * (baseline.prb / baseline.total)));
+  const src = Math.max(10, Math.round(scale * (baseline.src / baseline.total)));
   const evd = scale - prb - src;
   if (evd <= 0) throw new Error(`Scale ${scale} too small for proportional generation`);
   return { src, evd, prb };

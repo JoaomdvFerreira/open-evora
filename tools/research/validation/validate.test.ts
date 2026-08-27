@@ -102,7 +102,7 @@ test("nested PRB references must resolve and belong to the PRB relationship set"
 
 test("canonical PRBs and optional PRB structures remain valid", () => {
   const canonical = loadCorpusIndex(root);
-  assert.equal(canonical.byPrefix.get("PRB-")?.records.length, 10);
+  assert.ok(canonical.byPrefix.get("PRB-")!.records.length > 0);
   assert.deepEqual(validateCorpusIndex(canonical).errors, []);
 
   const optional = loadCorpusIndex(root);

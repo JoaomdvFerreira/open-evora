@@ -17,6 +17,16 @@ const RESEARCH_ROOT = path.join(REPO_ROOT, "research");
 const GENERATOR = path.join(__dirname, "generate-corpus.js");
 const { computeCounts } = require("./generate-corpus.js");
 
+function loadedCanonicalCounts() {
+  const index = require(path.join(REPO_ROOT, "tools", "research", "index.ts")).loadCorpusIndex(RESEARCH_ROOT);
+  return {
+    src: index.byPrefix.get("SRC-").records.length,
+    evd: index.byPrefix.get("EVD-").records.length,
+    prb: index.byPrefix.get("PRB-").records.length,
+    total: index.totalRecords,
+  };
+}
+
 function validateCorpus(root) {
   return require(path.join(REPO_ROOT, "tools", "research", "index.ts")).validateResearchRoot(root);
 }
@@ -65,8 +75,13 @@ function run(name, fn) {
   }
 }
 
-run("RE-05 count proportions match the current 243-record canonical baseline", () => {
-  assert.deepEqual(computeCounts(243), { src: 105, evd: 128, prb: 10 });
+run("RE-05 count proportions match the loaded canonical baseline", () => {
+  const baseline = loadedCanonicalCounts();
+  assert.deepEqual(computeCounts(baseline.total), {
+    src: baseline.src,
+    evd: baseline.evd,
+    prb: baseline.prb,
+  });
 });
 
 run("RE-05 generator emits a deterministic small corpus accepted by the canonical validator", () => {
