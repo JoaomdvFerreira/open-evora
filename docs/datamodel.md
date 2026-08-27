@@ -15,6 +15,12 @@ No Hypothesis (`HYP-*`) record type is part of the current process or target mod
 
 Assessment (`ASM-*`) is not part of the current canonical model. Historical snapshot storage for material Problem history is deferred until material Problem history actually justifies it; see §4's future-policy note.
 
+## 0. Local research workbench boundary
+
+`.research-workbench/` is a local, non-canonical, non-public workspace. It may contain raw source material, private notes, AI intermediate outputs, candidate drafts, rejected/no-delta work, and similar research working material. Nothing acquires canonical status merely by existing there, and workbench material must not be committed as such.
+
+Canonical research remains only the governed SRC/EVD/PRB records under `research/`. Before anything from the workbench is integrated into that canonical state, the publication and privacy safeguards in `AGENTS.md` still apply.
+
 ## 1. Source (`SRC-*`)
 
 A Source is an identifiable origin from which information is obtained.

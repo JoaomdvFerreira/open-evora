@@ -3,6 +3,7 @@ Thumbs.db
 *.log
 .env
 .env.*
+/.research-workbench/
 .playwright-mcp/
 node_modules/
 /prompts
