@@ -1,4 +1,4 @@
-import { parse } from "yaml";
+import { parse, stringify } from "yaml";
 
 import type { RecordFields } from "./types.ts";
 
@@ -15,4 +15,17 @@ export function parseRecordYaml(text: string): RecordFields {
     throw new Error("expected a YAML mapping at the document root");
   }
   return parsed as RecordFields;
+}
+
+/**
+ * Serializes one canonical research record as a YAML mapping. The mature
+ * `yaml` package remains the sole parser/serializer implementation for the
+ * research tooling. Its output is normalized to exactly one trailing newline.
+ */
+export function stringifyRecordYaml(fields: RecordFields): string {
+  if (!fields || typeof fields !== "object" || Array.isArray(fields)) {
+    throw new Error("record fields must be a YAML mapping");
+  }
+
+  return `${stringify(fields).replace(/\n+$/, "")}\n`;
 }
