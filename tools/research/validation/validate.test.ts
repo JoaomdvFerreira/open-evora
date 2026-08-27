@@ -99,3 +99,65 @@ test("nested PRB references must resolve and belong to the PRB relationship set"
   });
   assert.match(unlinked, /investigation\.path\.initial_signal.*not linked in PRB\.evidence/);
 });
+
+test("canonical PRBs and optional PRB structures remain valid", () => {
+  const canonical = loadCorpusIndex(root);
+  assert.equal(canonical.byPrefix.get("PRB-")?.records.length, 10);
+  assert.deepEqual(validateCorpusIndex(canonical).errors, []);
+
+  const optional = loadCorpusIndex(root);
+  const record = prb(optional, "PRB-0006");
+  delete record.causal_reading;
+  delete record.investigation;
+  assert.deepEqual(validateCorpusIndex(optional).errors, []);
+});
+
+test("PRB contract rejects unknown fields and wrong declared container types", () => {
+  const topLevel = errorsAfter((index) => { prb(index).unapproved = true; });
+  assert.match(topLevel, /field "unapproved" is not an allowed field/);
+
+  const nested = errorsAfter((index) => {
+    prb(index).decision_basis.manifestation.unapproved = "no";
+  });
+  assert.match(nested, /field "decision_basis\.manifestation\.unapproved" is not an allowed field/);
+
+  const types = errorsAfter((index) => {
+    prb(index).geography = [];
+    prb(index).decision_basis = "not an object";
+    prb(index).evidence = {};
+  });
+  assert.match(types, /field "geography" has type "array"/);
+  assert.match(types, /field "decision_basis" has type "string"/);
+  assert.match(types, /field "evidence" has type "object"/);
+});
+
+test("PRB authored relationship, investigation and decision-basis structures are closed", () => {
+  const relationships = errorsAfter((index) => {
+    const relation = prb(index).evidence[0];
+    relation.extra = true;
+    relation.effects = { value: "SUPPORTS" };
+  });
+  assert.match(relationships, /field "evidence\[0\]\.extra" is not an allowed field/);
+  assert.match(relationships, /missing required non-empty field: evidence\[0\]\.effects/);
+
+  const investigation = errorsAfter((index) => {
+    prb(index).investigation.open_questions = [{ question: "Questão", evidence: [42], invented: true }];
+  });
+  assert.match(investigation, /field "investigation\.open_questions\[0\]\.invented" is not an allowed field/);
+  assert.match(investigation, /field "investigation\.open_questions\[0\]\.evidence\[0\]" must be a string/);
+
+  const investigationContainers = errorsAfter((index) => {
+    prb(index).investigation.open_questions = [
+      { question: "Questão escalar", evidence: "EVD-000001" },
+      { question: "Questão objecto", evidence: { evidence_id: "EVD-000001" } },
+    ];
+  });
+  assert.match(investigationContainers, /field "investigation\.open_questions\[0\]\.evidence" must be an array/);
+  assert.match(investigationContainers, /field "investigation\.open_questions\[1\]\.evidence" must be an array/);
+
+  const decisionBasis = errorsAfter((index) => {
+    prb(index).decision_basis.manifestation = { summary: "Forma inválida", evidence: [42], invented: true };
+  });
+  assert.match(decisionBasis, /field "decision_basis\.manifestation\.invented" is not an allowed field/);
+  assert.match(decisionBasis, /field "decision_basis\.manifestation\.evidence\[0\]" must be a string/);
+});

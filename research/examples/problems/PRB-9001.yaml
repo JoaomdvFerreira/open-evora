@@ -15,7 +15,10 @@ affected_populations: [example-population]
 
 problem_statement: "Synthetic problem statement used only to validate schema and validator behavior."
 
-evidence: [EVD-900001]
+evidence:
+  - evidence_id: EVD-900001
+    effects: [SUPPORTS]
+    research_roles: [LOCAL_OBSERVATION]
 
 evidence_status: discovered
 

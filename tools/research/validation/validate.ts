@@ -223,6 +223,26 @@ const INVESTIGATION_PATH_STAGES = ["initial_signal", "development", "delimitatio
 const PRB_EFFECTS = new Set(["SUPPORTS", "REFINES", "BOUNDS", "CONTRADICTS"]);
 const PRB_RESEARCH_ROLES = new Set(["LOCAL_OBSERVATION", "CONTEXTUAL", "COMPARATIVE_MECHANISM", "COMPARATIVE_RESPONSE", "EXISTING_RESPONSE", "PLANNED_RESPONSE"]);
 
+function validatePrbObjectKeys(
+  file: string,
+  field: string,
+  value: Record<string, unknown>,
+  allowed: readonly string[],
+  errors: string[]
+): void {
+  const permitted = new Set(allowed);
+  for (const key of Object.keys(value)) {
+    if (!permitted.has(key)) errors.push(`[${file}] field "${field}.${key}" is not an allowed field for this PRB structure`);
+  }
+}
+
+function validatePrbStringList(file: string, field: string, value: unknown, errors: string[]): void {
+  if (!Array.isArray(value)) return; // the schema-declared fieldTypes rule reports the container mismatch
+  for (const [i, item] of value.entries()) {
+    if (typeof item !== "string") errors.push(`[${file}] field "${field}[${i}]" must be a string`);
+  }
+}
+
 function validatePrbEvidenceRelations(file: string, record: RecordFields, errors: string[]): void {
   const evidence = record.evidence;
   if (!Array.isArray(evidence)) return;
@@ -233,6 +253,7 @@ function validatePrbEvidenceRelations(file: string, record: RecordFields, errors
       errors.push(`[${file}] field "${field}" must be an object`); continue;
     }
     const relation = entry as Record<string, unknown>;
+    validatePrbObjectKeys(file, field, relation, ["evidence_id", "effects", "research_roles"], errors);
     if (typeof relation.evidence_id !== "string" || relation.evidence_id.trim() === "") errors.push(`[${file}] missing required field: ${field}.evidence_id`);
     else if (seenEvidenceIds.has(relation.evidence_id)) errors.push(`[${file}] duplicate PRB evidence relationship: ${relation.evidence_id}`);
     else seenEvidenceIds.add(relation.evidence_id);
@@ -250,16 +271,33 @@ function validatePrbEvidenceRelations(file: string, record: RecordFields, errors
   }
 }
 
+function validatePrbDeclaredListItems(file: string, record: RecordFields, errors: string[]): void {
+  for (const path of [
+    "affected_populations",
+    "decision_basis.manifestation.evidence",
+    "decision_basis.consequence.evidence",
+    "decision_basis.currentness.evidence",
+    "decision_basis.contradiction_search.evidence",
+    "decision_basis.overlap_check.related_problems",
+    "decision_basis.supporting_evidence",
+    "decision_basis.boundary_evidence",
+  ]) {
+    validatePrbStringList(file, path, getPath(record, path), errors);
+  }
+  const domain = getPath(record, "domain");
+  if (Array.isArray(domain)) validatePrbStringList(file, "domain", domain, errors);
+}
+
 function validateNestedPrbEvidenceMembership(file: string, record: RecordFields, errors: string[]): void {
   const linked = new Set(
     (Array.isArray(record.evidence) ? record.evidence : []).map((entry) => entry && typeof entry === "object" && !Array.isArray(entry) ? (entry as Record<string, unknown>).evidence_id : undefined).filter((id): id is string => typeof id === "string")
   );
   const paths = ["decision_basis.manifestation.evidence", "decision_basis.consequence.evidence", "decision_basis.currentness.evidence", "decision_basis.contradiction_search.evidence", "decision_basis.supporting_evidence", "decision_basis.boundary_evidence"];
-  for (const path of paths) for (const id of (getPath(record, path) as unknown[] | undefined) || []) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at ${path} is not linked in PRB.evidence`);
+  for (const path of paths) for (const id of (Array.isArray(getPath(record, path)) ? getPath(record, path) as unknown[] : [])) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at ${path} is not linked in PRB.evidence`);
   const investigation = record.investigation as Record<string, unknown> | undefined;
-  for (const item of Array.isArray(investigation?.open_questions) ? investigation.open_questions : []) for (const id of ((item as Record<string, unknown>)?.evidence as unknown[] || [])) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at investigation.open_questions is not linked in PRB.evidence`);
+  for (const item of Array.isArray(investigation?.open_questions) ? investigation.open_questions : []) for (const id of (item && typeof item === "object" && !Array.isArray(item) && Array.isArray((item as Record<string, unknown>).evidence) ? (item as Record<string, unknown>).evidence as unknown[] : [])) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at investigation.open_questions is not linked in PRB.evidence`);
   const path = investigation?.path as Record<string, unknown> | undefined;
-  for (const stage of INVESTIGATION_PATH_STAGES) for (const id of (((path?.[stage] as Record<string, unknown> | undefined)?.evidence as unknown[]) || [])) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at investigation.path.${stage} is not linked in PRB.evidence`);
+  for (const stage of INVESTIGATION_PATH_STAGES) for (const id of (path?.[stage] && typeof path[stage] === "object" && !Array.isArray(path[stage]) && Array.isArray((path[stage] as Record<string, unknown>).evidence) ? (path[stage] as Record<string, unknown>).evidence as unknown[] : [])) if (typeof id === "string" && !linked.has(id)) errors.push(`[${file}] nested EVD reference "${id}" at investigation.path.${stage} is not linked in PRB.evidence`);
 }
 
 /**
@@ -318,7 +356,18 @@ function validateInvestigation(
       if (typeof question !== "string" || question.trim() === "") {
         errors.push(`[${file}] missing required field: ${fieldBase}.question`);
       }
-      checkEvidenceList(`${fieldBase}.evidence`, (entry as Record<string, unknown>).evidence);
+      validatePrbObjectKeys(file, fieldBase, entry as Record<string, unknown>, ["question", "why_open", "current_action", "latest_result", "resolution_condition", "evidence"], errors);
+      for (const field of ["why_open", "current_action", "latest_result", "resolution_condition"] as const) {
+        const value = (entry as Record<string, unknown>)[field];
+        if (value !== undefined && typeof value !== "string") errors.push(`[${file}] field "${fieldBase}.${field}" must be a string`);
+      }
+      const evidence = (entry as Record<string, unknown>).evidence;
+      if (evidence !== undefined && !Array.isArray(evidence)) {
+        errors.push(`[${file}] field "${fieldBase}.evidence" must be an array`);
+      } else {
+        validatePrbStringList(file, `${fieldBase}.evidence`, evidence, errors);
+      }
+      checkEvidenceList(`${fieldBase}.evidence`, evidence);
     });
   }
 
@@ -328,6 +377,10 @@ function validateInvestigation(
       const stageVal = (path as Record<string, unknown>)[stage];
       if (stageVal === undefined || stageVal === null) continue;
       if (typeof stageVal !== "object" || Array.isArray(stageVal)) continue;
+      validatePrbObjectKeys(file, `investigation.path.${stage}`, stageVal as Record<string, unknown>, ["summary", "evidence"], errors);
+      const summary = (stageVal as Record<string, unknown>).summary;
+      if (summary !== undefined && typeof summary !== "string") errors.push(`[${file}] field "investigation.path.${stage}.summary" must be a string`);
+      validatePrbStringList(file, `investigation.path.${stage}.evidence`, (stageVal as Record<string, unknown>).evidence, errors);
       checkEvidenceList(`investigation.path.${stage}.evidence`, (stageVal as Record<string, unknown>).evidence);
     }
   }
@@ -404,6 +457,7 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
       validateExclusiveFieldSets(file, fields, schema, errors);
       if (schema.prefix === "PRB-") {
         validatePrbEvidenceRelations(file, fields, errors);
+        validatePrbDeclaredListItems(file, fields, errors);
         validateNestedPrbEvidenceMembership(file, fields, errors);
         validateInvestigation(file, fields, evidenceById, errors);
       }
