@@ -42,6 +42,8 @@ export type {
   CanonicalIntegrationPlanOperation,
   CanonicalIntegrationWriteOperation,
 } from "./canonical-integration-plan.ts";
+export { applyCanonicalIntegrationPlan } from "./canonical-promoter.ts";
+export type { CanonicalIntegrationPromotionResult } from "./canonical-promoter.ts";
 export type {
   CorpusIndex,
   ParsedRecord,
