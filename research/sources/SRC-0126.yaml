@@ -1,0 +1,36 @@
+source_id: SRC-0126
+publisher: Diário da República
+creators:
+  - Município de Évora
+name: Anúncio de procedimento n.º 4772/2026 — Reparação de Estradas Municipais
+  no Concelho de Évora
+resource_type: document
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  temporal:
+    as_of: 2026-02-27
+  domains:
+    - URB
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: https://files.diariodarepublica.pt/cp_hora/2026/02/041/419952390.pdf
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-02-27
+  last_checked_at: 2026-08-28
+  update_frequency: one_off
+caveats:
+  - O anúncio define as condições do procedimento e o prazo contratual previsto;
+    não estabelece a data efetiva de início, o grau de execução, a conclusão da
+    obra ou o estado atual das vias.

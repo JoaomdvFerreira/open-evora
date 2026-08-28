@@ -1,0 +1,32 @@
+evidence_id: EVD-000155
+provenance:
+  sources:
+    - SRC-0126
+  extracted_at: 2026-08-28
+observation:
+  summary: O anúncio oficial do concurso público para a empreitada de reparação de
+    estradas municipais no concelho de Évora fixou um preço base de 745 000
+    euros e um prazo de execução contratual de 10 meses.
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-02-27
+domains:
+  - URB
+  - MOB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - O prazo de 10 meses é um parâmetro do procedimento e não prova a data
+    efetiva de início, a execução física, o grau de progresso ou a conclusão da
+    empreitada.
+  - O anúncio não mede o estado do pavimento durante ou após a execução e não
+    permite concluir que a rede esteja reparada ou que a degradação persista.
+  - Na ausência de evidência de conclusão, o anúncio não suporta tratar agosto
+    de 2026 como um estado necessariamente posterior à execução integral da
+    empreitada.

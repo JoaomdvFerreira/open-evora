@@ -1,0 +1,33 @@
+evidence_id: EVD-000154
+provenance:
+  sources:
+    - SRC-0125
+  extracted_at: 2026-08-28
+observation:
+  summary: Em 4 de fevereiro de 2026, a Câmara Municipal de Évora descreveu a rede
+    viária municipal como apresentando níveis significativos de degradação e
+    carências prolongadas de conservação e manutenção preventiva; informou
+    também ter realizado um levantamento técnico exaustivo das vias municipais
+    com necessidade de intervenção e estar a hierarquizar prioridades segundo
+    degradação, tráfego, relevância funcional e segurança.
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-02-04
+domains:
+  - URB
+  - MOB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - A página não publica o levantamento técnico referido, pelo que não permite
+    quantificar a extensão, distribuição ou severidade da degradação por via.
+  - A observação descreve o diagnóstico municipal em fevereiro de 2026 e não
+    estabelece a condição da rede em agosto de 2026.
+  - Por se tratar do diagnóstico do próprio Município, não constitui uma medição
+    independente da experiência dos utilizadores da rede.

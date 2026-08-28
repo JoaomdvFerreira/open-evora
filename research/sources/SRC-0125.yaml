@@ -1,0 +1,34 @@
+source_id: SRC-0125
+publisher: Câmara Municipal de Évora
+name: Estado da Rede Viária do Concelho de Évora
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  temporal:
+    as_of: 2026-02-04
+  domains:
+    - URB
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/estado-da-rede-viaria-do-concelho-de-evora/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-02-04
+  updated_at: 2026-02-04
+  last_checked_at: 2026-08-28
+  update_frequency: one_off
+caveats:
+  - O conteúdo apresenta o diagnóstico e o planeamento do próprio Município; não
+    disponibiliza o inventário técnico subjacente nem uma medição independente
+    do estado de cada via.
