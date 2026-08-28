@@ -1,0 +1,35 @@
+source_id: SRC-0120
+publisher: Câmara Municipal de Évora
+name: Ata n.º 04/2026 — Reunião Pública de Câmara de 19 de fevereiro de 2026
+resource_type: document
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  temporal:
+    as_of: 2026-02-19
+  domains:
+    - SOC
+    - HEA
+    - EMP
+    - EDU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/wp-content/uploads/2026/05/Ata-no-4-da-RPC-de-19-de-fevereiro-de-2026.pdf
+licensing:
+  status: unknown
+  reuse: unknown
+  attribution: Câmara Municipal de Évora
+temporal:
+  last_checked_at: 2026-08-28
+  update_frequency: one_off
+caveats:
+  - As dificuldades atribuídas à população migrante são apresentadas em 2026 com
+    base num diagnóstico municipal efetuado em 2023; não constituem uma medição
+    direta da persistência ou prevalência em 2026.

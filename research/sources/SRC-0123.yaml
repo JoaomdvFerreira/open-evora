@@ -1,0 +1,34 @@
+source_id: SRC-0123
+publisher: Universidade de Évora
+name: Centro Local de Apoio à Integração de Migrantes — Serviços de Ação Social
+  da Universidade de Évora
+resource_type: webpage
+scope:
+  geography:
+    level: site
+    area: Serviços de Ação Social da Universidade de Évora, Évora
+  temporal:
+    as_of: 2026-08-28
+  domains:
+    - SOC
+    - EDU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.sas.uevora.pt/servicos/estrutura_dos_servicos/unidade_apoio/%28id%29/361973
+licensing:
+  status: unknown
+  reuse: unknown
+  attribution: Universidade de Évora
+temporal:
+  last_checked_at: 2026-08-28
+  update_frequency: irregular
+caveats:
+  - A página confirma a existência e contactos do CLAIM na Universidade de
+    Évora, mas não explicita nesta página o universo de utilizadores elegíveis,
+    volume de utilização, capacidade, cobertura municipal ou eficácia.

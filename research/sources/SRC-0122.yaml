@@ -1,0 +1,36 @@
+source_id: SRC-0122
+publisher: Câmara Municipal de Évora
+name: Acolher no VAGAR — Plano Municipal para a Integração de Migrantes do
+  Concelho de Évora
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  temporal:
+    start: "2025"
+    end: 2027-04
+  domains:
+    - SOC
+    - HEA
+    - EMP
+    - EDU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/?p=78363&post_type=listas_ficheiros
+licensing:
+  status: unknown
+  reuse: unknown
+  attribution: Câmara Municipal de Évora
+temporal:
+  last_checked_at: 2026-08-28
+  update_frequency: irregular
+caveats:
+  - A ficha descreve objetivos, financiamento e metas da intervenção; não
+    demonstra execução efetiva de cada ação nem resultados obtidos.

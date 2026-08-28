@@ -1,0 +1,33 @@
+source_id: SRC-0121
+publisher: Agência para a Integração, Migrações e Asilo (AIMA)
+name: Relatório de Migrações e Asilo 2024 — população estrangeira residente por
+  distrito e concelho
+resource_type: document
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  temporal:
+    as_of: "2024"
+  domains:
+    - SOC
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: https://aima.gov.pt/media/pages/documents/65870eae21-1761164556/populacao-estrangeira-residente-2024_distrito_concelho.pdf
+licensing:
+  status: unknown
+  reuse: unknown
+  attribution: AIMA
+temporal:
+  last_checked_at: 2026-08-28
+  update_frequency: annual
+caveats:
+  - A contagem administrativa de população estrangeira residente não mede, por
+    si só, necessidades de integração, barreiras de acesso a serviços ou
+    experiência vivida.

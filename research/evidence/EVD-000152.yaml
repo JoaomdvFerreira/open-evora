@@ -1,0 +1,28 @@
+evidence_id: EVD-000152
+provenance:
+  sources:
+    - SRC-0123
+  extracted_at: 2026-08-28
+observation:
+  summary: Os Serviços de Ação Social da Universidade de Évora mantêm uma página
+    pública para um Centro Local de Apoio à Integração de Migrantes (CLAIM), com
+    equipa e contacto institucional identificados.
+scope:
+  geography:
+    level: site
+    area: Universidade de Évora, Évora
+  temporal:
+    as_of: 2026-08-28
+  populations:
+    - utilizadores potenciais do CLAIM da Universidade de Évora
+domains:
+  - SOC
+  - EDU
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A página não estabelece a cobertura do serviço para toda a população
+    migrante do concelho.
+  - Não fornece dados de utilização, tempos de resposta, necessidades
+    apresentadas, resultados ou eficácia.
+lineage_id: MIG-2026-UE-CLAIM

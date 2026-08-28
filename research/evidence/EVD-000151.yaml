@@ -1,0 +1,33 @@
+evidence_id: EVD-000151
+provenance:
+  sources:
+    - SRC-0122
+  extracted_at: 2026-08-28
+observation:
+  summary: O projeto municipal Acolher no VAGAR prevê conceber, implementar e
+    avaliar o Plano Municipal para a Integração de Migrantes, promover
+    acolhimento estruturado, vivência saudável, desenvolvimento de competências,
+    percurso académico de crianças e jovens e participação cívica e social; a
+    ficha apresenta uma meta de 2 589 destinatários e 863 participantes.
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  temporal:
+    start: "2025"
+    end: 2027-04
+  populations:
+    - população migrante no concelho de Évora
+domains:
+  - SOC
+  - HEA
+  - EMP
+  - EDU
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - Os objetivos e metas planeados não demonstram que as ações tenham sido
+    executadas, que tenham alcançado os destinatários previstos ou que tenham
+    reduzido as barreiras identificadas.
+  - A ficha não fornece resultados atuais por tipo de barreira ou por serviço.
+lineage_id: MIG-2025-2027-CME-ACOLHER-NO-VAGAR

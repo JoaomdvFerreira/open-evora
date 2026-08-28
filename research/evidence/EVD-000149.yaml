@@ -1,0 +1,32 @@
+evidence_id: EVD-000149
+provenance:
+  sources:
+    - SRC-0120
+  extracted_at: 2026-08-28
+observation:
+  summary: Na apresentação municipal do diagnóstico de 2023 sobre a população
+    migrante do concelho de Évora foram identificadas, entre outras
+    dificuldades, barreiras linguísticas e dificuldades no acesso à saúde e à
+    saúde mental.
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  temporal:
+    as_of: "2023"
+  populations:
+    - população migrante residente no concelho de Évora
+domains:
+  - SOC
+  - HEA
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - A ata de 2026 reporta conclusões de um diagnóstico de 2023 e não estabelece
+    que estas dificuldades persistam atualmente com a mesma extensão.
+  - A observação não mede prevalência, frequência, severidade, grupos mais
+    afetados ou jornadas concretas de acesso aos serviços de saúde.
+  - Não permite separar dificuldades específicas da condição migrante de
+    constrangimentos gerais do sistema de saúde que também possam afetar outros
+    residentes.
+lineage_id: MIG-2023-CME-DIAGNOSTICO-PMIM

@@ -1,0 +1,27 @@
+evidence_id: EVD-000150
+provenance:
+  sources:
+    - SRC-0121
+  extracted_at: 2026-08-28
+observation:
+  summary: A AIMA registou 5 621 cidadãos estrangeiros residentes no concelho de
+    Évora em 2024.
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  temporal:
+    as_of: "2024"
+  populations:
+    - população estrangeira residente
+domains:
+  - SOC
+evidence_nature: measurement
+claim_authority: authoritative
+inference_limits:
+  - A contagem não mede barreiras de integração, acesso a serviços,
+    vulnerabilidade ou experiência vivida.
+  - Não deve ser comparada mecanicamente com os 3 684 cidadãos estrangeiros
+    referidos no diagnóstico municipal de 2023 sem confirmar definições, bases
+    administrativas e momentos de referência.
+lineage_id: MIG-2024-AIMA-RESIDENTES-ESTRANGEIROS
