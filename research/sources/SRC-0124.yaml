@@ -1,0 +1,33 @@
+source_id: SRC-0124
+publisher: Entidade Reguladora da Saúde
+name: Estudo sobre Acesso de Imigrantes a Cuidados de Saúde Primários
+resource_type: webpage
+scope:
+  geography:
+    level: national
+    area: Portugal
+  temporal:
+    as_of: 2025-03-20
+  domains:
+    - HEA
+    - SOC
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.ers.pt/pt/atividade/regulacao-economica/selecionar/estudos/lista-de-estudos/estudo-sobre-acesso-de-imigrantes-a-cuidados-de-saude-primarios/
+licensing:
+  status: unknown
+  reuse: unknown
+  attribution: Entidade Reguladora da Saúde
+temporal:
+  published_at: 2025-03-20
+  last_checked_at: 2026-08-28
+  update_frequency: one_off
+caveats:
+  - O estudo é nacional e não permite inferir que os mesmos obstáculos ocorram,
+    com a mesma frequência ou intensidade, no concelho de Évora.

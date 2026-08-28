@@ -1,0 +1,31 @@
+evidence_id: EVD-000153
+provenance:
+  sources:
+    - SRC-0124
+  extracted_at: 2026-08-28
+observation:
+  summary: Num estudo nacional publicado em 2025, a Entidade Reguladora da Saúde
+    identificou questões legais, barreiras linguísticas e constrangimentos
+    administrativos entre os principais obstáculos reportados no acesso de
+    imigrantes a cuidados de saúde primários; o estudo também registou ampla
+    existência de procedimentos de acesso dirigidos a utentes imigrantes nas
+    unidades respondentes.
+scope:
+  geography:
+    level: national
+    area: Portugal
+  temporal:
+    as_of: 2025-03-20
+  populations:
+    - imigrantes que procuram cuidados de saúde primários
+domains:
+  - HEA
+  - SOC
+evidence_nature: measurement
+claim_authority: authoritative
+inference_limits:
+  - É evidência nacional e contextual; não estabelece a existência, frequência
+    ou intensidade destes obstáculos em Évora.
+  - A coexistência de obstáculos e procedimentos de acesso não demonstra, por si
+    só, a eficácia ou insuficiência de respostas locais.
+lineage_id: MIG-2025-ERS-ACESSO-CSP

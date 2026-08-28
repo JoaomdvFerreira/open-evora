@@ -1,0 +1,123 @@
+problem_id: PRB-0011
+title: Barreiras linguísticas e dificuldades de acesso à saúde foram
+  identificadas para a população migrante em Évora, mas a persistência atual
+  ainda não está estabelecida
+domain:
+  - SOC
+  - HEA
+geography:
+  level: municipality
+  area: Évora
+affected_populations:
+  - população migrante residente no concelho de Évora
+problem_statement: >-
+  O diagnóstico municipal de 2023, retomado publicamente pelo Município em
+  fevereiro de 2026 no contexto do Plano Municipal para a Integração de
+  Migrantes, identificou barreiras linguísticas e dificuldades no acesso à saúde
+  e à saúde mental para a população migrante em Évora. A AIMA registou 5 621
+  cidadãos estrangeiros residentes no concelho em 2024, confirmando uma
+  população local numericamente relevante, mas esta contagem não mede a
+  existência ou prevalência das barreiras.
+
+
+  Existem respostas institucionais atuais ou planeadas, incluindo o projeto
+  municipal Acolher no VAGAR e um CLAIM nos Serviços de Ação Social da
+  Universidade de Évora. A evidência disponível não estabelece a cobertura,
+  utilização ou eficácia destas respostas, nem confirma se as barreiras
+  identificadas no diagnóstico de 2023 persistem em 2026 com intensidade
+  material. O problema fica, por isso, limitado à existência de uma barreira
+  local institucionalmente identificada cuja persistência e extensão atuais
+  permanecem por confirmar.
+investigation:
+  open_questions:
+    - question: Persistem em 2026 barreiras linguísticas e dificuldades materiais no
+        acesso à saúde ou saúde mental entre residentes migrantes em Évora?
+      why_open: A evidência local que identifica as dificuldades deriva de um
+        diagnóstico de 2023, embora tenha sido retomada pelo Município na
+        aprovação do PMIM em 2026.
+      current_action: Procurar apenas evidência local atual capaz de confirmar,
+        delimitar ou contrariar a persistência das barreiras, preferindo dados
+        de serviço ou experiência de jornada a novas fontes genéricas.
+      resolution_condition: Evidência local recente de utilizadores ou serviços que
+        permita estabelecer se as barreiras persistem, em que jornadas e com que
+        limites.
+      evidence:
+        - EVD-000149
+    - question: As respostas atualmente existentes ou planeadas reduzem materialmente
+        estas barreiras para a população migrante do concelho?
+      why_open: O Acolher no VAGAR define objetivos e metas e a Universidade de Évora
+        mantém um CLAIM, mas não foram encontrados resultados locais que
+        estabeleçam cobertura ou eficácia face às barreiras identificadas.
+      current_action: Não inferir eficácia a partir da existência dos serviços;
+        procurar resultados ou challenge direto apenas se o problema sobreviver
+        à validação do candidate delta.
+      resolution_condition: Dados de execução, utilização, resultados ou challenge
+        direto que permitam avaliar a cobertura e o efeito das respostas
+        relevantes.
+      evidence:
+        - EVD-000151
+        - EVD-000152
+  path:
+    initial_signal:
+      summary: O Município retomou em 2026 um diagnóstico local de 2023 que
+        identificava barreiras linguísticas e dificuldades de acesso à saúde e
+        saúde mental entre a população migrante; dados administrativos da AIMA
+        confirmam uma população estrangeira residente relevante no concelho em
+        2024.
+      evidence:
+        - EVD-000149
+        - EVD-000150
+    development:
+      summary: Foram identificadas respostas institucionais locais — o Plano Municipal
+        Acolher no VAGAR e um CLAIM na Universidade de Évora — e evidência
+        nacional recente que mostra mecanismos semelhantes de barreira no acesso
+        de imigrantes aos cuidados de saúde primários.
+      evidence:
+        - EVD-000151
+        - EVD-000152
+        - EVD-000153
+    delimitation:
+      summary: O candidato não incorpora como manifestação central a precariedade
+        laboral, habitação ou desalinhamento de competências, para evitar
+        duplicação com problemas já representados no corpus. A evidência
+        nacional é apenas contextual e a existência de respostas institucionais
+        não prova resolução. A leitura fica limitada às barreiras linguísticas e
+        ao acesso à saúde/saúde mental especificamente identificados no
+        diagnóstico local, mantendo a persistência atual como UNKNOWN.
+      evidence:
+        - EVD-000149
+        - EVD-000151
+        - EVD-000152
+        - EVD-000153
+evidence:
+  - evidence_id: EVD-000149
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000150
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000151
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000152
+    effects:
+      - BOUNDS
+    research_roles:
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000153
+    effects:
+      - REFINES
+    research_roles:
+      - CONTEXTUAL
+evidence_status: discovered
+validation_status: unvalidated
+digital_tractability: not_assessed
+solution_landscape_status: not_assessed
+status: OPEN
