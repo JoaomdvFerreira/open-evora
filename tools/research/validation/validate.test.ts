@@ -131,6 +131,21 @@ test("PRB contract rejects unknown fields and wrong declared container types", (
   assert.match(types, /field "evidence" has type "object"/);
 });
 
+test("PRB lifecycle dates are required full ISO dates", () => {
+  const missingCreated = errorsAfter((index) => { delete prb(index).created_at; });
+  assert.match(missingCreated, /missing required field: created_at/);
+
+  const missingUpdated = errorsAfter((index) => { delete prb(index).updated_at; });
+  assert.match(missingUpdated, /missing required field: updated_at/);
+
+  const partial = errorsAfter((index) => {
+    prb(index).created_at = "2026-08";
+    prb(index).updated_at = "2026";
+  });
+  assert.match(partial, /created_at.*does not match required pattern/);
+  assert.match(partial, /updated_at.*does not match required pattern/);
+});
+
 test("PRB authored relationship, investigation and decision-basis structures are closed", () => {
   const relationships = errorsAfter((index) => {
     const relation = prb(index).evidence[0];

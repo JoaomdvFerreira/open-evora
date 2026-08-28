@@ -96,6 +96,8 @@ inference_limits:
 function minimalPrb({ id = "PRB-9001", evidence = [] } = {}) {
   return `
 problem_id: ${id}
+created_at: "2026-01-01"
+updated_at: "2026-01-01"
 title: "Fixture problem"
 domain: [example]
 geography:

@@ -193,6 +193,8 @@ function generate(scale, outDir) {
     const evCount = isHub ? Math.min(evdIds.length, 15 + Math.floor(rng() * 20)) : Math.min(evdIds.length, 2 + Math.floor(rng() * 8));
     const rec = {
       problem_id: id,
+      created_at: "2026-08-10",
+      updated_at: "2026-08-10",
       title: `Synthetic problem statement for ${id}`,
       domain: pickN(rng, DOMAINS, 1 + Math.floor(rng() * 2)),
       geography: { level: "municipality" },
