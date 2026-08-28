@@ -1,6 +1,6 @@
 problem_id: PRB-0001
-created_at: "2026-08-28"
-updated_at: "2026-08-28"
+created_at: 2026-08-28
+updated_at: 2026-08-28
 title: A utilidade prática dos transportes públicos varia consoante os horários
   e os territórios
 domain:
@@ -21,18 +21,32 @@ causal_reading: A variação na utilidade prática do serviço está associada
   operacionais que possam contribuir para o problema.
 investigation:
   open_questions:
-    - question: Quais as linhas/corredores/períodos horários concretos que sofrem a
-        maior redução de serviço, e em que medida?
-      why_open: Nenhum conjunto de dados público ao nível de linha ou corredor foi
-        localizado; a evidência institucional disponível documenta o padrão ao
-        nível da rede — serviço diurno face a serviço noturno, de fim de semana
-        e de feriados —, mas não a severidade por linha.
-      current_action: A plataforma de reclamações do TREVO continua a ser uma via
-        disponível para recolher e caracterizar situações concretas de
-        dificuldade por linha, corredor e período horário.
+    - question: Em que medida as diferenças de oferta já identificadas por carreira e
+        tipo de dia, e os atrasos recorrentes nas horas de ponta, se traduzem em
+        tempos de espera, ligações inviáveis ou outros impactos materiais para
+        os utilizadores, e quais horários ou paragens são mais críticos?
+      why_open: Os quilómetros comerciais programados por carreira e tipo de dia, e as
+        janelas/corredores de atraso recorrente, estão agora documentados para
+        2025. Porém, quilómetros comerciais não estabelecem frequência, tempo de
+        espera, viabilidade de uma deslocação, capacidade ou prevalência dos
+        utilizadores afetados.
+      latest_result: EVD-000157 desagrega a oferta programada de 2025 por carreira e
+        tipo de dia; EVD-000158 regista indicadores agregados e
+        janelas/corredores de atrasos recorrentes nas horas de ponta em 2025.
+        Ambos delimitam melhor a variação documentada, sem estabelecer impacto
+        prático ao nível do utilizador.
+      current_action: Procurar dados operacionais atuais ao nível de linha/paragem
+        e/ou evidência delimitada de deslocações afetadas, sem iniciar
+        entrevistas genéricas de percurso neste refresh.
+      resolution_condition: Dados operacionais atuais ao nível de linha/paragem e/ou
+        evidência delimitada de deslocações afetadas suficiente para estabelecer
+        o impacto prático, mantendo separadas frequência, espera, capacidade e
+        prevalência.
       evidence:
         - EVD-000002
         - EVD-000117
+        - EVD-000157
+        - EVD-000158
   path:
     initial_signal:
       summary: O Plano de Desenvolvimento Social (PDS 2024-2027) e o relatório anual
@@ -64,11 +78,16 @@ investigation:
         Os relatórios institucionais de 2022 e 2023 confirmaram que o padrão de
         redução do serviço à noite, aos fins de semana e nos feriados persiste
         ao longo de vários anos e não constitui uma observação nova ou
-        transitória.
+        transitória. Para 2025, dados oficiais identificam diferenças de oferta
+        programada por carreira e tipo de dia, bem como corredores e janelas de
+        atraso recorrente nas horas de ponta, sem medir o impacto prático em
+        cada deslocação.
       evidence:
         - EVD-000079
         - EVD-000080
         - EVD-000117
+        - EVD-000157
+        - EVD-000158
 evidence:
   - evidence_id: EVD-000001
     effects:
@@ -114,6 +133,18 @@ evidence:
     research_roles:
       - LOCAL_OBSERVATION
   - evidence_id: EVD-000117
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000157
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000158
     effects:
       - SUPPORTS
       - REFINES
@@ -186,15 +217,15 @@ decision_basis:
 
 
     EVD-000011 (avaliação anual CIMAC/ATAC de 2026, SRC-0019) contribui como
-    sustenta e refina a leitura ao nível intermunicipal: o conjunto de reclamações mostra
-    que as comunicações relacionadas com horários constituem a maior categoria e
-    que a experiência de acesso e espera é menos favorável do que a experiência
-    a bordo. É tratado como contexto e refinamento coerente com a mesma
-    afirmação de variação temporal e do contexto do serviço, e não, por si só,
-    como uma linha independente de suporte direto com o mesmo peso das fontes
-    primárias da manifestação. A existência de uma fonte e linhagem distintas
-    (SRC-0019) não é suficiente para a tornar equivalente às fontes primárias e
-    oficiais de corroboração direta.
+    sustenta e refina a leitura ao nível intermunicipal: o conjunto de
+    reclamações mostra que as comunicações relacionadas com horários constituem
+    a maior categoria e que a experiência de acesso e espera é menos favorável
+    do que a experiência a bordo. É tratado como contexto e refinamento coerente
+    com a mesma afirmação de variação temporal e do contexto do serviço, e não,
+    por si só, como uma linha independente de suporte direto com o mesmo peso
+    das fontes primárias da manifestação. A existência de uma fonte e linhagem
+    distintas (SRC-0019) não é suficiente para a tornar equivalente às fontes
+    primárias e oficiais de corroboração direta.
 
 
     A evidência de experiência vivida fraca e anedótica (EVD-000079, EVD-000080)
@@ -240,6 +271,16 @@ decision_basis:
       peso.
 
 
+      O mesmo relatório municipal desagrega para 2025 os quilómetros comerciais
+      programados por carreira e tipo de dia (EVD-000157), identificando
+      diferenças de oferta de fim de semana entre carreiras, e regista atrasos
+      recorrentes em corredores e janelas de hora de ponta, com indicadores
+      agregados de regularidade e pontualidade (EVD-000158). Estes dados refinam
+      a manifestação por carreira/tipo de dia e corredor/período, sem
+      estabelecer frequência, espera, capacidade ou severidade ao nível de cada
+      utilizador.
+
+
       A existência de transporte flexível para locais de baixa procura
       (EVD-000002) não é utilizada como evidência da manifestação do problema.
       Documenta uma resposta já existente e é considerada evidência que delimita
@@ -249,6 +290,8 @@ decision_basis:
       - EVD-000002
       - EVD-000011
       - EVD-000117
+      - EVD-000157
+      - EVD-000158
   consequence:
     summary: >-
       Evidência de experiência vivida, de natureza anedótica e autosselecionada,
@@ -280,10 +323,12 @@ decision_basis:
       - EVD-000080
   currentness:
     assessment: >-
-      ALTA para a manifestação institucional documentada. EVD-000002, relativo
-      ao relatório de 2026 da Autoridade de Transportes municipal, é a fonte
-      institucional mais recente no registo e confirma a variação entre o
-      serviço diurno e o serviço noturno, de fim de semana e de feriados.
+      ALTA para a manifestação institucional documentada, com limites temporais
+      explícitos. O relatório da Autoridade de Transportes municipal foi
+      publicado em junho de 2026; EVD-000002 confirma a variação entre o serviço
+      diurno e o serviço noturno, de fim de semana e de feriados, enquanto
+      EVD-000157 e EVD-000158 descrevem a oferta por carreira/tipo de dia e os
+      atrasos recorrentes por corredor/período em 2025.
 
 
       As edições de 2022 e 2023 do mesmo relatório (EVD-000117) confirmam que
@@ -295,14 +340,15 @@ decision_basis:
       a 2025-2026 que são consistentes com a manifestação institucional.
 
 
-      Não foi localizado nenhum conjunto de dados atual que permita comparar a
-      severidade do problema por linha, corredor ou período horário. Por isso,
-      esta avaliação de atualidade aplica-se à manifestação nos termos em que
-      está delimitada e não permite concluir quais as linhas ou períodos
+      Os dados de 2025 não estabelecem que o horário, a frequência, os tempos de
+      espera ou o impacto para utilizadores sejam idênticos em agosto de 2026. A
+      questão mantém-se aberta quanto às partidas, paragens e utilizadores
       atualmente mais afetados.
     evidence:
       - EVD-000002
       - EVD-000117
+      - EVD-000157
+      - EVD-000158
   contradiction_search:
     performed: true
     summary: >-
@@ -323,13 +369,18 @@ decision_basis:
 
 
       O crescimento da utilização da rede (EVD-000023), a cobertura territorial
-      ampla (EVD-000027) e a existência de transporte flexível (EVD-000002)
-      foram considerados como evidência que restringe uma leitura mais
-      abrangente do problema. Estes elementos mostram que não estamos perante
-      uma ausência generalizada de serviço, mas não demonstram que a variação da
-      sua utilidade prática esteja resolvida.
+      ampla (EVD-000027), a existência de transporte flexível (EVD-000002), a
+      regularidade agregada de 99,5% reportada para 2025 (EVD-000158), a oferta
+      substancial ao sábado e domingo/feriado em algumas carreiras, em especial
+      a carreira 25 (EVD-000157), e os canais atuais do TREVO para consultar
+      linhas e horários foram considerados como evidência que restringe uma
+      leitura mais abrangente do problema. Estes elementos mostram que não
+      estamos perante uma ausência generalizada de serviço, mas não demonstram
+      que a variação da sua utilidade prática esteja resolvida.
     evidence:
       - EVD-000117
+      - EVD-000157
+      - EVD-000158
   overlap_check:
     performed: true
     summary: >-
@@ -439,13 +490,22 @@ decision_basis:
       à noite, aos fins de semana e nos feriados (EVD-000117, EVD-000002).
 
 
+      EVD-000157 documenta quilómetros comerciais programados por carreira e
+      tipo de dia em 2025; EVD-000158 documenta, também para 2025, indicadores
+      agregados e corredores/janelas de atrasos recorrentes. Embora o relatório
+      tenha sido publicado em junho de 2026, estes elementos não descrevem
+      diretamente o horário ou desempenho em agosto de 2026.
+
+
       A evidência de experiência vivida inclui o protesto estudantil de março de
       2026 (EVD-000079) e incidentes individuais reportados entre fevereiro e
       outubro de 2025 (EVD-000080).
 
 
-      A conclusão não se estende a uma comparação atual, em 2026, da severidade
-      por linha, corredor ou período horário. Essa questão continua em aberto.
+      A conclusão não se estende a uma comparação atual, em agosto de 2026, da
+      frequência, espera, viabilidade de deslocação, capacidade, severidade ou
+      prevalência por linha, corredor, paragem ou período horário. Essa questão
+      continua em aberto.
     bounded: true
   limitations: >-
     A afirmação corroborada é SUPORTADA apenas nos seguintes termos: a evidência
@@ -463,6 +523,16 @@ decision_basis:
     ou em declínio.
 
 
+    EVD-000157 permite afirmar apenas que o quadro oficial de 2025 desagrega os
+    quilómetros comerciais programados por carreira e tipo de dia; EVD-000158
+    permite afirmar apenas que o relatório agrega indicadores de desempenho e
+    identifica atrasos recorrentes nos corredores e janelas indicados. Nenhum
+    dos dois estabelece frequência atual, tempos de espera, ligações inviáveis,
+    capacidade, impacto ao nível do utilizador ou prevalência. Em particular,
+    células sem quilómetros no quadro não são tratadas como observação
+    independente de ausência de serviço numa data concreta.
+
+
     O crescimento da utilização (EVD-000023), a ampla cobertura TPAC/TPF
     (EVD-000027) e a existência de transporte flexível (EVD-000002) são
     incluídos como evidência de limite e de estado atual que restringe a
@@ -476,12 +546,11 @@ decision_basis:
     resolvida.
 
 
-    O uso canónico de EVD-000011 é de suporte, refinamento e contexto ao
-    nível intermunicipal. É mantido como contexto corroborativo da mesma
-    afirmação de variação e não é tratado, por si só, como uma linha
-    independente de suporte direto com igual peso, uma vez que uma fonte ou
-    linhagem distinta não estabelece automaticamente corroboração direta
-    equivalente.
+    O uso canónico de EVD-000011 é de suporte, refinamento e contexto ao nível
+    intermunicipal. É mantido como contexto corroborativo da mesma afirmação de
+    variação e não é tratado, por si só, como uma linha independente de suporte
+    direto com igual peso, uma vez que uma fonte ou linhagem distinta não
+    estabelece automaticamente corroboração direta equivalente.
 
 
     EVD-000028 é excluído de `boundary_evidence`: o próprio registo alerta
@@ -500,11 +569,14 @@ decision_basis:
     representativa da experiência vivida.
 
 
-    Não está estabelecido quais as linhas, corredores ou períodos horários que
-    sofrem a maior redução de serviço, nem em que medida. Estas continuam a ser
-    questões críticas em aberto e não é feita qualquer inferência sobre a
-    severidade atual ao nível da linha. O número de `lineage_id` não é
-    interpretado como independência semântica: registos de diferentes edições
-    anuais provenientes da mesma voz institucional (SRC-0018 e os seus
-    antecedentes de 2022/2023, EVD-000117) são agrupados para efeitos de
-    avaliação da independência apesar de possuírem diferentes `source_id`.
+    Está estabelecido para 2025 que a oferta programada em quilómetros
+    comerciais varia por carreira e tipo de dia, e que existem corredores e
+    janelas de atraso recorrente identificados de forma agregada. Não está
+    estabelecido em que medida essas diferenças se traduzem em frequência,
+    espera, viabilidade de deslocação, capacidade ou severidade para
+    utilizadores, nem quais linhas, paragens ou períodos são atualmente mais
+    críticos em agosto de 2026. O número de `lineage_id` não é interpretado como
+    independência semântica: registos de diferentes edições anuais provenientes
+    da mesma voz institucional (SRC-0018 e os seus antecedentes de 2022/2023,
+    EVD-000117) são agrupados para efeitos de avaliação da independência apesar
+    de possuírem diferentes `source_id`.
