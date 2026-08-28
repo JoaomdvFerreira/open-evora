@@ -10,6 +10,7 @@ import {
   type RecordIndex,
   type RecordSchema,
 } from "../index.ts";
+import { loadCorpusIndex } from "../core/corpus.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 
@@ -104,4 +105,18 @@ test("clean CREATE, UPDATE, and NO_CHANGE candidates are equally ready", () => {
 
   assert.equal(review.readiness, "READY_FOR_INTEGRATION_GATE");
   assert.deepEqual(review.deltas.map((item) => item.action), ["CREATE", "NO_CHANGE", "UPDATE"]);
+});
+
+test("a structurally valid PRB history UPDATE reaches the integration gate as an UPDATE", () => {
+  const canonical = loadCorpusIndex(`${process.cwd()}/research`);
+  const fields = structuredClone(canonical.byPrefix.get("PRB-")!.byId.get("PRB-0001")!.fields) as RecordFields;
+  fields.history = [{
+    date: "2026-08-28",
+    summary: "Entrada de histórico para a revisão de integração.",
+    evidence: ["EVD-000001"],
+  }];
+
+  const prepared = prepareCanonicalIntegrationReview(SHA, canonical, [{ recordFamily: "PRB-", fields }]);
+  assert.equal(prepared.readiness, "READY_FOR_INTEGRATION_GATE");
+  assert.deepEqual(prepared.deltas, [{ recordFamily: "PRB-", id: "PRB-0001", action: "UPDATE" }]);
 });

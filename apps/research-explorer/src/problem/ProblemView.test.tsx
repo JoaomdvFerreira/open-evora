@@ -39,7 +39,7 @@ const records: Record<string, RecordDetail> = {
   ...Object.fromEntries(["1", "2", "3"].map((id) => [`SRC-${id}`, { id: `SRC-${id}`, type: "SRC-", file: "", record: { name: `Fonte ${id}` }, outgoingEdges: [], incomingEdges: [] }])),
 };
 const provider: DataProvider = { getManifest: async () => { throw Error("unused"); }, listRecords: async () => index, getEdges: async () => [], getRecord: async (id) => records[id] };
-const props = { dataProvider: provider, onOpenGeneric: vi.fn(), onBackToRecords: vi.fn(), onBackToOverview: vi.fn(), onViewInGraph: vi.fn() };
+const props = { dataProvider: provider, onOpenGeneric: vi.fn(), onBackToRecords: vi.fn(), onBackToOverview: vi.fn(), onViewHistory: vi.fn() };
 
 describe("ProblemView vNext", () => {
   it("keeps empty selection explicit and redirects non-PRB selections", async () => {

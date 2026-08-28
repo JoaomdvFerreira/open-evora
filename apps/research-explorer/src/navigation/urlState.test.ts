@@ -31,6 +31,16 @@ describe("parseUrlState", () => {
     });
   });
 
+  it("recognizes the PRB material-history view", () => {
+    expect(parseUrlState("?view=history&id=PRB-0010")).toEqual({
+      view: "history",
+      selectedId: "PRB-0010",
+      query: "",
+      typeFilter: ALL_TYPES,
+      graphDepth: 1,
+    });
+  });
+
   it("UX-F: a graph-depth param round-trips even though 'graph' itself is normalized away below", () => {
     expect(parseUrlState("?d=2").graphDepth).toBe(2);
   });
@@ -96,6 +106,10 @@ describe("serializeUrlState", () => {
   it("round-trips a full state", () => {
     const state = { view: "overview" as const, selectedId: "EVD-000105", query: "via verde", typeFilter: "EVD-", graphDepth: 2 as const };
     expect(parseUrlState(serializeUrlState(state))).toEqual(state);
+  });
+
+  it("serializes a history bookmark with its PRB identity", () => {
+    expect(serializeUrlState({ ...DEFAULT_URL_STATE, view: "history", selectedId: "PRB-0010" })).toBe("?view=history&id=PRB-0010");
   });
 
   it("omits typeFilter when it equals ALL_TYPES", () => {

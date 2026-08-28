@@ -11,6 +11,7 @@ import {
   type RecordSchema,
   validateCandidateSet,
 } from "../index.ts";
+import { loadCorpusIndex } from "../core/corpus.ts";
 
 const SOURCE_SCHEMA: RecordSchema = {
   prefix: "SRC-",
@@ -229,4 +230,24 @@ test("schema-declared nested custom idField works in the prospective overlay", (
   const result = validateCandidateSet(canonical, [candidate("ALT-", { identity: { canonical_id: "ALT-TWO" }, value: "Candidate" })]);
   assert.deepEqual(result.validation.errors, []);
   assert.deepEqual(result.deltas, [{ recordFamily: "ALT-", id: "ALT-TWO", action: "CREATE" }]);
+});
+
+test("history-bearing PRB UPDATEs use the canonical validator prospectively", () => {
+  const canonical = loadCorpusIndex(`${process.cwd()}/research`);
+  const original = canonical.byPrefix.get("PRB-")!.byId.get("PRB-0001")!.fields;
+  const validFields = structuredClone(original) as RecordFields;
+  validFields.history = [{
+    date: "2026-08-28",
+    summary: "Entrada de histórico para a validação prospetiva.",
+    evidence: ["EVD-000001"],
+  }];
+
+  const valid = validateCandidateSet(canonical, [{ recordFamily: "PRB-", fields: validFields }]);
+  assert.deepEqual(valid.validation.errors, []);
+  assert.deepEqual(valid.deltas, [{ recordFamily: "PRB-", id: "PRB-0001", action: "UPDATE" }]);
+
+  const invalidFields = structuredClone(validFields);
+  (invalidFields.history as Array<Record<string, unknown>>)[0]!.date = "2026-02-30";
+  const invalid = validateCandidateSet(canonical, [{ recordFamily: "PRB-", fields: invalidFields }]);
+  assert.match(invalid.validation.errors.join("\n"), /history\[0\]\.date.*valid full YYYY-MM-DD date/);
 });
