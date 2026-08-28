@@ -323,3 +323,5 @@ Keep the global header and primary navigation composed in `Explorer`. Its one-us
 ## 10. Scope boundary
 
 DS-03A approves only this component/layout contract. It does not itself implement components, modify production React/CSS, add Storybook or dependencies, freeze token values, change schemas/read models/canonical research data, redesign or migrate Graph, or start the later implementation sequence.
+
+The approved downstream component visual relationships are recorded in the [DS-03B component visual contract](component-visual-contract.md).

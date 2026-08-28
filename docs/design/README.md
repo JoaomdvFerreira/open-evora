@@ -1,16 +1,16 @@
 # Research Explorer design
 
-`docs/design/` is the canonical repository home for human-approved Research Explorer visual direction and foundation decisions. It owns design intent and visual relationships; it does not redefine research semantics, Explorer architecture, or production implementation contracts. Those remain with their existing canonical owners.
+`docs/design/` is the stable home for approved Research Explorer design contracts and their supporting evidence. It owns design intent and approved visual relationships; it does not redefine research semantics, Explorer architecture, or production implementation contracts.
 
-Approved Claude Design artefacts are review evidence and design inputs. Human approval promotes their decisions into this directory; the artefacts themselves do not become production specifications. [The approved foundations](foundations.md) state the durable design intent, while production code and tests own the implemented components, tokens, and behaviour. A material conflict with [Explorer architecture](../explorerarchitecture.md) or research-data semantics must be reported rather than reconciled here.
+## Authority hierarchy
 
-The current direction is **DS-02 / Gate B: PASS — Warm Ledger, Reading First**. The Research Explorer is primarily a reading and research interface. Readability, information hierarchy, accessibility, and consistency take precedence over visual novelty; colour is restrained and supportive.
+- [Foundations](foundations.md), [component model](component-model.md), and [component visual contract](component-visual-contract.md) are the current canonical design contracts. Each owns the topic named by its document.
+- [Audits](audits/) are diagnostic and historical evidence. They may describe a point-in-time implementation state, but do not become current authority.
+- [Reference](reference/) contains explicit human-approved rendered visual evidence for implementation and comparison.
+- [Archive](archive/) contains superseded or historical design material. It provides provenance, not current direction.
 
-Changes follow this flow:
+Explorer and research canonical documents retain ownership of product and research semantics. Production code and tests own eventual implementation details, including React APIs, CSS architecture, tokens, and deterministic behaviour. A material conflict with [Explorer architecture](../explorerarchitecture.md) or [research-data semantics](../datamodel.md) must be reported rather than resolved in this directory.
 
-1. Produce or revise design evidence.
-2. Obtain an explicit human gate decision.
-3. Record only the approved durable decisions in `docs/design/`.
-4. Implement them in production code and validate the rendered result against the approved reference.
+Claude Design artefacts are visual evidence and design inputs. They do not override canonical research semantics, Explorer architecture, or production implementation contracts. Explicit human approval is required before a durable decision is recorded in a current contract or an artefact enters `reference/`.
 
-New evidence can prompt review but cannot silently change an approved foundation. Historical prototypes, including material under `docs/design/research-explorer-prototype/`, remain useful references to earlier decisions; they are not current design authority.
+Historical prototypes are retained under [archive/research-explorer-prototype/](archive/research-explorer-prototype/); they remain useful evidence of earlier decisions, not current design authority.

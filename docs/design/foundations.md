@@ -86,3 +86,5 @@ The following remain provisional and require implementation work, rendered valid
 - exact React APIs, implementation file structure, CSS class/custom-property names, and token names or values. Approved component and layout boundaries are owned by [the DS-03A component and layout contract](component-model.md).
 
 These open details must not be inferred from the approved Claude Design HTML or from historical prototypes. They remain candidates until separately implemented, validated, and approved.
+
+The approved downstream component visual relationships are recorded in the [DS-03B component visual contract](component-visual-contract.md).

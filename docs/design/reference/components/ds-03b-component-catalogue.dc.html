@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #ececea; font-family: 'Public Sans', system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  a { color: oklch(42% 0.13 40); text-decoration: underline; text-decoration-color: oklch(42% 0.13 40 / 0.45); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:hover { color: oklch(30% 0.11 40); text-decoration-color: currentColor; }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2.5px solid oklch(42% 0.13 40); outline-offset: 2px; border-radius: 2px; }
+  .toc-link { text-decoration: none; color: #38546b; }
+  .toc-link:hover { text-decoration: underline; }
+  .prose p { margin: 0 0 1.1em; }
+  .prose p:last-child { margin-bottom: 0; }
+  .demo-link:hover { color: oklch(30% 0.11 40); }
+  .demo-item:hover { background: #f4f1e8; }
+  .demo-textbtn:hover { text-decoration-color: currentColor; }
+  .demo-outbtn:hover { background: #f4f1e8; border-color: #c9c2ae; }
+  .demo-tab:hover { color: #201e1a; }
+  .demo-railitem:hover { color: #201e1a; border-left-color: #b9b2a0; }
+</style>
+</helmet>
+
+<div style="max-width:1200px; margin:0 auto; padding:56px 32px 120px;">
+
+  <div style="margin-bottom:40px;">
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:0.04em; color:#8a8578;">Open Évora — Research Explorer</div>
+    <h1 style="font-family:'Source Serif 4',serif; font-size:32px; line-height:1.25; margin:8px 0 12px; color:#201e1a; font-weight:600;">DS-03B — Component visual design</h1>
+    <p style="font-size:16px; line-height:1.65; color:#3a372f; max-width:72ch; margin:0 0 14px;">A visual catalogue for the component and layout boundaries approved at DS-03A / Gate C1, drawn in the approved <strong>Warm Ledger — Reading First</strong> direction. It specifies visual relationships only: no page design, no React APIs, no CSS architecture, no token names, no new research semantics.</p>
+    <p style="font-size:14px; line-height:1.65; color:#5c584c; max-width:72ch; margin:0;">Authority order: <em>foundations.md</em> owns visual principles · <em>component-model.md</em> owns component/layout boundaries and Gate C1 decisions · DS-02b owns visual intent. Anything here not supported by those documents is a <span style="font-family:'IBM Plex Mono',monospace; font-size:12.5px;">proposal</span> for Gate C2 review, marked as such.</p>
+  </div>
+
+  <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:center; padding:14px 18px; background:#fff; border:1px solid #ddd8cb; border-radius:6px; margin-bottom:20px;">
+    <span style="font-size:13px; color:#5c584c; font-weight:600;">Annotation legend</span>
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px solid #201e1a; border-radius:2px; color:#201e1a;">freeze at C2</span>
+    <span style="font-size:13px; color:#5c584c;">visual relationship proposed as binding</span>
+    <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px dashed #b9b2a0; border-radius:2px; color:#8a8578;">flexible</span>
+    <span style="font-size:13px; color:#5c584c;">detail left to implementation and validation</span>
+  </div>
+
+  <div style="display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.02em; color:#8a5a3f; background:#f7ece2; border:1px solid #e3c9b3; border-radius:3px; padding:5px 10px; margin-bottom:28px;">SYNTHETIC DESIGN FIXTURE — NOT CANONICAL RESEARCH DATA</div>
+
+  <nav style="display:flex; flex-wrap:wrap; gap:6px 18px; padding:14px 18px; background:#fff; border:1px solid #ddd8cb; border-radius:6px; margin-bottom:56px; font-size:13.5px;">
+    <a class="toc-link" href="#foundations">1. Foundations</a>
+    <a class="toc-link" href="#layout">2. Layout</a>
+    <a class="toc-link" href="#generic">3. Generic UI</a>
+    <a class="toc-link" href="#domain">4. Domain presentation</a>
+    <a class="toc-link" href="#states">5. States</a>
+    <a class="toc-link" href="#compact">6. Compact / stress</a>
+    <a class="toc-link" href="#gate">7. Gate C2 summary</a>
+  </nav>
+
+  <!-- ================= 1. FOUNDATIONS ================= -->
+  <section id="foundations" style="margin-bottom:76px;">
+    <h2 style="font-family:'Source Serif 4',serif; font-size:22px; color:#201e1a; margin:0 0 8px; border-bottom:2px solid #201e1a; padding-bottom:10px; font-weight:600;">1. Foundations</h2>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 32px; max-width:72ch;">Carried forward from DS-02b without change of intent. Restated here as rendered specimens so that component sections below can reference roles rather than restate sizes.</p>
+
+    <h3 style="font-family:'Source Serif 4',serif; font-size:19px; font-weight:600; color:#201e1a; margin:0 0 6px;">1.1 Typography hierarchy</h3>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 18px; max-width:72ch;">Seven content roles, three families — plus one specimen of the sans interface voice, which is not an eighth role in the editorial hierarchy. Serif is the reading voice, sans the interface voice, mono technical identity only — mono is never emphasis.</p>
+
+    <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:32px 34px; margin-bottom:12px;">
+      <div style="display:grid; grid-template-columns:auto 1fr; gap:26px 32px; align-items:baseline;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#8a8578; white-space:nowrap; padding-top:6px;">page / display title</div>
+        <div>
+          <div style="font-family:'Source Serif 4',serif; font-size:32px; font-weight:600; line-height:1.3; color:oklch(22% 0.01 60);">Barreiras de acessibilidade no Centro Histórico</div>
+          <div style="font-size:13px; color:#8a8578; margin-top:6px;">Source Serif 4 600 · 30–34px · 1.3 · sentence case · explicit compact step to 24px</div>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#8a8578; white-space:nowrap; padding-top:4px;">section heading</div>
+        <div>
+          <div style="font-family:'Source Serif 4',serif; font-size:22px; font-weight:600; line-height:1.35; color:oklch(22% 0.01 60);">Evidência e relações</div>
+          <div style="font-size:13px; color:#8a8578; margin-top:6px;">Source Serif 4 600 · 22px · 1.35</div>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#8a8578; white-space:nowrap; padding-top:3px;">subsection heading</div>
+        <div>
+          <div style="font-family:'Source Serif 4',serif; font-size:18px; font-weight:600; line-height:1.4; color:#201e1a;">Provisão de fontes primárias</div>
+          <div style="font-size:13px; color:#8a8578; margin-top:6px;">Source Serif 4 600 · 18px · 1.4 — subsections stay in the reading voice; only size and weight step down. The voice never switches to sans inside the editorial hierarchy.</div>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#8a8578; white-space:nowrap; padding-top:5px;">sustained reading prose</div>
+        <div>
+          <div style="font-family:'Source Serif 4',serif; font-size:17.5px; line-height:1.72; color:oklch(26% 0.01 60); max-width:68ch;">A investigação regista fricções documentadas entre a rede de passeios e a mobilidade reduzida em várias zonas do Centro Histórico, com a persistência atual do problema ainda por validar contra evidência recente.</div>
+          <div style="font-size:13px; color:#8a8578; margin-top:8px;">Source Serif 4 400 · 17.5px · 1.72 · 68–72ch measure</div>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#8a8578; white-space:nowrap; padding-top:3px;">supporting text</div>
+        <div>
+          <div style="font-family:'Public Sans',sans-serif; font-size:15px; line-height:1.6; color:oklch(32% 0.012 60); max-width:44ch;">Última atualização a 2 de novembro de 2025, com base em três fontes primárias associadas a este registo.</div>
+          <div style="font-size:13px; color:#8a8578; margin-top:6px;">Public Sans 400 · 15px · 1.6 · 38–44ch</div>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#8a8578; white-space:nowrap; padding-top:2px;">metadata label / value</div>
+        <div>
+          <div style="font-family:'Public Sans',sans-serif; font-size:13px; font-weight:600; color:#5c584c;">Estado de validação</div>
+          <div style="font-family:'Public Sans',sans-serif; font-size:15px; color:oklch(32% 0.012 60); margin-top:4px;">Por validar</div>
+          <div style="font-size:13px; color:#8a8578; margin-top:6px;">label Public Sans 600 · 13px sentence case · value 15px · 4px between them</div>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#8a8578; white-space:nowrap; padding-top:2px;">technical identifier</div>
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:500; color:#3a372f;">PRB-XXXX</div>
+          <div style="font-size:13px; color:#8a8578; margin-top:6px;">IBM Plex Mono 500 · 13px · as issued, never re-cased, never used for emphasis</div>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#8a8578; white-space:nowrap; padding-top:3px;">UI / panel label</div>
+        <div>
+          <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a;">Filtros de pesquisa</div>
+          <div style="font-size:13px; color:#8a8578; margin-top:6px;">Public Sans 600 · 17px — the interface voice. This is not a subsection of the reading hierarchy: it names a control group, a panel or a navigation region. Every specimen title in this catalogue is one.</div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:13px; color:#8a8578; margin:0 0 34px; max-width:76ch;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px solid #201e1a; border-radius:2px; color:#201e1a;">freeze at C2</span> &nbsp;the three-family role split — serif for the whole editorial hierarchy including subsections, sans for interface voice, mono for identifiers only — and the relative order of the hierarchy. <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px dashed #b9b2a0; border-radius:2px; color:#8a8578;">flexible</span> &nbsp;exact px, weights, line-heights and the 13px floor, which foundations.md keeps unfrozen pending corpus validation.</p>
+
+    <h3 style="font-family:'Source Serif 4',serif; font-size:19px; font-weight:600; color:#201e1a; margin:0 0 6px;">1.2 Links, focus and separators</h3>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 18px; max-width:72ch;">Links are underlined at rest. Focus is one treatment across links, buttons, inputs, selects and summaries — a solid clay ring with offset, never a colour shift alone.</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; margin-bottom:14px;">
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:20px 22px;">
+        <div style="font-size:12px; color:#8a8578; margin-bottom:12px;">Link, at rest and hovered</div>
+        <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
+          <a href="#foundations" style="font-size:15px;">Ver evidência associada</a>
+          <span class="demo-link" style="font-size:15px; color:oklch(30% 0.11 40); text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:2px;">Ver evidência associada</span>
+          <span style="font-size:12.5px; color:#8a8578;">hover darkens ink and solidifies the underline; it never introduces the underline</span>
+        </div>
+      </div>
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:20px 22px;">
+        <div style="font-size:12px; color:#8a8578; margin-bottom:12px;">Focus ring, simulated</div>
+        <div style="display:flex; flex-direction:column; gap:14px; align-items:flex-start;">
+          <span style="font-size:15px; color:oklch(42% 0.13 40); text-decoration:underline; outline:2.5px solid oklch(42% 0.13 40); outline-offset:2px; border-radius:2px;">Ver evidência associada</span>
+          <button style="font-family:'Public Sans',sans-serif; font-size:14px; font-weight:600; background:#fff; color:#3a372f; border:1px solid #c9c2ae; border-radius:4px; padding:8px 14px;">Tab here for the real ring</button>
+        </div>
+      </div>
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:20px 22px;">
+        <div style="font-size:12px; color:#8a8578; margin-bottom:12px;">Separators</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div><div style="border-top:1px solid #ddd8cb;"></div><div style="font-size:12.5px; color:#8a8578; margin-top:5px;">rule — between peer items in a list</div></div>
+          <div><div style="border-top:1px solid #e3ddc9;"></div><div style="font-size:12.5px; color:#8a8578; margin-top:5px;">faint rule — inside a dense fact table</div></div>
+          <div><div style="border-top:2px solid #201e1a;"></div><div style="font-size:12.5px; color:#8a8578; margin-top:5px;">heading rule — reserved for top-level section headings</div></div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:13px; color:#8a8578; margin:0 0 34px; max-width:76ch;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px solid #201e1a; border-radius:2px; color:#201e1a;">freeze at C2</span> &nbsp;underline-at-rest, one shared focus treatment across all native interactive elements, and three separator weights only. <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px dashed #b9b2a0; border-radius:2px; color:#8a8578;">flexible</span> &nbsp;ring thickness, offset and exact rule colours.</p>
+
+    <h3 style="font-family:'Source Serif 4',serif; font-size:19px; font-weight:600; color:#201e1a; margin:0 0 6px;">1.3 Colour roles</h3>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 18px; max-width:72ch;">Roles, not a palette. Clay appears only in links, focus and a single primary action; status hues appear only as text-and-glyph on a soft tint, never as a dominant fill.</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+      <div style="width:126px;"><div style="height:52px; border-radius:4px; background:oklch(97% 0.012 80); border:1px solid #ddd8cb;"></div><div style="font-size:12.5px; margin-top:6px; color:#4a463e;">paper — reading canvas</div></div>
+      <div style="width:126px;"><div style="height:52px; border-radius:4px; background:oklch(22% 0.01 60);"></div><div style="font-size:12.5px; margin-top:6px; color:#4a463e;">ink — titles, essential text</div></div>
+      <div style="width:126px;"><div style="height:52px; border-radius:4px; background:oklch(38% 0.015 60);"></div><div style="font-size:12.5px; margin-top:6px; color:#4a463e;">ink-secondary — labels, supporting</div></div>
+      <div style="width:126px;"><div style="height:52px; border-radius:4px; background:oklch(47% 0.014 60);"></div><div style="font-size:12.5px; margin-top:6px; color:#4a463e;">ink-muted — non-essential only</div></div>
+      <div style="width:126px;"><div style="height:52px; border-radius:4px; background:#ddd8cb;"></div><div style="font-size:12.5px; margin-top:6px; color:#4a463e;">line — rules, borders</div></div>
+      <div style="width:126px;"><div style="height:52px; border-radius:4px; background:oklch(42% 0.13 40);"></div><div style="font-size:12.5px; margin-top:6px; color:#4a463e;">clay — link, focus, primary</div></div>
+      <div style="width:126px;"><div style="height:52px; border-radius:4px; background:oklch(38% 0.1 145);"></div><div style="font-size:12.5px; margin-top:6px; color:#4a463e;">status affirmed — text</div></div>
+      <div style="width:126px;"><div style="height:52px; border-radius:4px; background:oklch(42% 0.12 55);"></div><div style="font-size:12.5px; margin-top:6px; color:#4a463e;">status pending — text</div></div>
+      <div style="width:126px;"><div style="height:52px; border-radius:4px; background:oklch(45% 0.14 25);"></div><div style="font-size:12.5px; margin-top:6px; color:#4a463e;">error / critical — feedback only</div></div>
+    </div>
+    <p style="font-size:13px; color:#8a8578; margin:0 0 34px; max-width:76ch;">Contrast ratios are deliberately unstated: foundations.md requires them to be measured against final implementation colours and rendered text. The third hue is application error feedback — it belongs to ErrorNotice and to nothing else. No research disposition is drawn in it: a Problem lifecycle value such as “Evidência insuficiente” is a research state, not a failure, and takes the neutral label treatment. Every status specimen below carries a text word, so removing the hues loses no meaning.</p>
+
+    <h3 style="font-family:'Source Serif 4',serif; font-size:19px; font-weight:600; color:#201e1a; margin:0 0 6px;">1.4 Spacing, rhythm and measure</h3>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 18px; max-width:72ch;">The 4/8/12/16/24/32/48/64 scale, applied so a reader can see grouping without a box. The same intervals govern every component in this catalogue.</p>
+    <div style="display:flex; gap:24px; flex-wrap:wrap; margin-bottom:14px;">
+      <div style="flex:1 1 380px; background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:26px 28px;">
+        <div style="font-family:'Source Serif 4',serif; font-size:22px; font-weight:600; color:oklch(22% 0.01 60); margin-bottom:8px;">Barreiras de acessibilidade</div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#8a8578; margin-bottom:24px;">PRB-XXXX</div>
+        <div style="font-family:'Source Serif 4',serif; font-size:17.5px; line-height:1.72; color:oklch(26% 0.01 60); margin-bottom:32px;">A investigação regista fricções documentadas entre a rede de passeios e a mobilidade reduzida.</div>
+        <div style="font-family:'Public Sans',sans-serif; font-size:13px; font-weight:600; color:#5c584c; margin-bottom:4px;">Estado de validação</div>
+        <div style="font-family:'Public Sans',sans-serif; font-size:15px; color:oklch(32% 0.012 60);">Por validar</div>
+      </div>
+      <div style="flex:1 1 300px; display:flex; flex-direction:column; gap:12px; font-size:13.5px; color:#3a372f; padding-top:4px;">
+        <div><strong>4</strong> — label to value, one fact</div>
+        <div><strong>8</strong> — title to identifier, tightly coupled</div>
+        <div><strong>12–16</strong> — items within one list</div>
+        <div><strong>24</strong> — identifier to prose, new unit</div>
+        <div><strong>32</strong> — prose to a different content type</div>
+        <div><strong>48–64</strong> — between semantic sections (SectionFlow)</div>
+        <div style="border-top:1px solid #ddd8cb; padding-top:12px; color:#5c584c;">Sustained prose sits at <span style="font-family:'IBM Plex Mono',monospace;">{{ proseMeasure }}</span> in this specimen; the production ceiling between 68ch and 72ch stays open pending corpus validation. supporting text and metadata at 38–44ch. Measure is set by content role, not by the container that happens to hold it.</div>
+      </div>
+    </div>
+    <p style="font-size:13px; color:#8a8578; margin:0; max-width:76ch;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px solid #201e1a; border-radius:2px; color:#201e1a;">freeze at C2</span> &nbsp;the ordering rule — smaller interval binds, larger separates — and measure being role-driven. <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px dashed #b9b2a0; border-radius:2px; color:#8a8578;">flexible</span> &nbsp;exact step values and the 68ch/72ch ceiling.</p>
+  </section>
+
+  <!-- ================= 2. LAYOUT ================= -->
+  <section id="layout" style="margin-bottom:76px;">
+    <h2 style="font-family:'Source Serif 4',serif; font-size:22px; color:#201e1a; margin:0 0 8px; border-bottom:2px solid #201e1a; padding-bottom:10px; font-weight:600;">2. Layout specimens</h2>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 28px; max-width:72ch;">These are CSS-first geometry concepts, drawn as relationships rather than components. None of them chooses a landmark, heading, order or presence; those stay with page and domain code.</p>
+
+    <div style="display:flex; flex-direction:column; gap:28px;">
+
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; margin-bottom:6px;">
+          <span style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a;">ShellFrame</span>
+          <span style="font-size:13px; color:#8a8578;">width and horizontal centring only — no padding, no vertical spacing, no surface</span>
+        </div>
+        <div style="background:#f4f1e8; border:1px dashed #c9c2ae; border-radius:4px; padding:14px; margin-top:14px;">
+          <div style="max-width:760px; margin:0 auto; background:oklch(97% 0.012 80); border:1px solid #ddd8cb; border-radius:3px; padding:16px 18px; font-size:13.5px; color:#5c584c; text-align:center;">980px frame, centred · content unaware of the frame</div>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:12px 0 0;">The dashed area is a full-bleed parent (app chrome, footer). The frame is the only ordinary desktop centring device; views do not add their own.</p>
+      </div>
+
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; margin-bottom:6px;">
+          <span style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a;">ReadingLayout</span>
+          <span style="font-size:13px; color:#8a8578;">720px reading column · 44px gap · 216px supporting rail, when the frame accommodates it</span>
+        </div>
+        <div style="display:flex; gap:44px; margin-top:18px; align-items:flex-start;">
+          <div style="flex:0 0 auto; width:520px; max-width:100%;">
+            <div style="background:oklch(97% 0.012 80); border:1px solid #ddd8cb; border-radius:3px; padding:18px 20px;">
+              <div style="font-family:'Source Serif 4',serif; font-size:17.5px; line-height:1.72; color:oklch(26% 0.01 60);">Reading column — sustained prose, headings, fact lists, evidence. Measure is content-owned inside this column and never inherits the full frame width.</div>
+            </div>
+            <div style="font-size:12.5px; color:#8a8578; margin-top:8px;">720px at full desktop width (drawn to scale of the specimen)</div>
+          </div>
+          <div style="flex:0 0 156px;">
+            <div style="background:#f4f1e8; border:1px solid #e3ddc9; border-radius:3px; padding:14px 16px; font-size:13px; color:#5c584c; line-height:1.55;">Supporting rail — section index, metadata, caveat copy. Sticky on desktop.</div>
+            <div style="font-size:12.5px; color:#8a8578; margin-top:8px;">216px</div>
+          </div>
+        </div>
+        <div style="border-top:1px solid #e3ddc9; margin-top:22px; padding-top:16px;">
+          <div style="font-size:13px; font-weight:600; color:#5c584c; margin-bottom:10px;">Geometry-only one-column fit (768–1059px) — conceptual</div>
+          <div style="display:flex; gap:20px; flex-wrap:wrap;">
+            <div style="flex:0 0 300px;">
+              <div style="background:oklch(97% 0.012 80); border:1px solid #ddd8cb; border-radius:3px; padding:14px 16px; font-family:'Source Serif 4',serif; font-size:17.5px; line-height:1.6; color:oklch(26% 0.01 60);">Reading column, same type sizes</div>
+              <div style="background:#f4f1e8; border:1px solid #e3ddc9; border-radius:3px; padding:12px 16px; font-size:13px; color:#5c584c; margin-top:12px;">Rail content, recomposed in flow below</div>
+            </div>
+            <p style="flex:1 1 260px; font-size:13px; color:#8a8578; line-height:1.65; margin:0; max-width:52ch;">Recomposition changes measure and position only. It does not activate compact typography or compact navigation, does not create a third product breakpoint, and does not shrink body, metadata or status text to preserve two columns.</p>
+          </div>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:14px 0 0;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px solid #201e1a; border-radius:2px; color:#201e1a;">freeze at C2</span> &nbsp;720 / 44 / 216, the sticky rail, and recomposition-not-shrinking. Rail visibility and content stay caller-controlled; automatic short-record behaviour remains deferred.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px;">
+        <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+          <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Stack</div>
+          <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">vertical flow, three demonstrated gaps</div>
+          <div style="display:flex; gap:20px; align-items:flex-start;">
+            <div style="flex:1;">
+              <div style="font-size:12px; color:#8a8578; margin-bottom:8px;">tight · 8</div>
+              <div style="display:flex; flex-direction:column; gap:8px;"><div style="height:22px; background:#f4f1e8; border:1px solid #e3ddc9; border-radius:2px;"></div><div style="height:22px; background:#f4f1e8; border:1px solid #e3ddc9; border-radius:2px;"></div><div style="height:22px; background:#f4f1e8; border:1px solid #e3ddc9; border-radius:2px;"></div></div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px; color:#8a8578; margin-bottom:8px;">standard · 16</div>
+              <div style="display:flex; flex-direction:column; gap:16px;"><div style="height:22px; background:#f4f1e8; border:1px solid #e3ddc9; border-radius:2px;"></div><div style="height:22px; background:#f4f1e8; border:1px solid #e3ddc9; border-radius:2px;"></div><div style="height:22px; background:#f4f1e8; border:1px solid #e3ddc9; border-radius:2px;"></div></div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px; color:#8a8578; margin-bottom:8px;">loose · 24</div>
+              <div style="display:flex; flex-direction:column; gap:24px;"><div style="height:22px; background:#f4f1e8; border:1px solid #e3ddc9; border-radius:2px;"></div><div style="height:22px; background:#f4f1e8; border:1px solid #e3ddc9; border-radius:2px;"></div><div style="height:22px; background:#f4f1e8; border:1px solid #e3ddc9; border-radius:2px;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+          <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Cluster</div>
+          <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">wrapping inline flow, baseline-aligned, no semantic tone of its own</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px 12px; align-items:baseline; margin-bottom:14px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; color:#3a372f; background:oklch(97% 0.012 80);">PRB-XXXX</span>
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; font-weight:600; color:#3a372f;">Problema</span>
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:#f1ecdd; color:#4f4b3f; display:inline-flex; align-items:center; gap:6px;"><span style="color:#8a8578;">Validação:</span><span aria-hidden="true">○</span><span style="font-weight:600;">Por validar</span></span>
+          </div>
+          <p style="font-size:13px; color:#8a8578; margin:0;">Cluster supplies wrapping and alignment only. The identifier, the record type and the status remain three different dimensions — the cluster does not make them peers of one kind, and each names its own dimension in text.</p>
+        </div>
+      </div>
+
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; margin-bottom:16px;">
+          <span style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a;">SectionFlow</span>
+          <span style="font-size:13px; color:#8a8578;">separation between already-semantic sections — a spacing recipe, never a heading owner</span>
+        </div>
+        <div style="max-width:62ch;">
+          <div style="font-family:'Source Serif 4',serif; font-size:22px; font-weight:600; color:oklch(22% 0.01 60); margin-bottom:12px;">Estado atual</div>
+          <div style="font-family:'Source Serif 4',serif; font-size:17.5px; line-height:1.72; color:oklch(26% 0.01 60);">A persistência atual do problema permanece por validar contra evidência recolhida após o período de obras anunciado.</div>
+          <div style="height:48px; display:flex; align-items:center; justify-content:center;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#b9b2a0;">48 — standard section separation</span></div>
+          <div style="font-family:'Source Serif 4',serif; font-size:22px; font-weight:600; color:oklch(22% 0.01 60); margin-bottom:12px;">Questões em aberto</div>
+          <div style="font-family:'Source Serif 4',serif; font-size:17.5px; line-height:1.72; color:oklch(26% 0.01 60);">Três rampas identificadas em levantamentos anteriores carecem de verificação de campo.</div>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:16px 0 0; max-width:72ch;">Sections are separated by space alone — no rule and no box between them. A rule appears only where content types collide inside one section.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 3. GENERIC UI ================= -->
+  <section id="generic" style="margin-bottom:76px;">
+    <h2 style="font-family:'Source Serif 4',serif; font-size:22px; color:#201e1a; margin:0 0 8px; border-bottom:2px solid #201e1a; padding-bottom:10px; font-weight:600;">3. Generic UI</h2>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 28px; max-width:72ch;">Reusable presentation whose meaning is supplied by the caller. Nothing here decides presence, order, translation or research state.</p>
+
+    <div style="display:flex; flex-direction:column; gap:26px;">
+
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:14px;">Breadcrumb</div>
+        <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; font-size:14.5px;">
+          <a href="#generic">Registos</a>
+          <span style="color:#b9b2a0;" aria-hidden="true">/</span>
+          <a href="#generic">Problemas</a>
+          <span style="color:#b9b2a0;" aria-hidden="true">/</span>
+          <span style="color:#3a372f;" aria-current="page">Barreiras de acessibilidade — Centro Histórico</span>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:14px 0 0; max-width:72ch;">Sans 14.5px, a muted oblique separator, current item in plain ink and never a link. Parent items may be links or buttons depending on the caller; the visual recipe does not change between them, but the code semantics stay visible.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:24px;">
+        <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+          <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Reading-rail section index</div>
+          <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">desktop rail, sticky, current entry marked by weight and keyline</div>
+          <nav style="border-left:1px solid #ddd8cb; padding-left:0;">
+            <div style="display:flex; flex-direction:column;">
+              <a href="#generic" style="font-size:13.5px; padding:6px 0 6px 14px; border-left:2px solid #201e1a; margin-left:-1px; text-decoration:none; color:#201e1a; font-weight:600;">Estado atual</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 26px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">O que observamos</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 26px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">Consequências conhecidas</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 26px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">Atualidade</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 26px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">Âmbito conhecido</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 14px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">Evidência</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 26px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">Evidência que suporta</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 26px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">Evidência que limita a conclusão</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 26px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">Outra evidência relacionada</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 14px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">O que ainda não sabemos — e o que estamos a fazer</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 26px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">Perguntas em aberto</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 26px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">Procura de evidência contraditória</a>
+              <a class="demo-railitem" href="#generic" style="font-size:13.5px; padding:6px 0 6px 14px; border-left:2px solid transparent; margin-left:-1px; text-decoration:none; color:#5c584c;">Como chegámos a este problema</a>
+            </div>
+          </nav>
+          <p style="font-size:13px; color:#8a8578; margin:14px 0 0;">Nesting is expressed by indent only. Every label shown belongs to the current Problem section model, including its long fourth-level heading, which is never abbreviated to fit. Entry order, labels, anchors and presence remain Problem-domain-owned and conditional; the presentation evaluates none of them, and a specimen showing a subset is not a claim about presence.</p>
+        </div>
+
+        <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+          <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Compact section index</div>
+          <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">in-flow equivalent below the header on compact and in the fit fallback</div>
+          <nav style="background:#f7f4e9; border:1px solid #e3ddc9; border-radius:4px; padding:14px 16px;">
+            <div style="font-size:13px; font-weight:600; color:#5c584c; margin-bottom:10px;">Nesta página</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px 16px;">
+              <a href="#generic" style="font-size:14px;">Estado atual</a>
+              <a href="#generic" style="font-size:14px;">Evidência</a>
+              <a href="#generic" style="font-size:14px;">O que ainda não sabemos — e o que estamos a fazer</a>
+              <a href="#generic" style="font-size:14px;">Como chegámos a este problema</a>
+            </div>
+          </nav>
+          <p style="font-size:13px; color:#8a8578; margin:14px 0 0;">A different semantic shape, deliberately: a wrapping list of links inside a muted inset, not a keyline rail. Rail and compact share type and colour roles only.</p>
+        </div>
+      </div>
+
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:14px;">FactList</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:32px;">
+          <div>
+            <div style="font-size:12px; color:#8a8578; margin-bottom:12px;">reading density — rail and detail metadata</div>
+            <dl style="margin:0; display:grid; grid-template-columns:1fr; gap:16px;">
+              <div><dt style="font-size:13px; font-weight:600; color:#5c584c;">Estado de validação</dt><dd style="margin:4px 0 0; font-size:15px; color:oklch(32% 0.012 60);">Parcialmente validado</dd></div>
+              <div><dt style="font-size:13px; font-weight:600; color:#5c584c;">Freguesia</dt><dd style="margin:4px 0 0; font-size:15px; color:oklch(32% 0.012 60);">São Mamede</dd></div>
+              <div><dt style="font-size:13px; font-weight:600; color:#5c584c;">Data de registo</dt><dd style="margin:4px 0 0; font-size:15px; color:oklch(32% 0.012 60);">14 mar. 2025</dd></div>
+            </dl>
+          </div>
+          <div>
+            <div style="font-size:12px; color:#8a8578; margin-bottom:12px;">compact density — two columns, faint rules, dense content. Rows here belong to Datas e acesso; record identity is never a fact row.</div>
+            <dl style="margin:0; display:grid; grid-template-columns:auto 1fr; gap:0 20px; font-size:14.5px;">
+              <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:9px 0; border-top:1px solid #f1eee1;">Publicação</dt>
+              <dd style="margin:0; color:oklch(32% 0.012 60); padding:9px 0; border-top:1px solid #f1eee1;">14 mar. 2025</dd>
+              <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:9px 0; border-top:1px solid #f1eee1;">Frequência de atualização</dt>
+              <dd style="margin:0; color:oklch(32% 0.012 60); padding:9px 0; border-top:1px solid #f1eee1;">Irregular; sem calendário publicado</dd>
+              <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:9px 0; border-top:1px solid #f1eee1;">Nível de acesso</dt>
+              <dd style="margin:0; color:oklch(32% 0.012 60); padding:9px 0; border-top:1px solid #f1eee1;">Consulta pública sem registo prévio</dd>
+              <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:9px 0; border-top:1px solid #f1eee1;">Forma de consulta</dt>
+              <dd style="margin:0; color:oklch(32% 0.012 60); padding:9px 0; border-top:1px solid #f1eee1;">Descarregamento direto do ficheiro publicado</dd>
+            </dl>
+          </div>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:16px 0 0; max-width:76ch;">Both densities keep label and value at their foundation sizes; compact changes the grid, not the type. Absence is never rendered by the list itself — the caller supplies explicit text.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:24px;">
+        <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+          <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:14px;">ProgressMessage</div>
+          <div style="display:flex; gap:10px; align-items:baseline; padding:14px 16px; background:#f7f4e9; border:1px solid #e3ddc9; border-radius:4px;">
+            <span aria-hidden="true" style="color:#8a8578;">◴</span>
+            <span style="font-size:15px; color:oklch(32% 0.012 60);">A carregar o registo…</span>
+          </div>
+          <p style="font-size:13px; color:#8a8578; margin:12px 0 0;">Muted inset, no colour, no border emphasis. It is in-progress feedback, not a result.</p>
+        </div>
+        <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+          <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:14px;">ErrorNotice</div>
+          <div style="padding:16px 18px; background:oklch(97% 0.02 25); border:1px solid oklch(85% 0.06 25); border-left:3px solid oklch(45% 0.14 25); border-radius:4px;">
+            <div style="font-size:15px; font-weight:600; color:oklch(35% 0.13 25); margin-bottom:6px;">Não foi possível carregar o registo</div>
+            <div style="font-size:14.5px; line-height:1.6; color:oklch(30% 0.02 25); margin-bottom:12px;">O pedido falhou antes de devolver conteúdo canónico.</div>
+            <button style="font-family:'Public Sans',sans-serif; font-size:14px; font-weight:600; background:#fff; color:#3a372f; border:1px solid #c9c2ae; border-radius:4px; padding:7px 14px;">Tentar novamente</button>
+          </div>
+          <p style="font-size:13px; color:#8a8578; margin:12px 0 0;">The only place a status hue carries a border. Retry copy and action stay caller-owned.</p>
+        </div>
+        <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+          <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:14px;">EmptyState</div>
+          <div style="border-top:1px solid #ddd8cb; padding-top:14px;">
+            <div style="font-size:15px; line-height:1.6; color:oklch(32% 0.012 60);">Não existem evidências associadas a este problema.</div>
+          </div>
+          <p style="font-size:13px; color:#8a8578; margin:12px 0 0;">Ordinary content under a rule — no box, no live region, no alert. An established empty result is information, not an incident.</p>
+        </div>
+      </div>
+
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">UnavailableNote</div>
+        <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">explanation attached to a focusable aria-disabled control, on hover and on keyboard focus</div>
+        <div style="display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;">
+          <button aria-disabled="true" style="font-family:'Public Sans',sans-serif; font-size:14px; font-weight:600; background:#f4f1e8; color:#8a8578; border:1px dashed #c9c2ae; border-radius:4px; padding:8px 14px;">Abrir grafo de relações</button>
+          <div style="max-width:38ch; padding:10px 14px; background:oklch(97% 0.012 80); border:1px solid #ddd8cb; border-radius:4px; font-size:13.5px; line-height:1.55; color:#3a372f;">Indisponível: este registo ainda não tem relações resolvidas.</div>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:14px 0 0; max-width:74ch;">The disabled-but-focusable control keeps a dashed border so that its unavailability is visible without colour. The note is a paper card, distinct from EmptyState (no box) and from ErrorNotice (hued border).</p>
+      </div>
+
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:16px;">Native action and control recipes</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:26px;">
+          <div>
+            <div style="font-size:12px; color:#8a8578; margin-bottom:12px;">actions — the native element stays visible in code</div>
+            <div style="display:flex; flex-direction:column; gap:14px; align-items:flex-start;">
+              <a href="#generic" style="font-size:15px;">Navegação — âncora sublinhada</a>
+              <button class="demo-textbtn" style="font-family:'Public Sans',sans-serif; font-size:15px; background:none; border:none; padding:0; color:oklch(42% 0.13 40); text-decoration:underline; text-decoration-color:oklch(42% 0.13 40 / 0.45); text-underline-offset:2px; cursor:pointer;">Ação textual — botão</button>
+              <button class="demo-outbtn" style="font-family:'Public Sans',sans-serif; font-size:14px; font-weight:600; background:#fff; color:#3a372f; border:1px solid #c9c2ae; border-radius:4px; padding:8px 14px; cursor:pointer;">Ação delineada</button>
+              <button style="font-family:'Public Sans',sans-serif; font-size:14px; font-weight:600; background:oklch(42% 0.13 40); color:#fff; border:none; border-radius:4px; padding:9px 16px; cursor:pointer;">Ação primária</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px; color:#8a8578; margin-bottom:12px;">controls — 15px value text, 44px minimum target</div>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <label style="display:block;"><span style="display:block; font-size:13px; font-weight:600; color:#5c584c; margin-bottom:5px;">Identificador</span><input type="text" value="PRB-XXXX" style="width:100%; font-family:'IBM Plex Mono',monospace; font-size:14px; color:#3a372f; padding:11px 12px; background:#fff; border:1px solid #c9c2ae; border-radius:4px;"></label>
+              <label style="display:block;"><span style="display:block; font-size:13px; font-weight:600; color:#5c584c; margin-bottom:5px;">Pesquisar registos</span><span style="display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #c9c2ae; border-radius:4px; padding:0 12px;"><span aria-hidden="true" style="color:#8a8578; font-size:14px;">⌕</span><input type="search" placeholder="Título, identificador ou freguesia" style="flex:1; font-family:'Public Sans',sans-serif; font-size:15px; color:#3a372f; padding:11px 0; border:none; background:none; outline:none;"></span></label>
+              <label style="display:block;"><span style="display:block; font-size:13px; font-weight:600; color:#5c584c; margin-bottom:5px;">Tipo de registo</span><select style="width:100%; font-family:'Public Sans',sans-serif; font-size:15px; color:#3a372f; padding:11px 12px; background:#fff; border:1px solid #c9c2ae; border-radius:4px;"><option>Todos</option><option>Problema</option><option>Evidência</option><option>Fonte</option></select></label>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:16px 0 0; max-width:76ch;">Field labels are always visible; a placeholder never substitutes for one. The search field is an input with an inline glyph, not a distinct component family.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:24px;">
+        <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+          <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:16px;">Native details / summary</div>
+          <details style="background:oklch(97% 0.012 80); border:1px solid #ddd8cb; border-radius:4px; padding:0;">
+            <summary style="cursor:pointer; list-style:none; padding:13px 16px; font-family:'Public Sans',sans-serif; font-size:14.5px; font-weight:600; color:#3a372f; display:flex; align-items:center; gap:10px;"><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">+</span>Como ler este registo</summary>
+            <div style="padding:0 16px 16px 42px; font-family:'Source Serif 4',serif; font-size:16px; line-height:1.68; color:oklch(26% 0.01 60);">O estado de validação descreve a verificação da persistência atual, não a qualidade da recolha original.</div>
+          </details>
+          <p style="font-size:13px; color:#8a8578; margin:12px 0 0;">One disclosure shell for every use; content and default open-state are caller decisions.</p>
+        </div>
+
+        <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+          <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Surface recipes</div>
+          <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">three, and no more — there is no Card</div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="background:oklch(97% 0.012 80); border:1px solid #ddd8cb; border-radius:4px; padding:14px 16px; font-size:14.5px; color:#3a372f;">Plain outlined — a real boundary around authored content</div>
+            <div style="background:#f4f1e8; border:none; border-radius:4px; padding:14px 16px; font-size:14.5px; color:#3a372f;">Muted inset — aside, caveat, methodology, progress</div>
+            <div class="demo-item" style="background:#fff; border:1px solid #ddd8cb; border-radius:4px; padding:14px 16px; font-size:14.5px; color:#3a372f; cursor:pointer;">Interactive item — hover me; state, not decoration</div>
+          </div>
+          <p style="font-size:13px; color:#8a8578; margin:12px 0 0;">Ordinary adjacent content stays unboxed. A surface must be justifiable as a boundary, an aside, or an interactive unit.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 4. DOMAIN ================= -->
+  <section id="domain" style="margin-bottom:76px;">
+    <h2 style="font-family:'Source Serif 4',serif; font-size:22px; color:#201e1a; margin:0 0 8px; border-bottom:2px solid #201e1a; padding-bottom:10px; font-weight:600;">4. Domain presentation</h2>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 10px; max-width:74ch;">Seven distinct semantic dimensions, deliberately drawn with a <em>small</em> shared visual grammar rather than seven novelty treatments. Gate C1 permits shared inline-label anatomy; what must never be shared is the component and the values it accepts.</p>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 24px; max-width:74ch;">The grammar has three parts: mono in a hairline outline for canonical identity; plain sans for record type; and one shared inline label for the five relationship and state dimensions, each of which always names its dimension in text before its value. Dimension is carried by words, not by inventing a border style per concept — which is also what keeps the states legible in greyscale and at 360px.</p>
+
+    <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:26px 28px; margin-bottom:22px; overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:13.5px; min-width:660px;">
+        <thead>
+          <tr style="border-bottom:1px solid #ddd8cb;">
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Dimension</th>
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Specimen</th>
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Container</th>
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Family</th>
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Marker</th>
+          </tr>
+        </thead>
+        <tbody style="color:#3a372f;">
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:12px;">RecordIdentifier</td>
+            <td style="padding:12px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; color:#3a372f; background:oklch(97% 0.012 80);">EVD-XXXXXX</span></td>
+            <td style="padding:12px;">hairline outline, paper fill</td>
+            <td style="padding:12px;">mono</td>
+            <td style="padding:12px;">none</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:12px;">RecordTypeLabel</td>
+            <td style="padding:12px;"><span style="font-family:'Public Sans',sans-serif; font-size:13px; font-weight:600; color:#3a372f;">Evidência</span></td>
+            <td style="padding:12px;">none — plain text</td>
+            <td style="padding:12px;">sans 600</td>
+            <td style="padding:12px;">none</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:12px;">Validation status</td>
+            <td style="padding:12px;"><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:#f1ecdd; color:#4f4b3f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Validação:</span><span aria-hidden="true" style="color:#8a8578;">◐</span><span style="font-weight:600;">Parcialmente validada</span></span></td>
+            <td style="padding:12px;">shared inline label</td>
+            <td style="padding:12px;">sans</td>
+            <td style="padding:12px;">caption + ● ◐ ○</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:12px;">Evidence status</td>
+            <td style="padding:12px;"><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(96% 0.02 145); color:oklch(30% 0.09 145); display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Evidência:</span><span style="font-weight:600;">Corroborada</span></span></td>
+            <td style="padding:12px;">shared inline label</td>
+            <td style="padding:12px;">sans</td>
+            <td style="padding:12px;">caption</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:12px;">Problem lifecycle status</td>
+            <td style="padding:12px;"><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Estado:</span><span style="font-weight:600;">Aberto</span></span></td>
+            <td style="padding:12px;">shared inline label</td>
+            <td style="padding:12px;">sans</td>
+            <td style="padding:12px;">caption</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:12px;">EvidenceEffectTag (PRB→EVD)</td>
+            <td style="padding:12px;"><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Efeito:</span><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">→</span><span style="font-weight:600;">Sustenta</span></span></td>
+            <td style="padding:12px;">shared inline label</td>
+            <td style="padding:12px;">sans</td>
+            <td style="padding:12px;">caption + relation arrow</td>
+          </tr>
+          <tr>
+            <td style="padding:12px;">Research role (PRB→EVD)</td>
+            <td style="padding:12px;"><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Papel:</span><span style="font-weight:600;">Observação local</span></span></td>
+            <td style="padding:12px;">shared inline label</td>
+            <td style="padding:12px;">sans</td>
+            <td style="padding:12px;">caption</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px; color:#8a8578; margin:0 0 34px; max-width:78ch;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px solid #201e1a; border-radius:2px; color:#201e1a;">freeze at C2</span> &nbsp;that these seven remain distinct semantic dimensions with distinct domain components; that no component accepts values belonging to another dimension; and that each is identifiable from explicit text and context rather than from styling. Shared inline-label anatomy is permitted wherever it creates no ambiguity. <span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px dashed #b9b2a0; border-radius:2px; color:#8a8578;">flexible</span> &nbsp;the exact anatomy assignment above, including whether validation and evidence status keep a tint and whether the effect arrow survives review. Dashed borders are reserved for unavailability and are used nowhere else; muted inset is reserved for asides and progress; no static label carries a dotted or dashed underline, which would read as interaction.</p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px; margin-bottom:24px;">
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">RecordIdentifier</div>
+        <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">text and action forms, standard and compact density</div>
+        <div style="display:flex; flex-direction:column; gap:14px; align-items:flex-start;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; padding:4px 10px; border-radius:3px; border:1px solid #ddd8cb; color:#3a372f; background:oklch(97% 0.012 80);">PRB-XXXX</span>
+          <a href="#domain" style="font-family:'IBM Plex Mono',monospace; font-size:13px; padding:4px 10px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80);">EVD-XXXXXX</a>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#3a372f;">SRC-XXXX</span>
+          <span style="font-size:12.5px; color:#8a8578;">compact density drops the box and keeps mono — used inline in dense rows and in prose</span>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:14px 0 0;">Identity never carries a status hue and never outranks the human-readable title beside it.</p>
+      </div>
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">RecordTypeLabel</div>
+        <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">list marker and detail badge</div>
+        <div style="display:flex; flex-direction:column; gap:16px; align-items:flex-start;">
+          <span style="font-family:'Public Sans',sans-serif; font-size:13px; font-weight:600; color:#3a372f;">Problema</span>
+          <span style="font-family:'Public Sans',sans-serif; font-size:14px; font-weight:600; color:#201e1a;">Fonte</span>
+          <span style="font-size:12.5px; color:#8a8578;">the badge is the same anatomy at higher contrast, not a different shape</span>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:14px 0 0;">Type is a classification, so it takes no fill and no glyph — both of which this system reserves for state.</p>
+      </div>
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Validation status</div>
+        <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">three public values, caption plus glyph plus full word</div>
+        <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
+          <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(96% 0.02 145); color:oklch(30% 0.09 145); display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Validação:</span><span aria-hidden="true" style="color:oklch(38% 0.1 145);">●</span><span style="font-weight:600;">Validada</span></span>
+          <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:#f1ecdd; color:#4f4b3f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Validação:</span><span aria-hidden="true" style="color:#8a8578;">◐</span><span style="font-weight:600;">Parcialmente validada</span></span>
+          <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:#f1ecdd; color:#4f4b3f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Validação:</span><span aria-hidden="true" style="color:#8a8578;">○</span><span style="font-weight:600;">Por validar</span></span>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:14px 0 0;">Glyph fill tracks completeness, so the three read as one ordered dimension in greyscale. The caption keeps the dimension explicit when a validation status sits beside an evidence status.</p>
+      </div>
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Evidence status — a Problem investigation state</div>
+        <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">two public values, shown only in explicit Problem-state context, never on an individual EVD</div>
+        <div style="font-size:13px; font-weight:600; color:#5c584c; margin-bottom:8px;">Estado da investigação — PRB-XXXX</div>
+        <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
+          <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:#f1ecdd; color:#4f4b3f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Evidência:</span><span style="font-weight:600;">Identificada</span></span>
+          <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(96% 0.02 145); color:oklch(30% 0.09 145); display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Evidência:</span><span style="font-weight:600;">Corroborada</span></span>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:14px 0 0;">Same anatomy as validation status, different caption, different value set, different domain component. This state describes the Problem's investigation, so it appears beside the Problem's own state and never inside an evidence row. “Evidência insuficiente” does not belong to this dimension either: it is a Problem lifecycle value.</p>
+      </div>
+    </div>
+
+    <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px; margin-bottom:24px;">
+      <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Problem lifecycle status — four dimensioned presentations</div>
+      <div style="font-size:13px; color:#8a8578; margin-bottom:18px;">the same canonical field, four reading questions; none may drop the dimension caption or substitute a gloss for the raw value</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;">
+        <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Estado:</span><span style="font-weight:600;">Aberto</span></span>
+        <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Estado:</span><span style="font-weight:600;">Rejeitado</span></span>
+        <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Estado:</span><span style="font-weight:600;">Duplicado</span></span>
+        <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Estado:</span><span style="font-weight:600;">Não digital</span></span>
+        <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Estado:</span><span style="font-weight:600;">Já resolvido</span></span>
+        <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Estado:</span><span style="font-weight:600;">Evidência insuficiente</span></span>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px;">
+        <div>
+          <div style="font-size:12px; color:#8a8578; margin-bottom:10px;">Overview summary</div>
+          <div style="font-size:13px; font-weight:600; color:#5c584c;">Estado do problema</div>
+          <div style="font-size:15px; color:oklch(32% 0.012 60); margin-top:4px;">Evidência insuficiente</div>
+        </div>
+        <div>
+          <div style="font-size:12px; color:#8a8578; margin-bottom:10px;">Problem reading</div>
+          <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Estado:</span><span style="font-weight:600;">Evidência insuficiente</span></span>
+        </div>
+        <div>
+          <div style="font-size:12px; color:#8a8578; margin-bottom:10px;">Technical raw value</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#3a372f; background:#f4f1e8; padding:8px 10px; border-radius:3px;">status: INSUFFICIENT_EVIDENCE</div>
+        </div>
+        <div>
+          <div style="font-size:12px; color:#8a8578; margin-bottom:10px;">History transition</div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:14px; color:#3a372f; flex-wrap:wrap;"><span>Aberto</span><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">→</span><span style="font-weight:600;">Evidência insuficiente</span></div>
+          <div style="font-size:12.5px; color:#8a8578; margin-top:6px;">14 mar. 2025</div>
+        </div>
+      </div>
+      <p style="font-size:13px; color:#8a8578; margin:18px 0 0; max-width:76ch;">“Evidência insuficiente” is a lifecycle value and appears only here. The public gloss and the raw canonical value are never shown as substitutes for one another.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:24px; margin-bottom:24px;">
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:16px;">ContextTabs</div>
+        <nav style="border-bottom:1px solid #ddd8cb; display:flex; gap:24px;">
+          <span style="font-family:'Public Sans',sans-serif; font-size:15px; font-weight:600; color:#201e1a; padding:0 0 10px; border-bottom:2px solid #201e1a; margin-bottom:-1px;" aria-current="page">Detalhe</span>
+          <a class="demo-tab" href="#domain" style="font-family:'Public Sans',sans-serif; font-size:15px; color:#5c584c; padding:0 0 10px; text-decoration:none;">Problema</a>
+          <a class="demo-tab" href="#domain" style="font-family:'Public Sans',sans-serif; font-size:15px; color:#5c584c; padding:0 0 10px; text-decoration:none;">Histórico</a>
+        </nav>
+        <div style="display:flex; align-items:baseline; gap:10px; margin-top:14px; flex-wrap:wrap;">
+          <span style="font-size:13px; color:#5c584c;">Mesma identidade:</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; color:#3a372f; background:oklch(97% 0.012 80);">PRB-XXXX</span>
+        </div>
+        <p style="font-size:13px; color:#8a8578; margin:14px 0 0;">The identifier stays visible beside the tabs because the tabs preserve one PRB identity across orientations. That is what makes this domain-owned rather than generic tabs.</p>
+      </div>
+
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:16px;">Canonical technical inspection</div>
+        <details open="{{ isOpen }}" style="background:oklch(97% 0.012 80); border:1px solid #ddd8cb; border-radius:4px;">
+          <summary style="cursor:pointer; list-style:none; padding:13px 16px; font-family:'Public Sans',sans-serif; font-size:14.5px; font-weight:600; color:#3a372f; display:flex; align-items:center; gap:10px;"><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">−</span>Inspeção técnica canónica</summary>
+          <div style="padding:0 16px 16px;">
+            <div style="font-size:13px; color:#8a8578; margin-bottom:10px;">Excerto sintético da estrutura canónica, sem interpretação editorial</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; line-height:1.75; color:#3a372f; border-left:2px solid #e3ddc9; padding-left:14px;">
+              <div>problem_id: PRB-XXXX</div>
+              <div>status: OPEN</div>
+              <div>evidence[0].evidence_id: EVD-XXXXXX</div>
+              <div>evidence[0].effects[0]: SUPPORTS</div>
+              <div>evidence[0].research_roles[0]: LOCAL_OBSERVATION</div>
+              <div>evidence_status: discovered</div>
+              <div>validation_status: unvalidated</div>
+            </div>
+          </div>
+        </details>
+        <p style="font-size:13px; color:#8a8578; margin:14px 0 0;">Mono throughout, indentation for depth, no colour. Raw values are never glossed here — the public reading above owns that.</p>
+      </div>
+    </div>
+
+    <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px; margin-bottom:24px;">
+      <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Source fact-section presentation</div>
+      <div style="font-size:13px; color:#8a8578; margin-bottom:20px;">the four fact sections — Visão geral, Cobertura, Datas e acesso, Licenciamento — share one frame; findings, investigation, caveats and technical inspection deliberately do not. Each section carries only facts it owns: access belongs to Datas e acesso, never to Cobertura.</div>
+      <div style="max-width:66ch;">
+        <div style="font-family:'Source Serif 4',serif; font-size:22px; font-weight:600; color:oklch(22% 0.01 60); margin-bottom:14px;">Cobertura</div>
+        <dl style="margin:0 0 40px; display:grid; grid-template-columns:auto 1fr; gap:0 24px; font-size:14.5px;">
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:10px 0; border-top:1px solid #f1eee1;">Âmbito geográfico</dt>
+          <dd style="margin:0; color:oklch(32% 0.012 60); padding:10px 0; border-top:1px solid #f1eee1;">Centro Histórico e Freguesia de São Mamede</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:10px 0; border-top:1px solid #f1eee1;">Temas</dt>
+          <dd style="margin:0; color:oklch(32% 0.012 60); padding:10px 0; border-top:1px solid #f1eee1;">Mobilidade pedonal, acessibilidade</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:10px 0; border-top:1px solid #f1eee1;">Início</dt>
+          <dd style="margin:0; color:oklch(32% 0.012 60); padding:10px 0; border-top:1px solid #f1eee1;">jan. 2019</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:10px 0; border-top:1px solid #f1eee1;">Fim</dt>
+          <dd style="margin:0; color:oklch(32% 0.012 60); padding:10px 0; border-top:1px solid #f1eee1;">nov. 2025</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:10px 0; border-top:1px solid #f1eee1;">Área</dt>
+          <dd style="margin:0; color:oklch(32% 0.012 60); padding:10px 0; border-top:1px solid #f1eee1;">Centro Histórico — 1,8 km²</dd>
+        </dl>
+        <div style="font-family:'Source Serif 4',serif; font-size:22px; font-weight:600; color:oklch(22% 0.01 60); margin-bottom:14px;">Limitações declaradas</div>
+        <div style="background:#f4f1e8; border-radius:4px; padding:16px 18px; font-family:'Source Serif 4',serif; font-size:16.5px; line-height:1.68; color:oklch(26% 0.01 60);">O levantamento não cobre arruamentos privados de acesso condicionado. A ausência de uma limitação declarada não constitui uma afirmação de cobertura completa.</div>
+      </div>
+      <p style="font-size:13px; color:#8a8578; margin:16px 0 0; max-width:76ch;">Caveats take a muted inset because they are an aside; fact sections take rules because they are dense pairs. Absence of caveats renders nothing at all — not an affirmative statement.</p>
+    </div>
+
+    <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+      <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Evidence and reference presentations — four questions, four forms</div>
+      <div style="font-size:13px; color:#8a8578; margin-bottom:20px;">these share identifiers, fact lists, stacks and surfaces; they are not one row model</div>
+
+      <div style="display:flex; flex-direction:column; gap:26px; max-width:76ch;">
+        <div>
+          <div style="font-size:12px; color:#8a8578; margin-bottom:10px;">Evidence in a Problem — an observation with PRB-owned effect and Source provenance</div>
+          <div style="background:oklch(97% 0.012 80); border:1px solid #ddd8cb; border-radius:4px; padding:18px 20px;">
+            <div style="display:flex; gap:8px 12px; align-items:baseline; flex-wrap:wrap; margin-bottom:12px;">
+              <a href="#domain" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">EVD-XXXXXX</a>
+              <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Efeito:</span><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">→</span><span style="font-weight:600;">Sustenta</span></span>
+              <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Papel:</span><span style="font-weight:600;">Observação local</span></span>
+            </div>
+            <div style="font-family:'Source Serif 4',serif; font-size:16.5px; line-height:1.68; color:oklch(26% 0.01 60); margin-bottom:12px;">Levantamento fotográfico documenta larguras inferiores a 90 cm em onze arruamentos, com obstrução recorrente por mobiliário urbano.</div>
+            <div style="font-size:13.5px; color:#5c584c;">Fonte: <a href="#domain" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">SRC-XXXX</a></div>
+            <p style="font-size:13px; color:#8a8578; margin:12px 0 0;">Effect and role are properties of this PRB→EVD relationship, not of the EVD or the Source. They may be rendered wherever that relationship is explicitly presented — an Evidence use inside a Problem, or a Problem-use inside an EVD detail — and never as intrinsic properties of a record. The row carries no evidence status: <em>evidence_status</em> is the Problem's investigation state, not a property of this EVD.</p>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:12px; color:#8a8578; margin-bottom:10px;">PRB→EVD effect — the four public values</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Efeito:</span><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">→</span><span style="font-weight:600;">Sustenta</span></span>
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Efeito:</span><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">→</span><span style="font-weight:600;">Refina</span></span>
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Efeito:</span><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">→</span><span style="font-weight:600;">Delimita</span></span>
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Efeito:</span><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">→</span><span style="font-weight:600;">Contradiz</span></span>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:12px; color:#8a8578; margin-bottom:10px;">Research role — also a property of the PRB→EVD relationship, never of a record</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Papel:</span><span style="font-weight:600;">Observação local</span></span>
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Papel:</span><span style="font-weight:600;">Contexto</span></span>
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Papel:</span><span style="font-weight:600;">Mecanismo comparativo</span></span>
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Papel:</span><span style="font-weight:600;">Resposta comparativa</span></span>
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Papel:</span><span style="font-weight:600;">Resposta existente</span></span>
+            <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Papel:</span><span style="font-weight:600;">Resposta planeada</span></span>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:12px; color:#8a8578; margin-bottom:10px;">Compact evidence references attached to authored uncertainty</div>
+          <div style="font-family:'Source Serif 4',serif; font-size:16.5px; line-height:1.68; color:oklch(26% 0.01 60);">Permanece por determinar se as obras de repavimentação alteraram a acessibilidade nos pontos assinalados.</div>
+          <div style="display:flex; gap:8px 12px; flex-wrap:wrap; margin-top:10px; align-items:baseline;">
+            <span style="font-size:13px; color:#5c584c;">Evidência referida:</span>
+            <a href="#domain" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">EVD-XXXXXX</a>
+            <a href="#domain" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">EVD-XXXXXX</a>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:12px; color:#8a8578; margin-bottom:10px;">Exact canonical path occurrences — PRB references target EVD records, and repeated occurrences are deliberately not deduplicated</div>
+          <div style="display:flex; flex-direction:column; gap:0;">
+            <div style="display:flex; gap:16px; align-items:baseline; padding:9px 0; border-top:1px solid #f1eee1; flex-wrap:wrap;"><span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#8a8578;">evidence[0].evidence_id</span><a href="#domain" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">EVD-XXXXXX</a></div>
+            <div style="display:flex; gap:16px; align-items:baseline; padding:9px 0; border-top:1px solid #f1eee1; flex-wrap:wrap;"><span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#8a8578;">evidence[2].evidence_id</span><a href="#domain" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">EVD-XXXXXX</a></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:12px; color:#8a8578; margin-bottom:10px;">Related-record grouping — direction preserved</div>
+          <div style="font-size:13px; font-weight:600; color:#5c584c; margin-bottom:8px;">Registos relacionados — saída</div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; gap:12px; align-items:baseline; flex-wrap:wrap;">
+              <span style="font-family:'Public Sans',sans-serif; font-size:13px; font-weight:600; color:#3a372f;">Evidência</span>
+              <a href="#domain" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">EVD-XXXXXX</a>
+              <a href="#domain" style="font-size:14.5px;">Levantamento fotográfico de largura de passeios</a>
+            </div>
+            <div style="display:flex; gap:12px; align-items:baseline; flex-wrap:wrap;">
+              <span style="font-family:'Public Sans',sans-serif; font-size:13px; font-weight:600; color:#3a372f;">Fonte</span>
+              <a href="#domain" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">SRC-XXXX</a>
+              <a href="#domain" style="font-size:14.5px;">Registo de manutenção — câmara municipal</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:13px; color:#8a8578; margin:20px 0 0; max-width:76ch;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:2px 7px; border:1px solid #201e1a; border-radius:2px; color:#201e1a;">freeze at C2</span> &nbsp;that only the first form takes a surface. The other three are rules and whitespace, because their content is a reference, not a unit.</p>
+    </div>
+  </section>
+
+  <!-- ================= 5. STATES ================= -->
+  <section id="states" style="margin-bottom:76px;">
+    <h2 style="font-family:'Source Serif 4',serif; font-size:22px; color:#201e1a; margin:0 0 8px; border-bottom:2px solid #201e1a; padding-bottom:10px; font-weight:600;">5. States</h2>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 26px; max-width:74ch;">Only states that are semantically real for each element. Static labels have no hover or selected state and are not given one; identifiers gain interaction states only in their action form.</p>
+
+    <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:26px 28px; margin-bottom:24px; overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:13.5px; min-width:720px;">
+        <thead>
+          <tr style="border-bottom:1px solid #ddd8cb;">
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Element</th>
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Default</th>
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Hover</th>
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Focus</th>
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Active / selected</th>
+            <th style="text-align:left; padding:9px 12px; color:#5c584c; font-weight:600;">Disabled / aria-disabled</th>
+          </tr>
+        </thead>
+        <tbody style="color:#3a372f;">
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:13px 12px;">Link</td>
+            <td style="padding:13px 12px;"><a href="#states" style="font-size:14.5px;">Ver evidência</a></td>
+            <td style="padding:13px 12px;"><span class="demo-link" style="font-size:14.5px; color:oklch(30% 0.11 40); text-decoration:underline; text-underline-offset:2px;">Ver evidência</span></td>
+            <td style="padding:13px 12px;"><span style="font-size:14.5px; color:oklch(42% 0.13 40); text-decoration:underline; outline:2.5px solid oklch(42% 0.13 40); outline-offset:2px; border-radius:2px;">Ver evidência</span></td>
+            <td style="padding:13px 12px; color:#8a8578;">not applicable</td>
+            <td style="padding:13px 12px; color:#8a8578;">not applicable</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:13px 12px;">Outlined action</td>
+            <td style="padding:13px 12px;"><button style="font-family:'Public Sans',sans-serif; font-size:13.5px; font-weight:600; background:#fff; color:#3a372f; border:1px solid #c9c2ae; border-radius:4px; padding:7px 12px;">Filtrar</button></td>
+            <td style="padding:13px 12px;"><span style="display:inline-block; font-size:13.5px; font-weight:600; background:#f4f1e8; color:#3a372f; border:1px solid #b9b2a0; border-radius:4px; padding:7px 12px;">Filtrar</span></td>
+            <td style="padding:13px 12px;"><span style="display:inline-block; font-size:13.5px; font-weight:600; background:#fff; color:#3a372f; border:1px solid #c9c2ae; border-radius:4px; padding:7px 12px; outline:2.5px solid oklch(42% 0.13 40); outline-offset:2px;">Filtrar</span></td>
+            <td style="padding:13px 12px;"><span style="display:inline-block; font-size:13.5px; font-weight:600; background:#e9e4d5; color:#201e1a; border:1px solid #a89f8a; border-radius:4px; padding:7px 12px;">Filtrar</span></td>
+            <td style="padding:13px 12px;"><span style="display:inline-block; font-size:13.5px; font-weight:600; background:#f4f1e8; color:#8a8578; border:1px dashed #c9c2ae; border-radius:4px; padding:7px 12px;">Filtrar</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:13px 12px;">Identifier, action form</td>
+            <td style="padding:13px 12px;"><a href="#states" style="font-family:'IBM Plex Mono',monospace; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80);">EVD-XXXXXX</a></td>
+            <td style="padding:13px 12px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #b9b2a0; background:#f4f1e8; color:oklch(30% 0.11 40); text-decoration:underline;">EVD-XXXXXX</span></td>
+            <td style="padding:13px 12px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:oklch(42% 0.13 40); text-decoration:underline; outline:2.5px solid oklch(42% 0.13 40); outline-offset:2px;">EVD-XXXXXX</span></td>
+            <td style="padding:13px 12px; color:#8a8578;">not applicable</td>
+            <td style="padding:13px 12px; color:#8a8578;">not applicable</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:13px 12px;">Section-index entry</td>
+            <td style="padding:13px 12px;"><span style="font-size:13.5px; color:#5c584c; border-left:2px solid transparent; padding-left:10px;">Evidência que suporta</span></td>
+            <td style="padding:13px 12px;"><span style="font-size:13.5px; color:#201e1a; border-left:2px solid #b9b2a0; padding-left:10px;">Evidência que suporta</span></td>
+            <td style="padding:13px 12px;"><span style="display:inline-block; font-size:13.5px; color:#201e1a; padding-left:10px; border-left:2px solid transparent; outline:2.5px solid oklch(42% 0.13 40); outline-offset:2px;">Evidência que suporta</span></td>
+            <td style="padding:13px 12px;"><span style="font-size:13.5px; color:#201e1a; font-weight:600; border-left:2px solid #201e1a; padding-left:10px;">Evidência que suporta</span></td>
+            <td style="padding:13px 12px; color:#8a8578;">not applicable</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1eee1;">
+            <td style="padding:13px 12px;">Interactive item surface</td>
+            <td style="padding:13px 12px;"><span style="display:inline-block; font-size:13.5px; background:#fff; border:1px solid #ddd8cb; border-radius:4px; padding:8px 12px;">Registo</span></td>
+            <td style="padding:13px 12px;"><span style="display:inline-block; font-size:13.5px; background:#f4f1e8; border:1px solid #c9c2ae; border-radius:4px; padding:8px 12px;">Registo</span></td>
+            <td style="padding:13px 12px;"><span style="display:inline-block; font-size:13.5px; background:#fff; border:1px solid #ddd8cb; border-radius:4px; padding:8px 12px; outline:2.5px solid oklch(42% 0.13 40); outline-offset:2px;">Registo</span></td>
+            <td style="padding:13px 12px;"><span style="display:inline-block; font-size:13.5px; background:#f7f4e9; border:1px solid #201e1a; border-radius:4px; padding:8px 12px; font-weight:600;">Registo</span></td>
+            <td style="padding:13px 12px; color:#8a8578;">not applicable</td>
+          </tr>
+          <tr>
+            <td style="padding:13px 12px;">Status, type, role labels</td>
+            <td style="padding:13px 12px;"><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:#f1ecdd; color:#4f4b3f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Validação:</span><span aria-hidden="true" style="color:#8a8578;">○</span><span style="font-weight:600;">Por validar</span></span></td>
+            <td colspan="4" style="padding:13px 12px; color:#8a8578;">no interaction states — these are static text. No underline, dotted rule or hover is applied to them, since any of those would imply an affordance that does not exist</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px;">
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:16px;">Long content and wrapping</div>
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <div>
+            <div style="font-size:12px; color:#8a8578; margin-bottom:6px;">Long link text — wraps, never truncates</div>
+            <a href="#states" style="font-size:14.5px; line-height:1.55;">Levantamento fotográfico de largura de passeios e obstruções em arruamentos do Centro Histórico — novembro de 2025</a>
+          </div>
+          <div>
+            <div style="font-size:12px; color:#8a8578; margin-bottom:6px;">Status text — wraps whole, never clipped or abbreviated</div>
+            <div style="max-width:190px;"><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:4px 10px; border-radius:3px; border:1px solid #ddd8cb; background:#f1ecdd; color:#4f4b3f; display:inline-flex; align-items:baseline; gap:6px; line-height:1.45; flex-wrap:wrap;"><span style="color:#8a8578;">Validação:</span><span aria-hidden="true">◐</span><span style="font-weight:600;">Parcialmente validada</span></span></div>
+          </div>
+          <div>
+            <div style="font-size:12px; color:#8a8578; margin-bottom:6px;">Identifier and a long value in a narrow column</div>
+            <div style="max-width:140px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-block;">EVD-XXXXXX</span><div style="font-size:14.5px; line-height:1.55; color:oklch(32% 0.012 60); margin-top:8px;">Levantamento fotográfico de largura de passeios e obstruções em arruamentos do Centro Histórico</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#fff; border:1px solid #ddd8cb; border-radius:6px; padding:24px 26px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:4px;">Dense FactList</div>
+        <div style="font-size:13px; color:#8a8578; margin-bottom:16px;">rows drawn from the four Source fact sections — Visão geral, Cobertura, Datas e acesso, Licenciamento. The identifier is not among them: identity belongs to the record header, not to a fact section.</div>
+        <dl style="margin:0; display:grid; grid-template-columns:auto 1fr; gap:0 20px; font-size:14.5px;">
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Editor</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">Câmara Municipal de Évora — Divisão de Mobilidade</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Tipo de recurso</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">Levantamento municipal publicado em portal de dados abertos</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Âmbito geográfico</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">Centro Histórico e Freguesia de São Mamede</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Área</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">Centro Histórico — 1,8 km²</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Temas</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">Mobilidade pedonal, acessibilidade, espaço público</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Publicação</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">14 mar. 2025</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Última verificação pela Open Évora</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">2 nov. 2025</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Frequência de atualização</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">Irregular; sem calendário publicado pela entidade responsável</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Nível de acesso</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">Consulta pública sem registo prévio</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Formato</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">CSV e PDF</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Estado do licenciamento</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">Licenciamento explícito</dd>
+          <dt style="font-size:13px; font-weight:600; color:#5c584c; padding:8px 0; border-top:1px solid #f1eee1;">Atribuição</dt><dd style="margin:0; color:oklch(32% 0.012 60); padding:8px 0; border-top:1px solid #f1eee1;">Atribuição requerida à entidade publicadora em qualquer reutilização</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 6. COMPACT ================= -->
+  <section id="compact" style="margin-bottom:76px;">
+    <h2 style="font-family:'Source Serif 4',serif; font-size:22px; color:#201e1a; margin:0 0 8px; border-bottom:2px solid #201e1a; padding-bottom:10px; font-weight:600;">6. Compact and stress specimens</h2>
+    <p style="font-size:14px; color:#5c584c; margin:0 0 26px; max-width:74ch;">Rendered at the stress viewport. Body, metadata, status and identifier text hold their desktop sizes; only measure, column count and row shape change. The title takes its explicit responsive step.</p>
+
+    <div style="display:flex; gap:26px; flex-wrap:wrap; align-items:flex-start;">
+
+      <div style="width:{{ compactWidth }}px; max-width:100%; background:oklch(97% 0.012 80); border:1px solid #ddd8cb; border-radius:8px; padding:20px 18px;">
+        <div style="font-size:12px; color:#8a8578; margin-bottom:14px;">Record read — breadcrumb, header, index, prose, references</div>
+        <div style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; font-size:14px; margin-bottom:16px;">
+          <a href="#compact">Registos</a><span style="color:#b9b2a0;" aria-hidden="true">/</span><span style="color:#3a372f;">Barreiras de acessibilidade</span>
+        </div>
+        <div style="display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; margin-bottom:10px;">
+          <span style="font-family:'Public Sans',sans-serif; font-size:13px; font-weight:600; color:#3a372f;">Problema</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:#fff; color:#3a372f;">PRB-XXXX</span>
+        </div>
+        <h3 style="font-family:'Source Serif 4',serif; font-size:24px; font-weight:600; line-height:1.3; color:oklch(22% 0.01 60); margin:0 0 12px;">Degradação progressiva da rede de passeios pedonais e ausência de rampas de acessibilidade em múltiplos arruamentos do Centro Histórico e da Freguesia de São Mamede</h3>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
+          <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:4px 10px; border-radius:3px; border:1px solid #ddd8cb; background:#f1ecdd; color:#4f4b3f; display:inline-flex; align-items:baseline; gap:6px; line-height:1.5; flex-wrap:wrap;"><span style="color:#8a8578;">Validação:</span><span aria-hidden="true">◐</span><span style="font-weight:600;">Parcialmente validada</span></span>
+          <span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Estado:</span><span style="font-weight:600;">Aberto</span></span>
+        </div>
+        <nav style="background:#f4f1e8; border-radius:4px; padding:12px 14px; margin-bottom:20px;">
+          <div style="font-size:13px; font-weight:600; color:#5c584c; margin-bottom:8px;">Nesta página</div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px 14px;">
+            <a href="#compact" style="font-size:14px;">Estado atual</a>
+            <a href="#compact" style="font-size:14px;">Evidência</a>
+            <a href="#compact" style="font-size:14px;">O que ainda não sabemos — e o que estamos a fazer</a>
+            <a href="#compact" style="font-size:14px;">Como chegámos a este problema</a>
+          </div>
+        </nav>
+        <div class="prose" style="font-family:'Source Serif 4',serif; font-size:17.5px; line-height:1.72; color:oklch(26% 0.01 60); margin-bottom:22px;">
+          <p>A investigação regista fricções documentadas entre a rede de passeios e a mobilidade reduzida em várias zonas do Centro Histórico.</p>
+          <p>Três rampas identificadas em levantamentos anteriores encontram-se degradadas, sem manutenção registada em dezoito meses.</p>
+        </div>
+        <div style="border-top:1px solid #ddd8cb; padding-top:14px; margin-bottom:18px;">
+          <div style="font-size:13px; font-weight:600; color:#5c584c; margin-bottom:10px;">Evidência</div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <a href="#compact" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">EVD-XXXXXX</a>
+              <a href="#compact" style="font-size:14.5px; line-height:1.5;">Levantamento fotográfico de largura de passeios — nov. 2025</a>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;"><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Efeito:</span><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">→</span><span style="font-weight:600;">Sustenta</span></span><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Papel:</span><span style="font-weight:600;">Observação local</span></span></div>
+              <div style="font-size:13.5px; color:#5c584c;">Fonte: <a href="#compact" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">SRC-XXXX</a></div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px; border-top:1px solid #f1eee1; padding-top:14px;">
+              <a href="#compact" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">EVD-XXXXXX</a>
+              <a href="#compact" style="font-size:14.5px; line-height:1.5;">Depoimento de residente sobre obstrução de passeio — Rua da Misericórdia</a>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;"><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Efeito:</span><span aria-hidden="true" style="font-family:'IBM Plex Mono',monospace; color:#8a8578;">→</span><span style="font-weight:600;">Delimita</span></span><span style="font-family:'Public Sans',sans-serif; font-size:13px; padding:3px 9px; border-radius:3px; border:1px solid #ddd8cb; background:oklch(97% 0.012 80); color:#3a372f; display:inline-flex; align-items:baseline; gap:6px;"><span style="color:#8a8578;">Papel:</span><span style="font-weight:600;">Contexto</span></span></div>
+              <div style="font-size:13.5px; color:#5c584c;">Fonte: <a href="#compact" style="font-family:'IBM Plex Mono',monospace; font-size:13px;">SRC-XXXX</a></div>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid #ddd8cb; padding-top:14px;">
+          <div style="font-size:13px; font-weight:600; color:#5c584c; margin-bottom:10px;">Metadados</div>
+          <dl style="margin:0; display:flex; flex-direction:column; gap:12px;">
+            <div><dt style="font-size:13px; font-weight:600; color:#5c584c;">Freguesia</dt><dd style="margin:4px 0 0; font-size:15px; color:oklch(32% 0.012 60);">São Mamede</dd></div>
+            <div><dt style="font-size:13px; font-weight:600; color:#5c584c;">Última atualização</dt><dd style="margin:4px 0 0; font-size:15px; color:oklch(32% 0.012 60);">2 nov. 2025</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div style="width:{{ compactWidth }}px; max-width:100%; background:oklch(97% 0.012 80); border:1px solid #ddd8cb; border-radius:8px; padding:20px 18px;">
+        <div style="font-size:12px; color:#8a8578; margin-bottom:14px;">Controls and feedback at the stress viewport</div>
+        <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:20px;">
+          <label style="display:block;"><span style="display:block; font-size:13px; font-weight:600; color:#5c584c; margin-bottom:5px;">Pesquisar registos</span><span style="display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #c9c2ae; border-radius:4px; padding:0 12px;"><span aria-hidden="true" style="color:#8a8578;">⌕</span><input type="search" placeholder="Título ou identificador" style="flex:1; min-width:0; font-family:'Public Sans',sans-serif; font-size:15px; color:#3a372f; padding:11px 0; border:none; background:none; outline:none;"></span></label>
+          <label style="display:block;"><span style="display:block; font-size:13px; font-weight:600; color:#5c584c; margin-bottom:5px;">Tipo de registo</span><select style="width:100%; font-family:'Public Sans',sans-serif; font-size:15px; color:#3a372f; padding:11px 12px; background:#fff; border:1px solid #c9c2ae; border-radius:4px;"><option>Todos</option><option>Problema</option></select></label>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button style="font-family:'Public Sans',sans-serif; font-size:14px; font-weight:600; background:oklch(42% 0.13 40); color:#fff; border:none; border-radius:4px; padding:11px 16px; flex:1 1 auto;">Aplicar</button>
+            <button style="font-family:'Public Sans',sans-serif; font-size:14px; font-weight:600; background:#fff; color:#3a372f; border:1px solid #c9c2ae; border-radius:4px; padding:11px 16px; flex:1 1 auto;">Limpar</button>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; gap:10px; align-items:baseline; padding:12px 14px; background:#f4f1e8; border-radius:4px;"><span aria-hidden="true" style="color:#8a8578;">◴</span><span style="font-size:15px; color:oklch(32% 0.012 60);">A carregar o registo…</span></div>
+          <div style="padding:14px 16px; background:oklch(97% 0.02 25); border:1px solid oklch(85% 0.06 25); border-left:3px solid oklch(45% 0.14 25); border-radius:4px;">
+            <div style="font-size:15px; font-weight:600; color:oklch(35% 0.13 25); margin-bottom:6px;">Não foi possível carregar o registo</div>
+            <button style="font-family:'Public Sans',sans-serif; font-size:14px; font-weight:600; background:#fff; color:#3a372f; border:1px solid #c9c2ae; border-radius:4px; padding:9px 14px; margin-top:6px;">Tentar novamente</button>
+          </div>
+          <div style="border-top:1px solid #ddd8cb; padding-top:14px; font-size:15px; line-height:1.6; color:oklch(32% 0.012 60);">Não existem evidências associadas a este problema.</div>
+          <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
+            <button aria-disabled="true" style="font-family:'Public Sans',sans-serif; font-size:14px; font-weight:600; background:#f4f1e8; color:#8a8578; border:1px dashed #c9c2ae; border-radius:4px; padding:11px 14px;">Abrir grafo de relações</button>
+            <div style="padding:10px 14px; background:#fff; border:1px solid #ddd8cb; border-radius:4px; font-size:13.5px; line-height:1.55; color:#3a372f;">Indisponível: este registo ainda não tem relações resolvidas.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:13px; color:#8a8578; margin:18px 0 0; max-width:76ch;">A Problem's evidence list contains EVD records only; Source provenance appears beneath the observation as an explicit “Fonte” line, never as an item in the list. Reference rows stack rather than compete for one line, so identifier, title and state each keep a full-width run. Action targets are 44px tall. Nothing here is a compact-only type scale.</p>
+  </section>
+
+  <!-- ================= 7. GATE ================= -->
+  <section id="gate" style="margin-bottom:24px;">
+    <h2 style="font-family:'Source Serif 4',serif; font-size:22px; color:#201e1a; margin:0 0 20px; border-bottom:2px solid #201e1a; padding-bottom:10px; font-weight:600;">7. Gate C2 — proposed freeze versus flexible</h2>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:24px;">
+      <div style="background:#fff; border:1px solid #201e1a; border-radius:6px; padding:22px 24px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#201e1a; margin-bottom:14px;">Proposed to freeze</div>
+        <ol style="margin:0; padding-left:20px; font-size:14.5px; line-height:1.7; color:#2e2b25;">
+          <li>The seven content typography roles and the family assigned to each. The sans “UI / panel label” specimen demonstrates the interface voice and does not add an eighth editorial role.</li>
+          <li>Underline-at-rest links and one shared focus treatment across all native interactive elements.</li>
+          <li>Three separator weights; no fourth.</li>
+          <li>Three surface recipes — plain outlined, muted inset, interactive item — and the rule that ordinary adjacent content is unboxed.</li>
+          <li>720 / 44 / 216, the sticky desktop rail, and recomposition-not-shrinking in the fit fallback and compact.</li>
+          <li>Seven distinct semantic dimensions — identifier, record type, validation status, evidence status, Problem lifecycle status, PRB→EVD effect, research role — each with its own domain component. No component accepts values from another dimension.</li>
+          <li>Each dimension is identifiable from explicit text and context, not from styling. Shared inline-label anatomy is permitted where it creates no ambiguity.</li>
+          <li>Effect and research role are properties of a PRB→EVD relationship. They appear wherever that relationship is explicitly presented — Evidence use inside a Problem, Problem-use inside an EVD detail — and never as intrinsic properties of an EVD or SRC.</li>
+          <li>Evidence status is the Problem's investigation state and is presented only in explicit Problem-state context, never on an individual evidence row.</li>
+          <li>When a dimension caption is rendered inline, the value takes its compact PT-PT form (Validação: Validada, Evidência: Corroborada); without a caption, the full public label is used unchanged.</li>
+          <li>A Problem's evidence list contains EVD records only; Source provenance is a separate explicit line.</li>
+          <li>Status always carries a text word; colour and glyph are reinforcement only.</li>
+          <li>Dashed borders mean unavailability and nothing else; muted inset means aside, caveat or progress and nothing else; no static label carries an underline of any kind.</li>
+          <li>Technical inspection shows raw canonical values; the public gloss never appears there and never replaces it.</li>
+          <li>ProgressMessage, ErrorNotice and EmptyState get three visibly different treatments; only ErrorNotice takes a hued border.</li>
+          <li>Rail and compact section indexes are visually different shapes, not one component at two widths.</li>
+          <li>Static labels receive no interaction states.</li>
+        </ol>
+      </div>
+      <div style="background:#fff; border:1px dashed #b9b2a0; border-radius:6px; padding:22px 24px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:17px; font-weight:600; color:#5c584c; margin-bottom:14px;">Left flexible for implementation</div>
+        <ol style="margin:0; padding-left:20px; font-size:14.5px; line-height:1.7; color:#2e2b25;">
+          <li>Exact px sizes, weights, line-heights, and whether the 13px floor survives corpus validation.</li>
+          <li>Exact colour values and all contrast ratios, to be measured against rendered implementation colours.</li>
+          <li>Focus ring thickness and offset; radius and border weights throughout.</li>
+          <li>The exact anatomy assignment across the five inline-label dimensions, including whether validation and evidence status keep a tint and whether the effect keeps its arrow. Semantic distinctness is the requirement; the visual assignment is a proposal.</li>
+          <li>Whether the dimension caption is always rendered inline or sometimes supplied by an adjacent label.</li>
+          <li>The 68ch versus 72ch production ceiling, pending Storybook and corpus validation.</li>
+          <li>The ● ◐ ○ glyph set, pending accessibility and cultural review.</li>
+          <li>Whether the compact index is a wrapping link list or a disclosure.</li>
+          <li>Whether the desktop rail ever becomes inline for shorter records — deferred by Gate C1 and untouched here.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div style="margin-top:26px; background:#f7f4e9; border:1px solid #e3ddc9; border-radius:6px; padding:20px 24px; max-width:80ch;">
+      <div style="font-family:'Public Sans',sans-serif; font-size:15px; font-weight:600; color:#201e1a; margin-bottom:10px;">Scope statement</div>
+      <p style="font-size:14px; line-height:1.7; color:#3a372f; margin:0 0 10px;">This artefact contains no production code, no React APIs, no CSS custom-property names, and no complete application pages. Overview, Records, Record Detail and Problem View remain undesigned as pages. Graph is out of scope in full.</p>
+      <p style="font-size:14px; line-height:1.7; color:#3a372f; margin:0 0 10px;">All identifiers are synthetic (PRB-XXXX, EVD-XXXXXX, SRC-XXXX). All status, effect and role examples use existing Explorer public vocabulary supplied at Gate C2 review: validation status (Por validar, Parcialmente validado, Validado), evidence status (Evidência identificada, Evidência corroborada), Problem lifecycle status (Aberto, Rejeitado, Duplicado, Não digital, Já resolvido, Evidência insuficiente), PRB→EVD effects (Sustenta, Refina, Delimita, Contradiz) and PRB→EVD research roles (Observação local, Contexto, Mecanismo comparativo, Resposta comparativa, Resposta existente, Resposta planeada). No vocabulary is invented here.</p>
+      <p style="font-size:14px; line-height:1.7; color:#3a372f; margin:0 0 10px;">Section-index entries use representative Problem section labels; canonical-path specimens reference EVD records only, since Source provenance is owned by EVD provenance. Source fact fixtures use the four approved Source fact sections and carry no invented field. No confidence, quality or completeness claim is asserted by any fixture.</p>
+      <p style="font-size:14px; line-height:1.7; color:#3a372f; margin:0;">360px remains a QA and stress viewport, not a breakpoint. This revision responds to the second Gate C2 review pass; the gate is not marked PASS and remains open for human review.</p>
+    </div>
+  </section>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;compactWidth&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:360,&quot;min&quot;:320,&quot;max&quot;:767,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Review controls&quot;},&quot;proseMeasure&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;68ch&quot;,&quot;options&quot;:[&quot;68ch&quot;,&quot;72ch&quot;,&quot;68–72ch&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Review controls&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      isOpen: true,
+      compactWidth: this.props.compactWidth ?? 360,
+      proseMeasure: this.props.proseMeasure ?? "68ch"
+    };
+  }
+}
+</script>
+</body>
+</html>
