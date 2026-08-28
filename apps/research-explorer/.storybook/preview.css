@@ -1,14 +1,13 @@
 /* Workbench-only baseline. This intentionally does not import src/index.css
-   and is not a design-system foundation or production styling contract. */
+   and is not a design-system foundation or production styling contract.
+   Foundation typography/colour/spacing rules live in
+   ../src/styles/foundations.css, loaded separately in preview.ts; only
+   genuinely workbench-specific canvas layout stays here. */
 
 html,
 body,
 #storybook-root {
   min-height: 100%;
-}
-
-body {
-  margin: 0;
 }
 
 .workbench-smoke {

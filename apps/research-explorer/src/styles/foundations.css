@@ -1,0 +1,218 @@
+/* DS-04B — Foundation layer (implementation candidate)
+   Implements the bounded global behaviour approved by docs/design/foundations.md
+   and docs/design/component-visual-contract.md. Consumes styles/tokens.css.
+
+   Storybook-only for now: not imported by the production application. No
+   component-specific, record-, Source-, Evidence-, Problem-, or Graph-
+   specific selectors belong here — see docs/design/component-model.md §2.1. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color: var(--color-ink-primary);
+  background: var(--color-surface-reading);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  font-weight: var(--text-interface-body-weight);
+  line-height: var(--text-interface-body-line-height);
+  color: var(--color-ink-primary);
+  background: var(--color-surface-reading);
+}
+
+/* ---- Reading-first typography hierarchy --------------------------------
+   Serif is the reading voice for headings and sustained prose; sans is the
+   interface voice; mono identifies technical values only. */
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-reading);
+  color: var(--color-ink-primary);
+  margin: 0 0 var(--space-tight);
+}
+
+h1 {
+  font-size: var(--text-reading-h1-size);
+  font-weight: var(--text-reading-h1-weight);
+  line-height: var(--text-reading-h1-line-height);
+}
+
+@media (max-width: 767px) {
+  h1 {
+    font-size: var(--text-reading-h1-size-compact);
+  }
+}
+
+h2 {
+  font-size: var(--text-reading-h2-size);
+  font-weight: var(--text-reading-h2-weight);
+  line-height: var(--text-reading-h2-line-height);
+}
+
+h3 {
+  font-size: var(--text-reading-h3-size);
+  font-weight: var(--text-reading-h3-weight);
+  line-height: var(--text-reading-h3-line-height);
+}
+
+/* Sustained prose: readable measure, deliberate rhythm. Supporting text and
+   metadata may use a shorter measure appropriate to their role. */
+.fnd-prose {
+  font-family: var(--font-reading);
+  font-size: var(--text-reading-body-size);
+  font-weight: var(--text-reading-body-weight);
+  line-height: var(--text-reading-body-line-height);
+  max-width: var(--measure-reading);
+  color: var(--color-ink-primary);
+}
+
+.fnd-prose > * + * {
+  margin-top: var(--space-standard);
+}
+
+/* Interface text: navigation, labels, metadata, supporting text, controls. */
+.fnd-interface-text {
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+  color: var(--color-ink-secondary);
+  max-width: var(--measure-supporting);
+}
+
+.fnd-label {
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  line-height: var(--text-interface-label-line-height);
+  color: var(--color-ink-secondary);
+}
+
+/* Technical identifiers: identity, never emphasis. */
+.fnd-technical {
+  font-family: var(--font-technical);
+  font-size: var(--text-technical-size);
+  font-weight: var(--text-technical-weight);
+  line-height: var(--text-technical-line-height);
+  color: var(--color-ink-faint);
+}
+
+/* ---- Links --------------------------------------------------------------
+   Underlined at rest; hover darkens ink and thickens the underline, so the
+   change is perceptible without depending on colour alone. */
+a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+  text-decoration-thickness: 2px;
+}
+
+/* ---- Focus ----------------------------------------------------------
+   One shared treatment across every native interactive element. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-focus);
+}
+
+/* ---- Native control baseline ------------------------------------------
+   Only what is required to make Foundation typography/focus/target-size
+   behaviour coherent on native elements; no component variants. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: var(--color-ink-primary);
+}
+
+button {
+  min-height: var(--target-min);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  background: var(--color-surface-raised);
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  padding: var(--p-space-2) var(--space-standard);
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  min-height: var(--target-min);
+  background: var(--color-surface-raised);
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  padding: var(--p-space-2) var(--space-standard);
+}
+
+/* Removes the UA-default dd { margin-left: 40px }; label/value spacing is
+   Foundation typography rhythm (margin between fnd-label and fnd-interface-
+   text), not an inherited indent. */
+dl,
+dd {
+  margin: 0;
+}
+
+/* ---- Separators / surfaces ---------------------------------------------
+   Restrained grammar only: ordinary adjacent content is not boxed by
+   default. Three separator weights and two neutral surface recipes. */
+.fnd-separator {
+  border: none;
+  border-top: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  margin: 0;
+}
+
+.fnd-separator--faint {
+  border-top-color: var(--color-separator-faint);
+}
+
+.fnd-separator--heading {
+  border-top-width: var(--p-border-width-heading);
+  border-top-color: var(--color-separator-emphasis);
+}
+
+.fnd-surface-raised {
+  background: var(--color-surface-raised);
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+}
+
+.fnd-surface-subtle {
+  background: var(--color-surface-subtle);
+  border: var(--p-border-width-hairline) solid var(--color-separator-faint);
+  border-radius: var(--radius-control);
+}
+
+/* ---- Visually-hidden utility --------------------------------------------
+   One shared clip technique (component-model.md §4.1). */
+.fnd-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

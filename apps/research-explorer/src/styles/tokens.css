@@ -1,0 +1,159 @@
+/* DS-04B — Foundation tokens (implementation candidate)
+   Scope: docs/design/foundations.md (APPROVED) and
+   docs/design/component-visual-contract.md (DS-03B / Gate C2 PASS).
+
+   This file is consumed by Storybook only. It is not yet imported by the
+   production application (see apps/research-explorer/src/index.css).
+
+   Primitives (--p-*) are raw values with no meaning of their own. Semantic
+   roles are the only tokens components/stories should consume. Every value
+   below that Gate C2 left implementation-flexible (font sizes, weights,
+   line-heights, colour values, radii, focus measurements, the 68ch/72ch
+   reading ceiling) is a bounded candidate recorded here in code, not a new
+   canonical design decision. */
+
+:root {
+  /* ---- Primitives: colour ------------------------------------------- */
+  --p-color-paper: oklch(97% 0.012 80);
+  --p-color-surface: #ffffff;
+  --p-color-surface-muted: #f7f4e9;
+  --p-color-ink-90: oklch(22% 0.01 60);
+  --p-color-ink-70: oklch(38% 0.015 60);
+  --p-color-ink-60: #6b675f;
+  --p-color-line: #ddd8cb;
+  --p-color-line-faint: #e3ddc9;
+  --p-color-line-strong: #201e1a;
+  --p-color-clay: oklch(42% 0.13 40);
+  --p-color-clay-dark: oklch(30% 0.11 40);
+  --p-color-status-affirmed: oklch(38% 0.1 145);
+  --p-color-status-pending: oklch(42% 0.12 55);
+  --p-color-error-ink: oklch(35% 0.13 25);
+  --p-color-error-line: oklch(85% 0.06 25);
+  --p-color-error-surface: oklch(97% 0.02 25);
+
+  /* ---- Primitives: type families -------------------------------------
+     Fontsource packages provide the local font files; DS-04B evaluates
+     Public Sans for the interface role in place of production's Inter
+     (see apps/research-explorer/src/main.tsx, unchanged in this phase). */
+  --p-font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --p-font-sans: "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --p-font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+
+  /* ---- Primitives: spacing scale (4/8/12/16/24/32/48/64) ------------- */
+  --p-space-1: 4px;
+  --p-space-2: 8px;
+  --p-space-3: 12px;
+  --p-space-4: 16px;
+  --p-space-5: 24px;
+  --p-space-6: 32px;
+  --p-space-7: 48px;
+  --p-space-8: 64px;
+
+  /* ---- Primitives: radii/borders/focus -------------------------------- */
+  --p-radius-sm: 2px;
+  --p-radius-md: 4px;
+  --p-radius-lg: 6px;
+  --p-border-width-hairline: 1px;
+  --p-border-width-heading: 2px;
+  --p-focus-ring-width: 2.5px;
+  --p-focus-ring-offset: 2px;
+  --p-tap-min: 44px;
+
+  /* ==================================================================
+     Semantic roles — components and stories should consume these, not
+     the primitives above.
+     ================================================================== */
+
+  /* Surfaces */
+  --color-surface-reading: var(--p-color-paper);
+  --color-surface-raised: var(--p-color-surface);
+  --color-surface-subtle: var(--p-color-surface-muted);
+
+  /* Ink */
+  --color-ink-primary: var(--p-color-ink-90);
+  --color-ink-secondary: var(--p-color-ink-70);
+  --color-ink-muted: var(--p-color-ink-60);
+  --color-ink-faint: var(--p-color-ink-60);
+
+  /* Separators */
+  --color-separator-standard: var(--p-color-line);
+  --color-separator-faint: var(--p-color-line-faint);
+  --color-separator-emphasis: var(--p-color-line-strong);
+
+  /* Accent / interaction */
+  --color-accent: var(--p-color-clay);
+  --color-accent-hover: var(--p-color-clay-dark);
+
+  /* Feedback (status text always pairs with an explicit word — see
+     foundations.md "Colour and contrast intent"; colour never carries
+     meaning alone) */
+  --color-feedback-affirmed: var(--p-color-status-affirmed);
+  --color-feedback-pending: var(--p-color-status-pending);
+  --color-feedback-error-ink: var(--p-color-error-ink);
+  --color-feedback-error-line: var(--p-color-error-line);
+  --color-feedback-error-surface: var(--p-color-error-surface);
+
+  /* Typography roles */
+  --font-reading: var(--p-font-serif);
+  --font-interface: var(--p-font-sans);
+  --font-technical: var(--p-font-mono);
+
+  /* Reading hierarchy — sizes/weights/line-heights are bounded DS-04B
+     candidates per the approved DS-03B rendered direction; not frozen. */
+  --text-reading-h1-size: 32px;
+  --text-reading-h1-size-compact: 24px;
+  --text-reading-h1-weight: 600;
+  --text-reading-h1-line-height: 1.3;
+
+  --text-reading-h2-size: 22px;
+  --text-reading-h2-weight: 600;
+  --text-reading-h2-line-height: 1.35;
+
+  --text-reading-h3-size: 18px;
+  --text-reading-h3-weight: 600;
+  --text-reading-h3-line-height: 1.4;
+
+  --text-reading-body-size: 17.5px;
+  --text-reading-body-weight: 400;
+  --text-reading-body-line-height: 1.72;
+
+  --text-interface-body-size: 15px;
+  --text-interface-body-weight: 400;
+  --text-interface-body-line-height: 1.6;
+
+  --text-interface-label-size: 13px;
+  --text-interface-label-weight: 600;
+  --text-interface-label-line-height: 1.4;
+
+  --text-interface-heading-size: 17px;
+  --text-interface-heading-weight: 600;
+  --text-interface-heading-line-height: 1.3;
+
+  --text-technical-size: 13px;
+  --text-technical-weight: 500;
+  --text-technical-line-height: 1.3;
+
+  /* Reading measure — Gate C2 leaves 68ch vs 72ch open; 72ch chosen as the
+     bounded candidate matching the approved rendered artefact. */
+  --measure-reading: 72ch;
+  --measure-supporting: 44ch;
+
+  /* Spacing roles */
+  --space-tight: var(--p-space-2);
+  --space-standard: var(--p-space-4);
+  --space-loose: var(--p-space-5);
+  --space-section: var(--p-space-7);
+
+  /* Radii roles */
+  --radius-control: var(--p-radius-md);
+  --radius-surface: var(--p-radius-lg);
+  --radius-focus: var(--p-radius-sm);
+
+  /* Focus */
+  --focus-ring-color: var(--p-color-clay);
+  --focus-ring-width: var(--p-focus-ring-width);
+  --focus-ring-offset: var(--p-focus-ring-offset);
+
+  /* Minimum interactive target */
+  --target-min: var(--p-tap-min);
+}
