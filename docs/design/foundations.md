@@ -30,7 +30,7 @@ The current visual candidates are Source Serif 4, Public Sans, and IBM Plex Mono
 
 Sustained prose uses a deliberate, readable measure rather than inheriting arbitrary container widths. Supporting text and metadata may use a shorter measure appropriate to their role.
 
-The existing desktop reading geometry remains valid: a 720px reading column, a 44px gap, and a 216px supporting rail. This geometry is a layout relationship, not authorization to shrink essential text to make the composition fit.
+The existing desktop reading geometry remains valid when the available frame can accommodate it: a 720px reading column, a 44px gap, and a 216px supporting rail. This geometry is a layout relationship, not authorization to shrink essential text to make the composition fit.
 
 ### Colour and contrast intent
 
@@ -68,7 +68,7 @@ The existing responsive model remains valid:
 - desktop at 768px and above;
 - 360px as a compact QA and stress viewport, not an additional breakpoint.
 
-Desktop retains the 720/44/216 reading composition. Compact presentation recomposes it into one reading column, with supporting rail content placed in flow. Recomposition changes measure and layout, not the importance or legibility of the content. Body text, metadata, status text, and other essential reading text do not shrink merely to fit; headlines may use an explicit responsive size step.
+The product boundary remains compact at 767px and below and desktop at 768px and above. Within the desktop product range, the approved 720/44/216 reading composition applies when the available frame can accommodate it. The existing 768–1059px geometry-only fit fallback may recompose the reading layout into one column; it does not activate compact typography or navigation and does not create a third product breakpoint. Compact presentation also recomposes the reading layout into one column, with supporting rail content placed in flow. Recomposition changes measure and layout, not the importance or legibility of the content. Body text, metadata, status text, and other essential reading text must not shrink to force the two-column composition to fit; headlines may use an explicit responsive size step.
 
 ## Not yet frozen implementation details
 
@@ -82,7 +82,7 @@ The following remain provisional and require implementation work, rendered valid
 - exact spacing values or scales, separator weights, radii, borders, and other surface details;
 - status glyphs or icons, identifier/status variants, and whether particular states require visually distinct treatments;
 - exact link-decoration and focus-ring measurements;
-- whether the desktop metadata rail should ever become inline for shorter records;
-- component taxonomy, component variants, React structure or APIs, CSS custom-property names, and token names or values.
+- whether the desktop metadata rail should ever become inline for shorter records; this remains deferred by DS-03A / Gate C1;
+- exact React APIs, implementation file structure, CSS class/custom-property names, and token names or values. Approved component and layout boundaries are owned by [the DS-03A component and layout contract](component-model.md).
 
 These open details must not be inferred from the approved Claude Design HTML or from historical prototypes. They remain candidates until separately implemented, validated, and approved.

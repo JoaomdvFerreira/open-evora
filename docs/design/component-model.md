@@ -1,8 +1,8 @@
 # DS-03A — Research Explorer Component & Layout Contract
 
-Status: **PROPOSED — architecture analysis for human Gate C1**
+Status: **APPROVED — DS-03A / Gate C1 PASS**
 
-Scope: component and layout boundaries derived from the current Research Explorer. This document proposes a bounded architecture for later implementation. It does not approve component APIs, freeze token values, redesign pages, or change production React/CSS.
+Scope: approved component and layout boundaries derived from the current Research Explorer. This document defines a bounded architecture for later implementation. It does not approve exact component APIs, freeze token values, redesign pages, or change production React/CSS.
 
 The current implementation is the primary evidence for current-state claims. The DS-01 audit in `docs/design/audits/ds-01-current-state/audit.md` remains a useful baseline, but code that changed after that snapshot takes precedence. In particular, `RecordsExplorer` now renders the records list and a selected full-page detail mutually exclusively; `.records-explorer` no longer contains a persistent table-and-detail split.
 
@@ -10,11 +10,11 @@ The current implementation is the primary evidence for current-state claims. The
 
 1. **Canonical meaning stays outside visual primitives.** Foundation and layout code may control appearance and geometry. It must not infer research state, translate canonical values, decide section presence, group Evidence, or derive Source/Problem relationships.
 2. **Visual similarity is insufficient evidence for semantic reuse.** Record type, canonical identifier, Problem state, PRB→EVD effect, research role, absence, unavailability, methodology, and caveat content remain distinct dimensions even when they use similar borders, radii, or compact text.
-3. **Reuse proceeds from layout to semantics.** Prefer a shared frame, flow, grid, surface, or label recipe before introducing a polymorphic React component. Add a shared domain component only when the same domain meaning and behaviour recur.
+3. **Reuse proceeds from layout to semantics, CSS first.** Prefer a shared frame, flow, surface, or label recipe before introducing a polymorphic React component. Layout primitives are CSS-first and require a React wrapper only when later implementation demonstrates a real structural or behavioural reason. A wrapper must not exist merely to carry a class. Add a shared domain component only when the same domain meaning and behaviour recur.
 4. **Composition owns landmarks and reading order.** Page/domain code retains `<main>`, `<article>`, `<section>`, `<aside>`, headings, accessible names, conditional presence, and section order. A generic `Section` component must not conceal those decisions.
 5. **Human-readable meaning leads; technical identity remains available.** Shared identifier presentation must never turn an ID into a status or allow a technical label to dominate titles, observations, or sustained prose.
-6. **The approved reading relationship is invariant.** The desktop reading composition remains a 720px main measure, a 44px gap, and a 216px supporting rail inside the existing 980px frame. Later implementation may name that relationship but must not change its values in this phase.
-7. **Responsive reuse means recomposition, not shrinking.** The current `767px`/`768px` boundary and the geometry-only `768px–1059px` fallback remain intact. Compact and intermediate layouts move supporting content in flow or provide an equivalent in-flow index; essential text does not shrink to preserve a two-column shape.
+6. **The approved reading relationship is invariant when it fits.** Within the desktop product range, the reading composition remains a 720px main measure, a 44px gap, and a 216px supporting rail inside the existing 980px frame when the available frame can accommodate it. Later implementation may name that relationship but must not change its values in this phase.
+7. **Responsive reuse means recomposition, not shrinking.** The product boundary remains compact at `767px` and below and desktop at `768px` and above. The existing `768px–1059px` geometry-only fallback may recompose the reading layout into one column without activating compact typography/navigation or creating a third product breakpoint. Compact and fit-fallback layouts move supporting content in flow or provide an equivalent in-flow index; essential text must not shrink to force the two-column shape.
 8. **Native semantics come first.** Use `<a>`, `<button>`, `<input>`, `<select>`, `<fieldset>`, `<details>`, and `<summary>` directly. Shared styling must not erase the difference between navigation and activation or introduce headless/external primitives without demonstrated interaction complexity.
 9. **A small demonstrated system is preferable to a catalogue.** This contract admits only primitives supported by multiple current call sites. It does not add a generic modal, tooltip system, data table, form framework, page-header framework, or card library.
 10. **Migration is incremental and reversible.** Existing classes and components remain valid until their call sites have moved and deterministic/rendered checks pass. `RETIRE-LATER` never authorizes deletion during DS-03A.
@@ -31,7 +31,7 @@ Foundation may provide CSS variables and low-level recipes. It must not expose c
 
 DOM-neutral geometry controlling width, flow, alignment, wrapping, and responsive recomposition. Layout primitives accept content but do not choose headings, landmarks, labels, order, or presence.
 
-The bounded proposed set is:
+The bounded approved set is CSS-first:
 
 - `ShellFrame`: width and horizontal centring only;
 - `ReadingLayout`: main reading column plus supporting rail and current recomposition behaviour;
@@ -39,11 +39,13 @@ The bounded proposed set is:
 - `Cluster`: wrapping inline flow with alignment and demonstrated spacing variants;
 - `SectionFlow`: spacing between already-semantic sections, implemented as a class/recipe rather than a React `<Section>` owner.
 
+`ShellFrame`, `Stack`, `Cluster`, and `SectionFlow` do not require React wrappers. `ReadingLayout` also remains CSS-first unless later implementation demonstrates a real structural or behavioural reason for a wrapper. None may gain a wrapper merely to carry classes.
+
 A generic `Grid` is not admitted yet. The current grids encode materially different concerns; the repeated public fact layout belongs to `FactList`, while Overview, Records, and Graph grids remain local.
 
 ### 2.3 Generic UI
 
-Reusable accessible presentation whose meaning is supplied by the caller: breadcrumb structure, section indexes, fact lists, feedback framing, unavailable-control explanation, native action/control recipes, surface recipes, and visual label anatomy.
+Reusable accessible presentation whose meaning is supplied by the caller: breadcrumb structure, section-index presentation, fact lists, explicit progress/error/empty boundaries, unavailable-control explanation, native action/control recipes, surface recipes, and visual label anatomy.
 
 Generic UI may enforce HTML and accessibility behaviour. It must not determine whether a Source field is present, what a Problem status means, which Evidence belongs to a group, or whether an absent value means `NO`, `UNKNOWN`, unavailable, or not authored.
 
@@ -75,17 +77,17 @@ This is a bounded inventory of meaningful presentation boundaries, not a complet
 | Problem reading | `apps/research-explorer/src/problem/ProblemView.tsx` | Problem header, authored current state, Evidence partition, open questions, contradiction search, investigation path, section index, rail, focus entry, and error states. Presentation is dense but its boundaries correspond to distinct authored concepts. |
 | Problem history | `apps/research-explorer/src/problem/ProblemHistoryView.tsx` | Authored material history projection with state transitions and Evidence references. It reuses Problem list/item styles appropriately but duplicates the Problem breadcrumb structure. |
 | PRB context nav | `apps/research-explorer/src/navigation/ContextTabs.tsx`, `.context-tabs` | One real shared domain component used by Detail, Problem, History, and dormant Graph context. Its identity-preserving PRB semantics make it domain-owned, not generic tabs. |
-| Section navigation | `CompactSectionIndex`, `SourceCompactSectionIndex`, `SourceReadingRailIndex`, `EvdReadingRail`, `ProblemReadingRail`, and the compact index inside `ProblemHelpDisclosure` | Callers correctly own section order/presence, but rail/compact `<nav>/<ul>/<a>` markup and styling are repeated. This supports one semantics-free `SectionIndex` renderer with domain-provided entries. |
+| Section navigation | `CompactSectionIndex`, `SourceCompactSectionIndex`, `SourceReadingRailIndex`, `EvdReadingRail`, `ProblemReadingRail`, and the compact index inside `ProblemHelpDisclosure` | Callers correctly own section order/presence, while rail/compact navigation anatomy and styling recur. This supports shared semantics-free section-index presentation with domain-provided entries; it does not require rail and compact to use one React component when their semantic DOM differs. |
 | Metadata/facts | `.detail-provenance-grid`, `.problem-scope-grid`, `.problem-header-facts`, `.evd-relation-facts` | Repeated `<dl>` geometry exists. `.detail-provenance-grid` is reused across generic, PRB, SRC, and EVD views; `problem-scope-grid` is already shared by Problem and EVD. Values and presence remain caller-owned. |
 | Identifier/type | `formatTypedId`, `TypedLinkButton`, `RelatedRecordButton`, `.detail-technical-field`, `.source-finding-id`, `.detail-reference`, `.prb-reference-target`, `.detail-type-badge`, `.narrow-record-type` | Canonical record identity and record type recur in static and actionable forms. Current styling is fragmented, and type prefixes are sometimes presented through pill recipes that resemble state. Identity and type should share domain components, never status semantics. |
 | State/effect/role labels | `StatusChip` in `ProblemView`, `.overview-statuses`, `.effect-chip`, `.record-role-chip`, `.status-chip`, `.evd-identity-fact` | The visual anatomy overlaps, but the canonical dimensions do not. `.record-role-chip` is particularly overloaded: generic schema summary fields and EVD research roles use the same class name. Only base visual anatomy should consolidate by default. |
 | Evidence/reference rows | `EvidenceCard`, `OpenQuestionEvidenceRefs`, `PrbCanonicalReferences`, `RelationshipList`, `SourceFindingsSection`, `SourceInvestigationSection`, and EVD Source/Problem lists | Rows answer different questions: observation, exact canonical path, related-record grouping, Source provenance, or Problem use. A generic “reference row” would erase those distinctions. A shared atomic record link/identifier is sufficient. |
 | Surfaces | `.record-provenance`, `.effect-summary`, `.problem-help`, `.records-controls`, `.evidence-card`, `.open-question-item`, `.evd-problem-card`, `.problem-identity` | Repeated border/background/padding recipes exist, but the boxes express different boundaries. Consolidate visual surface recipes; keep landmarks/content in domain/page owners. |
 | Disclosures/asides | `ReadingGuide`, `ProblemHelpDisclosure`, Overview status explanation, `TechnicalDisclosure`, `PrbRawTechnicalDisclosure`, Source/EVD technical sections | Native `<details>` is consistently appropriate. Their content semantics and default placement differ; there is no evidence for a polymorphic disclosure React component. Canonical technical inspection has enough same-domain repetition for a domain wrapper. |
-| Feedback/absence | repeated `role="status"`, `role="alert"`, retry buttons, plain empty messages, `.field-empty`, `UnavailableNote` | Loading and error semantics are consistent but repeated. `.field-empty` currently spans absent canonical values, missing effects, and relationship emptiness, which is too broad a semantic name for a durable primitive. `UnavailableNote` is a proven accessible component and remains distinct. |
+| Feedback/absence | repeated `role="status"`, `role="alert"`, retry buttons, plain empty messages, `.field-empty`, `UnavailableNote` | Loading, error, and empty semantics are consistent but repeated. They require separate `ProgressMessage`, `ErrorNotice`, and `EmptyState` boundaries rather than one mode-driven public component. `.field-empty` spans absent canonical values, missing effects, and relationship emptiness, which is too broad a semantic name for a durable primitive. `UnavailableNote` remains distinct. |
 | Graph | `apps/research-explorer/src/graph/GraphExplorer.tsx`, `apps/research-explorer/src/graph/GraphCanvas.tsx` | A supplementary, domain-owned view with specialised controls and an HTML fallback. Graph redesign and Graph-specific component extraction are outside DS-03A. |
 
-## 4. Proposed component and layout taxonomy
+## 4. Approved component and layout taxonomy
 
 ### 4.1 Foundation contract
 
@@ -100,8 +102,8 @@ This is a bounded inventory of meaningful presentation boundaries, not a complet
 | Primitive | Contract | Demonstrated users | Admitted variants |
 | --- | --- | --- | --- |
 | `ShellFrame` | Width and horizontal centring only; no page padding, vertical spacing, landmark, or surface | Chrome inner, Overview, Records, Record Detail, Problem View, History | No semantic variants. A full-bleed parent may contain it. |
-| `ReadingLayout` | Approved main/rail relationship, sticky desktop rail, geometry-only intermediate recomposition, compact in-flow/equivalent content | Record Detail, Problem View, Source, EVD | `rail`, `no-rail`; rail visibility/content remains caller controlled. No automatic “short record” mode until approved. |
-| `Stack` | Vertical flow only | Rail actions, Evidence lists, open-question/history lists, Graph controls, Source/EVD lists, section nav lists | A bounded spacing choice derived from current small/standard/section gaps; optional alignment. |
+| `ReadingLayout` | Approved main/rail relationship, sticky desktop rail, geometry-only intermediate recomposition, compact in-flow/equivalent content | Record Detail, Problem View, Source, EVD | `rail`, `no-rail`; rail visibility/content remains caller controlled. Automatic “short record” behaviour is deferred. |
+| `Stack` | Vertical flow only | Rail actions, Evidence lists, open-question/history lists, Source/EVD lists, section nav lists | A bounded spacing choice derived from current small/standard/section gaps; optional alignment. |
 | `Cluster` | Inline or inline-flex wrapping only | Status/effect/role groups, EVD identity facts, reference link groups, Overview actions | A bounded spacing choice; start/centre/baseline alignment; no semantic tone. |
 | `SectionFlow` | Vertical separation for already-semantic sections | `.problem-section`, `.record-editorial-section`, PRB technical sections | Standard and compact separation only if current rendered evidence supports both. CSS recipe/class, not a landmark-owning React component. |
 
@@ -112,9 +114,11 @@ This is a bounded inventory of meaningful presentation boundaries, not a complet
 | Candidate | Responsibility | Variants and exclusions |
 | --- | --- | --- |
 | `Breadcrumb` | Named navigation landmark, ordered actions/items, separator, current item | Caller supplies actual navigation element/action and current label. It never assumes `Registos` or `Visão geral`, derives a route, or formats an ID. |
-| `SectionIndex` | Render caller-provided anchor entries as accessible rail or compact navigation | `rail` and `compact`; optional nested entries. Domain code remains sole owner of entry order, label, anchor, and presence. |
+| Section-index presentation | Render caller-provided anchor entries as accessible rail or compact navigation | Shared styling/rendering helpers may support flat or nested entries. Domain code remains sole owner of entry order, label, anchor, and presence. Rail and compact may remain separate React components when their semantic DOM differs. |
 | `FactList` | Render a semantic `<dl>` from explicitly supplied labels and values with consistent geometry | `reading` and `compact` density only if both are demonstrated. It performs no field extraction, translation, absence inference, or ordering. |
-| `FeedbackMessage` | Enforce accessible structure for repeated progress, error/retry, and empty-result presentation | Explicit semantic modes: progress uses live status; error uses alert; empty is ordinary content. “Unknown”, “not authored”, “unavailable”, and caveat are not automatic modes. |
+| `ProgressMessage` | Present in-progress loading/processing feedback with an explicit live status boundary | Uses the appropriate status/live-region semantics; it does not render errors or empty results. |
+| `ErrorNotice` | Present an error boundary with explicit alert semantics and an optional caller-owned retry action | Error title, copy, and retry action remain caller-owned; it does not render progress or empty results. |
+| `EmptyState` | Present an explicitly established empty result/collection as ordinary content | No automatic live region or alert. It must not reinterpret missing, `UNKNOWN`, unavailable, or not-authored values as empty. |
 | `UnavailableNote` | Explain a focusable `aria-disabled` control on hover and keyboard focus | Keep the current `useUnavailableNote` behaviour. It is not a general tooltip or status component. |
 | Native action recipes | Apply consistent text-action, outlined-action, and tab-action appearance to the correct native element | CSS recipes/classes, not a polymorphic link/button component. Disabled versus `aria-disabled` stays interaction-owned. |
 | Surface recipes | Provide border/background/padding anatomy without choosing HTML or meaning | At most plain outlined, muted inset, and interactive item recipes demonstrated by current surfaces. No default `Card` wrapper and no automatic cardification. |
@@ -155,19 +159,19 @@ Native `<details>/<summary>` remains the generic disclosure primitive. A React `
 
 `.shell-frame` is the canonical outer-frame primitive. Do not add independent per-page centring/max-width wrappers for ordinary Explorer surfaces. Page padding remains the full-bleed shell's responsibility; narrower prose measure remains content responsibility.
 
-The loading/error branches in `App`, `RecordsExplorer`, `ProblemView`, `ProblemHistoryView`, and `GraphExplorer`, plus `.manifest-summary` and `.reading-guide`, currently use separate or implicit measures. Later implementation should align them through `ShellFrame` or an intentional reading measure, one surface at a time; this is consolidation, not authorization to redesign their content.
+The loading/error branches in `App`, `RecordsExplorer`, `ProblemView`, and `ProblemHistoryView`, plus `.manifest-summary` and `.reading-guide`, currently use separate or implicit measures. Later implementation should apply `ShellFrame` to their ordinary outer alignment one surface at a time, while each surface retains its content-owned local reading measure. This is consolidation, not authorization to redesign their content. `GraphExplorer` is excluded.
 
 ### 5.2 Reading layout and section indexes
 
 `.record-detail-columns/-main/-rail` remains the single reading-layout implementation. Problem, Source, and EVD must not introduce parallel rail widths or breakpoint systems.
 
-Rail and compact indexes may share `SectionIndex`, but their domain selectors remain separate:
+Rail and compact indexes may share section-index presentation, but their domain selectors remain separate:
 
 - `problemSectionIndex` owns Problem order/presence and nested entries;
 - `sourceSectionIndex` plus `computeSourceSectionPresence` owns Source order/presence;
 - `evdSectionIndex` owns EVD order/presence.
 
-The renderer must not evaluate records or relation state. `SourceCompactSectionIndex` can retire later as a thin adapter only after the shared renderer is adopted and its tests are preserved.
+Shared presentation must not evaluate records or relation state. It need not force rail and compact navigation into one React component when their semantic DOM legitimately differs. `SourceCompactSectionIndex` remains a Source-owned adapter over generic section-index presentation: it owns Source-specific entry derivation and label context and is not duplicate rendering. Retirement would require later implementation evidence that it has no remaining domain responsibility.
 
 ### 5.3 Breadcrumb and ContextTabs
 
@@ -201,7 +205,7 @@ Surface reuse is visual, not structural. A shared surface recipe may reduce drif
 
 Links and buttons may share appearance only when their native semantics remain visible in code. `TypedLinkButton`, Source finding ID buttons, PRB reference targets, and inline related-record buttons may share `RecordIdentifier` action rendering. External Source URLs remain anchors; URL-state actions may remain buttons unless a separately approved navigation phase changes that contract.
 
-Records and Graph form controls may share foundation styling later. A generic `FormField` component is deferred because only two specialised control groups demonstrate it, Graph is a deferred public surface, and their filtering state/fieldset behaviour differs.
+Records form controls may consume safe global foundation styling later. A generic `FormField` component is deferred because the current non-Graph evidence does not demonstrate a reusable form-field contract. Graph is excluded from component/layout migration and may inherit safe global foundation changes only.
 
 ### 5.7 Evidence/reference rows
 
@@ -225,7 +229,7 @@ Keep the global header and primary navigation composed in `Explorer`. Its one-us
 
 ### 5.9 Empty, unavailable, methodology, and caveat treatments
 
-- Loading, error/retry, and empty-result framing may use `FeedbackMessage` only with an explicit semantic mode and caller-owned copy.
+- Loading/progress feedback uses `ProgressMessage`, failures use `ErrorNotice`, and explicitly established empty results use `EmptyState`. These public boundaries remain separate and may share only internal CSS/frame anatomy.
 - Missing/absent canonical content must use explicit caller text. No primitive may turn missing into “No”, unavailable, or unknown.
 - `UnavailableNote` remains the focused-control explanation pattern; it is not an empty state.
 - `ReadingGuide` and `ProblemHelpDisclosure` remain methodology/orientation content, not generic caveats.
@@ -234,26 +238,28 @@ Keep the global header and primary navigation composed in `Explorer`. Its one-us
 
 ## 6. Recommendation matrix
 
-| Candidate | Current implementation/location | Proposed layer and ownership | Shared or domain-owned | Legitimate variants | Drift eliminated | Migration risk/coupling | Recommendation |
+| Candidate | Current implementation/location | Approved layer and ownership | Shared or domain-owned | Legitimate variants | Drift eliminated | Migration risk/coupling | Recommendation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Foundation roles/scales | `:root` and global selectors in `apps/research-explorer/src/index.css` | Foundation | Shared | Role-based only; values remain unfrozen | Parallel literals and inconsistent native baselines over time | High visual blast radius; requires rendered review | **KEEP** |
 | Legacy raw CSS values | Pre-foundation and override blocks in `apps/research-explorer/src/index.css` | Foundation migration | Shared recipes, migrated selectively | None defined here | Raw colours/sizes/spacing/radii and split selector definitions | High; no bulk migration | **CONSOLIDATE** |
 | Visually-hidden technique | Four clip-rect recipes in `apps/research-explorer/src/index.css` | Foundation utility | Shared | One utility | Accessibility maintenance drift | Low if markup/accessibility names remain tested | **EXTRACT** |
-| `.shell-frame` / `ShellFrame` | `apps/research-explorer/src/index.css` and app/view wrappers | Layout | Shared | None | Per-page width/centring drift | Low; structural CSS tests already guard it | **KEEP** |
-| `.record-detail-columns/-main/-rail` / `ReadingLayout` | `apps/research-explorer/src/index.css`, Record Detail, Problem View | Layout | Shared | rail/no-rail; current recomposition | Parallel reading geometries | Medium; sticky/compact index coupling | **KEEP** |
-| `Stack` | Repeated vertical flex/grid lists and actions across records/problem/graph | Layout | Shared | Bounded gap/alignment | Repeated flow declarations and spacing drift | Low if DOM-neutral | **EXTRACT** |
-| `Cluster` | Chip groups, identity facts, reference groups, Overview actions | Layout | Shared | Bounded gap/alignment/wrap | Repeated wrapping/alignment declarations | Low if DOM-neutral | **EXTRACT** |
+| `.shell-frame` / `ShellFrame` | `apps/research-explorer/src/index.css` and app/view wrappers | CSS-first layout | Shared class/recipe | None | Per-page width/centring drift | Low; structural CSS tests already guard it | **KEEP** |
+| `.record-detail-columns/-main/-rail` / `ReadingLayout` | `apps/research-explorer/src/index.css`, Record Detail, Problem View | CSS-first layout | Shared classes/recipe | rail/no-rail; current fit recomposition | Parallel reading geometries | Medium; sticky/compact index coupling | **KEEP** |
+| `Stack` | Repeated vertical flex/grid lists and actions across records/problem/Source/EVD | CSS-first layout | Shared class/recipe | Bounded gap/alignment | Repeated flow declarations and spacing drift | Low if DOM-neutral | **EXTRACT** |
+| `Cluster` | Chip groups, identity facts, reference groups, Overview actions | CSS-first layout | Shared class/recipe | Bounded gap/alignment/wrap | Repeated wrapping/alignment declarations | Low if DOM-neutral | **EXTRACT** |
 | Generic `Grid` | Several unrelated grids in `apps/research-explorer/src/index.css` | No shared layer yet | Remain local; fact layout goes to `FactList` | None | Little proven common drift beyond facts | High API ambiguity | **DOMAIN-OWNED** |
 | Generic React `Section` | `.problem-section`, `.record-editorial-section`, page landmarks | Page/domain composition plus `SectionFlow` class | Domain-owned semantics | Spacing class only | Shared rhythm without hiding landmarks | High if it owns heading/ARIA/presence | **DOMAIN-OWNED** |
 | Breadcrumb | Three implementations in records/problem/history | Generic UI | Shared | Parent action(s), current item | Duplicated nav/separator/current markup | Medium; preserve focus and button semantics | **EXTRACT** |
 | `ContextTabs` | `apps/research-explorer/src/navigation/ContextTabs.tsx` | Domain component | PRB-owned, shared across PRB contexts | Active context | Prevents PRB navigation drift already | Low; Graph remains dormant/out of scope | **KEEP** |
-| Section indexes | `CompactSectionIndex`, Problem/Source/EVD rail and compact renderers | Generic UI renderer plus domain selectors | Shared renderer; domain-owned entries | rail/compact; nested/flat | Repeated nav/list/anchor markup | Medium; responsive equivalence and presence tests | **CONSOLIDATE** |
-| `SourceCompactSectionIndex` | `apps/research-explorer/src/records/SourceCompactSectionIndex.tsx` | Source adapter during migration | Domain-owned temporarily | Source entries only | Thin adapter becomes unnecessary after shared renderer | Low, but tests/call sites must move together | **RETIRE-LATER** |
+| Section indexes | `CompactSectionIndex`, Problem/Source/EVD rail and compact renderers | Generic presentation plus domain selectors | Shared styling/helpers; domain-owned entries and semantic DOM | rail/compact; nested/flat | Repeated nav/list/anchor anatomy where equivalent | Medium; responsive equivalence and presence tests | **CONSOLIDATE** |
+| `SourceCompactSectionIndex` | `apps/research-explorer/src/records/SourceCompactSectionIndex.tsx` | Source adapter over generic section-index presentation | Source-owned | Source entry derivation and label context | Already avoids duplicate generic rendering while retaining Source responsibility | Low; retirement needs later evidence of no domain responsibility | **KEEP** |
 | `FactList` / `.detail-provenance-grid` | records, Source, EVD, PRB detail | Generic UI | Shared renderer; caller-owned rows | Reading/compact only if demonstrated | Repeated `<dl>/<dt>/<dd>` structure and grid drift | Medium; ReactNode values and compact stacking | **EXTRACT** |
 | Surface recipes | Repeated outlined/muted/item boxes in `apps/research-explorer/src/index.css` | Generic visual UI/CSS | Shared anatomy; domain-owned markup | Plain outlined, muted inset, interactive item at most | Border/background/padding drift | Medium; avoid cardification | **CONSOLIDATE** |
-| Native action/control recipes | Global links, text buttons, rail actions, form controls | Foundation/Generic UI CSS | Shared appearance | text, outlined, tab; native states | Repeated link-like button/control styling | Medium; link/button semantics must stay explicit | **CONSOLIDATE** |
+| Native action/control recipes | Global links, text buttons, rail actions, and Records form controls | Foundation/Generic UI CSS | Shared appearance; Graph only inherits safe global foundation changes | text, outlined, tab; native states | Repeated link-like button/control styling | Medium; link/button semantics must stay explicit | **CONSOLIDATE** |
 | `UnavailableNote` | `apps/research-explorer/src/presentation/UnavailableNote.tsx` | Generic UI behaviour | Shared | None | Already removes duplicated inaccessible `title`-only help | Low | **KEEP** |
-| `FeedbackMessage` | Repeated loading/error/empty branches across views | Generic UI | Shared structure; caller-owned meaning/copy | progress, error/retry, empty | Repeated roles/live-region/retry markup | Medium; incorrect role or over-broad “empty” semantics | **EXTRACT** |
+| `ProgressMessage` | Repeated loading/progress branches across views | Generic UI | Shared explicit semantic boundary | Progress only | Repeated live-status markup | Low/medium; preserve announcement timing | **EXTRACT** |
+| `ErrorNotice` | Repeated error/alert/retry branches across views | Generic UI | Shared explicit semantic boundary | Optional caller-owned retry | Repeated alert/title/retry markup | Medium; preserve focus entry and error specificity | **EXTRACT** |
+| `EmptyState` | Repeated established-empty result/collection branches | Generic UI | Shared explicit semantic boundary | Caller-owned copy/action | Repeated empty-result framing | Medium; must not collapse missing/unknown/not-authored | **EXTRACT** |
 | `RecordIdentifier` | Multiple static/actionable ID treatments in records/problem/source/history | Domain component | Shared across Explorer domains | text/action; compact/standard density | ID typography/action drift | Medium; must not absorb paths/type/status | **EXTRACT** |
 | `RecordTypeLabel` | `.detail-type-badge`, `.narrow-record-type`, EVD type row | Domain component | Shared across record contexts | compact marker, detail badge | Duplicate prefix/type-label anatomy | Medium; keep distinct from ID and state | **EXTRACT** |
 | Problem state presentations | Overview dimensions, `StatusChip`, PRB technical state, History transitions | Problem domain | Domain-owned compositions | overview/read/technical/history | May share formatting helpers and visual recipe only | High semantic risk across independent dimensions | **DOMAIN-OWNED** |
@@ -269,7 +275,7 @@ Keep the global header and primary navigation composed in `Explorer`. Its one-us
 | App header/primary nav | `Explorer.tsx` | Page composition | App-owned | compact layout only | Foundation/action styling only | Low benefit from a one-use design-system component | **KEEP** |
 | Reading/methodology/caveat treatments | Guide, Problem help, Source caveats, rail caveat copy | Domain composition with shared surface styles | Domain-owned | Existing purposes only | Visual recipe drift only | High semantic risk if unified | **DOMAIN-OWNED** |
 | `.field-empty` | Broad call sites across records/problem | Replace with explicit absence/empty presentations | Domain meaning plus generic feedback styles | Missing field, empty list, missing effect kept distinct | Removes semantic overloading | Medium; requires call-site audit | **RETIRE-LATER** |
-| Graph components | `apps/research-explorer/src/graph/GraphExplorer.tsx`, `apps/research-explorer/src/graph/GraphCanvas.tsx` | Graph domain | Domain-owned | Existing canvas/HTML fallback | Only consume shared foundation/layout where safe | High and explicitly out of redesign scope | **DOMAIN-OWNED** |
+| Graph components | `apps/research-explorer/src/graph/GraphExplorer.tsx`, `apps/research-explorer/src/graph/GraphCanvas.tsx` | Graph domain | Domain-owned | Existing canvas/HTML fallback | May inherit safe global foundation changes only | High and explicitly excluded from component/layout migration and redesign | **DOMAIN-OWNED** |
 
 ## 7. Known non-components and composition that should remain local
 
@@ -285,35 +291,35 @@ Keep the global header and primary navigation composed in `Explorer`. Its one-us
 - A universal `Card` that chooses landmark or heading structure.
 - A generic React `Section` that manufactures a heading or accessible name.
 - A generic `Grid` until a second non-fact layout demonstrates the same contract.
-- A `FormField` framework based mainly on Records and the deferred Graph surface.
+- A `FormField` framework based on the current Records controls alone; Graph is excluded from component/layout migration.
 - A custom disclosure/headless primitive where native `<details>/<summary>` remains sufficient.
 - Automatic rail-to-inline behaviour for “short” records; the approved foundation leaves that decision open and current code supplies no content-length rule.
 - Graph-specific control, canvas, legend, node, or edge redesign.
 
-## 8. Human Gate C1 questions
+## 8. Gate C1 decisions
 
-1. **Layout implementation form:** should `ShellFrame`, `ReadingLayout`, `Stack`, `Cluster`, and `SectionFlow` be CSS classes/recipes by default, with React wrappers only where behaviour/markup requires one? This contract recommends that default to avoid wrapper components with no semantic value.
-2. **Section index boundary:** approve one generic `SectionIndex` renderer with rail/compact and flat/nested variants, while Problem/Source/EVD keep independent order and presence authorities?
-3. **Identifier/type boundary:** approve separate `RecordIdentifier` and `RecordTypeLabel` domain components, rather than one combined badge that makes type and identity inseparable?
-4. **Inline-label consolidation:** approve a CSS-only visual recipe with dimension-specific domain wrappers for Problem state, Evidence effect, research role, and record type? The alternative—a single React `Chip`—is not recommended because it makes semantic misuse easier.
-5. **Source fact consolidation:** may the four fact-based Source sections use one internal Source renderer/`FactList` while keeping their extraction, formatting, public labels, presence, and tests separate? If per-section React boundaries are considered part of Source ownership, only their internal row markup should consolidate.
-6. **Feedback boundary:** should later implementation introduce one `FeedbackMessage` with required semantic modes, or separate `ProgressMessage`, `ErrorNotice`, and `EmptyState` components? The latter is more explicit; the former removes more repeated structure but needs stricter misuse tests.
-7. **Frame coverage:** should ordinary startup/view feedback, `ReadingGuide`, and `.manifest-summary` align through `ShellFrame`, while Graph-specific content remains unchanged? Current measures differ, but changing alignment requires rendered review.
-8. **Short-record rail:** confirm that automatic inline metadata for shorter desktop records remains deferred. The contract recommends retaining only the demonstrated rail/no-rail and current responsive recomposition until content-based behaviour is explicitly approved.
+1. **Layout primitives are CSS-first.** `ShellFrame`, `Stack`, `Cluster`, and `SectionFlow` do not require React wrappers. `ReadingLayout` remains CSS-first unless later implementation demonstrates a real structural or behavioural reason for a wrapper. Components must not exist merely to carry classes.
+2. **Section-index presentation is shared; domain ownership is not.** Problem, Source, and EVD remain sole owners of entry order, presence, labels, and anchors. Rail and compact presentation may share CSS or rendering helpers, but they are not forced into one React component when their semantic DOM legitimately differs.
+3. **Identifier and type are separate domain components.** `RecordIdentifier` and `RecordTypeLabel` are approved as distinct boundaries.
+4. **Inline-label anatomy is CSS-only and shared.** Dimension-specific domain components/wrappers own Problem state, Evidence effect, research role, and record type. A universal `Chip` component is rejected.
+5. **Source fact-section consolidation is approved.** The four fact-based Source sections may use `FactList`/shared internal rendering while preserving each section's extraction, formatting, labels, order, presence, and tests.
+6. **Public feedback boundaries are explicit.** Use `ProgressMessage`, `ErrorNotice`, and `EmptyState`, which may share internal CSS/frame anatomy. One public mode-driven `FeedbackMessage` component is rejected.
+7. **Ordinary outer alignment uses `ShellFrame`.** Startup/view feedback, `ReadingGuide`, and `.manifest-summary` should use it for outer alignment while retaining content-owned local reading measures. Graph is excluded.
+8. **Automatic short-record rail behaviour is deferred.** Retain only the demonstrated rail/no-rail and current responsive fit recomposition until later evidence and approval justify content-dependent behaviour.
 
 ## 9. Recommended implementation order for later phases
 
 1. **Lock structural tests around current invariants.** Preserve/extend the existing shell/reading-layout and compact-overflow tests before moving markup. Add focused tests for section-index equivalence and identifier/status separation.
 2. **Foundation-only cleanup with no visual target change.** Extract visually-hidden and native action/focus recipes; consolidate only exact or approved visual equivalents. Do not perform a bulk stylesheet migration.
-3. **Adopt layout primitives.** Keep `ShellFrame` and `ReadingLayout`; introduce `Stack`, `Cluster`, and `SectionFlow` at repeated call sites with rendered checks at desktop, around 360px, and the breakpoint-sensitive intermediate band.
-4. **Extract generic structural UI.** Implement `Breadcrumb`, `SectionIndex`, and `FactList`; migrate one domain at a time. Keep domain selectors/presence logic untouched.
+3. **Adopt CSS-first layout primitives outside Graph.** Keep `ShellFrame` and `ReadingLayout`; introduce `Stack`, `Cluster`, and `SectionFlow` at repeated non-Graph call sites with rendered checks at desktop, around 360px, and the breakpoint-sensitive intermediate fit band. Add no wrapper solely to carry a class.
+4. **Extract generic structural UI outside Graph.** Implement `Breadcrumb`, shared section-index presentation, and `FactList`; migrate one domain at a time. Keep domain selectors/presence logic untouched, allow distinct rail/compact components where semantic DOM differs, and keep `SourceCompactSectionIndex` as the Source-owned adapter.
 5. **Separate compact-label semantics.** Add `RecordIdentifier`, `RecordTypeLabel`, and `EvidenceEffectTag`; replace overloaded `.record-role-chip` call sites with dimension-specific wrappers over the shared visual recipe.
 6. **Consolidate Source fact rendering.** Move the four fact sections onto the approved internal renderer without changing extractors, order, presence, labels, link rules, or relation loading.
-7. **Consolidate technical disclosure framing and feedback.** Preserve exhaustive canonical content and current accessibility/focus behaviour. Replace `.field-empty` only after every call site has an explicit semantic classification.
+7. **Consolidate technical disclosure framing and explicit feedback boundaries.** Introduce separate `ProgressMessage`, `ErrorNotice`, and `EmptyState` components while preserving current accessibility/focus behaviour. Replace `.field-empty` only after every call site has an explicit semantic classification.
 8. **Decompose large domain files for ownership, not reuse.** Move PRB technical sections and Record Detail type branches out of `RecordDetailPanel.tsx`; move Problem domain sections only where this improves test ownership. Do not convert them into generic UI.
-9. **Retire compatibility adapters/classes.** Remove thin index adapters and old/duplicated selectors only after all call sites, structural tests, unit tests, and rendered validation pass.
+9. **Retire only proven compatibility classes.** Remove old/duplicated selectors only after all call sites, structural tests, unit tests, and rendered validation pass. `SourceCompactSectionIndex` is not a retirement target without later evidence that it has no Source-domain responsibility.
 10. **Run a separate visual implementation gate.** Compare representative Overview, Records, SRC/EVD/PRB Detail, Problem, and History surfaces at required viewports. Graph consumes safe foundation changes only and receives no redesign in this sequence.
 
 ## 10. Scope boundary
 
-DS-03A creates only this proposed contract. It does not implement components, modify production React/CSS, add Storybook or dependencies, freeze token values, change schemas/read models/canonical research data, redesign Graph, or authorize the later implementation order before Gate C1.
+DS-03A approves only this component/layout contract. It does not itself implement components, modify production React/CSS, add Storybook or dependencies, freeze token values, change schemas/read models/canonical research data, redesign or migrate Graph, or start the later implementation sequence.
