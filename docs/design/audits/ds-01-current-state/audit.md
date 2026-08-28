@@ -192,7 +192,7 @@ Ranked by combination of frequency and risk of visible drift:
 - **No dead or unused component was found.** Every `.tsx` file reviewed is reachable from a real view and has a corresponding non-skipped test.
 - **Test suite is green** (408 passed / 1 skipped / 0 failed) — there is no correctness regression underlying this audit; all findings are structural/consistency observations, not bugs.
 - **The existing structural CSS-parsing regression tests are a good pattern, not a workaround to be replaced** — they were written in direct response to real historical bugs and continue to pass.
-- **`docs/design/research-explorer-prototype/*.dc.html`** are confirmed (via code comments citing "Prototype A/B/D" as the approved reference for specific implemented decisions) to be historical inputs already reflected in the shipped implementation, not an unrealized target — consistent with the task's framing that they are historical references, not something to copy anew.
+- **`docs/design/archive/research-explorer-prototype/*.dc.html`** are confirmed (via code comments citing "Prototype A/B/D" as the approved reference for specific implemented decisions) to be historical inputs already reflected in the shipped implementation, not an unrealized target — consistent with the task's framing that they are historical references, not something to copy anew.
 - **No evidence was found of a performance or corpus-size problem** — out of scope for this audit and not investigated further, consistent with `docs/explorerarchitecture.md` §7's guidance to treat performance as measured evidence, not speculation.
 
 ## 13. Gate A review questions
