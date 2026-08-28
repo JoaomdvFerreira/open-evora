@@ -165,6 +165,14 @@ textarea {
   padding: var(--p-space-2) var(--space-standard);
 }
 
+/* Removes the UA-default dd { margin-left: 40px }; label/value spacing is
+   Foundation typography rhythm (margin between fnd-label and fnd-interface-
+   text), not an inherited indent. */
+dl,
+dd {
+  margin: 0;
+}
+
 /* ---- Separators / surfaces ---------------------------------------------
    Restrained grammar only: ordinary adjacent content is not boxed by
    default. Three separator weights and two neutral surface recipes. */
