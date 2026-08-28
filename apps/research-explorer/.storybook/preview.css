@@ -1,0 +1,45 @@
+/* Workbench-only baseline. This intentionally does not import src/index.css
+   and is not a design-system foundation or production styling contract. */
+
+html,
+body,
+#storybook-root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.workbench-smoke {
+  box-sizing: border-box;
+  max-width: 48rem;
+  padding: 2rem;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.workbench-smoke *,
+.workbench-smoke *::before,
+.workbench-smoke *::after {
+  box-sizing: inherit;
+}
+
+.workbench-smoke__title,
+.workbench-smoke__reading-sample {
+  font-family: "Source Serif 4", Georgia, serif;
+}
+
+.workbench-smoke__identifier {
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.workbench-smoke__notice {
+  border: 1px solid currentColor;
+  padding: 1rem;
+}
+
+.workbench-smoke__form {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 24rem;
+}
