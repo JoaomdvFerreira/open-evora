@@ -1,0 +1,34 @@
+source_id: SRC-0129
+publisher: DianaFM
+name: Associação de Pais escolhe monoblocos em estacionamento para funcionamento
+  de escola
+resource_type: webpage
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei e Escola André de Resende, Évora
+  temporal:
+    as_of: 2026-08-27
+  domains:
+    - EDU
+    - URB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.dianafm.com/associacao-de-pais-escolhe-monoblocos-em-estacionamento-para-funcionamento-de-escola/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-08-27
+  last_checked_at: 2026-08-28
+  update_frequency: one_off
+caveats:
+  - A peça jornalística inclui declarações da presidente da Associação de Pais;
+    essas declarações representam a perspetiva dessa entidade e não uma medição
+    independente da experiência de toda a comunidade escolar.

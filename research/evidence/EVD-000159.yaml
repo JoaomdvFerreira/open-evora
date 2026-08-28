@@ -1,0 +1,35 @@
+evidence_id: EVD-000159
+lineage_id: EDU-2026-08-CHAFARIZ-DEL-REI-CLOSURE-TEMPORARY-SCHOOL
+provenance:
+  sources:
+    - SRC-0128
+  extracted_at: 2026-08-28
+observation:
+  summary: O Município de Évora informa que a Escola Básica do Chafariz d'El-Rei
+    se encontra encerrada desde novembro de 2025, depois de terem sido
+    identificados problemas estruturais no edifício, entretanto agravados por
+    intempéries, e que em agosto de 2026 estão a ser instalados dezasseis
+    monoblocos pré-fabricados junto à escola para acolher temporariamente os
+    alunos do 1.º ciclo no arranque do ano letivo 2026/2027.
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei, Évora
+  populations:
+    - alunos do 1.º ciclo da Escola Básica do Chafariz d'El-Rei
+    - comunidade educativa da escola
+  temporal:
+    as_of: 2026-08-27
+domains:
+  - EDU
+  - URB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A comunicação municipal não quantifica os alunos afetados nem estabelece
+    impactos educativos, de aprendizagem ou bem-estar causados pelo
+    encerramento.
+  - A existência de problemas estruturais e o encerramento desta escola não
+    estabelecem um problema semelhante no restante parque escolar de Évora.
+  - A comunicação não descreve tecnicamente os defeitos estruturais nem
+    estabelece o calendário contratual da reabilitação.

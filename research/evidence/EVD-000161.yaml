@@ -1,0 +1,34 @@
+evidence_id: EVD-000161
+lineage_id: EDU-2026-08-CHAFARIZ-DEL-REI-PARENT-EXPERIENCE
+provenance:
+  sources:
+    - SRC-0129
+  extracted_at: 2026-08-28
+observation:
+  summary: A DianaFM reporta, com base em declarações da presidente da Associação
+    de Pais da Escola Básica do Chafariz d'El-Rei, que a continuidade dos alunos
+    na Escola André de Resende implicaria novas limitações, nomeadamente nas
+    refeições, e que os representantes dos pais preferiram por isso a solução
+    temporária de monoblocos próxima da escola de origem.
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei e Escola André de Resende, Évora
+  populations:
+    - alunos do 1.º ciclo da Escola Básica do Chafariz d'El-Rei
+    - pais e encarregados de educação
+  temporal:
+    as_of: 2026-08-27
+domains:
+  - EDU
+evidence_nature: reported-experience
+claim_authority: non_authoritative
+inference_limits:
+  - As declarações representam a perspetiva da Associação de Pais e não
+    demonstram a experiência de todos os alunos ou famílias.
+  - A referência a limitações nas refeições diz respeito à alternativa de
+    permanência na Escola André de Resende e não estabelece que os monoblocos
+    tenham a mesma limitação.
+  - A preferência dos representantes dos pais pela solução de monoblocos não
+    estabelece, por si só, a adequação das instalações depois de entrarem em
+    utilização.

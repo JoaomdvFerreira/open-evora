@@ -1,0 +1,36 @@
+source_id: SRC-0128
+publisher: Câmara Municipal de Évora
+name: Instalação de monoblocos permite arranque das aulas em segurança na Escola
+  Básica do Chafariz d’El Rei
+resource_type: webpage
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei e instalações temporárias junto ao
+      Hospital do Patrocínio, Évora
+  temporal:
+    as_of: 2026-08-27
+  domains:
+    - EDU
+    - URB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/instalacao-de-monoblocos-permite-arranque-das-aulas-em-seguranca-na-escola-basica-do-chafariz-del-rei/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-08-27
+  updated_at: 2026-08-27
+  last_checked_at: 2026-08-28
+  update_frequency: one_off
+caveats:
+  - A página é uma comunicação institucional do Município sobre o estado da
+    escola e a resposta municipal; não constitui uma avaliação independente das
+    condições pedagógicas ou da experiência dos alunos.
