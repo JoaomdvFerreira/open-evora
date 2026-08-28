@@ -5,7 +5,7 @@
  * and validation checks are safety checks, not approval, and it writes exactly
  * the plan supplied by the caller without interpreting candidate research.
  */
-import { cpSync, existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { isAbsolute, join, posix as path, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -178,6 +178,30 @@ function applyWrites(writes: readonly PreparedWrite[], root: string): void {
   }
 }
 
+/**
+ * Copies the canonical research tree into an isolated staging directory.
+ *
+ * Node's recursive cpSync can fail with EIO/Access denied for a repository
+ * worktree on Windows despite being able to copy its individual files. This
+ * explicit traversal keeps staging content-based and platform-neutral without
+ * changing the promotion flow. Special filesystem entries are rejected rather
+ * than followed or silently transformed.
+ */
+export function copyResearchTreeForStaging(source: string, destination: string): void {
+  mkdirSync(destination, { recursive: true });
+  for (const entry of readdirSync(source, { withFileTypes: true })) {
+    const sourcePath = join(source, entry.name);
+    const destinationPath = join(destination, entry.name);
+    if (entry.isDirectory()) {
+      copyResearchTreeForStaging(sourcePath, destinationPath);
+    } else if (entry.isFile()) {
+      copyFileSync(sourcePath, destinationPath);
+    } else {
+      throw new CanonicalIntegrationPromotionError(`unsupported filesystem entry in canonical research tree: ${sourcePath}`);
+    }
+  }
+}
+
 /** Restores only files touched by this one promotion attempt. */
 export function rollbackCanonicalPromotion(entries: readonly CanonicalPromotionRollbackEntry[]): boolean {
   try {
@@ -215,7 +239,7 @@ function applyCanonicalIntegrationPlanWithWriter(
   const stageParent = mkdtempSync(join(tmpdir(), "open-evora-canonical-promoter-"));
   try {
     const stagedResearchRoot = join(stageParent, "research");
-    cpSync(state.researchRoot, stagedResearchRoot, { recursive: true });
+    copyResearchTreeForStaging(state.researchRoot, stagedResearchRoot);
     applyWrites(writes, stagedResearchRoot);
     const stagedValidation = validateResearchRoot(stagedResearchRoot);
     if (stagedValidation.errors.length > 0) {

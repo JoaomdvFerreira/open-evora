@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { copyFileSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import test from "node:test";
 
@@ -12,8 +12,11 @@ import {
 import {
   applyCanonicalIntegrationPlanWithTestWriter,
   CanonicalIntegrationPromotionError,
+  copyResearchTreeForStaging,
   rollbackCanonicalPromotion,
 } from "./canonical-promoter.ts";
+import { loadCorpusIndex } from "../core/corpus.ts";
+import { validateResearchRoot } from "../validation/validate.ts";
 
 
 function sourceYaml(id: string, name = "Synthetic source"): string {
@@ -80,6 +83,17 @@ test("a valid canonical target passes platform-neutral containment and promotes 
     assert.equal(result.postWriteValidation.errors.length, 0);
     assert.deepEqual(readFileSync(join(current.research, operation.targetFile)), Buffer.from(operation.yaml));
   } finally { current.cleanup(); }
+});
+
+test("staging copies and validates the real canonical research tree without recursive cpSync", () => {
+  const stageParent = mkdtempSync(join(tmpdir(), "open-evora-promoter-real-staging-test-"));
+  try {
+    const canonicalResearch = resolve(process.cwd(), "research");
+    const stagedResearch = join(stageParent, "research");
+    copyResearchTreeForStaging(canonicalResearch, stagedResearch);
+    assert.equal(loadCorpusIndex(stagedResearch).totalRecords, loadCorpusIndex(canonicalResearch).totalRecords);
+    assert.deepEqual(validateResearchRoot(stagedResearch).errors, []);
+  } finally { rmSync(stageParent, { recursive: true, force: true }); }
 });
 
 test("UPDATE preserves the exact approved YAML bytes", () => {
