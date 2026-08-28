@@ -18,7 +18,7 @@ const details: Record<string, RecordDetail> = {
     record: {
       title: "Degradação do pavimento",
       history: [
-        { date: "2026-08-28", summary: "Nova evidência oficial estabeleceu uma cronologia de resposta faseada/em curso — levantamento técnico em fevereiro, horizonte de contratação de 10 meses e intervenções locais até junho — pelo que a investigação deixa de assumir um estado pós-reparação e passa a perguntar pela condição atual da rede em todo o município durante a implementação.", evidence: ["EVD-000154", "EVD-000155", "EVD-000156"] },
+        { date: "2026-08-28", summary: "Nova evidência oficial estabeleceu uma cronologia de resposta faseada/em curso — levantamento técnico em fevereiro, prazo de execução contratual de 10 meses e intervenções locais até junho — pelo que a investigação deixa de assumir um estado pós-reparação e passa a perguntar pela condição atual da rede em todo o município durante a implementação.", evidence: ["EVD-000154", "EVD-000155", "EVD-000156"] },
       ],
     },
   },
