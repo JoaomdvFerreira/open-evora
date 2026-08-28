@@ -1,0 +1,35 @@
+evidence_id: EVD-000158
+lineage_id: MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT
+provenance:
+  sources:
+    - SRC-0018
+  extracted_at: 2026-08-28
+observation:
+  summary: O Relatório de Atividades 2026 da Autoridade de Transportes do
+    Município de Évora reporta para 2025 um índice de regularidade de 99,5% e um
+    índice de pontualidade IP-5min de 84,4%. O relatório refere vários atrasos
+    ao longo do ano associados a fluxo de trânsito lento nas principais artérias
+    de acesso ao Centro Histórico e, em particular, na circular de acesso ao
+    Parque Industrial, nas horas de ponta das 08h00 às 09h30 e das 17h00 às
+    19h00, qualificando a situação como recorrente.
+scope:
+  geography:
+    level: municipality
+    area: cidade de Évora
+  populations:
+    - utilizadores da rede urbana TREVO
+    - residentes que dependem dos transportes públicos
+  temporal:
+    as_of: "2025"
+domains:
+  - MOB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - Os índices de regularidade e pontualidade são agregados para o serviço e não
+    identificam quais carreiras, partidas ou paragens concentraram os atrasos.
+  - O relatório atribui os atrasos ao congestionamento nos corredores indicados,
+    mas não quantifica a duração dos atrasos nem o número de passageiros ou
+    deslocações afetadas.
+  - A informação reporta o desempenho de 2025 e não estabelece diretamente o
+    desempenho operacional em agosto de 2026.

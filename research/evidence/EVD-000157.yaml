@@ -1,0 +1,44 @@
+evidence_id: EVD-000157
+lineage_id: MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT
+provenance:
+  sources:
+    - SRC-0018
+  extracted_at: 2026-08-28
+observation:
+  summary: O Quadro 3.2.1 do Relatório de Atividades 2026 da Autoridade de
+    Transportes do Município de Évora desagrega os quilómetros comerciais
+    diários previstos por carreira e tipo de dia para 2025. Nas carreiras 22,
+    24, 26 e 32 o quadro não apresenta quilómetros comerciais ao sábado, domingo
+    ou feriado. As carreiras 21, 34 e 41 apresentam oferta ao sábado mas não ao
+    domingo/feriado. As carreiras 23, 25, 31 e 33 apresentam quilómetros
+    comerciais tanto ao sábado como ao domingo/feriado. A carreira 25 passa de
+    221,7 km comerciais por dia útil para 203,8 ao sábado e 96,0 ao
+    domingo/feriado; a carreira 23 passa de 272,6 para 149,6 e 12,9; a carreira
+    31 de 88,8 para 37,7 e 25,2; e a carreira 33 de 156,8 para 52,2 e 37,0. A
+    LinhAzul Norte passa de 374,4 km comerciais por dia útil para 187,2 ao
+    sábado e a LinhAzul Sul de 369,6 para 131,6, sem quilómetros comerciais
+    indicados para domingo/feriado em qualquer dos dois percursos.
+scope:
+  geography:
+    level: municipality
+    area: cidade de Évora
+  populations:
+    - utilizadores da rede urbana TREVO
+    - residentes que dependem dos transportes públicos
+  temporal:
+    as_of: "2025"
+domains:
+  - MOB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - Quilómetros comerciais por dia medem volume de oferta programada em
+    distância e não estabelecem, por si só, número de partidas, intervalo entre
+    serviços, tempo de espera, duração da viagem, lotação ou utilidade prática
+    de uma deslocação concreta.
+  - As células sem quilómetros comerciais são tratadas apenas como ausência de
+    quilómetros reportados nesse quadro; esta extração não substitui a consulta
+    do horário operacional de uma data concreta.
+  - Os valores dizem respeito a 2025, embora o relatório tenha sido publicado em
+    junho de 2026, e não demonstram que a configuração seja idêntica em agosto
+    de 2026.
