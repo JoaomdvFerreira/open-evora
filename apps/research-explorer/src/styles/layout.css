@@ -1,0 +1,210 @@
+/* DS-04C — Layout primitives (implementation candidate)
+   Scope: docs/design/component-model.md §2.2 (layout primitives) and
+   §4.2 (layout contract), consuming docs/design/foundations.md via
+   styles/tokens.css + styles/foundations.css.
+
+   Storybook-only for now: not imported by the production application (see
+   apps/research-explorer/src/index.css, which owns the equivalent current
+   production classes .shell-frame / .record-detail-columns/-main/-rail /
+   .problem-section / .record-editorial-section unchanged in this phase).
+
+   CSS-first, DOM-neutral: these classes control width, flow, alignment,
+   wrapping, and responsive recomposition only. They do not choose headings,
+   landmarks, labels, order, presence, or semantic tone (component-model.md
+   §2.2, Gate C1 decision 1). No React wrapper exists here merely to carry a
+   class — Storybook stories apply these classes directly to ordinary
+   semantic HTML. */
+
+/* ---------------------------------------------------------------------
+   Layout tokens — the minimum fixed-relationship set the approved
+   contract names (component-model.md §4.2, foundations.md "Reading
+   measure"). These record the already-approved 980/720/44/216
+   relationship as implementation values; they do not authorize changing
+   it (DS-04C task scope, "Tokens"). Everything else reuses DS-04B
+   Foundation tokens directly (--space-*, --measure-*, --p-space-*).
+   ------------------------------------------------------------------- */
+:root {
+  --layout-frame-max: 980px;
+  --layout-reading-main: 720px;
+  --layout-reading-gap: 44px;
+  --layout-reading-rail: 216px;
+}
+
+/* =======================================================================
+   ShellFrame — width and horizontal centring only.
+   Sole ordinary desktop frame. No page semantics, no landmark ownership,
+   no surface/background, no vertical spacing, no built-in page padding.
+   May sit inside a full-bleed parent. Mirrors production `.shell-frame`
+   (index.css) at the same 980px maximum.
+   ======================================================================= */
+.lyt-shell-frame {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--layout-frame-max);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* =======================================================================
+   ReadingLayout — main reading column plus supporting rail.
+
+   Desktop (>=1060px): 720px main + 44px gap + 216px rail = 980px, rail
+   sticky. 768-1059px is a geometry-only fit fallback that recomposes to
+   one column without shrinking reading text or activating compact
+   typography/navigation (foundations.md "Responsive reading";
+   component-model.md principle 7). Compact (<=767px) recomposes to one
+   column with rail content in flow; caller owns whether rail content
+   exists and where it appears in that flow.
+
+   Admitted variants: rail, no-rail (data-rail attribute). Automatic
+   short-record rail behaviour is explicitly deferred (component-model.md
+   §4.2, §7) and is not implemented here.
+   ======================================================================= */
+.lyt-reading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--layout-reading-gap);
+  width: 100%;
+}
+
+.lyt-reading-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: var(--layout-reading-main);
+}
+
+/* no-rail: the main column alone still honours the 720px reading measure,
+   without reserving rail space or gap (caller supplies no rail content). */
+.lyt-reading[data-rail="none"] {
+  gap: 0;
+}
+
+.lyt-reading[data-rail="none"] .lyt-reading-main {
+  max-width: var(--layout-reading-main);
+}
+
+.lyt-reading-rail {
+  flex: 0 0 var(--layout-reading-rail);
+  width: var(--layout-reading-rail);
+  position: sticky;
+  top: var(--space-loose);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-loose);
+}
+
+/* Fit fallback: the 980px relationship cannot fit destructively, so recompose
+   into one column rather than compressing the 720px column. Not a third
+   product mode — compact typography/navigation stay untouched. */
+@media (min-width: 768px) and (max-width: 1059px) {
+  .lyt-reading {
+    flex-direction: column;
+    gap: var(--space-loose);
+  }
+
+  .lyt-reading-main {
+    max-width: var(--layout-reading-main);
+  }
+
+  .lyt-reading-rail {
+    position: static;
+    width: 100%;
+    max-width: var(--layout-reading-main);
+    flex-basis: auto;
+  }
+}
+
+/* Compact product boundary: one column, rail content in flow, full width. */
+@media (max-width: 767px) {
+  .lyt-reading {
+    flex-direction: column;
+    gap: var(--space-loose);
+    max-width: 100%;
+  }
+
+  .lyt-reading-main {
+    max-width: 100%;
+  }
+
+  .lyt-reading-rail {
+    position: static;
+    width: 100%;
+    flex-basis: auto;
+  }
+}
+
+/* =======================================================================
+   Stack — vertical flow only. Bounded spacing set from the existing
+   Foundation scale; no semantic tone, surface, or list semantics.
+   ======================================================================= */
+.lyt-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.lyt-stack--tight {
+  gap: var(--space-tight);
+}
+
+.lyt-stack--standard {
+  gap: var(--space-standard);
+}
+
+.lyt-stack--section {
+  gap: var(--space-section);
+}
+
+.lyt-stack--align-start {
+  align-items: flex-start;
+}
+
+.lyt-stack--align-center {
+  align-items: center;
+}
+
+/* =======================================================================
+   Cluster — wrapping inline flow only. Bounded spacing choice, justified
+   alignment variants only. No status/effect/research-role meaning.
+   ======================================================================= */
+.lyt-cluster {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.lyt-cluster--tight {
+  gap: var(--space-tight);
+}
+
+.lyt-cluster--standard {
+  gap: var(--space-standard);
+}
+
+.lyt-cluster--align-start {
+  align-items: flex-start;
+}
+
+.lyt-cluster--align-center {
+  align-items: center;
+}
+
+.lyt-cluster--align-baseline {
+  align-items: baseline;
+}
+
+/* =======================================================================
+   SectionFlow — spacing between already-semantic sections. CSS
+   recipe/class only: it does not render or own <section>, choose
+   headings/landmarks/order, or add borders/surfaces by default. Mirrors
+   production `.problem-section` / `.record-editorial-section`
+   (index.css), which both use a single `margin-bottom: var(--space-8)`
+   rhythm — only that one "standard" variant is demonstrated by current
+   rendered evidence, so no "compact" variant is implemented here.
+   ======================================================================= */
+.lyt-section-flow > * {
+  margin-top: 0;
+  margin-bottom: var(--space-section);
+}
+
+.lyt-section-flow > *:last-child {
+  margin-bottom: 0;
+}
