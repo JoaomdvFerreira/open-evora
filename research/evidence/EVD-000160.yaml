@@ -1,0 +1,37 @@
+evidence_id: EVD-000160
+lineage_id: EDU-2026-08-CHAFARIZ-DEL-REI-CLOSURE-TEMPORARY-SCHOOL
+provenance:
+  sources:
+    - SRC-0128
+  extracted_at: 2026-08-28
+observation:
+  summary: O Município apresenta os monoblocos como uma solução temporária para
+    assegurar a continuidade das atividades letivas em condições de segurança e
+    funcionalidade enquanto se aguarda a reabilitação do edifício, e declara
+    como objetivo permitir o regresso dos alunos à escola antes do final do ano
+    letivo 2026/2027, apenas depois de concluídos os trabalhos necessários e
+    reunidas as condições de segurança.
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei e instalações temporárias junto ao
+      Hospital do Patrocínio, Évora
+  populations:
+    - alunos do 1.º ciclo da Escola Básica do Chafariz d'El-Rei
+    - comunidade educativa da escola
+  temporal:
+    as_of: 2026-08-27
+domains:
+  - EDU
+  - URB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - O objetivo municipal de regresso antes do fim do ano letivo 2026/2027 não
+    constitui uma data confirmada de conclusão da obra.
+  - A caracterização institucional da solução temporária como segura e funcional
+    não substitui evidência independente sobre a experiência quotidiana,
+    acessibilidade, conforto ou adequação das instalações depois de entrarem em
+    utilização.
+  - A existência de uma resposta temporária reduz o risco de interrupção letiva,
+    mas não demonstra que a condição do edifício original esteja resolvida.

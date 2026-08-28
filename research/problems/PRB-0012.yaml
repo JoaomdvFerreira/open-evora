@@ -1,0 +1,111 @@
+problem_id: PRB-0012
+created_at: 2026-08-28
+updated_at: 2026-08-28
+title: O encerramento prolongado da Escola Básica do Chafariz d'El-Rei obriga a
+  soluções temporárias enquanto a reabilitação permanece pendente
+domain:
+  - EDU
+  - URB
+geography:
+  level: site
+  area: Escola Básica do Chafariz d'El-Rei, Évora
+affected_populations:
+  - alunos do 1.º ciclo da Escola Básica do Chafariz d'El-Rei
+  - pais e encarregados de educação
+  - comunidade educativa da escola
+problem_statement: >-
+  A Escola Básica do Chafariz d'El-Rei está encerrada desde novembro de 2025
+  depois de terem sido identificados problemas estruturais no edifício. Os
+  alunos foram acolhidos noutra escola e, para o início de 2026/2027, o
+  Município está a instalar estruturas pré-fabricadas junto à escola de origem
+  enquanto se aguarda a reabilitação do edifício.
+
+  A solução temporária procura garantir continuidade letiva, segurança e
+  proximidade à escola e constitui uma resposta material ao problema. Ainda
+  assim, o edifício original permanece indisponível e não está estabelecido um
+  calendário confirmado de conclusão e regresso. A evidência disponível também
+  não caracteriza de forma suficiente os efeitos quotidianos das soluções
+  temporárias sobre refeições, acessibilidade, conforto, rotinas e deslocações
+  dos alunos e famílias.
+investigation:
+  open_questions:
+    - question: Qual é o âmbito, estado de contratação ou execução e calendário
+        verificável da reabilitação do edifício da Escola Básica do Chafariz
+        d'El-Rei?
+      why_open: A comunicação municipal confirma que a reabilitação permanece
+        necessária e aponta como objetivo o regresso antes do final do ano
+        letivo 2026/2027, mas não fornece um marco de conclusão confirmado nem o
+        estado detalhado da empreitada.
+      current_action: Procurar apenas informação institucional atual sobre projeto,
+        contratação, execução e condições de reabertura.
+      resolution_condition: Evidência institucional que estabeleça os trabalhos
+        necessários, o estado de execução e marcos verificáveis para a
+        reabertura.
+      evidence:
+        - EVD-000159
+        - EVD-000160
+    - question: Que efeitos materiais têm as instalações temporárias sobre a
+        experiência quotidiana dos alunos e famílias depois de entrarem em
+        funcionamento?
+      why_open: A Associação de Pais reportou limitações na alternativa anterior,
+        nomeadamente nas refeições, mas a evidência disponível não estabelece
+        como funcionarão na prática os novos monoblocos quanto a refeições,
+        acessibilidade, conforto, rotinas ou deslocações.
+      current_action: Se o problema sobreviver à integração, procurar experiência
+        atual da comunidade escolar apenas após o início efetivo do
+        funcionamento das instalações temporárias.
+      resolution_condition: Evidência atual da experiência de alunos, famílias ou
+        escola que permita caracterizar efeitos concretos das instalações
+        temporárias e distinguir constrangimentos resolvidos dos que persistem.
+      evidence:
+        - EVD-000160
+        - EVD-000161
+  path:
+    initial_signal:
+      summary: O Município confirmou que a escola permanece encerrada desde novembro
+        de 2025 devido a problemas estruturais e que o edifício continua a
+        necessitar de reabilitação.
+      evidence:
+        - EVD-000159
+    development:
+      summary: Para o ano letivo 2026/2027, o Município está a instalar uma solução
+        temporária junto à escola de origem; a Associação de Pais reportou que a
+        alternativa anterior de permanência noutra escola teria novas limitações
+        práticas, incluindo nas refeições.
+      evidence:
+        - EVD-000160
+        - EVD-000161
+    delimitation:
+      summary: "O candidato é estritamente site-specific. Não infere uma crise do
+        parque escolar municipal, impactos de aprendizagem, inadequação dos
+        monoblocos ou responsabilidade causal por atrasos. A resposta temporária
+        é reconhecida como um limite material da leitura: existe continuidade
+        letiva planeada apesar de o edifício original permanecer indisponível."
+      evidence:
+        - EVD-000159
+        - EVD-000160
+        - EVD-000161
+evidence:
+  - evidence_id: EVD-000159
+    effects:
+      - SUPPORTS
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000160
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - EXISTING_RESPONSE
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000161
+    effects:
+      - SUPPORTS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+evidence_status: discovered
+validation_status: unvalidated
+digital_tractability: not_assessed
+solution_landscape_status: not_assessed
+status: OPEN
