@@ -105,8 +105,8 @@ h3 {
 }
 
 /* ---- Links --------------------------------------------------------------
-   Underlined at rest; hover darkens ink and never depends on colour alone
-   since the underline is already present. */
+   Underlined at rest; hover darkens ink and thickens the underline, so the
+   change is perceptible without depending on colour alone. */
 a {
   color: var(--color-accent);
   text-decoration: underline;
@@ -116,6 +116,7 @@ a {
 
 a:hover {
   color: var(--color-accent-hover);
+  text-decoration-thickness: 2px;
 }
 
 /* ---- Focus ----------------------------------------------------------
