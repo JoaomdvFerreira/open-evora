@@ -3,7 +3,7 @@
   "project": {
     "id": "PROJECT-001",
     "name": "open-evora",
-    "objective": "Discovery and evidence-based civic problem intelligence for Évora, with an open civic data infrastructure track; no product implementation authorized yet",
+    "objective": "Evidence-first civic problem investigation and validation for Évora, governed by the canonical SRC → EVD → PRB model",
     "targetUsers": [
       "residents, students, workers, businesses, public bodies, and visitors in Évora"
     ],
@@ -14,14 +14,12 @@
   },
   "context": {
     "constraints": [
-      "Documentation/research-first repository: no application framework, database, or cloud infrastructure during D1.",
-      "Substantive Évora research is performed externally and integrated via reviewed handoffs (docs/discovery/research-handoff-protocol.md).",
-      "Research records use the YAML schemas in research/schemas/ and are validated with tools/research/ (typed, minimal dependency surface)."
+      "Research follows docs/investigationstrategy.md and the canonical SRC → EVD → PRB semantics in docs/datamodel.md.",
+      "Direct engagement and any canonical integration follow the public-repository, privacy, and evidence-integrity safeguards in AGENTS.md.",
+      "Research records use the executable schemas in research/schemas/ and deterministic validation in tools/research/."
     ],
     "nonGoals": [
-      "No civic product selection during D1.",
-      "No Évora Open API implementation during D1.",
-      "No cloud, frontend, or database technology selection during D1."
+      "No automatic research-state transition from deterministic validation."
     ],
     "technologyPreferences": [
       "Node.js (already available) for the research-record validator.",

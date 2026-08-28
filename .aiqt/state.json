@@ -61,7 +61,7 @@
       {
         "id": "M005",
         "title": "D5 — Stakeholder Challenge & Validation",
-        "objective": "Challenge the current D3/D4 problem diagnoses with the minimum credible direct operator, institutional, affected-journey and observational evidence needed to resolve decision-critical unknowns, refine or falsify problem framings, and update formal validation status only where the canonical validation contract is actually satisfied. D5 does not attempt to maximize the number of validated PRBs.",
+        "objective": "Challenge the current Problem framings with the minimum credible direct operator, institutional, affected-journey and observational evidence needed to resolve decision-critical unknowns, refine or falsify those framings, and update validation_status only through a human-authored decision supported by proportionate direct challenge. D5 does not attempt to maximize validated PRBs.",
         "status": "in_progress",
         "workUnitIds": [
           "WU022",
@@ -781,10 +781,10 @@
         "title": "WU-D5-01 — Operator / Institutional Challenge",
         "objective": "Resolve decision questions that are best answered through direct operator/institutional evidence, process artefacts or administrative/service data, using only the questions that remain unresolved after D4 and are genuinely answerable by operators/institutions across PRB-0001, PRB-0002, PRB-0003, PRB-0004, PRB-0005 (operator-side D5-P5-02/03/05/06), PRB-0006, PRB-0007, PRB-0008, and PRB-0009 (conditional, low-cost operator access only, core stays WATCH).",
         "scope": [
-          "Select the exact operator/institutional validation questions to pursue per problem, tracing each to a named critical unknown, blocked gate, or D4 falsification question",
+          "Select the exact operator/institutional validation questions to pursue per Problem, tracing each to a named critical unknown or D4 falsification question",
           "Define the contact/artefact/data route for each selected question",
-          "Establish the privacy/handling plan before any contact (docs/discovery/research-ethics.md §11)",
-          "Integrate direct evidence only after actual responses/data are received (stakeholder/observation EVD, shared analysis.lineage_id per engagement)",
+          "Before any contact, define the minimum information, relevant negative cases, stopping condition, and public-repository handling required by AGENTS.md",
+          "Integrate direct findings only after actual responses/data are received, using a sanitised canonical SRC for provenance and an EVD with optional lineage_id where applicable",
           "Explicitly carry unresolved questions to WU023 or later",
           "Do not default-engage PRB-0009 beyond its named D5-P9-01/02/03/04/06 questions or PRB-0010 at all"
         ],
@@ -792,22 +792,21 @@
           "No open-ended stakeholder outreach",
           "No generic 'tell us about the problem' interviews",
           "No solution ideation",
-          "No new HYP-*",
+          "No record type other than the canonical SRC, EVD, and PRB model",
           "No D6 work",
           "No forced validation-status changes",
           "Do not assume Via Verde/Parking Buddy coverage from public marketing pages alone"
         ],
         "acceptanceCriteria": [
-          "Exact operator/institutional validation questions are selected and documented per problem, each traced to a named critical unknown/gate/falsification question",
-          "A privacy/handling plan exists before any contact",
-          "Any integrated EVD uses shared analysis.lineage_id per engagement and follows docs/models/evidence-model.md D5 engagement rules",
+          "Exact operator/institutional validation questions are selected and documented per Problem, each traced to a named critical unknown or falsification question",
+          "Direct engagement has the required minimisation, handling, and stopping plan before contact",
+          "Any integrated finding preserves SRC → EVD provenance; EVD lineage_id is used only where applicable",
           "node tools/validate-research.js passes"
         ],
         "agentContextRefs": [
-          "docs/discovery/research-methodology.md",
-          "docs/discovery/research-ethics.md",
-          "docs/models/evidence-model.md",
-          "docs/models/problem-model.md"
+          "AGENTS.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md"
         ],
         "suggestedFiles": [
           "docs/milestones/"
@@ -828,9 +827,9 @@
         "scope": [
           "Do not recruit participants for questions already resolved sufficiently in WU022",
           "Every engagement traces to an explicit validation question and includes a negative-case/counterexample prompt",
-          "Collect only the minimum data required; no recording by default; preserve participant anonymity/minimization",
+          "Collect only the minimum information required; no recording by default; canonicalize the civic finding rather than participant identity",
           "Stop each question when decision sufficiency or diminishing informational return is reached",
-          "Record stakeholder/observation EVD where appropriate, with shared analysis.lineage_id per engagement and no fake public SRC-*",
+          "Where a finding is integrated, represent its provenance through a sanitised canonical SRC and create EVD lineage_id only where applicable; do not represent direct engagement as a public source",
           "Record explicit contradictions/refinements and a stopping/saturation note for each active validation question"
         ],
         "outOfScope": [
@@ -842,13 +841,13 @@
         "acceptanceCriteria": [
           "Only questions still unresolved after WU022 are pursued, with the reason recorded",
           "Every engagement guide includes a negative-case prompt",
-          "Any integrated EVD follows docs/models/evidence-model.md D5 engagement rules and docs/discovery/research-ethics.md §11",
+          "Any integrated finding follows AGENTS.md and preserves canonical SRC → EVD provenance with the required scope and inference limits",
           "node tools/validate-research.js passes"
         ],
         "agentContextRefs": [
-          "docs/discovery/research-methodology.md",
-          "docs/discovery/research-ethics.md",
-          "docs/models/evidence-model.md"
+          "AGENTS.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md"
         ],
         "suggestedFiles": [
           "docs/milestones/"
@@ -867,10 +866,10 @@
         "id": "WU024",
         "milestoneId": "M005",
         "title": "WU-D5-03 — Validation Decisions & D5 Closure",
-        "objective": "Synthesize D5 direct evidence from WU022/WU023 and make formal problem-validation decisions using the canonical 7-point validation contract, for every PRB actually challenged, then produce the D6 handoff and close M005.",
+        "objective": "Synthesize D5 direct evidence from WU022/WU023 and make human-authored validation_status decisions for every PRB actually challenged, consistent with current canonical research semantics, then produce the D6 handoff and close M005.",
         "scope": [
-          "For each PRB actually challenged, record: questions challenged; evidence roles reached; counterexamples sought; material findings; contradictions/refinements; remaining HIGH-impact unknowns; validation_status before/after; PRB status change if any; ASM gate/triage changes if any; next route",
-          "Apply only validation_status/PRB.status transitions supported by actual evidence and the current schema/contracts; no transition is mandatory",
+          "For each PRB actually challenged, record the questions challenged, counterexamples sought, material findings, contradictions/refinements, remaining material uncertainty, validation_status before/after, any authorised current PRB-state change, and next route",
+          "Apply a validation_status or other current PRB-state transition only through an authorised human decision supported by actual evidence; no transition is mandatory",
           "Create the final D5 validation matrix, contradiction/refinement log, and unresolved-unknowns list",
           "Create the explicit D6 handoff",
           "Evaluate the D5 exit gate and close M005"
@@ -881,16 +880,17 @@
           "Do not force every challenged PRB to a validation-status change"
         ],
         "acceptanceCriteria": [
-          "Every PRB actually challenged in D5 has a recorded decision using the canonical validation contract",
-          "No PRB was forced to validated without satisfying all 7 conditions",
+          "Every PRB actually challenged in D5 has a recorded human-authored validation decision",
+          "No PRB was forced to validated by participant count, agreement, deterministic validation, or absence of contradiction",
           "An explicit D6 handoff exists",
           "D5 exit gate evaluated and recorded; M004-style closure document produced",
           "node tools/validate-research.js passes",
           "Working tree clean before closure commit"
         ],
         "agentContextRefs": [
-          "docs/models/problem-model.md",
-          "docs/discovery/research-methodology.md"
+          "AGENTS.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md"
         ],
         "suggestedFiles": [
           "docs/milestones/"
