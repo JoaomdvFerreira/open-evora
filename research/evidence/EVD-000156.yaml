@@ -1,0 +1,32 @@
+evidence_id: EVD-000156
+provenance:
+  sources:
+    - SRC-0127
+  extracted_at: 2026-08-28
+observation:
+  summary: A Câmara Municipal de Évora reportou a execução de trabalhos de
+    aplicação de microaglomerado a frio nas avenidas Cartaxo Júnior e das
+    Fontanas e indicou que a correção da calçada na Avenida de São João de Deus
+    já tinha sido realizada.
+scope:
+  geography:
+    level: city
+    area: Évora
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-06-15
+domains:
+  - URB
+  - MOB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - As intervenções são específicas de três vias e não permitem inferir a
+    condição da rede viária do município no seu conjunto.
+  - O relato municipal de trabalhos executados não mede diretamente a qualidade
+    resultante do pavimento nem a experiência dos utilizadores após a
+    intervenção.
+  - A observação não estabelece a conclusão da empreitada geral de reparação de
+    estradas municipais.

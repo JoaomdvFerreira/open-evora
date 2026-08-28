@@ -1,0 +1,33 @@
+source_id: SRC-0127
+publisher: Câmara Municipal de Évora
+name: REPARAR ÉVORA — avenidas Cartaxo Júnior e das Fontanas
+resource_type: webpage
+scope:
+  geography:
+    level: city
+    area: Évora
+  temporal:
+    as_of: 2026-06-15
+  domains:
+    - URB
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/reparar-evora-avenidas-cartaxo-junior-e-das-fontanas/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-04-30
+  updated_at: 2026-06-15
+  last_checked_at: 2026-08-28
+  update_frequency: one_off
+caveats:
+  - A página descreve intervenções em vias específicas da cidade e não constitui
+    um balanço da condição da rede viária municipal no seu conjunto.
