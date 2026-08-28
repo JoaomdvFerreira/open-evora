@@ -2,6 +2,8 @@
 # Not real research. Do not treat as a real problem identified in Évora.
 
 problem_id: PRB-9001
+created_at: "2026-08-28"
+updated_at: "2026-08-28"
 
 title: "Fixture Problem for Validator Testing"
 

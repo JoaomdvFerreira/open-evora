@@ -241,10 +241,15 @@ A Problem is the canonical mutable representation of the project's current under
 It owns:
 - the current substantive problem description;
 - the current investigation state and decision posture.
+- authored lifecycle dates for the canonical PRB.
 
 The Problem is the canonical answer to:
 
 > What does the project currently understand and decide about this civic problem?
+
+### Lifecycle metadata
+
+`created_at` is the full `YYYY-MM-DD` date on which the canonical PRB was created and is immutable afterwards. `updated_at` is the full `YYYY-MM-DD` date on which the canonical PRB was last updated. Both are canonical authored metadata; they are not derived from Git history or automatically mutated.
 
 ### Current substantive state
 
