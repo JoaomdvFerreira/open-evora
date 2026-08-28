@@ -212,6 +212,14 @@ function validateExclusiveFieldSets(file: string, record: RecordFields, schema: 
 const INVESTIGATION_PATH_STAGES = ["initial_signal", "development", "delimitation"] as const;
 const PRB_EFFECTS = new Set(["SUPPORTS", "REFINES", "BOUNDS", "CONTRADICTS"]);
 const PRB_RESEARCH_ROLES = new Set(["LOCAL_OBSERVATION", "CONTEXTUAL", "COMPARATIVE_MECHANISM", "COMPARATIVE_RESPONSE", "EXISTING_RESPONSE", "PLANNED_RESPONSE"]);
+const PRB_HISTORY_STATE_FIELDS = ["status", "evidence_status", "validation_status", "digital_tractability", "solution_landscape_status"] as const;
+
+function isFullCalendarDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
 
 function validatePrbObjectKeys(
   file: string,
@@ -276,6 +284,111 @@ function validatePrbDeclaredListItems(file: string, record: RecordFields, errors
   }
   const domain = getRecordField(record, "domain");
   if (Array.isArray(domain)) validatePrbStringList(file, "domain", domain, errors);
+}
+
+/**
+ * PRB.history needs bounded item checks because generic allowed-field
+ * traversal treats arrays as leaves. This remains structural validation only.
+ */
+function validatePrbHistory(
+  file: string,
+  record: RecordFields,
+  schema: RecordSchema,
+  evidenceById: ReadonlyMap<string, ParsedRecord>,
+  errors: string[]
+): void {
+  const history = record.history;
+  if (history === undefined || history === null || !Array.isArray(history)) return;
+
+  const linkedEvidence = new Set(
+    (Array.isArray(record.evidence) ? record.evidence : [])
+      .map((entry) => entry && typeof entry === "object" && !Array.isArray(entry) ? (entry as Record<string, unknown>).evidence_id : undefined)
+      .filter((id): id is string => typeof id === "string")
+  );
+  let previousDate: string | null = null;
+
+  history.forEach((entry, index) => {
+    const field = `history[${index}]`;
+    if (entry === null || typeof entry !== "object" || Array.isArray(entry)) {
+      errors.push(`[${file}] field "${field}" must be an object`);
+      return;
+    }
+    const item = entry as Record<string, unknown>;
+    validatePrbObjectKeys(file, field, item, ["date", "summary", "evidence", "state_changes"], errors);
+
+    const date = item.date;
+    if (typeof date !== "string" || date.trim() === "") {
+      errors.push(`[${file}] missing required field: ${field}.date`);
+    } else if (!isFullCalendarDate(date)) {
+      errors.push(`[${file}] field "${field}.date" must be a valid full YYYY-MM-DD date`);
+    } else {
+      if (previousDate !== null && date < previousDate) {
+        errors.push(`[${file}] field "${field}.date" must not be earlier than the preceding history date`);
+      }
+      previousDate = date;
+    }
+
+    const summary = item.summary;
+    if (typeof summary !== "string" || summary.trim() === "") {
+      errors.push(`[${file}] missing required non-empty field: ${field}.summary`);
+    }
+
+    const evidence = item.evidence;
+    if (evidence !== undefined) {
+      if (!Array.isArray(evidence) || evidence.length === 0) {
+        errors.push(`[${file}] field "${field}.evidence" must be a non-empty array when present`);
+      } else {
+        const seen = new Set<string>();
+        evidence.forEach((id, evidenceIndex) => {
+          const evidenceField = `${field}.evidence[${evidenceIndex}]`;
+          if (typeof id !== "string" || id.trim() === "") {
+            errors.push(`[${file}] field "${evidenceField}" must be a non-empty EVD-* reference`);
+          } else if (seen.has(id)) {
+            errors.push(`[${file}] field "${field}.evidence" contains duplicate reference "${id}"`);
+          } else {
+            seen.add(id);
+            if (!evidenceById.has(id)) {
+              errors.push(`[${file}] field "${field}.evidence" references non-existent EVD-* record "${id}"`);
+            } else if (!linkedEvidence.has(id)) {
+              errors.push(`[${file}] field "${field}.evidence" references "${id}" which is not linked to this problem (not present in its evidence list)`);
+            }
+          }
+        });
+      }
+    }
+
+    const stateChanges = item.state_changes;
+    if (stateChanges === undefined) return;
+    if (stateChanges === null || typeof stateChanges !== "object" || Array.isArray(stateChanges)) {
+      errors.push(`[${file}] field "${field}.state_changes" must be an object`);
+      return;
+    }
+    const changes = stateChanges as Record<string, unknown>;
+    validatePrbObjectKeys(file, `${field}.state_changes`, changes, PRB_HISTORY_STATE_FIELDS, errors);
+    if (Object.keys(changes).length === 0) {
+      errors.push(`[${file}] field "${field}.state_changes" must contain at least one state change when present`);
+    }
+    for (const [stateField, change] of Object.entries(changes)) {
+      const changeField = `${field}.state_changes.${stateField}`;
+      if (!PRB_HISTORY_STATE_FIELDS.includes(stateField as typeof PRB_HISTORY_STATE_FIELDS[number])) continue;
+      if (change === null || typeof change !== "object" || Array.isArray(change)) {
+        errors.push(`[${file}] field "${changeField}" must be an object`);
+        continue;
+      }
+      const transition = change as Record<string, unknown>;
+      validatePrbObjectKeys(file, changeField, transition, ["from", "to"], errors);
+      const allowedValues = schema.enums?.[stateField] ?? [];
+      for (const transitionField of ["from", "to"] as const) {
+        const value = transition[transitionField];
+        if (typeof value !== "string" || !allowedValues.includes(value)) {
+          errors.push(`[${file}] field "${changeField}.${transitionField}" has invalid value "${value}"`);
+        }
+      }
+      if (transition.from === transition.to && typeof transition.from === "string") {
+        errors.push(`[${file}] field "${changeField}" must change: from and to must differ`);
+      }
+    }
+  });
 }
 
 function validateNestedPrbEvidenceMembership(file: string, record: RecordFields, errors: string[]): void {
@@ -450,6 +563,7 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
         validatePrbDeclaredListItems(file, fields, errors);
         validateNestedPrbEvidenceMembership(file, fields, errors);
         validateInvestigation(file, fields, evidenceById, errors);
+        validatePrbHistory(file, fields, schema, evidenceById, errors);
       }
     }
   }

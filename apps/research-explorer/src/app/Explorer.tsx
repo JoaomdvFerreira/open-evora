@@ -4,6 +4,7 @@ import { useExplorerUrlState } from "../navigation/useExplorerUrlState";
 import { Overview } from "../overview/Overview";
 import { RecordsExplorer } from "../records/RecordsExplorer";
 import { ProblemView } from "../problem/ProblemView";
+import { ProblemHistoryView } from "../problem/ProblemHistoryView";
 import { ReadingGuide } from "../guide/ReadingGuide";
 import { useUnavailableNote } from "../presentation/UnavailableNote";
 
@@ -36,6 +37,8 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
     const viewTitle =
       url.state.view === "problem"
         ? `Problema${selected}`
+        : url.state.view === "history"
+          ? `Histórico${selected}`
         : url.state.view === "graph"
           ? `Grafo${selected}`
           : url.state.view === "overview"
@@ -93,6 +96,7 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
           typeFilter={url.state.typeFilter}
           onTypeFilterChange={url.setTypeFilter}
           onViewAsProblem={(id) => url.setViewAndSelection("problem", id)}
+          onViewHistory={(id) => url.setViewAndSelection("history", id)}
           onViewInGraph={(id) => url.setViewAndSelection("graph", id)}
           onBackToRecords={() => url.setSelectedId(null)}
         />
@@ -105,7 +109,18 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
           onOpenGeneric={(id) => url.setViewAndSelection("records", id)}
           onBackToRecords={() => url.clearSelectionAndSetView("records")}
           onBackToOverview={() => url.clearSelectionAndSetView("overview")}
-          onViewInGraph={(id) => url.setViewAndSelection("graph", id)}
+          onViewHistory={(id) => url.setViewAndSelection("history", id)}
+        />
+      )}
+
+      {url.state.view === "history" && (
+        <ProblemHistoryView
+          dataProvider={dataProvider}
+          problemId={url.state.selectedId}
+          onOpenGeneric={(id) => url.setViewAndSelection("records", id)}
+          onBackToRecords={() => url.clearSelectionAndSetView("records")}
+          onBackToOverview={() => url.clearSelectionAndSetView("overview")}
+          onViewAsProblem={(id) => url.setViewAndSelection("problem", id)}
         />
       )}
 
@@ -126,6 +141,7 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
             onDepthChange={url.setGraphDepth}
             onOpenGeneric={(id) => url.setViewAndSelection("records", id)}
             onViewAsProblem={(id) => url.setViewAndSelection("problem", id)}
+            onViewHistory={(id) => url.setViewAndSelection("history", id)}
           />
         </Suspense>
       )}

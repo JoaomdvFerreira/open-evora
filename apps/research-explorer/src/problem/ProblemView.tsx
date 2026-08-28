@@ -919,10 +919,10 @@ interface ProblemContentProps {
   problemId: string;
   onOpenGeneric: (id: string) => void;
   onBackToOverview: () => void;
-  onViewInGraph: (id: string) => void;
+  onViewHistory: (id: string) => void;
 }
 
-function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToOverview, onViewInGraph }: ProblemContentProps) {
+function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToOverview, onViewHistory }: ProblemContentProps) {
   const state = useProblemProjection(dataProvider, lookup, problemId);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -969,7 +969,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
     <article aria-labelledby="problem-heading" className="problem-view shell-frame">
       <ProblemBreadcrumb problemId={problem.id} onBackToOverview={onBackToOverview} />
 
-      <ContextTabs prbId={problem.id} active="problem" onOpenGeneric={onOpenGeneric} onViewAsProblem={onOpenGeneric} onViewInGraph={onViewInGraph} />
+      <ContextTabs prbId={problem.id} active="problem" onOpenGeneric={onOpenGeneric} onViewAsProblem={onOpenGeneric} onViewHistory={onViewHistory} />
 
       <ProblemHelpDisclosure record={record} />
 
@@ -1025,7 +1025,7 @@ interface ProblemViewProps {
   onBackToRecords: () => void;
   /** UX-D §2: the Problem breadcrumb's own first action — Problem View reads as "Visão geral › PRB-*", not a child of Records. */
   onBackToOverview: () => void;
-  onViewInGraph: (id: string) => void;
+  onViewHistory: (id: string) => void;
 }
 
 /**
@@ -1036,7 +1036,7 @@ interface ProblemViewProps {
  * record type reached from here (evidence, source) still opens through the
  * same generic detail renderer via onOpenGeneric.
  */
-export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewInGraph }: ProblemViewProps) {
+export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewHistory }: ProblemViewProps) {
   const indexState = useRecordIndex(dataProvider);
 
   if (indexState.status === "loading") {
@@ -1090,7 +1090,7 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
       problemId={problemId}
       onOpenGeneric={onOpenGeneric}
       onBackToOverview={onBackToOverview}
-      onViewInGraph={onViewInGraph}
+      onViewHistory={onViewHistory}
     />
   );
 }

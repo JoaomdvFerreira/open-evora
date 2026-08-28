@@ -13,7 +13,7 @@ The canonical research model contains exactly three record types:
 
 No Hypothesis (`HYP-*`) record type is part of the current process or target model.
 
-Assessment (`ASM-*`) is not part of the current canonical model. Historical snapshot storage for material Problem history is deferred until material Problem history actually justifies it; see §4's future-policy note.
+Assessment (`ASM-*`) is not part of the current canonical model. Problem history is an optional authored lightweight changelog on a PRB, not another record type; full historical snapshots remain deferred (see §4).
 
 ## 0. Local research workbench boundary
 
@@ -300,15 +300,13 @@ Inverse genealogy should be derived rather than redundantly authored.
 
 Considering and rejecting structural change creates no genealogy.
 
-## 4. Future historical-snapshot policy
+## 4. Material history and future snapshots
 
-Assessment (`ASM-*`) is not an implemented canonical record type. Historical snapshots of Problem state are deferred until material Problem history actually justifies storing them; this unit does not design that future schema.
+Assessment (`ASM-*`) remains retired and is not an implemented canonical record type. A PRB may optionally author a lightweight, public-facing material-change history. It is a concise changelog of material changes, not a full PRB snapshot, Git-derived audit log, or mechanically reconstructed history. Its implemented shape is schema-owned.
 
-The material-change criteria that previously governed Assessment creation are preserved here as the future policy for when a historical snapshot would be justified, so a later decision to implement snapshot storage does not require redefining what counts as a materially significant Problem change. `docs/investigationstrategy.md` §9 owns the operational rules; this section anchors their status as forward-looking policy, not an active requirement.
+Whether a change is material remains a Gate 1 human semantic decision under `docs/investigationstrategy.md` §9. Integration and projection tooling must not infer or create history. `updated_at` remains the last authored PRB update and is independent from whether that update is material.
 
-A materially significant Problem change is one where, if the project were asked what it currently believes or has decided about the Problem, the answer would differ from before the change. This includes changes to lifecycle status, `evidence_status`, `validation_status`, investigation posture/triage, an actual structural disposition (split/merge), or an effect-tested material change to manifestation, consequence, scope, a high-impact critical uncertainty, or a materially conclusion-changing contradiction. It excludes reinforcing evidence, metadata/wording/formatting changes, maintained provenance links, mere passage of time, or a review reaffirming materially equivalent state.
-
-Should historical snapshot storage be implemented in the future, it may reuse these criteria as its creation trigger rather than redefining materiality from scratch.
+No retrospective backfill is required where reliable continuous investigation history does not exist. Full historical snapshots of Problem state remain explicitly deferred; a future snapshot design may reuse the materiality criteria without redefining them.
 
 ## 5. Core relationships
 

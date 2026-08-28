@@ -57,6 +57,8 @@ interface GraphExplorerProps {
   onDepthChange: (depth: GraphDepth) => void;
   onOpenGeneric: (id: string) => void;
   onViewAsProblem: (id: string) => void;
+  /** Kept for the dormant Graph surface's shared PRB context switcher. */
+  onViewHistory?: (id: string) => void;
 }
 
 /**
@@ -77,6 +79,7 @@ export function GraphExplorer({
   onDepthChange,
   onOpenGeneric,
   onViewAsProblem,
+  onViewHistory,
 }: GraphExplorerProps) {
   const state = useGraphData(dataProvider);
   const canvasRef = useRef<GraphCanvasHandle>(null);
@@ -207,7 +210,7 @@ export function GraphExplorer({
       </p>
 
       {!fullCorpusView && focusSummary?.type === "PRB-" && (
-        <ContextTabs prbId={focusSummary.id} active="graph" onOpenGeneric={onOpenGeneric} onViewAsProblem={onViewAsProblem} onViewInGraph={onFocusChange} />
+        <ContextTabs prbId={focusSummary.id} active="graph" onOpenGeneric={onOpenGeneric} onViewAsProblem={onViewAsProblem} onViewHistory={onViewHistory ?? (() => undefined)} />
       )}
 
       <div className="graph-controls">

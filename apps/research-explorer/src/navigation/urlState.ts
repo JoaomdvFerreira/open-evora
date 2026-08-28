@@ -15,7 +15,7 @@ import { MIN_DEPTH, clampDepth, type GraphDepth } from "../graph/neighbourhood";
  * would, never a bypassed fetch. See StaticDataProvider.ts.
  */
 
-export type ExplorerView = "overview" | "records" | "problem" | "graph";
+export type ExplorerView = "overview" | "records" | "problem" | "history" | "graph";
 export const DEFAULT_VIEW: ExplorerView = "overview";
 export const DEFAULT_GRAPH_DEPTH: GraphDepth = MIN_DEPTH;
 
@@ -37,7 +37,7 @@ export const DEFAULT_URL_STATE: ExplorerUrlState = {
 };
 
 function isExplorerView(value: string | null): value is ExplorerView {
-  return value === "overview" || value === "records" || value === "problem" || value === "graph";
+  return value === "overview" || value === "records" || value === "problem" || value === "history" || value === "graph";
 }
 
 /**

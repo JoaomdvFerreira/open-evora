@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { classifyCandidateDelta, type CandidateRecord, type CorpusIndex, type RecordFields, type RecordSchema } from "../index.ts";
+import { loadCorpusIndex } from "../core/corpus.ts";
 
 const SCHEMA: RecordSchema = {
   prefix: "TST-",
@@ -90,4 +91,26 @@ test("classification does not mutate canonical or candidate inputs", () => {
 
   assert.deepEqual(index.byPrefix.get("TST-")!.records[0].fields, canonicalBefore);
   assert.deepEqual(input.fields, candidateBefore);
+});
+
+test("a PRB candidate whose only delta is an authored history entry is an UPDATE and then NO_CHANGE", () => {
+  const canonical = loadCorpusIndex(`${process.cwd()}/research`);
+  const original = canonical.byPrefix.get("PRB-")!.byId.get("PRB-0001")!.fields;
+  const fields = structuredClone(original) as RecordFields;
+  fields.history = [{
+    date: "2026-08-28",
+    summary: "Entrada de histórico para a regressão da integração.",
+    evidence: ["EVD-000001"],
+  }];
+  const candidate: CandidateRecord = { recordFamily: "PRB-", fields };
+
+  assert.deepEqual(classifyCandidateDelta(canonical, candidate), {
+    recordFamily: "PRB-", id: "PRB-0001", action: "UPDATE",
+  });
+
+  const historyBearingCanonical = structuredClone(canonical);
+  const record = historyBearingCanonical.byPrefix.get("PRB-")!.byId.get("PRB-0001")!;
+  record.fields = structuredClone(fields);
+  historyBearingCanonical.byPrefix.get("PRB-")!.records.find((item) => item.file === record.file)!.fields = record.fields;
+  assert.equal(classifyCandidateDelta(historyBearingCanonical, candidate).action, "NO_CHANGE");
 });

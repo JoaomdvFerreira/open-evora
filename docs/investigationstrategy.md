@@ -206,9 +206,13 @@ For public-repository handling, follow `AGENTS.md`. Operationally, canonicalize 
 
 Recording requires a concrete need, appropriate consent, and an explicit retention basis.
 
-## 9. Material change and future historical snapshots
+## 9. Material change and authored PRB history
 
-Assessment (`ASM-*`) is not an implemented canonical record type (`docs/datamodel.md` §4). Historical snapshot storage for Problem state is deferred until material Problem history actually justifies it. The rules below define materiality itself and are preserved as the future trigger for that snapshot storage, not as a current record-creation requirement.
+Assessment (`ASM-*`) remains retired; no new canonical record type or full PRB snapshot/versioning system is introduced. A material change may be recorded as a concise, authored public PRB-history entry. It is not mechanically generated, Git-derived, or retrospectively reconstructed. Gate 1 retains the human semantic authority to decide materiality and authorize the entry.
+
+Do not backfill history where reliable continuous investigation history does not exist. A full historical-snapshot design remains deferred (`docs/datamodel.md` §4).
+
+For a PRB UPDATE, human review determines whether the change is materially significant. Where that reviewed change is material, the Gate 1 candidate should contain the appropriate authored history entry. Deterministic tooling validates authored history but does not decide whether it is required; CREATE, UPDATE and NO_CHANGE remain structural observations, not materiality decisions.
 
 ### Effect test
 
@@ -239,7 +243,7 @@ A field diff alone is not sufficient for these conditional triggers.
 
 ### Non-triggers
 
-A review is not materially significant merely because:
+A review is not materially significant, and does not require a history entry, merely because:
 - new Evidence reinforces the existing reading;
 - metadata, wording, or formatting changes;
 - provenance or Source links are maintained;

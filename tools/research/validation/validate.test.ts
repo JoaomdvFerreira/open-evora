@@ -146,6 +146,31 @@ test("PRB lifecycle dates are required full ISO dates", () => {
   assert.match(partial, /updated_at.*does not match required pattern/);
 });
 
+test("PRB material history validates its bounded authored structure", () => {
+  const valid = loadCorpusIndex(root);
+  const prb0010 = prb(valid, "PRB-0010");
+  assert.ok(Array.isArray(prb0010.history));
+  assert.deepEqual(validateCorpusIndex(valid).errors, []);
+
+  const noHistory = loadCorpusIndex(root);
+  delete prb(noHistory, "PRB-0010").history;
+  assert.deepEqual(validateCorpusIndex(noHistory).errors, []);
+
+  assert.match(errorsAfter((index) => { prb(index).history = ["not an object"]; }), /history\[0\].*must be an object/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ summary: "Alteração." }]; }), /missing required field: history\[0\]\.date/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-28" }]; }), /missing required non-empty field: history\[0\]\.summary/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-02-30", summary: "Alteração." }]; }), /valid full YYYY-MM-DD date/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-28", summary: "", extra: true }]; }), /history\[0\]\.extra.*not an allowed field/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-28", summary: "Alteração.", evidence: ["EVD-000001", "EVD-000001"] }]; }), /contains duplicate reference/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-28", summary: "Alteração.", evidence: ["EVD-999999"] }]; }), /non-existent EVD/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-28", summary: "Alteração.", evidence: ["EVD-000148"] }]; }), /not linked to this problem/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-28", summary: "Alteração.", state_changes: { invented: { from: "a", to: "b" } } }]; }), /state_changes\.invented.*not an allowed field/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-28", summary: "Alteração.", state_changes: { status: { from: "OPEN", to: "UNKNOWN" } } }]; }), /state_changes\.status\.to.*invalid value/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-28", summary: "Alteração.", state_changes: { status: { from: "OPEN", to: "OPEN" } } }]; }), /from and to must differ/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-28", summary: "Alteração.", state_changes: { status: "OPEN" } }]; }), /state_changes\.status.*must be an object/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-29", summary: "Nova." }, { date: "2026-08-28", summary: "Antiga." }]; }), /must not be earlier than the preceding history date/);
+});
+
 test("PRB authored relationship, investigation and decision-basis structures are closed", () => {
   const relationships = errorsAfter((index) => {
     const relation = prb(index).evidence[0];

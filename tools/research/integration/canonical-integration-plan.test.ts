@@ -13,6 +13,7 @@ import {
   type RecordIndex,
   type RecordSchema,
 } from "../index.ts";
+import { loadCorpusIndex } from "../core/corpus.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 
@@ -175,4 +176,25 @@ test("an UPDATE target that escapes its schema directory is rejected", () => {
   const updateIndex = index([source("SRC-UPDATE", "Canonical")], ["../outside.yaml"]);
   const updateReview = review(updateIndex, [candidate("SRC-UPDATE", "Updated")]);
   assert.throws(() => prepareCanonicalIntegrationPlan(updateIndex, updateReview), /escapes schema directory/);
+});
+
+test("a reviewed PRB history UPDATE is serialized unchanged into its existing canonical target", () => {
+  const canonical = loadCorpusIndex(`${process.cwd()}/research`);
+  const fields = structuredClone(canonical.byPrefix.get("PRB-")!.byId.get("PRB-0001")!.fields) as RecordFields;
+  fields.history = [{
+    date: "2026-08-28",
+    summary: "Entrada de histórico para o plano de integração.",
+    evidence: ["EVD-000001"],
+  }];
+  const candidate: CandidateRecord = { recordFamily: "PRB-", fields };
+  const prepared = prepareCanonicalIntegrationReview(SHA, canonical, [candidate]);
+  const plan = prepareCanonicalIntegrationPlan(canonical, prepared);
+  const operation = plan.operations[0]!;
+
+  assert.equal(prepared.readiness, "READY_FOR_INTEGRATION_GATE");
+  assert.deepEqual(plan.deltas, [{ recordFamily: "PRB-", id: "PRB-0001", action: "UPDATE" }]);
+  assert.equal(operation.action, "UPDATE");
+  assert.equal("targetFile" in operation && operation.targetFile, "problems/PRB-0001.yaml");
+  assert.deepEqual("yaml" in operation && parseRecordYaml(operation.yaml), fields);
+  assert.deepEqual("yaml" in operation && (parseRecordYaml(operation.yaml).history), fields.history);
 });

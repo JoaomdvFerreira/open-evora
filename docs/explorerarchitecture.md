@@ -64,14 +64,16 @@ Foreground:
 
 Answers:
 
-> What is the state of this investigation and how did it evolve?
+> What is the current state of this investigation?
 
 Foreground:
 - current investigation state and decision posture;
 - provenance;
 - technical inspection where useful.
 
-Material historical-state presentation is deferred until historical snapshot storage exists (`docs/datamodel.md` §4); `Detalhe` currently has no Assessment/history surface to present.
+### `Histórico`
+
+Presents the optional authored material-change history of the selected Problem, newest first. It must not fabricate entries or imply that a Problem without entries never changed. It is a read-only projection of PRB history, not a snapshot/versioning or audit-log surface.
 
 All research semantics come from `docs/datamodel.md`.
 

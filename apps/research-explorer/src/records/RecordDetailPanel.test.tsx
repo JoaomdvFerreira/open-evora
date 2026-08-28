@@ -29,7 +29,7 @@ const provider: DataProvider = { getManifest: async () => { throw Error("unused"
 const lookup = new Map(index.map((item) => [item.id, item]));
 const renderDetail = (detail = evd, onSelect = vi.fn(), onViewAsProblem = vi.fn(), selectedId = "EVD-1") => {
   const fixture: DataProvider = { ...provider, getRecord: async (id) => id === selectedId ? detail : records[id] };
-  render(<RecordDetailPanel dataProvider={fixture} lookup={lookup} selectedId={selectedId} onBackToRecords={vi.fn()} onSelect={onSelect} onViewAsProblem={onViewAsProblem} onViewInGraph={vi.fn()} />);
+  render(<RecordDetailPanel dataProvider={fixture} lookup={lookup} selectedId={selectedId} onBackToRecords={vi.fn()} onSelect={onSelect} onViewAsProblem={onViewAsProblem} onViewHistory={vi.fn()} onViewInGraph={vi.fn()} />);
   return { onSelect, onViewAsProblem };
 };
 

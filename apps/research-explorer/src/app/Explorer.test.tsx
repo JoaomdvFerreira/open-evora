@@ -535,80 +535,11 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     const backBreadcrumb = within(backDetailPanel).getByLabelText("Localização");
     await within(backBreadcrumb).findByText("PRB-0005");
     expect(window.location.search).toContain("id=PRB-0005");
-  });
 
-  it("UX-F: PRB ContextTabs Grafo is visible, focusable, and aria-disabled — activation cannot navigate to Graph", async () => {
-    const user = userEvent.setup();
-    render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
-    const detailPanel = await getDetailPanel();
-    const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
-
-    const grafoTab = within(switcher).getByRole("button", { name: "Grafo" }) as HTMLButtonElement;
-    expect(grafoTab.disabled).toBe(false);
-    expect(grafoTab.getAttribute("aria-disabled")).toBe("true");
-    expect(grafoTab.getAttribute("title")).toBe("Em desenvolvimento");
-
-    // UX-F accessibility fix: aria-describedby must resolve to a real,
-    // non-empty, on-page element carrying the explanation text.
-    const describedById = grafoTab.getAttribute("aria-describedby");
-    expect(describedById).toBeTruthy();
-    const grafoNote = document.getElementById(describedById!);
-    expect(grafoNote).not.toBeNull();
-    expect(grafoNote!.textContent).toBe("Em desenvolvimento");
-
-    grafoTab.focus();
-    expect(document.activeElement).toBe(grafoTab);
-
-    await user.click(grafoTab);
-    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
-    let stillDetailPanel = await getDetailPanel();
-    let breadcrumb = within(stillDetailPanel).getByLabelText("Localização");
-    await within(breadcrumb).findByText("PRB-0005");
-
-    grafoTab.focus();
-    await user.keyboard("{Enter}");
-    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
-    stillDetailPanel = await getDetailPanel();
-    breadcrumb = within(stillDetailPanel).getByLabelText("Localização");
-    await within(breadcrumb).findByText("PRB-0005");
-
-    grafoTab.focus();
-    await user.keyboard(" ");
-    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
-    stillDetailPanel = await getDetailPanel();
-    breadcrumb = within(stillDetailPanel).getByLabelText("Localização");
-    await within(breadcrumb).findByText("PRB-0005");
-  });
-
-  it("UX-F: GlobalNav and ContextTabs Grafo unavailable-notes don't collide when both render on the same PRB Detail page", async () => {
-    const user = userEvent.setup();
-    render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
-    const detailPanel = await getDetailPanel();
-    const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
-
-    const globalGrafo = within(globalNav()).getByRole("button", { name: "Grafo" });
-    const tabsGrafo = within(switcher).getByRole("button", { name: "Grafo" });
-
-    const globalDescribedById = globalGrafo.getAttribute("aria-describedby")!;
-    const tabsDescribedById = tabsGrafo.getAttribute("aria-describedby")!;
-    expect(globalDescribedById).toBeTruthy();
-    expect(tabsDescribedById).toBeTruthy();
-    expect(globalDescribedById).not.toBe(tabsDescribedById);
-
-    expect(document.getElementById(globalDescribedById)!.textContent).toBe("Em desenvolvimento");
-    expect(document.getElementById(tabsDescribedById)!.textContent).toBe("Em desenvolvimento");
-
-    // No duplicate ids anywhere on the page (getElementById only ever returns
-    // the first match, so this catches a collision that assertion would hide).
-    const idCounts = new Map<string, number>();
-    document.querySelectorAll("[id]").forEach((el) => {
-      idCounts.set(el.id, (idCounts.get(el.id) ?? 0) + 1);
-    });
-    for (const [id, count] of idCounts) {
-      expect(count, `duplicate id: ${id}`).toBe(1);
-    }
+    await user.click(within(backDetailPanel).getByRole("button", { name: "Histórico" }));
+    expect(await screen.findByText("Não existe histórico material registado para este problema.")).toBeTruthy();
+    expect(window.location.search).toContain("view=history");
+    expect(window.location.search).toContain("id=PRB-0005");
   });
 
   it("browser back after a GlobalNav area change restores the prior area and selection deterministically", async () => {

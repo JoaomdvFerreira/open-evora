@@ -16,6 +16,7 @@ import {
   rollbackCanonicalPromotion,
 } from "./canonical-promoter.ts";
 import { loadCorpusIndex } from "../core/corpus.ts";
+import { parseRecordYaml, stringifyRecordYaml } from "../core/yaml.ts";
 import { validateResearchRoot } from "../validation/validate.ts";
 
 
@@ -43,6 +44,25 @@ function fixture(): Fixture {
     copyFileSync(join(process.cwd(), "research", "schemas", name), join(schemas, name));
   }
   writeFileSync(join(research, "sources", "SRC-BASE.yaml"), sourceYaml("SRC-BASE", "Before"));
+  execFileSync("git", ["init", "--quiet", root]);
+  execFileSync("git", ["-C", root, "add", "."]);
+  execFileSync("git", ["-C", root, "-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--quiet", "-m", "initial"]);
+  return {
+    root,
+    research,
+    cleanup: () => rmSync(root, { recursive: true, force: true }),
+    head: () => execFileSync("git", ["-C", root, "rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+    commit: (message) => {
+      execFileSync("git", ["-C", root, "add", "."]);
+      execFileSync("git", ["-C", root, "-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--quiet", "-m", message]);
+    },
+  };
+}
+
+function historyFixture(): Fixture {
+  const root = mkdtempSync(join(tmpdir(), "open-evora-promoter-history-test-"));
+  const research = join(root, "research");
+  copyResearchTreeForStaging(resolve(process.cwd(), "research"), research);
   execFileSync("git", ["init", "--quiet", root]);
   execFileSync("git", ["-C", root, "add", "."]);
   execFileSync("git", ["-C", root, "-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--quiet", "-m", "initial"]);
@@ -103,6 +123,29 @@ test("UPDATE preserves the exact approved YAML bytes", () => {
     const result = applyCanonicalIntegrationPlan(current.research, plan(current.head(), [operation]));
     assert.equal(result.updateCount, 1);
     assert.deepEqual(readFileSync(join(current.research, operation.targetFile)), Buffer.from(operation.yaml));
+  } finally { current.cleanup(); }
+});
+
+test("an approved PRB history UPDATE writes the exact plan and passes canonical validation", () => {
+  const current = historyFixture();
+  try {
+    const canonical = loadCorpusIndex(current.research);
+    const fields = structuredClone(canonical.byPrefix.get("PRB-")!.byId.get("PRB-0001")!.fields) as Record<string, unknown>;
+    const history = [{
+      date: "2026-08-28",
+      summary: "Entrada de histórico para a promoção canónica.",
+      evidence: ["EVD-000001"],
+    }];
+    fields.history = history;
+    const yaml = stringifyRecordYaml(fields);
+    const operation = { recordFamily: "PRB-", id: "PRB-0001", action: "UPDATE" as const, targetFile: "problems/PRB-0001.yaml", yaml };
+
+    const result = applyCanonicalIntegrationPlan(current.research, plan(current.head(), [operation]));
+    const written = readFileSync(join(current.research, operation.targetFile));
+    assert.equal(result.updateCount, 1);
+    assert.deepEqual(result.postWriteValidation.errors, []);
+    assert.deepEqual(written, Buffer.from(yaml));
+    assert.deepEqual((parseRecordYaml(written.toString("utf8")) as Record<string, unknown>).history, history);
   } finally { current.cleanup(); }
 });
 
