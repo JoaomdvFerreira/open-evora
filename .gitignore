@@ -12,5 +12,6 @@ node_modules/
 /apps/research-explorer/.generated.backup-*/
 /apps/research-explorer/spike/generated/
 /apps/research-explorer/dist/
+/apps/research-explorer/storybook-static/
 /apps/research-explorer/benchmark/fixtures/
 /apps/research-explorer/benchmark/output/
