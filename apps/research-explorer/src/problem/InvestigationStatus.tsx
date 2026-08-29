@@ -85,7 +85,7 @@ function InvestigationDimensionStatus({ field, value, form }: { field: "validati
   if (form === "overview") {
     return (
       <span className="prb-status-overview">
-        <span className="prb-status-overview-caption">{caption}</span>
+        <span className="prb-status-overview-caption">{caption}:</span>
         <span className="prb-status-overview-value">{label}</span>
       </span>
     );

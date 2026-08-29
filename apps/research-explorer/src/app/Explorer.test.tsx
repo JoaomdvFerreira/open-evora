@@ -264,10 +264,11 @@ describe("Explorer — Overview view", () => {
     await screen.findByRole("heading", { name: "Visão geral" });
     expect(screen.queryByText("Por validar · Corroborado")).toBeNull();
     expect(screen.queryByText("Por validar · Corroborada")).toBeNull();
-    expect(await screen.findByText(/Validação: Por validar/)).toBeTruthy();
+    const statusRow = await screen.findByText("Validação:");
+    expect(statusRow.closest(".overview-statuses")?.textContent).toMatch(/Validação:\s*Por validar/);
     // F01: compact label agrees grammatically with "Evidência" (feminine), not "Corroborado".
-    expect(screen.getByText(/Evidência: Corroborada/)).toBeTruthy();
-    expect(screen.queryByText(/Evidência: Corroborado\b/)).toBeNull();
+    expect(statusRow.closest(".overview-statuses")?.textContent).toMatch(/Evidência:\s*Corroborada/);
+    expect(statusRow.closest(".overview-statuses")?.textContent).not.toMatch(/Evidência:\s*Corroborado\b/);
   });
 
   it("opens the exact PRB in Problem View when Explore is selected", async () => {

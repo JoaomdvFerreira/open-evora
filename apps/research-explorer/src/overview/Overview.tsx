@@ -4,6 +4,7 @@ import { useRecordIndex } from "../records/useRecordIndex";
 import { findMeaningField } from "../records/meaningField";
 import { computePublicOverviewData, formatEvidenceCount, formatProblemCount } from "./overviewStats";
 import { formatPublicCount, publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
+import { ValidationStatus, EvidenceStatus } from "../problem/InvestigationStatus";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -11,28 +12,6 @@ const ERROR_TITLES: Record<string, string> = {
   incompatible: "Versão do modelo de leitura incompatível",
   network: "Falha ao carregar a visão geral",
 };
-
-interface ProblemStatusDimension {
-  caption: string;
-  label: string;
-}
-
-/**
- * UX-D §4: Validação and Evidência are two independent dimensions — an
- * unlabeled "Por validar · Corroborado" reads as one combined judgement.
- * Each dimension keeps its own caption so a public reader can tell them
- * apart without inferring which word belongs to which axis.
- */
-function problemStatusDimensions(validationStatus: string | null, evidenceStatus: string | null): ProblemStatusDimension[] {
-  const dimensions: ProblemStatusDimension[] = [];
-  if (validationStatus !== null) {
-    dimensions.push({ caption: "Validação", label: publicCompactEnumLabel("validation_status", validationStatus) });
-  }
-  if (evidenceStatus !== null) {
-    dimensions.push({ caption: "Evidência", label: publicCompactEnumLabel("evidence_status", evidenceStatus) });
-  }
-  return dimensions;
-}
 
 /**
  * Lightweight corpus-orientation view built only from the already-loaded
@@ -150,30 +129,32 @@ export function Overview({
           <p role="status" aria-live="polite">A carregar títulos dos problemas…</p>
         ) : (
           <ul className="overview-problem-list">
-            {overview.problems.map((problem) => {
-              const dimensions = problemStatusDimensions(problem.validationStatus, problem.evidenceStatus);
-              return (
+            {overview.problems.map((problem) => (
               <li key={problem.id}>
                 <div className="overview-problem-identity">
                   <code>{problem.id}</code>
                   <h4 className="overview-problem-title">{fullTitles.get(problem.id) ?? problem.title}</h4>
                 </div>
                 <div className="overview-problem-action">
-                  {dimensions.length > 0 && (
+                  {(problem.validationStatus !== null || problem.evidenceStatus !== null) && (
                     <p className="overview-statuses">
-                      {dimensions.map((dimension, index) => (
-                        <span key={dimension.caption} className="overview-status-dimension">
-                          {index > 0 ? " · " : ""}
-                          {dimension.caption}: {dimension.label}
+                      {problem.validationStatus !== null && (
+                        <span className="overview-status-dimension">
+                          <ValidationStatus value={problem.validationStatus} form="overview" />
                         </span>
-                      ))}
+                      )}
+                      {problem.evidenceStatus !== null && (
+                        <span className="overview-status-dimension">
+                          {problem.validationStatus !== null && <span aria-hidden="true"> · </span>}
+                          <EvidenceStatus value={problem.evidenceStatus} form="overview" />
+                        </span>
+                      )}
                     </p>
                   )}
                   <button type="button" onClick={() => onExploreProblem(problem.id)}>Explorar →</button>
                 </div>
               </li>
-              );
-            })}
+            ))}
           </ul>
         )}
       </section>
