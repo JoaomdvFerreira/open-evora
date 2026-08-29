@@ -129,3 +129,70 @@
 .evd-effect-tag--compact {
   font-weight: var(--text-interface-label-weight);
 }
+
+/* =========================================================================
+   DS-04D Slice 3B — Problem-domain state presentations
+   (ProblemLifecycleStatus.tsx, InvestigationStatus.tsx). Three approved
+   dimensions — Problem lifecycle `status`, `validation_status`,
+   `evidence_status` — each keeps its own component and field name; this
+   block supplies only the shared visual anatomy the approved catalogue
+   demonstrates for their `overview`/`reading`/`technical` forms. Colour is
+   never the sole carrier of meaning: every form pairs a caption with an
+   explicit value word (component-visual-contract.md "Status always has
+   explicit text: colour and glyph reinforce meaning but never carry it
+   alone").
+   ========================================================================= */
+.prb-status-overview {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--p-space-1);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+}
+
+.prb-status-overview-caption {
+  color: var(--color-ink-muted);
+}
+
+.prb-status-overview-value {
+  color: var(--color-ink-primary);
+  font-weight: var(--text-interface-label-weight);
+}
+
+/* .prb-status-chip composes .ui-inline-label for its border/radius/padding —
+   this recipe adds only the caption/value colour split, matching the
+   caption-muted / value-emphasised split already demonstrated by
+   EvidenceEffectTag and RecordTypeLabel, never a per-value tint or fill
+   (component-model.md §4.3 "no colour-only meaning ... no invented semantic
+   variants such as success/warning/error"). The approved catalogue's
+   validated/pending glyph-and-tint treatment for validation/evidence status
+   remains `flexible` per Gate C2 and is deliberately not implemented here —
+   text is the only carrier in this slice. */
+.prb-status-chip-caption {
+  color: var(--color-ink-muted);
+}
+
+.prb-status-chip-value {
+  color: var(--color-ink-primary);
+  font-weight: var(--text-interface-label-weight);
+}
+
+/* .prb-status-technical mirrors RecordDetailPanel.tsx's
+   `PrbCanonicalStatePanel` technical-field treatment (production
+   `.detail-technical-field`) but is reimplemented on the DS-04B foundation
+   token layer (`--font-technical`) rather than depending on `index.css`'s
+   pre-DS-04 legacy tokens, matching `.rec-identifier`'s own precedent
+   (RecordIdentifier.tsx) of not reusing that production class. */
+.prb-status-technical {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--p-space-1);
+  flex-wrap: wrap;
+}
+
+.prb-status-technical-field {
+  font-family: var(--font-technical);
+  font-size: var(--text-technical-size);
+  color: var(--color-ink-secondary);
+  overflow-wrap: anywhere;
+}
