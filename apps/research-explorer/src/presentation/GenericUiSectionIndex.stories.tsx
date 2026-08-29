@@ -180,41 +180,43 @@ export const CompactNarrowInFlow: Story = {
    content placed inside the rail slot. */
 function CombinedReadingLayoutDemo() {
   return (
-    <main className="lyt-shell-frame" style={{ padding: "var(--space-loose) var(--space-standard)" }}>
-      <h1>DS-04D — Índice de secção em ReadingLayout</h1>
-      <div className="lyt-reading" data-rail="present">
-        <article className="lyt-reading-main">
-          <h2 id="demo-visao-geral" style={{ fontFamily: "var(--font-reading)" }}>
-            Visão geral
-          </h2>
-          <p style={{ fontFamily: "var(--font-reading)", fontSize: "var(--text-reading-body-size)", lineHeight: "var(--text-reading-body-line-height)" }}>
-            Parágrafo de leitura sintético para a secção "Visão geral", suficientemente longo para ocupar a coluna
-            principal de leitura na relação 720/44/216 aprovada.
-          </p>
-          <h2 id="demo-limitacoes" style={{ fontFamily: "var(--font-reading)" }}>
-            Limitações
-          </h2>
-          <p style={{ fontFamily: "var(--font-reading)", fontSize: "var(--text-reading-body-size)", lineHeight: "var(--text-reading-body-line-height)" }}>
-            Parágrafo de leitura sintético para a secção "Limitações".
-          </p>
-          <h2 id="demo-cobertura" style={{ fontFamily: "var(--font-reading)" }}>
-            Cobertura
-          </h2>
-          <p style={{ fontFamily: "var(--font-reading)", fontSize: "var(--text-reading-body-size)", lineHeight: "var(--text-reading-body-line-height)" }}>
-            Parágrafo de leitura sintético para a secção "Cobertura".
-          </p>
-          <h2 id="demo-licenciamento" style={{ fontFamily: "var(--font-reading)" }}>
-            Licenciamento
-          </h2>
-          <p style={{ fontFamily: "var(--font-reading)", fontSize: "var(--text-reading-body-size)", lineHeight: "var(--text-reading-body-line-height)" }}>
-            Parágrafo de leitura sintético para a secção "Licenciamento".
-          </p>
-        </article>
-        <aside className="lyt-reading-rail">
-          <RailSectionIndex label="Nesta página" entries={FLAT_ENTRIES} />
-        </aside>
-      </div>
-    </main>
+    <div style={{ padding: "var(--space-loose) var(--space-standard)" }}>
+      <main className="lyt-shell-frame">
+        <h1>DS-04D — Índice de secção em ReadingLayout</h1>
+        <div className="lyt-reading" data-rail="present">
+          <article className="lyt-reading-main">
+            <h2 id="demo-visao-geral" style={{ fontFamily: "var(--font-reading)" }}>
+              Visão geral
+            </h2>
+            <p style={{ fontFamily: "var(--font-reading)", fontSize: "var(--text-reading-body-size)", lineHeight: "var(--text-reading-body-line-height)" }}>
+              Parágrafo de leitura sintético para a secção "Visão geral", suficientemente longo para ocupar a coluna
+              principal de leitura na relação 720/44/216 aprovada.
+            </p>
+            <h2 id="demo-limitacoes" style={{ fontFamily: "var(--font-reading)" }}>
+              Limitações
+            </h2>
+            <p style={{ fontFamily: "var(--font-reading)", fontSize: "var(--text-reading-body-size)", lineHeight: "var(--text-reading-body-line-height)" }}>
+              Parágrafo de leitura sintético para a secção "Limitações".
+            </p>
+            <h2 id="demo-cobertura" style={{ fontFamily: "var(--font-reading)" }}>
+              Cobertura
+            </h2>
+            <p style={{ fontFamily: "var(--font-reading)", fontSize: "var(--text-reading-body-size)", lineHeight: "var(--text-reading-body-line-height)" }}>
+              Parágrafo de leitura sintético para a secção "Cobertura".
+            </p>
+            <h2 id="demo-licenciamento" style={{ fontFamily: "var(--font-reading)" }}>
+              Licenciamento
+            </h2>
+            <p style={{ fontFamily: "var(--font-reading)", fontSize: "var(--text-reading-body-size)", lineHeight: "var(--text-reading-body-line-height)" }}>
+              Parágrafo de leitura sintético para a secção "Licenciamento".
+            </p>
+          </article>
+          <aside className="lyt-reading-rail">
+            <RailSectionIndex label="Nesta página" entries={FLAT_ENTRIES} />
+          </aside>
+        </div>
+      </main>
+    </div>
   );
 }
 

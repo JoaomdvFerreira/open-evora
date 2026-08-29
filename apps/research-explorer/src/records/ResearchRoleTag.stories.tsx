@@ -4,6 +4,9 @@ import "../styles/ui.css";
 import "../styles/domain.css";
 import { ResearchRoleTag } from "./ResearchRoleTag";
 import { EvidenceEffectTag } from "./EvidenceEffectTag";
+import { RecordIdentifier } from "./RecordIdentifier";
+import { RecordTypeLabel } from "./RecordTypeLabel";
+import { FactList } from "../presentation/FactList";
 
 /* DS-04D Slice 3C — ResearchRoleTag stories. Ordinary semantic HTML/React
    demonstrating src/records/ResearchRoleTag.tsx in isolation, on top of the
@@ -14,7 +17,15 @@ import { EvidenceEffectTag } from "./EvidenceEffectTag";
    docs/design/foundations.md "Synthetic design content" — no real research
    findings or claims. No production call site (EvdDetail.tsx, ProblemView.tsx,
    evdRelations.ts, problemProjection.ts) is modified, migrated, or retired in
-   this slice. */
+   this slice.
+
+   Isolated anatomy only: no production-only `evd-*` classes (those live in
+   index.css on legacy tokens the Storybook layer does not load). Already-
+   captioned and relationship fixtures reuse the same DS-04D isolated
+   primitives as PrbEvdRelationship.stories.tsx — FactList (`ui-fact-list`,
+   preserving `<dt>Papel</dt>` semantics), `ui-surface-outlined` for the
+   relationship card surface, and `lyt-stack`/`lyt-cluster` for layout —
+   rather than reimplementing or importing production `.evd-*` CSS. */
 
 const meta = {
   title: "Record Domain Atoms/ResearchRoleTag",
@@ -59,7 +70,7 @@ export const CanonicalRoles: Story = {
   render: () => (
     <StandaloneDemo heading="ResearchRoleTag — papéis de investigação canónicos">
       <p>Um papel de investigação já autorado por relação PRB→EVD, um por linha, cada um com a legenda explícita "Papel:".</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-tight)" }}>
+      <div className="lyt-stack lyt-stack--tight">
         {CANONICAL_ROLES.map((role) => (
           <ResearchRoleTagRow key={role} role={role} />
         ))}
@@ -73,16 +84,23 @@ export const AlreadyCaptionedFact: Story = {
   render: () => (
     <StandaloneDemo heading="ResearchRoleTag — contexto já legendado">
       <p>
-        Contexto onde o chamador já apresenta a legenda visível "Papel" (aqui, um <code>&lt;dt&gt;</code>) — a variante <code>compact</code>{" "}
-        evita duplicar essa legenda por cada papel, preservando o contexto acessível via <code>aria-label</code>.
+        Contexto onde o chamador já apresenta a legenda visível "Papel" (aqui, um <code>&lt;dt&gt;</code> via FactList) — a variante{" "}
+        <code>compact</code> evita duplicar essa legenda por cada papel, preservando o contexto acessível via <code>aria-label</code>.
       </p>
-      <dl className="evd-relation-facts">
-        <dt>Papel</dt>
-        <dd style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-tight)" }}>
-          <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />
-          <ResearchRoleTag role="CONTEXTUAL" variant="compact" />
-        </dd>
-      </dl>
+      <FactList
+        rows={[
+          {
+            key: "roles",
+            label: "Papel",
+            value: (
+              <span className="lyt-cluster lyt-cluster--tight">
+                <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />
+                <ResearchRoleTag role="CONTEXTUAL" variant="compact" />
+              </span>
+            ),
+          },
+        ]}
+      />
     </StandaloneDemo>
   ),
 };
@@ -92,14 +110,17 @@ export const UnknownRole: Story = {
   render: () => (
     <StandaloneDemo heading="ResearchRoleTag — valor futuro desconhecido">
       <p>Valor sintético não mapeado — deve mostrar o valor canónico em bruto em vez de desaparecer ou ser reclassificado, em ambas as variantes.</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-tight)" }}>
+      <div className="lyt-stack lyt-stack--tight">
         <ResearchRoleTag role="EMERGING_FUTURE_ROLE" />
-        <dl className="evd-relation-facts">
-          <dt>Papel</dt>
-          <dd>
-            <ResearchRoleTag role="EMERGING_FUTURE_ROLE" variant="compact" />
-          </dd>
-        </dl>
+        <FactList
+          rows={[
+            {
+              key: "roles",
+              label: "Papel",
+              value: <ResearchRoleTag role="EMERGING_FUTURE_ROLE" variant="compact" />,
+            },
+          ]}
+        />
       </div>
     </StandaloneDemo>
   ),
@@ -110,23 +131,35 @@ export const UnknownRole: Story = {
    story) owns iteration, authored order, and the surrounding relationship
    context — matching evdRelations.ts's `researchRoles: string[]` and
    EvdDetail.tsx's own per-item mapping, never internal `research_roles[]`
-   iteration inside the component. */
+   iteration inside the component. Reuses the isolated `ui-surface-outlined`
+   relationship-card anatomy from PrbEvdRelationship.stories.tsx rather than
+   the production `.evd-problem-card`/`.evd-problem-heading` classes. */
 function MultiRoleRelationshipDemo() {
   const roles = ["LOCAL_OBSERVATION", "CONTEXTUAL", "COMPARATIVE_RESPONSE"];
   return (
-    <div className="evd-problem-card">
-      <div className="evd-problem-heading">
-        <code>PRB-0006</code>
-        <span>Passeios estreitos no centro histórico</span>
+    <div className="ui-surface-outlined">
+      <div className="lyt-cluster lyt-cluster--tight lyt-cluster--align-baseline" style={{ marginBottom: "var(--space-tight)" }}>
+        <RecordTypeLabel prefix="PRB-" variant="compact" />
+        <RecordIdentifier id="PRB-0006" density="compact" />
+        <span style={{ fontFamily: "var(--font-interface)", fontSize: "var(--text-interface-body-size)" }}>
+          Passeios estreitos no centro histórico
+        </span>
       </div>
-      <dl className="evd-relation-facts">
-        <dt>Papel</dt>
-        <dd style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-tight)" }}>
-          {roles.map((role, index) => (
-            <ResearchRoleTag key={`${role}-${index}`} role={role} variant="compact" />
-          ))}
-        </dd>
-      </dl>
+      <FactList
+        rows={[
+          {
+            key: "roles",
+            label: "Papel",
+            value: (
+              <span className="lyt-cluster lyt-cluster--tight">
+                {roles.map((role, index) => (
+                  <ResearchRoleTag key={`${role}-${index}`} role={role} variant="compact" />
+                ))}
+              </span>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }
@@ -148,21 +181,28 @@ export const MultipleRolesAuthoredOrder: Story = {
 /* ---- Comparison: effect vs. research role ------------------------------- */
 function EffectRoleComparisonCard() {
   return (
-    <div className="evd-problem-card">
-      <div className="evd-problem-heading">
-        <code>PRB-0006</code>
-        <span>Passeios estreitos no centro histórico</span>
+    <div className="ui-surface-outlined">
+      <div className="lyt-cluster lyt-cluster--tight lyt-cluster--align-baseline" style={{ marginBottom: "var(--space-tight)" }}>
+        <RecordTypeLabel prefix="PRB-" variant="compact" />
+        <RecordIdentifier id="PRB-0006" density="compact" />
+        <span style={{ fontFamily: "var(--font-interface)", fontSize: "var(--text-interface-body-size)" }}>
+          Passeios estreitos no centro histórico
+        </span>
       </div>
-      <dl className="evd-relation-facts">
-        <dt>Efeito</dt>
-        <dd>
-          <EvidenceEffectTag effect="SUPPORTS" />
-        </dd>
-        <dt>Papel</dt>
-        <dd>
-          <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />
-        </dd>
-      </dl>
+      <FactList
+        rows={[
+          {
+            key: "effect",
+            label: "Efeito",
+            value: <EvidenceEffectTag effect="SUPPORTS" variant="compact" />,
+          },
+          {
+            key: "role",
+            label: "Papel",
+            value: <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />,
+          },
+        ]}
+      />
     </div>
   );
 }
@@ -172,10 +212,11 @@ export const ComparisonEffectVsResearchRole: Story = {
   render: () => (
     <StandaloneDemo heading="Comparação — Efeito vs. Papel de investigação">
       <p style={{ maxWidth: "72ch" }}>
-        Mesma evidência sintética, mesma relação PRB→EVD sintética, duas dimensões distintas apresentadas lado a lado. O{" "}
-        <strong>efeito</strong> ("Sustenta") responde ao que esta evidência faz ao enquadramento do Problema. O <strong>papel</strong> de
-        investigação ("Observação local") responde a porquê/como esta evidência é usada na investigação. Nenhum dos dois é uma propriedade
-        intrínseca da evidência — ambos pertencem apenas a esta relação PRB→EVD explícita.
+        Mesma evidência sintética, mesma relação PRB→EVD sintética, duas dimensões distintas apresentadas lado a lado como linhas FactList
+        separadas — cada uma já legendada ("Efeito"/"Papel"), sem duplicar legendas. O <strong>efeito</strong> ("Sustenta") responde ao que
+        esta evidência faz ao enquadramento do Problema. O <strong>papel</strong> de investigação ("Observação local") responde a
+        porquê/como esta evidência é usada na investigação. Nenhum dos dois é uma propriedade intrínseca da evidência — ambos pertencem
+        apenas a esta relação PRB→EVD explícita.
       </p>
       <EffectRoleComparisonCard />
     </StandaloneDemo>
@@ -200,13 +241,20 @@ function CombinedResearchRoleTagPage() {
 
         <section aria-labelledby="captioned-fact-heading">
           <h2 id="captioned-fact-heading">Contexto já legendado (compact)</h2>
-          <dl className="evd-relation-facts">
-            <dt>Papel</dt>
-            <dd style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-tight)" }}>
-              <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />
-              <ResearchRoleTag role="CONTEXTUAL" variant="compact" />
-            </dd>
-          </dl>
+          <FactList
+            rows={[
+              {
+                key: "roles",
+                label: "Papel",
+                value: (
+                  <span className="lyt-cluster lyt-cluster--tight">
+                    <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />
+                    <ResearchRoleTag role="CONTEXTUAL" variant="compact" />
+                  </span>
+                ),
+              },
+            ]}
+          />
         </section>
 
         <section aria-labelledby="multi-heading">

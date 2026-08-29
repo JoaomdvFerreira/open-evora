@@ -33,6 +33,7 @@ function FoundationTypography() {
 function FoundationInterfaceText() {
   return (
     <main style={{ padding: "var(--space-loose)" }}>
+      <h1 style={{ fontSize: "var(--text-reading-h2-size)" }}>Texto de interface e metadados</h1>
       <p className="fnd-label">Metadados do registo</p>
       <p className="fnd-interface-text">
         Texto de interface para navegação, legendas e metadados — voz sans,
@@ -56,6 +57,7 @@ function FoundationInterfaceText() {
 function FoundationTechnicalIdentity() {
   return (
     <main style={{ padding: "var(--space-loose)" }}>
+      <h1 style={{ fontSize: "var(--text-reading-h2-size)" }}>Identidade técnica</h1>
       <p className="fnd-label">Identificador técnico</p>
       <p className="fnd-technical">PRB-XXXX</p>
       <p className="fnd-technical">EVD-000001</p>
@@ -70,6 +72,7 @@ function FoundationTechnicalIdentity() {
 function FoundationLinksAndFocus() {
   return (
     <main style={{ padding: "var(--space-loose)" }}>
+      <h1 style={{ fontSize: "var(--text-reading-h2-size)" }}>Ligações e foco de teclado</h1>
       <p className="fnd-label">Ligações e foco de teclado</p>
       <p className="fnd-prose">
         Consulte a <a href="#evidencia-associada">evidência associada</a> a
@@ -97,7 +100,7 @@ function FoundationLinksAndFocus() {
 function FoundationSurfacesAndSeparators() {
   return (
     <main style={{ padding: "var(--space-loose)" }}>
-      <h2>Superfícies e separadores</h2>
+      <h1 style={{ fontSize: "var(--text-reading-h2-size)" }}>Superfícies e separadores</h1>
       <hr className="fnd-separator fnd-separator--heading" />
       <p className="fnd-interface-text">
         Regra de cabeçalho, reservada para separações de topo entre secções.
@@ -128,7 +131,7 @@ function FoundationSurfacesAndSeparators() {
 function FoundationSpacingRhythm() {
   return (
     <main style={{ padding: "var(--space-loose)" }}>
-      <h2>Espaçamento e ritmo</h2>
+      <h1 style={{ fontSize: "var(--text-reading-h2-size)" }}>Espaçamento e ritmo</h1>
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-tight)" }}>
         <div className="fnd-surface-subtle" style={{ padding: "var(--space-tight)" }}>tight — var(--space-tight)</div>
         <div className="fnd-surface-subtle" style={{ padding: "var(--space-tight)" }}>tight — var(--space-tight)</div>
@@ -145,7 +148,7 @@ function FoundationSpacingRhythm() {
 function FoundationReadingMeasure() {
   return (
     <main style={{ padding: "var(--space-loose)" }}>
-      <h2>Medida de leitura</h2>
+      <h1 style={{ fontSize: "var(--text-reading-h2-size)" }}>Medida de leitura</h1>
       <div className="fnd-prose">
         <p>
           Este bloco de prosa está limitado pela medida de leitura da
