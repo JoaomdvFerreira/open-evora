@@ -86,6 +86,7 @@
 .lyt-reading-rail {
   flex: 0 0 var(--layout-reading-rail);
   width: var(--layout-reading-rail);
+  min-width: 0;
   position: sticky;
   top: var(--space-loose);
   display: flex;
