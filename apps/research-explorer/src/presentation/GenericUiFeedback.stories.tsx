@@ -63,7 +63,11 @@ function ErrorNoticeWithRetryDemo() {
     <ErrorNotice
       title="Não foi possível carregar o registo sintético"
       message="Ocorreu um erro sintético de rede ao obter PRB-XXXX. Pode tentar novamente."
-      onRetry={() => {}}
+      action={
+        <button type="button" className="ui-action-outlined" onClick={() => {}}>
+          Tentar novamente
+        </button>
+      }
     />
   );
 }
@@ -73,8 +77,11 @@ function ErrorNoticeLongCopyDemo() {
     <ErrorNotice
       title="Não foi possível carregar o histórico sintético do registo"
       message="Ocorreu um erro sintético prolongado ao contactar a fonte de dados: a ligação foi interrompida antes de todos os registos sintéticos terem sido recebidos, pelo que o histórico apresentado poderia ficar incompleto ou inconsistente até uma nova tentativa bem-sucedida."
-      onRetry={() => {}}
-      retryLabel="Tentar novamente"
+      action={
+        <button type="button" className="ui-action-outlined" onClick={() => {}}>
+          Tentar novamente
+        </button>
+      }
     />
   );
 }

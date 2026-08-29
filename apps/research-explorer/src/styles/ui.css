@@ -407,9 +407,11 @@ button.ui-action-outlined[aria-disabled="true"]:hover {
   margin-bottom: 0;
 }
 
-/* The retry action keeps the ordinary ui-action-outlined recipe (ordinary
-   ink/surface roles, not the error hue) so it reads as a ordinary control
-   rather than compounding the alert's visual weight. */
+/* A caller-supplied action using the ordinary ui-action-outlined recipe
+   (ordinary ink/surface roles, not the error hue) reads as an ordinary
+   control rather than compounding the alert's visual weight. This selector
+   only positions such an action when the caller opts into that recipe; it
+   never constructs the action itself (see ErrorNotice.tsx `action` prop). */
 .ui-error-notice .ui-action-outlined {
   margin-top: var(--space-tight);
 }
