@@ -38,13 +38,13 @@ import { RecordTypeLabel } from "./RecordTypeLabel";
    Composition B anatomy is derived from `PrbCanonicalReferences`
    (RecordDetailPanel.tsx): one row per occurrence, pairing the exact
    canonical field path (`<code>`, monospace, unaltered) with the
-   independently actionable target identifier. The same target ID reached
-   through two distinct paths renders as two rows — `PrbCanonicalReferences`
-   itself is explicitly documented as "deliberately not deduplicated"
-   (RecordDetailPanel.tsx `CanonicalReference` docblock) and the catalogue
-   specimen (§4, ~line 720) demonstrates exactly this with
-   `evidence[0].evidence_id` / `evidence[2].evidence_id` both resolving to
-   the same EVD.
+   independently actionable target identifier only — no type label.
+   The same target ID reached through two distinct paths renders as two
+   rows — `PrbCanonicalReferences` itself is explicitly documented as
+   "deliberately not deduplicated" (RecordDetailPanel.tsx
+   `CanonicalReference` docblock) and the catalogue specimen (§4, ~line 720)
+   demonstrates exactly this with `evidence[0].evidence_id` /
+   `evidence[2].evidence_id` both resolving to the same EVD.
 
    Composition C anatomy is derived from `RelationshipList`
    (RecordDetailPanel.tsx): grouped by related-record identity, each group
@@ -52,12 +52,16 @@ import { RecordTypeLabel } from "./RecordTypeLabel";
    every distinct incoming/outgoing path beneath it is preserved and
    direction-tagged (arrow + "Entrada"/"Saída" label + relation field),
    mirroring `RelationshipList`'s own `groupPathsByRelatedRecord` — which
-   groups by related-record ID only and "never discards a distinct path."
+   groups once by related-record identity and preserves every distinct
+   path occurrence beneath that group, never collapsing any of them.
 
    All three compositions are caller-supplied fixtures only: no ID
-   resolution, no inference of unresolved references, no deduplication by
-   target, no derived relationship meaning from connectivity, no
-   ranking/strength/confidence. Synthetic identifiers only
+   resolution, no inference of unresolved references, no derived
+   relationship meaning from connectivity, no ranking/strength/confidence.
+   Canonical path occurrences (Composition B) remain deliberately
+   non-deduplicated by target; related-record groups (Composition C) are
+   deduplicated once by related-record identity while every distinct path
+   occurrence beneath each group remains preserved. Synthetic identifiers only
    (EVD-XXXXXX / PRB-XXXX / SRC-XXXX style, foundations.md "Synthetic
    design content") — no real Open Évora research claims or IDs. No
    production call site (ProblemView.tsx, RecordDetailPanel.tsx) is
@@ -183,21 +187,17 @@ export const CompactEvdRefsLongStress: Story = {
 /* =========================================================================
    Composition B — Exact canonical-path occurrence
    Caller-owned fixture shape: each occurrence independently supplies exact
-   canonical path text, target record ID, target type/prefix (used only
-   where public orientation legitimately requires it — omitted from the
-   minimal/duplicate/multiple-target stories below since PrbCanonicalReferences
-   itself never renders a type label, and included only in the
-   long/stress story to demonstrate the caller-supplied option exists),
-   action. Mirrors PrbCanonicalReferences's own `.prb-reference-item` row
-   (path <code> + target action) — critical invariant: same target through
-   two distinct paths renders as two rows, never deduplicated. Path text is
-   rendered exactly as supplied, in technical typography, never translated,
-   prettified, shortened, or inferred.
+   canonical path text and target record ID, action. Mirrors
+   PrbCanonicalReferences's own `.prb-reference-item` row (path <code> +
+   target action only — no type label; PrbCanonicalReferences itself never
+   renders one) — critical invariant: same target through two distinct
+   paths renders as two rows, never deduplicated by occurrence. Path text
+   is rendered exactly as supplied, in technical typography, never
+   translated, prettified, shortened, or inferred.
    ========================================================================= */
 interface CanonicalPathOccurrence {
   path: string;
   targetId: string;
-  targetPrefix?: string;
 }
 
 function CanonicalPathList({ occurrences }: { occurrences: CanonicalPathOccurrence[] }) {
@@ -210,7 +210,6 @@ function CanonicalPathList({ occurrences }: { occurrences: CanonicalPathOccurren
           style={{ borderTop: "var(--p-border-width-hairline) solid var(--color-separator-faint)", padding: "var(--space-tight) 0" }}
         >
           <code style={{ fontFamily: "var(--font-technical)", fontSize: "var(--text-technical-size)", color: "var(--color-ink-secondary)", overflowWrap: "anywhere" }}>{occurrence.path}</code>
-          {occurrence.targetPrefix && <RecordTypeLabel prefix={occurrence.targetPrefix} variant="compact" />}
           <RecordIdentifier variant="action" id={occurrence.targetId} density="compact" onActivate={() => {}} accessibleLabel={`Abrir ${occurrence.targetId} referenciado em ${occurrence.path}`} />
         </li>
       ))}
@@ -272,14 +271,13 @@ export const CanonicalPathLongStress: Story = {
   name: "Canonical paths / pathological long path + ID",
   render: () => (
     <StandaloneDemo heading="Ocorrência de caminho canónico — caminho e identificador longos, coluna estreita">
-      <p style={{ maxWidth: "72ch" }}>Um caminho canónico e um identificador sintéticos deliberadamente longos, dentro de uma coluna estreita (320px), com o rótulo de tipo de alvo incluído.</p>
+      <p style={{ maxWidth: "72ch" }}>Um caminho canónico e um identificador sintéticos deliberadamente longos, dentro de uma coluna estreita (320px), para verificar quebra sem transbordo horizontal.</p>
       <div style={{ maxWidth: "320px" }}>
         <CanonicalPathList
           occurrences={[
             {
               path: "investigation.open_questions[3].resolution_condition.supporting_evidence[12].evidence_id",
               targetId: "EVD-000000000000000777-SUFIXO-SINTETICO-LONGO",
-              targetPrefix: "EVD-",
             },
           ]}
         />
@@ -294,10 +292,11 @@ export const CanonicalPathLongStress: Story = {
    direction, path/edge occurrence, target identity, public type/label.
    Mirrors RelationshipList's own grouped-by-related-record shape (heading
    pairing RecordTypeLabel + RecordIdentifier for the target, `<ul>` of
-   every direction-tagged path beneath it) — never deduplicates by target
-   ID, never infers relationship meaning from connectivity, never converts
-   path names into effects/research roles, never implies ranking/strength/
-   confidence.
+   every direction-tagged path beneath it) — grouped once by related-record
+   identity, with every distinct path occurrence preserved beneath that
+   group, never collapsed into one; never infers relationship meaning from
+   connectivity, never converts path names into effects/research roles,
+   never implies ranking/strength/confidence.
    ========================================================================= */
 interface RelatedPathOccurrence {
   direction: "incoming" | "outgoing";
