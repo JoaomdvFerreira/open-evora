@@ -29,9 +29,14 @@
    technical typography with no border/background). */
 
 /* =========================================================================
-   RecordIdentifier — canonical record ID, technical typography only. No
-   type gloss, no border/surface: current evidence (.detail-technical-field,
-   .prb-reference-target) renders a bare monospace string, not a chip.
+   RecordIdentifier — canonical record ID, technical typography only, never
+   a type gloss/status/effect. `density` is orthogonal to `variant` (text vs.
+   action): standard is the bounded identifier treatment demonstrated by the
+   approved component catalogue (docs/design/reference/components/
+   ds-03b-component-catalogue.dc.html §4 — hairline outline, subtle fill);
+   compact drops that surrounding treatment and stays bare technical
+   identity for dense rows/prose, matching current evidence
+   (.detail-technical-field, .prb-reference-target).
    ========================================================================= */
 .rec-identifier {
   font-family: var(--font-technical);
@@ -42,20 +47,38 @@
   overflow-wrap: anywhere;
 }
 
-/* The actionable form is a native <button>: current evidence
+.rec-identifier--standard {
+  display: inline-block;
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  padding: var(--p-space-1) var(--space-tight);
+  background: var(--color-surface-subtle);
+}
+
+.rec-identifier--compact {
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+/* The action form is a native <button>: current evidence
    (.prb-reference-target, RelatedRecordButton/TypedLinkButton) always wraps
    the identifier text in a real interactive element rather than adding a
    role to the static span, so this recipe only adjusts appearance —
-   interactivity itself is the browser's own button semantics. */
+   interactivity itself is the browser's own button semantics. Density
+   (border/fill vs. bare) still applies via .rec-identifier--standard/
+   --compact; only the text colour/decoration changes here. */
 .rec-identifier--action {
-  padding: 0;
-  border: 0;
-  background: none;
   color: var(--color-accent);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.14em;
   cursor: pointer;
+}
+
+.rec-identifier--action.rec-identifier--compact {
+  font: inherit;
+  font-family: var(--font-technical);
 }
 
 .rec-identifier--action:hover {
@@ -65,32 +88,26 @@
 }
 
 /* =========================================================================
-   RecordTypeLabel — record prefix + approved public type meaning. Two
-   demonstrably distinct shapes: a bare compact marker beside a record row,
-   and a bordered detail badge once per Record Detail meaning zone.
+   RecordTypeLabel — the approved public type meaning (e.g. "Evidência"),
+   never the bare technical prefix alone (docs/design/reference/components/
+   ds-03b-component-catalogue.dc.html §4: "the badge is the same anatomy at
+   higher contrast, not a different shape"). Both variants stay plain
+   sans/interface type presentation with no border/fill/glyph — those are
+   reserved for state dimensions, not classification.
    ========================================================================= */
-
-/* ---- compact --------------------------------------------------------
-   Current evidence: .desktop-record-type / .narrow-record-type — a bare
-   monospace prefix token with no border, sitting beside the record's
-   human-readable label/id, not a chip in its own right. */
 .rec-type-label--compact {
   flex-shrink: 0;
-  font-family: var(--font-technical);
-  font-size: var(--text-technical-size);
-  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  color: var(--color-ink-secondary);
 }
 
-/* ---- detail -----------------------------------------------------------
-   Current evidence: .detail-type-badge — a bordered prefix+label badge
-   shown once above the meaning sentence. Composes .ui-inline-label anatomy
-   (shared border/radius/padding) and keeps the canonical prefix in its own
-   <code> so it stays technically legible even though the label text uses
-   interface typography. */
-.rec-type-label--detail code {
-  font-family: var(--font-technical);
-  font-size: var(--text-technical-size);
-  color: var(--color-ink-muted);
+.rec-type-label--detail {
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: 600;
+  color: var(--color-ink-primary);
 }
 
 /* =========================================================================

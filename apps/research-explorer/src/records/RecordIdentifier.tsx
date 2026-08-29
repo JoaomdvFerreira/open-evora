@@ -14,40 +14,56 @@
  * status/effect/research-role value, and never derives a route: an
  * actionable identifier's `onActivate` is caller-supplied, exactly as
  * `RelatedRecordButton`'s `onSelect`/`TypedLinkButton`'s `onOpenGeneric`
- * are today. Static and actionable forms are kept explicit — `variant`
- * chooses between a non-interactive `<span>` (static) and a native
- * `<button>` (actionable), never a polymorphic element (component-model.md
- * §4.3 "no polymorphic Action component" applies equally here).
+ * are today. Text and action forms are kept explicit — `variant` chooses
+ * between a non-interactive `<span>` (text) and a native `<button>`
+ * (action), never a polymorphic element (component-model.md §4.3 "no
+ * polymorphic Action component" applies equally here).
  *
- * No compact/standard density split: current evidence shows exactly one
- * rendered size for every identifier occurrence above, so DS-04D does not
- * invent a second one.
+ * `density` is orthogonal to `variant` (docs/design/reference/components/
+ * ds-03b-component-catalogue.dc.html §4 "text and action forms, standard
+ * and compact density"): `standard` renders the bounded identifier
+ * treatment (hairline outline, subtle fill) the approved catalogue
+ * demonstrates; `compact` drops that surrounding treatment and stays bare
+ * technical identity for dense rows/prose. Both densities apply to both
+ * interaction forms.
  */
-export interface RecordIdentifierStaticProps {
-  variant?: "static";
+export interface RecordIdentifierTextProps {
+  variant?: "text";
   /** The canonical ID exactly as stored, e.g. "EVD-000105". */
   id: string;
+  /** `standard` — bounded identifier treatment. `compact` — bare technical identity for dense rows/prose. Defaults to `standard`. */
+  density?: "standard" | "compact";
 }
 
 export interface RecordIdentifierActionProps {
   variant: "action";
   /** The canonical ID exactly as stored, e.g. "EVD-000105". */
   id: string;
+  /** `standard` — bounded identifier treatment. `compact` — bare technical identity for dense rows/prose. Defaults to `standard`. */
+  density?: "standard" | "compact";
   /** Caller-owned navigation/action intent — this component derives no route. */
   onActivate: () => void;
   /** Optional caller-owned accessible name override (e.g. "Abrir EVD-000105 referenciado em ..."); defaults to the visible id text. */
   accessibleLabel?: string;
 }
 
-export type RecordIdentifierProps = RecordIdentifierStaticProps | RecordIdentifierActionProps;
+export type RecordIdentifierProps = RecordIdentifierTextProps | RecordIdentifierActionProps;
 
 export function RecordIdentifier(props: RecordIdentifierProps) {
+  const density = props.density ?? "standard";
+  const densityClass = density === "compact" ? "rec-identifier--compact" : "rec-identifier--standard";
+
   if (props.variant === "action") {
     return (
-      <button type="button" className="rec-identifier rec-identifier--action" onClick={props.onActivate} aria-label={props.accessibleLabel}>
+      <button
+        type="button"
+        className={`rec-identifier rec-identifier--action ${densityClass}`}
+        onClick={props.onActivate}
+        aria-label={props.accessibleLabel}
+      >
         {props.id}
       </button>
     );
   }
-  return <span className="rec-identifier">{props.id}</span>;
+  return <span className={`rec-identifier ${densityClass}`}>{props.id}</span>;
 }

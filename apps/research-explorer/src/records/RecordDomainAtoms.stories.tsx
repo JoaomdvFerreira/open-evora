@@ -42,18 +42,26 @@ function StandaloneDemo({ heading, children }: { heading: string; children: Reac
 
 /* ---- RecordIdentifier ------------------------------------------------- */
 
-function RecordIdentifierStaticDemo() {
+function RecordIdentifierTextStandardDemo() {
   return <RecordIdentifier id="EVD-000105" />;
 }
 
-function RecordIdentifierActionDemo() {
+function RecordIdentifierActionStandardDemo() {
   return <RecordIdentifier variant="action" id="PRB-0006" onActivate={() => {}} />;
 }
 
-function RecordIdentifierLongDemo() {
+function RecordIdentifierTextCompactDemo() {
+  return <RecordIdentifier id="EVD-000105" density="compact" />;
+}
+
+function RecordIdentifierActionCompactDemo() {
+  return <RecordIdentifier variant="action" id="PRB-0006" density="compact" onActivate={() => {}} />;
+}
+
+function RecordIdentifierLongCompactDemo() {
   return (
     <div style={{ maxWidth: "160px" }}>
-      <RecordIdentifier id="EVD-000000000000000105-SUFIXO-SINTETICO-LONGO" />
+      <RecordIdentifier id="EVD-000000000000000105-SUFIXO-SINTETICO-LONGO" density="compact" />
     </div>
   );
 }
@@ -64,7 +72,7 @@ function RecordTypeLabelCompactRow({ prefix }: { prefix: string }) {
   return (
     <p style={{ display: "flex", alignItems: "center", gap: "var(--space-tight)" }}>
       <RecordTypeLabel prefix={prefix} variant="compact" />
-      <RecordIdentifier id={`${prefix}XXXX`} />
+      <RecordIdentifier id={`${prefix}XXXX`} density="compact" />
     </p>
   );
 }
@@ -91,32 +99,52 @@ function EvidenceEffectTagUnknownDemo() {
 
 /* ---- Individual stories ------------------------------------------------- */
 
-export const RecordIdentifierStatic: Story = {
-  name: "RecordIdentifier — static",
+export const RecordIdentifierTextStandard: Story = {
+  name: "RecordIdentifier — text / standard",
   render: () => (
-    <StandaloneDemo heading="RecordIdentifier — estático">
-      <p>Identificador não interativo, tipografia técnica apenas.</p>
-      <RecordIdentifierStaticDemo />
+    <StandaloneDemo heading="RecordIdentifier — texto / standard">
+      <p>Identificador não interativo, densidade standard: tratamento delimitado.</p>
+      <RecordIdentifierTextStandardDemo />
     </StandaloneDemo>
   ),
 };
 
-export const RecordIdentifierAction: Story = {
-  name: "RecordIdentifier — action",
+export const RecordIdentifierActionStandard: Story = {
+  name: "RecordIdentifier — action / standard",
   render: () => (
-    <StandaloneDemo heading="RecordIdentifier — acionável">
-      <p>Identificador acionável: a intenção de navegação pertence ao chamador.</p>
-      <RecordIdentifierActionDemo />
+    <StandaloneDemo heading="RecordIdentifier — acionável / standard">
+      <p>Identificador acionável, densidade standard: a intenção de navegação pertence ao chamador.</p>
+      <RecordIdentifierActionStandardDemo />
     </StandaloneDemo>
   ),
 };
 
-export const RecordIdentifierLong: Story = {
-  name: "RecordIdentifier — long/pathological (containment)",
+export const RecordIdentifierTextCompact: Story = {
+  name: "RecordIdentifier — text / compact",
   render: () => (
-    <StandaloneDemo heading="RecordIdentifier — identificador longo">
+    <StandaloneDemo heading="RecordIdentifier — texto / compact">
+      <p>Densidade compacta: sem o tratamento delimitado, identidade técnica nua para linhas densas/prosa.</p>
+      <RecordIdentifierTextCompactDemo />
+    </StandaloneDemo>
+  ),
+};
+
+export const RecordIdentifierActionCompact: Story = {
+  name: "RecordIdentifier — action / compact",
+  render: () => (
+    <StandaloneDemo heading="RecordIdentifier — acionável / compact">
+      <p>Forma acionável em densidade compacta, sem o tratamento delimitado.</p>
+      <RecordIdentifierActionCompactDemo />
+    </StandaloneDemo>
+  ),
+};
+
+export const RecordIdentifierLongCompact: Story = {
+  name: "RecordIdentifier — long/pathological (compact containment)",
+  render: () => (
+    <StandaloneDemo heading="RecordIdentifier — identificador longo (compact)">
       <p>Identificador sintético longo dentro de uma coluna estreita (160px) — deve quebrar, nunca transbordar.</p>
-      <RecordIdentifierLongDemo />
+      <RecordIdentifierLongCompactDemo />
     </StandaloneDemo>
   ),
 };
@@ -193,7 +221,7 @@ function ComparisonRow() {
   return (
     <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "var(--space-standard)", padding: "var(--space-standard) 0", borderTop: "1px solid var(--color-separator-standard)" }}>
       <RecordTypeLabel prefix="EVD-" variant="compact" />
-      <RecordIdentifier variant="action" id="EVD-000105" onActivate={() => {}} />
+      <RecordIdentifier variant="action" id="EVD-000105" density="compact" onActivate={() => {}} />
       <EvidenceEffectTag effect="SUPPORTS" />
     </div>
   );
@@ -221,9 +249,11 @@ function CombinedRecordDomainAtomsPage() {
         <section aria-labelledby="identifier-heading">
           <h2 id="identifier-heading">RecordIdentifier</h2>
           <div className="lyt-stack lyt-stack--standard">
-            <RecordIdentifierStaticDemo />
-            <RecordIdentifierActionDemo />
-            <RecordIdentifierLongDemo />
+            <RecordIdentifierTextStandardDemo />
+            <RecordIdentifierActionStandardDemo />
+            <RecordIdentifierTextCompactDemo />
+            <RecordIdentifierActionCompactDemo />
+            <RecordIdentifierLongCompactDemo />
           </div>
         </section>
 
