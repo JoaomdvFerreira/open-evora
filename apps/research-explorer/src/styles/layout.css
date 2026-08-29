@@ -154,14 +154,6 @@
   gap: var(--space-section);
 }
 
-.lyt-stack--align-start {
-  align-items: flex-start;
-}
-
-.lyt-stack--align-center {
-  align-items: center;
-}
-
 /* =======================================================================
    Cluster — wrapping inline flow only. Bounded spacing choice, justified
    alignment variants only. No status/effect/research-role meaning.
@@ -194,11 +186,15 @@
 /* =======================================================================
    SectionFlow — spacing between already-semantic sections. CSS
    recipe/class only: it does not render or own <section>, choose
-   headings/landmarks/order, or add borders/surfaces by default. Mirrors
-   production `.problem-section` / `.record-editorial-section`
-   (index.css), which both use a single `margin-bottom: var(--space-8)`
-   rhythm — only that one "standard" variant is demonstrated by current
-   rendered evidence, so no "compact" variant is implemented here.
+   headings/landmarks/order, or add borders/surfaces by default. Production
+   `.problem-section` / `.record-editorial-section` (index.css) both use a
+   single `margin-bottom: var(--space-8)` rhythm — that evidence justifies
+   implementing exactly one "standard" separation variant here, not an exact
+   legacy-token/value carry-forward, so no "compact" variant is implemented.
+   Production's legacy `--space-8` currently resolves to 40px; DS-04C
+   intentionally consumes the new DS-04B semantic `--space-section`
+   candidate instead, currently 48px (tokens.css), consistent with
+   consuming DS-04B Foundation tokens rather than legacy literals.
    ======================================================================= */
 .lyt-section-flow > * {
   margin-top: 0;
