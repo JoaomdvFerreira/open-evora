@@ -348,3 +348,133 @@ button.ui-action-outlined[aria-disabled="true"]:hover {
     margin-top: var(--space-tight);
   }
 }
+
+/* =========================================================================
+   Feedback boundaries — DS-04D Slice 2B (component-model.md §4.3
+   "ProgressMessage", "ErrorNotice", "EmptyState"; Gate C1 decision 6: three
+   separate explicit boundaries, never one mode-driven component). Anatomy
+   only: role/live-region semantics live in the React components
+   (src/presentation/ProgressMessage.tsx, ErrorNotice.tsx, EmptyState.tsx),
+   and message/title/retry/action content stays entirely caller-owned. Only
+   ErrorNotice uses the error/red hue (component-visual-contract.md "Status
+   always has explicit text: colour and glyph reinforce meaning but never
+   carry it alone") — ProgressMessage and EmptyState stay on ordinary ink/
+   surface roles so they cannot read as failures.
+   ========================================================================= */
+
+/* ---- ProgressMessage ---------------------------------------------------
+   Restrained: current evidence (App/Explorer/Overview/RecordsExplorer/
+   ProblemView/RecordDetailPanel loading branches) is plain status text with
+   no border/surface/icon. No colour or icon is added here — the text alone
+   carries "in progress", matching current production treatment. */
+.ui-progress-message {
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+/* ---- ErrorNotice ---------------------------------------------------------
+   Current evidence (App/RecordDetailPanel/ProblemView/RecordsExplorer
+   `role="alert"` branches) pairs a heading and message inside a bordered
+   box; this recipe keeps that shape restrained (hairline border, not a
+   heavy fill) so it states failure explicitly without dominating the page. */
+.ui-error-notice {
+  border: var(--p-border-width-hairline) solid var(--color-feedback-error-line);
+  border-radius: var(--radius-surface);
+  padding: var(--space-standard);
+  background: var(--color-feedback-error-surface);
+  color: var(--color-feedback-error-ink);
+}
+
+.ui-error-notice-title {
+  margin: 0 0 var(--space-tight);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-heading-size);
+  font-weight: var(--text-interface-heading-weight);
+  line-height: var(--text-interface-heading-line-height);
+}
+
+.ui-error-notice-message {
+  margin: 0 0 var(--space-tight);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-error-notice-message:last-child {
+  margin-bottom: 0;
+}
+
+/* The retry action keeps the ordinary ui-action-outlined recipe (ordinary
+   ink/surface roles, not the error hue) so it reads as a ordinary control
+   rather than compounding the alert's visual weight. */
+.ui-error-notice .ui-action-outlined {
+  margin-top: var(--space-tight);
+}
+
+/* ---- EmptyState -----------------------------------------------------------
+   Ordinary content, not an alert: current evidence is plain empty-result
+   copy (no border/fill in current production). Kept on ordinary ink so it
+   cannot be mistaken for ErrorNotice at a glance, per the approved
+   visual contract ("ProgressMessage, ErrorNotice, and EmptyState remain
+   visually and semantically distinct treatments"). */
+.ui-empty-state {
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-empty-state-message {
+  margin: 0;
+}
+
+.ui-empty-state > * + * {
+  margin-top: var(--space-tight);
+}
+
+/* =========================================================================
+   UnavailableNote — DS-04D Slice 2B isolated Storybook coverage only
+   (component-model.md §4.3 "UnavailableNote"; Gate C1: keep current
+   `useUnavailableNote` behaviour unchanged, do not redesign or generalise
+   it). Production behaviour and class name
+   (`.unavailable-control`/`.unavailable-note`) are defined in
+   `apps/research-explorer/src/index.css` (not touched by this file, which
+   the production app does not import — see the file-header note above).
+   This is the minimum equivalent anatomy, mapped onto the DS-04B token
+   layer (`--ink`/`--canvas`/`--radius-sm` there vs
+   `--color-ink-primary`/`--color-surface-raised`/`--radius-focus` here), so
+   the existing pointer/focus-reveal behaviour can be demonstrated in
+   Storybook isolation without depending on production's index.css. */
+.unavailable-control {
+  position: relative;
+  display: inline-flex;
+}
+
+.unavailable-note {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 4px);
+  z-index: 1;
+  padding: var(--p-space-1) var(--space-tight);
+  color: var(--color-surface-raised);
+  background: var(--color-ink-primary);
+  border-radius: var(--radius-focus);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  line-height: var(--text-interface-label-line-height);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+}
+
+.unavailable-control:hover .unavailable-note,
+.unavailable-control button:focus-visible ~ .unavailable-note {
+  opacity: 1;
+  visibility: visible;
+}
