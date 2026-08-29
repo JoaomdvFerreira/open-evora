@@ -533,6 +533,17 @@ button.ui-action-outlined[aria-disabled="true"]:hover {
   column-gap: var(--space-standard);
 }
 
+/* When any top-level entry has nested children, the horizontal wrapping row
+   makes parent/child ownership ambiguous: a childless sibling can land beside
+   another entry's child column at the top of the same wrapped row. Stack the
+   top-level list vertically instead so each parent and its children form one
+   unambiguous group. Flat indexes (no `li > .ui-section-index-list` anywhere)
+   are untouched and keep the row-wrap treatment above. */
+.ui-section-index-compact-nav > .ui-section-index-list:has(li > .ui-section-index-list) {
+  flex-direction: column;
+  row-gap: var(--p-space-1);
+}
+
 /* Nested entries stay block-flow inside their own parent <li> (not part of
    the row-wrap), so each parent's subsections visually group underneath it
    rather than floating into the shared top-level row — current evidence:
