@@ -1,0 +1,116 @@
+/* DS-04D Slice 3A — Record/evidence domain atom visual recipes
+   (implementation candidate)
+   Scope: docs/design/component-model.md §2.4 (Domain components) and §4.4
+   (Domain component contract) — RecordIdentifier, RecordTypeLabel,
+   EvidenceEffectTag. Consumes the DS-04B Foundation token layer
+   (styles/tokens.css + styles/foundations.css) and the DS-04D Slice 1
+   generic inline-label anatomy (styles/ui.css .ui-inline-label), which
+   RecordTypeLabel's detail variant and EvidenceEffectTag both compose
+   rather than duplicate.
+
+   Storybook-only for now: not imported by the production application (see
+   apps/research-explorer/src/index.css, which owns the equivalent current
+   production classes .detail-technical-field/.prb-reference-target,
+   .detail-type-badge/.narrow-record-type/.desktop-record-type, and
+   .effect-chip unchanged in this phase).
+
+   This file exists separately from ui.css precisely because these three
+   classes carry domain meaning (record identity, record type, PRB→EVD
+   effect) — component-model.md §2.3 "Generic UI ... must not determine ...
+   what a Problem status means" applies by the same logic to type/effect
+   semantics, so semantic domain styling does not belong in the generic
+   layer even though it shares that layer's anatomy. Sharing
+   .ui-inline-label here is deliberate reuse of anatomy, not evidence that
+   RecordIdentifier/RecordTypeLabel/EvidenceEffectTag are becoming one
+   interchangeable chip family — each keeps its own class and, where the
+   dimension calls for it, its own distinct shape (RecordIdentifier never
+   reuses .ui-inline-label at all: an identifier is not a labelled fact
+   about the record, it is the record's own name, so it stays plain
+   technical typography with no border/background). */
+
+/* =========================================================================
+   RecordIdentifier — canonical record ID, technical typography only. No
+   type gloss, no border/surface: current evidence (.detail-technical-field,
+   .prb-reference-target) renders a bare monospace string, not a chip.
+   ========================================================================= */
+.rec-identifier {
+  font-family: var(--font-technical);
+  font-size: var(--text-technical-size);
+  font-weight: var(--text-technical-weight);
+  line-height: var(--text-technical-line-height);
+  color: var(--color-ink-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* The actionable form is a native <button>: current evidence
+   (.prb-reference-target, RelatedRecordButton/TypedLinkButton) always wraps
+   the identifier text in a real interactive element rather than adding a
+   role to the static span, so this recipe only adjusts appearance —
+   interactivity itself is the browser's own button semantics. */
+.rec-identifier--action {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+  cursor: pointer;
+}
+
+.rec-identifier--action:hover {
+  color: var(--color-accent-hover);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.16em;
+}
+
+/* =========================================================================
+   RecordTypeLabel — record prefix + approved public type meaning. Two
+   demonstrably distinct shapes: a bare compact marker beside a record row,
+   and a bordered detail badge once per Record Detail meaning zone.
+   ========================================================================= */
+
+/* ---- compact --------------------------------------------------------
+   Current evidence: .desktop-record-type / .narrow-record-type — a bare
+   monospace prefix token with no border, sitting beside the record's
+   human-readable label/id, not a chip in its own right. */
+.rec-type-label--compact {
+  flex-shrink: 0;
+  font-family: var(--font-technical);
+  font-size: var(--text-technical-size);
+  color: var(--color-ink-muted);
+}
+
+/* ---- detail -----------------------------------------------------------
+   Current evidence: .detail-type-badge — a bordered prefix+label badge
+   shown once above the meaning sentence. Composes .ui-inline-label anatomy
+   (shared border/radius/padding) and keeps the canonical prefix in its own
+   <code> so it stays technically legible even though the label text uses
+   interface typography. */
+.rec-type-label--detail code {
+  font-family: var(--font-technical);
+  font-size: var(--text-technical-size);
+  color: var(--color-ink-muted);
+}
+
+/* =========================================================================
+   EvidenceEffectTag — one authored PRB→EVD effect. Explicit "Efeito:"
+   caption plus an aria-hidden arrow glyph in standard form (current
+   evidence: .effect-chip in EvidenceCard); compact form drops the caption
+   for a caller-provided context (current evidence: .effect-summary-chip's
+   tally chip) but keeps the same accessible-text requirement via
+   aria-label, never colour/shape alone.
+   ========================================================================= */
+.evd-effect-tag-caption {
+  color: var(--color-ink-muted);
+}
+
+.evd-effect-tag-arrow {
+  font-family: var(--font-technical);
+  color: var(--color-ink-muted);
+}
+
+.evd-effect-tag--standard,
+.evd-effect-tag--compact {
+  font-weight: var(--text-interface-label-weight);
+}
