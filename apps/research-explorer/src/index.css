@@ -2902,30 +2902,16 @@ main.explorer-shell {
   font-size: 12px;
 }
 
-/* "Estado atual" canonical-value-plus-gloss chips (REDUX-007/008 §8) —
-   identical treatment for every field; the gloss label is a plain-language
-   accompaniment, the canonical value in parentheses/monospace never omitted. */
+/* "Estado atual" status row (DS-05A): row layout only. Each chip's own
+   visual anatomy now comes from ProblemLifecycleStatus/ValidationStatus/
+   EvidenceStatus's `reading` form (styles/domain.css `.prb-status-chip`,
+   composing styles/inline-label.css `.ui-inline-label`), not a local class
+   here. */
 .status-chip-row {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
   margin: 0 0 var(--space-4);
-}
-
-.status-chip {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  padding: 6px 11px;
-  color: var(--ink);
-  background: var(--surface);
-  font-family: var(--ui);
-  font-size: 13px;
-}
-
-.status-chip code {
-  color: var(--ink-faintest);
-  font-family: var(--recipe-technical-id-family);
-  font-size: 11px;
 }
 
 @media (max-width: 767px) {

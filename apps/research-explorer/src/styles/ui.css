@@ -16,6 +16,14 @@
    only visual anatomy; domain components remain the sole owners of meaning
    (component-model.md §2.3, §2.4). */
 
+/* DS-05A: `.ui-inline-label` now lives in its own file so the production
+   application can depend on it without importing this file's other
+   selectors, in particular `.unavailable-control`/`.unavailable-note` below,
+   which intentionally collide with production's own selectors of the same
+   name in index.css. Imported here so every existing Storybook consumer of
+   ui.css keeps the exact same `.ui-inline-label` behaviour unchanged. */
+@import "./inline-label.css";
+
 /* =========================================================================
    Native action recipes — CSS classes applied directly to native <a> or
    <button>. Link vs button semantics stay caller-owned: these recipes never
@@ -254,31 +262,6 @@ button.ui-action-outlined[aria-disabled="true"]:hover {
    surface's border legible while a descendant carries visible focus. */
 .ui-surface-interactive:has(:focus-visible) {
   border-color: var(--focus-ring-color);
-}
-
-/* =========================================================================
-   Inline-label recipe — shared compact border/radius/padding/alignment
-   anatomy only. No status/effect/type/research-role semantics, no
-   colour-only meaning, no invented semantic variants such as success/
-   warning/error (component-model.md §2.3, §4.3, §5.4). Domain components
-   (RecordTypeLabel, EvidenceEffectTag, Problem state presentations, etc.)
-   consume this anatomy later and remain the sole owners of tone/meaning.
-   ========================================================================= */
-.ui-inline-label {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--p-space-1);
-  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
-  border-radius: var(--radius-control);
-  padding: var(--p-space-1) var(--space-tight);
-  background: var(--color-surface-subtle);
-  color: var(--color-ink-secondary);
-  font-family: var(--font-interface);
-  font-size: var(--text-interface-label-size);
-  font-weight: var(--text-interface-label-weight);
-  line-height: var(--text-interface-label-line-height);
-  white-space: normal;
-  overflow-wrap: anywhere;
 }
 
 /* =========================================================================
