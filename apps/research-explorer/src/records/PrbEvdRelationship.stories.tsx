@@ -24,13 +24,16 @@ import { FactList } from "../presentation/FactList";
    Composition A anatomy is derived from ProblemView.tsx's `EvidenceCard`
    (identifier + type + effect(s) header, serif observation paragraph,
    separate Source provenance line) plus the catalogue's own "Evidence in a
-   Problem" specimen (§4, ~line 674) — same header/body/provenance shape.
-   Research role is NOT demonstrated in Composition A: current `EvidenceCard`
-   renders only `effects`, never `research_roles`, in the Problem-facing
-   evidence list (problemProjection.ts's `EvidenceWithSources.researchRoles`
-   is read but EvidenceCard does not render it) — inventing that presentation
-   here would exceed current evidence, so this slice omits it rather than
-   adding it merely because ResearchRoleTag exists.
+   Problem" specimen (§4, ~line 674) — same header/body/provenance shape,
+   extended with the catalogue's own research-role property. Current
+   production `EvidenceCard` (ProblemView.tsx) does not yet render
+   `research_roles` in its Problem-facing evidence list — it reads
+   `EvidenceWithSources.researchRoles` (problemProjection.ts) but only
+   renders `effects` today. The approved DS-03B "Evidence in a Problem"
+   specimen renders both Efeito and Papel as properties of the same PRB→EVD
+   relationship, so this Storybook composition demonstrates the approved,
+   isolated target — not a migration of ProblemView.tsx, which is left
+   unchanged (see "production-isolation" below).
 
    Composition B anatomy is derived from EvdDetail.tsx's `EvdInvestigation`
    (`.evd-problem-card` surface, PRB identity heading, `.evd-relation-facts`
@@ -80,20 +83,28 @@ function StandaloneDemo({ heading, children }: { heading: string; children: Reac
 /* =========================================================================
    Composition A — Evidence use inside a Problem
    Caller-owned fixture shape: identity, type, one-or-more authored effects
-   (authored order preserved), observation prose, optional Source
-   provenance. Mirrors EvidenceCard's own `<li className="evidence-card">`
-   header/body/provenance ordering; reuses the .ui-surface-outlined recipe
-   rather than a new card primitive (component-model.md §5.6 "Surface reuse
-   is visual, not structural").
+   and research roles (authored order preserved for each, independently),
+   observation prose, optional Source provenance. Mirrors EvidenceCard's own
+   `<li className="evidence-card">` header/body/provenance ordering, extended
+   with the approved DS-03B "Evidence in a Problem" specimen's research-role
+   property; reuses the .ui-surface-outlined recipe rather than a new card
+   primitive (component-model.md §5.6 "Surface reuse is visual, not
+   structural"). Effect and research role remain two independent tags, never
+   combined into one generic array/component (component-visual-contract.md
+   "Effects and research roles ... [are] independent PRB→EVD dimensions").
+   `ResearchRoleTag` uses `variant="standard"` here because this header does
+   not provide a separate visible `<dt>Papel</dt>` caption the way
+   Composition B's FactList row does — the caption must be visible inline.
    ========================================================================= */
 interface EvidenceUseFixture {
   evdId: string;
   observation: string;
   effects: string[];
+  researchRoles: string[];
   sourceId?: string;
 }
 
-function EvidenceUseInProblem({ evdId, observation, effects, sourceId }: EvidenceUseFixture) {
+function EvidenceUseInProblem({ evdId, observation, effects, researchRoles, sourceId }: EvidenceUseFixture) {
   return (
     <li className="ui-surface-outlined" style={{ listStyle: "none" }}>
       <div className="lyt-cluster lyt-cluster--tight lyt-cluster--align-baseline" style={{ marginBottom: "var(--space-tight)" }}>
@@ -101,6 +112,9 @@ function EvidenceUseInProblem({ evdId, observation, effects, sourceId }: Evidenc
         <RecordIdentifier variant="action" id={evdId} density="compact" onActivate={() => {}} accessibleLabel={`Abrir ${evdId}`} />
         {effects.map((effect, index) => (
           <EvidenceEffectTag key={`${effect}-${index}`} effect={effect} />
+        ))}
+        {researchRoles.map((role, index) => (
+          <ResearchRoleTag key={`${role}-${index}`} role={role} variant="standard" />
         ))}
       </div>
       <p style={{ fontFamily: "var(--font-reading)", fontSize: "var(--text-reading-body-size)", lineHeight: "var(--text-reading-body-line-height)", margin: "0 0 var(--space-tight)" }}>
@@ -120,11 +134,16 @@ export const ProblemToEvdMinimal: Story = {
   render: () => (
     <StandaloneDemo heading="Evidência associada a um Problema — mínimo">
       <p style={{ maxWidth: "72ch" }}>
-        Uma evidência sintética com um único efeito autorado e sem fonte associada. O resumo humano ("observação") lidera; o identificador
-        técnico permanece disponível mas subordinado.
+        Uma evidência sintética com um único efeito e um único papel de investigação já autorados, sem fonte associada. O resumo humano
+        ("observação") lidera; o identificador técnico permanece disponível mas subordinado.
       </p>
       <ul className="lyt-stack lyt-stack--standard" style={{ padding: 0, maxWidth: "72ch" }}>
-        <EvidenceUseInProblem evdId="EVD-000210" observation="Levantamento fotográfico sintético regista um padrão de obstrução recorrente em passeios do centro histórico." effects={["SUPPORTS"]} />
+        <EvidenceUseInProblem
+          evdId="EVD-000210"
+          observation="Levantamento fotográfico sintético regista um padrão de obstrução recorrente em passeios do centro histórico."
+          effects={["SUPPORTS"]}
+          researchRoles={["LOCAL_OBSERVATION"]}
+        />
       </ul>
     </StandaloneDemo>
   ),
@@ -135,14 +154,16 @@ export const ProblemToEvdMultipleEffects: Story = {
   render: () => (
     <StandaloneDemo heading="Evidência associada a um Problema — vários efeitos autorados">
       <p style={{ maxWidth: "72ch" }}>
-        A mesma evidência sintética pode ter mais do que um efeito já autorado sobre o enquadramento do Problema; a ordem autorada é
-        preservada exatamente como fornecida pelo chamador — nunca reordenada por força ou confiança.
+        A mesma evidência sintética pode ter mais do que um efeito já autorado sobre o enquadramento do Problema, além de um papel de
+        investigação; a ordem autorada de cada lista é preservada exatamente como fornecida pelo chamador — nunca reordenada por força ou
+        confiança.
       </p>
       <ul className="lyt-stack lyt-stack--standard" style={{ padding: 0, maxWidth: "72ch" }}>
         <EvidenceUseInProblem
           evdId="EVD-000388"
           observation="Comparação sintética entre dois levantamentos sucessivos sustenta a leitura inicial mas também delimita o âmbito geográfico da conclusão."
           effects={["SUPPORTS", "BOUNDS"]}
+          researchRoles={["CONTEXTUAL"]}
           sourceId="SRC-0042"
         />
       </ul>
@@ -254,8 +275,9 @@ export const LongTitleLongLabelStress: Story = {
         <ul className="lyt-stack lyt-stack--standard" style={{ padding: 0 }}>
           <EvidenceUseInProblem
             evdId="EVD-000000000000000777-SUFIXO-SINTETICO-LONGO"
-            observation="Observação sintética deliberadamente longa para verificar que o texto de leitura quebra dentro da coluna sem forçar deslocamento horizontal da página, mesmo com vários efeitos autorados a acompanhar o cabeçalho."
+            observation="Observação sintética deliberadamente longa para verificar que o texto de leitura quebra dentro da coluna sem forçar deslocamento horizontal da página, mesmo com vários efeitos e papéis autorados a acompanhar o cabeçalho."
             effects={["CONTRADICTS", "BOUNDS"]}
+            researchRoles={["COMPARATIVE_MECHANISM", "PLANNED_RESPONSE"]}
             sourceId="SRC-0000000000000099-SUFIXO-SINTETICO-LONGO"
           />
         </ul>
@@ -297,6 +319,7 @@ export const ComparisonBothOrientations: Story = {
               evdId="EVD-000512"
               observation="Registo sintético de inquérito local sustenta a leitura do Problema sobre acessibilidade pedonal no centro histórico."
               effects={["SUPPORTS"]}
+              researchRoles={["LOCAL_OBSERVATION"]}
               sourceId="SRC-0017"
             />
           </ul>
@@ -323,11 +346,17 @@ function CombinedRelationshipPage() {
         <section aria-labelledby="combined-a-heading">
           <h2 id="combined-a-heading">Evidência dentro de um Problema</h2>
           <ul className="lyt-stack lyt-stack--standard" style={{ padding: 0, maxWidth: "72ch" }}>
-            <EvidenceUseInProblem evdId="EVD-000210" observation="Levantamento fotográfico sintético regista um padrão de obstrução recorrente em passeios do centro histórico." effects={["SUPPORTS"]} />
+            <EvidenceUseInProblem
+              evdId="EVD-000210"
+              observation="Levantamento fotográfico sintético regista um padrão de obstrução recorrente em passeios do centro histórico."
+              effects={["SUPPORTS"]}
+              researchRoles={["LOCAL_OBSERVATION"]}
+            />
             <EvidenceUseInProblem
               evdId="EVD-000388"
               observation="Comparação sintética entre dois levantamentos sucessivos sustenta a leitura inicial mas também delimita o âmbito geográfico da conclusão."
               effects={["SUPPORTS", "BOUNDS"]}
+              researchRoles={["CONTEXTUAL"]}
               sourceId="SRC-0042"
             />
           </ul>
