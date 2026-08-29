@@ -1,0 +1,600 @@
+/* DS-04D Slice 1 — Generic UI visual recipes (implementation candidate)
+   Scope: docs/design/component-model.md §2.3 (Generic UI) and §4.3 (Generic
+   UI contract), consuming docs/design/foundations.md via styles/tokens.css +
+   styles/foundations.css and docs/design/component-model.md §2.2 via
+   styles/layout.css where a demo composes them.
+
+   Storybook-only for now: not imported by the production application (see
+   apps/research-explorer/src/index.css, which owns the equivalent current
+   production classes .detail-rail-actions a/button, .problem-rail-nav a,
+   .context-tabs button, .record-provenance, .evidence-card/.open-question-
+   item, and .record-role-chip/.effect-chip unchanged in this phase).
+
+   CSS classes only, applied directly to native HTML. No polymorphic Action/
+   Card/Chip React component exists here (component-model.md §4.3, Gate C1
+   decision 4). No status/effect/type/research-role semantics belong here —
+   only visual anatomy; domain components remain the sole owners of meaning
+   (component-model.md §2.3, §2.4). */
+
+/* =========================================================================
+   Native action recipes — CSS classes applied directly to native <a> or
+   <button>. Link vs button semantics stay caller-owned: these recipes never
+   redefine disabled/aria-disabled behaviour and never introduce a
+   polymorphic element. Foundation focus treatment (foundations.css) is
+   inherited unchanged, not redeclared here.
+   ========================================================================= */
+
+/* ---- Text action ---------------------------------------------------------
+   Compact inline-weight action: current evidence is `.problem-rail-nav a`
+   and `.detail-rail-actions` styling before the outlined box is added. The
+   canonical Foundation/visual contract requires links to be underlined at
+   rest (foundations.md "Interaction and focus"; component-visual-contract.md
+   "Links are underlined at rest"), so `a.ui-action-text` keeps that
+   underline; hover thickens it. `button.ui-action-text` is not a link and
+   stays non-underlined at rest, matching native button convention. */
+.ui-action-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--p-space-1);
+  min-height: var(--target-min);
+  padding: var(--p-space-1) var(--p-space-2);
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+  cursor: pointer;
+}
+
+a.ui-action-text {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+}
+
+button.ui-action-text {
+  text-decoration: none;
+}
+
+.ui-action-text:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.16em;
+}
+
+/* aria-disabled stays interaction-owned (component-model.md §4.3): this
+   recipe only supplies the muted appearance a caller opts into alongside
+   its own aria-disabled/UnavailableNote wiring, never a `disabled` default. */
+.ui-action-text[aria-disabled="true"] {
+  color: var(--color-ink-muted);
+  cursor: not-allowed;
+}
+
+a.ui-action-text[aria-disabled="true"]:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+}
+
+button.ui-action-text[aria-disabled="true"]:hover {
+  text-decoration: none;
+}
+
+/* ---- Outlined action -------------------------------------------------
+   Bordered action box: current evidence is `.detail-rail-actions a` /
+   `.detail-rail-actions button`, which already share one bordered
+   appearance across both elements. Minimum target sizing applies because
+   the current evidence is a standalone rail action, not inline prose.
+   `a.ui-action-outlined` keeps an at-rest underline so it remains
+   recognisable as a link even inside the bordered box (canonical rule:
+   links are underlined at rest); a button needs no such treatment. */
+.ui-action-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--p-space-1);
+  min-height: var(--target-min);
+  padding: var(--p-space-2) var(--space-standard);
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+  color: var(--color-ink-primary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  line-height: var(--text-interface-label-line-height);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.ui-action-outlined {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+}
+
+/* Hover cue must not depend on colour alone: the anchor thickens its
+   existing underline; the button gains a border-width step. Neither
+   introduces motion or new decorative treatment. */
+.ui-action-outlined:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
+a.ui-action-outlined:hover {
+  text-decoration-thickness: 2px;
+}
+
+button.ui-action-outlined:hover {
+  border-width: calc(var(--p-border-width-hairline) + 1px);
+  padding: calc(var(--p-space-2) - 1px) calc(var(--space-standard) - 1px);
+}
+
+.ui-action-outlined[aria-disabled="true"] {
+  color: var(--color-ink-muted);
+  border-color: var(--color-separator-faint);
+  cursor: not-allowed;
+}
+
+.ui-action-outlined[aria-disabled="true"]:hover {
+  border-color: var(--color-separator-faint);
+  color: var(--color-ink-muted);
+}
+
+button.ui-action-outlined[aria-disabled="true"]:hover {
+  border-width: var(--p-border-width-hairline);
+  padding: var(--p-space-2) var(--space-standard);
+}
+
+/* ---- Tab action ------------------------------------------------------
+   Demonstrated by the approved visual contract's grouped-tab appearance
+   (current evidence: `.context-tabs button` — a bordered inline group with
+   a filled `aria-current="page"` state). This recipe supplies only that
+   shared appearance; grouping semantics and `aria-current` wiring remain
+   caller-owned (ContextTabs stays a PRB-scoped domain component per
+   component-model.md §5.3). No `overflow: hidden` on the group: that would
+   clip the inherited Foundation `:focus-visible` outline on the first/last
+   child. The rounded group appearance is achieved by giving only the outer
+   corners of the first/last `.ui-action-tab` the group radius instead. */
+.ui-action-tab-group {
+  display: inline-flex;
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+}
+
+.ui-action-tab {
+  min-height: var(--target-min);
+  padding: var(--p-space-2) var(--space-standard);
+  border: 0;
+  border-right: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  background: none;
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  line-height: var(--text-interface-label-line-height);
+  cursor: pointer;
+}
+
+.ui-action-tab:first-child {
+  border-top-left-radius: var(--radius-control);
+  border-bottom-left-radius: var(--radius-control);
+}
+
+.ui-action-tab:last-child {
+  border-right: 0;
+  border-top-right-radius: var(--radius-control);
+  border-bottom-right-radius: var(--radius-control);
+}
+
+.ui-action-tab:hover {
+  color: var(--color-ink-primary);
+  background: var(--color-surface-subtle);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+.ui-action-tab[aria-current="page"] {
+  color: var(--color-surface-raised);
+  background: var(--color-ink-primary);
+  font-weight: var(--text-interface-label-weight);
+}
+
+/* =========================================================================
+   Surface recipes — visual anatomy only. No React Card component, no
+   landmark ownership, no semantic meaning (component-model.md §2.3, §4.3).
+   Ordinary adjacent content remains unboxed by default (foundations.md
+   "Surfaces and separators"); callers opt a specific element into one of
+   these three recipes only when it is a real boundary.
+   ========================================================================= */
+
+/* ---- Plain outlined ----------------------------------------------------
+   Hairline border, no fill: current evidence is `.evidence-card` and
+   `.open-question-item`. */
+.ui-surface-outlined {
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  padding: var(--space-standard);
+}
+
+/* ---- Muted inset --------------------------------------------------------
+   Filled recess: current evidence is `.record-provenance`. */
+.ui-surface-inset {
+  background: var(--color-surface-subtle);
+  border: var(--p-border-width-hairline) solid var(--color-separator-faint);
+  border-radius: var(--radius-control);
+  padding: var(--space-standard);
+}
+
+/* ---- Interactive item ---------------------------------------------------
+   Adds a hover/focus-affordance on top of the plain outlined anatomy for a
+   surface that is already interactive by other means (e.g. it wraps a
+   native <a>/<button>, or its own interactive descendant carries the real
+   affordance). This recipe supplies appearance only — applying it to a
+   non-interactive element does not, by itself, make that element
+   interactive (component-model.md §4.3): no tabindex, role, or keyboard
+   handling is added here. */
+.ui-surface-interactive {
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  padding: var(--space-standard);
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.ui-surface-interactive:hover {
+  border-color: var(--color-accent);
+  background: var(--color-surface-subtle);
+}
+
+/* When the interactive-item surface wraps a native focusable element,
+   Foundation's shared focus-visible treatment (foundations.css) already
+   applies to that element directly; this rule only keeps the surrounding
+   surface's border legible while a descendant carries visible focus. */
+.ui-surface-interactive:has(:focus-visible) {
+  border-color: var(--focus-ring-color);
+}
+
+/* =========================================================================
+   Inline-label recipe — shared compact border/radius/padding/alignment
+   anatomy only. No status/effect/type/research-role semantics, no
+   colour-only meaning, no invented semantic variants such as success/
+   warning/error (component-model.md §2.3, §4.3, §5.4). Domain components
+   (RecordTypeLabel, EvidenceEffectTag, Problem state presentations, etc.)
+   consume this anatomy later and remain the sole owners of tone/meaning.
+   ========================================================================= */
+.ui-inline-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--p-space-1);
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  padding: var(--p-space-1) var(--space-tight);
+  background: var(--color-surface-subtle);
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  line-height: var(--text-interface-label-line-height);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================================
+   Breadcrumb anatomy — DS-04D Slice 2A (component-model.md §4.3
+   "Breadcrumb"), extracted from the current `.detail-breadcrumb` markup in
+   RecordDetailPanel/ProblemView/ProblemHistoryView. Presentation only: no
+   landmark ownership beyond the <nav> the component itself renders, no
+   label/route/ID logic — see src/presentation/Breadcrumb.tsx. The
+   separator's own visual weight comes from ordinary ink colour, not a
+   border or background, so it reads as punctuation rather than a control.
+   ========================================================================= */
+.ui-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-tight);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-breadcrumb-separator {
+  color: var(--color-ink-muted);
+}
+
+.ui-breadcrumb-current {
+  color: var(--color-ink-primary);
+}
+
+/* =========================================================================
+   FactList anatomy — DS-04D Slice 2A (component-model.md §4.3 "FactList"),
+   extracted from the current `.detail-provenance-grid` markup. A two-column
+   label/value grid on desktop; the current evidence (index.css's compact
+   `.detail-provenance-grid` media query) recomposes to one column with the
+   value stacked under its label at the compact boundary, so that
+   recomposition is built into this single recipe rather than offered as a
+   separate selectable density — see src/presentation/FactList.tsx.
+   ========================================================================= */
+.ui-fact-list {
+  display: grid;
+  grid-template-columns: minmax(0, var(--fact-list-label-width, 8.5rem)) 1fr;
+  row-gap: var(--space-tight);
+  column-gap: var(--space-standard);
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-fact-list dt {
+  color: var(--color-ink-muted);
+}
+
+.ui-fact-list dd {
+  margin: 0;
+  color: var(--color-ink-primary);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  .ui-fact-list {
+    grid-template-columns: 1fr;
+    row-gap: var(--p-space-1);
+  }
+
+  .ui-fact-list dt {
+    margin-top: var(--space-tight);
+  }
+}
+
+/* =========================================================================
+   Feedback boundaries — DS-04D Slice 2B (component-model.md §4.3
+   "ProgressMessage", "ErrorNotice", "EmptyState"; Gate C1 decision 6: three
+   separate explicit boundaries, never one mode-driven component). Anatomy
+   only: role/live-region semantics live in the React components
+   (src/presentation/ProgressMessage.tsx, ErrorNotice.tsx, EmptyState.tsx),
+   and message/title/retry/action content stays entirely caller-owned. Only
+   ErrorNotice uses the error/red hue (component-visual-contract.md "Status
+   always has explicit text: colour and glyph reinforce meaning but never
+   carry it alone") — ProgressMessage and EmptyState stay on ordinary ink/
+   surface roles so they cannot read as failures.
+   ========================================================================= */
+
+/* ---- ProgressMessage ---------------------------------------------------
+   Restrained: current evidence (App/Explorer/Overview/RecordsExplorer/
+   ProblemView/RecordDetailPanel loading branches) is plain status text with
+   no border/surface/icon. No colour or icon is added here — the text alone
+   carries "in progress", matching current production treatment. */
+.ui-progress-message {
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+/* ---- ErrorNotice ---------------------------------------------------------
+   Current evidence (App/RecordDetailPanel/ProblemView/RecordsExplorer
+   `role="alert"` branches) pairs a heading and message inside a bordered
+   box; this recipe keeps that shape restrained (hairline border, not a
+   heavy fill) so it states failure explicitly without dominating the page. */
+.ui-error-notice {
+  border: var(--p-border-width-hairline) solid var(--color-feedback-error-line);
+  border-radius: var(--radius-surface);
+  padding: var(--space-standard);
+  background: var(--color-feedback-error-surface);
+  color: var(--color-feedback-error-ink);
+}
+
+.ui-error-notice-title {
+  margin: 0 0 var(--space-tight);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-heading-size);
+  font-weight: var(--text-interface-heading-weight);
+  line-height: var(--text-interface-heading-line-height);
+}
+
+.ui-error-notice-message {
+  margin: 0 0 var(--space-tight);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-error-notice-message:last-child {
+  margin-bottom: 0;
+}
+
+/* A caller-supplied action using the ordinary ui-action-outlined recipe
+   (ordinary ink/surface roles, not the error hue) reads as an ordinary
+   control rather than compounding the alert's visual weight. This selector
+   only positions such an action when the caller opts into that recipe; it
+   never constructs the action itself (see ErrorNotice.tsx `action` prop). */
+.ui-error-notice .ui-action-outlined {
+  margin-top: var(--space-tight);
+}
+
+/* ---- EmptyState -----------------------------------------------------------
+   Ordinary content, not an alert: current evidence is plain empty-result
+   copy (no border/fill in current production). Kept on ordinary ink so it
+   cannot be mistaken for ErrorNotice at a glance, per the approved
+   visual contract ("ProgressMessage, ErrorNotice, and EmptyState remain
+   visually and semantically distinct treatments"). */
+.ui-empty-state {
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-empty-state-message {
+  margin: 0;
+}
+
+.ui-empty-state > * + * {
+  margin-top: var(--space-tight);
+}
+
+/* =========================================================================
+   Section-index anatomy — DS-04D Slice 2C (component-model.md §4.3
+   "Section-index presentation"), extracted from the current
+   `.problem-rail-nav` (rail) and `.problem-help`/`.problem-help-section-
+   index` (compact) markup — see src/presentation/RailSectionIndex.tsx,
+   CompactSectionIndex.tsx, and the shared SectionIndexList.tsx renderer.
+   Restrained by design: a section index is an orientation/navigation aid,
+   not primary content — links stay underlined at rest (no
+   `text-decoration: none`), there is no status/chip styling, and no new
+   card-like surface beyond the compact disclosure's existing bounded
+   surface grammar (ui-surface-inset, reused rather than duplicated).
+   ========================================================================= */
+
+/* ---- Shared list anatomy (rail + compact) -------------------------------
+   Current evidence: `.problem-rail-nav ul/a` (rail) and
+   `.problem-help-section-index ul/li>ul a` (compact) already share one
+   list shape — flex column for the rail's vertical nav, reused as flex-wrap
+   in the compact nav below since the compact index sits in flowing prose
+   width rather than a fixed-width rail. */
+.ui-section-index-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-space-1);
+}
+
+.ui-section-index-list a {
+  display: inline-block;
+  padding: var(--p-space-1) 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-section-index-list a:hover {
+  color: var(--color-accent-hover);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.16em;
+}
+
+/* Nested entries (one caller-demonstrated level, `problemSectionIndex`
+   subsections): indented and slightly smaller purely to signal structure,
+   never severity or ranking (current evidence: `.problem-rail-nav li > ul`,
+   `.problem-help-section-index li > ul a`). */
+.ui-section-index-list li > .ui-section-index-list {
+  margin-left: var(--space-standard);
+  margin-top: var(--p-space-1);
+}
+
+.ui-section-index-list li > .ui-section-index-list a {
+  font-size: var(--text-interface-label-size);
+  color: var(--color-ink-muted);
+}
+
+/* ---- Rail variant ---------------------------------------------------------
+   Current evidence: `.problem-rail-nav` inside `.record-detail-rail` /
+   `.lyt-reading-rail`. No sticky/layout ownership here — ReadingLayout
+   (layout.css `.lyt-reading-rail`) owns positioning; this class supplies
+   only the nav's own heading-less vertical rhythm. */
+.ui-section-index-rail {
+  display: block;
+}
+
+/* ---- Compact variant -------------------------------------------------
+   Current evidence: `.problem-help` (bordered/muted disclosure shell,
+   reused here as `ui-surface-inset` rather than a duplicate recipe) and
+   `.problem-help-section-index` (flex-wrap compact nav so short entries
+   flow inline in the narrower ~360px in-flow measure). Remains ordinary
+   in-flow content: no role/live-region semantics beyond the native
+   <details>/<summary> element itself. */
+.ui-section-index-compact {
+  margin: 0;
+}
+
+.ui-section-index-compact > summary {
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  line-height: var(--text-interface-label-line-height);
+  cursor: pointer;
+}
+
+.ui-section-index-compact-nav {
+  margin-top: var(--space-tight);
+}
+
+.ui-section-index-compact-nav > .ui-section-index-list {
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: var(--space-standard);
+}
+
+/* When any top-level entry has nested children, the horizontal wrapping row
+   makes parent/child ownership ambiguous: a childless sibling can land beside
+   another entry's child column at the top of the same wrapped row. Stack the
+   top-level list vertically instead so each parent and its children form one
+   unambiguous group. Flat indexes (no `li > .ui-section-index-list` anywhere)
+   are untouched and keep the row-wrap treatment above. */
+.ui-section-index-compact-nav > .ui-section-index-list:has(li > .ui-section-index-list) {
+  flex-direction: column;
+  row-gap: var(--p-space-1);
+}
+
+/* Nested entries stay block-flow inside their own parent <li> (not part of
+   the row-wrap), so each parent's subsections visually group underneath it
+   rather than floating into the shared top-level row — current evidence:
+   `.problem-help-section-index li > ul` is ordinary block flow, not itself
+   wrapped into the row. */
+.ui-section-index-compact-nav .ui-section-index-list li > .ui-section-index-list {
+  flex-direction: column;
+  margin-left: var(--space-tight);
+  margin-top: var(--p-space-1);
+}
+
+/* =========================================================================
+   UnavailableNote — DS-04D Slice 2B isolated Storybook coverage only
+   (component-model.md §4.3 "UnavailableNote"; Gate C1: keep current
+   `useUnavailableNote` behaviour unchanged, do not redesign or generalise
+   it). Production behaviour and class name
+   (`.unavailable-control`/`.unavailable-note`) are defined in
+   `apps/research-explorer/src/index.css` (not touched by this file, which
+   the production app does not import — see the file-header note above).
+   This is the minimum equivalent anatomy, mapped onto the DS-04B token
+   layer (`--ink`/`--canvas`/`--radius-sm` there vs
+   `--color-ink-primary`/`--color-surface-raised`/`--radius-focus` here), so
+   the existing pointer/focus-reveal behaviour can be demonstrated in
+   Storybook isolation without depending on production's index.css. */
+.unavailable-control {
+  position: relative;
+  display: inline-flex;
+}
+
+.unavailable-note {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 4px);
+  z-index: 1;
+  padding: var(--p-space-1) var(--space-tight);
+  color: var(--color-surface-raised);
+  background: var(--color-ink-primary);
+  border-radius: var(--radius-focus);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  line-height: var(--text-interface-label-line-height);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+}
+
+.unavailable-control:hover .unavailable-note,
+.unavailable-control button:focus-visible ~ .unavailable-note {
+  opacity: 1;
+  visibility: visible;
+}

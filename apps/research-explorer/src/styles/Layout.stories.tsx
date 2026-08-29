@@ -53,7 +53,10 @@ function SyntheticRail() {
 
 function ShellFrameDemo() {
   return (
-    <div style={{ background: "var(--color-surface-subtle)", padding: "var(--space-loose) 0" }}>
+    <main style={{ background: "var(--color-surface-subtle)", padding: "var(--space-loose) 0" }}>
+      <h1 style={{ fontSize: "var(--text-reading-h2-size)", padding: "0 var(--space-standard)" }}>
+        ShellFrame
+      </h1>
       <div className="lyt-shell-frame">
         <div
           className="fnd-surface-raised"
@@ -67,7 +70,7 @@ function ShellFrameDemo() {
           </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -117,7 +120,7 @@ function StackSpacingVariants() {
 
   return (
     <main style={{ padding: "var(--space-loose)" }}>
-      <h2>Stack — variantes de espaçamento</h2>
+      <h1 style={{ fontSize: "var(--text-reading-h2-size)" }}>Stack — variantes de espaçamento</h1>
       <div className="lyt-stack lyt-stack--tight" style={{ marginBottom: "var(--space-loose)" }}>
         <p className="fnd-label">tight (lyt-stack--tight)</p>
         {item("Item A")}
@@ -165,7 +168,7 @@ function ClusterWrappingAndAlignment() {
 
   return (
     <main style={{ padding: "var(--space-loose)", maxWidth: "28rem" }}>
-      <h2>Cluster — wrapping e alinhamento</h2>
+      <h1 style={{ fontSize: "var(--text-reading-h2-size)" }}>Cluster — wrapping e alinhamento</h1>
       <p className="fnd-label">start (lyt-cluster--align-start)</p>
       <div
         className="lyt-cluster lyt-cluster--standard lyt-cluster--align-start"
@@ -200,6 +203,7 @@ function ClusterWrappingAndAlignment() {
 function SectionFlowWithRealSections() {
   return (
     <main className="lyt-shell-frame" style={{ padding: "var(--space-loose) 0" }}>
+      <h1 style={{ fontSize: "var(--text-reading-h2-size)" }}>SectionFlow — secções reais</h1>
       <div className="lyt-section-flow">
         <section aria-labelledby="s1-heading">
           <h2 id="s1-heading">Estado atual</h2>

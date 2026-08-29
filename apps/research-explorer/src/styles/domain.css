@@ -1,0 +1,228 @@
+/* DS-04D Slice 3A — Record/evidence domain atom visual recipes
+   (implementation candidate)
+   Scope: docs/design/component-model.md §2.4 (Domain components) and §4.4
+   (Domain component contract) — RecordIdentifier, RecordTypeLabel,
+   EvidenceEffectTag. Consumes the DS-04B Foundation token layer
+   (styles/tokens.css + styles/foundations.css) and the DS-04D Slice 1
+   generic inline-label anatomy (styles/ui.css .ui-inline-label), which only
+   EvidenceEffectTag composes rather than duplicates; RecordIdentifier and
+   RecordTypeLabel keep their own anatomy (see below).
+
+   Storybook-only for now: not imported by the production application (see
+   apps/research-explorer/src/index.css, which owns the equivalent current
+   production classes .detail-technical-field/.prb-reference-target,
+   .detail-type-badge/.narrow-record-type/.desktop-record-type, and
+   .effect-chip unchanged in this phase).
+
+   This file exists separately from ui.css precisely because these three
+   classes carry domain meaning (record identity, record type, PRB→EVD
+   effect) — component-model.md §2.3 "Generic UI ... must not determine ...
+   what a Problem status means" applies by the same logic to type/effect
+   semantics, so semantic domain styling does not belong in the generic
+   layer even though it shares that layer's anatomy. Sharing
+   .ui-inline-label with EvidenceEffectTag is deliberate reuse of anatomy,
+   not evidence that RecordIdentifier/RecordTypeLabel/EvidenceEffectTag are
+   becoming one interchangeable chip family — each keeps its own class and,
+   where the dimension calls for it, its own distinct shape.
+   RecordIdentifier never reuses .ui-inline-label at all: an identifier is
+   not a labelled fact about the record, it is the record's own name, so it
+   stays plain technical typography with no border/background by default.
+   RecordTypeLabel likewise does not compose .ui-inline-label: it is a
+   classification rendered as plain sans/interface text, with no
+   border/fill/glyph anatomy to share in the first place. */
+
+/* =========================================================================
+   RecordIdentifier — canonical record ID, technical typography only, never
+   a type gloss/status/effect. `density` is orthogonal to `variant` (text vs.
+   action): standard is the bounded identifier treatment demonstrated by the
+   approved component catalogue (docs/design/reference/components/
+   ds-03b-component-catalogue.dc.html §4 — hairline outline, subtle fill);
+   compact drops that surrounding treatment and stays bare technical
+   identity for dense rows/prose, matching current evidence
+   (.detail-technical-field, .prb-reference-target).
+   ========================================================================= */
+.rec-identifier {
+  font-family: var(--font-technical);
+  font-size: var(--text-technical-size);
+  font-weight: var(--text-technical-weight);
+  line-height: var(--text-technical-line-height);
+  color: var(--color-ink-secondary);
+  overflow-wrap: anywhere;
+}
+
+.rec-identifier--standard {
+  display: inline-block;
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  padding: var(--p-space-1) var(--space-tight);
+  background: var(--color-surface-subtle);
+}
+
+.rec-identifier--compact {
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+/* The action form is a native <button>: current evidence
+   (.prb-reference-target, RelatedRecordButton/TypedLinkButton) always wraps
+   the identifier text in a real interactive element rather than adding a
+   role to the static span, so this recipe only adjusts appearance —
+   interactivity itself is the browser's own button semantics. Density
+   (border/fill vs. bare) still applies via .rec-identifier--standard/
+   --compact; only the text colour/decoration changes here. */
+.rec-identifier--action {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+  cursor: pointer;
+}
+
+.rec-identifier--action:hover {
+  color: var(--color-accent-hover);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.16em;
+}
+
+/* =========================================================================
+   RecordTypeLabel — the approved public type meaning (e.g. "Evidência"),
+   never the bare technical prefix alone (docs/design/reference/components/
+   ds-03b-component-catalogue.dc.html §4: "the badge is the same anatomy at
+   higher contrast, not a different shape"). Both variants stay plain
+   sans/interface type presentation with no border/fill/glyph — those are
+   reserved for state dimensions, not classification.
+   ========================================================================= */
+.rec-type-label--compact {
+  flex-shrink: 0;
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  color: var(--color-ink-secondary);
+}
+
+.rec-type-label--detail {
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: 600;
+  color: var(--color-ink-primary);
+}
+
+/* =========================================================================
+   EvidenceEffectTag — one authored PRB→EVD effect. Explicit "Efeito:"
+   caption plus an aria-hidden arrow glyph in standard form (current
+   evidence: .effect-chip in EvidenceCard); compact form drops the caption
+   for a caller-provided context (current evidence: .effect-summary-chip's
+   tally chip) but keeps the same accessible-text requirement via
+   aria-label, never colour/shape alone.
+   ========================================================================= */
+.evd-effect-tag-caption {
+  color: var(--color-ink-muted);
+}
+
+.evd-effect-tag-arrow {
+  font-family: var(--font-technical);
+  color: var(--color-ink-muted);
+}
+
+.evd-effect-tag--standard,
+.evd-effect-tag--compact {
+  font-weight: var(--text-interface-label-weight);
+}
+
+/* =========================================================================
+   DS-04D Slice 3B — Problem-domain state presentations
+   (ProblemLifecycleStatus.tsx, InvestigationStatus.tsx). Three approved
+   dimensions — Problem lifecycle `status`, `validation_status`,
+   `evidence_status` — each keeps its own component and field name; this
+   block supplies only the shared visual anatomy the approved catalogue
+   demonstrates for their `overview`/`reading`/`technical` forms. Colour is
+   never the sole carrier of meaning: every form pairs a caption with an
+   explicit value word (component-visual-contract.md "Status always has
+   explicit text: colour and glyph reinforce meaning but never carry it
+   alone").
+   ========================================================================= */
+.prb-status-overview {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--p-space-1);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+}
+
+.prb-status-overview-caption {
+  color: var(--color-ink-muted);
+}
+
+.prb-status-overview-value {
+  color: var(--color-ink-primary);
+  font-weight: var(--text-interface-label-weight);
+}
+
+/* .prb-status-chip composes .ui-inline-label for its border/radius/padding —
+   this recipe adds only the caption/value colour split, matching the
+   caption-muted / value-emphasised split already demonstrated by
+   EvidenceEffectTag and RecordTypeLabel, never a per-value tint or fill
+   (component-model.md §4.3 "no colour-only meaning ... no invented semantic
+   variants such as success/warning/error"). The approved catalogue's
+   validated/pending glyph-and-tint treatment for validation/evidence status
+   remains `flexible` per Gate C2 and is deliberately not implemented here —
+   text is the only carrier in this slice. */
+.prb-status-chip-caption {
+  color: var(--color-ink-muted);
+}
+
+.prb-status-chip-value {
+  color: var(--color-ink-primary);
+  font-weight: var(--text-interface-label-weight);
+}
+
+/* .prb-status-technical mirrors RecordDetailPanel.tsx's
+   `PrbCanonicalStatePanel` technical-field treatment (production
+   `.detail-technical-field`) but is reimplemented on the DS-04B foundation
+   token layer (`--font-technical`) rather than depending on `index.css`'s
+   pre-DS-04 legacy tokens, matching `.rec-identifier`'s own precedent
+   (RecordIdentifier.tsx) of not reusing that production class. */
+.prb-status-technical {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--p-space-1);
+  flex-wrap: wrap;
+}
+
+.prb-status-technical-field {
+  font-family: var(--font-technical);
+  font-size: var(--text-technical-size);
+  color: var(--color-ink-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================================
+   DS-04D Slice 3C — ResearchRoleTag: one authored PRB→EVD research role.
+   Explicit "Papel:" caption plus value in `standard` form, matching the
+   approved catalogue's captioned research-role chip (docs/design/reference/
+   components/ds-03b-component-catalogue.dc.html §"Research role (PRB→EVD)").
+   `compact` drops the caption for a caller-provided context (current
+   evidence: EvdDetail's `EvdInvestigation` Papel column, already captioned
+   by its own `<dt>`) but keeps the same accessible-text requirement via
+   aria-label, never colour/shape alone. A dimension-specific class, not a
+   reuse of `.record-role-chip` as the new semantic owner
+   (component-model.md §5.4) — `.record-role-chip` remains a separate,
+   overloaded legacy name this slice does not touch. Deliberately without an
+   arrow glyph: unlike EvidenceEffectTag's effect, research role has no
+   directional "acts upon the Problem" meaning to depict, so this tag stays
+   visually distinguishable from `.evd-effect-tag` at a glance, not a copy of
+   its anatomy with a different caption.
+   ========================================================================= */
+.research-role-tag-caption {
+  color: var(--color-ink-muted);
+}
+
+.research-role-tag-value {
+  font-weight: var(--text-interface-label-weight);
+}
+
+.research-role-tag--standard,
+.research-role-tag--compact {
+  font-weight: var(--text-interface-label-weight);
+}
