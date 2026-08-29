@@ -1,0 +1,230 @@
+/* DS-04D Slice 1 — Generic UI visual recipes (implementation candidate)
+   Scope: docs/design/component-model.md §2.3 (Generic UI) and §4.3 (Generic
+   UI contract), consuming docs/design/foundations.md via styles/tokens.css +
+   styles/foundations.css and docs/design/component-model.md §2.2 via
+   styles/layout.css where a demo composes them.
+
+   Storybook-only for now: not imported by the production application (see
+   apps/research-explorer/src/index.css, which owns the equivalent current
+   production classes .detail-rail-actions a/button, .problem-rail-nav a,
+   .context-tabs button, .record-provenance, .evidence-card/.open-question-
+   item, and .record-role-chip/.effect-chip unchanged in this phase).
+
+   CSS classes only, applied directly to native HTML. No polymorphic Action/
+   Card/Chip React component exists here (component-model.md §4.3, Gate C1
+   decision 4). No status/effect/type/research-role semantics belong here —
+   only visual anatomy; domain components remain the sole owners of meaning
+   (component-model.md §2.3, §2.4). */
+
+/* =========================================================================
+   Native action recipes — CSS classes applied directly to native <a> or
+   <button>. Link vs button semantics stay caller-owned: these recipes never
+   redefine disabled/aria-disabled behaviour and never introduce a
+   polymorphic element. Foundation focus treatment (foundations.css) is
+   inherited unchanged, not redeclared here.
+   ========================================================================= */
+
+/* ---- Text action ---------------------------------------------------------
+   Compact inline-weight action: current evidence is `.problem-rail-nav a`
+   and `.detail-rail-actions` styling before the outlined box is added. No
+   underline at rest (distinguishing it from Foundation's sustained-prose
+   links, which are always underlined); hover adds an underline rather than
+   relying on colour alone, matching foundations.md "Interaction and focus".
+   Legitimate on both <a> and <button> — a same-page action button and a
+   navigation link may share this appearance while keeping their own
+   element. */
+.ui-action-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--p-space-1);
+  min-height: var(--target-min);
+  padding: var(--p-space-1) var(--p-space-2);
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ui-action-text:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+/* aria-disabled stays interaction-owned (component-model.md §4.3): this
+   recipe only supplies the muted appearance a caller opts into alongside
+   its own aria-disabled/UnavailableNote wiring, never a `disabled` default. */
+.ui-action-text[aria-disabled="true"] {
+  color: var(--color-ink-muted);
+  cursor: not-allowed;
+}
+
+.ui-action-text[aria-disabled="true"]:hover {
+  text-decoration: none;
+}
+
+/* ---- Outlined action -------------------------------------------------
+   Bordered action box: current evidence is `.detail-rail-actions a` /
+   `.detail-rail-actions button`, which already share one bordered
+   appearance across both elements. Minimum target sizing applies because
+   the current evidence is a standalone rail action, not inline prose. */
+.ui-action-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--p-space-1);
+  min-height: var(--target-min);
+  padding: var(--p-space-2) var(--space-standard);
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+  color: var(--color-ink-primary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  line-height: var(--text-interface-label-line-height);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ui-action-outlined:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
+.ui-action-outlined[aria-disabled="true"] {
+  color: var(--color-ink-muted);
+  border-color: var(--color-separator-faint);
+  cursor: not-allowed;
+}
+
+.ui-action-outlined[aria-disabled="true"]:hover {
+  border-color: var(--color-separator-faint);
+  color: var(--color-ink-muted);
+}
+
+/* ---- Tab action ------------------------------------------------------
+   Demonstrated by the approved visual contract's grouped-tab appearance
+   (current evidence: `.context-tabs button` — a bordered inline group with
+   a filled `aria-current="page"` state). This recipe supplies only that
+   shared appearance; grouping semantics, `role="tablist"`/`aria-current`
+   wiring, and PRB-identity behaviour remain domain-owned (ContextTabs stays
+   a PRB-scoped domain component per component-model.md §5.3). */
+.ui-action-tab-group {
+  display: inline-flex;
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+
+.ui-action-tab {
+  min-height: var(--target-min);
+  padding: var(--p-space-2) var(--space-standard);
+  border: 0;
+  border-right: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  background: none;
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  line-height: var(--text-interface-label-line-height);
+  cursor: pointer;
+}
+
+.ui-action-tab:last-child {
+  border-right: 0;
+}
+
+.ui-action-tab:hover {
+  color: var(--color-ink-primary);
+  background: var(--color-surface-subtle);
+}
+
+.ui-action-tab[aria-current="page"] {
+  color: var(--color-surface-raised);
+  background: var(--color-ink-primary);
+  font-weight: var(--text-interface-label-weight);
+}
+
+/* =========================================================================
+   Surface recipes — visual anatomy only. No React Card component, no
+   landmark ownership, no semantic meaning (component-model.md §2.3, §4.3).
+   Ordinary adjacent content remains unboxed by default (foundations.md
+   "Surfaces and separators"); callers opt a specific element into one of
+   these three recipes only when it is a real boundary.
+   ========================================================================= */
+
+/* ---- Plain outlined ----------------------------------------------------
+   Hairline border, no fill: current evidence is `.evidence-card` and
+   `.open-question-item`. */
+.ui-surface-outlined {
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  padding: var(--space-standard);
+}
+
+/* ---- Muted inset --------------------------------------------------------
+   Filled recess: current evidence is `.record-provenance`. */
+.ui-surface-inset {
+  background: var(--color-surface-subtle);
+  border: var(--p-border-width-hairline) solid var(--color-separator-faint);
+  border-radius: var(--radius-control);
+  padding: var(--space-standard);
+}
+
+/* ---- Interactive item ---------------------------------------------------
+   Adds a hover/focus-affordance on top of the plain outlined anatomy for a
+   surface that is already interactive by other means (e.g. it wraps a
+   native <a>/<button>, or its own interactive descendant carries the real
+   affordance). This recipe supplies appearance only — applying it to a
+   non-interactive element does not, by itself, make that element
+   interactive (component-model.md §4.3): no tabindex, role, or keyboard
+   handling is added here. */
+.ui-surface-interactive {
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  padding: var(--space-standard);
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.ui-surface-interactive:hover {
+  border-color: var(--color-accent);
+  background: var(--color-surface-subtle);
+}
+
+/* When the interactive-item surface wraps a native focusable element,
+   Foundation's shared focus-visible treatment (foundations.css) already
+   applies to that element directly; this rule only keeps the surrounding
+   surface's border legible while a descendant carries visible focus. */
+.ui-surface-interactive:has(:focus-visible) {
+  border-color: var(--focus-ring-color);
+}
+
+/* =========================================================================
+   Inline-label recipe — shared compact border/radius/padding/alignment
+   anatomy only. No status/effect/type/research-role semantics, no
+   colour-only meaning, no invented semantic variants such as success/
+   warning/error (component-model.md §2.3, §4.3, §5.4). Domain components
+   (RecordTypeLabel, EvidenceEffectTag, Problem state presentations, etc.)
+   consume this anatomy later and remain the sole owners of tone/meaning.
+   ========================================================================= */
+.ui-inline-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--p-space-1);
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  padding: var(--p-space-1) var(--space-tight);
+  background: var(--color-surface-subtle);
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  line-height: var(--text-interface-label-line-height);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
