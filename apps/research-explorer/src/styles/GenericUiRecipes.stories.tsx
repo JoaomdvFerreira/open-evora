@@ -51,19 +51,25 @@ function OutlinedActionDemo() {
   );
 }
 
+/* Ordinary caller-owned navigation, not an invented ARIA Tabs widget:
+   .ui-action-tab-group/.ui-action-tab are visual anatomy only. This models
+   the current ContextTabs semantic shape (a <nav> of same-page-context
+   buttons with the current one marked via aria-current="page") without
+   importing PRB/domain behaviour, tab keyboard navigation, aria-selected,
+   or tabpanels into Generic UI (component-model.md §5.3). */
 function TabActionDemo() {
   return (
-    <div className="ui-action-tab-group" role="tablist" aria-label="Contexto do registo sintético">
-      <button className="ui-action-tab" type="button" role="tab" aria-current="page">
+    <nav className="ui-action-tab-group" aria-label="Contexto do registo sintético">
+      <button className="ui-action-tab" type="button" aria-current="page">
         Detalhe
       </button>
-      <button className="ui-action-tab" type="button" role="tab">
+      <button className="ui-action-tab" type="button">
         Discussão
       </button>
-      <button className="ui-action-tab" type="button" role="tab" aria-disabled="true">
+      <button className="ui-action-tab" type="button" aria-disabled="true">
         Histórico
       </button>
-    </div>
+    </nav>
   );
 }
 
@@ -97,16 +103,23 @@ function MutedInsetSurfaceDemo() {
   );
 }
 
+/* The interactive-item surface itself stays a plain <div>: the real
+   interactive element is the ui-action-text link inside it, so the anchor's
+   canonical underline-at-rest treatment applies to actual link text rather
+   than requiring a textDecoration override on a block-wrapping card. */
 function InteractiveItemSurfaceDemo() {
   return (
-    <a className="ui-surface-interactive" href="#item-sintetico" style={{ display: "block", textDecoration: "none", color: "inherit" }}>
+    <div className="ui-surface-interactive">
       <p className="fnd-label">Item interativo (sintético)</p>
       <p className="fnd-interface-text">
-        Este contentor é interativo porque envolve um elemento nativo focável
-        — o próprio &lt;a&gt; — e não porque a receita de superfície, por si
-        só, adiciona comportamento.
+        Este contentor é interativo porque contém um elemento nativo focável
+        — a hiperligação abaixo — e não porque a receita de superfície, por
+        si só, adiciona comportamento.
       </p>
-    </a>
+      <a className="ui-action-text" href="#item-sintetico">
+        Abrir item sintético
+      </a>
+    </div>
   );
 }
 

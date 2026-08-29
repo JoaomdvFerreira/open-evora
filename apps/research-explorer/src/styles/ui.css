@@ -26,13 +26,12 @@
 
 /* ---- Text action ---------------------------------------------------------
    Compact inline-weight action: current evidence is `.problem-rail-nav a`
-   and `.detail-rail-actions` styling before the outlined box is added. No
-   underline at rest (distinguishing it from Foundation's sustained-prose
-   links, which are always underlined); hover adds an underline rather than
-   relying on colour alone, matching foundations.md "Interaction and focus".
-   Legitimate on both <a> and <button> — a same-page action button and a
-   navigation link may share this appearance while keeping their own
-   element. */
+   and `.detail-rail-actions` styling before the outlined box is added. The
+   canonical Foundation/visual contract requires links to be underlined at
+   rest (foundations.md "Interaction and focus"; component-visual-contract.md
+   "Links are underlined at rest"), so `a.ui-action-text` keeps that
+   underline; hover thickens it. `button.ui-action-text` is not a link and
+   stays non-underlined at rest, matching native button convention. */
 .ui-action-text {
   display: inline-flex;
   align-items: center;
@@ -45,14 +44,23 @@
   font-family: var(--font-interface);
   font-size: var(--text-interface-body-size);
   line-height: var(--text-interface-body-line-height);
-  text-decoration: none;
   cursor: pointer;
+}
+
+a.ui-action-text {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+}
+
+button.ui-action-text {
+  text-decoration: none;
 }
 
 .ui-action-text:hover {
   color: var(--color-accent-hover);
   text-decoration: underline;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 2px;
   text-underline-offset: 0.16em;
 }
 
@@ -64,7 +72,13 @@
   cursor: not-allowed;
 }
 
-.ui-action-text[aria-disabled="true"]:hover {
+a.ui-action-text[aria-disabled="true"]:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+}
+
+button.ui-action-text[aria-disabled="true"]:hover {
   text-decoration: none;
 }
 
@@ -72,7 +86,10 @@
    Bordered action box: current evidence is `.detail-rail-actions a` /
    `.detail-rail-actions button`, which already share one bordered
    appearance across both elements. Minimum target sizing applies because
-   the current evidence is a standalone rail action, not inline prose. */
+   the current evidence is a standalone rail action, not inline prose.
+   `a.ui-action-outlined` keeps an at-rest underline so it remains
+   recognisable as a link even inside the bordered box (canonical rule:
+   links are underlined at rest); a button needs no such treatment. */
 .ui-action-outlined {
   display: inline-flex;
   align-items: center;
@@ -92,9 +109,27 @@
   cursor: pointer;
 }
 
+a.ui-action-outlined {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+}
+
+/* Hover cue must not depend on colour alone: the anchor thickens its
+   existing underline; the button gains a border-width step. Neither
+   introduces motion or new decorative treatment. */
 .ui-action-outlined:hover {
   border-color: var(--color-accent);
   color: var(--color-accent-hover);
+}
+
+a.ui-action-outlined:hover {
+  text-decoration-thickness: 2px;
+}
+
+button.ui-action-outlined:hover {
+  border-width: calc(var(--p-border-width-hairline) + 1px);
+  padding: calc(var(--p-space-2) - 1px) calc(var(--space-standard) - 1px);
 }
 
 .ui-action-outlined[aria-disabled="true"] {
@@ -108,18 +143,25 @@
   color: var(--color-ink-muted);
 }
 
+button.ui-action-outlined[aria-disabled="true"]:hover {
+  border-width: var(--p-border-width-hairline);
+  padding: var(--p-space-2) var(--space-standard);
+}
+
 /* ---- Tab action ------------------------------------------------------
    Demonstrated by the approved visual contract's grouped-tab appearance
    (current evidence: `.context-tabs button` — a bordered inline group with
    a filled `aria-current="page"` state). This recipe supplies only that
-   shared appearance; grouping semantics, `role="tablist"`/`aria-current`
-   wiring, and PRB-identity behaviour remain domain-owned (ContextTabs stays
-   a PRB-scoped domain component per component-model.md §5.3). */
+   shared appearance; grouping semantics and `aria-current` wiring remain
+   caller-owned (ContextTabs stays a PRB-scoped domain component per
+   component-model.md §5.3). No `overflow: hidden` on the group: that would
+   clip the inherited Foundation `:focus-visible` outline on the first/last
+   child. The rounded group appearance is achieved by giving only the outer
+   corners of the first/last `.ui-action-tab` the group radius instead. */
 .ui-action-tab-group {
   display: inline-flex;
   border: var(--p-border-width-hairline) solid var(--color-separator-standard);
   border-radius: var(--radius-control);
-  overflow: hidden;
 }
 
 .ui-action-tab {
@@ -135,13 +177,23 @@
   cursor: pointer;
 }
 
+.ui-action-tab:first-child {
+  border-top-left-radius: var(--radius-control);
+  border-bottom-left-radius: var(--radius-control);
+}
+
 .ui-action-tab:last-child {
   border-right: 0;
+  border-top-right-radius: var(--radius-control);
+  border-bottom-right-radius: var(--radius-control);
 }
 
 .ui-action-tab:hover {
   color: var(--color-ink-primary);
   background: var(--color-surface-subtle);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
 }
 
 .ui-action-tab[aria-current="page"] {
