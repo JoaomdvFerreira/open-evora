@@ -4,9 +4,9 @@
    (Domain component contract) — RecordIdentifier, RecordTypeLabel,
    EvidenceEffectTag. Consumes the DS-04B Foundation token layer
    (styles/tokens.css + styles/foundations.css) and the DS-04D Slice 1
-   generic inline-label anatomy (styles/ui.css .ui-inline-label), which
-   RecordTypeLabel's detail variant and EvidenceEffectTag both compose
-   rather than duplicate.
+   generic inline-label anatomy (styles/ui.css .ui-inline-label), which only
+   EvidenceEffectTag composes rather than duplicates; RecordIdentifier and
+   RecordTypeLabel keep their own anatomy (see below).
 
    Storybook-only for now: not imported by the production application (see
    apps/research-explorer/src/index.css, which owns the equivalent current
@@ -20,13 +20,16 @@
    what a Problem status means" applies by the same logic to type/effect
    semantics, so semantic domain styling does not belong in the generic
    layer even though it shares that layer's anatomy. Sharing
-   .ui-inline-label here is deliberate reuse of anatomy, not evidence that
-   RecordIdentifier/RecordTypeLabel/EvidenceEffectTag are becoming one
-   interchangeable chip family — each keeps its own class and, where the
-   dimension calls for it, its own distinct shape (RecordIdentifier never
-   reuses .ui-inline-label at all: an identifier is not a labelled fact
-   about the record, it is the record's own name, so it stays plain
-   technical typography with no border/background). */
+   .ui-inline-label with EvidenceEffectTag is deliberate reuse of anatomy,
+   not evidence that RecordIdentifier/RecordTypeLabel/EvidenceEffectTag are
+   becoming one interchangeable chip family — each keeps its own class and,
+   where the dimension calls for it, its own distinct shape.
+   RecordIdentifier never reuses .ui-inline-label at all: an identifier is
+   not a labelled fact about the record, it is the record's own name, so it
+   stays plain technical typography with no border/background by default.
+   RecordTypeLabel likewise does not compose .ui-inline-label: it is a
+   classification rendered as plain sans/interface text, with no
+   border/fill/glyph anatomy to share in the first place. */
 
 /* =========================================================================
    RecordIdentifier — canonical record ID, technical typography only, never
@@ -74,11 +77,6 @@
   text-decoration-thickness: 1px;
   text-underline-offset: 0.14em;
   cursor: pointer;
-}
-
-.rec-identifier--action.rec-identifier--compact {
-  font: inherit;
-  font-family: var(--font-technical);
 }
 
 .rec-identifier--action:hover {
