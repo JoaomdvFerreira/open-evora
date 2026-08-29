@@ -4,7 +4,9 @@ import { useRecordIndex } from "../records/useRecordIndex";
 import { useProblemProjection } from "./useProblemProjection";
 import type { EvidenceWithSources } from "./problemProjection";
 import { summarizeEffects } from "./effectSummary";
-import { DISCLOSURE_FIELDS, DISCLOSURE_FIELD_LABELS, FIELD_CAPTIONS, glossFor, type FieldGloss } from "./statusGloss";
+import { DISCLOSURE_FIELDS, DISCLOSURE_FIELD_LABELS, glossFor, type FieldGloss } from "./statusGloss";
+import { ProblemLifecycleStatus } from "./ProblemLifecycleStatus";
+import { ValidationStatus, EvidenceStatus } from "./InvestigationStatus";
 import { describeType, formatTypedId } from "../presentation/typeGlossary";
 import { formatPublicCount, publicEnumLabel } from "../presentation/presentation";
 import { ContextTabs } from "../navigation/ContextTabs";
@@ -254,20 +256,6 @@ function TypedLinkButton({ detail, onOpenGeneric, suffix }: { detail: RecordDeta
       {formatTypedId(detail.type, detail.id)}
       {suffix ? ` — ${suffix}` : ""}
     </button>
-  );
-}
-
-/**
- * Presentation labels retain canonical values only as a safe fallback when a
- * future value has no approved PT-PT mapping.
- */
-function StatusChip({ field, value }: { field: string; value: string }) {
-  const gloss = glossFor(field, value);
-  const caption = FIELD_CAPTIONS[field] ?? field;
-  return (
-    <span className="status-chip" aria-label={`${caption}: ${gloss ? gloss.label : publicEnumLabel(field, value)}`}>
-      {gloss ? gloss.label : publicEnumLabel(field, value)}
-    </span>
   );
 }
 
@@ -564,7 +552,10 @@ function ProblemCurrentStateSection({ record }: { record: Record<string, unknown
       <div className="status-chip-row">
         {HEADER_STATE_FIELDS.map((key) => {
           const value = fieldValue(record, key);
-          return value === null ? null : <StatusChip key={key} field={key} value={value} />;
+          if (value === null) return null;
+          if (key === "status") return <ProblemLifecycleStatus key={key} value={value} form="reading" />;
+          if (key === "evidence_status") return <EvidenceStatus key={key} value={value} form="reading" />;
+          return <ValidationStatus key={key} value={value} form="reading" />;
         })}
       </div>
 

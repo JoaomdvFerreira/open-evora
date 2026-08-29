@@ -1,0 +1,36 @@
+/* DS-04D Slice 1 — Inline-label anatomy (implementation candidate)
+   Scope: docs/design/component-model.md §2.3 (Generic UI) and §4.3 (Generic
+   UI contract "Inline-label recipe"), consuming docs/design/foundations.md
+   via styles/tokens.css.
+
+   Extracted from styles/ui.css into its own file (DS-05A) so production can
+   depend on this one recipe without importing ui.css's other Generic UI
+   selectors — in particular ui.css's own `.unavailable-control`/
+   `.unavailable-note` Storybook-isolation rules, which intentionally reuse
+   production's class names on the DS-04B token layer and would otherwise
+   collide with and override the unrelated production selectors of the same
+   name in apps/research-explorer/src/index.css. ui.css still imports this
+   file so Storybook keeps the exact same `.ui-inline-label` behaviour.
+
+   Shared compact border/radius/padding/alignment anatomy only. No status/
+   effect/type/research-role semantics, no colour-only meaning, no invented
+   semantic variants such as success/warning/error (component-model.md §2.3,
+   §4.3, §5.4). Domain components (RecordTypeLabel, EvidenceEffectTag,
+   Problem state presentations, etc.) consume this anatomy and remain the
+   sole owners of tone/meaning. */
+.ui-inline-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--p-space-1);
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  padding: var(--p-space-1) var(--space-tight);
+  background: var(--color-surface-subtle);
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  line-height: var(--text-interface-label-line-height);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
