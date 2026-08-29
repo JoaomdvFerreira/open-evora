@@ -37,8 +37,11 @@ import { publicEnumLabel } from "../presentation/presentation";
  * without touching the other four would not be a clean isolated boundary,
  * and this slice does not modify `ProblemHistoryView.tsx`.
  *
- * The dimension caption ("Estado") is always rendered — no form may drop it,
- * per this slice's scope boundary. The public gloss (`glossFor`/
+ * The dimension caption is always rendered — no form may drop it, per this
+ * slice's scope boundary. `overview` uses the surface-specific "Estado do
+ * problema" (DS-04D Slice 3B F01); `reading`'s inline chip caption stays
+ * "Estado" (FIELD_CAPTIONS), matching the bounded chip's existing anatomy.
+ * The public gloss (`glossFor`/
  * `publicEnumLabel`) and the raw canonical value are never substituted for
  * one another: `technical` shows only the stored value, `overview`/`reading`
  * show only the public label. An unrecognised future `status` value still
@@ -54,8 +57,17 @@ export interface ProblemLifecycleStatusProps {
 
 const FIELD = "status";
 
+/* DS-04D Slice 3B F01: `overview`'s caption is the surface-specific
+ * "Estado do problema" (disambiguating this dimension from validation/
+ * evidence state when several status dimensions may appear together in a
+ * summary), distinct from `reading`'s inline "Estado" (FIELD_CAPTIONS,
+ * unchanged — the bounded chip already carries its own visual boundary, so
+ * the shorter caption stays sufficient there). Presentation copy, not a
+ * second canonical enum mapping. */
+const OVERVIEW_CAPTION = "Estado do problema";
+
 export function ProblemLifecycleStatus({ value, form }: ProblemLifecycleStatusProps) {
-  const caption = FIELD_CAPTIONS[FIELD];
+  const readingCaption = FIELD_CAPTIONS[FIELD];
 
   if (form === "technical") {
     return (
@@ -71,15 +83,15 @@ export function ProblemLifecycleStatus({ value, form }: ProblemLifecycleStatusPr
   if (form === "overview") {
     return (
       <span className="prb-status-overview">
-        <span className="prb-status-overview-caption">{caption}</span>
+        <span className="prb-status-overview-caption">{OVERVIEW_CAPTION}</span>
         <span className="prb-status-overview-value">{label}</span>
       </span>
     );
   }
 
   return (
-    <span className="prb-status-chip ui-inline-label" aria-label={`${caption}: ${label}`}>
-      <span className="prb-status-chip-caption">{caption}:</span>
+    <span className="prb-status-chip ui-inline-label" aria-label={`${readingCaption}: ${label}`}>
+      <span className="prb-status-chip-caption">{readingCaption}:</span>
       <span className="prb-status-chip-value">{label}</span>
     </span>
   );

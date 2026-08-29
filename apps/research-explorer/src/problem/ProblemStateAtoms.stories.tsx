@@ -55,7 +55,10 @@ export const LifecycleOverview: Story = {
   name: "ProblemLifecycleStatus — overview summary",
   render: () => (
     <StandaloneDemo heading="Estado do problema — resumo (visão geral)">
-      <p>Par legenda/valor simples, sem anatomia de chip — a forma usada num resumo compacto.</p>
+      <p>
+        Par legenda/valor simples, sem anatomia de chip — a forma usada num resumo compacto. Legenda: <strong>"Estado do problema"</strong> (DS-04D
+        Slice 3B F01).
+      </p>
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-tight)" }}>
         {LIFECYCLE_VALUES.map((value) => (
           <LifecycleOverviewRow key={value} value={value} />
@@ -69,7 +72,9 @@ export const LifecycleReading: Story = {
   name: "ProblemLifecycleStatus — Problem reading (chip)",
   render: () => (
     <StandaloneDemo heading="Estado do problema — leitura do Problema">
-      <p>Chip delimitado com legenda explícita — a forma usada na leitura do Problema.</p>
+      <p>
+        Chip delimitado com legenda explícita — a forma usada na leitura do Problema. Legenda: <strong>"Estado"</strong> (inalterada).
+      </p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-tight)" }}>
         {LIFECYCLE_VALUES.map((value) => (
           <LifecycleReadingRow key={value} value={value} />
@@ -115,9 +120,13 @@ export const ValidationStatusForms: Story = {
   name: "ValidationStatus — overview / reading / technical",
   render: () => (
     <StandaloneDemo heading="Estado de validação — três formas">
+      <p>
+        DS-04D Slice 3B F01: <strong>overview</strong> e <strong>reading</strong> usam a legenda compacta <strong>"Validação"</strong> e o
+        rótulo compacto (ex.: "Validação: Parcialmente validada"). <strong>technical</strong> mantém o par canónico em bruto, inalterado.
+      </p>
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-standard)" }}>
         <div>
-          <p>Visão geral (resumo)</p>
+          <p>Visão geral (resumo) — "Validação: ..."</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-tight)" }}>
             {VALIDATION_VALUES.map((value) => (
               <ValidationStatus key={value} value={value} form="overview" />
@@ -125,7 +134,7 @@ export const ValidationStatusForms: Story = {
           </div>
         </div>
         <div>
-          <p>Leitura do Problema (chip)</p>
+          <p>Leitura do Problema (chip) — "Validação: ..."</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-tight)" }}>
             {VALIDATION_VALUES.map((value) => (
               <ValidationStatus key={value} value={value} form="reading" />
@@ -133,7 +142,7 @@ export const ValidationStatusForms: Story = {
           </div>
         </div>
         <div>
-          <p>Valor técnico/bruto</p>
+          <p>Valor técnico/bruto — validation_status &lt;valor&gt; (inalterado)</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-tight)" }}>
             {VALIDATION_VALUES.map((value) => (
               <ValidationStatus key={value} value={value} form="technical" />
@@ -154,9 +163,13 @@ export const EvidenceStatusForms: Story = {
   render: () => (
     <StandaloneDemo heading="Estado da evidência — três formas">
       <p>Estado da investigação de um Problema — nunca apresentado numa linha de um registo EVD individual.</p>
+      <p>
+        DS-04D Slice 3B F01: <strong>overview</strong> e <strong>reading</strong> usam a legenda compacta <strong>"Evidência"</strong> e o
+        rótulo compacto (ex.: "Evidência: Corroborada"). <strong>technical</strong> mantém o par canónico em bruto, inalterado.
+      </p>
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-standard)" }}>
         <div>
-          <p>Visão geral (resumo)</p>
+          <p>Visão geral (resumo) — "Evidência: ..."</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-tight)" }}>
             {EVIDENCE_STATUS_VALUES.map((value) => (
               <EvidenceStatus key={value} value={value} form="overview" />
@@ -164,7 +177,7 @@ export const EvidenceStatusForms: Story = {
           </div>
         </div>
         <div>
-          <p>Leitura do Problema (chip)</p>
+          <p>Leitura do Problema (chip) — "Evidência: ..."</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-tight)" }}>
             {EVIDENCE_STATUS_VALUES.map((value) => (
               <EvidenceStatus key={value} value={value} form="reading" />
@@ -172,7 +185,7 @@ export const EvidenceStatusForms: Story = {
           </div>
         </div>
         <div>
-          <p>Valor técnico/bruto</p>
+          <p>Valor técnico/bruto — evidence_status &lt;valor&gt; (inalterado)</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-tight)" }}>
             {EVIDENCE_STATUS_VALUES.map((value) => (
               <EvidenceStatus key={value} value={value} form="technical" />
@@ -213,9 +226,9 @@ export const ComparisonSeparateDimensions: Story = {
   render: () => (
     <StandaloneDemo heading="Comparação — três dimensões de estado distintas">
       <p style={{ maxWidth: "72ch" }}>
-        Estado do problema (Evidência insuficiente), estado de validação (Por validar) e estado da evidência (Evidência corroborada) para o mesmo
-        Problema sintético, lado a lado. Cada dimensão mantém a sua própria legenda explícita — nenhuma substitui as outras, e nenhuma pode ser
-        confundida com uma classificação de registo ou identificador.
+        Estado (Evidência insuficiente), Validação (Por validar) e Evidência (Corroborada) para o mesmo Problema sintético, lado a lado. Cada
+        dimensão mantém a sua própria legenda explícita — nenhuma substitui as outras, e nenhuma pode ser confundida com uma classificação de
+        registo ou identificador.
       </p>
       <ComparisonRow />
     </StandaloneDemo>

@@ -1,5 +1,4 @@
-import { glossFor, FIELD_CAPTIONS } from "./statusGloss";
-import { publicEnumLabel, publicCompactEnumLabel } from "../presentation/presentation";
+import { publicCompactEnumLabel } from "../presentation/presentation";
 
 /**
  * DS-04D Slice 3B — Problem domain: `validation_status` and `evidence_status`,
@@ -42,22 +41,36 @@ import { publicEnumLabel, publicCompactEnumLabel } from "../presentation/present
  * one generic renderer, not as a dimension-specific composition, and this
  * slice does not modify `ProblemHistoryView.tsx`.
  *
- * `overview` uses the compact label set (`publicCompactEnumLabel`) to match
- * Overview.tsx's existing grammar exactly ("Validação: Parcialmente
- * validada", not the full-label "Parcialmente validado"); `reading` and
- * `technical` keep the full label set, matching `StatusChip`/the canonical
- * panel unchanged.
+ * DS-04D Slice 3B F01: both `overview` and `reading` use the compact PT-PT
+ * caption ("Validação" / "Evidência") and the compact label set
+ * (`publicCompactEnumLabel`) — the approved DS-03B contract freezes compact
+ * grammar whenever a dimension caption is inline, and both forms here pair
+ * an inline caption with the value ("Validação: Parcialmente validada", not
+ * the full-label "Estado de validação: Parcialmente validado"). `technical`
+ * is unaffected — it never renders a public caption or gloss, only the raw
+ * canonical field:value pair.
  */
 export interface InvestigationStatusProps {
   /** The stored canonical value, e.g. "unvalidated" or "discovered". Never translated or reclassified by this component. */
   value: string;
-  /** `overview` — plain caption/value pair (compact label grammar). `reading` — bounded inline-label chip. `technical` — raw field:value pair, gloss never substituted. */
+  /** `overview` — plain caption/value pair (compact caption/label grammar). `reading` — bounded inline-label chip (same compact grammar). `technical` — raw field:value pair, gloss never substituted. */
   form: "overview" | "reading" | "technical";
 }
 
-function InvestigationDimensionStatus({ field, value, form }: { field: "validation_status" | "evidence_status" } & InvestigationStatusProps) {
-  const caption = FIELD_CAPTIONS[field];
+/* DS-04D Slice 3B F01: both `overview` and `reading` use the compact
+ * PT-PT captions ("Validação" / "Evidência"), not FIELD_CAPTIONS's full
+ * "Estado de validação" / "Estado da evidência" — the approved DS-03B
+ * contract freezes compact grammar whenever a dimension caption is inline,
+ * and both forms here are inline caption+value presentations. `technical`
+ * is unaffected: it never shows a public caption at all. Presentation copy,
+ * not a second canonical enum mapping — FIELD_CAPTIONS/publicCompactEnumLabel
+ * remain the single mapping authority. */
+const COMPACT_CAPTIONS: Record<"validation_status" | "evidence_status", string> = {
+  validation_status: "Validação",
+  evidence_status: "Evidência",
+};
 
+function InvestigationDimensionStatus({ field, value, form }: { field: "validation_status" | "evidence_status" } & InvestigationStatusProps) {
   if (form === "technical") {
     return (
       <span className="prb-status-technical">
@@ -66,17 +79,17 @@ function InvestigationDimensionStatus({ field, value, form }: { field: "validati
     );
   }
 
+  const caption = COMPACT_CAPTIONS[field];
+  const label = publicCompactEnumLabel(field, value);
+
   if (form === "overview") {
     return (
       <span className="prb-status-overview">
         <span className="prb-status-overview-caption">{caption}</span>
-        <span className="prb-status-overview-value">{publicCompactEnumLabel(field, value)}</span>
+        <span className="prb-status-overview-value">{label}</span>
       </span>
     );
   }
-
-  const gloss = glossFor(field, value);
-  const label = gloss ? gloss.label : publicEnumLabel(field, value);
 
   return (
     <span className="prb-status-chip ui-inline-label" aria-label={`${caption}: ${label}`}>
