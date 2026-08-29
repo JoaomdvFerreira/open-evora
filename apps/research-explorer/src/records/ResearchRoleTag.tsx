@@ -35,23 +35,34 @@ import { publicEnumLabel } from "../presentation/presentation";
  * reclassified, so the type must not reject it at compile time either.
  *
  * The visible text alone carries the meaning — an explicit "Papel:" caption
- * in standalone form — so colour/shape never carries it alone
- * (component-visual-contract.md "Status always has explicit text"). Only one
- * standalone form is demonstrated by current production evidence and the
- * approved catalogue (EvdDetail's Papel column, always captioned); no
- * caption-dropping compact form analogous to `EvidenceEffectTag`'s
- * `compact` variant has current evidence, so none is implemented here.
+ * — so colour/shape never carries it alone (component-visual-contract.md
+ * "Status always has explicit text"). `standard`/`compact` density mirrors
+ * `EvidenceEffectTag`'s precedent: `EvdDetail`'s standalone catalogue chip
+ * keeps the caption inline (`standard`); `EvdDetail`'s `EvdInvestigation`
+ * Papel column already supplies the visible "Papel" context via its own
+ * `<dt>`, so repeating the caption per-chip there would duplicate it
+ * (`compact`, caption dropped, accessible name preserved via aria-label).
  */
 export interface ResearchRoleTagProps {
   /** One already-authored PRB→EVD research role value, e.g. "LOCAL_OBSERVATION". Never derived, ranked, or aggregated here. */
   role: string;
+  /** `standard` — includes the "Papel:" caption inline. `compact` — value only, for a caller-provided context (e.g. an already-captioned `<dt>Papel</dt>` fact row). */
+  variant?: "standard" | "compact";
 }
 
-export function ResearchRoleTag({ role }: ResearchRoleTagProps) {
+export function ResearchRoleTag({ role, variant = "standard" }: ResearchRoleTagProps) {
   const label = publicEnumLabel("research_roles", role);
 
+  if (variant === "compact") {
+    return (
+      <span className="research-role-tag research-role-tag--compact ui-inline-label" aria-label={`Papel: ${label}`}>
+        {label}
+      </span>
+    );
+  }
+
   return (
-    <span className="research-role-tag ui-inline-label">
+    <span className="research-role-tag research-role-tag--standard ui-inline-label">
       <span className="research-role-tag-caption">Papel:</span>
       <span className="research-role-tag-value">{label}</span>
     </span>

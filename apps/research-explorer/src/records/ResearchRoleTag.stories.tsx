@@ -55,7 +55,7 @@ function ResearchRoleTagRow({ role }: { role: string }) {
 /* ---- Individual role stories -------------------------------------------- */
 
 export const CanonicalRoles: Story = {
-  name: "ResearchRoleTag — every mapped public role",
+  name: "ResearchRoleTag — every mapped public role (standard)",
   render: () => (
     <StandaloneDemo heading="ResearchRoleTag — papéis de investigação canónicos">
       <p>Um papel de investigação já autorado por relação PRB→EVD, um por linha, cada um com a legenda explícita "Papel:".</p>
@@ -68,12 +68,39 @@ export const CanonicalRoles: Story = {
   ),
 };
 
+export const AlreadyCaptionedFact: Story = {
+  name: "ResearchRoleTag — already-captioned fact (compact)",
+  render: () => (
+    <StandaloneDemo heading="ResearchRoleTag — contexto já legendado">
+      <p>
+        Contexto onde o chamador já apresenta a legenda visível "Papel" (aqui, um <code>&lt;dt&gt;</code>) — a variante <code>compact</code>{" "}
+        evita duplicar essa legenda por cada papel, preservando o contexto acessível via <code>aria-label</code>.
+      </p>
+      <dl className="evd-relation-facts">
+        <dt>Papel</dt>
+        <dd style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-tight)" }}>
+          <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />
+          <ResearchRoleTag role="CONTEXTUAL" variant="compact" />
+        </dd>
+      </dl>
+    </StandaloneDemo>
+  ),
+};
+
 export const UnknownRole: Story = {
   name: "ResearchRoleTag — unknown/future value fallback",
   render: () => (
     <StandaloneDemo heading="ResearchRoleTag — valor futuro desconhecido">
-      <p>Valor sintético não mapeado — deve mostrar o valor canónico em bruto em vez de desaparecer ou ser reclassificado.</p>
-      <ResearchRoleTag role="EMERGING_FUTURE_ROLE" />
+      <p>Valor sintético não mapeado — deve mostrar o valor canónico em bruto em vez de desaparecer ou ser reclassificado, em ambas as variantes.</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-tight)" }}>
+        <ResearchRoleTag role="EMERGING_FUTURE_ROLE" />
+        <dl className="evd-relation-facts">
+          <dt>Papel</dt>
+          <dd>
+            <ResearchRoleTag role="EMERGING_FUTURE_ROLE" variant="compact" />
+          </dd>
+        </dl>
+      </div>
     </StandaloneDemo>
   ),
 };
@@ -96,7 +123,7 @@ function MultiRoleRelationshipDemo() {
         <dt>Papel</dt>
         <dd style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-tight)" }}>
           {roles.map((role, index) => (
-            <ResearchRoleTag key={`${role}-${index}`} role={role} />
+            <ResearchRoleTag key={`${role}-${index}`} role={role} variant="compact" />
           ))}
         </dd>
       </dl>
@@ -105,12 +132,13 @@ function MultiRoleRelationshipDemo() {
 }
 
 export const MultipleRolesAuthoredOrder: Story = {
-  name: "ResearchRoleTag — multiple caller-rendered roles (authored order)",
+  name: "ResearchRoleTag — multiple caller-rendered roles (authored order, compact)",
   render: () => (
     <StandaloneDemo heading="ResearchRoleTag — vários papéis, uma relação PRB→EVD">
       <p>
         Uma evidência sintética usada num Problema sintético com três papéis já autorados — o chamador decide quantos papéis existem, a sua
-        ordem, e se a relação envolvente é apresentada. O componente recebe um papel de cada vez.
+        ordem, e se a relação envolvente é apresentada. O componente recebe um papel de cada vez; a variante <code>compact</code> é usada
+        porque o <code>&lt;dt&gt;Papel&lt;/dt&gt;</code> envolvente já fornece a legenda visível.
       </p>
       <MultiRoleRelationshipDemo />
     </StandaloneDemo>
@@ -132,7 +160,7 @@ function EffectRoleComparisonCard() {
         </dd>
         <dt>Papel</dt>
         <dd>
-          <ResearchRoleTag role="LOCAL_OBSERVATION" />
+          <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />
         </dd>
       </dl>
     </div>
@@ -161,13 +189,24 @@ function CombinedResearchRoleTagPage() {
       <h1>DS-04D — ResearchRoleTag</h1>
       <div className="lyt-stack lyt-stack--section">
         <section aria-labelledby="roles-heading">
-          <h2 id="roles-heading">Papéis de investigação canónicos</h2>
+          <h2 id="roles-heading">Papéis de investigação canónicos (standard)</h2>
           <div className="lyt-stack lyt-stack--standard">
             {CANONICAL_ROLES.map((role) => (
               <ResearchRoleTagRow key={role} role={role} />
             ))}
             <ResearchRoleTag role="EMERGING_FUTURE_ROLE" />
           </div>
+        </section>
+
+        <section aria-labelledby="captioned-fact-heading">
+          <h2 id="captioned-fact-heading">Contexto já legendado (compact)</h2>
+          <dl className="evd-relation-facts">
+            <dt>Papel</dt>
+            <dd style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-tight)" }}>
+              <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />
+              <ResearchRoleTag role="CONTEXTUAL" variant="compact" />
+            </dd>
+          </dl>
         </section>
 
         <section aria-labelledby="multi-heading">

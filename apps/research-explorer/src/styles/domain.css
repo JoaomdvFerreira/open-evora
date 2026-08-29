@@ -199,21 +199,30 @@
 
 /* =========================================================================
    DS-04D Slice 3C — ResearchRoleTag: one authored PRB→EVD research role.
-   Explicit "Papel:" caption plus value, matching the approved catalogue's
-   captioned research-role chip (docs/design/reference/components/
-   ds-03b-component-catalogue.dc.html §"Research role (PRB→EVD)"). A
-   dimension-specific class, not a reuse of `.record-role-chip` as the new
-   semantic owner (component-model.md §5.4) — `.record-role-chip` remains a
-   separate, overloaded legacy name this slice does not touch. Deliberately
-   without an arrow glyph: unlike EvidenceEffectTag's effect, research role
-   has no directional "acts upon the Problem" meaning to depict, so this tag
-   stays visually distinguishable from `.evd-effect-tag` at a glance, not a
-   copy of its anatomy with a different caption.
+   Explicit "Papel:" caption plus value in `standard` form, matching the
+   approved catalogue's captioned research-role chip (docs/design/reference/
+   components/ds-03b-component-catalogue.dc.html §"Research role (PRB→EVD)").
+   `compact` drops the caption for a caller-provided context (current
+   evidence: EvdDetail's `EvdInvestigation` Papel column, already captioned
+   by its own `<dt>`) but keeps the same accessible-text requirement via
+   aria-label, never colour/shape alone. A dimension-specific class, not a
+   reuse of `.record-role-chip` as the new semantic owner
+   (component-model.md §5.4) — `.record-role-chip` remains a separate,
+   overloaded legacy name this slice does not touch. Deliberately without an
+   arrow glyph: unlike EvidenceEffectTag's effect, research role has no
+   directional "acts upon the Problem" meaning to depict, so this tag stays
+   visually distinguishable from `.evd-effect-tag` at a glance, not a copy of
+   its anatomy with a different caption.
    ========================================================================= */
 .research-role-tag-caption {
   color: var(--color-ink-muted);
 }
 
 .research-role-tag-value {
+  font-weight: var(--text-interface-label-weight);
+}
+
+.research-role-tag--standard,
+.research-role-tag--compact {
   font-weight: var(--text-interface-label-weight);
 }
