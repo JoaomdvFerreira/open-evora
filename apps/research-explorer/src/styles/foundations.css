@@ -72,6 +72,7 @@ h3 {
   line-height: var(--text-reading-body-line-height);
   max-width: var(--measure-reading);
   color: var(--color-ink-primary);
+  overflow-wrap: anywhere;
 }
 
 .fnd-prose > * + * {
@@ -102,6 +103,7 @@ h3 {
   font-weight: var(--text-technical-weight);
   line-height: var(--text-technical-line-height);
   color: var(--color-ink-faint);
+  overflow-wrap: anywhere;
 }
 
 /* ---- Links --------------------------------------------------------------
