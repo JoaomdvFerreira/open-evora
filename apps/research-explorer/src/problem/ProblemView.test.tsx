@@ -92,3 +92,59 @@ describe("ProblemView vNext", () => {
     expect(onOpenGeneric).toHaveBeenCalledWith("SRC-1");
   });
 });
+
+describe("ProblemView DS-05H — RailSectionIndex/CompactSectionIndex adoption", () => {
+  it("rail and compact 'Nesta página' indexes expose identical ordered entries/hrefs", async () => {
+    render(<ProblemView {...props} problemId="PRB-1" />);
+    await screen.findByText("Manifestação documentada.");
+
+    const railNav = screen.getAllByRole("navigation", { name: "Nesta página" });
+    expect(railNav).toHaveLength(1);
+    const compactNav = screen.getByRole("navigation", { name: "Nesta página (versão compacta)" });
+
+    const railLinks = Array.from(railNav[0].querySelectorAll("a"));
+    const compactLinks = Array.from(compactNav.querySelectorAll("a"));
+    expect(railLinks.map((link) => link.textContent)).toEqual(compactLinks.map((link) => link.textContent));
+    expect(railLinks.map((link) => link.getAttribute("href"))).toEqual(compactLinks.map((link) => link.getAttribute("href")));
+    expect(railLinks.length).toBeGreaterThan(0);
+  });
+
+  it("conditional subsections are present in the index exactly matching rendered content", async () => {
+    render(<ProblemView {...props} problemId="PRB-1" />);
+    await screen.findByText("Manifestação documentada.");
+    const compactNav = screen.getByRole("navigation", { name: "Nesta página (versão compacta)" });
+    expect(within(compactNav).getByRole("link", { name: "O que observamos" })).toBeTruthy();
+    expect(within(compactNav).getByRole("link", { name: "Sinal inicial" })).toBeTruthy();
+  });
+
+  it("omits an absent conditional subsection from both rail and compact when its content is absent", async () => {
+    const sparseRecords: Record<string, RecordDetail> = {
+      ...records,
+      "PRB-1": { ...records["PRB-1"], record: { title: "Sem opcionais", evidence: [] }, outgoingEdges: [] },
+    };
+    const sparseProvider: DataProvider = { ...provider, getRecord: async (id) => sparseRecords[id] };
+    render(<ProblemView {...props} dataProvider={sparseProvider} problemId="PRB-1" />);
+    await screen.findByText("Nenhuma evidência associada.");
+    expect(screen.queryByRole("link", { name: "O que observamos" })).toBeNull();
+  });
+
+  it("ProblemHelpDisclosure no longer owns section-index navigation", async () => {
+    render(<ProblemView {...props} problemId="PRB-1" />);
+    await screen.findByText("Manifestação documentada.");
+    const disclosureSummary = screen.getByText("O que é um Problema, e o que significam os estados abaixo?");
+    const disclosure = disclosureSummary.closest("details")!;
+    expect(within(disclosure).queryByRole("navigation")).toBeNull();
+  });
+
+  it("the compact 'Nesta página' index is independently discoverable without opening the explanatory help disclosure", async () => {
+    render(<ProblemView {...props} problemId="PRB-1" />);
+    await screen.findByText("Manifestação documentada.");
+    const disclosureSummary = screen.getByText("O que é um Problema, e o que significam os estados abaixo?");
+    const helpDisclosure = disclosureSummary.closest("details")!;
+    expect(helpDisclosure.hasAttribute("open")).toBe(false);
+
+    const compactNav = screen.getByRole("navigation", { name: "Nesta página (versão compacta)" });
+    const compactDisclosure = compactNav.closest("details")!;
+    expect(compactDisclosure).not.toBe(helpDisclosure);
+  });
+});

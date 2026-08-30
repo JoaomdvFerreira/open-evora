@@ -158,4 +158,11 @@ describe("SourceCompactSectionIndex", () => {
     expect(screen.queryByRole("status")).toBeNull();
     expect(screen.queryByText(/a carregar/i)).toBeNull();
   });
+
+  it("16. DS-05H: renders the canonical presentation/CompactSectionIndex (native details/summary, named nested nav)", () => {
+    render(<SourceCompactSectionIndex record={SRC_0093} relationContext={{ hasRelatedProblem: true }} />);
+    const summary = screen.getByText("Nesta fonte");
+    expect(summary.closest("details")).not.toBeNull();
+    expect(screen.getByRole("navigation", { name: "Nesta fonte (versão compacta)" })).toBeTruthy();
+  });
 });

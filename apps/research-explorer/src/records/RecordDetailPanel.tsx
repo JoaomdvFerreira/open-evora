@@ -27,6 +27,20 @@ import { EvdDetail, EvdReadingRail } from "./EvdDetail";
 import { useEvdProblemUses } from "./useEvdProblemUses";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { RailSectionIndex } from "../presentation/RailSectionIndex";
+import type { SectionIndexEntry } from "../presentation/SectionIndexEntry";
+import type { SourceSectionIndexEntry } from "./sourceSectionIndex";
+
+/**
+ * DS-05H: adapts `sourceSectionIndex`'s already-decided order/presence/
+ * labels/anchors into the neutral `SectionIndexEntry` shape the generic
+ * `RailSectionIndex` presentation renders — purely a shape adaptation at the
+ * presentation boundary (component-model.md §2.3): no sorting,
+ * deduplication, or inferred anchor IDs are introduced here.
+ */
+function toSectionIndexEntries(sections: SourceSectionIndexEntry[]): SectionIndexEntry[] {
+  return sections.map((section) => ({ key: section.sectionId, label: section.label, href: `#${section.anchorId}` }));
+}
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -267,33 +281,28 @@ function SourceOriginalLinkAction({ detail, variant }: { detail: RecordDetail; v
 
 /**
  * SUI-03J1B: "Nesta fonte" desktop rail index — the SRC-only counterpart to
- * `ProblemReadingRail`'s "Nesta página" nav (`ProblemView.tsx`), reusing the
- * same `.problem-rail-nav` treatment. `sourceSectionIndex` (SUI-03J0) is the
- * sole order/label/anchor/filtering authority; this component never
- * hardcodes a duplicate section list.
+ * `ProblemReadingRail`'s "Nesta página" nav (`ProblemView.tsx`).
+ * `sourceSectionIndex` (SUI-03J0) is the sole order/label/anchor/filtering
+ * authority; this component never hardcodes a duplicate section list.
  *
  * SUI-03J2B: `relationContext` is now derived once by the caller
  * (`RecordDetailContent`) and passed in, rather than recomputed here — the
  * same resolved value also reaches the compact `SourceCompactSectionIndex`,
  * so both indexes are driven from one `toSourceSectionRelationContext` call.
- * Wrapped in `.problem-reading-rail`-equivalent visibility: reuses the exact
- * Problem View responsive class (`.problem-reading-rail`) so it hides at the
- * same breakpoint the desktop reading rail already hides at, with no new
- * Source-specific breakpoint.
+ *
+ * DS-05H: the nav/list anatomy is now the canonical `RailSectionIndex`
+ * (component-model.md §4.3); `.problem-reading-rail` still owns this rail's
+ * responsive visibility (reused verbatim, no new Source-specific
+ * breakpoint), applied to the wrapping element here since `RailSectionIndex`
+ * itself owns no responsive behaviour.
  */
 function SourceReadingRailIndex({ record, relationContext }: { record: Record<string, unknown>; relationContext?: SourceSectionRelationContext }) {
   const sections = sourceSectionIndex(record, relationContext);
   return (
-    <nav aria-label="Nesta fonte" className="problem-rail-nav problem-reading-rail">
+    <div className="problem-reading-rail">
       <h4 className="detail-panel-label">Nesta fonte</h4>
-      <ul>
-        {sections.map((section) => (
-          <li key={section.sectionId}>
-            <a href={`#${section.anchorId}`}>{section.label}</a>
-          </li>
-        ))}
-      </ul>
-    </nav>
+      <RailSectionIndex label="Nesta fonte" entries={toSectionIndexEntries(sections)} />
+    </div>
   );
 }
 

@@ -136,11 +136,11 @@ describe("Source View 'Nesta fonte' index responsive contract (SUI-03J2B, reuses
     }
   });
 
-  it("the compact index visibility rules reuse the exact same media queries as .problem-help-section-index (Problem View's own compact-index pattern) — no new Source-specific breakpoint", () => {
+  it("the compact index visibility rules reuse the exact same media queries as .problem-compact-section-index (Problem View's own compact-index pattern) — no new Source-specific breakpoint", () => {
     for (const mediaSelector of ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"]) {
-      const problemHelpBodies = bodiesInMediaBlock(mediaSelector, ".problem-help-section-index");
+      const problemCompactBodies = bodiesInMediaBlock(mediaSelector, ".problem-compact-section-index");
       const sourceCompactBodies = bodiesInMediaBlock(mediaSelector, ".source-compact-section-index");
-      expect(problemHelpBodies.length).toBeGreaterThan(0);
+      expect(problemCompactBodies.length).toBeGreaterThan(0);
       expect(sourceCompactBodies.length).toBeGreaterThan(0);
     }
   });
@@ -348,5 +348,36 @@ describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K
     const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
     expect(bodies.length).toBeGreaterThan(0);
     expect(bodies[0].trim()).toBe("margin-bottom: var(--space-8);");
+  });
+});
+
+/**
+ * DS-05H remediation F1: the canonical presentation/CompactSectionIndex
+ * deliberately owns `margin: 0` (no composition spacing) — the previous
+ * `margin: 0 0 var(--space-6)` separation from following Source/EVD content
+ * (formerly supplied by the legacy records/CompactSectionIndex root, which
+ * also carried `.problem-help`) must be restored at the domain-owned
+ * `.source-compact-section-index`/`.evd-compact-section-index` wrappers
+ * instead, not on the generic component.
+ */
+describe("Source/EVD compact-index composition spacing (DS-05H remediation F1)", () => {
+  const css = readFileSync(CSS_PATH, "utf-8");
+
+  function ruleBodiesForRawPattern(pattern: RegExp): string[] {
+    return [...css.matchAll(pattern)].map((match) => match[1]);
+  }
+
+  it("both .source-compact-section-index and .evd-compact-section-index carry margin: 0 0 var(--space-6)", () => {
+    const bodies = ruleBodiesForRawPattern(/\.source-compact-section-index,\s*\n?\s*\.evd-compact-section-index\s*\{([^}]*)\}/g);
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0]).toMatch(/margin\s*:\s*0\s+0\s+var\(--space-6\)\s*;/);
+  });
+
+  it("the canonical .ui-section-index-compact recipe remains margin: 0 (composition spacing stays domain-owned)", () => {
+    const sectionIndexCss = readFileSync(path.join(__dirname, "..", "styles", "section-index.css"), "utf-8");
+    const bodies = ruleBodiesFor(sectionIndexCss, ".ui-section-index-compact");
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0]).toMatch(/margin\s*:\s*0\s*;/);
+    expect(bodies[0]).not.toMatch(/var\(--space-6\)/);
   });
 });

@@ -35,6 +35,12 @@ import "./styles/feedback.css";
 // DS-05G: the narrow canonical FactList visual recipe only (not the rest of
 // ui.css, which still carries unrelated selectors/collision risk).
 import "./styles/fact-list.css";
+// DS-05H: the narrow canonical RailSectionIndex/CompactSectionIndex visual
+// recipes, plus the one surface recipe CompactSectionIndex directly depends
+// on (`.ui-surface-inset`) — not the rest of ui.css, which still carries
+// unrelated selectors/collision risk.
+import "./styles/surface-inset.css";
+import "./styles/section-index.css";
 
 const container = document.getElementById("root");
 if (!container) {

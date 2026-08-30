@@ -16,6 +16,9 @@ import { RecordIdentifier } from "../records/RecordIdentifier";
 import { RecordTypeLabel } from "../records/RecordTypeLabel";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { RailSectionIndex } from "../presentation/RailSectionIndex";
+import { CompactSectionIndex } from "../presentation/CompactSectionIndex";
+import type { SectionIndexEntry } from "../presentation/SectionIndexEntry";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -391,6 +394,26 @@ function problemSectionIndex(record: Record<string, unknown>): ProblemSectionInd
 }
 
 /**
+ * DS-05H: adapts `problemSectionIndex`'s already-decided order/presence/
+ * labels/anchors into the neutral `SectionIndexEntry` shape the generic
+ * `RailSectionIndex`/`CompactSectionIndex` presentation renders — purely a
+ * shape adaptation at the presentation boundary (component-model.md §2.3):
+ * no sorting, deduplication, or inferred anchor IDs are introduced here.
+ */
+function toSectionIndexEntries(sections: ProblemSectionIndexEntry[]): SectionIndexEntry[] {
+  return sections.map((section) => ({
+    key: section.id,
+    label: section.label,
+    href: `#${section.id}`,
+    entries: section.subsections.map((subsection) => ({
+      key: subsection.id,
+      label: subsection.label,
+      href: `#${subsection.id}`,
+    })),
+  }));
+}
+
+/**
  * Desktop reading rail (scope §3/§4, UX-C §3): reuses Record Detail's
  * rail/layout pattern (`.record-detail-rail`, `.detail-rail-type-note`)
  * rather than inventing a second sticky-rail treatment. Provides lightweight
@@ -411,25 +434,8 @@ function ProblemReadingRail({ record }: { record: Record<string, unknown> }) {
           confiança.
         </p>
       </div>
-      <nav aria-label="Nesta página" className="problem-rail-nav">
-        <h4 className="detail-panel-label">Nesta página</h4>
-        <ul>
-          {sections.map((section) => (
-            <li key={section.id}>
-              <a href={`#${section.id}`}>{section.label}</a>
-              {section.subsections.length > 0 && (
-                <ul>
-                  {section.subsections.map((subsection) => (
-                    <li key={subsection.id}>
-                      <a href={`#${subsection.id}`}>{subsection.label}</a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <h4 className="detail-panel-label">Nesta página</h4>
+      <RailSectionIndex label="Nesta página" entries={toSectionIndexEntries(sections)} />
     </aside>
   );
 }
@@ -462,29 +468,27 @@ function ProblemHelpDisclosure({ record }: { record: Record<string, unknown> }) 
             {gloss?.explanation ? ` — ${gloss.explanation}` : ""}
           </p>
         ))}
-        {/* Compact substitute for the desktop reading rail's "Nesta página" index (UX-B §4) —
-            hidden on desktop (index.css) where `.record-detail-rail`'s own nav already covers it. */}
-        <nav aria-label="Nesta página (versão compacta)" className="problem-help-section-index">
-          <p className="problem-help-section-index-label">Nesta página:</p>
-          <ul>
-            {problemSectionIndex(record).map((section) => (
-              <li key={section.id}>
-                <a href={`#${section.id}`}>{section.label}</a>
-                {section.subsections.length > 0 && (
-                  <ul>
-                    {section.subsections.map((subsection) => (
-                      <li key={subsection.id}>
-                        <a href={`#${subsection.id}`}>{subsection.label}</a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
       </div>
     </details>
+  );
+}
+
+/**
+ * DS-05H: the compact "Nesta página" section index, now independently
+ * discoverable in flow rather than nested inside `ProblemHelpDisclosure`'s
+ * explanatory content — a reader must be able to reach section navigation
+ * without first opening the "O que é um Problema…" disclosure. A narrow
+ * Problem-owned wrapper class (`.problem-compact-section-index`) retains
+ * exactly the same responsive visibility responsibility formerly carried by
+ * `.problem-help-section-index` (index.css); the canonical
+ * `CompactSectionIndex` component itself owns no responsive behaviour.
+ */
+function ProblemCompactSectionIndex({ record }: { record: Record<string, unknown> }) {
+  const sections = problemSectionIndex(record);
+  return (
+    <div className="problem-compact-section-index">
+      <CompactSectionIndex summary="Nesta página" navLabel="Nesta página (versão compacta)" entries={toSectionIndexEntries(sections)} />
+    </div>
   );
 }
 
@@ -993,6 +997,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
       <ContextTabs prbId={problem.id} active="problem" onOpenGeneric={onOpenGeneric} onViewAsProblem={onOpenGeneric} onViewHistory={onViewHistory} />
 
       <ProblemHelpDisclosure record={record} />
+      <ProblemCompactSectionIndex record={record} />
 
       <div className="record-detail-columns problem-view-columns">
         <div className="record-detail-main">

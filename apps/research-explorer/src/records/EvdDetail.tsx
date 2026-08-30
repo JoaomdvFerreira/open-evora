@@ -2,7 +2,6 @@ import { Fragment } from "react";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { formatPublicDate, formatPublicPartialDate, publicEnumLabel } from "../presentation/presentation";
 import { RecordFieldTree } from "./RecordFieldTree";
-import { CompactSectionIndex, type CompactSectionIndexEntry } from "./CompactSectionIndex";
 import { EvidenceEffectTag } from "./EvidenceEffectTag";
 import { ResearchRoleTag } from "./ResearchRoleTag";
 import { RecordTypeLabel } from "./RecordTypeLabel";
@@ -10,8 +9,17 @@ import type { EVDProblemUsesState } from "./useEvdProblemUses";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { FactList } from "../presentation/FactList";
+import { CompactSectionIndex } from "../presentation/CompactSectionIndex";
+import { RailSectionIndex } from "../presentation/RailSectionIndex";
+import type { SectionIndexEntry } from "../presentation/SectionIndexEntry";
 
-const EVD_SECTIONS: CompactSectionIndexEntry[] = [
+interface EvdSectionEntry {
+  sectionId: string;
+  anchorId: string;
+  label: string;
+}
+
+const EVD_SECTIONS: EvdSectionEntry[] = [
   { sectionId: "scope", anchorId: "evd-scope", label: "Âmbito desta evidência" },
   { sectionId: "limits", anchorId: "evd-limits", label: "O que não permite concluir" },
   { sectionId: "investigation", anchorId: "evd-investigation", label: "Como é usada" },
@@ -20,9 +28,20 @@ const EVD_SECTIONS: CompactSectionIndexEntry[] = [
 ];
 
 /** One EVD section-presence authority shared by the compact and rail indexes. */
-export function evdSectionIndex(record: Record<string, unknown>): CompactSectionIndexEntry[] {
+export function evdSectionIndex(record: Record<string, unknown>): EvdSectionEntry[] {
   const hasLimits = strings(record.inference_limits).length > 0;
   return EVD_SECTIONS.filter((section) => section.sectionId !== "limits" || hasLimits);
+}
+
+/**
+ * DS-05H: adapts `evdSectionIndex`'s already-decided order/presence/labels/
+ * anchors into the neutral `SectionIndexEntry` shape the generic
+ * `RailSectionIndex`/`CompactSectionIndex` presentation renders — purely a
+ * shape adaptation at the presentation boundary (component-model.md §2.3):
+ * no sorting, deduplication, or inferred anchor IDs are introduced here.
+ */
+function toSectionIndexEntries(sections: EvdSectionEntry[]): SectionIndexEntry[] {
+  return sections.map((section) => ({ key: section.sectionId, label: section.label, href: `#${section.anchorId}` }));
 }
 
 function objectValue(value: unknown): Record<string, unknown> | null {
@@ -139,10 +158,10 @@ function EvdTechnical({ detail }: { detail: RecordDetail }) {
 
 export function EvdDetail({ detail, lookup, problemUses, onSelect }: { detail: RecordDetail; lookup: Map<string, RecordSummary>; problemUses: EVDProblemUsesState & { retry: () => void }; onSelect: (id: string) => void }) {
   const sections = evdSectionIndex(detail.record);
-  return <><EvdIdentity detail={detail} /><CompactSectionIndex label="Nesta evidência" sections={sections} className="evd-compact-section-index" /><EvdScope record={detail.record} /><EvdLimits record={detail.record} /><EvdInvestigation state={problemUses} onSelect={onSelect} /><EvdSources record={detail.record} lookup={lookup} onSelect={onSelect} /><EvdTechnical detail={detail} /></>;
+  return <><EvdIdentity detail={detail} /><div className="evd-compact-section-index"><CompactSectionIndex summary="Nesta evidência" navLabel="Nesta evidência (versão compacta)" entries={toSectionIndexEntries(sections)} /></div><EvdScope record={detail.record} /><EvdLimits record={detail.record} /><EvdInvestigation state={problemUses} onSelect={onSelect} /><EvdSources record={detail.record} lookup={lookup} onSelect={onSelect} /><EvdTechnical detail={detail} /></>;
 }
 
 export function EvdReadingRail({ detail }: { detail: RecordDetail }) {
   const sections = evdSectionIndex(detail.record);
-  return <><nav aria-label="Nesta evidência" className="problem-rail-nav problem-reading-rail"><h2 className="detail-panel-label">Nesta evidência</h2><ul>{sections.map((section) => <li key={section.sectionId}><a href={`#${section.anchorId}`}>{section.label}</a></li>)}</ul></nav><span className="detail-rail-file">{detail.file}</span></>;
+  return <><div className="problem-reading-rail"><h2 className="detail-panel-label">Nesta evidência</h2><RailSectionIndex label="Nesta evidência" entries={toSectionIndexEntries(sections)} /></div><span className="detail-rail-file">{detail.file}</span></>;
 }
