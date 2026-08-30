@@ -91,3 +91,80 @@ describe("RecordDetailPanel vNext", () => {
     expect(onSelect).toHaveBeenCalledWith("PRB-2");
   });
 });
+
+describe("RecordDetailPanel DS-05H — Source RailSectionIndex/CompactSectionIndex adoption", () => {
+  const srcMinimal: RecordDetail = {
+    id: "SRC-1",
+    type: "SRC-",
+    file: "",
+    outgoingEdges: [],
+    incomingEdges: [],
+    record: {
+      name: "Fonte mínima",
+      resource_type: "webpage",
+      scope: { geography: { level: "non_geographic" }, domains: ["DIG"] },
+      access: { level: "unknown", availability: "unknown", machine_readable: "unknown" },
+      acquisition: { method: "unknown" },
+      licensing: { status: "unknown", reuse: "unknown" },
+      temporal: { last_checked_at: "2026-08-25" },
+    },
+  };
+
+  it("rail and compact expose identical entries from one domain authority (sourceSectionIndex)", async () => {
+    renderDetail(srcMinimal, vi.fn(), vi.fn(), "SRC-1");
+    await screen.findByRole("navigation", { name: "Nesta fonte" });
+
+    const railNav = screen.getByRole("navigation", { name: "Nesta fonte" });
+    const compactNav = screen.getByRole("navigation", { name: "Nesta fonte (versão compacta)" });
+    const railLinks = Array.from(railNav.querySelectorAll("a"));
+    const compactLinks = Array.from(compactNav.querySelectorAll("a"));
+    expect(railLinks.length).toBeGreaterThan(0);
+    expect(railLinks.map((link) => link.textContent)).toEqual(compactLinks.map((link) => link.textContent));
+    expect(railLinks.map((link) => link.getAttribute("href"))).toEqual(compactLinks.map((link) => link.getAttribute("href")));
+  });
+
+  it("excludes deferred/absent Source sections (no relationContext yet resolved => Na investigação absent, no caveats => Limitações absent)", async () => {
+    renderDetail(srcMinimal, vi.fn(), vi.fn(), "SRC-1");
+    await screen.findByRole("navigation", { name: "Nesta fonte" });
+    expect(screen.queryByRole("link", { name: "Na investigação" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Limitações" })).toBeNull();
+  });
+
+  it("resolved investigation section presence is unchanged: appears once related-Problem relation data resolves", async () => {
+    const srcWithRelatedProblem: RecordDetail = {
+      ...srcMinimal,
+      incomingEdges: [{ field: "provenance.sources", ordinal: 0, from: "EVD-1" }],
+    };
+    renderDetail(srcWithRelatedProblem, vi.fn(), vi.fn(), "SRC-1");
+    await screen.findByRole("navigation", { name: "Nesta fonte" });
+    expect(await screen.findAllByRole("link", { name: "Na investigação" })).not.toHaveLength(0);
+  });
+});
+
+describe("RecordDetailPanel DS-05H — EVD RailSectionIndex/CompactSectionIndex adoption", () => {
+  it("rail and compact expose identical entries", async () => {
+    renderDetail();
+    await screen.findByRole("navigation", { name: "Nesta evidência" });
+
+    const railNav = screen.getByRole("navigation", { name: "Nesta evidência" });
+    const compactNav = screen.getByRole("navigation", { name: "Nesta evidência (versão compacta)" });
+    const railLinks = Array.from(railNav.querySelectorAll("a"));
+    const compactLinks = Array.from(compactNav.querySelectorAll("a"));
+    expect(railLinks.length).toBeGreaterThan(0);
+    expect(railLinks.map((link) => link.textContent)).toEqual(compactLinks.map((link) => link.textContent));
+    expect(railLinks.map((link) => link.getAttribute("href"))).toEqual(compactLinks.map((link) => link.getAttribute("href")));
+  });
+
+  it("omits Limits when inference_limits is empty, in both rail and compact", async () => {
+    const noLimits: RecordDetail = { ...evd, record: { ...evd.record, inference_limits: [] } };
+    renderDetail(noLimits);
+    await screen.findByRole("navigation", { name: "Nesta evidência" });
+    expect(screen.queryByRole("link", { name: "O que não permite concluir" })).toBeNull();
+  });
+
+  it("keeps detail-rail-file present alongside the EVD rail index", async () => {
+    renderDetail();
+    await screen.findByRole("navigation", { name: "Nesta evidência" });
+    expect(document.querySelector(".detail-rail-file")).not.toBeNull();
+  });
+});

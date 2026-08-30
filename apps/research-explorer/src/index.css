@@ -1656,45 +1656,6 @@ main.explorer-shell {
   text-underline-offset: 0.16em;
 }
 
-/* Problem View reading rail (UX-B §3/§4) — lightweight contextual
-   orientation and a "Nesta página" index, inside the reused
-   `.record-detail-rail` shell. SUI-03J1B reuses this same nav treatment for
-   the SRC rail's "Nesta fonte" index — no separate Source-specific class. */
-.problem-rail-nav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.problem-rail-nav a {
-  display: block;
-  padding: var(--space-1) 0;
-  color: var(--ink-soft);
-  font-size: 13px;
-  text-decoration: none;
-}
-
-.problem-rail-nav a:hover {
-  color: var(--accent-dark);
-  text-decoration: underline;
-  text-underline-offset: 0.16em;
-}
-
-/* PI-02F3: hierarchical "Nesta página" — nested subsection links are indented
-   and slightly smaller, purely to signal structure (top-level vs. subsection),
-   never severity or ranking. */
-.problem-rail-nav li > ul {
-  margin-left: var(--space-3);
-}
-
-.problem-rail-nav li > ul a {
-  font-size: 12px;
-  color: var(--ink-faintest);
-}
-
 .detail-rail-file {
   display: block;
   padding: var(--space-2) var(--space-3);
@@ -2079,19 +2040,25 @@ main.explorer-shell {
    index (UX-B §4) — the rail already provides it on desktop, so this stays
    hidden there to avoid a duplicate section index. Placed before the
    responsive overrides below so their `display: block` wins by source
-   order in the bands where the section index should show. */
-.problem-help-section-index {
+   order in the bands where the section index should show.
+   DS-05H: renamed from `.problem-help-section-index` (the class formerly on
+   the compact nav embedded inside `ProblemHelpDisclosure`) to
+   `.problem-compact-section-index` (the wrapper around the now-independent
+   canonical CompactSectionIndex, rendered adjacent to ProblemHelpDisclosure
+   — see ProblemView.tsx's `ProblemCompactSectionIndex`). Same visibility
+   contract, unchanged breakpoints. */
+.problem-compact-section-index {
   display: none;
   margin: 0 0 var(--space-3);
 }
 
 /* SUI-03J2B: SRC's own compact "Nesta fonte" index reuses the exact same
-   hidden-by-default/compact-visible contract as `.problem-help-section-index`
-   above — unlike Problem View's disclosure (which stays visible for its
-   own explanatory content beyond the index), the entire SRC compact
-   disclosure *is* the index, so the whole wrapper is gated, not just an
-   inner nav. Same breakpoints, same pattern, no new Source-specific
-   breakpoint. */
+   hidden-by-default/compact-visible contract as
+   `.problem-compact-section-index` above — unlike Problem View's disclosure
+   (which stays visible for its own explanatory content beyond the index),
+   the entire SRC compact disclosure *is* the index, so the whole wrapper is
+   gated, not just an inner nav. Same breakpoints, same pattern, no new
+   Source-specific breakpoint. */
 .source-compact-section-index {
   display: none;
 }
@@ -2137,7 +2104,7 @@ main.explorer-shell {
     display: none;
   }
 
-  .problem-help-section-index {
+  .problem-compact-section-index {
     display: block;
   }
 
@@ -2547,32 +2514,6 @@ main.explorer-shell {
   margin: 0 0 var(--space-2);
 }
 
-.problem-help-section-index-label {
-  margin: 0 0 var(--space-1);
-  font-weight: 600;
-}
-
-.problem-help-section-index ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-3);
-}
-
-/* PI-02F3: subsection links stay in the same flex-wrap row group as their
-   top-level entry's siblings but read visually subordinate — no ranking
-   implied, purely a structural (top-level vs. subsection) distinction. */
-.problem-help-section-index li > ul a {
-  font-size: 12px;
-  color: var(--ink-faintest);
-}
-
-.problem-help-section-index li > ul a::before {
-  content: "› ";
-}
-
 .problem-identity {
   border: 1px solid var(--line-emphasis);
   border-radius: var(--radius-lg);
@@ -2940,7 +2881,7 @@ main.explorer-shell {
     font-size: var(--recipe-editorial-h1-size-compact);
   }
 
-  .problem-help-section-index {
+  .problem-compact-section-index {
     display: block;
   }
 

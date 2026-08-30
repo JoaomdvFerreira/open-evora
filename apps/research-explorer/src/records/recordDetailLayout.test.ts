@@ -136,11 +136,11 @@ describe("Source View 'Nesta fonte' index responsive contract (SUI-03J2B, reuses
     }
   });
 
-  it("the compact index visibility rules reuse the exact same media queries as .problem-help-section-index (Problem View's own compact-index pattern) — no new Source-specific breakpoint", () => {
+  it("the compact index visibility rules reuse the exact same media queries as .problem-compact-section-index (Problem View's own compact-index pattern) — no new Source-specific breakpoint", () => {
     for (const mediaSelector of ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"]) {
-      const problemHelpBodies = bodiesInMediaBlock(mediaSelector, ".problem-help-section-index");
+      const problemCompactBodies = bodiesInMediaBlock(mediaSelector, ".problem-compact-section-index");
       const sourceCompactBodies = bodiesInMediaBlock(mediaSelector, ".source-compact-section-index");
-      expect(problemHelpBodies.length).toBeGreaterThan(0);
+      expect(problemCompactBodies.length).toBeGreaterThan(0);
       expect(sourceCompactBodies.length).toBeGreaterThan(0);
     }
   });
