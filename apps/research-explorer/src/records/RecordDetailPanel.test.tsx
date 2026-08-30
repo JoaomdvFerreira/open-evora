@@ -84,7 +84,8 @@ describe("RecordDetailPanel vNext", () => {
 
     expect(await screen.findByText("Relações no corpus")).toBeTruthy();
     expect(screen.getByText("← Referenciado por")).toBeTruthy();
-    const relatedButton = screen.getByRole("button", { name: /PRB-2.*Problema relacionado/ });
+    expect(screen.getByText("Problema relacionado")).toBeTruthy();
+    const relatedButton = screen.getByRole("button", { name: "Abrir PRB-2" });
     fireEvent.click(relatedButton);
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect).toHaveBeenCalledWith("PRB-2");

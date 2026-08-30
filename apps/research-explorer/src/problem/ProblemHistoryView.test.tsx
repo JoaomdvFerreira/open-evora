@@ -44,12 +44,12 @@ const props = {
 };
 
 describe("ProblemHistoryView", () => {
-  it("renders the authored PRB-0010 entry and typed evidence navigation", async () => {
+  it("renders the authored PRB-0010 entry and actionable evidence navigation", async () => {
     const onOpenGeneric = vi.fn();
     render(<ProblemHistoryView {...props} problemId="PRB-0010" onOpenGeneric={onOpenGeneric} />);
 
     await screen.findByText(/Nova evidência oficial estabeleceu uma cronologia de resposta faseada/);
-    fireEvent.click(screen.getAllByRole("button", { name: "[Evidência] EVD-000154" })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: "Abrir EVD-000154" })[0]);
     expect(onOpenGeneric).toHaveBeenCalledWith("EVD-000154");
   });
 

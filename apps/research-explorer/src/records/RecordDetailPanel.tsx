@@ -2,9 +2,10 @@ import { Fragment, useEffect, useRef, type ReactNode } from "react";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordDetail } from "./useRecordDetail";
 import { RecordFieldTree } from "./RecordFieldTree";
-import { describeType, formatTypedId, knownTypePrefixes } from "../presentation/typeGlossary";
+import { describeType, knownTypePrefixes } from "../presentation/typeGlossary";
 import { RecordTypeLabel } from "./RecordTypeLabel";
 import { RecordIdentifier } from "./RecordIdentifier";
+import { Breadcrumb } from "../presentation/Breadcrumb";
 import { findMeaningField } from "./meaningField";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation/presentation";
 import { ContextTabs } from "../navigation/ContextTabs";
@@ -97,9 +98,11 @@ function RelationshipList({ detail, lookup, onSelect }: RelationshipListProps) {
             const paths = groups.get(relatedId)!;
             return (
               <li key={relatedId}>
-                <button type="button" onClick={() => onSelect(relatedId)}>
-                  {related ? `${formatTypedId(related.type, related.id)} — ${related.label}` : relatedId}
-                </button>
+                <span className="record-type-identifier-cluster">
+                  {related && <RecordTypeLabel prefix={related.type} variant="compact" />}
+                  <RecordIdentifier variant="action" id={relatedId} density="compact" onActivate={() => onSelect(relatedId)} accessibleLabel={`Abrir ${relatedId}`} />
+                  {related && <span>{related.label}</span>}
+                </span>
                 <ul className="relationship-paths">
                   {paths.map((path, index) => {
                     const arrow = path.direction === "outgoing" ? "→" : "←";
@@ -149,9 +152,11 @@ function RelatedRecordButton({ id, lookup, onSelect }: { id: string; lookup: Map
   const related = lookup.get(id);
   return (
     <li>
-      <button type="button" onClick={() => onSelect(id)}>
-        {related ? `${formatTypedId(related.type, related.id)} — ${related.label}` : id}
-      </button>
+      <span className="record-type-identifier-cluster">
+        {related && <RecordTypeLabel prefix={related.type} variant="compact" />}
+        <RecordIdentifier variant="action" id={id} density="compact" onActivate={() => onSelect(id)} accessibleLabel={`Abrir ${id}`} />
+        {related && <span>{related.label}</span>}
+      </span>
     </li>
   );
 }
@@ -343,17 +348,22 @@ function SourceInvestigation({ state, onSelect }: { state: SourceEvidenceRelatio
   return <SourceInvestigationSection relations={state.relations} onSelect={onSelect} />;
 }
 
-function Breadcrumb({ detail, onBackToRecords }: { detail: RecordDetail; onBackToRecords: () => void }) {
+function RecordDetailBreadcrumb({ detail, onBackToRecords }: { detail: RecordDetail; onBackToRecords: () => void }) {
   return (
-    <nav aria-label="Localização" className="detail-breadcrumb">
-      <button type="button" onClick={onBackToRecords}>
-        Registos
-      </button>
-      <span aria-hidden="true" className="detail-breadcrumb-separator">
-        ›
-      </span>
-      <span className="detail-breadcrumb-current">{detail.id}</span>
-    </nav>
+    <Breadcrumb
+      label="Localização"
+      ancestors={[
+        {
+          key: "registos",
+          action: (
+            <button type="button" onClick={onBackToRecords}>
+              Registos
+            </button>
+          ),
+        },
+      ]}
+      current={<RecordIdentifier variant="text" density="compact" id={detail.id} />}
+    />
   );
 }
 
@@ -770,9 +780,13 @@ function PrbCanonicalReferences({ detail, onSelect }: { detail: RecordDetail; on
           {filteredReferences.map((ref, index) => (
             <li key={`${ref.path}-${index}`} className="prb-reference-item">
               <code className="prb-reference-path">{ref.path}</code>
-              <button type="button" className="prb-reference-target" onClick={() => onSelect(ref.targetId)} aria-label={`Abrir ${ref.targetId} referenciado em ${ref.path}`}>
-                {ref.targetId}
-              </button>
+              <RecordIdentifier
+                variant="action"
+                id={ref.targetId}
+                density="compact"
+                onActivate={() => onSelect(ref.targetId)}
+                accessibleLabel={`Abrir ${ref.targetId} referenciado em ${ref.path}`}
+              />
             </li>
           ))}
         </ul>
@@ -886,7 +900,7 @@ function RecordDetailContent({
 
   return (
     <div className="record-detail-layout shell-frame">
-      <Breadcrumb detail={detail} onBackToRecords={onBackToRecords} />
+      <RecordDetailBreadcrumb detail={detail} onBackToRecords={onBackToRecords} />
 
       {detail.type === "PRB-" && (
         <ContextTabs prbId={detail.id} active="detail" onOpenGeneric={onSelect} onViewAsProblem={onViewAsProblem} onViewHistory={onViewHistory} />
@@ -1057,6 +1071,10 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
               Registos
             </button>
           </nav>
+          {/* DS-05E: this error branch never had a current-item ID to show
+              (the record failed to load), so it keeps its own minimal
+              ancestor-only nav rather than forcing an empty `current` node
+              through the generic Breadcrumb, which always renders one. */}
           <div role="alert">
             <h3>{ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o registo"}</h3>
             <p>{state.error.message}</p>

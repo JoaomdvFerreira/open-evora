@@ -13,9 +13,14 @@
    (RecordsTable.tsx/NarrowRecordsList.tsx), generic Record Detail
    (RecordDetailPanel.tsx), and EVD identity (EvdDetail.tsx) call sites;
    EvidenceEffectTag/ResearchRoleTag were adopted at their own call sites in
-   DS-05C. .detail-technical-field/.prb-reference-target remain untouched
-   production classes for the actionable-identifier call sites deferred to
-   DS-05E.
+   DS-05C. DS-05E additionally adopts RecordIdentifier's action form at the
+   remaining actionable canonical-record-ID call sites (PRB canonical/related-
+   record references, EvidenceCard/Source-provenance identity, compact
+   evidence references, Source finding/investigation IDs, Problem History
+   evidence IDs) — .prb-reference-target's own CSS rule is retired as a direct
+   consequence (no remaining production consumer); .detail-technical-field
+   remains for the still-untouched heterogeneous-metadata call sites named in
+   the DS-05D commit.
 
    This file exists separately from ui.css precisely because these three
    classes carry domain meaning (record identity, record type, PRB→EVD
@@ -86,6 +91,22 @@
   color: var(--color-accent-hover);
   text-decoration-thickness: 2px;
   text-underline-offset: 0.16em;
+}
+
+/* =========================================================================
+   DS-05E — RecordTypeLabel + RecordIdentifier (+ optional suffix) cluster:
+   the approved compact identity composition (ReferencePathCompositions/
+   PrbEvdRelationship stories' RecordTypeLabel+RecordIdentifier pairing)
+   reimplemented on production's own flex primitive rather than importing
+   `layout.css`'s `.lyt-cluster` (out of the approved narrow production style
+   boundary — tokens.css/inline-label.css/domain.css only). Wrapping inline
+   flow only, no status/effect meaning.
+   ========================================================================= */
+.record-type-identifier-cluster {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--p-space-1) var(--space-tight);
 }
 
 /* =========================================================================

@@ -24,6 +24,13 @@
    ui.css keeps the exact same `.ui-inline-label` behaviour unchanged. */
 @import "./inline-label.css";
 
+/* DS-05E: `.ui-breadcrumb*` now lives in its own file (breadcrumb.css) so the
+   production application can depend on it without importing this file's
+   other selectors — same rationale as `.ui-inline-label` above. Imported here
+   so every existing Storybook consumer of ui.css keeps the exact same
+   `.ui-breadcrumb*` behaviour unchanged. */
+@import "./breadcrumb.css";
+
 /* =========================================================================
    Native action recipes — CSS classes applied directly to native <a> or
    <button>. Link vs button semantics stay caller-owned: these recipes never
@@ -262,33 +269,6 @@ button.ui-action-outlined[aria-disabled="true"]:hover {
    surface's border legible while a descendant carries visible focus. */
 .ui-surface-interactive:has(:focus-visible) {
   border-color: var(--focus-ring-color);
-}
-
-/* =========================================================================
-   Breadcrumb anatomy — DS-04D Slice 2A (component-model.md §4.3
-   "Breadcrumb"), extracted from the current `.detail-breadcrumb` markup in
-   RecordDetailPanel/ProblemView/ProblemHistoryView. Presentation only: no
-   landmark ownership beyond the <nav> the component itself renders, no
-   label/route/ID logic — see src/presentation/Breadcrumb.tsx. The
-   separator's own visual weight comes from ordinary ink colour, not a
-   border or background, so it reads as punctuation rather than a control.
-   ========================================================================= */
-.ui-breadcrumb {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-tight);
-  font-family: var(--font-interface);
-  font-size: var(--text-interface-body-size);
-  line-height: var(--text-interface-body-line-height);
-}
-
-.ui-breadcrumb-separator {
-  color: var(--color-ink-muted);
-}
-
-.ui-breadcrumb-current {
-  color: var(--color-ink-primary);
 }
 
 /* =========================================================================

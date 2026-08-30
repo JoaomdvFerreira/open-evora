@@ -1,5 +1,6 @@
 import type { SourceEvidenceRelations, SourceRelatedProblem } from "./sourceEvidenceRelations";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
+import { RecordIdentifier } from "./RecordIdentifier";
 
 /**
  * SUI-03H1/H2: isolated presentation component for the Source View "Na
@@ -11,9 +12,10 @@ import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
  * EVD ids under "Através de" stay text-only to avoid duplicating the EVD
  * navigation already available in "O que encontrámos"
  * (`SourceFindingsSection.tsx`). PRB navigation reuses the same
- * `source-finding-id` neutral record-ID button treatment `SourceFindingsSection`
- * already uses for EVD ids — a button when `onSelect` is supplied, plain
- * text otherwise (mirrors that section's own `onSelect`-optional contract).
+ * `RecordIdentifier` action/text neutral record-ID treatment (DS-05E)
+ * `SourceFindingsSection` already uses for EVD ids — action when `onSelect`
+ * is supplied, text otherwise (mirrors that section's own
+ * `onSelect`-optional contract).
  *
  * SUI-03K3: "Observações relacionadas" (the `uniqueEvidenceCount` metric)
  * moved to `SourceFindingsSection` ("O que encontrámos") — that count
@@ -26,11 +28,9 @@ function RelatedProblemItem({ problem, onSelect }: { problem: SourceRelatedProbl
   return (
     <li className="source-finding-item">
       {onSelect ? (
-        <button type="button" className="source-finding-id detail-technical-field" onClick={() => onSelect(problem.problemId)}>
-          {problem.problemId}
-        </button>
+        <RecordIdentifier variant="action" id={problem.problemId} density="compact" onActivate={() => onSelect(problem.problemId)} accessibleLabel={`Abrir ${problem.problemId}`} />
       ) : (
-        <span className="source-finding-id detail-technical-field">{problem.problemId}</span>
+        <RecordIdentifier variant="text" id={problem.problemId} density="compact" />
       )}
       <p className="source-finding-summary">Através de: {problem.viaEvidenceIds.join(", ")}</p>
     </li>

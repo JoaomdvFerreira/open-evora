@@ -11,6 +11,9 @@ import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { describeType, formatTypedId } from "../presentation/typeGlossary";
 import { formatPublicCount, publicEnumLabel } from "../presentation/presentation";
 import { ContextTabs } from "../navigation/ContextTabs";
+import { Breadcrumb } from "../presentation/Breadcrumb";
+import { RecordIdentifier } from "../records/RecordIdentifier";
+import { RecordTypeLabel } from "../records/RecordTypeLabel";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -251,35 +254,54 @@ function groupEvidenceByDecisionBasis(record: Record<string, unknown>, evidence:
   return { supporting, boundary, other };
 }
 
-function TypedLinkButton({ detail, onOpenGeneric, suffix }: { detail: RecordDetail; onOpenGeneric: (id: string) => void; suffix?: string }) {
+/**
+ * DS-05E remediation F2: renamed from `TypedLinkButton` — this no longer
+ * renders one link/button carrying a formatted type+ID string, so that name
+ * became misleading. It composes the approved EvidenceCard-identity/
+ * Source-provenance composition (ReferencePathCompositions.stories.tsx /
+ * PrbEvdRelationship.stories.tsx): RecordTypeLabel (compact) +
+ * RecordIdentifier (action/compact) own the record's type and canonical ID
+ * as two explicit dimensions; `suffix` remains ordinary non-interactive text
+ * appended after them, never absorbed into the identifier's own visible text
+ * or accessible name.
+ */
+function RecordIdentityAction({ detail, onOpenGeneric, suffix }: { detail: RecordDetail; onOpenGeneric: (id: string) => void; suffix?: string }) {
   return (
-    <button type="button" onClick={() => onOpenGeneric(detail.id)}>
-      {formatTypedId(detail.type, detail.id)}
-      {suffix ? ` — ${suffix}` : ""}
-    </button>
+    <span className="record-type-identifier-cluster">
+      <RecordTypeLabel prefix={detail.type} variant="compact" />
+      <RecordIdentifier variant="action" id={detail.id} density="compact" onActivate={() => onOpenGeneric(detail.id)} accessibleLabel={`Abrir ${detail.id}`} />
+      {suffix ? <span>{suffix}</span> : null}
+    </span>
   );
 }
 
 /**
- * Problem-scoped breadcrumb ("Localização"): visually mirrors Record
- * Detail's Breadcrumb (RecordDetailPanel.tsx) — same navigational pattern
- * (design-system.md §3) — but Problem View is a public problem-reading
- * surface, not conceptually a child of Records (UX-D §2), so its first
- * breadcrumb action returns to Overview ("Visão geral › PRB-0006"), not
- * Registos. Generic Record Detail keeps its own Registos-based breadcrumb
- * unchanged.
+ * Problem-scoped breadcrumb ("Localização"): uses the same generic
+ * Breadcrumb component as Record Detail (RecordDetailPanel.tsx) — same
+ * navigational pattern (design-system.md §3) — but Problem View is a public
+ * problem-reading surface, not conceptually a child of Records (UX-D §2), so
+ * its first breadcrumb action returns to Overview ("Visão geral › PRB-0006"),
+ * not Registos. Generic Record Detail keeps its own Registos-based
+ * breadcrumb composition unchanged. Retained as a small domain wrapper
+ * (component-model.md §5.3) because it still owns "Visão geral" +
+ * onBackToOverview semantics distinct from Record Detail's "Registos".
  */
 function ProblemBreadcrumb({ problemId, onBackToOverview }: { problemId: string; onBackToOverview: () => void }) {
   return (
-    <nav aria-label="Localização" className="detail-breadcrumb">
-      <button type="button" onClick={onBackToOverview}>
-        Visão geral
-      </button>
-      <span aria-hidden="true" className="detail-breadcrumb-separator">
-        ›
-      </span>
-      <span className="detail-breadcrumb-current">{problemId}</span>
-    </nav>
+    <Breadcrumb
+      label="Localização"
+      ancestors={[
+        {
+          key: "visao-geral",
+          action: (
+            <button type="button" onClick={onBackToOverview}>
+              Visão geral
+            </button>
+          ),
+        },
+      ]}
+      current={<RecordIdentifier variant="text" density="compact" id={problemId} />}
+    />
   );
 }
 
@@ -627,7 +649,7 @@ function EvidenceCard({ detail, sources, effects = [], onOpenGeneric }: Evidence
   return (
     <li className="evidence-card">
       <div className="evidence-item-header">
-        <TypedLinkButton
+        <RecordIdentityAction
           detail={detail}
           onOpenGeneric={onOpenGeneric}
           suffix={fieldValue(evidenceRecord, "type") ? publicEnumLabel("type", fieldValue(evidenceRecord, "type")!) : undefined}
@@ -654,7 +676,7 @@ function EvidenceCard({ detail, sources, effects = [], onOpenGeneric }: Evidence
         <ul aria-label={`Registos de fonte relacionados com ${detail.id}`} className="evidence-sources">
           {sources.map((source) => (
             <li key={source.id}>
-              <TypedLinkButton detail={source} onOpenGeneric={onOpenGeneric} suffix={fieldValue(source.record as Record<string, unknown>, "publisher") ?? undefined} />
+              <RecordIdentityAction detail={source} onOpenGeneric={onOpenGeneric} suffix={fieldValue(source.record as Record<string, unknown>, "publisher") ?? undefined} />
             </li>
           ))}
         </ul>
@@ -726,11 +748,15 @@ function EffectOccurrenceSummary({ evidence }: { evidence: EvidenceWithSources[]
 }
 
 /**
- * PI-02D compact EVD- reference row — reuses the existing `TypedLinkButton`
- * record-navigation behaviour, but never the full `EvidenceCard` (that stays
- * exclusive to the Evidência section, per scope). Omitted entirely when no
- * referenced ID resolves to an already-loaded evidence detail; an ID that
- * cannot be resolved is silently skipped rather than shown as broken.
+ * PI-02D compact EVD- reference row — a lightweight `RecordIdentifier`
+ * action/compact reference (DS-05E, mirrors OpenQuestionEvidenceRefs's own
+ * approved composition in ReferencePathCompositions.stories.tsx), never the
+ * full `EvidenceCard` (that stays exclusive to the Evidência section, per
+ * scope) and never `RecordTypeLabel` merely because the resolved type is
+ * known — the surrounding "Evidência relacionada:" caption already states
+ * the type. Omitted entirely when no referenced ID resolves to an
+ * already-loaded evidence detail; an ID that cannot be resolved is silently
+ * skipped rather than shown as broken.
  */
 function OpenQuestionEvidenceRefs({
   evidenceIds,
@@ -750,7 +776,7 @@ function OpenQuestionEvidenceRefs({
       <ul className="open-question-evidence-refs-list">
         {details.map((detail) => (
           <li key={detail.id}>
-            <TypedLinkButton detail={detail} onOpenGeneric={onOpenGeneric} />
+            <RecordIdentifier variant="action" id={detail.id} density="compact" onActivate={() => onOpenGeneric(detail.id)} accessibleLabel={`Abrir ${detail.id}`} />
           </li>
         ))}
       </ul>
