@@ -18,6 +18,8 @@ import { buildRenderGraph } from "./renderGraph";
 import { GraphCanvas, type GraphCanvasHandle } from "./GraphCanvas";
 import { FOCUS_NODE_COLOR, typeVisual } from "./typeVisuals";
 import type { ResearchGraph } from "./buildGraphModel";
+import { ProgressMessage } from "../presentation/ProgressMessage";
+import { ErrorNotice } from "../presentation/ErrorNotice";
 import { ContextTabs } from "../navigation/ContextTabs";
 
 const ERROR_TITLES: Record<string, string> = {
@@ -137,22 +139,23 @@ export function GraphExplorer({
   }, [invalidFocus, state.status]);
 
   if (state.status === "loading") {
-    return (
-      <p role="status" aria-live="polite">
-        A carregar dados do grafo…
-      </p>
-    );
+    return <ProgressMessage message="A carregar dados do grafo…" />;
   }
 
   if (state.status === "error") {
     return (
-      <div ref={errorRef} role="alert" tabIndex={-1}>
-        <h2>{ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o grafo"}</h2>
-        <p>{state.error.message}</p>
-        <button type="button" onClick={state.retry}>
-          Tentar novamente
-        </button>
-      </div>
+      <ErrorNotice
+        ref={errorRef}
+        tabIndex={-1}
+        titleAs="h2"
+        title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o grafo"}
+        message={state.error.message}
+        action={
+          <button type="button" onClick={state.retry}>
+            Tentar novamente
+          </button>
+        }
+      />
     );
   }
 
@@ -161,13 +164,18 @@ export function GraphExplorer({
     return (
       <section aria-labelledby="graph-heading" className="graph-explorer">
         <h2 id="graph-heading">Grafo</h2>
-        <div ref={invalidFocusRef} role="alert" tabIndex={-1}>
-          <h3>Registo focado não encontrado</h3>
-          <p>O identificador no endereço não corresponde a um registo disponível neste grafo.</p>
-          <button type="button" onClick={onClearFocus}>
-            Limpar seleção e escolher outro registo
-          </button>
-        </div>
+        <ErrorNotice
+          ref={invalidFocusRef}
+          tabIndex={-1}
+          titleAs="h3"
+          title="Registo focado não encontrado"
+          message="O identificador no endereço não corresponde a um registo disponível neste grafo."
+          action={
+            <button type="button" onClick={onClearFocus}>
+              Limpar seleção e escolher outro registo
+            </button>
+          }
+        />
       </section>
     );
   }

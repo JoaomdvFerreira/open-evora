@@ -4,6 +4,8 @@ import { StaticDataProvider } from "../dataProvider/StaticDataProvider";
 import { loadExplorerStartupState, type ExplorerStartupState } from "./startup";
 import { Explorer } from "./Explorer";
 import { formatPublicCount, formatPublicDateTime } from "../presentation/presentation";
+import { ProgressMessage } from "../presentation/ProgressMessage";
+import { ErrorNotice } from "../presentation/ErrorNotice";
 
 const defaultProvider: DataProvider = new StaticDataProvider();
 
@@ -41,20 +43,19 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
         Saltar para o conteúdo
       </a>
       <main id="main-content" className="explorer-shell" tabIndex={-1}>
-        {state.status === "loading" && (
-          <p role="status" aria-live="polite">
-            A carregar modelo de leitura gerado…
-          </p>
-        )}
+        {state.status === "loading" && <ProgressMessage message="A carregar modelo de leitura gerado…" />}
 
         {state.status === "error" && (
-          <div role="alert">
-            <h2>{ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Explorer"}</h2>
-            <p>{state.error.message}</p>
-            <button type="button" onClick={() => setAttempt((value) => value + 1)}>
-              Tentar novamente
-            </button>
-          </div>
+          <ErrorNotice
+            titleAs="h2"
+            title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Explorer"}
+            message={state.error.message}
+            action={
+              <button type="button" onClick={() => setAttempt((value) => value + 1)}>
+                Tentar novamente
+              </button>
+            }
+          />
         )}
 
         {state.status === "ready" && (

@@ -28,6 +28,10 @@ import "./styles/domain.css";
 // of ui.css, which still carries unrelated selectors/collision risk with
 // index.css's own `.unavailable-control`/`.unavailable-note`).
 import "./styles/breadcrumb.css";
+// DS-05F: the narrow canonical ProgressMessage/ErrorNotice visual recipes
+// only (not the rest of ui.css, which still carries EmptyState and other
+// unrelated/colliding selectors).
+import "./styles/feedback.css";
 
 const container = document.getElementById("root");
 if (!container) {

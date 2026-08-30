@@ -14,6 +14,8 @@ import { ContextTabs } from "../navigation/ContextTabs";
 import { Breadcrumb } from "../presentation/Breadcrumb";
 import { RecordIdentifier } from "../records/RecordIdentifier";
 import { RecordTypeLabel } from "../records/RecordTypeLabel";
+import { ProgressMessage } from "../presentation/ProgressMessage";
+import { ErrorNotice } from "../presentation/ErrorNotice";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -960,22 +962,23 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
   if (state.status === "idle") return null;
 
   if (state.status === "loading") {
-    return (
-      <p role="status" aria-live="polite">
-        A carregar Problema {state.id}…
-      </p>
-    );
+    return <ProgressMessage message={`A carregar Problema ${state.id}…`} />;
   }
 
   if (state.status === "error") {
     return (
-      <div ref={errorRef} role="alert" tabIndex={-1}>
-        <h2>{ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Problema"}</h2>
-        <p>{state.error.message}</p>
-        <button type="button" onClick={state.retry}>
-          Tentar novamente
-        </button>
-      </div>
+      <ErrorNotice
+        ref={errorRef}
+        tabIndex={-1}
+        titleAs="h2"
+        title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Problema"}
+        message={state.error.message}
+        action={
+          <button type="button" onClick={state.retry}>
+            Tentar novamente
+          </button>
+        }
+      />
     );
   }
 
@@ -1058,22 +1061,21 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
   const indexState = useRecordIndex(dataProvider);
 
   if (indexState.status === "loading") {
-    return (
-      <p role="status" aria-live="polite">
-        A carregar…
-      </p>
-    );
+    return <ProgressMessage message="A carregar…" />;
   }
 
   if (indexState.status === "error") {
     return (
-      <div role="alert">
-        <h2>Não foi possível carregar os registos</h2>
-          <p>{indexState.error.message}</p>
+      <ErrorNotice
+        titleAs="h2"
+        title="Não foi possível carregar os registos"
+        message={indexState.error.message}
+        action={
           <button type="button" onClick={indexState.retry}>
             Tentar novamente
           </button>
-      </div>
+        }
+      />
     );
   }
 
@@ -1091,13 +1093,16 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
   const summary = indexState.lookup.get(problemId);
   if (summary && summary.type !== "PRB-") {
     return (
-      <div role="alert">
-        <h2>Este registo não é um Problema</h2>
-        <p>{formatTypedId(summary.type, problemId)} não pode ser aberto como vista de Problema.</p>
-        <button type="button" onClick={() => onOpenGeneric(problemId)}>
-          Ver detalhe genérico
-        </button>
-      </div>
+      <ErrorNotice
+        titleAs="h2"
+        title="Este registo não é um Problema"
+        message={`${formatTypedId(summary.type, problemId)} não pode ser aberto como vista de Problema.`}
+        action={
+          <button type="button" onClick={() => onOpenGeneric(problemId)}>
+            Ver detalhe genérico
+          </button>
+        }
+      />
     );
   }
 

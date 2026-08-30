@@ -89,7 +89,8 @@ describe("GraphExplorer", () => {
     );
 
     const alert = await screen.findByRole("alert");
-    expect(within(alert).getByRole("heading", { name: "Registo focado não encontrado" })).toBeTruthy();
+    expect(within(alert).getByRole("heading", { level: 3, name: "Registo focado não encontrado" })).toBeTruthy();
+    expect(document.activeElement).toBe(alert);
     expect(screen.queryByText(/0 nós visíveis/)).toBeNull();
     const user = userEvent.setup();
     await user.click(within(alert).getByRole("button", { name: /Limpar seleção/ }));
@@ -280,9 +281,8 @@ describe("GraphExplorer", () => {
       />
     );
     const alert = await screen.findByRole("alert");
-    expect(alert.textContent).toBe(
-      "Não foi possível desenhar a representação visual do grafo neste ambiente. Os Registos e a vista de Problema continuam disponíveis como alternativas completas."
-    );
+    expect(within(alert).getByText("Não foi possível desenhar a representação visual do grafo neste ambiente.")).toBeTruthy();
+    expect(within(alert).getByText("Os Registos e a vista de Problema continuam disponíveis como alternativas completas.")).toBeTruthy();
   });
 
   it("announces total Graph-search matches separately from the 12-result display cap", async () => {

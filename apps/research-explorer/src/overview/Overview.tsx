@@ -5,6 +5,8 @@ import { findMeaningField } from "../records/meaningField";
 import { computePublicOverviewData, formatEvidenceCount, formatProblemCount } from "./overviewStats";
 import { formatPublicCount, publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
 import { ValidationStatus, EvidenceStatus } from "../problem/InvestigationStatus";
+import { ProgressMessage } from "../presentation/ProgressMessage";
+import { ErrorNotice } from "../presentation/ErrorNotice";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -58,19 +60,16 @@ export function Overview({
   }, [dataProvider, problemIds]);
 
   if (indexState.status === "loading") {
-    return (
-      <p role="status" aria-live="polite">
-        A carregar visão geral…
-      </p>
-    );
+    return <ProgressMessage message="A carregar visão geral…" />;
   }
 
   if (indexState.status === "error") {
     return (
-      <div role="alert">
-        <h2>{ERROR_TITLES[indexState.error.kind] ?? "Não foi possível carregar a visão geral"}</h2>
-        <p>{indexState.error.message}</p>
-      </div>
+      <ErrorNotice
+        titleAs="h2"
+        title={ERROR_TITLES[indexState.error.kind] ?? "Não foi possível carregar a visão geral"}
+        message={indexState.error.message}
+      />
     );
   }
 
@@ -126,7 +125,7 @@ export function Overview({
           <p>ordenados por identificador, não por relevância</p>
         </div>
         {fullTitles === null ? (
-          <p role="status" aria-live="polite">A carregar títulos dos problemas…</p>
+          <ProgressMessage message="A carregar títulos dos problemas…" />
         ) : (
           <ul className="overview-problem-list">
             {overview.problems.map((problem) => (

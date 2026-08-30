@@ -6,6 +6,8 @@ import { formatTypedId } from "../presentation/typeGlossary";
 import { ContextTabs } from "../navigation/ContextTabs";
 import { Breadcrumb } from "../presentation/Breadcrumb";
 import { RecordIdentifier } from "../records/RecordIdentifier";
+import { ProgressMessage } from "../presentation/ProgressMessage";
+import { ErrorNotice } from "../presentation/ErrorNotice";
 
 const HISTORY_STATE_FIELDS = ["status", "evidence_status", "validation_status", "digital_tractability", "solution_landscape_status"] as const;
 
@@ -107,9 +109,9 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
   }, [detail]);
 
   if (error) {
-    return <div role="alert"><h2>Não foi possível carregar o histórico</h2><p>{error instanceof Error ? error.message : String(error)}</p></div>;
+    return <ErrorNotice titleAs="h2" title="Não foi possível carregar o histórico" message={error instanceof Error ? error.message : String(error)} />;
   }
-  if (!detail) return <p role="status" aria-live="polite">A carregar histórico de {problemId}…</p>;
+  if (!detail) return <ProgressMessage message={`A carregar histórico de ${problemId}…`} />;
 
   const record = detail.record as Record<string, unknown>;
   const title = typeof record.title === "string" ? record.title : detail.id;
@@ -143,13 +145,13 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
 /** Read-only PRB material-history projection over the existing DataProvider. */
 export function ProblemHistoryView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewAsProblem }: ProblemHistoryViewProps) {
   const indexState = useRecordIndex(dataProvider);
-  if (indexState.status === "loading") return <p role="status" aria-live="polite">A carregar…</p>;
-  if (indexState.status === "error") return <div role="alert"><h2>Não foi possível carregar os registos</h2><p>{indexState.error.message}</p><button type="button" onClick={indexState.retry}>Tentar novamente</button></div>;
+  if (indexState.status === "loading") return <ProgressMessage message="A carregar…" />;
+  if (indexState.status === "error") return <ErrorNotice titleAs="h2" title="Não foi possível carregar os registos" message={indexState.error.message} action={<button type="button" onClick={indexState.retry}>Tentar novamente</button>} />;
   if (problemId === null) return <div><p>Nenhum Problema selecionado.</p><button type="button" onClick={onBackToRecords}>Procurar um Problema em Registos</button></div>;
 
   const summary = indexState.lookup.get(problemId);
   if (summary && summary.type !== "PRB-") {
-    return <div role="alert"><h2>Este registo não é um Problema</h2><p>{formatTypedId(summary.type, problemId)} não pode ser aberto como histórico.</p><button type="button" onClick={() => onOpenGeneric(problemId)}>Ver detalhe genérico</button></div>;
+    return <ErrorNotice titleAs="h2" title="Este registo não é um Problema" message={`${formatTypedId(summary.type, problemId)} não pode ser aberto como histórico.`} action={<button type="button" onClick={() => onOpenGeneric(problemId)}>Ver detalhe genérico</button>} />;
   }
   return <ProblemHistoryContent dataProvider={dataProvider} problemId={problemId} onOpenGeneric={onOpenGeneric} onBackToOverview={onBackToOverview} onViewAsProblem={onViewAsProblem} />;
 }

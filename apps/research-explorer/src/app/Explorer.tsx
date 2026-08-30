@@ -7,6 +7,7 @@ import { ProblemView } from "../problem/ProblemView";
 import { ProblemHistoryView } from "../problem/ProblemHistoryView";
 import { ReadingGuide } from "../guide/ReadingGuide";
 import { useUnavailableNote } from "../presentation/UnavailableNote";
+import { ProgressMessage } from "../presentation/ProgressMessage";
 
 // RE-05: lazily imported, not just GraphCanvas's Sigma module inside it —
 // GraphExplorer's own module graph (Graphology + buildGraphModel/neighbourhood/
@@ -125,13 +126,7 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
       )}
 
       {url.state.view === "graph" && (
-        <Suspense
-          fallback={
-            <p role="status" aria-live="polite">
-              A carregar o grafo…
-            </p>
-          }
-        >
+        <Suspense fallback={<ProgressMessage message="A carregar o grafo…" />}>
           <GraphExplorer
             dataProvider={dataProvider}
             focusId={url.state.selectedId}

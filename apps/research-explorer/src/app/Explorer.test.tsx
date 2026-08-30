@@ -399,7 +399,7 @@ describe("Explorer — URL-addressable state", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
 
     const alert = await screen.findByRole("alert");
-    expect(within(alert).getByRole("heading")).toBeTruthy();
+    expect(within(alert).getByRole("heading", { level: 3, name: "Falha ao carregar o registo" })).toBeTruthy();
     // V2: Records is reachable again via the breadcrumb, not a persistent table.
     const breadcrumb = screen.getByLabelText("Localização");
     await user.click(within(breadcrumb).getByRole("button", { name: "Registos" }));
