@@ -60,10 +60,11 @@
 }
 
 /* ---- Rail variant ---------------------------------------------------------
-   Current evidence: `.problem-rail-nav` inside `.record-detail-rail` /
-   `.lyt-reading-rail`. No sticky/layout ownership here — ReadingLayout
-   (layout.css `.lyt-reading-rail`) owns positioning; this class supplies
-   only the nav's own heading-less vertical rhythm. */
+   Current evidence: `.problem-rail-nav` inside the canonical
+   `.lyt-reading-rail` (DS-05J production adoption, Record Detail/Problem
+   View). No sticky/layout ownership here — ReadingLayout
+   (styles/reading-layout.css `.lyt-reading-rail`) owns positioning; this
+   class supplies only the nav's own heading-less vertical rhythm. */
 .ui-section-index-rail {
   display: block;
 }

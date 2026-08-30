@@ -14,6 +14,7 @@ import path from "node:path";
  * contract explicitly asks unit tests not to do).
  */
 const CSS_PATH = path.join(__dirname, "..", "index.css");
+const READING_LAYOUT_CSS_PATH = path.join(__dirname, "..", "styles", "reading-layout.css");
 
 function ruleBodiesFor(css: string, selector: string): string[] {
   const bodies: string[] = [];
@@ -43,9 +44,9 @@ describe("record-detail layout (shell-frame ownership, UX-C)", () => {
     expect(source).toMatch(/className="record-detail-layout shell-frame"/);
   });
 
-  it("does not give .record-detail-columns its own independent width cap now that the parent frame owns it", () => {
-    const css = readFileSync(CSS_PATH, "utf-8");
-    const desktopBodies = ruleBodiesFor(css, ".record-detail-columns");
+  it("does not give .lyt-reading its own independent width cap now that the parent frame owns it", () => {
+    const css = readFileSync(READING_LAYOUT_CSS_PATH, "utf-8");
+    const desktopBodies = ruleBodiesFor(css, ".lyt-reading");
     expect(desktopBodies.length).toBeGreaterThan(0);
     for (const body of desktopBodies) {
       expect(hasWidthCap(body)).toBe(false);
@@ -69,6 +70,163 @@ describe("record-detail layout (shell-frame ownership, UX-C)", () => {
         expect(hasAutoInlineCentering(body)).toBe(true);
       }
     }
+  });
+});
+
+/**
+ * DS-05J: Record Detail and Problem View now adopt the canonical
+ * ReadingLayout (`.lyt-reading`/`-main`/`-rail`, styles/reading-layout.css)
+ * for their outer reading geometry, replacing the superseded
+ * `.record-detail-columns`/`-rail` implementation. `.record-detail-main`
+ * remains in production JSX only as a domain/style hook — the active
+ * descendant selectors below (`.record-meaning-zone`, `.record-meaning`,
+ * `.record-role-fields`, `.record-provenance`) still depend on it — but it
+ * no longer carries reading geometry itself.
+ */
+describe("ReadingLayout production adoption (DS-05J)", () => {
+  const recordDetailSource = readFileSync(path.join(__dirname, "RecordDetailPanel.tsx"), "utf-8");
+  const problemViewSource = readFileSync(path.join(__dirname, "..", "problem", "ProblemView.tsx"), "utf-8");
+  const indexCss = readFileSync(CSS_PATH, "utf-8");
+  const readingLayoutCss = readFileSync(READING_LAYOUT_CSS_PATH, "utf-8");
+
+  it("Record Detail's outer reading layout uses lyt-reading with data-rail=\"present\"", () => {
+    expect(recordDetailSource).toMatch(/className="lyt-reading" data-rail="present"/);
+  });
+
+  it("Record Detail's main column carries lyt-reading-main alongside the retained record-detail-main domain hook", () => {
+    expect(recordDetailSource).toMatch(/className="record-detail-main lyt-reading-main"/);
+  });
+
+  it("Record Detail's supporting <aside> carries lyt-reading-rail", () => {
+    expect(recordDetailSource).toMatch(/<aside className="lyt-reading-rail" aria-label="Mais ações">/);
+  });
+
+  it("Record Detail production JSX no longer uses record-detail-columns or record-detail-rail", () => {
+    expect(recordDetailSource).not.toMatch(/record-detail-columns/);
+    expect(recordDetailSource).not.toMatch(/className="record-detail-rail/);
+  });
+
+  it("Problem View uses the same lyt-reading / data-rail=\"present\" / lyt-reading-main composition", () => {
+    expect(problemViewSource).toMatch(/className="lyt-reading" data-rail="present"/);
+    expect(problemViewSource).toMatch(/className="record-detail-main lyt-reading-main"/);
+  });
+
+  it("ProblemReadingRail's <aside> carries lyt-reading-rail problem-reading-rail", () => {
+    expect(problemViewSource).toMatch(/<aside className="lyt-reading-rail problem-reading-rail">/);
+  });
+
+  it("Problem View production JSX no longer uses problem-view-columns", () => {
+    expect(problemViewSource).not.toMatch(/problem-view-columns/);
+  });
+
+  it("reading-layout.css owns the 720/44/216 geometry tokens", () => {
+    expect(readingLayoutCss).toMatch(/--layout-reading-main:\s*720px/);
+    expect(readingLayoutCss).toMatch(/--layout-reading-gap:\s*44px/);
+    expect(readingLayoutCss).toMatch(/--layout-reading-rail:\s*216px/);
+  });
+
+  it("reading-layout.css owns the sticky rail rule", () => {
+    const bodies = ruleBodiesFor(readingLayoutCss, ".lyt-reading-rail");
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0]).toMatch(/position\s*:\s*sticky/);
+  });
+
+  it("reading-layout.css owns exactly the existing 768-1059px fallback for .lyt-reading/-main/-rail", () => {
+    const mediaMatch = readingLayoutCss.match(/@media \(min-width: 768px\) and \(max-width: 1059px\) \{([\s\S]*?)\n\}/);
+    expect(mediaMatch).not.toBeNull();
+    const body = mediaMatch![1];
+    expect(body).toMatch(/\.lyt-reading\s*\{[^}]*flex-direction:\s*column/);
+    expect(body).toMatch(/\.lyt-reading-main\s*\{[^}]*max-width:\s*var\(--layout-reading-main\)/);
+    expect(body).toMatch(/\.lyt-reading-rail\s*\{[^}]*position:\s*static/);
+  });
+
+  it("reading-layout.css owns <=767px compact recomposition for .lyt-reading/-main/-rail", () => {
+    const mediaMatch = readingLayoutCss.match(/@media \(max-width: 767px\) \{([\s\S]*?)\n\}/);
+    expect(mediaMatch).not.toBeNull();
+    const body = mediaMatch![1];
+    expect(body).toMatch(/\.lyt-reading\s*\{[^}]*flex-direction:\s*column/);
+    expect(body).toMatch(/\.lyt-reading-main\s*\{[^}]*max-width:\s*100%/);
+    expect(body).toMatch(/\.lyt-reading-rail\s*\{[^}]*position:\s*static/);
+  });
+
+  it("index.css contains no .record-detail-columns rule", () => {
+    expect(ruleBodiesFor(indexCss, ".record-detail-columns").length).toBe(0);
+  });
+
+  it("index.css contains no direct .record-detail-rail geometry rule", () => {
+    expect(ruleBodiesFor(indexCss, ".record-detail-rail")).toEqual([]);
+  });
+
+  it("index.css contains no direct .record-detail-main geometry rule (flex/min-width/max-width on the bare class)", () => {
+    const bareBodies = ruleBodiesFor(indexCss, ".record-detail-main");
+    for (const body of bareBodies) {
+      expect(body).not.toMatch(/flex\s*:/);
+      expect(body).not.toMatch(/min-width\s*:/);
+      expect(body).not.toMatch(/max-width\s*:/);
+    }
+  });
+
+  it("--detail-gap is absent from index.css (no consumer remains)", () => {
+    expect(indexCss).not.toMatch(/--detail-gap/);
+  });
+
+  it("index.css has no .problem-view-columns rule (retirement note text aside)", () => {
+    expect(ruleBodiesFor(indexCss, ".problem-view-columns")).toEqual([]);
+  });
+
+  function bodiesInMediaBlock(css: string, mediaSelector: string, ruleSelector: string): string[] {
+    const escapedMedia = mediaSelector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const mediaPattern = new RegExp(`@media\\s*${escapedMedia}\\s*\\{`, "g");
+    const bodies: string[] = [];
+    for (const match of css.matchAll(mediaPattern)) {
+      const start = match.index! + match[0].length;
+      let depth = 1;
+      let i = start;
+      while (i < css.length && depth > 0) {
+        if (css[i] === "{") depth++;
+        else if (css[i] === "}") depth--;
+        i++;
+      }
+      const blockBody = css.slice(start, i - 1);
+      bodies.push(...ruleBodiesFor(blockBody, ruleSelector));
+    }
+    return bodies;
+  }
+
+  it(".problem-reading-rail remains hidden in both the 768-1059px and <=767px bands, with compact indexes shown", () => {
+    for (const mediaSelector of ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"]) {
+      const railBodies = bodiesInMediaBlock(indexCss, mediaSelector, ".problem-reading-rail");
+      expect(railBodies.some((body) => /display\s*:\s*none/.test(body))).toBe(true);
+
+      const problemCompactBodies = bodiesInMediaBlock(indexCss, mediaSelector, ".problem-compact-section-index");
+      const sourceCompactBodies = bodiesInMediaBlock(indexCss, mediaSelector, ".source-compact-section-index");
+      const evdCompactBodies = bodiesInMediaBlock(indexCss, mediaSelector, ".evd-compact-section-index");
+      expect(problemCompactBodies.some((body) => /display\s*:\s*block/.test(body))).toBe(true);
+      expect(sourceCompactBodies.some((body) => /display\s*:\s*block/.test(body))).toBe(true);
+      expect(evdCompactBodies.some((body) => /display\s*:\s*block/.test(body))).toBe(true);
+    }
+  });
+
+  /**
+   * DS-05J remediation: ProblemReadingRail's own `<aside>` carries both
+   * `lyt-reading-rail` and `problem-reading-rail` on the SAME element
+   * (unlike Source/EVD, where `.problem-reading-rail` wraps a nested child
+   * inside the outer `.lyt-reading-rail` aside). At equal specificity
+   * (single class each), CSS source order — not media-query nesting —
+   * decides the cascade: reading-layout.css's unconditional
+   * `.lyt-reading-rail { display: flex }` base rule would otherwise beat
+   * index.css's media-scoped `.problem-reading-rail { display: none }`
+   * override if reading-layout.css were imported after index.css. main.tsx
+   * must import reading-layout.css BEFORE index.css so the domain-owned
+   * visibility rule always wins.
+   */
+  it("main.tsx imports styles/reading-layout.css before index.css (cascade order for .problem-reading-rail vs .lyt-reading-rail)", () => {
+    const mainSource = readFileSync(path.join(__dirname, "..", "main.tsx"), "utf-8");
+    const readingLayoutImportIndex = mainSource.indexOf('"./styles/reading-layout.css"');
+    const indexCssImportIndex = mainSource.indexOf('"./index.css"');
+    expect(readingLayoutImportIndex).toBeGreaterThan(-1);
+    expect(indexCssImportIndex).toBeGreaterThan(-1);
+    expect(readingLayoutImportIndex).toBeLessThan(indexCssImportIndex);
   });
 });
 

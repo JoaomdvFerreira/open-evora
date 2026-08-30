@@ -919,8 +919,8 @@ function RecordDetailContent({
         <ContextTabs prbId={detail.id} active="detail" onOpenGeneric={onSelect} onViewAsProblem={onViewAsProblem} onViewHistory={onViewHistory} />
       )}
 
-      <div className="record-detail-columns">
-        <div className="record-detail-main">
+      <div className="lyt-reading" data-rail="present">
+        <div className="record-detail-main lyt-reading-main">
           {isEvd ? (
             <EvdDetail detail={detail} lookup={lookup} problemUses={evdProblemUses} onSelect={onSelect} />
           ) : (
@@ -1003,7 +1003,7 @@ function RecordDetailContent({
           )}
         </div>
 
-        <aside className="record-detail-rail" aria-label="Mais ações">
+        <aside className="lyt-reading-rail" aria-label="Mais ações">
           <div className="detail-rail-type-note">
             <code>{detail.type}</code>
             <p>{typeInfo.description}</p>

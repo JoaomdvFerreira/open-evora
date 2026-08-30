@@ -675,7 +675,6 @@ code {
   --space-11: 90px;
   --control-height: 40px;
   --tap-min: 44px;
-  --detail-gap: 44px;
   --radius-sm: 3px;
   --radius-md: 4px;
   --radius-lg: 5px;
@@ -1493,12 +1492,13 @@ main.explorer-shell {
   outline-color: var(--accent);
 }
 
-/* V2: Record Detail (design-system.md §1/§2 — desktop composition is 720px
-   main column + 44px gap (--detail-gap) + 216px rail = 980px total; every
-   size/family below is one of the semantic recipes, never assembled
-   ad hoc). Desktop-only sizing lives here; compact overrides are in the
-   existing 767px media query below. No shadows — separation comes from
-   1px borders and the canvas/surface steps only. */
+/* V2: Record Detail (design-system.md §1/§2 — desktop composition is the
+   canonical ReadingLayout 720px main + 44px gap + 216px rail = 980px total,
+   DS-05J, styles/reading-layout.css; every size/family below is one of the
+   semantic recipes, never assembled ad hoc). Desktop-only sizing lives
+   here; compact overrides are in the existing 767px media query below. No
+   shadows — separation comes from 1px borders and the canvas/surface steps
+   only. */
 .record-detail-heading {
   position: absolute;
   width: 1px;
@@ -1566,28 +1566,12 @@ main.explorer-shell {
   }
 }
 
-.record-detail-columns {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--detail-gap);
-  width: 100%;
-}
-
-.record-detail-main {
-  flex: 1 1 auto;
-  min-width: 0;
-  max-width: 720px;
-}
-
-.record-detail-rail {
-  flex: 0 0 216px;
-  width: 216px;
-  position: sticky;
-  top: var(--space-6);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-}
+/* DS-05J: `.record-detail-main` no longer owns reading geometry (moved to
+   the canonical `.lyt-reading-main`, styles/reading-layout.css) — it
+   remains solely as a domain/style hook for the descendant selectors below
+   (.record-meaning-zone, .record-meaning, .record-role-fields,
+   .record-provenance). `.record-detail-columns`/`.record-detail-rail` are
+   retired; production JSX now carries `.lyt-reading`/`.lyt-reading-rail`. */
 
 .detail-rail-type-note {
   border: 1px solid var(--line);
@@ -2090,28 +2074,16 @@ main.explorer-shell {
 
 /* F1 intermediate reading-layout recomposition (768px-1059px): the
    canonical 720 main + 44 gap + 216 rail composition cannot fit in this
-   band without destructively compressing the 720px reading column. Reuse
-   the compact single-column recomposition for the two reading surfaces
-   only (Record Detail, Problem View) rather than a parallel layout
-   system; compact typography/navigation rules are intentionally excluded.
-   At >=1060px the canonical two-column geometry resumes unchanged. */
+   band without destructively compressing the 720px reading column.
+   DS-05J: the geometry recomposition itself (flex-direction/gap/max-width/
+   rail static+width) is now owned by the canonical `.lyt-reading`/`-main`/
+   `-rail` rules in styles/reading-layout.css (imported by main.tsx) for
+   both reading surfaces (Record Detail, Problem View) — this block keeps
+   only the domain-owned rail/index *visibility* rules, which stay
+   independent of ReadingLayout itself (component-model.md §2.2: layout
+   primitives do not decide content presence). At >=1060px the canonical
+   two-column geometry resumes unchanged. */
 @media (min-width: 768px) and (max-width: 1059px) {
-  .record-detail-columns {
-    flex-direction: column;
-    gap: var(--space-6);
-  }
-
-  .record-detail-main {
-    max-width: 720px;
-  }
-
-  .record-detail-rail {
-    position: static;
-    width: 100%;
-    max-width: 720px;
-    flex-basis: auto;
-  }
-
   .problem-reading-rail {
     display: none;
   }
@@ -2356,26 +2328,14 @@ main.explorer-shell {
 
   /* V2: Record Detail compact recomposition — full-bleed, single column,
      rail content flows after the main content instead of sitting beside
-     it. No horizontal overflow at 360px (design-system.md §0.1/§1). */
+     it. No horizontal overflow at 360px (design-system.md §0.1/§1).
+     DS-05J: the geometry itself (flex-direction/gap/max-width/rail
+     static+width) is now owned by the canonical `.lyt-reading`/`-main`/
+     `-rail` compact rules in styles/reading-layout.css; only the
+     domain-owned compact typography override remains here. */
   .detail-breadcrumb {
     margin-bottom: var(--space-4);
     font-size: 12px;
-  }
-
-  .record-detail-columns {
-    flex-direction: column;
-    gap: var(--space-6);
-    max-width: 100%;
-  }
-
-  .record-detail-main {
-    max-width: 100%;
-  }
-
-  .record-detail-rail {
-    position: static;
-    width: 100%;
-    flex-basis: auto;
   }
 
   .record-detail-main .record-meaning {
@@ -2395,20 +2355,18 @@ main.explorer-shell {
 /* V3/UX-B: Problem View (design-system.md §1/§2/§3, Prototype B) — an
    editorial reading composition sharing the Breadcrumb pattern with Record
    Detail and the ContextTabs pattern (Detalhe/Problema/Grafo) unique to
-   PRB-scoped surfaces. UX-B adds a desktop reading rail reusing Record
-   Detail's exact two-column geometry (`.record-detail-columns`/`-main`/
-   `-rail`: 720px main + 44px `--detail-gap` + 216px rail = 980px), rather
-   than a second bespoke rail width — `.problem-view`'s own frame widens
-   from the original 800px main-only reading width to that same 980px total
-   to house it. Desktop sizing lives here; compact overrides are in the
-   767px media query below. No shadows — separation comes from 1px borders
-   and surface steps only. */
+   PRB-scoped surfaces. UX-B adds a desktop reading rail reusing the same
+   canonical ReadingLayout geometry as Record Detail (DS-05J: `.lyt-reading`/
+   `-main`/`-rail`, styles/reading-layout.css — 720px main + 44px gap +
+   216px rail = 980px), rather than a second bespoke rail width —
+   `.problem-view`'s own frame widens from the original 800px main-only
+   reading width to that same 980px total to house it. `.problem-view-columns`
+   is retired: it carried only `align-items: flex-start`, already the
+   canonical `.lyt-reading` base rule, and JSX no longer uses it. Desktop
+   sizing lives here; compact overrides are in the 767px media query below.
+   No shadows — separation comes from 1px borders and surface steps only. */
 .problem-view {
   padding-bottom: var(--space-9);
-}
-
-.problem-view-columns {
-  align-items: flex-start;
 }
 
 .context-tabs {
@@ -2849,10 +2807,6 @@ main.explorer-shell {
 @media (max-width: 767px) {
   .problem-view {
     max-width: 100%;
-  }
-
-  .problem-view-columns {
-    display: block;
   }
 
   /* No persistent side rail on compact (UX-B §4) — the "Nesta página"

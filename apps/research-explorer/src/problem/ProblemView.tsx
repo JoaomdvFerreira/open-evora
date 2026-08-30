@@ -416,19 +416,20 @@ function toSectionIndexEntries(sections: ProblemSectionIndexEntry[]): SectionInd
 
 /**
  * Desktop reading rail (scope §3/§4, UX-C §3): reuses Record Detail's
- * rail/layout pattern (`.record-detail-rail`, `.detail-rail-type-note`)
- * rather than inventing a second sticky-rail treatment. Provides lightweight
- * contextual orientation and a "Nesta página" index — the global
- * ReadingGuide no longer exists on this surface (UX-C §3), so this rail is
- * Problem View's own, self-sufficient orientation, not a link into it.
- * Desktop-only by CSS (hidden under the existing 767px breakpoint, matching
- * `.record-detail-rail`); compact gets the equivalent index in-flow via
- * `ProblemHelpDisclosure` instead (Slice UX-B §4).
+ * rail/layout pattern (DS-05J: canonical `.lyt-reading-rail`,
+ * styles/reading-layout.css; `.detail-rail-type-note`) rather than inventing
+ * a second sticky-rail treatment. Provides lightweight contextual
+ * orientation and a "Nesta página" index — the global ReadingGuide no
+ * longer exists on this surface (UX-C §3), so this rail is Problem View's
+ * own, self-sufficient orientation, not a link into it. `.problem-reading-rail`
+ * remains the domain-owned visibility hook (hidden under 1059px, matching
+ * `.lyt-reading-rail`'s own recomposition); compact gets the equivalent
+ * index in-flow via `ProblemHelpDisclosure` instead (Slice UX-B §4).
  */
 function ProblemReadingRail({ record }: { record: Record<string, unknown> }) {
   const sections = problemSectionIndex(record);
   return (
-    <aside className="record-detail-rail problem-reading-rail">
+    <aside className="lyt-reading-rail problem-reading-rail">
       <div className="detail-rail-type-note">
         <p>
           Cada secção reúne o que já é canónico sobre este Problema — nenhuma ordem ou destaque aqui implica classificação, força ou
@@ -1000,8 +1001,8 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
       <ProblemHelpDisclosure record={record} />
       <ProblemCompactSectionIndex record={record} />
 
-      <div className="record-detail-columns problem-view-columns">
-        <div className="record-detail-main">
+      <div className="lyt-reading" data-rail="present">
+        <div className="record-detail-main lyt-reading-main">
           <ProblemHeader problemId={problem.id} record={record} headingRef={headingRef} />
           <p className="problem-file-path">
             <code>{problem.file}</code>
