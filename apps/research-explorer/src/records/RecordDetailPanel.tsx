@@ -357,11 +357,10 @@ function Breadcrumb({ detail, onBackToRecords }: { detail: RecordDetail; onBackT
   );
 }
 
-/** TechnicalID / TypeBadge row above the meaning sentence: RecordTypeLabel owns the public type meaning, RecordIdentifier owns the canonical prefix as a separate identity dimension — never combined back into one generic badge. */
+/** TypeBadge row above the meaning sentence: RecordTypeLabel owns the public type meaning for detail.type (a canonical type prefix, e.g. "EVD-" — not a complete canonical record identifier, so it is never passed to RecordIdentifier). The record's own complete canonical identity remains separately available via ProvenancePanel/the breadcrumb. */
 function TypeBadge({ detail }: { detail: RecordDetail }) {
   return (
     <div className="detail-type-row">
-      <RecordIdentifier variant="text" id={detail.type} density="compact" />
       <RecordTypeLabel prefix={detail.type} variant="detail" />
     </div>
   );
