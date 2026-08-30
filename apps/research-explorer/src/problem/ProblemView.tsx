@@ -16,6 +16,7 @@ import { RecordIdentifier } from "../records/RecordIdentifier";
 import { RecordTypeLabel } from "../records/RecordTypeLabel";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { EmptyState } from "../presentation/EmptyState";
 import { RailSectionIndex } from "../presentation/RailSectionIndex";
 import { CompactSectionIndex } from "../presentation/CompactSectionIndex";
 import type { SectionIndexEntry } from "../presentation/SectionIndexEntry";
@@ -1018,7 +1019,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
             )}
             <EffectOccurrenceSummary evidence={evidence} />
             {evidence.length === 0 ? (
-              <p>Nenhuma evidência associada.</p>
+              <EmptyState message="Nenhuma evidência associada." />
             ) : (
               (() => {
                 const groups = groupEvidenceByDecisionBasis(record, evidence);

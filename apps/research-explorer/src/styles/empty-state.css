@@ -1,0 +1,30 @@
+/* DS-05I — canonical production EmptyState visual recipe, moved (not
+   duplicated) from styles/ui.css so the production application can depend
+   on EmptyState without importing the rest of ui.css, which still carries
+   unrelated selectors/collision risk (`.unavailable-control`/
+   `.unavailable-note` collide with index.css's own production selectors of
+   the same name) — same rationale as breadcrumb.css (DS-05E) and
+   feedback.css (DS-05F). Imported by ui.css so Storybook's existing
+   `.ui-empty-state*` consumers keep the exact same behaviour unchanged.
+   Visual recipe is unchanged from its prior ui.css definition. */
+
+/* ---- EmptyState -----------------------------------------------------------
+   Ordinary content, not an alert: current evidence is plain empty-result
+   copy (no border/fill in current production). Kept on ordinary ink so it
+   cannot be mistaken for ErrorNotice at a glance, per the approved
+   visual contract ("ProgressMessage, ErrorNotice, and EmptyState remain
+   visually and semantically distinct treatments"). */
+.ui-empty-state {
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-empty-state-message {
+  margin: 0;
+}
+
+.ui-empty-state > * + * {
+  margin-top: var(--space-tight);
+}

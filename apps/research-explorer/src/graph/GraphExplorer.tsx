@@ -20,6 +20,7 @@ import { FOCUS_NODE_COLOR, typeVisual } from "./typeVisuals";
 import type { ResearchGraph } from "./buildGraphModel";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { EmptyState } from "../presentation/EmptyState";
 import { ContextTabs } from "../navigation/ContextTabs";
 
 const ERROR_TITLES: Record<string, string> = {
@@ -350,7 +351,7 @@ export function GraphExplorer({
           <section aria-labelledby="graph-nodes-heading">
             <h3 id="graph-nodes-heading">Nós visíveis</h3>
             {view!.nodeIds.length === 0 ? (
-              <p>Nenhum nó visível com os filtros atuais.</p>
+              <EmptyState message="Nenhum nó visível com os filtros atuais." />
             ) : (
               <ul>
                 {view!.nodeIds.map((id) => {
@@ -377,7 +378,7 @@ export function GraphExplorer({
               causalidade.
             </p>
             {rows.length === 0 ? (
-              <p>Nenhuma relação visível com os filtros atuais.</p>
+              <EmptyState message="Nenhuma relação visível com os filtros atuais." />
             ) : (
               <div className="graph-edges-table-scroll">
                 <table>

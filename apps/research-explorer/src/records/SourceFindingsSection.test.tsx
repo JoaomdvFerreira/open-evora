@@ -24,4 +24,11 @@ describe("SourceFindingsSection vNext", () => {
     expect(container.querySelectorAll("dl.ui-fact-list")).toHaveLength(0);
     expect(screen.getByText("Ainda não existem observações da investigação ligadas explicitamente a esta fonte.")).toBeTruthy();
   });
+
+  it("DS-05I: renders the resolved zero-relations branch as EmptyState", () => {
+    const empty: SourceEvidenceRelations = { evidence: [], uniqueEvidenceCount: 0, relatedProblems: [] };
+    render(<SourceFindingsSection relations={empty} />);
+    const message = screen.getByText("Ainda não existem observações da investigação ligadas explicitamente a esta fonte.");
+    expect(message.className).toBe("ui-empty-state-message");
+  });
 });

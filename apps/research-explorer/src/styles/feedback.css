@@ -8,8 +8,8 @@
    `.ui-error-notice*` consumers keep the exact same behaviour unchanged.
    Visual recipes are unchanged from their prior ui.css definitions.
 
-   EmptyState's `.ui-empty-state*` selectors stay in ui.css: EmptyState
-   remains Storybook-only until DS-05I and is not part of this boundary
+   EmptyState's `.ui-empty-state*` selectors live in their own file
+   (empty-state.css, DS-05I) and are not part of this boundary
    (component-model.md §4.3 "ProgressMessage", "ErrorNotice", "EmptyState";
    Gate C1 decision 6: three separate explicit boundaries). */
 

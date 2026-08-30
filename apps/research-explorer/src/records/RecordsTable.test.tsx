@@ -128,4 +128,13 @@ describe("RecordsTable — width-independent behavior", () => {
     expect(screen.queryByRole("table")).toBeNull();
     expect(screen.queryByRole("list", { name: "Registos" })).toBeNull();
   });
+
+  it("DS-05I: renders the zero-result state as EmptyState with the exact copy, and keeps the result-count live region intact", () => {
+    renderTable({ query: "no-such-record-anywhere" });
+    const message = screen.getByText("Nenhum resultado.");
+    expect(message.className).toBe("ui-empty-state-message");
+    const liveRegion = screen.getByText(/registos encontrados\.$/);
+    expect(liveRegion.getAttribute("aria-live")).toBe("polite");
+    expect(liveRegion.textContent).toBe("0 registos encontrados.");
+  });
 });

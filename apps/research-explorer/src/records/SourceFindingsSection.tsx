@@ -3,6 +3,7 @@ import type { SourceEvidenceRelations } from "./sourceEvidenceRelations";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 import { RecordIdentifier } from "./RecordIdentifier";
 import { FactList, type FactListRow } from "../presentation/FactList";
+import { EmptyState } from "../presentation/EmptyState";
 
 function objectValue(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
@@ -42,7 +43,7 @@ export function SourceFindingsSection({ relations, onSelect }: { relations: Sour
   return (
     <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="record-editorial-section source-findings-section">
       <h3 className="detail-panel-label">O que encontrámos</h3>
-      {relations.evidence.length === 0 ? <p className="field-empty">Ainda não existem observações da investigação ligadas explicitamente a esta fonte.</p> : (
+      {relations.evidence.length === 0 ? <EmptyState message="Ainda não existem observações da investigação ligadas explicitamente a esta fonte." /> : (
         <>
           <FactList rows={[{ key: "unique-evidence-count", label: "Observações relacionadas", value: relations.uniqueEvidenceCount }]} />
           <div className="source-finding-group"><h4 className="record-editorial-subheading">Observações com esta fonte de proveniência</h4><ul className="source-finding-list">{relations.evidence.map((item) => <EvidenceFindingItem key={item.id} evidence={item} onSelect={onSelect} />)}</ul></div>

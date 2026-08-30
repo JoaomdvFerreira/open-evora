@@ -93,6 +93,31 @@ describe("ProblemView vNext", () => {
   });
 });
 
+describe("ProblemView DS-05I — EmptyState adoption", () => {
+  it("renders EmptyState with the exact copy when the resolved Evidence collection is zero", async () => {
+    const sparseRecords: Record<string, RecordDetail> = { ...records, "PRB-1": { ...records["PRB-1"], record: { title: "Sem opcionais", evidence: [] }, outgoingEdges: [] } };
+    const sparseProvider: DataProvider = { ...provider, getRecord: async (id) => sparseRecords[id] };
+    render(<ProblemView {...props} dataProvider={sparseProvider} problemId="PRB-1" />);
+    const message = await screen.findByText("Nenhuma evidência associada.");
+    expect(message.className).toBe("ui-empty-state-message");
+  });
+
+  it("keeps a missing PRB→EVD effect as field-empty, not EmptyState", async () => {
+    const noEffectRecords: Record<string, RecordDetail> = {
+      ...records,
+      "PRB-1": {
+        ...records["PRB-1"],
+        record: { ...prbRecord, evidence: [{ evidence_id: "EVD-1", research_roles: ["LOCAL_OBSERVATION"] }] },
+      },
+    };
+    const noEffectProvider: DataProvider = { ...provider, getRecord: async (id) => noEffectRecords[id] };
+    render(<ProblemView {...props} dataProvider={noEffectProvider} problemId="PRB-1" />);
+    const missing = await screen.findAllByText("efeito não registado.");
+    expect(missing.length).toBeGreaterThan(0);
+    missing.forEach((node) => expect(node.className).toBe("field-empty"));
+  });
+});
+
 describe("ProblemView DS-05H — RailSectionIndex/CompactSectionIndex adoption", () => {
   it("rail and compact 'Nesta página' indexes expose identical ordered entries/hrefs", async () => {
     render(<ProblemView {...props} problemId="PRB-1" />);

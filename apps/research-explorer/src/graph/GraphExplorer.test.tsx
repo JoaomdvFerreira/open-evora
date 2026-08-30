@@ -370,6 +370,40 @@ describe("GraphExplorer", () => {
     expect(screen.queryByRole("navigation", { name: "Nesta página" })).toBeNull();
   });
 
+  it("DS-05I: renders EmptyState with the exact copy for a zero-relations focused node, and keeps the orientation copy ordinary when unfocused", async () => {
+    render(
+      <GraphExplorer
+        dataProvider={fakeProvider()}
+        focusId="EVD-ISOLATED"
+        depth={1}
+        onFocusChange={vi.fn()}
+        onClearFocus={vi.fn()}
+        onDepthChange={vi.fn()}
+        onOpenGeneric={vi.fn()}
+        onViewAsProblem={vi.fn()}
+      />
+    );
+    const message = await screen.findByText("Nenhuma relação visível com os filtros atuais.");
+    expect(message.className).toBe("ui-empty-state-message");
+  });
+
+  it("DS-05I: keeps the no-selection orientation guidance as ordinary content, not EmptyState", async () => {
+    render(
+      <GraphExplorer
+        dataProvider={fakeProvider()}
+        focusId={null}
+        depth={1}
+        onFocusChange={vi.fn()}
+        onClearFocus={vi.fn()}
+        onDepthChange={vi.fn()}
+        onOpenGeneric={vi.fn()}
+        onViewAsProblem={vi.fn()}
+      />
+    );
+    const orientation = await screen.findByText(/Procure e selecione um registo/);
+    expect(orientation.className).not.toBe("ui-empty-state-message");
+  });
+
   it("does not infer SUPPORTS/CONTRADICTS/CAUSES semantics anywhere in the rendered output", async () => {
     render(
       <GraphExplorer
