@@ -8,11 +8,14 @@
    EvidenceEffectTag composes rather than duplicates; RecordIdentifier and
    RecordTypeLabel keep their own anatomy (see below).
 
-   Storybook-only for now: not imported by the production application (see
-   apps/research-explorer/src/index.css, which owns the equivalent current
-   production classes .detail-technical-field/.prb-reference-target,
-   .detail-type-badge/.narrow-record-type/.desktop-record-type, and
-   .effect-chip unchanged in this phase).
+   Imported by the production application since DS-05A. RecordIdentifier and
+   RecordTypeLabel are production-adopted as of DS-05D at the record-list
+   (RecordsTable.tsx/NarrowRecordsList.tsx), generic Record Detail
+   (RecordDetailPanel.tsx), and EVD identity (EvdDetail.tsx) call sites;
+   EvidenceEffectTag/ResearchRoleTag were adopted at their own call sites in
+   DS-05C. .detail-technical-field/.prb-reference-target remain untouched
+   production classes for the actionable-identifier call sites deferred to
+   DS-05E.
 
    This file exists separately from ui.css precisely because these three
    classes carry domain meaning (record identity, record type, PRB→EVD

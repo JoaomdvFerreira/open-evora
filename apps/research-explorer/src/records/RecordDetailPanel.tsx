@@ -3,6 +3,8 @@ import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/
 import { useRecordDetail } from "./useRecordDetail";
 import { RecordFieldTree } from "./RecordFieldTree";
 import { describeType, formatTypedId, knownTypePrefixes } from "../presentation/typeGlossary";
+import { RecordTypeLabel } from "./RecordTypeLabel";
+import { RecordIdentifier } from "./RecordIdentifier";
 import { findMeaningField } from "./meaningField";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation/presentation";
 import { ContextTabs } from "../navigation/ContextTabs";
@@ -355,14 +357,11 @@ function Breadcrumb({ detail, onBackToRecords }: { detail: RecordDetail; onBackT
   );
 }
 
-/** TechnicalID / TypeBadge row above the meaning sentence. */
+/** TypeBadge row above the meaning sentence: RecordTypeLabel owns the public type meaning for detail.type (a canonical type prefix, e.g. "EVD-" — not a complete canonical record identifier, so it is never passed to RecordIdentifier). The record's own complete canonical identity remains separately available via ProvenancePanel/the breadcrumb. */
 function TypeBadge({ detail }: { detail: RecordDetail }) {
-  const typeInfo = describeType(detail.type);
   return (
     <div className="detail-type-row">
-      <span className="detail-type-badge">
-        <code>{detail.type}</code> {typeInfo.label}
-      </span>
+      <RecordTypeLabel prefix={detail.type} variant="detail" />
     </div>
   );
 }
@@ -789,7 +788,9 @@ function ProvenancePanel({ detail }: { detail: RecordDetail }) {
       <h3 className="detail-panel-label">Proveniência</h3>
       <dl className="detail-provenance-grid">
         <dt>ID</dt>
-        <dd className="detail-technical-field">{detail.id}</dd>
+        <dd>
+          <RecordIdentifier variant="text" id={detail.id} density="standard" />
+        </dd>
         <dt>Ficheiro</dt>
         <dd className="detail-technical-field">{detail.file}</dd>
         <dt>Relações</dt>

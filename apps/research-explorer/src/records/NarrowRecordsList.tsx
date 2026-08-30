@@ -1,4 +1,6 @@
 import type { RecordSummary } from "../dataProvider/types";
+import { RecordTypeLabel } from "./RecordTypeLabel";
+import { RecordIdentifier } from "./RecordIdentifier";
 
 interface NarrowRecordsListProps {
   /** Already filtered, sorted, and paginated — the same rows the desktop table would render for this page, never a second data pipeline. */
@@ -28,13 +30,19 @@ export function NarrowRecordsList({ records, selectedId, onSelect }: NarrowRecor
         return (
           <li key={record.id}>
             <button type="button" className="narrow-record-row" aria-pressed={isSelected} onClick={() => onSelect(record.id)}>
-              <span className="narrow-record-type">{record.type}</span>
+              <span className="narrow-record-type">
+                <RecordTypeLabel prefix={record.type} variant="compact" />
+              </span>
               <span className="narrow-record-text">
                 <span className="narrow-record-label">
                   {isSelected ? "● " : ""}
                   {record.label}
                 </span>
-                {hasDistinctLabel && <span className="narrow-record-id">{record.id}</span>}
+                {hasDistinctLabel && (
+                  <span className="narrow-record-id">
+                    <RecordIdentifier variant="text" id={record.id} density="compact" />
+                  </span>
+                )}
               </span>
               <span className="narrow-record-chevron" aria-hidden="true">
                 ›
