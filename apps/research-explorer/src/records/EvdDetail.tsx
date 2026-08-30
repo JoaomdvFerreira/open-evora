@@ -4,6 +4,8 @@ import { formatPublicDate, formatPublicPartialDate, publicEnumLabel } from "../p
 import { describeType } from "../presentation/typeGlossary";
 import { RecordFieldTree } from "./RecordFieldTree";
 import { CompactSectionIndex, type CompactSectionIndexEntry } from "./CompactSectionIndex";
+import { EvidenceEffectTag } from "./EvidenceEffectTag";
+import { ResearchRoleTag } from "./ResearchRoleTag";
 import type { EVDProblemUsesState } from "./useEvdProblemUses";
 
 const EVD_SECTIONS: CompactSectionIndexEntry[] = [
@@ -79,8 +81,8 @@ function EvdInvestigation({ state, onSelect }: { state: EVDProblemUsesState & { 
       return <li key={`${use.detail.id}-${use.relationshipPath}`} className="evd-problem-card">
         <div className="evd-problem-heading"><code>{use.detail.id}</code>{title && <span>{title}</span>}</div>
         <dl className="evd-relation-facts">
-          <dt>Efeito</dt><dd>{use.effects.map((effect, index) => <span key={`${effect}-${index}`} className="effect-chip">{publicEnumLabel("effects", effect)}</span>)}</dd>
-          <dt>Papel</dt><dd>{use.researchRoles.map((role, index) => <span key={`${role}-${index}`} className="record-role-chip">{publicEnumLabel("research_roles", role)}</span>)}</dd>
+          <dt>Efeito</dt><dd>{use.effects.map((effect, index) => <EvidenceEffectTag key={`${effect}-${index}`} effect={effect} variant="compact" />)}</dd>
+          <dt>Papel</dt><dd>{use.researchRoles.map((role, index) => <ResearchRoleTag key={`${role}-${index}`} role={role} variant="compact" />)}</dd>
         </dl>
         <button type="button" className="evd-problem-action" onClick={() => onSelect(use.detail.id)}>Ver Problema →</button>
       </li>;

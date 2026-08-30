@@ -7,6 +7,7 @@ import { summarizeEffects } from "./effectSummary";
 import { DISCLOSURE_FIELDS, DISCLOSURE_FIELD_LABELS, glossFor, type FieldGloss } from "./statusGloss";
 import { ProblemLifecycleStatus } from "./ProblemLifecycleStatus";
 import { ValidationStatus, EvidenceStatus } from "./InvestigationStatus";
+import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { describeType, formatTypedId } from "../presentation/typeGlossary";
 import { formatPublicCount, publicEnumLabel } from "../presentation/presentation";
 import { ContextTabs } from "../navigation/ContextTabs";
@@ -633,7 +634,7 @@ function EvidenceCard({ detail, sources, effects = [], onOpenGeneric }: Evidence
         />
         <span className="evidence-item-effects" aria-label="Efeito canónico no Problema">
           {relationshipEffects.length > 0 ? (
-            relationshipEffects.map((value, index) => <span key={`${value}-${index}`} className="effect-chip">{publicEnumLabel("effects", value)}</span>)
+            relationshipEffects.map((value, index) => <EvidenceEffectTag key={`${value}-${index}`} effect={value} variant="standard" />)
           ) : (
             <span className="field-empty">efeito não registado.</span>
           )}
@@ -716,7 +717,7 @@ function EffectOccurrenceSummary({ evidence }: { evidence: EvidenceWithSources[]
       <div className="effect-summary-chips">
         {summary.occurrences.map(({ value, count }) => (
           <span key={value} className="effect-summary-chip">
-            <span className="effect-chip">{value === "CONTRADICTS" ? "Contradiz" : value === "SUPPORTS" ? "Sustenta" : value === "REFINES" ? "Refina" : "Delimita"}</span> <span className="effect-count">{count} {count === 1 ? "ocorrência" : "ocorrências"}</span>
+            <EvidenceEffectTag effect={value} variant="compact" /> <span className="effect-count">{count} {count === 1 ? "ocorrência" : "ocorrências"}</span>
           </span>
         ))}
       </div>
