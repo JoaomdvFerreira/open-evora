@@ -1075,6 +1075,7 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
               ancestor-only nav rather than forcing an empty `current` node
               through the generic Breadcrumb, which always renders one. */}
           <ErrorNotice
+            titleAs="h3"
             title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o registo"}
             message={state.error.message}
             action={

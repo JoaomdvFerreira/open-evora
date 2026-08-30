@@ -144,17 +144,18 @@ export function GraphExplorer({
 
   if (state.status === "error") {
     return (
-      <div ref={errorRef} tabIndex={-1}>
-        <ErrorNotice
-          title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o grafo"}
-          message={state.error.message}
-          action={
-            <button type="button" onClick={state.retry}>
-              Tentar novamente
-            </button>
-          }
-        />
-      </div>
+      <ErrorNotice
+        ref={errorRef}
+        tabIndex={-1}
+        titleAs="h2"
+        title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o grafo"}
+        message={state.error.message}
+        action={
+          <button type="button" onClick={state.retry}>
+            Tentar novamente
+          </button>
+        }
+      />
     );
   }
 
@@ -163,17 +164,18 @@ export function GraphExplorer({
     return (
       <section aria-labelledby="graph-heading" className="graph-explorer">
         <h2 id="graph-heading">Grafo</h2>
-        <div ref={invalidFocusRef} tabIndex={-1}>
-          <ErrorNotice
-            title="Registo focado não encontrado"
-            message="O identificador no endereço não corresponde a um registo disponível neste grafo."
-            action={
-              <button type="button" onClick={onClearFocus}>
-                Limpar seleção e escolher outro registo
-              </button>
-            }
-          />
-        </div>
+        <ErrorNotice
+          ref={invalidFocusRef}
+          tabIndex={-1}
+          titleAs="h3"
+          title="Registo focado não encontrado"
+          message="O identificador no endereço não corresponde a um registo disponível neste grafo."
+          action={
+            <button type="button" onClick={onClearFocus}>
+              Limpar seleção e escolher outro registo
+            </button>
+          }
+        />
       </section>
     );
   }

@@ -62,6 +62,7 @@ export function RecordsExplorer({
   if (indexState.status === "error") {
     return (
       <ErrorNotice
+        titleAs="h2"
         title={ERROR_TITLES[indexState.error.kind] ?? "Não foi possível carregar os registos"}
         message={indexState.error.message}
         action={

@@ -47,6 +47,7 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
 
         {state.status === "error" && (
           <ErrorNotice
+            titleAs="h2"
             title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Explorer"}
             message={state.error.message}
             action={

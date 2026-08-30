@@ -967,17 +967,18 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
 
   if (state.status === "error") {
     return (
-      <div ref={errorRef} tabIndex={-1}>
-        <ErrorNotice
-          title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Problema"}
-          message={state.error.message}
-          action={
-            <button type="button" onClick={state.retry}>
-              Tentar novamente
-            </button>
-          }
-        />
-      </div>
+      <ErrorNotice
+        ref={errorRef}
+        tabIndex={-1}
+        titleAs="h2"
+        title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Problema"}
+        message={state.error.message}
+        action={
+          <button type="button" onClick={state.retry}>
+            Tentar novamente
+          </button>
+        }
+      />
     );
   }
 
@@ -1066,6 +1067,7 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
   if (indexState.status === "error") {
     return (
       <ErrorNotice
+        titleAs="h2"
         title="Não foi possível carregar os registos"
         message={indexState.error.message}
         action={
@@ -1092,6 +1094,7 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
   if (summary && summary.type !== "PRB-") {
     return (
       <ErrorNotice
+        titleAs="h2"
         title="Este registo não é um Problema"
         message={`${formatTypedId(summary.type, problemId)} não pode ser aberto como vista de Problema.`}
         action={

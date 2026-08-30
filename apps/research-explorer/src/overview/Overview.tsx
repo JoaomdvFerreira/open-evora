@@ -66,6 +66,7 @@ export function Overview({
   if (indexState.status === "error") {
     return (
       <ErrorNotice
+        titleAs="h2"
         title={ERROR_TITLES[indexState.error.kind] ?? "Não foi possível carregar a visão geral"}
         message={indexState.error.message}
       />

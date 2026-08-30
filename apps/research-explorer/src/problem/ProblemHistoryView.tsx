@@ -109,7 +109,7 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
   }, [detail]);
 
   if (error) {
-    return <ErrorNotice title="Não foi possível carregar o histórico" message={error instanceof Error ? error.message : String(error)} />;
+    return <ErrorNotice titleAs="h2" title="Não foi possível carregar o histórico" message={error instanceof Error ? error.message : String(error)} />;
   }
   if (!detail) return <ProgressMessage message={`A carregar histórico de ${problemId}…`} />;
 
@@ -146,12 +146,12 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
 export function ProblemHistoryView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewAsProblem }: ProblemHistoryViewProps) {
   const indexState = useRecordIndex(dataProvider);
   if (indexState.status === "loading") return <ProgressMessage message="A carregar…" />;
-  if (indexState.status === "error") return <ErrorNotice title="Não foi possível carregar os registos" message={indexState.error.message} action={<button type="button" onClick={indexState.retry}>Tentar novamente</button>} />;
+  if (indexState.status === "error") return <ErrorNotice titleAs="h2" title="Não foi possível carregar os registos" message={indexState.error.message} action={<button type="button" onClick={indexState.retry}>Tentar novamente</button>} />;
   if (problemId === null) return <div><p>Nenhum Problema selecionado.</p><button type="button" onClick={onBackToRecords}>Procurar um Problema em Registos</button></div>;
 
   const summary = indexState.lookup.get(problemId);
   if (summary && summary.type !== "PRB-") {
-    return <ErrorNotice title="Este registo não é um Problema" message={`${formatTypedId(summary.type, problemId)} não pode ser aberto como histórico.`} action={<button type="button" onClick={() => onOpenGeneric(problemId)}>Ver detalhe genérico</button>} />;
+    return <ErrorNotice titleAs="h2" title="Este registo não é um Problema" message={`${formatTypedId(summary.type, problemId)} não pode ser aberto como histórico.`} action={<button type="button" onClick={() => onOpenGeneric(problemId)}>Ver detalhe genérico</button>} />;
   }
   return <ProblemHistoryContent dataProvider={dataProvider} problemId={problemId} onOpenGeneric={onOpenGeneric} onBackToOverview={onBackToOverview} onViewAsProblem={onViewAsProblem} />;
 }
