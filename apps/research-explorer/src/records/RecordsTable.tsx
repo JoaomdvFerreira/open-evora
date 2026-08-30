@@ -10,6 +10,7 @@ import { NarrowRecordsList } from "./NarrowRecordsList";
 import { formatPublicCount } from "../presentation/presentation";
 import { RecordTypeLabel } from "./RecordTypeLabel";
 import { RecordIdentifier } from "./RecordIdentifier";
+import { EmptyState } from "../presentation/EmptyState";
 
 interface RecordsTableProps {
   records: RecordSummary[];
@@ -139,7 +140,7 @@ export function RecordsTable({
       </div>
 
       {filtered.length === 0 ? (
-        <p>Nenhum resultado.</p>
+        <EmptyState message="Nenhum resultado." />
       ) : (
         <>
           {isNarrow ? (

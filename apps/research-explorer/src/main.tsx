@@ -29,9 +29,12 @@ import "./styles/domain.css";
 // index.css's own `.unavailable-control`/`.unavailable-note`).
 import "./styles/breadcrumb.css";
 // DS-05F: the narrow canonical ProgressMessage/ErrorNotice visual recipes
-// only (not the rest of ui.css, which still carries EmptyState and other
-// unrelated/colliding selectors).
+// only (not the rest of ui.css, which still carries other unrelated/
+// colliding selectors).
 import "./styles/feedback.css";
+// DS-05I: the narrow canonical EmptyState visual recipe only (not the rest
+// of ui.css, which still carries unrelated selectors/collision risk).
+import "./styles/empty-state.css";
 // DS-05G: the narrow canonical FactList visual recipe only (not the rest of
 // ui.css, which still carries unrelated selectors/collision risk).
 import "./styles/fact-list.css";

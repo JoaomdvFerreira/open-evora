@@ -4,6 +4,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ProgressMessage } from "./ProgressMessage";
 import { ErrorNotice } from "./ErrorNotice";
+import { EmptyState } from "./EmptyState";
 
 describe("ProgressMessage", () => {
   it("exposes role=status/aria-live=polite and the exact caller-supplied copy", () => {
@@ -65,5 +66,38 @@ describe("ErrorNotice", () => {
     expect(ref.current).toBe(alert);
     ref.current?.focus();
     expect(document.activeElement).toBe(alert);
+  });
+});
+
+describe("EmptyState", () => {
+  it("renders the exact caller-supplied message as ordinary content with no alert/status/live-region semantics", () => {
+    const { container } = render(<EmptyState message="Nenhum resultado sintético." />);
+    expect(screen.getByText("Nenhum resultado sintético.")).toBeTruthy();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(container.querySelector("[aria-live]")).toBeNull();
+  });
+
+  it("renders no action when none is supplied", () => {
+    const { container } = render(<EmptyState message="Nenhum resultado sintético." />);
+    expect(container.querySelector("a")).toBeNull();
+    expect(container.querySelector("button")).toBeNull();
+  });
+
+  it("renders and fires a caller-owned action when explicitly supplied", async () => {
+    const onActivate = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <EmptyState
+        message="Nenhuma referência sintética foi encontrada."
+        action={
+          <button type="button" onClick={onActivate}>
+            Ver todos
+          </button>
+        }
+      />
+    );
+    await user.click(screen.getByRole("button", { name: "Ver todos" }));
+    expect(onActivate).toHaveBeenCalledTimes(1);
   });
 });

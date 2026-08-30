@@ -92,6 +92,36 @@ describe("RecordDetailPanel vNext", () => {
   });
 });
 
+describe("RecordDetailPanel DS-05I — EmptyState adoption", () => {
+  it("renders EmptyState with the exact copy when a generic (non-PRB/SRC/EVD) record has zero related-record relations", async () => {
+    const zeroRelations: RecordDetail = { id: "WID-1", type: "WID-", file: "", outgoingEdges: [], incomingEdges: [], record: { name: "Widget isolado." } };
+    renderDetail(zeroRelations, vi.fn(), vi.fn(), "WID-1");
+    const message = await screen.findByText("Nenhum registo relacionado.");
+    expect(message.className).toBe("ui-empty-state-message");
+  });
+
+  it("renders EmptyState with the exact copy when a PRB record has zero derived canonical references", async () => {
+    const prbNoReferences: RecordDetail = { id: "PRB-1", type: "PRB-", file: "", record: { title: "Problema" }, outgoingEdges: [], incomingEdges: [] };
+    renderDetail(prbNoReferences, vi.fn(), vi.fn(), "PRB-1");
+    const message = await screen.findByText("Nenhuma referência canónica registada.");
+    expect(message.className).toBe("ui-empty-state-message");
+  });
+
+  it("keeps a missing PRB inspector value as field-empty, not EmptyState", async () => {
+    renderDetail(records["PRB-1"], vi.fn(), vi.fn(), "PRB-1");
+    const values = await screen.findAllByText("Não registado");
+    expect(values.length).toBeGreaterThan(0);
+    values.forEach((value) => expect(value.className).toBe("field-empty"));
+  });
+
+  it("keeps a missing record title/meaning as non-EmptyState field-empty copy", async () => {
+    const noMeaning: RecordDetail = { id: "SRC-1", type: "SRC-", file: "", record: {}, outgoingEdges: [], incomingEdges: [] };
+    renderDetail(noMeaning, vi.fn(), vi.fn(), "SRC-1");
+    const meaning = await screen.findByText("SRC-1 — sem campo de significado canónico identificado para este tipo de registo.");
+    expect(meaning.className).toContain("field-empty");
+  });
+});
+
 describe("RecordDetailPanel DS-05H — Source RailSectionIndex/CompactSectionIndex adoption", () => {
   const srcMinimal: RecordDetail = {
     id: "SRC-1",

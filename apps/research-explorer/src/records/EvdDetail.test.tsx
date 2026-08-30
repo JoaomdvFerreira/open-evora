@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { evdSectionIndex, EvdDetail, EvdReadingRail } from "./EvdDetail";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
+import { DataLoadError } from "../dataProvider/types";
 import type { EVDProblemUsesState } from "./useEvdProblemUses";
 import type { EVDProblemUse } from "./evdRelations";
 
@@ -135,6 +136,37 @@ describe("EVD relationship and technical FactList facts", () => {
     const technicalList = container.querySelector("#evd-technical dl.ui-fact-list");
     const labels = Array.from(technicalList!.querySelectorAll("dt")).map((node) => node.textContent);
     expect(labels).toEqual(["Ficheiro canónico", "evidence_id"]);
+  });
+});
+
+describe("EVD Detail DS-05I — EmptyState adoption for zero Problem uses", () => {
+  const base: RecordDetail = {
+    id: "EVD-TEST",
+    type: "EVD-",
+    file: "research/evidence/EVD-TEST.yaml",
+    outgoingEdges: [],
+    incomingEdges: [],
+    record: { observation: { summary: "Observação de teste." }, provenance: { sources: [] } },
+  };
+
+  it("renders EmptyState with the exact copy once ready with zero Problem uses", () => {
+    render(<EvdDetail detail={base} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} />);
+    const message = screen.getByText("Esta evidência ainda não está ligada explicitamente a um Problema.");
+    expect(message.className).toBe("ui-empty-state-message");
+  });
+
+  it("keeps loading as ProgressMessage, not EmptyState", () => {
+    render(<EvdDetail detail={base} lookup={lookup} problemUses={{ status: "loading", retry: vi.fn() }} onSelect={vi.fn()} />);
+    expect(screen.getByRole("status").textContent).toBe("A carregar usos nos Problemas…");
+    expect(screen.queryByText("Esta evidência ainda não está ligada explicitamente a um Problema.")).toBeNull();
+  });
+
+  it("keeps error as ErrorNotice with retry, not EmptyState", () => {
+    const retry = vi.fn();
+    render(<EvdDetail detail={base} lookup={lookup} problemUses={{ status: "error", error: new DataLoadError("Falha.", "network"), retry }} onSelect={vi.fn()} />);
+    expect(screen.getByRole("alert")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Tentar novamente" }));
+    expect(retry).toHaveBeenCalledTimes(1);
   });
 });
 

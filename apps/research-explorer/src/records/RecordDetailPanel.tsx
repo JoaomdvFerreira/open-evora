@@ -27,6 +27,7 @@ import { EvdDetail, EvdReadingRail } from "./EvdDetail";
 import { useEvdProblemUses } from "./useEvdProblemUses";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { EmptyState } from "../presentation/EmptyState";
 import { RailSectionIndex } from "../presentation/RailSectionIndex";
 import type { SectionIndexEntry } from "../presentation/SectionIndexEntry";
 import type { SourceSectionIndexEntry } from "./sourceSectionIndex";
@@ -106,7 +107,7 @@ function RelationshipList({ detail, lookup, onSelect }: RelationshipListProps) {
     <section aria-label="Registos relacionados">
       <h4>Registos relacionados</h4>
       {relatedIds.length === 0 ? (
-        <p>Nenhum registo relacionado.</p>
+        <EmptyState message="Nenhum registo relacionado." />
       ) : (
         <ul>
           {relatedIds.map((relatedId) => {
@@ -786,7 +787,7 @@ function PrbCanonicalReferences({ detail, onSelect }: { detail: RecordDetail; on
     <section aria-label="Referências canónicas" className="record-prb-references">
       <h3 className="detail-panel-label">Referências canónicas</h3>
       {filteredReferences.length === 0 ? (
-        <p className="field-empty">Nenhuma referência canónica registada.</p>
+        <EmptyState message="Nenhuma referência canónica registada." />
       ) : (
         <ul className="prb-reference-list">
           {filteredReferences.map((ref, index) => (

@@ -8,6 +8,7 @@ import { RecordTypeLabel } from "./RecordTypeLabel";
 import type { EVDProblemUsesState } from "./useEvdProblemUses";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { EmptyState } from "../presentation/EmptyState";
 import { FactList } from "../presentation/FactList";
 import { CompactSectionIndex } from "../presentation/CompactSectionIndex";
 import { RailSectionIndex } from "../presentation/RailSectionIndex";
@@ -98,7 +99,7 @@ function EvdLimits({ record }: { record: Record<string, unknown> }) {
 function EvdInvestigation({ state, onSelect }: { state: EVDProblemUsesState & { retry: () => void }; onSelect: (id: string) => void }) {
   return <section id="evd-investigation" aria-label="Como é usada na investigação" className="record-editorial-section evd-section">
     <h2 className="detail-panel-label">Como é usada na investigação</h2>
-    {state.status === "loading" || state.status === "idle" ? <ProgressMessage message="A carregar usos nos Problemas…" /> : state.status === "error" ? <ErrorNotice title="Não foi possível carregar os usos desta evidência nos Problemas." message="" action={<button type="button" onClick={state.retry}>Tentar novamente</button>} /> : state.uses.length === 0 ? <p className="field-empty">Esta evidência ainda não está ligada explicitamente a um Problema.</p> : <ul className="evd-problem-list">{state.uses.map((use) => {
+    {state.status === "loading" || state.status === "idle" ? <ProgressMessage message="A carregar usos nos Problemas…" /> : state.status === "error" ? <ErrorNotice title="Não foi possível carregar os usos desta evidência nos Problemas." message="" action={<button type="button" onClick={state.retry}>Tentar novamente</button>} /> : state.uses.length === 0 ? <EmptyState message="Esta evidência ainda não está ligada explicitamente a um Problema." /> : <ul className="evd-problem-list">{state.uses.map((use) => {
       const title = text(use.detail.record.title);
       return <li key={`${use.detail.id}-${use.relationshipPath}`} className="evd-problem-card">
         <div className="evd-problem-heading"><code>{use.detail.id}</code>{title && <span>{title}</span>}</div>
