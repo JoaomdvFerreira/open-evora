@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M005",
-  "currentWorkUnitId": null,
+  "currentWorkUnitId": "WU023",
   "workGraph": {
     "milestones": [
       {
@@ -855,12 +855,12 @@
         "validationCommands": [
           "node tools/validate-research.js"
         ],
-        "status": "planned",
+        "status": "in_progress",
         "dependencies": [
           "DEP-027"
         ],
         "createdAt": "2026-08-11T18:56:45.186Z",
-        "updatedAt": "2026-08-11T18:56:45.186Z"
+        "updatedAt": "2026-08-30T18:32:12.160Z"
       },
       {
         "id": "WU024",
@@ -2766,17 +2766,17 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-08-30T14:14:35.461Z",
-      "nextRecommendation": "WU022 is terminally closed; do not start WU023 without a separate owner instruction."
+      "nextRecommendation": "WU022 is terminally closed; do not start WU023 without a separate owner instruction.",
+      "createdAt": "2026-08-30T14:14:35.461Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-023",
-    "workUnitId": "WU022",
+    "id": "PKT-024",
+    "workUnitId": "WU023",
     "milestoneId": "M005",
-    "createdAt": "2026-08-11T19:08:50.031Z",
+    "createdAt": "2026-08-30T18:32:12.160Z",
     "format": "markdown",
-    "contentHash": "sha256:5fe7dda9b0901b390d0b62bd54c72dae288fa1f610b4d91784455be2531b4825",
+    "contentHash": "sha256:e6199a9d5a2ad9b8255eb9c643426a031196467c36941643905acdb9f6d01146",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -2794,8 +2794,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "No workflow command is authorized until the owner directs the next step.",
-  "lastUpdatedAt": "2026-08-30T14:44:37.402Z",
+  "nextRecommendedCommand": "aiqt checkpoint",
+  "lastUpdatedAt": "2026-08-30T18:32:12.160Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
