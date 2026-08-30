@@ -1,6 +1,7 @@
 import type { RecordDetail } from "../dataProvider/types";
 import type { SourceEvidenceRelations } from "./sourceEvidenceRelations";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
+import { RecordIdentifier } from "./RecordIdentifier";
 
 function objectValue(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
@@ -21,7 +22,11 @@ function EvidenceFindingItem({ evidence, onSelect }: { evidence: RecordDetail; o
   const sources = textList(provenance?.sources);
   return (
     <li className="source-finding-item">
-      {onSelect ? <button type="button" className="source-finding-id detail-technical-field" onClick={() => onSelect(evidence.id)}>{evidence.id}</button> : <span className="source-finding-id detail-technical-field">{evidence.id}</span>}
+      {onSelect ? (
+        <RecordIdentifier variant="action" id={evidence.id} density="compact" onActivate={() => onSelect(evidence.id)} accessibleLabel={`Abrir ${evidence.id}`} />
+      ) : (
+        <RecordIdentifier variant="text" id={evidence.id} density="compact" />
+      )}
       {text(observation?.summary) && <p className="source-finding-summary">{text(observation?.summary)}</p>}
       {(text(geography?.area) || populations.length > 0 || sources.length > 0) && (
         <dl className="detail-provenance-grid">

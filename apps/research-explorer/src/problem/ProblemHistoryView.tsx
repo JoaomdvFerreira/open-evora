@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
+import type { DataProvider, RecordDetail } from "../dataProvider/types";
 import { useRecordIndex } from "../records/useRecordIndex";
 import { formatPublicDate, publicEnumLabel, publicFieldCaption } from "../presentation/presentation";
 import { formatTypedId } from "../presentation/typeGlossary";
 import { ContextTabs } from "../navigation/ContextTabs";
+import { Breadcrumb } from "../presentation/Breadcrumb";
+import { RecordIdentifier } from "../records/RecordIdentifier";
 
 const HISTORY_STATE_FIELDS = ["status", "evidence_status", "validation_status", "digital_tractability", "solution_landscape_status"] as const;
 
@@ -11,24 +13,19 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
 }
 
-function HistoryEvidenceLinks({ evidence, lookup, onOpenGeneric }: { evidence: unknown; lookup: Map<string, RecordSummary>; onOpenGeneric: (id: string) => void }) {
+function HistoryEvidenceLinks({ evidence, onOpenGeneric }: { evidence: unknown; onOpenGeneric: (id: string) => void }) {
   if (!Array.isArray(evidence) || evidence.length === 0) return null;
   const ids = evidence.filter((id): id is string => typeof id === "string");
   if (ids.length === 0) return null;
   return (
     <p>
       <strong>Evidência:</strong>{" "}
-      {ids.map((id, index) => {
-        const summary = lookup.get(id);
-        return (
-          <span key={id}>
-            {index > 0 && ", "}
-            <button type="button" className="detail-reference" onClick={() => onOpenGeneric(id)}>
-              {formatTypedId(summary?.type ?? "EVD-", id)}
-            </button>
-          </span>
-        );
-      })}
+      {ids.map((id, index) => (
+        <span key={id}>
+          {index > 0 && ", "}
+          <RecordIdentifier variant="action" id={id} density="compact" onActivate={() => onOpenGeneric(id)} accessibleLabel={`Abrir ${id}`} />
+        </span>
+      ))}
     </p>
   );
 }
@@ -53,7 +50,7 @@ function StateChanges({ stateChanges }: { stateChanges: unknown }) {
   );
 }
 
-function HistoryEntries({ record, lookup, onOpenGeneric }: { record: Record<string, unknown>; lookup: Map<string, RecordSummary>; onOpenGeneric: (id: string) => void }) {
+function HistoryEntries({ record, onOpenGeneric }: { record: Record<string, unknown>; onOpenGeneric: (id: string) => void }) {
   const entries = Array.isArray(record.history)
     ? record.history.map(asRecord).filter((entry): entry is Record<string, unknown> => entry !== null).reverse()
     : [];
@@ -72,7 +69,7 @@ function HistoryEntries({ record, lookup, onOpenGeneric }: { record: Record<stri
             <p className="open-question-question"><time dateTime={date}>{formatPublicDate(date)}</time></p>
             <p>{summary}</p>
             <StateChanges stateChanges={entry.state_changes} />
-            <HistoryEvidenceLinks evidence={entry.evidence} lookup={lookup} onOpenGeneric={onOpenGeneric} />
+            <HistoryEvidenceLinks evidence={entry.evidence} onOpenGeneric={onOpenGeneric} />
           </li>
         );
       })}
@@ -89,7 +86,7 @@ interface ProblemHistoryViewProps {
   onViewAsProblem: (id: string) => void;
 }
 
-function ProblemHistoryContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToOverview, onViewAsProblem }: Omit<ProblemHistoryViewProps, "problemId" | "onBackToRecords"> & { lookup: Map<string, RecordSummary>; problemId: string }) {
+function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackToOverview, onViewAsProblem }: Omit<ProblemHistoryViewProps, "problemId" | "onBackToRecords"> & { problemId: string }) {
   const [detail, setDetail] = useState<RecordDetail | null>(null);
   const [error, setError] = useState<unknown>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -118,17 +115,26 @@ function ProblemHistoryContent({ dataProvider, lookup, problemId, onOpenGeneric,
   const title = typeof record.title === "string" ? record.title : detail.id;
   return (
     <article aria-labelledby="problem-history-heading" className="problem-view shell-frame">
-      <nav aria-label="Localização" className="detail-breadcrumb">
-        <button type="button" onClick={onBackToOverview}>Visão geral</button>
-        <span aria-hidden="true" className="detail-breadcrumb-separator">›</span>
-        <span className="detail-breadcrumb-current">{detail.id}</span>
-      </nav>
+      <Breadcrumb
+        label="Localização"
+        ancestors={[
+          {
+            key: "visao-geral",
+            action: (
+              <button type="button" onClick={onBackToOverview}>
+                Visão geral
+              </button>
+            ),
+          },
+        ]}
+        current={<RecordIdentifier variant="text" density="compact" id={detail.id} />}
+      />
       <ContextTabs prbId={detail.id} active="history" onOpenGeneric={onOpenGeneric} onViewAsProblem={onViewAsProblem} onViewHistory={() => undefined} />
       <section className="problem-section">
         <div className="problem-identity-id">{detail.id}</div>
         <h2 ref={headingRef} id="problem-history-heading" tabIndex={-1} className="problem-identity-title">{title}</h2>
         <h3 className="detail-panel-label">Histórico material</h3>
-        <HistoryEntries record={record} lookup={lookup} onOpenGeneric={onOpenGeneric} />
+        <HistoryEntries record={record} onOpenGeneric={onOpenGeneric} />
       </section>
     </article>
   );
@@ -145,5 +151,5 @@ export function ProblemHistoryView({ dataProvider, problemId, onOpenGeneric, onB
   if (summary && summary.type !== "PRB-") {
     return <div role="alert"><h2>Este registo não é um Problema</h2><p>{formatTypedId(summary.type, problemId)} não pode ser aberto como histórico.</p><button type="button" onClick={() => onOpenGeneric(problemId)}>Ver detalhe genérico</button></div>;
   }
-  return <ProblemHistoryContent dataProvider={dataProvider} lookup={indexState.lookup} problemId={problemId} onOpenGeneric={onOpenGeneric} onBackToOverview={onBackToOverview} onViewAsProblem={onViewAsProblem} />;
+  return <ProblemHistoryContent dataProvider={dataProvider} problemId={problemId} onOpenGeneric={onOpenGeneric} onBackToOverview={onBackToOverview} onViewAsProblem={onViewAsProblem} />;
 }

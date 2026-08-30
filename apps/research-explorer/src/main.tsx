@@ -24,6 +24,10 @@ import "./index.css";
 import "./styles/tokens.css";
 import "./styles/inline-label.css";
 import "./styles/domain.css";
+// DS-05E: the narrow canonical Breadcrumb visual recipe only (not the rest
+// of ui.css, which still carries unrelated selectors/collision risk with
+// index.css's own `.unavailable-control`/`.unavailable-note`).
+import "./styles/breadcrumb.css";
 
 const container = document.getElementById("root");
 if (!container) {

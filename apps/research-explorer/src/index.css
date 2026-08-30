@@ -1544,6 +1544,26 @@ main.explorer-shell {
   color: var(--ink);
 }
 
+/* DS-05E: the generic ui-breadcrumb.css recipe carries no vertical
+   placement of its own (component-model.md §4.3 "Breadcrumb": caller
+   supplies navigation content, never layout placement) — production's own
+   `var(--space-6) 0` breadcrumb placement, previously baked into
+   `.detail-breadcrumb`/`.detail-breadcrumb-current` above, is preserved here
+   at the page-composition level, scoped to the narrowest existing Record
+   Detail / Problem View / Problem History root selectors that now render the
+   shared `Breadcrumb` component as their first child. */
+.record-detail-layout > .ui-breadcrumb,
+.problem-view > .ui-breadcrumb {
+  margin: var(--space-6) 0;
+}
+
+@media (max-width: 767px) {
+  .record-detail-layout > .ui-breadcrumb,
+  .problem-view > .ui-breadcrumb {
+    margin-bottom: var(--space-4);
+  }
+}
+
 .record-detail-columns {
   display: flex;
   align-items: flex-start;
@@ -1840,11 +1860,6 @@ main.explorer-shell {
   color: var(--ink-faint);
   min-width: 0;
   overflow-wrap: anywhere;
-}
-
-.prb-reference-target {
-  font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
-  font-size: 0.85rem;
 }
 
 @media (max-width: 480px) {

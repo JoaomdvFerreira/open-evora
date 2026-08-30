@@ -1,0 +1,27 @@
+/* DS-05E — canonical production Breadcrumb visual recipe, moved (not
+   duplicated) from styles/ui.css so the production application can depend on
+   it without importing the rest of ui.css, which still carries unrelated
+   selectors/collision risk (`.unavailable-control`/`.unavailable-note`
+   collide with index.css's own production selectors of the same name).
+   Imported by ui.css so Storybook's existing `.ui-breadcrumb*` consumers keep
+   the exact same behaviour unchanged. Visual recipe is unchanged from its
+   prior ui.css definition — page-specific vertical spacing stays out of this
+   file (component-model.md §4.3 "Breadcrumb": caller supplies navigation
+   content, never layout placement). */
+.ui-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-tight);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-breadcrumb-separator {
+  color: var(--color-ink-muted);
+}
+
+.ui-breadcrumb-current {
+  color: var(--color-ink-primary);
+}
