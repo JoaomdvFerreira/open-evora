@@ -162,6 +162,8 @@ describe("SourceDatesAccessSection", () => {
     expect(link.tagName).toBe("A");
     expect(link.getAttribute("href")).toBe("https://doi.org/10.1038/s41598-022-23987-z");
     expect(link.textContent).toBe("https://doi.org/10.1038/s41598-022-23987-z");
+    expect(link.getAttribute("target")).toBe("_blank");
+    expect(link.getAttribute("rel")).toBe("noopener noreferrer");
   });
 
   it("renders canonical_reference as a clickable link when it is a valid http URL", () => {
@@ -196,6 +198,24 @@ describe("SourceDatesAccessSection", () => {
     render(<SourceDatesAccessSection record={SRC_0093} />);
 
     expect(screen.getAllByText("Referência original")).toHaveLength(1);
+  });
+
+  it("renders one semantic FactList dl with ordered dt/dd pairs matching field order", () => {
+    const { container } = render(<SourceDatesAccessSection record={SRC_0093} />);
+
+    const lists = container.querySelectorAll("dl.ui-fact-list");
+    expect(lists).toHaveLength(1);
+    const labels = Array.from(lists[0].querySelectorAll("dt")).map((node) => node.textContent);
+    expect(labels).toEqual([
+      "Publicação",
+      "Última verificação pela Open Évora",
+      "Nível de acesso",
+      "Disponibilidade",
+      "Leitura automática",
+      "Forma de consulta",
+      "Formato",
+      "Referência original",
+    ]);
   });
 
   it("renders no licensing/geography/EVD/PRB content", () => {

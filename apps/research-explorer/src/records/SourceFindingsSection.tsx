@@ -2,6 +2,7 @@ import type { RecordDetail } from "../dataProvider/types";
 import type { SourceEvidenceRelations } from "./sourceEvidenceRelations";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 import { RecordIdentifier } from "./RecordIdentifier";
+import { FactList, type FactListRow } from "../presentation/FactList";
 
 function objectValue(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
@@ -20,6 +21,10 @@ function EvidenceFindingItem({ evidence, onSelect }: { evidence: RecordDetail; o
   const provenance = objectValue(evidence.record.provenance);
   const populations = textList(scope?.populations);
   const sources = textList(provenance?.sources);
+  const rows: FactListRow[] = [];
+  if (text(geography?.area)) rows.push({ key: "geography", label: "Âmbito", value: text(geography?.area) });
+  if (populations.length > 0) rows.push({ key: "populations", label: "Populações", value: populations.join(", ") });
+  if (sources.length > 0) rows.push({ key: "sources", label: "Fontes de proveniência", value: sources.join(", ") });
   return (
     <li className="source-finding-item">
       {onSelect ? (
@@ -28,13 +33,7 @@ function EvidenceFindingItem({ evidence, onSelect }: { evidence: RecordDetail; o
         <RecordIdentifier variant="text" id={evidence.id} density="compact" />
       )}
       {text(observation?.summary) && <p className="source-finding-summary">{text(observation?.summary)}</p>}
-      {(text(geography?.area) || populations.length > 0 || sources.length > 0) && (
-        <dl className="detail-provenance-grid">
-          {text(geography?.area) && <><dt>Âmbito</dt><dd>{text(geography?.area)}</dd></>}
-          {populations.length > 0 && <><dt>Populações</dt><dd>{populations.join(", ")}</dd></>}
-          {sources.length > 0 && <><dt>Fontes de proveniência</dt><dd>{sources.join(", ")}</dd></>}
-        </dl>
-      )}
+      {rows.length > 0 && <FactList rows={rows} />}
     </li>
   );
 }
@@ -45,7 +44,7 @@ export function SourceFindingsSection({ relations, onSelect }: { relations: Sour
       <h3 className="detail-panel-label">O que encontrámos</h3>
       {relations.evidence.length === 0 ? <p className="field-empty">Ainda não existem observações da investigação ligadas explicitamente a esta fonte.</p> : (
         <>
-          <dl className="detail-provenance-grid"><dt>Observações relacionadas</dt><dd>{relations.uniqueEvidenceCount}</dd></dl>
+          <FactList rows={[{ key: "unique-evidence-count", label: "Observações relacionadas", value: relations.uniqueEvidenceCount }]} />
           <div className="source-finding-group"><h4 className="record-editorial-subheading">Observações com esta fonte de proveniência</h4><ul className="source-finding-list">{relations.evidence.map((item) => <EvidenceFindingItem key={item.id} evidence={item} onSelect={onSelect} />)}</ul></div>
         </>
       )}

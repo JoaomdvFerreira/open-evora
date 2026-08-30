@@ -1,7 +1,7 @@
-import { Fragment } from "react";
 import { extractSourceLicensing, type SourceLicensing } from "./sourceView";
 import { publicEnumLabel } from "../presentation/presentation";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
+import { FactList } from "../presentation/FactList";
 
 interface LicensingRow {
   label: string;
@@ -47,16 +47,7 @@ export function SourceLicensingSection({ record }: { record: Record<string, unkn
   return (
     <section id={SOURCE_SECTION_ANCHOR_IDS.licensing} aria-label="Licenciamento" className="record-editorial-section source-licensing-section">
       <h3 className="detail-panel-label">Licenciamento</h3>
-      {rows.length > 0 && (
-        <dl className="detail-provenance-grid">
-          {rows.map((row) => (
-            <Fragment key={row.field}>
-              <dt>{row.label}</dt>
-              <dd>{row.value}</dd>
-            </Fragment>
-          ))}
-        </dl>
-      )}
+      {rows.length > 0 && <FactList rows={rows.map((row) => ({ key: row.field, label: row.label, value: row.value }))} />}
     </section>
   );
 }

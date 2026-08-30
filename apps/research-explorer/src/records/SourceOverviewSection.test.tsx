@@ -97,4 +97,14 @@ describe("SourceOverviewSection", () => {
     expect(screen.queryByText("Permitida")).toBeNull();
     expect(screen.queryByText("Público")).toBeNull();
   });
+
+  it("renders one semantic FactList dl with ordered dt/dd pairs matching field order", () => {
+    const { container } = render(<SourceOverviewSection record={SRC_0093} />);
+
+    const lists = container.querySelectorAll("dl.ui-fact-list");
+    expect(lists).toHaveLength(1);
+    const dl = lists[0];
+    const labels = Array.from(dl.querySelectorAll("dt")).map((node) => node.textContent);
+    expect(labels).toEqual(["Editor", "Tipo de recurso", "Autores / criadores", "Última verificação pela Open Évora"]);
+  });
 });

@@ -32,6 +32,9 @@ import "./styles/breadcrumb.css";
 // only (not the rest of ui.css, which still carries EmptyState and other
 // unrelated/colliding selectors).
 import "./styles/feedback.css";
+// DS-05G: the narrow canonical FactList visual recipe only (not the rest of
+// ui.css, which still carries unrelated selectors/collision risk).
+import "./styles/fact-list.css";
 
 const container = document.getElementById("root");
 if (!container) {

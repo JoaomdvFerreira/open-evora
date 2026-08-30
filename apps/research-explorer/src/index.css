@@ -2625,7 +2625,7 @@ main.explorer-shell {
   margin: 0 0 var(--space-8);
 }
 
-.evd-type-row, .evd-identity-facts, .evd-problem-heading, .evd-source-list li, .evd-relation-facts dd {
+.evd-type-row, .evd-identity-facts, .evd-problem-heading, .evd-source-list li, .evd-relation-values {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -2646,9 +2646,6 @@ main.explorer-shell {
 .evd-problem-card { border: 1px solid var(--line); border-radius: var(--radius-lg); padding: var(--space-4); }
 .evd-problem-heading code, .evd-source-list code { color: var(--ink-faintest); font-family: var(--recipe-technical-id-family); font-size: 12px; }
 .evd-problem-heading span { color: var(--ink); font-size: 14px; font-weight: 600; }
-.evd-relation-facts { display: grid; grid-template-columns: 60px 1fr; gap: var(--space-2) var(--space-3); margin: var(--space-4) 0; }
-.evd-relation-facts dt { color: var(--ink-faintest); font-family: var(--ui); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
-.evd-relation-facts dd { margin: 0; }
 .evd-problem-action, .evd-source-list button { padding: 0; border: 0; background: none; color: var(--link); font: inherit; cursor: pointer; text-align: left; }
 .evd-extracted-at { margin: 0 0 var(--space-3); color: var(--ink-faint); font-size: 13px; }
 .evd-source-list { display: grid; gap: var(--space-2); }

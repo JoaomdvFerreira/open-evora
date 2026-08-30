@@ -1,7 +1,7 @@
-import { Fragment } from "react";
 import { extractSourceDatesAccess, isHttpUrl, type SourceDatesAccess } from "./sourceView";
 import { publicEnumLabel, publicTriStateLabel, formatPublicPartialDate } from "../presentation/presentation";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
+import { FactList } from "../presentation/FactList";
 
 interface DatesAccessRow {
   label: string;
@@ -82,22 +82,19 @@ export function SourceDatesAccessSection({ record }: { record: Record<string, un
     <section id={SOURCE_SECTION_ANCHOR_IDS["dates-access"]} aria-label="Datas e acesso" className="record-editorial-section source-dates-access-section">
       <h3 className="detail-panel-label">Datas e acesso</h3>
       {rows.length > 0 && (
-        <dl className="detail-provenance-grid">
-          {rows.map((row) => (
-            <Fragment key={row.field}>
-              <dt>{row.label}</dt>
-              <dd>
-                {row.href ? (
-                  <a href={row.href} target="_blank" rel="noopener noreferrer">
-                    {row.value}
-                  </a>
-                ) : (
-                  row.value
-                )}
-              </dd>
-            </Fragment>
-          ))}
-        </dl>
+        <FactList
+          rows={rows.map((row) => ({
+            key: row.field,
+            label: row.label,
+            value: row.href ? (
+              <a href={row.href} target="_blank" rel="noopener noreferrer">
+                {row.value}
+              </a>
+            ) : (
+              row.value
+            ),
+          }))}
+        />
       )}
     </section>
   );

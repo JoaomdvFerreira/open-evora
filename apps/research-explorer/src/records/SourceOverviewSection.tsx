@@ -1,7 +1,7 @@
-import { Fragment } from "react";
 import { extractSourceOverview, type SourceOverview } from "./sourceView";
 import { publicEnumLabel, formatPublicPartialDate } from "../presentation/presentation";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
+import { FactList } from "../presentation/FactList";
 
 interface OverviewRow {
   label: string;
@@ -43,16 +43,7 @@ export function SourceOverviewSection({ record }: { record: Record<string, unkno
   return (
     <section id={SOURCE_SECTION_ANCHOR_IDS.overview} aria-label="Visão geral" className="record-editorial-section source-overview-section">
       <h3 className="detail-panel-label">Visão geral</h3>
-      {rows.length > 0 && (
-        <dl className="detail-provenance-grid">
-          {rows.map((row) => (
-            <Fragment key={row.field}>
-              <dt>{row.label}</dt>
-              <dd>{row.value}</dd>
-            </Fragment>
-          ))}
-        </dl>
-      )}
+      {rows.length > 0 && <FactList rows={rows.map((row) => ({ key: row.field, label: row.label, value: row.value }))} />}
     </section>
   );
 }

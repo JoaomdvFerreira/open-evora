@@ -31,6 +31,13 @@
    `.ui-breadcrumb*` behaviour unchanged. */
 @import "./breadcrumb.css";
 
+/* DS-05G: `.ui-fact-list*` now lives in its own file (fact-list.css) so the
+   production application can depend on it without importing this file's
+   other selectors — same rationale as `.ui-inline-label`/`.ui-breadcrumb*`
+   above. Imported here so every existing Storybook consumer of ui.css keeps
+   the exact same `.ui-fact-list*` behaviour unchanged. */
+@import "./fact-list.css";
+
 /* =========================================================================
    Native action recipes — CSS classes applied directly to native <a> or
    <button>. Link vs button semantics stay caller-owned: these recipes never
@@ -269,47 +276,6 @@ button.ui-action-outlined[aria-disabled="true"]:hover {
    surface's border legible while a descendant carries visible focus. */
 .ui-surface-interactive:has(:focus-visible) {
   border-color: var(--focus-ring-color);
-}
-
-/* =========================================================================
-   FactList anatomy — DS-04D Slice 2A (component-model.md §4.3 "FactList"),
-   extracted from the current `.detail-provenance-grid` markup. A two-column
-   label/value grid on desktop; the current evidence (index.css's compact
-   `.detail-provenance-grid` media query) recomposes to one column with the
-   value stacked under its label at the compact boundary, so that
-   recomposition is built into this single recipe rather than offered as a
-   separate selectable density — see src/presentation/FactList.tsx.
-   ========================================================================= */
-.ui-fact-list {
-  display: grid;
-  grid-template-columns: minmax(0, var(--fact-list-label-width, 8.5rem)) 1fr;
-  row-gap: var(--space-tight);
-  column-gap: var(--space-standard);
-  margin: 0;
-  font-family: var(--font-interface);
-  font-size: var(--text-interface-body-size);
-  line-height: var(--text-interface-body-line-height);
-}
-
-.ui-fact-list dt {
-  color: var(--color-ink-muted);
-}
-
-.ui-fact-list dd {
-  margin: 0;
-  color: var(--color-ink-primary);
-  overflow-wrap: anywhere;
-}
-
-@media (max-width: 767px) {
-  .ui-fact-list {
-    grid-template-columns: 1fr;
-    row-gap: var(--p-space-1);
-  }
-
-  .ui-fact-list dt {
-    margin-top: var(--space-tight);
-  }
 }
 
 /* =========================================================================
