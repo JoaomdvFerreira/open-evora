@@ -9,6 +9,7 @@ import { RecordTypeLabel } from "./RecordTypeLabel";
 import type { EVDProblemUsesState } from "./useEvdProblemUses";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { FactList } from "../presentation/FactList";
 
 const EVD_SECTIONS: CompactSectionIndexEntry[] = [
   { sectionId: "scope", anchorId: "evd-scope", label: "Âmbito desta evidência" },
@@ -82,10 +83,20 @@ function EvdInvestigation({ state, onSelect }: { state: EVDProblemUsesState & { 
       const title = text(use.detail.record.title);
       return <li key={`${use.detail.id}-${use.relationshipPath}`} className="evd-problem-card">
         <div className="evd-problem-heading"><code>{use.detail.id}</code>{title && <span>{title}</span>}</div>
-        <dl className="evd-relation-facts">
-          <dt>Efeito</dt><dd>{use.effects.map((effect, index) => <EvidenceEffectTag key={`${effect}-${index}`} effect={effect} variant="compact" />)}</dd>
-          <dt>Papel</dt><dd>{use.researchRoles.map((role, index) => <ResearchRoleTag key={`${role}-${index}`} role={role} variant="compact" />)}</dd>
-        </dl>
+        <FactList
+          rows={[
+            {
+              key: "effects",
+              label: "Efeito",
+              value: <span className="evd-relation-values">{use.effects.map((effect, index) => <EvidenceEffectTag key={`${effect}-${index}`} effect={effect} variant="compact" />)}</span>,
+            },
+            {
+              key: "roles",
+              label: "Papel",
+              value: <span className="evd-relation-values">{use.researchRoles.map((role, index) => <ResearchRoleTag key={`${role}-${index}`} role={role} variant="compact" />)}</span>,
+            },
+          ]}
+        />
         <button type="button" className="evd-problem-action" onClick={() => onSelect(use.detail.id)}>Ver Problema →</button>
       </li>;
     })}</ul>}
@@ -106,11 +117,21 @@ function EvdTechnical({ detail }: { detail: RecordDetail }) {
     ...detail.outgoingEdges.map((edge) => edge.to ? `${edge.field}${edge.ordinal === null ? "" : `[${edge.ordinal}]`} → ${edge.to}` : edge.field),
     ...detail.incomingEdges.map((edge) => edge.from ? `${edge.from} → ${edge.field}${edge.ordinal === null ? "" : `[${edge.ordinal}]`}` : edge.field),
   ];
+  const lineageId = text(detail.record.lineage_id);
   return <section id="evd-technical" aria-label="Inspeção técnica" className="record-editorial-section evd-section">
     <h2 className="detail-panel-label">Inspeção técnica</h2>
     <details className="technical-disclosure"><summary>Inspeção técnica completa</summary>
       <p className="technical-disclosure-caption">Campos canónicos, ficheiro e caminhos de relação para auditoria.</p>
-      <dl className="detail-provenance-grid"><dt>Ficheiro canónico</dt><dd><code>{detail.file}</code></dd><dt>evidence_id</dt><dd><code>{detail.id}</code></dd>{text(detail.record.lineage_id) && <><dt>lineage_id</dt><dd><code>{text(detail.record.lineage_id)}</code></dd></>}{paths.length > 0 && <><dt>Caminhos de relação</dt><dd><ul className="relationship-paths">{paths.map((path) => <li key={path}><code>{path}</code></li>)}</ul></dd></>}</dl>
+      <FactList
+        rows={[
+          { key: "file", label: "Ficheiro canónico", value: <code>{detail.file}</code> },
+          { key: "evidence_id", label: "evidence_id", value: <code>{detail.id}</code> },
+          ...(lineageId ? [{ key: "lineage_id", label: "lineage_id", value: <code>{lineageId}</code> }] : []),
+          ...(paths.length > 0
+            ? [{ key: "relationship-paths", label: "Caminhos de relação", value: <ul className="relationship-paths">{paths.map((path) => <li key={path}><code>{path}</code></li>)}</ul> }]
+            : []),
+        ]}
+      />
       <RecordFieldTree data={detail.record} />
     </details>
   </section>;

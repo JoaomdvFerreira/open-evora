@@ -74,6 +74,70 @@ describe.skipIf(!hasGeneratedData)("EVD Detail vNext — canonical regression ca
   });
 });
 
+describe("EVD relationship and technical FactList facts", () => {
+  const base: RecordDetail = {
+    id: "EVD-TEST",
+    type: "EVD-",
+    file: "research/evidence/EVD-TEST.yaml",
+    outgoingEdges: [{ field: "provenance.sources", ordinal: 0, to: "SRC-0093" }],
+    incomingEdges: [{ field: "evidence", ordinal: 3, from: "PRB-0005" }],
+    record: {
+      observation: { summary: "Observação de teste." },
+      provenance: { sources: ["SRC-0093"] },
+      lineage_id: "EVD-LEGACY-0001",
+    },
+  };
+  const problem: RecordDetail = {
+    id: "PRB-0005",
+    type: "PRB-",
+    file: "research/problems/PRB-0005.yaml",
+    outgoingEdges: [],
+    incomingEdges: [],
+    record: { title: "Problema de teste" },
+  };
+
+  it("renders Efeito before Papel as one semantic FactList dl, preserving authored effect/role order and cardinality", () => {
+    const { container } = render(
+      <EvdDetail
+        detail={base}
+        lookup={lookup}
+        problemUses={ready([{ detail: problem, effects: ["SUPPORTS", "BOUNDS"], researchRoles: ["CONTEXTUAL", "COMPARATIVE_RESPONSE"], relationshipPath: "evidence[3]" }])}
+        onSelect={vi.fn()}
+      />
+    );
+
+    const relationList = container.querySelector(".evd-problem-card dl.ui-fact-list");
+    expect(relationList).toBeTruthy();
+    const dtLabels = Array.from(relationList!.querySelectorAll("dt")).map((node) => node.textContent);
+    expect(dtLabels).toEqual(["Efeito", "Papel"]);
+
+    const dds = relationList!.querySelectorAll("dd");
+    expect(dds[0].querySelectorAll(".evd-effect-tag")).toHaveLength(2);
+    expect(dds[1].querySelectorAll(".research-role-tag")).toHaveLength(2);
+    expect(screen.getAllByText("Sustenta")[0].compareDocumentPosition(screen.getAllByText("Delimita")[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("preserves the exact technical fact row order including optional lineage_id and relationship paths", () => {
+    const { container } = render(<EvdDetail detail={base} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} />);
+    fireEvent.click(screen.getByText("Inspeção técnica completa"));
+
+    const technicalList = container.querySelector("#evd-technical dl.ui-fact-list");
+    expect(technicalList).toBeTruthy();
+    const labels = Array.from(technicalList!.querySelectorAll("dt")).map((node) => node.textContent);
+    expect(labels).toEqual(["Ficheiro canónico", "evidence_id", "lineage_id", "Caminhos de relação"]);
+  });
+
+  it("omits the optional lineage_id and relationship-path rows when absent", () => {
+    const noLineage: RecordDetail = { ...base, outgoingEdges: [], incomingEdges: [], record: { observation: { summary: "Observação de teste." }, provenance: { sources: [] } } };
+    const { container } = render(<EvdDetail detail={noLineage} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} />);
+    fireEvent.click(screen.getByText("Inspeção técnica completa"));
+
+    const technicalList = container.querySelector("#evd-technical dl.ui-fact-list");
+    const labels = Array.from(technicalList!.querySelectorAll("dt")).map((node) => node.textContent);
+    expect(labels).toEqual(["Ficheiro canónico", "evidence_id"]);
+  });
+});
+
 describe("EVD section index", () => {
   const emptyLimits: RecordDetail = {
     id: "EVD-EMPTY-LIMITS",
