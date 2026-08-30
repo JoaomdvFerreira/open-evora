@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M005",
-  "currentWorkUnitId": "WU022",
+  "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
       {
@@ -814,10 +814,10 @@
         "validationCommands": [
           "node tools/validate-research.js"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-08-11T18:56:45.186Z",
-        "updatedAt": "2026-08-11T19:08:50.031Z"
+        "updatedAt": "2026-08-30T14:14:35.461Z"
       },
       {
         "id": "WU023",
@@ -2713,6 +2713,61 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt review --mode release",
       "createdAt": "2026-08-11T18:14:31.290Z"
+    },
+    {
+      "id": "C023",
+      "workUnitId": "WU022",
+      "packetId": "PKT-023",
+      "summary": "Prepared WU022 for owner closure without changing research records or starting WU023. APCE and SASUE direct-engagement results remain the only integrated operator/institutional findings. For D5-OP-001, D5-OP-002, D5-OP-005, and D5-OP-006, the project owner confirmed on 2026-08-30 that no response followed the documented initial outreach and follow-up. This is an outreach outcome only, not evidence for or against any Problem. The D5-cycle stopping rule is applied: no further contact is proportionate.",
+      "completed": [
+        "Owner approved C023 for closure on 2026-08-30 (PASS / APPROVED FOR CLOSURE).",
+        "Recorded the owner-confirmed 2026-08-30 no-further-response outcome for D5-OP-001 (TREVO), D5-OP-002 (CME/DAM), D5-OP-005 (CME/DEIS), and D5-OP-006 (NERE), after their historical initial outreach and follow-up.",
+        "Kept the unanswered institutional questions unresolved without creating SRC/EVD or changing PRB evidence_status or validation_status.",
+        "Preserved D5-OP-003 (APCE) as completed direct engagement integrated through SRC-0118 and EVD-000112, EVD-000113, EVD-000114, and EVD-000131.",
+        "Preserved D5-OP-004 (SASUE) as CLOSED_SUFFICIENT on the institutional side through SRC-0119 and EVD-000125, EVD-000126, and EVD-000127.",
+        "Set the WU023 carry only to current affected-journey or observational questions: PRB-0001 practical trip impact; PRB-0002 real passenger information failures; PRB-0003 current location-level barriers; PRB-0004 everyday cycling journeys; PRB-0005 location/journey evidence of search friction and decision usefulness only; PRB-0006 concrete student usability, accessibility, waiting, notification, or routing experience only if still decision-relevant; PRB-0007 caregiver awareness, rights/navigation, handoffs, and relative importance versus other support needs.",
+        "Excluded unresolved institutional-data questions from WU023: PRB-0002 channel-state reconciliation, PRB-0004 current GIS layer/reuse, PRB-0005 sensor/operator-data questions, PRB-0007 plan execution/effectiveness, and PRB-0008 municipality-specific skills shortage. PRB-0009 remains WATCH/low-cost conditional only; PRB-0010 remains outside WU022."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Research typecheck, 145 tests, and canonical validation passed; 268 records validated."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors before the AIQT checkpoint."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Exact operator/institutional outcomes and unresolved questions are recorded without treating non-response as Problem evidence.",
+          "result": "passed",
+          "evidence": "Owner-confirmed no-further-response state is recorded for D5-OP-001/002/005/006; no SRC/EVD was created."
+        },
+        {
+          "criterion": "Direct engagement provenance remains SRC to EVD and existing integrated routes are preserved.",
+          "result": "passed",
+          "evidence": "APCE remains SRC-0118 to EVD-000112/113/114/131; SASUE remains SRC-0119 to EVD-000125/126/127."
+        },
+        {
+          "criterion": "Only genuinely affected-journey or observational questions carry to WU023, without starting it.",
+          "result": "passed",
+          "evidence": "Carry set excludes unanswered institutional data and PRB-0008; WU023 remains planned."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-08-30T14:14:35.461Z",
+      "nextRecommendation": "WU022 is terminally closed; do not start WU023 without a separate owner instruction."
     }
   ],
   "lastAgentPacket": {
@@ -2739,8 +2794,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-08-11T19:08:50.031Z",
+  "nextRecommendedCommand": "No workflow command is authorized until the owner directs the next step.",
+  "lastUpdatedAt": "2026-08-30T14:44:37.402Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
@@ -3445,6 +3500,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-08-11T18:14:31.290Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C023",
+      "current": {
+        "observationId": "sha256:283faaa76b3c9849347b64685e88452e21dd884e4b06b2aa64741d2c8537bddb",
+        "checkpointId": "C023",
+        "workUnitId": "WU022",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-08-30T14:14:35.461Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-08-30T14:14:35.461Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:283faaa76b3c9849347b64685e88452e21dd884e4b06b2aa64741d2c8537bddb",
+          "checkpointId": "C023",
+          "workUnitId": "WU022",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-08-30T14:14:35.461Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-08-30T14:14:35.461Z"
         }
       ]
     }
