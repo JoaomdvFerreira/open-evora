@@ -1690,26 +1690,6 @@ main.explorer-shell {
   margin: 0 0 var(--space-4);
 }
 
-.detail-type-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--surface-chip);
-  padding: 3px 9px;
-  color: var(--ink-faint);
-  font-family: var(--recipe-technical-id-family);
-  font-size: var(--recipe-technical-id-size);
-  letter-spacing: 0.4px;
-}
-
-.detail-type-badge code {
-  background: none;
-  padding: 0;
-  font-family: inherit;
-}
-
 .detail-type-kind {
   color: var(--ink-faintest);
   font-family: var(--recipe-technical-id-family);

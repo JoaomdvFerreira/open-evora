@@ -1,11 +1,11 @@
 import { Fragment } from "react";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { formatPublicDate, formatPublicPartialDate, publicEnumLabel } from "../presentation/presentation";
-import { describeType } from "../presentation/typeGlossary";
 import { RecordFieldTree } from "./RecordFieldTree";
 import { CompactSectionIndex, type CompactSectionIndexEntry } from "./CompactSectionIndex";
 import { EvidenceEffectTag } from "./EvidenceEffectTag";
 import { ResearchRoleTag } from "./ResearchRoleTag";
+import { RecordTypeLabel } from "./RecordTypeLabel";
 import type { EVDProblemUsesState } from "./useEvdProblemUses";
 
 const EVD_SECTIONS: CompactSectionIndexEntry[] = [
@@ -42,7 +42,7 @@ function EvdIdentity({ detail }: { detail: RecordDetail }) {
   const nature = text(detail.record.evidence_nature);
   const authority = text(detail.record.claim_authority);
   return <header className="evd-identity">
-    <div className="evd-type-row"><span className="detail-type-badge"><code>{detail.type}</code> {describeType(detail.type).label}</span>{lineageId && <span className="evd-secondary-id">Linagem: <code>{lineageId}</code></span>}</div>
+    <div className="evd-type-row"><RecordTypeLabel prefix={detail.type} variant="detail" />{lineageId && <span className="evd-secondary-id">Linagem: <code>{lineageId}</code></span>}</div>
     <h1>{text(observation?.summary) ?? detail.id}</h1>
     <div className="evd-identity-facts">
       {nature && <span className="evd-identity-fact">Natureza: <b>{publicEnumLabel("evidence_nature", nature)}</b></span>}

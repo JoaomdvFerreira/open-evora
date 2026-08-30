@@ -16,7 +16,7 @@ describe("NarrowRecordsList", () => {
     render(<NarrowRecordsList records={RECORDS} selectedId={null} onSelect={vi.fn()} />);
 
     const row = screen.getByRole("button", { name: /EVD-000001/ });
-    expect(row.textContent).toContain("EVD-");
+    expect(row.textContent).toContain("Evidência");
     expect(row.textContent).toContain("The Social Development Plan reports a lack of transport");
     expect(row.textContent).toContain("EVD-000001");
     expect(row.textContent).not.toContain("research/evidence/EVD-000001.yaml");
@@ -33,7 +33,7 @@ describe("NarrowRecordsList", () => {
   it("renders an unrecognised future record type safely, generically", () => {
     render(<NarrowRecordsList records={RECORDS} selectedId={null} onSelect={vi.fn()} />);
     const row = screen.getByRole("button", { name: /WID-0001/ });
-    expect(row.textContent).toContain("WID-");
+    expect(row.textContent).toContain("WID");
     expect(row.textContent).toContain("Future widget label");
   });
 
