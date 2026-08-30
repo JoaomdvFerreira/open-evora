@@ -2067,6 +2067,18 @@ main.explorer-shell {
   display: none;
 }
 
+/* DS-05H remediation F1: before DS-05H, Source/EVD compact indexes rendered
+   the legacy records/CompactSectionIndex, whose root also carried
+   `.problem-help`'s `margin: 0 0 var(--space-6)` — the deliberate separation
+   from the following Source/EVD content. The canonical
+   presentation/CompactSectionIndex deliberately owns `margin: 0` instead
+   (generic recipe, no composition spacing), so that separation must be
+   restored here at the domain-owned wrapper, not on the generic component. */
+.source-compact-section-index,
+.evd-compact-section-index {
+  margin: 0 0 var(--space-6);
+}
+
 /* SUI-03K3: "Abrir fonte original" desktop-rail copy vs. compact in-flow
    copy — same exclusive-visibility contract as the rail/compact index pair
    above (`.problem-reading-rail` / `.source-compact-section-index`). Both

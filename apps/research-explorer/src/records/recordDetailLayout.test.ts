@@ -350,3 +350,34 @@ describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K
     expect(bodies[0].trim()).toBe("margin-bottom: var(--space-8);");
   });
 });
+
+/**
+ * DS-05H remediation F1: the canonical presentation/CompactSectionIndex
+ * deliberately owns `margin: 0` (no composition spacing) — the previous
+ * `margin: 0 0 var(--space-6)` separation from following Source/EVD content
+ * (formerly supplied by the legacy records/CompactSectionIndex root, which
+ * also carried `.problem-help`) must be restored at the domain-owned
+ * `.source-compact-section-index`/`.evd-compact-section-index` wrappers
+ * instead, not on the generic component.
+ */
+describe("Source/EVD compact-index composition spacing (DS-05H remediation F1)", () => {
+  const css = readFileSync(CSS_PATH, "utf-8");
+
+  function ruleBodiesForRawPattern(pattern: RegExp): string[] {
+    return [...css.matchAll(pattern)].map((match) => match[1]);
+  }
+
+  it("both .source-compact-section-index and .evd-compact-section-index carry margin: 0 0 var(--space-6)", () => {
+    const bodies = ruleBodiesForRawPattern(/\.source-compact-section-index,\s*\n?\s*\.evd-compact-section-index\s*\{([^}]*)\}/g);
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0]).toMatch(/margin\s*:\s*0\s+0\s+var\(--space-6\)\s*;/);
+  });
+
+  it("the canonical .ui-section-index-compact recipe remains margin: 0 (composition spacing stays domain-owned)", () => {
+    const sectionIndexCss = readFileSync(path.join(__dirname, "..", "styles", "section-index.css"), "utf-8");
+    const bodies = ruleBodiesFor(sectionIndexCss, ".ui-section-index-compact");
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies[0]).toMatch(/margin\s*:\s*0\s*;/);
+    expect(bodies[0]).not.toMatch(/var\(--space-6\)/);
+  });
+});
