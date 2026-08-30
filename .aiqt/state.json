@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M005",
-  "currentWorkUnitId": null,
+  "currentWorkUnitId": "WU024",
   "workGraph": {
     "milestones": [
       {
@@ -62,7 +62,7 @@
         "id": "M005",
         "title": "D5 — Stakeholder Challenge & Validation",
         "objective": "Challenge the current Problem framings with the minimum credible direct operator, institutional, affected-journey and observational evidence needed to resolve decision-critical unknowns, refine or falsify those framings, and update validation_status only through a human-authored decision supported by proportionate direct challenge. D5 does not attempt to maximize validated PRBs.",
-        "status": "ready",
+        "status": "in_progress",
         "workUnitIds": [
           "WU022",
           "WU023",
@@ -898,12 +898,12 @@
         "validationCommands": [
           "node tools/validate-research.js"
         ],
-        "status": "ready",
+        "status": "in_progress",
         "dependencies": [
           "DEP-028"
         ],
         "createdAt": "2026-08-11T18:56:45.186Z",
-        "updatedAt": "2026-08-30T20:08:14.592Z"
+        "updatedAt": "2026-08-30T20:17:33.994Z"
       }
     ],
     "dependencies": [
@@ -2822,17 +2822,17 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-08-30T20:08:14.592Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-08-30T20:08:14.592Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-024",
-    "workUnitId": "WU023",
+    "id": "PKT-025",
+    "workUnitId": "WU024",
     "milestoneId": "M005",
-    "createdAt": "2026-08-30T18:32:12.160Z",
+    "createdAt": "2026-08-30T20:17:33.994Z",
     "format": "markdown",
-    "contentHash": "sha256:e6199a9d5a2ad9b8255eb9c643426a031196467c36941643905acdb9f6d01146",
+    "contentHash": "sha256:dea1af7f23c6e2bbafd781496785f10fb73a532b627e314560e86c84a258cb4b",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -2850,8 +2850,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-08-30T20:08:14.592Z",
+  "nextRecommendedCommand": "aiqt checkpoint",
+  "lastUpdatedAt": "2026-08-30T20:17:33.994Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
