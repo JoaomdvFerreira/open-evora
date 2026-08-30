@@ -255,14 +255,17 @@ function groupEvidenceByDecisionBasis(record: Record<string, unknown>, evidence:
 }
 
 /**
- * DS-05E: the approved EvidenceCard-identity/Source-provenance composition
- * (ReferencePathCompositions.stories.tsx / PrbEvdRelationship.stories.tsx) —
- * RecordTypeLabel (compact) + RecordIdentifier (action/compact) own the
- * record's type and canonical ID as two explicit dimensions; `suffix`
- * remains ordinary non-interactive text appended after them, never absorbed
- * into the identifier's own visible text or accessible name.
+ * DS-05E remediation F2: renamed from `TypedLinkButton` — this no longer
+ * renders one link/button carrying a formatted type+ID string, so that name
+ * became misleading. It composes the approved EvidenceCard-identity/
+ * Source-provenance composition (ReferencePathCompositions.stories.tsx /
+ * PrbEvdRelationship.stories.tsx): RecordTypeLabel (compact) +
+ * RecordIdentifier (action/compact) own the record's type and canonical ID
+ * as two explicit dimensions; `suffix` remains ordinary non-interactive text
+ * appended after them, never absorbed into the identifier's own visible text
+ * or accessible name.
  */
-function TypedLinkButton({ detail, onOpenGeneric, suffix }: { detail: RecordDetail; onOpenGeneric: (id: string) => void; suffix?: string }) {
+function RecordIdentityAction({ detail, onOpenGeneric, suffix }: { detail: RecordDetail; onOpenGeneric: (id: string) => void; suffix?: string }) {
   return (
     <span className="record-type-identifier-cluster">
       <RecordTypeLabel prefix={detail.type} variant="compact" />
@@ -646,7 +649,7 @@ function EvidenceCard({ detail, sources, effects = [], onOpenGeneric }: Evidence
   return (
     <li className="evidence-card">
       <div className="evidence-item-header">
-        <TypedLinkButton
+        <RecordIdentityAction
           detail={detail}
           onOpenGeneric={onOpenGeneric}
           suffix={fieldValue(evidenceRecord, "type") ? publicEnumLabel("type", fieldValue(evidenceRecord, "type")!) : undefined}
@@ -673,7 +676,7 @@ function EvidenceCard({ detail, sources, effects = [], onOpenGeneric }: Evidence
         <ul aria-label={`Registos de fonte relacionados com ${detail.id}`} className="evidence-sources">
           {sources.map((source) => (
             <li key={source.id}>
-              <TypedLinkButton detail={source} onOpenGeneric={onOpenGeneric} suffix={fieldValue(source.record as Record<string, unknown>, "publisher") ?? undefined} />
+              <RecordIdentityAction detail={source} onOpenGeneric={onOpenGeneric} suffix={fieldValue(source.record as Record<string, unknown>, "publisher") ?? undefined} />
             </li>
           ))}
         </ul>

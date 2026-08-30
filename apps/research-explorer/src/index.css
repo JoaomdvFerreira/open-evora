@@ -1521,7 +1521,15 @@ main.explorer-shell {
   color: var(--ink-faint);
 }
 
-.detail-breadcrumb button {
+/* DS-05E remediation F1: the migrated generic Breadcrumb callers
+   (RecordDetailPanel/ProblemView/ProblemHistoryView) render their ancestor
+   action as a raw native <button> inside `.ui-breadcrumb` — these two
+   selectors extend the same existing production reset/hover declarations to
+   those migrated page compositions, unchanged in value, rather than
+   widening the style boundary to ui-action-text/ui.css. */
+.detail-breadcrumb button,
+.record-detail-layout > .ui-breadcrumb > button,
+.problem-view > .ui-breadcrumb > button {
   padding: 0;
   color: var(--ink-faint);
   border: 0;
@@ -1530,18 +1538,12 @@ main.explorer-shell {
   cursor: pointer;
 }
 
-.detail-breadcrumb button:hover {
+.detail-breadcrumb button:hover,
+.record-detail-layout > .ui-breadcrumb > button:hover,
+.problem-view > .ui-breadcrumb > button:hover {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 0.16em;
-}
-
-.detail-breadcrumb-separator {
-  color: var(--line-control);
-}
-
-.detail-breadcrumb-current {
-  color: var(--ink);
 }
 
 /* DS-05E: the generic ui-breadcrumb.css recipe carries no vertical
