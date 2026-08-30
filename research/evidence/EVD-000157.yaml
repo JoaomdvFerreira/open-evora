@@ -7,10 +7,11 @@ provenance:
 observation:
   summary: O Quadro 3.2.1 do Relatório de Atividades 2026 da Autoridade de
     Transportes do Município de Évora desagrega os quilómetros comerciais
-    diários previstos por carreira e tipo de dia para 2025. Nas carreiras 22,
-    24, 26 e 32 o quadro não apresenta quilómetros comerciais ao sábado, domingo
-    ou feriado. As carreiras 21, 34 e 41 apresentam oferta ao sábado mas não ao
-    domingo/feriado. As carreiras 23, 25, 31 e 33 apresentam quilómetros
+    diários previstos por carreira e tipo de dia para 2025. A carreira 22 é
+    Canaviais–PITE via Malagueira e a carreira 24 é Canaviais–PITE via Centro
+    Histórico. Nas carreiras 22, 24, 26 e 32 o quadro não apresenta quilómetros
+    comerciais ao sábado, domingo ou feriado. As carreiras 21, 34 e 41 apresentam
+    oferta ao sábado mas não ao domingo/feriado. As carreiras 23, 25, 31 e 33 apresentam quilómetros
     comerciais tanto ao sábado como ao domingo/feriado. A carreira 25 passa de
     221,7 km comerciais por dia útil para 203,8 ao sábado e 96,0 ao
     domingo/feriado; a carreira 23 passa de 272,6 para 149,6 e 12,9; a carreira
@@ -42,3 +43,9 @@ inference_limits:
   - Os valores dizem respeito a 2025, embora o relatório tenha sido publicado em
     junho de 2026, e não demonstram que a configuração seja idêntica em agosto
     de 2026.
+  - A identificação das carreiras 22 e 24 não estabelece a sua sequência atual
+    de paragens, um horário atual de partidas, tempos de espera ou a consequência
+    prática para uma deslocação concreta.
+  - Esta evidência não pode ser combinada com EVD-000158 para afirmar que os
+    atrasos documentados no Parque Industrial afetaram especificamente as
+    carreiras 22 ou 24.

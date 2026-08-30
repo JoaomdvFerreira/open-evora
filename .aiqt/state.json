@@ -62,7 +62,7 @@
         "id": "M005",
         "title": "D5 — Stakeholder Challenge & Validation",
         "objective": "Challenge the current Problem framings with the minimum credible direct operator, institutional, affected-journey and observational evidence needed to resolve decision-critical unknowns, refine or falsify those framings, and update validation_status only through a human-authored decision supported by proportionate direct challenge. D5 does not attempt to maximize validated PRBs.",
-        "status": "in_progress",
+        "status": "ready",
         "workUnitIds": [
           "WU022",
           "WU023",
@@ -855,12 +855,12 @@
         "validationCommands": [
           "node tools/validate-research.js"
         ],
-        "status": "planned",
+        "status": "done",
         "dependencies": [
           "DEP-027"
         ],
         "createdAt": "2026-08-11T18:56:45.186Z",
-        "updatedAt": "2026-08-11T18:56:45.186Z"
+        "updatedAt": "2026-08-30T20:08:14.592Z"
       },
       {
         "id": "WU024",
@@ -898,12 +898,12 @@
         "validationCommands": [
           "node tools/validate-research.js"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-028"
         ],
         "createdAt": "2026-08-11T18:56:45.186Z",
-        "updatedAt": "2026-08-11T18:56:45.186Z"
+        "updatedAt": "2026-08-30T20:08:14.592Z"
       }
     ],
     "dependencies": [
@@ -2766,17 +2766,73 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-08-30T14:14:35.461Z",
-      "nextRecommendation": "WU022 is terminally closed; do not start WU023 without a separate owner instruction."
+      "nextRecommendation": "WU022 is terminally closed; do not start WU023 without a separate owner instruction.",
+      "createdAt": "2026-08-30T14:14:35.461Z"
+    },
+    {
+      "id": "C024",
+      "workUnitId": "WU023",
+      "packetId": "PKT-024",
+      "summary": "Closed WU023 through the owner-approved proportionality, safety and executability stopping conditions. No further affected-journey fieldwork was warranted, no recruitment was authorized, and no PRB validation_status changed.",
+      "completed": [
+        "Recorded the owner-approved WU023 route dispositions: PRB-0001 and PRB-0002 STOP_NO_EXECUTABLE_CASE; PRB-0003 STOP_NOT_SAFELY_EXECUTABLE; PRB-0004 NOT_TRIGGERED; PRB-0005 and PRB-0006 STOP_SUFFICIENT; PRB-0007 NO_SUITABLE_CASE; PRB-0008 LEAVE_UNRESOLVED; PRB-0009 WATCH; PRB-0010 outside WU023.",
+        "Bounded the 2025 service context in EVD-000157 using the existing SRC-0018 and without creating a new source or evidence record.",
+        "Stopped all further WU023 fieldwork because proportionality, safety, or executability conditions prevented a suitable direct challenge; this stopping outcome is not evidence for or against any PRB.",
+        "Preserved all PRB validation_status values and left unresolved questions for WU024 synthesis."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "research/evidence/EVD-000157.yaml"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Research typecheck, 145 tests, and canonical validation passed; 268 records validated."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors before the WU023 closure checkpoint."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Only questions still unresolved after WU022 are pursued, with the reason recorded.",
+          "result": "passed",
+          "evidence": "The owner-approved route dispositions record why no bounded executable or safe affected-journey challenge remained."
+        },
+        {
+          "criterion": "Every engagement guide includes a negative-case prompt.",
+          "result": "passed",
+          "evidence": "No engagement guide or recruitment was authorized because no suitable executable case remained; no engagement occurred."
+        },
+        {
+          "criterion": "Any integrated finding follows AGENTS.md and preserves canonical SRC → EVD provenance with the required scope and inference limits.",
+          "result": "passed",
+          "evidence": "The sole research-record refinement updates EVD-000157 from existing SRC-0018 and explicitly preserves the 2025/currentness, stop-sequence, timetable, waiting-time, journey-consequence, and EVD-000158 non-combination limits."
+        },
+        {
+          "criterion": "node tools/validate-research.js passes",
+          "result": "passed",
+          "evidence": "The canonical validator passed through npm run research:check."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-08-30T20:08:14.592Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-023",
-    "workUnitId": "WU022",
+    "id": "PKT-024",
+    "workUnitId": "WU023",
     "milestoneId": "M005",
-    "createdAt": "2026-08-11T19:08:50.031Z",
+    "createdAt": "2026-08-30T18:32:12.160Z",
     "format": "markdown",
-    "contentHash": "sha256:5fe7dda9b0901b390d0b62bd54c72dae288fa1f610b4d91784455be2531b4825",
+    "contentHash": "sha256:e6199a9d5a2ad9b8255eb9c643426a031196467c36941643905acdb9f6d01146",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -2794,8 +2850,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "No workflow command is authorized until the owner directs the next step.",
-  "lastUpdatedAt": "2026-08-30T14:44:37.402Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-08-30T20:08:14.592Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
@@ -3530,6 +3586,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-08-30T14:14:35.461Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C024",
+      "current": {
+        "observationId": "sha256:944f332b9e61bb3d2889f84f392ff1c8b69ba9c2fef6e62bacb4bfeeec66a830",
+        "checkpointId": "C024",
+        "workUnitId": "WU023",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-08-30T20:08:14.592Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-08-30T20:08:14.592Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:944f332b9e61bb3d2889f84f392ff1c8b69ba9c2fef6e62bacb4bfeeec66a830",
+          "checkpointId": "C024",
+          "workUnitId": "WU023",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-08-30T20:08:14.592Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-08-30T20:08:14.592Z"
         }
       ]
     }
