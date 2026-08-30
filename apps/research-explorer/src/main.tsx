@@ -12,6 +12,15 @@ import "@fontsource/ibm-plex-mono/latin-ext-500.css";
 import "@fontsource/public-sans/latin-ext-400.css";
 import "@fontsource/public-sans/latin-ext-600.css";
 import { App } from "./app/App";
+// DS-05J: reading-layout.css is imported before index.css so that
+// domain-owned visibility rules in index.css (e.g. `.problem-reading-rail`'s
+// `display: none` at the 768-1059px/<=767px bands) win the cascade over
+// ReadingLayout's own unconditional `.lyt-reading-rail { display: flex }`
+// base rule wherever a single element (Problem View's own rail `<aside>`)
+// carries both classes at equal specificity — domain presence decisions
+// must never be overridden by generic layout geometry (component-model.md
+// §2.2).
+import "./styles/reading-layout.css";
 import "./index.css";
 // DS-05A: the minimum DS-04 production dependency for ProblemView's reading
 // status adoption (ProblemLifecycleStatus/ValidationStatus/EvidenceStatus).

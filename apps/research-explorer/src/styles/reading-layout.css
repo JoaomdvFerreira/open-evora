@@ -1,0 +1,106 @@
+/* DS-05J — ReadingLayout production style boundary.
+   Extracted from styles/layout.css (DS-04C) so the canonical main/rail
+   reading geometry can be imported directly by production (main.tsx)
+   without pulling in the rest of the Storybook-only layout catalogue
+   (ShellFrame, Stack, Cluster, SectionFlow), which remains Storybook-owned
+   pending later approved adoption.
+
+   Contract unchanged from DS-04C: CSS-first, DOM-neutral — these classes
+   control width, flow, alignment, and responsive recomposition only
+   (component-model.md §2.2, Gate C1 decision 1). No React wrapper exists
+   here to carry a class. */
+
+:root {
+  --layout-reading-main: 720px;
+  --layout-reading-gap: 44px;
+  --layout-reading-rail: 216px;
+}
+
+/* =======================================================================
+   ReadingLayout — main reading column plus supporting rail.
+
+   Desktop (>=1060px): 720px main + 44px gap + 216px rail = 980px, rail
+   sticky. 768-1059px is a geometry-only fit fallback that recomposes to
+   one column without shrinking reading text or activating compact
+   typography/navigation (foundations.md "Responsive reading";
+   component-model.md principle 7). Compact (<=767px) recomposes to one
+   column with rail content in flow; caller owns whether rail content
+   exists and where it appears in that flow.
+
+   Admitted variants: rail, no-rail (data-rail attribute). Automatic
+   short-record rail behaviour is explicitly deferred (component-model.md
+   §4.2, §7) and is not implemented here.
+   ======================================================================= */
+.lyt-reading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--layout-reading-gap);
+  width: 100%;
+}
+
+.lyt-reading-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: var(--layout-reading-main);
+}
+
+/* no-rail: the main column alone still honours the 720px reading measure,
+   without reserving rail space or gap (caller supplies no rail content). */
+.lyt-reading[data-rail="none"] {
+  gap: 0;
+}
+
+.lyt-reading[data-rail="none"] .lyt-reading-main {
+  max-width: var(--layout-reading-main);
+}
+
+.lyt-reading-rail {
+  flex: 0 0 var(--layout-reading-rail);
+  width: var(--layout-reading-rail);
+  min-width: 0;
+  position: sticky;
+  top: var(--space-loose);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-loose);
+}
+
+/* Fit fallback: the 980px relationship cannot fit destructively, so recompose
+   into one column rather than compressing the 720px column. Not a third
+   product mode — compact typography/navigation stay untouched. */
+@media (min-width: 768px) and (max-width: 1059px) {
+  .lyt-reading {
+    flex-direction: column;
+    gap: var(--space-loose);
+  }
+
+  .lyt-reading-main {
+    max-width: var(--layout-reading-main);
+  }
+
+  .lyt-reading-rail {
+    position: static;
+    width: 100%;
+    max-width: var(--layout-reading-main);
+    flex-basis: auto;
+  }
+}
+
+/* Compact product boundary: one column, rail content in flow, full width. */
+@media (max-width: 767px) {
+  .lyt-reading {
+    flex-direction: column;
+    gap: var(--space-loose);
+    max-width: 100%;
+  }
+
+  .lyt-reading-main {
+    max-width: 100%;
+  }
+
+  .lyt-reading-rail {
+    position: static;
+    width: 100%;
+    flex-basis: auto;
+  }
+}
