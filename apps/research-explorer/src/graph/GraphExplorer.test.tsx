@@ -89,7 +89,7 @@ describe("GraphExplorer", () => {
     );
 
     const alert = await screen.findByRole("alert");
-    expect(within(alert).getByRole("heading", { name: "Registo focado não encontrado" })).toBeTruthy();
+    expect(within(alert).getByText("Registo focado não encontrado")).toBeTruthy();
     expect(screen.queryByText(/0 nós visíveis/)).toBeNull();
     const user = userEvent.setup();
     await user.click(within(alert).getByRole("button", { name: /Limpar seleção/ }));

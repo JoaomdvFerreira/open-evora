@@ -25,6 +25,8 @@ import { SourceCompactSectionIndex } from "./SourceCompactSectionIndex";
 import type { SourceSectionRelationContext } from "./sourceView";
 import { EvdDetail, EvdReadingRail } from "./EvdDetail";
 import { useEvdProblemUses } from "./useEvdProblemUses";
+import { ProgressMessage } from "../presentation/ProgressMessage";
+import { ErrorNotice } from "../presentation/ErrorNotice";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -311,9 +313,7 @@ function SourceFindings({ state, onSelect }: { state: SourceEvidenceRelationsSta
     return (
       <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="record-editorial-section source-findings-section">
         <h3 className="detail-panel-label">O que encontrámos</h3>
-        <p role="status" aria-live="polite">
-          A carregar observações da investigação…
-        </p>
+        <ProgressMessage message="A carregar observações da investigação…" />
       </section>
     );
   }
@@ -322,12 +322,15 @@ function SourceFindings({ state, onSelect }: { state: SourceEvidenceRelationsSta
     return (
       <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="record-editorial-section source-findings-section">
         <h3 className="detail-panel-label">O que encontrámos</h3>
-        <div role="alert">
-          <p>Não foi possível carregar as observações da investigação ligadas a esta fonte.</p>
-          <button type="button" onClick={state.retry}>
-            Tentar novamente
-          </button>
-        </div>
+        <ErrorNotice
+          title="Não foi possível carregar as observações da investigação ligadas a esta fonte."
+          message=""
+          action={
+            <button type="button" onClick={state.retry}>
+              Tentar novamente
+            </button>
+          }
+        />
       </section>
     );
   }
@@ -1058,11 +1061,7 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
 
       {selectedId === null && <p>Nenhum registo selecionado.</p>}
 
-      {state.status === "loading" && (
-        <p role="status" aria-live="polite">
-          A carregar detalhes de {state.id}…
-        </p>
-      )}
+      {state.status === "loading" && <ProgressMessage message={`A carregar detalhes de ${state.id}…`} />}
 
       {state.status === "error" && (
         <>
@@ -1075,13 +1074,15 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
               (the record failed to load), so it keeps its own minimal
               ancestor-only nav rather than forcing an empty `current` node
               through the generic Breadcrumb, which always renders one. */}
-          <div role="alert">
-            <h3>{ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o registo"}</h3>
-            <p>{state.error.message}</p>
-            <button type="button" onClick={state.retry}>
-              Tentar novamente
-            </button>
-          </div>
+          <ErrorNotice
+            title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o registo"}
+            message={state.error.message}
+            action={
+              <button type="button" onClick={state.retry}>
+                Tentar novamente
+              </button>
+            }
+          />
         </>
       )}
 

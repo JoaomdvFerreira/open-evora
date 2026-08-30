@@ -1,0 +1,71 @@
+/* DS-05F — canonical production Progress/Error feedback visual recipes,
+   moved (not duplicated) from styles/ui.css so the production application
+   can depend on ProgressMessage/ErrorNotice without importing the rest of
+   ui.css, which still carries unrelated selectors/collision risk
+   (`.unavailable-control`/`.unavailable-note` collide with index.css's own
+   production selectors of the same name) — same rationale as breadcrumb.css
+   (DS-05E). Imported by ui.css so Storybook's existing `.ui-progress-message`/
+   `.ui-error-notice*` consumers keep the exact same behaviour unchanged.
+   Visual recipes are unchanged from their prior ui.css definitions.
+
+   EmptyState's `.ui-empty-state*` selectors stay in ui.css: EmptyState
+   remains Storybook-only until DS-05I and is not part of this boundary
+   (component-model.md §4.3 "ProgressMessage", "ErrorNotice", "EmptyState";
+   Gate C1 decision 6: three separate explicit boundaries). */
+
+/* ---- ProgressMessage ---------------------------------------------------
+   Restrained: current evidence (App/Explorer/Overview/RecordsExplorer/
+   ProblemView/RecordDetailPanel loading branches) is plain status text with
+   no border/surface/icon. No colour or icon is added here — the text alone
+   carries "in progress", matching current production treatment. */
+.ui-progress-message {
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+/* ---- ErrorNotice ---------------------------------------------------------
+   Current evidence (App/RecordDetailPanel/ProblemView/RecordsExplorer
+   `role="alert"` branches) pairs a heading and message inside a bordered
+   box; this recipe keeps that shape restrained (hairline border, not a
+   heavy fill) so it states failure explicitly without dominating the page. */
+.ui-error-notice {
+  border: var(--p-border-width-hairline) solid var(--color-feedback-error-line);
+  border-radius: var(--radius-surface);
+  padding: var(--space-standard);
+  background: var(--color-feedback-error-surface);
+  color: var(--color-feedback-error-ink);
+}
+
+.ui-error-notice-title {
+  margin: 0 0 var(--space-tight);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-heading-size);
+  font-weight: var(--text-interface-heading-weight);
+  line-height: var(--text-interface-heading-line-height);
+}
+
+.ui-error-notice-message {
+  margin: 0 0 var(--space-tight);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-error-notice-message:last-child {
+  margin-bottom: 0;
+}
+
+/* A caller-supplied action using the ordinary ui-action-outlined recipe
+   (ordinary ink/surface roles, not the error hue) reads as an ordinary
+   control rather than compounding the alert's visual weight. This selector
+   only positions such an action when the caller opts into that recipe; it
+   never constructs the action itself (see ErrorNotice.tsx `action` prop).
+   Harmless when ui-action-outlined is absent from the production style
+   boundary: production does not yet import that recipe, so this selector
+   simply does not match until it does. */
+.ui-error-notice .ui-action-outlined {
+  margin-top: var(--space-tight);
+}

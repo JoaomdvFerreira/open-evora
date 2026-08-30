@@ -2,6 +2,8 @@ import type { DataProvider } from "../dataProvider/types";
 import { useRecordIndex } from "./useRecordIndex";
 import { RecordsTable } from "./RecordsTable";
 import { RecordDetailPanel } from "./RecordDetailPanel";
+import { ProgressMessage } from "../presentation/ProgressMessage";
+import { ErrorNotice } from "../presentation/ErrorNotice";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -54,22 +56,20 @@ export function RecordsExplorer({
   const indexState = useRecordIndex(dataProvider);
 
   if (indexState.status === "loading") {
-    return (
-      <p role="status" aria-live="polite">
-        A carregar registos…
-      </p>
-    );
+    return <ProgressMessage message="A carregar registos…" />;
   }
 
   if (indexState.status === "error") {
     return (
-      <div role="alert">
-        <h2>{ERROR_TITLES[indexState.error.kind] ?? "Não foi possível carregar os registos"}</h2>
-          <p>{indexState.error.message}</p>
+      <ErrorNotice
+        title={ERROR_TITLES[indexState.error.kind] ?? "Não foi possível carregar os registos"}
+        message={indexState.error.message}
+        action={
           <button type="button" onClick={indexState.retry}>
             Tentar novamente
           </button>
-      </div>
+        }
+      />
     );
   }
 
