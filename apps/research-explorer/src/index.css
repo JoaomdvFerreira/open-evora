@@ -551,23 +551,6 @@ code {
   margin-right: var(--space-2);
 }
 
-.effect-chip {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--line-emphasis);
-  border-radius: var(--radius-sm);
-  padding: 3px 8px;
-  color: var(--ink);
-  background: var(--surface);
-  font-family: var(--recipe-technical-id-family);
-  font-size: 11px;
-}
-
-.effect-chip code {
-  background: none;
-  padding: 0;
-}
-
 /* PI-02F3: effect-label help — same visible-on-hover/focus tooltip
    pattern as .unavailable-note (UX-F), reused here so keyboard focus exposes
    the explanation exactly as pointer hover does. */
