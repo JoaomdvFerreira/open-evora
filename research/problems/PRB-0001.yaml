@@ -1,6 +1,6 @@
 problem_id: PRB-0001
 created_at: 2026-08-28
-updated_at: 2026-08-28
+updated_at: 2026-08-31
 title: A utilidade prática dos transportes públicos varia consoante os horários
   e os territórios
 domain:
@@ -30,18 +30,15 @@ investigation:
         2025. Porém, quilómetros comerciais não estabelecem frequência, tempo de
         espera, viabilidade de uma deslocação, capacidade ou prevalência dos
         utilizadores afetados.
-      latest_result: EVD-000157 desagrega a oferta programada de 2025 por carreira e
-        tipo de dia; EVD-000158 regista indicadores agregados e
-        janelas/corredores de atrasos recorrentes nas horas de ponta em 2025.
-        Ambos delimitam melhor a variação documentada, sem estabelecer impacto
-        prático ao nível do utilizador.
-      current_action: Procurar dados operacionais atuais ao nível de linha/paragem
-        e/ou evidência delimitada de deslocações afetadas, sem iniciar
-        entrevistas genéricas de percurso neste refresh.
-      resolution_condition: Dados operacionais atuais ao nível de linha/paragem e/ou
-        evidência delimitada de deslocações afetadas suficiente para estabelecer
-        o impacto prático, mantendo separadas frequência, espera, capacidade e
-        prevalência.
+      latest_result: O contexto de carreiras e corredores de 2025 foi mais delimitado,
+        mas não foi possível estabelecer uma deslocação atual reproduzível por
+        linha, paragem e partida, nem o seu impacto prático para utilizadores.
+      current_action: Não é proporcional prosseguir desafio direto sem dados
+        operacionais atuais ao nível de linha/paragem ou uma deslocação afetada
+        delimitada.
+      resolution_condition: Dados operacionais atuais ao nível de linha/paragem ou uma
+        deslocação afetada delimitada que permitam estabelecer o impacto prático,
+        mantendo separadas frequência, espera, capacidade e prevalência.
       evidence:
         - EVD-000002
         - EVD-000117
@@ -580,3 +577,6 @@ decision_basis:
     da mesma voz institucional (SRC-0018 e os seus antecedentes de 2022/2023,
     EVD-000117) são agrupados para efeitos de avaliação da independência apesar
     de possuírem diferentes `source_id`.
+history:
+  - date: 2026-08-31
+    summary: O contexto de serviço de 2025 foi mais delimitado, mas não foi possível estabelecer uma deslocação atual reproduzível por linha, paragem e partida; a investigação passa a aguardar dados operacionais atuais ou uma deslocação afetada delimitada.

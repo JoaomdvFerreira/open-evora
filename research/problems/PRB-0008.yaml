@@ -1,6 +1,6 @@
 problem_id: PRB-0008
 created_at: "2026-08-28"
-updated_at: "2026-08-28"
+updated_at: "2026-08-31"
 title: O alinhamento entre competências e necessidades dos empregadores é uma
   preocupação institucional ativa, mas o desfasamento específico em Évora ainda
   não está caracterizado
@@ -45,8 +45,12 @@ investigation:
         abrange catorze municípios, pelo que os dados dos centros de emprego do
         IEFP também não permitem obter uma lista específica para o concelho de
         Évora.
-      current_action: A validação institucional junto da NERE continua a ser a via de
-        investigação adequada para esta questão.
+      latest_result: A via institucional terminou sem resposta após uma sequência de
+        contacto delimitada; a ausência de resposta não é evidência a favor nem
+        contra o problema.
+      current_action: Não é proporcional prosseguir contacto institucional; a questão
+        permanece em aberto até existirem dados municipais específicos ou evidência
+        institucional de igual alcance.
       resolution_condition: Dados ou validação institucional específicos do concelho
         de Évora, e não apenas regionais, sobre profissões ou competências em
         situação de escassez.
@@ -180,3 +184,6 @@ validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
+history:
+  - date: 2026-08-31
+    summary: A via institucional terminou sem resposta e essa ausência não é evidência a favor nem contra o problema; a questão municipal sobre competências e profissões em escassez mantém-se em aberto até existir evidência específica do concelho.

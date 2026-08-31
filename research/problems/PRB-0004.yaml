@@ -1,6 +1,6 @@
 problem_id: PRB-0004
 created_at: "2026-08-28"
-updated_at: "2026-08-28"
+updated_at: "2026-08-31"
 title: Descontinuidades na rede ciclável de Évora e impacto quotidiano ainda por
   caracterizar
 domain:
@@ -45,12 +45,14 @@ investigation:
         concretamente afetados pela descontinuidade, nem em que medida esta
         reduz a utilidade prática da rede para quem se desloca diariamente de
         bicicleta.
-      current_action: A observação direta, a análise da rede de percursos e a
-        validação com partes interessadas e utilizadores continuam a ser as vias
-        de investigação para caracterizar as deslocações afetadas.
-      resolution_condition: Validação das dimensões de conectividade, segurança,
-        manutenção, utilidade para os destinos e orientação/sinalética, de forma
-        a estabelecer quais as deslocações quotidianas concretamente afetadas.
+      latest_result: Não foi identificada uma deslocação quotidiana recorrente que
+        cumprisse o critério delimitado para desafio direto.
+      current_action: Não está autorizada nova procura de deslocações no âmbito atual;
+        a questão reabre apenas perante uma deslocação concreta e segura ou
+        evidência operacional atual materialmente melhor.
+      resolution_condition: Uma deslocação quotidiana concreta e segura ou evidência
+        operacional atual materialmente melhor que permita estabelecer quais as
+        deslocações são afetadas.
       evidence:
         - EVD-000118
   path:
@@ -138,3 +140,6 @@ validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
+history:
+  - date: 2026-08-31
+    summary: Não foi identificada uma deslocação quotidiana recorrente que cumprisse o critério delimitado para desafio direto; a investigação deixa de procurar novas deslocações e reabre apenas perante uma deslocação concreta e segura ou evidência operacional atual materialmente melhor.

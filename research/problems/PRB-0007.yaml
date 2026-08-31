@@ -1,6 +1,6 @@
 problem_id: PRB-0007
 created_at: "2026-08-28"
-updated_at: "2026-08-28"
+updated_at: "2026-08-31"
 title: Os cuidadores informais em Évora enfrentam dificuldades no acesso a
   apoios, incluindo necessidades de informação e orientação
 domain:
@@ -69,6 +69,12 @@ investigation:
         financeiro e apoio psicológico são reportadas com maior frequência do
         que as necessidades de orientação, pelo que permanecem explicações
         alternativas e possivelmente mais prevalentes.
+      latest_result: Não estava disponível um episódio concreto de procura de apoio
+        que permitisse testar esta relação; a recolha não foi alargada apenas para
+        obter evidência de validação.
+      current_action: Não é proporcional recrutar ou procurar novos episódios no
+        âmbito atual; a questão reabre apenas com um episódio delimitado adequado
+        ou evidência direta materialmente mais forte.
       resolution_condition: Evidência que relacione diretamente as dificuldades de
         informação e orientação com a não utilização de apoio formal ou que
         permita estabelecer a importância relativa das diferentes explicações.
@@ -197,3 +203,6 @@ validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
+history:
+  - date: 2026-08-31
+    summary: Não estava disponível um episódio concreto de procura de apoio adequado e a recolha não foi alargada apenas para obter evidência; a importância causal da orientação face às necessidades diretas de cuidado, descanso, apoio financeiro e psicológico mantém-se sem resolução.

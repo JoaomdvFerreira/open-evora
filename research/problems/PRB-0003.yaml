@@ -1,6 +1,6 @@
 problem_id: PRB-0003
 created_at: "2026-08-28"
-updated_at: "2026-08-28"
+updated_at: "2026-08-31"
 title: Barreiras pedonais e de acessibilidade em partes de Évora, com
   persistência atual ainda por validar
 domain:
@@ -32,11 +32,14 @@ investigation:
         projeto corretivo da EB1 Azaruja é recente (2025-2026) e o seu estado
         pós-intervenção não foi verificado; as plataformas de turismo acessível
         têm atualidade desconhecida.
-      current_action: Testes de percursos experimentais de 2026 (4ª revisão do PUE)
-        convidam o público a testar fisicamente percursos pedonais/de mobilidade
-        suave e contribuir perceções sobre inclusão e acessibilidade.
-      resolution_condition: Um inventário de barreiras ao nível da localização/atual
-        que estabeleça quais as barreiras concretas que persistem hoje.
+      latest_result: O desafio institucional confirmou avaliação in-loco e fatores
+        concretos de barreira, bem como correção parcial; não estabeleceu quais
+        barreiras persistem em cada localização nem a consequência vivida atual.
+      current_action: Não é seguro nem proporcional prosseguir observação no local sem
+        uma base suficiente de acesso público e salvaguarda.
+      resolution_condition: Um inventário autoritativo atual ao nível da localização ou
+        uma observação do estado atual proporcional e seguramente executável que
+        estabeleça quais as barreiras concretas que persistem hoje.
       evidence:
         - EVD-000029
         - EVD-000112
@@ -171,10 +174,17 @@ evidence:
       - LOCAL_OBSERVATION
       - EXISTING_RESPONSE
 evidence_status: corroborated
-validation_status: unvalidated
+validation_status: partially_validated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
+history:
+  - date: 2026-08-31
+    summary: O desafio institucional confirmou avaliação in-loco, fatores concretos de barreira e correção parcial, sem estabelecer as barreiras atuais em cada localização nem a consequência vivida; a investigação passa a aguardar um inventário atual ou uma observação seguramente executável.
+    state_changes:
+      validation_status:
+        from: unvalidated
+        to: partially_validated
 decision_basis:
   contract_version: "0.1"
   eligibility_basis: >-
