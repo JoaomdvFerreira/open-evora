@@ -265,6 +265,24 @@ Examples:
 
 Do not use quotas of Sources, Evidence records, interviews, or stakeholder groups as completion criteria.
 
+### External engagement and late responses
+
+External engagement is subject to the same proportional stopping rule as any
+other method. A route may be stopped when no safe or executable case is
+available, when recruitment would not be proportionate, or when further
+waiting is no longer decision-proportionate.
+
+A pending external response does not by itself block programme progression.
+The associated substantive question remains explicitly unresolved, and the
+waiting route may be retained as non-blocking or stopped with its reason
+recorded. Non-response is an outreach outcome, not Evidence for or against a
+Problem.
+
+If a substantive response arrives after a phase has closed, treat it as new
+incoming research. It must pass the normal human Gate 1 review before any
+canonical Source, Evidence, or Problem change is made. A late response does
+not automatically reopen a closed phase or invalidate its historical closure.
+
 Before completing an integration:
 - avoid duplicate Sources, Evidence, and Problems;
 - preserve provenance, scope, contradictions, and material uncertainty;

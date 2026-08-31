@@ -1,6 +1,6 @@
 problem_id: PRB-0006
 created_at: "2026-08-28"
-updated_at: "2026-08-28"
+updated_at: "2026-08-31"
 title: O acesso a habitação adequada e a preços comportáveis é difícil para
   alguns grupos populacionais
 domain:
@@ -40,11 +40,13 @@ investigation:
         entanto, essa resposta não estabelece a usabilidade, clareza,
         acessibilidade nem a experiência de espera do lado dos estudantes
         afetados.
-      latest_result: A resposta institucional da SASUE, de 13 de agosto de 2026,
-        descreve um processo de candidatura online estruturado através do
-        SIIUE/Perfil de aluno, com consulta direta do estado, notificação do
-        resultado e uma via para alterações com suporte dos serviços de
-        informática, avaliando o processo como totalmente operacional.
+      latest_result: O desafio institucional descreveu um processo online estruturado,
+        com consulta de estado, notificação de resultado e apoio, contrariando
+        materialmente uma falha sistémica institucional de candidatura ou
+        informação. Não estabelece a usabilidade, clareza, acessibilidade ou
+        experiência de espera dos estudantes.
+      current_action: Não é proporcional prosseguir desafio direto; qualquer reabertura
+        da questão de navegação deve incidir na experiência efetiva dos estudantes.
       resolution_condition: Evidência direta da experiência dos estudantes —
         usabilidade, clareza, acessibilidade, experiência de espera e
         dificuldades individuais — que permita estabelecer se existe uma falha
@@ -169,10 +171,17 @@ evidence:
     research_roles:
       - LOCAL_OBSERVATION
 evidence_status: corroborated
-validation_status: unvalidated
+validation_status: partially_validated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
+history:
+  - date: 2026-08-31
+    summary: O desafio institucional descreveu um processo online estruturado com consulta de estado, notificação e apoio, contrariando materialmente uma falha sistémica institucional de candidatura ou informação; a usabilidade e experiência dos estudantes mantêm-se por estabelecer.
+    state_changes:
+      validation_status:
+        from: unvalidated
+        to: partially_validated
 decision_basis:
   contract_version: "0.1"
   eligibility_basis: >-

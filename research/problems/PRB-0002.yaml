@@ -1,6 +1,6 @@
 problem_id: PRB-0002
 created_at: "2026-08-28"
-updated_at: "2026-08-28"
+updated_at: "2026-08-31"
 title: A informação dos transportes públicos apresenta lacunas documentadas, com
   impacto nas viagens ainda por caracterizar
 domain:
@@ -27,9 +27,13 @@ investigation:
         e físicos (TREVO, TPAC/GTFS) e que a informação física nas paragens é
         inconsistente, mas não existe ainda evidência sobre as viagens afetadas
         nem sobre se estas lacunas causam falhas reais para os passageiros.
-      resolution_condition: Evidência sobre as viagens afetadas dos passageiros que
-        permita estabelecer se e como estas lacunas de informação causam falhas
-        práticas nas deslocações.
+      latest_result: Não estava disponível uma deslocação real delimitada que
+        permitisse distinguir uma falha de viagem causada pela informação de
+        inconveniência ou de uma falha operacional.
+      current_action: Não é proporcional prosseguir desafio direto a passageiros sem
+        uma deslocação real delimitada que permita testar essa cadeia causal.
+      resolution_condition: Uma deslocação real delimitada que permita estabelecer se
+        e como estas lacunas de informação causam falhas práticas nas deslocações.
       evidence:
         - EVD-000016
         - EVD-000123
@@ -122,3 +126,6 @@ validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
+history:
+  - date: 2026-08-31
+    summary: Não foi possível testar numa deslocação real delimitada se uma lacuna de informação causa falha de viagem, em vez de inconveniência ou falha operacional; a investigação passa a aguardar uma deslocação adequada para testar essa cadeia causal.

@@ -1,6 +1,6 @@
 problem_id: PRB-0005
 created_at: "2026-08-28"
-updated_at: "2026-08-28"
+updated_at: "2026-08-31"
 title: O tráfego automóvel e a pressão de estacionamento entram em conflito com
   a qualidade, a segurança e a legibilidade do espaço pedonal em zonas
   urbanas-chave
@@ -39,15 +39,13 @@ investigation:
         da Via Verde Estacionar. A evidência atual não estabelece, contudo, que
         a falta de informação sobre a ocupação do estacionamento seja uma causa
         material dos resultados observados.
-      latest_result: "A revisão da lacuna residual classificou o resultado como
-        PARCIAL: a evidência comparativa — Seattle OpenPark e SFpark — demonstra
-        a existência de um mecanismo credível baseado em informação sobre
-        disponibilidade de estacionamento, mas não estabelece que esse mecanismo
-        tenha causalidade material no caso de Évora."
-      current_action: A validação ao nível da deslocação e da localização continua a
-        ser a via de investigação para estabelecer se a disponibilidade e
-        visibilidade da informação sobre ocupação de estacionamento contribui
-        materialmente para os resultados observados.
+      latest_result: O desafio institucional não produziu evidência que resolva se a
+        disponibilidade de informação sobre estacionamento contribui
+        materialmente para os resultados observados. A evidência comparativa não
+        estabelece causalidade material em Évora.
+      current_action: Não é proporcional prosseguir desafio de deslocação no âmbito
+        atual; a via de informação reabre apenas com evidência local direta capaz
+        de estabelecer contribuição causal material.
       evidence:
         - EVD-000105
         - EVD-000106
@@ -150,3 +148,6 @@ validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
+history:
+  - date: 2026-08-31
+    summary: O desafio direto não resolveu se a disponibilidade de informação de estacionamento é uma causa material; o enquadramento físico e operacional de tráfego e estacionamento mantém-se distinto da hipótese informacional, que reabre apenas com evidência local direta de contribuição causal material.

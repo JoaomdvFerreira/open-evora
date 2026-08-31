@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
-  "currentMilestoneId": "M005",
+  "projectStatus": "review",
+  "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -62,7 +62,7 @@
         "id": "M005",
         "title": "D5 — Stakeholder Challenge & Validation",
         "objective": "Challenge the current Problem framings with the minimum credible direct operator, institutional, affected-journey and observational evidence needed to resolve decision-critical unknowns, refine or falsify those framings, and update validation_status only through a human-authored decision supported by proportionate direct challenge. D5 does not attempt to maximize validated PRBs.",
-        "status": "ready",
+        "status": "done",
         "workUnitIds": [
           "WU022",
           "WU023",
@@ -898,12 +898,12 @@
         "validationCommands": [
           "node tools/validate-research.js"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-028"
         ],
         "createdAt": "2026-08-11T18:56:45.186Z",
-        "updatedAt": "2026-08-30T20:08:14.592Z"
+        "updatedAt": "2026-08-31T09:38:56.308Z"
       }
     ],
     "dependencies": [
@@ -2822,17 +2822,85 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-08-30T20:08:14.592Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-08-30T20:08:14.592Z"
+    },
+    {
+      "id": "C025",
+      "workUnitId": "WU024",
+      "packetId": "PKT-025",
+      "summary": "Owner-approved D5 exit decision: PASS WITH EXPLICIT UNRESOLVED UNCERTAINTY. WU024 recorded the final human validation matrix, bounded refinements, unresolved unknowns, the non-blocking PRB-0007 DEIS route, and a D6 handoff without starting D6.",
+      "completed": [
+        "Recorded the D5 closure artefact and the final validation matrix: PRB-0003 and PRB-0006 are partially_validated; all other PRB-0001 through PRB-0010 remain unvalidated.",
+        "Recorded bounded APCE and SASUE refinements without inferring current prevalence, lived consequences, housing affordability, or student-side experience.",
+        "Recorded PRB-0007 as two distinct routes: affected journey stopped for NO_SUITABLE_CASE without recruitment expansion; DEIS pending a substantive response and non-blocking.",
+        "Added the general proportional external-wait and late-response Gate 1 rule to the canonical investigation strategy.",
+        "Recorded an explicit D6 handoff boundary without selecting a product, vendor, architecture, intervention, or starting D6."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "docs/investigationstrategy.md",
+        "docs/milestones/D5-WU03-closure.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "145 tests passed; canonical validation reported 268 records OK."
+        },
+        {
+          "command": "npm run research:readiness",
+          "result": "partial",
+          "summary": "Readiness completed; its existing review-required findings were preserved and no readiness decision was made by this closure."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "Documentation delta is whitespace-clean."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Each challenged PRB has a human validation decision and no validation status was changed automatically.",
+          "result": "passed",
+          "evidence": "D5 closure matrix and existing canonical PRB records."
+        },
+        {
+          "criterion": "The final D5 matrix, bounded contradiction/refinement log, unresolved unknowns, and M004-style closure artefact exist.",
+          "result": "passed",
+          "evidence": "docs/milestones/D5-WU03-closure.md."
+        },
+        {
+          "criterion": "PRB-0007 distinguishes a stopped affected-journey route from a pending, non-blocking DEIS route without treating acknowledgement or non-response as Evidence.",
+          "result": "passed",
+          "evidence": "PRB-0007 current investigation state and D5 closure record section 5."
+        },
+        {
+          "criterion": "An explicit D6 handoff exists and D6 was not started.",
+          "result": "passed",
+          "evidence": "D5 closure record section 6; no D6 work unit was selected."
+        },
+        {
+          "criterion": "Working tree was clean before the closure checkpoint commit.",
+          "result": "passed",
+          "evidence": "Documentation commit 53057c3608a643023074c9307e7195acb5caa6ef was completed before this checkpoint."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-08-31T09:38:56.308Z",
+      "nextRecommendation": "aiqt review --mode release"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-024",
-    "workUnitId": "WU023",
+    "id": "PKT-025",
+    "workUnitId": "WU024",
     "milestoneId": "M005",
-    "createdAt": "2026-08-30T18:32:12.160Z",
+    "createdAt": "2026-08-30T20:17:33.994Z",
     "format": "markdown",
-    "contentHash": "sha256:e6199a9d5a2ad9b8255eb9c643426a031196467c36941643905acdb9f6d01146",
+    "contentHash": "sha256:dea1af7f23c6e2bbafd781496785f10fb73a532b627e314560e86c84a258cb4b",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -2850,8 +2918,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-08-30T20:08:14.592Z",
+  "nextRecommendedCommand": "aiqt review --mode release",
+  "lastUpdatedAt": "2026-08-31T09:38:56.308Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
@@ -3616,6 +3684,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-08-30T20:08:14.592Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C025",
+      "current": {
+        "observationId": "sha256:eb011fff6f869ddcc3419543ad57c79c05e33a420eb68c8ef3aac5eb1f647508",
+        "checkpointId": "C025",
+        "workUnitId": "WU024",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-08-31T09:38:56.308Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-08-31T09:38:56.308Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:eb011fff6f869ddcc3419543ad57c79c05e33a420eb68c8ef3aac5eb1f647508",
+          "checkpointId": "C025",
+          "workUnitId": "WU024",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-08-31T09:38:56.308Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-08-31T09:38:56.308Z"
         }
       ]
     }

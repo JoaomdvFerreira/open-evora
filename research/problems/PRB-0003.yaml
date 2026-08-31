@@ -1,6 +1,6 @@
 problem_id: PRB-0003
 created_at: "2026-08-28"
-updated_at: "2026-08-28"
+updated_at: "2026-08-31"
 title: Barreiras pedonais e de acessibilidade em partes de Évora, com
   persistência atual ainda por validar
 domain:
@@ -25,18 +25,25 @@ causal_reading: "Esta é uma interpretação não validada: as barreiras apontam
 investigation:
   open_questions:
     - question: Quais as barreiras concretas que persistem hoje, a nível de
-        localização, face às intervenções físicas em curso e à correção parcial
-        já reportada?
-      why_open: A APCE confirma que apenas algumas barreiras identificadas foram
-        corrigidas, sem fornecer um inventário ao nível da localização; o
+        localização, face às intervenções físicas em curso e ao relato de
+        intervenção posterior sobre algumas barreiras identificadas?
+      why_open: A APCE reporta que algumas barreiras identificadas anteriormente
+        foram posteriormente alvo de intervenção, sem mapear o diagnóstico à
+        intervenção nem fornecer um inventário ao nível da localização; o
         projeto corretivo da EB1 Azaruja é recente (2025-2026) e o seu estado
         pós-intervenção não foi verificado; as plataformas de turismo acessível
         têm atualidade desconhecida.
-      current_action: Testes de percursos experimentais de 2026 (4ª revisão do PUE)
-        convidam o público a testar fisicamente percursos pedonais/de mobilidade
-        suave e contribuir perceções sobre inclusão e acessibilidade.
-      resolution_condition: Um inventário de barreiras ao nível da localização/atual
-        que estabeleça quais as barreiras concretas que persistem hoje.
+      latest_result: O desafio institucional confirmou avaliação in-loco e fatores
+        concretos de barreira; a APCE reportou adicionalmente que algumas
+        barreiras identificadas anteriormente foram posteriormente alvo de
+        intervenção. Isto não estabelece se as intervenções corrigiram
+        integralmente as barreiras, que localizações estão resolvidas ou pendentes,
+        nem a consequência vivida atual.
+      current_action: Não é seguro nem proporcional prosseguir observação no local sem
+        uma base suficiente de acesso público e salvaguarda.
+      resolution_condition: Um inventário autoritativo atual ao nível da localização ou
+        uma observação do estado atual proporcional e seguramente executável que
+        estabeleça quais as barreiras concretas que persistem hoje.
       evidence:
         - EVD-000029
         - EVD-000112
@@ -68,8 +75,9 @@ investigation:
       summary: A resposta institucional direta da APCE (agosto de 2026) confirmou a
         metodologia (avaliação in-loco com participação direta de pessoas com
         mobilidade reduzida) e nomeou fatores de barreira (inclinação,
-        localização) em acessos, com correção parcial já realizada mas sem
-        inventário ao nível da localização. Um programa distinto de
+        localização) em acessos e reportou intervenção posterior sobre algumas
+        barreiras anteriormente identificadas, mas sem inventário ao nível da
+        localização. Um programa distinto de
         acessibilidade em comércios do Centro Histórico foi identificado como
         uma segunda via de solução existente.
       evidence:
@@ -171,10 +179,17 @@ evidence:
       - LOCAL_OBSERVATION
       - EXISTING_RESPONSE
 evidence_status: corroborated
-validation_status: unvalidated
+validation_status: partially_validated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
+history:
+  - date: 2026-08-31
+    summary: O desafio institucional confirmou avaliação in-loco e fatores concretos de barreira; a APCE reportou que algumas barreiras anteriormente identificadas foram posteriormente alvo de intervenção, sem estabelecer se essas intervenções as corrigiram integralmente, que localizações estão resolvidas ou pendentes, nem a consequência vivida atual; a investigação passa a aguardar um inventário atual ou uma observação seguramente executável.
+    state_changes:
+      validation_status:
+        from: unvalidated
+        to: partially_validated
 decision_basis:
   contract_version: "0.1"
   eligibility_basis: >-
@@ -207,9 +222,13 @@ decision_basis:
 
     continuam hoje por corrigir em cada localização: EVD-000148 documenta uma
 
-    resposta corretiva recente; EVD-000112 e EVD-000113 confirmam que algumas
+    resposta corretiva recente; EVD-000113 e EVD-000131 registam, respetivamente,
 
-    barreiras foram corrigidas sem fornecer uma discriminação completa por
+    fatores de barreira identificados em avaliação in-loco e o relato de
+
+    intervenção posterior sobre algumas barreiras anteriormente identificadas,
+
+    sem mapeamento diagnóstico-intervenção ou discriminação completa por
 
     localização; e EVD-000029 mantém a necessidade de teste contemporâneo das
 
@@ -286,12 +305,15 @@ decision_basis:
     institucional: confirma avaliações in loco, identifica fatores de barreira
     como
 
-    inclinação e localização dos acessos e refere que algumas barreiras foram
+    inclinação e localização dos acessos. EVD-000131 acrescenta o relato de que
 
-    corrigidas, mas não fornece um inventário completo das situações corrigidas
-    e
+    algumas barreiras anteriormente identificadas foram posteriormente alvo de
 
-    por corrigir ao nível da localização.
+    intervenção, mas não fornece um mapeamento diagnóstico-intervenção, nem um
+
+    inventário completo de situações resolvidas ou pendentes ao nível da
+
+    localização.
 
 
     Em conjunto, estas linhas sustentam a afirmação delimitada de que existem
@@ -363,11 +385,13 @@ decision_basis:
 
 
       A evidência mais recente disponível é a resposta direta da APCE de agosto
-      de 2026 (EVD-000112, EVD-000113). Confirma que continuam a ser
-      identificados fatores de barreira em avaliações in loco e que algumas
-      correções já foram realizadas, mas não fornece um inventário por
-      localização que permita saber quais as barreiras específicas que
-      permanecem por corrigir.
+      de 2026 (EVD-000112, EVD-000113, EVD-000131). Confirma que continuam a ser
+      identificados fatores de barreira em avaliações in loco e regista que
+      algumas barreiras anteriormente identificadas foram posteriormente alvo de
+      intervenção, mas não estabelece se as intervenções as corrigiram
+      integralmente, nem fornece um inventário por localização que permita saber
+      quais as barreiras específicas permanecem ou quais situações estão
+      resolvidas ou pendentes.
 
 
       Nenhum conjunto de dados ou registo estabelece um estado exaustivo e atual
@@ -388,8 +412,9 @@ decision_basis:
 
 
       A procura não encontrou evidência de que as barreiras documentadas estejam
-      hoje totalmente resolvidas. A própria resposta da APCE descreve apenas uma
-      correção parcial, sem detalhe por localização, e nenhum registo estabelece
+      hoje totalmente resolvidas. A APCE reporta apenas intervenção posterior
+      sobre algumas barreiras anteriormente identificadas, sem mapeamento por
+      localização ou evidência de conclusão/eficácia; nenhum registo estabelece
       que o estado pós-intervenção do projeto corretivo da EB1 da Azaruja tenha
       sido verificado.
 
@@ -497,9 +522,11 @@ decision_basis:
 
     menos uma manifestação local concreta, e à existência de processos
 
-    institucionais e participativos que continuaram a identificar e a corrigir
+    institucionais e participativos que continuaram a identificar barreiras e,
 
-    parcialmente essas barreiras até agosto de 2026.
+    segundo relato da APCE, sujeitaram algumas barreiras anteriormente
+
+    identificadas a intervenção até agosto de 2026.
 
 
     A evidência não sustenta uma afirmação de prevalência à escala de todo o
