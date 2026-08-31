@@ -23,7 +23,7 @@ this closure record.
 | --- | --- | --- |
 | `PRB-0001` | `unvalidated` | No reproducible current affected journey was available. |
 | `PRB-0002` | `unvalidated` | No bounded real journey tested the information-to-impact chain. |
-| `PRB-0003` | `partially_validated` | APCE established an in-loco assessment, concrete barrier factors and partial correction. |
+| `PRB-0003` | `partially_validated` | APCE established an in-loco assessment and concrete barrier factors, and reported later intervention on some previously identified barriers. |
 | `PRB-0004` | `unvalidated` | No suitable recurring everyday cycling journey was available. |
 | `PRB-0005` | `unvalidated` | The parking-information mechanism was not established as a local material cause. |
 | `PRB-0006` | `partially_validated` | SASUE restricted the systemic institutional application/information-process framing. |
@@ -39,11 +39,13 @@ for every Problem, and no status was changed automatically.
 
 ### `PRB-0003` — pedestrian and accessibility barriers
 
-The APCE direct challenge established that an in-loco assessment took place,
-identified concrete barrier factors and led to partial correction. This is a
-bounded partial validation and refinement: it does not establish that a
-historical barrier persists unchanged, establish present condition at each
-location, establish municipal prevalence, or establish lived consequence. A
+The APCE direct challenge established that an in-loco assessment took place and
+identified concrete barrier factors. APCE additionally reported that some
+barriers identified in earlier Acesso Universal versions were later subject to
+intervention. This bounded partial validation and refinement does not establish
+a diagnostic-to-intervention mapping by location, whether those interventions
+fully corrected the barriers, which situations are resolved or pending, present
+condition at each location, municipal prevalence, or lived consequence. A
 current location-level inventory or a safely executable observation remains
 necessary for those questions.
 
