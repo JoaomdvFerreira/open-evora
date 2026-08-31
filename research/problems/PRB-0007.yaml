@@ -47,6 +47,11 @@ investigation:
         procura responder explicitamente às dificuldades de informação e
         orientação descritas neste problema, mas a execução e eficácia dessas
         medidas ainda não foram verificadas.
+      latest_result: A DEIS reconheceu o pedido e solicitou contexto adicional sobre
+        Open Évora; esse contexto foi fornecido. Não foi recebida resposta
+        substantiva sobre a execução ou eficácia das medidas.
+      current_action: Aguardar resposta substantiva da DEIS sobre a execução e
+        eficácia das medidas de apoio e orientação.
       resolution_condition: Validação junto das partes interessadas sobre o
         conhecimento dos serviços existentes e sobre a execução e eficácia das
         medidas previstas no plano 2026-2027.
@@ -72,9 +77,11 @@ investigation:
       latest_result: Não estava disponível um episódio concreto de procura de apoio
         que permitisse testar esta relação; a recolha não foi alargada apenas para
         obter evidência de validação.
-      current_action: Não é proporcional recrutar ou procurar novos episódios no
-        âmbito atual; a questão reabre apenas com um episódio delimitado adequado
-        ou evidência direta materialmente mais forte.
+      current_action: >-
+        A via de percurso afetado está parada: não é proporcional recrutar ou
+        procurar novos episódios no âmbito atual. A questão reabre apenas com
+        um episódio delimitado adequado ou evidência direta materialmente mais
+        forte.
       resolution_condition: Evidência que relacione diretamente as dificuldades de
         informação e orientação com a não utilização de apoio formal ou que
         permita estabelecer a importância relativa das diferentes explicações.
@@ -205,4 +212,4 @@ solution_landscape_status: not_assessed
 status: OPEN
 history:
   - date: 2026-08-31
-    summary: Não estava disponível um episódio concreto de procura de apoio adequado e a recolha não foi alargada apenas para obter evidência; a importância causal da orientação face às necessidades diretas de cuidado, descanso, apoio financeiro e psicológico mantém-se sem resolução.
+    summary: Não estava disponível um episódio concreto de procura de apoio adequado e a recolha não foi alargada apenas para obter evidência; em paralelo, a DEIS reconheceu o pedido, solicitou contexto adicional que foi fornecido e aguarda-se resposta substantiva. A importância causal da orientação face às necessidades diretas de cuidado, descanso, apoio financeiro e psicológico mantém-se sem resolução.
