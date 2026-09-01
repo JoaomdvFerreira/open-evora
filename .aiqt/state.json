@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
-  "currentMilestoneId": "M007",
+  "projectStatus": "review",
+  "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -83,7 +83,7 @@
         "id": "M007",
         "title": "M007 — PRB-0009 Decision-Critical Research Carry",
         "objective": "Determine whether already-produced aggregate, comparable and legitimately accessible operational metrics can resolve the D6 uncertainty around the waste-service restructuring sufficiently for a later human readiness decision. M007 is a bounded research follow-up to D6, not a general D7 programme phase.",
-        "status": "ready",
+        "status": "done",
         "workUnitIds": [
           "WU027",
           "WU028"
@@ -1095,12 +1095,12 @@
           "npm run research:readiness",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-030"
         ],
         "createdAt": "2026-09-01T13:24:14.610Z",
-        "updatedAt": "2026-09-01T14:47:37.594Z"
+        "updatedAt": "2026-09-01T16:28:34.369Z"
       }
     ],
     "dependencies": [
@@ -3294,17 +3294,73 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-01T14:47:37.594Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-01T14:47:37.594Z"
+    },
+    {
+      "id": "C029",
+      "workUnitId": "WU028",
+      "packetId": "PKT-029",
+      "summary": "Registada a disposição humana aprovada WATCH para PRB-0009 e o fecho limitado de M007.",
+      "completed": [
+        "Registado em docs/milestones/PRB-0009-WU028-human-readiness-gate.md o resultado de WU027: COMPARABILITY_NOT_ESTABLISHED.",
+        "Registada a disposição humana final WATCH, o gatilho exato de reconsideração e as não-inferências.",
+        "Confirmado que o candidato local de RUV não avançou para Gate 1 e que não houve integração ou transição canónica.",
+        "Fechada M007 apenas como carry de investigação concluído, sem autorização de avaliação, D7 ou fase posterior."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "docs/milestones/PRB-0009-WU028-human-readiness-gate.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Typecheck, 145 testes e validação de 268 registos passaram."
+        },
+        {
+          "command": "npm run research:readiness",
+          "result": "passed",
+          "summary": "Relatório determinístico executado; não altera a disposição humana WATCH."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "Sem erros de espaços no diff."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Uma disposição humana final é explicitamente registada.",
+          "result": "passed",
+          "evidence": "WATCH é registado no artefacto de gate humano."
+        },
+        {
+          "criterion": "M007 é encerrada com handoff limitado.",
+          "result": "passed",
+          "evidence": "O artefacto limita o fecho ao carry concluído e não autoriza D7 ou fase posterior."
+        },
+        {
+          "criterion": "Candidato canónico mantém-se sujeito a workbench/Gate 1.",
+          "result": "passed",
+          "evidence": "O candidato RUV não avançou; não houve Gate 1, integração SRC/EVD/PRB ou avaliação."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-01T16:28:34.369Z",
+      "nextRecommendation": "aiqt review --mode release"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-028",
-    "workUnitId": "WU027",
+    "id": "PKT-029",
+    "workUnitId": "WU028",
     "milestoneId": "M007",
-    "createdAt": "2026-09-01T14:43:18.851Z",
+    "createdAt": "2026-09-01T16:26:41.862Z",
     "format": "markdown",
-    "contentHash": "sha256:6ae568e4767dd9ad99c0d6c854c2c8335479e3fd1a666ac0d716deb4cd2c8ad3",
+    "contentHash": "sha256:065a8601f7c153b8d93474558d51c4cad7dd8cad4b2a12dccc98cb09e59ccb8e",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -3322,8 +3378,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-01T14:47:37.594Z",
+  "nextRecommendedCommand": "aiqt review --mode release",
+  "lastUpdatedAt": "2026-09-01T16:28:34.369Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
@@ -4208,6 +4264,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-01T14:47:37.594Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C029",
+      "current": {
+        "observationId": "sha256:5f3f8ba0cf54aa154d6b8f9728012aabe222d8d4528bfab1029eeeb17d2d1f6d",
+        "checkpointId": "C029",
+        "workUnitId": "WU028",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-01T16:28:34.369Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-01T16:28:34.369Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:5f3f8ba0cf54aa154d6b8f9728012aabe222d8d4528bfab1029eeeb17d2d1f6d",
+          "checkpointId": "C029",
+          "workUnitId": "WU028",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-01T16:28:34.369Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-01T16:28:34.369Z"
         }
       ]
     }
