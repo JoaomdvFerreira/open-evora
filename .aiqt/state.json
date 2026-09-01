@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "projectStatus": "review",
+  "projectStatus": "in_progress",
   "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
@@ -77,6 +77,16 @@
         "workUnitIds": [
           "WU025",
           "WU026"
+        ]
+      },
+      {
+        "id": "M007",
+        "title": "M007 — PRB-0009 Decision-Critical Research Carry",
+        "objective": "Determine whether already-produced aggregate, comparable and legitimately accessible operational metrics can resolve the D6 uncertainty around the waste-service restructuring sufficiently for a later human readiness decision. M007 is a bounded research follow-up to D6, not a general D7 programme phase.",
+        "status": "ready",
+        "workUnitIds": [
+          "WU027",
+          "WU028"
         ]
       }
     ],
@@ -1003,6 +1013,94 @@
         ],
         "createdAt": "2026-08-31T14:01:09.720Z",
         "updatedAt": "2026-09-01T12:06:38.240Z"
+      },
+      {
+        "id": "WU027",
+        "milestoneId": "M007",
+        "title": "WU027 — Operational Metrics Availability Research",
+        "objective": "Determine whether the required aggregate operational metrics exist, are comparable, sufficiently scoped, current enough, and legitimately accessible for a human evaluation-readiness decision for PRB-0009.",
+        "scope": [
+          "Answer whether aggregate and comparable operational metrics exist before and after the restructuring, with defined unit, period, and coverage.",
+          "Inspect the existing canonical corpus first, then authoritative or publicly available sources, datasets, portals, documents, and metadata.",
+          "Seek aggregate series by period and, where applicable, zone or route; delays, missed collections, and resolution-time metrics; the operational-change definition/date/scope; meaningful denominators or context; and access/provenance for legitimate use.",
+          "Identify whether the responsible entity appears to hold relevant aggregate metrics without contacting it."
+        ],
+        "outOfScope": [
+          "Do not conduct institutional or stakeholder outreach, request non-public data, perform fieldwork, recruit residents, or use personal data from individual service requests.",
+          "Do not execute evaluation, research solutions, promote PRB-0009, or integrate canonical SRC/EVD/PRB changes without Gate 1.",
+          "Do not infer service improvement or failure from the presence or absence of data."
+        ],
+        "acceptanceCriteria": [
+          "One bounded outcome is recorded: SUFFICIENT_METRICS_FOUND, INSUFFICIENT_METRICS, ACCESS_NOT_ESTABLISHED, or COMPARABILITY_NOT_ESTABLISHED.",
+          "The result records whether metrics exist, are comparable, are sufficiently scoped/current, and are legitimately accessible.",
+          "The work stops when the stated proportional stopping conditions apply; if useful metrics require non-public access, ACCESS_NOT_ESTABLISHED is recorded and no holder is contacted.",
+          "No evaluation is executed and no canonical integration occurs without Gate 1."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md",
+          "docs/milestones/D6-WU01-evaluation-readiness-screen.md",
+          "docs/milestones/D6-WU02-human-readiness-gate.md",
+          "research/problems/PRB-0009.yaml"
+        ],
+        "suggestedFiles": [
+          ".research-workbench/",
+          "docs/milestones/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run research:readiness",
+          "git diff --check"
+        ],
+        "status": "ready",
+        "dependencies": [],
+        "createdAt": "2026-09-01T13:24:14.610Z",
+        "updatedAt": "2026-09-01T13:24:14.610Z"
+      },
+      {
+        "id": "WU028",
+        "milestoneId": "M007",
+        "title": "WU028 — Human Research Gate & Readiness Reassessment",
+        "objective": "Review the exact WU027 result and record the human post-research disposition for PRB-0009, then close M007 and record the bounded programme handoff.",
+        "scope": [
+          "Review the exact WU027 result and record one human final disposition: EVALUATION_ROUTE_READY, CONDITIONAL, or WATCH.",
+          "Close M007 and record the bounded programme handoff.",
+          "Prepare any warranted candidate SRC/EVD changes through the normal research workbench and integration process."
+        ],
+        "outOfScope": [
+          "Do not make an automatic disposition.",
+          "Do not treat WU027 discovery as canonical Evidence or integrate candidate SRC/EVD changes without Gate 1.",
+          "Do not execute evaluation, select an intervention, product, vendor, or architecture, promote PRB-0009, or create D7."
+        ],
+        "acceptanceCriteria": [
+          "A human final disposition is explicitly recorded as EVALUATION_ROUTE_READY, CONDITIONAL, or WATCH.",
+          "M007 is closed with its bounded programme handoff recorded.",
+          "Any candidate canonical change remains behind the normal workbench/integration process and mandatory Gate 1.",
+          "No evaluation is executed and no automatic PRB/SRC/EVD state transition occurs."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md",
+          "docs/milestones/PRB-0009-decision-critical-research-carry.md",
+          "research/problems/PRB-0009.yaml"
+        ],
+        "suggestedFiles": [
+          "docs/milestones/",
+          ".research-workbench/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run research:readiness",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-030"
+        ],
+        "createdAt": "2026-09-01T13:24:14.610Z",
+        "updatedAt": "2026-09-01T13:24:14.610Z"
       }
     ],
     "dependencies": [
@@ -1208,6 +1306,13 @@
         "toId": "WU026",
         "type": "blocks",
         "reason": "The human D6 readiness gate requires the complete evidence-grounded screen and proposed dispositions from WU025."
+      },
+      {
+        "id": "DEP-030",
+        "fromId": "WU027",
+        "toId": "WU028",
+        "type": "blocks",
+        "reason": "The human post-research readiness reassessment requires the exact bounded operational-metrics availability result from WU027."
       }
     ]
   },
@@ -3134,8 +3239,8 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-01T12:06:38.240Z",
-      "nextRecommendation": "aiqt review --mode release"
+      "nextRecommendation": "aiqt review --mode release",
+      "createdAt": "2026-09-01T12:06:38.240Z"
     }
   ],
   "lastAgentPacket": {
@@ -3162,8 +3267,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt review --mode release",
-  "lastUpdatedAt": "2026-09-01T12:06:38.240Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-01T13:24:14.610Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
