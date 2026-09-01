@@ -1,8 +1,8 @@
 {
   "version": "0.8.0",
   "projectStatus": "in_progress",
-  "currentMilestoneId": null,
-  "currentWorkUnitId": null,
+  "currentMilestoneId": "M007",
+  "currentWorkUnitId": "WU027",
   "workGraph": {
     "milestones": [
       {
@@ -83,7 +83,7 @@
         "id": "M007",
         "title": "M007 — PRB-0009 Decision-Critical Research Carry",
         "objective": "Determine whether already-produced aggregate, comparable and legitimately accessible operational metrics can resolve the D6 uncertainty around the waste-service restructuring sufficiently for a later human readiness decision. M007 is a bounded research follow-up to D6, not a general D7 programme phase.",
-        "status": "ready",
+        "status": "in_progress",
         "workUnitIds": [
           "WU027",
           "WU028"
@@ -1053,10 +1053,10 @@
           "npm run research:readiness",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "in_progress",
         "dependencies": [],
         "createdAt": "2026-09-01T13:24:14.610Z",
-        "updatedAt": "2026-09-01T13:24:14.610Z"
+        "updatedAt": "2026-09-01T14:43:18.851Z"
       },
       {
         "id": "WU028",
@@ -3244,12 +3244,12 @@
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-027",
-    "workUnitId": "WU026",
-    "milestoneId": "M006",
-    "createdAt": "2026-09-01T12:03:59.730Z",
+    "id": "PKT-028",
+    "workUnitId": "WU027",
+    "milestoneId": "M007",
+    "createdAt": "2026-09-01T14:43:18.851Z",
     "format": "markdown",
-    "contentHash": "sha256:2089af9cf1d4eaa85832a9ab390eada4025296bd8f0e90d765622988f6372ca5",
+    "contentHash": "sha256:6ae568e4767dd9ad99c0d6c854c2c8335479e3fd1a666ac0d716deb4cd2c8ad3",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -3267,8 +3267,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-01T13:24:14.610Z",
+  "nextRecommendedCommand": "aiqt checkpoint",
+  "lastUpdatedAt": "2026-09-01T14:43:18.851Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
