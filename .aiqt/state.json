@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
-  "currentMilestoneId": "M006",
+  "projectStatus": "review",
+  "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -73,7 +73,7 @@
         "id": "M006",
         "title": "M006 — D6 Evaluation Readiness",
         "objective": "Determine, through a bounded canonical screen and human gate, whether any current PRB has a sufficiently defined, measurable, locally grounded evaluation route; explicitly retain all other PRBs as conditional, hold, watch, or outside D6.",
-        "status": "ready",
+        "status": "done",
         "workUnitIds": [
           "WU025",
           "WU026"
@@ -997,12 +997,12 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-029"
         ],
         "createdAt": "2026-08-31T14:01:09.720Z",
-        "updatedAt": "2026-09-01T07:06:23.550Z"
+        "updatedAt": "2026-09-01T12:06:38.240Z"
       }
     ],
     "dependencies": [
@@ -3062,17 +3062,89 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-01T07:06:23.550Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-01T07:06:23.550Z"
+    },
+    {
+      "id": "C027",
+      "workUnitId": "WU026",
+      "packetId": "PKT-027",
+      "summary": "Recorded the owner-approved final D6 human gate, closed D6 with zero evaluation-ready routes, and retained only a bounded, unauthorized PRB-0009 research carry.",
+      "completed": [
+        "Recorded the final human disposition for PRB-0001 through PRB-0010.",
+        "Recorded the PRB-0005 human override from OUTSIDE_D6 to CONDITIONAL with its D5/D6 carry rationale.",
+        "Recorded the D6 exit PASS — ZERO EVALUATION_ROUTE_READY result and bounded later-programme handoff.",
+        "Confirmed that no evaluation, research execution, solution selection, canonical PRB advancement, or later-phase authorization occurred."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "docs/milestones/D6-WU02-human-readiness-gate.md",
+        "docs/milestones/D6-evaluation-readiness.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "WU026 was active in M006 before closure."
+        },
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Typecheck, 145 tests, and canonical validation passed."
+        },
+        {
+          "command": "npm run research:readiness",
+          "result": "passed",
+          "summary": "Readiness report completed; existing structural review findings were reported without mutation."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "A human D6 disposition is recorded for every PRB-0001 through PRB-0010.",
+          "result": "passed",
+          "evidence": "D6-WU02-human-readiness-gate.md section 2 records all ten owner-approved dispositions."
+        },
+        {
+          "criterion": "The D6 exit gate is evaluated against the recorded dispositions and any route boundaries.",
+          "result": "passed",
+          "evidence": "D6-WU02-human-readiness-gate.md section 5 records PASS — ZERO EVALUATION_ROUTE_READY."
+        },
+        {
+          "criterion": "A bounded next-phase handoff exists without designing or starting that phase.",
+          "result": "passed",
+          "evidence": "D6-WU02-human-readiness-gate.md section 6 explicitly requires separate owner authorization for any future phase."
+        },
+        {
+          "criterion": "No evaluation execution, research execution, solution selection, or automatic PRB advancement occurs.",
+          "result": "passed",
+          "evidence": "No research/ PRB, SRC, or EVD files changed; the closure artifact records the non-authorization boundary."
+        },
+        {
+          "criterion": "npm run research:check passes.",
+          "result": "passed",
+          "evidence": "Completed successfully before checkpoint."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-01T12:06:38.240Z",
+      "nextRecommendation": "aiqt review --mode release"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-026",
-    "workUnitId": "WU025",
+    "id": "PKT-027",
+    "workUnitId": "WU026",
     "milestoneId": "M006",
-    "createdAt": "2026-09-01T07:01:56.281Z",
+    "createdAt": "2026-09-01T12:03:59.730Z",
     "format": "markdown",
-    "contentHash": "sha256:bc7dd38ea140e51f8f81c208beae63527bdbb713e398dc4f3b2b7cb4f2521c1c",
+    "contentHash": "sha256:2089af9cf1d4eaa85832a9ab390eada4025296bd8f0e90d765622988f6372ca5",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -3090,8 +3162,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-01T07:06:23.550Z",
+  "nextRecommendedCommand": "aiqt review --mode release",
+  "lastUpdatedAt": "2026-09-01T12:06:38.240Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
@@ -3916,6 +3988,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-01T07:06:23.550Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C027",
+      "current": {
+        "observationId": "sha256:d9f64a1b35a5bfa5ca377c7dfa1090525c3948f28c612c790dd478760d292dfc",
+        "checkpointId": "C027",
+        "workUnitId": "WU026",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-01T12:06:38.240Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-01T12:06:38.240Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:d9f64a1b35a5bfa5ca377c7dfa1090525c3948f28c612c790dd478760d292dfc",
+          "checkpointId": "C027",
+          "workUnitId": "WU026",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-01T12:06:38.240Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-01T12:06:38.240Z"
         }
       ]
     }
