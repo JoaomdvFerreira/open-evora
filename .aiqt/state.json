@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
   "projectStatus": "in_progress",
-  "currentMilestoneId": null,
+  "currentMilestoneId": "M007",
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -1053,10 +1053,10 @@
           "npm run research:readiness",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-09-01T13:24:14.610Z",
-        "updatedAt": "2026-09-01T13:24:14.610Z"
+        "updatedAt": "2026-09-01T14:47:37.594Z"
       },
       {
         "id": "WU028",
@@ -1095,12 +1095,12 @@
           "npm run research:readiness",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-030"
         ],
         "createdAt": "2026-09-01T13:24:14.610Z",
-        "updatedAt": "2026-09-01T13:24:14.610Z"
+        "updatedAt": "2026-09-01T14:47:37.594Z"
       }
     ],
     "dependencies": [
@@ -3241,15 +3241,70 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt review --mode release",
       "createdAt": "2026-09-01T12:06:38.240Z"
+    },
+    {
+      "id": "C028",
+      "workUnitId": "WU027",
+      "packetId": "PKT-028",
+      "summary": "Completed bounded desk research on public aggregate operational metrics for PRB-0009.",
+      "completed": [
+        "Recorded the final outcome COMPARABILITY_NOT_ESTABLISHED in the durable WU027 artefact.",
+        "Inspected the existing PRB-0009 corpus before proportionate public municipal and ERSAR discovery.",
+        "Confirmed that no canonical SRC, EVD, or PRB record was changed and that WU028 was not started."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "docs/milestones/PRB-0009-WU027-operational-metrics-research.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Typecheck, 145 tests, and canonical corpus validation passed."
+        },
+        {
+          "command": "npm run research:readiness",
+          "result": "passed",
+          "summary": "Readiness report completed; no canonical state was altered."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "One bounded outcome is recorded with the minimum-evidence assessment.",
+          "result": "passed",
+          "evidence": "The artefact records COMPARABILITY_NOT_ESTABLISHED: public 2023/2025 aggregate RUV values and 2023 ERSAR indicators do not provide a post-August-2026 comparable series for regular collection."
+        },
+        {
+          "criterion": "No unauthorized external action or canonical integration occurs.",
+          "result": "passed",
+          "evidence": "Only public unauthenticated sources were inspected; no outreach, non-public request, evaluation, or canonical SRC/EVD/PRB change occurred."
+        },
+        {
+          "criterion": "WU028 remains human-owned and is not started.",
+          "result": "passed",
+          "evidence": "WU028 was not invoked; DEP-030 remains the dependency path after this closure."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-01T14:47:37.594Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-027",
-    "workUnitId": "WU026",
-    "milestoneId": "M006",
-    "createdAt": "2026-09-01T12:03:59.730Z",
+    "id": "PKT-028",
+    "workUnitId": "WU027",
+    "milestoneId": "M007",
+    "createdAt": "2026-09-01T14:43:18.851Z",
     "format": "markdown",
-    "contentHash": "sha256:2089af9cf1d4eaa85832a9ab390eada4025296bd8f0e90d765622988f6372ca5",
+    "contentHash": "sha256:6ae568e4767dd9ad99c0d6c854c2c8335479e3fd1a666ac0d716deb4cd2c8ad3",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -3268,7 +3323,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-01T13:24:14.610Z",
+  "lastUpdatedAt": "2026-09-01T14:47:37.594Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
@@ -4123,6 +4178,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-01T12:06:38.240Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C028",
+      "current": {
+        "observationId": "sha256:c86eef4da1f00a88bb4f7e3b9af4cb64e400796f9826dd9c2f30efef237c9f4d",
+        "checkpointId": "C028",
+        "workUnitId": "WU027",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-01T14:47:37.594Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-01T14:47:37.594Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:c86eef4da1f00a88bb4f7e3b9af4cb64e400796f9826dd9c2f30efef237c9f4d",
+          "checkpointId": "C028",
+          "workUnitId": "WU027",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-01T14:47:37.594Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-01T14:47:37.594Z"
         }
       ]
     }
