@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
   "projectStatus": "in_progress",
-  "currentMilestoneId": null,
+  "currentMilestoneId": "M006",
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -954,10 +954,10 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-08-31T14:01:09.720Z",
-        "updatedAt": "2026-08-31T14:01:09.720Z"
+        "updatedAt": "2026-09-01T07:06:23.550Z"
       },
       {
         "id": "WU026",
@@ -997,12 +997,12 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-029"
         ],
         "createdAt": "2026-08-31T14:01:09.720Z",
-        "updatedAt": "2026-08-31T14:01:09.720Z"
+        "updatedAt": "2026-09-01T07:06:23.550Z"
       }
     ],
     "dependencies": [
@@ -2998,15 +2998,81 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt review --mode release",
       "createdAt": "2026-08-31T09:38:56.308Z"
+    },
+    {
+      "id": "C026",
+      "workUnitId": "WU025",
+      "packetId": "PKT-026",
+      "summary": "Screened the current canonical PRB-0001 through PRB-0010 corpus against all seven D6 evaluation-readiness criteria. The resulting WU025 artifact records proposed dispositions, missing conditions, non-inferences and reconsideration triggers without evaluation execution, external research, solution selection or canonical research-state changes.",
+      "completed": [
+        "Created docs/milestones/D6-WU01-evaluation-readiness-screen.md with a ten-PRB screening matrix and per-PRB seven-criterion assessments.",
+        "Recorded zero EVALUATION_ROUTE_READY proposals; proposed CONDITIONAL for PRB-0001 and PRB-0009, HOLD for PRB-0002, PRB-0003 and PRB-0007, WATCH for PRB-0004 and PRB-0010, and OUTSIDE_D6 for PRB-0005, PRB-0006 and PRB-0008.",
+        "Specified one non-authorized decision-critical research proposal for PRB-0009, with minimum evidence, proportional method and stopping condition.",
+        "Preserved all canonical PRB, SRC and EVD records and all human-owned research-state fields."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "docs/milestones/D6-WU01-evaluation-readiness-screen.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "145 tests passed; canonical validation reported 268 records OK."
+        },
+        {
+          "command": "npm run research:readiness",
+          "result": "partial",
+          "summary": "Completed with pre-existing review-required findings; no readiness decision was inferred or changed by WU025."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "The WU025 artifact delta was whitespace-clean before checkpointing."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Every current PRB-0001 through PRB-0010 has one evidence-grounded proposed D6 disposition, missing conditions, non-inferences and reconsideration trigger.",
+          "result": "passed",
+          "evidence": "docs/milestones/D6-WU01-evaluation-readiness-screen.md sections 2 and 3."
+        },
+        {
+          "criterion": "Any evaluation-ready route is bounded by all seven criteria and does not authorize execution.",
+          "result": "passed",
+          "evidence": "The screen records zero EVALUATION_ROUTE_READY routes and explicitly preserves the execution boundary."
+        },
+        {
+          "criterion": "Any research need is decision-critical, fully bounded and not executed.",
+          "result": "passed",
+          "evidence": "The sole PRB-0009 proposal is bounded in section 4 and explicitly marked non-authorized and non-executed."
+        },
+        {
+          "criterion": "No PRB state transition, evaluation execution, solution selection or external research occurred.",
+          "result": "passed",
+          "evidence": "The sole substantive commit changes only the milestone artifact; no research YAML files changed."
+        },
+        {
+          "criterion": "Canonical research validation passes.",
+          "result": "passed",
+          "evidence": "npm run research:check passed."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-01T07:06:23.550Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-025",
-    "workUnitId": "WU024",
-    "milestoneId": "M005",
-    "createdAt": "2026-08-30T20:17:33.994Z",
+    "id": "PKT-026",
+    "workUnitId": "WU025",
+    "milestoneId": "M006",
+    "createdAt": "2026-09-01T07:01:56.281Z",
     "format": "markdown",
-    "contentHash": "sha256:dea1af7f23c6e2bbafd781496785f10fb73a532b627e314560e86c84a258cb4b",
+    "contentHash": "sha256:bc7dd38ea140e51f8f81c208beae63527bdbb713e398dc4f3b2b7cb4f2521c1c",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -3025,7 +3091,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-08-31T14:01:09.720Z",
+  "lastUpdatedAt": "2026-09-01T07:06:23.550Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
@@ -3820,6 +3886,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-08-31T09:38:56.308Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C026",
+      "current": {
+        "observationId": "sha256:793542d22b649f94b77c5ea1cc30842bff45a8046eed18b43bc919c6e6e9271f",
+        "checkpointId": "C026",
+        "workUnitId": "WU025",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-01T07:06:23.550Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-01T07:06:23.550Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:793542d22b649f94b77c5ea1cc30842bff45a8046eed18b43bc919c6e6e9271f",
+          "checkpointId": "C026",
+          "workUnitId": "WU025",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-01T07:06:23.550Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-01T07:06:23.550Z"
         }
       ]
     }
