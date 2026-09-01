@@ -107,10 +107,16 @@ continuaria a não autorizar a sua execução.
 - **A. Unidade/mecanismo:** parcialmente definido — barreira física num local e
   percurso pedonal acessível; falta identificar quais persistem após
   intervenções.
-- **B. Baseline local atual:** existe diagnóstico e avaliação in-loco, e a APCE
-  reporta intervenções posteriores (`EVD-000029`, `EVD-000112`, `EVD-000113`,
-  `EVD-000148`). Não existe inventário atual que mapeie barreira, localização,
-  intervenção e condição posterior.
+- **B. Baseline local atual:** `EVD-000112` e `EVD-000113` registam a
+  avaliação in-loco da APCE, o respetivo método e fatores concretos de barreira.
+  `EVD-000131` regista que a APCE reportou que algumas barreiras identificadas
+  em versões anteriores de Acesso Universal foram posteriormente alvo de
+  intervenção, sem mapear diagnóstico a intervenção nem indicar estado
+  resolvido/pendente. `EVD-000148` é um registo público PRR distinto, relativo
+  à intervenção corretiva planeada para 2025–2026 na EB1 Azaruja, e não
+  estabelece conclusão nem acessibilidade pós-intervenção. Não existe
+  inventário atual que mapeie barreira, localização, intervenção e condição
+  posterior.
 - **C. Resultado mensurável:** acessibilidade/passabilidade de um percurso e
   persistência de barreiras seriam mensuráveis por localização; não há baseline
   atual defensável.
@@ -265,9 +271,14 @@ continuaria a não autorizar a sua execução.
 - **A. Unidade/mecanismo:** parcialmente definido — reestruturação de frota,
   recursos, rotas, responsabilidades e monitorização; a unidade operacional e
   respetivo período de implementação precisam de ser fixados.
-- **B. Baseline local atual:** interrupção em fevereiro e dificuldades em zonas
-  em julho-agosto são documentadas (`EVD-000095`); faltam métricas operacionais
-  posteriores a agosto de 2026 para atraso, recolha falhada e resolução.
+- **B. Baseline local atual:** `EVD-000071` e `EVD-000072` documentam a
+  interrupção do serviço em fevereiro de 2026 associada a falhas de frota
+  envelhecida. `EVD-000065` e `EVD-000066` documentam a urgência institucional,
+  a reestruturação e as dificuldades remanescentes em julho-agosto.
+  `EVD-000095` delimita a leitura de atualidade: regista a entrada em serviço,
+  em maio de 2026, de quatro veículos de recolha e uma normalização parcial.
+  Faltam métricas operacionais posteriores a agosto de 2026 para atraso,
+  recolha falhada e resolução.
 - **C. Resultado mensurável:** tempos de resolução, atrasos, recolhas falhadas
   e encaminhamento são resultados legítimos, se medidos com definição estável.
 - **D. Comparador/observação:** seria possível antes/depois ou por zona/rota
