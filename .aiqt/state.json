@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "projectStatus": "review",
+  "projectStatus": "in_progress",
   "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
@@ -67,6 +67,16 @@
           "WU022",
           "WU023",
           "WU024"
+        ]
+      },
+      {
+        "id": "M006",
+        "title": "M006 — D6 Evaluation Readiness",
+        "objective": "Determine, through a bounded canonical screen and human gate, whether any current PRB has a sufficiently defined, measurable, locally grounded evaluation route; explicitly retain all other PRBs as conditional, hold, watch, or outside D6.",
+        "status": "ready",
+        "workUnitIds": [
+          "WU025",
+          "WU026"
         ]
       }
     ],
@@ -904,6 +914,95 @@
         ],
         "createdAt": "2026-08-11T18:56:45.186Z",
         "updatedAt": "2026-08-31T09:38:56.308Z"
+      },
+      {
+        "id": "WU025",
+        "milestoneId": "M006",
+        "title": "WU-D6-01 — Evaluation-Readiness Screen",
+        "objective": "Screen PRB-0001 through PRB-0010 against the owner-approved evaluation-readiness criteria and produce explicit, evidence-grounded dispositions, missing conditions, non-inferences, and reconsideration triggers without executing evaluation or research.",
+        "scope": [
+          "Screen every PRB against evaluation unit/mechanism, current local baseline, measurable outcome, comparator or observation route, access/ethics/privacy feasibility, decision relevance, and proportionality.",
+          "For every PRB, record exactly one disposition: EVALUATION_ROUTE_READY, CONDITIONAL, HOLD, WATCH, or OUTSIDE_D6.",
+          "Record the evidence-grounded missing conditions, non-inferences, and reconsideration triggers for every disposition.",
+          "Identify a decision-critical research need only when one specific uncertainty could materially change the D6 disposition; specify its decision, minimum evidence, proportionate method, and stopping condition without executing it."
+        ],
+        "outOfScope": [
+          "Do not execute evaluation, research, stakeholder contact, or external research.",
+          "Do not select an intervention, product, vendor, or architecture.",
+          "Do not automatically advance a PRB or infer corroboration, validation, tractability, or promotion readiness.",
+          "Do not treat partial validation, D4 carries, late stakeholder evidence, non-response, or absence of evidence as readiness."
+        ],
+        "acceptanceCriteria": [
+          "Every PRB-0001 through PRB-0010 has an explicit evidence-grounded D6 disposition, missing conditions, non-inferences, and reconsideration triggers.",
+          "Any EVALUATION_ROUTE_READY disposition is bounded by all seven owner-approved readiness criteria and does not authorize evaluation execution.",
+          "Any proposed research need is decision-critical, fully bounded, and explicitly not authorized or executed.",
+          "No PRB state transition, evaluation execution, solution selection, or external research occurs.",
+          "npm run research:check passes."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md",
+          "docs/milestones/D5-WU03-closure.md",
+          "docs/milestones/D6-evaluation-readiness.md"
+        ],
+        "suggestedFiles": [
+          "docs/milestones/",
+          "research/problems/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "git diff --check"
+        ],
+        "status": "ready",
+        "dependencies": [],
+        "createdAt": "2026-08-31T14:01:09.720Z",
+        "updatedAt": "2026-08-31T14:01:09.720Z"
+      },
+      {
+        "id": "WU026",
+        "milestoneId": "M006",
+        "title": "WU-D6-02 — Human Readiness Gate & Closure",
+        "objective": "Record the human D6 disposition for every PRB after WU025, evaluate the D6 exit gate, and create a bounded later-phase handoff without designing or starting that phase.",
+        "scope": [
+          "Review WU025's dispositions and record a human decision for every PRB-0001 through PRB-0010.",
+          "Evaluate and record the D6 exit gate.",
+          "Record any bounded handoff for a later programme phase without designing, selecting, or starting it.",
+          "Preserve a zero EVALUATION_ROUTE_READY result where supported by the human gate."
+        ],
+        "outOfScope": [
+          "Do not execute evaluation or any research proposed by WU025.",
+          "Do not select an intervention, product, vendor, or architecture.",
+          "Do not automatically advance any PRB or turn a readiness disposition into a programme authorization.",
+          "Do not make late stakeholder evidence blocking or infer a canonical update without Gate 1."
+        ],
+        "acceptanceCriteria": [
+          "A human D6 disposition is recorded for every PRB-0001 through PRB-0010.",
+          "The D6 exit gate is evaluated against the recorded dispositions and any route boundaries.",
+          "A bounded next-phase handoff exists without designing or starting that phase.",
+          "No evaluation execution, research execution, solution selection, or automatic PRB advancement occurs.",
+          "npm run research:check passes."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md",
+          "docs/milestones/D5-WU03-closure.md",
+          "docs/milestones/D6-evaluation-readiness.md"
+        ],
+        "suggestedFiles": [
+          "docs/milestones/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-029"
+        ],
+        "createdAt": "2026-08-31T14:01:09.720Z",
+        "updatedAt": "2026-08-31T14:01:09.720Z"
       }
     ],
     "dependencies": [
@@ -1102,6 +1201,13 @@
         "toId": "WU024",
         "type": "blocks",
         "reason": "Formal validation decisions and D5 closure require both operator/institutional and affected-journey evidence to be gathered first."
+      },
+      {
+        "id": "DEP-029",
+        "fromId": "WU025",
+        "toId": "WU026",
+        "type": "blocks",
+        "reason": "The human D6 readiness gate requires the complete evidence-grounded screen and proposed dispositions from WU025."
       }
     ]
   },
@@ -2890,8 +2996,8 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-08-31T09:38:56.308Z",
-      "nextRecommendation": "aiqt review --mode release"
+      "nextRecommendation": "aiqt review --mode release",
+      "createdAt": "2026-08-31T09:38:56.308Z"
     }
   ],
   "lastAgentPacket": {
@@ -2918,8 +3024,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt review --mode release",
-  "lastUpdatedAt": "2026-08-31T09:38:56.308Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-08-31T14:01:09.720Z",
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
