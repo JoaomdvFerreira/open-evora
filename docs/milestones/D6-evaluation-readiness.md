@@ -1,6 +1,6 @@
 # D6 — Evaluation Readiness
 
-**Status:** PLANNED  
+**Status:** PLANNED
 **Milestone:** `M006` — D6 Evaluation Readiness
 
 ## Objective
