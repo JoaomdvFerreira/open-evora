@@ -1,6 +1,6 @@
 # D6 — Evaluation Readiness
 
-**Status:** PLANNED
+**Status:** CLOSED — `PASS — ZERO EVALUATION_ROUTE_READY` (2026-09-01)
 **Milestone:** `M006` — D6 Evaluation Readiness
 
 ## Objective
@@ -30,6 +30,10 @@ WU025 may identify, but must not create, a decision-critical research need. It m
 ### WU026 — D6 Human Readiness Gate & Closure
 
 Dependent on WU025. Record the human disposition for every screened Problem, evaluate the D6 exit gate, and create a bounded handoff to a later programme phase without designing or starting that phase.
+
+**Closure result:** `D6-WU02-human-readiness-gate.md` records the final human
+gate. D6 closed with zero `EVALUATION_ROUTE_READY` routes; no later programme
+phase was created, started, or authorized.
 
 ## D6 entry gate
 
