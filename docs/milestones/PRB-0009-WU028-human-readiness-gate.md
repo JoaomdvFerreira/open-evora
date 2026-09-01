@@ -1,8 +1,8 @@
 # PRB-0009 — WU028: gate humano de investigação e reavaliação de prontidão
 
-**Milestone:** `M007` — PRB-0009 Decision-Critical Research Carry  
-**Work unit:** `WU028`  
-**Data da decisão humana:** 2026-09-01  
+**Milestone:** `M007` — PRB-0009 Decision-Critical Research Carry
+**Work unit:** `WU028`
+**Data da decisão humana:** 2026-09-01
 **Autoridade:** disposição final explicitamente aprovada pelo owner
 
 ## Disposição humana final
