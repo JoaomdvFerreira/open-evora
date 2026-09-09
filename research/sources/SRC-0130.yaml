@@ -1,0 +1,28 @@
+source_id: SRC-0130
+publisher: CIMAC
+name: CIMAC — esclarecimento institucional sobre GEOCIMAC e reutilização de
+  informação geográfica
+resource_type: correspondence
+scope:
+  geography:
+    level: intermunicipal
+    area: Alentejo Central
+  domains:
+    - GEO
+    - URB
+    - DIG
+access:
+  level: private
+  availability: available
+  machine_readable: false
+  method: direct
+  format: text
+acquisition:
+  method: direct_contact
+  obtained_at: 2026-09-03
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: 2026-09-03
+  update_frequency: one_off
