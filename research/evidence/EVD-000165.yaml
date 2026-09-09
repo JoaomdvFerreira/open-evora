@@ -1,0 +1,34 @@
+evidence_id: EVD-000165
+lineage_id: SOC-2026-DEIS-RESPOSTA-DIRETA-CUIDADORES-INFORMAIS
+provenance:
+  sources:
+    - SRC-0131
+  extracted_at: 2026-09-09
+observation:
+  summary: A DEIS considera prematuro identificar resultados consistentes ou
+    avaliar impactos, por a implementação ser recente. A DEIS reporta que ainda
+    são necessários processos específicos de monitorização e avaliação para
+    apreciar o nível de execução, as mudanças produzidas e a relevância para os
+    cuidadores informais, prevendo um documento de avaliação no final do período
+    do plano, em 2027.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - cuidadores informais
+  temporal:
+    as_of: 2026-09-09
+domains:
+  - SOC
+  - HEA
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A ausência atual de resultados consolidados não estabelece a ausência de
+    efeitos.
+  - A avaliação prevista para 2027 não garante publicação, completude, qualidade
+    nem resultados positivos.
+  - A monitorização prevista não estabelece que exista já um quadro de
+    monitorização operacional.
+  - Esta evidência não estabelece eficácia nem ineficácia.
