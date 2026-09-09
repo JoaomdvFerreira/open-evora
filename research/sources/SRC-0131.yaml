@@ -1,0 +1,27 @@
+source_id: SRC-0131
+publisher: Município de Évora / DEIS
+name: Município de Évora / DEIS — esclarecimento institucional sobre
+  implementação e avaliação do Plano Concelhio dos Cuidadores Informais
+resource_type: correspondence
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  domains:
+    - SOC
+    - HEA
+access:
+  level: private
+  availability: available
+  machine_readable: false
+  method: direct
+  format: text
+acquisition:
+  method: direct_contact
+  obtained_at: 2026-09-09
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: 2026-09-09
+  update_frequency: one_off

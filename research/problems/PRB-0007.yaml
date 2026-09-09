@@ -1,6 +1,6 @@
 problem_id: PRB-0007
-created_at: "2026-08-28"
-updated_at: "2026-08-31"
+created_at: 2026-08-28
+updated_at: 2026-09-09
 title: Os cuidadores informais em Évora enfrentam dificuldades no acesso a
   apoios, incluindo necessidades de informação e orientação
 domain:
@@ -45,19 +45,28 @@ investigation:
       why_open: O plano municipal 2026-2027 — que prevê um manual, a sistematização
         das respostas, procedimentos simplificados e publicação digital —
         procura responder explicitamente às dificuldades de informação e
-        orientação descritas neste problema, mas a execução e eficácia dessas
-        medidas ainda não foram verificadas.
-      latest_result: A DEIS reconheceu o pedido e solicitou contexto adicional sobre
-        Open Évora; esse contexto foi fornecido. Não foi recebida resposta
-        substantiva sobre a execução ou eficácia das medidas.
-      current_action: Aguardar resposta substantiva da DEIS sobre a execução e
-        eficácia das medidas de apoio e orientação.
-      resolution_condition: Validação junto das partes interessadas sobre o
-        conhecimento dos serviços existentes e sobre a execução e eficácia das
-        medidas previstas no plano 2026-2027.
+        orientação descritas neste problema, mas a execução específica dessas
+        medidas e a sua eficácia ainda não foram verificadas.
+      latest_result: A DEIS reportou que as ações do Plano Concelhio dos Cuidadores
+        Informais se encontram operacionalizadas. A implementação é recente e
+        ainda não estão disponíveis resultados consistentes nem avaliação de
+        impacto; a DEIS considera essa avaliação prematura nesta fase.
+      current_action: Não é proporcional efetuar novo contacto imediato com a DEIS.
+        Monitorizar evidência específica de execução e futuros resultados de
+        monitorização e avaliação; reconsiderar se surgir evidência direta
+        material ou caso a avaliação prevista para 2027 venha a ficar
+        disponível.
+      resolution_condition: Evidência sobre a execução das medidas específicas de
+        orientação relevantes para este problema, o conhecimento e a utilização
+        pelos cuidadores das respostas disponíveis e o efeito na orientação e no
+        acesso; permanece também por estabelecer a importância causal e material
+        da orientação face às necessidades de cuidado direto, descanso, apoio
+        financeiro e apoio psicológico.
       evidence:
         - EVD-000044
         - EVD-000045
+        - EVD-000164
+        - EVD-000165
     - question: A burocracia e a dificuldade em compreender os direitos dos
         cuidadores, identificadas em grupos focais, explicam a não utilização de
         apoio formal reportada no estudo com 68 cuidadores e 89 pessoas
@@ -75,13 +84,12 @@ investigation:
         que as necessidades de orientação, pelo que permanecem explicações
         alternativas e possivelmente mais prevalentes.
       latest_result: Não estava disponível um episódio concreto de procura de apoio
-        que permitisse testar esta relação; a recolha não foi alargada apenas para
-        obter evidência de validação.
-      current_action: >-
-        A via de percurso afetado está parada: não é proporcional recrutar ou
-        procurar novos episódios no âmbito atual. A questão reabre apenas com
-        um episódio delimitado adequado ou evidência direta materialmente mais
-        forte.
+        que permitisse testar esta relação; a recolha não foi alargada apenas
+        para obter evidência de validação.
+      current_action: "A via de percurso afetado está parada: não é proporcional
+        recrutar ou procurar novos episódios no âmbito atual. A questão reabre
+        apenas com um episódio delimitado adequado ou evidência direta
+        materialmente mais forte."
       resolution_condition: Evidência que relacione diretamente as dificuldades de
         informação e orientação com a não utilização de apoio formal ou que
         permita estabelecer a importância relativa das diferentes explicações.
@@ -102,20 +110,24 @@ investigation:
     development:
       summary: >-
         Foi confirmado que a Câmara Municipal reconhece oficialmente 262 pessoas
-        com estatuto de cuidador informal, em janeiro de 2026, e está a
-        implementar um plano para cuidadores para 2026-2027 que procura
-        responder às dificuldades de informação e orientação. Já existem também
-        serviços dirigidos aos cuidadores — UCC, Cantinho do Cuidador e
-        VIVAMENTE.
+        com estatuto de cuidador informal, em janeiro de 2026. A DEIS reportou
+        que as ações do Plano Concelhio dos Cuidadores Informais para 2026-2027
+        se encontram operacionalizadas, num modelo que inclui coordenação
+        interinstitucional e facilitação de procedimentos; a implementação é
+        recente e os resultados e a eficácia ainda não estão estabelecidos.
 
 
-        A evidência disponível afasta, por isso, uma leitura de ausência de
-        serviços e mantém em aberto questões relacionadas com o conhecimento das
-        respostas existentes, a orientação e a coordenação entre apoios.
+        Já existem também serviços dirigidos aos cuidadores — UCC, Cantinho do
+        Cuidador e VIVAMENTE. A evidência disponível afasta, por isso, uma
+        leitura de ausência de serviços e mantém em aberto questões relacionadas
+        com o conhecimento das respostas existentes, a orientação e a
+        coordenação entre apoios.
       evidence:
         - EVD-000044
         - EVD-000146
         - EVD-000045
+        - EVD-000164
+        - EVD-000165
     delimitation:
       summary: >-
         Um estudo com 68 cuidadores e 89 pessoas cuidadas apurou que 35% das
@@ -205,6 +217,20 @@ evidence:
       - REFINES
     research_roles:
       - CONTEXTUAL
+  - evidence_id: EVD-000164
+    effects:
+      - REFINES
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000165
+    effects:
+      - REFINES
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
@@ -212,4 +238,16 @@ solution_landscape_status: not_assessed
 status: OPEN
 history:
   - date: 2026-08-31
-    summary: Não estava disponível um episódio concreto de procura de apoio adequado e a recolha não foi alargada apenas para obter evidência; em paralelo, a DEIS reconheceu o pedido, solicitou contexto adicional que foi fornecido e aguarda-se resposta substantiva. A importância causal da orientação face às necessidades diretas de cuidado, descanso, apoio financeiro e psicológico mantém-se sem resolução.
+    summary: Não estava disponível um episódio concreto de procura de apoio adequado
+      e a recolha não foi alargada apenas para obter evidência; em paralelo, a
+      DEIS reconheceu o pedido, solicitou contexto adicional que foi fornecido e
+      aguarda-se resposta substantiva. A importância causal da orientação face
+      às necessidades diretas de cuidado, descanso, apoio financeiro e
+      psicológico mantém-se sem resolução.
+  - date: 2026-09-09
+    summary: A DEIS reportou que as ações do Plano Concelhio dos Cuidadores
+      Informais se encontram operacionalizadas, encerrando a espera
+      institucional sobre a operacionalização geral das ações previstas no
+      Plano. A implementação é recente e a eficácia e o impacto ainda não estão
+      avaliados; permanece também por estabelecer a importância causal das
+      dificuldades de orientação face às restantes necessidades dos cuidadores.

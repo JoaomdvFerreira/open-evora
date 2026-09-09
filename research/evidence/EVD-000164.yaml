@@ -1,0 +1,39 @@
+evidence_id: EVD-000164
+lineage_id: SOC-2026-DEIS-RESPOSTA-DIRETA-CUIDADORES-INFORMAIS
+provenance:
+  sources:
+    - SRC-0131
+  extracted_at: 2026-09-09
+observation:
+  summary: A DEIS reporta que as ações do Plano Concelhio dos Cuidadores Informais
+    se encontram operacionalizadas, que o plano resultou de um diagnóstico
+    participativo com consulta a cuidadores e que a implementação é
+    interinstitucional. Segundo a DEIS, a Unidade de Rede de Cuidadores
+    Informais centra-se na coordenação entre entidades, na criação de canais de
+    comunicação e na facilitação de procedimentos entre cuidadores informais e
+    respostas e recursos comunitários existentes.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - cuidadores informais
+  temporal:
+    as_of: 2026-09-09
+domains:
+  - SOC
+  - HEA
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A referência a ações operacionalizadas não estabelece a conclusão de cada
+    ação prevista no plano.
+  - Esta evidência não estabelece que o manual, a publicação digital, os
+    procedimentos simplificados ou cada medida individual prevista em EVD-000044
+    estejam concluídos.
+  - A participação no diagnóstico não estabelece a representatividade das
+    pessoas cuidadoras consultadas.
+  - A coordenação interinstitucional não estabelece conhecimento,
+    acessibilidade, utilização ou eficácia das respostas.
+  - Esta evidência não estabelece melhores resultados para os cuidadores
+    informais.
