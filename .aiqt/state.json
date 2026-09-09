@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "projectStatus": "review",
+  "projectStatus": "in_progress",
   "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
@@ -87,6 +87,17 @@
         "workUnitIds": [
           "WU027",
           "WU028"
+        ]
+      },
+      {
+        "id": "M008",
+        "title": "AR-01 — Research Trust Baseline",
+        "objective": "Establish the post-audit research trust baseline by resolving or explicitly verifying the approved targeted canonical findings, hardening the approved mechanical validation gaps, and making the repository publication boundary unambiguous.",
+        "status": "ready",
+        "workUnitIds": [
+          "WU029",
+          "WU030",
+          "WU031"
         ]
       }
     ],
@@ -1101,6 +1112,143 @@
         ],
         "createdAt": "2026-09-01T13:24:14.610Z",
         "updatedAt": "2026-09-01T16:28:34.369Z"
+      },
+      {
+        "id": "WU029",
+        "milestoneId": "M008",
+        "title": "AR-01 — Verification and Gate 1 decision package",
+        "objective": "Verify the targeted audit findings against the existing canonical corpus and source records, then prepare the exact-base, exact-delta Gate 1 package without changing canonical state.",
+        "scope": [
+          "Verify ODM-001, ODM-002, and ODM-004; record a bounded result of correction required or NO_CHANGE without new research.",
+          "Prepare the exact canonical candidate changes for ODM-003, ODM-005, and ODM-006, preserving status and identity sets.",
+          "Prepare the exact implementation and documentation plan for ODM-007, ODM-008, and ODM-011.",
+          "Present every canonical candidate against its exact Git base for the existing human Gate 1 decision."
+        ],
+        "outOfScope": [
+          "Do not mutate SRC, EVD, or PRB records.",
+          "Do not create or delete canonical identities, begin new research, contact stakeholders, or change research or validation status.",
+          "Do not decide corroboration, validation, investigation posture, or any other human-owned semantic state."
+        ],
+        "acceptanceCriteria": [
+          "Each of ODM-001 through ODM-006 has an auditable, evidence-bounded proposed outcome, with MUST VERIFY items allowed to be NO_CHANGE.",
+          "The candidate package specifies the exact Git base and exact canonical delta for every proposed SRC/EVD/PRB mutation.",
+          "A human Gate 1 decision is explicitly required before any canonical integration proceeds.",
+          "The package records that unexpected corpus failures exposed by later hardening must stop for human triage."
+        ],
+        "agentContextRefs": [
+          "docs/investigationstrategy.md#gate-1-canonical-integration",
+          "docs/datamodel.md",
+          "AGENTS.md"
+        ],
+        "suggestedFiles": [
+          "research/",
+          "research/schemas/",
+          "tools/research/",
+          "AGENTS.md"
+        ],
+        "validationCommands": [
+          "git diff --check",
+          "npm run research:validate"
+        ],
+        "status": "ready",
+        "dependencies": [],
+        "createdAt": "2026-09-09T17:53:22.951Z",
+        "updatedAt": "2026-09-09T17:53:22.951Z"
+      },
+      {
+        "id": "WU030",
+        "milestoneId": "M008",
+        "title": "AR-01 — Approved integration and mechanical hardening",
+        "objective": "Apply only Gate 1-approved exact canonical deltas, enforce the approved provenance/list and temporal invariants mechanically, and clarify publication-safety timing.",
+        "scope": [
+          "Integrate only the exact Gate 1-approved resolutions for ODM-001 through ODM-006, including explicitly verified NO_CHANGE outcomes where applicable.",
+          "Implement and regression-test ODM-007 provenance/list validation and ODM-008 calendar-date and PRB created_at immutability validation without making substantive evidential decisions.",
+          "Clarify in the canonical governance owner that publication safety is required before push, pull-request, preview, or equivalent repository publication act, without creating a new Gate 2.",
+          "Stop for human triage if validator hardening exposes unexpected corpus failures; do not silently change corpus records or weaken validators."
+        ],
+        "outOfScope": [
+          "Do not apply an unapproved, broadened, or rebased canonical delta.",
+          "Do not create or delete canonical identities, perform new research or outreach, or automatically change research or validation status.",
+          "Do not deliver ODM-009, ODM-010, ODM-012, AR-02, or a later roadmap milestone."
+        ],
+        "acceptanceCriteria": [
+          "Every canonical mutation is exactly covered by a human Gate 1 approval tied to its reviewed plan and exact base.",
+          "EVD provenance/list structures reject invalid element types and required empty or invalid source references, while structural checks do not decide evidential adequacy.",
+          "Impossible full calendar dates fail while supported YYYY, YYYY-MM, and YYYY-MM-DD precision remains valid; UPDATE validation rejects a changed PRB created_at against the base record.",
+          "ODM-011's publication-safety timing is unambiguous and creates no Gate 2.",
+          "Unexpected post-hardening corpus failures are left unchanged and escalated for human triage."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md#publication-boundary",
+          "docs/investigationstrategy.md#gate-1-canonical-integration",
+          "docs/datamodel.md",
+          "docs/explorerarchitecture.md"
+        ],
+        "suggestedFiles": [
+          "AGENTS.md",
+          "research/",
+          "research/schemas/",
+          "tools/research/validation/",
+          "tools/research/**/*.test.ts"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run research:readiness",
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-031"
+        ],
+        "createdAt": "2026-09-09T17:53:22.951Z",
+        "updatedAt": "2026-09-09T17:53:22.951Z"
+      },
+      {
+        "id": "WU031",
+        "milestoneId": "M008",
+        "title": "AR-01 — Independent closure verification",
+        "objective": "Independently verify the completed AR-01 contract and prepare the milestone for owner closure review without starting later roadmap work.",
+        "scope": [
+          "Independently check every in-scope ODM outcome, Gate 1 traceability, canonical identity stability, and absence of unauthorized semantic or status changes.",
+          "Run the required research readiness, canonical-to-Explorer projection, relevant Explorer build/tests, and diff checks.",
+          "Confirm no later roadmap milestone was created or started and prepare the prescribed AR-01 closure statement only if all conditions hold."
+        ],
+        "outOfScope": [
+          "Do not make corrective implementation changes as part of independent verification.",
+          "Do not start AR-02, create a later roadmap milestone, publish, push, open a pull request, merge, or deploy."
+        ],
+        "acceptanceCriteria": [
+          "All AR-01 Definition of Done conditions have independent evidence, or the milestone remains open with the specific blocker reported.",
+          "Research validation/readiness, canonical-to-Explorer projection, relevant Explorer tests/build, and git diff --check pass.",
+          "The closure statement accurately says that conclusions and the canonical identity set are otherwise unchanged.",
+          "Owner review, rather than automatic closure, remains required."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md",
+          "docs/explorerarchitecture.md"
+        ],
+        "suggestedFiles": [
+          ".aiqt/",
+          "research/",
+          "tools/research/",
+          "apps/research-explorer/"
+        ],
+        "validationCommands": [
+          "npm run research:validate",
+          "npm run research:readiness",
+          "npm run explorer:build",
+          "git diff --check",
+          "aiqt review"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-032"
+        ],
+        "createdAt": "2026-09-09T17:53:22.951Z",
+        "updatedAt": "2026-09-09T17:53:22.951Z"
       }
     ],
     "dependencies": [
@@ -1313,6 +1461,20 @@
         "toId": "WU028",
         "type": "blocks",
         "reason": "The human post-research readiness reassessment requires the exact bounded operational-metrics availability result from WU027."
+      },
+      {
+        "id": "DEP-031",
+        "fromId": "WU029",
+        "toId": "WU030",
+        "type": "blocks",
+        "reason": "Verification and the exact-base human Gate 1 decision must precede every canonical mutation or approved integration."
+      },
+      {
+        "id": "DEP-032",
+        "fromId": "WU030",
+        "toId": "WU031",
+        "type": "blocks",
+        "reason": "Independent closure verification can only assess the final approved integration and mechanical hardening result."
       }
     ]
   },
@@ -3350,8 +3512,8 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-01T16:28:34.369Z",
-      "nextRecommendation": "aiqt review --mode release"
+      "nextRecommendation": "aiqt review --mode release",
+      "createdAt": "2026-09-01T16:28:34.369Z"
     }
   ],
   "lastAgentPacket": {
@@ -3378,8 +3540,30 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt review --mode release",
-  "lastUpdatedAt": "2026-09-01T16:28:34.369Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-09T18:01:38.933Z",
+  "review": {
+    "acknowledgedFindings": [
+      {
+        "findingKey": "state:checkpoint:C008:missing-packet-ref",
+        "reason": "Owner-approved acknowledgement of strictly pre-existing baseline debt at 2cfeaa69addb172f4b22ae8c39fe718d3b29e7da; not remediated and outside AR-01 scope.",
+        "acknowledgedAt": "2026-09-09T18:01:37.455Z",
+        "sourceCommand": "aiqt review acknowledge"
+      },
+      {
+        "findingKey": "state:checkpoint:C009:missing-packet-ref",
+        "reason": "Owner-approved acknowledgement of strictly pre-existing baseline debt at 2cfeaa69addb172f4b22ae8c39fe718d3b29e7da; not remediated and outside AR-01 scope.",
+        "acknowledgedAt": "2026-09-09T18:01:38.247Z",
+        "sourceCommand": "aiqt review acknowledge"
+      },
+      {
+        "findingKey": "state:checkpoint:C010:missing-packet-ref",
+        "reason": "Owner-approved acknowledgement of strictly pre-existing baseline debt at 2cfeaa69addb172f4b22ae8c39fe718d3b29e7da; not remediated and outside AR-01 scope.",
+        "acknowledgedAt": "2026-09-09T18:01:38.933Z",
+        "sourceCommand": "aiqt review acknowledge"
+      }
+    ]
+  },
   "checkpointAmendments": [
     {
       "amendmentId": "AMEND-001",
