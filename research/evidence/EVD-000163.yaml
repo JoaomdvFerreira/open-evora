@@ -1,0 +1,38 @@
+evidence_id: EVD-000163
+lineage_id: GEO-2026-09-CIMAC-GEOCIMAC-DIRECT-RESPONSE
+provenance:
+  sources:
+    - SRC-0130
+  extracted_at: 2026-09-03
+observation:
+  summary: A CIMAC identifica acesso ArcGIS REST através do Portal for ArcGIS e
+    serviços WMS, em particular de cartografia militar e cobertura
+    ortofotográfica, descritos para consumo pelos municípios do Alentejo Central
+    nos termos dos protocolos aplicáveis; a descarga direta de ficheiros não é a
+    regra geral e depende do que cada município disponibiliza. Refere que as
+    condições de cedência, utilização e reutilização da informação dependem de
+    cada município titular da informação. Refere ainda que, além do SNIG, não
+    existe atualmente um repositório central público sistemático de metadados
+    detalhados para todos os conjuntos de dados e que não preserva nem
+    disponibiliza de forma sistemática versões ou instantâneos históricos,
+    embora possa existir informação mais antiga em projetos específicos.
+scope:
+  geography:
+    level: intermunicipal
+    area: Alentejo Central
+  temporal:
+    as_of: 2026-09-03
+domains:
+  - GEO
+  - URB
+  - DIG
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A ausência de confirmação de WFS na resposta não estabelece que WFS esteja
+    indisponível ou tenha sido descontinuado.
+  - Os serviços WMS descritos para consumo municipal não estabelecem uma
+    autorização geral de acesso WMS para terceiros.
+  - Visibilidade ou acesso público não estabelece permissão de reutilização.
+  - A ausência de uma preservação sistemática de instantâneos não estabelece que
+    não exista informação histórica em qualquer projeto ou município.

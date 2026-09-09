@@ -1,0 +1,38 @@
+evidence_id: EVD-000162
+lineage_id: GEO-2026-09-CIMAC-GEOCIMAC-DIRECT-RESPONSE
+provenance:
+  sources:
+    - SRC-0130
+  extracted_at: 2026-09-03
+observation:
+  summary: A CIMAC refere gerir a infraestrutura GEOCIMAC, baseada em ArcGIS
+    Enterprise / Portal for ArcGIS, e disponibilizá-la aos municípios do
+    Alentejo Central; os municípios criam e publicam mapas e aplicações com
+    informação geográfica de que são titulares, com apoio técnico da CIMAC. A
+    CIMAC refere não existir atualmente um catálogo público central único que
+    reúna todos os conjuntos de dados, camadas e serviços GEOCIMAC; a descoberta
+    pública ocorre sobretudo através de sites, aplicações e mapas municipais, do
+    Portal for ArcGIS e do SNIG. Refere ainda recolher informação geográfica
+    atualizada durante revisões ou alterações de PDM, visando a
+    normalização/homogeneização e um futuro catálogo sub-regional atualizado,
+    cuja disponibilização pública continua por avaliar.
+scope:
+  geography:
+    level: intermunicipal
+    area: Alentejo Central
+  temporal:
+    as_of: 2026-09-03
+domains:
+  - GEO
+  - URB
+  - DIG
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A inexistência de um catálogo central único não estabelece que não exista
+    informação geográfica pública nos municípios ou nas superfícies de
+    descoberta identificadas.
+  - O trabalho para um futuro catálogo não estabelece compromisso, data nem
+    garantia de disponibilização pública.
+  - A Observação não estabelece qualidade, atualidade ou completude de qualquer
+    conjunto de dados, camada ou serviço individual.
