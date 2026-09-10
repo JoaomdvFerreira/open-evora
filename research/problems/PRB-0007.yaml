@@ -16,9 +16,10 @@ problem_statement: >-
   Os cuidadores informais em Évora têm necessidades documentadas de informação
   que abrangem saúde, mobilidade, estruturas de apoio e apoio financeiro e
   social. Um estudo com 68 cuidadores e 89 pessoas cuidadas, integrado no Plano
-  Concelhio dos Cuidadores Informais, apurou que 35% das pessoas cuidadas não
-  utilizavam qualquer serviço formal de apoio — um resultado específico dessa
-  amostra, que não pode ser generalizado ao conjunto dos cuidadores de Évora.
+  Concelhio dos Cuidadores Informais, apurou que 35% dos inquiridos indicaram
+  que a pessoa de quem cuidavam não utilizava qualquer serviço formal de apoio —
+  um resultado específico dessa amostra, que não pode ser generalizado ao
+  conjunto dos cuidadores de Évora.
 
 
   Material de grupos focais do mesmo plano identifica, numa amostra distinta, a
@@ -130,11 +131,12 @@ investigation:
         - EVD-000165
     delimitation:
       summary: >-
-        Um estudo com 68 cuidadores e 89 pessoas cuidadas apurou que 35% das
-        pessoas cuidadas não utilizavam qualquer serviço formal de apoio.
-        Material de grupos focais, relativo a uma amostra distinta, identificou
-        a burocracia e a dificuldade em compreender os direitos como
-        dificuldades separadas da sobrecarga geral associada ao ato de cuidar.
+        Um estudo com 68 cuidadores e 89 pessoas cuidadas apurou que 35% dos
+        inquiridos indicaram que a pessoa de quem cuidavam não utilizava
+        qualquer serviço formal de apoio. Material de grupos focais, relativo a
+        uma amostra distinta, identificou a burocracia e a dificuldade em
+        compreender os direitos como dificuldades separadas da sobrecarga geral
+        associada ao ato de cuidar.
 
 
         Um terceiro inquérito realizado junto de 133 cuidadores delimitou
@@ -251,3 +253,9 @@ history:
       Plano. A implementação é recente e a eficácia e o impacto ainda não estão
       avaliados; permanece também por estabelecer a importância causal das
       dificuldades de orientação face às restantes necessidades dos cuidadores.
+  - date: 2026-09-09
+    summary: "Corrigida a formulação do resultado de 35% para refletir a unidade de
+      análise suportada pela evidência: 35% dos inquiridos indicaram que a
+      pessoa de quem cuidavam não utilizava qualquer serviço formal de apoio; o
+      resultado não estabelece que 35% do conjunto das pessoas cuidadas não
+      utilizava apoio formal."

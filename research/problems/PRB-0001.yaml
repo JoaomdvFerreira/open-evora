@@ -1,6 +1,6 @@
 problem_id: PRB-0001
 created_at: 2026-08-28
-updated_at: 2026-08-31
+updated_at: 2026-09-09
 title: A utilidade prática dos transportes públicos varia consoante os horários
   e os territórios
 domain:
@@ -37,8 +37,9 @@ investigation:
         operacionais atuais ao nível de linha/paragem ou uma deslocação afetada
         delimitada.
       resolution_condition: Dados operacionais atuais ao nível de linha/paragem ou uma
-        deslocação afetada delimitada que permitam estabelecer o impacto prático,
-        mantendo separadas frequência, espera, capacidade e prevalência.
+        deslocação afetada delimitada que permitam estabelecer o impacto
+        prático, mantendo separadas frequência, espera, capacidade e
+        prevalência.
       evidence:
         - EVD-000002
         - EVD-000117
@@ -321,11 +322,11 @@ decision_basis:
   currentness:
     assessment: >-
       ALTA para a manifestação institucional documentada, com limites temporais
-      explícitos. O relatório da Autoridade de Transportes municipal foi
-      publicado em junho de 2026; EVD-000002 confirma a variação entre o serviço
-      diurno e o serviço noturno, de fim de semana e de feriados, enquanto
-      EVD-000157 e EVD-000158 descrevem a oferta por carreira/tipo de dia e os
-      atrasos recorrentes por corredor/período em 2025.
+      explícitos. O relatório da Autoridade de Transportes municipal está datado
+      de junho de 2026; EVD-000002 confirma a variação entre o serviço diurno e
+      o serviço noturno, de fim de semana e de feriados, enquanto EVD-000157 e
+      EVD-000158 descrevem a oferta por carreira/tipo de dia e os atrasos
+      recorrentes por corredor/período em 2025.
 
 
       As edições de 2022 e 2023 do mesmo relatório (EVD-000117) confirmam que
@@ -490,8 +491,8 @@ decision_basis:
       EVD-000157 documenta quilómetros comerciais programados por carreira e
       tipo de dia em 2025; EVD-000158 documenta, também para 2025, indicadores
       agregados e corredores/janelas de atrasos recorrentes. Embora o relatório
-      tenha sido publicado em junho de 2026, estes elementos não descrevem
-      diretamente o horário ou desempenho em agosto de 2026.
+      esteja datado de junho de 2026, estes elementos não descrevem diretamente
+      o horário ou desempenho em agosto de 2026.
 
 
       A evidência de experiência vivida inclui o protesto estudantil de março de
@@ -579,4 +580,7 @@ decision_basis:
     de possuírem diferentes `source_id`.
 history:
   - date: 2026-08-31
-    summary: O contexto de serviço de 2025 foi mais delimitado, mas não foi possível estabelecer uma deslocação atual reproduzível por linha, paragem e partida; a investigação passa a aguardar dados operacionais atuais ou uma deslocação afetada delimitada.
+    summary: O contexto de serviço de 2025 foi mais delimitado, mas não foi possível
+      estabelecer uma deslocação atual reproduzível por linha, paragem e
+      partida; a investigação passa a aguardar dados operacionais atuais ou uma
+      deslocação afetada delimitada.

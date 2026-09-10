@@ -42,6 +42,8 @@ User/public-facing Open Évora content uses PT-PT. Internal technical documentat
 
 The repository is public. Treat commits, branches, pull requests, generated artifacts, and deployments as potential publication acts.
 
+Publication safety must be established *before* the first repository publication act involving the material, not after it. For candidate research material this means the Gate 1 canonical-integration decision precedes any commit, push, pull request, or preview publication that carries it. Local, gitignored workbench material (for example `.research-workbench/`) is not itself a repository publication act, but it becomes one as soon as it is committed, pushed, or published in any form. This is a timing clarification of the existing gate; it creates no additional gate.
+
 Do not publish:
 - private correspondence or raw stakeholder material;
 - transcripts, recordings, private notes, or unnecessary personal identifiers;

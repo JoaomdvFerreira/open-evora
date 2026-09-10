@@ -1197,12 +1197,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-031"
         ],
         "createdAt": "2026-09-09T17:53:22.951Z",
-        "updatedAt": "2026-09-10T08:39:16.325Z"
+        "updatedAt": "2026-09-10T10:25:52.819Z"
       },
       {
         "id": "WU031",
@@ -1243,12 +1243,12 @@
           "git diff --check",
           "aiqt review"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-032"
         ],
         "createdAt": "2026-09-09T17:53:22.951Z",
-        "updatedAt": "2026-09-09T17:53:22.951Z"
+        "updatedAt": "2026-09-10T10:25:52.819Z"
       }
     ],
     "dependencies": [
@@ -3578,17 +3578,127 @@
         }
       ],
       "finalWorkUnitStatus": "needs_review",
-      "createdAt": "2026-09-09T18:51:12.296Z",
-      "nextRecommendation": "aiqt checkpoint amend --checkpoint C030"
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C030",
+      "createdAt": "2026-09-09T18:51:12.296Z"
+    },
+    {
+      "id": "C031",
+      "workUnitId": "WU030",
+      "packetId": "PKT-031",
+      "summary": "Promoted the owner-approved Gate 1 R4 canonical integration (9 UPDATE, 1 machine NO_CHANGE, 0 CREATE/DELETE) using the supported canonical promoter, then implemented the approved ODM-007 provenance/list and ODM-008 calendar-date and PRB created_at UPDATE-immutability validation contracts with focused regression tests, and made the minimal ODM-011 publication-boundary timing clarification in AGENTS.md.",
+      "completed": [
+        "Ran the pre-promotion hash gate: HEAD, clean tree, Plan/Review SHA-256, baseGitSha, operation set and the research/ tree object all matched the approved R4 values exactly.",
+        "Promoted the exact approved R4 plan with applyCanonicalIntegrationPlan as the first mutation; result 9 UPDATE / 0 CREATE / 1 NO_CHANGE, 274 records, 0 validation errors.",
+        "Verified the committed bytes of all 9 promoted records are byte-identical to the approved R4 plan YAML.",
+        "Verified EVD-000002, EVD-000143 and SRC-0018 are byte-identical, and EVD-000002 retains effects [SUPPORTS, BOUNDS].",
+        "Verified PRB-0007 gained exactly one approved history entry and PRB-0001/0011/0012 histories are semantically unchanged.",
+        "ODM-007: added declarative stringListFields/nonEmptyListFields schema keys and validator enforcement; provenance.sources must be a non-empty list of valid SRC references and every declared string-list item must be a string; inference_limits [] remains structurally valid with no minItems.",
+        "ODM-008: added declarative calendarDateFields and calendar-date validation reusing the existing isFullCalendarDate helper; YYYY and YYYY-MM precision preserved, impossible full dates rejected.",
+        "ODM-008: implemented PRB created_at immutability as an UPDATE/base integration invariant in validateCandidateSet, deliberately not as a pure record-schema rule.",
+        "Added 13 focused regression tests (8 validator, 5 update-immutability) covering every required case.",
+        "ODM-011: added one minimal paragraph to the AGENTS.md publication-boundary section establishing that publication safety precedes commit/push/PR/preview and that gitignored .research-workbench/ material is not itself a publication act; no Gate 2 created.",
+        "Confirmed no existing canonical record outside the approved 9 fails under the hardened validator."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "AGENTS.md",
+        "research/evidence/EVD-000023.yaml",
+        "research/evidence/EVD-000034.yaml",
+        "research/evidence/EVD-000157.yaml",
+        "research/problems/PRB-0001.yaml",
+        "research/problems/PRB-0007.yaml",
+        "research/problems/PRB-0011.yaml",
+        "research/problems/PRB-0012.yaml",
+        "research/sources/SRC-0017.yaml",
+        "research/sources/SRC-0119.yaml",
+        "research/schemas/evidence.schema.json",
+        "research/schemas/problem.schema.json",
+        "research/schemas/source.schema.json",
+        "tools/research/core/types.ts",
+        "tools/research/validation/validate.ts",
+        "tools/research/integration/prospective-validation.ts",
+        "tools/research/validation/odm-hardening.test.ts",
+        "tools/research/integration/update-immutability.test.ts"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK."
+        },
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Typecheck clean; 158 tests passed, 0 failed; 274 records OK."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "Read model published: 274 records, 403 edges, 0 dangling; 480 Explorer tests passed; build succeeded."
+        },
+        {
+          "command": "npm run research:readiness",
+          "result": "passed",
+          "summary": "Readiness output identical to the pre-WU030 baseline; no semantic or readiness drift."
+        },
+        {
+          "command": "node --test tools/research/integration/*.test.ts",
+          "result": "passed",
+          "summary": "57 integration/promoter tests passed, 0 failed."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "AIQT status passed; current work unit WU030."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Every canonical mutation is exactly covered by a human Gate 1 approval tied to its reviewed plan and exact base.",
+          "result": "passed",
+          "evidence": "Pre-promotion hash gate matched Plan cfe85246...aa5ac43f, Review fcd461c3...f4bebeae and baseGitSha 83e024a6...0c499a0 (= HEAD). The promoter enforces literal HEAD==baseGitSha. Committed bytes of all 9 records are byte-identical to the approved plan YAML; 0 CREATE, 0 DELETE."
+        },
+        {
+          "criterion": "EVD provenance/list structures reject invalid element types and required empty or invalid source references, while structural checks do not decide evidential adequacy.",
+          "result": "passed",
+          "evidence": "validateStringListFields/validateNonEmptyListFields plus hardened validateReferences. Covered by odm-hardening.test.ts: empty provenance.sources, non-string element, nested-object element, dangling SRC and non-SRC reference all rejected; inference_limits [] accepted. No adequacy judgement is made."
+        },
+        {
+          "criterion": "Impossible full calendar dates fail while supported YYYY, YYYY-MM, and YYYY-MM-DD precision remains valid; UPDATE validation rejects a changed PRB created_at against the base record.",
+          "result": "passed",
+          "evidence": "validateCalendarDateFields reuses isFullCalendarDate: 2026-02-30, 2026-99-99, 2025-02-29 and 2026-13-01 rejected; 2024-02-29, YYYY and YYYY-MM accepted. update-immutability.test.ts covers changed, unchanged, re-quoted, absent created_at and NO_CHANGE."
+        },
+        {
+          "criterion": "ODM-011's publication-safety timing is unambiguous and creates no Gate 2.",
+          "result": "passed",
+          "evidence": "One paragraph added to AGENTS.md 'Publication boundary' stating Gate 1 precedes commit/push/PR/preview and that gitignored .research-workbench/ material is not itself a publication act; explicitly labelled a timing clarification creating no additional gate."
+        },
+        {
+          "criterion": "Unexpected post-hardening corpus failures are left unchanged and escalated for human triage.",
+          "result": "passed",
+          "evidence": "npm run research:validate returns 'Validated 274 record(s): OK.' after hardening. No record outside the approved 9 failed, so no triage escalation was required and no corpus record was silently repaired."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-10T10:25:52.819Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-030",
-    "workUnitId": "WU029",
+    "id": "PKT-031",
+    "workUnitId": "WU030",
     "milestoneId": "M008",
-    "createdAt": "2026-09-09T18:42:41.410Z",
+    "createdAt": "2026-09-10T09:50:42.017Z",
     "format": "markdown",
-    "contentHash": "sha256:c073a6bc4de17e75b1f2a4e4c39b0f90dec20aec653d4a4f6a79a27f80ce3d21",
+    "contentHash": "sha256:5cf6f50fcd3946748319e12dfa1ec26ab55f7f9c4f177bb8119b1402592c645e",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -3607,7 +3717,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-10T08:39:16.325Z",
+  "lastUpdatedAt": "2026-09-10T10:25:52.819Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -4574,6 +4684,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-09T18:51:12.296Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C031",
+      "current": {
+        "observationId": "sha256:1724fd0ae9d5bb9f544acf77a455d54e695595f0f70bd421a548cd1f6fbd7f5b",
+        "checkpointId": "C031",
+        "workUnitId": "WU030",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-10T10:25:52.819Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-10T10:25:52.819Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:1724fd0ae9d5bb9f544acf77a455d54e695595f0f70bd421a548cd1f6fbd7f5b",
+          "checkpointId": "C031",
+          "workUnitId": "WU030",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-10T10:25:52.819Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-10T10:25:52.819Z"
         }
       ]
     }

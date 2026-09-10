@@ -1,6 +1,6 @@
 problem_id: PRB-0012
 created_at: 2026-08-28
-updated_at: 2026-08-28
+updated_at: 2026-09-09
 title: O encerramento prolongado da Escola Básica do Chafariz d'El-Rei obriga a
   soluções temporárias enquanto a reabilitação permanece pendente
 domain:
@@ -51,9 +51,8 @@ investigation:
         nomeadamente nas refeições, mas a evidência disponível não estabelece
         como funcionarão na prática os novos monoblocos quanto a refeições,
         acessibilidade, conforto, rotinas ou deslocações.
-      current_action: Se o problema sobreviver à integração, procurar experiência
-        atual da comunidade escolar apenas após o início efetivo do
-        funcionamento das instalações temporárias.
+      current_action: Procurar experiência atual da comunidade escolar apenas após o
+        início efetivo do funcionamento das instalações temporárias.
       resolution_condition: Evidência atual da experiência de alunos, famílias ou
         escola que permita caracterizar efeitos concretos das instalações
         temporárias e distinguir constrangimentos resolvidos dos que persistem.
