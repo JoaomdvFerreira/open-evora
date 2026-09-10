@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
-  "currentMilestoneId": "M008",
+  "projectStatus": "review",
+  "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -93,7 +93,7 @@
         "id": "M008",
         "title": "AR-01 — Research Trust Baseline",
         "objective": "Establish the post-audit research trust baseline by resolving or explicitly verifying the approved targeted canonical findings, hardening the approved mechanical validation gaps, and making the repository publication boundary unambiguous.",
-        "status": "ready",
+        "status": "done",
         "workUnitIds": [
           "WU029",
           "WU030",
@@ -1243,12 +1243,12 @@
           "git diff --check",
           "aiqt review"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-032"
         ],
         "createdAt": "2026-09-09T17:53:22.951Z",
-        "updatedAt": "2026-09-10T10:25:52.819Z"
+        "updatedAt": "2026-09-10T12:10:00.000Z"
       }
     ],
     "dependencies": [
@@ -3688,17 +3688,110 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-10T10:25:52.819Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-10T10:25:52.819Z"
+    },
+    {
+      "id": "C032",
+      "workUnitId": "WU031",
+      "packetId": "PKT-032",
+      "summary": "Independent read-only closure verification of AR-01. Every in-scope ODM outcome, the Gate 1 R3->R4 approval chain, canonical identity and semantic invariants, validator/tooling behaviour, public projection and the roadmap/scope boundary were verified against the pre-AR-01 audited baseline 2cfeaa69 and current main 3fe4dfdd. No discrepancy was found and no corrective change was made. Owner review is required before AR-01 closure.",
+      "completed": [
+        "ODM-001 verified: EVD-000002 byte-identical since the pre-AR-01 baseline, retains effects [SUPPORTS, BOUNDS]; PRB-0001 evidence[] block identical to baseline, so no evidence-role change occurred.",
+        "ODM-002 verified: PRB-0007 states the respondent as unit of analysis in both sites; EVD-000143 byte-identical; exactly one history entry added, none removed, carrying no state_changes.",
+        "ODM-003 verified: SRC-0119 caveats now carry a Source limitation only; the corroboration judgement was removed from Source caveats.",
+        "ODM-004 verified: SRC-0017 caveat corrected and consistent with its own published_at 2025-02; SRC-0018 byte-identical with published_at 2026-07; EVD-000157 and PRB-0001 (two sites) use 'datado de junho de 2026'; zero residual 'publicado em junho de 2026'; no unsupported publication date introduced.",
+        "ODM-005 verified: PRB-0011/0012 stale candidate/integration conditionals removed; changes confined to investigation.open_questions and updated_at; no history entry added; status/evidence_status/validation_status unchanged.",
+        "ODM-006 verified: EVD-000023 (one) and EVD-000034 (two) population values corrected, scope only; other records still carry English population values, proving no wider taxonomy cleanup.",
+        "ODM-007 verified mechanically: empty provenance.sources rejected; non-string and nested elements rejected; dangling and non-SRC references rejected; inference_limits [] accepted; non-string inference_limits item rejected.",
+        "ODM-008 verified mechanically: 2026-02-30, 2026-99-99, 2025-02-29, 2026-13-01 rejected; 2024-02-29 accepted; YYYY and YYYY-MM preserved; PRB created_at mutation and removal on UPDATE rejected; unchanged and re-quoted created_at accepted.",
+        "Tests proven non-vacuous by four independent mutation tests: disabling stringListFields, nonEmptyListFields, calendarDateFields and validateUpdateImmutability each failed exactly the corresponding tests; all source files restored byte-identical afterwards.",
+        "ODM-011 verified: one paragraph in the AGENTS.md publication-boundary section; the only 'Gate 2' reference in governance is pre-existing text in docs/investigationstrategy.md describing a separate future Explorer-publication gate, unchanged by AR-01.",
+        "Gate 1 traceability verified directly against the surviving local artifacts: R3 Plan 5c8298fc / Review b4745121 at base 60b16a16, R4 Plan cfe85246 / Review fcd461c3 at base 83e024a6; R4 differs from R3 by exactly one baseGitSha line per file; research/ tree object 8e385f3d identical at both bases; 9 UPDATE + EVD-000143 NO_CHANGE, 0 CREATE, 0 DELETE; EVD-000002 and SRC-0018 outside the candidate set as human NO_CHANGE outcomes.",
+        "Canonical invariants verified: 274 records; identity fingerprint f091213b...c357e8; identity sets identical between baseline and main by an independent Git-tree method; zero CREATE/DELETE; zero status-field drift across all 9 changed records.",
+        "Readiness output is identical to the pre-AR-01 baseline, evidencing no unintended research-state transition and no strengthened claim.",
+        "Public projection verified: 274 records, 403 edges, 0 dangling; corrected ODM-002/004/006 text projects; zero workbench or private references in the generated read model.",
+        "Roadmap boundary verified: M008 is the only current milestone; no AR-02 or D7; 31 work units with none beyond WU031; docs/ and apps/ unchanged, so ODM-012 was not expanded."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK."
+        },
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Typecheck clean; 158 tests passed, 0 failed."
+        },
+        {
+          "command": "npm run research:readiness",
+          "result": "passed",
+          "summary": "Output identical to the pre-AR-01 baseline 2cfeaa69; no research-state transition."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "274 records, 403 edges, 0 dangling; 480 Explorer tests passed; build succeeded."
+        },
+        {
+          "command": "node --test odm-hardening.test.ts update-immutability.test.ts",
+          "result": "passed",
+          "summary": "13 focused ODM-007/008 tests passed; proven non-vacuous by 4 mutation tests."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Completed with non-blocking findings only: the three pre-existing owner-acknowledged C008/C009/C010 packet-ref findings plus the expected WU031 awaiting-checkpoint notice. No new finding was raised and none was acknowledged."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "All AR-01 Definition of Done conditions have independent evidence, or the milestone remains open with the specific blocker reported.",
+          "result": "passed",
+          "evidence": "Every ODM-001..008 and ODM-011 outcome independently verified against baseline 2cfeaa69 and main 3fe4dfdd; Gate 1 R3/R4 chain reconstructed from surviving artifact hashes; no blocker found."
+        },
+        {
+          "criterion": "Research validation/readiness, canonical-to-Explorer projection, relevant Explorer tests/build, and git diff --check pass.",
+          "result": "passed",
+          "evidence": "274 records OK; readiness identical to baseline; read model 274/403/0 dangling; 480 Explorer tests pass; git diff --check clean."
+        },
+        {
+          "criterion": "The closure statement accurately says that conclusions and the canonical identity set are otherwise unchanged.",
+          "result": "passed",
+          "evidence": "Identity fingerprint unchanged; identity sets identical by independent Git-tree comparison; zero status-field drift; readiness unchanged; zero CREATE/DELETE."
+        },
+        {
+          "criterion": "Owner review, rather than automatic closure, remains required.",
+          "result": "passed",
+          "evidence": "WU031 checkpointed with targetStatus needs_review; M008 not closed; no later milestone or work unit created or started; nothing committed, pushed or published."
+        }
+      ],
+      "finalWorkUnitStatus": "needs_review",
+      "createdAt": "2026-09-10T11:18:58.722Z",
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C032"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-031",
-    "workUnitId": "WU030",
+    "id": "PKT-032",
+    "workUnitId": "WU031",
     "milestoneId": "M008",
-    "createdAt": "2026-09-10T09:50:42.017Z",
+    "createdAt": "2026-09-10T11:10:56.926Z",
     "format": "markdown",
-    "contentHash": "sha256:5cf6f50fcd3946748319e12dfa1ec26ab55f7f9c4f177bb8119b1402592c645e",
+    "contentHash": "sha256:c6a45af26f7d0574dc747678dd37bdd06ae0bf786c6fae21f037988b7c902848",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -3716,8 +3809,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-10T10:25:52.819Z",
+  "nextRecommendedCommand": "aiqt review --mode release",
+  "lastUpdatedAt": "2026-09-10T12:10:00.000Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -4714,6 +4807,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-10T10:25:52.819Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C032",
+      "current": {
+        "observationId": "sha256:8ced3e55bad70a8dc584edc77f193518e7b8d15150169a78cebfb7b704184f2f",
+        "checkpointId": "C032",
+        "workUnitId": "WU031",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-10T11:18:58.722Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-10T11:18:58.722Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:8ced3e55bad70a8dc584edc77f193518e7b8d15150169a78cebfb7b704184f2f",
+          "checkpointId": "C032",
+          "workUnitId": "WU031",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-10T11:18:58.722Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-10T11:18:58.722Z"
         }
       ]
     }
