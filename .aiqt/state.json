@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
   "projectStatus": "in_progress",
-  "currentMilestoneId": null,
+  "currentMilestoneId": "M009",
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -1321,10 +1321,10 @@
           "npm run test --prefix apps/research-explorer",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-09-10T17:34:44.071Z",
-        "updatedAt": "2026-09-10T17:34:44.071Z"
+        "updatedAt": "2026-09-10T18:17:25.498Z"
       },
       {
         "id": "WU033",
@@ -1384,12 +1384,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-033"
         ],
         "createdAt": "2026-09-10T17:34:44.071Z",
-        "updatedAt": "2026-09-10T17:34:44.071Z"
+        "updatedAt": "2026-09-10T18:17:25.498Z"
       },
       {
         "id": "WU034",
@@ -3998,15 +3998,167 @@
       "finalWorkUnitStatus": "needs_review",
       "nextRecommendation": "aiqt checkpoint amend --checkpoint C032",
       "createdAt": "2026-09-10T11:18:58.722Z"
+    },
+    {
+      "id": "C033",
+      "workUnitId": "WU032",
+      "packetId": "PKT-033",
+      "summary": "WU032 (analysis only, no runtime change) reverified all eight owner-approved MUST ADDRESS AR-02 findings against main @ de75877a1e29f990e842baf8c139331232e7a3b0 using source inspection, replay of the exact production search function over the generated read model, and rendered browser verification at 1440x900 desktop and 360x740 compact. Disposition: 6 REPRODUCED (ODM-014, ODM-015, ODM-016, ODM-017, ODM-019, ODM-021), 1 REPRODUCED-AS-PRESENTATION-AMBIGUITY (ODM-020), 1 NOT_INDEPENDENTLY_REPRODUCIBLE / OWNER INTERPRETATION REQUIRED (ODM-013: every classic functional state family - loading, error, empty, not-found, invalid-id, no-selection - was found present and correct on every audited surface, with the single absent state being the Overview error retry already owned by ODM-021, so ODM-013 has no defensible residual scope of its own). An exact smallest implementation contract for WU033 is recorded per reproduced finding. Contrast was measured objectively (WCAG 2.1 relative-luminance computation over live rendered getComputedStyle values), never visually guessed. WU032 finishes in needs_review because the dispositions and the WU033 contract require an explicit owner gate before implementation.",
+      "completed": [
+        "ODM-013 - NOT_INDEPENDENTLY_REPRODUCIBLE / OWNER INTERPRETATION REQUIRED. The persisted wording ('required functional states are absent') does not name which states. Rather than invent scope, the current Explorer behaviour was audited exhaustively for every functional state family on every primary surface. Rendered evidence (browser, index.json fetch aborted via route interception): Overview error -> alert 'Falha ao carregar a visao geral' present; Records error -> alert + 'Tentar novamente'; Problem error -> alert + 'Tentar novamente'; Records empty (q=zzzznonexistentquery) -> EmptyState 'Nenhum resultado.'; unknown record (id=EVD-999999) -> 'Registo desconhecido' + retry; malformed id (id=../../etc/passwd) -> 'Identificador de registo invalido' + retry; problem with no id -> 'Nenhum Problema selecionado.' + 'Procurar um Problema em Registos'; ProblemHistoryView zero authored entries -> handled (ProblemHistoryView.tsx:60). Source audit of loading/error/empty/retry coverage across Overview, RecordsExplorer, RecordsTable, RecordDetailPanel, ProblemView, ProblemHistoryView and App found exactly one surface with an error state but no retry: Overview. That single absent state is already the separately persisted ODM-021 and must not be double-counted (WU032 out-of-scope forbids merging findings). Conclusion: no defensible ODM-013-specific correction is identifiable from current behaviour; recorded as an owner-review issue, not invented scope.",
+        "ODM-014 - REPRODUCED. Mechanism: apps/research-explorer/src/records/recordIndex.ts:31-34 recordSearchText() builds the searchable string from only record.id, record.type, record.label and flattened summaryFields; its own comment states 'nothing else (no record-detail content; search never triggers a detail load)'. filterRecords() (recordIndex.ts:52-58) is the only search path and is consumed by RecordsTable.tsx:83-86. Compounding factor: the generated index label is truncated - 193 of 274 records (70%) have an ellipsis-terminated label, so even the label is only partially searchable. Measured coverage: searchable index text 73,104 chars vs canonical detail text 571,048 chars = ~12.8% of canonical content is reachable by search. Concrete canonical examples, verified by replaying the exact production normalize+match functions over generated/: 'conectividade rural-urbana' -> 0 search hits, present in EVD-000001 canonical detail; 'igualdade no acesso aos servicos' -> 0 hits, present in EVD-000001; 'deslocacao dentro do municipio' -> 0 hits, present in EVD-000001; 'prevalencia' -> 0 hits, present in 29 records; 'horarios' -> 2 hits but present in 12 records; 'MOB' -> 14 hits but present in 98 records. Whole canonical fields are unreachable, e.g. PRB problem_statement and causal_reading, and EVD observation.summary and inference_limits. Rendered browser confirmation: /?view=records&q=conectividade%20rural-urbana renders EmptyState 'Nenhum resultado.' with 0 rows while EVD-000001 contains that exact phrase.",
+        "ODM-015 - REPRODUCED. Mechanism is component remount / state ownership, NOT browser history. Sorting and pagination live in a component-local useReducer (RecordsTable.tsx:74, initialRecordsControllerState from recordsController.ts:23-26) and are deliberately excluded from URL state (recordsController.ts:5-12 comment; urlState.ts ExplorerUrlState carries only view, selectedId, query, typeFilter, graphDepth). RecordsExplorer.tsx:77-90 returns RecordDetailPanel INSTEAD OF RecordsTable when selectedId !== null, so selecting a record unmounts RecordsTable and destroys its reducer state; returning remounts it at initial state. Rendered browser reproduction at 1440x900: on /?view=records set sort=Tipo (aria-pressed=true, label 'Tipo up-arrow') and paged to 'Pagina 3 de 11'; clicked the first row -> URL ?view=records&id=EVD-000056; pressed browser Back -> URL correctly restored to ?view=records (history behaved correctly), but sort reverted to none (all four sort buttons aria-pressed=false) and pagination reverted to 'Pagina 1 de 11', first row back to EVD-000001. Both sort and pagination are lost; the loss is attributable to remount, not to history.",
+        "ODM-016 - REPRODUCED, two concrete and separate failures. Failure A - deep-link fragment never applied: navigating directly to /?view=records&id=EVD-000001#evd-sources at 360x740 left scrollY=128 while the #evd-sources target was still 1800px below the viewport top. Record detail is lazily loaded, so the fragment target does not exist in the DOM at the moment the browser performs its native fragment scroll, and nothing re-applies the fragment after content arrives. The same fragment applied correctly (scrollY=1761) when set after load, isolating the cause to load-order, not to a bad target. Failure B - sticky-header occlusion of fragment targets: at 360px .explorer-chrome is position:sticky with measured height 104px (index.css:2113-2125), but scroll-margin-top:108px is scoped to only two selectors, #overview-problemas and .problem-section, inside @media (max-width:767px) (index.css:2262-2267). Every other real fragment target has computed scroll-margin-top:0px. Measured at 360x740 with room to scroll: #evd-scope, #evd-limits and #evd-investigation each landed with their heading at top=0 versus headerBottom=104, i.e. 104px of the section heading hidden behind the sticky header. #evd-sources and #evd-technical were not occluded only because the document hit its scroll limit. These targets are reached by real in-app UI: SectionIndexList (presentation/SectionIndexList.tsx:19) renders ordinary anchor links to them, and RecordDetailPanel.tsx:826 links to #relacoes. Failure B was additionally captured as rendered screenshot evidence at 360px showing mid-paragraph text cut off at the header edge with the section heading invisible. Focus note: fragment navigation left document.activeElement as BODY, so keyboard focus does not follow the fragment; this is recorded as observed context, and the contract deliberately does not redesign navigation.",
+        "ODM-017 - REPRODUCED, measured objectively, not visually guessed. Method: WCAG 2.1 relative-luminance contrast computed in-browser from live getComputedStyle color and the nearest non-transparent ancestor background, over elements owning direct text nodes, with the correct large-text threshold applied (3.0 only for >=24px, or >=18.66px bold; otherwise 4.5). Every failure resolves to exactly one production token, --ink-faintest = #8a8578 = rgb(138,133,120) (index.css:653). Independent static computation of the production palette agrees: --ink-faintest scores 3.47:1 on --canvas, 3.68:1 on --surface, 3.31:1 on --surface-muted, 3.20:1 on --surface-chip; all below the 4.5:1 required for the sizes actually used (11px, 12px, 14.08px - none qualify as large text). Rendered failures by surface: Overview and Records - nav button 'Grafo' 3.47:1 at 14.08px; Problem - .problem-identity-id 3.47, header fact DT 3.47, file-path CODE 3.47, .effect-summary-counts 3.31, .effect-count 3.31, .open-question-evidence-refs-label 3.47; History - .problem-identity-id 3.47; EVD detail - .evd-secondary-id 3.47, lineage CODE 3.29, DT 3.47, scope SMALL 3.47, PRB CODE 3.29; SRC detail - identifier CODE 3.68. Two further declared low-contrast tokens, --ink-disclaimer (2.43:1) and --icon-muted (2.00:1), are declared in index.css but have zero usages, so they are not part of the reproduced defect. This is a functional accessibility correction confined to one token value, explicitly not a visual redesign.",
+        "ODM-019 - REPRODUCED. Mechanism: apps/research-explorer/src/records/EvdDetail.tsx:120 renders the button labelled 'Ver Problema ->' with onClick={() => onSelect(use.detail.id)}. onSelect is threaded from Explorer.tsx:94 as url.setSelectedId, which changes only selectedId and leaves view=records, so the user lands on the generic technical Detail for the PRB. The correct existing navigation path already exists and is used by every other 'go to the Problem experience' affordance: onViewAsProblem -> url.setViewAndSelection('problem', id) (Explorer.tsx:99, 124, 138), which is exactly what ContextTabs' 'Problema' tab (navigation/ContextTabs.tsx:22) and GraphExplorer's 'Ver como Problema' (GraphExplorer.tsx:343) already call. Rendered browser reproduction: from /?view=records&id=EVD-000001, clicking '.evd-problem-action' produced URL ?view=records&id=PRB-0001, document heading 'Detalhes', .problem-view absent, and ContextTabs reporting Detalhe=page (Problema and Historico not current) - i.e. technical Detail, not the Problem experience.",
+        "ODM-020 - REPRODUCED as a presentation ambiguity. What is currently shown: App.tsx:64-67 renders a single global line 'Corpus: {N} registos - gerado em <time dateTime={manifest.generatedAt}>'. Rendered browser value: 'Corpus: 274 registos - gerado em 10/09/2026, 18:59' with dateTime 2026-09-10T17:59:52.370Z. Why it can be mistaken for research freshness: manifest.generatedAt is assigned generatedAt: now() at data-build time in apps/research-explorer/scripts/build-data.js:123, so it is pure build wall-clock and advances on every rebuild even when no canonical research changed - it was 18:59 in this session purely because build-data was re-run. It carries no qualifier distinguishing build/generation time from research currency, and it sits immediately adjacent to corpus counts and to the Overview line 'investigacao em atualizacao continua' (Overview.tsx:165), so a reader can reasonably read the timestamp as 'the research was updated at this time'. Per-record canonical dates are separate and already correctly labelled where shown (e.g. EVD 'Extraida pela Open Evora em ...', EvdDetail.tsx:131). The required correction is presentation-only labelling/qualification; canonical research semantics and timestamps must not change.",
+        "ODM-021 - REPRODUCED, and the existing architecture already supports the bounded fix. Mechanism: Overview.tsx:66-74 renders ErrorNotice with title and message but passes NO action prop, while the sibling RecordsExplorer.tsx:62-75 passes action={<button onClick={indexState.retry}>Tentar novamente</button>} for the identical error shape. Both consume the same hook, and useRecordIndex already returns a retry function (records/useRecordIndex.ts:21,43) that bumps an attempt counter re-running the effect - Overview.tsx:33 already calls useRecordIndex and simply discards retry. ErrorNotice already accepts a caller-owned action node (presentation/ErrorNotice.tsx:34,50). Rendered browser reproduction with index.json aborted: Overview shows role=alert 'Falha ao carregar a visao geral' with buttonsInside=[] and no retry-like control anywhere on the page; the same interception on Records shows 'Tentar novamente', and clicking it after restoring the route fully recovered the view (alert gone, 25 rows rendered), proving the retry path is bounded, already implemented, and effective.",
+        "WU033 IMPLEMENTATION CONTRACT - ODM-014 (search coverage). Files: apps/research-explorer/src/records/recordIndex.ts (recordSearchText only); if additional canonical text must be present in the index, apps/research-explorer/scripts/build-data.js / read-model builder plus dataProvider/types.ts RecordSummary. Required behaviour: canonical/detail content that a reasonable user would search - at minimum the untruncated label text and the primary canonical meaning fields (EVD observation.summary and inference_limits; PRB problem_statement and causal_reading) - must be matched by the existing single-token normalized substring search. Do NOT broaden search semantics: no fuzzy matching, no ranking/scoring, no multi-term or boolean operators, no new filter dimensions, no per-keystroke detail fetching (search must remain synchronous over already-loaded data). Regression test: extend src/records/recordIndex.test.ts to assert a canonical phrase drawn from detail content matches its record, plus src/records/realCorpus.test.ts style coverage asserting the exact phrases proven failing here ('conectividade rural-urbana' -> EVD-000001) now match, and that type filtering and diacritic/case-insensitivity still behave. Rendered verification: /?view=records&q=<canonical phrase> returns the expected record at desktop and 360px. Accessibility verification: not applicable beyond unchanged EmptyState semantics.",
+        "WU033 IMPLEMENTATION CONTRACT - ODM-015 (pagination/sort persistence). Files: apps/research-explorer/src/records/RecordsTable.tsx, src/records/recordsController.ts, and whichever single ownership mechanism is chosen - either lifting the reducer state into RecordsExplorer.tsx (so it survives the detail-panel swap) or adding sort/page to src/navigation/urlState.ts + useExplorerUrlState.ts. Required behaviour: after selecting a record from the Records list and returning (browser Back and the in-app 'Registos' breadcrumb), the previously chosen sort column/direction and page index are still in effect. Preserve the existing rule that a query or type-filter change resets to page 1 (recordsController RESET_PAGE) and that sorting alone never resets the page. If sort/page are added to the URL, they must remain absent from the serialized string at their default values so default state still round-trips to a bare path. Regression test: src/records/recordsController.test.ts for any reducer change; a component test asserting sort+page survive the select-then-return cycle; src/navigation/urlState.test.ts round-trip and default-omission assertions if URL state is extended. Rendered verification: the exact reproduction above (sort=Tipo, page 3, select, Back) at desktop and 360px. Accessibility verification: sort controls keep aria-pressed state and pagination controls keep their disabled/enabled semantics after return.",
+        "WU033 IMPLEMENTATION CONTRACT - ODM-016 (deep-link/fragment/header). Files: apps/research-explorer/src/index.css (scroll-margin-top scope) and the record/problem detail mount path (src/records/RecordDetailPanel.tsx and/or src/app/Explorer.tsx) for post-load fragment application. Required behaviour, addressing the two failures separately: (A) a direct deep link carrying a fragment must reach its target once the lazily loaded content has mounted - re-apply the fragment after the target exists, once, without hijacking ordinary user scrolling and without changing routing/URL semantics; (B) every real fragment target must clear the sticky header - extend the existing scroll-margin-top rule to the remaining in-app targets (.record-editorial-section / .evd-section ids, #relacoes, and the section-index targets) rather than introducing a new mechanism, keeping the offset tied to the actual 104px sticky header height and to the compact media query where the header is sticky. Do NOT redesign navigation, do not convert fragments into routes, and do not add scroll-spy. Regression test: unit/component coverage that the fragment is re-applied after async content mount; a CSS-contract or component test asserting the affected targets carry the header offset. Rendered verification: at 360px and desktop, deep-link directly to #evd-limits, #evd-sources, #evd-investigation and #relacoes and assert the section heading is fully below the sticky header (heading top >= header bottom) and that the target is actually in view. Accessibility verification: keyboard activation of the section-index links reaches the same visible position, the skip link still moves focus to #main-content, and no focus is stolen from the user.",
+        "WU033 IMPLEMENTATION CONTRACT - ODM-017 (contrast). Files: apps/research-explorer/src/index.css, token --ink-faintest (line 653) only. Required behaviour: text currently rendered in --ink-faintest must meet WCAG 2.1 AA 4.5:1 against the backgrounds it is actually used on. The binding constraint is --surface-chip (currently 3.20:1), so the corrected value must reach >=4.5:1 against canvas #faf8f3, surface #ffffff, surface-muted #f5f3ec and surface-chip #f1efe8 simultaneously; for reference the existing --ink-faint #6b675f already achieves 5.30/5.63/5.07/4.89 and is the natural minimal target darkness. Prefer correcting the single token value over per-selector overrides so all fifteen usages are fixed once. This is a minimal accessibility correction, explicitly not a redesign: do not change typography, spacing, layout, hierarchy, or any other token. Regression test: a deterministic contrast assertion over the corrected token pair values (pure computation, no browser needed) so the ratio cannot silently regress. Rendered verification and accessibility verification: re-run the same measured in-browser contrast sweep over Overview, Records, Problem, History, EVD detail and SRC detail at desktop and 360px and assert zero remaining sub-threshold text.",
+        "WU033 IMPLEMENTATION CONTRACT - ODM-019 ('Ver Problema' routing). Files: apps/research-explorer/src/records/EvdDetail.tsx (the EvdInvestigation section, line 120 and the props threading it) and src/records/RecordDetailPanel.tsx where EvdDetail is composed. Required behaviour: activating 'Ver Problema ->' must reach the Problem experience for that PRB - reuse the existing onViewAsProblem path that resolves to url.setViewAndSelection('problem', id) (already threaded to RecordDetailPanel from Explorer.tsx:99), producing view=problem&id=PRB-xxxx in one history entry, exactly like ContextTabs' 'Problema' tab. Do not introduce a new navigation callback, do not change the button label, and leave the sibling source-navigation buttons (which correctly open generic detail via onSelect) untouched. Regression test: extend src/records/EvdDetail.test.tsx to assert that activating 'Ver Problema' invokes the view-as-problem callback with the PRB id, and does not invoke plain onSelect. Rendered verification: from /?view=records&id=EVD-000001 activate the control and assert the resulting URL is view=problem&id=PRB-0001 and the Problem view is rendered, at desktop and 360px. Accessibility verification: the control remains a native button reachable and activatable by keyboard.",
+        "WU033 IMPLEMENTATION CONTRACT - ODM-020 (freshness disambiguation). Files: apps/research-explorer/src/app/App.tsx (the .manifest-summary line, 64-67) and, only if a shared label helper is warranted, src/presentation/presentation.ts. Required behaviour: presentation-only. The displayed timestamp must be unambiguously identified as the generation/build time of the published read model, so it cannot be read as the currency of the underlying research - e.g. an explicit qualifier naming what the date refers to, still rendered in a semantic <time> element preserving the existing machine-readable dateTime. Strictly presentation: do NOT change manifest.generatedAt, do not change scripts/build-data.js, do not introduce a new research-freshness concept, date, or derived 'last researched' value, and do not alter canonical research semantics or any per-record canonical date. PT-PT user-facing copy. Regression test: extend src/app/App.test.tsx to assert the qualifying label renders alongside the unchanged machine-readable timestamp. Rendered verification: desktop and 360px, confirming the line still fits the compact viewport without page-level horizontal overflow. Accessibility verification: the <time> element and its accessible text remain correct.",
+        "WU033 IMPLEMENTATION CONTRACT - ODM-021 (Overview retry). Files: apps/research-explorer/src/overview/Overview.tsx only (error branch, lines 66-74). Required behaviour: the Overview error state offers a bounded retry action matching the established pattern - pass action={<button type=\"button\" onClick={indexState.retry}>Tentar novamente</button>} to the existing ErrorNotice, reusing the retry already returned by useRecordIndex; a successful retry must clear the error and render the Overview normally. Bounded means a single user-initiated attempt per activation, with no automatic retry loop, no backoff scheduler, no new state machine, and no change to ErrorNotice or useRecordIndex. Regression test: extend src/overview/Overview.test.tsx following the existing proven pattern in src/app/App.test.tsx:18 ('retries a failed startup manifest load') - fail the first listRecords, assert the error and the retry control, activate it, assert recovery. Rendered verification: with index.json failing, Overview shows the retry; after recovery the problem list renders, at desktop and 360px. Accessibility verification: the action stays inside the existing role=alert boundary and is keyboard reachable and activatable.",
+        "ACCESSIBILITY VERIFICATION MECHANISM DECISION (no tooling added, none required for WU033). Smallest sufficient existing mechanisms, in order of preference: (1) Rendered browser verification via the already-available Playwright MCP browser, computing WCAG 2.1 contrast in-page from getComputedStyle - this is what produced the ODM-017 measurements here, requires no dependency, and objectively measures rather than guesses; (2) a deterministic pure-computation contrast assertion in the existing Vitest suite over the token pair values, which pins the corrected --ink-faintest against regression with no browser; (3) the existing @storybook/addon-a11y (already a devDependency, already enabled in .storybook/main.ts) for component-level axe checks and for keyboard/focus exercise. IMPORTANT LIMITATION for owner awareness: .storybook/preview.ts imports src/styles/tokens.css, which is a Storybook-only candidate palette explicitly documented as NOT imported by the production app; it does not import the production src/index.css where --ink-faintest lives. Storybook's a11y addon therefore cannot currently observe the production contrast defect, so it must not be treated as the primary ODM-017 gate. Mechanisms (1) and (2) together are sufficient and are the named contract mechanism. NO new persistent accessibility tooling (no axe-core, no jest-axe, no Lighthouse, no contrast linter) is required for WU033 and none is recommended at this time.",
+        "RENDERED/BROWSER VERIFICATION REQUIRED FOR WU033 AND WU034: representative desktop viewport 1440x900 and the compact QA viewport 360x740, covering Overview, Records list, Records detail (EVD and SRC), Problem, and Problem History. Per finding: ODM-014 search-hit verification; ODM-015 sort+page survival across select-and-return; ODM-016 fragment landing position versus sticky-header bottom for every affected target; ODM-017 the full measured contrast sweep showing zero sub-threshold text; ODM-019 resulting URL and rendered Problem view; ODM-020 label legibility and no compact overflow; ODM-021 retry presence and successful recovery. Keyboard/focus must be exercised for ODM-016 and ODM-019.",
+        "BASELINE AND NON-MODIFICATION EVIDENCE: Explorer typecheck passed (exit 0) both before and after the analysis; the Explorer test suite result is unchanged from baseline at 49 test files passed, 1 skipped, 480 tests passed, 1 skipped; npm run research:validate reported 'Validated 274 record(s): OK.'; git diff --check is clean. No file under apps/, docs/, research/ or tools/ was modified and no dependency or tooling was installed. Temporary rendered-evidence artifacts (one screenshot and two browser audit scripts) were written to untracked locations and deleted before completion; git status shows only .aiqt/state.json and .aiqt/runlog.jsonl modified, which is the expected result of aiqt next and this checkpoint."
+      ],
+      "notCompleted": [
+        "No ODM finding was implemented; WU032 is analysis and reverification only, by design.",
+        "ODM-013 was not converted into an implementation contract because no defensible finding-specific absent state could be identified from current behaviour; it is escalated for owner interpretation instead of being expanded into invented scope."
+      ],
+      "filesChanged": [],
+      "issues": [
+        {
+          "title": "ODM-013 requires explicit owner interpretation before any WU033 implementation. The persisted wording 'required functional states are absent' does not identify which states are meant, and the exhaustive behavioural audit of current main found every classic functional state family present and correct on every primary surface - loading, error, empty/established-empty, unknown record, malformed identifier, and no-selection - with the single absent state (Overview error retry) already owned by the separately persisted ODM-021. Inventing a scope for ODM-013 would breach the WU032 out-of-scope rules against expanding a finding beyond its approved meaning and against merging findings. Owner decision required: either (a) confirm ODM-013 is subsumed by ODM-021 and close it with no separate WU033 scope, (b) supply the specific absent states originally meant so a bounded contract can be written, or (c) direct a further bounded investigation. WU033 must not implement anything for ODM-013 until this is resolved.",
+          "description": null,
+          "severity": "high",
+          "status": "open",
+          "agentCanFix": true
+        },
+        {
+          "title": "Owner acknowledgement requested for the ODM-017 verification-mechanism limitation: .storybook/preview.ts imports the Storybook-only src/styles/tokens.css and not the production src/index.css, so the existing @storybook/addon-a11y cannot observe the production --ink-faintest contrast failure. WU033 must therefore gate ODM-017 on rendered browser measurement plus a deterministic contrast assertion in the existing test suite. No tooling addition is being requested; the owner should simply confirm this mechanism is acceptable rather than expecting Storybook a11y to be the gate.",
+          "description": null,
+          "severity": "medium",
+          "status": "open",
+          "agentCanFix": true
+        },
+        {
+          "title": "ODM-014 scope boundary requires an owner decision on mechanism before WU033: making canonical detail content searchable may require either enlarging the generated index (build-data.js / read-model, affecting generated payload size) or loading detail content into the search path. The contract deliberately does not choose between them because the first touches the generated read-model shape. Owner should confirm the acceptable mechanism and confirm that untruncating the currently 70%-truncated index label is in scope, since label truncation is itself part of why canonical text is unreachable.",
+          "description": null,
+          "severity": "medium",
+          "status": "open",
+          "agentCanFix": true
+        },
+        {
+          "title": "ODM-015 requires an owner decision on state ownership: preserving sort/pagination can be done either by lifting the existing reducer into RecordsExplorer (purely local, not shareable) or by promoting sort/page into URL state (bookmarkable/shareable, but widens the URL contract that RE-02C deliberately limited to view/id/q/type/d). Both satisfy the finding; the second changes a documented URL-state boundary and should be owner-confirmed before implementation.",
+          "description": null,
+          "severity": "low",
+          "status": "open",
+          "agentCanFix": true
+        },
+        {
+          "title": "Pre-existing C008/C009/C010 broken checkpoint packet references remain outstanding and continue to make aiqt graph validate report failed. They are explicitly out of scope for WU032 and were left untouched; they are recorded here only so the failed graph-validate exit status is not misread as a WU032 regression.",
+          "description": null,
+          "severity": "low",
+          "status": "open",
+          "agentCanFix": true
+        }
+      ],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "tsc --noEmit completed with exit code 0; unchanged from the pre-analysis baseline."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "49 test files passed, 1 skipped; 480 tests passed, 1 skipped - identical to the baseline captured before analysis, confirming no test or source modification."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "Clean, exit code 0. Only informational CRLF notices for the two AIQT state files; no whitespace errors."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK. Canonical research untouched."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "Project in_progress; M009 active with WU032 in_progress; WU033 and WU034 remained planned throughout; no other work unit was started."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Non-blocking warnings only: the three pre-existing C008/C009/C010 missing-packet-ref integrity findings plus the expected WU032 awaiting-checkpoint workflow notice. No new finding."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "failed",
+          "summary": "Reported exactly the three pre-existing GRAPH-VALIDATE-BROKEN-CHECKPOINT-PACKET-REFERENCE findings for C008/C009/C010 and nothing else. Per the WU032 gate these three alone are not a WU032 failure and must not be repaired, suppressed or re-acknowledged here; NO new graph finding was introduced, so nothing blocking arose from this run."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "All eight approved MUST ADDRESS findings are independently accounted for, each with an explicit REPRODUCED or NO_LONGER_REPRODUCIBLE disposition supported by concrete evidence.",
+          "result": "passed",
+          "evidence": "Eight findings each carry an individually evidenced disposition: ODM-014/015/016/017/019/021 REPRODUCED; ODM-020 REPRODUCED as a presentation ambiguity; ODM-013 recorded as NOT_INDEPENDENTLY_REPRODUCIBLE with an explicit owner-review escalation rather than a forced binary verdict, because its persisted wording does not identify which states are meant and the exhaustive behavioural audit found every state family present except the one already owned by ODM-021. Evidence is source-located, replayed against the generated read model, and confirmed by rendered browser verification."
+        },
+        {
+          "criterion": "The owner-approved meaning of each in-scope finding is inspectable from .aiqt/state.json, so no execution step depends on chat history or an unavailable audit artifact.",
+          "result": "passed",
+          "evidence": "The approved wording remains verbatim in the WU032 objective and scope in .aiqt/state.json, and this checkpoint persists the disposition, evidence, mechanism and per-finding WU033 contract into the same canonical state file."
+        },
+        {
+          "criterion": "No finding is expanded beyond its approved meaning, and every out-of-scope finding stays untouched.",
+          "result": "passed",
+          "evidence": "Each contract is confined to its finding's persisted wording, with explicit non-goals recorded per finding (no search-semantics broadening, no navigation redesign, no visual redesign, presentation-only for ODM-020, bounded retry for ODM-021). Findings were not merged - notably the Overview retry gap is attributed solely to ODM-021 rather than being reused to manufacture ODM-013 scope. ODM-018, ODM-009, ODM-010, ODM-012 and ODM-022+ were not investigated or touched, and no AR-03/04/05 or D7 work was started."
+        },
+        {
+          "criterion": "An exact bounded implementation contract exists naming affected components, routes, expected behaviour, and required regression coverage per finding.",
+          "result": "passed",
+          "evidence": "Seven per-finding contracts name exact files and line anchors, the required behaviour, the URL/route or state involved, the regression test to add and where, the rendered verification, the accessibility verification, and explicit non-goals. ODM-013 intentionally has no contract pending owner interpretation."
+        },
+        {
+          "criterion": "The contract names the smallest sufficient existing accessibility verification mechanism, states how contrast will be measured or verified rather than guessed, and explicitly identifies any recommended persistent tooling addition before WU033 starts.",
+          "result": "passed",
+          "evidence": "The named mechanism is existing rendered browser measurement (WCAG 2.1 relative-luminance computed from live getComputedStyle) plus a deterministic pure-computation contrast assertion in the existing Vitest suite, with the existing @storybook/addon-a11y available for component keyboard/focus and axe checks. The limitation that Storybook loads tokens.css and not production index.css - so it cannot currently observe this defect - is recorded explicitly. No persistent tooling addition is required or recommended, and none was installed."
+        },
+        {
+          "criterion": "The rendered/browser verification required for WU033 and WU034 is specified for desktop and the ~360px compact QA viewport.",
+          "result": "passed",
+          "evidence": "Specified as 1440x900 desktop and 360x740 compact across Overview, Records list, EVD and SRC detail, Problem and Problem History, with per-finding checks and explicit keyboard/focus exercise for ODM-016 and ODM-019."
+        },
+        {
+          "criterion": "No source or runtime changes were made and no tooling or dependency was added; git diff --check is clean and the Explorer test suite result is unchanged from the baseline.",
+          "result": "passed",
+          "evidence": "filesChanged is empty. git status shows only .aiqt/state.json and .aiqt/runlog.jsonl, the expected AIQT bookkeeping. git diff --check exits clean. Test suite is identical to baseline (49 files passed/1 skipped; 480 passed/1 skipped) and typecheck exits 0. Temporary rendered-evidence artifacts were untracked and were deleted before completion."
+        },
+        {
+          "criterion": "Graph validation, if run, is reported with the pre-existing C008/C009/C010 findings classified separately; those three alone are not a failure, while any new graph finding is blocking.",
+          "result": "passed",
+          "evidence": "aiqt graph validate returned exactly the three pre-existing C008/C009/C010 broken-packet-reference criticals and no others. They are reported separately here, were not repaired, suppressed, mutated or re-acknowledged, and no new graph finding was introduced."
+        }
+      ],
+      "finalWorkUnitStatus": "needs_review",
+      "createdAt": "2026-09-10T18:11:04.054Z",
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C033"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-032",
-    "workUnitId": "WU031",
-    "milestoneId": "M008",
-    "createdAt": "2026-09-10T11:10:56.926Z",
+    "id": "PKT-033",
+    "workUnitId": "WU032",
+    "milestoneId": "M009",
+    "createdAt": "2026-09-10T17:56:39.572Z",
     "format": "markdown",
-    "contentHash": "sha256:c6a45af26f7d0574dc747678dd37bdd06ae0bf786c6fae21f037988b7c902848",
+    "contentHash": "sha256:b4c66906a3c0a874a80598e6cdebc9e319e563821825a3dbfa9d43fd3950c5d0",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -4025,7 +4177,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-10T17:34:44.071Z",
+  "lastUpdatedAt": "2026-09-10T18:17:25.498Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -5052,6 +5204,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-10T11:18:58.722Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C033",
+      "current": {
+        "observationId": "sha256:f0f872dca5c5a661bb552dc4183b173d0d689ac6429a6378ce581596fbe93331",
+        "checkpointId": "C033",
+        "workUnitId": "WU032",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-10T18:11:04.054Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-10T18:11:04.054Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:f0f872dca5c5a661bb552dc4183b173d0d689ac6429a6378ce581596fbe93331",
+          "checkpointId": "C033",
+          "workUnitId": "WU032",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-10T18:11:04.054Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-10T18:11:04.054Z"
         }
       ]
     }
