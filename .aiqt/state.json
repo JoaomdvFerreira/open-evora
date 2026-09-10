@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M008",
-  "currentWorkUnitId": null,
+  "currentWorkUnitId": "WU030",
   "workGraph": {
     "milestones": [
       {
@@ -93,7 +93,7 @@
         "id": "M008",
         "title": "AR-01 — Research Trust Baseline",
         "objective": "Establish the post-audit research trust baseline by resolving or explicitly verifying the approved targeted canonical findings, hardening the approved mechanical validation gaps, and making the repository publication boundary unambiguous.",
-        "status": "ready",
+        "status": "in_progress",
         "workUnitIds": [
           "WU029",
           "WU030",
@@ -1197,12 +1197,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "in_progress",
         "dependencies": [
           "DEP-031"
         ],
         "createdAt": "2026-09-09T17:53:22.951Z",
-        "updatedAt": "2026-09-10T08:39:16.325Z"
+        "updatedAt": "2026-09-10T09:50:42.017Z"
       },
       {
         "id": "WU031",
@@ -3578,17 +3578,17 @@
         }
       ],
       "finalWorkUnitStatus": "needs_review",
-      "createdAt": "2026-09-09T18:51:12.296Z",
-      "nextRecommendation": "aiqt checkpoint amend --checkpoint C030"
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C030",
+      "createdAt": "2026-09-09T18:51:12.296Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-030",
-    "workUnitId": "WU029",
+    "id": "PKT-031",
+    "workUnitId": "WU030",
     "milestoneId": "M008",
-    "createdAt": "2026-09-09T18:42:41.410Z",
+    "createdAt": "2026-09-10T09:50:42.017Z",
     "format": "markdown",
-    "contentHash": "sha256:c073a6bc4de17e75b1f2a4e4c39b0f90dec20aec653d4a4f6a79a27f80ce3d21",
+    "contentHash": "sha256:5cf6f50fcd3946748319e12dfa1ec26ab55f7f9c4f177bb8119b1402592c645e",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -3606,8 +3606,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-10T08:39:16.325Z",
+  "nextRecommendedCommand": "aiqt checkpoint",
+  "lastUpdatedAt": "2026-09-10T09:50:42.017Z",
   "review": {
     "acknowledgedFindings": [
       {
