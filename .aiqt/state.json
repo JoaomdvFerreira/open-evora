@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "projectStatus": "review",
+  "projectStatus": "in_progress",
   "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
@@ -98,6 +98,17 @@
           "WU029",
           "WU030",
           "WU031"
+        ]
+      },
+      {
+        "id": "M009",
+        "title": "M009 — AR-02 Explorer Functional Foundation",
+        "objective": "Establish a reliable functional Explorer baseline before knowledge-first product/design evolution by resolving the eight approved MUST ADDRESS functional findings (ODM-013, ODM-014, ODM-015, ODM-016, ODM-017, ODM-019, ODM-020, ODM-021) without redesigning the product or changing canonical research semantics. Graph-validation contract: the pre-existing owner-acknowledged C008/C009/C010 checkpoint packet-reference findings are historical debt, are reported separately, must not be repaired, suppressed, mutated, or re-acknowledged, and alone never constitute an AR-02 failure; any new graph finding is blocking.",
+        "status": "ready",
+        "workUnitIds": [
+          "WU032",
+          "WU033",
+          "WU034"
         ]
       }
     ],
@@ -1249,6 +1260,196 @@
         ],
         "createdAt": "2026-09-09T17:53:22.951Z",
         "updatedAt": "2026-09-10T12:10:00.000Z"
+      },
+      {
+        "id": "WU032",
+        "milestoneId": "M009",
+        "title": "AR-02 — Finding reverification and implementation contract",
+        "objective": "Reproduce and reverify the eight owner-approved MUST ADDRESS AR-02 findings against current main, then define the smallest exact bounded implementation contract for WU033 without modifying any runtime. The owner-approved meaning of every in-scope finding is persisted verbatim in this work unit's scope so execution never depends on chat history or an unavailable audit artifact: ODM-013 — required functional states are absent. ODM-014 — Explorer canonical search does not search relevant canonical/detail content that users reasonably need to find. ODM-015 — Records pagination/sort state is lost when navigating away and returning. ODM-016 — header/focus/fragment behaviour weakens or breaks deep-link navigation. ODM-017 — insufficient contrast exists on affected Explorer UI. ODM-019 — 'Ver Problema' routes/selects into technical Detail rather than the Problem experience. ODM-020 — research freshness/currentness is ambiguous relative to generated/build date. ODM-021 — Overview error state has no retry action.",
+        "scope": [
+          "ODM-013 — required functional states are absent. Reproduce against current main and record REPRODUCED or NO_LONGER_REPRODUCIBLE with concrete evidence.",
+          "ODM-014 — Explorer canonical search does not search relevant canonical/detail content that users reasonably need to find. Reproduce against current main and record REPRODUCED or NO_LONGER_REPRODUCIBLE with concrete evidence.",
+          "ODM-015 — Records pagination/sort state is lost when navigating away and returning. Reproduce against current main and record REPRODUCED or NO_LONGER_REPRODUCIBLE with concrete evidence.",
+          "ODM-016 — header/focus/fragment behaviour weakens or breaks deep-link navigation. Reproduce against current main and record REPRODUCED or NO_LONGER_REPRODUCIBLE with concrete evidence.",
+          "ODM-017 — insufficient contrast exists on affected Explorer UI. Reproduce against current main and record REPRODUCED or NO_LONGER_REPRODUCIBLE with concrete evidence.",
+          "ODM-019 — 'Ver Problema' routes/selects into technical Detail rather than the Problem experience. Reproduce against current main and record REPRODUCED or NO_LONGER_REPRODUCIBLE with concrete evidence.",
+          "ODM-020 — research freshness/currentness is ambiguous relative to generated/build date. Reproduce against current main and record REPRODUCED or NO_LONGER_REPRODUCIBLE with concrete evidence.",
+          "ODM-021 — Overview error state has no retry action. Reproduce against current main and record REPRODUCED or NO_LONGER_REPRODUCIBLE with concrete evidence.",
+          "Identify the exact affected components, routes, URL/history state, and existing tests for every finding.",
+          "Define the expected behaviour and the focused regression coverage required for each reproduced finding.",
+          "Distinguish functional correctness from visual redesign for every finding, in particular ODM-017 contrast.",
+          "Determine the smallest existing verification mechanism sufficient for ODM-017 and other affected accessibility behaviour, preferring existing Storybook accessibility capability and/or existing rendered/browser verification; contrast must be measured or otherwise verifiable rather than visually guessed, and keyboard/focus behaviour must be exercised where relevant.",
+          "Recommend additional persistent accessibility tooling only if the existing mechanisms are demonstrably insufficient, and explicitly identify any such tooling addition in the implementation contract before WU033 starts.",
+          "Determine the rendered/browser verification required for WU033 and WU034, including a representative desktop viewport and the ~360px compact QA viewport."
+        ],
+        "outOfScope": [
+          "Do not modify any source, runtime, generated data, or test file; this work unit is analysis only.",
+          "Do not add, install, or configure accessibility tooling or any other dependency in this work unit; tooling may only be recommended for explicit approval.",
+          "Do not expand any finding beyond its owner-approved meaning as persisted in scope, and do not merge findings together.",
+          "Do not address ODM-018 compact/mobile sorting, which is an accepted deferral, nor ODM-009, ODM-010, ODM-012, or ODM-022 and later.",
+          "Do not start AR-03, AR-04, AR-05, or D7, and do not change canonical research, schemas, or research semantics.",
+          "Do not perform new external research, product/solution selection, or design-system redesign.",
+          "Do not repair, suppress, mutate, or re-acknowledge the pre-existing C008/C009/C010 checkpoint packet-reference findings.",
+          "Do not create a separate audit document; the approved finding meanings live in this work unit."
+        ],
+        "acceptanceCriteria": [
+          "All eight approved MUST ADDRESS findings are independently accounted for, each with an explicit REPRODUCED or NO_LONGER_REPRODUCIBLE disposition supported by concrete evidence.",
+          "The owner-approved meaning of each in-scope finding is inspectable from .aiqt/state.json, so no execution step depends on chat history or an unavailable audit artifact.",
+          "No finding is expanded beyond its approved meaning, and every out-of-scope finding stays untouched.",
+          "An exact bounded implementation contract exists naming affected components, routes, expected behaviour, and required regression coverage per finding.",
+          "The contract names the smallest sufficient existing accessibility verification mechanism, states how contrast will be measured or verified rather than guessed, and explicitly identifies any recommended persistent tooling addition before WU033 starts.",
+          "The rendered/browser verification required for WU033 and WU034 is specified for desktop and the ~360px compact QA viewport.",
+          "No source or runtime changes were made and no tooling or dependency was added; git diff --check is clean and the Explorer test suite result is unchanged from the baseline.",
+          "Graph validation, if run, is reported with the pre-existing C008/C009/C010 findings classified separately; those three alone are not a failure, while any new graph finding is blocking."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/datamodel.md"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/src/",
+          "apps/research-explorer/src/navigation/",
+          "apps/research-explorer/src/records/",
+          "apps/research-explorer/src/overview/",
+          "apps/research-explorer/src/problem/",
+          "apps/research-explorer/src/presentation/",
+          "apps/research-explorer/src/app/"
+        ],
+        "validationCommands": [
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run test --prefix apps/research-explorer",
+          "git diff --check"
+        ],
+        "status": "ready",
+        "dependencies": [],
+        "createdAt": "2026-09-10T17:34:44.071Z",
+        "updatedAt": "2026-09-10T17:34:44.071Z"
+      },
+      {
+        "id": "WU033",
+        "milestoneId": "M009",
+        "title": "AR-02 — Explorer functional hardening",
+        "objective": "Implement only the approved and reproduced AR-02 functional corrections defined by the WU032 implementation contract, preserving the current approved design system and canonical research semantics.",
+        "scope": [
+          "ODM-013 — required functional states are absent: implement the required functional states exactly as contracted.",
+          "ODM-014 — Explorer canonical search does not search relevant canonical/detail content that users reasonably need to find: correct search coverage without changing canonical research semantics.",
+          "ODM-015 — Records pagination/sort state is lost when navigating away and returning: preserve pagination and sort state across that navigation.",
+          "ODM-016 — header/focus/fragment behaviour weakens or breaks deep-link navigation: correct header, focus, and fragment behaviour so deep-link navigation works.",
+          "ODM-017 — insufficient contrast exists on affected Explorer UI: correct contrast as a minimal accessibility correction only.",
+          "ODM-019 — 'Ver Problema' routes/selects into technical Detail rather than the Problem experience: route the action to the Problem experience.",
+          "ODM-020 — research freshness/currentness is ambiguous relative to generated/build date: disambiguate as a presentation-only clarification.",
+          "ODM-021 — Overview error state has no retry action: add the missing retry affordance to the Overview error path.",
+          "Add focused regression tests covering every reproduced finding.",
+          "Perform accessibility verification using the mechanism named in the WU032 implementation contract."
+        ],
+        "outOfScope": [
+          "Do not perform a general redesign; preserve the current approved design system unless a minimal accessibility correction is required.",
+          "Do not change canonical research records, schemas, or research semantics, and do not alter research conclusions.",
+          "Do not implement ODM-018 compact/mobile sorting, ODM-009, ODM-010, ODM-012, or ODM-022 and later.",
+          "Do not perform opportunistic cleanup, refactoring, or unrelated improvement.",
+          "Do not add accessibility tooling or any other dependency unless the WU032 implementation contract explicitly identified it as required before this work unit started.",
+          "Do not start AR-03, AR-04, AR-05, or D7, and do not begin knowledge-first product or design evolution.",
+          "Do not implement any finding recorded by WU032 as NO_LONGER_REPRODUCIBLE.",
+          "Do not repair, suppress, mutate, or re-acknowledge the pre-existing C008/C009/C010 checkpoint packet-reference findings."
+        ],
+        "acceptanceCriteria": [
+          "Every finding recorded REPRODUCED by WU032 is corrected exactly within its approved meaning, and no other behaviour is changed.",
+          "Explorer typecheck, the full Explorer test suite, and the production build pass.",
+          "Focused regression tests exist and pass for every reproduced finding.",
+          "Rendered browser verification passes at a representative desktop viewport and at the ~360px compact QA viewport for affected surfaces.",
+          "Keyboard, focus, and deep-link behaviour is verified for the affected navigation surfaces.",
+          "Accessibility verification of affected surfaces, using the mechanism named in the WU032 contract, shows no new relevant violations; contrast is measured or verifiable rather than visually guessed, and the ODM-017 correction is minimal.",
+          "Canonical research validation still passes unchanged and git diff --check is clean.",
+          "Graph validation, if run, is reported with the pre-existing C008/C009/C010 findings classified separately; those three alone are not a failure, while any new graph finding is blocking."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/datamodel.md"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/src/",
+          "apps/research-explorer/src/navigation/",
+          "apps/research-explorer/src/records/",
+          "apps/research-explorer/src/overview/",
+          "apps/research-explorer/src/problem/",
+          "apps/research-explorer/src/presentation/",
+          "apps/research-explorer/src/app/"
+        ],
+        "validationCommands": [
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run test --prefix apps/research-explorer",
+          "npm run build --prefix apps/research-explorer",
+          "npm run research:validate",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-033"
+        ],
+        "createdAt": "2026-09-10T17:34:44.071Z",
+        "updatedAt": "2026-09-10T17:34:44.071Z"
+      },
+      {
+        "id": "WU034",
+        "milestoneId": "M009",
+        "title": "AR-02 — Independent closure verification",
+        "objective": "Independently and read-only verify the exact AR-02 outcomes and prepare the milestone for owner closure review without making corrective changes or starting later roadmap work.",
+        "scope": [
+          "Verify that every reproduced MUST ADDRESS finding is resolved within its owner-approved meaning as persisted in WU032, and that each NO_LONGER_REPRODUCIBLE disposition was evidentially valid.",
+          "ODM-015 — verify navigation state and back behaviour, including pagination and sort state preserved when navigating away and returning.",
+          "ODM-014 — verify search behaviour reaches the relevant canonical/detail content users reasonably need to find.",
+          "ODM-016 — verify deep links, fragments, header, and focus behaviour.",
+          "ODM-013 — verify the required functional states are present.",
+          "ODM-017 — verify contrast and accessibility on affected surfaces at desktop and the ~360px compact QA viewport, using the mechanism named in the WU032 contract.",
+          "ODM-019 — verify the 'Ver Problema' action routes to the Problem experience rather than technical Detail.",
+          "ODM-020 — verify research freshness/currentness is unambiguous relative to generated/build date.",
+          "ODM-021 — verify the Overview error state offers a retry action.",
+          "Confirm no ODM-018 or later-roadmap scope slipped in, no canonical research change occurred, no unapproved tooling or dependency was added, and no AR-03 or D7 work was started."
+        ],
+        "outOfScope": [
+          "Do not make corrective implementation changes as part of independent verification.",
+          "Do not add accessibility tooling or any other dependency.",
+          "Do not start AR-03, AR-04, AR-05, D7, or any later roadmap milestone.",
+          "Do not publish, push, open a pull request, merge, or deploy.",
+          "Do not close the milestone automatically; owner review is required.",
+          "Do not repair, suppress, mutate, or re-acknowledge the pre-existing C008/C009/C010 checkpoint packet-reference findings."
+        ],
+        "acceptanceCriteria": [
+          "Every AR-02 exit-gate condition has independent read-only evidence, or the milestone remains open with the specific blocker reported.",
+          "Automated functional validation (Explorer typecheck, full test suite, production build) and npm run research:validate pass.",
+          "Rendered browser verification passes on affected desktop and compact surfaces, and accessibility verification shows no new relevant violations.",
+          "Canonical research and research conclusions are verified unchanged.",
+          "No design or product evolution, ODM-018, later-roadmap work, or unapproved tooling addition is present in the delivered change.",
+          "Graph validation is reported with the pre-existing C008/C009/C010 findings classified separately as historical debt; those three alone are not an AR-02 failure, while any new graph finding is blocking.",
+          "The work unit ends in needs_review so the owner performs closure."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/datamodel.md"
+        ],
+        "suggestedFiles": [
+          ".aiqt/",
+          "apps/research-explorer/",
+          "research/",
+          "docs/"
+        ],
+        "validationCommands": [
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run test --prefix apps/research-explorer",
+          "npm run build --prefix apps/research-explorer",
+          "npm run research:validate",
+          "git diff --check",
+          "aiqt review"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-034"
+        ],
+        "createdAt": "2026-09-10T17:34:44.071Z",
+        "updatedAt": "2026-09-10T17:34:44.071Z"
       }
     ],
     "dependencies": [
@@ -1475,6 +1676,20 @@
         "toId": "WU031",
         "type": "blocks",
         "reason": "Independent closure verification can only assess the final approved integration and mechanical hardening result."
+      },
+      {
+        "id": "DEP-033",
+        "fromId": "WU032",
+        "toId": "WU033",
+        "type": "blocks",
+        "reason": "Reverification and the exact bounded implementation contract must precede any AR-02 functional change, so only approved and reproduced findings are implemented and any required tooling is identified before implementation starts."
+      },
+      {
+        "id": "DEP-034",
+        "fromId": "WU033",
+        "toId": "WU034",
+        "type": "blocks",
+        "reason": "Independent closure verification can only assess the completed AR-02 functional hardening result."
       }
     ]
   },
@@ -3781,8 +3996,8 @@
         }
       ],
       "finalWorkUnitStatus": "needs_review",
-      "createdAt": "2026-09-10T11:18:58.722Z",
-      "nextRecommendation": "aiqt checkpoint amend --checkpoint C032"
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C032",
+      "createdAt": "2026-09-10T11:18:58.722Z"
     }
   ],
   "lastAgentPacket": {
@@ -3809,8 +4024,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt review --mode release",
-  "lastUpdatedAt": "2026-09-10T12:10:00.000Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-10T17:34:44.071Z",
   "review": {
     "acknowledgedFindings": [
       {
