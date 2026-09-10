@@ -167,6 +167,54 @@ function validatePatterns(file: string, record: RecordFields, schema: RecordSche
   }
 }
 
+/**
+ * Enforces the element-type half of an already schema-declared string-list
+ * contract (ODM-007). The container type itself remains `fieldTypes`'
+ * concern; this only rejects non-string items inside a list the schema
+ * already declares as a list of strings. An empty array is structurally
+ * valid here — emptiness is `nonEmptyListFields`' concern, and substantive
+ * adequacy stays a human decision.
+ */
+function validateStringListFields(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
+  for (const field of schema.stringListFields || []) {
+    const value = getRecordField(record, field);
+    if (value === undefined || value === null) continue;
+    if (!Array.isArray(value)) continue; // container mismatch is fieldTypes' error to report
+    value.forEach((item, index) => {
+      if (typeof item !== "string") {
+        errors.push(`[${file}] field "${field}[${index}]" must be a string (got "${actualTypeName(item)}")`);
+      }
+    });
+  }
+}
+
+/** Rejects an empty array where the schema declares the list must carry at least one item. */
+function validateNonEmptyListFields(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
+  for (const field of schema.nonEmptyListFields || []) {
+    const value = getRecordField(record, field);
+    if (value === undefined || value === null) continue;
+    if (!Array.isArray(value)) continue; // container mismatch is fieldTypes' error to report
+    if (value.length === 0) errors.push(`[${file}] field "${field}" must not be empty`);
+  }
+}
+
+/**
+ * Rejects calendar-impossible full dates (ODM-008) such as 2026-02-30 or
+ * 2026-99-99, which the field's `patterns` regex alone cannot detect.
+ * Reduced precision that the field's own pattern permits (YYYY, YYYY-MM) is
+ * deliberately left untouched, so supported precision is preserved.
+ */
+function validateCalendarDateFields(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
+  for (const field of schema.calendarDateFields || []) {
+    const value = getRecordField(record, field);
+    if (typeof value !== "string") continue; // absence or non-string type is other rules' concern
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) continue; // reduced precision stays as the pattern allows
+    if (!isFullCalendarDate(value)) {
+      errors.push(`[${file}] field "${field}" value "${value}" is not a valid calendar date`);
+    }
+  }
+}
+
 function validateConditionalRequired(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
   for (const rule of schema.conditionalRequired || []) {
     const val = getRecordField(record, rule.field);
@@ -511,7 +559,18 @@ function validateReferences(recordIndexes: RecordIndex[], errors: string[]): voi
           const target = ref.itemField && t && typeof t === "object" && !Array.isArray(t)
             ? getRecordField(t as RecordFields, ref.itemField)
             : t;
-          if (typeof target !== "string") continue;
+          if (typeof target !== "string") {
+            // A non-string entry inside a reference list can never resolve to a
+            // canonical record, so it is rejected rather than skipped (ODM-007).
+            // Non-list fields keep their previous behaviour: their container/leaf
+            // type is fieldTypes' concern.
+            if (ref.isList && target !== undefined && target !== null) {
+              errors.push(
+                `[${file}] field "${ref.field}" contains a non-string reference entry (expected a ${ref.targetPrefix}* ID)`
+              );
+            }
+            continue;
+          }
           if (target.trim() === "") {
             if (ref.isList) {
               errors.push(
@@ -558,6 +617,9 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
       validatePatterns(file, fields, schema, errors);
       validateConditionalRequired(file, fields, schema, errors);
       validateExclusiveFieldSets(file, fields, schema, errors);
+      validateStringListFields(file, fields, schema, errors);
+      validateNonEmptyListFields(file, fields, schema, errors);
+      validateCalendarDateFields(file, fields, schema, errors);
       if (schema.prefix === "PRB-") {
         validatePrbEvidenceRelations(file, fields, errors);
         validatePrbDeclaredListItems(file, fields, errors);

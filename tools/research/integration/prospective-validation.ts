@@ -129,13 +129,81 @@ export function buildProspectiveCorpusIndex(index: CorpusIndex, candidates: read
 }
 
 /**
+ * Fields that an UPDATE may never change relative to its canonical base
+ * record, keyed by schema-declared record family (ODM-008).
+ *
+ * This is an integration/UPDATE invariant, not a pure record-schema rule: a
+ * standalone PRB carrying any well-formed `created_at` is valid on its own,
+ * and only becomes invalid when offered as an UPDATE that would rewrite the
+ * canonical record's original creation date. Encoding it in the record
+ * schema would therefore be semantically wrong.
+ */
+const UPDATE_IMMUTABLE_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
+  ["PRB-", ["created_at"]],
+]);
+
+/**
+ * Compares one immutable field between an UPDATE candidate and its canonical
+ * base. YAML may surface a date as a Date or a string depending on quoting,
+ * so both sides are normalized to their authored `YYYY-MM-DD` form before
+ * comparison: re-quoting a date is a serialization change, not a mutation.
+ */
+function immutableFieldValue(value: unknown): string | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  return String(value);
+}
+
+/**
+ * Rejects an UPDATE candidate that would change a field the integration
+ * contract holds immutable against the canonical base record.
+ */
+function validateUpdateImmutability(
+  index: CorpusIndex,
+  candidates: readonly CandidateRecord[],
+  deltas: readonly CandidateDelta[],
+  errors: string[]
+): void {
+  for (const delta of deltas) {
+    if (delta.action !== "UPDATE") continue;
+    const immutable = UPDATE_IMMUTABLE_FIELDS.get(delta.recordFamily);
+    if (!immutable) continue;
+    const recordIndex = index.byPrefix.get(delta.recordFamily);
+    const base = recordIndex?.byId.get(delta.id);
+    if (!recordIndex || !base) continue;
+    const candidate = candidates.find((entry) => {
+      if (entry.recordFamily !== delta.recordFamily) return false;
+      return getRecordField(entry.fields, recordIndex.schema.idField) === delta.id;
+    });
+    if (!candidate) continue;
+
+    for (const field of immutable) {
+      const baseValue = immutableFieldValue(getRecordField(base.fields, field));
+      const candidateValue = immutableFieldValue(getRecordField(candidate.fields, field));
+      if (baseValue === candidateValue) continue;
+      errors.push(
+        `[${syntheticFile(recordIndex, delta.id)}] field "${field}" is immutable on UPDATE: `
+        + `base "${baseValue ?? "(absent)"}" cannot become "${candidateValue ?? "(absent)"}"`
+      );
+    }
+  }
+}
+
+/**
  * Classifies a whole candidate set, overlays it in memory, then runs the
  * canonical corpus validator exactly once against the complete result.
+ *
+ * Structural validity is the corpus validator's decision; this additionally
+ * enforces the UPDATE-only invariants that are only meaningful relative to a
+ * canonical base record and therefore cannot live in the record schema.
  */
 export function validateCandidateSet(
   index: CorpusIndex,
   candidates: readonly CandidateRecord[]
 ): CandidateSetValidationResult {
   const overlay = buildOverlay(index, candidates);
-  return { deltas: overlay.deltas, validation: validateCorpusIndex(overlay.index) };
+  const validation = validateCorpusIndex(overlay.index);
+  const errors = [...validation.errors];
+  validateUpdateImmutability(index, candidates, overlay.deltas, errors);
+  return { deltas: overlay.deltas, validation: { ...validation, errors } };
 }

@@ -80,6 +80,23 @@ export interface RecordSchema {
   conditionalRequired?: ConditionalRequiredRule[];
   /** Declarative bounded-XOR rules: within an object path, exactly one declared field-set may be authored. */
   exclusiveFieldSets?: ExclusiveFieldSetRule[];
+  /**
+   * Dotted paths already declared as `array` in `fieldTypes` whose items the
+   * schema contract treats as strings. Every present item must be a string;
+   * an empty array stays structurally valid. This enforces the existing
+   * string-list contract mechanically — it declares no new semantic
+   * requirement and never judges substantive adequacy.
+   */
+  stringListFields?: string[];
+  /** Dotted array paths that must not be empty when the field is present. */
+  nonEmptyListFields?: string[];
+  /**
+   * Dotted paths whose full `YYYY-MM-DD` values must be real calendar dates.
+   * Precision permitted by the field's own `patterns` entry is preserved:
+   * a schema allowing `YYYY` or `YYYY-MM` keeps accepting them, and only a
+   * complete date is calendar-checked.
+   */
+  calendarDateFields?: string[];
 }
 
 /** All records of one schema-declared type, plus the schema that describes them. */

@@ -13,7 +13,7 @@ scope:
     level: city
     area: Évora urbana rede
   populations:
-    - urbana transport passengers
+    - passageiros da rede urbana
   temporal:
     as_of: "2025"
 domains:

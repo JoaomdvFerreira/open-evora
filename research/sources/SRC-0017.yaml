@@ -27,5 +27,6 @@ temporal:
   published_at: 2025-02
   last_checked_at: 2026-08-10
 caveats:
-  - O relatório setorial publicado em 2026 reutiliza diagnóstico e material
-    anterior e não deve ser tratado como uma medição inteiramente nova de 2026.
+  - O relatório setorial publicado em 2025 reutiliza diagnóstico e material
+    anterior e não deve ser tratado como uma medição inteiramente nova à data de
+    publicação.

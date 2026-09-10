@@ -3,21 +3,194 @@
   "directory": "evidence",
   "idField": "evidence_id",
   "sourceModel": "docs/datamodel.md",
-  "requiredFields": ["evidence_id", "provenance.sources", "provenance.extracted_at", "observation.summary", "scope.geography.level", "scope.temporal", "domains", "evidence_nature", "claim_authority", "inference_limits"],
-  "allowedFields": ["evidence_id", "lineage_id", "provenance", "provenance.sources", "provenance.extracted_at", "observation", "observation.summary", "scope", "scope.geography", "scope.geography.level", "scope.geography.area", "scope.populations", "scope.temporal", "scope.temporal.as_of", "scope.temporal.start", "scope.temporal.end", "scope.temporal.status", "domains", "evidence_nature", "claim_authority", "inference_limits"],
+  "requiredFields": [
+    "evidence_id",
+    "provenance.sources",
+    "provenance.extracted_at",
+    "observation.summary",
+    "scope.geography.level",
+    "scope.temporal",
+    "domains",
+    "evidence_nature",
+    "claim_authority",
+    "inference_limits"
+  ],
+  "allowedFields": [
+    "evidence_id",
+    "lineage_id",
+    "provenance",
+    "provenance.sources",
+    "provenance.extracted_at",
+    "observation",
+    "observation.summary",
+    "scope",
+    "scope.geography",
+    "scope.geography.level",
+    "scope.geography.area",
+    "scope.populations",
+    "scope.temporal",
+    "scope.temporal.as_of",
+    "scope.temporal.start",
+    "scope.temporal.end",
+    "scope.temporal.status",
+    "domains",
+    "evidence_nature",
+    "claim_authority",
+    "inference_limits"
+  ],
   "enums": {
-    "scope.geography.level": ["site", "local_area", "parish", "city", "municipality", "intermunicipal", "regional", "national", "international", "non_geographic", "unknown"],
-    "scope.temporal.status": ["unknown"],
-    "evidence_nature": ["fact", "reported-experience", "opinion", "claim", "measurement", "recommendation"],
-    "claim_authority": ["authoritative", "non_authoritative", "unknown"]
+    "scope.geography.level": [
+      "site",
+      "local_area",
+      "parish",
+      "city",
+      "municipality",
+      "intermunicipal",
+      "regional",
+      "national",
+      "international",
+      "non_geographic",
+      "unknown"
+    ],
+    "scope.temporal.status": [
+      "unknown"
+    ],
+    "evidence_nature": [
+      "fact",
+      "reported-experience",
+      "opinion",
+      "claim",
+      "measurement",
+      "recommendation"
+    ],
+    "claim_authority": [
+      "authoritative",
+      "non_authoritative",
+      "unknown"
+    ]
   },
   "fieldTypes": {
-    "evidence_id": ["string"], "lineage_id": ["string"], "provenance": ["object"], "provenance.sources": ["array"], "provenance.extracted_at": ["string"], "observation": ["object"], "observation.summary": ["string"], "scope": ["object"], "scope.geography": ["object"], "scope.geography.level": ["string"], "scope.geography.area": ["string"], "scope.populations": ["array"], "scope.temporal": ["object"], "scope.temporal.as_of": ["string"], "scope.temporal.start": ["string"], "scope.temporal.end": ["string"], "scope.temporal.status": ["string"], "domains": ["array"], "evidence_nature": ["string"], "claim_authority": ["string"], "inference_limits": ["array"]
+    "evidence_id": [
+      "string"
+    ],
+    "lineage_id": [
+      "string"
+    ],
+    "provenance": [
+      "object"
+    ],
+    "provenance.sources": [
+      "array"
+    ],
+    "provenance.extracted_at": [
+      "string"
+    ],
+    "observation": [
+      "object"
+    ],
+    "observation.summary": [
+      "string"
+    ],
+    "scope": [
+      "object"
+    ],
+    "scope.geography": [
+      "object"
+    ],
+    "scope.geography.level": [
+      "string"
+    ],
+    "scope.geography.area": [
+      "string"
+    ],
+    "scope.populations": [
+      "array"
+    ],
+    "scope.temporal": [
+      "object"
+    ],
+    "scope.temporal.as_of": [
+      "string"
+    ],
+    "scope.temporal.start": [
+      "string"
+    ],
+    "scope.temporal.end": [
+      "string"
+    ],
+    "scope.temporal.status": [
+      "string"
+    ],
+    "domains": [
+      "array"
+    ],
+    "evidence_nature": [
+      "string"
+    ],
+    "claim_authority": [
+      "string"
+    ],
+    "inference_limits": [
+      "array"
+    ]
   },
   "patterns": {
-    "provenance.extracted_at": "\\d{4}-\\d{2}-\\d{2}", "scope.temporal.as_of": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?", "scope.temporal.start": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?", "scope.temporal.end": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?"
+    "provenance.extracted_at": "\\d{4}-\\d{2}-\\d{2}",
+    "scope.temporal.as_of": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?",
+    "scope.temporal.start": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?",
+    "scope.temporal.end": "\\d{4}(?:-\\d{2}(?:-\\d{2})?)?"
   },
-  "conditionalRequired": [{"field":"scope.geography.level","notIn":["non_geographic","unknown"],"requires":["scope.geography.area"]}],
-  "exclusiveFieldSets": [{"path":"scope.temporal","sets":[["as_of"],["start","end"],["status"]]}],
-  "references": [{"field":"provenance.sources","isList":true,"targetPrefix":"SRC-","targetDirectory":"sources","required":true}]
+  "conditionalRequired": [
+    {
+      "field": "scope.geography.level",
+      "notIn": [
+        "non_geographic",
+        "unknown"
+      ],
+      "requires": [
+        "scope.geography.area"
+      ]
+    }
+  ],
+  "exclusiveFieldSets": [
+    {
+      "path": "scope.temporal",
+      "sets": [
+        [
+          "as_of"
+        ],
+        [
+          "start",
+          "end"
+        ],
+        [
+          "status"
+        ]
+      ]
+    }
+  ],
+  "references": [
+    {
+      "field": "provenance.sources",
+      "isList": true,
+      "targetPrefix": "SRC-",
+      "targetDirectory": "sources",
+      "required": true
+    }
+  ],
+  "stringListFields": [
+    "provenance.sources",
+    "scope.populations",
+    "domains",
+    "inference_limits"
+  ],
+  "nonEmptyListFields": [
+    "provenance.sources"
+  ],
+  "calendarDateFields": [
+    "provenance.extracted_at",
+    "scope.temporal.as_of",
+    "scope.temporal.start",
+    "scope.temporal.end"
+  ]
 }

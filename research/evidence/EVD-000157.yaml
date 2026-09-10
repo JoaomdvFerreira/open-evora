@@ -10,15 +10,16 @@ observation:
     diários previstos por carreira e tipo de dia para 2025. A carreira 22 é
     Canaviais–PITE via Malagueira e a carreira 24 é Canaviais–PITE via Centro
     Histórico. Nas carreiras 22, 24, 26 e 32 o quadro não apresenta quilómetros
-    comerciais ao sábado, domingo ou feriado. As carreiras 21, 34 e 41 apresentam
-    oferta ao sábado mas não ao domingo/feriado. As carreiras 23, 25, 31 e 33 apresentam quilómetros
-    comerciais tanto ao sábado como ao domingo/feriado. A carreira 25 passa de
-    221,7 km comerciais por dia útil para 203,8 ao sábado e 96,0 ao
-    domingo/feriado; a carreira 23 passa de 272,6 para 149,6 e 12,9; a carreira
-    31 de 88,8 para 37,7 e 25,2; e a carreira 33 de 156,8 para 52,2 e 37,0. A
-    LinhAzul Norte passa de 374,4 km comerciais por dia útil para 187,2 ao
-    sábado e a LinhAzul Sul de 369,6 para 131,6, sem quilómetros comerciais
-    indicados para domingo/feriado em qualquer dos dois percursos.
+    comerciais ao sábado, domingo ou feriado. As carreiras 21, 34 e 41
+    apresentam oferta ao sábado mas não ao domingo/feriado. As carreiras 23, 25,
+    31 e 33 apresentam quilómetros comerciais tanto ao sábado como ao
+    domingo/feriado. A carreira 25 passa de 221,7 km comerciais por dia útil
+    para 203,8 ao sábado e 96,0 ao domingo/feriado; a carreira 23 passa de 272,6
+    para 149,6 e 12,9; a carreira 31 de 88,8 para 37,7 e 25,2; e a carreira 33
+    de 156,8 para 52,2 e 37,0. A LinhAzul Norte passa de 374,4 km comerciais por
+    dia útil para 187,2 ao sábado e a LinhAzul Sul de 369,6 para 131,6, sem
+    quilómetros comerciais indicados para domingo/feriado em qualquer dos dois
+    percursos.
 scope:
   geography:
     level: municipality
@@ -40,12 +41,12 @@ inference_limits:
   - As células sem quilómetros comerciais são tratadas apenas como ausência de
     quilómetros reportados nesse quadro; esta extração não substitui a consulta
     do horário operacional de uma data concreta.
-  - Os valores dizem respeito a 2025, embora o relatório tenha sido publicado em
-    junho de 2026, e não demonstram que a configuração seja idêntica em agosto
-    de 2026.
+  - Os valores dizem respeito a 2025, embora o relatório esteja datado de junho
+    de 2026, e não demonstram que a configuração seja idêntica em agosto de
+    2026.
   - A identificação das carreiras 22 e 24 não estabelece a sua sequência atual
-    de paragens, um horário atual de partidas, tempos de espera ou a consequência
-    prática para uma deslocação concreta.
+    de paragens, um horário atual de partidas, tempos de espera ou a
+    consequência prática para uma deslocação concreta.
   - Esta evidência não pode ser combinada com EVD-000158 para afirmar que os
     atrasos documentados no Parque Industrial afetaram especificamente as
     carreiras 22 ou 24.

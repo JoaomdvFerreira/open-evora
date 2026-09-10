@@ -1,6 +1,6 @@
 problem_id: PRB-0011
-created_at: "2026-08-28"
-updated_at: "2026-08-28"
+created_at: 2026-08-28
+updated_at: 2026-09-09
 title: Barreiras linguísticas e dificuldades de acesso à saúde foram
   identificadas para a população migrante em Évora, mas a persistência atual
   ainda não está estabelecida
@@ -51,8 +51,8 @@ investigation:
         mantém um CLAIM, mas não foram encontrados resultados locais que
         estabeleçam cobertura ou eficácia face às barreiras identificadas.
       current_action: Não inferir eficácia a partir da existência dos serviços;
-        procurar resultados ou challenge direto apenas se o problema sobreviver
-        à validação do candidate delta.
+        procurar resultados de execução ou challenge direto apenas quando
+        existir evidência local de cobertura, utilização ou resultados.
       resolution_condition: Dados de execução, utilização, resultados ou challenge
         direto que permitam avaliar a cobertura e o efeito das respostas
         relevantes.
