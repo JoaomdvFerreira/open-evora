@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
   "projectStatus": "in_progress",
-  "currentMilestoneId": null,
+  "currentMilestoneId": "M008",
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -1150,10 +1150,10 @@
           "git diff --check",
           "npm run research:validate"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-09-09T17:53:22.951Z",
-        "updatedAt": "2026-09-09T17:53:22.951Z"
+        "updatedAt": "2026-09-10T08:39:16.325Z"
       },
       {
         "id": "WU030",
@@ -1197,12 +1197,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-031"
         ],
         "createdAt": "2026-09-09T17:53:22.951Z",
-        "updatedAt": "2026-09-09T17:53:22.951Z"
+        "updatedAt": "2026-09-10T08:39:16.325Z"
       },
       {
         "id": "WU031",
@@ -3514,15 +3514,81 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt review --mode release",
       "createdAt": "2026-09-01T16:28:34.369Z"
+    },
+    {
+      "id": "C030",
+      "workUnitId": "WU029",
+      "packetId": "PKT-030",
+      "summary": "Verified ODM-001/002/004 and prepared exact canonical candidates for ODM-003/005/006 plus the bounded WU030 plan for ODM-007/008/011. No canonical SRC/EVD/PRB state was mutated. WU029 is held for the human Gate 1 decision.",
+      "completed": [
+        "ODM-001 (PRB-0001/EVD-000002) verified as NO_CHANGE: SUPPORTS and BOUNDS are jointly correct because EVD-000002 carries two distinct observations and the authored reasoning scopes the exclusion to the flexible-transport observation only.",
+        "ODM-002 (PRB-0007/EVD-000143) verified: unit of analysis incompatible (respondents vs cared-for people); wording correction prepared for 2 PRB-0007 occurrences; EVD-000143 NO_CHANGE.",
+        "ODM-003 (SRC-0119) caveat-layer remediation prepared: caveat 1 retained as SOURCE LIMITATION, caveat 2 reclassified as RESEARCH-PROCESS/CORROBORATION COMMENTARY and replaced by its source-limitation half; no new field introduced.",
+        "ODM-004 verified: SRC-0017 caveat prose corrected to the record's own published_at (2025-02, corroborated by URL path and lineage_id); SRC-0018 NO_CHANGE (publication vs observation period legitimately coexist); PRB-0001/EVD-000157 NO_CHANGE with the June/July prose discrepancy escalated as an owner decision.",
+        "ODM-005 (PRB-0011/PRB-0012) current_action corrections prepared; both assessed as non-material with no history entry required.",
+        "ODM-006 (EVD-000023/EVD-000034) PT-PT population wording corrections prepared, aligned to terms already canonical in PRB-0007; no wider taxonomy cleanup.",
+        "ODM-007/008/011 bounded WU030 implementation plan prepared, with all three validator gaps empirically confirmed against a throwaway probe corpus.",
+        "Gate 1 package prepared through the repository's existing candidate/review/plan mechanism, bound to base 60b16a169480fc27684cea1fb577ffd718b59a88; readiness READY_FOR_INTEGRATION_GATE with 0 validation errors."
+      ],
+      "notCompleted": [
+        "Human Gate 1 decision on the 6 proposed UPDATE deltas — owner-owned, deliberately not taken by the agent.",
+        "UHD-1: SRC-0018 publication month (prose 'junho de 2026' vs published_at 2026-07) requires an owner ruling or re-consulting the source.",
+        "UHD-2: whether an empty inference_limits[] is valid is not unambiguously established by the canonical contract; flagged rather than invented.",
+        "UHD-3: materiality of the ODM-005 deltas is a Gate 1 human judgement."
+      ],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK. Canonical corpus unchanged."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "Exit 0; no whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Each of ODM-001 through ODM-006 has an auditable, evidence-bounded proposed outcome, with MUST VERIFY items allowed to be NO_CHANGE.",
+          "result": "passed",
+          "evidence": "GATE1-PACKAGE.md sections 2-7. ODM-001 and the SRC-0018/PRB-0001 parts of ODM-004 resolved as verified NO_CHANGE; ODM-002/003/005/006 and the SRC-0017 part of ODM-004 carry exact deltas."
+        },
+        {
+          "criterion": "The candidate package specifies the exact Git base and exact canonical delta for every proposed SRC/EVD/PRB mutation.",
+          "result": "passed",
+          "evidence": "CanonicalIntegrationReview.json and CanonicalIntegrationPlan.json bound to baseGitSha 60b16a169480fc27684cea1fb577ffd718b59a88; field-level before/after deltas in GATE1-PACKAGE.md sections 3-7."
+        },
+        {
+          "criterion": "A human Gate 1 decision is explicitly required before any canonical integration proceeds.",
+          "result": "passed",
+          "evidence": "GATE1-PACKAGE.md section 13; WU029 checkpointed as needs_review so WU030's blocking dependency stays unsatisfied."
+        },
+        {
+          "criterion": "The package records that unexpected corpus failures exposed by later hardening must stop for human triage.",
+          "result": "passed",
+          "evidence": "GATE1-PACKAGE.md section 8, 'Cross-cutting WU030 stop condition'; baseline recorded as 274 records / 0 errors."
+        }
+      ],
+      "finalWorkUnitStatus": "needs_review",
+      "createdAt": "2026-09-09T18:51:12.296Z",
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C030"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-029",
-    "workUnitId": "WU028",
-    "milestoneId": "M007",
-    "createdAt": "2026-09-01T16:26:41.862Z",
+    "id": "PKT-030",
+    "workUnitId": "WU029",
+    "milestoneId": "M008",
+    "createdAt": "2026-09-09T18:42:41.410Z",
     "format": "markdown",
-    "contentHash": "sha256:065a8601f7c153b8d93474558d51c4cad7dd8cad4b2a12dccc98cb09e59ccb8e",
+    "contentHash": "sha256:c073a6bc4de17e75b1f2a4e4c39b0f90dec20aec653d4a4f6a79a27f80ce3d21",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -3541,7 +3607,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-09T18:01:38.933Z",
+  "lastUpdatedAt": "2026-09-10T08:39:16.325Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -4478,6 +4544,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-01T16:28:34.369Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C030",
+      "current": {
+        "observationId": "sha256:d79cffb382422191b3d39588f0b5b666779362a8f2630aa5b7a30eaf6ef73e38",
+        "checkpointId": "C030",
+        "workUnitId": "WU029",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-09T18:51:12.296Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-09T18:51:12.296Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:d79cffb382422191b3d39588f0b5b666779362a8f2630aa5b7a30eaf6ef73e38",
+          "checkpointId": "C030",
+          "workUnitId": "WU029",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-09T18:51:12.296Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-09T18:51:12.296Z"
         }
       ]
     }
