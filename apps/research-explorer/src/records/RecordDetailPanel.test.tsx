@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { RecordDetailPanel } from "./RecordDetailPanel";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 
@@ -48,12 +48,14 @@ describe("RecordDetailPanel vNext", () => {
     expect(screen.getByRole("button", { name: "Fonte" })).toBeTruthy();
   });
 
-  it("navigates to the resolved Source and incoming Problem relationship", async () => {
-    const { onSelect } = renderDetail();
+  it("navigates to the resolved Source, and routes 'Ver Problema' to the Problem experience, not technical Detail (ODM-019)", async () => {
+    const { onSelect, onViewAsProblem } = renderDetail();
     fireEvent.click(await screen.findByRole("button", { name: "Fonte" }));
-    fireEvent.click(await screen.findByRole("button", { name: "Ver Problema →" }));
     expect(onSelect).toHaveBeenCalledWith("SRC-1");
-    expect(onSelect).toHaveBeenCalledWith("PRB-1");
+
+    fireEvent.click(await screen.findByRole("button", { name: "Ver Problema →" }));
+    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-1");
+    expect(onSelect).not.toHaveBeenCalledWith("PRB-1");
   });
 
   it("omits absent optional vNext fields without fabricating a value", async () => {
@@ -89,6 +91,32 @@ describe("RecordDetailPanel vNext", () => {
     fireEvent.click(relatedButton);
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect).toHaveBeenCalledWith("PRB-2");
+  });
+});
+
+describe("RecordDetailPanel — initial deep-link fragment (ODM-016A)", () => {
+  let scrollIntoView: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView as unknown as typeof Element.prototype.scrollIntoView;
+  });
+
+  afterEach(() => {
+    window.location.hash = "";
+  });
+
+  it("re-applies a fragment present at initial load once the async detail content mounts", async () => {
+    window.location.hash = "#evd-limits";
+    renderDetail();
+
+    const section = await waitFor(() => {
+      const el = document.getElementById("evd-limits");
+      if (!el) throw new Error("evd-limits section not yet mounted");
+      return el;
+    });
+    expect(scrollIntoView).toHaveBeenCalled();
+    expect(document.activeElement).toBe(section);
   });
 });
 

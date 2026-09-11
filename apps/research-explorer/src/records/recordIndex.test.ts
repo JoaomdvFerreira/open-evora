@@ -35,6 +35,23 @@ describe("recordSearchText", () => {
     expect(text).toContain("evd-000105");
     expect(text).toContain("secondary");
   });
+
+  it("includes the bounded additional canonical/detail searchText (ODM-014), beyond the truncated label and enum-only summaryFields", () => {
+    const record = summary({
+      id: "EVD-000200",
+      type: "EVD-",
+      label: "Um rótulo truncado a 80 carateres que nunca contém a frase de deteção…",
+      summaryFields: { evidence_nature: "claim" },
+      searchText: "conectividade rural-urbana permanece um desafio fundamental",
+    });
+    const text = recordSearchText(record);
+    expect(text).toContain("conectividade rural-urbana");
+  });
+
+  it("tolerates a missing searchText field (pre-ODM-014 generated data)", () => {
+    const record = summary({ id: "EVD-000201", searchText: undefined });
+    expect(() => recordSearchText(record)).not.toThrow();
+  });
 });
 
 describe("filterRecords — search", () => {
@@ -56,6 +73,20 @@ describe("filterRecords — search", () => {
   it("is diacritic-insensitive: 'evora' matches 'Évora'", () => {
     const result = filterRecords(RECORDS, { query: "evora", typeFilter: ALL_TYPES });
     expect(result.map((r) => r.id)).toEqual(["PRB-0005"]);
+  });
+
+  it("ODM-014: matches a canonical detail phrase beyond the truncated label/enum summaryFields, via searchText", () => {
+    const withSearchText: RecordSummary[] = [
+      ...RECORDS,
+      summary({
+        id: "EVD-000200",
+        type: "EVD-",
+        label: "Um rótulo truncado a 80 carateres que nunca contém a frase de deteção…",
+        searchText: "Enquadra a conectividade rural-urbana como um desafio fundamental para a igualdade no acesso aos serviços.",
+      }),
+    ];
+    const result = filterRecords(withSearchText, { query: "conectividade rural-urbana", typeFilter: ALL_TYPES });
+    expect(result.map((r) => r.id)).toEqual(["EVD-000200"]);
   });
 });
 

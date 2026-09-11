@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { useReducer } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RecordsTable } from "./RecordsTable";
+import { initialRecordsControllerState, recordsControllerReducer } from "./recordsController";
 import type { RecordSummary } from "../dataProvider/types";
 
 function setInnerWidth(width: number) {
@@ -28,7 +30,13 @@ const RECORDS: RecordSummary[] = [
   { id: "WID-0001", type: "WID-", label: "Future widget label", file: "research/widgets/WID-0001.yaml", summaryFields: {} },
 ];
 
-function renderTable(overrides: Partial<Parameters<typeof RecordsTable>[0]> = {}) {
+/** Owns the ODM-015 controller state the way RecordsExplorer does, so existing tests keep exercising real sort/page behaviour. */
+function ControlledRecordsTable(props: Omit<Parameters<typeof RecordsTable>[0], "controllerState" | "dispatchController">) {
+  const [controllerState, dispatchController] = useReducer(recordsControllerReducer, initialRecordsControllerState);
+  return <RecordsTable {...props} controllerState={controllerState} dispatchController={dispatchController} />;
+}
+
+function renderTable(overrides: Partial<Omit<Parameters<typeof RecordsTable>[0], "controllerState" | "dispatchController">> = {}) {
   const props = {
     records: RECORDS,
     selectedId: null,
@@ -39,7 +47,7 @@ function renderTable(overrides: Partial<Parameters<typeof RecordsTable>[0]> = {}
     onTypeFilterChange: vi.fn(),
     ...overrides,
   };
-  return { ...render(<RecordsTable {...props} />), props };
+  return { ...render(<ControlledRecordsTable {...props} />), props };
 }
 
 describe("RecordsTable — desktop (default jsdom width, above the 767px breakpoint)", () => {

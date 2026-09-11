@@ -22,6 +22,13 @@ export interface RecordSummary {
   label: string;
   file: string;
   summaryFields: Record<string, unknown>;
+  /**
+   * Additional untruncated canonical/detail text (ODM-014) already
+   * legitimate for the public Explorer/detail projection — e.g. the full
+   * observation summary or problem statement — beyond the truncated
+   * `label` and the enum-only `summaryFields`. Search-only; never rendered.
+   */
+  searchText?: string;
 }
 
 export interface RecordEdgeRef {

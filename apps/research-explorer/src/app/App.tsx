@@ -62,8 +62,9 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
           <>
             <Explorer dataProvider={dataProvider} schemaPrefixes={state.manifest.schemaPrefixes} />
             <p className="manifest-summary">
-              Corpus: {formatPublicCount(state.manifest.totalRecords)} registos · gerado em{" "}
-              <time dateTime={state.manifest.generatedAt}>{formatPublicDateTime(state.manifest.generatedAt)}</time>
+              Corpus: {formatPublicCount(state.manifest.totalRecords)} registos · esta versão publicada dos dados foi gerada em{" "}
+              <time dateTime={state.manifest.generatedAt}>{formatPublicDateTime(state.manifest.generatedAt)}</time>{" "}
+              (não indica a atualidade da investigação)
             </p>
           </>
         )}

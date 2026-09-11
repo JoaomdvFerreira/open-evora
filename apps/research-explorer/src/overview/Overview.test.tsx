@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { Overview } from "./Overview";
-import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
+import { DataLoadError, type DataProvider, type RecordDetail, type RecordSummary } from "../dataProvider/types";
 
 function makeProvider(index: RecordSummary[]): DataProvider {
   const details: Record<string, RecordDetail> = Object.fromEntries(
@@ -64,5 +65,29 @@ describe("Overview — Problem investigation-state dimensions", () => {
     expect(screen.queryByText("Validação:")).toBeNull();
     expect(screen.queryByText("Evidência:")).toBeNull();
     expect(document.querySelector(".overview-statuses")).toBeNull();
+  });
+});
+
+describe("Overview — error state retry (ODM-021)", () => {
+  it("retries a failed listRecords load and recovers", async () => {
+    let attempts = 0;
+    const provider: DataProvider = {
+      getManifest: async () => { throw new Error("unused"); },
+      listRecords: () =>
+        attempts++ === 0
+          ? Promise.reject(new DataLoadError("falha temporária", "network"))
+          : Promise.resolve([{ id: "PRB-9", type: "PRB-", label: "Problema recuperado", file: "", summaryFields: {} }]),
+      getEdges: async () => [],
+      getRecord: async (id) => ({ id, type: "PRB-", file: "", record: { title: "Problema recuperado" }, outgoingEdges: [], incomingEdges: [] }),
+    };
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toContain("falha temporária");
+    await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
+
+    await screen.findByText("PRB-9");
+    expect(attempts).toBe(2);
   });
 });

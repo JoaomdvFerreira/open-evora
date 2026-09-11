@@ -24,12 +24,21 @@ function flattenSearchableValues(value: unknown): (string | number | boolean)[] 
 }
 
 /**
- * Precomputed, normalised search text for one record: ID, type, label, and
- * every serialisable summaryFields value — nothing else (no record-detail
- * content; search never triggers a detail load).
+ * Precomputed, normalised search text for one record: ID, type, label,
+ * every serialisable summaryFields value, and the bounded additional
+ * canonical/detail text already present on the record (ODM-014,
+ * `searchText` — see read-model.js's SEARCH_FIELD_CANDIDATES). Nothing else:
+ * search never triggers a per-query detail load, it only reads what is
+ * already in the loaded index.
  */
 export function recordSearchText(record: RecordSummary): string {
-  const parts = [record.id, record.type, record.label, ...flattenSearchableValues(record.summaryFields).map(String)];
+  const parts = [
+    record.id,
+    record.type,
+    record.label,
+    ...flattenSearchableValues(record.summaryFields).map(String),
+    record.searchText ?? "",
+  ];
   return normalizeForSearch(parts.join(" "));
 }
 

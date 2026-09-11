@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useReducer } from "react";
+import { useMemo } from "react";
 import { flexRender, getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import type { RecordSummary } from "../dataProvider/types";
 import { recordColumns } from "./columns";
 import { ALL_TYPES, availableRecordTypes, filterRecords } from "./recordIndex";
-import { initialRecordsControllerState, recordsControllerReducer } from "./recordsController";
+import type { RecordsControllerAction, RecordsControllerState } from "./recordsController";
 import { describeType } from "../presentation/typeGlossary";
 import { useNarrowViewport } from "./useNarrowViewport";
 import { NarrowRecordsList } from "./NarrowRecordsList";
@@ -20,6 +20,13 @@ interface RecordsTableProps {
   onQueryChange: (query: string) => void;
   typeFilter: string;
   onTypeFilterChange: (typeFilter: string) => void;
+  /**
+   * ODM-015: sort/page state, owned by the caller (RecordsExplorer) rather
+   * than locally here, so it survives this component unmounting when the
+   * caller swaps to RecordDetailPanel and back.
+   */
+  controllerState: RecordsControllerState;
+  dispatchController: (action: RecordsControllerAction) => void;
 }
 
 function DesktopRecordsList({ records, selectedId, onSelect }: { records: RecordSummary[]; selectedId: string | null; onSelect: (id: string) => void }) {
@@ -58,7 +65,9 @@ function DesktopRecordsList({ records, selectedId, onSelect }: { records: Record
  * no SRC-/EVD-/PRB- specific columns (see columns.ts) — search,
  * type filter, client-side sort/paginate via TanStack Table's own row
  * models. `query`/`typeFilter` are controlled by the caller (URL-synced,
- * RE-02C); sorting/pagination remain locally owned here (recordsController).
+ * RE-02C); sorting/pagination (recordsController) are also owned by the
+ * caller (RecordsExplorer, ODM-015) rather than here, so they survive this
+ * component unmounting when the caller swaps to the detail panel and back.
  * Filtered/sorted/paginated data is always derived, never stored
  * redundantly.
  */
@@ -70,8 +79,9 @@ export function RecordsTable({
   onQueryChange,
   typeFilter,
   onTypeFilterChange,
+  controllerState: state,
+  dispatchController: dispatch,
 }: RecordsTableProps) {
-  const [state, dispatch] = useReducer(recordsControllerReducer, initialRecordsControllerState);
   const isNarrow = useNarrowViewport();
 
   const types = useMemo(() => availableRecordTypes(records), [records]);
@@ -84,12 +94,6 @@ export function RecordsTable({
     () => filterRecords(records, { query, typeFilter: effectiveTypeFilter }),
     [records, query, effectiveTypeFilter]
   );
-
-  // Query/type-filter changes alter set membership, so the current page
-  // position is no longer meaningful.
-  useEffect(() => {
-    dispatch({ type: "RESET_PAGE" });
-  }, [query, effectiveTypeFilter]);
 
   const table = useReactTable({
     data: filtered,

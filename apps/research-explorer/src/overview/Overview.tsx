@@ -69,6 +69,11 @@ export function Overview({
         titleAs="h2"
         title={ERROR_TITLES[indexState.error.kind] ?? "Não foi possível carregar a visão geral"}
         message={indexState.error.message}
+        action={
+          <button type="button" onClick={indexState.retry}>
+            Tentar novamente
+          </button>
+        }
       />
     );
   }

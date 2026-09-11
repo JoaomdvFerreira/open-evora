@@ -20,7 +20,7 @@ const lookup = new Map<string, RecordSummary>([
 describe.skipIf(!hasGeneratedData)("EVD Detail vNext — canonical regression cases", () => {
   it("EVD-000001 renders observation, scope, limits, source navigation and extracted date", () => {
     const onSelect = vi.fn(); const item = detail("EVD-000001");
-    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([])} onSelect={onSelect} />);
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([])} onSelect={onSelect} onViewAsProblem={vi.fn()} />);
     expect(screen.getByRole("heading", { name: (item.record.observation as Record<string, unknown>).summary as string })).toBeTruthy();
     expect(screen.getAllByText("Município de Évora").length).toBeGreaterThan(0);
     expect(screen.getByText("2024 — 2027")).toBeTruthy();
@@ -31,7 +31,7 @@ describe.skipIf(!hasGeneratedData)("EVD Detail vNext — canonical regression ca
 
   it("EVD-000114 exposes direct-engagement facts and claim authority", () => {
     const item = detail("EVD-000114");
-    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} />);
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} onViewAsProblem={vi.fn()} />);
     expect(screen.getAllByText("Facto").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Com autoridade").length).toBeGreaterThan(0);
     expect(screen.getAllByText("pessoas com deficiência").length).toBeGreaterThan(0);
@@ -39,15 +39,15 @@ describe.skipIf(!hasGeneratedData)("EVD Detail vNext — canonical regression ca
 
   it("EVD-000096 renders its multiple canonical Sources as peers and omits absent lineage", () => {
     const item = detail("EVD-000096");
-    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} />);
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} onViewAsProblem={vi.fn()} />);
     expect(screen.getAllByText("SRC-0081").length).toBeGreaterThan(0);
     expect(screen.getAllByText("SRC-0053").length).toBeGreaterThan(0);
     expect(screen.queryByText(/Linagem:/)).toBeNull();
   });
 
-  it("EVD-000106 preserves comparative Seattle scope and shows only the PRB-owned mechanism role/effect", () => {
-    const item = detail("EVD-000106"); const problem = detail("PRB-0005"); const onSelect = vi.fn();
-    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([{ detail: problem, effects: ["REFINES"], researchRoles: ["COMPARATIVE_MECHANISM"], relationshipPath: "evidence[7]" }])} onSelect={onSelect} />);
+  it("EVD-000106 preserves comparative Seattle scope and shows only the PRB-owned mechanism role/effect, and 'Ver Problema' routes to the Problem experience (ODM-019)", () => {
+    const item = detail("EVD-000106"); const problem = detail("PRB-0005"); const onSelect = vi.fn(); const onViewAsProblem = vi.fn();
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([{ detail: problem, effects: ["REFINES"], researchRoles: ["COMPARATIVE_MECHANISM"], relationshipPath: "evidence[7]" }])} onSelect={onSelect} onViewAsProblem={onViewAsProblem} />);
     expect(screen.getAllByText("Belltown, Seattle, Washington, EUA").length).toBeGreaterThan(0);
     expect(screen.getAllByText("O estudo não demonstra uma redução proporcional da distância total percorrida ou das emissões e não estabelece um efeito equivalente em Évora.").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Refina").length).toBeGreaterThan(0); expect(screen.getAllByText("Mecanismo comparativo").length).toBeGreaterThan(0);
@@ -57,18 +57,20 @@ describe.skipIf(!hasGeneratedData)("EVD Detail vNext — canonical regression ca
     fireEvent.click(screen.getByText("Inspeção técnica completa"));
     expect(screen.getByText("provenance.sources[0] → SRC-0093")).toBeTruthy();
     expect(screen.getByText("PRB-0005 → evidence[7]")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Ver Problema →" })); expect(onSelect).toHaveBeenCalledWith("PRB-0005");
+    fireEvent.click(screen.getByRole("button", { name: "Ver Problema →" }));
+    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0005");
+    expect(onSelect).not.toHaveBeenCalled();
   });
 
   it("EVD-000147 preserves month precision and the planned-response relationship", () => {
     const item = detail("EVD-000147"); const problem = detail("PRB-0008");
-    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([{ detail: problem, effects: ["BOUNDS", "REFINES"], researchRoles: ["LOCAL_OBSERVATION", "PLANNED_RESPONSE"], relationshipPath: "evidence[5]" }])} onSelect={vi.fn()} />);
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([{ detail: problem, effects: ["BOUNDS", "REFINES"], researchRoles: ["LOCAL_OBSERVATION", "PLANNED_RESPONSE"], relationshipPath: "evidence[5]" }])} onSelect={vi.fn()} onViewAsProblem={vi.fn()} />);
     expect(screen.getByText("outubro de 2026")).toBeTruthy(); expect(screen.getByText("Resposta planeada")).toBeTruthy();
   });
 
   it("EVD-000012 supports independently rendered multiple Problem uses and keeps technical inspection available", () => {
     const item = detail("EVD-000012"); const first = detail("PRB-0004"); const second = detail("PRB-0005");
-    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([{ detail: first, effects: ["REFINES"], researchRoles: ["LOCAL_OBSERVATION"], relationshipPath: "evidence[3]" }, { detail: second, effects: ["BOUNDS", "REFINES"], researchRoles: ["LOCAL_OBSERVATION", "EXISTING_RESPONSE"], relationshipPath: "evidence[5]" }])} onSelect={vi.fn()} />);
+    render(<EvdDetail detail={item} lookup={lookup} problemUses={ready([{ detail: first, effects: ["REFINES"], researchRoles: ["LOCAL_OBSERVATION"], relationshipPath: "evidence[3]" }, { detail: second, effects: ["BOUNDS", "REFINES"], researchRoles: ["LOCAL_OBSERVATION", "EXISTING_RESPONSE"], relationshipPath: "evidence[5]" }])} onSelect={vi.fn()} onViewAsProblem={vi.fn()} />);
     expect(screen.getAllByRole("button", { name: "Ver Problema →" })).toHaveLength(2);
     expect(screen.getByText("Inspeção técnica completa")).toBeTruthy();
     expect(screen.queryByText(/representativeness|analysis\./i)).toBeNull();
@@ -104,6 +106,7 @@ describe("EVD relationship and technical FactList facts", () => {
         lookup={lookup}
         problemUses={ready([{ detail: problem, effects: ["SUPPORTS", "BOUNDS"], researchRoles: ["CONTEXTUAL", "COMPARATIVE_RESPONSE"], relationshipPath: "evidence[3]" }])}
         onSelect={vi.fn()}
+        onViewAsProblem={vi.fn()}
       />
     );
 
@@ -119,7 +122,7 @@ describe("EVD relationship and technical FactList facts", () => {
   });
 
   it("preserves the exact technical fact row order including optional lineage_id and relationship paths", () => {
-    const { container } = render(<EvdDetail detail={base} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} />);
+    const { container } = render(<EvdDetail detail={base} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} onViewAsProblem={vi.fn()} />);
     fireEvent.click(screen.getByText("Inspeção técnica completa"));
 
     const technicalList = container.querySelector("#evd-technical dl.ui-fact-list");
@@ -130,7 +133,7 @@ describe("EVD relationship and technical FactList facts", () => {
 
   it("omits the optional lineage_id and relationship-path rows when absent", () => {
     const noLineage: RecordDetail = { ...base, outgoingEdges: [], incomingEdges: [], record: { observation: { summary: "Observação de teste." }, provenance: { sources: [] } } };
-    const { container } = render(<EvdDetail detail={noLineage} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} />);
+    const { container } = render(<EvdDetail detail={noLineage} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} onViewAsProblem={vi.fn()} />);
     fireEvent.click(screen.getByText("Inspeção técnica completa"));
 
     const technicalList = container.querySelector("#evd-technical dl.ui-fact-list");
@@ -150,20 +153,20 @@ describe("EVD Detail DS-05I — EmptyState adoption for zero Problem uses", () =
   };
 
   it("renders EmptyState with the exact copy once ready with zero Problem uses", () => {
-    render(<EvdDetail detail={base} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} />);
+    render(<EvdDetail detail={base} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} onViewAsProblem={vi.fn()} />);
     const message = screen.getByText("Esta evidência ainda não está ligada explicitamente a um Problema.");
     expect(message.className).toBe("ui-empty-state-message");
   });
 
   it("keeps loading as ProgressMessage, not EmptyState", () => {
-    render(<EvdDetail detail={base} lookup={lookup} problemUses={{ status: "loading", retry: vi.fn() }} onSelect={vi.fn()} />);
+    render(<EvdDetail detail={base} lookup={lookup} problemUses={{ status: "loading", retry: vi.fn() }} onSelect={vi.fn()} onViewAsProblem={vi.fn()} />);
     expect(screen.getByRole("status").textContent).toBe("A carregar usos nos Problemas…");
     expect(screen.queryByText("Esta evidência ainda não está ligada explicitamente a um Problema.")).toBeNull();
   });
 
   it("keeps error as ErrorNotice with retry, not EmptyState", () => {
     const retry = vi.fn();
-    render(<EvdDetail detail={base} lookup={lookup} problemUses={{ status: "error", error: new DataLoadError("Falha.", "network"), retry }} onSelect={vi.fn()} />);
+    render(<EvdDetail detail={base} lookup={lookup} problemUses={{ status: "error", error: new DataLoadError("Falha.", "network"), retry }} onSelect={vi.fn()} onViewAsProblem={vi.fn()} />);
     expect(screen.getByRole("alert")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Tentar novamente" }));
     expect(retry).toHaveBeenCalledTimes(1);
@@ -186,7 +189,7 @@ describe("EVD section index", () => {
 
   it("omits an unrendered limits section from the shared compact and rail index", () => {
     expect(evdSectionIndex(emptyLimits.record).map((section) => section.sectionId)).not.toContain("limits");
-    render(<><EvdDetail detail={emptyLimits} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} /><EvdReadingRail detail={emptyLimits} /></>);
+    render(<><EvdDetail detail={emptyLimits} lookup={lookup} problemUses={ready([])} onSelect={vi.fn()} onViewAsProblem={vi.fn()} /><EvdReadingRail detail={emptyLimits} /></>);
     expect(screen.queryByRole("link", { name: "O que não permite concluir" })).toBeNull();
   });
 });

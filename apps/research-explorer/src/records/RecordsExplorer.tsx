@@ -1,9 +1,11 @@
+import { useEffect, useReducer, useRef } from "react";
 import type { DataProvider } from "../dataProvider/types";
 import { useRecordIndex } from "./useRecordIndex";
 import { RecordsTable } from "./RecordsTable";
 import { RecordDetailPanel } from "./RecordDetailPanel";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { initialRecordsControllerState, recordsControllerReducer } from "./recordsController";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -54,6 +56,26 @@ export function RecordsExplorer({
   onBackToRecords,
 }: RecordsExplorerProps) {
   const indexState = useRecordIndex(dataProvider);
+  // ODM-015: owned here, not inside RecordsTable, so sort/page survive the
+  // Records -> Detail -> Records cycle — RecordsTable/RecordDetailPanel are
+  // mutually exclusive below (see the V2 comment above), so a reducer local
+  // to RecordsTable would remount and reset on every return to Records.
+  const [recordsControllerState, dispatchRecordsController] = useReducer(recordsControllerReducer, initialRecordsControllerState);
+
+  // ODM-015: query/type-filter changes alter set membership, so the current
+  // page position is no longer meaningful — reset it. Owned here (not inside
+  // RecordsTable, which remounts across the Records <-> Detail cycle) so a
+  // return to Records is never mistaken for a query/type-filter change; the
+  // skip-first-run guard means mounting this component for the first time
+  // does not itself dispatch a reset.
+  const skipNextReset = useRef(true);
+  useEffect(() => {
+    if (skipNextReset.current) {
+      skipNextReset.current = false;
+      return;
+    }
+    dispatchRecordsController({ type: "RESET_PAGE" });
+  }, [query, typeFilter]);
 
   if (indexState.status === "loading") {
     return <ProgressMessage message="A carregar registos…" />;
@@ -99,6 +121,8 @@ export function RecordsExplorer({
         onQueryChange={onQueryChange}
         typeFilter={typeFilter}
         onTypeFilterChange={onTypeFilterChange}
+        controllerState={recordsControllerState}
+        dispatchController={dispatchRecordsController}
       />
     </div>
   );

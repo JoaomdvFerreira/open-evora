@@ -53,3 +53,18 @@ it("moves focus to the main content when the skip link is activated", async () =
   await user.tab();
   expect(document.activeElement).toBe(screen.getByRole("button", { name: "Visão geral" }));
 });
+
+it("qualifies the manifest timestamp as build/generation time, distinct from research currentness (ODM-020)", async () => {
+  const provider: DataProvider = {
+    getManifest: () => Promise.resolve(manifest),
+    listRecords: () => Promise.resolve([]),
+    getRecord: () => Promise.reject(new Error("not used")),
+    getEdges: () => Promise.resolve([]),
+  };
+  render(<App dataProvider={provider} />);
+
+  const summary = await screen.findByText(/Corpus: 0/);
+  expect(summary.textContent).toContain("não indica a atualidade da investigação");
+  const time = summary.querySelector("time");
+  expect(time?.getAttribute("dateTime")).toBe(manifest.generatedAt);
+});

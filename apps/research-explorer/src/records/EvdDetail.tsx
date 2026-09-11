@@ -96,7 +96,7 @@ function EvdLimits({ record }: { record: Record<string, unknown> }) {
   </section>;
 }
 
-function EvdInvestigation({ state, onSelect }: { state: EVDProblemUsesState & { retry: () => void }; onSelect: (id: string) => void }) {
+function EvdInvestigation({ state, onViewAsProblem }: { state: EVDProblemUsesState & { retry: () => void }; onViewAsProblem: (id: string) => void }) {
   return <section id="evd-investigation" aria-label="Como é usada na investigação" className="record-editorial-section evd-section">
     <h2 className="detail-panel-label">Como é usada na investigação</h2>
     {state.status === "loading" || state.status === "idle" ? <ProgressMessage message="A carregar usos nos Problemas…" /> : state.status === "error" ? <ErrorNotice title="Não foi possível carregar os usos desta evidência nos Problemas." message="" action={<button type="button" onClick={state.retry}>Tentar novamente</button>} /> : state.uses.length === 0 ? <EmptyState message="Esta evidência ainda não está ligada explicitamente a um Problema." /> : <ul className="evd-problem-list">{state.uses.map((use) => {
@@ -117,7 +117,7 @@ function EvdInvestigation({ state, onSelect }: { state: EVDProblemUsesState & { 
             },
           ]}
         />
-        <button type="button" className="evd-problem-action" onClick={() => onSelect(use.detail.id)}>Ver Problema →</button>
+        <button type="button" className="evd-problem-action" onClick={() => onViewAsProblem(use.detail.id)}>Ver Problema →</button>
       </li>;
     })}</ul>}
   </section>;
@@ -157,9 +157,9 @@ function EvdTechnical({ detail }: { detail: RecordDetail }) {
   </section>;
 }
 
-export function EvdDetail({ detail, lookup, problemUses, onSelect }: { detail: RecordDetail; lookup: Map<string, RecordSummary>; problemUses: EVDProblemUsesState & { retry: () => void }; onSelect: (id: string) => void }) {
+export function EvdDetail({ detail, lookup, problemUses, onSelect, onViewAsProblem }: { detail: RecordDetail; lookup: Map<string, RecordSummary>; problemUses: EVDProblemUsesState & { retry: () => void }; onSelect: (id: string) => void; onViewAsProblem: (id: string) => void }) {
   const sections = evdSectionIndex(detail.record);
-  return <><EvdIdentity detail={detail} /><div className="evd-compact-section-index"><CompactSectionIndex summary="Nesta evidência" navLabel="Nesta evidência (versão compacta)" entries={toSectionIndexEntries(sections)} /></div><EvdScope record={detail.record} /><EvdLimits record={detail.record} /><EvdInvestigation state={problemUses} onSelect={onSelect} /><EvdSources record={detail.record} lookup={lookup} onSelect={onSelect} /><EvdTechnical detail={detail} /></>;
+  return <><EvdIdentity detail={detail} /><div className="evd-compact-section-index"><CompactSectionIndex summary="Nesta evidência" navLabel="Nesta evidência (versão compacta)" entries={toSectionIndexEntries(sections)} /></div><EvdScope record={detail.record} /><EvdLimits record={detail.record} /><EvdInvestigation state={problemUses} onViewAsProblem={onViewAsProblem} /><EvdSources record={detail.record} lookup={lookup} onSelect={onSelect} /><EvdTechnical detail={detail} /></>;
 }
 
 export function EvdReadingRail({ detail }: { detail: RecordDetail }) {

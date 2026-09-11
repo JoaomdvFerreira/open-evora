@@ -28,6 +28,7 @@ import { useEvdProblemUses } from "./useEvdProblemUses";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
+import { applyInitialFragment } from "../navigation/applyInitialFragment";
 import { RailSectionIndex } from "../presentation/RailSectionIndex";
 import type { SectionIndexEntry } from "../presentation/SectionIndexEntry";
 import type { SourceSectionIndexEntry } from "./sourceSectionIndex";
@@ -922,7 +923,7 @@ function RecordDetailContent({
       <div className="lyt-reading" data-rail="present">
         <div className="record-detail-main lyt-reading-main">
           {isEvd ? (
-            <EvdDetail detail={detail} lookup={lookup} problemUses={evdProblemUses} onSelect={onSelect} />
+            <EvdDetail detail={detail} lookup={lookup} problemUses={evdProblemUses} onSelect={onSelect} onViewAsProblem={onViewAsProblem} />
           ) : (
             <>
           <section aria-label="Significado" className="record-meaning-zone">
@@ -1062,6 +1063,20 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
       contentRef.current?.focus();
     }
   }, [readyId]);
+
+  // ODM-016A: a direct deep link's fragment (e.g. #evd-limits) targets a
+  // section that only exists after this async content load completes, so
+  // the browser's native on-load fragment scroll already ran and found
+  // nothing. Re-apply it exactly once, on the first content-ready
+  // transition only — an empty dependency array, not [readyId], so
+  // selecting a different record afterward never re-triggers this and
+  // hijacks the user's own scroll position.
+  useEffect(() => {
+    if (readyId !== null) {
+      applyInitialFragment();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [readyId === null]);
 
   return (
     <section aria-labelledby="detail-heading" className="record-detail-panel">
