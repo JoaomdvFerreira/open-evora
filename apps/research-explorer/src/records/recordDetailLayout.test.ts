@@ -474,9 +474,9 @@ describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K
     const bodies = ruleBodiesForRawPattern(SHARED_RULE_PATTERN);
     expect(bodies.length).toBeGreaterThan(0);
     const body = bodies[0];
-    expect(body).toMatch(/margin\s*:\s*0 0 var\(--space-2\)\s*;/);
-    expect(body).toMatch(/color\s*:\s*var\(--ink-faint\)\s*;/);
-    expect(body).toMatch(/font-family\s*:\s*var\(--ui\)\s*;/);
+    expect(body).toMatch(/margin\s*:\s*0 0 var\(--space-tight\)\s*;/);
+    expect(body).toMatch(/color\s*:\s*var\(--color-ink-muted\)\s*;/);
+    expect(body).toMatch(/font-family\s*:\s*var\(--font-interface\)\s*;/);
     expect(body).toMatch(/font-size\s*:\s*12px\s*;/);
     expect(body).toMatch(/font-weight\s*:\s*600\s*;/);
     expect(body).toMatch(/text-transform\s*:\s*uppercase\s*;/);
@@ -528,7 +528,7 @@ describe("Source/EVD compact-index composition spacing (DS-05H remediation F1)",
   it("both .source-compact-section-index and .evd-compact-section-index carry margin: 0 0 var(--space-6)", () => {
     const bodies = ruleBodiesForRawPattern(/\.source-compact-section-index,\s*\n?\s*\.evd-compact-section-index\s*\{([^}]*)\}/g);
     expect(bodies.length).toBeGreaterThan(0);
-    expect(bodies[0]).toMatch(/margin\s*:\s*0\s+0\s+var\(--space-6\)\s*;/);
+    expect(bodies[0]).toMatch(/margin\s*:\s*0\s+0\s+var\(--space-loose\)\s*;/);
   });
 
   it("the canonical .ui-section-index-compact recipe remains margin: 0 (composition spacing stays domain-owned)", () => {

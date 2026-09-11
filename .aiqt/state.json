@@ -115,7 +115,7 @@
         "id": "M010",
         "title": "AR-03 Knowledge-First Product Design: Foundation Consolidation",
         "objective": "Consolidate the Explorer's legacy production foundation (index.css's own hex-literal variables, ad hoc selectors, and Inter-based interface typography) onto the semantic DS-04B foundation tokens already imported into production via tokens.css (DS-05A), under the owner-frozen Public Sans interface family, without adopting foundations.css/layout.css wholesale, without any structural/component/navigation/layout redesign, and without treating DS-04B's remaining numeric/token candidates as frozen beyond what this milestone's own implementation and verification earn. Interface font is owner-frozen as Public Sans; reading font remains Source Serif 4; technical font remains IBM Plex Mono. Remaining DS-04B numeric/token values used by this migration become owner-frozen foundation values for the M010 migration scope only after successful WU036 implementation, WU037 independent production-rendered verification, and explicit owner M010 closure -- they are not previously-unused values and not universally 'newly-adopted production facts' beyond this migration's bounded scope. Short-record inline rail remains deferred. No AR-04 Problem Experience, AR-05 Discovery & Provenance, or D7 scope is included.",
-        "status": "in_progress",
+        "status": "ready",
         "workUnitIds": [
           "WU035",
           "WU036",
@@ -1573,12 +1573,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-035"
         ],
         "createdAt": "2026-09-11T09:45:11.099Z",
-        "updatedAt": "2026-09-11T12:51:55.034Z"
+        "updatedAt": "2026-09-11T13:26:49.096Z"
       },
       {
         "id": "WU037",
@@ -1632,7 +1632,7 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-036"
         ],
@@ -4686,17 +4686,146 @@
         }
       ],
       "finalWorkUnitStatus": "needs_review",
-      "createdAt": "2026-09-11T12:35:18.985Z",
-      "nextRecommendation": "aiqt checkpoint amend --checkpoint C036"
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C036",
+      "createdAt": "2026-09-11T12:35:18.985Z"
+    },
+    {
+      "id": "C037",
+      "workUnitId": "WU036",
+      "packetId": "PKT-037",
+      "summary": "Implemented the WU035/DS-04B foundation-consolidation contract in full across the five authorized files: all 23 MIGRATE legacy tokens were rewritten to their exact DS-04B semantic destinations in index.css (356 consumer occurrences across 193 selector sites, including the --recipe-*-family indirection layer inside :root), the tokens.css stale scope comment was corrected per contract §E, main.tsx's four production @fontsource/inter imports were removed after confirming zero remaining --ui/--font-interface consumer resolves to Inter, and package.json/package-lock.json were updated for the two frozen dependency-classification moves (@fontsource/public-sans -> dependencies, @fontsource/inter -> devDependencies). typecheck, build, research:validate, and git diff --check all pass clean. However, `npm run test` surfaces 2 pre-existing failures in src/records/recordDetailLayout.test.ts, which asserts on literal legacy-token-name strings (var(--space-2), var(--ink-faint), var(--ui), var(--space-6)) embedded in the raw CSS text of two rules that were correctly migrated to their new semantic names (var(--space-tight), var(--color-ink-muted), var(--font-interface), var(--space-loose)) with no value or structural change. Fixing this requires editing recordDetailLayout.test.ts, which is not one of the five files the WU035 contract and owner authorization list as WU036-editable. Per the owner's explicit instruction (\"If implementation appears to require another source/test/config file: STOP and report the contract conflict\"), implementation stops here for owner review rather than touching a sixth file.",
+      "completed": [
+        "index.css: rewrote all 23 MIGRATE legacy token consumers (356 occurrences) to DS-04B semantic destinations per contract §A.0/§C direct-rewrite strategy",
+        "index.css: verified zero remaining consumers of any of the 23 MIGRATE legacy variable names",
+        "index.css: verified all 4 LEAVE_UNCHANGED items (--space-1, --space-3, --space-8, --radius-sm) and 1 OUT_OF_SCOPE/LEAVE_UNCHANGED item (--shell-content-max) preserved with unchanged consumer counts",
+        "index.css: verified all 8 DEAD_NO_ACTION :root declarations left untouched",
+        "index.css: verified the undefined --link defect at line 2568 left untouched",
+        "index.css: verified no unclassified legacy consumer exists (exact var(--name) counts for all 37 items cross-checked against contract before and after migration)",
+        "tokens.css: replaced the stale lines 4-7 scope comment with the exact §E replacement wording; no other line changed",
+        "main.tsx: removed the four production @fontsource/inter imports after confirming 100% of --ui consumers (21/21) migrated to --font-interface",
+        "package.json: moved @fontsource/public-sans from devDependencies to dependencies",
+        "package.json: moved @fontsource/inter from dependencies to devDependencies",
+        "package-lock.json: regenerated via npm install, producing exactly the mechanical lockfile delta for the two classification moves (dependencies/devDependencies block placement and \"dev\" flag) with no other dependency added/upgraded/removed",
+        "Verified .storybook/preview.ts (outside src/, outside the 5-file scope) still imports @fontsource/inter correctly for Storybook/development use",
+        "Verified no other genuine production Inter font-family reference exists anywhere in apps/research-explorer/src/**"
+      ],
+      "notCompleted": [
+        "recordDetailLayout.test.ts not updated: 2 test assertions rely on literal legacy-token-name strings in raw CSS text that the contract's migration correctly changed; updating them requires editing a file outside the WU036-authorized 5-file list"
+      ],
+      "filesChanged": [
+        "apps/research-explorer/src/index.css",
+        "apps/research-explorer/src/styles/tokens.css",
+        "apps/research-explorer/src/main.tsx",
+        "apps/research-explorer/package.json",
+        "apps/research-explorer/package-lock.json"
+      ],
+      "issues": [
+        {
+          "title": "recordDetailLayout.test.ts asserts on literal legacy-token-name strings that the authorized migration correctly changed",
+          "description": "recordDetailLayout.test.ts (2 of 501 tests) asserts on literal legacy CSS custom-property name strings (var(--space-2), var(--ink-faint), var(--ui), var(--space-6)) embedded in raw index.css rule text. The WU035 contract's own §F explicitly anticipated this class of test staleness (\"CSS class/selector renames must not break any .test.ts/.test.tsx that asserts on CSS text... verify these before and after\"), but the owner's WU036 authorization restricts implementation to exactly 5 files, none of which is this test file. This is a genuine contract/authorization boundary conflict, not a migration defect: the underlying CSS rules were migrated correctly (same rendered value, new semantic token name), and the test needs its literal-string expectations updated to match, but doing so requires a 6th file outside WU036's authorized scope. Per the owner's explicit step 6 instruction, implementation stops here rather than improvising an out-of-scope file edit. Recommendation: owner should either (a) authorize recordDetailLayout.test.ts as a 6th WU036 file specifically for updating these two literal-string assertions to the new semantic token names (space-2->space-tight, ink-faint->color-ink-muted, ui->font-interface, space-6->space-loose), with no other change to the test, or (b) explicitly accept 2/501 test failures as known, tracked debt for this checkpoint and defer the test-string update to a follow-up work unit.",
+          "severity": "medium",
+          "status": "open",
+          "agentCanFix": true
+        }
+      ],
+      "validationResult": "failed",
+      "acceptanceCriteriaResult": "failed",
+      "validationCommands": [
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "tsc --noEmit completed with no errors."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "failed",
+          "summary": "498 passed, 2 failed, 1 skipped (501 total, 1 file affected). Both failures in recordDetailLayout.test.ts are literal legacy-token-name string assertions against selectors that were correctly migrated to new semantic token names (no value/structural change). Fix requires editing a file outside the 5 WU036-authorized files -- contract conflict, not a migration defect."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Vite production build succeeded with no new warnings; no Inter font files present in the output bundle, confirming zero production Inter dependency."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK. Canonical research data unchanged."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors reported."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "AIQT status: passed. Current work unit WU036, awaiting checkpoint."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Review (development mode): warning, non-blocking. Findings are exactly the pre-existing tolerated C008/C009/C010 missing-packet-ref debt plus the expected WU036-awaiting-checkpoint notice. No new finding."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "3 blocking errors reported, all pre-existing tolerated debt (C008/C009/C010 broken checkpoint/packet references). No new graph/integrity finding."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Explorer typecheck passes",
+          "result": "passed",
+          "evidence": "npm run typecheck --prefix apps/research-explorer completed with no errors."
+        },
+        {
+          "criterion": "The full Explorer test suite passes",
+          "result": "failed",
+          "evidence": "2 of 501 tests fail in recordDetailLayout.test.ts due to literal legacy-token-name string assertions against correctly-migrated selectors; fix is outside the 5-file authorization boundary."
+        },
+        {
+          "criterion": "The production build passes",
+          "result": "passed",
+          "evidence": "vite build succeeded, no new warnings, no Inter assets bundled."
+        },
+        {
+          "criterion": "npm run research:validate passes with canonical research data verified unchanged",
+          "result": "passed",
+          "evidence": "Validated 274 record(s): OK."
+        },
+        {
+          "criterion": "git diff --check is clean",
+          "result": "passed",
+          "evidence": "No whitespace errors."
+        },
+        {
+          "criterion": "Every selector identified in the WU035 contract resolves through its DS-04B semantic token per the chosen alias-or-rewrite approach",
+          "result": "passed",
+          "evidence": "All 23 MIGRATE items fully migrated (356/356 occurrences); zero remaining legacy consumers of any MIGRATE token; exact var() counts verified before and after against the contract's per-item counts."
+        },
+        {
+          "criterion": "The tokens.css stale scope comment is corrected exactly as WU035 defined",
+          "result": "passed",
+          "evidence": "Lines 4-7 replaced verbatim with the §E wording; lines 1-3/8-13 unchanged."
+        },
+        {
+          "criterion": "No structural, component, navigation, or layout regression exists versus the DS-05A-DS-05J baseline",
+          "result": "passed",
+          "evidence": "Diff is limited to CSS custom-property references, one comment block, import removals, and dependency-classification lines; no selector, DOM, or component change."
+        }
+      ],
+      "finalWorkUnitStatus": "needs_review",
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C037",
+      "createdAt": "2026-09-11T13:26:49.096Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-036",
-    "workUnitId": "WU035",
+    "id": "PKT-037",
+    "workUnitId": "WU036",
     "milestoneId": "M010",
-    "createdAt": "2026-09-11T10:07:33.695Z",
+    "createdAt": "2026-09-11T13:19:49.413Z",
     "format": "markdown",
-    "contentHash": "sha256:d22e73c76421de37b423aa2d6c26bdde45e3cc0b4d16bd1b07574ab3596e0e44",
+    "contentHash": "sha256:92c3d1b6412085815cccae7aa2a76dc69991a4b3db65b22260b1aea74cb2c15e",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -4715,7 +4844,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-11T12:51:55.034Z",
+  "lastUpdatedAt": "2026-09-11T13:52:27.226Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -4767,6 +4896,16 @@
       "validationResult": "passed",
       "reason": "Rendered/browser verification completed at desktop (1440x900) and compact (~360px) using an isolated Playwright browser context (fresh temporary user-data-dir, no shared-profile interference). ODM-014/015/016/017/019/020/021 all confirmed PASS: search finds previously-unreachable canonical content (EVD-000001 via 'conectividade rural-urbana') with no per-record detail fetch; Records sort/page survive select-then-return with no URL leakage and correct query-change reset; initial deep-link fragment (#evd-limits) is re-applied post-mount and clears the compact sticky header (target top 108.2 >= header bottom 104.1), desktop smoke-checked with no regression; live computed --ink-faintest (#6b675f) measured >=4.5:1 (5.30/5.63) against every affected background, cross-checked against the deterministic Vitest assertion; 'Ver Problema' reaches view=problem&id=PRB-0001 (not technical Detail) via mouse and keyboard; Overview manifest timestamp is clearly qualified as generation/build time with the canonical <time dateTime> unchanged; Overview error state shows and recovers via 'Tentar novamente' with no reload or new retry architecture. ODM-013 remains without independent implementation per the WU032 contract. Two observations (favicon.ico 404; ~7px scrollWidth delta from the pre-existing, invisible-by-default .unavailable-note tooltip and the intentionally off-screen skip-link) were traced to base commit a20ecf4b, confirmed pre-existing and out of WU033 scope -- not a regression. No implementation or test changes were made during rendered verification; C034 was read-only until this amendment.",
       "amendedAt": "2026-09-11T07:24:34.597Z",
+      "sourceCommand": "aiqt checkpoint amend"
+    },
+    {
+      "amendmentId": "AMEND-004",
+      "checkpointId": "C037",
+      "workUnitId": "WU036",
+      "acceptanceCriteriaResult": "passed",
+      "validationResult": "passed",
+      "reason": "Owner-approved WU036 remediation completed. The two failing recordDetailLayout.test.ts cases were confirmed as stale literal legacy-token assertions caused by the contractually required DS-04B migration. Four assertion literals were updated to the already-authorized semantic destinations only. Final validation: full Explorer suite passes (500 passed, 1 pre-existing skip, 0 failed), typecheck passes, build passes, research:validate passes, git diff --check passes, and the WU035 implementation contract is fully satisfied.",
+      "amendedAt": "2026-09-11T13:52:27.226Z",
       "sourceCommand": "aiqt checkpoint amend"
     }
   ],
@@ -5884,6 +6023,48 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-11T12:35:18.985Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C037",
+      "current": {
+        "observationId": "sha256:418036e0d8f5f3a0641a095b1854e48d48b183f7c9354082630c794011fcb4a0",
+        "checkpointId": "C037",
+        "workUnitId": "WU036",
+        "trigger": "amendment",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-11T13:52:27.226Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-11T13:52:27.226Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:fda3f746fe7cdb73f2ff54111b3cd76e9f16c770af07282c10cfff32a1c870f7",
+          "checkpointId": "C037",
+          "workUnitId": "WU036",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-11T13:26:49.096Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-11T13:26:49.096Z"
+        },
+        {
+          "observationId": "sha256:418036e0d8f5f3a0641a095b1854e48d48b183f7c9354082630c794011fcb4a0",
+          "checkpointId": "C037",
+          "workUnitId": "WU036",
+          "trigger": "amendment",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-11T13:52:27.226Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-11T13:52:27.226Z"
         }
       ]
     }

@@ -377,24 +377,24 @@ tr[aria-selected="true"] {
    Source identity/header area — same action-link visual language as
    .detail-rail-actions a, scoped to its own inline placement. */
 .record-source-header-action {
-  margin: var(--space-4) 0 0;
+  margin: var(--space-standard) 0 0;
 }
 
 .record-source-header-action a {
   display: inline-block;
-  min-height: var(--tap-min);
-  padding: var(--space-2) var(--space-3);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
+  min-height: var(--target-min);
+  padding: var(--space-tight) var(--space-3);
+  color: var(--color-ink-primary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
   font-size: 13px;
   text-decoration: none;
 }
 
 .record-source-header-action a:hover {
-  border-color: var(--accent);
-  color: var(--accent-dark);
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
   text-decoration: underline;
   text-underline-offset: 0.16em;
 }
@@ -548,7 +548,7 @@ code {
 .effect-chip-wrap {
   position: relative;
   display: inline-flex;
-  margin-right: var(--space-2);
+  margin-right: var(--space-tight);
 }
 
 /* PI-02F3: effect-label help — same visible-on-hover/focus tooltip
@@ -563,10 +563,10 @@ code {
   width: max-content;
   max-width: 220px;
   padding: 3px 8px;
-  color: var(--canvas);
-  background: var(--ink);
+  color: var(--color-surface-reading);
+  background: var(--color-ink-primary);
   border-radius: var(--radius-sm);
-  font-family: var(--ui);
+  font-family: var(--font-interface);
   font-size: 12px;
   line-height: 1.4;
   opacity: 0;
@@ -586,8 +586,8 @@ code {
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-bottom: var(--space-2);
+  gap: var(--space-tight);
+  margin-bottom: var(--space-tight);
 }
 
 .evidence-item-effects {
@@ -599,30 +599,30 @@ code {
 /* Contribution occurrence summary (REDUX-002) — a tally of already-explicit
    canonical values, explicitly labelled as occurrences, never a score. */
 .effect-summary {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface-muted);
-  padding: var(--space-3) var(--space-4);
-  margin: 0 0 var(--space-4);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  background: var(--color-surface-subtle);
+  padding: var(--space-3) var(--space-standard);
+  margin: 0 0 var(--space-standard);
 }
 
 .effect-summary-caption {
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-weight: 600;
   font-size: 11px;
   margin: 0 0 2px;
 }
 
 .effect-summary-counts {
-  color: var(--ink-faintest);
+  color: var(--color-ink-faint);
   font-size: 11px;
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-tight);
 }
 
 .effect-summary-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-tight);
 }
 
 .effect-summary-chip {
@@ -632,7 +632,7 @@ code {
 }
 
 .effect-count {
-  color: var(--ink-faintest);
+  color: var(--color-ink-faint);
   font-size: 11px;
 }
 
@@ -685,109 +685,109 @@ code {
 
   /* Semantic typography recipes — design-system.md §2. Primitives only;
      no component selectors consume these yet (V1/V2/V3 reconciliation). */
-  --recipe-wordmark-family: var(--ui);
+  --recipe-wordmark-family: var(--font-interface);
   --recipe-wordmark-size: 15px;
   --recipe-wordmark-weight: 700;
   --recipe-wordmark-line-height: 1.2;
 
-  --recipe-shell-subtitle-family: var(--ui);
+  --recipe-shell-subtitle-family: var(--font-interface);
   --recipe-shell-subtitle-size: 14px;
   --recipe-shell-subtitle-weight: 400;
   --recipe-shell-subtitle-line-height: 1.3;
 
-  --recipe-global-nav-family: var(--ui);
+  --recipe-global-nav-family: var(--font-interface);
   --recipe-global-nav-size: 14px;
   --recipe-global-nav-weight: 400;
   --recipe-global-nav-weight-active: 600;
   --recipe-global-nav-line-height: 1.3;
 
-  --recipe-section-label-family: var(--ui);
+  --recipe-section-label-family: var(--font-interface);
   --recipe-section-label-size: 12px;
   --recipe-section-label-weight: 600;
   --recipe-section-label-line-height: 1.4;
   --recipe-section-label-letter-spacing: 0.5px;
   --recipe-section-label-transform: uppercase;
 
-  --recipe-interface-body-family: var(--ui);
+  --recipe-interface-body-family: var(--font-interface);
   --recipe-interface-body-size: 14px;
   --recipe-interface-body-weight: 400;
   --recipe-interface-body-line-height: 1.55;
 
-  --recipe-interface-meta-family: var(--ui);
+  --recipe-interface-meta-family: var(--font-interface);
   --recipe-interface-meta-size: 12px;
   --recipe-interface-meta-weight: 400;
   --recipe-interface-meta-line-height: 1.4;
 
-  --recipe-problem-card-title-family: var(--editorial);
+  --recipe-problem-card-title-family: var(--font-reading);
   --recipe-problem-card-title-size: 15px;
   --recipe-problem-card-title-size-compact: 14px;
   --recipe-problem-card-title-weight: 400;
   --recipe-problem-card-title-line-height: 1.45;
 
-  --recipe-record-label-family: var(--ui);
+  --recipe-record-label-family: var(--font-interface);
   --recipe-record-label-size: 14px;
   --recipe-record-label-weight: 600;
   --recipe-record-label-line-height: 1.35;
 
-  --recipe-editorial-intro-family: var(--editorial);
+  --recipe-editorial-intro-family: var(--font-reading);
   --recipe-editorial-intro-size: 22px;
   --recipe-editorial-intro-size-compact: 17px;
   --recipe-editorial-intro-weight: 400;
   --recipe-editorial-intro-line-height: 1.55;
 
-  --recipe-editorial-body-family: var(--editorial);
+  --recipe-editorial-body-family: var(--font-reading);
   --recipe-editorial-body-size: 17px;
   --recipe-editorial-body-weight: 400;
   --recipe-editorial-body-line-height: 1.6;
 
-  --recipe-editorial-h1-family: var(--editorial);
+  --recipe-editorial-h1-family: var(--font-reading);
   --recipe-editorial-h1-size: 25px;
   --recipe-editorial-h1-size-compact: 17px;
   --recipe-editorial-h1-weight: 600;
   --recipe-editorial-h1-line-height: 1.4;
 
-  --recipe-evidence-hero-family: var(--editorial);
+  --recipe-evidence-hero-family: var(--font-reading);
   --recipe-evidence-hero-size: 17px;
   --recipe-evidence-hero-weight: 400;
   --recipe-evidence-hero-line-height: 1.5;
 
-  --recipe-technical-id-family: var(--technical);
+  --recipe-technical-id-family: var(--font-technical);
   --recipe-technical-id-size: 11px;
   --recipe-technical-id-weight: 400;
   --recipe-technical-id-line-height: 1.3;
 
-  --recipe-technical-field-family: var(--technical);
+  --recipe-technical-field-family: var(--font-technical);
   --recipe-technical-field-size: 13px;
   --recipe-technical-field-weight: 400;
   --recipe-technical-field-line-height: 1.4;
 
-  --recipe-technical-meta-family: var(--technical);
+  --recipe-technical-meta-family: var(--font-technical);
   --recipe-technical-meta-size: 10px;
   --recipe-technical-meta-weight: 400;
   --recipe-technical-meta-line-height: 1.3;
 
-  --recipe-status-family: var(--ui);
+  --recipe-status-family: var(--font-interface);
   --recipe-status-size: 11px;
   --recipe-status-size-standard: 13px;
   --recipe-status-weight: 400;
   --recipe-status-line-height: 1.2;
 
-  --recipe-control-family: var(--ui);
+  --recipe-control-family: var(--font-interface);
   --recipe-control-size: 14px;
   --recipe-control-weight: 400;
   --recipe-control-line-height: 1.2;
 
-  color: var(--ink);
-  background: var(--canvas);
-  font-family: var(--ui);
+  color: var(--color-ink-primary);
+  background: var(--color-surface-reading);
+  font-family: var(--font-interface);
   line-height: 1.55;
 }
 
 body {
   margin: 0;
   min-width: 320px;
-  color: var(--ink);
-  background: var(--canvas);
+  color: var(--color-ink-primary);
+  background: var(--color-surface-reading);
 }
 
 button,
@@ -799,17 +799,17 @@ select {
 button,
 select,
 input {
-  accent-color: var(--accent);
+  accent-color: var(--color-accent);
 }
 
 a {
-  color: var(--accent-dark);
+  color: var(--color-accent-hover);
   text-underline-offset: 0.16em;
   text-decoration-thickness: 1px;
 }
 
 a:hover {
-  color: var(--accent);
+  color: var(--color-accent);
 }
 
 main.explorer-shell {
@@ -823,7 +823,7 @@ main.explorer-shell {
   min-height: 48px;
   margin: 0 -2rem;
   padding: 0 2rem;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-separator-standard);
 }
 
 /* Shared desktop outer-frame primitive (UX-C): width + centering only, no
@@ -857,18 +857,18 @@ main.explorer-shell {
   align-items: baseline;
   gap: 0.42rem;
   margin: 0;
-  font-family: var(--ui);
+  font-family: var(--font-interface);
   font-size: 0.95rem;
   letter-spacing: -0.01em;
 }
 
 .explorer-brand {
-  color: var(--ink);
+  color: var(--color-ink-primary);
   font-weight: 700;
 }
 
 .explorer-subtitle {
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-size: 0.85rem;
   font-weight: 400;
   letter-spacing: 0;
@@ -878,9 +878,9 @@ main.explorer-shell {
   max-width: 58rem;
   margin: 1.5rem auto 0;
   padding-top: 0.85rem;
-  border-top: 1px solid var(--line-subtle);
-  color: var(--ink-faint);
-  font-family: var(--technical);
+  border-top: 1px solid var(--color-separator-faint);
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
   font-size: 0.72rem;
 }
 
@@ -899,19 +899,19 @@ main.explorer-shell {
   align-items: center;
   min-height: 42px;
   padding: 0.55rem 1rem;
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   border: 0;
   border-radius: 0;
   font-size: 0.88rem;
 }
 
 .explorer-navigation button:hover {
-  color: var(--ink);
-  background: var(--surface-muted);
+  color: var(--color-ink-primary);
+  background: var(--color-surface-subtle);
 }
 
 .explorer-navigation button[aria-disabled="true"] {
-  color: var(--ink-faintest);
+  color: var(--color-ink-faint);
   cursor: not-allowed;
   opacity: 0.72;
 }
@@ -921,7 +921,7 @@ main.explorer-shell {
 }
 
 .explorer-navigation button[aria-current="page"] {
-  color: var(--ink);
+  color: var(--color-ink-primary);
   border-color: transparent;
   font-weight: 650;
 }
@@ -932,30 +932,30 @@ main.explorer-shell {
   bottom: 0;
   left: 1rem;
   height: 2px;
-  background: var(--accent);
+  background: var(--color-accent);
   content: "";
 }
 
 .skip-link {
-  background: var(--surface);
-  color: var(--ink);
-  border-color: var(--accent);
+  background: var(--color-surface-raised);
+  color: var(--color-ink-primary);
+  border-color: var(--color-accent);
 }
 
 .reading-guide {
   max-width: 68rem;
-  margin: var(--space-4) auto 1.5rem;
-  border: 1px solid var(--line-subtle);
+  margin: var(--space-standard) auto 1.5rem;
+  border: 1px solid var(--color-separator-faint);
   border-radius: 0.25rem;
   background: transparent;
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   padding: 0.4rem 0.7rem;
   font-size: 0.82rem;
 }
 
 .reading-guide summary,
 .overview-status-explanation summary {
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-weight: 650;
 }
 
@@ -978,8 +978,8 @@ main.explorer-shell {
 .overview-introduction {
   max-width: 43rem;
   margin: 0 0 0.8rem;
-  color: var(--ink);
-  font-family: var(--editorial);
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
   font-size: clamp(1.15rem, 2.4vw, 1.45rem);
   line-height: 1.55;
 }
@@ -987,7 +987,7 @@ main.explorer-shell {
 .overview-introduction + p {
   max-width: 42rem;
   margin: 0;
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-size: 0.97rem;
 }
 
@@ -1000,21 +1000,21 @@ main.explorer-shell {
 .overview-status-explanation {
   box-sizing: border-box;
   max-width: none;
-  border-color: var(--line);
+  border-color: var(--color-separator-standard);
   border-radius: 0.3rem;
-  background: var(--surface-muted);
+  background: var(--color-surface-subtle);
 }
 
 .overview-independence {
   margin: 0;
   padding: 0.48rem 0.75rem;
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-size: 0.78rem;
   line-height: 1.45;
 }
 
 .overview-independence strong {
-  color: var(--ink);
+  color: var(--color-ink-primary);
 }
 
 .overview-primary-actions {
@@ -1047,20 +1047,20 @@ main.explorer-shell {
   gap: 1.5rem;
   margin: 0 0 1.25rem;
   padding: 1.5rem 0;
-  border-top: 1px solid var(--line-subtle);
-  border-bottom: 1px solid var(--line-subtle);
+  border-top: 1px solid var(--color-separator-faint);
+  border-bottom: 1px solid var(--color-separator-faint);
 }
 
 .overview-concepts h3 {
   margin: 0 0 0.35rem;
-  color: var(--ink);
-  font-family: var(--editorial);
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
   font-size: 1.05rem;
   font-weight: 600;
 }
 
 .overview-concepts p {
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-size: 0.86rem;
   line-height: 1.55;
 }
@@ -1070,13 +1070,13 @@ main.explorer-shell {
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-size: 0.85rem;
   line-height: 1.6;
 }
 
 .overview-trust strong {
-  color: var(--ink);
+  color: var(--color-ink-primary);
 }
 
 .overview-status-explanation {
@@ -1086,7 +1086,7 @@ main.explorer-shell {
 }
 
 .overview-status-explanation p {
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
 }
 
 .overview-problems-heading {
@@ -1095,7 +1095,7 @@ main.explorer-shell {
 
 .overview-problems-heading h3 {
   margin: 0;
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-size: 0.77rem;
   font-weight: 700;
   letter-spacing: 0.055em;
@@ -1104,7 +1104,7 @@ main.explorer-shell {
 
 .overview-problems-heading p {
   margin: 0;
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-size: 0.75rem;
 }
 
@@ -1117,29 +1117,29 @@ main.explorer-shell {
   align-items: center;
   margin: 0;
   padding: 0.85rem 1rem;
-  border-color: var(--line);
+  border-color: var(--color-separator-standard);
   border-radius: 0.3rem;
   background: transparent;
 }
 
 .overview-problem-list li:hover {
   border-color: #bbb3a3;
-  background: var(--surface);
+  background: var(--color-surface-raised);
 }
 
 .overview-problem-list code,
 .technical-id {
   padding: 0;
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   background: none;
-  font-family: var(--technical);
+  font-family: var(--font-technical);
   font-size: 0.68rem;
 }
 
 .overview-problem-list h4 {
   margin: 0.22rem 0 0;
-  color: var(--ink);
-  font-family: var(--editorial);
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
   font-size: 1rem;
   font-weight: 400;
   font-synthesis: none;
@@ -1151,8 +1151,8 @@ main.explorer-shell {
   gap: 0;
   margin: 0;
   padding: 0.16rem 0.42rem;
-  color: var(--ink-soft);
-  border: 1px solid var(--line);
+  color: var(--color-ink-secondary);
+  border: 1px solid var(--color-separator-standard);
   border-radius: 0.18rem;
   font-size: 0.7rem;
   line-height: 1.35;
@@ -1170,7 +1170,7 @@ main.explorer-shell {
 .overview-problem-action button {
   min-height: auto;
   padding: 0.25rem 0;
-  color: var(--accent-dark);
+  color: var(--color-accent-hover);
   border: 0;
   background: transparent;
   font-size: 0.78rem;
@@ -1179,7 +1179,7 @@ main.explorer-shell {
 }
 
 .overview-problem-action button:hover {
-  color: var(--accent);
+  color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 0.16em;
 }
@@ -1187,12 +1187,12 @@ main.explorer-shell {
 .overview-closing-actions {
   margin: 1.25rem 0 0;
   padding-top: 1rem;
-  border-top: 1px solid var(--line-subtle);
+  border-top: 1px solid var(--color-separator-faint);
 }
 
 .overview-closing-actions button {
   padding: 0;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   border: 0;
   background: transparent;
   font-size: 0.86rem;
@@ -1201,15 +1201,15 @@ main.explorer-shell {
 }
 
 .overview-closing-actions button:hover {
-  color: var(--accent-dark);
+  color: var(--color-accent-hover);
   text-decoration: underline;
   text-underline-offset: 0.16em;
 }
 
 .overview-corpus-context {
   margin: 1.4rem 0 0;
-  color: var(--ink-faint);
-  font-family: var(--technical);
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
   font-size: 0.68rem;
 }
 
@@ -1235,14 +1235,14 @@ main.explorer-shell {
   gap: 0.75rem;
   margin-bottom: 0.7rem;
   padding: 0.9rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-separator-standard);
   border-radius: 0.3rem;
-  background: var(--surface-muted);
+  background: var(--color-surface-subtle);
 }
 
 .records-controls label {
   margin-bottom: 0.28rem;
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-size: 0.73rem;
   font-weight: 650;
 }
@@ -1252,10 +1252,10 @@ main.explorer-shell {
   box-sizing: border-box;
   min-height: 38px;
   padding: 0.4rem 0.55rem;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   border: 1px solid #beb7aa;
   border-radius: 0.22rem;
-  background: var(--surface);
+  background: var(--color-surface-raised);
 }
 
 .records-controls input {
@@ -1264,13 +1264,13 @@ main.explorer-shell {
 
 .records-controls input:focus,
 .records-controls select:focus {
-  border-color: var(--accent);
+  border-color: var(--color-accent);
 }
 
 .records-result-count {
   flex: 1 0 100%;
   margin: 0;
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-size: 0.78rem;
 }
 
@@ -1280,7 +1280,7 @@ main.explorer-shell {
   align-items: center;
   gap: 0.25rem;
   margin: 0 0 0.45rem;
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-size: 0.72rem;
 }
 
@@ -1291,7 +1291,7 @@ main.explorer-shell {
 .records-sort-controls button {
   min-height: 28px;
   padding: 0.18rem 0.42rem;
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   border: 1px solid transparent;
   border-radius: 0.2rem;
   background: transparent;
@@ -1300,16 +1300,16 @@ main.explorer-shell {
 
 .records-sort-controls button:hover,
 .records-sort-controls button[aria-pressed="true"] {
-  color: var(--ink);
-  border-color: var(--line);
-  background: var(--surface-muted);
+  color: var(--color-ink-primary);
+  border-color: var(--color-separator-standard);
+  background: var(--color-surface-subtle);
 }
 
 .desktop-records-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--color-separator-standard);
 }
 
 .desktop-record-row {
@@ -1319,9 +1319,9 @@ main.explorer-shell {
   width: 100%;
   min-height: 54px;
   padding: 0.62rem 0.55rem;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   border: 0;
-  border-bottom: 1px solid var(--line-subtle);
+  border-bottom: 1px solid var(--color-separator-faint);
   background: transparent;
   font: inherit;
   text-align: left;
@@ -1329,18 +1329,18 @@ main.explorer-shell {
 }
 
 .desktop-record-row:hover {
-  background: var(--surface);
+  background: var(--color-surface-raised);
 }
 
 .desktop-record-row[aria-pressed="true"] {
   background: #f0f5f3;
-  box-shadow: inset 3px 0 0 var(--accent);
+  box-shadow: inset 3px 0 0 var(--color-accent);
 }
 
 .desktop-record-type {
   flex: 0 0 3.6rem;
-  color: var(--ink-soft);
-  font-family: var(--technical);
+  color: var(--color-ink-secondary);
+  font-family: var(--font-technical);
   font-size: 0.68rem;
 }
 
@@ -1351,7 +1351,7 @@ main.explorer-shell {
 
 .desktop-record-label {
   display: block;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   font-size: 0.9rem;
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -1360,33 +1360,33 @@ main.explorer-shell {
 .desktop-record-id {
   display: block;
   margin-top: 0.12rem;
-  color: var(--ink-faint);
-  font-family: var(--technical);
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
   font-size: 0.68rem;
 }
 
 .desktop-record-chevron {
   flex: 0 0 auto;
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-size: 1.2rem;
 }
 
 .records-table table {
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--color-separator-standard);
+  border-bottom: 1px solid var(--color-separator-standard);
 }
 
 .records-table th,
 .records-table td {
   padding: 0.6rem 0.7rem;
   border: 0;
-  border-bottom: 1px solid var(--line-subtle);
+  border-bottom: 1px solid var(--color-separator-faint);
   vertical-align: top;
 }
 
 .records-table th {
-  color: var(--ink-soft);
-  background: var(--surface-muted);
+  color: var(--color-ink-secondary);
+  background: var(--color-surface-subtle);
   font-size: 0.73rem;
   font-weight: 700;
   letter-spacing: 0.025em;
@@ -1400,62 +1400,62 @@ main.explorer-shell {
 .records-table tbody td:nth-child(1),
 .records-table tbody td:nth-child(2),
 .records-table tbody td:nth-child(4) {
-  color: var(--ink-faint);
-  font-family: var(--technical);
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
   font-size: 0.72rem;
 }
 
 .records-table tbody td:nth-child(3) {
-  color: var(--ink);
+  color: var(--color-ink-primary);
   font-size: 0.88rem;
   line-height: 1.42;
 }
 
 .records-table tbody tr:hover {
-  background: var(--surface);
+  background: var(--color-surface-raised);
 }
 
 .records-table tr[aria-selected="true"] {
-  outline-color: var(--accent);
+  outline-color: var(--color-accent);
   background: #f0f5f3;
 }
 
 .records-pagination {
   justify-content: flex-start;
   margin-top: 0.85rem;
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-size: 0.78rem;
 }
 
 .records-pagination button {
   min-height: 36px;
   padding: 0.35rem 0.7rem;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   border: 1px solid #beb7aa;
   border-radius: 0.22rem;
-  background: var(--surface);
+  background: var(--color-surface-raised);
   cursor: pointer;
 }
 
 .records-pagination button:disabled {
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   cursor: not-allowed;
   opacity: 0.72;
 }
 
 .narrow-records-list {
-  border-top-color: var(--line);
+  border-top-color: var(--color-separator-standard);
 }
 
 .narrow-record-row {
   gap: 0.625rem;
   min-height: 44px;
   padding: 0.8rem 0;
-  border-bottom-color: var(--line-subtle);
+  border-bottom-color: var(--color-separator-faint);
 }
 
 .narrow-record-row:hover {
-  background: var(--surface);
+  background: var(--color-surface-raised);
 }
 
 .narrow-record-row[aria-pressed="true"] {
@@ -1465,31 +1465,31 @@ main.explorer-shell {
 
 .narrow-record-type {
   padding: 0.125rem 0.32rem;
-  color: var(--ink-soft);
-  border-color: var(--line);
-  background: var(--surface-muted);
+  color: var(--color-ink-secondary);
+  border-color: var(--color-separator-standard);
+  background: var(--color-surface-subtle);
   font-size: 0.625rem;
 }
 
 .narrow-record-label {
-  color: var(--ink);
+  color: var(--color-ink-primary);
   font-size: 0.875rem;
   line-height: 1.35;
 }
 
 .narrow-record-id {
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-size: 0.6875rem;
   margin-top: 0.1875rem;
 }
 
 .narrow-record-chevron {
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-size: 1.2rem;
 }
 
 :focus-visible {
-  outline-color: var(--accent);
+  outline-color: var(--color-accent);
 }
 
 /* V2: Record Detail (design-system.md §1/§2 — desktop composition is the
@@ -1514,11 +1514,11 @@ main.explorer-shell {
 .detail-breadcrumb {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  margin: var(--space-6) 0;
+  gap: var(--space-tight);
+  margin: var(--space-loose) 0;
   font-family: var(--recipe-technical-field-family);
   font-size: 13px;
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
 }
 
 /* DS-05E remediation F1: the migrated generic Breadcrumb callers
@@ -1531,7 +1531,7 @@ main.explorer-shell {
 .record-detail-layout > .ui-breadcrumb > button,
 .problem-view > .ui-breadcrumb > button {
   padding: 0;
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   border: 0;
   background: none;
   font: inherit;
@@ -1541,7 +1541,7 @@ main.explorer-shell {
 .detail-breadcrumb button:hover,
 .record-detail-layout > .ui-breadcrumb > button:hover,
 .problem-view > .ui-breadcrumb > button:hover {
-  color: var(--accent);
+  color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 0.16em;
 }
@@ -1549,20 +1549,20 @@ main.explorer-shell {
 /* DS-05E: the generic ui-breadcrumb.css recipe carries no vertical
    placement of its own (component-model.md §4.3 "Breadcrumb": caller
    supplies navigation content, never layout placement) — production's own
-   `var(--space-6) 0` breadcrumb placement, previously baked into
+   `var(--space-loose) 0` breadcrumb placement, previously baked into
    `.detail-breadcrumb`/`.detail-breadcrumb-current` above, is preserved here
    at the page-composition level, scoped to the narrowest existing Record
    Detail / Problem View / Problem History root selectors that now render the
    shared `Breadcrumb` component as their first child. */
 .record-detail-layout > .ui-breadcrumb,
 .problem-view > .ui-breadcrumb {
-  margin: var(--space-6) 0;
+  margin: var(--space-loose) 0;
 }
 
 @media (max-width: 767px) {
   .record-detail-layout > .ui-breadcrumb,
   .problem-view > .ui-breadcrumb {
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-standard);
   }
 }
 
@@ -1574,16 +1574,16 @@ main.explorer-shell {
    retired; production JSX now carries `.lyt-reading`/`.lyt-reading-rail`. */
 
 .detail-rail-type-note {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  padding: var(--space-4);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  background: var(--color-surface-raised);
+  padding: var(--space-standard);
 }
 
 .detail-rail-type-note code {
   display: block;
-  margin-bottom: var(--space-2);
-  color: var(--ink-faintest);
+  margin-bottom: var(--space-tight);
+  color: var(--color-ink-faint);
   background: none;
   font-family: var(--recipe-technical-id-family);
   font-size: var(--recipe-technical-id-size);
@@ -1591,7 +1591,7 @@ main.explorer-shell {
 
 .detail-rail-type-note p {
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -1599,51 +1599,51 @@ main.explorer-shell {
 .detail-rail-actions {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-tight);
 }
 
 .detail-rail-actions button {
   display: block;
   width: 100%;
-  min-height: var(--tap-min);
-  padding: var(--space-2) var(--space-3);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
+  min-height: var(--target-min);
+  padding: var(--space-tight) var(--space-3);
+  color: var(--color-ink-primary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
   font-size: 13px;
   text-align: left;
   cursor: pointer;
 }
 
 .detail-rail-actions button:hover {
-  border-color: var(--accent);
-  color: var(--accent-dark);
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
 }
 
 .detail-rail-actions a {
   display: block;
-  min-height: var(--tap-min);
-  padding: var(--space-2) var(--space-3);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
+  min-height: var(--target-min);
+  padding: var(--space-tight) var(--space-3);
+  color: var(--color-ink-primary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
   font-size: 13px;
   text-decoration: none;
 }
 
 .detail-rail-actions a:hover {
-  border-color: var(--accent);
-  color: var(--accent-dark);
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
   text-decoration: underline;
   text-underline-offset: 0.16em;
 }
 
 .detail-rail-file {
   display: block;
-  padding: var(--space-2) var(--space-3);
-  color: var(--ink-faint);
+  padding: var(--space-tight) var(--space-3);
+  color: var(--color-ink-muted);
   font-family: var(--recipe-technical-meta-family);
   font-size: 12px;
   overflow-wrap: anywhere;
@@ -1653,12 +1653,12 @@ main.explorer-shell {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2);
-  margin: 0 0 var(--space-4);
+  gap: var(--space-tight);
+  margin: 0 0 var(--space-standard);
 }
 
 .detail-type-kind {
-  color: var(--ink-faintest);
+  color: var(--color-ink-faint);
   font-family: var(--recipe-technical-id-family);
   font-size: var(--recipe-technical-id-size);
 }
@@ -1673,8 +1673,8 @@ main.explorer-shell {
   font-size: var(--recipe-editorial-intro-size);
   font-weight: var(--recipe-editorial-intro-weight);
   line-height: var(--recipe-editorial-intro-line-height);
-  color: var(--ink);
-  margin: 0 0 var(--space-4);
+  color: var(--color-ink-primary);
+  margin: 0 0 var(--space-standard);
 }
 
 .record-detail-main .record-role-fields {
@@ -1683,15 +1683,15 @@ main.explorer-shell {
 }
 
 .detail-effect-target {
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-size: 13px;
 }
 
 .record-detail-main .record-provenance {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface-muted);
-  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  background: var(--color-surface-subtle);
+  padding: var(--space-standard) var(--space-loose);
   margin: 0 0 var(--space-8);
 }
 
@@ -1704,9 +1704,9 @@ main.explorer-shell {
 .record-prb-canonical-state,
 .record-prb-inspector,
 .record-prb-references {
-  margin: 0 0 var(--space-6);
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--line);
+  margin: 0 0 var(--space-loose);
+  padding-top: var(--space-loose);
+  border-top: 1px solid var(--color-separator-standard);
 }
 
 .record-prb-metadata {
@@ -1721,14 +1721,14 @@ main.explorer-shell {
 }
 
 .inspector-field {
-  padding: var(--space-2) 0;
-  border-top: 1px solid var(--line);
+  padding: var(--space-tight) 0;
+  border-top: 1px solid var(--color-separator-standard);
 }
 
 .inspector-field-name {
   font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
   font-size: 0.85rem;
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
 }
 
 .inspector-field-value {
@@ -1737,7 +1737,7 @@ main.explorer-shell {
 
 .inspector-object,
 .inspector-array {
-  margin: 0 0 0 var(--space-4);
+  margin: 0 0 0 var(--space-standard);
   padding: 0;
 }
 
@@ -1748,19 +1748,19 @@ main.explorer-shell {
 .inspector-key {
   font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
   font-size: 0.85rem;
-  color: var(--ink-faint);
-  margin-top: var(--space-2);
+  color: var(--color-ink-muted);
+  margin-top: var(--space-tight);
 }
 
 .inspector-index {
   font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
   font-size: 0.8rem;
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
 }
 
 .inspector-null,
 .inspector-empty {
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-style: italic;
 }
 
@@ -1772,7 +1772,7 @@ main.explorer-shell {
   font-family: var(--recipe-interface-body-family);
   font-size: var(--recipe-interface-body-size);
   line-height: var(--recipe-interface-body-line-height);
-  color: var(--ink);
+  color: var(--color-ink-primary);
 }
 
 /* RD-01C: PRB canonical references — one compact row per exact canonical
@@ -1796,15 +1796,15 @@ main.explorer-shell {
   align-items: baseline;
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-3);
-  padding: var(--space-2) 0;
-  border-top: 1px solid var(--line);
+  padding: var(--space-tight) 0;
+  border-top: 1px solid var(--color-separator-standard);
   min-width: 0;
 }
 
 .prb-reference-path {
   font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
   font-size: 0.85rem;
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -1822,7 +1822,7 @@ main.explorer-shell {
 
 .detail-panel-label {
   margin: 0 0 var(--space-3);
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-family: var(--recipe-section-label-family);
   font-size: var(--recipe-section-label-size);
   font-weight: var(--recipe-section-label-weight);
@@ -1840,42 +1840,42 @@ main.explorer-shell {
 .record-prb-references > .detail-panel-label,
 .record-detail-relations > .detail-panel-label,
 .record-provenance > .detail-panel-label {
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-weight: 700;
 }
 
 .detail-provenance-grid {
   display: grid;
   grid-template-columns: 130px 1fr;
-  row-gap: var(--space-2);
-  column-gap: var(--space-4);
+  row-gap: var(--space-tight);
+  column-gap: var(--space-standard);
   margin: 0;
   font-size: 14px;
 }
 
 .detail-provenance-grid dt {
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
 }
 
 .detail-provenance-grid dd {
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink-primary);
 }
 
 .detail-technical-field {
   font-family: var(--recipe-technical-field-family);
   font-size: var(--recipe-technical-field-size);
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
 }
 
 .record-detail-technical {
-  margin: 0 0 var(--space-2);
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--line);
+  margin: 0 0 var(--space-tight);
+  padding-top: var(--space-loose);
+  border-top: 1px solid var(--color-separator-standard);
 }
 
 .record-detail-technical .technical-disclosure summary {
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-family: var(--recipe-section-label-family);
   font-size: var(--recipe-section-label-size);
   font-weight: var(--recipe-section-label-weight);
@@ -1884,8 +1884,8 @@ main.explorer-shell {
 }
 
 .technical-disclosure-caption {
-  margin: var(--space-2) 0 var(--space-4);
-  color: var(--ink-faint);
+  margin: var(--space-tight) 0 var(--space-standard);
+  color: var(--color-ink-muted);
   font-size: 13px;
 }
 
@@ -1893,7 +1893,7 @@ main.explorer-shell {
    framing Record Detail as an auditability surface (not editorial content). */
 .record-orientation-intro {
   margin: var(--space-1) 0 var(--space-3);
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-family: var(--recipe-interface-body-family);
   font-size: var(--recipe-interface-body-size);
   line-height: var(--recipe-interface-body-line-height);
@@ -1902,24 +1902,24 @@ main.explorer-shell {
 /* UX-E bounded quick-read: reuses the .record-provenance box treatment so
    it reads as the same family of "compact canonical summary" surface. */
 .record-quick-read {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface-muted);
-  padding: var(--space-4) var(--space-5);
-  margin: 0 0 var(--space-6);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  background: var(--color-surface-subtle);
+  padding: var(--space-standard) var(--space-loose);
+  margin: 0 0 var(--space-loose);
 }
 
 .record-quick-read-title {
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-tight);
   font-weight: 600;
-  color: var(--ink);
+  color: var(--color-ink-primary);
 }
 
 .record-quick-read-grid {
   display: grid;
   grid-template-columns: 160px 1fr;
-  row-gap: var(--space-2);
-  column-gap: var(--space-4);
+  row-gap: var(--space-tight);
+  column-gap: var(--space-standard);
   margin: 0;
   font-size: 14px;
 }
@@ -1929,12 +1929,12 @@ main.explorer-shell {
 }
 
 .record-quick-read-item dt {
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
 }
 
 .record-quick-read-item dd {
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink-primary);
 }
 
 .record-quick-read-relations {
@@ -1951,24 +1951,24 @@ main.explorer-shell {
   background: none;
   border: none;
   padding: 0;
-  color: var(--accent-dark);
+  color: var(--color-accent-hover);
   cursor: pointer;
   text-decoration: underline;
   font: inherit;
 }
 
 .record-quick-read-relations button:hover {
-  color: var(--accent);
+  color: var(--color-accent);
 }
 
 .record-detail-relations {
   margin-top: var(--space-8);
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--line);
+  padding-top: var(--space-loose);
+  border-top: 1px solid var(--color-separator-standard);
 }
 
 .record-detail-relations .relationship-paths {
-  margin: var(--space-1) 0 var(--space-3) var(--space-5);
+  margin: var(--space-1) 0 var(--space-3) var(--space-loose);
 }
 
 .record-detail-relations .relationship-paths code {
@@ -1982,8 +1982,8 @@ main.explorer-shell {
    sections read as distinct kinds of list rather than duplicates of each
    other. */
 .record-prb-relations-boundary h4 {
-  margin: var(--space-4) 0 var(--space-2);
-  color: var(--ink-faint);
+  margin: var(--space-standard) 0 var(--space-tight);
+  color: var(--color-ink-muted);
   font-family: var(--recipe-section-label-family);
   font-size: 0.8rem;
   font-weight: 600;
@@ -2009,7 +2009,7 @@ main.explorer-shell {
   background: none;
   border: none;
   padding: 0;
-  color: var(--accent-dark);
+  color: var(--color-accent-hover);
   cursor: pointer;
   text-decoration: underline;
   font: inherit;
@@ -2017,7 +2017,7 @@ main.explorer-shell {
 }
 
 .prb-relations-list button:hover {
-  color: var(--accent);
+  color: var(--color-accent);
 }
 
 /* Compact-only substitute for the desktop reading rail's "Nesta página"
@@ -2053,14 +2053,14 @@ main.explorer-shell {
 
 /* DS-05H remediation F1: before DS-05H, Source/EVD compact indexes rendered
    the legacy records/CompactSectionIndex, whose root also carried
-   `.problem-help`'s `margin: 0 0 var(--space-6)` — the deliberate separation
+   `.problem-help`'s `margin: 0 0 var(--space-loose)` — the deliberate separation
    from the following Source/EVD content. The canonical
    presentation/CompactSectionIndex deliberately owns `margin: 0` instead
    (generic recipe, no composition spacing), so that separation must be
    restored here at the domain-owned wrapper, not on the generic component. */
 .source-compact-section-index,
 .evd-compact-section-index {
-  margin: 0 0 var(--space-6);
+  margin: 0 0 var(--space-loose);
 }
 
 /* SUI-03K3: "Abrir fonte original" desktop-rail copy vs. compact in-flow
@@ -2120,7 +2120,7 @@ main.explorer-shell {
     z-index: 1;
     margin: 0 -1rem;
     padding: 0;
-    background: var(--canvas);
+    background: var(--color-surface-reading);
   }
 
   .explorer-chrome-inner {
@@ -2133,7 +2133,7 @@ main.explorer-shell {
   .explorer-chrome-inner > h1 {
     min-height: 1rem;
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--color-separator-standard);
     font-size: 0.8125rem;
   }
 
@@ -2234,7 +2234,7 @@ main.explorer-shell {
   .overview-status-explanation p.overview-mobile-copy {
     display: block;
     margin: 0.55rem 0 0;
-    color: var(--ink-soft);
+    color: var(--color-ink-secondary);
     font-size: 0.75rem;
     line-height: 1.5;
   }
@@ -2340,7 +2340,7 @@ main.explorer-shell {
      `-rail` compact rules in styles/reading-layout.css; only the
      domain-owned compact typography override remains here. */
   .detail-breadcrumb {
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-standard);
     font-size: 12px;
   }
 
@@ -2354,7 +2354,7 @@ main.explorer-shell {
   }
 
   .detail-provenance-grid dt {
-    margin-top: var(--space-2);
+    margin-top: var(--space-tight);
   }
 }
 
@@ -2372,26 +2372,26 @@ main.explorer-shell {
    sizing lives here; compact overrides are in the 767px media query below.
    No shadows — separation comes from 1px borders and surface steps only. */
 .problem-view {
-  padding-bottom: var(--space-9);
+  padding-bottom: var(--space-section);
 }
 
 .context-tabs {
   box-sizing: border-box;
   display: inline-flex;
   gap: 0;
-  margin: var(--space-3) 0 var(--space-6);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  margin: var(--space-3) 0 var(--space-loose);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
   overflow: hidden;
 }
 
 .context-tabs button {
   padding: 7px 14px;
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   border: 0;
-  border-right: 1px solid var(--line);
+  border-right: 1px solid var(--color-separator-standard);
   background: none;
-  font-family: var(--ui);
+  font-family: var(--font-interface);
   font-size: 13px;
   cursor: pointer;
 }
@@ -2402,12 +2402,12 @@ main.explorer-shell {
 }
 
 .context-tabs button:hover {
-  color: var(--ink);
-  background: var(--surface-muted);
+  color: var(--color-ink-primary);
+  background: var(--color-surface-subtle);
 }
 
 .context-tabs button[aria-disabled="true"] {
-  color: var(--ink-faintest);
+  color: var(--color-ink-faint);
   cursor: not-allowed;
   opacity: 0.72;
 }
@@ -2417,8 +2417,8 @@ main.explorer-shell {
 }
 
 .context-tabs button[aria-current="page"] {
-  color: var(--canvas);
-  background: var(--ink);
+  color: var(--color-surface-reading);
+  background: var(--color-ink-primary);
   font-weight: 600;
   cursor: default;
 }
@@ -2440,10 +2440,10 @@ main.explorer-shell {
   transform: translate(-50%, 4px);
   z-index: 1;
   padding: 3px 8px;
-  color: var(--canvas);
-  background: var(--ink);
+  color: var(--color-surface-reading);
+  background: var(--color-ink-primary);
   border-radius: var(--radius-sm);
-  font-family: var(--ui);
+  font-family: var(--font-interface);
   font-size: 12px;
   line-height: 1.4;
   white-space: nowrap;
@@ -2464,16 +2464,16 @@ main.explorer-shell {
    treatment only by placement (top of Problem View), not by a different
    interaction model. */
 .problem-help {
-  margin: 0 0 var(--space-6);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface-muted);
-  padding: var(--space-3) var(--space-4);
+  margin: 0 0 var(--space-loose);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  background: var(--color-surface-subtle);
+  padding: var(--space-3) var(--space-standard);
 }
 
 .problem-help summary {
-  color: var(--ink-soft);
-  font-family: var(--ui);
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -2481,32 +2481,32 @@ main.explorer-shell {
 
 .problem-help-content {
   margin-top: var(--space-3);
-  color: var(--ink-soft);
+  color: var(--color-ink-secondary);
   font-size: 13px;
   line-height: 1.65;
 }
 
 .problem-help-content p {
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-tight);
 }
 
 .problem-identity {
-  border: 1px solid var(--line-emphasis);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5) var(--space-6);
-  margin: 0 0 var(--space-6);
+  border: 1px solid var(--color-separator-emphasis);
+  border-radius: var(--radius-surface);
+  padding: var(--space-loose) var(--space-loose);
+  margin: 0 0 var(--space-loose);
 }
 
 .problem-identity-id {
-  margin-bottom: var(--space-2);
-  color: var(--ink-faintest);
+  margin-bottom: var(--space-tight);
+  color: var(--color-ink-faint);
   font-family: var(--recipe-technical-id-family);
   font-size: var(--recipe-technical-id-size);
 }
 
 .problem-identity-title {
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   font-family: var(--recipe-editorial-h1-family);
   font-size: var(--recipe-editorial-h1-size);
   font-weight: var(--recipe-editorial-h1-weight);
@@ -2515,7 +2515,7 @@ main.explorer-shell {
 
 .problem-file-path {
   margin: 0 0 var(--space-8);
-  color: var(--ink-faintest);
+  color: var(--color-ink-faint);
   font-family: var(--recipe-technical-meta-family);
   font-size: 11px;
 }
@@ -2546,33 +2546,33 @@ main.explorer-shell {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-tight);
 }
-.evd-type-row { margin-bottom: var(--space-4); }
-.evd-secondary-id { color: var(--ink-faintest); font-family: var(--recipe-technical-meta-family); font-size: 11px; }
-.evd-identity h1 { margin: 0; color: var(--ink); font-family: var(--recipe-editorial-h1-family); font-size: var(--recipe-editorial-h1-size); font-weight: var(--recipe-editorial-h1-weight); line-height: var(--recipe-editorial-h1-line-height); }
-.evd-identity-facts { margin-top: var(--space-4); color: var(--ink-soft); font-size: 12px; }
-.evd-identity-fact { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: var(--space-1) var(--space-2); background: var(--surface); font-family: var(--ui); }
-.evd-identity-facts b { color: var(--ink); }
-.evd-scope-grid small { display: block; margin-top: 2px; color: var(--ink-faintest); font-size: 12px; }
-.evd-limits { margin: 0; padding: 0; border-top: 1px solid var(--line); color: var(--ink); list-style: none; }
-.evd-limits li { position: relative; padding: var(--space-3) 0 var(--space-3) var(--space-5); border-bottom: 1px solid var(--line); line-height: 1.6; }
-.evd-limits li::before { position: absolute; left: 0; color: var(--ink-faintest); content: "—"; }
+.evd-type-row { margin-bottom: var(--space-standard); }
+.evd-secondary-id { color: var(--color-ink-faint); font-family: var(--recipe-technical-meta-family); font-size: 11px; }
+.evd-identity h1 { margin: 0; color: var(--color-ink-primary); font-family: var(--recipe-editorial-h1-family); font-size: var(--recipe-editorial-h1-size); font-weight: var(--recipe-editorial-h1-weight); line-height: var(--recipe-editorial-h1-line-height); }
+.evd-identity-facts { margin-top: var(--space-standard); color: var(--color-ink-secondary); font-size: 12px; }
+.evd-identity-fact { border: 1px solid var(--color-separator-standard); border-radius: var(--radius-sm); padding: var(--space-1) var(--space-tight); background: var(--color-surface-raised); font-family: var(--font-interface); }
+.evd-identity-facts b { color: var(--color-ink-primary); }
+.evd-scope-grid small { display: block; margin-top: 2px; color: var(--color-ink-faint); font-size: 12px; }
+.evd-limits { margin: 0; padding: 0; border-top: 1px solid var(--color-separator-standard); color: var(--color-ink-primary); list-style: none; }
+.evd-limits li { position: relative; padding: var(--space-3) 0 var(--space-3) var(--space-loose); border-bottom: 1px solid var(--color-separator-standard); line-height: 1.6; }
+.evd-limits li::before { position: absolute; left: 0; color: var(--color-ink-faint); content: "—"; }
 .evd-problem-list, .evd-source-list { list-style: none; margin: 0; padding: 0; }
-.evd-problem-list { display: grid; gap: var(--space-4); }
-.evd-problem-card { border: 1px solid var(--line); border-radius: var(--radius-lg); padding: var(--space-4); }
+.evd-problem-list { display: grid; gap: var(--space-standard); }
+.evd-problem-card { border: 1px solid var(--color-separator-standard); border-radius: var(--radius-surface); padding: var(--space-standard); }
 .evd-problem-heading { margin-bottom: var(--space-tight); }
-.evd-problem-heading code, .evd-source-list code { color: var(--ink-faintest); font-family: var(--recipe-technical-id-family); font-size: 12px; }
-.evd-problem-heading span { color: var(--ink); font-size: 14px; font-weight: 600; }
+.evd-problem-heading code, .evd-source-list code { color: var(--color-ink-faint); font-family: var(--recipe-technical-id-family); font-size: 12px; }
+.evd-problem-heading span { color: var(--color-ink-primary); font-size: 14px; font-weight: 600; }
 .evd-problem-action { margin-top: var(--space-tight); }
 .evd-problem-action, .evd-source-list button { padding: 0; border: 0; background: none; color: var(--link); font: inherit; cursor: pointer; text-align: left; }
-.evd-extracted-at { margin: 0 0 var(--space-3); color: var(--ink-faint); font-size: 13px; }
-.evd-source-list { display: grid; gap: var(--space-2); }
+.evd-extracted-at { margin: 0 0 var(--space-3); color: var(--color-ink-muted); font-size: 13px; }
+.evd-source-list { display: grid; gap: var(--space-tight); }
 
 .problem-statement {
   max-width: none;
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   font-family: var(--recipe-editorial-body-family);
   font-size: var(--recipe-editorial-body-size);
   font-weight: var(--recipe-editorial-body-weight);
@@ -2580,7 +2580,7 @@ main.explorer-shell {
 }
 
 .problem-header-statement {
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-loose);
 }
 
 /* PI-02B header facts (Onde / Quem é afetado / Atualidade / Âmbito) — compact
@@ -2588,15 +2588,15 @@ main.explorer-shell {
    than a new pattern. */
 .problem-header-facts {
   display: grid;
-  gap: var(--space-3) var(--space-6);
+  gap: var(--space-3) var(--space-loose);
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  margin: 0 0 var(--space-5);
+  margin: 0 0 var(--space-loose);
 }
 
 .problem-header-fact dt {
   margin-bottom: 2px;
-  color: var(--ink-faintest);
-  font-family: var(--ui);
+  color: var(--color-ink-faint);
+  font-family: var(--font-interface);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -2604,7 +2604,7 @@ main.explorer-shell {
 
 .problem-header-fact dd {
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -2613,7 +2613,7 @@ main.explorer-shell {
    decision_basis field, no shared card chrome beyond the existing
    .problem-section rhythm. */
 .problem-current-state-item {
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-loose);
 }
 
 .problem-current-state-item:last-child {
@@ -2622,9 +2622,9 @@ main.explorer-shell {
 
 .problem-current-state-item h4,
 .record-editorial-subheading {
-  margin: 0 0 var(--space-2);
-  color: var(--ink-faint);
-  font-family: var(--ui);
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -2633,22 +2633,22 @@ main.explorer-shell {
 
 .problem-current-state-item p {
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   font-size: 14px;
   line-height: 1.6;
 }
 
 .problem-scope-grid {
   display: grid;
-  gap: var(--space-3) var(--space-6);
+  gap: var(--space-3) var(--space-loose);
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   margin: 0;
 }
 
 .problem-scope-item dt {
   margin-bottom: 2px;
-  color: var(--ink-faintest);
-  font-family: var(--ui);
+  color: var(--color-ink-faint);
+  font-family: var(--font-interface);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -2656,7 +2656,7 @@ main.explorer-shell {
 
 .problem-scope-item dd {
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink-primary);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -2666,8 +2666,8 @@ main.explorer-shell {
    reuses the existing .problem-current-state-item labelled-block pattern. */
 .problem-support-statement {
   max-width: none;
-  margin: 0 0 var(--space-5);
-  color: var(--ink);
+  margin: 0 0 var(--space-loose);
+  color: var(--color-ink-primary);
   font-family: var(--recipe-editorial-body-family);
   font-size: var(--recipe-editorial-body-size);
   font-weight: var(--recipe-editorial-body-weight);
@@ -2679,7 +2679,7 @@ main.explorer-shell {
    .evidence-list, no per-group visual ranking beyond the heading text
    itself. */
 .evidence-group {
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-loose);
 }
 
 .evidence-group:last-child {
@@ -2688,8 +2688,8 @@ main.explorer-shell {
 
 .evidence-group h4 {
   margin: 0 0 var(--space-3);
-  color: var(--ink-faint);
-  font-family: var(--ui);
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -2702,13 +2702,13 @@ main.explorer-shell {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-standard);
 }
 
 .evidence-card {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  padding: var(--space-standard);
 }
 
 .evidence-item-header > a,
@@ -2719,20 +2719,20 @@ main.explorer-shell {
 
 .evidence-observation,
 .evidence-provenance {
-  margin: 0 0 var(--space-2);
-  color: var(--ink);
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-primary);
   font-size: 14px;
   line-height: 1.55;
 }
 
 .evidence-provenance {
-  color: var(--ink-faint);
+  color: var(--color-ink-muted);
   font-size: 12px;
 }
 
 .evidence-sources {
-  margin: var(--space-2) 0 0;
-  padding-left: var(--space-5);
+  margin: var(--space-tight) 0 0;
+  padding-left: var(--space-loose);
   font-size: 13px;
 }
 
@@ -2747,18 +2747,18 @@ main.explorer-shell {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-loose);
 }
 
 .open-question-item {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  padding: var(--space-standard);
 }
 
 .open-question-question {
-  margin: 0 0 var(--space-4);
-  color: var(--ink);
+  margin: 0 0 var(--space-standard);
+  color: var(--color-ink-primary);
   font-family: var(--recipe-editorial-body-family);
   font-size: 15px;
   font-weight: 600;
@@ -2766,15 +2766,15 @@ main.explorer-shell {
 }
 
 .open-question-evidence-refs {
-  margin-top: var(--space-4);
+  margin-top: var(--space-standard);
   padding-top: var(--space-3);
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--color-separator-standard);
 }
 
 .open-question-evidence-refs-label {
-  margin-right: var(--space-2);
-  color: var(--ink-faintest);
-  font-family: var(--ui);
+  margin-right: var(--space-tight);
+  color: var(--color-ink-faint);
+  font-family: var(--font-interface);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -2783,7 +2783,7 @@ main.explorer-shell {
 .open-question-evidence-refs-list {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-tight);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -2806,8 +2806,8 @@ main.explorer-shell {
 .status-chip-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
-  margin: 0 0 var(--space-4);
+  gap: var(--space-tight);
+  margin: 0 0 var(--space-standard);
 }
 
 @media (max-width: 767px) {
@@ -2842,7 +2842,7 @@ main.explorer-shell {
   }
 
   .problem-identity {
-    padding: var(--space-4);
+    padding: var(--space-standard);
   }
 
   .evd-identity h1 {
