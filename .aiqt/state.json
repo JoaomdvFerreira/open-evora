@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "projectStatus": "review",
+  "projectStatus": "in_progress",
   "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
@@ -120,6 +120,17 @@
           "WU035",
           "WU036",
           "WU037"
+        ]
+      },
+      {
+        "id": "M011",
+        "title": "AR-04 Knowledge-First Problem Experience",
+        "objective": "Transform the existing public Problem experience from a technically complete canonical projection into a coherent knowledge-first reading experience in which a reader can understand what the problem is, its current lifecycle/investigation state, what the canonical evidence establishes, the important boundaries and limits of that evidence, what remains uncertain or open, the current response/action context where canonical data supports it, and how to inspect the already-linked supporting material when needed, without changing canonical research meaning or inventing conclusions. AR-04 builds on the existing Problem View rather than creating a second Problem product model. It preserves canonical research semantics, existing canonical PRB identity, current routing/deep-link guarantees unless an exact AR-04 problem requires a bounded change, generic/shared component boundaries already established by the design system, M010 owner-frozen DS-04B foundation values, and accessibility and responsive contracts. M010-frozen DS-04B values must not be changed incidentally; any discovered need to change a frozen value is an owner decision, not delegated to AR-04 implementation. Out of scope: canonical research edits or reinterpretation, new external research, new fields/schema semantics merely to improve presentation, Records redesign, Overview redesign, Source/Evidence detail redesign except a strictly required bounded navigation handoff, global search/discovery redesign, cross-record provenance/discovery architecture (reserved for AR-05), Graph work, new product/solution selection, broad navigation redesign, foundation/token redesign, changing M010 owner-frozen DS-04B values, general CSS cleanup/refactoring, historical C008/C009/C010 repair, D7, AR-05, and unrelated deferred design debt (pre-existing body/some-navigation system-ui, invisible .unavailable-note geometry-only compact scrollWidth, favicon.ico 404 -- not automatically in scope unless WU038 independently proves one is required). C008/C009/C010 remain pre-existing acknowledged historical packet-reference debt: reported separately, never repaired/suppressed/mutated/re-acknowledged, and alone never make AR-04 fail; any NEW graph integrity finding is blocking. No successor beyond WU040 is authorized; AR-05 and D7 remain not started.",
+        "status": "ready",
+        "workUnitIds": [
+          "WU038",
+          "WU039",
+          "WU040"
         ]
       }
     ],
@@ -1638,6 +1649,177 @@
         ],
         "createdAt": "2026-09-11T09:45:11.099Z",
         "updatedAt": "2026-09-11T17:58:58.537Z"
+      },
+      {
+        "id": "WU038",
+        "milestoneId": "M011",
+        "title": "AR-04 Problem Experience Reconciliation & Contract",
+        "objective": "Perform a read-only/current-state reconciliation of the existing Problem experience against canonical research semantics, current design-system authority, and representative real PRBs, then produce the exact bounded implementation/verification contract for WU039 and WU040. Analysis/design-contract work only -- no runtime implementation.",
+        "scope": [
+          "Determine, with evidence, the current information hierarchy of ProblemView.tsx and ProblemHistoryView.tsx",
+          "Identify what already works and must remain NO_CHANGE",
+          "Identify concrete knowledge-first comprehension/navigation weaknesses, with evidence",
+          "Assess variation across representative PRBs, including sparse and richer records",
+          "Determine exact sections/order/presentation changes, if any, and justify each against the milestone objective",
+          "Determine exact shared-vs-domain component ownership for any proposed change, consistent with component-model.md",
+          "Determine responsive behavior for any proposed change (compact <=767px, desktop >=768px, 360px compact QA viewport, 768-1059 intermediate band)",
+          "Determine accessibility expectations for any proposed change",
+          "Determine the implementation file boundary for WU039",
+          "Define the rendered verification matrix for WU040",
+          "Record any owner decisions still required before WU039 may be authorized",
+          "Produce docs/design/ar-04-problem-experience-contract.md as the WU038 artifact",
+          "Report C008/C009/C010 status separately as pre-existing historical debt without repairing/suppressing/mutating/re-acknowledging them",
+          "Report the three WU037 non-scope observations (body/navigation system-ui, .unavailable-note geometry-only compact scrollWidth, favicon.ico 404) as still out of scope unless independently proven required by an approved Problem-experience outcome"
+        ],
+        "outOfScope": [
+          "No runtime implementation of any kind",
+          "No canonical research edits or reinterpretation",
+          "No modification of M010 owner-frozen DS-04B foundation values",
+          "No modification of docs/explorerarchitecture.md, docs/design/foundations.md, docs/design/component-model.md, or docs/design/component-visual-contract.md",
+          "No Records, Overview, Source/Evidence-detail, search/discovery, or Graph redesign",
+          "No repair of C008/C009/C010",
+          "No starting of WU039 or any implementation work",
+          "Do not freeze exact Problem section order, exact visual composition, specific selectors/components, exact implementation files, visual values, or copy changes prematurely -- these are WU038 outputs, not inputs"
+        ],
+        "acceptanceCriteria": [
+          "docs/design/ar-04-problem-experience-contract.md exists and is traceable to canonical evidence (explorerarchitecture.md, component-model.md, component-visual-contract.md, ds-04b-foundation-consolidation-contract.md, current ProblemView.tsx/ProblemHistoryView.tsx/problemProjection.ts/ContextTabs.tsx, existing Problem tests, and rendered inspection of representative real PRBs)",
+          "Contract explicitly enumerates NO_CHANGE elements versus proposed changes with justification for each proposed change",
+          "Contract defines the WU039 implementation file boundary and the WU040 rendered verification matrix",
+          "Contract explicitly flags any owner decision still required",
+          "Contract confirms no M010 owner-frozen DS-04B value is proposed for change; any apparent need for such a change is surfaced as an owner decision, not resolved in-contract",
+          "No product/runtime/test/research files modified by this work unit",
+          "aiqt graph validate reports no new findings beyond the pre-existing C008/C009/C010",
+          "Work unit execution returns for explicit OWNER CONTRACT REVIEW before any WU039 authorization -- WU039 must not be silently authorized by WU038 completion alone"
+        ],
+        "agentContextRefs": [
+          "project.objective",
+          "docs/explorerarchitecture.md",
+          "docs/design/README.md",
+          "docs/design/foundations.md",
+          "docs/design/component-model.md",
+          "docs/design/component-visual-contract.md",
+          "docs/design/ds-04b-foundation-consolidation-contract.md"
+        ],
+        "suggestedFiles": [
+          "docs/design/ar-04-problem-experience-contract.md",
+          "apps/research-explorer/src/problem/ProblemView.tsx",
+          "apps/research-explorer/src/problem/ProblemHistoryView.tsx",
+          "apps/research-explorer/src/problem/problemProjection.ts",
+          "apps/research-explorer/src/navigation/ContextTabs.tsx",
+          "apps/research-explorer/src/navigation/urlState.ts"
+        ],
+        "validationCommands": [
+          "npm run research:validate",
+          "git diff --check",
+          "aiqt status",
+          "aiqt review",
+          "aiqt graph validate"
+        ],
+        "status": "ready",
+        "dependencies": [],
+        "createdAt": "2026-09-11T18:51:39.184Z",
+        "updatedAt": "2026-09-11T18:51:39.184Z"
+      },
+      {
+        "id": "WU039",
+        "milestoneId": "M011",
+        "title": "AR-04 Problem Experience Implementation",
+        "objective": "Implement only the owner-approved WU038 contract for the Problem experience, with no independent product/design reinterpretation, no canonical research changes, no scope expansion, no frozen foundation changes, and no opportunistic refactor. Implementation must be traceable item-by-item to the approved WU038 contract.",
+        "scope": [
+          "Implement exactly the changes enumerated and owner-approved in docs/design/ar-04-problem-experience-contract.md",
+          "Preserve canonical research semantics and existing canonical PRB identity",
+          "Preserve current routing/deep-link guarantees unless the approved contract specifies an exact bounded change",
+          "Preserve generic/shared component boundaries already established by the design system",
+          "Preserve M010 owner-frozen DS-04B foundation values"
+        ],
+        "outOfScope": [
+          "Any change not item-by-item traceable to the approved WU038 contract",
+          "Any canonical research change",
+          "Any change to M010 owner-frozen DS-04B foundation values",
+          "Any opportunistic refactor or general CSS cleanup outside the approved contract",
+          "Repair of C008/C009/C010",
+          "Starting WU040 without separate owner start authorization"
+        ],
+        "acceptanceCriteria": [
+          "Every implementation change maps to a specific approved WU038 contract item",
+          "No canonical research or frozen foundation value changed",
+          "Existing Problem-related tests updated/extended consistent with the approved contract and passing",
+          "Typecheck, lint, build, and full test suite pass",
+          "Any server/process started during the work unit is stopped before commit/closure",
+          "Work committed on a branch scoped to this execution phase before the work unit is considered closed"
+        ],
+        "agentContextRefs": [
+          "docs/design/ar-04-problem-experience-contract.md"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/src/problem/"
+        ],
+        "validationCommands": [
+          "npm run test --prefix apps/research-explorer",
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run build --prefix apps/research-explorer",
+          "npm run research:validate",
+          "git diff --check",
+          "aiqt status",
+          "aiqt review",
+          "aiqt graph validate"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-037"
+        ],
+        "createdAt": "2026-09-11T18:51:39.184Z",
+        "updatedAt": "2026-09-11T18:51:39.184Z"
+      },
+      {
+        "id": "WU040",
+        "milestoneId": "M011",
+        "title": "AR-04 Independent Rendered Verification",
+        "objective": "Independently verify WU039 against the approved WU038 contract using the BUILT production artifact. Make no remediation; any regression returns to owner review.",
+        "scope": [
+          "Verify representative real Problem records against the approved WU038 contract using the built production artifact",
+          "Verify desktop, ~360px compact, and the 768-1059 intermediate band where applicable",
+          "Verify information hierarchy/comprehension against the contract",
+          "Verify canonical-content fidelity (no reinterpretation or invention)",
+          "Verify section navigation/deep links where affected",
+          "Verify keyboard/focus behavior",
+          "Verify responsive overflow/layout",
+          "Verify contrast/accessibility for changed presentation",
+          "Verify console/network integrity",
+          "Run automated tests/typecheck/build/research validation"
+        ],
+        "outOfScope": [
+          "Any remediation or code change -- regressions return to owner review instead",
+          "Any new scope beyond the approved WU038 contract",
+          "Repair of C008/C009/C010"
+        ],
+        "acceptanceCriteria": [
+          "Verification report covers every item in the WU040 verification matrix defined by the approved WU038 contract",
+          "All automated tests/typecheck/build/research validation pass",
+          "No new console/network integrity issues introduced",
+          "No regression against the approved WU038 contract, or regressions are explicitly reported back to owner review with no in-place fix",
+          "A passing result may close this work unit done natively; explicit AR-04 owner closure remains a separate post-verification/post-publication gate"
+        ],
+        "agentContextRefs": [
+          "docs/design/ar-04-problem-experience-contract.md"
+        ],
+        "suggestedFiles": [],
+        "validationCommands": [
+          "npm run test --prefix apps/research-explorer",
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run build --prefix apps/research-explorer",
+          "npm run research:validate",
+          "git diff --check",
+          "aiqt status",
+          "aiqt review",
+          "aiqt graph validate"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-038"
+        ],
+        "createdAt": "2026-09-11T18:51:39.184Z",
+        "updatedAt": "2026-09-11T18:51:39.184Z"
       }
     ],
     "dependencies": [
@@ -1892,6 +2074,20 @@
         "toId": "WU037",
         "type": "blocks",
         "reason": "WU037 independently verifies the production build that only exists once WU036's implementation is complete."
+      },
+      {
+        "id": "DEP-037",
+        "fromId": "WU038",
+        "toId": "WU039",
+        "type": "blocks",
+        "reason": "WU039 must implement only the owner-approved WU038 contract; the contract must exist and be owner-approved before implementation may begin."
+      },
+      {
+        "id": "DEP-038",
+        "fromId": "WU039",
+        "toId": "WU040",
+        "type": "blocks",
+        "reason": "WU040 independently verifies the built implementation produced by WU039 against the approved WU038 contract; verification cannot precede implementation."
       }
     ]
   },
@@ -4952,8 +5148,8 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-11T17:58:58.537Z",
-      "nextRecommendation": "aiqt review --mode release"
+      "nextRecommendation": "aiqt review --mode release",
+      "createdAt": "2026-09-11T17:58:58.537Z"
     }
   ],
   "lastAgentPacket": {
@@ -4980,8 +5176,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt review --mode release",
-  "lastUpdatedAt": "2026-09-11T17:58:58.537Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-11T18:51:39.184Z",
   "review": {
     "acknowledgedFindings": [
       {
