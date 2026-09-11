@@ -1,11 +1,11 @@
 # AR-04 — Problem Experience Reconciliation & Contract
 
-Status: **WU038 contract — reconciliation complete. OWNER CONTRACT REVIEW = PASS
-(2026-09-11; see §21). OD-1 and OD-2 are both resolved (§8); zero
-OWNER_DECISION_REQUIRED items remain. Execution-deterministic bounded implementation
-contract for WU039 and rendered-verification contract for WU040. WU039 remains
-mechanically ready but is NOT owner-authorized to start — it requires a separate
-owner start gate. This contract does not itself authorize WU039.**
+Status: **M011 / AR-04 OWNER APPROVED / CLOSED (2026-09-11; see §22).** WU038 contract
+review, WU039 implementation, and WU040 independent rendered verification are all
+complete. OD-1 and OD-2 are both resolved (§8); zero OWNER_DECISION_REQUIRED items
+remain. Checkpoints C039, C040, and C041 all recorded validation and acceptance as
+passed, with zero AR-04 FAIL findings. The repository owner has explicitly closed
+M011. See §22 for the closure record.
 
 Scope: reconciles the existing public Problem experience (`ProblemView.tsx`,
 `ProblemHistoryView.tsx`, `problemProjection.ts`, `ContextTabs.tsx`, and their
@@ -606,3 +606,59 @@ to repair, suppress, or mutate.
   canonical contract; it does not itself constitute a WU039 start authorization, does
   not create or amend any AIQT checkpoint, and does not modify `.aiqt/state.json` or
   `.aiqt/runlog.jsonl`.
+
+## 22. Owner closure
+
+Status: OWNER APPROVED / CLOSED
+
+The repository owner explicitly closed M011 after:
+- WU038 completed the reconciliation and implementation contract (§1–§21);
+- WU039 implemented CR-1 and CR-2 exactly within the approved §14 file boundary;
+- WU040 independently verified the built production artifact against the §16
+  rendered-verification matrix on real canonical PRB-0006 and PRB-0012 across the
+  1440×900, 900×800, and 360×740 viewports;
+- checkpoints C039, C040, and C041 all recorded `validationResult: passed` and
+  `acceptanceCriteriaResult: passed`, with zero AR-04 FAIL findings across all three
+  work units.
+
+### Final approved AR-04 outcomes
+
+**CR-1** — the Evidência section's rendered reading order is fixed as:
+1. `EffectOccurrenceSummary` (if present);
+2. grouped evidence content (`Evidência que suporta` / `Evidência que limita a
+   conclusão` / `Outra evidência relacionada`) or `EmptyState`;
+3. `independence_assessment` (if authored), as the final conditional block.
+
+No canonical field meaning, copy, evidence grouping, or effect semantics changed by
+this reorder.
+
+**CR-2** — the four `OpenQuestionItem` internal detail labels (`why_open`,
+`current_action`, `latest_result`, `resolution_condition`) remain semantic `<h4>`
+headings with unchanged text and heading level, rendered sentence-case via the
+`open-question-detail-label` treatment. "Estado atual"'s labels retain their existing
+uppercase treatment unchanged. No DS-04B foundation value was introduced or altered by
+this treatment.
+
+### Accepted observations not legitimized by this closure
+
+The following remain separately known, out-of-scope observations and are **not**
+legitimized or adopted as desired AR-04 behaviour by this decision:
+
+- the pre-existing 9px `.explorer-navigation` app-chrome horizontal-overflow delta at
+  360px (§7);
+- the pre-existing `favicon.ico` 404 (§7);
+- historical C008/C009/C010 checkpoint-packet-reference debt (§20).
+
+They remain separate known matters and may be addressed only through separately
+authorized work.
+
+### Closure statement
+
+M011 / AR-04 Knowledge-First Problem Experience is owner-closed.
+
+This closure does **not** authorize:
+- AR-05;
+- D7;
+- any successor work, milestone, or work unit;
+- repair of C008/C009/C010;
+- remediation of the accepted pre-existing/out-of-scope observations listed above.
