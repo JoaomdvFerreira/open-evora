@@ -1,6 +1,6 @@
 # DS-04B foundation-consolidation reconciliation and implementation contract
 
-Status: **WU035 contract — reconciliation complete, execution-deterministic bounded implementation contract for WU036/WU037. Amended per owner hold: every legacy property/reference now carries exactly one final disposition; WU036 has zero unresolved design/scope decisions.**
+Status: **WU035 contract — reconciliation complete, execution-deterministic bounded implementation contract for WU036/WU037. Amended per owner hold: every legacy property/reference now carries exactly one final disposition; WU036 has zero unresolved design/scope decisions. The original WU035 reconciliation/implementation contract below remains historical authority. M010 owner closure has now occurred (§H.1) and the §H freeze boundary is satisfied for the M010 migration scope.**
 
 Scope: reconciles the approved DS-04B foundation tokens already present in production
 (`apps/research-explorer/src/styles/tokens.css`, imported by
@@ -561,3 +561,61 @@ reconciliation pass — it is implementation-candidate state, not canonical desi
 [foundations.md](foundations.md) "Not yet frozen implementation details" and
 [component-visual-contract.md](component-visual-contract.md) "Intentionally
 implementation-flexible."
+
+### H.1 M010 owner closure and effective freeze
+
+Status: OWNER APPROVED / CLOSED
+
+The repository owner explicitly closed M010 after:
+- WU036 completed the §F implementation contract;
+- WU037 completed the §G independent built-artifact rendered verification with PASS;
+- checkpoint C038 recorded validation and acceptance as passed and WU037 as done.
+
+Accordingly, the three §H freeze conditions are jointly satisfied.
+
+Effective from this owner closure, the DS-04B foundation values referenced by this
+contract for the M010 migration scope are owner-frozen canonical design values.
+
+The freeze includes the existing DS-04B semantic destination/value choices adopted by
+M010, including the applicable:
+- surface/colour roles
+- ink roles
+- separator roles
+- accent / accent-hover clay values
+- interface/reading/technical typography roles
+- migrated spacing roles
+- migrated radius roles
+- target sizing
+
+The freeze applies to the values actually adopted by the completed M010 migration and
+verified by WU037.
+
+It does NOT convert any deliberately excluded legacy item into a frozen DS-04B value.
+
+Explicitly outside this freeze remain:
+- `--space-1`
+- `--space-3`
+- `--space-8`
+- `--radius-sm`
+- `--shell-content-max`
+- undefined `--link`
+- DEAD_NO_ACTION legacy declarations
+- §B.2 hard-coded literals that were outside WU036
+- other separately identified OUT_OF_SCOPE items
+
+The following accepted WU037 observations are also NOT legitimized or frozen as
+desired design behavior by this decision:
+- pre-existing `body` / some navigation `system-ui` literal behavior
+- invisible `.unavailable-note` geometry-only scrollWidth contribution at compact width
+- pre-existing `favicon.ico` 404
+
+They remain separate known observations/out-of-scope matters and may be addressed only
+through separately authorized work.
+
+Any future change to an owner-frozen DS-04B value covered by this M010 boundary requires
+a new explicit design/work authorization; it must not occur as incidental cleanup or
+silent token drift.
+
+M010 / AR-03 Foundation Consolidation is therefore owner-closed.
+
+No AR-04, AR-05, or D7 work is authorized by this closure.
