@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
   "projectStatus": "in_progress",
-  "currentMilestoneId": null,
+  "currentMilestoneId": "M011",
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -1715,10 +1715,10 @@
           "aiqt review",
           "aiqt graph validate"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-09-11T18:51:39.184Z",
-        "updatedAt": "2026-09-11T18:51:39.184Z"
+        "updatedAt": "2026-09-11T19:13:21.831Z"
       },
       {
         "id": "WU039",
@@ -1764,12 +1764,12 @@
           "aiqt review",
           "aiqt graph validate"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-037"
         ],
         "createdAt": "2026-09-11T18:51:39.184Z",
-        "updatedAt": "2026-09-11T18:51:39.184Z"
+        "updatedAt": "2026-09-11T19:13:21.831Z"
       },
       {
         "id": "WU040",
@@ -5150,15 +5150,116 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt review --mode release",
       "createdAt": "2026-09-11T17:58:58.537Z"
+    },
+    {
+      "id": "C039",
+      "workUnitId": "WU038",
+      "packetId": "PKT-039",
+      "summary": "Performed a read-only reconciliation of the existing public Problem experience (ProblemView.tsx, ProblemHistoryView.tsx, problemProjection.ts, ContextTabs.tsx and supporting Problem-domain status/gloss components) against canonical PRB semantics (docs/datamodel.md), current design-system authority (foundations.md, component-model.md, component-visual-contract.md, ds-04b-foundation-consolidation-contract.md), and rendered production-build evidence on four representative real PRBs (PRB-0006 information-rich, PRB-0012 sparse, PRB-0007 richest material history with no state_changes/evidence authored, PRB-0006 history with an authored validation_status transition). Produced docs/design/ar-04-problem-experience-contract.md as the execution-deterministic bounded contract for WU039 (2 CHANGE_REQUIRED items, 11 NO_CHANGE findings, 6 OUT_OF_SCOPE items, 2 OWNER_DECISION_REQUIRED items) and the rendered verification matrix for WU040. No runtime/product/test/research file was modified. WU038 execution is complete but the contract requires explicit OWNER CONTRACT REVIEW before WU039 may be authorized -- this checkpoint does not authorize WU039.",
+      "completed": [
+        "Read all required canonical authority: AGENTS.md, CLAUDE.md, docs/explorerarchitecture.md, docs/design/README.md, docs/design/foundations.md, docs/design/component-model.md, docs/design/component-visual-contract.md, docs/design/ds-04b-foundation-consolidation-contract.md, docs/datamodel.md",
+        "Read current ProblemView.tsx, ProblemHistoryView.tsx, problemProjection.ts, ContextTabs.tsx, InvestigationStatus.tsx, ProblemLifecycleStatus.tsx, statusGloss.ts in full, plus existing ProblemView.test.tsx (13 cases) and ProblemHistoryView.test.tsx",
+        "Selected and inspected 4 representative real canonical PRBs (PRB-0006, PRB-0012, PRB-0007, plus PRB-0006's own history) chosen to cover information-rich vs sparse decision_basis, dense multi-effect evidence vs minimal evidence, and authored-but-fieldless vs authored-with-transition history",
+        "Built the production bundle (npm run build) and served it via npm run preview (never the dev server) on port 4173",
+        "Performed rendered browser verification via Playwright at desktop (1440x900), the 768-1059px geometry-fallback band (900x800), and the compact QA viewport (360x740) for both Problem and History contexts on all four fixtures",
+        "Verified heading hierarchy, landmark structure, focus-on-load behaviour, and duplicate rail/compact section-index accessibility treatment via DOM/accessibility queries",
+        "Verified the pre-existing 360px scrollWidth/clientWidth delta traces to app-chrome (.explorer-navigation), not Problem content, confirming it is the same pre-existing WU037 observation and not a new Problem-specific finding",
+        "Identified 2 CHANGE_REQUIRED items (CR-1: independence_assessment interrupts the Evidencia section's primary reading path; CR-2: open-question sub-item heading treatment, flagged OWNER_DECISION_REQUIRED) with concrete evidence, impact, intended outcome, canonical constraint, implementation boundary, and verification method for each",
+        "Documented 11 NO_CHANGE findings, 6 OUT_OF_SCOPE items, and 2 OWNER_DECISION_REQUIRED items with evidence",
+        "Defined the exact WU039 implementation file boundary and WU040 rendered verification matrix",
+        "Confirmed no M010 owner-frozen DS-04B value is proposed for change",
+        "Produced docs/design/ar-04-problem-experience-contract.md",
+        "Cleaned up all transient screenshot evidence and stopped the preview server before treating execution as complete",
+        "Ran full validation suite: npm run research:validate, git diff --check, aiqt status, aiqt review, aiqt graph validate"
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "docs/design/ar-04-problem-experience-contract.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace/conflict-marker errors (only LF/CRLF line-ending notices on pre-existing .aiqt files)."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "AIQT status: passed. Current work unit: WU038."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Non-blocking warnings only: pre-existing C008/C009/C010 checkpoint-packet-ref findings, pre-existing WU040:vague-scope, and the expected WU038:awaiting-checkpoint workflow notice."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "3 blocking findings reported, all pre-existing C008/C009/C010 broken checkpoint-packet references -- no new finding introduced by WU038."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "docs/design/ar-04-problem-experience-contract.md exists and is traceable to canonical evidence (explorerarchitecture.md, component-model.md, component-visual-contract.md, ds-04b-foundation-consolidation-contract.md, current ProblemView.tsx/ProblemHistoryView.tsx/problemProjection.ts/ContextTabs.tsx, existing Problem tests, and rendered inspection of representative real PRBs)",
+          "result": "passed",
+          "evidence": "Artifact cites explorerarchitecture.md, component-model.md, component-visual-contract.md, ds-04b-foundation-consolidation-contract.md, datamodel.md, current source files by path/line, existing tests, and rendered inspection of 4 real PRBs throughout."
+        },
+        {
+          "criterion": "Contract explicitly enumerates NO_CHANGE elements versus proposed changes with justification for each proposed change",
+          "result": "passed",
+          "evidence": "Contract SS5-6: 11 NO_CHANGE findings, 2 CHANGE_REQUIRED items each with evidence/impact/outcome/constraint/boundary/verification."
+        },
+        {
+          "criterion": "Contract defines the WU039 implementation file boundary and the WU040 rendered verification matrix",
+          "result": "passed",
+          "evidence": "Contract SS14 and SS16."
+        },
+        {
+          "criterion": "Contract explicitly flags any owner decision still required",
+          "result": "passed",
+          "evidence": "Contract SS8: OD-1 (CR-2 authorization) and OD-2 (CR-1 placement latitude)."
+        },
+        {
+          "criterion": "Contract confirms no M010 owner-frozen DS-04B value is proposed for change; any apparent need for such a change is surfaced as an owner decision, not resolved in-contract",
+          "result": "passed",
+          "evidence": "Contract SS17."
+        },
+        {
+          "criterion": "No product/runtime/test/research files modified by this work unit",
+          "result": "passed",
+          "evidence": "git status shows only docs/design/ar-04-problem-experience-contract.md (new) plus legitimate AIQT lifecycle files (.aiqt/state.json, .aiqt/runlog.jsonl) and untouched .vscode/."
+        },
+        {
+          "criterion": "aiqt graph validate reports no new findings beyond the pre-existing C008/C009/C010",
+          "result": "passed",
+          "evidence": "aiqt graph validate output lists exactly the 3 pre-existing C008/C009/C010 findings, nothing new."
+        },
+        {
+          "criterion": "Work unit execution returns for explicit OWNER CONTRACT REVIEW before any WU039 authorization -- WU039 must not be silently authorized by WU038 completion alone",
+          "result": "passed",
+          "evidence": "Contract SS19 and this checkpoint's summary/notes explicitly state WU039 is not authorized by this checkpoint."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-11T19:13:21.831Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-038",
-    "workUnitId": "WU037",
-    "milestoneId": "M010",
-    "createdAt": "2026-09-11T15:28:42.161Z",
+    "id": "PKT-039",
+    "workUnitId": "WU038",
+    "milestoneId": "M011",
+    "createdAt": "2026-09-11T19:04:26.725Z",
     "format": "markdown",
-    "contentHash": "sha256:373ef22dd1420e6806ebc5acea5b80f3a1b625248da6fa94a610d8e60b510f88",
+    "contentHash": "sha256:4601eb6e51c8e859c787953c1c7dc03ab95734b7fe9f95b02df631fa9435c806",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -5177,7 +5278,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-11T18:51:39.184Z",
+  "lastUpdatedAt": "2026-09-11T19:13:21.831Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -6428,6 +6529,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-11T17:58:58.537Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C039",
+      "current": {
+        "observationId": "sha256:42138f3006115920a96f1eed2f321b197dd8d8de92019765e88c6462d7e8ea3f",
+        "checkpointId": "C039",
+        "workUnitId": "WU038",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-11T19:13:21.831Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-11T19:13:21.831Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:42138f3006115920a96f1eed2f321b197dd8d8de92019765e88c6462d7e8ea3f",
+          "checkpointId": "C039",
+          "workUnitId": "WU038",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-11T19:13:21.831Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-11T19:13:21.831Z"
         }
       ]
     }
