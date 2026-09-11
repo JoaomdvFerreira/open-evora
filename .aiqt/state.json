@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
-  "currentMilestoneId": "M010",
+  "projectStatus": "review",
+  "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -115,7 +115,7 @@
         "id": "M010",
         "title": "AR-03 Knowledge-First Product Design: Foundation Consolidation",
         "objective": "Consolidate the Explorer's legacy production foundation (index.css's own hex-literal variables, ad hoc selectors, and Inter-based interface typography) onto the semantic DS-04B foundation tokens already imported into production via tokens.css (DS-05A), under the owner-frozen Public Sans interface family, without adopting foundations.css/layout.css wholesale, without any structural/component/navigation/layout redesign, and without treating DS-04B's remaining numeric/token candidates as frozen beyond what this milestone's own implementation and verification earn. Interface font is owner-frozen as Public Sans; reading font remains Source Serif 4; technical font remains IBM Plex Mono. Remaining DS-04B numeric/token values used by this migration become owner-frozen foundation values for the M010 migration scope only after successful WU036 implementation, WU037 independent production-rendered verification, and explicit owner M010 closure -- they are not previously-unused values and not universally 'newly-adopted production facts' beyond this migration's bounded scope. Short-record inline rail remains deferred. No AR-04 Problem Experience, AR-05 Discovery & Provenance, or D7 scope is included.",
-        "status": "ready",
+        "status": "done",
         "workUnitIds": [
           "WU035",
           "WU036",
@@ -1632,12 +1632,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-036"
         ],
         "createdAt": "2026-09-11T09:45:11.099Z",
-        "updatedAt": "2026-09-11T09:45:11.099Z"
+        "updatedAt": "2026-09-11T17:58:58.537Z"
       }
     ],
     "dependencies": [
@@ -4817,15 +4817,152 @@
       "finalWorkUnitStatus": "needs_review",
       "nextRecommendation": "aiqt checkpoint amend --checkpoint C037",
       "createdAt": "2026-09-11T13:26:49.096Z"
+    },
+    {
+      "id": "C038",
+      "workUnitId": "WU037",
+      "packetId": "PKT-038",
+      "summary": "Independent built-production-artifact rendered verification of the WU036 DS-04B foundation consolidation passed at desktop, compact/mobile, and intermediate viewports. No regression attributable to WU036 was found.",
+      "completed": [
+        "production-preview verification at 1440x900",
+        "production-preview verification at 360x740",
+        "production-preview verification at 900x800",
+        "global shell/header/navigation verified",
+        "Overview verified",
+        "Records verified",
+        "Record Detail verified",
+        "Problem Detail verified",
+        "CompactSectionIndex verified",
+        "production typography/font assets verified",
+        "semantic-token rendering verified",
+        "responsive overflow/layout verified",
+        "keyboard/focus-visible behavior verified",
+        "contrast checked",
+        "console/network checked",
+        "full Explorer tests passed",
+        "typecheck passed",
+        "production build passed",
+        "research:validate passed",
+        "git diff --check passed"
+      ],
+      "notCompleted": [],
+      "filesChanged": [],
+      "issues": [
+        {
+          "title": "Geometry-only scrollWidth contribution from hidden tooltip at 360px (non-blocking, acceptable bounded variance)",
+          "description": ".unavailable-note (disabled 'Grafo' nav tooltip) contributes geometry-only scrollWidth at ~360px while invisible (opacity:0/visibility:hidden by default); no visible overflow results. Pre-existing absolute-positioning/centering behavior, not caused by the token migration. Owner-accepted, non-blocking.",
+          "severity": "low",
+          "status": "open",
+          "agentCanFix": true
+        },
+        {
+          "title": "body/nav-control font resolves to system-ui, not Public Sans (non-blocking, pre-existing out-of-scope)",
+          "description": "document.body and some navigation controls resolve to system-ui rather than Public Sans, traced to the pre-existing index.css:6 'body { font-family: system-ui, sans-serif; }' workbench-era literal, explicitly documented as OUT_OF_SCOPE for WU036 in the WU035 contract §B.2. Owner-accepted, non-blocking.",
+          "severity": "low",
+          "status": "open",
+          "agentCanFix": true
+        },
+        {
+          "title": "favicon.ico 404 console error (non-blocking, pre-existing and unrelated)",
+          "description": "favicon.ico returns 404 in the browser console on every page load; unrelated to the CSS/token migration and not introduced by WU036. Owner-accepted, non-blocking.",
+          "severity": "low",
+          "status": "open",
+          "agentCanFix": true
+        }
+      ],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "tsc --noEmit completed with no errors."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "53 test files passed, 1 skipped; 500 tests passed, 1 skipped."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Production build succeeded via vite build; asset manifest contains only Public Sans, Source Serif 4, and IBM Plex Mono font files, zero Inter assets."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace/conflict-marker errors."
+        },
+        {
+          "command": "npm run preview -- --port 4173 (served, then Playwright-driven rendered verification)",
+          "result": "passed",
+          "summary": "Production preview server used as sole authoritative rendered target (never the Vite dev server) for all viewport/surface checks below."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Every WU035 contract item has independent, production-rendered evidence at 1440x900, 360x740, and the 768-1059px band, or the milestone remains open with the specific blocker reported",
+          "result": "passed",
+          "evidence": "Overview, Records (table/narrow), Record Detail, and Problem Detail surfaces inspected at 1440x900, 360x740, and 900x800 (intermediate band) against the npm run preview production build; intermediate band confirmed table-layout geometry recomposition without activating compact typography/navigation."
+        },
+        {
+          "criterion": "Contrast measurements are recorded as measured computed-style numbers, not visual impressions",
+          "result": "passed",
+          "evidence": "Canvas-based oklch-to-sRGB conversion of getComputedStyle output. --color-accent on reading/raised surfaces: 8.19:1 / 8.97:1. --color-accent-hover: 12.93:1 / 14.16:1 (both AAA). --color-ink-muted/--color-ink-faint (#6b675f): 5.14:1 (AA; identical to legacy value, unchanged by migration). --color-ink-secondary: 9.12:1."
+        },
+        {
+          "criterion": "Keyboard and focus-visible behaviour is verified and recorded for affected surfaces",
+          "result": "passed",
+          "evidence": "Real keyboard Tab traversal confirmed el.matches(':focus-visible') === true with a visible 3px solid --color-accent outline across skip-link, nav buttons, records search input, technical-disclosure <summary>, and record-detail section-index anchor links."
+        },
+        {
+          "criterion": "No visible-overflow regression is present",
+          "result": "passed",
+          "evidence": "document.documentElement.scrollWidth vs clientWidth checked at all three viewports on every inspected surface; no visible element (visibility!=hidden, display!=none, non-zero box) exceeded the viewport bounds except the intentionally off-screen .skip-link. One geometry-only artifact (.unavailable-note tooltip, opacity:0/visibility:hidden by default) contributes to raw scrollWidth at 360px but produces no visible overflow; classified acceptable bounded variance, pre-existing positioning logic untouched by the token migration."
+        },
+        {
+          "criterion": "No new browser console errors or warnings are present",
+          "result": "passed",
+          "evidence": "Console checked on every surface/viewport transition. Only pre-existing favicon.ico 404 observed (unrelated to CSS/token migration, not introduced by WU036)."
+        },
+        {
+          "criterion": "Automated functional validation (Explorer typecheck, full test suite, production build) and npm run research:validate pass",
+          "result": "passed",
+          "evidence": "See validationCommands."
+        },
+        {
+          "criterion": "Canonical research and research conclusions are verified unchanged",
+          "result": "passed",
+          "evidence": "research:validate passed against unmodified research/ records; WU037 made no changes to research/, tools/research/, or research/schemas/."
+        },
+        {
+          "criterion": "No design or product evolution beyond the WU035 contract, no ODM-018 or later-roadmap work, and no unapproved tooling addition is present",
+          "result": "passed",
+          "evidence": "WU037 performed read-only rendered verification only; no production, test, or dependency file was modified; no AR-04/AR-05/D7 work started."
+        },
+        {
+          "criterion": "The work unit ends in needs_review so the owner performs closure",
+          "result": "passed",
+          "evidence": "Findings reported to the owner (READY_FOR_WU037_OWNER_VERIFICATION_REVIEW) prior to this checkpoint; owner has now returned an explicit PASS decision authorizing checkpoint/closure."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-11T17:58:58.537Z",
+      "nextRecommendation": "aiqt review --mode release"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-037",
-    "workUnitId": "WU036",
+    "id": "PKT-038",
+    "workUnitId": "WU037",
     "milestoneId": "M010",
-    "createdAt": "2026-09-11T13:19:49.413Z",
+    "createdAt": "2026-09-11T15:28:42.161Z",
     "format": "markdown",
-    "contentHash": "sha256:92c3d1b6412085815cccae7aa2a76dc69991a4b3db65b22260b1aea74cb2c15e",
+    "contentHash": "sha256:373ef22dd1420e6806ebc5acea5b80f3a1b625248da6fa94a610d8e60b510f88",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -4843,8 +4980,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-11T13:52:27.226Z",
+  "nextRecommendedCommand": "aiqt review --mode release",
+  "lastUpdatedAt": "2026-09-11T17:58:58.537Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -6065,6 +6202,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-11T13:52:27.226Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C038",
+      "current": {
+        "observationId": "sha256:eb9f2d211723f2bfa2753c107283dbbc29ceb5dfa2c7b01d340b430ab27bdfbc",
+        "checkpointId": "C038",
+        "workUnitId": "WU037",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-11T17:58:58.537Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-11T17:58:58.537Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:eb9f2d211723f2bfa2753c107283dbbc29ceb5dfa2c7b01d340b430ab27bdfbc",
+          "checkpointId": "C038",
+          "workUnitId": "WU037",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-11T17:58:58.537Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-11T17:58:58.537Z"
         }
       ]
     }
