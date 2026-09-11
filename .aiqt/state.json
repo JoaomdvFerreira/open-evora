@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "projectStatus": "review",
+  "projectStatus": "in_progress",
   "currentMilestoneId": "M009",
   "currentWorkUnitId": null,
   "workGraph": {
@@ -109,6 +109,17 @@
           "WU032",
           "WU033",
           "WU034"
+        ]
+      },
+      {
+        "id": "M010",
+        "title": "AR-03 Knowledge-First Product Design: Foundation Consolidation",
+        "objective": "Consolidate the Explorer's legacy production foundation (index.css's own hex-literal variables, ad hoc selectors, and Inter-based interface typography) onto the semantic DS-04B foundation tokens already imported into production via tokens.css (DS-05A), under the owner-frozen Public Sans interface family, without adopting foundations.css/layout.css wholesale, without any structural/component/navigation/layout redesign, and without treating DS-04B's remaining numeric/token candidates as frozen beyond what this milestone's own implementation and verification earn. Interface font is owner-frozen as Public Sans; reading font remains Source Serif 4; technical font remains IBM Plex Mono. Remaining DS-04B numeric/token values used by this migration become owner-frozen foundation values for the M010 migration scope only after successful WU036 implementation, WU037 independent production-rendered verification, and explicit owner M010 closure -- they are not previously-unused values and not universally 'newly-adopted production facts' beyond this migration's bounded scope. Short-record inline rail remains deferred. No AR-04 Problem Experience, AR-05 Discovery & Provenance, or D7 scope is included.",
+        "status": "ready",
+        "workUnitIds": [
+          "WU035",
+          "WU036",
+          "WU037"
         ]
       }
     ],
@@ -1450,6 +1461,183 @@
         ],
         "createdAt": "2026-09-10T17:34:44.071Z",
         "updatedAt": "2026-09-11T08:18:47.418Z"
+      },
+      {
+        "id": "WU035",
+        "milestoneId": "M010",
+        "title": "AR-03 foundation-consolidation reconciliation and bounded implementation contract",
+        "objective": "Reconcile the approved DS-04B foundation tokens already present in production (apps/research-explorer/src/styles/tokens.css, imported by main.tsx since DS-05A commit 0daf239) against the legacy foundation values still in production apps/research-explorer/src/index.css, and persist one canonical design artifact in docs/design/ (per AGENTS.md documentation routing, which assigns Explorer design-contract ownership to docs/design/) that defines the exact bounded implementation contract for WU036 and the exact verification contract for WU037. Make no runtime change.",
+        "scope": [
+          "Persist one canonical design artifact under docs/design/ containing: an exhaustive legacy-to-semantic token mapping covering every legacy index.css custom property in scope (including --ink, --ink-soft, --ink-faint, --ink-faintest, --ink-disclaimer, --line, --surface, --ui, and equivalent spacing/radius/focus literals) mapped to its DS-04B semantic replacement in tokens.css, flagging any legacy variable with no current DS-04B equivalent",
+          "Inventory every affected production selector in index.css and any apps/research-explorer/src/styles/*.css file that currently reads a legacy variable in scope for this mapping",
+          "Decide and record, with explicit rationale, whether compatibility aliases (legacy variable names redefined to reference semantic tokens) or direct selector rewrites (selectors changed to reference semantic token names directly) is the minimum-risk migration path for this milestone",
+          "Record Public Sans as the owner-approved, frozen interface family for this milestone's implementation",
+          "Define the exact Public Sans production dependency/import treatment: @fontsource/public-sans moves from devDependencies to production dependencies",
+          "Define the exact Inter production-versus-Storybook treatment: production Inter imports in main.tsx are removed once no production selector still resolves to Inter; the @fontsource/inter package itself is retained if active Storybook code (stories, .storybook/preview.ts, styles/ui.css, etc.) still depends on it, unless this contract explicitly extends migration to that Storybook usage",
+          "Identify the stale tokens.css lines 5-6 scope comment (which currently states the file is 'consumed by Storybook only' and 'not yet imported by the production application', contradicted by main.tsx's actual DS-05A import) and define its exact replacement text as a named WU036 correction item",
+          "Define the exact WU036 implementation scope: which files change, which legacy references are replaced or aliased, and explicit confirmation that no foundations.css or layout.css adoption and no structural/component/navigation/layout redesign is authorized",
+          "Define the exact WU037 verification contract: production build served via npm run preview or equivalent production preview path (not the Vite dev server) as primary evidence; desktop viewport ~1440x900; compact viewport ~360x740; a representative check at the 768-1059px geometry-fallback band; computed-style contrast measurements; keyboard and focus-visible verification; visible-overflow check; browser console check; Storybook/axe-core evidence usable only as supplemental corroboration, never as the primary production gate",
+          "State explicitly in the artifact that remaining DS-04B numeric/token values stay bounded implementation candidates through this work unit and remain so until WU036 implementation, WU037 verification, and explicit owner M010 closure jointly establish them as owner-frozen foundation values for the M010 migration scope only"
+        ],
+        "outOfScope": [
+          "Do not modify any file under apps/research-explorer/src/ or any other runtime/production file",
+          "Do not adopt apps/research-explorer/src/styles/foundations.css or styles/layout.css wholesale, and do not author a contract that authorizes such adoption",
+          "Do not define or authorize any structural, component-boundary, navigation, or layout redesign",
+          "Do not reopen or reinterpret any AR-02 finding (ODM-013, ODM-014, ODM-015, ODM-016, ODM-017, ODM-019, ODM-020, ODM-021)",
+          "Do not address ODM-018, ODM-009, ODM-010, ODM-012, or ODM-022 and later",
+          "Do not change canonical research records, schemas, docs/datamodel.md semantics, or research conclusions",
+          "Do not start or scope AR-04 Problem Experience, AR-05 Discovery & Provenance, or D7",
+          "Do not perform external research",
+          "Do not perform opportunistic cleanup, refactoring, or unrelated improvement beyond the named token-consolidation contract",
+          "Do not resolve the deferred short-record inline rail question",
+          "Do not create more than one canonical design artifact for this contract"
+        ],
+        "acceptanceCriteria": [
+          "Exactly one canonical design artifact is persisted under docs/design/ containing the exhaustive legacy-to-semantic token mapping, the affected-selector inventory, the alias-vs-rewrite decision and rationale, the Public Sans dependency/import treatment, the Inter production/Storybook treatment, the stale tokens.css comment correction, the exact WU036 scope, and the exact WU037 verification contract",
+          "No file under apps/research-explorer/src/ is modified",
+          "The artifact explicitly states it does not authorize foundations.css or layout.css adoption or any structural/component/navigation/layout redesign",
+          "The artifact explicitly states DS-04B's remaining numeric/token values stay bounded candidates and only become owner-frozen foundation values for the M010 migration scope after WU036, WU037, and explicit owner M010 closure",
+          "git diff --check is clean and no unrelated file is touched"
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/design/foundations.md",
+          "docs/design/component-model.md",
+          "docs/design/component-visual-contract.md"
+        ],
+        "suggestedFiles": [
+          "docs/design/",
+          "apps/research-explorer/src/styles/tokens.css",
+          "apps/research-explorer/src/index.css",
+          "apps/research-explorer/src/main.tsx",
+          "apps/research-explorer/package.json"
+        ],
+        "validationCommands": [
+          "git diff --check"
+        ],
+        "status": "ready",
+        "dependencies": [],
+        "createdAt": "2026-09-11T09:45:11.099Z",
+        "updatedAt": "2026-09-11T09:45:11.099Z"
+      },
+      {
+        "id": "WU036",
+        "milestoneId": "M010",
+        "title": "Foundation consolidation production adoption",
+        "objective": "Implement exactly the WU035 canonical design contract: consolidate production foundation references onto DS-04B semantic tokens, adopt Public Sans as the production interface font, and correct the stale tokens.css scope comment, with no structural, component, navigation, or layout change.",
+        "scope": [
+          "Apply the WU035-selected alias-or-direct-rewrite migration so every selector identified in the WU035 contract resolves through DS-04B semantic tokens instead of legacy index.css variables/literals",
+          "Apply the Public Sans interface-font adoption exactly as scoped by WU035: promote @fontsource/public-sans to production dependencies, remove Inter's production imports in main.tsx once no production selector resolves to Inter, retain the @fontsource/inter package only if WU035 determined Storybook still depends on it",
+          "Correct the stale tokens.css scope comment exactly as defined by the WU035 contract",
+          "Preserve every DS-05A-DS-05J structural and behavioural outcome unchanged",
+          "Add or adjust only the regression coverage needed to prove the token substitution did not change structure or behaviour"
+        ],
+        "outOfScope": [
+          "Do not introduce any new component",
+          "Do not change composition, hierarchy, spacing-rhythm decisions, density, or responsive breakpoints -- only token values referenced by existing selectors may change",
+          "Do not adopt foundations.css or layout.css",
+          "Do not add any dependency beyond what the WU035 contract explicitly named",
+          "Do not address ODM-018, ODM-009, ODM-010, ODM-012, or ODM-022 and later",
+          "Do not reopen AR-02 findings",
+          "Do not change canonical research records, schemas, or research semantics",
+          "Do not start or scope AR-04, AR-05, or D7",
+          "Do not exceed the exact scope persisted in the WU035 artifact"
+        ],
+        "acceptanceCriteria": [
+          "Explorer typecheck passes",
+          "The full Explorer test suite passes",
+          "The production build passes",
+          "npm run research:validate passes with canonical research data verified unchanged",
+          "git diff --check is clean",
+          "Every selector identified in the WU035 contract resolves through its DS-04B semantic token per the chosen alias-or-rewrite approach",
+          "The tokens.css stale scope comment is corrected exactly as WU035 defined",
+          "No structural, component, navigation, or layout regression exists versus the DS-05A-DS-05J baseline"
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "the WU035 canonical design artifact"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/src/index.css",
+          "apps/research-explorer/src/main.tsx",
+          "apps/research-explorer/src/styles/tokens.css",
+          "apps/research-explorer/package.json",
+          "apps/research-explorer/src/index.css.contrast.test.ts"
+        ],
+        "validationCommands": [
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run test --prefix apps/research-explorer",
+          "npm run build --prefix apps/research-explorer",
+          "npm run research:validate",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-035"
+        ],
+        "createdAt": "2026-09-11T09:45:11.099Z",
+        "updatedAt": "2026-09-11T09:45:11.099Z"
+      },
+      {
+        "id": "WU037",
+        "milestoneId": "M010",
+        "title": "Independent production-rendered UX/accessibility verification",
+        "objective": "Independently and read-only verify the WU036 foundation consolidation against a served production build, at the required viewports and bands, and prepare M010 for owner closure review without making corrective changes or starting later roadmap work.",
+        "scope": [
+          "Build the real production application and serve the built artifact using npm run preview or an equivalent production preview path; the Vite dev server must not be used as primary evidence",
+          "Verify the WU035 contract's selectors and Public Sans adoption render correctly at a desktop viewport of approximately 1440x900",
+          "Verify at a compact viewport of approximately 360x740",
+          "Verify at a representative check within the 768-1059px geometry-fallback band",
+          "Measure contrast using computed-style measurements, not visual estimation",
+          "Verify keyboard navigation and focus-visible behaviour on affected interactive elements",
+          "Check for visible horizontal overflow introduced by the token substitution",
+          "Check the browser console for new errors or warnings introduced by the change",
+          "Treat Storybook/axe-core evidence as supplemental corroboration only, never as the primary production-rendered gate",
+          "Confirm no ODM-018 or later-roadmap scope slipped in, no canonical research change occurred, no unapproved tooling or dependency was added, and no AR-04, AR-05, or D7 work was started"
+        ],
+        "outOfScope": [
+          "Do not make corrective implementation changes as part of independent verification",
+          "Do not add accessibility tooling or any other dependency",
+          "Do not start AR-04, AR-05, or D7",
+          "Do not publish, push, open a pull request, merge, or deploy",
+          "Do not close the milestone automatically; owner review is required",
+          "Do not repair, suppress, mutate, or re-acknowledge the pre-existing C008/C009/C010 checkpoint packet-reference findings",
+          "Do not use the Vite dev server as primary rendered evidence"
+        ],
+        "acceptanceCriteria": [
+          "Every WU035 contract item has independent, production-rendered evidence at 1440x900, 360x740, and the 768-1059px band, or the milestone remains open with the specific blocker reported",
+          "Contrast measurements are recorded as measured computed-style numbers, not visual impressions",
+          "Keyboard and focus-visible behaviour is verified and recorded for affected surfaces",
+          "No visible-overflow regression is present",
+          "No new browser console errors or warnings are present",
+          "Automated functional validation (Explorer typecheck, full test suite, production build) and npm run research:validate pass",
+          "Canonical research and research conclusions are verified unchanged",
+          "No design or product evolution beyond the WU035 contract, no ODM-018 or later-roadmap work, and no unapproved tooling addition is present",
+          "The work unit ends in needs_review so the owner performs closure"
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "the WU035 canonical design artifact"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/"
+        ],
+        "validationCommands": [
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run test --prefix apps/research-explorer",
+          "npm run build --prefix apps/research-explorer",
+          "npm run research:validate",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-036"
+        ],
+        "createdAt": "2026-09-11T09:45:11.099Z",
+        "updatedAt": "2026-09-11T09:45:11.099Z"
       }
     ],
     "dependencies": [
@@ -1690,6 +1878,20 @@
         "toId": "WU034",
         "type": "blocks",
         "reason": "Independent closure verification can only assess the completed AR-02 functional hardening result."
+      },
+      {
+        "id": "DEP-035",
+        "fromId": "WU035",
+        "toId": "WU036",
+        "type": "blocks",
+        "reason": "WU036 must implement exactly the bounded contract WU035 persists; it cannot begin until that canonical design artifact exists."
+      },
+      {
+        "id": "DEP-036",
+        "fromId": "WU036",
+        "toId": "WU037",
+        "type": "blocks",
+        "reason": "WU037 independently verifies the production build that only exists once WU036's implementation is complete."
       }
     ]
   },
@@ -4408,8 +4610,8 @@
         }
       ],
       "finalWorkUnitStatus": "needs_review",
-      "createdAt": "2026-09-11T08:18:47.418Z",
-      "nextRecommendation": "aiqt checkpoint amend --checkpoint C035"
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C035",
+      "createdAt": "2026-09-11T08:18:47.418Z"
     }
   ],
   "lastAgentPacket": {
@@ -4436,8 +4638,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint amend --checkpoint C035",
-  "lastUpdatedAt": "2026-09-11T08:18:47.418Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-11T09:45:11.099Z",
   "review": {
     "acknowledgedFindings": [
       {
