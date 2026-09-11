@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
+  "projectStatus": "review",
   "currentMilestoneId": "M009",
   "currentWorkUnitId": null,
   "workGraph": {
@@ -104,7 +104,7 @@
         "id": "M009",
         "title": "M009 — AR-02 Explorer Functional Foundation",
         "objective": "Establish a reliable functional Explorer baseline before knowledge-first product/design evolution by resolving the eight approved MUST ADDRESS functional findings (ODM-013, ODM-014, ODM-015, ODM-016, ODM-017, ODM-019, ODM-020, ODM-021) without redesigning the product or changing canonical research semantics. Graph-validation contract: the pre-existing owner-acknowledged C008/C009/C010 checkpoint packet-reference findings are historical debt, are reported separately, must not be repaired, suppressed, mutated, or re-acknowledged, and alone never constitute an AR-02 failure; any new graph finding is blocking.",
-        "status": "ready",
+        "status": "done",
         "workUnitIds": [
           "WU032",
           "WU033",
@@ -1444,12 +1444,12 @@
           "git diff --check",
           "aiqt review"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-034"
         ],
         "createdAt": "2026-09-10T17:34:44.071Z",
-        "updatedAt": "2026-09-11T07:24:34.597Z"
+        "updatedAt": "2026-09-11T08:18:47.418Z"
       }
     ],
     "dependencies": [
@@ -4277,15 +4277,148 @@
       "finalWorkUnitStatus": "needs_review",
       "nextRecommendation": "aiqt checkpoint amend --checkpoint C034",
       "createdAt": "2026-09-10T19:14:15.922Z"
+    },
+    {
+      "id": "C035",
+      "workUnitId": "WU034",
+      "packetId": "PKT-035",
+      "summary": "WU034 (independent, read-only verification; no product/test/docs changes) independently reverified all seven WU032/WU033-approved AR-02 dispositions against merged main @ ee3468a6a7debf144fd2f45a31a75657669cf9b2 using source inspection, a full deterministic validation run, and fresh rendered/keyboard/console verification in an isolated Playwright browser context at desktop (1440x900) and compact (360x740) viewports. All seven independently PASS: ODM-014 (search now resolves 'conectividade rural-urbana' to exactly EVD-000001, bounded to four schema-declared canonical fields, no per-query detail fetch, label still truncated as before), ODM-015 (Tipo-sort and page 3-of-11 both survived a real select-then-Back cycle with the URL staying bare ?view=records throughout; a query change independently confirmed to reset to page 1 while sort is preserved), ODM-016A (a fresh deep link to #evd-limits reached and focused its target on first load, ordinary in-app navigation to a different record did not inherit the stale fragment, and browser Back to the original deep link re-landed and re-focused it correctly), ODM-016B (measured live: #evd-limits/#evd-scope/#evd-investigation/#evd-sources/#evd-technical and a real SRC section (#source-licensing) all clear the 104px compact sticky header by design; #relacoes could not be exercised against real corpus data because no PRB in the current 274-record corpus has incoming edges and no non-SRC/EVD/PRB record type exists, so only its deterministic CSS-contract/unit coverage applies -- reported as UNVERIFIABLE-BY-RENDERED-MEANS-ONLY, not a defect), ODM-017 (measured live getComputedStyle WCAG 2.1 contrast, not Storybook addon-a11y: the corrected --ink-faintest/--ink-faint #6b675f = rgb(107,103,95) scores 5.30:1 on --canvas and 5.07:1 on --surface-muted; a full sweep of every element with direct text across Overview/Records/EVD-detail/SRC-detail/Problem/History (233-369 elements per surface) found zero sub-threshold text at both viewports; cross-checked against the passing deterministic Vitest assertion in index.css.contrast.test.ts), ODM-019 ('Ver Problema' on EVD-000106 reached view=problem&id=PRB-0005 -- a real rendered Problem view, not technical Detail -- via both mouse click and independent Enter and Space keyboard activation; the sibling Fonte/source button on EVD-000001 was independently confirmed to still land on generic technical Detail (SRC-0002), unaffected), ODM-020 (rendered manifest line reads 'Corpus: 274 registos - esta versao publicada dos dados foi gerada em 10/09/2026, 20:08 (nao indica a atualidade da investigacao)', unambiguously build/generation time, with the machine-readable <time dateTime> unchanged), ODM-021 (a genuine network-level failure of index.json produced the role=alert with 'Tentar novamente'; releasing the failure and clicking retry -- and separately, focusing the button and pressing Enter -- both recovered the Overview with zero additional performance-navigation entries, i.e. no full-page reload, reusing the existing useRecordIndex retry rather than new architecture). ODM-013 was independently confirmed NOT implemented (Overview.tsx's only diff line is the ODM-021 retry button), consistent with the WU032 contract's NOT_INDEPENDENTLY_REPRODUCIBLE disposition -- this remains an open owner-interpretation item, not a WU034 finding. Scope audit of a20ecf4..ee3468a confirms every product/test change maps only to ODM-014/015/016/017/019/020/021 (grep of the diff found exactly this set and no ODM-013/018/022+ tag); no package.json/lockfile diff anywhere in the repo; no canonical research/schema change (research:validate reports the same 274 records OK); C034/AMEND-003 read but not altered. Full deterministic validation suite passed (typecheck clean; 53 files/500 tests passed, 1 pre-existing skip, matching C034's own numbers; production build succeeded; research:validate OK; git diff --check clean). aiqt review and aiqt graph validate both report exactly the same three pre-existing C008/C009/C010 broken-checkpoint-packet-reference findings and nothing new -- confirmed unchanged historical debt, not repaired or reacknowledged. Two non-blocking observations carried forward, both independently traced to pre-existing, out-of-scope causes: (1) a benign favicon.ico 404 on every page load, and (2) a ~9px compact-viewport scrollWidth/clientWidth delta caused by the pre-existing off-screen .skip-link (left:-9999px), not a visible overflow (no element's rendered bounding box exceeds the 360px viewport). Neither is new, neither is a WU033/WU034 regression, and neither was fixed (out of scope for this read-only unit). WU034 made no source, test, doc, or dependency changes; the only working-tree diff is .aiqt/state.json and .aiqt/runlog.jsonl from aiqt next starting this unit, as intended.",
+      "completed": [
+        "Read WU032/C033, WU033/C034, AMEND-003, EVT-215/EVT-216, AGENTS.md, docs/explorerarchitecture.md, docs/datamodel.md before forming conclusions.",
+        "Ran aiqt next --work-unit WU034 preview, then aiqt next to start WU034 (confirmed in_progress via aiqt status).",
+        "Independently reverified ODM-013 (confirmed not implemented; Overview.tsx diff is exactly the ODM-021 retry action and nothing else).",
+        "Independently reverified ODM-014 via source inspection of read-model.js/recordIndex.ts/search-field-candidates.json and a live rendered search for 'conectividade rural-urbana' resolving to exactly EVD-000001 with unchanged truncated-label rendering.",
+        "Independently reverified ODM-015 via a live select-then-Back cycle (Tipo sort + page 3 of 11 preserved, URL never carried sort/page) and a live query-change-resets-to-page-1 check.",
+        "Independently reverified ODM-016A/B via fresh isolated navigations to multiple real EVD/SRC fragment targets at both viewports, browser Back to a deep link, and an in-app navigation-does-not-inherit-stale-fragment check; found #relacoes unreachable in the real corpus and reported that boundary honestly.",
+        "Independently reverified ODM-017 via live getComputedStyle WCAG 2.1 contrast computation swept over every direct-text element on 5 surfaces at desktop and compact, confirming zero sub-threshold text, without using Storybook addon-a11y.",
+        "Independently reverified ODM-019 via real mouse click and independent Enter/Space keyboard activation of 'Ver Problema', and a control check that the sibling Fonte/source navigation is unaffected.",
+        "Independently reverified ODM-020 via live rendered manifest-summary text and unchanged machine-readable <time dateTime>.",
+        "Independently reverified ODM-021 via a genuine network-level index.json failure/recovery cycle (both mouse and keyboard activation of retry), confirming no full-page reload via the Performance Navigation API.",
+        "Ran the full deterministic validation suite (typecheck, test, build, research:validate, git diff --check, aiqt review, aiqt graph validate) and recorded actual results.",
+        "Ran a scope audit of a20ecf4..ee3468a: confirmed the ODM tag set in the diff, confirmed no dependency/lockfile changes, confirmed no canonical research change.",
+        "Removed all Playwright artifacts and scratch diff files created during this session before finishing; stopped the dev server process I started."
+      ],
+      "notCompleted": [
+        "ODM-016B's #relacoes-specific live rendered sticky-header clearance could not be independently exercised against real corpus data: no PRB in the current 274-record generated corpus has incoming edges, and no non-SRC/EVD/PRB record type exists in the real corpus, so the only DOM branches that render #relacoes are unreachable live. This is reported as UNVERIFIABLE-BY-RENDERED-MEANS-ONLY for that one anchor; the extended scroll-margin-top rule and applyInitialFragment logic are still covered by their deterministic unit/CSS-contract tests, and every other real .record-editorial-section target (EVD and SRC) was independently confirmed live.",
+        "No implementation, test, documentation, or dependency change was made, by design (independent verification unit)."
+      ],
+      "filesChanged": [],
+      "issues": [
+        {
+          "title": "ODM-016B's #relacoes anchor could not be independently exercised against real rendered data",
+          "description": "No PRB in the current 274-record generated corpus has incomingEdges.length > 0 (all edges in generated/edges.json originate from PRB or EVD, none terminate at a PRB), and the real corpus contains only SRC/EVD/PRB record types (confirmed against docs/datamodel.md's 'exactly three record types'), so the generic-record #relacoes branch (RecordDetailPanel.tsx:997) is also unreachable live. This means the extended compact scroll-margin-top rule for #relacoes has deterministic CSS-contract and component-test coverage only, not independent live-rendered confirmation in this session. This is reported as an honest verification gap, not a suspected defect -- the rule and mechanism are identical to the independently-confirmed EVD/SRC .record-editorial-section targets which do work live.",
+          "severity": "low",
+          "status": "open",
+          "agentCanFix": false
+        },
+        {
+          "title": "Pre-existing C008/C009/C010 broken checkpoint packet references remain outstanding",
+          "description": "aiqt graph validate continues to report exactly these three pre-existing critical findings. They are explicitly out of scope for WU034 and were left untouched; recorded here only so the failed graph-validate exit status is not misread as a WU034 regression.",
+          "severity": "low",
+          "status": "open",
+          "agentCanFix": true
+        },
+        {
+          "title": "Two non-blocking pre-existing observations reconfirmed, not fixed (out of WU034 scope)",
+          "description": "(1) apps/research-explorer requests /favicon.ico which 404s on every page load in the dev server; traced to base commit a20ecf4, not introduced by WU033/WU034. (2) At 360px, document.documentElement.scrollWidth exceeds clientWidth by roughly 9px; independently confirmed this is caused by the pre-existing off-screen .skip-link (left:-9999px in index.css, unmodified by the WU033 diff) and not by any element whose rendered bounding box actually exceeds the viewport -- i.e. no visible overflow. Both are historical, out of scope, and were not remediated.",
+          "severity": "low",
+          "status": "open",
+          "agentCanFix": false
+        }
+      ],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "tsc --noEmit completed with exit code 0, no errors."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "53 test files passed, 1 skipped (54); 500 tests passed, 1 skipped (501) -- matches the count recorded in C034."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "vite build succeeded with no errors; standard production asset output."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK. Canonical research corpus unchanged."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "Clean, exit code 0; only informational LF/CRLF notices on .aiqt/state.json and .aiqt/runlog.jsonl."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "Project in_progress; M009 active with WU034 in_progress; no other work unit started."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Non-blocking warnings only: the same three pre-existing C008/C009/C010 missing-packet-ref integrity findings, plus the expected WU034-awaiting-checkpoint workflow notice. No new finding."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "failed",
+          "summary": "Reported exactly the three pre-existing GRAPH-VALIDATE-BROKEN-CHECKPOINT-PACKET-REFERENCE findings for C008/C009/C010 and nothing else, confirmed unchanged historical debt per the WU034 gate; not repaired, suppressed, or reacknowledged. No new graph finding introduced."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Every AR-02 exit-gate condition has independent read-only evidence, or the milestone remains open with the specific blocker reported.",
+          "result": "passed",
+          "evidence": "All seven reproduced-and-corrected findings (ODM-014/015/016/017/019/020/021) were independently re-verified with fresh rendered/source/keyboard/console evidence gathered in this session, not by trusting WU033/C034/AMEND-003's own claims. ODM-013's continued non-implementation was independently confirmed correct. One narrow sub-scope (#relacoes rendered clearance) is honestly reported as unverifiable against the real corpus rather than claimed as verified."
+        },
+        {
+          "criterion": "Automated functional validation (Explorer typecheck, full test suite, production build) and npm run research:validate pass.",
+          "result": "passed",
+          "evidence": "All four commands independently run in this session with exit-clean/passing results; see validationCommands."
+        },
+        {
+          "criterion": "Rendered browser verification passes on affected desktop and compact surfaces, and accessibility verification shows no new relevant violations.",
+          "result": "passed",
+          "evidence": "Fresh Playwright verification performed at 1440x900 and 360x740 across Overview/Records/EVD detail/SRC detail/Problem/History; live WCAG contrast sweep found zero sub-threshold text on any surface at either viewport; console showed only the pre-existing favicon 404 and my own deliberately-induced ODM-021 network failures."
+        },
+        {
+          "criterion": "Canonical research and research conclusions are verified unchanged.",
+          "result": "passed",
+          "evidence": "research:validate reports 274 records OK, matching the pre-WU033 baseline; the diff touches only apps/research-explorer (read-model builder and Explorer client), never research/."
+        },
+        {
+          "criterion": "No design or product evolution, ODM-018, later-roadmap work, or unapproved tooling addition is present in the delivered change.",
+          "result": "passed",
+          "evidence": "grep of the full a20ecf4..ee3468a diff for ODM tags returns exactly {014,015,016,017,019,020,021}; no package.json/package-lock.json diff anywhere in the repository; no AR-03/04/05 or D7 artifact found in state.json or the diff."
+        },
+        {
+          "criterion": "Graph validation is reported with the pre-existing C008/C009/C010 findings classified separately as historical debt; those three alone are not an AR-02 failure, while any new graph finding is blocking.",
+          "result": "passed",
+          "evidence": "aiqt graph validate returned exactly the three pre-existing C008/C009/C010 findings and nothing else; not repaired or reacknowledged; no new finding."
+        },
+        {
+          "criterion": "The work unit ends in needs_review so the owner performs closure.",
+          "result": "passed",
+          "evidence": "targetStatus set to needs_review in this checkpoint; no milestone/project lifecycle state manually forced."
+        }
+      ],
+      "finalWorkUnitStatus": "needs_review",
+      "createdAt": "2026-09-11T08:18:47.418Z",
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C035"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-034",
-    "workUnitId": "WU033",
+    "id": "PKT-035",
+    "workUnitId": "WU034",
     "milestoneId": "M009",
-    "createdAt": "2026-09-10T18:53:21.996Z",
+    "createdAt": "2026-09-11T08:01:52.491Z",
     "format": "markdown",
-    "contentHash": "sha256:57543f6ebc0d1998a0da0d8874f0d9e2f9e5b43a45efb7c3032def389a525fc5",
+    "contentHash": "sha256:a9e5fa6378c508804bfc1450d3f700ee6dfd22ab934d8614c996345b633e9904",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -4303,8 +4436,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-11T07:24:34.597Z",
+  "nextRecommendedCommand": "aiqt checkpoint amend --checkpoint C035",
+  "lastUpdatedAt": "2026-09-11T08:18:47.418Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -5413,6 +5546,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-11T07:24:34.597Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C035",
+      "current": {
+        "observationId": "sha256:ea85585ae824c01e64750da2a4bf8552fdba41ff954b78d9ef0c11a7bee76f89",
+        "checkpointId": "C035",
+        "workUnitId": "WU034",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-11T08:18:47.418Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-11T08:18:47.418Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:ea85585ae824c01e64750da2a4bf8552fdba41ff954b78d9ef0c11a7bee76f89",
+          "checkpointId": "C035",
+          "workUnitId": "WU034",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-11T08:18:47.418Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-11T08:18:47.418Z"
         }
       ]
     }
