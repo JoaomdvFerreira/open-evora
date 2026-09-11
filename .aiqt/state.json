@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
   "projectStatus": "in_progress",
-  "currentMilestoneId": "M009",
+  "currentMilestoneId": "M010",
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -115,7 +115,7 @@
         "id": "M010",
         "title": "AR-03 Knowledge-First Product Design: Foundation Consolidation",
         "objective": "Consolidate the Explorer's legacy production foundation (index.css's own hex-literal variables, ad hoc selectors, and Inter-based interface typography) onto the semantic DS-04B foundation tokens already imported into production via tokens.css (DS-05A), under the owner-frozen Public Sans interface family, without adopting foundations.css/layout.css wholesale, without any structural/component/navigation/layout redesign, and without treating DS-04B's remaining numeric/token candidates as frozen beyond what this milestone's own implementation and verification earn. Interface font is owner-frozen as Public Sans; reading font remains Source Serif 4; technical font remains IBM Plex Mono. Remaining DS-04B numeric/token values used by this migration become owner-frozen foundation values for the M010 migration scope only after successful WU036 implementation, WU037 independent production-rendered verification, and explicit owner M010 closure -- they are not previously-unused values and not universally 'newly-adopted production facts' beyond this migration's bounded scope. Short-record inline rail remains deferred. No AR-04 Problem Experience, AR-05 Discovery & Provenance, or D7 scope is included.",
-        "status": "ready",
+        "status": "in_progress",
         "workUnitIds": [
           "WU035",
           "WU036",
@@ -1516,10 +1516,10 @@
         "validationCommands": [
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-09-11T09:45:11.099Z",
-        "updatedAt": "2026-09-11T09:45:11.099Z"
+        "updatedAt": "2026-09-11T12:51:55.034Z"
       },
       {
         "id": "WU036",
@@ -1573,12 +1573,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-035"
         ],
         "createdAt": "2026-09-11T09:45:11.099Z",
-        "updatedAt": "2026-09-11T09:45:11.099Z"
+        "updatedAt": "2026-09-11T12:51:55.034Z"
       },
       {
         "id": "WU037",
@@ -4612,15 +4612,91 @@
       "finalWorkUnitStatus": "needs_review",
       "nextRecommendation": "aiqt checkpoint amend --checkpoint C035",
       "createdAt": "2026-09-11T08:18:47.418Z"
+    },
+    {
+      "id": "C036",
+      "workUnitId": "WU035",
+      "packetId": "PKT-036",
+      "summary": "Produced the single canonical WU035 DS-04B foundation-consolidation reconciliation and bounded implementation contract at docs/design/ds-04b-foundation-consolidation-contract.md, reconciling AGENTS.md, docs/explorerarchitecture.md, docs/design/foundations.md, docs/design/component-model.md, docs/design/component-visual-contract.md, apps/research-explorer/src/index.css, apps/research-explorer/src/styles/tokens.css, apps/research-explorer/src/main.tsx, and apps/research-explorer/package.json against each other. Made no runtime/product change.",
+      "completed": [
+        "Section A: exhaustive legacy-to-semantic token mapping for all 36 legacy index.css :root custom properties (18 mapped with explicit value/role notes, 18 flagged as having no safe DS-04B equivalent, including the 4/12/40px spacing-scale gap and the undefined --link bug).",
+        "Section B: exact affected-selector inventory — 201 rule blocks / 193 distinct selector texts across index.css grouped by feature area (no categorical hand-waving), plus a separate hard-coded-literal inventory (hex colours, ui-monospace drift, other literals) and a dead/shadowed-declaration appendix marked no-action.",
+        "Section C: migration strategy decision — direct selector rewrites chosen over compatibility aliases, with rationale (value drift, no 1:1 spacing/radius mapping, --ink-faint/--ink-faintest collapse, indefinite dual-naming risk), migration-risk tradeoff, and an explicit statement that no temporary compatibility alias survives WU036.",
+        "Section D: typography/package contract — Public Sans/Source Serif 4/IBM Plex Mono roles recorded; exact @fontsource/public-sans devDependencies-to-dependencies move specified; Inter production-import removal from main.tsx made conditional on 100% --ui consumer migration; @fontsource/inter retention justified by verified active Storybook consumers (.storybook/preview.ts, preview.css).",
+        "Section E: tokens.css stale-comment correction — exact current stale statement (lines 4-7) quoted verbatim and exact replacement wording defined for WU036.",
+        "Section F: WU036 implementation contract — exact allowed files, exact authorized token/selector changes, required tests, and explicit prohibitions (no foundations.css/layout.css wholesale adoption, no structural/component/navigation/layout redesign, no unrelated cleanup).",
+        "Section G: WU037 verification contract — production preview build as primary gate (never dev server), covering ~1440x900, ~360x740, a 768-1059px fallback check, computed-style contrast measurement, keyboard/focus-visible, visible-overflow, console, with Storybook/axe as supplemental only.",
+        "Section H: freeze boundary — explicit statement that all referenced DS-04B values remain bounded implementation candidates through WU035 and WU036, becoming owner-frozen only after WU036 + WU037 + explicit owner M010 closure.",
+        "Verified artifact claims directly against source: index.css :root at line 645 (confirmed), tokens.css stale comment text (confirmed verbatim), main.tsx Inter/Public Sans imports (confirmed lines 3-13), package.json @fontsource/public-sans in devDependencies vs @fontsource/inter in dependencies (confirmed), main.tsx:26-28 foundations.css/layout.css exclusion comment (confirmed verbatim), component-model.md ShellFrame/ReadingLayout/Stack/Cluster/SectionFlow layout-primitive names (confirmed)."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "docs/design/ds-04b-foundation-consolidation-contract.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace-conflict errors in the working tree diff."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "AIQT status: passed. Current milestone M010, current work unit WU035."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Warning-level result with only the pre-existing tolerated C008/C009/C010 missing-packet-ref findings and the expected informational WU035-awaiting-checkpoint finding. No new finding."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "Reported exactly the three pre-existing C008/C009/C010 broken-checkpoint-packet-reference findings and nothing else. No new graph/integrity finding."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Exactly one canonical design artifact is persisted under docs/design/ containing the exhaustive legacy-to-semantic token mapping, the affected-selector inventory, the alias-vs-rewrite decision and rationale, the Public Sans dependency/import treatment, the Inter production/Storybook treatment, the stale tokens.css comment correction, the exact WU036 scope, and the exact WU037 verification contract.",
+          "result": "passed",
+          "evidence": "docs/design/ds-04b-foundation-consolidation-contract.md (424 lines) contains sections A through H covering every named element; no second artifact was created."
+        },
+        {
+          "criterion": "No file under apps/research-explorer/src/ is modified.",
+          "result": "passed",
+          "evidence": "git diff main --name-only shows only .aiqt/runlog.jsonl and .aiqt/state.json (AIQT lifecycle bookkeeping) as modified, plus the one new untracked docs/design artifact. No apps/research-explorer/src/** path appears."
+        },
+        {
+          "criterion": "The artifact explicitly states it does not authorize foundations.css or layout.css adoption or any structural/component/navigation/layout redesign.",
+          "result": "passed",
+          "evidence": "Section F 'Explicit prohibitions' states both exclusions verbatim, cross-referenced against main.tsx's own DS-05A comment and component-model.md's Foundation/Layout-primitive boundaries."
+        },
+        {
+          "criterion": "The artifact explicitly states DS-04B's remaining numeric/token values stay bounded candidates and only become owner-frozen foundation values for the M010 migration scope after WU036, WU037, and explicit owner M010 closure.",
+          "result": "passed",
+          "evidence": "Section H states this exact three-part condition (WU036 implementation completion, WU037 verification PASS, explicit repository-owner M010 closure) jointly, matching the packet's required wording."
+        },
+        {
+          "criterion": "git diff --check is clean and no unrelated file is touched.",
+          "result": "passed",
+          "evidence": "git diff --check exit code 0; changed-file set is limited to the two AIQT state files and the one authorized artifact."
+        }
+      ],
+      "finalWorkUnitStatus": "needs_review",
+      "createdAt": "2026-09-11T12:35:18.985Z",
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C036"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-035",
-    "workUnitId": "WU034",
-    "milestoneId": "M009",
-    "createdAt": "2026-09-11T08:01:52.491Z",
+    "id": "PKT-036",
+    "workUnitId": "WU035",
+    "milestoneId": "M010",
+    "createdAt": "2026-09-11T10:07:33.695Z",
     "format": "markdown",
-    "contentHash": "sha256:a9e5fa6378c508804bfc1450d3f700ee6dfd22ab934d8614c996345b633e9904",
+    "contentHash": "sha256:d22e73c76421de37b423aa2d6c26bdde45e3cc0b4d16bd1b07574ab3596e0e44",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -4639,7 +4715,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-11T09:45:11.099Z",
+  "lastUpdatedAt": "2026-09-11T12:51:55.034Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -5778,6 +5854,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-11T08:18:47.418Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C036",
+      "current": {
+        "observationId": "sha256:4a3810c28a9fbb86e516b17698d4788dd843b3fc985bc524a7bfb28b8966f392",
+        "checkpointId": "C036",
+        "workUnitId": "WU035",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-11T12:35:18.985Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-11T12:35:18.985Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:4a3810c28a9fbb86e516b17698d4788dd843b3fc985bc524a7bfb28b8966f392",
+          "checkpointId": "C036",
+          "workUnitId": "WU035",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-11T12:35:18.985Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-11T12:35:18.985Z"
         }
       ]
     }
