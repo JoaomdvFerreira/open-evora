@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
-  "currentMilestoneId": "M011",
+  "projectStatus": "review",
+  "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -126,7 +126,7 @@
         "id": "M011",
         "title": "AR-04 Knowledge-First Problem Experience",
         "objective": "Transform the existing public Problem experience from a technically complete canonical projection into a coherent knowledge-first reading experience in which a reader can understand what the problem is, its current lifecycle/investigation state, what the canonical evidence establishes, the important boundaries and limits of that evidence, what remains uncertain or open, the current response/action context where canonical data supports it, and how to inspect the already-linked supporting material when needed, without changing canonical research meaning or inventing conclusions. AR-04 builds on the existing Problem View rather than creating a second Problem product model. It preserves canonical research semantics, existing canonical PRB identity, current routing/deep-link guarantees unless an exact AR-04 problem requires a bounded change, generic/shared component boundaries already established by the design system, M010 owner-frozen DS-04B foundation values, and accessibility and responsive contracts. M010-frozen DS-04B values must not be changed incidentally; any discovered need to change a frozen value is an owner decision, not delegated to AR-04 implementation. Out of scope: canonical research edits or reinterpretation, new external research, new fields/schema semantics merely to improve presentation, Records redesign, Overview redesign, Source/Evidence detail redesign except a strictly required bounded navigation handoff, global search/discovery redesign, cross-record provenance/discovery architecture (reserved for AR-05), Graph work, new product/solution selection, broad navigation redesign, foundation/token redesign, changing M010 owner-frozen DS-04B values, general CSS cleanup/refactoring, historical C008/C009/C010 repair, D7, AR-05, and unrelated deferred design debt (pre-existing body/some-navigation system-ui, invisible .unavailable-note geometry-only compact scrollWidth, favicon.ico 404 -- not automatically in scope unless WU038 independently proves one is required). C008/C009/C010 remain pre-existing acknowledged historical packet-reference debt: reported separately, never repaired/suppressed/mutated/re-acknowledged, and alone never make AR-04 fail; any NEW graph integrity finding is blocking. No successor beyond WU040 is authorized; AR-05 and D7 remain not started.",
-        "status": "ready",
+        "status": "done",
         "workUnitIds": [
           "WU038",
           "WU039",
@@ -1814,12 +1814,12 @@
           "aiqt review",
           "aiqt graph validate"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-038"
         ],
         "createdAt": "2026-09-11T18:51:39.184Z",
-        "updatedAt": "2026-09-11T19:35:43.759Z"
+        "updatedAt": "2026-09-11T20:11:09.410Z"
       }
     ],
     "dependencies": [
@@ -5350,17 +5350,117 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-11T19:35:43.759Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-11T19:35:43.759Z"
+    },
+    {
+      "id": "C041",
+      "workUnitId": "WU040",
+      "packetId": "PKT-041",
+      "summary": "Independently verified the merged WU039 AR-04 implementation (CR-1 Evidência reorder, CR-2 open-question detail-label treatment) against the built production artifact (npm run build + npm run preview, port 4173) on real canonical PRB-0006 and PRB-0012, across 1440x900, 900x800, and 360x740 viewports. No regression found; all rendered checks pass.",
+      "completed": [
+        "Read PKT-041, ar-04-problem-experience-contract.md, and the merged ProblemView.tsx/index.css/ProblemView.test.tsx implementation without modifying them.",
+        "Built the production artifact (vite build, 119 modules, no warnings) and served it exclusively via vite preview on port 4173 (never the dev server).",
+        "Verified CR-1 (Evidência section DOM order: EffectOccurrenceSummary -> evidence groups -> independence_assessment) rendered correctly on PRB-0006 at all three viewports via DOM inspection of the built artifact.",
+        "Verified CR-1 order is unaffected on PRB-0012 (no independence_assessment authored, groups fall through to 'Outra evidência relacionada' only).",
+        "Verified CR-2 (open-question-detail-label class on all four optional OpenQuestionItem <h4> labels) with correct computed style (text-transform: none, letter-spacing: normal) vs Estado atual's h4 labels (text-transform: uppercase, letter-spacing: 0.36px) at all three viewports.",
+        "Verified heading level/text/semantics unchanged for CR-2-styled labels (still <h4>, same text).",
+        "Verified problem-heading receives focus on load (confirmed via waitForFunction against the built artifact after an initial false-negative caused by reading DOM state before the async projection settled).",
+        "Verified rail/compact 'Nesta página' section-index equivalence (16 identical entries/hrefs) and correct closed-<details> hiding of the compact copy at desktop width.",
+        "Verified section-anchor deep-link navigation (#problem-evidencia) scrolls correctly.",
+        "Verified ContextTabs navigation (Problema -> Historico) updates the URL/view correctly with no console errors.",
+        "Verified tab order through the reordered Evidencia section follows natural DOM order with no tabindex overrides.",
+        "Verified responsive recomposition: rail hidden and single-column at 900x800; PRB-content overflow is 0px at 360x740 for both PRB-0006 and PRB-0012 (the pre-existing 9px .explorer-navigation app-chrome delta is present and unchanged, matching the WU038-documented baseline).",
+        "Verified zero new browser console/network errors on either fixture at any viewport; only the pre-existing favicon.ico 404 occurs.",
+        "Ran full automated validation: explorer tests (506 passed, 1 pre-existing skip), typecheck (clean), build (clean), research:validate (274 records OK), git diff --check (clean, only CRLF/LF advisory), aiqt status (passed), aiqt review (only pre-existing C008/C009/C010 findings + normal awaiting-checkpoint note; WU040:vague-scope did not reappear), aiqt graph validate (only the same pre-existing C008/C009/C010 critical findings, no new integrity finding).",
+        "Stopped the preview server and confirmed port 4173 is no longer listening before checkpoint/commit."
+      ],
+      "notCompleted": [],
+      "filesChanged": [],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "53 test files passed, 1 skipped; 506 tests passed, 1 skipped."
+        },
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "tsc --noEmit completed with no errors."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "vite build succeeded, no new warnings."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "274 canonical records validated OK."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace/conflict-marker errors; only CRLF/LF line-ending advisories from git itself."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "Project in_progress, current work unit WU040, no blocking status issues."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Only pre-existing high-severity C008/C009/C010 missing-packet-ref findings and a normal medium awaiting-checkpoint workflow note; no new finding."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "Only the same pre-existing C008/C009/C010 critical missing-packet-ref findings; no new integrity finding."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Verification report covers every item in the WU040 verification matrix defined by the approved WU038 contract",
+          "result": "passed",
+          "evidence": "Desktop/compact/900px viewport checks, CR-1 order, CR-2 label casing, section-index equivalence, keyboard/focus, heading semantics, and console checks all performed against the built artifact on PRB-0006 and PRB-0012 as specified in contract section 16 items 1-7."
+        },
+        {
+          "criterion": "All automated tests/typecheck/build/research validation pass",
+          "result": "passed",
+          "evidence": "See validationCommands."
+        },
+        {
+          "criterion": "No new console/network integrity issues introduced",
+          "result": "passed",
+          "evidence": "Only the pre-existing favicon.ico 404 observed on both fixtures at all viewports; zero new errors/warnings."
+        },
+        {
+          "criterion": "No regression against the approved WU038 contract, or regressions are explicitly reported back to owner review with no in-place fix",
+          "result": "passed",
+          "evidence": "CR-1 and CR-2 both render exactly as contracted; all NO_CHANGE findings from WU038 section 5 re-confirmed rendered on the built artifact; no new defect found."
+        },
+        {
+          "criterion": "A passing result may close this work unit done natively; explicit AR-04 owner closure remains a separate post-verification/post-publication gate",
+          "result": "passed",
+          "evidence": "This checkpoint records a native passing closure for WU040 only; it does not assert or perform AR-04 owner closure, which remains a separate later gate."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-11T20:11:09.410Z",
+      "nextRecommendation": "aiqt review --mode release"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-040",
-    "workUnitId": "WU039",
+    "id": "PKT-041",
+    "workUnitId": "WU040",
     "milestoneId": "M011",
-    "createdAt": "2026-09-11T19:31:15.795Z",
+    "createdAt": "2026-09-11T20:01:55.180Z",
     "format": "markdown",
-    "contentHash": "sha256:87b4715cd7e472d1748adf08af8db89e565fa35d94c6cebe578942a738a40eb7",
+    "contentHash": "sha256:8b71051fc12c26f24cb60e053064215dab9619e089e7c3131038fa4a5e7c8200",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -5378,8 +5478,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-11T19:35:43.759Z",
+  "nextRecommendedCommand": "aiqt review --mode release",
+  "lastUpdatedAt": "2026-09-11T20:11:09.410Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -6690,6 +6790,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-11T19:35:43.759Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C041",
+      "current": {
+        "observationId": "sha256:327061bc17305052de5ab90cb64bb6940c6db6d19233b2a4609fb9f1a5130944",
+        "checkpointId": "C041",
+        "workUnitId": "WU040",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-11T20:11:09.410Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-11T20:11:09.410Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:327061bc17305052de5ab90cb64bb6940c6db6d19233b2a4609fb9f1a5130944",
+          "checkpointId": "C041",
+          "workUnitId": "WU040",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-11T20:11:09.410Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-11T20:11:09.410Z"
         }
       ]
     }
