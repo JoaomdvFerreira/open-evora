@@ -1384,12 +1384,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-033"
         ],
         "createdAt": "2026-09-10T17:34:44.071Z",
-        "updatedAt": "2026-09-10T18:17:25.498Z"
+        "updatedAt": "2026-09-11T07:24:34.597Z"
       },
       {
         "id": "WU034",
@@ -1444,12 +1444,12 @@
           "git diff --check",
           "aiqt review"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-034"
         ],
         "createdAt": "2026-09-10T17:34:44.071Z",
-        "updatedAt": "2026-09-10T17:34:44.071Z"
+        "updatedAt": "2026-09-11T07:24:34.597Z"
       }
     ],
     "dependencies": [
@@ -4148,17 +4148,144 @@
         }
       ],
       "finalWorkUnitStatus": "needs_review",
-      "createdAt": "2026-09-10T18:11:04.054Z",
-      "nextRecommendation": "aiqt checkpoint amend --checkpoint C033"
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C033",
+      "createdAt": "2026-09-10T18:11:04.054Z"
+    },
+    {
+      "id": "C034",
+      "workUnitId": "WU033",
+      "packetId": "PKT-034",
+      "summary": "Implemented all six WU032-approved reproduced AR-02 functional corrections (ODM-014/015/016/017/019/020/021 disposition set; ODM-013 correctly not implemented, per the WU032 contract's NOT_INDEPENDENTLY_REPRODUCIBLE disposition). Full deterministic validation (typecheck, test suite, production build, research:validate, git diff --check) passes. Rendered/browser verification could not be completed: the shared Playwright browser profile in this environment is held by a concurrent session for the entire verification window, returning 'Browser is already in use' on every retry across the session. No visual/rendered check was fabricated.",
+      "completed": [
+        "ODM-014: read-model search-coverage enrichment (searchText field, bounded SEARCH_FIELD_CANDIDATES) plus recordSearchText consumption and focused regression tests, including the exact EVD-000001 / 'conectividade rural-urbana' phrase against the real generated corpus.",
+        "ODM-015: lifted Records sort/page controller state from RecordsTable to RecordsExplorer (the smallest stable owner surviving Records -> Detail -> Records) and moved the query/type-filter page-reset effect alongside it with a skip-first-run guard; added RecordsExplorer.test.tsx round-trip regression coverage.",
+        "ODM-016A: added applyInitialFragment() to re-apply an initial deep-link URL fragment once RecordDetailPanel's async content mounts, wired via a once-per-mount effect; added unit + component regression tests.",
+        "ODM-016B: extended the existing compact sticky-header scroll-margin-top rule to .record-editorial-section and #relacoes (previously only .problem-section/#overview-problemas); added a CSS-contract regression test.",
+        "ODM-017: corrected --ink-faintest from #8a8578 to #6b675f (matching --ink-faint, the WU032-identified minimal target darkness) so it reaches >=4.5:1 against all four backgrounds; added a deterministic WCAG contrast regression test reading the real token values from index.css.",
+        "ODM-019: 'Ver Problema' in EvdDetail's EvdInvestigation section now calls a distinct onViewAsProblem callback (reusing Explorer.tsx's existing url.setViewAndSelection('problem', id) path already wired through RecordDetailPanel/ContextTabs) instead of the generic onSelect that landed on technical Detail; updated existing tests that asserted the old behaviour and added an explicit routing-target assertion.",
+        "ODM-020: added a PT-PT qualifier to App.tsx's manifest-summary line distinguishing the generated/build timestamp from research currentness, preserving the existing machine-readable <time dateTime> value unchanged; added a regression test.",
+        "ODM-021: added the established ErrorNotice action={<button onClick={indexState.retry}>Tentar novamente</button>} retry pattern (already used in RecordsExplorer/ProblemView) to Overview's error branch; added a regression test following the App.test.tsx 'retries a failed startup manifest load' pattern."
+      ],
+      "notCompleted": [
+        "Rendered/browser verification (desktop 1440x900 and compact 360x740) for all seven findings could not be performed: the shared Playwright MCP browser instance was held by a concurrent session for this entire session ('Browser is already in use for ...mcp-chrome-160a0da'), on every retry. This blocks visual confirmation only -- functional behaviour for every finding is covered by jsdom/Testing-Library regression tests (DOM assertions, scrollIntoView/focus calls, computed WCAG contrast over the real token values, routing-callback assertions), but real painted layout, actual sticky-header pixel clearance, and real rendered contrast were not visually confirmed."
+      ],
+      "filesChanged": [
+        "apps/research-explorer/scripts/read-model.js",
+        "apps/research-explorer/shared/search-field-candidates.json",
+        "apps/research-explorer/src/dataProvider/types.ts",
+        "apps/research-explorer/src/records/recordIndex.ts",
+        "apps/research-explorer/src/records/recordIndex.test.ts",
+        "apps/research-explorer/src/records/realCorpus.test.ts",
+        "apps/research-explorer/src/records/RecordsExplorer.tsx",
+        "apps/research-explorer/src/records/RecordsExplorer.test.tsx",
+        "apps/research-explorer/src/records/RecordsTable.tsx",
+        "apps/research-explorer/src/records/RecordsTable.test.tsx",
+        "apps/research-explorer/src/navigation/applyInitialFragment.ts",
+        "apps/research-explorer/src/navigation/applyInitialFragment.test.ts",
+        "apps/research-explorer/src/records/RecordDetailPanel.tsx",
+        "apps/research-explorer/src/records/RecordDetailPanel.test.tsx",
+        "apps/research-explorer/src/index.css",
+        "apps/research-explorer/src/index.css.scrollmargin.test.ts",
+        "apps/research-explorer/src/index.css.contrast.test.ts",
+        "apps/research-explorer/src/records/EvdDetail.tsx",
+        "apps/research-explorer/src/records/EvdDetail.test.tsx",
+        "apps/research-explorer/src/app/App.tsx",
+        "apps/research-explorer/src/app/App.test.tsx",
+        "apps/research-explorer/src/overview/Overview.tsx",
+        "apps/research-explorer/src/overview/Overview.test.tsx"
+      ],
+      "issues": [
+        {
+          "title": "Rendered/browser verification blocked by Playwright browser contention",
+          "description": "Rendered/browser verification (desktop + 360px, all affected surfaces) is outstanding due to environment-level Playwright browser contention, not a code defect. Owner should either re-run this verification once the shared browser is free, or explicitly accept the deterministic-test evidence in place of it.",
+          "severity": "high",
+          "status": "open",
+          "agentCanFix": true
+        }
+      ],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "partial",
+      "validationCommands": [
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "tsc --noEmit clean, no errors."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "53 passed | 1 skipped (pre-existing, unrelated) test files; 500 passed | 1 skipped tests."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "vite build succeeded, no errors."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors; only informational LF/CRLF notices on .aiqt/* lifecycle files."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Every REPRODUCED finding is corrected exactly within its approved meaning, no other behaviour changed",
+          "result": "passed",
+          "evidence": "ODM-014/015/016/017/019/020/021 implemented per the WU032 contract's exact file/behaviour scope; ODM-013 not implemented."
+        },
+        {
+          "criterion": "Explorer typecheck, full test suite, and production build pass",
+          "result": "passed",
+          "evidence": "All three commands green, see validationCommands."
+        },
+        {
+          "criterion": "Focused regression tests exist and pass for every reproduced finding",
+          "result": "passed",
+          "evidence": "New/extended tests in recordIndex.test.ts, realCorpus.test.ts, RecordsExplorer.test.tsx, RecordsTable.test.tsx, applyInitialFragment.test.ts, RecordDetailPanel.test.tsx, index.css.scrollmargin.test.ts, index.css.contrast.test.ts, EvdDetail.test.tsx, App.test.tsx, Overview.test.tsx."
+        },
+        {
+          "criterion": "Rendered browser verification at desktop and ~360px compact for affected surfaces",
+          "result": "failed",
+          "evidence": "Blocked: shared Playwright browser held by a concurrent session for the full session ('Browser is already in use'); not performed, not fabricated."
+        },
+        {
+          "criterion": "Keyboard, focus, and deep-link behaviour verified for affected navigation surfaces",
+          "result": "partial",
+          "evidence": "Verified via jsdom/Testing Library (focus target assertions, scrollIntoView calls, keyboard-reachable native buttons/links); real browser keyboard/focus traversal not additionally confirmed due to the same browser blocker."
+        },
+        {
+          "criterion": "ODM-017 accessibility verification shows no new relevant violations; contrast measured/verifiable, correction minimal",
+          "result": "partial",
+          "evidence": "Deterministic WCAG 2.1 contrast computation added and passing (>=4.5:1 against all four backgrounds); the WU032-specified rendered in-browser getComputedStyle contrast sweep was not additionally performed due to the browser blocker."
+        },
+        {
+          "criterion": "Canonical research validation passes unchanged; git diff --check clean",
+          "result": "passed",
+          "evidence": "See validationCommands."
+        },
+        {
+          "criterion": "C008/C009/C010 classified separately; any NEW graph finding is blocking",
+          "result": "not_checked",
+          "evidence": "No aiqt graph/review run as part of this checkpoint request beyond the checkpoint call itself; no new finding introduced by this implementation."
+        }
+      ],
+      "finalWorkUnitStatus": "needs_review",
+      "nextRecommendation": "aiqt checkpoint amend --checkpoint C034",
+      "createdAt": "2026-09-10T19:14:15.922Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-033",
-    "workUnitId": "WU032",
+    "id": "PKT-034",
+    "workUnitId": "WU033",
     "milestoneId": "M009",
-    "createdAt": "2026-09-10T17:56:39.572Z",
+    "createdAt": "2026-09-10T18:53:21.996Z",
     "format": "markdown",
-    "contentHash": "sha256:b4c66906a3c0a874a80598e6cdebc9e319e563821825a3dbfa9d43fd3950c5d0",
+    "contentHash": "sha256:57543f6ebc0d1998a0da0d8874f0d9e2f9e5b43a45efb7c3032def389a525fc5",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -4177,7 +4304,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-10T18:17:25.498Z",
+  "lastUpdatedAt": "2026-09-11T07:24:34.597Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -4219,6 +4346,16 @@
       "validationResult": "passed",
       "reason": "Project owner explicitly approved WU-D1-02 Research Batch C and the institutional-saturation conclusion; human review resolved, all validation/acceptance results pass.",
       "amendedAt": "2026-08-10T20:52:57.626Z",
+      "sourceCommand": "aiqt checkpoint amend"
+    },
+    {
+      "amendmentId": "AMEND-003",
+      "checkpointId": "C034",
+      "workUnitId": "WU033",
+      "acceptanceCriteriaResult": "passed",
+      "validationResult": "passed",
+      "reason": "Rendered/browser verification completed at desktop (1440x900) and compact (~360px) using an isolated Playwright browser context (fresh temporary user-data-dir, no shared-profile interference). ODM-014/015/016/017/019/020/021 all confirmed PASS: search finds previously-unreachable canonical content (EVD-000001 via 'conectividade rural-urbana') with no per-record detail fetch; Records sort/page survive select-then-return with no URL leakage and correct query-change reset; initial deep-link fragment (#evd-limits) is re-applied post-mount and clears the compact sticky header (target top 108.2 >= header bottom 104.1), desktop smoke-checked with no regression; live computed --ink-faintest (#6b675f) measured >=4.5:1 (5.30/5.63) against every affected background, cross-checked against the deterministic Vitest assertion; 'Ver Problema' reaches view=problem&id=PRB-0001 (not technical Detail) via mouse and keyboard; Overview manifest timestamp is clearly qualified as generation/build time with the canonical <time dateTime> unchanged; Overview error state shows and recovers via 'Tentar novamente' with no reload or new retry architecture. ODM-013 remains without independent implementation per the WU032 contract. Two observations (favicon.ico 404; ~7px scrollWidth delta from the pre-existing, invisible-by-default .unavailable-note tooltip and the intentionally off-screen skip-link) were traced to base commit a20ecf4b, confirmed pre-existing and out of WU033 scope -- not a regression. No implementation or test changes were made during rendered verification; C034 was read-only until this amendment.",
+      "amendedAt": "2026-09-11T07:24:34.597Z",
       "sourceCommand": "aiqt checkpoint amend"
     }
   ],
@@ -5234,6 +5371,48 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-10T18:11:04.054Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C034",
+      "current": {
+        "observationId": "sha256:2ba8af3b1d075edf1507c319301bbfe4acff8ec68e287b2933d50a9f1466bdf9",
+        "checkpointId": "C034",
+        "workUnitId": "WU033",
+        "trigger": "amendment",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-11T07:24:34.597Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-11T07:24:34.597Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:9fd51886ee1fc2634e1c337bc3ce7c950fe5e6e9c5dd753a43c3c94a737ebae7",
+          "checkpointId": "C034",
+          "workUnitId": "WU033",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-10T19:14:15.922Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-10T19:14:15.922Z"
+        },
+        {
+          "observationId": "sha256:2ba8af3b1d075edf1507c319301bbfe4acff8ec68e287b2933d50a9f1466bdf9",
+          "checkpointId": "C034",
+          "workUnitId": "WU033",
+          "trigger": "amendment",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-11T07:24:34.597Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-11T07:24:34.597Z"
         }
       ]
     }
