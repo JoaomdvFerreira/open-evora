@@ -807,25 +807,25 @@ function OpenQuestionItem({
       <p className="open-question-question">{item.question}</p>
       {item.whyOpen && (
         <div className="problem-current-state-item">
-          <h4>Porque continua em aberto</h4>
+          <h4 className="open-question-detail-label">Porque continua em aberto</h4>
           <p>{item.whyOpen}</p>
         </div>
       )}
       {item.currentAction && (
         <div className="problem-current-state-item">
-          <h4>O que estamos a fazer</h4>
+          <h4 className="open-question-detail-label">O que estamos a fazer</h4>
           <p>{item.currentAction}</p>
         </div>
       )}
       {item.latestResult && (
         <div className="problem-current-state-item">
-          <h4>O que aprendemos mais recentemente</h4>
+          <h4 className="open-question-detail-label">O que aprendemos mais recentemente</h4>
           <p>{item.latestResult}</p>
         </div>
       )}
       {item.resolutionCondition && (
         <div className="problem-current-state-item">
-          <h4>O que permitiria esclarecer</h4>
+          <h4 className="open-question-detail-label">O que permitiria esclarecer</h4>
           <p>{item.resolutionCondition}</p>
         </div>
       )}
@@ -1012,12 +1012,6 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
 
           <section id="problem-evidencia" aria-label="Evidência" className="problem-section">
             <h3 className="detail-panel-label">Registos de evidência associados ({formatPublicCount(evidence.length)})</h3>
-            {independenceAssessment && (
-              <div className="problem-current-state-item">
-                <h4>Independência da evidência</h4>
-                <p>{independenceAssessment}</p>
-              </div>
-            )}
             <EffectOccurrenceSummary evidence={evidence} />
             {evidence.length === 0 ? (
               <EmptyState message="Nenhuma evidência associada." />
@@ -1032,6 +1026,12 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
                   </>
                 );
               })()
+            )}
+            {independenceAssessment && (
+              <div className="problem-current-state-item">
+                <h4>Independência da evidência</h4>
+                <p>{independenceAssessment}</p>
+              </div>
             )}
           </section>
 

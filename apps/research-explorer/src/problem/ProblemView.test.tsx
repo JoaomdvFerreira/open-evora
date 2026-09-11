@@ -24,6 +24,7 @@ const prbRecord = {
     supporting_evidence: ["EVD-1"],
     boundary_evidence: ["EVD-2"],
     contradiction_search: { performed: true, summary: "Procura contraditória concluída.", evidence: ["EVD-3"] },
+    independence_assessment: "Avaliação de independência documentada.",
   },
   investigation: {
     open_questions: [{ question: "Questão em aberto.", why_open: "Ainda não resolvida.", evidence: ["EVD-1"] }],
@@ -90,6 +91,112 @@ describe("ProblemView vNext", () => {
     fireEvent.click(screen.getByRole("button", { name: /SRC-1/ }));
     expect(onOpenGeneric).toHaveBeenCalledWith("EVD-1");
     expect(onOpenGeneric).toHaveBeenCalledWith("SRC-1");
+  });
+
+  it("orders the Evidência section as EffectOccurrenceSummary, then evidence groups, then independence assessment", async () => {
+    render(<ProblemView {...props} problemId="PRB-1" />);
+    const support = await screen.findByText("Evidência que suporta (1)");
+    const section = support.closest("section")!;
+
+    const effectSummaryLabel = within(section).getByText(/papéis indicados não representam/);
+    const evidenceGroupHeading = within(section).getByText("Evidência que suporta (1)");
+    const independenceHeading = within(section).getByText("Independência da evidência");
+    const independenceText = within(section).getByText("Avaliação de independência documentada.");
+
+    const position = (node: Element) => node.compareDocumentPosition(effectSummaryLabel);
+    expect(position(evidenceGroupHeading) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+    expect(evidenceGroupHeading.compareDocumentPosition(independenceHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(independenceHeading.compareDocumentPosition(independenceText) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("keeps the empty-evidence EmptyState in place of evidence groups ahead of any independence assessment", async () => {
+    const sparseRecords: Record<string, RecordDetail> = { ...records, "PRB-1": { ...records["PRB-1"], record: { title: "Sem opcionais", evidence: [] }, outgoingEdges: [] } };
+    const sparseProvider: DataProvider = { ...provider, getRecord: async (id) => sparseRecords[id] };
+    render(<ProblemView {...props} dataProvider={sparseProvider} problemId="PRB-1" />);
+    const message = await screen.findByText("Nenhuma evidência associada.");
+    expect(message.className).toBe("ui-empty-state-message");
+    expect(screen.queryByText("Independência da evidência")).toBeNull();
+  });
+
+  it("orders EmptyState before independence_assessment when evidence is empty but the assessment is authored", async () => {
+    const emptyEvidenceWithAssessmentRecords: Record<string, RecordDetail> = {
+      ...records,
+      "PRB-1": {
+        ...records["PRB-1"],
+        record: {
+          title: "Sem evidência, com avaliação de independência",
+          evidence: [],
+          decision_basis: { independence_assessment: "Avaliação de independência documentada." },
+        },
+        outgoingEdges: [],
+      },
+    };
+    const emptyEvidenceProvider: DataProvider = { ...provider, getRecord: async (id) => emptyEvidenceWithAssessmentRecords[id] };
+    render(<ProblemView {...props} dataProvider={emptyEvidenceProvider} problemId="PRB-1" />);
+
+    const message = await screen.findByText("Nenhuma evidência associada.");
+    const independenceHeading = screen.getByText("Independência da evidência");
+
+    expect(message.className).toBe("ui-empty-state-message");
+    expect(independenceHeading.tagName).toBe("H4");
+    expect(message.compareDocumentPosition(independenceHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
+describe("ProblemView AR-04 CR-2 — open-question internal detail labels", () => {
+  const fullOpenQuestionRecords: Record<string, RecordDetail> = {
+    ...records,
+    "PRB-1": {
+      ...records["PRB-1"],
+      record: {
+        ...prbRecord,
+        investigation: {
+          ...prbRecord.investigation,
+          open_questions: [
+            {
+              question: "Questão em aberto.",
+              why_open: "Ainda não resolvida.",
+              current_action: "Ação em curso registada.",
+              latest_result: "Resultado mais recente registado.",
+              resolution_condition: "Condição de resolução registada.",
+              evidence: ["EVD-1"],
+            },
+          ],
+        },
+      },
+    },
+  };
+  const fullOpenQuestionProvider: DataProvider = { ...provider, getRecord: async (id) => fullOpenQuestionRecords[id] };
+
+  it("marks all four open-question internal detail labels with open-question-detail-label, unchanged text and heading level", async () => {
+    render(<ProblemView {...props} dataProvider={fullOpenQuestionProvider} problemId="PRB-1" />);
+
+    const expectedLabels = [
+      "Porque continua em aberto",
+      "O que estamos a fazer",
+      "O que aprendemos mais recentemente",
+      "O que permitiria esclarecer",
+    ];
+
+    for (const text of expectedLabels) {
+      const label = await screen.findByText(text);
+      expect(label.tagName).toBe("H4");
+      expect(label.className).toBe("open-question-detail-label");
+    }
+  });
+
+  it("does not apply open-question-detail-label to the primary open question", async () => {
+    render(<ProblemView {...props} dataProvider={fullOpenQuestionProvider} problemId="PRB-1" />);
+    const question = await screen.findByText("Questão em aberto.");
+    expect(question.className).toBe("open-question-question");
+  });
+
+  it("does not apply open-question-detail-label to Estado atual's h4 labels", async () => {
+    render(<ProblemView {...props} dataProvider={fullOpenQuestionProvider} problemId="PRB-1" />);
+    await screen.findByText("Manifestação documentada.");
+    const manifestationLabel = screen.getAllByText("O que observamos").find((node) => node.tagName === "H4")!;
+    expect(manifestationLabel).toBeTruthy();
+    expect(manifestationLabel.className).toBe("");
   });
 });
 

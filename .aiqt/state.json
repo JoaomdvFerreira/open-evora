@@ -1764,12 +1764,12 @@
           "aiqt review",
           "aiqt graph validate"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-037"
         ],
         "createdAt": "2026-09-11T18:51:39.184Z",
-        "updatedAt": "2026-09-11T19:13:21.831Z"
+        "updatedAt": "2026-09-11T19:35:43.759Z"
       },
       {
         "id": "WU040",
@@ -1814,12 +1814,12 @@
           "aiqt review",
           "aiqt graph validate"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-038"
         ],
         "createdAt": "2026-09-11T18:51:39.184Z",
-        "updatedAt": "2026-09-11T18:51:39.184Z"
+        "updatedAt": "2026-09-11T19:35:43.759Z"
       }
     ],
     "dependencies": [
@@ -5249,17 +5249,118 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-11T19:13:21.831Z",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-11T19:13:21.831Z"
+    },
+    {
+      "id": "C040",
+      "workUnitId": "WU039",
+      "packetId": "PKT-040",
+      "summary": "Implemented CR-1 (Evidência section reading-order fix: independence_assessment moved to the final conditional block, after EffectOccurrenceSummary and grouped evidence/EmptyState) and CR-2 (open-question internal detail labels distinguished from Estado atual via open-question-detail-label className and a narrowly scoped CSS override removing inherited uppercase/letter-spacing) exactly as specified in docs/design/ar-04-problem-experience-contract.md, within the three-file WU039 boundary.",
+      "completed": [
+        "CR-1: reordered problem-evidencia section JSX in ProblemView.tsx so independence_assessment renders after EffectOccurrenceSummary and the evidence groups/EmptyState, as the final conditional block",
+        "CR-2: added className=\"open-question-detail-label\" to the four OpenQuestionItem internal detail <h4> labels in ProblemView.tsx",
+        "CR-2: added the exact two-declaration scoped CSS override in index.css (.problem-current-state-item h4.open-question-detail-label { text-transform: none; letter-spacing: normal; })",
+        "Added an order-sensitive DOM-position test proving EffectOccurrenceSummary < evidence group content < independence assessment",
+        "Added a test preserving EmptyState-before-independence-assessment behavior in the sparse-evidence case",
+        "Added CR-2 tests proving the four labels carry open-question-detail-label and remain h4 with unchanged text, the primary question is unaffected, and Estado atual h4 labels are unaffected",
+        "Ran full validation suite: tests, typecheck, build, research:validate, git diff --check all passed"
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "apps/research-explorer/src/problem/ProblemView.tsx",
+        "apps/research-explorer/src/index.css",
+        "apps/research-explorer/src/problem/ProblemView.test.tsx"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "505 passed, 1 skipped, 0 failed across 54 test files."
+        },
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "tsc --noEmit produced no errors."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "vite build succeeded with no new warnings."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK. Canonical corpus unchanged."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace/conflict-marker errors; only LF/CRLF informational warnings on .aiqt files."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "AIQT status: passed. Project in_progress, milestone M011, current work unit WU039."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Review completed with only pre-existing non-blocking findings: historical C008/C009/C010 broken-checkpoint-packet-reference, pre-existing WU040:vague-scope advisory, and the expected WU039:awaiting-checkpoint workflow notice. No new finding."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "Graph validate reported only the three pre-existing, historical GRAPH-VALIDATE-BROKEN-CHECKPOINT-PACKET-REFERENCE findings for C008/C009/C010, confirmed identical to baseline and named as historical debt in the approved contract (§20). No new graph finding was introduced by WU039's changes."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Every implementation change maps to a specific approved WU038 contract item",
+          "result": "passed",
+          "evidence": "CR-1 maps to contract §6/§14 (Evidência DOM reorder); CR-2 maps to contract §6/§14 (open-question-detail-label className + scoped CSS override)."
+        },
+        {
+          "criterion": "No canonical research or frozen foundation value changed",
+          "result": "passed",
+          "evidence": "research:validate passed unchanged; no DS-04B token/selector-value touched; only one new selector added with exactly the two authorized declarations."
+        },
+        {
+          "criterion": "Existing Problem-related tests updated/extended consistent with the approved contract and passing",
+          "result": "passed",
+          "evidence": "All prior ProblemView.test.tsx cases pass unmodified; new order-sensitive and className tests added per contract §14/§15."
+        },
+        {
+          "criterion": "Typecheck, lint, build, and full test suite pass",
+          "result": "passed",
+          "evidence": "See validationCommands."
+        },
+        {
+          "criterion": "Any server/process started during the work unit is stopped before commit/closure",
+          "result": "passed",
+          "evidence": "No dev server or preview process was started during this work unit; build and test commands ran to completion and exited on their own."
+        },
+        {
+          "criterion": "Work committed on a branch scoped to this execution phase before the work unit is considered closed",
+          "result": "passed",
+          "evidence": "Branch work/m011-wu039-problem-experience created before implementation; commit to follow checkpoint."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-11T19:35:43.759Z",
       "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-039",
-    "workUnitId": "WU038",
+    "id": "PKT-040",
+    "workUnitId": "WU039",
     "milestoneId": "M011",
-    "createdAt": "2026-09-11T19:04:26.725Z",
+    "createdAt": "2026-09-11T19:31:15.795Z",
     "format": "markdown",
-    "contentHash": "sha256:4601eb6e51c8e859c787953c1c7dc03ab95734b7fe9f95b02df631fa9435c806",
+    "contentHash": "sha256:87b4715cd7e472d1748adf08af8db89e565fa35d94c6cebe578942a738a40eb7",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -5278,7 +5379,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-11T19:13:21.831Z",
+  "lastUpdatedAt": "2026-09-11T19:35:43.759Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -6559,6 +6660,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-11T19:13:21.831Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C040",
+      "current": {
+        "observationId": "sha256:52574ee69c39e1f1cc4bf488ec5b4f898ff197536e8d78585a4059e7b587054d",
+        "checkpointId": "C040",
+        "workUnitId": "WU039",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-11T19:35:43.759Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-11T19:35:43.759Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:52574ee69c39e1f1cc4bf488ec5b4f898ff197536e8d78585a4059e7b587054d",
+          "checkpointId": "C040",
+          "workUnitId": "WU039",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-11T19:35:43.759Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-11T19:35:43.759Z"
         }
       ]
     }
