@@ -2631,6 +2631,11 @@ main.explorer-shell {
   letter-spacing: 0.03em;
 }
 
+.problem-current-state-item h4.open-question-detail-label {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
 .problem-current-state-item p {
   margin: 0;
   color: var(--color-ink-primary);
