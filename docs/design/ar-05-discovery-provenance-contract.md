@@ -1062,3 +1062,75 @@ matching the standard already established by AR-04's WU040 and
   C008/C009/C010 critical findings (§12); no new integrity finding.
 - No `research/**` canonical file, schema, or `apps/research-explorer` source
   file was modified during WU041. Only this document was created.
+
+## 18. Owner closure
+
+Status: OWNER APPROVED / CLOSED
+
+Owner decision date: 2026-09-12.
+
+The repository owner explicitly closed M012 / AR-05 Discovery & Provenance
+after:
+- WU041 completed the reconciliation and implementation contract (§1–§17),
+  with owner decisions OD-1 through OD-4 resolved (§10);
+- WU042 implemented only the approved CR-1/CR-2/CR-3 boundary exactly as
+  specified in §14, touching exactly the four files listed there;
+- WU043 independently verified the built production artifact against the
+  exact §15 verification matrix on real canonical PRB-0005, PRB-0012,
+  PRB-0006, SRC-0006, SRC-0017, and EVD-000012 across the 1440×900, 900×800,
+  and 360×740 viewports, producing zero FAIL findings;
+- checkpoints C042, C043, and C044 all recorded `validationResult: passed`
+  and `acceptanceCriteriaResult: passed`.
+
+### Final owner decision register
+
+- **OD-1** (Records relationship-level filter/sort) — **DEFER / Option 1.**
+  Not authorized for WU042 or by this closure.
+- **OD-2** (anchor-vs-button cross-reference semantics) — **DEFER /
+  Option 1.** Not authorized for WU042 or by this closure.
+- **OD-3** (aggregate research-role summary) — **APPROVED / Option 1.**
+  Resolved exactly as CR-1's minimum per-card scope (§14); no aggregate
+  summary was introduced, and `effectSummary.ts` remained outside WU042's
+  file boundary.
+- **OD-4** (`research_roles[]` filter/sort granularity) — **RESOLVED BY
+  OD-1.** Adds nothing beyond OD-1's disposition.
+
+This closure accepts the delivered AR-05 result — CR-1, CR-2, and CR-3 as
+implemented and independently verified — and does **not** authorize the
+deferred alternatives considered under OD-1 or OD-2, or any capability
+beyond OD-3's minimum-scope resolution.
+
+### Accepted observations not legitimized by this closure
+
+The following remain separately known, out-of-scope observations and are
+**not** legitimized, adopted as desired behaviour, or remediated by this
+decision:
+
+- the pre-existing `favicon.ico` 404;
+- the pre-existing 9px `.explorer-navigation` app-chrome horizontal-overflow
+  delta at 360px (§7, §15);
+- historical C008/C009/C010 checkpoint-packet-reference debt (§12).
+
+They remain separate known matters and may be addressed only through
+separately authorized work.
+
+### Explicit non-authorizations
+
+No additional value freeze is created by M012 closure. Specifically, this
+closure does **not** authorize:
+- Records relationship-level filtering or sorting (OD-1, remains deferred);
+- migration of in-page cross-reference `<button>` controls to `<a href>`
+  anchors (OD-2, remains deferred);
+- any aggregate research-role summary beyond OD-3's approved minimum scope;
+- Graph reachability/redesign (DF-1, §11) or the general
+  relationship-browsing surface (DF-2, §11) — both remain deferred;
+- D7;
+- Decision Horizon;
+- any successor work, milestone, or work unit;
+- repair of C008/C009/C010;
+- any change to canonical research schema or semantics, which remain
+  unchanged throughout WU041, WU042, and WU043 (§13).
+
+### Closure statement
+
+M012 / AR-05 Discovery & Provenance is owner-closed.
