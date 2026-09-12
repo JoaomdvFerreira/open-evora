@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "projectStatus": "review",
+  "projectStatus": "in_progress",
   "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
@@ -131,6 +131,17 @@
           "WU038",
           "WU039",
           "WU040"
+        ]
+      },
+      {
+        "id": "M012",
+        "title": "AR-05 Discovery & Provenance",
+        "objective": "Make the existing research corpus easier to discover, traverse and trust by allowing a reader to find relevant records and understand the provenance chain between Problems, Evidence and Sources, using existing canonical semantics wherever sufficient.",
+        "status": "ready",
+        "workUnitIds": [
+          "WU041",
+          "WU042",
+          "WU043"
         ]
       }
     ],
@@ -1820,6 +1831,141 @@
         ],
         "createdAt": "2026-09-11T18:51:39.184Z",
         "updatedAt": "2026-09-11T20:11:09.410Z"
+      },
+      {
+        "id": "WU041",
+        "milestoneId": "M012",
+        "title": "AR-05 Discovery & Provenance Reconciliation & Contract",
+        "objective": "Independently reconcile the existing canonical model, read model, Explorer behaviour and rendered experience, then define the exact AR-05 implementation and verification contract.",
+        "scope": [
+          "Determine what discovery functionality already works",
+          "Determine what provenance functionality already works",
+          "Identify which existing relationships are already deterministic",
+          "Identify which backlinks can already be derived without schema changes",
+          "Identify which information is available but poorly surfaced",
+          "Identify which UX/navigation gaps are real",
+          "Identify which apparent gaps are actually data/schema limitations",
+          "Classify each finding as NO_CHANGE, CHANGE_REQUIRED, OWNER_DECISION_REQUIRED, or DEFER",
+          "Define the exact WU042 implementation boundary",
+          "Define the exact WU043 independent verification matrix",
+          "Produce docs/design/ar-05-discovery-provenance-contract.md"
+        ],
+        "outOfScope": [
+          "Canonical schema modification",
+          "Adding new canonical fields",
+          "Changing the meaning of existing research fields",
+          "Canonical research edits or new research",
+          "Automatic inference of provenance not supported canonically",
+          "Automatically assigning research roles",
+          "Graph redesign/visualisation overhaul",
+          "Overview redesign unrelated to discovery",
+          "Problem-experience redesign already closed under AR-04",
+          "DS-04B foundation changes",
+          "Broad visual-system redesign",
+          "Repair of C008/C009/C010",
+          "D7 / Decision Horizon implementation",
+          "Any runtime/product/test/canonical research/schema file change"
+        ],
+        "acceptanceCriteria": [
+          "docs/design/ar-05-discovery-provenance-contract.md exists and reconciles current discovery/provenance behaviour against docs/datamodel.md and docs/explorerarchitecture.md",
+          "Every finding is classified as NO_CHANGE, CHANGE_REQUIRED, OWNER_DECISION_REQUIRED, or DEFER",
+          "research_roles[] and source.source_id are treated as existing canonical capabilities, not missing schema",
+          "Any item where a schema/canonical-data change would materially improve AR-05 is classified OWNER_DECISION_REQUIRED and not assumed as a WU042 requirement",
+          "WU041 makes no runtime, product, schema, or canonical research change",
+          "Returns for explicit AR05_WU041_OWNER_CONTRACT_REVIEW",
+          "WU041 completion does not itself authorize WU042"
+        ],
+        "agentContextRefs": [
+          "project.objective",
+          "docs/datamodel.md",
+          "docs/explorerarchitecture.md",
+          "docs/design/README.md",
+          "docs/design/foundations.md",
+          "docs/design/component-model.md",
+          "docs/design/component-visual-contract.md",
+          "docs/design/ar-04-problem-experience-contract.md"
+        ],
+        "suggestedFiles": [
+          "docs/design/ar-05-discovery-provenance-contract.md"
+        ],
+        "validationCommands": [
+          "npm run research:validate",
+          "git diff --check"
+        ],
+        "status": "ready",
+        "dependencies": [],
+        "createdAt": "2026-09-12T06:52:09.086Z",
+        "updatedAt": "2026-09-12T06:52:09.086Z"
+      },
+      {
+        "id": "WU042",
+        "milestoneId": "M012",
+        "title": "AR-05 Discovery & Provenance Implementation",
+        "objective": "Implement only the future owner-approved WU041 contract.",
+        "scope": [
+          "Implement exactly the bounded, owner-approved WU041 contract once it exists and is approved"
+        ],
+        "outOfScope": [
+          "Any item classified OWNER_DECISION_REQUIRED by WU041 unless separately approved by the owner",
+          "Canonical schema modification",
+          "Canonical research edits",
+          "Any scope not explicitly authorized by the owner-approved WU041 contract"
+        ],
+        "acceptanceCriteria": [
+          "Implementation matches the owner-approved WU041 contract exactly",
+          "No file outside the WU041-defined implementation boundary is changed"
+        ],
+        "agentContextRefs": [
+          "docs/design/ar-05-discovery-provenance-contract.md"
+        ],
+        "suggestedFiles": [],
+        "validationCommands": [
+          "npm run research:validate"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-039"
+        ],
+        "createdAt": "2026-09-12T06:52:09.086Z",
+        "updatedAt": "2026-09-12T06:52:09.086Z"
+      },
+      {
+        "id": "WU043",
+        "milestoneId": "M012",
+        "title": "AR-05 Independent Verification",
+        "objective": "Independently verify the future WU042 implementation against the owner-approved WU041 contract using the built production artifact and canonical real records.",
+        "scope": [
+          "Verify discovery journeys",
+          "Verify provenance journeys",
+          "Verify deterministic backlinks",
+          "Verify canonical fidelity",
+          "Verify relationship-role comprehension",
+          "Verify routing/deep links",
+          "Verify keyboard/focus/accessibility",
+          "Verify responsive behaviour",
+          "Verify console/network integrity",
+          "Run automated tests/typecheck/build/research validation"
+        ],
+        "outOfScope": [
+          "Any remediation of findings; failures return to owner review"
+        ],
+        "acceptanceCriteria": [
+          "Independent verification report against the exact WU041 contract matrix",
+          "Any failure is returned to owner review rather than remediated within WU043"
+        ],
+        "agentContextRefs": [
+          "docs/design/ar-05-discovery-provenance-contract.md"
+        ],
+        "suggestedFiles": [],
+        "validationCommands": [
+          "npm run research:validate"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-040"
+        ],
+        "createdAt": "2026-09-12T06:52:09.086Z",
+        "updatedAt": "2026-09-12T06:52:09.086Z"
       }
     ],
     "dependencies": [
@@ -2088,6 +2234,20 @@
         "toId": "WU040",
         "type": "blocks",
         "reason": "WU040 independently verifies the built implementation produced by WU039 against the approved WU038 contract; verification cannot precede implementation."
+      },
+      {
+        "id": "DEP-039",
+        "fromId": "WU041",
+        "toId": "WU042",
+        "type": "blocks",
+        "reason": "Implementation requires the owner-reviewed discovery/provenance contract."
+      },
+      {
+        "id": "DEP-040",
+        "fromId": "WU042",
+        "toId": "WU043",
+        "type": "blocks",
+        "reason": "Independent verification requires the completed approved implementation."
       }
     ]
   },
@@ -5450,8 +5610,8 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-11T20:11:09.410Z",
-      "nextRecommendation": "aiqt review --mode release"
+      "nextRecommendation": "aiqt review --mode release",
+      "createdAt": "2026-09-11T20:11:09.410Z"
     }
   ],
   "lastAgentPacket": {
@@ -5478,8 +5638,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt review --mode release",
-  "lastUpdatedAt": "2026-09-11T20:11:09.410Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-12T06:52:09.086Z",
   "review": {
     "acknowledgedFindings": [
       {
