@@ -1,10 +1,13 @@
 # AR-05 — Discovery & Provenance Reconciliation & Contract
 
-Status: **M012 / AR-05 WU041 CONTRACT — READY FOR OWNER CONTRACT REVIEW.** This
-document is the sole WU041 deliverable. It makes no runtime, schema, or
-canonical-research change. It contains four OWNER_DECISION_REQUIRED items (§8);
-WU042's file boundary (§14) covers only the CHANGE_REQUIRED items that do not
-depend on those decisions.
+Status: **M012 / AR-05 WU041 CONTRACT — OWNER DECISIONS RECORDED (2026-09-12).**
+This document is the sole WU041 deliverable. It makes no runtime, schema, or
+canonical-research change. All four OWNER_DECISION_REQUIRED items (§10) are now
+resolved: OD-1 = DEFER/Option 1, OD-2 = DEFER/Option 1, OD-3 = APPROVED/Option 1,
+OD-4 = RESOLVED BY OD-1. Zero OWNER_DECISION_REQUIRED items remain unresolved.
+WU042's file boundary (§14) is unchanged by these resolutions — it authorizes
+only CR-1, CR-2, and CR-3, exactly the same four files as before this amendment.
+This amendment does not itself authorize WU042 to start.
 
 Scope: reconciles the existing canonical SRC → EVD → PRB relationship model, the
 Explorer's build-time read model and client-side derivation code, and the
@@ -554,6 +557,13 @@ No WU042 action.
 
 ## 10. Owner decisions
 
+**Owner decision record (2026-09-12):** OD-1 = **RESOLVED — DEFER / Option 1**.
+OD-2 = **RESOLVED — DEFER / Option 1**. OD-3 = **RESOLVED — APPROVED / Option 1**.
+OD-4 = **RESOLVED BY OD-1**. Zero OWNER_DECISION_REQUIRED items remain open in
+this contract. Each resolution is recorded in place below, immediately after
+its original question/options/trade-offs, which are preserved unchanged as the
+historical record of what was considered.
+
 ### OD-1: Whether Records discovery should support filtering/sorting by relationship-level values (`effects`, `research_roles`, `source`)
 
 - **Exact question:** Should the Records list (desktop `RecordsTable` /
@@ -599,6 +609,13 @@ No WU042 action.
   (type + free-text only). This is not a regression — it is the status quo,
   and per §4 it already functions correctly for record-level scanning; the
   gap is additive discovery capability, not a defect.
+
+**Owner decision (2026-09-12): OD-1 = DEFER / Option 1.** Records discovery
+remains record-type + free-text only. No filter or sort by `effects`,
+`research_roles`, or `source` is added. **This is not authorized for WU042.**
+Options 2 and 3 remain on record as considered-but-not-approved for this
+milestone; either would require a future contract amendment and its own
+execution-deterministic file boundary before any implementation could proceed.
 
 ### OD-2: Whether in-page cross-reference controls should become real `<a href>` anchors
 
@@ -652,6 +669,15 @@ No WU042 action.
   a click — this is a UX limitation, not a defect, and matches
   `component-model.md`'s own anticipated deferral.
 
+**Owner decision (2026-09-12): OD-2 = DEFER / Option 1.** The current
+`<button onClick>` + `history.pushState` cross-reference pattern is retained
+exactly as-is. Real `<a href>` navigation (Option 2) and the partial-pilot
+approach (Option 3) both remain deferred to a separately approved navigation
+phase, consistent with `component-model.md` §4.5's own anticipated deferral
+(§11, DF-3). **This is not authorized for WU042** — no cross-reference control
+in `records/`, `problem/`, or `navigation/` may be converted to an anchor
+element under this contract.
+
 ### OD-3: `EffectOccurrenceSummary`-equivalent aggregate summary for `research_roles`
 
 - **Exact question:** If CR-1 (§9) is approved and per-card role rendering is
@@ -691,6 +717,17 @@ No WU042 action.
   §14 — WU042 must implement CR-1 at Option 1's scope unless and until this
   decision is separately approved.
 
+**Owner decision (2026-09-12): OD-3 = APPROVED / Option 1.** CR-1 renders
+authored `research_roles[]` per Evidence card only, using the existing
+`ResearchRoleTag` component exactly as already proven correct in
+`EvdDetail.tsx`. **No aggregate research-role summary is authorized.**
+`effectSummary.ts` remains outside WU042's file boundary and must not be
+modified — CR-1's implementation is confined to `ProblemView.tsx` and
+`ProblemView.test.tsx` exactly as specified in §14, with no extension into a
+tally/summary component. Option 2 (aggregate summary) remains unapproved and
+would require a future contract amendment with its own file boundary,
+including `effectSummary.ts`, before any implementation could proceed.
+
 ### OD-4: `research_roles[]` filter/sort granularity relative to OD-1
 
 - **Exact question:** Subsumed by OD-1 — if OD-1 is approved at Option 2's
@@ -707,6 +744,14 @@ No WU042 action.
 - **Consequence of deferring:** Resolved automatically as "no filter of any
   kind" if OD-1 is not approved; requires explicit scoping from the owner
   alongside OD-1 approval if it is.
+
+**Owner decision (2026-09-12): OD-4 = RESOLVED BY OD-1.** OD-1 was resolved as
+DEFER / Option 1 — no relationship-level filter of any kind is added in
+WU042. Because no filter exists to grant granularity to, OD-4's question does
+not arise for this milestone. OD-4 carries no independent resolution beyond
+this and remains automatically closed for as long as OD-1 stays deferred; it
+would need to be reopened only if a future contract amendment separately
+approves OD-1.
 
 ## 11. DEFER register
 
@@ -788,9 +833,16 @@ mutate.
 ## 14. Exact WU042 implementation contract
 
 This boundary is execution-deterministic for the three CHANGE_REQUIRED items
-that require no owner decision (CR-1, CR-2, CR-3). It excludes anything gated
-by OD-1 through OD-4 — those items must not appear as assumed WU042 work
-until separately approved, per the WU041 packet's explicit instruction.
+that require no further owner decision (CR-1, CR-2, CR-3). OD-1 through OD-4
+are now resolved (§10: OD-1 = DEFER/Option 1, OD-2 = DEFER/Option 1, OD-3 =
+APPROVED/Option 1, OD-4 = RESOLVED BY OD-1), and none of those resolutions
+adds work to this boundary: OD-1 and OD-2 were resolved as DEFER, so the
+capabilities they considered (relationship-level filtering, anchor-based
+navigation) remain explicitly unauthorized for WU042; OD-3 was approved at
+its minimum Option 1 scope, which is already exactly CR-1 as specified below,
+with `effectSummary.ts` explicitly excluded. WU042 therefore contains only
+CR-1, CR-2, and CR-3 — the same four-file boundary as before this amendment,
+unchanged in scope or content.
 
 ### CR-1 — render `research_roles[]` per evidence card in `ProblemView.tsx`
 
@@ -923,11 +975,16 @@ contract's own future amendment if one becomes necessary, `.aiqt/state.json`,
 `recordIndex.ts`, `RecordsTable.tsx`, `NarrowRecordsList.tsx`,
 `urlState.ts`, and every Graph file must not change under this contract.
 
-**OWNER_DECISION_REQUIRED items (OD-1 through OD-4) must not appear as
-assumed WU042 work.** If any is approved before WU042 executes, it requires
-a contract amendment (a new/updated CR item with its own exact file boundary)
-before WU042 may act on it — WU042 as authorized by this contract covers only
-CR-1, CR-2, and CR-3.
+**OD-1 through OD-4 are now resolved (§10) and none expands this boundary.**
+OD-1 (DEFER/Option 1) and OD-2 (DEFER/Option 1) leave relationship-level
+filtering and anchor-based navigation unauthorized for WU042. OD-3
+(APPROVED/Option 1) authorizes exactly CR-1 as already specified above — no
+aggregate research-role summary, and `effectSummary.ts` remains outside this
+boundary. OD-4 is resolved by OD-1 and adds nothing. WU042 as authorized by
+this contract covers only CR-1, CR-2, and CR-3, using exactly the four files
+listed above. Any future change to Records filtering, cross-reference anchor
+semantics, or an aggregate research-role summary would require a new contract
+amendment with its own exact file boundary — none is authorized here.
 
 ## 15. Exact WU043 independent-verification matrix
 
@@ -957,13 +1014,17 @@ matching the standard already established by AR-04's WU040 and
 
 ## 16. Explicit deferred/out-of-scope register
 
-- **OD-1/OD-4 (Records relationship-level filter/sort)** — deferred pending
-  owner decision; not assumed as WU042 work (§10, §14).
-- **OD-2 (anchor-vs-button cross-reference semantics)** — deferred pending
-  owner decision; `component-model.md` §4.5 already anticipates this as
-  requiring "a separately approved navigation phase" (§10, §11 DF-3).
-- **OD-3 (aggregate research-role summary)** — deferred; CR-1 ships at its
-  minimum per-card scope regardless of this decision's timing (§10).
+- **OD-1/OD-4 (Records relationship-level filter/sort)** — **RESOLVED:
+  DEFER / Option 1 (2026-09-12).** Not authorized for WU042; not assumed as
+  WU042 work (§10, §14).
+- **OD-2 (anchor-vs-button cross-reference semantics)** — **RESOLVED:
+  DEFER / Option 1 (2026-09-12).** Not authorized for WU042;
+  `component-model.md` §4.5 already anticipates this as requiring "a
+  separately approved navigation phase" (§10, §11 DF-3).
+- **OD-3 (aggregate research-role summary)** — **RESOLVED: APPROVED /
+  Option 1 (2026-09-12).** CR-1 ships at its minimum per-card scope only; no
+  aggregate research-role summary is authorized, and `effectSummary.ts`
+  remains outside WU042's file boundary (§10).
 - **Graph reachability/redesign (DF-1)** — explicitly out of scope per the
   WU041 packet; not reopened by any finding in this contract (§11).
 - **General relationship-browsing surface (DF-2)** — explicitly deferred,
