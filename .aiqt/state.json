@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
-  "currentMilestoneId": "M012",
+  "projectStatus": "review",
+  "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -137,7 +137,7 @@
         "id": "M012",
         "title": "AR-05 Discovery & Provenance",
         "objective": "Make the existing research corpus easier to discover, traverse and trust by allowing a reader to find relevant records and understand the provenance chain between Problems, Evidence and Sources, using existing canonical semantics wherever sufficient.",
-        "status": "ready",
+        "status": "done",
         "workUnitIds": [
           "WU041",
           "WU042",
@@ -1960,12 +1960,12 @@
         "validationCommands": [
           "npm run research:validate"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-040"
         ],
         "createdAt": "2026-09-12T06:52:09.086Z",
-        "updatedAt": "2026-09-12T08:01:39.774Z"
+        "updatedAt": "2026-09-12T08:35:46.911Z"
       }
     ],
     "dependencies": [
@@ -5828,17 +5828,150 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-12T08:01:39.774Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-12T08:01:39.774Z"
+    },
+    {
+      "id": "C044",
+      "workUnitId": "WU043",
+      "packetId": "PKT-044",
+      "summary": "Independently verified the WU042 AR-05 discovery/provenance implementation against the owner-approved WU041 contract's exact §15 WU043 verification matrix, using the production build served via npm run preview at 1440x900, 900x800, and 360x740. All 8 matrix items pass with zero FAIL findings; no remediation was performed.",
+      "completed": [
+        "Verified CR-1 primary role rendering (PRB-0005/EVD-000012) at all 3 viewports: effects (Delimita/Refina) and roles (Observação local/Resposta existente) render additively, matching research/problems/PRB-0005.yaml exactly; EffectOccurrenceSummary unchanged; no aggregate role summary introduced.",
+        "Verified CR-1 sparse non-regression (PRB-0012) at 1440x900: all 3 evidence relationships render with correct, non-fabricated roles matching research/problems/PRB-0012.yaml exactly.",
+        "Verified CR-1 effect non-regression (PRB-0006, 11 evidence relationships) at 1440x900 and 360x740: every effect/role pair matches research/problems/PRB-0006.yaml exactly; role rendering additive only.",
+        "Inspected SourceInvestigationSection.test.tsx (CR-2): confirmed coverage for zero related Problems, multiple related Problems with correct viaEvidenceIds attribution, onSelect-present (action) and onSelect-absent (text) branches; original test preserved unmodified; no production behaviour introduced under CR-2.",
+        "Verified CR-3 empty state (SRC-0006, a real zero-related-Problem fixture) at 1440x900 and 360x740: EmptyState renders the exact required copy, non-alerting (no role/aria-live), section-index/rail correctly omits 'Na investigação'.",
+        "Verified SRC-0017 backlink non-regression at 1440x900, 900x800, 360x740: 8 related EVDs and 3 related PRBs with correct viaEvidenceIds render and navigate correctly (button + pushState, Back functional); pre-existing 9px .explorer-navigation overflow at 360px unchanged.",
+        "Verified EVD-000012 backlink non-regression at 1440x900: both PRB-0004 (Refina/Observação local) and PRB-0005 (Delimita+Refina/Observação local+Resposta existente) render with correct distinct effect/role pairs in EvdDetail.tsx, confirmed untouched by the WU042 diff.",
+        "Verified navigation/deep-link behaviour: direct URL load of ?view=problem&id=PRB-0005 and PRB-0003, cross-reference buttons use <button> (no <a href> migration), Back/Forward functional.",
+        "Verified accessibility/keyboard/focus: ResearchRoleTag renders as a non-interactive <span> (no spurious tab stops), visible focus outline present on evidence-card actions, tab order unaffected.",
+        "Ran full automated validation suite: npm run test (513 passed, 1 pre-existing skip), npm run typecheck (pass), npm run build (pass, 119 modules), npm run research:validate (274 records OK), git diff --check (pass), aiqt status (pass), aiqt review (only C008/C009/C010 historical debt + expected awaiting-checkpoint notice), aiqt graph validate (only the 3 pre-existing C008/C009/C010 broken-checkpoint-packet-reference findings, no new finding)."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "119 modules transformed, no warnings."
+        },
+        {
+          "command": "npm run preview --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Used for all rendered verification at 1440x900/900x800/360x740; stopped and confirmed unreachable before checkpoint."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "513 tests passed, 1 pre-existing skip (54 files)."
+        },
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "tsc --noEmit clean."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors; only benign CRLF/LF line-ending warnings."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "AIQT status: passed."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Warning-level only: C008/C009/C010 historical broken-packet-reference debt plus expected WU043-awaiting-checkpoint notice; no new finding."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "3 blocking findings, all pre-existing C008/C009/C010 broken-checkpoint-packet-reference debt per contract §12/§18; no new finding; not repaired per WU043 verification-only scope."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Independent verification report against the exact WU041 contract matrix",
+          "result": "passed",
+          "evidence": "All 8 items of docs/design/ar-05-discovery-provenance-contract.md §15's exact WU043 independent-verification matrix were executed against the production build and are individually recorded below; zero FAIL findings."
+        },
+        {
+          "criterion": "Any failure is returned to owner review rather than remediated within WU043",
+          "result": "passed",
+          "evidence": "No FAIL finding was produced, so no remediation question arose; the pre-authorized C008/C009/C010 historical graph debt was confirmed unchanged and explicitly not repaired, per contract §12/§16/§18."
+        },
+        {
+          "criterion": "Matrix item 1 (CR-1 primary role rendering, PRB-0005/EVD-000012, 3 viewports)",
+          "result": "passed",
+          "evidence": "Rendered effects/roles match research/problems/PRB-0005.yaml exactly at 1440x900, 900x800, 360x740; additive only; accessible; no essential text shrinkage; only the pre-existing 9px nav overflow at 360px."
+        },
+        {
+          "criterion": "Matrix item 2 (CR-1 sparse non-regression, PRB-0012, 1440x900)",
+          "result": "passed",
+          "evidence": "All 3 relationships match research/problems/PRB-0012.yaml exactly; no fabricated/placeholder role."
+        },
+        {
+          "criterion": "Matrix item 3 (CR-1 effect non-regression, PRB-0006, 1440x900/360x740)",
+          "result": "passed",
+          "evidence": "All 11 relationships match research/problems/PRB-0006.yaml exactly; EffectOccurrenceSummary and effect chips unchanged; role rendering additive only."
+        },
+        {
+          "criterion": "Matrix item 4 (CR-2 test coverage, read-only)",
+          "result": "passed",
+          "evidence": "SourceInvestigationSection.test.tsx covers zero/multiple related Problems, viaEvidenceIds attribution, onSelect action/text branches; original assertion preserved; no coverage weakened."
+        },
+        {
+          "criterion": "Matrix item 5 (CR-3 empty state, SRC-0006, 1440x900/360x740)",
+          "result": "passed",
+          "evidence": "EmptyState renders exact required copy, non-alerting, rail correctly omits the empty section; no new console error."
+        },
+        {
+          "criterion": "Matrix item 6 (SRC-0017 backlink non-regression, 3 viewports)",
+          "result": "passed",
+          "evidence": "8 EVDs and 3 PRBs (correct viaEvidenceIds) render and navigate correctly; only pre-existing 9px overflow at 360px."
+        },
+        {
+          "criterion": "Matrix item 7 (EVD-000012 backlink non-regression, 1440x900)",
+          "result": "passed",
+          "evidence": "PRB-0004 and PRB-0005 both render with correct, distinct effect/role pairs in unmodified EvdDetail.tsx."
+        },
+        {
+          "criterion": "Matrix item 8 (full validation suite)",
+          "result": "passed",
+          "evidence": "See validationCommands; aiqt review/graph validate show only historical C008/C009/C010 debt plus the expected workflow advisory."
+        },
+        {
+          "criterion": "Any server/process started during the work unit is stopped before commit/checkpoint",
+          "result": "passed",
+          "evidence": "npm run preview (port 4173) was used for all rendered verification and was stopped and confirmed unreachable (curl connection failed) before this checkpoint."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-12T08:35:46.911Z",
+      "nextRecommendation": "aiqt review --mode release"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-043",
-    "workUnitId": "WU042",
+    "id": "PKT-044",
+    "workUnitId": "WU043",
     "milestoneId": "M012",
-    "createdAt": "2026-09-12T07:53:59.495Z",
+    "createdAt": "2026-09-12T08:25:35.117Z",
     "format": "markdown",
-    "contentHash": "sha256:14fd3988479a80d0c50c321be7a170d946e7603e7f9cd3988d374120b9d44afd",
+    "contentHash": "sha256:891d2ae3dadd61008d25972e710e677c9fb159ab955cec3889ef065dedee59dd",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -5856,8 +5989,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-12T08:01:39.774Z",
+  "nextRecommendedCommand": "aiqt review --mode release",
+  "lastUpdatedAt": "2026-09-12T08:35:46.911Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -7258,6 +7391,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-12T08:01:39.774Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C044",
+      "current": {
+        "observationId": "sha256:af383de123d3d636f39cd145f336a89514870d68592a0b6510ab46113e47445b",
+        "checkpointId": "C044",
+        "workUnitId": "WU043",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-12T08:35:46.911Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-12T08:35:46.911Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:af383de123d3d636f39cd145f336a89514870d68592a0b6510ab46113e47445b",
+          "checkpointId": "C044",
+          "workUnitId": "WU043",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-12T08:35:46.911Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-12T08:35:46.911Z"
         }
       ]
     }
