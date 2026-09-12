@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
   "projectStatus": "in_progress",
-  "currentMilestoneId": null,
+  "currentMilestoneId": "M012",
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -1892,10 +1892,10 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-09-12T06:52:09.086Z",
-        "updatedAt": "2026-09-12T06:52:09.086Z"
+        "updatedAt": "2026-09-12T07:27:03.227Z"
       },
       {
         "id": "WU042",
@@ -1922,12 +1922,12 @@
         "validationCommands": [
           "npm run research:validate"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-039"
         ],
         "createdAt": "2026-09-12T06:52:09.086Z",
-        "updatedAt": "2026-09-12T06:52:09.086Z"
+        "updatedAt": "2026-09-12T07:27:03.227Z"
       },
       {
         "id": "WU043",
@@ -5612,15 +5612,125 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt review --mode release",
       "createdAt": "2026-09-11T20:11:09.410Z"
+    },
+    {
+      "id": "C042",
+      "workUnitId": "WU041",
+      "packetId": "PKT-042",
+      "summary": "Independently reconciled AR-05 discovery/provenance capability against canonical schemas, canonical data, read-model/projection code, and the rendered production build, then produced docs/design/ar-05-discovery-provenance-contract.md defining the exact WU042 implementation boundary and WU043 verification matrix.",
+      "completed": [
+        "Read canonical authority: AGENTS.md, docs/datamodel.md, docs/explorerarchitecture.md, docs/design/README.md, foundations.md, component-model.md, component-visual-contract.md, ar-04-problem-experience-contract.md.",
+        "Confirmed exact PRB.evidence[] (evidence_id/effects/research_roles), EVD.provenance (sources[]/extracted_at/lineage_id), and SRC (source_id, no back-reference field) schema shapes against research/schemas/*.json and real canonical records.",
+        "Inventoried 274 canonical records (12 PRB + 143 EVD + 119 SRC); identified PRB-0003 (15 evidence relationships) and PRB-0009 (5 distinct research_roles) as richest fixtures; found only 2 of 110 EVDs reused across PRBs (EVD-000011, EVD-000012) versus 34 of 116 SRCs reused across EVDs (SRC-0017 max fan-out of 8); identified PRB-0012 as the sparse/no-decision_basis fixture.",
+        "Delegated deep static analysis of read-model/projection code (apps/research-explorer/src/records, problem, navigation, graph, scripts) to a research subagent; confirmed with file:line citations that PRB->EVD forward direction (ProblemView.tsx) renders effects but silently drops research_roles despite problemProjection.ts already computing it, while EVD->PRB reverse direction (EvdDetail.tsx) already renders both dimensions correctly and is test-locked.",
+        "Confirmed SRC->EVD and SRC->EVD->PRB backlinks (SourceFindingsSection.tsx, SourceInvestigationSection.tsx) are already implemented as client-side derivations over generic build-time edges, with SourceInvestigationSection.test.tsx materially thinner than its EVD->PRB sibling.",
+        "Confirmed Records discovery supports only type-filter and free-text search (no effect/role/source filtering); all in-page cross-references are <button onClick> + history.pushState, never <a href>; Graph is implemented but deliberately unreachable (aria-disabled nav button, URL-level rewrite-away).",
+        "Built the production artifact (vite build, 119 modules, no warnings) and served it via npm run preview on port 4173 (never the dev server).",
+        "Performed rendered inspection via Playwright at 1440x900, 900x800, and 360x740 on PRB-0005/PRB-0004 (via EVD-000012's differing effects/research_roles per PRB), SRC-0017 (8-EVD/3-PRB backlink fan-out), and PRB-0012 (sparse, no decision_basis) -- confirming zero research-role tags render in ProblemView's Evidencia section, full backlink rendering on SRC-0017, and no fabricated grouping on PRB-0012.",
+        "Confirmed zero new console errors/warnings beyond the pre-existing favicon.ico 404, and zero new horizontal overflow beyond the pre-existing 9px .explorer-navigation delta at 360px.",
+        "Stopped the preview server (confirmed port 4173 no longer listening) before checkpoint.",
+        "Classified every material finding as NO_CHANGE (4), CHANGE_REQUIRED (3: CR-1 research_roles rendering gap, CR-2 SourceInvestigationSection test coverage, CR-3 empty-state consistency), OWNER_DECISION_REQUIRED (4: OD-1/OD-4 relationship-level filtering, OD-2 anchor-vs-button navigation semantics, OD-3 aggregate role summary), or DEFER (3: Graph reachability, general relationship-browsing surface, broader navigation-phase work).",
+        "Produced docs/design/ar-05-discovery-provenance-contract.md with an execution-deterministic WU042 file boundary (exactly 4 files: ProblemView.tsx/.test.tsx, SourceInvestigationSection.tsx/.test.tsx) covering only CR-1/CR-2/CR-3, explicitly excluding all OWNER_DECISION_REQUIRED items, plus an exact WU043 verification matrix.",
+        "Ran full validation: research-explorer tests (506 passed, 1 pre-existing skip), typecheck (clean), build (clean), research:validate (274 records OK), git diff --check (clean, only CRLF/LF advisories), aiqt status/review/graph validate (only pre-existing C008/C009/C010 debt and expected WU042/WU043 vague-scope advisories, no new finding)."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "docs/design/ar-05-discovery-provenance-contract.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "53 test files passed, 1 skipped; 506 tests passed, 1 skipped."
+        },
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "tsc --noEmit completed with no errors."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "vite build succeeded, 119 modules, no new warnings."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "274 canonical records validated OK."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace/conflict-marker errors; only CRLF/LF line-ending advisories from git itself."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "Project in_progress, current work unit WU041, no blocking status issues."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Only pre-existing high-severity C008/C009/C010 missing-packet-ref findings, expected medium WU042/WU043 vague-scope advisories, and the normal WU041-awaiting-checkpoint note; no new finding."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "Only the same pre-existing C008/C009/C010 critical missing-packet-ref findings; no new integrity finding."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "docs/design/ar-05-discovery-provenance-contract.md exists and reconciles current discovery/provenance behaviour against docs/datamodel.md and docs/explorerarchitecture.md",
+          "result": "passed",
+          "evidence": "Contract sections 3-8 ground every finding in exact schema/code/canonical-data citations and rendered evidence against both documents' semantics."
+        },
+        {
+          "criterion": "Every finding is classified as NO_CHANGE, CHANGE_REQUIRED, OWNER_DECISION_REQUIRED, or DEFER",
+          "result": "passed",
+          "evidence": "Contract sections 9-11 classify all 11 material findings with zero unclassified items."
+        },
+        {
+          "criterion": "research_roles[] and source.source_id are treated as existing canonical capabilities, not missing schema",
+          "result": "passed",
+          "evidence": "Contract section 3 explicitly confirms both as existing, populated schema fields with direct schema/data citations; section 13 binds this as an invariant for WU042."
+        },
+        {
+          "criterion": "Any item where a schema/canonical-data change would materially improve AR-05 is classified OWNER_DECISION_REQUIRED and not assumed as a WU042 requirement",
+          "result": "passed",
+          "evidence": "OD-1 through OD-4 (section 10) are all product/UX decisions requiring no schema change (confirmed derivable from existing data); no schema/canonical-data change was identified as needed anywhere, and section 14 explicitly excludes all OD items from the WU042 boundary."
+        },
+        {
+          "criterion": "WU041 makes no runtime, product, schema, or canonical research change",
+          "result": "passed",
+          "evidence": "git diff --name-only confirms the only new tracked file is the contract document itself; no apps/research-explorer source file, schema, or research/** file was modified."
+        },
+        {
+          "criterion": "Returns for explicit AR05_WU041_OWNER_CONTRACT_REVIEW",
+          "result": "passed",
+          "evidence": "Contract status line and this checkpoint both record readiness for owner contract review."
+        },
+        {
+          "criterion": "WU041 completion does not itself authorize WU042",
+          "result": "passed",
+          "evidence": "Contract section 1 and this checkpoint make no claim of WU042 authorization; aiqt next is not run a second time in this task."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-12T07:27:03.227Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-041",
-    "workUnitId": "WU040",
-    "milestoneId": "M011",
-    "createdAt": "2026-09-11T20:01:55.180Z",
+    "id": "PKT-042",
+    "workUnitId": "WU041",
+    "milestoneId": "M012",
+    "createdAt": "2026-09-12T07:09:55.183Z",
     "format": "markdown",
-    "contentHash": "sha256:8b71051fc12c26f24cb60e053064215dab9619e089e7c3131038fa4a5e7c8200",
+    "contentHash": "sha256:de8cb5d8407b0fcbeea7c4e3beb6a3b3688cf8274f41021cdf01e1b5d40de520",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -5639,7 +5749,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-12T06:52:09.086Z",
+  "lastUpdatedAt": "2026-09-12T07:27:03.227Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -6980,6 +7090,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-11T20:11:09.410Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C042",
+      "current": {
+        "observationId": "sha256:2c36722fca2fd65eabcd6e27533e5b22fb7716ad28ef186c4425b4515e681676",
+        "checkpointId": "C042",
+        "workUnitId": "WU041",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-12T07:27:03.227Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-12T07:27:03.227Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:2c36722fca2fd65eabcd6e27533e5b22fb7716ad28ef186c4425b4515e681676",
+          "checkpointId": "C042",
+          "workUnitId": "WU041",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-12T07:27:03.227Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-12T07:27:03.227Z"
         }
       ]
     }
