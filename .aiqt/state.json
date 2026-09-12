@@ -1922,12 +1922,12 @@
         "validationCommands": [
           "npm run research:validate"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-039"
         ],
         "createdAt": "2026-09-12T06:52:09.086Z",
-        "updatedAt": "2026-09-12T07:27:03.227Z"
+        "updatedAt": "2026-09-12T08:01:39.774Z"
       },
       {
         "id": "WU043",
@@ -1960,12 +1960,12 @@
         "validationCommands": [
           "npm run research:validate"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-040"
         ],
         "createdAt": "2026-09-12T06:52:09.086Z",
-        "updatedAt": "2026-09-12T06:52:09.086Z"
+        "updatedAt": "2026-09-12T08:01:39.774Z"
       }
     ],
     "dependencies": [
@@ -5720,17 +5720,125 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-12T07:27:03.227Z",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-12T07:27:03.227Z"
+    },
+    {
+      "id": "C043",
+      "workUnitId": "WU042",
+      "packetId": "PKT-043",
+      "summary": "Implemented the owner-approved AR-05 discovery/provenance contract (docs/design/ar-05-discovery-provenance-contract.md) exactly at its WU042 boundary: CR-1 renders authored research_roles[] per evidence card in ProblemView.tsx using the existing ResearchRoleTag component, additive alongside effects[]; CR-2 broadens SourceInvestigationSection.test.tsx coverage (zero/multiple related Problems, onSelect action/text branch); CR-3 investigation found the zero-related-Problem state is reachable (the component always mounts once relation state is ready; only the section-index/rail entry is presence-suppressed) so Outcome A applies — SourceInvestigationSection.tsx now renders EmptyState instead of return null for that case.",
+      "completed": [
+        "CR-1: imported ResearchRoleTag into ProblemView.tsx and extended EvidenceCard to destructure researchRoles and render it as an additive span (evidence-item-research-roles) alongside the existing effects rendering, reusing ResearchRoleTag variant=\"standard\" exactly as already proven in EvdDetail.tsx; no change to problemProjection.ts, effectSummary.ts, ResearchRoleTag's own implementation, or any CSS file; no aggregate role summary added (OD-3/Option 1).",
+        "CR-1 tests: added a new describe block in ProblemView.test.tsx with 3 cases — per-card research_roles fidelity against the fixture (EVD-1/EVD-2/EVD-3 distinct roles matching canonical relationship data), a no-research_roles case confirming no role tag renders when absent, and a non-regression case confirming effects/EffectOccurrenceSummary continue to render unchanged alongside the new role rendering; all 13 pre-existing ProblemView.test.tsx cases continue to pass unmodified.",
+        "CR-2: rewrote SourceInvestigationSection.test.tsx to cover zero related Problems (EmptyState render, no 'Problemas relacionados' group), multiple related Problems with correct per-PRB viaEvidenceIds attribution (using SRC-0017's real 3-PRB canonical fixture data from the contract), the onSelect-present action-button branch (calls onSelect with the correct problemId), and the onSelect-absent text-only branch; the original single test's assertion is preserved unmodified as its own case.",
+        "CR-3 investigation: read sourceSectionIndex.ts and computeSourceSectionPresence (sourceView.ts) — confirmed 'investigation' section presence is 'absent' (not 'deferred') when hasRelatedProblem is false, which only suppresses the section-index/rail *link*. Separately confirmed in RecordDetailPanel.tsx that the SourceInvestigation wrapper unconditionally mounts SourceInvestigationSection once relation state is 'ready', regardless of hasRelatedProblem — so the component itself is reachable/invoked in the zero-related-Problem case and was silently returning null. This is Outcome A (reachable while empty), not Outcome B. No presence/index file was modified — only SourceInvestigationSection.tsx's own internal render branch changed.",
+        "CR-3 implementation: replaced SourceInvestigationSection's `if (relations.relatedProblems.length === 0) return null;` early return with a conditional EmptyState render inside the existing <section>, matching SourceFindingsSection.tsx's EmptyState pattern exactly (same component, no new CSS, no live-region/alert semantics). Copy: 'Ainda não existem Problemas da investigação ligados explicitamente a esta fonte.' (tone-consistent with SourceFindingsSection's own copy, PRB-specific wording since this section is PRB-only).",
+        "CR-3 test coverage: added to the same SourceInvestigationSection.test.tsx rewrite (see CR-2) — a dedicated case asserting the exact EmptyState copy renders for zero related Problems.",
+        "Full validation: npm run test (513 passed, 1 pre-existing skip, up from 506 baseline), npm run typecheck (clean), npm run build (119 modules, no warnings), npm run research:validate (274 records OK), git diff --check (clean, only pre-existing CRLF/LF advisories), aiqt status (passed), aiqt review (only pre-existing C008/C009/C010 + expected WU043 vague-scope + expected WU042-awaiting-checkpoint, no new finding), aiqt graph validate (only the same 3 pre-existing C008/C009/C010 critical findings, no new integrity finding).",
+        "Rendered verification via npm run build + npm run preview (port 4173, never the dev server), per WU043's matrix: PRB-0005 at 1440x900/900x800/360x740 (12 research-role tags across 9 evidence cards, values/counts matching research/problems/PRB-0005.yaml exactly for EVD-000012 — BOUNDS/REFINES + LOCAL_OBSERVATION/EXISTING_RESPONSE — effects and EffectOccurrenceSummary unchanged, no aggregate role summary, 9px pre-existing .explorer-navigation overflow at 360px unchanged, only the pre-existing favicon 404 in console); PRB-0012 at 1440x900 (sparse fixture, 3 cards, no fabricated fallback, Estado atual correctly absent); PRB-0006 at 1440x900 (4 distinct effects render unchanged: Sustenta 4, Refina 9, Delimita 5, Contradiz 1); EVD-000012 at 1440x900 (EvdDetail.tsx's 'Como e usada na investigacao' still renders both PRB-0004 and PRB-0005 uses with correct distinct effect/role pairs, confirming CR-1 did not touch EvdDetail.tsx); SRC-0017 at 1440x900 (8 EVD backlinks, 3 PRB backlinks with correct Através de attribution, unaffected by CR-1/CR-2/CR-3); SRC-0006 (real corpus fixture with citing EVDs but zero related Problems, found via corpus scan) at 1440x900 and 360x740 confirming CR-3's EmptyState renders with the exact copy, zero new console errors, 9px pre-existing overflow unchanged at 360px, and the section-index/rail correctly still omits a 'Na investigação' link (presence logic unchanged, only the in-section render branch changed). Preview server stopped and confirmed down before this checkpoint."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "apps/research-explorer/src/problem/ProblemView.tsx",
+        "apps/research-explorer/src/problem/ProblemView.test.tsx",
+        "apps/research-explorer/src/records/SourceInvestigationSection.tsx",
+        "apps/research-explorer/src/records/SourceInvestigationSection.test.tsx"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "53 test files passed, 1 skipped; 513 tests passed, 1 skipped (up from 506/505 baseline)."
+        },
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "tsc --noEmit completed with no errors."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "vite build succeeded, 119 modules, no new warnings."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "274 canonical records validated OK; no research/schema file changed."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace/conflict-marker errors; only pre-existing CRLF/LF line-ending advisories."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "Project in_progress, milestone M012, current work unit WU042."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Only pre-existing high-severity C008/C009/C010 findings, the expected medium WU043:vague-scope advisory, and the expected WU042:awaiting-checkpoint workflow note; no new finding."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "Only the same 3 pre-existing C008/C009/C010 critical missing-packet-ref findings; no new integrity finding."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Implementation matches the owner-approved WU041 contract exactly",
+          "result": "passed",
+          "evidence": "CR-1 maps to contract §14 CR-1; CR-2 to §14 CR-2; CR-3 investigation resolved to Outcome A per §14 CR-3's own conditional branching, implemented exactly as specified there."
+        },
+        {
+          "criterion": "No file outside the WU041-defined implementation boundary is changed",
+          "result": "passed",
+          "evidence": "git diff --name-only shows exactly ProblemView.tsx, ProblemView.test.tsx, SourceInvestigationSection.tsx, SourceInvestigationSection.test.tsx, plus .aiqt/state.json and .aiqt/runlog.jsonl native lifecycle files; .vscode/ remains untracked."
+        },
+        {
+          "criterion": "No aggregate research-role summary added (OD-3/Option 1)",
+          "result": "passed",
+          "evidence": "effectSummary.ts untouched; rendered inspection of PRB-0005/PRB-0006 confirms EffectOccurrenceSummary tallies only effects, no parallel role-tally component exists."
+        },
+        {
+          "criterion": "No relationship-level filter/sort or anchor-based navigation added (OD-1/OD-2, both DEFER)",
+          "result": "passed",
+          "evidence": "No change to recordIndex.ts, RecordsTable.tsx, NarrowRecordsList.tsx, urlState.ts, or any cross-reference control's button/anchor semantics anywhere in the diff."
+        },
+        {
+          "criterion": "CR-3's presence/index logic was investigated but not modified unless reachability required it",
+          "result": "passed",
+          "evidence": "sourceSectionIndex.ts and sourceView.ts were read-only inspected; investigation concluded Outcome A (reachable while empty at the component level) without any presence-logic change being necessary — the fix is fully contained to SourceInvestigationSection.tsx's own render branch, matching the contract's own predicted 'primary fix is expected to be contained to the rendering file alone.'"
+        },
+        {
+          "criterion": "Full validation suite passes with no new integrity finding",
+          "result": "passed",
+          "evidence": "See validationCommands; aiqt review/graph validate show only historical C008/C009/C010 debt plus the expected workflow advisories."
+        },
+        {
+          "criterion": "Any server/process started during the work unit is stopped before commit/checkpoint",
+          "result": "passed",
+          "evidence": "npm run preview (port 4173) was used for all rendered verification and was stopped and confirmed unreachable (curl connection failed) before this checkpoint."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-12T08:01:39.774Z",
       "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-042",
-    "workUnitId": "WU041",
+    "id": "PKT-043",
+    "workUnitId": "WU042",
     "milestoneId": "M012",
-    "createdAt": "2026-09-12T07:09:55.183Z",
+    "createdAt": "2026-09-12T07:53:59.495Z",
     "format": "markdown",
-    "contentHash": "sha256:de8cb5d8407b0fcbeea7c4e3beb6a3b3688cf8274f41021cdf01e1b5d40de520",
+    "contentHash": "sha256:14fd3988479a80d0c50c321be7a170d946e7603e7f9cd3988d374120b9d44afd",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -5749,7 +5857,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-12T07:27:03.227Z",
+  "lastUpdatedAt": "2026-09-12T08:01:39.774Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -7120,6 +7228,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-12T07:27:03.227Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C043",
+      "current": {
+        "observationId": "sha256:35897abb7f97e58acfd14c5caa2db2e3df7fe07f7537a10b12485c41c7e5221e",
+        "checkpointId": "C043",
+        "workUnitId": "WU042",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-12T08:01:39.774Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-12T08:01:39.774Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:35897abb7f97e58acfd14c5caa2db2e3df7fe07f7537a10b12485c41c7e5221e",
+          "checkpointId": "C043",
+          "workUnitId": "WU042",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-12T08:01:39.774Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-12T08:01:39.774Z"
         }
       ]
     }

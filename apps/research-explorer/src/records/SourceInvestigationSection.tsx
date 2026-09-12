@@ -1,6 +1,7 @@
 import type { SourceEvidenceRelations, SourceRelatedProblem } from "./sourceEvidenceRelations";
 import { SOURCE_SECTION_ANCHOR_IDS } from "./sourceSectionIndex";
 import { RecordIdentifier } from "./RecordIdentifier";
+import { EmptyState } from "../presentation/EmptyState";
 
 /**
  * SUI-03H1/H2: isolated presentation component for the Source View "Na
@@ -38,19 +39,21 @@ function RelatedProblemItem({ problem, onSelect }: { problem: SourceRelatedProbl
 }
 
 export function SourceInvestigationSection({ relations, onSelect }: { relations: SourceEvidenceRelations; onSelect?: (id: string) => void }) {
-  if (relations.relatedProblems.length === 0) return null;
-
   return (
     <section id={SOURCE_SECTION_ANCHOR_IDS.investigation} aria-label="Na investigação" className="record-editorial-section source-findings-section">
       <h3 className="detail-panel-label">Na investigação</h3>
-      <div className="source-finding-group">
-        <h4 className="record-editorial-subheading">Problemas relacionados</h4>
-        <ul className="source-finding-list">
-          {relations.relatedProblems.map((problem) => (
-            <RelatedProblemItem key={problem.problemId} problem={problem} onSelect={onSelect} />
-          ))}
-        </ul>
-      </div>
+      {relations.relatedProblems.length === 0 ? (
+        <EmptyState message="Ainda não existem Problemas da investigação ligados explicitamente a esta fonte." />
+      ) : (
+        <div className="source-finding-group">
+          <h4 className="record-editorial-subheading">Problemas relacionados</h4>
+          <ul className="source-finding-list">
+            {relations.relatedProblems.map((problem) => (
+              <RelatedProblemItem key={problem.problemId} problem={problem} onSelect={onSelect} />
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }

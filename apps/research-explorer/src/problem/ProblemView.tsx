@@ -8,6 +8,7 @@ import { DISCLOSURE_FIELDS, DISCLOSURE_FIELD_LABELS, glossFor, type FieldGloss }
 import { ProblemLifecycleStatus } from "./ProblemLifecycleStatus";
 import { ValidationStatus, EvidenceStatus } from "./InvestigationStatus";
 import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
+import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { describeType, formatTypedId } from "../presentation/typeGlossary";
 import { formatPublicCount, publicEnumLabel } from "../presentation/presentation";
 import { ContextTabs } from "../navigation/ContextTabs";
@@ -648,9 +649,10 @@ function ProblemCurrentStateSection({ record }: { record: Record<string, unknown
  * the grouping is new; the card itself carries no ranking beyond the
  * already-authored effects.
  */
-function EvidenceCard({ detail, sources, effects = [], onOpenGeneric }: EvidenceWithSources & { onOpenGeneric: (id: string) => void }) {
+function EvidenceCard({ detail, sources, effects = [], researchRoles = [], onOpenGeneric }: EvidenceWithSources & { onOpenGeneric: (id: string) => void }) {
   const evidenceRecord = detail.record as Record<string, unknown>;
   const relationshipEffects = effects;
+  const relationshipResearchRoles = researchRoles;
   const observation = recordValue(evidenceRecord.observation);
   const observationSummary = observation ? fieldValue(observation, "summary") : null;
 
@@ -669,6 +671,11 @@ function EvidenceCard({ detail, sources, effects = [], onOpenGeneric }: Evidence
             <span className="field-empty">efeito não registado.</span>
           )}
         </span>
+        {relationshipResearchRoles.length > 0 && (
+          <span className="evidence-item-research-roles" aria-label="Papel desta evidência na investigação do Problema">
+            {relationshipResearchRoles.map((value, index) => <ResearchRoleTag key={`${value}-${index}`} role={value} variant="standard" />)}
+          </span>
+        )}
       </div>
       {observationSummary && (
         <p className="evidence-observation">
