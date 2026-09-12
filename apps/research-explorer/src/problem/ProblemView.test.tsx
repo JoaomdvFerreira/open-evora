@@ -143,6 +143,49 @@ describe("ProblemView vNext", () => {
   });
 });
 
+describe("ProblemView AR-05 CR-1 — research_roles[] rendering per evidence card", () => {
+  it("renders each evidence relationship's research_roles alongside its effects, matching the fixture exactly", async () => {
+    render(<ProblemView {...props} problemId="PRB-1" />);
+    const support = await screen.findByText("Evidência que suporta (1)");
+    const boundary = screen.getByText("Evidência que limita a conclusão (1)");
+    const other = screen.getByText("Outra evidência relacionada (1)");
+
+    const supportCard = within(support.parentElement!).getByRole("button", { name: /EVD-1/ }).closest("li")!;
+    const boundaryCard = within(boundary.parentElement!).getByRole("button", { name: /EVD-2/ }).closest("li")!;
+    const otherCard = within(other.parentElement!).getByRole("button", { name: /EVD-3/ }).closest("li")!;
+
+    expect(within(supportCard).getByText("Observação local").closest(".research-role-tag")).toBeTruthy();
+    expect(within(boundaryCard).getByText("Contexto").closest(".research-role-tag")).toBeTruthy();
+    expect(within(otherCard).getByText("Mecanismo comparativo").closest(".research-role-tag")).toBeTruthy();
+
+    expect(within(supportCard).getByLabelText("Efeito canónico no Problema")).toBeTruthy();
+    expect(within(boundaryCard).getByLabelText("Efeito canónico no Problema")).toBeTruthy();
+    expect(within(otherCard).getByLabelText("Efeito canónico no Problema")).toBeTruthy();
+  });
+
+  it("does not render a research-role tag when a relationship carries no research_roles", async () => {
+    const noRoleRecords: Record<string, RecordDetail> = {
+      ...records,
+      "PRB-1": {
+        ...records["PRB-1"],
+        record: { ...prbRecord, evidence: [{ evidence_id: "EVD-1", effects: ["SUPPORTS"] }] },
+      },
+    };
+    const noRoleProvider: DataProvider = { ...provider, getRecord: async (id) => noRoleRecords[id] };
+    render(<ProblemView {...props} dataProvider={noRoleProvider} problemId="PRB-1" />);
+    await screen.findAllByText("efeito não registado.");
+    expect(screen.queryByLabelText("Papel desta evidência na investigação do Problema")).toBeNull();
+  });
+
+  it("continues to render effects and EffectOccurrenceSummary unchanged alongside the new research-role rendering", async () => {
+    render(<ProblemView {...props} problemId="PRB-1" />);
+    await screen.findByText("Evidência que suporta (1)");
+    expect(screen.getByText(/papéis indicados não representam/)).toBeTruthy();
+    expect(screen.getAllByLabelText("Efeito canónico no Problema")).toHaveLength(3);
+    expect(screen.getAllByLabelText("Papel desta evidência na investigação do Problema")).toHaveLength(3);
+  });
+});
+
 describe("ProblemView AR-04 CR-2 — open-question internal detail labels", () => {
   const fullOpenQuestionRecords: Record<string, RecordDetail> = {
     ...records,
