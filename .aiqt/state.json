@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "projectStatus": "review",
+  "projectStatus": "in_progress",
   "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
@@ -142,6 +142,19 @@
           "WU041",
           "WU042",
           "WU043"
+        ]
+      },
+      {
+        "id": "M013",
+        "title": "Public Launch Readiness & Automated Research Operations",
+        "objective": "Prepare Open Évora for sustained public operation by hardening the public Research Explorer and by orchestrating the existing governed research tooling into an end-to-end process that can move from a research trigger to an approval-ready research package with zero normal-path human handoffs before the human research gate, while preserving human semantic authority over canonical research acceptance, corroboration/validation/investigation-state judgement, public research approval, repository merge, and final go-live decision. Social-channel creation and posting are manual owner operations outside the M013 critical path.",
+        "status": "ready",
+        "workUnitIds": [
+          "WU044",
+          "WU045",
+          "WU046",
+          "WU047",
+          "WU048"
         ]
       }
     ],
@@ -1966,6 +1979,239 @@
         ],
         "createdAt": "2026-09-12T06:52:09.086Z",
         "updatedAt": "2026-09-12T08:35:46.911Z"
+      },
+      {
+        "id": "WU044",
+        "milestoneId": "M013",
+        "title": "Launch & Research Automation Reconciliation & Contract",
+        "objective": "Perform a read-only reconciliation of the current repository, production deployment, Research Explorer, research tooling, publication boundaries and research workflow, and produce the exact implementation contract for WU045-WU048. WU044 must not implement anything.",
+        "scope": [
+          "Inventory every research pipeline stage from trigger to production deployment: research trigger, question definition, source discovery, source retrieval, source snapshot/provenance capture, existing-source lookup, deduplication, source change detection, source freshness/currentness, research extraction, candidate SRC generation, candidate EVD generation, candidate PRB creation/update, cross-record linking, inference-limit preservation, contradiction search, duplicate/problem overlap analysis, prospective validation, readiness evaluation, independent AI review, canonical delta generation, canonical integration review, canonical integration plan, publication-readiness review, human decision, deterministic canonical promotion, post-promotion validation, branch/commit/push/PR preparation, CI, Explorer build, production deployment path",
+          "Classify every inventoried stage as exactly one of AUTOMATED, PARTIALLY_AUTOMATED, MANUAL_REQUIRED, MISSING, or OWNER_DECISION_REQUIRED",
+          "Resolve OD-A: automation topology -- default candidate is local/operator-triggered orchestration first; scheduled/cloud/continuous execution must not be assumed necessary for launch",
+          "Resolve OD-B: AI execution contract for how AI-assisted discovery, extraction, candidate generation, contradiction search, and independent review produce structured outputs that deterministic tooling validates",
+          "Resolve OD-C: assess a non-canonical operational Research Change Set review artifact grouping candidate SRC/EVD/PRB, rationale, provenance, deltas, validation, readiness, contradiction findings, independent-review result, risks, and exact canonical base SHA -- without authorizing a new canonical RCS-* record type",
+          "Resolve OD-D: assess whether the normal path should expose one human interaction recording both canonical integration approval and public Explorer publication approval, while preserving the ability to separate them when necessary, without silently collapsing the semantic distinction",
+          "Resolve OD-E: define the bounded automated post-approval path from approved research package through canonical promotion, validation, branch, commit, push, PR, CI, to READY_FOR_OWNER_MERGE, with owner merge remaining manual and outside automation",
+          "Produce the exact WU045 implementation contract",
+          "Produce the exact WU046 implementation contract",
+          "Produce the exact WU047 implementation contract",
+          "Produce the exact WU048 verification matrix",
+          "Produce the Go-Live Acceptance Contract with the minimum required criteria",
+          "Produce the current Human Touches Before Research Approval baseline",
+          "Produce docs/design/m013-launch-automation-contract.md"
+        ],
+        "outOfScope": [
+          "Any implementation of automation, tooling, or orchestration",
+          "Any runtime/product code change",
+          "Any canonical SRC/EVD/PRB data change",
+          "Any research schema or research semantics change",
+          "Any new canonical record type",
+          "Any deployment action",
+          "Any social integration",
+          "Starting D7",
+          "Starting Decision Horizon",
+          "Repair of C008/C009/C010",
+          "Modifying .vscode/",
+          "Merging any PR",
+          "Running aiqt next or starting WU044 implementation work"
+        ],
+        "acceptanceCriteria": [
+          "docs/design/m013-launch-automation-contract.md exists and inventories every required stage with an explicit AUTOMATED/PARTIALLY_AUTOMATED/MANUAL_REQUIRED/MISSING/OWNER_DECISION_REQUIRED classification",
+          "OD-A through OD-E are each explicitly resolved with a recorded owner decision",
+          "Exact WU045, WU046, WU047 implementation contracts and WU048 verification matrix are produced",
+          "Go-Live Acceptance Contract is produced meeting the minimum required criteria (P0=0, P1=0 unless individually owner-accepted, dry run PASS, pre-Gate leakage=0, deterministic validation coverage=100%, independent review coverage=100%, automatic canonical approvals=0, automatic owner merges=0, automatic public publication without approval=0, production build/deployment PASS, rollback/recovery PASS, accessibility/public-quality PASS, public trust requirements PASS)",
+          "No canonical research, schema, or runtime/product file is changed by WU044",
+          "WU044 completion does not itself authorize WU045",
+          "Returns for explicit M013_WU044_OWNER_CONTRACT_REVIEW followed by independent Astra architecture/governance review before WU045 may start"
+        ],
+        "agentContextRefs": [
+          "project.objective",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md",
+          "docs/explorerarchitecture.md",
+          "docs/design/ar-05-discovery-provenance-contract.md"
+        ],
+        "suggestedFiles": [
+          "docs/design/m013-launch-automation-contract.md"
+        ],
+        "validationCommands": [
+          "npm run research:validate",
+          "git diff --check"
+        ],
+        "status": "ready",
+        "dependencies": [],
+        "createdAt": "2026-09-12T13:02:54.845Z",
+        "updatedAt": "2026-09-12T13:02:54.845Z"
+      },
+      {
+        "id": "WU045",
+        "milestoneId": "M013",
+        "title": "Automated Research Preparation",
+        "objective": "Implement only the owner-approved WU044 contract for moving from an explicit research trigger to an approval-ready non-canonical research package, with zero human semantic interventions before the review gate.",
+        "scope": [
+          "Implement the normal-path pipeline: RESEARCH TRIGGER -> automated preparation -> READY_FOR_HUMAN_REVIEW",
+          "Automate, where approved by the WU044 contract: discovery, retrieval, snapshot/provenance capture, canonical-source lookup, deduplication, change detection, bounded extraction, candidate SRC generation, candidate EVD generation, candidate PRB create/update generation, relationship construction, contradiction search support, inference-limit preservation, deterministic validation, readiness calculation, independent AI review, canonical delta generation, integration-review preparation, integration-plan preparation",
+          "Reuse existing tooling rather than rebuild: candidate delta classification, prospective validation, canonical integration review, canonical integration plan, readiness tooling, existing validators"
+        ],
+        "outOfScope": [
+          "Committing, pushing, or publishing any pre-Gate candidate material",
+          "Any automatic canonical write",
+          "Any automatic research-state transition",
+          "Any automatic corroboration/validation decision",
+          "Any automatic public publication",
+          "Any silent claim strengthening",
+          "Any schema change unless separately owner-authorized",
+          "Any new canonical record type",
+          "D7 work",
+          "Scheduled/cloud monitoring unless WU044 proves it necessary"
+        ],
+        "acceptanceCriteria": [
+          ".research-workbench/ remains non-canonical, non-public, and gitignored",
+          "No pre-Gate candidate material is committed, pushed, or published",
+          "Zero human semantic interventions occur on the normal path before READY_FOR_HUMAN_REVIEW",
+          "Implementation matches only the owner-approved WU044 contract boundary"
+        ],
+        "agentContextRefs": [
+          "docs/design/m013-launch-automation-contract.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md"
+        ],
+        "suggestedFiles": [],
+        "validationCommands": [
+          "npm run research:check",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-041"
+        ],
+        "createdAt": "2026-09-12T13:02:54.845Z",
+        "updatedAt": "2026-09-12T13:02:54.845Z"
+      },
+      {
+        "id": "WU046",
+        "milestoneId": "M013",
+        "title": "Human Gate & Post-Approval Orchestration",
+        "objective": "Implement the owner-approved review/promotion path around the approval-ready Research Change Set produced by WU045, presenting one coherent, inspectable human review package and, after explicit approval, executing only the approved deterministic post-approval path up to READY_FOR_OWNER_MERGE.",
+        "scope": [
+          "Assemble one coherent review package exposing investigation question, candidate records, CREATE/UPDATE/NO_CHANGE deltas, exact provenance, claim scope, inference limits, affected existing PRBs, contradiction analysis, duplicate/overlap analysis, prospective validation result, readiness result, independent AI review, exact canonical Git base SHA, exact integration plan, expected Explorer/public effect, risks/unresolved uncertainties, and a clearly non-authoritative recommendation",
+          "Support human decision options of at least APPROVE, REJECT, and HOLD/MORE_RESEARCH",
+          "After explicit human approval, verify the approved exact package/plan/base SHA, apply the canonical integration plan, validate the resulting corpus, build the Explorer/read model, create a bounded branch, commit, push, create a PR, and run/observe CI where tooling supports it, returning READY_FOR_OWNER_MERGE"
+        ],
+        "outOfScope": [
+          "Merging the PR",
+          "Bypassing branch protection",
+          "Auto-approving research",
+          "Auto-publishing candidate material before Gate approval",
+          "Treating an AI recommendation as approval"
+        ],
+        "acceptanceCriteria": [
+          "The review package makes every required element inspectable in one place",
+          "No AI recommendation is ever treated as an approval decision",
+          "Only the approved deterministic path executes after explicit human approval",
+          "The PR is never merged and branch protection is never bypassed by this work unit",
+          "Repository publication remains owner-controlled"
+        ],
+        "agentContextRefs": [
+          "docs/design/m013-launch-automation-contract.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md"
+        ],
+        "suggestedFiles": [],
+        "validationCommands": [
+          "npm run research:check",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-043"
+        ],
+        "createdAt": "2026-09-12T13:02:54.845Z",
+        "updatedAt": "2026-09-12T13:02:54.845Z"
+      },
+      {
+        "id": "WU047",
+        "milestoneId": "M013",
+        "title": "Production Launch Hardening",
+        "objective": "Implement only the launch blockers approved by the WU044 contract across production, public web, quality, and trust audit areas.",
+        "scope": [
+          "Audit production: deployment topology, Git->Vercel production path, reproducible build, rollback, runtime/error observability, failure recovery, dependency/security posture, secrets exposure, production ownership",
+          "Audit public web: domain strategy, HTTPS, canonical URL, title/description metadata, OpenGraph/social previews, X/Twitter card metadata where applicable, favicon, robots.txt, sitemap, 404/error surfaces, broken links",
+          "Audit quality: accessibility, keyboard, mobile, browser compatibility, performance, public data integrity, build/read-model integrity",
+          "Audit trust: About, methodology, source/provenance explanation, correction/challenge route, contact, independence/non-affiliation, privacy posture",
+          "Re-evaluate known pre-existing observations (favicon.ico 404; 9px .explorer-navigation overflow at 360px) only as launch-quality issues"
+        ],
+        "outOfScope": [
+          "Reopening AR-05",
+          "Authorizing or performing C008/C009/C010 repair",
+          "Broad redesign",
+          "Changing M010 DS-04B owner-frozen values",
+          "Any launch blocker not approved by the WU044 contract"
+        ],
+        "acceptanceCriteria": [
+          "Only WU044-approved launch blockers are implemented",
+          "AR-05 is not reopened and C008/C009/C010 are not repaired",
+          "M010 DS-04B owner-frozen values remain binding and unchanged",
+          "No broad redesign is introduced"
+        ],
+        "agentContextRefs": [
+          "docs/design/m013-launch-automation-contract.md",
+          "docs/explorerarchitecture.md"
+        ],
+        "suggestedFiles": [],
+        "validationCommands": [
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-042"
+        ],
+        "createdAt": "2026-09-12T13:02:54.845Z",
+        "updatedAt": "2026-09-12T13:02:54.845Z"
+      },
+      {
+        "id": "WU048",
+        "milestoneId": "M013",
+        "title": "End-to-End Dry Run & Independent Go-Live Verification",
+        "objective": "Independently verify the complete M013 system end-to-end, including adversarial/failure cases and production/public hardening against the built production artifact, without making the go-live decision.",
+        "scope": [
+          "Test a normal end-to-end research path up to the human gate with zero normal-path human intervention",
+          "Test the approved post-Gate path using a controlled dry-run / approved fixture or owner-approved test path",
+          "Verify adversarial/failure cases: duplicate source -> NO_CHANGE/no unnecessary candidate; weak source -> HOLD/review required; contradictory evidence surfaced not suppressed; invalid candidate blocked; privacy-sensitive/non-public material blocked; stale base SHA blocked; source disappears/becomes unavailable surfaced; weakly supported candidate Problem not silently promoted; independent review disagreement surfaced to human; validation failure blocked; promotion failure triggers rollback/safe failure; build failure blocked; PR/CI failure does not reach READY_FOR_OWNER_MERGE; candidate material cannot leak to Git/preview before human Gate",
+          "Verify production/public hardening against the built production artifact",
+          "Evaluate the Go-Live Acceptance Contract and return NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE"
+        ],
+        "outOfScope": [
+          "Making the go-live decision",
+          "Merging a PR",
+          "Starting D7",
+          "Starting any successor"
+        ],
+        "acceptanceCriteria": [
+          "All required adversarial/failure cases are exercised and their expected safe outcome is verified",
+          "Production/public hardening is verified against the actual built production artifact",
+          "WU048 returns exactly one of NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE",
+          "Only the owner decides GO / HOLD",
+          "No successor beyond WU048 is started or authorized"
+        ],
+        "agentContextRefs": [
+          "docs/design/m013-launch-automation-contract.md"
+        ],
+        "suggestedFiles": [],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-044",
+          "DEP-045"
+        ],
+        "createdAt": "2026-09-12T13:02:54.845Z",
+        "updatedAt": "2026-09-12T13:02:54.845Z"
       }
     ],
     "dependencies": [
@@ -2248,6 +2494,41 @@
         "toId": "WU043",
         "type": "blocks",
         "reason": "Independent verification requires the completed approved implementation."
+      },
+      {
+        "id": "DEP-041",
+        "fromId": "WU044",
+        "toId": "WU045",
+        "type": "blocks",
+        "reason": "WU045 implements only the exact contract WU044 produces; WU044 must be complete and owner-reviewed first."
+      },
+      {
+        "id": "DEP-042",
+        "fromId": "WU044",
+        "toId": "WU047",
+        "type": "blocks",
+        "reason": "WU047 implements only launch blockers approved by the WU044 contract."
+      },
+      {
+        "id": "DEP-043",
+        "fromId": "WU045",
+        "toId": "WU046",
+        "type": "blocks",
+        "reason": "WU046 orchestrates the human gate and post-approval path around the Research Change Set that WU045 produces."
+      },
+      {
+        "id": "DEP-044",
+        "fromId": "WU046",
+        "toId": "WU048",
+        "type": "blocks",
+        "reason": "WU048 independently verifies the human gate and post-approval orchestration built in WU046."
+      },
+      {
+        "id": "DEP-045",
+        "fromId": "WU047",
+        "toId": "WU048",
+        "type": "blocks",
+        "reason": "WU048 verifies production/public hardening against the artifact WU047 produces."
       }
     ]
   },
@@ -5961,8 +6242,8 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-12T08:35:46.911Z",
-      "nextRecommendation": "aiqt review --mode release"
+      "nextRecommendation": "aiqt review --mode release",
+      "createdAt": "2026-09-12T08:35:46.911Z"
     }
   ],
   "lastAgentPacket": {
@@ -5989,8 +6270,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt review --mode release",
-  "lastUpdatedAt": "2026-09-12T08:35:46.911Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-12T13:02:54.845Z",
   "review": {
     "acknowledgedFindings": [
       {
