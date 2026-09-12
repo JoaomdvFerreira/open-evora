@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
   "projectStatus": "in_progress",
-  "currentMilestoneId": null,
+  "currentMilestoneId": "M013",
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -2039,10 +2039,10 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T13:02:54.845Z"
+        "updatedAt": "2026-09-12T19:19:19.431Z"
       },
       {
         "id": "WU045",
@@ -2082,12 +2082,12 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-041"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T13:02:54.845Z"
+        "updatedAt": "2026-09-12T19:19:19.431Z"
       },
       {
         "id": "WU046",
@@ -2164,12 +2164,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-042"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T13:02:54.845Z"
+        "updatedAt": "2026-09-12T19:19:19.431Z"
       },
       {
         "id": "WU048",
@@ -6244,15 +6244,107 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt review --mode release",
       "createdAt": "2026-09-12T08:35:46.911Z"
+    },
+    {
+      "id": "C045",
+      "workUnitId": "WU044",
+      "packetId": "PKT-045",
+      "summary": "Reconciled the actual implemented state of the Open Évora research pipeline against docs/investigationstrategy.md, docs/datamodel.md, docs/explorerarchitecture.md, and AGENTS.md; obtained explicit owner approval for OD-A through OD-E; ran an independent Claude Code architecture/governance review gate (§18a) which returned PASS_WITH_NONBLOCKING_FINDINGS (0 BLOCKER, 2 HIGH, 4 MEDIUM, 3 LOW, 4 OBSERVATION); incorporated every ACCEPT/ACCEPT_WITH_MODIFIED_REMEDY finding as a binding contract amendment; and had a subsequent independent, read-only remediation verification confirm every accepted finding is correctly closed (M013_WU044_REMEDIATION_VERIFICATION_PASS). No runtime, schema, or canonical-research change was made at any point.",
+      "completed": [
+        "Mapped all 30 pipeline stages (trigger through production deployment) with exactly one primary classification each, citing concrete files/commands.",
+        "Corrected the human-touch baseline to 2 genuine pre-Gate human touches and 5 post-approval touches, with a target of 0 and 2 respectively per the milestone's normal-path definition.",
+        "Verified GitHub branch protection on main via the Repository Rulesets API (withdrawing a prior false negative) and recorded VERIFIED_EXTERNAL Vercel/production facts.",
+        "Obtained explicit owner approval for OD-A (Option 1), OD-B (Option 2, five-point independence minimum bar), OD-C (Option 3, JSON source of truth + generated Markdown view), OD-D (Option 2, combined-by-default with private-hold sequencing), and OD-E (Option 1, automate through READY_FOR_OWNER_MERGE).",
+        "Froze WU045 (§11) and WU046 (§12) to implementation-grade boundaries and finalized WU047 (§13) and WU048's 22-case verification matrix (§14) against the approved decisions.",
+        "Ran the independent Claude Code architecture/governance review gate (§18a) in place of the unavailable Astra tool, per explicit owner process override.",
+        "Incorporated the review's disposition (§0a) into binding contract amendments: HIGH-1 (OD-D hold-path adversarial case 18), HIGH-2 (exact RCS approval/content-hash binding protocol, §12), MEDIUM-1 (strengthened OD-B review context-isolation, §9), MEDIUM-2 (malformed structured-output case 19), MEDIUM-3 (WU045 idempotent-rerun/WU046 partial-retry cases 20-21), MEDIUM-4 (high-risk-claim case 22), LOW-1 (exact ReasonCode count of 31), LOW-3 (deterministic publication guard, §12), and recorded LOW-2 as a deferred observation (§7a).",
+        "Had an independent, read-only follow-up verification confirm every accepted HIGH/MEDIUM/LOW finding is correctly and completely closed in the contract text, with zero regressions and zero repository mutations (M013_WU044_REMEDIATION_VERIFICATION_PASS)."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "docs/design/m013-launch-automation-contract.md",
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No conflict markers or whitespace errors."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "Project in_progress; M013/WU044 current; next recommended command aiqt checkpoint."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Non-blocking findings only: pre-existing C008/C009/C010 packet-reference debt and expected planned-work-unit scope notices; no new finding."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "3 pre-existing blocking findings, all C008/C009/C010 broken checkpoint-packet references (historical AIQT debt, out of WU044 scope to repair); no new graph-integrity finding introduced."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "docs/design/m013-launch-automation-contract.md exists and inventories every required stage with an explicit AUTOMATED/PARTIALLY_AUTOMATED/MANUAL_REQUIRED/MISSING/OWNER_DECISION_REQUIRED classification",
+          "result": "passed",
+          "evidence": "Contract §4 inventories all 30 pipeline stages with exactly one primary classification per stage (10 AUTOMATED, 5 PARTIALLY_AUTOMATED, 10 MANUAL_REQUIRED, 5 MISSING, 0 OWNER_DECISION_REQUIRED at stage level; proof 10+5+10+5+0=30)."
+        },
+        {
+          "criterion": "OD-A through OD-E are each explicitly resolved with a recorded owner decision",
+          "result": "passed",
+          "evidence": "Contract §9 records OD-A (Option 1), OD-B (Option 2), OD-C (Option 3), OD-D (Option 2), OD-E (Option 1), each OWNER_APPROVED with rationale, binding consequence, and rejected alternatives."
+        },
+        {
+          "criterion": "Exact WU045, WU046, WU047 implementation contracts and WU048 verification matrix are produced",
+          "result": "passed",
+          "evidence": "Contract §11 (WU045), §12 (WU046), §13 (WU047) are frozen to implementation-grade boundaries; §14 defines WU048's 22-case verification matrix (2 normal-path + 20 adversarial), independently re-counted and confirmed numbered 1-22 exactly once."
+        },
+        {
+          "criterion": "Go-Live Acceptance Contract is produced meeting the minimum required criteria (P0=0, P1=0 unless individually owner-accepted, dry run PASS, pre-Gate leakage=0, deterministic validation coverage=100%, independent review coverage=100%, automatic canonical approvals=0, automatic owner merges=0, automatic public publication without approval=0, production build/deployment PASS, rollback/recovery PASS, accessibility/public-quality PASS, public trust requirements PASS)",
+          "result": "passed",
+          "evidence": "Contract §15/§15a records the draft Go-Live Acceptance Contract with every named criterion annotated against current-state evidence (P0=0, P1=0 confirmed per §10; remaining items correctly deferred to WU045-WU048 execution, not silently marked satisfied); §15a defines the terminal outcome mapping (NOT_READY / READY_WITH_ACCEPTED_RISK / READY_FOR_GO_LIVE_GATE), with neither READY state equated to GO."
+        },
+        {
+          "criterion": "No canonical research, schema, or runtime/product file is changed by WU044",
+          "result": "passed",
+          "evidence": "Diff against main baseline (f5ffeb6) touches only .aiqt/state.json, .aiqt/runlog.jsonl, and the new docs/design/m013-launch-automation-contract.md; npm run research:validate confirms the unchanged 274-record corpus (12 PRB + 143 EVD + 119 SRC)."
+        },
+        {
+          "criterion": "WU044 completion does not itself authorize WU045",
+          "result": "passed",
+          "evidence": "Contract §0a, §18a, and §19 each explicitly state that this pass's remediation/verification does not itself authorize WU045; a separate, subsequent, explicit owner action is required."
+        },
+        {
+          "criterion": "Returns for explicit M013_WU044_OWNER_CONTRACT_REVIEW followed by independent Astra architecture/governance review before WU045 may start",
+          "result": "passed",
+          "evidence": "Per explicit owner process override (§18a), the Astra-specific requirement was superseded by an independent Claude Code architecture/governance review on the same binding terms; that review ran and returned M013_WU044_INDEPENDENT_REVIEW_PASS_WITH_NONBLOCKING_FINDINGS (§0a), and a subsequent independent, read-only remediation verification confirmed every accepted finding is correctly closed (M013_WU044_REMEDIATION_VERIFICATION_PASS)."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-12T19:19:19.431Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-044",
-    "workUnitId": "WU043",
-    "milestoneId": "M012",
-    "createdAt": "2026-09-12T08:25:35.117Z",
+    "id": "PKT-045",
+    "workUnitId": "WU044",
+    "milestoneId": "M013",
+    "createdAt": "2026-09-12T14:22:28.400Z",
     "format": "markdown",
-    "contentHash": "sha256:891d2ae3dadd61008d25972e710e677c9fb159ab955cec3889ef065dedee59dd",
+    "contentHash": "sha256:c399f14f8ff1f06766c1d9adf28556b826035b8e81381e410c3f15d0ecd94036",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -6271,7 +6363,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-12T13:02:54.845Z",
+  "lastUpdatedAt": "2026-09-12T19:19:19.431Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -7702,6 +7794,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-12T08:35:46.911Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C045",
+      "current": {
+        "observationId": "sha256:a69c51002543266a371acbe4d057564d0096ce4fee93720252c12f9567012e07",
+        "checkpointId": "C045",
+        "workUnitId": "WU044",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-12T19:19:19.431Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-12T19:19:19.431Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:a69c51002543266a371acbe4d057564d0096ce4fee93720252c12f9567012e07",
+          "checkpointId": "C045",
+          "workUnitId": "WU044",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-12T19:19:19.431Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-12T19:19:19.431Z"
         }
       ]
     }
