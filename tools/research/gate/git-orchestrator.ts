@@ -97,21 +97,78 @@ function remoteBranchExists(repoRoot: string, branch: string, env: NodeJS.Proces
   return result.ok && result.stdout.trim() !== "";
 }
 
+/**
+ * R1 remediation (independent-review MEDIUM finding): a deterministic branch
+ * name existing is not itself proof the branch is safe to resume onto — a
+ * stale/unrelated branch could coincidentally (or adversarially) share the
+ * name. This reuses the exact base-SHA identity WU046 already verified via
+ * HIGH-2/the pre-promotion repository-state precheck (no second, parallel
+ * approval-identity system is introduced): a branch is compatible with the
+ * current approved run iff the approved `baseGitSha` is an ancestor of the
+ * branch tip, i.e. the branch's history genuinely descends from the exact
+ * commit the current promotion was verified against. An unrelated branch
+ * (disjoint history) or one built on a stale/different base fails this
+ * check and is reported as an explicit, fail-closed incompatibility rather
+ * than silently checked out and built upon.
+ */
+function isBranchCompatible(repoRoot: string, branch: string, baseGitSha: string, env: NodeJS.ProcessEnv): boolean {
+  return run(repoRoot, "git", ["merge-base", "--is-ancestor", baseGitSha, `refs/heads/${branch}`], env).ok;
+}
+
 interface ExistingPr {
   number: number;
   url: string;
   headRefName: string;
+  baseRefName: string;
 }
 
-function findExistingPr(repoRoot: string, branch: string, env: NodeJS.ProcessEnv): ExistingPr | null {
-  const result = run(repoRoot, "gh", ["pr", "list", "--head", branch, "--json", "number,url,headRefName", "--limit", "1"], env);
-  if (!result.ok || result.stdout === "") return null;
+function findExistingPr(repoRoot: string, branch: string, env: NodeJS.ProcessEnv): ExistingPr[] {
+  const result = run(repoRoot, "gh", ["pr", "list", "--head", branch, "--json", "number,url,headRefName,baseRefName"], env);
+  if (!result.ok || result.stdout === "") return [];
   try {
-    const parsed = JSON.parse(result.stdout) as ExistingPr[];
-    return parsed.length > 0 ? parsed[0]! : null;
+    const parsed = JSON.parse(result.stdout);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (item): item is ExistingPr =>
+        item !== null &&
+        typeof item === "object" &&
+        typeof item.number === "number" &&
+        typeof item.url === "string" &&
+        typeof item.headRefName === "string" &&
+        typeof item.baseRefName === "string"
+    );
   } catch {
-    return null;
+    return [];
   }
+}
+
+/**
+ * R2 remediation (independent-review MEDIUM finding): a PR matching the
+ * expected head branch is not itself proof it is safe to reuse — it must
+ * also target the expected base branch. This resolves the existing-PR
+ * lookup to exactly one of three outcomes:
+ *  - "NONE": no PR exists for this head branch; the caller should create one;
+ *  - "COMPATIBLE": exactly one PR targets the expected base branch and is
+ *    safe to resume onto;
+ *  - "INCOMPATIBLE": at least one PR exists for this head branch, but none
+ *    matches the expected base branch (wrong base) or more than one
+ *    candidate is ambiguous (malformed/unexpected `gh` output shape) — in
+ *    either case this must fail explicitly rather than silently reuse a
+ *    mismatched PR or create a duplicate one alongside it.
+ */
+type ExistingPrLookup =
+  | { status: "NONE" }
+  | { status: "COMPATIBLE"; pr: ExistingPr }
+  | { status: "INCOMPATIBLE"; candidates: ExistingPr[] };
+
+function resolveExistingPr(repoRoot: string, branch: string, baseBranch: string, env: NodeJS.ProcessEnv): ExistingPrLookup {
+  const candidates = findExistingPr(repoRoot, branch, env);
+  if (candidates.length === 0) return { status: "NONE" };
+  const compatible = candidates.filter((pr) => pr.baseRefName === baseBranch);
+  if (compatible.length === 1 && candidates.length === 1) {
+    return { status: "COMPATIBLE", pr: compatible[0]! };
+  }
+  return { status: "INCOMPATIBLE", candidates };
 }
 
 function currentCommitSha(repoRoot: string, env: NodeJS.ProcessEnv): string | null {
@@ -154,6 +211,21 @@ export function runPostApprovalGitSequence(input: GitOrchestratorInput): GitOrch
     const create = run(input.repoRoot, "git", ["checkout", "-b", branch], env);
     if (!create.ok) return { status: "FAILED", failedStage: "BRANCH", message: create.stderr || "failed to create branch" };
   } else {
+    // R1: an existing branch with this deterministic name is not itself
+    // proof it is safe to resume onto — verify the approved baseGitSha is
+    // actually an ancestor of the branch tip before ever checking it out or
+    // building on top of it. An unrelated/stale-base branch fails closed
+    // here, before any commit/push/PR touches it.
+    if (!isBranchCompatible(input.repoRoot, branch, input.baseGitSha, env)) {
+      return {
+        status: "FAILED",
+        failedStage: "BRANCH",
+        message:
+          `existing branch "${branch}" is not compatible with this run: approved baseGitSha ` +
+          `${input.baseGitSha} is not an ancestor of the branch tip. Refusing to resume onto ` +
+          "unrelated/stale branch history. No destructive reset or force-push was attempted.",
+      };
+    }
     const checkout = run(input.repoRoot, "git", ["checkout", branch], env);
     if (!checkout.ok) return { status: "FAILED", failedStage: "BRANCH", message: checkout.stderr || "failed to check out existing branch" };
   }
@@ -189,8 +261,30 @@ export function runPostApprovalGitSequence(input: GitOrchestratorInput): GitOrch
   }
 
   // --- PR CREATION (or resume an existing compatible PR) ----------------
-  let pr = findExistingPr(input.repoRoot, branch, env);
-  if (!pr) {
+  // R2: an existing PR matching the head branch is not itself proof it is
+  // safe to reuse — it must also target the expected base branch. A head
+  // match with the wrong base fails explicitly rather than being silently
+  // reused or retargeted, and is never masked by creating a second,
+  // duplicate PR alongside it.
+  const existingLookup = resolveExistingPr(input.repoRoot, branch, input.baseBranch, env);
+  if (existingLookup.status === "INCOMPATIBLE") {
+    const describe = existingLookup.candidates
+      .map((c) => `#${c.number} (base=${c.baseRefName}, url=${c.url})`)
+      .join(", ");
+    return {
+      status: "FAILED",
+      failedStage: "PR_CREATE",
+      message:
+        `existing PR(s) for head branch "${branch}" do not unambiguously match the expected base ` +
+        `branch "${input.baseBranch}": ${describe}. Refusing to reuse a mismatched PR, retarget it, ` +
+        "or create a duplicate. Resolve the conflicting PR manually before retrying.",
+    };
+  }
+
+  let pr: ExistingPr;
+  if (existingLookup.status === "COMPATIBLE") {
+    pr = existingLookup.pr;
+  } else {
     // The PR body is written to a temp file and passed via --body-file
     // rather than --body: a multi-line body passed as a literal command-
     // line argument is fundamentally unreliable on Windows — cmd.exe/the
@@ -215,8 +309,11 @@ export function runPostApprovalGitSequence(input: GitOrchestratorInput): GitOrch
     } finally {
       rmSync(bodyFileDir, { recursive: true, force: true });
     }
-    pr = findExistingPr(input.repoRoot, branch, env);
-    if (!pr) return { status: "FAILED", failedStage: "PR_CREATE", message: "PR creation reported success but no PR could be found for this branch" };
+    const afterCreate = resolveExistingPr(input.repoRoot, branch, input.baseBranch, env);
+    if (afterCreate.status !== "COMPATIBLE") {
+      return { status: "FAILED", failedStage: "PR_CREATE", message: "PR creation reported success but no compatible PR could be found for this branch/base" };
+    }
+    pr = afterCreate.pr;
   }
 
   // --- CI OBSERVATION (best-effort; a pending/unknown status is not itself a failure) --

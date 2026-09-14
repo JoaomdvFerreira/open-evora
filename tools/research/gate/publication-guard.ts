@@ -27,27 +27,53 @@ export interface PublicationGuardResult {
 
 const WORKBENCH_PREFIXES = [".research-workbench/"];
 
+/**
+ * R3 remediation (independent-review LOW finding): the prior implementation
+ * parsed the default, human-oriented `git status --porcelain` format, which
+ * quotes/C-escapes any path containing a literal `"`, backslash, or other
+ * "unusual" byte (per Git's `core.quotePath`/`quote_c_style` behavior) — a
+ * fragile decode this module was not correctly reversing. Rather than
+ * implementing that decoding correctly (a second fragile parser replacing
+ * the first), this uses Git's own documented machine-readable alternative:
+ * `--porcelain=v1 -z`. With `-z`, Git guarantees paths are NEVER quoted or
+ * escaped, and NUL (`\0`) — a byte that cannot appear in a Git path — is
+ * used as the field terminator instead of the arrow-delimited/quoted text
+ * format. Renames/copies are emitted as two consecutive NUL-terminated
+ * fields (new path, then old path) rather than one "orig -> new" text field,
+ * removing the ambiguity of a literal " -> " substring inside a real
+ * filename entirely. This eliminates the quoted-path decode problem at the
+ * source instead of re-solving it with custom unescaping logic.
+ */
 function runGitPorcelainStatus(repoRoot: string): string[] {
-  const result = spawnSync("git", ["-C", repoRoot, "status", "--porcelain", "--untracked-files=all"], { encoding: "utf8" });
+  const result = spawnSync("git", ["-C", repoRoot, "status", "--porcelain=v1", "-z", "--untracked-files=all"], { encoding: "utf8" });
   if (result.error || result.status !== 0) {
     throw new Error(`git status failed: ${(result.stderr || result.error?.message || "unknown Git error").trim()}`);
   }
-  return result.stdout
-    .split("\n")
-    .filter((line) => line.replace(/[\r\n]+$/, "").length > 0)
-    .map((line) => {
-      // Porcelain format is fixed-width: exactly 2 status characters, then
-      // a single space, then the path — "XY path" or "XY orig -> path" for
-      // renames. A leading space in "XY" (e.g. " M") is itself meaningful
-      // (unstaged-modified) and must not be trimmed away before slicing,
-      // or the fixed 3-character prefix offset would eat into the path.
-      const withoutTrailingNewline = line.replace(/[\r\n]+$/, "");
-      const withoutStatus = withoutTrailingNewline.slice(3);
-      const arrowIndex = withoutStatus.indexOf(" -> ");
-      const path = arrowIndex === -1 ? withoutStatus : withoutStatus.slice(arrowIndex + 4);
-      // Strip surrounding quotes Git adds for paths with special characters.
-      return path.startsWith('"') && path.endsWith('"') ? path.slice(1, -1) : path;
-    });
+  const rawFields = result.stdout.split("\0");
+  // split("\0") on a NUL-terminated stream leaves one trailing empty field;
+  // drop it rather than treating it as a (would-be empty) path.
+  if (rawFields.length > 0 && rawFields[rawFields.length - 1] === "") rawFields.pop();
+
+  const paths: string[] = [];
+  for (let i = 0; i < rawFields.length; i++) {
+    const record = rawFields[i]!;
+    // Each record's first 3 bytes are "XY " (two status characters plus a
+    // single space) exactly as in the text format; -z changes only path
+    // encoding/termination, not the fixed-width status prefix.
+    const statusCode = record.slice(0, 2);
+    const path = record.slice(3);
+    paths.push(path);
+    // A rename/copy status ("R" or "C" in either status column) is followed
+    // by one additional NUL-terminated field holding the origin path — with
+    // -z there is no " -> " delimiter to search for, so this is driven
+    // entirely by the status code, which cannot be confused with path text.
+    if (statusCode.includes("R") || statusCode.includes("C")) {
+      i++;
+      const originPath = rawFields[i];
+      if (originPath !== undefined) paths.push(originPath);
+    }
+  }
+  return paths;
 }
 
 /**

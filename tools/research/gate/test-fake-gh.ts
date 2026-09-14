@@ -11,7 +11,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 interface FakeGhState {
-  prs: Array<{ number: number; url: string; headRefName: string }>;
+  prs: Array<{ number: number; url: string; headRefName: string; baseRefName: string }>;
   ciState: "SUCCESS" | "FAILURE" | "PENDING" | "NONE";
   nextPrNumber: number;
   failPrCreate?: boolean;
@@ -62,8 +62,10 @@ function main(): void {
     }
     const headIdx = args.indexOf("--head");
     const head = headIdx !== -1 ? args[headIdx + 1] : "unknown-branch";
+    const baseIdx = args.indexOf("--base");
+    const base = baseIdx !== -1 ? args[baseIdx + 1] : "unknown-base";
     const number = state.nextPrNumber;
-    const pr = { number, url: `https://github.com/example/repo/pull/${number}`, headRefName: head };
+    const pr = { number, url: `https://github.com/example/repo/pull/${number}`, headRefName: head, baseRefName: base };
     state.prs.push(pr);
     state.nextPrNumber += 1;
     saveState(statePath, state);

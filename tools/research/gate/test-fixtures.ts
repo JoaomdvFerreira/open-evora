@@ -71,6 +71,13 @@ export function gitFixture(): GitFixture {
  * tests must not require destructive interaction with a real repository or
  * remote.
  */
+export interface FakeGhPr {
+  number: number;
+  url: string;
+  headRefName: string;
+  baseRefName: string;
+}
+
 export interface RemoteGitFixture extends GitFixture {
   remoteDir: string;
   fakeGhStatePath: string;
@@ -78,7 +85,9 @@ export interface RemoteGitFixture extends GitFixture {
   env: NodeJS.ProcessEnv;
   setFakeGhCiState(state: "SUCCESS" | "FAILURE" | "PENDING" | "NONE"): void;
   setFakeGhFailPrCreate(fail: boolean): void;
-  readFakeGhState(): { prs: Array<{ number: number; url: string; headRefName: string }>; ciState: string; nextPrNumber: number; failPrCreate?: boolean };
+  /** Seeds an existing PR directly into the fake gh state, e.g. to simulate a prior run's PR with a different base branch. */
+  seedFakeGhPr(pr: FakeGhPr): void;
+  readFakeGhState(): { prs: FakeGhPr[]; ciState: string; nextPrNumber: number; failPrCreate?: boolean };
 }
 
 const NODE_EXECUTABLE = process.execPath;
@@ -135,6 +144,14 @@ export function remoteGitFixture(): RemoteGitFixture {
     setFakeGhFailPrCreate: (fail) => {
       const current = JSON.parse(readFileSync(fakeGhStatePath, "utf8"));
       writeFileSync(fakeGhStatePath, JSON.stringify({ ...current, failPrCreate: fail }), "utf8");
+    },
+    seedFakeGhPr: (pr) => {
+      const current = JSON.parse(readFileSync(fakeGhStatePath, "utf8"));
+      writeFileSync(
+        fakeGhStatePath,
+        JSON.stringify({ ...current, prs: [...current.prs, pr], nextPrNumber: Math.max(current.nextPrNumber, pr.number + 1) }),
+        "utf8"
+      );
     },
     readFakeGhState: () => JSON.parse(readFileSync(fakeGhStatePath, "utf8")),
   };
