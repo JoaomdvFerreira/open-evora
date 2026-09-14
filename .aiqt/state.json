@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M013",
-  "currentWorkUnitId": null,
+  "currentWorkUnitId": "WU046",
   "workGraph": {
     "milestones": [
       {
@@ -148,7 +148,7 @@
         "id": "M013",
         "title": "Public Launch Readiness & Automated Research Operations",
         "objective": "Prepare Open Évora for sustained public operation by hardening the public Research Explorer and by orchestrating the existing governed research tooling into an end-to-end process that can move from a research trigger to an approval-ready research package with zero normal-path human handoffs before the human research gate, while preserving human semantic authority over canonical research acceptance, corroboration/validation/investigation-state judgement, public research approval, repository merge, and final go-live decision. Social-channel creation and posting are manual owner operations outside the M013 critical path.",
-        "status": "ready",
+        "status": "in_progress",
         "workUnitIds": [
           "WU044",
           "WU045",
@@ -2096,22 +2096,35 @@
         "objective": "Implement the owner-approved review/promotion path around the approval-ready Research Change Set produced by WU045, presenting one coherent, inspectable human review package and, after explicit approval, executing only the approved deterministic post-approval path up to READY_FOR_OWNER_MERGE.",
         "scope": [
           "Assemble one coherent review package exposing investigation question, candidate records, CREATE/UPDATE/NO_CHANGE deltas, exact provenance, claim scope, inference limits, affected existing PRBs, contradiction analysis, duplicate/overlap analysis, prospective validation result, readiness result, independent AI review, exact canonical Git base SHA, exact integration plan, expected Explorer/public effect, risks/unresolved uncertainties, and a clearly non-authoritative recommendation",
+          "SCOPE TRANSFER (owner decision, WU046 scope refinement, superseding the WU045-B02 handoff gap identified by the WU046 scope review): invoke the existing canonical tools/research/readiness/readiness.ts evaluator (evaluateEligibility()/evaluateCorroboration()) directly, and include its structured ReadinessReport (eligibility/corroboration findings, contradiction-search and duplicate/overlap evidence, existing ReasonCodes) in the assembled review package. WU045's delivered Research Change Set does not itself contain this data -- WU045 never invoked readiness.ts despite its own §11 boundary text -- so WU046, not WU045, is the point that must call it. This invocation is pre-Gate analysis only: read-only against the existing readiness contract, no canonical/public research write, no new research generation, no change to readiness rules or ReasonCodes, and no reimplementation of eligibility/corroboration logic.",
+          "PRE-PROMOTION VERIFICATION (owner decision, WU046 scope refinement): immediately before attempting canonical promotion, call the existing canonical-promoter.ts repository-state assertion (export assertCanonicalRepositoryState, or an equivalent public entry point that delegates to that exact function with no logic duplicated and no change to its validation semantics) to re-verify the approved baseGitSha still equals current HEAD; a mismatch or stale base state must abort before any canonical write is attempted. This is a narrow, explicit exception to WU046's own 'do not modify canonical-promoter.ts internals' boundary: symbol exposure is authorized; promoter validation behavior is not to change.",
+          "HUMAN GATE DECISION RECORD (owner decision, WU046 scope refinement): persist the Human Gate decision as a JSON-source-of-truth record in the same gitignored research-cycle directory as the Research Change Set it decides -- outside canonical/public research/** -- bound to packageId, contentHash, baseGitSha, actor, timestamp, canonicalAcceptance, and publicExplorerPublication. The record must support safe post-approval resume/retry and must never authorize a package other than the one it is bound to. Filename/schema is an implementation-time choice using the repository's normal contract conventions (e.g. the same JSON-shape/validation-module pattern already used for the RCS itself); this scope entry does not itself prescribe one.",
           "Support human decision options of at least APPROVE, REJECT, and HOLD/MORE_RESEARCH",
-          "After explicit human approval, verify the approved exact package/plan/base SHA, apply the canonical integration plan, validate the resulting corpus, build the Explorer/read model, create a bounded branch, commit, push, create a PR, and run/observe CI where tooling supports it, returning READY_FOR_OWNER_MERGE"
+          "After explicit human approval, verify the approved exact package/plan/base SHA (via the pre-promotion verification above), apply the canonical integration plan, validate the resulting corpus, build the Explorer/read model, create a bounded branch, commit, push, create a PR, and run/observe CI where tooling supports it, returning READY_FOR_OWNER_MERGE"
         ],
         "outOfScope": [
           "Merging the PR",
           "Bypassing branch protection",
           "Auto-approving research",
           "Auto-publishing candidate material before Gate approval",
-          "Treating an AI recommendation as approval"
+          "Treating an AI recommendation as approval",
+          "Reopening or re-implementing any part of WU045 (the readiness-invocation scope transfer above is narrow and additive to WU046 only; WU045 itself remains done and is not reopened)",
+          "Changing readiness.ts's rules, ReasonCodes, or evaluation logic, or reimplementing eligibility/corroboration checks inside WU046",
+          "Generating new research/candidate material merely to satisfy or improve a readiness result",
+          "Any canonical/public research write as part of the readiness invocation itself (it is pre-Gate analysis only, run before any human decision exists)",
+          "Duplicating canonical-promoter.ts's repository-state validation logic instead of calling its existing assertion",
+          "Weakening applyCanonicalIntegrationPlan()'s own internal safety checks as part of exposing the pre-promotion verification entry point"
         ],
         "acceptanceCriteria": [
-          "The review package makes every required element inspectable in one place",
+          "The review package makes every required element inspectable in one place, including the readiness.ts-derived eligibility/corroboration/contradiction/duplicate-overlap findings (scope transfer above)",
           "No AI recommendation is ever treated as an approval decision",
           "Only the approved deterministic path executes after explicit human approval",
           "The PR is never merged and branch protection is never bypassed by this work unit",
-          "Repository publication remains owner-controlled"
+          "Repository publication remains owner-controlled",
+          "HIGH-2 approval/content-hash binding is independently demonstrable: contentHash is a SHA-256 over the deterministic canonical JSON serialization of the validated RCS source of truth (never the rendered Markdown); the rendered Human Gate view is generated from that exact same validated in-memory object; on approval submission the JSON source is re-read from disk, revalidated, and re-hashed; the recomputed hash must equal the hash of the package actually shown to the owner; any mismatch aborts, invalidates the review session, and fails closed rather than proceeding; an approval decision can never be reused to authorize a different package, base SHA, or integration plan than the one it was recorded against",
+          "LOW-3 deterministic publication guard is independently demonstrable: immediately before commit/push/PR, staged/tracked paths are checked against the exact approved CanonicalIntegrationPlan operation set; any unexpected staged/tracked path (including any .research-workbench/** or equivalent gitignored candidate/RCS location) fails the publication sequence closed before any commit/push/PR occurs; the control is enforced at the Git-publication boundary itself and does not rely solely on .gitignore, a pre-commit hook, or developer discipline",
+          "Pre-promotion repository-state re-verification (baseGitSha vs. current HEAD) occurs via the existing canonical-promoter.ts assertion immediately before any promotion attempt, and a stale/mismatched base aborts before any canonical write",
+          "The Human Gate decision record persists in the same gitignored cycle directory as the RCS it decides, outside research/**, bound to packageId/contentHash/baseGitSha/actor/timestamp/canonicalAcceptance/publicExplorerPublication, and a decision record for one package never authorizes another"
         ],
         "agentContextRefs": [
           "docs/design/m013-launch-automation-contract.md",
@@ -2123,12 +2136,12 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "in_progress",
         "dependencies": [
           "DEP-043"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-14T09:20:34.406Z"
+        "updatedAt": "2026-09-14T09:45:14.000Z"
       },
       {
         "id": "WU047",
@@ -6459,17 +6472,17 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-14T09:20:34.406Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-14T09:20:34.406Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-046",
-    "workUnitId": "WU045",
+    "id": "PKT-047",
+    "workUnitId": "WU046",
     "milestoneId": "M013",
-    "createdAt": "2026-09-13T10:09:30.861Z",
+    "createdAt": "2026-09-14T09:24:00.086Z",
     "format": "markdown",
-    "contentHash": "sha256:c17b9728e6eddc59ad3d4765fe2afaae8a5a73f7df1788ac4bd8d50f0017017c",
+    "contentHash": "sha256:6420be42459e355d8921878f65db222d68f1cf46c682f36dc892707115f701d9",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -6487,8 +6500,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-14T09:20:34.406Z",
+  "nextRecommendedCommand": "aiqt checkpoint",
+  "lastUpdatedAt": "2026-09-14T09:24:00.086Z",
   "review": {
     "acknowledgedFindings": [
       {

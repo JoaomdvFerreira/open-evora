@@ -42,7 +42,7 @@ export type {
   CanonicalIntegrationPlanOperation,
   CanonicalIntegrationWriteOperation,
 } from "./integration/canonical-integration-plan.ts";
-export { applyCanonicalIntegrationPlan } from "./integration/canonical-promoter.ts";
+export { applyCanonicalIntegrationPlan, assertCanonicalRepositoryState, CanonicalIntegrationPromotionError } from "./integration/canonical-promoter.ts";
 export type { CanonicalIntegrationPromotionResult } from "./integration/canonical-promoter.ts";
 export type {
   CorpusIndex,
