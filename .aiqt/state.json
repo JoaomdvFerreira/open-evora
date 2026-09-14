@@ -2082,12 +2082,12 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-041"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T19:19:19.431Z"
+        "updatedAt": "2026-09-14T09:20:34.406Z"
       },
       {
         "id": "WU046",
@@ -2123,12 +2123,12 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-043"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T13:02:54.845Z"
+        "updatedAt": "2026-09-14T09:20:34.406Z"
       },
       {
         "id": "WU047",
@@ -6334,17 +6334,142 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-12T19:19:19.431Z",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-12T19:19:19.431Z"
+    },
+    {
+      "id": "C046",
+      "workUnitId": "WU045",
+      "packetId": "PKT-046",
+      "summary": "Implemented WU045 automated research preparation per the owner-approved WU044 contract: a local/operator-triggered orchestrator (tools/research/orchestrate/) that drives an accepted RESEARCH_TRIGGER through both required OD-B AI invocations (PRIMARY_AUTHOR then a fresh, separately-invoked INDEPENDENT_REVIEWER) to a validated, non-canonical READY_FOR_HUMAN_REVIEW Research Change Set, with zero normal-path human handoffs. An implementation review found WU045-B01 (the normal path consumed pre-created files instead of performing the two AI invocations); that gap was remediated with a provider-neutral local AiInvoker boundary. A first independent review then found two CRITICAL findings (unsafe idempotent RCS reuse; AI-controlled candidate-path traversal) plus two lower-severity design/hardening items (reviewer/final-package snapshot divergence; child-process environment inheritance); all four were remediated (rcs-validator.ts full structural+fingerprint validation; path-containment.ts two-layer structural+symlink-aware containment; assembleResearchChangeSet() carrying the reviewer's exact in-memory snapshot into final assembly; ai-invoker.ts's buildChildEnv() minimal environment allowlist). A second independent re-review returned PASS — READY_FOR_M013_WU045_OWNER_GATE, and the repository owner recorded APPROVE — WU045_ACCEPTED, explicitly accepting two residual LOW observations as non-blocking debt. This checkpoint records that accepted outcome; it performs no further implementation.",
+      "completed": [
+        "Implemented the normal-path orchestration entry point (tools/research/orchestrate/cli.ts) driving RESEARCH_TRIGGER -> PRIMARY_AUTHOR invocation -> envelope validation -> materialization -> deterministic candidate/delta/validation/readiness preparation -> frozen reviewer input -> fresh INDEPENDENT_REVIEWER invocation -> review validation -> final RCS assembly -> READY_FOR_HUMAN_REVIEW, reusing existing deterministic primitives (candidate-delta, prospective-validation, canonical-integration-review, canonical-integration-plan) without reimplementing them.",
+        "Added a provider-neutral local AiInvoker/LocalCommandAiInvoker boundary (tools/research/orchestrate/ai-invoker.ts) using safe argv-based spawnSync with shell:false, stdin/stdout-only input/output, explicit timeout/exit-code/stderr handling, and fail-closed AI_RUNTIME_NOT_CONFIGURED when no local command is configured -- no vendor SDK, hosted backend, or credential architecture introduced.",
+        "Remediated WU045-B01 (normal path did not perform the two OD-B AI invocations) by wiring both PRIMARY_AUTHOR and a fresh, separately-invoked INDEPENDENT_REVIEWER into the CLI's normal path, with zero pre-created manifest/candidate/review files required.",
+        "Remediated independent-review CRITICAL finding 1 (unsafe idempotent RCS reuse) with rcs-validator.ts: full structural validation of every ResearchChangeSet sub-structure plus deterministic recomputation and verification of preparationFingerprint before any existing package is trusted, replacing a prior four-string-field comparison that could be satisfied by a fabricated or corrupted file.",
+        "Remediated independent-review CRITICAL finding 2 (AI-controlled candidate-path traversal) with path-containment.ts: structural rejection of traversal/absolute/rooted path forms plus symlink-aware runtime containment (realpathSync-based, not string-prefix comparison) applied identically to both the candidate write path (materializeAuthoringEnvelope) and read path (candidate-loader.ts).",
+        "Remediated design-hardening finding 3 (reviewed snapshot vs. final package divergence) by extracting assembleResearchChangeSet() so the final package is built directly from the same in-memory CanonicalIntegrationReview object frozen for the independent reviewer, eliminating the prior second disk re-read/re-derivation step.",
+        "Remediated design-hardening finding 4 (unbounded child-process environment inheritance) with ai-invoker.ts's buildChildEnv(): a minimal, documented OS/launch-essential allowlist plus an explicit RESEARCH_AI_CHILD_*-prefixed operator opt-in channel, replacing full process.env inheritance by the spawned AI command.",
+        "Added 96 new adversarial/regression tests (path-containment.test.ts, rcs-validator.test.ts, cli-reuse.test.ts, plus additions to run-cycle/authoring-envelope/manifest/candidate-loader/ai-invoker tests) reproducing every independent-review proof-of-concept as a permanent regression.",
+        "Independent re-review additionally and independently reproduced all adversarial PoCs against the committed code (fabricated RCS reuse, incomplete RCS reuse, invalid independent-review outcome, traversal write toward the repository root, traversal read outside the candidates directory, real-secret env leakage, and an unprivileged Windows junction/reparse-point escape) and confirmed every one fails closed.",
+        "Obtained explicit owner approval (Owner Gate: APPROVE -- WU045_ACCEPTED) of the delivered architecture, the OD-B two-invocation model, the independent-reviewer isolation model, the fail-closed security/trust boundaries, and the two accepted LOW residual observations."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "tools/research/orchestrate/ai-invoker.ts",
+        "tools/research/orchestrate/ai-invoker.test.ts",
+        "tools/research/orchestrate/authoring-envelope.ts",
+        "tools/research/orchestrate/authoring-envelope.test.ts",
+        "tools/research/orchestrate/candidate-loader.ts",
+        "tools/research/orchestrate/candidate-loader.test.ts",
+        "tools/research/orchestrate/cli.ts",
+        "tools/research/orchestrate/cli-reuse.test.ts",
+        "tools/research/orchestrate/fingerprint.ts",
+        "tools/research/orchestrate/fingerprint.test.ts",
+        "tools/research/orchestrate/independent-review.ts",
+        "tools/research/orchestrate/independent-review.test.ts",
+        "tools/research/orchestrate/manifest.ts",
+        "tools/research/orchestrate/manifest.test.ts",
+        "tools/research/orchestrate/path-containment.ts",
+        "tools/research/orchestrate/path-containment.test.ts",
+        "tools/research/orchestrate/primary-prompt.ts",
+        "tools/research/orchestrate/rcs-validator.ts",
+        "tools/research/orchestrate/rcs-validator.test.ts",
+        "tools/research/orchestrate/research-change-set.ts",
+        "tools/research/orchestrate/research-change-set.test.ts",
+        "tools/research/orchestrate/reviewer-input.ts",
+        "tools/research/orchestrate/reviewer-input.test.ts",
+        "tools/research/orchestrate/reviewer-prompt.ts",
+        "tools/research/orchestrate/run-cycle.ts",
+        "tools/research/orchestrate/run-cycle.test.ts",
+        "tools/research/orchestrate/types.ts",
+        "tools/research/orchestrate/workbench-boundary.ts",
+        "tools/research/orchestrate/workbench-boundary.test.ts"
+      ],
+      "issues": [
+        {
+          "title": "Duplicated fingerprint field lists (rcs-validator.ts / research-change-set.ts)",
+          "description": "rcs-validator.ts's fingerprint recomputation and research-change-set.ts's fingerprint construction use intentionally duplicated field lists rather than one shared function. Owner-accepted non-blocking maintenance debt (Owner Gate, APPROVE -- WU045_ACCEPTED). Any future field-list divergence fails closed (every valid package would fail fingerprint verification) rather than silently passing, so the residual risk is maintenance friction, not a safety or security gap. May be consolidated opportunistically in a later work unit; not required for WU045 closure.",
+          "severity": "low",
+          "status": "resolved",
+          "agentCanFix": true
+        },
+        {
+          "title": "Windows symlink unit test skipped where privilege is unavailable",
+          "description": "The Windows symlink-specific unit test in path-containment.test.ts is skipped in environments lacking symlink-creation privilege (confirmed via EPERM on this machine). Owner-accepted (Owner Gate, APPROVE -- WU045_ACCEPTED): the skip condition is explicit and genuinely environment-forced (re-verified independently, not merely trusted); the non-symlink containment model is independently covered by 15 other passing path-containment tests; and the production runtime-containment implementation was independently, concretely corroborated on this machine via an unprivileged Windows junction/reparse-point escape attempt against the real resolveContainedPath(), which correctly rejected it.",
+          "severity": "low",
+          "status": "resolved",
+          "agentCanFix": true
+        }
+      ],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "typecheck + full test suite + research:validate all passed: 297 tests, 296 pass, 1 legitimate environment-gated skip (Windows symlink privilege), 0 failures; 274 canonical records validated OK."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK -- unchanged from the WU044 baseline (12 PRB + 143 EVD + 119 SRC)."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No conflict markers or whitespace errors (only pre-existing CRLF/LF line-ending warnings on already-tracked .aiqt/* files)."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "Project in_progress; M013/WU045 current; next recommended command aiqt checkpoint."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Non-blocking findings only: pre-existing C008/C009/C010 packet-reference debt and expected planned-work-unit scope notices (WU046/WU047/WU048); no new finding attributable to WU045."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "3 pre-existing blocking findings, all C008/C009/C010 broken checkpoint-packet references (historical AIQT debt predating WU045, out of scope to repair here); no new graph-integrity finding introduced by WU045."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": ".research-workbench/ remains non-canonical, non-public, and gitignored",
+          "result": "passed",
+          "evidence": "workbench-boundary.ts's assertWorkbenchBoundary() (enforced at CLI startup) plus the existing workbench-boundary.test.ts regression test confirm .research-workbench/ is git-ignored; path-containment.ts additionally guarantees every materialized candidate file stays strictly within the approved candidate directory beneath it, independently verified by reproduced traversal PoCs (deep traversal write, repository-root-targeted traversal write, outside-directory traversal read) that all failed closed against the committed code."
+        },
+        {
+          "criterion": "No pre-Gate candidate material is committed, pushed, or published",
+          "result": "passed",
+          "evidence": "No commit, push, or PR occurred at any point in WU045's implementation, remediation, or review; grep across tools/research/orchestrate/ confirms zero import or call of applyCanonicalIntegrationPlan() or the canonical promoter; research/** carries zero diff throughout, confirmed by repeated npm run research:validate runs reporting an unchanged 274-record corpus."
+        },
+        {
+          "criterion": "Zero human semantic interventions occur on the normal path before READY_FOR_HUMAN_REVIEW",
+          "result": "passed",
+          "evidence": "run-cycle.ts's runResearchCycle() drives RESEARCH_TRIGGER through PRIMARY_AUTHOR invocation, envelope validation, materialization, deterministic review preparation, frozen reviewer input, a fresh INDEPENDENT_REVIEWER invocation, review validation, and final RCS assembly to READY_FOR_HUMAN_REVIEW with no pre-created manifest/candidate/review files required and no manual step in between; independently re-verified end-to-end with a synthetic normal-path run confirming exactly two AI invocations and zero manual intervention."
+        },
+        {
+          "criterion": "Implementation matches only the owner-approved WU044 contract boundary",
+          "result": "passed",
+          "evidence": "All new/modified files are confined to tools/research/orchestrate/, matching contract section 11's 'explicit files/areas WU045 may touch'; no file under research/**, research/schemas/*.json, tools/research/{core,integration,readiness,validation}/, apps/research-explorer/**, .github/workflows/**, vercel.json, or .aiqt/** was modified by the WU045 implementation itself; OD-A (local/operator-triggered, no scheduler), OD-B (structured manifest + five-point-minimum-bar independent review, both now genuinely invoked and independently verified), and OD-C (JSON source of truth, WU046 renders the Markdown view) are implemented exactly as owner-approved."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-14T09:20:34.406Z",
       "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-045",
-    "workUnitId": "WU044",
+    "id": "PKT-046",
+    "workUnitId": "WU045",
     "milestoneId": "M013",
-    "createdAt": "2026-09-12T14:22:28.400Z",
+    "createdAt": "2026-09-13T10:09:30.861Z",
     "format": "markdown",
-    "contentHash": "sha256:c399f14f8ff1f06766c1d9adf28556b826035b8e81381e410c3f15d0ecd94036",
+    "contentHash": "sha256:c17b9728e6eddc59ad3d4765fe2afaae8a5a73f7df1788ac4bd8d50f0017017c",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -6363,7 +6488,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-12T19:19:19.431Z",
+  "lastUpdatedAt": "2026-09-14T09:20:34.406Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -7824,6 +7949,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-12T19:19:19.431Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C046",
+      "current": {
+        "observationId": "sha256:ae4c10a6dbdd2c02809c15cdf40a055c422f912ffbf407fe2521a5421c62713c",
+        "checkpointId": "C046",
+        "workUnitId": "WU045",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-14T09:20:34.406Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-14T09:20:34.406Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:ae4c10a6dbdd2c02809c15cdf40a055c422f912ffbf407fe2521a5421c62713c",
+          "checkpointId": "C046",
+          "workUnitId": "WU045",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-14T09:20:34.406Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-14T09:20:34.406Z"
         }
       ]
     }
