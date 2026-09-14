@@ -42,20 +42,24 @@ export type GitOrchestratorOutcome =
 /**
  * Windows-safe argument quoting for `cmd.exe /d /s /c` (the same escaping
  * cmd.exe's own argument parser expects: double any embedded `"`, then wrap
- * the whole argument in `"..."` whenever it contains a space, quote, or is
- * empty). Used only by the Windows branch of run() below, and only because
- * `spawnSync` cannot invoke a `.cmd`/`.bat` PATH executable (e.g. this
- * module's own tests substitute a fake `gh.cmd`) without going through a
- * shell — `shell: true` with an args array is avoided here because Node
+ * the whole argument in `"..."` whenever it contains a space, quote, caret,
+ * or is empty). Used only by the Windows branch of run() below, and only
+ * because `spawnSync` cannot invoke a `.cmd`/`.bat` PATH executable (e.g.
+ * this module's own tests substitute a fake `gh.cmd`) without going through
+ * a shell — `shell: true` with an args array is avoided here because Node
  * only concatenates args unescaped in that mode, which both breaks
  * multi-word arguments (commit messages, PR bodies) and is a real
  * shell-injection risk for attacker-adjacent content; this explicit
  * per-argument quoting keeps the array-args safety property spawnSync
- * normally provides.
+ * normally provides. `^` is included alongside `\s`/`"` because it is
+ * cmd.exe's own escape metacharacter — an unquoted Git revision expression
+ * such as `HEAD^{commit}` (used by the R1 branch-compatibility check below)
+ * is silently mangled by cmd.exe's parser otherwise, observed directly as
+ * `git rev-parse` failing with no stderr output at all.
  */
 function quoteForWindowsCmd(arg: string): string {
   if (arg === "") return '""';
-  if (!/[\s"]/.test(arg)) return arg;
+  if (!/[\s"^]/.test(arg)) return arg;
   return `"${arg.replace(/"/g, '\\"')}"`;
 }
 
@@ -97,22 +101,106 @@ function remoteBranchExists(repoRoot: string, branch: string, env: NodeJS.Proces
   return result.ok && result.stdout.trim() !== "";
 }
 
+/** Resolves the Git tree object a ref/commit points at, or null if the ref/commit cannot be resolved. */
+function treeOf(repoRoot: string, commitish: string, env: NodeJS.ProcessEnv): string | null {
+  const result = run(repoRoot, "git", ["rev-parse", "--verify", "--quiet", `${commitish}^{tree}`], env);
+  return result.ok ? result.stdout : null;
+}
+
+/** Resolves a ref/commit to its full commit SHA, or null if it cannot be resolved. */
+function commitOf(repoRoot: string, commitish: string, env: NodeJS.ProcessEnv): string | null {
+  const result = run(repoRoot, "git", ["rev-parse", "--verify", "--quiet", `${commitish}^{commit}`], env);
+  return result.ok ? result.stdout : null;
+}
+
 /**
- * R1 remediation (independent-review MEDIUM finding): a deterministic branch
- * name existing is not itself proof the branch is safe to resume onto — a
- * stale/unrelated branch could coincidentally (or adversarially) share the
- * name. This reuses the exact base-SHA identity WU046 already verified via
- * HIGH-2/the pre-promotion repository-state precheck (no second, parallel
- * approval-identity system is introduced): a branch is compatible with the
- * current approved run iff the approved `baseGitSha` is an ancestor of the
- * branch tip, i.e. the branch's history genuinely descends from the exact
- * commit the current promotion was verified against. An unrelated branch
- * (disjoint history) or one built on a stale/different base fails this
- * check and is reported as an explicit, fail-closed incompatibility rather
- * than silently checked out and built upon.
+ * Resolves a ref/commit's sole parent commit SHA, or null if it has zero or
+ * more than one parent, or cannot be resolved. Uses `git rev-list --parents
+ * -n 1 <commitish>` (one line: "<commit> [parent1] [parent2...]") rather
+ * than the `<rev>^@` revision syntax — `rev-parse --verify` on `^@` exits
+ * non-zero on at least one real Git version even though it prints the
+ * correct parent SHA to stdout, which would make this helper unreliable;
+ * `rev-list --parents` is the command Git documents for parent enumeration
+ * and exits 0 reliably, including for a root commit (zero parents).
  */
-function isBranchCompatible(repoRoot: string, branch: string, baseGitSha: string, env: NodeJS.ProcessEnv): boolean {
-  return run(repoRoot, "git", ["merge-base", "--is-ancestor", baseGitSha, `refs/heads/${branch}`], env).ok;
+function soleParentOf(repoRoot: string, commitish: string, env: NodeJS.ProcessEnv): string | null {
+  const result = run(repoRoot, "git", ["rev-list", "--parents", "-n", "1", commitish], env);
+  if (!result.ok || result.stdout === "") return null;
+  const fields = result.stdout.split(/\s+/).filter((field) => field !== "");
+  // fields[0] is the commit itself; the rest are its parents, in order.
+  const parents = fields.slice(1);
+  return parents.length === 1 ? parents[0]! : null;
+}
+
+/**
+ * The Git tree object the current index would produce if committed right
+ * now, without mutating the index or working tree (`git write-tree` reads
+ * the index as-is and only writes a new tree object into the object
+ * database; it performs no checkout and touches no ref). Called from
+ * `runPostApprovalGitSequence` while the repository is still on the base
+ * branch at `baseGitSha`, with the index already holding exactly the
+ * approved staged changes (guaranteed by the LOW-3 publication guard, which
+ * `promote.ts` runs immediately before this function) — so this is exactly
+ * the publication result WU046 is about to commit for this package.
+ */
+function currentIndexTree(repoRoot: string, env: NodeJS.ProcessEnv): string | null {
+  const result = run(repoRoot, "git", ["write-tree"], env);
+  return result.ok ? result.stdout : null;
+}
+
+/**
+ * R1 remediation (independent-review FAIL finding, re-review of the prior
+ * MEDIUM fix): ancestry of `baseGitSha` alone proves only that a branch
+ * *descends* from the approved base — it does not prove the branch carries
+ * *only* the exact approved publication result. A branch that is a genuine
+ * descendant of `baseGitSha` but also carries an unrelated extra commit (or
+ * a modification to an approved path with unapproved content, a missing
+ * approved change, an unexpected deletion, etc.) would pass ancestry and
+ * then have that unapproved content silently carried into the resulting PR.
+ *
+ * This derives compatibility from the exact state WU046 is about to
+ * publish (no second, parallel approval-identity/fingerprint system is
+ * introduced) using Git's own tree comparison rather than manual file-diffing:
+ * `expectedPublicationTree` is the tree the COMMIT stage below would produce
+ * for this exact approved run (the current index's tree, per
+ * `currentIndexTree` above). A branch is compatible iff its tip is in
+ * exactly one of the two shapes the COMMIT stage can ever produce:
+ *
+ *  - State A (branch created, not yet committed): the branch tip IS
+ *    `baseGitSha` — same commit, so trivially the same tree as `baseGitSha`.
+ *  - State B (a prior run's publication commit already exists): the branch
+ *    tip has `baseGitSha` as its *sole* parent (i.e. exactly one commit
+ *    ahead of the approved base — no room for an extra/unrelated commit
+ *    between them), AND the branch tip's tree is byte-for-byte identical
+ *    (via Git's own tree-object equality, which is content-addressed and
+ *    therefore inherently content-sensitive rather than path-only) to
+ *    `expectedPublicationTree`.
+ *
+ * Any other shape — disjoint history, a stale/wrong base, an extra commit
+ * before or after the publication commit, a publication commit whose tree
+ * differs in any way (extra file, missing file, wrong content on an
+ * approved path, unexpected deletion/rename) — is incompatible and fails
+ * closed here, before the branch is ever checked out or built upon. This is
+ * the narrowest history shape actually produced by this module: the COMMIT
+ * stage below makes at most one commit per invocation, so no wider shape is
+ * ever legitimate.
+ */
+function isBranchCompatible(repoRoot: string, branch: string, baseGitSha: string, expectedPublicationTree: string | null, env: NodeJS.ProcessEnv): boolean {
+  const ref = `refs/heads/${branch}`;
+  const branchCommit = commitOf(repoRoot, ref, env);
+  const baseCommit = commitOf(repoRoot, baseGitSha, env);
+  if (!branchCommit || !baseCommit) return false;
+
+  // State A: branch created but no publication commit made yet.
+  if (branchCommit === baseCommit) return true;
+
+  // State B: exactly one commit ahead of the approved base, with a tree
+  // identical to the exact approved publication result.
+  if (!expectedPublicationTree) return false;
+  const soleParent = soleParentOf(repoRoot, ref, env);
+  if (soleParent !== baseCommit) return false;
+  const branchTree = treeOf(repoRoot, ref, env);
+  return branchTree !== null && branchTree === expectedPublicationTree;
 }
 
 interface ExistingPr {
@@ -206,24 +294,47 @@ export function runPostApprovalGitSequence(input: GitOrchestratorInput): GitOrch
   const branch = branchNameForPackage(input.packageId);
   const env = input.env ?? process.env;
 
+  // Stage the approved working-tree changes now, while still on the base
+  // branch, before any branch decision is made. This is the same `git add
+  // -A` the COMMIT stage below always performs — staging it early (rather
+  // than after the branch switch) makes `currentIndexTree` below an
+  // accurate preview of the tree this run's COMMIT stage will produce (an
+  // index that still only holds tracked content, with approved-but-
+  // untracked files never staged, would understate that tree and make the
+  // R1 compatibility comparison below meaningless). Staging is index-only
+  // and non-destructive; Git carries staged-but-uncommitted changes across
+  // a subsequent `checkout`/`checkout -b` as long as the target branch has
+  // no conflicting committed content, which is exactly the resume case
+  // this function needs to support.
+  const preStageAdd = run(input.repoRoot, "git", ["add", "-A"], env);
+  if (!preStageAdd.ok) return { status: "FAILED", failedStage: "COMMIT", message: preStageAdd.stderr || "git add failed" };
+
   // --- BRANCH -----------------------------------------------------------
   if (!branchExists(input.repoRoot, branch, env)) {
     const create = run(input.repoRoot, "git", ["checkout", "-b", branch], env);
     if (!create.ok) return { status: "FAILED", failedStage: "BRANCH", message: create.stderr || "failed to create branch" };
   } else {
     // R1: an existing branch with this deterministic name is not itself
-    // proof it is safe to resume onto — verify the approved baseGitSha is
-    // actually an ancestor of the branch tip before ever checking it out or
-    // building on top of it. An unrelated/stale-base branch fails closed
-    // here, before any commit/push/PR touches it.
-    if (!isBranchCompatible(input.repoRoot, branch, input.baseGitSha, env)) {
+    // proof it is safe to resume onto, and ancestry of baseGitSha alone is
+    // not sufficient either — it does not rule out unrelated extra commits
+    // riding along. Captured here, while still on the base branch, is the
+    // exact tree this run's COMMIT stage below would produce (the current,
+    // now-fully-staged index's tree; the LOW-3 publication guard has
+    // already verified the working tree holds exactly the approved
+    // changes). isBranchCompatible then requires the existing branch tip to
+    // be either exactly baseGitSha, or exactly one commit ahead of it with
+    // that identical tree — before the branch is ever checked out or built
+    // upon.
+    const expectedPublicationTree = currentIndexTree(input.repoRoot, env);
+    if (!isBranchCompatible(input.repoRoot, branch, input.baseGitSha, expectedPublicationTree, env)) {
       return {
         status: "FAILED",
         failedStage: "BRANCH",
         message:
-          `existing branch "${branch}" is not compatible with this run: approved baseGitSha ` +
-          `${input.baseGitSha} is not an ancestor of the branch tip. Refusing to resume onto ` +
-          "unrelated/stale branch history. No destructive reset or force-push was attempted.",
+          `existing branch "${branch}" is not compatible with this run: it is not exactly the approved ` +
+          `baseGitSha ${input.baseGitSha}, nor exactly one commit ahead of it with a tree identical to the ` +
+          "approved publication result. Refusing to resume onto unrelated/stale/divergent branch history. " +
+          "No destructive reset or force-push was attempted.",
       };
     }
     const checkout = run(input.repoRoot, "git", ["checkout", branch], env);
@@ -231,6 +342,13 @@ export function runPostApprovalGitSequence(input: GitOrchestratorInput): GitOrch
   }
 
   // --- COMMIT -------------------------------------------------------------
+  // Re-stage: on the create/checkout-b path, the initial staging above
+  // already carried onto the new branch, so this is a no-op; on the
+  // existing-compatible-branch path, checking out a branch whose tip
+  // already differs from the base (State B) can otherwise leave the
+  // pre-staged changes conflicting with what's already committed there, so
+  // re-running `add -A` here reconciles the index against the branch that
+  // is now actually checked out.
   const add = run(input.repoRoot, "git", ["add", "-A"], env);
   if (!add.ok) return { status: "FAILED", failedStage: "COMMIT", message: add.stderr || "git add failed" };
 
