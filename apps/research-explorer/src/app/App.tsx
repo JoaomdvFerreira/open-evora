@@ -6,6 +6,7 @@ import { Explorer } from "./Explorer";
 import { formatPublicCount, formatPublicDateTime } from "../presentation/presentation";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { PublicFooter, TrustPage, trustPageForPath } from "./TrustPage";
 
 const defaultProvider: DataProvider = new StaticDataProvider();
 
@@ -23,10 +24,12 @@ interface AppProps {
 }
 
 export function App({ dataProvider = defaultProvider }: AppProps) {
+  const trustPage = trustPageForPath(window.location.pathname);
   const [state, setState] = useState<ExplorerStartupState | { status: "loading" }>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    if (trustPage) return;
     let cancelled = false;
     setState({ status: "loading" });
     loadExplorerStartupState(dataProvider).then((result) => {
@@ -35,7 +38,7 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
     return () => {
       cancelled = true;
     };
-  }, [dataProvider, attempt]);
+  }, [dataProvider, attempt, trustPage]);
 
   return (
     <>
@@ -43,6 +46,7 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
         Saltar para o conteúdo
       </a>
       <main id="main-content" className="explorer-shell" tabIndex={-1}>
+        {trustPage ? <TrustPage page={trustPage} /> : <>
         {state.status === "loading" && <ProgressMessage message="A carregar modelo de leitura gerado…" />}
 
         {state.status === "error" && (
@@ -67,8 +71,9 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
               (não indica a atualidade da investigação)
             </p>
           </>
-        )}
+        )}</>}
       </main>
+      <PublicFooter />
     </>
   );
 }

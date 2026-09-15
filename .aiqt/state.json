@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M013",
-  "currentWorkUnitId": null,
+  "currentWorkUnitId": "WU047",
   "workGraph": {
     "milestones": [
       {
@@ -148,7 +148,7 @@
         "id": "M013",
         "title": "Public Launch Readiness & Automated Research Operations",
         "objective": "Prepare Open Évora for sustained public operation by hardening the public Research Explorer and by orchestrating the existing governed research tooling into an end-to-end process that can move from a research trigger to an approval-ready research package with zero normal-path human handoffs before the human research gate, while preserving human semantic authority over canonical research acceptance, corroboration/validation/investigation-state judgement, public research approval, repository merge, and final go-live decision. Social-channel creation and posting are manual owner operations outside the M013 critical path.",
-        "status": "ready",
+        "status": "in_progress",
         "workUnitIds": [
           "WU044",
           "WU045",
@@ -2149,24 +2149,39 @@
         "title": "Production Launch Hardening",
         "objective": "Implement only the launch blockers approved by the WU044 contract across production, public web, quality, and trust audit areas.",
         "scope": [
-          "Audit production: deployment topology, Git->Vercel production path, reproducible build, rollback, runtime/error observability, failure recovery, dependency/security posture, secrets exposure, production ownership",
-          "Audit public web: domain strategy, HTTPS, canonical URL, title/description metadata, OpenGraph/social previews, X/Twitter card metadata where applicable, favicon, robots.txt, sitemap, 404/error surfaces, broken links",
-          "Audit quality: accessibility, keyboard, mobile, browser compatibility, performance, public data integrity, build/read-model integrity",
-          "Audit trust: About, methodology, source/provenance explanation, correction/challenge route, contact, independence/non-affiliation, privacy posture",
-          "Re-evaluate known pre-existing observations (favicon.ico 404; 9px .explorer-navigation overflow at 360px) only as launch-quality issues"
+          "Resolve or explicitly disposition the exact WU044 §13 P2 closure set: (1) Deployment Protection evidence/disposition; (2) Preview access-control evidence/disposition; (3) required production metadata; (4) robots/sitemap; (5) required trust surfaces; (6) accessibility/responsive/browser compatibility; (7) custom-domain decision. Each item must end as PASS_VERIFIED, OWNER_ACCEPTED_DEFER, or OWNER_ACTION_REQUIRED.",
+          "Inspect and document Vercel Deployment Protection/public-access state read-only. Production intended for public launch must be reachable without unintended authentication/protection; if it is not, record OWNER_ACTION_REQUIRED with objective evidence and do not change Vercel settings.",
+          "Inspect and document Preview access-control state read-only. Establish whether Preview deployments are distinguishable from and appropriately separated/protected relative to Production; if a posture change is necessary, record OWNER_ACTION_REQUIRED and do not change Vercel settings.",
+          "Audit only the WU044-required production metadata, robots/sitemap, trust surfaces, and bounded accessibility/responsive/browser compatibility launch requirements using their approved contract requirements; do not add SEO, trust-policy, product, or design requirements.",
+          "Record custom domain as OWNER_ACCEPTED_DEFER: the currently approved Vercel production origin may be used for launch, and WU047 must not configure a domain, DNS, or Vercel domain setting unless canonical evidence shows that origin is unusable for public launch.",
+          "Re-evaluate only the two known P3 observations: favicon.ico 404 and approximately 9px .explorer-navigation horizontal overflow at approximately 360px. Both remain OWNER_ACCEPTED_DEFER and are not remediated by WU047 unless fresh evidence establishes a genuine P0/P1 launch impact, in which case stop and escalate."
         ],
         "outOfScope": [
           "Reopening AR-05",
           "Authorizing or performing C008/C009/C010 repair",
           "Broad redesign",
           "Changing M010 DS-04B owner-frozen values",
-          "Any launch blocker not approved by the WU044 contract"
+          "Any launch blocker not approved by the WU044 contract",
+          "Creating a new quality backlog from WU047; a newly observed genuine P0/P1 issue must stop and escalate",
+          "Favicon P3 remediation or cosmetic 360px overflow remediation",
+          "Vercel settings, Deployment Protection, environment-variable, domain, DNS, CI workflow, branch-protection, or ruleset changes",
+          "Discretionary visual polish, new features, new trust/content policy, research-data changes, or WU045/WU046 changes",
+          "WU048 end-to-end, adversarial, or independent Go-Live verification"
         ],
         "acceptanceCriteria": [
-          "Only WU044-approved launch blockers are implemented",
+          "Every one of the seven WU044 §13 P2 items is explicitly recorded as exactly one of PASS_VERIFIED, OWNER_ACCEPTED_DEFER, or OWNER_ACTION_REQUIRED; no P2 item remains undispositioned.",
+          "WU047 cannot close while an OWNER_ACTION_REQUIRED P2 item remains unresolved unless the owner subsequently records an explicit defer/accept decision.",
+          "Metadata PASS_VERIFIED evidence demonstrates every WU044-required production metadata element is present and correct; robots/sitemap evidence demonstrates the WU044-required public endpoints and their status/content on the intended production origin; trust-surface evidence demonstrates each WU044-required surface exists, is reachable in the intended public experience, and contains its canonically required information.",
+          "The bounded accessibility/responsive/browser audit uses existing repository browser/testing tooling where available and evidence establishes no launch-blocking unusable navigation, inaccessible primary action, material clipping/overflow, or browser-specific broken primary workflow on WU044 public launch surfaces at the project's supported desktop/mobile viewports and browser matrix.",
+          "Deployment Protection and Preview access-control results are supported by objective read-only external evidence; any configuration change needed is recorded OWNER_ACTION_REQUIRED rather than performed.",
+          "The custom-domain item is recorded OWNER_ACCEPTED_DEFER unless canonical evidence shows the approved current production origin is unusable for public launch.",
+          "The favicon.ico 404 and approximately 9px .explorer-navigation overflow at approximately 360px are each re-evaluated and recorded as P3 OWNER_ACCEPTED_DEFER; if fresh evidence establishes P0/P1 impact, WU047 stops for owner disposition without changing severity or implementing a fix.",
+          "WU047 closes only with no unresolved P0/P1 launch blocker, all seven P2 dispositions recorded, all authorized local remediations complete and validated, both P3 observations re-evaluated, and no newly discovered unresolved launch blocker.",
+          "Only WU044-approved, confirmed, required, minimal, repository-local fixes needing no new product/design/governance decision are implemented",
           "AR-05 is not reopened and C008/C009/C010 are not repaired",
           "M010 DS-04B owner-frozen values remain binding and unchanged",
-          "No broad redesign is introduced"
+          "No broad redesign is introduced",
+          "npm run explorer:build and git diff --check pass; closure evidence includes the seven P2 dispositions and both P3 re-evaluations, without adding research:check as a WU047 gate."
         ],
         "agentContextRefs": [
           "docs/design/m013-launch-automation-contract.md",
@@ -2177,12 +2192,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "in_progress",
         "dependencies": [
           "DEP-042"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T19:19:19.431Z"
+        "updatedAt": "2026-09-15T09:39:16.791Z"
       },
       {
         "id": "WU048",
@@ -6563,17 +6578,17 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-15T09:26:17.655Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-15T09:26:17.655Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-047",
-    "workUnitId": "WU046",
+    "id": "PKT-048",
+    "workUnitId": "WU047",
     "milestoneId": "M013",
-    "createdAt": "2026-09-14T09:24:00.086Z",
+    "createdAt": "2026-09-15T09:39:16.791Z",
     "format": "markdown",
-    "contentHash": "sha256:6420be42459e355d8921878f65db222d68f1cf46c682f36dc892707115f701d9",
+    "contentHash": "sha256:c8b5da26aab0b9480b83eaee004cd82a9f43875e0ae674da2bbf0e8ba5553ab0",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -6591,8 +6606,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-15T09:26:17.655Z",
+  "nextRecommendedCommand": "aiqt checkpoint",
+  "lastUpdatedAt": "2026-09-15T09:39:16.791Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8116,5 +8131,58 @@
         }
       ]
     }
-  ]
+  ],
+  "evidence": {
+    "records": [
+      {
+        "evidenceId": "EVID-001",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-owner",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU047",
+          "packetId": "PKT-048",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "work/m013-wu047-production-launch-hardening",
+          "commitSha": "eab6d4a53e5f3b7082b0ce251c537554156ebd1e",
+          "capturedAt": "2026-09-15T10:24:25.742Z"
+        },
+        "reviewer": {
+          "reviewerId": "owner",
+          "reviewerType": "human",
+          "independentContext": "declared_not_independent"
+        },
+        "results": {
+          "reviewResult": "passed",
+          "validationResult": "not_run",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Owner approved exact WU047 metadata, public crawling/sitemap inventory, five trust-surface texts, canonical Issues destination, and the stated privacy precondition. Deployment and platform settings remain out of scope."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-15T10:24:25.742Z",
+        "recordedAt": "2026-09-15T10:27:00.967Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:18ed0fee805b108625c5658f03a9fa9b41e0536269cdf91e0e110338a258f499",
+          "externalEvidenceId": "WU047-owner-launch-surface-decision-2026-09-15",
+          "importIdentityKey": "sha256:9ffef2e8d99264e897a0d7311a570d54dd6abb536e63ac5f1482e9f418d85afb",
+          "importedAt": "2026-09-15T10:27:00.967Z"
+        }
+      }
+    ],
+    "decisionEscalations": []
+  },
+  "issues": {
+    "overrides": [],
+    "promotions": [],
+    "projectIssues": [],
+    "projectIssueTransitions": []
+  }
 }
