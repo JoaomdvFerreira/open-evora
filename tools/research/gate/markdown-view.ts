@@ -51,7 +51,7 @@ function renderContradictionAndOverlapAnalysis(pkg: HumanGatePackage): string {
   ]);
   const admission = pkg.safetyAdmission.findings.filter((f) => f.code === "CONTRADICTION_VISIBLE");
   if (findings.length === 0 && admission.length === 0) return "_No contradiction/duplicate-overlap findings surfaced by readiness evaluation._";
-  return bulletList([...findings.map((f) => `${f.code}${f.field ? ` (${f.field})` : ""}${f.detail ? `: ${f.detail}` : ""}`), ...admission.map((f) => `${f.code} (${f.subjectId}): ${f.summary}`)]);
+  return bulletList([...findings.map((f) => `${f.code}${f.field ? ` (${f.field})` : ""}${f.detail ? `: ${f.detail}` : ""}`), ...admission.map((f) => `${f.code} (${f.subjectId}): ${f.summary}${f.evidenceReferences?.length ? ` [${f.evidenceReferences.join(", ")}]` : ""}`)]);
 }
 
 function renderCandidateScope(pkg: HumanGatePackage): string {

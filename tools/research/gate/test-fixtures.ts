@@ -236,7 +236,7 @@ export function syntheticResearchChangeSet(
     readiness: core.readiness,
     independentReview: core.independentReview,
     integrationPlan: core.integrationPlan,
-    safetyAdmission: core.safetyAdmission,
+    safetyAdmission: { disposition: core.safetyAdmission.disposition, findings: core.safetyAdmission.findings },
   });
   return { ...core, packageId: `RCS-${fingerprint.slice(0, 16)}`, preparationFingerprint: fingerprint };
 }

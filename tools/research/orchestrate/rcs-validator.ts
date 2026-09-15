@@ -152,7 +152,10 @@ function recomputeFingerprint(rcs: {
     readiness: rcs.readiness,
     independentReview: rcs.independentReview,
     integrationPlan: rcs.integrationPlan,
-    safetyAdmission: rcs.safetyAdmission,
+    safetyAdmission: {
+      disposition: rcs.safetyAdmission.disposition,
+      findings: rcs.safetyAdmission.findings.map(({ code, subjectId, severity, summary, evidenceReferences }) => ({ code, subjectId, severity, summary, evidenceReferences })),
+    },
   });
 }
 

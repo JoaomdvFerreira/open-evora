@@ -29,6 +29,9 @@ function record(index: CorpusIndex, prefix: string, id: string): ParsedRecord | 
 function array(value: unknown): string[] { return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : []; }
 function idOf(fields: Record<string, unknown>, field: string): string | undefined { const value = getRecordField(fields, field); return typeof value === "string" ? value : undefined; }
 function evdSources(fields: Record<string, unknown>): string[] { return array(getRecordField(fields, "provenance.sources")); }
+function candidateById(candidates: readonly CandidateRecord[], family: string, field: string, id: string): Record<string, unknown> | undefined {
+  return candidates.find((candidate) => candidate.recordFamily === family && idOf(candidate.fields, field) === id)?.fields;
+}
 
 /** Explicit candidate EVD provenance plus decision-basis EVD provenance only. */
 function materialEvidence(input: EvaluateSafetyAdmissionInput): { id: string; fields: Record<string, unknown> }[] {
@@ -37,7 +40,7 @@ function materialEvidence(input: EvaluateSafetyAdmissionInput): { id: string; fi
     const id = idOf(candidate.fields, "evidence_id"); if (id) result.set(id, candidate.fields);
   }
   for (const problemId of input.affectedProblemIds) {
-    const fields = record(input.index, "PRB-", problemId)?.fields; if (!fields) continue;
+    const fields = candidateById(input.candidates, "PRB-", "problem_id", problemId) ?? record(input.index, "PRB-", problemId)?.fields; if (!fields) continue;
     const basis = getRecordField(fields, "decision_basis");
     if (!basis || typeof basis !== "object") continue;
     for (const key of ["manifestation.evidence", "consequence.evidence", "currentness.evidence", "contradiction_search.evidence", "supporting_evidence", "boundary_evidence"]) {
@@ -49,6 +52,24 @@ function materialEvidence(input: EvaluateSafetyAdmissionInput): { id: string; fi
   return [...result].map(([id, fields]) => ({ id, fields }));
 }
 
+/** PRB evidence relationships own contradiction semantics; EVD does not. */
+function contradictionFindings(input: EvaluateSafetyAdmissionInput): SafetyFinding[] {
+  const findings: SafetyFinding[] = [];
+  for (const problemId of input.affectedProblemIds) {
+    const problem = candidateById(input.candidates, "PRB-", "problem_id", problemId) ?? record(input.index, "PRB-", problemId)?.fields;
+    if (!problem) continue;
+    for (const relation of getRecordField(problem, "evidence") as unknown[] ?? []) {
+      if (!relation || typeof relation !== "object") continue;
+      const fields = relation as Record<string, unknown>;
+      const evidenceId = typeof fields.evidence_id === "string" ? fields.evidence_id : undefined;
+      if (!evidenceId || !array(fields.effects).includes("CONTRADICTS")) continue;
+      const summary = getRecordField(problem, "decision_basis.contradiction_search.summary");
+      findings.push({ code: "CONTRADICTION_VISIBLE", subjectId: evidenceId, severity: "info", summary: typeof summary === "string" && summary.trim() ? summary : `Contradictory evidence is linked to ${problemId}.`, evidenceReferences: [problemId, evidenceId] });
+    }
+  }
+  return findings;
+}
+
 function findingsSorted(findings: SafetyFinding[]): SafetyFinding[] {
   const unique = new Map<string, SafetyFinding>();
   for (const finding of findings) unique.set(`${finding.code}\u0000${finding.subjectId}`, finding);
@@ -56,7 +77,7 @@ function findingsSorted(findings: SafetyFinding[]): SafetyFinding[] {
 }
 
 export function evaluateSafetyAdmission(input: EvaluateSafetyAdmissionInput): SafetyAdmission {
-  const findings: SafetyFinding[] = [];
+  const findings: SafetyFinding[] = contradictionFindings(input);
   const candidateSources = new Map<string, Record<string, unknown>>();
   for (const candidate of input.candidates) if (candidate.recordFamily === "SRC-") { const id = idOf(candidate.fields, "source_id"); if (id) candidateSources.set(id, candidate.fields); }
   const evidence = materialEvidence(input);
@@ -70,16 +91,16 @@ export function evaluateSafetyAdmission(input: EvaluateSafetyAdmissionInput): Sa
       if (!Array.isArray(limits)) findings.push({ code: "CLAIM_INFERENCE_LIMITS_INDETERMINATE", subjectId: item.id, severity: "blocker", summary: "Claim inference limits are absent or indeterminate." });
       else if (limits.length > 0) findings.push({ code: "CLAIM_INFERENCE_LIMITS_PRESENT", subjectId: item.id, severity: "blocker", summary: "Claim has explicit inference limits requiring human resolution." });
     }
-    if (getRecordField(item.fields, "effect") === "CONTRADICTS") findings.push({ code: "CONTRADICTION_VISIBLE", subjectId: item.id, severity: "info", summary: "Represented contradiction must be visible to the human reviewer.", evidenceReferences: [item.id] });
   }
   for (const sourceId of sourceIds) {
     const source = candidateSources.get(sourceId) ?? record(input.index, "SRC-", sourceId)?.fields;
     if (!source) { findings.push({ code: "SOURCE_REVALIDATION_MISSING", subjectId: sourceId, severity: "blocker", summary: "Material Source cannot be resolved for revalidation." }); continue; }
     if (getRecordField(source, "access.level") === "private") { findings.push({ code: "PRIVATE_SOURCE", subjectId: sourceId, severity: "blocker", summary: "Material Source is private and cannot enter the pre-Gate path." }); continue; }
-    const evidence = input.availabilityAdapter?.check(sourceId, source);
+    let evidence: AvailabilityEvidence | undefined;
+    try { evidence = input.availabilityAdapter?.check(sourceId, source); } catch { findings.push({ code: "SOURCE_AVAILABILITY_UNVERIFIABLE", subjectId: sourceId, severity: "blocker", summary: "Material Source availability could not be verified." }); continue; }
     if (!evidence || evidence.sourceId !== sourceId) { findings.push({ code: "SOURCE_REVALIDATION_MISSING", subjectId: sourceId, severity: "blocker", summary: "No same-Source availability evidence was supplied." }); continue; }
     const checked = Date.parse(evidence.checkedAt), frozen = Date.parse(input.frozenAt), now = Date.parse(input.evaluatedAt);
-    if (!Number.isFinite(checked) || checked < frozen || now - checked > 10 * MINUTE) { findings.push({ code: "SOURCE_REVALIDATION_STALE", subjectId: sourceId, severity: "blocker", summary: "Material Source availability evidence is not fresh after candidate freeze." }); continue; }
+    if (!Number.isFinite(checked) || !Number.isFinite(frozen) || !Number.isFinite(now) || checked < frozen || checked > now || now - checked > 10 * MINUTE) { findings.push({ code: "SOURCE_REVALIDATION_STALE", subjectId: sourceId, severity: "blocker", summary: "Material Source availability evidence is not fresh after candidate freeze." }); continue; }
     if (evidence.status === "unavailable") findings.push({ code: "SOURCE_UNAVAILABLE", subjectId: sourceId, severity: "blocker", summary: "Material Source is unavailable." });
     else if (evidence.status !== "available") findings.push({ code: "SOURCE_AVAILABILITY_UNVERIFIABLE", subjectId: sourceId, severity: "blocker", summary: "Material Source availability could not be verified." });
   }

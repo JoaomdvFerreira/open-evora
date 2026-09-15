@@ -39,6 +39,10 @@ function preparationFingerprintOf(
   manifest: GenerationManifest,
   changeSet: Omit<ResearchChangeSet, "packageId" | "preparationFingerprint">
 ): string {
+  const deterministicAdmission = {
+    disposition: changeSet.safetyAdmission.disposition,
+    findings: changeSet.safetyAdmission.findings.map(({ code, subjectId, severity, summary, evidenceReferences }) => ({ code, subjectId, severity, summary, evidenceReferences })),
+  };
   return sha256Hex({
     baseGitSha: changeSet.baseGitSha,
     manifest,
@@ -48,7 +52,7 @@ function preparationFingerprintOf(
     readiness: changeSet.readiness,
     independentReview: changeSet.independentReview,
     integrationPlan: changeSet.integrationPlan,
-    safetyAdmission: changeSet.safetyAdmission,
+    safetyAdmission: deterministicAdmission,
   });
 }
 
@@ -119,7 +123,9 @@ export function assembleResearchChangeSet(
     readiness: review.readiness,
     independentReview,
     integrationPlan,
-    safetyAdmission,
+    // Runtime timestamp stays in the Hold Report only; Human Gate/RCS identity
+    // carries the deterministic decision content, not execution metadata.
+    safetyAdmission: { ...safetyAdmission, evaluatedAt: "" },
   };
 
   const preparationFingerprint = preparationFingerprintOf(manifest, changeSetCore);

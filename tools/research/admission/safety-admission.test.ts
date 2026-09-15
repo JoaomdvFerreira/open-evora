@@ -5,6 +5,7 @@ import { evaluateSafetyAdmission, type SourceAvailabilityAdapter } from "./safet
 
 const schema: RecordSchema = { prefix: "SRC-", directory: "sources", idField: "source_id" };
 const evidenceSchema: RecordSchema = { prefix: "EVD-", directory: "evidence", idField: "evidence_id" };
+const problemSchema: RecordSchema = { prefix: "PRB-", directory: "problems", idField: "problem_id" };
 function index(source: Record<string, unknown>): CorpusIndex { return { researchRoot: "/synthetic", totalRecords: 1, byPrefix: new Map([["SRC-", { schema, records: [{ file: "sources/SRC-1.yaml", fields: source }], byId: new Map([["SRC-1", { file: "sources/SRC-1.yaml", fields: source }]]) }], ["EVD-", { schema: evidenceSchema, records: [], byId: new Map() }]]) }; }
 const source = { source_id: "SRC-1", access: { level: "public" } };
 const claim = (overrides: Record<string, unknown> = {}) => ({ recordFamily: "EVD-", fields: { evidence_id: "EVD-1", provenance: { sources: ["SRC-1"] }, evidence_nature: "claim", claim_authority: "authoritative", inference_limits: [], ...overrides } });
@@ -28,4 +29,32 @@ test("private Sources hold before the adapter can be invoked", () => {
   let calls = 0;
   const result = evaluateSafetyAdmission({ index: index({ source_id: "SRC-1", access: { level: "private" } }), candidates: [claim()], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, availabilityAdapter: { check: () => { calls++; return { sourceId: "SRC-1", status: "available", checkedAt: time }; } } });
   assert.equal(result.findings[0]?.code, "PRIVATE_SOURCE"); assert.equal(calls, 0);
+});
+
+test("availability time boundaries require checkedAt from freeze through evaluation and within ten minutes", () => {
+  const cases: Array<[string, string, string]> = [["2026-09-15T12:00:00.000Z", "2026-09-15T12:00:00.000Z", "ELIGIBLE"], ["2026-09-15T12:10:00.000Z", "2026-09-15T12:10:00.000Z", "ELIGIBLE"], ["2026-09-15T12:00:00.000Z", "2026-09-15T12:10:00.000Z", "ELIGIBLE"], ["2026-09-15T12:00:00.000Z", "2026-09-15T12:10:00.001Z", "HOLD"], ["2026-09-15T11:59:59.999Z", "2026-09-15T12:00:00.000Z", "HOLD"], ["2026-09-15T12:00:00.001Z", "2026-09-15T12:00:00.000Z", "HOLD"]];
+  for (const [checkedAt, evaluatedAt, expected] of cases) {
+    const result = evaluateSafetyAdmission({ index: index(source), candidates: [claim()], affectedProblemIds: [], frozenAt: time, evaluatedAt, availabilityAdapter: { check: () => ({ sourceId: "SRC-1", status: "available", checkedAt }) } });
+    assert.equal(result.disposition, expected);
+  }
+});
+
+test("adapter throws fail closed with a safe fixed finding", () => {
+  const result = evaluateSafetyAdmission({ index: index(source), candidates: [claim()], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, availabilityAdapter: { check: () => { throw new Error("https://private.invalid/?token=secret"); } } });
+  assert.deepEqual(result.findings.map((finding) => [finding.code, finding.summary]), [["SOURCE_AVAILABILITY_UNVERIFIABLE", "Material Source availability could not be verified."]]);
+});
+
+test("canonical PRB evidence effects become non-blocking structured contradiction findings with context", () => {
+  const problem = { problem_id: "PRB-1", evidence: [{ evidence_id: "EVD-1", effects: ["CONTRADICTS"], research_roles: ["LOCAL_OBSERVATION"] }], decision_basis: { contradiction_search: { summary: "The contradiction concerns scope." } } };
+  const base = index(source);
+  const rich: CorpusIndex = { ...base, byPrefix: new Map([...base.byPrefix, ["PRB-", { schema: problemSchema, records: [{ file: "problems/PRB-1.yaml", fields: problem }], byId: new Map([["PRB-1", { file: "problems/PRB-1.yaml", fields: problem }]]) }]]) };
+  const result = evaluateSafetyAdmission({ index: rich, candidates: [claim()], affectedProblemIds: ["PRB-1"], frozenAt: time, evaluatedAt: time, availabilityAdapter: { check: () => ({ sourceId: "SRC-1", status: "available", checkedAt: time }) } });
+  assert.equal(result.disposition, "ELIGIBLE");
+  assert.deepEqual(result.findings, [{ code: "CONTRADICTION_VISIBLE", subjectId: "EVD-1", severity: "info", summary: "The contradiction concerns scope.", evidenceReferences: ["PRB-1", "EVD-1"] }]);
+});
+
+test("findings deduplicate by code and subject and sort independent of input order", () => {
+  const candidates = [claim({ evidence_id: "EVD-B", claim_authority: "unknown", inference_limits: ["x"] }), claim({ evidence_id: "EVD-A", claim_authority: "unknown", inference_limits: ["x"] })];
+  const result = evaluateSafetyAdmission({ index: index(source), candidates: [...candidates, candidates[0]!], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, availabilityAdapter: { check: () => ({ sourceId: "SRC-1", status: "available", checkedAt: time }) } });
+  assert.deepEqual(result.findings.map((finding) => `${finding.code}:${finding.subjectId}`), ["CLAIM_AUTHORITY_UNKNOWN:EVD-A", "CLAIM_AUTHORITY_UNKNOWN:EVD-B", "CLAIM_INFERENCE_LIMITS_PRESENT:EVD-A", "CLAIM_INFERENCE_LIMITS_PRESENT:EVD-B"]);
 });
