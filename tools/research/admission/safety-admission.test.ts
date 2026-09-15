@@ -58,3 +58,19 @@ test("findings deduplicate by code and subject and sort independent of input ord
   const result = evaluateSafetyAdmission({ index: index(source), candidates: [...candidates, candidates[0]!], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, availabilityAdapter: { check: () => ({ sourceId: "SRC-1", status: "available", checkedAt: time }) } });
   assert.deepEqual(result.findings.map((finding) => `${finding.code}:${finding.subjectId}`), ["CLAIM_AUTHORITY_UNKNOWN:EVD-A", "CLAIM_AUTHORITY_UNKNOWN:EVD-B", "CLAIM_INFERENCE_LIMITS_PRESENT:EVD-A", "CLAIM_INFERENCE_LIMITS_PRESENT:EVD-B"]);
 });
+
+test("candidate affected PRB decision basis makes only its referenced Source material", () => {
+  const material = { source_id: "SRC-MATERIAL", access: { level: "public" } };
+  const unrelated = { source_id: "SRC-UNRELATED", access: { level: "public" } };
+  const evidence = { evidence_id: "EVD-BASIS", provenance: { sources: ["SRC-MATERIAL"] }, evidence_nature: "observation", inference_limits: [] };
+  const corpus: CorpusIndex = { researchRoot: "/synthetic", totalRecords: 3, byPrefix: new Map([
+    ["SRC-", { schema, records: [{ file: "sources/SRC-MATERIAL.yaml", fields: material }, { file: "sources/SRC-UNRELATED.yaml", fields: unrelated }], byId: new Map([["SRC-MATERIAL", { file: "sources/SRC-MATERIAL.yaml", fields: material }], ["SRC-UNRELATED", { file: "sources/SRC-UNRELATED.yaml", fields: unrelated }]]) }],
+    ["EVD-", { schema: evidenceSchema, records: [{ file: "evidence/EVD-BASIS.yaml", fields: evidence }], byId: new Map([["EVD-BASIS", { file: "evidence/EVD-BASIS.yaml", fields: evidence }]]) }],
+    ["PRB-", { schema: problemSchema, records: [], byId: new Map() }],
+  ]) };
+  const candidateProblem = { recordFamily: "PRB-", fields: { problem_id: "PRB-CANDIDATE", decision_basis: { supporting_evidence: ["EVD-BASIS"] } } };
+  const checked: string[] = [];
+  const result = evaluateSafetyAdmission({ index: corpus, candidates: [candidateProblem], affectedProblemIds: ["PRB-CANDIDATE"], frozenAt: time, evaluatedAt: time, availabilityAdapter: { check: (id) => { checked.push(id); return { sourceId: id, status: "available", checkedAt: time }; } } });
+  assert.equal(result.disposition, "ELIGIBLE");
+  assert.deepEqual(checked, ["SRC-MATERIAL"]);
+});

@@ -16,9 +16,10 @@ const SOURCE_SCHEMA: RecordSchema = {
   directory: "sources",
   idField: "source_id",
   requiredFields: ["source_id", "name"],
-  allowedFields: ["source_id", "name"],
-  fieldTypes: { source_id: ["string"], name: ["string"] },
+  allowedFields: ["source_id", "name", "access", "access.level"],
+  fieldTypes: { source_id: ["string"], name: ["string"], access: ["object"], "access.level": ["string"] },
 };
+const EVIDENCE_SCHEMA: RecordSchema = { prefix: "EVD-", directory: "evidence", idField: "evidence_id", requiredFields: ["evidence_id", "provenance", "provenance.sources", "evidence_nature", "claim_authority", "inference_limits"], allowedFields: ["evidence_id", "provenance", "provenance.sources", "evidence_nature", "claim_authority", "inference_limits"], fieldTypes: { evidence_id: ["string"], provenance: ["object"], "provenance.sources": ["array"], evidence_nature: ["string"], claim_authority: ["string"], inference_limits: ["array"] }, references: [{ field: "provenance.sources", isList: true, targetPrefix: "SRC-", targetDirectory: "sources", required: true }], stringListFields: ["provenance.sources", "inference_limits"], nonEmptyListFields: ["provenance.sources"] };
 
 function emptyIndex(): CorpusIndex {
   return {
@@ -26,6 +27,18 @@ function emptyIndex(): CorpusIndex {
     byPrefix: new Map([["SRC-", { schema: SOURCE_SCHEMA, records: [], byId: new Map() }]]),
     totalRecords: 0,
   };
+}
+
+function admissionIndex(level: "public" | "private"): CorpusIndex {
+  const source = { source_id: "SRC-MATERIAL", name: "Synthetic material", access: { level } };
+  return { researchRoot: "/synthetic", totalRecords: 1, byPrefix: new Map([
+    ["SRC-", { schema: SOURCE_SCHEMA, records: [{ file: "sources/SRC-MATERIAL.yaml", fields: source }], byId: new Map([["SRC-MATERIAL", { file: "sources/SRC-MATERIAL.yaml", fields: source }]]) }],
+    ["EVD-", { schema: EVIDENCE_SCHEMA, records: [], byId: new Map() }],
+  ]) };
+}
+
+function claimEnvelope(): unknown {
+  return { schemaVersion: "1", manifest: { schemaVersion: "1", mode: "daily-discovery", investigationQuestion: "q", candidateFiles: ["EVD-NEW.yaml"], claimedRecordIds: ["EVD-NEW"], rationale: "r" }, candidateFiles: [{ path: "EVD-NEW.yaml", yaml: "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: claim\nclaim_authority: authoritative\ninference_limits: []\n" }] };
 }
 
 function withTempDir(fn: (dir: string) => void): void {
@@ -102,6 +115,37 @@ test("one accepted trigger causes exactly two role-specific invocations, primary
     assert.equal(shared.calls.length, 2);
     assert.equal(shared.calls[0].role, "PRIMARY_AUTHOR");
     assert.equal(shared.calls[1].role, "INDEPENDENT_REVIEWER");
+  });
+});
+
+test("WU049 HOLD through real orchestration prevents reviewer/RCS and writes a safe private report", () => {
+  withTempDir((cycleDir) => {
+    const privateSentinels = ["PRIVATE_BODY_SENTINEL", "https://private.invalid/?token=PRIVATE_TOKEN_SENTINEL", "PRIVATE_CORRESPONDENCE_SENTINEL"];
+    const corpus = admissionIndex("private");
+    const source = corpus.byPrefix.get("SRC-")!.byId.get("SRC-MATERIAL")!.fields;
+    for (const [key, value] of [["body", privateSentinels[0]], ["canonical_reference", privateSentinels[1]], ["notes", privateSentinels[2]]]) Object.defineProperty(source, key, { value, enumerable: false });
+    const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
+    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = runResearchCycle({ trigger: TRIGGER, index: corpus, baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    assert.equal(outcome.status, "PRE_GATE_SAFETY_HOLD", outcome.status === "FAILED" ? outcome.message : "");
+    assert.equal(reviewer.calls.length, 0);
+    assert.equal(existsSync(join(cycleDir, "independent-review.json")), false);
+    assert.equal(existsSync(join(cycleDir, "research-change-set.json")), false);
+    assert.equal(existsSync(join(cycleDir, "human-gate-package.json")), false);
+    if (outcome.status !== "PRE_GATE_SAFETY_HOLD") return;
+    const serialized = readFileSync(outcome.holdReportPath, "utf8");
+    assert.match(serialized, /PRIVATE_SOURCE/);
+    for (const sentinel of privateSentinels) assert.equal(serialized.includes(sentinel), false);
+  });
+});
+
+test("WU049 valid claim reaches the independent reviewer through real orchestration", () => {
+  withTempDir((cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
+    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
+    assert.equal(reviewer.calls.length, 1);
   });
 });
 
