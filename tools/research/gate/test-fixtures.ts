@@ -225,6 +225,7 @@ export function syntheticResearchChangeSet(
     readiness: "READY_FOR_INTEGRATION_GATE" as const,
     independentReview: ir,
     integrationPlan: plan,
+    safetyAdmission: { disposition: "ELIGIBLE" as const, findings: [], evaluatedAt: "2026-09-15T12:00:00.000Z" },
   };
   const fingerprint = sha256Hex({
     baseGitSha: core.baseGitSha,
@@ -235,6 +236,7 @@ export function syntheticResearchChangeSet(
     readiness: core.readiness,
     independentReview: core.independentReview,
     integrationPlan: core.integrationPlan,
+    safetyAdmission: core.safetyAdmission,
   });
   return { ...core, packageId: `RCS-${fingerprint.slice(0, 16)}`, preparationFingerprint: fingerprint };
 }

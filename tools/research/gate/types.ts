@@ -13,6 +13,7 @@ import type { CanonicalIntegrationPlan } from "../integration/canonical-integrat
 import type { ReadinessReport } from "../readiness/readiness.ts";
 import type { ValidationResult } from "../validation/validate.ts";
 import type { GenerationManifest, IndependentReviewResult, ResearchChangeSet } from "../orchestrate/types.ts";
+import type { SafetyAdmission } from "../admission/safety-admission.ts";
 
 /**
  * The Human Gate package (OD-C Option 3): one coherent, inspectable JSON
@@ -43,6 +44,8 @@ export interface HumanGatePackage {
   integrationPlan: CanonicalIntegrationPlan | null;
   /** Convenience projection of researchChangeSet.manifest. */
   manifest: GenerationManifest;
+  /** Structured WU049 admission output, projected without recomputing policy. */
+  safetyAdmission: SafetyAdmission;
   /**
    * Structured readiness results (readiness.ts, evaluateEligibility()/
    * evaluateCorroboration()) for every PRB-* affected by this package's

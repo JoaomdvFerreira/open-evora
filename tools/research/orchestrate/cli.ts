@@ -256,6 +256,11 @@ function main(): void {
     process.exitCode = 1;
     return;
   }
+  if (outcome.status === "PRE_GATE_SAFETY_HOLD") {
+    console.error(`PRE_GATE_SAFETY_HOLD: ${outcome.holdReportPath}`);
+    process.exitCode = 1;
+    return;
+  }
 
   writeFileSync(outputPath, `${JSON.stringify(outcome.changeSet, null, 2)}\n`, "utf8");
 

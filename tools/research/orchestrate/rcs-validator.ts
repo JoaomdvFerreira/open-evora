@@ -24,6 +24,7 @@ import type { CandidateDelta, CandidateRecord } from "../integration/candidate-d
 import type { CanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
 import type { ValidationResult } from "../validation/validate.ts";
 import type { GenerationManifest, IndependentReviewResult, ResearchChangeSet } from "./types.ts";
+import type { SafetyAdmission } from "../admission/safety-admission.ts";
 
 export interface RcsValidationResult {
   errors: string[];
@@ -140,6 +141,7 @@ function recomputeFingerprint(rcs: {
   readiness: string;
   independentReview: IndependentReviewResult;
   integrationPlan: CanonicalIntegrationPlan | null;
+  safetyAdmission: SafetyAdmission;
 }): string {
   return sha256Hex({
     baseGitSha: rcs.baseGitSha,
@@ -150,6 +152,7 @@ function recomputeFingerprint(rcs: {
     readiness: rcs.readiness,
     independentReview: rcs.independentReview,
     integrationPlan: rcs.integrationPlan,
+    safetyAdmission: rcs.safetyAdmission,
   });
 }
 
@@ -207,6 +210,9 @@ export function validateResearchChangeSet(value: unknown): RcsValidationResult {
 
   const reviewValidation = validateIndependentReview(rcs.independentReview);
   errors.push(...reviewValidation.errors.map((message) => `independentReview.${message}`));
+  if (!rcs.safetyAdmission || typeof rcs.safetyAdmission !== "object" || (rcs.safetyAdmission as Record<string, unknown>).disposition !== "ELIGIBLE" || !Array.isArray((rcs.safetyAdmission as Record<string, unknown>).findings)) {
+    errors.push("rcs.safetyAdmission must be an eligible structured admission result");
+  }
 
   if (typeof rcs.baseGitSha === "string") {
     errors.push(...validateIntegrationPlanShape(rcs.integrationPlan, rcs.baseGitSha));
@@ -232,6 +238,7 @@ export function validateResearchChangeSet(value: unknown): RcsValidationResult {
       readiness: rcs.readiness as string,
       independentReview,
       integrationPlan: rcs.integrationPlan as CanonicalIntegrationPlan | null,
+      safetyAdmission: rcs.safetyAdmission as SafetyAdmission,
     });
     if (recomputed !== rcs.preparationFingerprint) {
       errors.push(

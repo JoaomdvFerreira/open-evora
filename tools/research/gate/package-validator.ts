@@ -113,6 +113,9 @@ export function validateHumanGatePackage(value: unknown): HumanGatePackageValida
   if (!pkg.manifest || typeof pkg.manifest !== "object") {
     errors.push("package.manifest must be an object");
   }
+  if (!pkg.safetyAdmission || typeof pkg.safetyAdmission !== "object") {
+    errors.push("package.safetyAdmission must be an object");
+  }
 
   if (!Array.isArray(pkg.affectedProblemReadiness)) {
     errors.push("package.affectedProblemReadiness must be an array");

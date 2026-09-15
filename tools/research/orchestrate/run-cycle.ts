@@ -39,6 +39,8 @@ import { assembleResearchChangeSet } from "./research-change-set.ts";
 import { buildReviewerInput } from "./reviewer-input.ts";
 import { buildReviewerPrompt } from "./reviewer-prompt.ts";
 import type { PreparationOutcome, ResearchTrigger } from "./types.ts";
+import { evaluateSafetyAdmission, type SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
+import { writeSafetyHoldReport } from "../admission/hold-report.ts";
 
 export interface RunResearchCycleInput {
   trigger: ResearchTrigger;
@@ -48,6 +50,10 @@ export interface RunResearchCycleInput {
   cycleDir: string;
   primaryInvoker: AiInvoker;
   reviewerInvoker: AiInvoker;
+  /** Narrow, injectable read-only same-Source availability boundary. */
+  availabilityAdapter?: SourceAvailabilityAdapter;
+  /** Injectable clock for deterministic tests; admission evidence is runtime-only. */
+  now?: () => Date;
 }
 
 function failed(failedCheck: string, message: string): PreparationOutcome {
@@ -173,6 +179,21 @@ export function runResearchCycle(input: RunResearchCycleInput): PreparationOutco
     return failed("READINESS", "canonical integration review did not reach READY_FOR_INTEGRATION_GATE");
   }
 
+  // --- CANDIDATE FREEZE -> MATERIAL SOURCE REVALIDATION -> SAFETY ADMISSION --
+  // No reviewer, RCS, or Human Gate package can be reached on HOLD.
+  const frozenAt = (input.now?.() ?? new Date()).toISOString();
+  const evaluatedAt = (input.now?.() ?? new Date()).toISOString();
+  const affectedProblemIds = [
+    ...new Set([
+      ...review.deltas.filter((delta) => delta.recordFamily === "PRB-").map((delta) => delta.id),
+      ...(envelope.manifest.mode === "problem-refresh" && envelope.manifest.targetProblemId ? [envelope.manifest.targetProblemId] : []),
+    ]),
+  ].sort();
+  const admission = evaluateSafetyAdmission({ index: input.index, candidates: review.candidates, affectedProblemIds, frozenAt, evaluatedAt, availabilityAdapter: input.availabilityAdapter });
+  if (admission.disposition === "HOLD") {
+    return { status: "PRE_GATE_SAFETY_HOLD", admission, holdReportPath: writeSafetyHoldReport(input.cycleDir, input.baseGitSha, admission) };
+  }
+
   // --- FREEZE THE IMMUTABLE REVIEWER INPUT -----------------------------------
   const reviewerInputJson = buildReviewerInput({
     baseGitSha: input.baseGitSha,
@@ -215,7 +236,7 @@ export function runResearchCycle(input: RunResearchCycleInput): PreparationOutco
   // potentially-divergent snapshot (WU045-B01 independent-review
   // remediation, finding 3). This is the only call whose output is ever
   // returned as READY_FOR_HUMAN_REVIEW.
-  return assembleResearchChangeSet(input.index, envelope.manifest, review, independentReview);
+  return assembleResearchChangeSet(input.index, envelope.manifest, review, independentReview, admission);
 }
 
 export function cycleArtifactsExist(cycleDir: string): boolean {

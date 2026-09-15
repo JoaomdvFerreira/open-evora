@@ -11,6 +11,7 @@ import type { CandidateDelta, CandidateRecord } from "../integration/candidate-d
 import type { CanonicalIntegrationReadiness } from "../integration/canonical-integration-review.ts";
 import type { CanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
 import type { ValidationResult } from "../validation/validate.ts";
+import type { SafetyAdmission } from "../admission/safety-admission.ts";
 
 /** Which prompt/mode a cycle was triggered under (§11 orchestration entry point). */
 export type ResearchMode = "daily-discovery" | "problem-refresh";
@@ -87,6 +88,8 @@ export interface ResearchChangeSet {
   readiness: CanonicalIntegrationReadiness;
   independentReview: IndependentReviewResult;
   integrationPlan: CanonicalIntegrationPlan | null;
+  /** WU049's single pre-Gate admission result; informational findings are projected to Human Gate. */
+  safetyAdmission: SafetyAdmission;
   /**
    * Deterministic fingerprint over every field above except `packageId`
    * itself and this field. Identical logical inputs always yield the same
@@ -100,6 +103,7 @@ export interface ResearchChangeSet {
 /** Terminal outcome of one WU045 orchestration run. Never a Gate 1 decision. */
 export type PreparationOutcome =
   | { status: "READY_FOR_HUMAN_REVIEW"; changeSet: ResearchChangeSet }
+  | { status: "PRE_GATE_SAFETY_HOLD"; admission: import("../admission/safety-admission.ts").SafetyAdmission; holdReportPath: string }
   | { status: "FAILED"; failedCheck: string; message: string };
 
 /**

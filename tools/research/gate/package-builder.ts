@@ -138,6 +138,7 @@ export function buildHumanGatePackage(index: CorpusIndex, changeSet: ResearchCha
     independentReview: changeSet.independentReview,
     integrationPlan: changeSet.integrationPlan,
     manifest: changeSet.manifest,
+    safetyAdmission: changeSet.safetyAdmission,
     affectedProblemReadiness,
     affectedProblemIds,
     expectedPublicEffect: deriveExpectedPublicEffect(changeSet),

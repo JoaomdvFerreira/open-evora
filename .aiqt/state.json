@@ -1,8 +1,8 @@
 {
   "version": "0.8.0",
-  "projectStatus": "review",
-  "currentMilestoneId": null,
-  "currentWorkUnitId": null,
+  "projectStatus": "in_progress",
+  "currentMilestoneId": "M014",
+  "currentWorkUnitId": "WU049",
   "workGraph": {
     "milestones": [
       {
@@ -155,6 +155,18 @@
           "WU046",
           "WU047",
           "WU048"
+        ]
+      },
+      {
+        "id": "M014",
+        "title": "M014 — Post-M013 Go-Live Remediation",
+        "objective": "Remediate the specific safety-admission, release-provenance, and public-production launch gaps recorded by completed M013/WU048 (canonical verdict NOT_READY), then independently reverify the complete Go-Live acceptance matrix. M013 and WU048 remain historical and are not reopened. A successful M014/WU052 reverification is not the owner GO/HOLD decision.",
+        "status": "in_progress",
+        "workUnitIds": [
+          "WU049",
+          "WU050",
+          "WU051",
+          "WU052"
         ]
       }
     ],
@@ -2253,6 +2265,206 @@
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
         "updatedAt": "2026-09-15T13:06:57.029Z"
+      },
+      {
+        "id": "WU049",
+        "milestoneId": "M014",
+        "title": "Pre-Gate Safety Admission",
+        "objective": "Implement the bounded pre-Gate safety-admission controls required by the M013/WU048 NOT_READY findings, while preserving human authority over the truth, corroboration, validation, investigation posture, canonical integration, and publication decisions.",
+        "scope": [
+          "Implement one deterministic Pre-Gate Safety Admission producer, consumed without policy duplication by orchestration, Human Gate package projection, Human Gate Markdown rendering, and tests. Its only dispositions are ELIGIBLE and HOLD, with ordered/deduplicated structured findings; it classifies admission safety only and never decides truth, corroboration, validation, investigation posture, canonical integration, publication, or materiality.",
+          "Apply the owner-approved deterministic safety-sensitive claim predicate exactly to every candidate EVD with evidence_nature = claim. Only claim_authority = authoritative satisfies the authority predicate; non_authoritative, unknown, absent, or indeterminate HOLD. A claim with non-empty inference_limits[] HOLDs without parsing, keyword matching, NLP, semantic ranking, or materiality inference from its text; an explicit empty list does not HOLD by itself and an absent/indeterminate list HOLDs. Do not introduce replacement canonical enum values.",
+          "Derive material-Source membership deterministically from explicit provenance: a Source is material only when reachable from an EVD included in the current candidate or contributing to an affected record's decision_basis in the current cycle. Unreferenced corpus Sources are excluded.",
+          "After candidate freeze and immediately before admission, revalidate every non-private material Source through the existing canonical Source-checking boundary where available, or a bounded read-only availability adapter. Fresh evidence must identify the same Source, be produced after freeze, be no more than ten minutes old at admission, and report available. Missing, unavailable, unknown, timeout, verification error, unsupported, stale, authenticated, or private revalidation conditions HOLD; a private Source HOLDs before any external revalidation attempt. This is Source availability evidence, not semantic claim currentness or truth. Preserve the immutable candidate snapshot and do not create a general crawler or live-research system.",
+          "Require HOLD before a Source with access.level = private can propagate to a public/canonical candidate or publication path. On HOLD, do not invoke the independent reviewer, assemble a final RCS, generate a normal Human Gate package, return READY_FOR_HUMAN_REVIEW, write canonical research state, commit, push, or publish. Generate instead a non-canonical safe Pre-Gate Safety Hold Report in the existing cycle/workbench artifact convention.",
+          "Represent at least contradiction visibility, private Source, Source revalidation missing, Source revalidation stale, Source unavailable, Source availability unknown/unverifiable, claim authority insufficient/unknown, and claim inference limits present/indeterminate as structured findings. Do not emit a semantic claim-currentness finding or duplicate a Source revalidation failure as one. Allow multiple findings; sort by reason code then stable subject ID and deduplicate by that pair. Contradiction visibility is non-blocking unless another finding requires HOLD.",
+          "When admission is otherwise ELIGIBLE, preserve a represented contradiction structurally and project its safe summary and references into the Human Gate package and visible Markdown for explicit human consideration. Rendering consumes the structured finding; it never recomputes contradiction semantics.",
+          "Add bounded deterministic unit, integration, package-projection, Markdown-rendering, orchestration-enforcement, and fresh scenario tests for M013/WU048 cases 5, 7, 9, and 22, retaining existing Human Gate semantics and publication guards."
+        ],
+        "outOfScope": [
+          "Any automatic truth, corroboration, validation, materiality, investigation-posture, canonical-integration, or publication decision",
+          "Automatic sanitization, redaction, or transformation of private source material",
+          "Canonical research data, schema, enum, or semantic changes",
+          "A persisted SRC/EVD/PRB risk taxonomy or canonical corpus migration",
+          "A general crawler, uncontrolled live-web research dependency, authenticated/private fetch, or semantic research refresh",
+          "A semantic claim-currentness predicate, semantic temporal-validity judgement, or inference-limit text interpretation",
+          "Commit, push, pull request, merge, deployment, production promotion, or external configuration mutation",
+          "M013/WU048 reopening or alteration",
+          "C008/C009/C010 repair",
+          "WU050/WU051/WU052, deployment provenance, Production posture, and unrelated Explorer/product work"
+        ],
+        "acceptanceCriteria": [
+          "One canonical Pre-Gate Safety Admission producer returns only ELIGIBLE or HOLD with deterministic ordered/deduplicated findings, and orchestration, package projection, rendering, and tests consume that same result without reimplementing safety policy.",
+          "Every candidate EVD with evidence_nature = claim receives the owner-approved structured safety checks. Only claim_authority = authoritative satisfies authority; non_authoritative, unknown, absent, or indeterminate authority HOLDs. Non-empty or indeterminate inference_limits[] HOLDs without parsing or semantically interpreting its text; an explicit empty list does not HOLD by itself. No truth, corroboration, legal/reputational, materiality, canonical-integration, or publication decision is introduced.",
+          "A material Source is derived only from explicit provenance of candidate EVD or affected-record decision_basis EVD. A private material Source HOLDs before reviewer/package and before external revalidation; no private content leaks and no automatic sanitization workflow exists.",
+          "Every non-private material Source is revalidated after candidate freeze and within ten minutes before admission; unavailable, unknown, timeout, verification error, unsupported, missing, authenticated/private, or stale revalidation deterministically HOLDs before Human Gate. This evidence establishes only fresh Source availability, not semantic claim currentness or truth.",
+          "A HOLD can never invoke the independent reviewer, assemble a final RCS, generate a normal Human Gate package, return READY_FOR_HUMAN_REVIEW, write canonical research state, commit, push, or publish; it produces only a non-canonical safe Pre-Gate Safety Hold Report with the approved minimal fields.",
+          "A represented contradiction remains structurally preserved and, when otherwise ELIGIBLE, appears with safe summary and references in the Human Gate JSON and rendered Markdown; it is not automatically a HOLD and is not recomputed by rendering.",
+          "Structured findings distinguish contradiction visibility, private Source, Source revalidation missing/stale/unavailable/unknown-unverifiable, claim authority insufficient/unknown, and claim inference limits present/indeterminate; no semantic claim-currentness reason is emitted. Multiple findings sort by code then stable subject ID and deduplicate by that pair.",
+          "Fresh deterministic unit, integration, package-projection, Markdown-rendering, orchestration-enforcement, and scenario coverage passes for M013/WU048 cases 5, 7, 9, and 22, including case-22 negative scenarios for authority, inference limits, and Source revalidation HOLD plus a positive regression proving that a claim whose structured predicates pass remains ELIGIBLE. Relevant existing §14 behavior does not regress.",
+          "No persisted research-schema migration, new persisted risk taxonomy, general crawler/live-research dependency, or forbidden semantic decision is introduced.",
+          "M013 remains historically done with WU048 canonical NOT_READY, and C008/C009/C010 are untouched."
+        ],
+        "agentContextRefs": [
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md",
+          "docs/design/m013-launch-automation-contract.md",
+          "docs/design/audits/m013-wu048-go-live-verification/report.md"
+        ],
+        "suggestedFiles": [
+          "tools/research/",
+          "docs/design/audits/m013-wu048-go-live-verification/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "git diff --check"
+        ],
+        "status": "in_progress",
+        "dependencies": [],
+        "createdAt": "2026-09-15T13:31:45.422Z",
+        "updatedAt": "2026-09-15T14:44:15.323Z"
+      },
+      {
+        "id": "WU050",
+        "milestoneId": "M014",
+        "title": "Attested Release Provenance",
+        "objective": "Establish exact provider-attested provenance from one dedicated release/candidate branch and committed SHA to a protected candidate deployment, so the resulting immutable deployment can be independently tied to its exact Git input.",
+        "scope": [
+          "Create and push a dedicated release/candidate branch containing the exact bounded M014 candidate revision after WU049 is complete.",
+          "Use the Git-linked protected candidate deployment path to obtain and record provider-attested repository, branch/ref, commit SHA, deployment identity, immutable URL, build result, timestamps, and protection/public-access posture.",
+          "Persist publication-safe provenance evidence that establishes the provider-attested exact SHA-to-deployment relationship; distinguish provider attestation from local upload/build assertions.",
+          "Fail closed if the provider cannot attest the exact candidate SHA, the deployment is not protected as required, or any recorded provenance element is inconsistent."
+        ],
+        "outOfScope": [
+          "Merge into main",
+          "Production promotion, Production alias assignment, domain/DNS/environment/protection configuration change, or other production mutation",
+          "GO/HOLD decision",
+          "Canonical research data or semantic changes beyond WU049's completed bounded remediation",
+          "M013/WU048 reopening or alteration",
+          "C008/C009/C010 repair"
+        ],
+        "acceptanceCriteria": [
+          "A dedicated release/candidate branch is pushed under this authorization, and the candidate deployment is Git-linked and protected.",
+          "Provider-attested evidence independently binds the exact repository/ref and immutable commit SHA to one immutable candidate deployment identity and URL, including successful build status and inspection timestamps.",
+          "The provenance record clearly distinguishes provider attestation from locally asserted provenance and contains no credentials, tokens, private content, or unsafe URLs.",
+          "No merge or Production promotion is performed in WU050; the candidate is not represented as Production or as a GO decision.",
+          "If exact provider SHA attestation cannot be established, WU050 returns NOT_READY/BLOCKED without bypassing the requirement."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/design/audits/m013-wu048-go-live-verification/report.md"
+        ],
+        "suggestedFiles": [
+          "docs/design/audits/m014-wu050-release-provenance/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-046"
+        ],
+        "createdAt": "2026-09-15T13:31:45.422Z",
+        "updatedAt": "2026-09-15T13:31:45.422Z"
+      },
+      {
+        "id": "WU051",
+        "milestoneId": "M014",
+        "title": "Production Launch-Hardening Release",
+        "objective": "After WU050 establishes exact provider-attested SHA provenance, perform the conditionally authorized Production hardening release through the preferred owner-controlled merge and Git-linked Vercel Production deployment path. This release does not decide GO/HOLD.",
+        "scope": [
+          "Use the exact WU050 provider-attested candidate SHA/provenance as the release input; stop if that provenance is absent, stale, inconsistent, or cannot be carried forward to the merged release.",
+          "Preferred authorized path: manual owner merge of the dedicated release/candidate branch followed by Git-linked Vercel Production deployment.",
+          "Verify and record the deployed Production commit SHA, deployment identity, immutable URL/production origin relationship, build result, timestamps, public accessibility, required metadata, robots/sitemap, and protection posture.",
+          "Keep this work unit bounded to the exact launch-hardening release required to replace M013/WU048's failing Production posture."
+        ],
+        "outOfScope": [
+          "Final GO/HOLD decision",
+          "Unattested or manually uploaded Production deployment",
+          "Unrelated product, design, research, schema, or architecture work",
+          "Automatic merge or bypass of repository protections",
+          "M013/WU048 reopening or alteration",
+          "C008/C009/C010 repair"
+        ],
+        "acceptanceCriteria": [
+          "WU050's exact provider-attested candidate SHA provenance is present and reconciled with the release input before Production action.",
+          "The release follows the preferred manual owner merge followed by Git-linked Vercel Production deployment path, with no protection bypass or automatic merge.",
+          "Provider evidence independently identifies the Production deployment and exact deployed commit SHA, and records its relationship to the Production origin.",
+          "Fresh public checks establish the required public launch posture: intended origin accessible without unintended authentication, required metadata/trust surfaces, and working robots/sitemap endpoints.",
+          "The Production hardening release is explicitly recorded as a deployment operation only, not a final GO decision; GO/HOLD remains owner-owned after WU052."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/design/m013-launch-automation-contract.md",
+          "docs/design/audits/m013-wu048-go-live-verification/report.md"
+        ],
+        "suggestedFiles": [
+          "docs/design/audits/m014-wu051-production-release/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-047"
+        ],
+        "createdAt": "2026-09-15T13:31:45.422Z",
+        "updatedAt": "2026-09-15T13:31:45.422Z"
+      },
+      {
+        "id": "WU052",
+        "milestoneId": "M014",
+        "title": "Independent Go-Live Reverification",
+        "objective": "Independently and freshly reverify the complete 22-case M013 §14 Go-Live matrix against the WU051 Production release and its attested provenance, without remediation or making the owner GO/HOLD decision.",
+        "scope": [
+          "Freshly rerun every one of all 22 §14 cases. M013/WU048 PASS evidence is historical only and may be contextualized but not reused as current PASS evidence.",
+          "Independently verify the WU049 admission controls, WU050 exact provider-attested candidate provenance, and WU051 Production release/origin posture in the same reverification cycle.",
+          "Produce sanitized, publication-safe evidence with expected/actual/PASS-FAIL/freshness for each case, release provenance, Production origin inspection, P0-P3 findings, and one bounded terminal readiness result.",
+          "Return a readiness recommendation only under the existing NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE semantics; preserve the separate owner GO/HOLD gate."
+        ],
+        "outOfScope": [
+          "Any remediation, code change, configuration mutation, release action, merge, or deployment",
+          "Deciding GO/HOLD or representing a verifier result as GO",
+          "Reusing prior M013/WU048 PASS evidence as fresh execution evidence",
+          "M013/WU048 reopening or alteration",
+          "C008/C009/C010 repair"
+        ],
+        "acceptanceCriteria": [
+          "All 22 §14 cases are freshly rerun and individually recorded with fresh expected outcome, actual outcome, PASS/FAIL result, evidence reference, and freshness classification; previous M013/WU048 PASS evidence is historical only.",
+          "Case 17 independently establishes exact provider-attested SHA provenance for the candidate/release and its relationship to the fresh WU051 Production deployment/origin; missing or inconsistent provenance is NOT_READY.",
+          "Cases 5, 7, 9, and 22 freshly demonstrate the WU049 remediation: contradiction surfacing, private-source HOLD, unavailable-source handling, and high-risk-claim HOLD/escalation without leakage.",
+          "The Production origin passes fresh public-access, protection, metadata, robots/sitemap, trust-surface, accessibility/responsive/browser, and release-provenance checks required by the 22-case matrix.",
+          "The evidence is publication-safe and contains no secrets, credentials, raw private material, personal identifiers, session data, or token-bearing URLs.",
+          "The terminal result is exactly NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE. A successful READY result does not decide GO/HOLD; GO/HOLD remains a separate owner action after this independent reverification."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md",
+          "docs/explorerarchitecture.md",
+          "docs/design/m013-launch-automation-contract.md",
+          "docs/design/audits/m013-wu048-go-live-verification/report.md"
+        ],
+        "suggestedFiles": [
+          "docs/design/audits/m014-wu052-go-live-reverification/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-048"
+        ],
+        "createdAt": "2026-09-15T13:31:45.422Z",
+        "updatedAt": "2026-09-15T13:31:45.422Z"
       }
     ],
     "dependencies": [
@@ -2570,6 +2782,27 @@
         "toId": "WU048",
         "type": "blocks",
         "reason": "WU048 verifies production/public hardening against the artifact WU047 produces."
+      },
+      {
+        "id": "DEP-046",
+        "fromId": "WU049",
+        "toId": "WU050",
+        "type": "blocks",
+        "reason": "Exact release provenance is established only after the required safety-admission remediation is complete."
+      },
+      {
+        "id": "DEP-047",
+        "fromId": "WU050",
+        "toId": "WU051",
+        "type": "blocks",
+        "reason": "Production hardening release is conditionally authorized only after exact provider-attested SHA provenance exists."
+      },
+      {
+        "id": "DEP-048",
+        "fromId": "WU051",
+        "toId": "WU052",
+        "type": "blocks",
+        "reason": "Independent Go-Live reverification must assess the actual hardened Production release."
       }
     ]
   },
@@ -6796,17 +7029,17 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-15T13:06:57.029Z",
-      "nextRecommendation": "aiqt review --mode release"
+      "nextRecommendation": "aiqt review --mode release",
+      "createdAt": "2026-09-15T13:06:57.029Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-049",
-    "workUnitId": "WU048",
-    "milestoneId": "M013",
-    "createdAt": "2026-09-15T11:18:53.103Z",
+    "id": "PKT-050",
+    "workUnitId": "WU049",
+    "milestoneId": "M014",
+    "createdAt": "2026-09-15T13:33:09.445Z",
     "format": "markdown",
-    "contentHash": "sha256:0962e93deadc3d186869f9eaaf21977aa4acfd02ac724f0fc35628984d4f4fa7",
+    "contentHash": "sha256:a37f09da03b0e4637ba4b3cc4462a5f55d8c3d1c5c25e7eddf03e9a2c2f3ab63",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -6824,8 +7057,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt review --mode release",
-  "lastUpdatedAt": "2026-09-15T13:06:57.029Z",
+  "nextRecommendedCommand": "aiqt checkpoint",
+  "lastUpdatedAt": "2026-09-15T14:44:15.323Z",
   "review": {
     "acknowledgedFindings": [
       {

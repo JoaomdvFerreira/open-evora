@@ -21,6 +21,7 @@ import { loadCandidates } from "./candidate-loader.ts";
 import { validateManifest, asValidatedManifest } from "./manifest.ts";
 import { validateIndependentReview, asValidatedIndependentReview } from "./independent-review.ts";
 import type { GenerationManifest, IndependentReviewResult, PreparationOutcome, ResearchChangeSet } from "./types.ts";
+import { evaluateSafetyAdmission, type SafetyAdmission } from "../admission/safety-admission.ts";
 
 export interface PrepareResearchChangeSetInput {
   index: CorpusIndex;
@@ -47,6 +48,7 @@ function preparationFingerprintOf(
     readiness: changeSet.readiness,
     independentReview: changeSet.independentReview,
     integrationPlan: changeSet.integrationPlan,
+    safetyAdmission: changeSet.safetyAdmission,
   });
 }
 
@@ -78,8 +80,10 @@ export function assembleResearchChangeSet(
   index: CorpusIndex,
   manifest: GenerationManifest,
   review: CanonicalIntegrationReview,
-  independentReview: IndependentReviewResult
+  independentReview: IndependentReviewResult,
+  safetyAdmission: SafetyAdmission = evaluateSafetyAdmission({ index, candidates: review.candidates, affectedProblemIds: review.deltas.filter((d) => d.recordFamily === "PRB-").map((d) => d.id), frozenAt: new Date().toISOString(), evaluatedAt: new Date().toISOString() })
 ): PreparationOutcome {
+  if (safetyAdmission.disposition === "HOLD") return failed("PRE_GATE_SAFETY_ADMISSION", "pre-Gate safety admission returned HOLD");
   const claimedIds = new Set(manifest.claimedRecordIds);
   const actualIds = new Set(review.deltas.map((delta) => delta.id));
   const missingClaims = manifest.claimedRecordIds.filter((id) => !actualIds.has(id));
@@ -115,6 +119,7 @@ export function assembleResearchChangeSet(
     readiness: review.readiness,
     independentReview,
     integrationPlan,
+    safetyAdmission,
   };
 
   const preparationFingerprint = preparationFingerprintOf(manifest, changeSetCore);
