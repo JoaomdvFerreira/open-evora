@@ -50,10 +50,11 @@ favicon, or cosmetic-overflow change was made by this remediation.
 
 ## R1 sitemap remediation record
 
-The independent review found that the initial sitemap contained **286
-query-state URLs** (`?view=problem&id=...` and `?view=records&id=...`). Its
-previous assertion that query/filter/search state was excluded "by
-construction" was incorrect.
+The independent review found that the initial sitemap contained **292 total
+URLs**: **286 query-state Problem/Record detail URLs**
+(`?view=problem&id=...` and `?view=records&id=...`), plus `/` and the five
+trust routes. Its previous assertion that query/filter/search state was
+excluded "by construction" was incorrect.
 
 The follow-up investigation confirmed that the current Explorer uses
 `URLSearchParams` for Problem and Record selection and has no already-supported
