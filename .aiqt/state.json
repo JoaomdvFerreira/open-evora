@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M013",
-  "currentWorkUnitId": "WU046",
+  "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
       {
@@ -148,7 +148,7 @@
         "id": "M013",
         "title": "Public Launch Readiness & Automated Research Operations",
         "objective": "Prepare Open Évora for sustained public operation by hardening the public Research Explorer and by orchestrating the existing governed research tooling into an end-to-end process that can move from a research trigger to an approval-ready research package with zero normal-path human handoffs before the human research gate, while preserving human semantic authority over canonical research acceptance, corroboration/validation/investigation-state judgement, public research approval, repository merge, and final go-live decision. Social-channel creation and posting are manual owner operations outside the M013 critical path.",
-        "status": "in_progress",
+        "status": "ready",
         "workUnitIds": [
           "WU044",
           "WU045",
@@ -2136,12 +2136,12 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [
           "DEP-043"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-14T09:45:14.000Z"
+        "updatedAt": "2026-09-15T09:26:17.655Z"
       },
       {
         "id": "WU047",
@@ -6474,6 +6474,97 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt next",
       "createdAt": "2026-09-14T09:20:34.406Z"
+    },
+    {
+      "id": "C047",
+      "workUnitId": "WU046",
+      "packetId": "PKT-047",
+      "summary": "WU046 implemented the owner-approved Human Gate and bounded post-approval orchestration contract. Independent review passed and owner approval is recorded in EVT-302; no WU046 remediation is outstanding.",
+      "completed": [
+        "Assembled the Human Gate package architecture with JSON source of truth and Markdown rendered from the validated package object.",
+        "Transferred the readiness invocation into WU046 by directly using the existing readiness evaluator and preserving its rules and ReasonCodes.",
+        "Bound approval to deterministic RCS content hashing, rendered-package identity, and re-read/revalidate/re-hash decision submission checks.",
+        "Implemented fail-closed OD-D APPROVE, REJECT, and HOLD decision semantics and persisted package/content/base-bound decision records.",
+        "Re-verified canonical repository state immediately before promotion through the existing canonical promoter assertion and reused the existing promoter rather than adding a parallel write path.",
+        "Implemented the LOW-3 deterministic publication guard and bounded branch/PR retry compatibility checks.",
+        "Enforced the terminal hard stop at READY_FOR_OWNER_MERGE with no merge, auto-merge, or branch-protection bypass path."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "tools/research/human-gate/",
+        "tools/research/canonical-promoter.ts",
+        ".aiqt/runlog.jsonl"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Research typecheck, tests, and canonical validation passed; 274 canonical records validated."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "Explorer read-model generation, typecheck, tests, and production build passed; generated read model contains 274 records."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "The review package makes every required element inspectable in one place, including the readiness.ts-derived eligibility/corroboration/contradiction/duplicate-overlap findings (scope transfer above)",
+          "result": "passed",
+          "evidence": "Independent review PASS and EVT-302 confirm the JSON-source package exposes the readiness evaluator's structured findings and Markdown is rendered from the same validated object."
+        },
+        {
+          "criterion": "No AI recommendation is ever treated as an approval decision",
+          "result": "passed",
+          "evidence": "OD-D tests and independent review verified that only explicit human decision submission can approve; recommendations remain non-authoritative."
+        },
+        {
+          "criterion": "Only the approved deterministic path executes after explicit human approval",
+          "result": "passed",
+          "evidence": "Decision submission re-reads, revalidates, and re-hashes the exact package; invalid combinations and identity mismatches fail closed."
+        },
+        {
+          "criterion": "The PR is never merged and branch protection is never bypassed by this work unit",
+          "result": "passed",
+          "evidence": "Independent review confirmed no merge, auto-merge, owner-auto-approval, or branch-protection-bypass path; execution terminates at READY_FOR_OWNER_MERGE."
+        },
+        {
+          "criterion": "Repository publication remains owner-controlled",
+          "result": "passed",
+          "evidence": "The publication guard blocks unexpected staged/tracked content and the workflow requires explicit human approval; no push, PR, or merge was performed in this work unit's implementation or review."
+        },
+        {
+          "criterion": "HIGH-2 approval/content-hash binding is independently demonstrable: contentHash is a SHA-256 over the deterministic canonical JSON serialization of the validated RCS source of truth (never the rendered Markdown); the rendered Human Gate view is generated from that exact same validated in-memory object; on approval submission the JSON source is re-read from disk, revalidated, and re-hashed; the recomputed hash must equal the hash of the package actually shown to the owner; any mismatch aborts, invalidates the review session, and fails closed rather than proceeding; an approval decision can never be reused to authorize a different package, base SHA, or integration plan than the one it was recorded against",
+          "result": "passed",
+          "evidence": "Adversarial tests verified deterministic hashing, same-object render binding, mutation/replay/cross-package rejection, and content/base/package-bound approval records."
+        },
+        {
+          "criterion": "LOW-3 deterministic publication guard is independently demonstrable: immediately before commit/push/PR, staged/tracked paths are checked against the exact approved CanonicalIntegrationPlan operation set; any unexpected staged/tracked path (including any .research-workbench/** or equivalent gitignored candidate/RCS location) fails the publication sequence closed before any commit/push/PR occurs; the control is enforced at the Git-publication boundary itself and does not rely solely on .gitignore, a pre-commit hook, or developer discipline",
+          "result": "passed",
+          "evidence": "Publication-guard tests passed, including Git porcelain -z handling and rejection of unexpected publication content."
+        },
+        {
+          "criterion": "Pre-promotion repository-state re-verification (baseGitSha vs. current HEAD) occurs via the existing canonical-promoter.ts assertion immediately before any promotion attempt, and a stale/mismatched base aborts before any canonical write",
+          "result": "passed",
+          "evidence": "Independent review verified immediate invocation of the existing canonical promoter assertion and no parallel canonical-write path."
+        },
+        {
+          "criterion": "The Human Gate decision record persists in the same gitignored cycle directory as the RCS it decides, outside research/**, bound to packageId/contentHash/baseGitSha/actor/timestamp/canonicalAcceptance/publicExplorerPublication, and a decision record for one package never authorizes another",
+          "result": "passed",
+          "evidence": "Decision-record tests and independent review verified required persistence fields, package/content/base binding, resume/retry support, and cross-package rejection."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-15T09:26:17.655Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
@@ -6500,8 +6591,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-09-14T09:24:00.086Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-15T09:26:17.655Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -7992,6 +8083,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-14T09:20:34.406Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C047",
+      "current": {
+        "observationId": "sha256:dec933f5fae66cfb2ec660d7d1020e6edb57baf6d88652572102d4d2aa67ca15",
+        "checkpointId": "C047",
+        "workUnitId": "WU046",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-15T09:26:17.655Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-15T09:26:17.655Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:dec933f5fae66cfb2ec660d7d1020e6edb57baf6d88652572102d4d2aa67ca15",
+          "checkpointId": "C047",
+          "workUnitId": "WU046",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-15T09:26:17.655Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-15T09:26:17.655Z"
         }
       ]
     }
