@@ -16,8 +16,8 @@ const SOURCE_SCHEMA: RecordSchema = {
   directory: "sources",
   idField: "source_id",
   requiredFields: ["source_id", "name"],
-  allowedFields: ["source_id", "name", "access", "access.level"],
-  fieldTypes: { source_id: ["string"], name: ["string"], access: ["object"], "access.level": ["string"] },
+  allowedFields: ["source_id", "publisher", "name", "resource_type", "identity", "identity.snapshot_reference", "scope", "scope.geography", "scope.geography.level", "scope.domains", "access", "access.level", "access.availability", "access.machine_readable", "acquisition", "acquisition.method", "canonical_reference", "licensing", "licensing.status", "licensing.reuse", "licensing.attribution", "temporal", "temporal.last_checked_at", "caveats"],
+  fieldTypes: { source_id: ["string"], publisher: ["string"], name: ["string"], resource_type: ["string"], identity: ["object"], "identity.snapshot_reference": ["string"], scope: ["object"], "scope.geography": ["object"], "scope.geography.level": ["string"], "scope.domains": ["array"], access: ["object"], "access.level": ["string"], "access.availability": ["string"], "access.machine_readable": ["boolean", "string"], acquisition: ["object"], "acquisition.method": ["string"], canonical_reference: ["string"], licensing: ["object"], "licensing.status": ["string"], "licensing.reuse": ["string"], "licensing.attribution": ["string", "null"], temporal: ["object"], "temporal.last_checked_at": ["string"], caveats: ["array"] },
 };
 const EVIDENCE_SCHEMA: RecordSchema = { prefix: "EVD-", directory: "evidence", idField: "evidence_id", requiredFields: ["evidence_id", "provenance", "provenance.sources", "evidence_nature", "claim_authority", "inference_limits"], allowedFields: ["evidence_id", "provenance", "provenance.sources", "evidence_nature", "claim_authority", "inference_limits"], fieldTypes: { evidence_id: ["string"], provenance: ["object"], "provenance.sources": ["array"], evidence_nature: ["string"], claim_authority: ["string"], inference_limits: ["array"] }, references: [{ field: "provenance.sources", isList: true, targetPrefix: "SRC-", targetDirectory: "sources", required: true }], stringListFields: ["provenance.sources", "inference_limits"], nonEmptyListFields: ["provenance.sources"] };
 
@@ -120,10 +120,32 @@ test("one accepted trigger causes exactly two role-specific invocations, primary
 
 test("WU049 HOLD through real orchestration prevents reviewer/RCS and writes a safe private report", () => {
   withTempDir((cycleDir) => {
-    const privateSentinels = ["PRIVATE_BODY_SENTINEL", "https://private.invalid/?token=PRIVATE_TOKEN_SENTINEL", "PRIVATE_CORRESPONDENCE_SENTINEL"];
     const corpus = admissionIndex("private");
     const source = corpus.byPrefix.get("SRC-")!.byId.get("SRC-MATERIAL")!.fields;
-    for (const [key, value] of [["body", privateSentinels[0]], ["canonical_reference", privateSentinels[1]], ["notes", privateSentinels[2]]]) Object.defineProperty(source, key, { value, enumerable: false });
+    // Every value below is an ordinary enumerable field accepted by SRC v2.
+    // JSON.stringify(source) therefore contains each sentinel: this test would
+    // fail if hold-report.ts spread or assigned the complete Source object.
+    const privateSentinels = [
+      "PRIVATE_SOURCE_TITLE_SENTINEL",
+      "PRIVATE_SOURCE_PUBLISHER_SENTINEL",
+      "https://private.invalid/document?token=PRIVATE_URL_TOKEN_SENTINEL",
+      "PRIVATE_SNAPSHOT_METADATA_SENTINEL",
+      "PRIVATE_CORRESPONDENCE_ATTRIBUTION_SENTINEL",
+      "PRIVATE_CAVEAT_METADATA_SENTINEL",
+    ];
+    Object.assign(source, {
+      name: privateSentinels[0],
+      publisher: privateSentinels[1],
+      resource_type: "correspondence",
+      identity: { snapshot_reference: privateSentinels[3] },
+      scope: { geography: { level: "non_geographic" }, domains: ["civic"] },
+      canonical_reference: privateSentinels[2],
+      licensing: { status: "unknown", reuse: "unknown", attribution: privateSentinels[4] },
+      temporal: { last_checked_at: "2026-09-15" },
+      caveats: [privateSentinels[5]],
+    });
+    assert.equal(Object.values(source).some((value) => value === privateSentinels[0]), true);
+    for (const sentinel of privateSentinels) assert.equal(JSON.stringify(source).includes(sentinel), true);
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
     const outcome = runResearchCycle({ trigger: TRIGGER, index: corpus, baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
@@ -134,7 +156,11 @@ test("WU049 HOLD through real orchestration prevents reviewer/RCS and writes a s
     assert.equal(existsSync(join(cycleDir, "human-gate-package.json")), false);
     if (outcome.status !== "PRE_GATE_SAFETY_HOLD") return;
     const serialized = readFileSync(outcome.holdReportPath, "utf8");
-    assert.match(serialized, /PRIVATE_SOURCE/);
+    const report = JSON.parse(serialized) as Record<string, unknown>;
+    assert.deepEqual(Object.keys(report).sort(), ["baseGitSha", "disposition", "findings", "humanResolutionCategory", "timestamp"]);
+    assert.equal(report.disposition, "HOLD");
+    assert.equal(report.humanResolutionCategory, "PRE_GATE_SAFETY_REVIEW");
+    assert.deepEqual(report.findings, [{ code: "PRIVATE_SOURCE", subjectId: "SRC-MATERIAL", severity: "blocker", summary: "Material Source is private and cannot enter the pre-Gate path." }]);
     for (const sentinel of privateSentinels) assert.equal(serialized.includes(sentinel), false);
   });
 });

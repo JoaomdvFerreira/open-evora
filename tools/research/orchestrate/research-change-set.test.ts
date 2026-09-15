@@ -5,7 +5,11 @@ import { join } from "node:path";
 import test from "node:test";
 
 import type { CorpusIndex, RecordSchema } from "../core/types.ts";
-import { prepareResearchChangeSet } from "./research-change-set.ts";
+import type { CandidateRecord } from "../integration/candidate-delta.ts";
+import { prepareCanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
+import { evaluateSafetyAdmission } from "../admission/safety-admission.ts";
+import { assembleResearchChangeSet, prepareResearchChangeSet } from "./research-change-set.ts";
+import type { GenerationManifest, IndependentReviewResult } from "./types.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 
@@ -14,8 +18,19 @@ const SOURCE_SCHEMA: RecordSchema = {
   directory: "sources",
   idField: "source_id",
   requiredFields: ["source_id", "name"],
-  allowedFields: ["source_id", "name"],
-  fieldTypes: { source_id: ["string"], name: ["string"] },
+  allowedFields: ["source_id", "name", "access", "access.level"],
+  fieldTypes: { source_id: ["string"], name: ["string"], access: ["object"], "access.level": ["string"] },
+};
+const EVIDENCE_SCHEMA: RecordSchema = {
+  prefix: "EVD-",
+  directory: "evidence",
+  idField: "evidence_id",
+  requiredFields: ["evidence_id", "provenance", "provenance.sources", "evidence_nature", "claim_authority", "inference_limits"],
+  allowedFields: ["evidence_id", "provenance", "provenance.sources", "evidence_nature", "claim_authority", "inference_limits"],
+  fieldTypes: { evidence_id: ["string"], provenance: ["object"], "provenance.sources": ["array"], evidence_nature: ["string"], claim_authority: ["string"], inference_limits: ["array"] },
+  references: [{ field: "provenance.sources", isList: true, targetPrefix: "SRC-", targetDirectory: "sources", required: true }],
+  stringListFields: ["provenance.sources", "inference_limits"],
+  nonEmptyListFields: ["provenance.sources"],
 };
 
 function emptyIndex(): CorpusIndex {
@@ -26,7 +41,23 @@ function emptyIndex(): CorpusIndex {
   };
 }
 
-function validManifest(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+function materialIndex(): CorpusIndex {
+  const source = { source_id: "SRC-MATERIAL", name: "Material source", access: { level: "public" } };
+  return {
+    researchRoot: "/synthetic",
+    totalRecords: 1,
+    byPrefix: new Map([
+      ["SRC-", { schema: SOURCE_SCHEMA, records: [{ file: "sources/SRC-MATERIAL.yaml", fields: source }], byId: new Map([["SRC-MATERIAL", { file: "sources/SRC-MATERIAL.yaml", fields: source }]]) }],
+      ["EVD-", { schema: EVIDENCE_SCHEMA, records: [], byId: new Map() }],
+    ]),
+  };
+}
+
+function materialCandidate(): CandidateRecord {
+  return { recordFamily: "EVD-", fields: { evidence_id: "EVD-MATERIAL", provenance: { sources: ["SRC-MATERIAL"] }, evidence_nature: "claim", claim_authority: "authoritative", inference_limits: [] } };
+}
+
+function validManifest(overrides: Partial<GenerationManifest> = {}): GenerationManifest {
   return {
     schemaVersion: "1",
     mode: "daily-discovery",
@@ -38,7 +69,7 @@ function validManifest(overrides: Record<string, unknown> = {}): Record<string, 
   };
 }
 
-function validIndependentReview(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+function validIndependentReview(overrides: Partial<IndependentReviewResult> = {}): IndependentReviewResult {
   return {
     schemaVersion: "1",
     outcome: "CONCUR",
@@ -218,6 +249,42 @@ test("identical inputs are idempotent: rerun produces the same fingerprint and p
     assert.equal(first.changeSet.packageId, second.changeSet.packageId);
     assert.deepEqual(first.changeSet, second.changeSet);
   });
+});
+
+test("WU049 case 20: distinct evaluatedAt values preserve RCS identity for identical material admission", () => {
+  const index = materialIndex();
+  const review = prepareCanonicalIntegrationReview(SHA, index, [materialCandidate()]);
+  const manifest = validManifest({ candidateFiles: ["EVD-MATERIAL.yaml"], claimedRecordIds: ["EVD-MATERIAL"] });
+  const reviewed = validIndependentReview();
+  const frozenAt = "2026-09-15T12:00:00.000Z";
+  const evaluatedAtA = "2026-09-15T12:01:00.000Z";
+  const evaluatedAtB = "2026-09-15T12:09:00.000Z";
+  assert.notEqual(evaluatedAtA, evaluatedAtB);
+  const admissionFor = (evaluatedAt: string) => evaluateSafetyAdmission({
+    index,
+    candidates: review.candidates,
+    affectedProblemIds: [],
+    frozenAt,
+    evaluatedAt,
+    availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: evaluatedAt }) },
+  });
+  const admissionA = admissionFor(evaluatedAtA);
+  const admissionB = admissionFor(evaluatedAtB);
+  assert.equal(admissionA.disposition, "ELIGIBLE");
+  assert.equal(admissionB.disposition, "ELIGIBLE");
+  assert.deepEqual(admissionA.findings, admissionB.findings);
+  const first = assembleResearchChangeSet(index, manifest, review, reviewed, admissionA);
+  const second = assembleResearchChangeSet(index, manifest, review, reviewed, admissionB);
+  assert.equal(first.status, "READY_FOR_HUMAN_REVIEW");
+  assert.equal(second.status, "READY_FOR_HUMAN_REVIEW");
+  if (first.status !== "READY_FOR_HUMAN_REVIEW" || second.status !== "READY_FOR_HUMAN_REVIEW") return;
+  assert.equal(first.changeSet.preparationFingerprint, second.changeSet.preparationFingerprint);
+  assert.equal(first.changeSet.packageId, second.changeSet.packageId);
+  const changedReview = validIndependentReview({ rationale: "A distinct deterministic review conclusion." });
+  const changed = assembleResearchChangeSet(index, manifest, review, changedReview, admissionA);
+  assert.equal(changed.status, "READY_FOR_HUMAN_REVIEW");
+  if (changed.status !== "READY_FOR_HUMAN_REVIEW") return;
+  assert.notEqual(first.changeSet.preparationFingerprint, changed.changeSet.preparationFingerprint);
 });
 
 test("a different base Git SHA produces a different fingerprint even with identical candidates", () => {

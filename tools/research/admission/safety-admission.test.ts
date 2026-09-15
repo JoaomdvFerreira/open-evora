@@ -74,3 +74,23 @@ test("candidate affected PRB decision basis makes only its referenced Source mat
   assert.equal(result.disposition, "ELIGIBLE");
   assert.deepEqual(checked, ["SRC-MATERIAL"]);
 });
+
+test("candidate EVD provenance resolves a candidate Source exactly once and excludes unrelated Sources", () => {
+  const canonical = { source_id: "SRC-CANONICAL", access: { level: "public" } };
+  const candidateSource = { recordFamily: "SRC-", fields: { source_id: "SRC-CANDIDATE", access: { level: "public" } } };
+  const candidateEvidence = { recordFamily: "EVD-", fields: { evidence_id: "EVD-CANDIDATE", provenance: { sources: ["SRC-CANDIDATE", "SRC-CANDIDATE"] }, evidence_nature: "observation", inference_limits: [] } };
+  const checked: string[] = [];
+  const result = evaluateSafetyAdmission({ index: index(canonical), candidates: [candidateEvidence, candidateSource], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, availabilityAdapter: { check: (id) => { checked.push(id); return { sourceId: id, status: "available", checkedAt: time }; } } });
+  assert.equal(result.disposition, "ELIGIBLE");
+  assert.deepEqual(checked, ["SRC-CANDIDATE"]);
+});
+
+test("candidate EVD provenance resolves a canonical Source and excludes unrelated candidate Sources", () => {
+  const canonical = { source_id: "SRC-1", access: { level: "public" } };
+  const unrelatedCandidateSource = { recordFamily: "SRC-", fields: { source_id: "SRC-UNRELATED-CANDIDATE", access: { level: "public" } } };
+  const candidateEvidence = { recordFamily: "EVD-", fields: { evidence_id: "EVD-CANDIDATE", provenance: { sources: ["SRC-1"] }, evidence_nature: "observation", inference_limits: [] } };
+  const checked: string[] = [];
+  const result = evaluateSafetyAdmission({ index: index(canonical), candidates: [unrelatedCandidateSource, candidateEvidence], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, availabilityAdapter: { check: (id) => { checked.push(id); return { sourceId: id, status: "available", checkedAt: time }; } } });
+  assert.equal(result.disposition, "ELIGIBLE");
+  assert.deepEqual(checked, ["SRC-1"]);
+});

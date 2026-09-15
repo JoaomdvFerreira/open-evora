@@ -29,6 +29,7 @@ function genuineRcs() {
   const validation = { errors: [] as string[], totalRecords: 1 };
   const readiness = "READY_FOR_INTEGRATION_GATE" as const;
   const independentReview = genuineIndependentReview();
+  const safetyAdmission = { disposition: "ELIGIBLE" as const, findings: [], evaluatedAt: "" };
   const integrationPlan = {
     baseGitSha: SHA,
     deltas,
@@ -44,6 +45,7 @@ function genuineRcs() {
     readiness,
     independentReview,
     integrationPlan,
+    safetyAdmission: { disposition: safetyAdmission.disposition, findings: safetyAdmission.findings },
   });
   const packageId = `RCS-${preparationFingerprint.slice(0, 16)}`;
 
@@ -58,6 +60,7 @@ function genuineRcs() {
     readiness,
     independentReview,
     integrationPlan,
+    safetyAdmission,
     preparationFingerprint,
   };
 }
