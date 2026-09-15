@@ -1,8 +1,8 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
-  "currentMilestoneId": "M013",
-  "currentWorkUnitId": "WU048",
+  "projectStatus": "review",
+  "currentMilestoneId": null,
+  "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
       {
@@ -148,7 +148,7 @@
         "id": "M013",
         "title": "Public Launch Readiness & Automated Research Operations",
         "objective": "Prepare Open Évora for sustained public operation by hardening the public Research Explorer and by orchestrating the existing governed research tooling into an end-to-end process that can move from a research trigger to an approval-ready research package with zero normal-path human handoffs before the human research gate, while preserving human semantic authority over canonical research acceptance, corroboration/validation/investigation-state judgement, public research approval, repository merge, and final go-live decision. Social-channel creation and posting are manual owner operations outside the M013 critical path.",
-        "status": "in_progress",
+        "status": "done",
         "workUnitIds": [
           "WU044",
           "WU045",
@@ -2246,13 +2246,13 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [
           "DEP-044",
           "DEP-045"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-15T11:25:45.144Z"
+        "updatedAt": "2026-09-15T13:06:57.029Z"
       }
     ],
     "dependencies": [
@@ -6708,6 +6708,96 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt next",
       "createdAt": "2026-09-15T11:16:27.117Z"
+    },
+    {
+      "id": "C049",
+      "workUnitId": "WU048",
+      "packetId": "PKT-049",
+      "summary": "Completed the independent M013/WU048 verification and owner-reviewed evidence correction cycle. The accepted canonical verification verdict is NOT_READY; this closes the verification work unit without authorizing remediation, promotion, publication, or GO/HOLD.",
+      "completed": [
+        "Executed and assessed all 22 Section 14 verification cases using bounded synthetic fixtures and a separately governed candidate where applicable.",
+        "Recorded the corrected 17 PASS / 5 FAIL matrix, technical gates, provenance limitation, candidate/Production distinction, and sanitized evidence.",
+        "Obtained independent review confirmation and owner acceptance that NOT_READY is the accurate WU048 verification outcome.",
+        "Preserved all six P1 remediation areas as unresolved blockers outside WU048."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl",
+        "docs/design/audits/m013-wu048-go-live-verification/report.md",
+        "docs/design/audits/m013-wu048-go-live-verification/evidence/execution-baseline.md",
+        "docs/design/audits/m013-wu048-go-live-verification/evidence/correction-cycle.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Fresh correction-cycle result: 391 passed, 0 failed, 1 skipped; 274 records validated."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "Fresh normal-checkout correction-cycle result: 520 passed, 0 failed, 1 skipped; Vite completed."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "All 22 §14 cases are exercised with per-case expected outcome, actual outcome, PASS/FAIL result, evidence reference, and freshness classification where applicable; WU046/WU047 evidence reuse is identified where applicable.",
+          "result": "passed",
+          "evidence": "The accepted report records 22 assessed cases: 17 PASS and 5 FAIL, with per-case expected/actual/result/evidence/freshness and C047/C048 reuse."
+        },
+        {
+          "criterion": "Case 17 uses a fresh separately governed candidate built/deployed from exactly add597da2510056d0f05d7b090d9a75828686f79, with immutable deployment identity/provenance, build result, timestamps, and SHA match recorded; its read-only Production-origin inspection is distinct from candidate-artifact proof.",
+          "result": "passed",
+          "evidence": "The report records candidate dpl_4RgDRBjSoBdTqEqnLo5fo9j3ZRec, its immutable URL, bound SHA, timestamp, Ready status, and the distinct Production inspection. It correctly records that the immutable source-to-deployment proof is insufficient, causing canonical NOT_READY."
+        },
+        {
+          "criterion": "The separately governed candidate does not become the Production alias and preserves existing configuration/protection. Any need to mutate external configuration stops as OWNER_ACTION_REQUIRED; unavailable authorized candidate tooling returns BLOCKED.",
+          "result": "passed",
+          "evidence": "Candidate remained SSO-protected/noindex and was not assigned the Production alias; no external configuration or protection mutation occurred."
+        },
+        {
+          "criterion": "Fixture cases use only disposable non-public synthetic state and safe boundary replacements; they perform no canonical corpus write, real push/PR/merge/Production publication, external configuration mutation, or public candidate leakage.",
+          "result": "passed",
+          "evidence": "Correction-cycle evidence records disposable synthetic fixtures, cleanup, no canonical writes, and no push, PR, merge, publication, configuration mutation, or leakage."
+        },
+        {
+          "criterion": "The canonical report is docs/design/audits/m013-wu048-go-live-verification/report.md with bounded supporting evidence under evidence/, and satisfies the defined provenance, case, finding, accepted-risk, freshness, and terminal-result record requirements without retaining prohibited sensitive material.",
+          "result": "passed",
+          "evidence": "Independent review accepted the sanitized report, execution baseline, and correction-cycle evidence; no secret, session, credential, private fixture, or token-bearing URL is retained."
+        },
+        {
+          "criterion": "NOT_READY is returned for any P0/P1, mandatory-case failure, provenance/bound-artifact failure, missing required evidence, or mandatory launch-requirement failure. READY_WITH_ACCEPTED_RISK requires all other requirements to pass plus only explicitly owner-accepted P2 risk. READY_FOR_GO_LIVE_GATE requires all mandatory cases and contract conditions to pass with no P0/P1 or unresolved/unaccepted P2.",
+          "result": "passed",
+          "evidence": "Five mandatory case failures and unresolved P1 findings are recorded; owner accepted NOT_READY as the correct canonical result and accepted no P1 risk."
+        },
+        {
+          "criterion": "WU048 remains verification-only: it does not decide GO/HOLD, remediate defects, promote/publish the candidate, or start a successor. M013 lifecycle completion, if later achieved through its canonical AIQT graph, is administrative and distinct from owner GO/HOLD.",
+          "result": "passed",
+          "evidence": "No remediation, promotion, publication, GO/HOLD decision, or successor action occurred; the owner gate explicitly retains GO/HOLD separately."
+        },
+        {
+          "criterion": "Only the owner decides GO / HOLD",
+          "result": "passed",
+          "evidence": "The owner accepted the verification outcome only. No GO/HOLD was issued."
+        },
+        {
+          "criterion": "No successor beyond WU048 is started or authorized",
+          "result": "passed",
+          "evidence": "No successor was created or started; remediation remains future separately scoped work."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-15T13:06:57.029Z",
+      "nextRecommendation": "aiqt review --mode release"
     }
   ],
   "lastAgentPacket": {
@@ -6734,8 +6824,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-09-15T11:18:53.103Z",
+  "nextRecommendedCommand": "aiqt review --mode release",
+  "lastUpdatedAt": "2026-09-15T13:06:57.029Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8339,6 +8429,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-15T11:16:27.117Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C049",
+      "current": {
+        "observationId": "sha256:ade79f30a24d472f15c02239c3d0cf1cf4b9af42c714f03293ee07d4cd0efdec",
+        "checkpointId": "C049",
+        "workUnitId": "WU048",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-15T13:06:57.029Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-15T13:06:57.029Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:ade79f30a24d472f15c02239c3d0cf1cf4b9af42c714f03293ee07d4cd0efdec",
+          "checkpointId": "C049",
+          "workUnitId": "WU048",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-15T13:06:57.029Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-15T13:06:57.029Z"
         }
       ]
     }
