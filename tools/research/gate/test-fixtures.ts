@@ -48,6 +48,11 @@ export function gitFixture(): GitFixture {
   }
   writeFileSync(join(research, "sources", "SRC-BASE.yaml"), sourceYaml("SRC-BASE", "Before"));
   execFileSync("git", ["init", "--quiet", root]);
+  // The post-approval orchestration commits inside this temporary repository.
+  // Configure identity locally so the fixture is hermetic and never depends
+  // on a developer or CI runner's global Git configuration.
+  execFileSync("git", ["-C", root, "config", "user.name", "Open Evora Test"]);
+  execFileSync("git", ["-C", root, "config", "user.email", "open-evora-test@example.invalid"]);
   execFileSync("git", ["-C", root, "add", "."]);
   execFileSync("git", ["-C", root, "-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--quiet", "-m", "initial"]);
   return {
