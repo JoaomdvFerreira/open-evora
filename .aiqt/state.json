@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M013",
-  "currentWorkUnitId": null,
+  "currentWorkUnitId": "WU048",
   "workGraph": {
     "milestones": [
       {
@@ -148,7 +148,7 @@
         "id": "M013",
         "title": "Public Launch Readiness & Automated Research Operations",
         "objective": "Prepare Open Évora for sustained public operation by hardening the public Research Explorer and by orchestrating the existing governed research tooling into an end-to-end process that can move from a research trigger to an approval-ready research package with zero normal-path human handoffs before the human research gate, while preserving human semantic authority over canonical research acceptance, corroboration/validation/investigation-state judgement, public research approval, repository merge, and final go-live decision. Social-channel creation and posting are manual owner operations outside the M013 critical path.",
-        "status": "ready",
+        "status": "in_progress",
         "workUnitIds": [
           "WU044",
           "WU045",
@@ -2205,22 +2205,35 @@
         "title": "End-to-End Dry Run & Independent Go-Live Verification",
         "objective": "Independently verify the complete M013 system end-to-end, including adversarial/failure cases and production/public hardening against the built production artifact, without making the go-live decision.",
         "scope": [
-          "Test a normal end-to-end research path up to the human gate with zero normal-path human intervention",
-          "Test the approved post-Gate path using a controlled dry-run / approved fixture or owner-approved test path",
-          "Verify adversarial/failure cases: duplicate source -> NO_CHANGE/no unnecessary candidate; weak source -> HOLD/review required; contradictory evidence surfaced not suppressed; invalid candidate blocked; privacy-sensitive/non-public material blocked; stale base SHA blocked; source disappears/becomes unavailable surfaced; weakly supported candidate Problem not silently promoted; independent review disagreement surfaced to human; validation failure blocked; promotion failure triggers rollback/safe failure; build failure blocked; PR/CI failure does not reach READY_FOR_OWNER_MERGE; candidate material cannot leak to Git/preview before human Gate",
-          "Verify production/public hardening against the built production artifact",
-          "Evaluate the Go-Live Acceptance Contract and return NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE"
+          "Execute the exact 22-case §14 matrix only after this refinement, using a disposable, non-public local fixture for cases 1–16 and 18–22. The fixture must be based on source revision add597da2510056d0f05d7b090d9a75828686f79, use synthetic/safe inputs and existing safe test doubles or equivalent non-public mechanisms at mutating boundaries, exercise real production orchestration codepaths where required, retain only sanitized bounded evidence, and remove temporary state/raw artifacts after safe retention.",
+          "Create and verify a fresh separately governed production candidate for case 17 from exactly committed source revision add597da2510056d0f05d7b090d9a75828686f79. Record source SHA, immutable deployment ID and URL, creation and READY timestamps, actual build result, and relevant production-build provenance. A mismatched SHA is a hard failure.",
+          "Use the existing production origin https://open-evora.vercel.app read-only for case-17 public access, protection, and availability inspection. The candidate proves the proposed launch artifact; the existing Production alias is not claimed to run that candidate unless separately authorized action makes that fact true.",
+          "Candidate creation/retry is the sole external mutation authorized: use existing project configuration and supported production build path; preserve Preview/candidate access protection; do not assign Production alias, alter DNS/domains, environment variables, project settings, Deployment Protection, or Preview access control. Retry only before a usable artifact exists, with identical source/configuration and every attempt recorded.",
+          "Apply the freshness rule: candidate creation follows this owner refinement and is verified in the same WU048 execution cycle; case-17 evidence is fresh only for that candidate, exact SHA, and unchanged relevant deployment/configuration/protection state. Refresh read-only deployment/public-origin checks after relevant external-state changes or if final acceptance is more than 24 hours later.",
+          "Verify all 22 §14 cases and the Go-Live Acceptance Contract without remediation, preserving human-owned Gate decisions as explicit synthetic fixture inputs only and never representing them as real publication approval.",
+          "Persist canonical WU048 evidence only under docs/design/audits/m013-wu048-go-live-verification/, with report.md as the summary and evidence/ for supporting durable evidence. The report records execution timestamps, all 22 cases with expected/actual/PASS-FAIL/evidence/freshness, reused WU046/WU047 evidence where applicable, candidate provenance, inspected Production origin, P0–P3 findings, accepted-risk references, and terminal result.",
+          "Apply publication-safe evidence retention: committed evidence is sanitized and contains no secrets, tokens, cookies/session values, authorization headers, credentials, environment values, personal/private identity, private fixture content, raw sensitive AI prompts/responses, access-token-bearing URLs, or unredacted external-service dumps. Screenshots contain only public surfaces or safe synthetic content.",
+          "Return exactly NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE under the owner-defined result semantics. Neither READY result authorizes promotion or publication; a separate owner GO/HOLD decision remains mandatory."
         ],
         "outOfScope": [
           "Making the go-live decision",
+          "Production promotion, Production alias assignment, automatic publication, DNS/domain changes, environment/project/protection/Preview-access-control changes, or any external mutation other than the authorized separately governed candidate creation/retry",
           "Merging a PR",
+          "Pushing, PR creation, real merge, real Production publication, canonical corpus writes, use of real canonical production data as mutable test material, or public candidate leakage",
+          "Product/runtime remediation; defects found by verification are recorded and classified only",
+          "Feature development, redesign, SEO, routing redesign, favicon remediation, compact-navigation remediation, custom-domain implementation, research corpus/schema changes, DS-04B, C008/C009/C010 repair, WU046/WU047 refactoring, analytics/observability work, D7, or successors",
+          "Changing the work graph, checkpointing WU048, or executing WU048 in this scope-refinement action",
           "Starting D7",
           "Starting any successor"
         ],
         "acceptanceCriteria": [
-          "All required adversarial/failure cases are exercised and their expected safe outcome is verified",
-          "Production/public hardening is verified against the actual built production artifact",
-          "WU048 returns exactly one of NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE",
+          "All 22 §14 cases are exercised with per-case expected outcome, actual outcome, PASS/FAIL result, evidence reference, and freshness classification where applicable; WU046/WU047 evidence reuse is identified where applicable.",
+          "Case 17 uses a fresh separately governed candidate built/deployed from exactly add597da2510056d0f05d7b090d9a75828686f79, with immutable deployment identity/provenance, build result, timestamps, and SHA match recorded; its read-only Production-origin inspection is distinct from candidate-artifact proof.",
+          "The separately governed candidate does not become the Production alias and preserves existing configuration/protection. Any need to mutate external configuration stops as OWNER_ACTION_REQUIRED; unavailable authorized candidate tooling returns BLOCKED.",
+          "Fixture cases use only disposable non-public synthetic state and safe boundary replacements; they perform no canonical corpus write, real push/PR/merge/Production publication, external configuration mutation, or public candidate leakage.",
+          "The canonical report is docs/design/audits/m013-wu048-go-live-verification/report.md with bounded supporting evidence under evidence/, and satisfies the defined provenance, case, finding, accepted-risk, freshness, and terminal-result record requirements without retaining prohibited sensitive material.",
+          "NOT_READY is returned for any P0/P1, mandatory-case failure, provenance/bound-artifact failure, missing required evidence, or mandatory launch-requirement failure. READY_WITH_ACCEPTED_RISK requires all other requirements to pass plus only explicitly owner-accepted P2 risk. READY_FOR_GO_LIVE_GATE requires all mandatory cases and contract conditions to pass with no P0/P1 or unresolved/unaccepted P2.",
+          "WU048 remains verification-only: it does not decide GO/HOLD, remediate defects, promote/publish the candidate, or start a successor. M013 lifecycle completion, if later achieved through its canonical AIQT graph, is administrative and distinct from owner GO/HOLD.",
           "Only the owner decides GO / HOLD",
           "No successor beyond WU048 is started or authorized"
         ],
@@ -2233,13 +2246,13 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "in_progress",
         "dependencies": [
           "DEP-044",
           "DEP-045"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-15T11:16:27.117Z"
+        "updatedAt": "2026-09-15T11:25:45.144Z"
       }
     ],
     "dependencies": [
@@ -6693,17 +6706,17 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-15T11:16:27.117Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-15T11:16:27.117Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-048",
-    "workUnitId": "WU047",
+    "id": "PKT-049",
+    "workUnitId": "WU048",
     "milestoneId": "M013",
-    "createdAt": "2026-09-15T09:39:16.791Z",
+    "createdAt": "2026-09-15T11:18:53.103Z",
     "format": "markdown",
-    "contentHash": "sha256:c8b5da26aab0b9480b83eaee004cd82a9f43875e0ae674da2bbf0e8ba5553ab0",
+    "contentHash": "sha256:0962e93deadc3d186869f9eaaf21977aa4acfd02ac724f0fc35628984d4f4fa7",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -6721,8 +6734,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-15T11:16:27.117Z",
+  "nextRecommendedCommand": "aiqt checkpoint",
+  "lastUpdatedAt": "2026-09-15T11:18:53.103Z",
   "review": {
     "acknowledgedFindings": [
       {
