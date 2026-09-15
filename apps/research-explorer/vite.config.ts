@@ -1,25 +1,17 @@
 import { defineConfig, type Plugin } from "vitest/config";
 import react from "@vitejs/plugin-react";
-import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { robotsTxt, sitemapXml } from "./src/publicCrawler";
 
 const APP_ROOT = fileURLToPath(new URL(".", import.meta.url));
-const PRODUCTION_ORIGIN = "https://open-evora.vercel.app";
 const TRUST_PAGE_INPUTS = ["about", "methodology", "corrections", "contact", "privacy"];
 
 function publicCrawlerFiles(): Plugin {
   return {
     name: "public-crawler-files",
     generateBundle() {
-      const index = JSON.parse(readFileSync(new URL("./generated/index.json", import.meta.url), "utf8")) as Array<{ id: string; type: string }>;
-      const urls = [
-        `${PRODUCTION_ORIGIN}/`,
-        ...index.filter((record) => record.type === "PRB-").map((record) => `${PRODUCTION_ORIGIN}/?view=problem&amp;id=${encodeURIComponent(record.id)}`),
-        ...index.map((record) => `${PRODUCTION_ORIGIN}/?view=records&amp;id=${encodeURIComponent(record.id)}`),
-        ...TRUST_PAGE_INPUTS.map((path) => `${PRODUCTION_ORIGIN}/${path}`),
-      ];
-      this.emitFile({ type: "asset", fileName: "robots.txt", source: `User-agent: *\nAllow: /\nSitemap: ${PRODUCTION_ORIGIN}/sitemap.xml\n` });
-      this.emitFile({ type: "asset", fileName: "sitemap.xml", source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n` });
+      this.emitFile({ type: "asset", fileName: "robots.txt", source: robotsTxt() });
+      this.emitFile({ type: "asset", fileName: "sitemap.xml", source: sitemapXml() });
     },
   };
 }
