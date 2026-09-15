@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M013",
-  "currentWorkUnitId": "WU047",
+  "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
       {
@@ -148,7 +148,7 @@
         "id": "M013",
         "title": "Public Launch Readiness & Automated Research Operations",
         "objective": "Prepare Open Évora for sustained public operation by hardening the public Research Explorer and by orchestrating the existing governed research tooling into an end-to-end process that can move from a research trigger to an approval-ready research package with zero normal-path human handoffs before the human research gate, while preserving human semantic authority over canonical research acceptance, corroboration/validation/investigation-state judgement, public research approval, repository merge, and final go-live decision. Social-channel creation and posting are manual owner operations outside the M013 critical path.",
-        "status": "in_progress",
+        "status": "ready",
         "workUnitIds": [
           "WU044",
           "WU045",
@@ -2192,12 +2192,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [
           "DEP-042"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-15T09:39:16.791Z"
+        "updatedAt": "2026-09-15T11:16:27.117Z"
       },
       {
         "id": "WU048",
@@ -2233,13 +2233,13 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-044",
           "DEP-045"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T13:02:54.845Z"
+        "updatedAt": "2026-09-15T11:16:27.117Z"
       }
     ],
     "dependencies": [
@@ -6580,6 +6580,121 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt next",
       "createdAt": "2026-09-15T09:26:17.655Z"
+    },
+    {
+      "id": "C048",
+      "workUnitId": "WU047",
+      "packetId": "PKT-048",
+      "summary": "WU047 Production Launch Hardening is accepted by the owner after final independent review.",
+      "completed": [
+        "Recorded all seven approved P2 dispositions: six PASS_VERIFIED and the custom-domain OWNER_ACCEPTED_DEFER.",
+        "Implemented and verified the bounded six-route sitemap, approved metadata, and five public trust surfaces.",
+        "Recorded accepted accessibility, responsive, browser, privacy-precondition, deployment-protection, and preview-access evidence.",
+        "Corrected the sitemap audit history to distinguish the initial 292-URL non-compliant sitemap from the final six-route sitemap."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "apps/research-explorer/src/lib/generateSitemap.ts",
+        "apps/research-explorer/src/lib/generateSitemap.test.ts",
+        "apps/research-explorer/src/components/App.tsx",
+        "apps/research-explorer/src/styles.css",
+        "docs/design/audits/m013-wu047-launch-hardening/audit.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "focused sitemap tests",
+          "result": "passed",
+          "summary": "Final sitemap has exactly six approved canonical path routes and no query strings, fragments, or duplicates."
+        },
+        {
+          "command": "full Explorer tests",
+          "result": "passed",
+          "summary": "Accepted final validation evidence."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "Accepted final validation evidence."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "Accepted final validation evidence."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Every one of the seven WU044 §13 P2 items is explicitly recorded as exactly one of PASS_VERIFIED, OWNER_ACCEPTED_DEFER, or OWNER_ACTION_REQUIRED; no P2 item remains undispositioned.",
+          "result": "passed",
+          "evidence": "Six PASS_VERIFIED dispositions and one OWNER_ACCEPTED_DEFER custom-domain decision were accepted by the owner."
+        },
+        {
+          "criterion": "WU047 cannot close while an OWNER_ACTION_REQUIRED P2 item remains unresolved unless the owner subsequently records an explicit defer/accept decision.",
+          "result": "passed",
+          "evidence": "No OWNER_ACTION_REQUIRED P2 disposition remains."
+        },
+        {
+          "criterion": "Metadata PASS_VERIFIED evidence demonstrates every WU044-required production metadata element is present and correct; robots/sitemap evidence demonstrates the WU044-required public endpoints and their status/content on the intended production origin; trust-surface evidence demonstrates each WU044-required surface exists, is reachable in the intended public experience, and contains its canonically required information.",
+          "result": "passed",
+          "evidence": "Final independent review accepted metadata, bounded sitemap, and five trust surfaces."
+        },
+        {
+          "criterion": "The bounded accessibility/responsive/browser audit uses existing repository browser/testing tooling where available and evidence establishes no launch-blocking unusable navigation, inaccessible primary action, material clipping/overflow, or browser-specific broken primary workflow on WU044 public launch surfaces at the project's supported desktop/mobile viewports and browser matrix.",
+          "result": "passed",
+          "evidence": "Accepted browser evidence covers 1280x900 and 360x800; navigation and primary actions remain usable."
+        },
+        {
+          "criterion": "Deployment Protection and Preview access-control results are supported by objective read-only external evidence; any configuration change needed is recorded OWNER_ACTION_REQUIRED rather than performed.",
+          "result": "passed",
+          "evidence": "Both Deployment Protection and Preview access control are PASS_VERIFIED by accepted read-only evidence."
+        },
+        {
+          "criterion": "The custom-domain item is recorded OWNER_ACCEPTED_DEFER unless canonical evidence shows the approved current production origin is unusable for public launch.",
+          "result": "passed",
+          "evidence": "The owner accepted the custom-domain defer; the approved production alias is usable."
+        },
+        {
+          "criterion": "The favicon.ico 404 and approximately 9px .explorer-navigation overflow at approximately 360px are each re-evaluated and recorded as P3 OWNER_ACCEPTED_DEFER; if fresh evidence establishes P0/P1 impact, WU047 stops for owner disposition without changing severity or implementing a fix.",
+          "result": "passed",
+          "evidence": "Both P3 observations were re-evaluated and accepted as non-blocking OWNER_ACCEPTED_DEFER residual debt."
+        },
+        {
+          "criterion": "WU047 closes only with no unresolved P0/P1 launch blocker, all seven P2 dispositions recorded, all authorized local remediations complete and validated, both P3 observations re-evaluated, and no newly discovered unresolved launch blocker.",
+          "result": "passed",
+          "evidence": "Final independent review passed and the owner accepted WU047."
+        },
+        {
+          "criterion": "Only WU044-approved, confirmed, required, minimal, repository-local fixes needing no new product/design/governance decision are implemented",
+          "result": "passed",
+          "evidence": "Owner accepted the bounded implementation scope."
+        },
+        {
+          "criterion": "AR-05 is not reopened and C008/C009/C010 are not repaired",
+          "result": "passed",
+          "evidence": "No AR-05 or C008/C009/C010 change occurred."
+        },
+        {
+          "criterion": "M010 DS-04B owner-frozen values remain binding and unchanged",
+          "result": "passed",
+          "evidence": "No M010 DS-04B value change occurred."
+        },
+        {
+          "criterion": "No broad redesign is introduced",
+          "result": "passed",
+          "evidence": "The implementation remained within the approved launch-hardening scope."
+        },
+        {
+          "criterion": "npm run explorer:build and git diff --check pass; closure evidence includes the seven P2 dispositions and both P3 re-evaluations, without adding research:check as a WU047 gate.",
+          "result": "passed",
+          "evidence": "Accepted validation records build and diff checks as passed, with all P2 and P3 dispositions recorded."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-15T11:16:27.117Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
@@ -6606,8 +6721,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-09-15T09:39:16.791Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-15T11:16:27.117Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -6629,6 +6744,12 @@
         "sourceCommand": "aiqt review acknowledge"
       }
     ]
+  },
+  "issues": {
+    "overrides": [],
+    "promotions": [],
+    "projectIssues": [],
+    "projectIssueTransitions": []
   },
   "checkpointAmendments": [
     {
@@ -6672,6 +6793,53 @@
       "sourceCommand": "aiqt checkpoint amend"
     }
   ],
+  "evidence": {
+    "records": [
+      {
+        "evidenceId": "EVID-001",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-owner",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU047",
+          "packetId": "PKT-048",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "work/m013-wu047-production-launch-hardening",
+          "commitSha": "eab6d4a53e5f3b7082b0ce251c537554156ebd1e",
+          "capturedAt": "2026-09-15T10:24:25.742Z"
+        },
+        "reviewer": {
+          "reviewerId": "owner",
+          "reviewerType": "human",
+          "independentContext": "declared_not_independent"
+        },
+        "results": {
+          "reviewResult": "passed",
+          "validationResult": "not_run",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Owner approved exact WU047 metadata, public crawling/sitemap inventory, five trust-surface texts, canonical Issues destination, and the stated privacy precondition. Deployment and platform settings remain out of scope."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-15T10:24:25.742Z",
+        "recordedAt": "2026-09-15T10:27:00.967Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:18ed0fee805b108625c5658f03a9fa9b41e0536269cdf91e0e110338a258f499",
+          "externalEvidenceId": "WU047-owner-launch-surface-decision-2026-09-15",
+          "importIdentityKey": "sha256:9ffef2e8d99264e897a0d7311a570d54dd6abb536e63ac5f1482e9f418d85afb",
+          "importedAt": "2026-09-15T10:27:00.967Z"
+        }
+      }
+    ],
+    "decisionEscalations": []
+  },
   "checkpointEvidenceAdvisories": [
     {
       "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
@@ -8130,59 +8298,36 @@
           "recordedAt": "2026-09-15T09:26:17.655Z"
         }
       ]
-    }
-  ],
-  "evidence": {
-    "records": [
-      {
-        "evidenceId": "EVID-001",
-        "contractVersion": "1.0",
-        "provider": {
-          "providerId": "open-evora-owner",
-          "providerType": "human",
-          "trustLevel": "self_reported"
-        },
-        "workflowBinding": {
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C048",
+      "current": {
+        "observationId": "sha256:044f17f5052e52723434ec84f059cead29eecbf9006b1d26541ecf43f2b46d54",
+        "checkpointId": "C048",
+        "workUnitId": "WU047",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-15T11:16:27.117Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-15T11:16:27.117Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:044f17f5052e52723434ec84f059cead29eecbf9006b1d26541ecf43f2b46d54",
+          "checkpointId": "C048",
           "workUnitId": "WU047",
-          "packetId": "PKT-048",
-          "implementationRootId": "open-evora"
-        },
-        "codeBinding": {
-          "branch": "work/m013-wu047-production-launch-hardening",
-          "commitSha": "eab6d4a53e5f3b7082b0ce251c537554156ebd1e",
-          "capturedAt": "2026-09-15T10:24:25.742Z"
-        },
-        "reviewer": {
-          "reviewerId": "owner",
-          "reviewerType": "human",
-          "independentContext": "declared_not_independent"
-        },
-        "results": {
-          "reviewResult": "passed",
-          "validationResult": "not_run",
-          "acceptanceCriteriaResult": "passed",
-          "summary": "Owner approved exact WU047 metadata, public crawling/sitemap inventory, five trust-surface texts, canonical Issues destination, and the stated privacy precondition. Deployment and platform settings remain out of scope."
-        },
-        "sourceFindings": [],
-        "decisionEscalationIds": [],
-        "artifactReferences": [],
-        "observedAt": "2026-09-15T10:24:25.742Z",
-        "recordedAt": "2026-09-15T10:27:00.967Z",
-        "importProvenance": {
-          "adapterId": "manual-evidence-json@1",
-          "sourcePayloadDigest": "sha256:18ed0fee805b108625c5658f03a9fa9b41e0536269cdf91e0e110338a258f499",
-          "externalEvidenceId": "WU047-owner-launch-surface-decision-2026-09-15",
-          "importIdentityKey": "sha256:9ffef2e8d99264e897a0d7311a570d54dd6abb536e63ac5f1482e9f418d85afb",
-          "importedAt": "2026-09-15T10:27:00.967Z"
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-15T11:16:27.117Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-15T11:16:27.117Z"
         }
-      }
-    ],
-    "decisionEscalations": []
-  },
-  "issues": {
-    "overrides": [],
-    "promotions": [],
-    "projectIssues": [],
-    "projectIssueTransitions": []
-  }
+      ]
+    }
+  ]
 }
