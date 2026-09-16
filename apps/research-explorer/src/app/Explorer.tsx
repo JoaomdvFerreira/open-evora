@@ -126,7 +126,7 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
       )}
 
       {url.state.view === "graph" && (
-        <Suspense fallback={<ProgressMessage message="A carregar o grafo…" />}>
+        <Suspense fallback={<div className="shell-frame"><ProgressMessage message="A carregar o grafo…" /></div>}>
           <GraphExplorer
             dataProvider={dataProvider}
             focusId={url.state.selectedId}

@@ -47,19 +47,21 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
       </a>
       <main id="main-content" className="explorer-shell" tabIndex={-1}>
         {trustPage ? <TrustPage page={trustPage} /> : <>
-        {state.status === "loading" && <ProgressMessage message="A carregar modelo de leitura gerado…" />}
+        {state.status === "loading" && <div className="shell-frame"><ProgressMessage message="A carregar modelo de leitura gerado…" /></div>}
 
         {state.status === "error" && (
-          <ErrorNotice
-            titleAs="h2"
-            title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Explorer"}
-            message={state.error.message}
-            action={
-              <button type="button" onClick={() => setAttempt((value) => value + 1)}>
-                Tentar novamente
-              </button>
-            }
-          />
+          <div className="shell-frame">
+            <ErrorNotice
+              titleAs="h2"
+              title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Explorer"}
+              message={state.error.message}
+              action={
+                <button type="button" onClick={() => setAttempt((value) => value + 1)}>
+                  Tentar novamente
+                </button>
+              }
+            />
+          </div>
         )}
 
         {state.status === "ready" && (

@@ -140,23 +140,25 @@ export function GraphExplorer({
   }, [invalidFocus, state.status]);
 
   if (state.status === "loading") {
-    return <ProgressMessage message="A carregar dados do grafo…" />;
+    return <div className="shell-frame"><ProgressMessage message="A carregar dados do grafo…" /></div>;
   }
 
   if (state.status === "error") {
     return (
-      <ErrorNotice
-        ref={errorRef}
-        tabIndex={-1}
-        titleAs="h2"
-        title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o grafo"}
-        message={state.error.message}
-        action={
-          <button type="button" onClick={state.retry}>
-            Tentar novamente
-          </button>
-        }
-      />
+      <div className="shell-frame">
+        <ErrorNotice
+          ref={errorRef}
+          tabIndex={-1}
+          titleAs="h2"
+          title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o grafo"}
+          message={state.error.message}
+          action={
+            <button type="button" onClick={state.retry}>
+              Tentar novamente
+            </button>
+          }
+        />
+      </div>
     );
   }
 

@@ -109,9 +109,9 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
   }, [detail]);
 
   if (error) {
-    return <ErrorNotice titleAs="h2" title="Não foi possível carregar o histórico" message={error instanceof Error ? error.message : String(error)} />;
+    return <div className="shell-frame"><ErrorNotice titleAs="h2" title="Não foi possível carregar o histórico" message={error instanceof Error ? error.message : String(error)} /></div>;
   }
-  if (!detail) return <ProgressMessage message={`A carregar histórico de ${problemId}…`} />;
+  if (!detail) return <div className="shell-frame"><ProgressMessage message={`A carregar histórico de ${problemId}…`} /></div>;
 
   const record = detail.record as Record<string, unknown>;
   const title = typeof record.title === "string" ? record.title : detail.id;
@@ -145,8 +145,8 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
 /** Read-only PRB material-history projection over the existing DataProvider. */
 export function ProblemHistoryView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewAsProblem }: ProblemHistoryViewProps) {
   const indexState = useRecordIndex(dataProvider);
-  if (indexState.status === "loading") return <ProgressMessage message="A carregar…" />;
-  if (indexState.status === "error") return <ErrorNotice titleAs="h2" title="Não foi possível carregar os registos" message={indexState.error.message} action={<button type="button" onClick={indexState.retry}>Tentar novamente</button>} />;
+  if (indexState.status === "loading") return <div className="shell-frame"><ProgressMessage message="A carregar…" /></div>;
+  if (indexState.status === "error") return <div className="shell-frame"><ErrorNotice titleAs="h2" title="Não foi possível carregar os registos" message={indexState.error.message} action={<button type="button" onClick={indexState.retry}>Tentar novamente</button>} /></div>;
   if (problemId === null) return <div><p>Nenhum Problema selecionado.</p><button type="button" onClick={onBackToRecords}>Procurar um Problema em Registos</button></div>;
 
   const summary = indexState.lookup.get(problemId);

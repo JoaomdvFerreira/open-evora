@@ -31,14 +31,16 @@ main {
 }
 
 .public-footer {
+  margin: 2rem 0 0;
+  padding: 1rem 2rem;
+  border-top: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
+.public-footer-inner {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
-  max-width: 1400px;
-  margin: 2rem auto 0;
-  padding-top: 1rem;
-  border-top: 1px solid #ccc;
-  font-size: 0.9rem;
 }
 
 .skip-link {
@@ -2134,6 +2136,11 @@ main.explorer-shell {
 @media (max-width: 767px) {
   main.explorer-shell {
     padding: 0 1rem 2rem;
+  }
+
+  .public-footer {
+    padding-right: 1rem;
+    padding-left: 1rem;
   }
 
   .explorer-chrome {

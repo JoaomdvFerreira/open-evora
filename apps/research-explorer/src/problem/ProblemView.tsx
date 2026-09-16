@@ -975,23 +975,25 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
   if (state.status === "idle") return null;
 
   if (state.status === "loading") {
-    return <ProgressMessage message={`A carregar Problema ${state.id}…`} />;
+    return <div className="shell-frame"><ProgressMessage message={`A carregar Problema ${state.id}…`} /></div>;
   }
 
   if (state.status === "error") {
     return (
-      <ErrorNotice
-        ref={errorRef}
-        tabIndex={-1}
-        titleAs="h2"
-        title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Problema"}
-        message={state.error.message}
-        action={
-          <button type="button" onClick={state.retry}>
-            Tentar novamente
-          </button>
-        }
-      />
+      <div className="shell-frame">
+        <ErrorNotice
+          ref={errorRef}
+          tabIndex={-1}
+          titleAs="h2"
+          title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Problema"}
+          message={state.error.message}
+          action={
+            <button type="button" onClick={state.retry}>
+              Tentar novamente
+            </button>
+          }
+        />
+      </div>
     );
   }
 
@@ -1075,21 +1077,23 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
   const indexState = useRecordIndex(dataProvider);
 
   if (indexState.status === "loading") {
-    return <ProgressMessage message="A carregar…" />;
+    return <div className="shell-frame"><ProgressMessage message="A carregar…" /></div>;
   }
 
   if (indexState.status === "error") {
     return (
-      <ErrorNotice
-        titleAs="h2"
-        title="Não foi possível carregar os registos"
-        message={indexState.error.message}
-        action={
-          <button type="button" onClick={indexState.retry}>
-            Tentar novamente
-          </button>
-        }
-      />
+      <div className="shell-frame">
+        <ErrorNotice
+          titleAs="h2"
+          title="Não foi possível carregar os registos"
+          message={indexState.error.message}
+          action={
+            <button type="button" onClick={indexState.retry}>
+              Tentar novamente
+            </button>
+          }
+        />
+      </div>
     );
   }
 

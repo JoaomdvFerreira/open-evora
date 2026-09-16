@@ -78,21 +78,23 @@ export function RecordsExplorer({
   }, [query, typeFilter]);
 
   if (indexState.status === "loading") {
-    return <ProgressMessage message="A carregar registos…" />;
+    return <div className="shell-frame"><ProgressMessage message="A carregar registos…" /></div>;
   }
 
   if (indexState.status === "error") {
     return (
-      <ErrorNotice
-        titleAs="h2"
-        title={ERROR_TITLES[indexState.error.kind] ?? "Não foi possível carregar os registos"}
-        message={indexState.error.message}
-        action={
-          <button type="button" onClick={indexState.retry}>
-            Tentar novamente
-          </button>
-        }
-      />
+      <div className="shell-frame">
+        <ErrorNotice
+          titleAs="h2"
+          title={ERROR_TITLES[indexState.error.kind] ?? "Não foi possível carregar os registos"}
+          message={indexState.error.message}
+          action={
+            <button type="button" onClick={indexState.retry}>
+              Tentar novamente
+            </button>
+          }
+        />
+      </div>
     );
   }
 
