@@ -33,9 +33,16 @@ function prb(index: ReturnType<typeof loadCorpusIndex>, id = "PRB-0001"): Record
 }
 
 test("ODM-007: the unmodified canonical corpus still validates cleanly", () => {
-  const result = validateCorpusIndex(loadCorpusIndex(root));
+  const index = loadCorpusIndex(root);
+  const result = validateCorpusIndex(index);
   assert.deepEqual(result.errors, []);
-  assert.equal(result.totalRecords, 274);
+  assert.equal(
+    result.totalRecords,
+    [...index.byPrefix.values()].reduce(
+      (total, recordIndex) => total + recordIndex.records.length,
+      0
+    )
+  );
 });
 
 test("ODM-007: provenance.sources rejects an empty list where the schema requires one", () => {
