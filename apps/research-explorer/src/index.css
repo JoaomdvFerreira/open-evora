@@ -19,6 +19,28 @@ main {
   font-size: 0.9rem;
 }
 
+.trust-page {
+  max-width: 48rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.trust-page h1 {
+  font-family: "Public Sans", system-ui, sans-serif;
+}
+
+.public-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  max-width: 1400px;
+  margin: 2rem auto 0;
+  padding-top: 1rem;
+  border-top: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
 .skip-link {
   position: absolute;
   left: -9999px;

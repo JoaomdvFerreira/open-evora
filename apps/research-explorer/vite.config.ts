@@ -1,5 +1,20 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, type Plugin } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import { fileURLToPath } from "node:url";
+import { robotsTxt, sitemapXml } from "./src/publicCrawler";
+
+const APP_ROOT = fileURLToPath(new URL(".", import.meta.url));
+const TRUST_PAGE_INPUTS = ["about", "methodology", "corrections", "contact", "privacy"];
+
+function publicCrawlerFiles(): Plugin {
+  return {
+    name: "public-crawler-files",
+    generateBundle() {
+      this.emitFile({ type: "asset", fileName: "robots.txt", source: robotsTxt() });
+      this.emitFile({ type: "asset", fileName: "sitemap.xml", source: sitemapXml() });
+    },
+  };
+}
 
 // Static deployment portability (docs/explorerarchitecture.md): `base` defaults to
 // "/" but can be overridden at build time (e.g. `VITE_BASE_PATH=/open-evora/
@@ -11,7 +26,7 @@ const basePath = process.env.VITE_BASE_PATH || "/";
 
 export default defineConfig({
   base: basePath,
-  plugins: [react()],
+  plugins: [react(), publicCrawlerFiles()],
   // RE-01's generated read model (apps/research-explorer/generated/) is
   // served directly as static assets, in both dev and production build, via
   // Vite's publicDir mechanism — no second, manually-maintained copy of the
@@ -25,6 +40,12 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL("./index.html", import.meta.url)),
+        ...Object.fromEntries(TRUST_PAGE_INPUTS.map((path) => [path, `${APP_ROOT}${path}/index.html`])),
+      },
+    },
   },
   test: {
     // RE-02B adds a small number of interaction-level tests (row selection ->

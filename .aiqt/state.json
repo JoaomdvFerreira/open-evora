@@ -1,8 +1,8 @@
 {
   "version": "0.8.0",
   "projectStatus": "in_progress",
-  "currentMilestoneId": "M013",
-  "currentWorkUnitId": null,
+  "currentMilestoneId": "M014",
+  "currentWorkUnitId": "WU049",
   "workGraph": {
     "milestones": [
       {
@@ -148,13 +148,25 @@
         "id": "M013",
         "title": "Public Launch Readiness & Automated Research Operations",
         "objective": "Prepare Open Évora for sustained public operation by hardening the public Research Explorer and by orchestrating the existing governed research tooling into an end-to-end process that can move from a research trigger to an approval-ready research package with zero normal-path human handoffs before the human research gate, while preserving human semantic authority over canonical research acceptance, corroboration/validation/investigation-state judgement, public research approval, repository merge, and final go-live decision. Social-channel creation and posting are manual owner operations outside the M013 critical path.",
-        "status": "ready",
+        "status": "done",
         "workUnitIds": [
           "WU044",
           "WU045",
           "WU046",
           "WU047",
           "WU048"
+        ]
+      },
+      {
+        "id": "M014",
+        "title": "M014 — Post-M013 Go-Live Remediation",
+        "objective": "Remediate the specific safety-admission, release-provenance, and public-production launch gaps recorded by completed M013/WU048 (canonical verdict NOT_READY), then independently reverify the complete Go-Live acceptance matrix. M013 and WU048 remain historical and are not reopened. A successful M014/WU052 reverification is not the owner GO/HOLD decision.",
+        "status": "in_progress",
+        "workUnitIds": [
+          "WU049",
+          "WU050",
+          "WU051",
+          "WU052"
         ]
       }
     ],
@@ -2082,12 +2094,12 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-041"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T19:19:19.431Z"
+        "updatedAt": "2026-09-14T09:20:34.406Z"
       },
       {
         "id": "WU046",
@@ -2096,22 +2108,35 @@
         "objective": "Implement the owner-approved review/promotion path around the approval-ready Research Change Set produced by WU045, presenting one coherent, inspectable human review package and, after explicit approval, executing only the approved deterministic post-approval path up to READY_FOR_OWNER_MERGE.",
         "scope": [
           "Assemble one coherent review package exposing investigation question, candidate records, CREATE/UPDATE/NO_CHANGE deltas, exact provenance, claim scope, inference limits, affected existing PRBs, contradiction analysis, duplicate/overlap analysis, prospective validation result, readiness result, independent AI review, exact canonical Git base SHA, exact integration plan, expected Explorer/public effect, risks/unresolved uncertainties, and a clearly non-authoritative recommendation",
+          "SCOPE TRANSFER (owner decision, WU046 scope refinement, superseding the WU045-B02 handoff gap identified by the WU046 scope review): invoke the existing canonical tools/research/readiness/readiness.ts evaluator (evaluateEligibility()/evaluateCorroboration()) directly, and include its structured ReadinessReport (eligibility/corroboration findings, contradiction-search and duplicate/overlap evidence, existing ReasonCodes) in the assembled review package. WU045's delivered Research Change Set does not itself contain this data -- WU045 never invoked readiness.ts despite its own §11 boundary text -- so WU046, not WU045, is the point that must call it. This invocation is pre-Gate analysis only: read-only against the existing readiness contract, no canonical/public research write, no new research generation, no change to readiness rules or ReasonCodes, and no reimplementation of eligibility/corroboration logic.",
+          "PRE-PROMOTION VERIFICATION (owner decision, WU046 scope refinement): immediately before attempting canonical promotion, call the existing canonical-promoter.ts repository-state assertion (export assertCanonicalRepositoryState, or an equivalent public entry point that delegates to that exact function with no logic duplicated and no change to its validation semantics) to re-verify the approved baseGitSha still equals current HEAD; a mismatch or stale base state must abort before any canonical write is attempted. This is a narrow, explicit exception to WU046's own 'do not modify canonical-promoter.ts internals' boundary: symbol exposure is authorized; promoter validation behavior is not to change.",
+          "HUMAN GATE DECISION RECORD (owner decision, WU046 scope refinement): persist the Human Gate decision as a JSON-source-of-truth record in the same gitignored research-cycle directory as the Research Change Set it decides -- outside canonical/public research/** -- bound to packageId, contentHash, baseGitSha, actor, timestamp, canonicalAcceptance, and publicExplorerPublication. The record must support safe post-approval resume/retry and must never authorize a package other than the one it is bound to. Filename/schema is an implementation-time choice using the repository's normal contract conventions (e.g. the same JSON-shape/validation-module pattern already used for the RCS itself); this scope entry does not itself prescribe one.",
           "Support human decision options of at least APPROVE, REJECT, and HOLD/MORE_RESEARCH",
-          "After explicit human approval, verify the approved exact package/plan/base SHA, apply the canonical integration plan, validate the resulting corpus, build the Explorer/read model, create a bounded branch, commit, push, create a PR, and run/observe CI where tooling supports it, returning READY_FOR_OWNER_MERGE"
+          "After explicit human approval, verify the approved exact package/plan/base SHA (via the pre-promotion verification above), apply the canonical integration plan, validate the resulting corpus, build the Explorer/read model, create a bounded branch, commit, push, create a PR, and run/observe CI where tooling supports it, returning READY_FOR_OWNER_MERGE"
         ],
         "outOfScope": [
           "Merging the PR",
           "Bypassing branch protection",
           "Auto-approving research",
           "Auto-publishing candidate material before Gate approval",
-          "Treating an AI recommendation as approval"
+          "Treating an AI recommendation as approval",
+          "Reopening or re-implementing any part of WU045 (the readiness-invocation scope transfer above is narrow and additive to WU046 only; WU045 itself remains done and is not reopened)",
+          "Changing readiness.ts's rules, ReasonCodes, or evaluation logic, or reimplementing eligibility/corroboration checks inside WU046",
+          "Generating new research/candidate material merely to satisfy or improve a readiness result",
+          "Any canonical/public research write as part of the readiness invocation itself (it is pre-Gate analysis only, run before any human decision exists)",
+          "Duplicating canonical-promoter.ts's repository-state validation logic instead of calling its existing assertion",
+          "Weakening applyCanonicalIntegrationPlan()'s own internal safety checks as part of exposing the pre-promotion verification entry point"
         ],
         "acceptanceCriteria": [
-          "The review package makes every required element inspectable in one place",
+          "The review package makes every required element inspectable in one place, including the readiness.ts-derived eligibility/corroboration/contradiction/duplicate-overlap findings (scope transfer above)",
           "No AI recommendation is ever treated as an approval decision",
           "Only the approved deterministic path executes after explicit human approval",
           "The PR is never merged and branch protection is never bypassed by this work unit",
-          "Repository publication remains owner-controlled"
+          "Repository publication remains owner-controlled",
+          "HIGH-2 approval/content-hash binding is independently demonstrable: contentHash is a SHA-256 over the deterministic canonical JSON serialization of the validated RCS source of truth (never the rendered Markdown); the rendered Human Gate view is generated from that exact same validated in-memory object; on approval submission the JSON source is re-read from disk, revalidated, and re-hashed; the recomputed hash must equal the hash of the package actually shown to the owner; any mismatch aborts, invalidates the review session, and fails closed rather than proceeding; an approval decision can never be reused to authorize a different package, base SHA, or integration plan than the one it was recorded against",
+          "LOW-3 deterministic publication guard is independently demonstrable: immediately before commit/push/PR, staged/tracked paths are checked against the exact approved CanonicalIntegrationPlan operation set; any unexpected staged/tracked path (including any .research-workbench/** or equivalent gitignored candidate/RCS location) fails the publication sequence closed before any commit/push/PR occurs; the control is enforced at the Git-publication boundary itself and does not rely solely on .gitignore, a pre-commit hook, or developer discipline",
+          "Pre-promotion repository-state re-verification (baseGitSha vs. current HEAD) occurs via the existing canonical-promoter.ts assertion immediately before any promotion attempt, and a stale/mismatched base aborts before any canonical write",
+          "The Human Gate decision record persists in the same gitignored cycle directory as the RCS it decides, outside research/**, bound to packageId/contentHash/baseGitSha/actor/timestamp/canonicalAcceptance/publicExplorerPublication, and a decision record for one package never authorizes another"
         ],
         "agentContextRefs": [
           "docs/design/m013-launch-automation-contract.md",
@@ -2123,12 +2148,12 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "done",
         "dependencies": [
           "DEP-043"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T13:02:54.845Z"
+        "updatedAt": "2026-09-15T09:26:17.655Z"
       },
       {
         "id": "WU047",
@@ -2136,24 +2161,39 @@
         "title": "Production Launch Hardening",
         "objective": "Implement only the launch blockers approved by the WU044 contract across production, public web, quality, and trust audit areas.",
         "scope": [
-          "Audit production: deployment topology, Git->Vercel production path, reproducible build, rollback, runtime/error observability, failure recovery, dependency/security posture, secrets exposure, production ownership",
-          "Audit public web: domain strategy, HTTPS, canonical URL, title/description metadata, OpenGraph/social previews, X/Twitter card metadata where applicable, favicon, robots.txt, sitemap, 404/error surfaces, broken links",
-          "Audit quality: accessibility, keyboard, mobile, browser compatibility, performance, public data integrity, build/read-model integrity",
-          "Audit trust: About, methodology, source/provenance explanation, correction/challenge route, contact, independence/non-affiliation, privacy posture",
-          "Re-evaluate known pre-existing observations (favicon.ico 404; 9px .explorer-navigation overflow at 360px) only as launch-quality issues"
+          "Resolve or explicitly disposition the exact WU044 §13 P2 closure set: (1) Deployment Protection evidence/disposition; (2) Preview access-control evidence/disposition; (3) required production metadata; (4) robots/sitemap; (5) required trust surfaces; (6) accessibility/responsive/browser compatibility; (7) custom-domain decision. Each item must end as PASS_VERIFIED, OWNER_ACCEPTED_DEFER, or OWNER_ACTION_REQUIRED.",
+          "Inspect and document Vercel Deployment Protection/public-access state read-only. Production intended for public launch must be reachable without unintended authentication/protection; if it is not, record OWNER_ACTION_REQUIRED with objective evidence and do not change Vercel settings.",
+          "Inspect and document Preview access-control state read-only. Establish whether Preview deployments are distinguishable from and appropriately separated/protected relative to Production; if a posture change is necessary, record OWNER_ACTION_REQUIRED and do not change Vercel settings.",
+          "Audit only the WU044-required production metadata, robots/sitemap, trust surfaces, and bounded accessibility/responsive/browser compatibility launch requirements using their approved contract requirements; do not add SEO, trust-policy, product, or design requirements.",
+          "Record custom domain as OWNER_ACCEPTED_DEFER: the currently approved Vercel production origin may be used for launch, and WU047 must not configure a domain, DNS, or Vercel domain setting unless canonical evidence shows that origin is unusable for public launch.",
+          "Re-evaluate only the two known P3 observations: favicon.ico 404 and approximately 9px .explorer-navigation horizontal overflow at approximately 360px. Both remain OWNER_ACCEPTED_DEFER and are not remediated by WU047 unless fresh evidence establishes a genuine P0/P1 launch impact, in which case stop and escalate."
         ],
         "outOfScope": [
           "Reopening AR-05",
           "Authorizing or performing C008/C009/C010 repair",
           "Broad redesign",
           "Changing M010 DS-04B owner-frozen values",
-          "Any launch blocker not approved by the WU044 contract"
+          "Any launch blocker not approved by the WU044 contract",
+          "Creating a new quality backlog from WU047; a newly observed genuine P0/P1 issue must stop and escalate",
+          "Favicon P3 remediation or cosmetic 360px overflow remediation",
+          "Vercel settings, Deployment Protection, environment-variable, domain, DNS, CI workflow, branch-protection, or ruleset changes",
+          "Discretionary visual polish, new features, new trust/content policy, research-data changes, or WU045/WU046 changes",
+          "WU048 end-to-end, adversarial, or independent Go-Live verification"
         ],
         "acceptanceCriteria": [
-          "Only WU044-approved launch blockers are implemented",
+          "Every one of the seven WU044 §13 P2 items is explicitly recorded as exactly one of PASS_VERIFIED, OWNER_ACCEPTED_DEFER, or OWNER_ACTION_REQUIRED; no P2 item remains undispositioned.",
+          "WU047 cannot close while an OWNER_ACTION_REQUIRED P2 item remains unresolved unless the owner subsequently records an explicit defer/accept decision.",
+          "Metadata PASS_VERIFIED evidence demonstrates every WU044-required production metadata element is present and correct; robots/sitemap evidence demonstrates the WU044-required public endpoints and their status/content on the intended production origin; trust-surface evidence demonstrates each WU044-required surface exists, is reachable in the intended public experience, and contains its canonically required information.",
+          "The bounded accessibility/responsive/browser audit uses existing repository browser/testing tooling where available and evidence establishes no launch-blocking unusable navigation, inaccessible primary action, material clipping/overflow, or browser-specific broken primary workflow on WU044 public launch surfaces at the project's supported desktop/mobile viewports and browser matrix.",
+          "Deployment Protection and Preview access-control results are supported by objective read-only external evidence; any configuration change needed is recorded OWNER_ACTION_REQUIRED rather than performed.",
+          "The custom-domain item is recorded OWNER_ACCEPTED_DEFER unless canonical evidence shows the approved current production origin is unusable for public launch.",
+          "The favicon.ico 404 and approximately 9px .explorer-navigation overflow at approximately 360px are each re-evaluated and recorded as P3 OWNER_ACCEPTED_DEFER; if fresh evidence establishes P0/P1 impact, WU047 stops for owner disposition without changing severity or implementing a fix.",
+          "WU047 closes only with no unresolved P0/P1 launch blocker, all seven P2 dispositions recorded, all authorized local remediations complete and validated, both P3 observations re-evaluated, and no newly discovered unresolved launch blocker.",
+          "Only WU044-approved, confirmed, required, minimal, repository-local fixes needing no new product/design/governance decision are implemented",
           "AR-05 is not reopened and C008/C009/C010 are not repaired",
           "M010 DS-04B owner-frozen values remain binding and unchanged",
-          "No broad redesign is introduced"
+          "No broad redesign is introduced",
+          "npm run explorer:build and git diff --check pass; closure evidence includes the seven P2 dispositions and both P3 re-evaluations, without adding research:check as a WU047 gate."
         ],
         "agentContextRefs": [
           "docs/design/m013-launch-automation-contract.md",
@@ -2164,12 +2204,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-042"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T19:19:19.431Z"
+        "updatedAt": "2026-09-15T11:16:27.117Z"
       },
       {
         "id": "WU048",
@@ -2177,22 +2217,35 @@
         "title": "End-to-End Dry Run & Independent Go-Live Verification",
         "objective": "Independently verify the complete M013 system end-to-end, including adversarial/failure cases and production/public hardening against the built production artifact, without making the go-live decision.",
         "scope": [
-          "Test a normal end-to-end research path up to the human gate with zero normal-path human intervention",
-          "Test the approved post-Gate path using a controlled dry-run / approved fixture or owner-approved test path",
-          "Verify adversarial/failure cases: duplicate source -> NO_CHANGE/no unnecessary candidate; weak source -> HOLD/review required; contradictory evidence surfaced not suppressed; invalid candidate blocked; privacy-sensitive/non-public material blocked; stale base SHA blocked; source disappears/becomes unavailable surfaced; weakly supported candidate Problem not silently promoted; independent review disagreement surfaced to human; validation failure blocked; promotion failure triggers rollback/safe failure; build failure blocked; PR/CI failure does not reach READY_FOR_OWNER_MERGE; candidate material cannot leak to Git/preview before human Gate",
-          "Verify production/public hardening against the built production artifact",
-          "Evaluate the Go-Live Acceptance Contract and return NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE"
+          "Execute the exact 22-case §14 matrix only after this refinement, using a disposable, non-public local fixture for cases 1–16 and 18–22. The fixture must be based on source revision add597da2510056d0f05d7b090d9a75828686f79, use synthetic/safe inputs and existing safe test doubles or equivalent non-public mechanisms at mutating boundaries, exercise real production orchestration codepaths where required, retain only sanitized bounded evidence, and remove temporary state/raw artifacts after safe retention.",
+          "Create and verify a fresh separately governed production candidate for case 17 from exactly committed source revision add597da2510056d0f05d7b090d9a75828686f79. Record source SHA, immutable deployment ID and URL, creation and READY timestamps, actual build result, and relevant production-build provenance. A mismatched SHA is a hard failure.",
+          "Use the existing production origin https://open-evora.vercel.app read-only for case-17 public access, protection, and availability inspection. The candidate proves the proposed launch artifact; the existing Production alias is not claimed to run that candidate unless separately authorized action makes that fact true.",
+          "Candidate creation/retry is the sole external mutation authorized: use existing project configuration and supported production build path; preserve Preview/candidate access protection; do not assign Production alias, alter DNS/domains, environment variables, project settings, Deployment Protection, or Preview access control. Retry only before a usable artifact exists, with identical source/configuration and every attempt recorded.",
+          "Apply the freshness rule: candidate creation follows this owner refinement and is verified in the same WU048 execution cycle; case-17 evidence is fresh only for that candidate, exact SHA, and unchanged relevant deployment/configuration/protection state. Refresh read-only deployment/public-origin checks after relevant external-state changes or if final acceptance is more than 24 hours later.",
+          "Verify all 22 §14 cases and the Go-Live Acceptance Contract without remediation, preserving human-owned Gate decisions as explicit synthetic fixture inputs only and never representing them as real publication approval.",
+          "Persist canonical WU048 evidence only under docs/design/audits/m013-wu048-go-live-verification/, with report.md as the summary and evidence/ for supporting durable evidence. The report records execution timestamps, all 22 cases with expected/actual/PASS-FAIL/evidence/freshness, reused WU046/WU047 evidence where applicable, candidate provenance, inspected Production origin, P0–P3 findings, accepted-risk references, and terminal result.",
+          "Apply publication-safe evidence retention: committed evidence is sanitized and contains no secrets, tokens, cookies/session values, authorization headers, credentials, environment values, personal/private identity, private fixture content, raw sensitive AI prompts/responses, access-token-bearing URLs, or unredacted external-service dumps. Screenshots contain only public surfaces or safe synthetic content.",
+          "Return exactly NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE under the owner-defined result semantics. Neither READY result authorizes promotion or publication; a separate owner GO/HOLD decision remains mandatory."
         ],
         "outOfScope": [
           "Making the go-live decision",
+          "Production promotion, Production alias assignment, automatic publication, DNS/domain changes, environment/project/protection/Preview-access-control changes, or any external mutation other than the authorized separately governed candidate creation/retry",
           "Merging a PR",
+          "Pushing, PR creation, real merge, real Production publication, canonical corpus writes, use of real canonical production data as mutable test material, or public candidate leakage",
+          "Product/runtime remediation; defects found by verification are recorded and classified only",
+          "Feature development, redesign, SEO, routing redesign, favicon remediation, compact-navigation remediation, custom-domain implementation, research corpus/schema changes, DS-04B, C008/C009/C010 repair, WU046/WU047 refactoring, analytics/observability work, D7, or successors",
+          "Changing the work graph, checkpointing WU048, or executing WU048 in this scope-refinement action",
           "Starting D7",
           "Starting any successor"
         ],
         "acceptanceCriteria": [
-          "All required adversarial/failure cases are exercised and their expected safe outcome is verified",
-          "Production/public hardening is verified against the actual built production artifact",
-          "WU048 returns exactly one of NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE",
+          "All 22 §14 cases are exercised with per-case expected outcome, actual outcome, PASS/FAIL result, evidence reference, and freshness classification where applicable; WU046/WU047 evidence reuse is identified where applicable.",
+          "Case 17 uses a fresh separately governed candidate built/deployed from exactly add597da2510056d0f05d7b090d9a75828686f79, with immutable deployment identity/provenance, build result, timestamps, and SHA match recorded; its read-only Production-origin inspection is distinct from candidate-artifact proof.",
+          "The separately governed candidate does not become the Production alias and preserves existing configuration/protection. Any need to mutate external configuration stops as OWNER_ACTION_REQUIRED; unavailable authorized candidate tooling returns BLOCKED.",
+          "Fixture cases use only disposable non-public synthetic state and safe boundary replacements; they perform no canonical corpus write, real push/PR/merge/Production publication, external configuration mutation, or public candidate leakage.",
+          "The canonical report is docs/design/audits/m013-wu048-go-live-verification/report.md with bounded supporting evidence under evidence/, and satisfies the defined provenance, case, finding, accepted-risk, freshness, and terminal-result record requirements without retaining prohibited sensitive material.",
+          "NOT_READY is returned for any P0/P1, mandatory-case failure, provenance/bound-artifact failure, missing required evidence, or mandatory launch-requirement failure. READY_WITH_ACCEPTED_RISK requires all other requirements to pass plus only explicitly owner-accepted P2 risk. READY_FOR_GO_LIVE_GATE requires all mandatory cases and contract conditions to pass with no P0/P1 or unresolved/unaccepted P2.",
+          "WU048 remains verification-only: it does not decide GO/HOLD, remediate defects, promote/publish the candidate, or start a successor. M013 lifecycle completion, if later achieved through its canonical AIQT graph, is administrative and distinct from owner GO/HOLD.",
           "Only the owner decides GO / HOLD",
           "No successor beyond WU048 is started or authorized"
         ],
@@ -2205,13 +2258,213 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "done",
         "dependencies": [
           "DEP-044",
           "DEP-045"
         ],
         "createdAt": "2026-09-12T13:02:54.845Z",
-        "updatedAt": "2026-09-12T13:02:54.845Z"
+        "updatedAt": "2026-09-15T13:06:57.029Z"
+      },
+      {
+        "id": "WU049",
+        "milestoneId": "M014",
+        "title": "Pre-Gate Safety Admission",
+        "objective": "Implement the bounded pre-Gate safety-admission controls required by the M013/WU048 NOT_READY findings, while preserving human authority over the truth, corroboration, validation, investigation posture, canonical integration, and publication decisions.",
+        "scope": [
+          "Implement one deterministic Pre-Gate Safety Admission producer, consumed without policy duplication by orchestration, Human Gate package projection, Human Gate Markdown rendering, and tests. Its only dispositions are ELIGIBLE and HOLD, with ordered/deduplicated structured findings; it classifies admission safety only and never decides truth, corroboration, validation, investigation posture, canonical integration, publication, or materiality.",
+          "Apply the owner-approved deterministic safety-sensitive claim predicate exactly to every candidate EVD with evidence_nature = claim. Only claim_authority = authoritative satisfies the authority predicate; non_authoritative, unknown, absent, or indeterminate HOLD. A claim with non-empty inference_limits[] HOLDs without parsing, keyword matching, NLP, semantic ranking, or materiality inference from its text; an explicit empty list does not HOLD by itself and an absent/indeterminate list HOLDs. Do not introduce replacement canonical enum values.",
+          "Derive material-Source membership deterministically from explicit provenance: a Source is material only when reachable from an EVD included in the current candidate or contributing to an affected record's decision_basis in the current cycle. Unreferenced corpus Sources are excluded.",
+          "After candidate freeze and immediately before admission, revalidate every non-private material Source through the existing canonical Source-checking boundary where available, or a bounded read-only availability adapter. Fresh evidence must identify the same Source, be produced after freeze, be no more than ten minutes old at admission, and report available. Missing, unavailable, unknown, timeout, verification error, unsupported, stale, authenticated, or private revalidation conditions HOLD; a private Source HOLDs before any external revalidation attempt. This is Source availability evidence, not semantic claim currentness or truth. Preserve the immutable candidate snapshot and do not create a general crawler or live-research system.",
+          "Require HOLD before a Source with access.level = private can propagate to a public/canonical candidate or publication path. On HOLD, do not invoke the independent reviewer, assemble a final RCS, generate a normal Human Gate package, return READY_FOR_HUMAN_REVIEW, write canonical research state, commit, push, or publish. Generate instead a non-canonical safe Pre-Gate Safety Hold Report in the existing cycle/workbench artifact convention.",
+          "Represent at least contradiction visibility, private Source, Source revalidation missing, Source revalidation stale, Source unavailable, Source availability unknown/unverifiable, claim authority insufficient/unknown, and claim inference limits present/indeterminate as structured findings. Do not emit a semantic claim-currentness finding or duplicate a Source revalidation failure as one. Allow multiple findings; sort by reason code then stable subject ID and deduplicate by that pair. Contradiction visibility is non-blocking unless another finding requires HOLD.",
+          "When admission is otherwise ELIGIBLE, preserve a represented contradiction structurally and project its safe summary and references into the Human Gate package and visible Markdown for explicit human consideration. Rendering consumes the structured finding; it never recomputes contradiction semantics.",
+          "Add bounded deterministic unit, integration, package-projection, Markdown-rendering, orchestration-enforcement, and fresh scenario tests for M013/WU048 cases 5, 7, 9, and 22, retaining existing Human Gate semantics and publication guards."
+        ],
+        "outOfScope": [
+          "Any automatic truth, corroboration, validation, materiality, investigation-posture, canonical-integration, or publication decision",
+          "Automatic sanitization, redaction, or transformation of private source material",
+          "Canonical research data, schema, enum, or semantic changes",
+          "A persisted SRC/EVD/PRB risk taxonomy or canonical corpus migration",
+          "A general crawler, uncontrolled live-web research dependency, authenticated/private fetch, or semantic research refresh",
+          "A semantic claim-currentness predicate, semantic temporal-validity judgement, or inference-limit text interpretation",
+          "Commit, push, pull request, merge, deployment, production promotion, or external configuration mutation",
+          "M013/WU048 reopening or alteration",
+          "C008/C009/C010 repair",
+          "WU050/WU051/WU052, deployment provenance, Production posture, and unrelated Explorer/product work"
+        ],
+        "acceptanceCriteria": [
+          "One canonical Pre-Gate Safety Admission producer returns only ELIGIBLE or HOLD with deterministic ordered/deduplicated findings, and orchestration, package projection, rendering, and tests consume that same result without reimplementing safety policy.",
+          "Every candidate EVD with evidence_nature = claim receives the owner-approved structured safety checks. Only claim_authority = authoritative satisfies authority; non_authoritative, unknown, absent, or indeterminate authority HOLDs. Non-empty or indeterminate inference_limits[] HOLDs without parsing or semantically interpreting its text; an explicit empty list does not HOLD by itself. No truth, corroboration, legal/reputational, materiality, canonical-integration, or publication decision is introduced.",
+          "A material Source is derived only from explicit provenance of candidate EVD or affected-record decision_basis EVD. A private material Source HOLDs before reviewer/package and before external revalidation; no private content leaks and no automatic sanitization workflow exists.",
+          "Every non-private material Source is revalidated after candidate freeze and within ten minutes before admission; unavailable, unknown, timeout, verification error, unsupported, missing, authenticated/private, or stale revalidation deterministically HOLDs before Human Gate. This evidence establishes only fresh Source availability, not semantic claim currentness or truth.",
+          "A HOLD can never invoke the independent reviewer, assemble a final RCS, generate a normal Human Gate package, return READY_FOR_HUMAN_REVIEW, write canonical research state, commit, push, or publish; it produces only a non-canonical safe Pre-Gate Safety Hold Report with the approved minimal fields.",
+          "A represented contradiction remains structurally preserved and, when otherwise ELIGIBLE, appears with safe summary and references in the Human Gate JSON and rendered Markdown; it is not automatically a HOLD and is not recomputed by rendering.",
+          "Structured findings distinguish contradiction visibility, private Source, Source revalidation missing/stale/unavailable/unknown-unverifiable, claim authority insufficient/unknown, and claim inference limits present/indeterminate; no semantic claim-currentness reason is emitted. Multiple findings sort by code then stable subject ID and deduplicate by that pair.",
+          "Fresh deterministic unit, integration, package-projection, Markdown-rendering, orchestration-enforcement, and scenario coverage passes for M013/WU048 cases 5, 7, 9, and 22, including case-22 negative scenarios for authority, inference limits, and Source revalidation HOLD plus a positive regression proving that a claim whose structured predicates pass remains ELIGIBLE. Relevant existing §14 behavior does not regress.",
+          "No persisted research-schema migration, new persisted risk taxonomy, general crawler/live-research dependency, or forbidden semantic decision is introduced.",
+          "M013 remains historically done with WU048 canonical NOT_READY, and C008/C009/C010 are untouched."
+        ],
+        "agentContextRefs": [
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md",
+          "docs/design/m013-launch-automation-contract.md",
+          "docs/design/audits/m013-wu048-go-live-verification/report.md"
+        ],
+        "suggestedFiles": [
+          "tools/research/",
+          "docs/design/audits/m013-wu048-go-live-verification/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "git diff --check"
+        ],
+        "status": "in_progress",
+        "dependencies": [],
+        "createdAt": "2026-09-15T13:31:45.422Z",
+        "updatedAt": "2026-09-15T14:44:15.323Z"
+      },
+      {
+        "id": "WU050",
+        "milestoneId": "M014",
+        "title": "Attested Release Provenance",
+        "objective": "Establish exact provider-attested provenance from one dedicated release/candidate branch and committed SHA to a protected candidate deployment, so the resulting immutable deployment can be independently tied to its exact Git input.",
+        "scope": [
+          "Create and push a dedicated release/candidate branch containing the exact bounded M014 candidate revision after WU049 is complete.",
+          "Use the Git-linked protected candidate deployment path to obtain and record provider-attested repository, branch/ref, commit SHA, deployment identity, immutable URL, build result, timestamps, and protection/public-access posture.",
+          "Persist publication-safe provenance evidence that establishes the provider-attested exact SHA-to-deployment relationship; distinguish provider attestation from local upload/build assertions.",
+          "Fail closed if the provider cannot attest the exact candidate SHA, the deployment is not protected as required, or any recorded provenance element is inconsistent."
+        ],
+        "outOfScope": [
+          "Merge into main",
+          "Production promotion, Production alias assignment, domain/DNS/environment/protection configuration change, or other production mutation",
+          "GO/HOLD decision",
+          "Canonical research data or semantic changes beyond WU049's completed bounded remediation",
+          "M013/WU048 reopening or alteration",
+          "C008/C009/C010 repair"
+        ],
+        "acceptanceCriteria": [
+          "A dedicated release/candidate branch is pushed under this authorization, and the candidate deployment is Git-linked and protected.",
+          "Provider-attested evidence independently binds the exact repository/ref and immutable commit SHA to one immutable candidate deployment identity and URL, including successful build status and inspection timestamps.",
+          "The provenance record clearly distinguishes provider attestation from locally asserted provenance and contains no credentials, tokens, private content, or unsafe URLs.",
+          "No merge or Production promotion is performed in WU050; the candidate is not represented as Production or as a GO decision.",
+          "If exact provider SHA attestation cannot be established, WU050 returns NOT_READY/BLOCKED without bypassing the requirement."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/design/audits/m013-wu048-go-live-verification/report.md"
+        ],
+        "suggestedFiles": [
+          "docs/design/audits/m014-wu050-release-provenance/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-046"
+        ],
+        "createdAt": "2026-09-15T13:31:45.422Z",
+        "updatedAt": "2026-09-15T13:31:45.422Z"
+      },
+      {
+        "id": "WU051",
+        "milestoneId": "M014",
+        "title": "Production Launch-Hardening Release",
+        "objective": "After WU050 establishes exact provider-attested SHA provenance, perform the conditionally authorized Production hardening release through the preferred owner-controlled merge and Git-linked Vercel Production deployment path. This release does not decide GO/HOLD.",
+        "scope": [
+          "Use the exact WU050 provider-attested candidate SHA/provenance as the release input; stop if that provenance is absent, stale, inconsistent, or cannot be carried forward to the merged release.",
+          "Preferred authorized path: manual owner merge of the dedicated release/candidate branch followed by Git-linked Vercel Production deployment.",
+          "Verify and record the deployed Production commit SHA, deployment identity, immutable URL/production origin relationship, build result, timestamps, public accessibility, required metadata, robots/sitemap, and protection posture.",
+          "Keep this work unit bounded to the exact launch-hardening release required to replace M013/WU048's failing Production posture."
+        ],
+        "outOfScope": [
+          "Final GO/HOLD decision",
+          "Unattested or manually uploaded Production deployment",
+          "Unrelated product, design, research, schema, or architecture work",
+          "Automatic merge or bypass of repository protections",
+          "M013/WU048 reopening or alteration",
+          "C008/C009/C010 repair"
+        ],
+        "acceptanceCriteria": [
+          "WU050's exact provider-attested candidate SHA provenance is present and reconciled with the release input before Production action.",
+          "The release follows the preferred manual owner merge followed by Git-linked Vercel Production deployment path, with no protection bypass or automatic merge.",
+          "Provider evidence independently identifies the Production deployment and exact deployed commit SHA, and records its relationship to the Production origin.",
+          "Fresh public checks establish the required public launch posture: intended origin accessible without unintended authentication, required metadata/trust surfaces, and working robots/sitemap endpoints.",
+          "The Production hardening release is explicitly recorded as a deployment operation only, not a final GO decision; GO/HOLD remains owner-owned after WU052."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/design/m013-launch-automation-contract.md",
+          "docs/design/audits/m013-wu048-go-live-verification/report.md"
+        ],
+        "suggestedFiles": [
+          "docs/design/audits/m014-wu051-production-release/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-047"
+        ],
+        "createdAt": "2026-09-15T13:31:45.422Z",
+        "updatedAt": "2026-09-15T13:31:45.422Z"
+      },
+      {
+        "id": "WU052",
+        "milestoneId": "M014",
+        "title": "Independent Go-Live Reverification",
+        "objective": "Independently and freshly reverify the complete 22-case M013 §14 Go-Live matrix against the WU051 Production release and its attested provenance, without remediation or making the owner GO/HOLD decision.",
+        "scope": [
+          "Freshly rerun every one of all 22 §14 cases. M013/WU048 PASS evidence is historical only and may be contextualized but not reused as current PASS evidence.",
+          "Independently verify the WU049 admission controls, WU050 exact provider-attested candidate provenance, and WU051 Production release/origin posture in the same reverification cycle.",
+          "Produce sanitized, publication-safe evidence with expected/actual/PASS-FAIL/freshness for each case, release provenance, Production origin inspection, P0-P3 findings, and one bounded terminal readiness result.",
+          "Return a readiness recommendation only under the existing NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE semantics; preserve the separate owner GO/HOLD gate."
+        ],
+        "outOfScope": [
+          "Any remediation, code change, configuration mutation, release action, merge, or deployment",
+          "Deciding GO/HOLD or representing a verifier result as GO",
+          "Reusing prior M013/WU048 PASS evidence as fresh execution evidence",
+          "M013/WU048 reopening or alteration",
+          "C008/C009/C010 repair"
+        ],
+        "acceptanceCriteria": [
+          "All 22 §14 cases are freshly rerun and individually recorded with fresh expected outcome, actual outcome, PASS/FAIL result, evidence reference, and freshness classification; previous M013/WU048 PASS evidence is historical only.",
+          "Case 17 independently establishes exact provider-attested SHA provenance for the candidate/release and its relationship to the fresh WU051 Production deployment/origin; missing or inconsistent provenance is NOT_READY.",
+          "Cases 5, 7, 9, and 22 freshly demonstrate the WU049 remediation: contradiction surfacing, private-source HOLD, unavailable-source handling, and high-risk-claim HOLD/escalation without leakage.",
+          "The Production origin passes fresh public-access, protection, metadata, robots/sitemap, trust-surface, accessibility/responsive/browser, and release-provenance checks required by the 22-case matrix.",
+          "The evidence is publication-safe and contains no secrets, credentials, raw private material, personal identifiers, session data, or token-bearing URLs.",
+          "The terminal result is exactly NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE. A successful READY result does not decide GO/HOLD; GO/HOLD remains a separate owner action after this independent reverification."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/investigationstrategy.md",
+          "docs/datamodel.md",
+          "docs/explorerarchitecture.md",
+          "docs/design/m013-launch-automation-contract.md",
+          "docs/design/audits/m013-wu048-go-live-verification/report.md"
+        ],
+        "suggestedFiles": [
+          "docs/design/audits/m014-wu052-go-live-reverification/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-048"
+        ],
+        "createdAt": "2026-09-15T13:31:45.422Z",
+        "updatedAt": "2026-09-15T13:31:45.422Z"
       }
     ],
     "dependencies": [
@@ -2529,6 +2782,27 @@
         "toId": "WU048",
         "type": "blocks",
         "reason": "WU048 verifies production/public hardening against the artifact WU047 produces."
+      },
+      {
+        "id": "DEP-046",
+        "fromId": "WU049",
+        "toId": "WU050",
+        "type": "blocks",
+        "reason": "Exact release provenance is established only after the required safety-admission remediation is complete."
+      },
+      {
+        "id": "DEP-047",
+        "fromId": "WU050",
+        "toId": "WU051",
+        "type": "blocks",
+        "reason": "Production hardening release is conditionally authorized only after exact provider-attested SHA provenance exists."
+      },
+      {
+        "id": "DEP-048",
+        "fromId": "WU051",
+        "toId": "WU052",
+        "type": "blocks",
+        "reason": "Independent Go-Live reverification must assess the actual hardened Production release."
       }
     ]
   },
@@ -6334,17 +6608,438 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-12T19:19:19.431Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-12T19:19:19.431Z"
+    },
+    {
+      "id": "C046",
+      "workUnitId": "WU045",
+      "packetId": "PKT-046",
+      "summary": "Implemented WU045 automated research preparation per the owner-approved WU044 contract: a local/operator-triggered orchestrator (tools/research/orchestrate/) that drives an accepted RESEARCH_TRIGGER through both required OD-B AI invocations (PRIMARY_AUTHOR then a fresh, separately-invoked INDEPENDENT_REVIEWER) to a validated, non-canonical READY_FOR_HUMAN_REVIEW Research Change Set, with zero normal-path human handoffs. An implementation review found WU045-B01 (the normal path consumed pre-created files instead of performing the two AI invocations); that gap was remediated with a provider-neutral local AiInvoker boundary. A first independent review then found two CRITICAL findings (unsafe idempotent RCS reuse; AI-controlled candidate-path traversal) plus two lower-severity design/hardening items (reviewer/final-package snapshot divergence; child-process environment inheritance); all four were remediated (rcs-validator.ts full structural+fingerprint validation; path-containment.ts two-layer structural+symlink-aware containment; assembleResearchChangeSet() carrying the reviewer's exact in-memory snapshot into final assembly; ai-invoker.ts's buildChildEnv() minimal environment allowlist). A second independent re-review returned PASS — READY_FOR_M013_WU045_OWNER_GATE, and the repository owner recorded APPROVE — WU045_ACCEPTED, explicitly accepting two residual LOW observations as non-blocking debt. This checkpoint records that accepted outcome; it performs no further implementation.",
+      "completed": [
+        "Implemented the normal-path orchestration entry point (tools/research/orchestrate/cli.ts) driving RESEARCH_TRIGGER -> PRIMARY_AUTHOR invocation -> envelope validation -> materialization -> deterministic candidate/delta/validation/readiness preparation -> frozen reviewer input -> fresh INDEPENDENT_REVIEWER invocation -> review validation -> final RCS assembly -> READY_FOR_HUMAN_REVIEW, reusing existing deterministic primitives (candidate-delta, prospective-validation, canonical-integration-review, canonical-integration-plan) without reimplementing them.",
+        "Added a provider-neutral local AiInvoker/LocalCommandAiInvoker boundary (tools/research/orchestrate/ai-invoker.ts) using safe argv-based spawnSync with shell:false, stdin/stdout-only input/output, explicit timeout/exit-code/stderr handling, and fail-closed AI_RUNTIME_NOT_CONFIGURED when no local command is configured -- no vendor SDK, hosted backend, or credential architecture introduced.",
+        "Remediated WU045-B01 (normal path did not perform the two OD-B AI invocations) by wiring both PRIMARY_AUTHOR and a fresh, separately-invoked INDEPENDENT_REVIEWER into the CLI's normal path, with zero pre-created manifest/candidate/review files required.",
+        "Remediated independent-review CRITICAL finding 1 (unsafe idempotent RCS reuse) with rcs-validator.ts: full structural validation of every ResearchChangeSet sub-structure plus deterministic recomputation and verification of preparationFingerprint before any existing package is trusted, replacing a prior four-string-field comparison that could be satisfied by a fabricated or corrupted file.",
+        "Remediated independent-review CRITICAL finding 2 (AI-controlled candidate-path traversal) with path-containment.ts: structural rejection of traversal/absolute/rooted path forms plus symlink-aware runtime containment (realpathSync-based, not string-prefix comparison) applied identically to both the candidate write path (materializeAuthoringEnvelope) and read path (candidate-loader.ts).",
+        "Remediated design-hardening finding 3 (reviewed snapshot vs. final package divergence) by extracting assembleResearchChangeSet() so the final package is built directly from the same in-memory CanonicalIntegrationReview object frozen for the independent reviewer, eliminating the prior second disk re-read/re-derivation step.",
+        "Remediated design-hardening finding 4 (unbounded child-process environment inheritance) with ai-invoker.ts's buildChildEnv(): a minimal, documented OS/launch-essential allowlist plus an explicit RESEARCH_AI_CHILD_*-prefixed operator opt-in channel, replacing full process.env inheritance by the spawned AI command.",
+        "Added 96 new adversarial/regression tests (path-containment.test.ts, rcs-validator.test.ts, cli-reuse.test.ts, plus additions to run-cycle/authoring-envelope/manifest/candidate-loader/ai-invoker tests) reproducing every independent-review proof-of-concept as a permanent regression.",
+        "Independent re-review additionally and independently reproduced all adversarial PoCs against the committed code (fabricated RCS reuse, incomplete RCS reuse, invalid independent-review outcome, traversal write toward the repository root, traversal read outside the candidates directory, real-secret env leakage, and an unprivileged Windows junction/reparse-point escape) and confirmed every one fails closed.",
+        "Obtained explicit owner approval (Owner Gate: APPROVE -- WU045_ACCEPTED) of the delivered architecture, the OD-B two-invocation model, the independent-reviewer isolation model, the fail-closed security/trust boundaries, and the two accepted LOW residual observations."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "tools/research/orchestrate/ai-invoker.ts",
+        "tools/research/orchestrate/ai-invoker.test.ts",
+        "tools/research/orchestrate/authoring-envelope.ts",
+        "tools/research/orchestrate/authoring-envelope.test.ts",
+        "tools/research/orchestrate/candidate-loader.ts",
+        "tools/research/orchestrate/candidate-loader.test.ts",
+        "tools/research/orchestrate/cli.ts",
+        "tools/research/orchestrate/cli-reuse.test.ts",
+        "tools/research/orchestrate/fingerprint.ts",
+        "tools/research/orchestrate/fingerprint.test.ts",
+        "tools/research/orchestrate/independent-review.ts",
+        "tools/research/orchestrate/independent-review.test.ts",
+        "tools/research/orchestrate/manifest.ts",
+        "tools/research/orchestrate/manifest.test.ts",
+        "tools/research/orchestrate/path-containment.ts",
+        "tools/research/orchestrate/path-containment.test.ts",
+        "tools/research/orchestrate/primary-prompt.ts",
+        "tools/research/orchestrate/rcs-validator.ts",
+        "tools/research/orchestrate/rcs-validator.test.ts",
+        "tools/research/orchestrate/research-change-set.ts",
+        "tools/research/orchestrate/research-change-set.test.ts",
+        "tools/research/orchestrate/reviewer-input.ts",
+        "tools/research/orchestrate/reviewer-input.test.ts",
+        "tools/research/orchestrate/reviewer-prompt.ts",
+        "tools/research/orchestrate/run-cycle.ts",
+        "tools/research/orchestrate/run-cycle.test.ts",
+        "tools/research/orchestrate/types.ts",
+        "tools/research/orchestrate/workbench-boundary.ts",
+        "tools/research/orchestrate/workbench-boundary.test.ts"
+      ],
+      "issues": [
+        {
+          "title": "Duplicated fingerprint field lists (rcs-validator.ts / research-change-set.ts)",
+          "description": "rcs-validator.ts's fingerprint recomputation and research-change-set.ts's fingerprint construction use intentionally duplicated field lists rather than one shared function. Owner-accepted non-blocking maintenance debt (Owner Gate, APPROVE -- WU045_ACCEPTED). Any future field-list divergence fails closed (every valid package would fail fingerprint verification) rather than silently passing, so the residual risk is maintenance friction, not a safety or security gap. May be consolidated opportunistically in a later work unit; not required for WU045 closure.",
+          "severity": "low",
+          "status": "resolved",
+          "agentCanFix": true
+        },
+        {
+          "title": "Windows symlink unit test skipped where privilege is unavailable",
+          "description": "The Windows symlink-specific unit test in path-containment.test.ts is skipped in environments lacking symlink-creation privilege (confirmed via EPERM on this machine). Owner-accepted (Owner Gate, APPROVE -- WU045_ACCEPTED): the skip condition is explicit and genuinely environment-forced (re-verified independently, not merely trusted); the non-symlink containment model is independently covered by 15 other passing path-containment tests; and the production runtime-containment implementation was independently, concretely corroborated on this machine via an unprivileged Windows junction/reparse-point escape attempt against the real resolveContainedPath(), which correctly rejected it.",
+          "severity": "low",
+          "status": "resolved",
+          "agentCanFix": true
+        }
+      ],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "typecheck + full test suite + research:validate all passed: 297 tests, 296 pass, 1 legitimate environment-gated skip (Windows symlink privilege), 0 failures; 274 canonical records validated OK."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 record(s): OK -- unchanged from the WU044 baseline (12 PRB + 143 EVD + 119 SRC)."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No conflict markers or whitespace errors (only pre-existing CRLF/LF line-ending warnings on already-tracked .aiqt/* files)."
+        },
+        {
+          "command": "aiqt status",
+          "result": "passed",
+          "summary": "Project in_progress; M013/WU045 current; next recommended command aiqt checkpoint."
+        },
+        {
+          "command": "aiqt review",
+          "result": "passed",
+          "summary": "Non-blocking findings only: pre-existing C008/C009/C010 packet-reference debt and expected planned-work-unit scope notices (WU046/WU047/WU048); no new finding attributable to WU045."
+        },
+        {
+          "command": "aiqt graph validate",
+          "result": "passed",
+          "summary": "3 pre-existing blocking findings, all C008/C009/C010 broken checkpoint-packet references (historical AIQT debt predating WU045, out of scope to repair here); no new graph-integrity finding introduced by WU045."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": ".research-workbench/ remains non-canonical, non-public, and gitignored",
+          "result": "passed",
+          "evidence": "workbench-boundary.ts's assertWorkbenchBoundary() (enforced at CLI startup) plus the existing workbench-boundary.test.ts regression test confirm .research-workbench/ is git-ignored; path-containment.ts additionally guarantees every materialized candidate file stays strictly within the approved candidate directory beneath it, independently verified by reproduced traversal PoCs (deep traversal write, repository-root-targeted traversal write, outside-directory traversal read) that all failed closed against the committed code."
+        },
+        {
+          "criterion": "No pre-Gate candidate material is committed, pushed, or published",
+          "result": "passed",
+          "evidence": "No commit, push, or PR occurred at any point in WU045's implementation, remediation, or review; grep across tools/research/orchestrate/ confirms zero import or call of applyCanonicalIntegrationPlan() or the canonical promoter; research/** carries zero diff throughout, confirmed by repeated npm run research:validate runs reporting an unchanged 274-record corpus."
+        },
+        {
+          "criterion": "Zero human semantic interventions occur on the normal path before READY_FOR_HUMAN_REVIEW",
+          "result": "passed",
+          "evidence": "run-cycle.ts's runResearchCycle() drives RESEARCH_TRIGGER through PRIMARY_AUTHOR invocation, envelope validation, materialization, deterministic review preparation, frozen reviewer input, a fresh INDEPENDENT_REVIEWER invocation, review validation, and final RCS assembly to READY_FOR_HUMAN_REVIEW with no pre-created manifest/candidate/review files required and no manual step in between; independently re-verified end-to-end with a synthetic normal-path run confirming exactly two AI invocations and zero manual intervention."
+        },
+        {
+          "criterion": "Implementation matches only the owner-approved WU044 contract boundary",
+          "result": "passed",
+          "evidence": "All new/modified files are confined to tools/research/orchestrate/, matching contract section 11's 'explicit files/areas WU045 may touch'; no file under research/**, research/schemas/*.json, tools/research/{core,integration,readiness,validation}/, apps/research-explorer/**, .github/workflows/**, vercel.json, or .aiqt/** was modified by the WU045 implementation itself; OD-A (local/operator-triggered, no scheduler), OD-B (structured manifest + five-point-minimum-bar independent review, both now genuinely invoked and independently verified), and OD-C (JSON source of truth, WU046 renders the Markdown view) are implemented exactly as owner-approved."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-14T09:20:34.406Z"
+    },
+    {
+      "id": "C047",
+      "workUnitId": "WU046",
+      "packetId": "PKT-047",
+      "summary": "WU046 implemented the owner-approved Human Gate and bounded post-approval orchestration contract. Independent review passed and owner approval is recorded in EVT-302; no WU046 remediation is outstanding.",
+      "completed": [
+        "Assembled the Human Gate package architecture with JSON source of truth and Markdown rendered from the validated package object.",
+        "Transferred the readiness invocation into WU046 by directly using the existing readiness evaluator and preserving its rules and ReasonCodes.",
+        "Bound approval to deterministic RCS content hashing, rendered-package identity, and re-read/revalidate/re-hash decision submission checks.",
+        "Implemented fail-closed OD-D APPROVE, REJECT, and HOLD decision semantics and persisted package/content/base-bound decision records.",
+        "Re-verified canonical repository state immediately before promotion through the existing canonical promoter assertion and reused the existing promoter rather than adding a parallel write path.",
+        "Implemented the LOW-3 deterministic publication guard and bounded branch/PR retry compatibility checks.",
+        "Enforced the terminal hard stop at READY_FOR_OWNER_MERGE with no merge, auto-merge, or branch-protection bypass path."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "tools/research/human-gate/",
+        "tools/research/canonical-promoter.ts",
+        ".aiqt/runlog.jsonl"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Research typecheck, tests, and canonical validation passed; 274 canonical records validated."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "Explorer read-model generation, typecheck, tests, and production build passed; generated read model contains 274 records."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "The review package makes every required element inspectable in one place, including the readiness.ts-derived eligibility/corroboration/contradiction/duplicate-overlap findings (scope transfer above)",
+          "result": "passed",
+          "evidence": "Independent review PASS and EVT-302 confirm the JSON-source package exposes the readiness evaluator's structured findings and Markdown is rendered from the same validated object."
+        },
+        {
+          "criterion": "No AI recommendation is ever treated as an approval decision",
+          "result": "passed",
+          "evidence": "OD-D tests and independent review verified that only explicit human decision submission can approve; recommendations remain non-authoritative."
+        },
+        {
+          "criterion": "Only the approved deterministic path executes after explicit human approval",
+          "result": "passed",
+          "evidence": "Decision submission re-reads, revalidates, and re-hashes the exact package; invalid combinations and identity mismatches fail closed."
+        },
+        {
+          "criterion": "The PR is never merged and branch protection is never bypassed by this work unit",
+          "result": "passed",
+          "evidence": "Independent review confirmed no merge, auto-merge, owner-auto-approval, or branch-protection-bypass path; execution terminates at READY_FOR_OWNER_MERGE."
+        },
+        {
+          "criterion": "Repository publication remains owner-controlled",
+          "result": "passed",
+          "evidence": "The publication guard blocks unexpected staged/tracked content and the workflow requires explicit human approval; no push, PR, or merge was performed in this work unit's implementation or review."
+        },
+        {
+          "criterion": "HIGH-2 approval/content-hash binding is independently demonstrable: contentHash is a SHA-256 over the deterministic canonical JSON serialization of the validated RCS source of truth (never the rendered Markdown); the rendered Human Gate view is generated from that exact same validated in-memory object; on approval submission the JSON source is re-read from disk, revalidated, and re-hashed; the recomputed hash must equal the hash of the package actually shown to the owner; any mismatch aborts, invalidates the review session, and fails closed rather than proceeding; an approval decision can never be reused to authorize a different package, base SHA, or integration plan than the one it was recorded against",
+          "result": "passed",
+          "evidence": "Adversarial tests verified deterministic hashing, same-object render binding, mutation/replay/cross-package rejection, and content/base/package-bound approval records."
+        },
+        {
+          "criterion": "LOW-3 deterministic publication guard is independently demonstrable: immediately before commit/push/PR, staged/tracked paths are checked against the exact approved CanonicalIntegrationPlan operation set; any unexpected staged/tracked path (including any .research-workbench/** or equivalent gitignored candidate/RCS location) fails the publication sequence closed before any commit/push/PR occurs; the control is enforced at the Git-publication boundary itself and does not rely solely on .gitignore, a pre-commit hook, or developer discipline",
+          "result": "passed",
+          "evidence": "Publication-guard tests passed, including Git porcelain -z handling and rejection of unexpected publication content."
+        },
+        {
+          "criterion": "Pre-promotion repository-state re-verification (baseGitSha vs. current HEAD) occurs via the existing canonical-promoter.ts assertion immediately before any promotion attempt, and a stale/mismatched base aborts before any canonical write",
+          "result": "passed",
+          "evidence": "Independent review verified immediate invocation of the existing canonical promoter assertion and no parallel canonical-write path."
+        },
+        {
+          "criterion": "The Human Gate decision record persists in the same gitignored cycle directory as the RCS it decides, outside research/**, bound to packageId/contentHash/baseGitSha/actor/timestamp/canonicalAcceptance/publicExplorerPublication, and a decision record for one package never authorizes another",
+          "result": "passed",
+          "evidence": "Decision-record tests and independent review verified required persistence fields, package/content/base binding, resume/retry support, and cross-package rejection."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-15T09:26:17.655Z"
+    },
+    {
+      "id": "C048",
+      "workUnitId": "WU047",
+      "packetId": "PKT-048",
+      "summary": "WU047 Production Launch Hardening is accepted by the owner after final independent review.",
+      "completed": [
+        "Recorded all seven approved P2 dispositions: six PASS_VERIFIED and the custom-domain OWNER_ACCEPTED_DEFER.",
+        "Implemented and verified the bounded six-route sitemap, approved metadata, and five public trust surfaces.",
+        "Recorded accepted accessibility, responsive, browser, privacy-precondition, deployment-protection, and preview-access evidence.",
+        "Corrected the sitemap audit history to distinguish the initial 292-URL non-compliant sitemap from the final six-route sitemap."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "apps/research-explorer/src/lib/generateSitemap.ts",
+        "apps/research-explorer/src/lib/generateSitemap.test.ts",
+        "apps/research-explorer/src/components/App.tsx",
+        "apps/research-explorer/src/styles.css",
+        "docs/design/audits/m013-wu047-launch-hardening/audit.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "focused sitemap tests",
+          "result": "passed",
+          "summary": "Final sitemap has exactly six approved canonical path routes and no query strings, fragments, or duplicates."
+        },
+        {
+          "command": "full Explorer tests",
+          "result": "passed",
+          "summary": "Accepted final validation evidence."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "Accepted final validation evidence."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "Accepted final validation evidence."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Every one of the seven WU044 §13 P2 items is explicitly recorded as exactly one of PASS_VERIFIED, OWNER_ACCEPTED_DEFER, or OWNER_ACTION_REQUIRED; no P2 item remains undispositioned.",
+          "result": "passed",
+          "evidence": "Six PASS_VERIFIED dispositions and one OWNER_ACCEPTED_DEFER custom-domain decision were accepted by the owner."
+        },
+        {
+          "criterion": "WU047 cannot close while an OWNER_ACTION_REQUIRED P2 item remains unresolved unless the owner subsequently records an explicit defer/accept decision.",
+          "result": "passed",
+          "evidence": "No OWNER_ACTION_REQUIRED P2 disposition remains."
+        },
+        {
+          "criterion": "Metadata PASS_VERIFIED evidence demonstrates every WU044-required production metadata element is present and correct; robots/sitemap evidence demonstrates the WU044-required public endpoints and their status/content on the intended production origin; trust-surface evidence demonstrates each WU044-required surface exists, is reachable in the intended public experience, and contains its canonically required information.",
+          "result": "passed",
+          "evidence": "Final independent review accepted metadata, bounded sitemap, and five trust surfaces."
+        },
+        {
+          "criterion": "The bounded accessibility/responsive/browser audit uses existing repository browser/testing tooling where available and evidence establishes no launch-blocking unusable navigation, inaccessible primary action, material clipping/overflow, or browser-specific broken primary workflow on WU044 public launch surfaces at the project's supported desktop/mobile viewports and browser matrix.",
+          "result": "passed",
+          "evidence": "Accepted browser evidence covers 1280x900 and 360x800; navigation and primary actions remain usable."
+        },
+        {
+          "criterion": "Deployment Protection and Preview access-control results are supported by objective read-only external evidence; any configuration change needed is recorded OWNER_ACTION_REQUIRED rather than performed.",
+          "result": "passed",
+          "evidence": "Both Deployment Protection and Preview access control are PASS_VERIFIED by accepted read-only evidence."
+        },
+        {
+          "criterion": "The custom-domain item is recorded OWNER_ACCEPTED_DEFER unless canonical evidence shows the approved current production origin is unusable for public launch.",
+          "result": "passed",
+          "evidence": "The owner accepted the custom-domain defer; the approved production alias is usable."
+        },
+        {
+          "criterion": "The favicon.ico 404 and approximately 9px .explorer-navigation overflow at approximately 360px are each re-evaluated and recorded as P3 OWNER_ACCEPTED_DEFER; if fresh evidence establishes P0/P1 impact, WU047 stops for owner disposition without changing severity or implementing a fix.",
+          "result": "passed",
+          "evidence": "Both P3 observations were re-evaluated and accepted as non-blocking OWNER_ACCEPTED_DEFER residual debt."
+        },
+        {
+          "criterion": "WU047 closes only with no unresolved P0/P1 launch blocker, all seven P2 dispositions recorded, all authorized local remediations complete and validated, both P3 observations re-evaluated, and no newly discovered unresolved launch blocker.",
+          "result": "passed",
+          "evidence": "Final independent review passed and the owner accepted WU047."
+        },
+        {
+          "criterion": "Only WU044-approved, confirmed, required, minimal, repository-local fixes needing no new product/design/governance decision are implemented",
+          "result": "passed",
+          "evidence": "Owner accepted the bounded implementation scope."
+        },
+        {
+          "criterion": "AR-05 is not reopened and C008/C009/C010 are not repaired",
+          "result": "passed",
+          "evidence": "No AR-05 or C008/C009/C010 change occurred."
+        },
+        {
+          "criterion": "M010 DS-04B owner-frozen values remain binding and unchanged",
+          "result": "passed",
+          "evidence": "No M010 DS-04B value change occurred."
+        },
+        {
+          "criterion": "No broad redesign is introduced",
+          "result": "passed",
+          "evidence": "The implementation remained within the approved launch-hardening scope."
+        },
+        {
+          "criterion": "npm run explorer:build and git diff --check pass; closure evidence includes the seven P2 dispositions and both P3 re-evaluations, without adding research:check as a WU047 gate.",
+          "result": "passed",
+          "evidence": "Accepted validation records build and diff checks as passed, with all P2 and P3 dispositions recorded."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-15T11:16:27.117Z"
+    },
+    {
+      "id": "C049",
+      "workUnitId": "WU048",
+      "packetId": "PKT-049",
+      "summary": "Completed the independent M013/WU048 verification and owner-reviewed evidence correction cycle. The accepted canonical verification verdict is NOT_READY; this closes the verification work unit without authorizing remediation, promotion, publication, or GO/HOLD.",
+      "completed": [
+        "Executed and assessed all 22 Section 14 verification cases using bounded synthetic fixtures and a separately governed candidate where applicable.",
+        "Recorded the corrected 17 PASS / 5 FAIL matrix, technical gates, provenance limitation, candidate/Production distinction, and sanitized evidence.",
+        "Obtained independent review confirmation and owner acceptance that NOT_READY is the accurate WU048 verification outcome.",
+        "Preserved all six P1 remediation areas as unresolved blockers outside WU048."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl",
+        "docs/design/audits/m013-wu048-go-live-verification/report.md",
+        "docs/design/audits/m013-wu048-go-live-verification/evidence/execution-baseline.md",
+        "docs/design/audits/m013-wu048-go-live-verification/evidence/correction-cycle.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Fresh correction-cycle result: 391 passed, 0 failed, 1 skipped; 274 records validated."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "Fresh normal-checkout correction-cycle result: 520 passed, 0 failed, 1 skipped; Vite completed."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "All 22 §14 cases are exercised with per-case expected outcome, actual outcome, PASS/FAIL result, evidence reference, and freshness classification where applicable; WU046/WU047 evidence reuse is identified where applicable.",
+          "result": "passed",
+          "evidence": "The accepted report records 22 assessed cases: 17 PASS and 5 FAIL, with per-case expected/actual/result/evidence/freshness and C047/C048 reuse."
+        },
+        {
+          "criterion": "Case 17 uses a fresh separately governed candidate built/deployed from exactly add597da2510056d0f05d7b090d9a75828686f79, with immutable deployment identity/provenance, build result, timestamps, and SHA match recorded; its read-only Production-origin inspection is distinct from candidate-artifact proof.",
+          "result": "passed",
+          "evidence": "The report records candidate dpl_4RgDRBjSoBdTqEqnLo5fo9j3ZRec, its immutable URL, bound SHA, timestamp, Ready status, and the distinct Production inspection. It correctly records that the immutable source-to-deployment proof is insufficient, causing canonical NOT_READY."
+        },
+        {
+          "criterion": "The separately governed candidate does not become the Production alias and preserves existing configuration/protection. Any need to mutate external configuration stops as OWNER_ACTION_REQUIRED; unavailable authorized candidate tooling returns BLOCKED.",
+          "result": "passed",
+          "evidence": "Candidate remained SSO-protected/noindex and was not assigned the Production alias; no external configuration or protection mutation occurred."
+        },
+        {
+          "criterion": "Fixture cases use only disposable non-public synthetic state and safe boundary replacements; they perform no canonical corpus write, real push/PR/merge/Production publication, external configuration mutation, or public candidate leakage.",
+          "result": "passed",
+          "evidence": "Correction-cycle evidence records disposable synthetic fixtures, cleanup, no canonical writes, and no push, PR, merge, publication, configuration mutation, or leakage."
+        },
+        {
+          "criterion": "The canonical report is docs/design/audits/m013-wu048-go-live-verification/report.md with bounded supporting evidence under evidence/, and satisfies the defined provenance, case, finding, accepted-risk, freshness, and terminal-result record requirements without retaining prohibited sensitive material.",
+          "result": "passed",
+          "evidence": "Independent review accepted the sanitized report, execution baseline, and correction-cycle evidence; no secret, session, credential, private fixture, or token-bearing URL is retained."
+        },
+        {
+          "criterion": "NOT_READY is returned for any P0/P1, mandatory-case failure, provenance/bound-artifact failure, missing required evidence, or mandatory launch-requirement failure. READY_WITH_ACCEPTED_RISK requires all other requirements to pass plus only explicitly owner-accepted P2 risk. READY_FOR_GO_LIVE_GATE requires all mandatory cases and contract conditions to pass with no P0/P1 or unresolved/unaccepted P2.",
+          "result": "passed",
+          "evidence": "Five mandatory case failures and unresolved P1 findings are recorded; owner accepted NOT_READY as the correct canonical result and accepted no P1 risk."
+        },
+        {
+          "criterion": "WU048 remains verification-only: it does not decide GO/HOLD, remediate defects, promote/publish the candidate, or start a successor. M013 lifecycle completion, if later achieved through its canonical AIQT graph, is administrative and distinct from owner GO/HOLD.",
+          "result": "passed",
+          "evidence": "No remediation, promotion, publication, GO/HOLD decision, or successor action occurred; the owner gate explicitly retains GO/HOLD separately."
+        },
+        {
+          "criterion": "Only the owner decides GO / HOLD",
+          "result": "passed",
+          "evidence": "The owner accepted the verification outcome only. No GO/HOLD was issued."
+        },
+        {
+          "criterion": "No successor beyond WU048 is started or authorized",
+          "result": "passed",
+          "evidence": "No successor was created or started; remediation remains future separately scoped work."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "nextRecommendation": "aiqt review --mode release",
+      "createdAt": "2026-09-15T13:06:57.029Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-045",
-    "workUnitId": "WU044",
-    "milestoneId": "M013",
-    "createdAt": "2026-09-12T14:22:28.400Z",
+    "id": "PKT-050",
+    "workUnitId": "WU049",
+    "milestoneId": "M014",
+    "createdAt": "2026-09-15T13:33:09.445Z",
     "format": "markdown",
-    "contentHash": "sha256:c399f14f8ff1f06766c1d9adf28556b826035b8e81381e410c3f15d0ecd94036",
+    "contentHash": "sha256:a37f09da03b0e4637ba4b3cc4462a5f55d8c3d1c5c25e7eddf03e9a2c2f3ab63",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -6362,8 +7057,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-12T19:19:19.431Z",
+  "nextRecommendedCommand": "aiqt checkpoint",
+  "lastUpdatedAt": "2026-09-15T14:44:15.323Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -6385,6 +7080,12 @@
         "sourceCommand": "aiqt review acknowledge"
       }
     ]
+  },
+  "issues": {
+    "overrides": [],
+    "promotions": [],
+    "projectIssues": [],
+    "projectIssueTransitions": []
   },
   "checkpointAmendments": [
     {
@@ -6428,6 +7129,53 @@
       "sourceCommand": "aiqt checkpoint amend"
     }
   ],
+  "evidence": {
+    "records": [
+      {
+        "evidenceId": "EVID-001",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-owner",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU047",
+          "packetId": "PKT-048",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "work/m013-wu047-production-launch-hardening",
+          "commitSha": "eab6d4a53e5f3b7082b0ce251c537554156ebd1e",
+          "capturedAt": "2026-09-15T10:24:25.742Z"
+        },
+        "reviewer": {
+          "reviewerId": "owner",
+          "reviewerType": "human",
+          "independentContext": "declared_not_independent"
+        },
+        "results": {
+          "reviewResult": "passed",
+          "validationResult": "not_run",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Owner approved exact WU047 metadata, public crawling/sitemap inventory, five trust-surface texts, canonical Issues destination, and the stated privacy precondition. Deployment and platform settings remain out of scope."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-15T10:24:25.742Z",
+        "recordedAt": "2026-09-15T10:27:00.967Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:18ed0fee805b108625c5658f03a9fa9b41e0536269cdf91e0e110338a258f499",
+          "externalEvidenceId": "WU047-owner-launch-surface-decision-2026-09-15",
+          "importIdentityKey": "sha256:9ffef2e8d99264e897a0d7311a570d54dd6abb536e63ac5f1482e9f418d85afb",
+          "importedAt": "2026-09-15T10:27:00.967Z"
+        }
+      }
+    ],
+    "decisionEscalations": []
+  },
   "checkpointEvidenceAdvisories": [
     {
       "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
@@ -7824,6 +8572,126 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-12T19:19:19.431Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C046",
+      "current": {
+        "observationId": "sha256:ae4c10a6dbdd2c02809c15cdf40a055c422f912ffbf407fe2521a5421c62713c",
+        "checkpointId": "C046",
+        "workUnitId": "WU045",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-14T09:20:34.406Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-14T09:20:34.406Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:ae4c10a6dbdd2c02809c15cdf40a055c422f912ffbf407fe2521a5421c62713c",
+          "checkpointId": "C046",
+          "workUnitId": "WU045",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-14T09:20:34.406Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-14T09:20:34.406Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C047",
+      "current": {
+        "observationId": "sha256:dec933f5fae66cfb2ec660d7d1020e6edb57baf6d88652572102d4d2aa67ca15",
+        "checkpointId": "C047",
+        "workUnitId": "WU046",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-15T09:26:17.655Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-15T09:26:17.655Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:dec933f5fae66cfb2ec660d7d1020e6edb57baf6d88652572102d4d2aa67ca15",
+          "checkpointId": "C047",
+          "workUnitId": "WU046",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-15T09:26:17.655Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-15T09:26:17.655Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C048",
+      "current": {
+        "observationId": "sha256:044f17f5052e52723434ec84f059cead29eecbf9006b1d26541ecf43f2b46d54",
+        "checkpointId": "C048",
+        "workUnitId": "WU047",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-15T11:16:27.117Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-15T11:16:27.117Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:044f17f5052e52723434ec84f059cead29eecbf9006b1d26541ecf43f2b46d54",
+          "checkpointId": "C048",
+          "workUnitId": "WU047",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-15T11:16:27.117Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-15T11:16:27.117Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C049",
+      "current": {
+        "observationId": "sha256:ade79f30a24d472f15c02239c3d0cf1cf4b9af42c714f03293ee07d4cd0efdec",
+        "checkpointId": "C049",
+        "workUnitId": "WU048",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-15T13:06:57.029Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-15T13:06:57.029Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:ade79f30a24d472f15c02239c3d0cf1cf4b9af42c714f03293ee07d4cd0efdec",
+          "checkpointId": "C049",
+          "workUnitId": "WU048",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-15T13:06:57.029Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-15T13:06:57.029Z"
         }
       ]
     }
