@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M014",
-  "currentWorkUnitId": "WU049",
+  "currentWorkUnitId": "WU053",
   "workGraph": {
     "milestones": [
       {
@@ -166,7 +166,8 @@
           "WU049",
           "WU050",
           "WU051",
-          "WU052"
+          "WU052",
+          "WU053"
         ]
       }
     ],
@@ -2319,10 +2320,10 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-09-15T13:31:45.422Z",
-        "updatedAt": "2026-09-15T14:44:15.323Z"
+        "updatedAt": "2026-09-16T11:48:43.912Z"
       },
       {
         "id": "WU050",
@@ -2363,12 +2364,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-046"
         ],
         "createdAt": "2026-09-15T13:31:45.422Z",
-        "updatedAt": "2026-09-15T13:31:45.422Z"
+        "updatedAt": "2026-09-16T11:48:43.912Z"
       },
       {
         "id": "WU051",
@@ -2465,6 +2466,54 @@
         ],
         "createdAt": "2026-09-15T13:31:45.422Z",
         "updatedAt": "2026-09-15T13:31:45.422Z"
+      },
+      {
+        "id": "WU053",
+        "milestoneId": "M014",
+        "title": "WU049 E2E Remediation: Real Source Availability + Pre-Gate Claim Resolution",
+        "objective": "Fix the two production-path gaps exposed by the real PRB-0005 (Variante Nascente) E2E run of the WU045 CLI: (1) no production SourceAvailabilityAdapter was ever wired into the normal CLI path, causing every non-private material Source to fail closed as SOURCE_REVALIDATION_MISSING instead of receiving a real availability check; (2) no operator-resolution path exists for the CLAIM_INFERENCE_LIMITS_PRESENT structural HOLD, so a safety-sensitive claim with explicit inference limits can never proceed to independent review even when an owner has reviewed and accepted it. Both fixes preserve WU049's existing fail-closed safety-admission semantics exactly; this is bounded maintenance on WU049's own deliverable, not new policy.",
+        "scope": [
+          "Implement a real production SourceAvailabilityAdapter (Node built-ins only) that performs a post-freeze HTTP(S) availability check against a Source's existing canonical_reference field and returns only the existing AvailabilityStatus values (available/unavailable/unknown/timeout/error/unsupported/authentication_required), preserving current freshness and fail-closed semantics; wire it into the normal tools/research/orchestrate/cli.ts execution path so a real CLI run no longer HOLDs every Source as SOURCE_REVALIDATION_MISSING.",
+          "Implement a local, workbench-only pre-Gate human-resolution mechanism scoped exclusively to the CLAIM_INFERENCE_LIMITS_PRESENT finding: a deterministic resolution record bound to the exact base SHA, subject (EVD id), candidate content, inference_limits, and finding, using the existing project fingerprint/hash convention (tools/research/orchestrate/fingerprint.ts sha256Hex/canonicalJsonStringify). A stale or mismatched resolution (changed candidate, limits, base SHA, or subject) fails closed and does not clear the finding. Resolution acceptance means only that the finding may stop blocking progression to independent review/Human Gate (with inference limits left fully intact in the package); it is never canonical approval or claim validation, and it must not affect any other finding code.",
+          "Add focused regression tests: real-adapter available/unavailable/unknown/timeout/error/unsupported outcomes; freshness/staleness boundaries reusing the existing convention; unresolved CLAIM_INFERENCE_LIMITS_PRESENT still HOLDs; an exact-match resolution is eligible only when no other blocking finding remains; changed candidate/limits/base SHA/subject invalidates a resolution; every other blocking finding code remains non-overridable by this mechanism; independent review is never invoked while HOLD remains."
+        ],
+        "outOfScope": [
+          "SRC/EVD/PRB schema or canonical research record changes",
+          "Any new AvailabilityStatus value or persisted risk taxonomy",
+          "Canonical approval, claim validation, or any human-owned semantic decision beyond accepting continuation to independent review with limits intact",
+          "Overriding any blocking finding other than CLAIM_INFERENCE_LIMITS_PRESENT",
+          "Research Explorer, deployment configuration, or unrelated M014/WU050-052 state",
+          "Committing candidate research, publishing, promoting, deploying, or creating a PR"
+        ],
+        "acceptanceCriteria": [
+          "A real, wired SourceAvailabilityAdapter is used by the normal WU045 CLI path, uses only the Source's canonical_reference, returns only existing AvailabilityStatus values, and preserves fail-closed freshness semantics; private/missing/unverifiable Sources still HOLD.",
+          "CLAIM_INFERENCE_LIMITS_PRESENT remains blocking until an explicit, local/workbench-only human resolution record matches the exact base SHA, subject, candidate content, inference_limits, and finding; any mismatch fails closed.",
+          "Only CLAIM_INFERENCE_LIMITS_PRESENT is overridable by this mechanism; all other safety findings remain non-overridable.",
+          "Resolution enables continuation to independent review/Human Gate only, never canonical approval; inference limits remain intact in all downstream artifacts.",
+          "Focused regression tests cover real availability outcomes, freshness, unresolved-HOLD, exact-match eligibility, staleness/mismatch invalidation, non-overridable blockers, and reviewer-does-not-run-while-HOLD.",
+          "npm run research:check and git diff --check pass; no canonical/public research write occurs."
+        ],
+        "agentContextRefs": [
+          "docs/design/m013-launch-automation-contract.md",
+          "tools/research/admission/safety-admission.ts",
+          "tools/research/admission/hold-report.ts",
+          "tools/research/orchestrate/run-cycle.ts",
+          "tools/research/orchestrate/cli.ts"
+        ],
+        "suggestedFiles": [
+          "tools/research/admission/",
+          "tools/research/orchestrate/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "git diff --check"
+        ],
+        "status": "in_progress",
+        "dependencies": [
+          "DEP-049"
+        ],
+        "createdAt": "2026-09-16T11:48:23.551Z",
+        "updatedAt": "2026-09-16T11:48:51.473Z"
       }
     ],
     "dependencies": [
@@ -2803,6 +2852,13 @@
         "toId": "WU052",
         "type": "blocks",
         "reason": "Independent Go-Live reverification must assess the actual hardened Production release."
+      },
+      {
+        "id": "DEP-049",
+        "fromId": "WU049",
+        "toId": "WU053",
+        "type": "blocks",
+        "reason": "This remediation fixes production-path gaps in WU049's own Pre-Gate Safety Admission deliverable, exposed by a real E2E run; WU049's implementation must exist first."
       }
     ]
   },
@@ -7031,15 +7087,128 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt review --mode release",
       "createdAt": "2026-09-15T13:06:57.029Z"
+    },
+    {
+      "id": "C050",
+      "workUnitId": "WU049",
+      "packetId": "PKT-050",
+      "summary": "Completed M014/WU049 Pre-Gate Safety Admission and recorded the owner-approved final independent review.",
+      "completed": [
+        "Implemented deterministic pre-Gate Safety Admission with ELIGIBLE/HOLD outcomes.",
+        "Verified contradiction visibility, private-source non-leakage, material-Source traversal, availability revalidation, claim predicates, and deterministic RCS identity.",
+        "Received explicit owner approval for WU049 closure."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "tools/research/admission/safety-admission.ts",
+        "tools/research/admission/hold-report.ts",
+        "tools/research/orchestrate/run-cycle.ts",
+        "tools/research/orchestrate/research-change-set.ts",
+        "tools/research/gate/markdown-view.ts",
+        "tools/research/gate/package-builder.ts",
+        "tools/research/gate/package-validator.ts",
+        "tools/research/gate/types.ts",
+        "tools/research/orchestrate/types.ts",
+        "tools/research/orchestrate/rcs-validator.ts",
+        "tools/research/admission/safety-admission.test.ts",
+        "tools/research/orchestrate/run-cycle.test.ts",
+        "tools/research/orchestrate/research-change-set.test.ts",
+        "tools/research/orchestrate/rcs-validator.test.ts"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "focused WU049 tests",
+          "result": "passed",
+          "summary": "68 focused tests passed."
+        },
+        {
+          "command": "npm run research:typecheck",
+          "result": "passed",
+          "summary": "TypeScript validation passed."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 canonical records."
+        },
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Repository research check passed."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "One canonical Pre-Gate Safety Admission producer returns only ELIGIBLE or HOLD with deterministic ordered/deduplicated findings, and orchestration, package projection, rendering, and tests consume that same result without reimplementing safety policy.",
+          "result": "passed",
+          "evidence": "Final independent review PASS and explicit owner acceptance."
+        },
+        {
+          "criterion": "Every candidate EVD with evidence_nature = claim receives the owner-approved structured safety checks. Only claim_authority = authoritative satisfies authority; non_authoritative, unknown, absent, or indeterminate authority HOLDs. Non-empty or indeterminate inference_limits[] HOLDs without parsing or semantically interpreting its text; an explicit empty list does not HOLD by itself. No truth, corroboration, legal/reputational, materiality, canonical-integration, or publication decision is introduced.",
+          "result": "passed",
+          "evidence": "Focused safety-admission and orchestration tests cover negative authority/inference-limit cases and the positive valid-claim path."
+        },
+        {
+          "criterion": "A material Source is derived only from explicit provenance of candidate EVD or affected-record decision_basis EVD. A private material Source HOLDs before reviewer/package and before external revalidation; no private content leaks and no automatic sanitization workflow exists.",
+          "result": "passed",
+          "evidence": "Traversal and private Hold Report regression coverage passed; final independent review accepted complete material-Source traversal."
+        },
+        {
+          "criterion": "Every non-private material Source is revalidated after candidate freeze and within ten minutes before admission; unavailable, unknown, timeout, verification error, unsupported, missing, authenticated/private, or stale revalidation deterministically HOLDs before Human Gate. This evidence establishes only fresh Source availability, not semantic claim currentness or truth.",
+          "result": "passed",
+          "evidence": "Focused temporal-boundary and unavailable/unverifiable availability tests passed."
+        },
+        {
+          "criterion": "A HOLD can never invoke the independent reviewer, assemble a final RCS, generate a normal Human Gate package, return READY_FOR_HUMAN_REVIEW, write canonical research state, commit, push, or publish; it produces only a non-canonical safe Pre-Gate Safety Hold Report with the approved minimal fields.",
+          "result": "passed",
+          "evidence": "Real orchestration HOLD regression passed, confirming no reviewer/RCS/package and a minimal safe Hold Report."
+        },
+        {
+          "criterion": "A represented contradiction remains structurally preserved and, when otherwise ELIGIBLE, appears with safe summary and references in the Human Gate JSON and rendered Markdown; it is not automatically a HOLD and is not recomputed by rendering.",
+          "result": "passed",
+          "evidence": "Canonical PRB evidence-effect contradiction regression and final independent review passed."
+        },
+        {
+          "criterion": "Structured findings distinguish contradiction visibility, private Source, Source revalidation missing/stale/unavailable/unknown-unverifiable, claim authority insufficient/unknown, and claim inference limits present/indeterminate; no semantic claim-currentness reason is emitted. Multiple findings sort by code then stable subject ID and deduplicate by that pair.",
+          "result": "passed",
+          "evidence": "Focused deterministic finding ordering/deduplication and claim-predicate tests passed."
+        },
+        {
+          "criterion": "Fresh deterministic unit, integration, package-projection, Markdown-rendering, orchestration-enforcement, and scenario coverage passes for M013/WU048 cases 5, 7, 9, and 22, including case-22 negative scenarios for authority, inference limits, and Source revalidation HOLD plus a positive regression proving that a claim whose structured predicates pass remains ELIGIBLE. Relevant existing §14 behavior does not regress.",
+          "result": "passed",
+          "evidence": "Focused WU049 suite passed 68/68; cases 5, 7, 9, 20, and 22 were freshly verified by final independent review."
+        },
+        {
+          "criterion": "No persisted research-schema migration, new persisted risk taxonomy, general crawler/live-research dependency, or forbidden semantic decision is introduced.",
+          "result": "passed",
+          "evidence": "Bounded diff and final independent review found no such expansion."
+        },
+        {
+          "criterion": "M013 remains historically done with WU048 canonical NOT_READY, and C008/C009/C010 are untouched.",
+          "result": "passed",
+          "evidence": "AIQT status and review retain historical M013/WU048 state and only report the pre-existing C008/C009/C010 diagnostics."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-16T11:48:43.912Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-050",
-    "workUnitId": "WU049",
+    "id": "PKT-051",
+    "workUnitId": "WU053",
     "milestoneId": "M014",
-    "createdAt": "2026-09-15T13:33:09.445Z",
+    "createdAt": "2026-09-16T11:48:51.473Z",
     "format": "markdown",
-    "contentHash": "sha256:a37f09da03b0e4637ba4b3cc4462a5f55d8c3d1c5c25e7eddf03e9a2c2f3ab63",
+    "contentHash": "sha256:8def4819ba333a7510477e22b288315acfb3dafed5412ad8b16664283ae064a3",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -7058,7 +7227,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-09-15T14:44:15.323Z",
+  "lastUpdatedAt": "2026-09-16T11:48:51.473Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8692,6 +8861,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-15T13:06:57.029Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C050",
+      "current": {
+        "observationId": "sha256:fb15a748f258066449c19d874473fccb3be0e25eab22f4f0559eee91d465262b",
+        "checkpointId": "C050",
+        "workUnitId": "WU049",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-16T11:48:43.912Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-16T11:48:43.912Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:fb15a748f258066449c19d874473fccb3be0e25eab22f4f0559eee91d465262b",
+          "checkpointId": "C050",
+          "workUnitId": "WU049",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-16T11:48:43.912Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-16T11:48:43.912Z"
         }
       ]
     }

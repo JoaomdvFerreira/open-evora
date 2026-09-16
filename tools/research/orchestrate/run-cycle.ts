@@ -39,7 +39,7 @@ import { assembleResearchChangeSet } from "./research-change-set.ts";
 import { buildReviewerInput } from "./reviewer-input.ts";
 import { buildReviewerPrompt } from "./reviewer-prompt.ts";
 import type { PreparationOutcome, ResearchTrigger } from "./types.ts";
-import { evaluateSafetyAdmission, type SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
+import { deriveMaterialNonPrivateSources, evaluateSafetyAdmission, type InferenceLimitResolutionChecker, type SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
 import { writeSafetyHoldReport } from "../admission/hold-report.ts";
 
 export interface RunResearchCycleInput {
@@ -50,8 +50,24 @@ export interface RunResearchCycleInput {
   cycleDir: string;
   primaryInvoker: AiInvoker;
   reviewerInvoker: AiInvoker;
-  /** Narrow, injectable read-only same-Source availability boundary. */
+  /**
+   * Narrow, injectable read-only same-Source availability boundary. Takes
+   * precedence over `resolveAvailabilityAdapter` below when both are
+   * supplied (tests use this synchronous form directly).
+   */
   availabilityAdapter?: SourceAvailabilityAdapter;
+  /**
+   * Async factory invoked once, immediately before admission, with exactly
+   * the material non-private Source set this cycle's frozen candidates
+   * produce (see safety-admission.ts's deriveMaterialNonPrivateSources()).
+   * Lets the normal CLI path perform real, live availability requests
+   * (necessarily asynchronous) without duplicating material-Source
+   * derivation or invoking AI twice. Ignored when `availabilityAdapter` is
+   * supplied directly.
+   */
+  resolveAvailabilityAdapter?: (materialSources: ReadonlyMap<string, Record<string, unknown>>) => Promise<SourceAvailabilityAdapter>;
+  /** Only ever consulted for CLAIM_INFERENCE_LIMITS_PRESENT; absent = always blocking. */
+  inferenceLimitResolutionChecker?: InferenceLimitResolutionChecker;
   /** Injectable clock for deterministic tests; admission evidence is runtime-only. */
   now?: () => Date;
 }
@@ -120,7 +136,7 @@ function materializeAuthoringEnvelope(
  * function delegates to for every deterministic step downstream of the two
  * AI invocations it adds.
  */
-export function runResearchCycle(input: RunResearchCycleInput): PreparationOutcome {
+export async function runResearchCycle(input: RunResearchCycleInput): Promise<PreparationOutcome> {
   // --- PRIMARY AI INVOCATION -------------------------------------------------
   const primaryPrompt = buildPrimaryAuthoringPrompt(input.trigger);
   const primaryResult = input.primaryInvoker.invoke({ role: "PRIMARY_AUTHOR", input: primaryPrompt });
@@ -182,14 +198,27 @@ export function runResearchCycle(input: RunResearchCycleInput): PreparationOutco
   // --- CANDIDATE FREEZE -> MATERIAL SOURCE REVALIDATION -> SAFETY ADMISSION --
   // No reviewer, RCS, or Human Gate package can be reached on HOLD.
   const frozenAt = (input.now?.() ?? new Date()).toISOString();
-  const evaluatedAt = (input.now?.() ?? new Date()).toISOString();
   const affectedProblemIds = [
     ...new Set([
       ...review.deltas.filter((delta) => delta.recordFamily === "PRB-").map((delta) => delta.id),
       ...(envelope.manifest.mode === "problem-refresh" && envelope.manifest.targetProblemId ? [envelope.manifest.targetProblemId] : []),
     ]),
   ].sort();
-  const admission = evaluateSafetyAdmission({ index: input.index, candidates: review.candidates, affectedProblemIds, frozenAt, evaluatedAt, availabilityAdapter: input.availabilityAdapter });
+
+  // Real availability requests happen here, strictly after freeze, so
+  // `checkedAt` can never precede `frozenAt`. The resolved adapter only ever
+  // covers the exact material non-private Source set the frozen candidates
+  // produce (deriveMaterialNonPrivateSources() — the same derivation
+  // evaluateSafetyAdmission() uses internally), never a broader or narrower
+  // set computed a second way.
+  let availabilityAdapter = input.availabilityAdapter;
+  if (!availabilityAdapter && input.resolveAvailabilityAdapter) {
+    const materialSources = deriveMaterialNonPrivateSources({ index: input.index, candidates: review.candidates, affectedProblemIds, frozenAt, evaluatedAt: frozenAt });
+    availabilityAdapter = await input.resolveAvailabilityAdapter(materialSources);
+  }
+
+  const evaluatedAt = (input.now?.() ?? new Date()).toISOString();
+  const admission = evaluateSafetyAdmission({ index: input.index, candidates: review.candidates, affectedProblemIds, frozenAt, evaluatedAt, baseGitSha: input.baseGitSha, availabilityAdapter, inferenceLimitResolutionChecker: input.inferenceLimitResolutionChecker });
   if (admission.disposition === "HOLD") {
     return { status: "PRE_GATE_SAFETY_HOLD", admission, holdReportPath: writeSafetyHoldReport(input.cycleDir, input.baseGitSha, admission) };
   }
