@@ -156,7 +156,16 @@ export function frozenCandidateFingerprint(manifest: GenerationManifest, candida
  * prospective-validation/availability/admission/reviewer/assembly logic —
  * there is no second, parallel implementation of any of those steps.
  */
-async function continueFromFrozenCandidates(
+/**
+ * Exported (beyond this module's own two callers) so a bounded, distinct
+ * orchestration path can re-verify and re-run the exact same prospective-
+ * validation -> freeze -> availability -> admission -> reviewer -> assembly
+ * sequence against frozen candidates it did not itself derive — see
+ * revalidate-frozen-cycle.ts. That module still never invokes
+ * PRIMARY_AUTHOR: it reaches this function the same way resumePreGateHold()
+ * does, by loading an already-frozen manifest/candidates from disk.
+ */
+export async function continueFromFrozenCandidates(
   cycleDir: string,
   baseGitSha: string,
   index: CorpusIndex,
