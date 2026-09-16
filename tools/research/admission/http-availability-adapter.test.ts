@@ -19,6 +19,7 @@ import test from "node:test";
 import {
   HttpSourceAvailabilityAdapter,
   isNonPublicAddress,
+  parseIpv6Literal,
   probe,
   resolveAvailabilityAdapter,
   resolvePublicAddress,
@@ -333,4 +334,126 @@ test("resolveAvailabilityAdapter resolves every material Source's guard decision
   assert.equal(adapter.check("SRC-B", {}).status, "unsupported");
   assert.equal(adapter.check("SRC-UNRELATED", {}).status, "unsupported");
   assert.deepEqual(new Set(resolved), new Set(["a.example.invalid", "b.example.invalid"]));
+});
+
+// --- F4: complete IANA special-purpose IPv6 classification --------------
+
+test("isNonPublicAddress blocks every IANA special-purpose IPv6 range named by the independent review", () => {
+  const addresses = [
+    "64:ff9b:1::1", // IPv4-IPv6 Translation (64:ff9b:1::/48)
+    "100:0:0:1::1", // AMT (100:0:0:1::/64)
+    "2001:2::1", // Benchmarking (2001:2::/48)
+    "2002::1", // 6to4 (2002::/16)
+    "3fff::1", // IETF Protocol Assignments, second block (3fff::/20)
+    "5f00::1", // Segment Routing (SRv6) SIDs (5f00::/16)
+  ];
+  for (const address of addresses) {
+    assert.equal(isNonPublicAddress(address), true, `expected ${address} to be blocked`);
+  }
+});
+
+test("isNonPublicAddress blocks the wider IETF Protocol Assignments umbrella (2001::/23) while still allowing public addresses outside it", () => {
+  for (const address of ["2001::1", "2001:1::1", "2001:3::1", "2001:4:112::1", "2001:20::1", "2001:1ff::1"]) {
+    assert.equal(isNonPublicAddress(address), true, `expected ${address} to be blocked`);
+  }
+  // 2001:db8::/32 (documentation) sits outside 2001::/23 and must remain
+  // blocked by its own separate rule, not merely by the umbrella above.
+  assert.equal(isNonPublicAddress("2001:db8::1"), true);
+  // A public address just outside every IANA special-purpose block must
+  // remain allowed — the umbrella must not over-block unrelated space.
+  assert.equal(isNonPublicAddress("2606:4700:4700::1111"), false);
+});
+
+test("resolvePublicAddress fails closed when one of several resolved addresses falls in an F4 special-purpose range, even if another is public", async () => {
+  const url = new URL("https://mixed-special-purpose.example.invalid/doc");
+  const result = await resolvePublicAddress(url, async () => [
+    { address: "2606:4700:4700::1111", family: 6 },
+    { address: "2002::1", family: 6 }, // 6to4
+  ]);
+  assert.equal(result, undefined);
+});
+
+// --- F5: IPv6 literals in canonical_reference URLs -----------------------
+
+test("parseIpv6Literal extracts the address from a bracketed IPv6 literal hostname", () => {
+  assert.equal(parseIpv6Literal("[::1]"), "::1");
+  assert.equal(parseIpv6Literal("[2606:4700:4700::1111]"), "2606:4700:4700::1111");
+  assert.equal(parseIpv6Literal("[2001:db8::1]"), "2001:db8::1");
+});
+
+test("parseIpv6Literal returns undefined for a plain hostname (not bracketed)", () => {
+  assert.equal(parseIpv6Literal("example.invalid"), undefined);
+  assert.equal(parseIpv6Literal("127.0.0.1"), undefined);
+  assert.equal(parseIpv6Literal("::1"), undefined); // unbracketed — not a valid URL authority form
+});
+
+test("parseIpv6Literal returns undefined for bracketed-but-invalid content, never trusting bracket syntax alone", () => {
+  assert.equal(parseIpv6Literal("[not-an-address]"), undefined);
+  assert.equal(parseIpv6Literal("[127.0.0.1]"), undefined); // IPv4 literal is never a valid bracketed IPv6 form
+  assert.equal(parseIpv6Literal("[]"), undefined);
+  assert.equal(parseIpv6Literal("[::1"), undefined); // missing closing bracket
+});
+
+test("resolvePublicAddress allows a public IPv6 literal canonical_reference without ever calling the resolver", async () => {
+  const url = new URL("https://[2606:4700:4700::1111]/doc");
+  let resolverCalled = false;
+  const result = await resolvePublicAddress(url, async () => {
+    resolverCalled = true;
+    return [];
+  });
+  assert.equal(result, "2606:4700:4700::1111");
+  assert.equal(resolverCalled, false);
+});
+
+test("resolvePublicAddress blocks a loopback IPv6 literal canonical_reference without ever calling the resolver", async () => {
+  const url = new URL("https://[::1]/doc");
+  let resolverCalled = false;
+  const result = await resolvePublicAddress(url, async () => {
+    resolverCalled = true;
+    return [];
+  });
+  assert.equal(result, undefined);
+  assert.equal(resolverCalled, false);
+});
+
+test("resolvePublicAddress blocks a non-public IPv6 literal canonical_reference from each named F4 range", async () => {
+  for (const literal of ["[fc00::1]", "[fe80::1]", "[2001:db8::1]", "[2002::1]", "[3fff::1]", "[5f00::1]"]) {
+    const url = new URL(`https://${literal}/doc`);
+    const result = await resolvePublicAddress(url, async () => []);
+    assert.equal(result, undefined, `expected ${literal} to be blocked`);
+  }
+});
+
+test("F5 end-to-end: a Source whose canonical_reference is a loopback IPv6 literal is reported unsupported and never receives a real request, even against a live IPv6-loopback server", async () => {
+  const server = createServer((_req, res) => {
+    res.statusCode = 200;
+    res.end();
+  });
+  await new Promise<void>((resolvePromise) => server.listen(0, "::1", resolvePromise));
+  try {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("expected a bound TCP address");
+    const adapter = new HttpSourceAvailabilityAdapter({ now: NOW });
+    const evidence = await adapter.checkAsync("SRC-1", { canonical_reference: `http://[::1]:${address.port}/` });
+    assert.equal(evidence.status, "unsupported");
+  } finally {
+    await new Promise<void>((resolvePromise) => server.close(() => resolvePromise()));
+  }
+});
+
+test("F5: probe() connects correctly given a URL whose authority is a bracketed IPv6 literal (transport layer, matching how F1 separates transport tests from guard tests)", async () => {
+  const server = createServer((_req, res) => {
+    res.statusCode = 200;
+    res.end();
+  });
+  await new Promise<void>((resolvePromise) => server.listen(0, "::1", resolvePromise));
+  try {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("expected a bound TCP address");
+    const url = new URL(`http://[::1]:${address.port}/`);
+    const result = await probe(url, "HEAD", 10_000, "::1");
+    assert.deepEqual(result, { kind: "status", status: "available" });
+  } finally {
+    await new Promise<void>((resolvePromise) => server.close(() => resolvePromise()));
+  }
 });

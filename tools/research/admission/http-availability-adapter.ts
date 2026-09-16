@@ -28,7 +28,7 @@ import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
 import type { ClientRequest, IncomingMessage } from "node:http";
 import { lookup as dnsLookup } from "node:dns/promises";
-import { BlockList, isIPv4 } from "node:net";
+import { BlockList, isIP, isIPv4 } from "node:net";
 import { getRecordField } from "../core/record-fields.ts";
 import type { AvailabilityEvidence, AvailabilityStatus, SourceAvailabilityAdapter } from "./safety-admission.ts";
 
@@ -81,8 +81,14 @@ for (const [subnet, prefix] of [
   ["::", 128], // unspecified
   ["::1", 128], // loopback
   ["64:ff9b::", 96], // NAT64 well-known prefix (embeds IPv4; treated conservatively)
+  ["64:ff9b:1::", 48], // IANA IPv4-IPv6 Translation (independent-review F4)
   ["100::", 64], // discard-only
+  ["100:0:0:1::", 64], // AMT (independent-review F4)
+  ["2001::", 23], // IETF Protocol Assignments — covers Teredo (2001::/32), ORCHIDv2 (2001:20::/28), benchmarking (2001:2::/48, independent-review F4), AMT (2001:3::/32), AS112-v6 (2001:4:112::/48), and any other allocation from this IANA block
   ["2001:db8::", 32], // documentation
+  ["2002::", 16], // 6to4 (independent-review F4)
+  ["3fff::", 20], // IETF Protocol Assignments, second block (independent-review F4)
+  ["5f00::", 16], // Segment Routing (SRv6) SIDs (independent-review F4)
   ["fc00::", 7], // unique local
   ["fe80::", 10], // link-local
   ["ff00::", 8], // multicast
@@ -101,6 +107,24 @@ export type AddressResolver = (hostname: string) => Promise<{ address: string; f
 const realDnsResolver: AddressResolver = (hostname) => dnsLookup(hostname, { all: true, verbatim: true });
 
 /**
+ * F5 (independent-review remediation): `URL.hostname` for an IPv6-literal
+ * authority keeps its brackets verbatim — `http://[::1]/x` yields hostname
+ * `"[::1]"`, not `"::1"` — which is not a hostname DNS can resolve nor a
+ * literal `net.isIP`/BlockList.check() recognizes (`isIPv4`/`isIP` both
+ * report false/0 on the bracketed form). Strips exactly one matching pair of
+ * brackets and confirms what remains is actually a valid IPv6 literal
+ * (net.isIP() === 6) before treating it as one, rather than trusting the
+ * bracket syntax alone. Returns undefined for a plain hostname (no
+ * brackets) or for bracketed-but-invalid content, so callers can tell "not
+ * an IPv6 literal" apart from "is one."
+ */
+export function parseIpv6Literal(hostname: string): string | undefined {
+  if (!hostname.startsWith("[") || !hostname.endsWith("]") || hostname.length < 3) return undefined;
+  const inner = hostname.slice(1, -1);
+  return isIP(inner) === 6 ? inner : undefined;
+}
+
+/**
  * Resolves every address `url.hostname` maps to and rejects (fail-closed) if
  * DNS resolution fails, returns nothing, or any single resolved address is
  * non-public — a hostname that resolves to a mix of public and non-public
@@ -109,12 +133,22 @@ const realDnsResolver: AddressResolver = (hostname) => dnsLookup(hostname, { all
  * returned first. Returns the first address on success so the caller can pin
  * the actual socket connection to it.
  *
+ * An IPv6-literal authority (see parseIpv6Literal()) is validated directly
+ * against the same isNonPublicAddress() guard and never sent to DNS at all —
+ * there is nothing to resolve, and forcing it through the hostname resolver
+ * is exactly the bracket-mishandling this function must not repeat.
+ *
  * `resolve` defaults to real DNS and must never be overridden in production
  * code; the only override in this codebase is test-only, to exercise this
  * guard against controlled addresses without depending on real DNS or a real
  * loopback/private target (both of which the guard itself must reject).
  */
 export async function resolvePublicAddress(url: URL, resolve: AddressResolver = realDnsResolver): Promise<string | undefined> {
+  const literal = parseIpv6Literal(url.hostname);
+  if (literal !== undefined) {
+    return isNonPublicAddress(literal) ? undefined : literal;
+  }
+
   let records: { address: string; family: number }[];
   try {
     records = await resolve(url.hostname);
@@ -148,7 +182,13 @@ function statusForHttpCode(code: number | undefined): AvailabilityStatus {
  * literal (via the transport's `lookup` option) rather than letting Node
  * resolve `url.hostname` again — a second, independent DNS lookup at connect
  * time could return a different (e.g. rebound) address than the one F1's
- * pre-flight check vetted, silently defeating the guard.
+ * pre-flight check vetted, silently defeating the guard. When `url.hostname`
+ * is itself an IP literal (F5: a plain IPv4 literal, or a bracketed IPv6
+ * literal like `[::1]`), Node's http(s) client connects to it directly and
+ * never calls `lookup` at all — there is no DNS step to rebind, so this is
+ * still safe: `pinnedAddress` in that case is (and must be) the exact same
+ * literal resolvePublicAddress() already validated, so what gets connected
+ * to is provably what was vetted either way.
  */
 export type ProbeResult = { kind: "status"; status: AvailabilityStatus } | { kind: "retry-with-get" };
 

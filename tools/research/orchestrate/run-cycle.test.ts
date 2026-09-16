@@ -6,9 +6,10 @@ import test from "node:test";
 
 import type { CorpusIndex, RecordSchema } from "../core/types.ts";
 import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "./ai-invoker.ts";
-import { runResearchCycle } from "./run-cycle.ts";
+import { readHoldFreeze, resumePreGateHold, runResearchCycle } from "./run-cycle.ts";
 import type { ResearchTrigger } from "./types.ts";
 import type { InferenceLimitResolutionChecker, SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
+import { createInferenceLimitResolutionChecker, writeInferenceLimitResolution } from "../admission/inference-limit-resolution.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 
@@ -765,5 +766,270 @@ test("identical materialized input/content remains idempotent: rerunning against
       assert.equal(first.changeSet.preparationFingerprint, second.changeSet.preparationFingerprint);
       assert.equal(first.changeSet.packageId, second.changeSet.packageId);
     });
+  });
+});
+
+// --- F3: resumable pre-Gate HOLD -----------------------------------------
+
+test("F3 two-run regression: run 1 HOLDs, an exact resolution is recorded, and resume reaches READY_FOR_HUMAN_REVIEW without a second PRIMARY_AUTHOR invocation and with the fresh reviewer invoked exactly once", async () => {
+  await withTempDir(async (cycleDir) => {
+    // --- run 1: normal path, unresolved inference limits -> HOLD ----------
+    const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
+    const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome1 = await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewerRun1,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      inferenceLimitResolutionChecker: { isResolved: () => false },
+    });
+    assert.equal(outcome1.status, "PRE_GATE_SAFETY_HOLD");
+    assert.equal(primary.calls.length, 1);
+    assert.equal(reviewerRun1.calls.length, 0);
+
+    // The normal path must have frozen a hold-freeze binding record and the
+    // exact manifest/candidates it evaluated, all under cycleDir.
+    assert.ok(existsSync(join(cycleDir, "hold-freeze.json")));
+    assert.ok(existsSync(join(cycleDir, "manifest.json")));
+    assert.ok(existsSync(join(cycleDir, "candidates", "EVD-NEW.yaml")));
+    const freezeCheck = readHoldFreeze(cycleDir, SHA, TRIGGER);
+    assert.equal(freezeCheck.ok, true);
+
+    // --- record the exact-match resolution against the real frozen candidate ---
+    const manifest = JSON.parse(readFileSync(join(cycleDir, "manifest.json"), "utf8"));
+    const candidateYaml = readFileSync(join(cycleDir, "candidates", "EVD-NEW.yaml"), "utf8");
+    assert.ok(candidateYaml.includes("evidence_id: EVD-NEW"));
+    const candidateFields = { evidence_id: "EVD-NEW", provenance: { sources: ["SRC-MATERIAL"] }, evidence_nature: "claim", claim_authority: "authoritative", inference_limits: ["a bounded inference limit"] };
+    writeInferenceLimitResolution(
+      cycleDir,
+      { baseGitSha: SHA, subjectId: "EVD-NEW", candidateFields, inferenceLimits: candidateFields.inference_limits },
+      "owner@example.invalid",
+      "Reviewed and accepted the stated inference limits."
+    );
+    void manifest; // manifest content itself is not asserted further here; its presence on disk is what resume reloads.
+
+    // --- resume: must not re-invoke PRIMARY_AUTHOR, must reach ELIGIBLE, ---
+    // --- must invoke a fresh reviewer exactly once ---------------------------
+    const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const checker = createInferenceLimitResolutionChecker(cycleDir);
+    const outcome2 = await resumePreGateHold({
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      trigger: TRIGGER,
+      cycleDir,
+      reviewerInvoker: reviewerResume,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:05:00.000Z" }) },
+      inferenceLimitResolutionChecker: checker,
+      now: () => new Date("2026-09-15T12:05:00.000Z"),
+    });
+
+    assert.equal(outcome2.status, "READY_FOR_HUMAN_REVIEW", outcome2.status === "FAILED" ? outcome2.message : JSON.stringify(outcome2));
+    // No second PRIMARY_AUTHOR invocation: the original primary invoker's
+    // call count is unchanged, and resumePreGateHold() never even takes a
+    // primaryInvoker parameter, so there is no code path by which it could
+    // invoke one.
+    assert.equal(primary.calls.length, 1);
+    // Exactly one fresh reviewer invocation on resume.
+    assert.equal(reviewerResume.calls.length, 1);
+    assert.equal(reviewerResume.calls[0].role, "INDEPENDENT_REVIEWER");
+    // The run-1 reviewer instance was never touched again.
+    assert.equal(reviewerRun1.calls.length, 0);
+
+    if (outcome2.status !== "READY_FOR_HUMAN_REVIEW") return;
+    assert.equal(outcome2.changeSet.candidates.some((c) => c.fields.evidence_id === "EVD-NEW"), true);
+  });
+});
+
+test("F3: resuming with a mismatched baseGitSha fails closed without reloading candidates or invoking the reviewer", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
+    const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewerRun1,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      inferenceLimitResolutionChecker: { isResolved: () => false },
+    });
+
+    const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const differentSha = "fedcba9876543210fedcba9876543210fedcba9";
+    const outcome = await resumePreGateHold({
+      index: admissionIndex("public"),
+      baseGitSha: differentSha,
+      trigger: TRIGGER,
+      cycleDir,
+      reviewerInvoker: reviewerResume,
+      inferenceLimitResolutionChecker: { isResolved: () => true },
+    });
+    assert.equal(outcome.status, "FAILED");
+    if (outcome.status !== "FAILED") return;
+    assert.equal(outcome.failedCheck, "HOLD_RESUME_IDENTITY_MISMATCH");
+    assert.equal(reviewerResume.calls.length, 0);
+  });
+});
+
+test("F3: resuming with a mismatched trigger request fails closed", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
+    const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewerRun1,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      inferenceLimitResolutionChecker: { isResolved: () => false },
+    });
+
+    const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = await resumePreGateHold({
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      trigger: { mode: "daily-discovery", request: "A completely different request" },
+      cycleDir,
+      reviewerInvoker: reviewerResume,
+      inferenceLimitResolutionChecker: { isResolved: () => true },
+    });
+    assert.equal(outcome.status, "FAILED");
+    if (outcome.status !== "FAILED") return;
+    assert.equal(outcome.failedCheck, "HOLD_RESUME_IDENTITY_MISMATCH");
+    assert.equal(reviewerResume.calls.length, 0);
+  });
+});
+
+test("F3: resuming with no prior HOLD (no hold-freeze.json) fails closed", async () => {
+  await withTempDir(async (cycleDir) => {
+    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = await resumePreGateHold({
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      trigger: TRIGGER,
+      cycleDir,
+      reviewerInvoker: reviewer,
+      inferenceLimitResolutionChecker: { isResolved: () => true },
+    });
+    assert.equal(outcome.status, "FAILED");
+    if (outcome.status !== "FAILED") return;
+    assert.equal(outcome.failedCheck, "HOLD_RESUME_IDENTITY_MISMATCH");
+    assert.equal(reviewer.calls.length, 0);
+  });
+});
+
+test("F3: a candidate file edited after the HOLD was recorded (tamper/staleness) fails closed on resume and never invokes the reviewer", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
+    const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewerRun1,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      inferenceLimitResolutionChecker: { isResolved: () => false },
+    });
+
+    // Tamper with the frozen candidate after the HOLD was recorded.
+    writeFileSync(
+      join(cycleDir, "candidates", "EVD-NEW.yaml"),
+      "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: claim\nclaim_authority: authoritative\ninference_limits: []\n",
+      "utf8"
+    );
+
+    const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = await resumePreGateHold({
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      trigger: TRIGGER,
+      cycleDir,
+      reviewerInvoker: reviewerResume,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:05:00.000Z" }) },
+      inferenceLimitResolutionChecker: { isResolved: () => true },
+    });
+    assert.equal(outcome.status, "FAILED");
+    if (outcome.status !== "FAILED") return;
+    assert.equal(outcome.failedCheck, "HOLD_RESUME_CANDIDATE_MISMATCH");
+    assert.equal(reviewerResume.calls.length, 0);
+  });
+});
+
+test("F3: resuming while the resolution is still absent stays HOLD, does not invoke the reviewer, and never invokes PRIMARY_AUTHOR", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
+    const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewerRun1,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      inferenceLimitResolutionChecker: { isResolved: () => false },
+    });
+
+    const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = await resumePreGateHold({
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      trigger: TRIGGER,
+      cycleDir,
+      reviewerInvoker: reviewerResume,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:05:00.000Z" }) },
+      // No resolution recorded yet: checker still reports false for everyone.
+      inferenceLimitResolutionChecker: { isResolved: () => false },
+    });
+    assert.equal(outcome.status, "PRE_GATE_SAFETY_HOLD");
+    assert.equal(primary.calls.length, 1);
+    assert.equal(reviewerResume.calls.length, 0);
+  });
+});
+
+test("F3: no other blocker becomes overridable through resume — a HOLD caused by an unavailable Source stays HOLD even with the inference-limit checker forced true", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
+    const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewerRun1,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "unavailable", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+    });
+
+    const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = await resumePreGateHold({
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      trigger: TRIGGER,
+      cycleDir,
+      reviewerInvoker: reviewerResume,
+      // Still unavailable: the Source itself has not actually recovered.
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "unavailable", checkedAt: "2026-09-15T12:05:00.000Z" }) },
+      // Forcing this true must not matter: SOURCE_UNAVAILABLE is a different
+      // finding code and this checker is only ever consulted for
+      // CLAIM_INFERENCE_LIMITS_PRESENT.
+      inferenceLimitResolutionChecker: { isResolved: () => true },
+    });
+    assert.equal(outcome.status, "PRE_GATE_SAFETY_HOLD");
+    assert.equal(reviewerResume.calls.length, 0);
   });
 });
