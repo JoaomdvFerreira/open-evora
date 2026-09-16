@@ -8,6 +8,7 @@ import type { CorpusIndex, RecordSchema } from "../core/types.ts";
 import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "./ai-invoker.ts";
 import { runResearchCycle } from "./run-cycle.ts";
 import type { ResearchTrigger } from "./types.ts";
+import type { InferenceLimitResolutionChecker, SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 
@@ -41,10 +42,15 @@ function claimEnvelope(): unknown {
   return { schemaVersion: "1", manifest: { schemaVersion: "1", mode: "daily-discovery", investigationQuestion: "q", candidateFiles: ["EVD-NEW.yaml"], claimedRecordIds: ["EVD-NEW"], rationale: "r" }, candidateFiles: [{ path: "EVD-NEW.yaml", yaml: "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: claim\nclaim_authority: authoritative\ninference_limits: []\n" }] };
 }
 
-function withTempDir(fn: (dir: string) => void): void {
+/** Same shape as claimEnvelope() but with a non-empty inference_limits[], to exercise CLAIM_INFERENCE_LIMITS_PRESENT. */
+function claimWithLimitsEnvelope(): unknown {
+  return { schemaVersion: "1", manifest: { schemaVersion: "1", mode: "daily-discovery", investigationQuestion: "q", candidateFiles: ["EVD-NEW.yaml"], claimedRecordIds: ["EVD-NEW"], rationale: "r" }, candidateFiles: [{ path: "EVD-NEW.yaml", yaml: "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: claim\nclaim_authority: authoritative\ninference_limits:\n  - a bounded inference limit\n" }] };
+}
+
+async function withTempDir(fn: (dir: string) => void | Promise<void>): Promise<void> {
   const dir = mkdtempSync(join(tmpdir(), "open-evora-run-cycle-test-"));
   try {
-    fn(dir);
+    await fn(dir);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -99,10 +105,10 @@ class SharedInvoker implements AiInvoker {
   }
 }
 
-test("one accepted trigger causes exactly two role-specific invocations, primary before reviewer", () => {
-  withTempDir((cycleDir) => {
+test("one accepted trigger causes exactly two role-specific invocations, primary before reviewer", async () => {
+  await withTempDir(async (cycleDir) => {
     const shared = new SharedInvoker();
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -118,8 +124,8 @@ test("one accepted trigger causes exactly two role-specific invocations, primary
   });
 });
 
-test("WU049 HOLD through real orchestration prevents reviewer/RCS and writes a safe private report", () => {
-  withTempDir((cycleDir) => {
+test("WU049 HOLD through real orchestration prevents reviewer/RCS and writes a safe private report", async () => {
+  await withTempDir(async (cycleDir) => {
     const corpus = admissionIndex("private");
     const source = corpus.byPrefix.get("SRC-")!.byId.get("SRC-MATERIAL")!.fields;
     // Every value below is an ordinary enumerable field accepted by SRC v2.
@@ -148,7 +154,7 @@ test("WU049 HOLD through real orchestration prevents reviewer/RCS and writes a s
     for (const sentinel of privateSentinels) assert.equal(JSON.stringify(source).includes(sentinel), true);
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = runResearchCycle({ trigger: TRIGGER, index: corpus, baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    const outcome = await runResearchCycle({ trigger: TRIGGER, index: corpus, baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
     assert.equal(outcome.status, "PRE_GATE_SAFETY_HOLD", outcome.status === "FAILED" ? outcome.message : "");
     assert.equal(reviewer.calls.length, 0);
     assert.equal(existsSync(join(cycleDir, "independent-review.json")), false);
@@ -165,21 +171,21 @@ test("WU049 HOLD through real orchestration prevents reviewer/RCS and writes a s
   });
 });
 
-test("WU049 valid claim reaches the independent reviewer through real orchestration", () => {
-  withTempDir((cycleDir) => {
+test("WU049 valid claim reaches the independent reviewer through real orchestration", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
     assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
     assert.equal(reviewer.calls.length, 1);
   });
 });
 
-test("the normal path does not require pre-created manifest/independent-review/candidate files", () => {
-  withTempDir((cycleDir) => {
+test("the normal path does not require pre-created manifest/independent-review/candidate files", async () => {
+  await withTempDir(async (cycleDir) => {
     assert.equal(existsSync(join(cycleDir, "manifest.json")), false);
     const shared = new SharedInvoker();
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -191,11 +197,11 @@ test("the normal path does not require pre-created manifest/independent-review/c
   });
 });
 
-test("reviewer input is built from immutable validated artifacts, and generator rationale/scratch never flows into it", () => {
-  withTempDir((cycleDir) => {
+test("reviewer input is built from immutable validated artifacts, and generator rationale/scratch never flows into it", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -213,11 +219,11 @@ test("reviewer input is built from immutable validated artifacts, and generator 
   });
 });
 
-test("generator conversation/scratch state cannot flow into reviewer input: distinct invoker instances share nothing", () => {
-  withTempDir((cycleDir) => {
+test("generator conversation/scratch state cannot flow into reviewer input: distinct invoker instances share nothing", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    runResearchCycle({
+    await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -234,11 +240,11 @@ test("generator conversation/scratch state cannot flow into reviewer input: dist
   });
 });
 
-test("malformed primary output fails closed before any reviewer invocation occurs", () => {
-  withTempDir((cycleDir) => {
+test("malformed primary output fails closed before any reviewer invocation occurs", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder({ not: "a valid envelope" }));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -253,11 +259,11 @@ test("malformed primary output fails closed before any reviewer invocation occur
   });
 });
 
-test("non-JSON primary stdout fails closed as PRIMARY_AI_OUTPUT_INVALID", () => {
-  withTempDir((cycleDir) => {
+test("non-JSON primary stdout fails closed as PRIMARY_AI_OUTPUT_INVALID", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary: AiInvoker = { invoke: () => ({ status: "OK", stdout: "not json at all" }) };
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -271,11 +277,11 @@ test("non-JSON primary stdout fails closed as PRIMARY_AI_OUTPUT_INVALID", () => 
   });
 });
 
-test("primary invocation failure fails closed as PRIMARY_AI_INVOCATION_FAILED", () => {
-  withTempDir((cycleDir) => {
+test("primary invocation failure fails closed as PRIMARY_AI_INVOCATION_FAILED", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary: AiInvoker = { invoke: () => ({ status: "INVOCATION_FAILED", message: "process exited 1" }) };
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -290,11 +296,11 @@ test("primary invocation failure fails closed as PRIMARY_AI_INVOCATION_FAILED", 
   });
 });
 
-test("primary invocation timeout fails closed as PRIMARY_AI_TIMEOUT", () => {
-  withTempDir((cycleDir) => {
+test("primary invocation timeout fails closed as PRIMARY_AI_TIMEOUT", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary: AiInvoker = { invoke: () => ({ status: "TIMEOUT", message: "exceeded 120000ms" }) };
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -308,11 +314,11 @@ test("primary invocation timeout fails closed as PRIMARY_AI_TIMEOUT", () => {
   });
 });
 
-test("malformed reviewer output fails closed and never reaches READY_FOR_HUMAN_REVIEW", () => {
-  withTempDir((cycleDir) => {
+test("malformed reviewer output fails closed and never reaches READY_FOR_HUMAN_REVIEW", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer = new RecordingInvoker(fixedResponder({ outcome: "NOT_A_REAL_OUTCOME" }));
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -326,11 +332,11 @@ test("malformed reviewer output fails closed and never reaches READY_FOR_HUMAN_R
   });
 });
 
-test("reviewer invocation failure fails closed as INDEPENDENT_REVIEW_INVOCATION_FAILED", () => {
-  withTempDir((cycleDir) => {
+test("reviewer invocation failure fails closed as INDEPENDENT_REVIEW_INVOCATION_FAILED", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer: AiInvoker = { invoke: () => ({ status: "INVOCATION_FAILED", message: "process exited 1" }) };
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -344,11 +350,11 @@ test("reviewer invocation failure fails closed as INDEPENDENT_REVIEW_INVOCATION_
   });
 });
 
-test("reviewer invocation timeout fails closed as INDEPENDENT_REVIEW_TIMEOUT", () => {
-  withTempDir((cycleDir) => {
+test("reviewer invocation timeout fails closed as INDEPENDENT_REVIEW_TIMEOUT", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer: AiInvoker = { invoke: () => ({ status: "TIMEOUT", message: "exceeded 120000ms" }) };
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -362,13 +368,13 @@ test("reviewer invocation timeout fails closed as INDEPENDENT_REVIEW_TIMEOUT", (
   });
 });
 
-test("disagreement is surfaced in the final package, never auto-resolved", () => {
-  withTempDir((cycleDir) => {
+test("disagreement is surfaced in the final package, never auto-resolved", async () => {
+  await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer = new RecordingInvoker(
       fixedResponder({ schemaVersion: "1", outcome: "DISAGREEMENT_FOUND", rationale: "Scope mismatch found." })
     );
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -382,10 +388,10 @@ test("disagreement is surfaced in the final package, never auto-resolved", () =>
   });
 });
 
-test("no candidate material leaves the gitignored cycle directory boundary", () => {
-  withTempDir((cycleDir) => {
+test("no candidate material leaves the gitignored cycle directory boundary", async () => {
+  await withTempDir(async (cycleDir) => {
     const shared = new SharedInvoker();
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -401,10 +407,10 @@ test("no candidate material leaves the gitignored cycle directory boundary", () 
   });
 });
 
-test("no canonical write occurs and the promoter is never invoked (module boundary)", () => {
-  withTempDir((cycleDir) => {
+test("no canonical write occurs and the promoter is never invoked (module boundary)", async () => {
+  await withTempDir(async (cycleDir) => {
     const shared = new SharedInvoker();
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -418,10 +424,10 @@ test("no canonical write occurs and the promoter is never invoked (module bounda
   });
 });
 
-test("materialized artifacts persist the real independent-review result for idempotent rerun observation", () => {
-  withTempDir((cycleDir) => {
+test("materialized artifacts persist the real independent-review result for idempotent rerun observation", async () => {
+  await withTempDir(async (cycleDir) => {
     const shared = new SharedInvoker();
-    runResearchCycle({
+    await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -441,8 +447,8 @@ test("materialized artifacts persist the real independent-review result for idem
 // the exact PoC the independent review used (a deep ../ traversal engineered
 // to land at a specific location outside the temp cycle directory) and
 // proves it now fails closed instead of writing anywhere.
-test("PoC regression: a deep ../ traversal write never escapes the cycle directory, even far outside it", () => {
-  withTempDir((outerDir) => {
+test("PoC regression: a deep ../ traversal write never escapes the cycle directory, even far outside it", async () => {
+  await withTempDir(async (outerDir) => {
     const cycleDir = join(outerDir, "a", "b", "c", "cycle");
     const traversal = "../".repeat(10) + "tmp-escaped-marker.txt";
     const maliciousEnvelope = {
@@ -460,7 +466,7 @@ test("PoC regression: a deep ../ traversal write never escapes the cycle directo
     const primary: AiInvoker = { invoke: () => ({ status: "OK", stdout: JSON.stringify(maliciousEnvelope) }) };
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
 
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: { mode: "daily-discovery", request: "q" },
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -482,8 +488,8 @@ test("PoC regression: a deep ../ traversal write never escapes the cycle directo
 // WU045-B01 independent-review remediation, finding 2 (regression):
 // reproduces the exact PoC that successfully wrote a marker file into the
 // tracked repository tree in the independent review's second proof.
-test("PoC regression: a traversal engineered to land inside the repository root never writes there", () => {
-  withTempDir((outerDir) => {
+test("PoC regression: a traversal engineered to land inside the repository root never writes there", async () => {
+  await withTempDir(async (outerDir) => {
     const cycleDir = join(outerDir, "cycle");
     const repoRoot = resolve(".");
     const targetInRepo = resolve(repoRoot, "SHOULD_NEVER_BE_CREATED_BY_WU045.txt");
@@ -505,7 +511,7 @@ test("PoC regression: a traversal engineered to land inside the repository root 
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
 
     try {
-      const outcome = runResearchCycle({
+      const outcome = await runResearchCycle({
         trigger: { mode: "daily-discovery", request: "q" },
         index: emptyIndex(),
         baseGitSha: SHA,
@@ -525,8 +531,8 @@ test("PoC regression: a traversal engineered to land inside the repository root 
 // path): a manifest.candidateFiles entry that traverses outside
 // candidatesDir must never cause an outside file's content to be read and
 // treated as a candidate.
-test("PoC regression: a manifest.candidateFiles traversal entry never reads content from outside the cycle directory", () => {
-  withTempDir((outerDir) => {
+test("PoC regression: a manifest.candidateFiles traversal entry never reads content from outside the cycle directory", async () => {
+  await withTempDir(async (outerDir) => {
     const cycleDir = join(outerDir, "cycle");
     mkdirSync(cycleDir, { recursive: true });
     const secretOutside = join(outerDir, "secret-outside.yaml");
@@ -547,7 +553,7 @@ test("PoC regression: a manifest.candidateFiles traversal entry never reads cont
     const primary: AiInvoker = { invoke: () => ({ status: "OK", stdout: JSON.stringify(maliciousEnvelope) }) };
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
 
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: { mode: "daily-discovery", request: "q" },
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -571,8 +577,8 @@ test("PoC regression: a manifest.candidateFiles traversal entry never reads cont
 // package still reflects the frozen snapshot (not the mutated file), which
 // is only possible if assembly carries the frozen snapshot forward rather
 // than re-reading.
-test("the final package reflects the exact snapshot frozen for the reviewer, even if the on-disk file is mutated afterward", () => {
-  withTempDir((cycleDir) => {
+test("the final package reflects the exact snapshot frozen for the reviewer, even if the on-disk file is mutated afterward", async () => {
+  await withTempDir(async (cycleDir) => {
     let reviewerSawCandidateName: string | undefined;
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer: AiInvoker = {
@@ -586,7 +592,7 @@ test("the final package reflects the exact snapshot frozen for the reviewer, eve
       },
     };
 
-    const outcome = runResearchCycle({
+    const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -605,10 +611,135 @@ test("the final package reflects the exact snapshot frozen for the reviewer, eve
   });
 });
 
-test("identical materialized input/content remains idempotent: rerunning against the same materialized artifacts yields the same fingerprint", () => {
-  withTempDir((cycleDir) => {
+// --- WU053 remediation: real-adapter resolution hook + pre-Gate resolution wiring ---
+
+test("resolveAvailabilityAdapter is invoked with exactly the material non-private Source set, and never when availabilityAdapter is supplied directly", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
+    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    let resolveCalls = 0;
+    let seenSourceIds: string[] = [];
+    const outcome = await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewer,
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      resolveAvailabilityAdapter: async (materialSources) => {
+        resolveCalls++;
+        seenSourceIds = [...materialSources.keys()];
+        const adapter: SourceAvailabilityAdapter = {
+          check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }),
+        };
+        return adapter;
+      },
+    });
+    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
+    assert.equal(resolveCalls, 1);
+    assert.deepEqual(seenSourceIds, ["SRC-MATERIAL"]);
+  });
+});
+
+test("resolveAvailabilityAdapter is never called when a synchronous availabilityAdapter is supplied directly", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
+    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    let resolveCalls = 0;
+    const outcome = await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewer,
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      resolveAvailabilityAdapter: async () => {
+        resolveCalls++;
+        return { check: () => ({ sourceId: "unused", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) };
+      },
+    });
+    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW");
+    assert.equal(resolveCalls, 0);
+  });
+});
+
+test("a real unavailable adapter result HOLDs through the async resolution hook", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
+    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewer,
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      resolveAvailabilityAdapter: async () => ({ check: (sourceId) => ({ sourceId, status: "unavailable", checkedAt: "2026-09-15T12:00:00.000Z" }) }),
+    });
+    assert.equal(outcome.status, "PRE_GATE_SAFETY_HOLD");
+    assert.equal(reviewer.calls.length, 0);
+  });
+});
+
+test("an unresolved CLAIM_INFERENCE_LIMITS_PRESENT HOLDs through real orchestration and the reviewer never runs", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
+    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewer,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      inferenceLimitResolutionChecker: { isResolved: () => false },
+    });
+    assert.equal(outcome.status, "PRE_GATE_SAFETY_HOLD");
+    assert.equal(reviewer.calls.length, 0);
+    if (outcome.status !== "PRE_GATE_SAFETY_HOLD") return;
+    assert.deepEqual(outcome.admission.findings.map((f) => f.code), ["CLAIM_INFERENCE_LIMITS_PRESENT"]);
+  });
+});
+
+test("an exact-match resolution lets a claim with inference limits reach the independent reviewer", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
+    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    let checkerArgs: unknown[] = [];
+    const checker: InferenceLimitResolutionChecker = {
+      isResolved: (...args) => {
+        checkerArgs = args;
+        return true;
+      },
+    };
+    const outcome = await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewer,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      inferenceLimitResolutionChecker: checker,
+    });
+    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
+    assert.equal(reviewer.calls.length, 1);
+    assert.equal(checkerArgs[0], SHA);
+    assert.equal(checkerArgs[1], "EVD-NEW");
+  });
+});
+
+test("identical materialized input/content remains idempotent: rerunning against the same materialized artifacts yields the same fingerprint", async () => {
+  await withTempDir(async (cycleDir) => {
     const shared = new SharedInvoker();
-    const first = runResearchCycle({
+    const first = await runResearchCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -618,9 +749,9 @@ test("identical materialized input/content remains idempotent: rerunning against
     });
     // Second AI-driven run against a fresh directory with the same trigger
     // and identical AI responses.
-    withTempDir((secondCycleDir) => {
+    await withTempDir(async (secondCycleDir) => {
       const secondShared = new SharedInvoker();
-      const second = runResearchCycle({
+      const second = await runResearchCycle({
         trigger: TRIGGER,
         index: emptyIndex(),
         baseGitSha: SHA,

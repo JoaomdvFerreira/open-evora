@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { CorpusIndex, RecordSchema } from "../core/types.ts";
-import { evaluateSafetyAdmission, type SourceAvailabilityAdapter } from "./safety-admission.ts";
+import { deriveMaterialNonPrivateSources, evaluateSafetyAdmission, type InferenceLimitResolutionChecker, type SourceAvailabilityAdapter } from "./safety-admission.ts";
 
 const schema: RecordSchema = { prefix: "SRC-", directory: "sources", idField: "source_id" };
 const evidenceSchema: RecordSchema = { prefix: "EVD-", directory: "evidence", idField: "evidence_id" };
@@ -93,4 +93,57 @@ test("candidate EVD provenance resolves a canonical Source and excludes unrelate
   const result = evaluateSafetyAdmission({ index: index(canonical), candidates: [unrelatedCandidateSource, candidateEvidence], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, availabilityAdapter: { check: (id) => { checked.push(id); return { sourceId: id, status: "available", checkedAt: time }; } } });
   assert.equal(result.disposition, "ELIGIBLE");
   assert.deepEqual(checked, ["SRC-1"]);
+});
+
+// --- WU053 remediation: CLAIM_INFERENCE_LIMITS_PRESENT pre-Gate human resolution ---
+
+const SHA = "0123456789abcdef0123456789abcdef01234567";
+const alwaysResolved: InferenceLimitResolutionChecker = { isResolved: () => true };
+const neverResolved: InferenceLimitResolutionChecker = { isResolved: () => false };
+
+test("an unresolved CLAIM_INFERENCE_LIMITS_PRESENT still HOLDs (no checker supplied)", () => {
+  const result = evaluate(claim({ inference_limits: ["a limit"] }));
+  assert.deepEqual(result.findings.map((f) => f.code), ["CLAIM_INFERENCE_LIMITS_PRESENT"]);
+  assert.equal(result.disposition, "HOLD");
+});
+
+test("an unresolved CLAIM_INFERENCE_LIMITS_PRESENT still HOLDs even with a checker that reports false", () => {
+  const result = evaluateSafetyAdmission({ index: index(source), candidates: [claim({ inference_limits: ["a limit"] })], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, baseGitSha: SHA, availabilityAdapter: { check: () => ({ sourceId: "SRC-1", status: "available", checkedAt: time }) }, inferenceLimitResolutionChecker: neverResolved });
+  assert.equal(result.disposition, "HOLD");
+  assert.deepEqual(result.findings.map((f) => f.code), ["CLAIM_INFERENCE_LIMITS_PRESENT"]);
+});
+
+test("a matching resolution clears CLAIM_INFERENCE_LIMITS_PRESENT and admission becomes eligible when no other blocker remains", () => {
+  const result = evaluateSafetyAdmission({ index: index(source), candidates: [claim({ inference_limits: ["a limit"] })], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, baseGitSha: SHA, availabilityAdapter: { check: () => ({ sourceId: "SRC-1", status: "available", checkedAt: time }) }, inferenceLimitResolutionChecker: alwaysResolved });
+  assert.equal(result.disposition, "ELIGIBLE");
+  assert.deepEqual(result.findings, []);
+});
+
+test("a resolution never suppresses any other blocking finding (only CLAIM_INFERENCE_LIMITS_PRESENT is overridable)", () => {
+  const result = evaluateSafetyAdmission({ index: index(source), candidates: [claim({ claim_authority: "unknown", inference_limits: ["a limit"] })], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, baseGitSha: SHA, availabilityAdapter: { check: () => ({ sourceId: "SRC-1", status: "available", checkedAt: time }) }, inferenceLimitResolutionChecker: alwaysResolved });
+  assert.equal(result.disposition, "HOLD");
+  assert.deepEqual(result.findings.map((f) => f.code), ["CLAIM_AUTHORITY_UNKNOWN"]);
+});
+
+test("a resolution never suppresses SOURCE_UNAVAILABLE or any Source finding", () => {
+  const result = evaluateSafetyAdmission({ index: index(source), candidates: [claim({ inference_limits: ["a limit"] })], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, baseGitSha: SHA, availabilityAdapter: { check: () => ({ sourceId: "SRC-1", status: "unavailable", checkedAt: time }) }, inferenceLimitResolutionChecker: alwaysResolved });
+  assert.equal(result.disposition, "HOLD");
+  assert.deepEqual(result.findings.map((f) => f.code), ["SOURCE_UNAVAILABLE"]);
+});
+
+test("no baseGitSha means the resolution checker is never consulted (fails closed)", () => {
+  const result = evaluateSafetyAdmission({ index: index(source), candidates: [claim({ inference_limits: ["a limit"] })], affectedProblemIds: [], frozenAt: time, evaluatedAt: time, availabilityAdapter: { check: () => ({ sourceId: "SRC-1", status: "available", checkedAt: time }) }, inferenceLimitResolutionChecker: alwaysResolved });
+  assert.equal(result.disposition, "HOLD");
+  assert.deepEqual(result.findings.map((f) => f.code), ["CLAIM_INFERENCE_LIMITS_PRESENT"]);
+});
+
+test("deriveMaterialNonPrivateSources excludes private Sources and matches the evaluator's own material-Source set", () => {
+  const privateSource = { source_id: "SRC-PRIVATE", access: { level: "private" } };
+  const evidence = { evidence_id: "EVD-BASIS", provenance: { sources: ["SRC-1", "SRC-PRIVATE"] }, evidence_nature: "observation", inference_limits: [] };
+  const corpus: CorpusIndex = { researchRoot: "/synthetic", totalRecords: 3, byPrefix: new Map([
+    ["SRC-", { schema, records: [{ file: "sources/SRC-1.yaml", fields: source }, { file: "sources/SRC-PRIVATE.yaml", fields: privateSource }], byId: new Map([["SRC-1", { file: "sources/SRC-1.yaml", fields: source }], ["SRC-PRIVATE", { file: "sources/SRC-PRIVATE.yaml", fields: privateSource }]]) }],
+    ["EVD-", { schema: evidenceSchema, records: [{ file: "evidence/EVD-BASIS.yaml", fields: evidence }], byId: new Map([["EVD-BASIS", { file: "evidence/EVD-BASIS.yaml", fields: evidence }]]) }],
+  ]) };
+  const materialSources = deriveMaterialNonPrivateSources({ index: corpus, candidates: [{ recordFamily: "EVD-", fields: evidence }], affectedProblemIds: [], frozenAt: time, evaluatedAt: time });
+  assert.deepEqual([...materialSources.keys()], ["SRC-1"]);
 });

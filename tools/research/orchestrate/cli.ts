@@ -60,6 +60,8 @@ import { asValidatedResearchChangeSet, validateResearchChangeSet } from "./rcs-v
 import { runResearchCycle } from "./run-cycle.ts";
 import type { ResearchChangeSet, ResearchMode, ResearchTrigger } from "./types.ts";
 import { assertWorkbenchBoundary } from "./workbench-boundary.ts";
+import { resolveAvailabilityAdapter } from "../admission/http-availability-adapter.ts";
+import { createInferenceLimitResolutionChecker } from "../admission/inference-limit-resolution.ts";
 
 export interface ReuseIdentity {
   baseGitSha: string;
@@ -127,7 +129,7 @@ function buildReadyOutput(changeSet: ResearchChangeSet, outputPath: string, suff
   ].join("\n");
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const flag = (name: string): string | undefined => {
     const idx = args.indexOf(name);
@@ -242,13 +244,22 @@ function main(): void {
     return;
   }
 
-  const outcome = runResearchCycle({
+  const outcome = await runResearchCycle({
     trigger,
     index,
     baseGitSha,
     cycleDir,
     primaryInvoker,
     reviewerInvoker,
+    // Real production Source availability (WU053 remediation): performs a
+    // live post-freeze request against each material non-private Source's
+    // own canonical_reference, using only Node built-ins. Never a fake
+    // default `available` result — see http-availability-adapter.ts.
+    resolveAvailabilityAdapter: (materialSources) => resolveAvailabilityAdapter(materialSources),
+    // Local, workbench-only pre-Gate resolution for CLAIM_INFERENCE_LIMITS_PRESENT
+    // only (WU053 remediation) — every other blocking finding remains
+    // non-overridable; see inference-limit-resolution.ts.
+    inferenceLimitResolutionChecker: createInferenceLimitResolutionChecker(cycleDir),
   });
 
   if (outcome.status === "FAILED") {
@@ -273,5 +284,8 @@ function main(): void {
 // tryReuseExistingChangeSet() without triggering a live CLI invocation as a
 // side effect of the import itself.
 if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {
-  main();
+  main().catch((error: unknown) => {
+    console.error(`FAILED [UNCAUGHT]: ${(error as Error).message}`);
+    process.exitCode = 1;
+  });
 }
