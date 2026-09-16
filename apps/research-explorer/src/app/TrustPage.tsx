@@ -42,5 +42,5 @@ export function TrustPage({ page }: { page: TrustPageContent }) {
 }
 
 export function PublicFooter() {
-  return <footer className="public-footer" aria-label="Informação sobre o Open Évora"><a href="/about">Sobre</a><a href="/methodology">Metodologia</a><a href="/corrections">Correções</a><a href="/contact">Contacto</a><a href="/privacy">Privacidade</a></footer>;
+  return <footer className="public-footer" aria-label="Informação sobre o Open Évora"><div className="public-footer-inner shell-frame"><a href="/about">Sobre</a><a href="/methodology">Metodologia</a><a href="/corrections">Correções</a><a href="/contact">Contacto</a><a href="/privacy">Privacidade</a></div></footer>;
 }
