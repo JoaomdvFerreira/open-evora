@@ -15,13 +15,28 @@ export interface SafetyFinding {
   evidenceReferences?: string[];
 }
 export interface SafetyAdmission { disposition: SafetyDisposition; findings: SafetyFinding[]; evaluatedAt: string; }
+/**
+ * Narrow, injectable check for whether a CLAIM_INFERENCE_LIMITS_PRESENT
+ * finding on `subjectId` has an exact-match local human resolution bound to
+ * `baseGitSha`, the candidate's own fields, and its own inference_limits
+ * (see ../admission/inference-limit-resolution.ts). This is the ONLY
+ * finding code any resolution mechanism may ever suppress; no other code in
+ * this module consults it, and this module never calls it for any other
+ * purpose than deciding whether to keep or drop that one blocker.
+ */
+export interface InferenceLimitResolutionChecker {
+  isResolved(baseGitSha: string, subjectId: string, candidateFields: Record<string, unknown>, inferenceLimits: readonly string[]): boolean;
+}
 export interface EvaluateSafetyAdmissionInput {
   index: CorpusIndex;
   candidates: readonly CandidateRecord[];
   affectedProblemIds: readonly string[];
   frozenAt: string;
   evaluatedAt: string;
+  baseGitSha?: string;
   availabilityAdapter?: SourceAvailabilityAdapter;
+  /** Only ever consulted for CLAIM_INFERENCE_LIMITS_PRESENT; absent = always blocking (fail closed). */
+  inferenceLimitResolutionChecker?: InferenceLimitResolutionChecker;
 }
 
 const MINUTE = 60_000;
@@ -76,6 +91,34 @@ function findingsSorted(findings: SafetyFinding[]): SafetyFinding[] {
   return [...unique.values()].sort((a, b) => a.code.localeCompare(b.code) || a.subjectId.localeCompare(b.subjectId));
 }
 
+/**
+ * Derives exactly the same material, non-private Source id -> fields map
+ * evaluateSafetyAdmission()'s own revalidation loop below would check,
+ * without performing any revalidation itself. Exported so a caller that
+ * needs to resolve real availability evidence *before* calling
+ * evaluateSafetyAdmission() (necessarily out-of-band, since availability
+ * adapters here are synchronous) — e.g. tools/research/orchestrate/cli.ts —
+ * can build its availability adapter over the exact same Source set, rather
+ * than re-deriving material-Source membership with a second, potentially
+ * divergent rule. A private Source is intentionally excluded here: it never
+ * reaches the availability adapter in evaluateSafetyAdmission() either.
+ */
+export function deriveMaterialNonPrivateSources(input: EvaluateSafetyAdmissionInput): Map<string, Record<string, unknown>> {
+  const candidateSources = new Map<string, Record<string, unknown>>();
+  for (const candidate of input.candidates) if (candidate.recordFamily === "SRC-") { const id = idOf(candidate.fields, "source_id"); if (id) candidateSources.set(id, candidate.fields); }
+  const evidence = materialEvidence(input);
+  const sourceIds = new Set<string>();
+  for (const item of evidence) for (const sourceId of evdSources(item.fields)) sourceIds.add(sourceId);
+  const result = new Map<string, Record<string, unknown>>();
+  for (const sourceId of sourceIds) {
+    const source = candidateSources.get(sourceId) ?? record(input.index, "SRC-", sourceId)?.fields;
+    if (!source) continue;
+    if (getRecordField(source, "access.level") === "private") continue;
+    result.set(sourceId, source);
+  }
+  return result;
+}
+
 export function evaluateSafetyAdmission(input: EvaluateSafetyAdmissionInput): SafetyAdmission {
   const findings: SafetyFinding[] = contradictionFindings(input);
   const candidateSources = new Map<string, Record<string, unknown>>();
@@ -89,7 +132,16 @@ export function evaluateSafetyAdmission(input: EvaluateSafetyAdmissionInput): Sa
       if (authority !== "authoritative") findings.push({ code: authority === "unknown" || authority === undefined ? "CLAIM_AUTHORITY_UNKNOWN" : "CLAIM_AUTHORITY_INSUFFICIENT", subjectId: item.id, severity: "blocker", summary: "Claim authority does not meet the required canonical value." });
       const limits = getRecordField(item.fields, "inference_limits");
       if (!Array.isArray(limits)) findings.push({ code: "CLAIM_INFERENCE_LIMITS_INDETERMINATE", subjectId: item.id, severity: "blocker", summary: "Claim inference limits are absent or indeterminate." });
-      else if (limits.length > 0) findings.push({ code: "CLAIM_INFERENCE_LIMITS_PRESENT", subjectId: item.id, severity: "blocker", summary: "Claim has explicit inference limits requiring human resolution." });
+      else if (limits.length > 0) {
+        const stringLimits = limits.filter((v): v is string => typeof v === "string");
+        const resolved = Boolean(
+          input.baseGitSha &&
+          input.inferenceLimitResolutionChecker?.isResolved(input.baseGitSha, item.id, item.fields, stringLimits)
+        );
+        if (!resolved) {
+          findings.push({ code: "CLAIM_INFERENCE_LIMITS_PRESENT", subjectId: item.id, severity: "blocker", summary: "Claim has explicit inference limits requiring human resolution." });
+        }
+      }
     }
   }
   for (const sourceId of sourceIds) {
