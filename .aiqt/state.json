@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M014",
-  "currentWorkUnitId": "WU053",
+  "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
       {
@@ -161,7 +161,7 @@
         "id": "M014",
         "title": "M014 — Post-M013 Go-Live Remediation",
         "objective": "Remediate the specific safety-admission, release-provenance, and public-production launch gaps recorded by completed M013/WU048 (canonical verdict NOT_READY), then independently reverify the complete Go-Live acceptance matrix. M013 and WU048 remain historical and are not reopened. A successful M014/WU052 reverification is not the owner GO/HOLD decision.",
-        "status": "in_progress",
+        "status": "ready",
         "workUnitIds": [
           "WU049",
           "WU050",
@@ -2508,12 +2508,12 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [
           "DEP-049"
         ],
         "createdAt": "2026-09-16T11:48:23.551Z",
-        "updatedAt": "2026-09-16T11:48:51.473Z"
+        "updatedAt": "2026-09-16T12:02:47.460Z"
       }
     ],
     "dependencies": [
@@ -7200,6 +7200,83 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt next",
       "createdAt": "2026-09-16T11:48:43.912Z"
+    },
+    {
+      "id": "C051",
+      "workUnitId": "WU053",
+      "packetId": "PKT-051",
+      "summary": "Fixed the two production-path gaps exposed by the real PRB-0005 E2E run: wired a real HttpSourceAvailabilityAdapter into the normal WU045 CLI, and implemented a local, workbench-only pre-Gate resolution mechanism scoped exclusively to CLAIM_INFERENCE_LIMITS_PRESENT.",
+      "completed": [
+        "Implemented HttpSourceAvailabilityAdapter using Node http/https built-ins only, checking a Source's own canonical_reference and returning only existing AvailabilityStatus values.",
+        "Added deriveMaterialNonPrivateSources() to safety-admission.ts as the single source of truth for the material, non-private Source set, reused by both the evaluator and the CLI's async resolution.",
+        "Wired a resolveAvailabilityAdapter async hook into run-cycle.ts/cli.ts so the normal CLI path performs real post-freeze availability checks without duplicating AI invocation or material-Source derivation.",
+        "Implemented a local, workbench-only resolution mechanism for CLAIM_INFERENCE_LIMITS_PRESENT only, bound via the existing sha256Hex/canonicalJsonStringify fingerprint convention to base SHA, subject, candidate content, and inference_limits.",
+        "Verified the resolution mechanism cannot suppress any other blocking finding code, fails closed on any mismatch, and only enables continuation to independent review (never canonical approval).",
+        "Added focused regression coverage: real availability outcomes (available/unavailable/authentication_required/unknown/timeout/unsupported/error/HEAD-then-GET retry), freshness/staleness, unresolved-HOLD, exact-match eligibility, staleness/mismatch invalidation, non-overridable other blockers, and reviewer-never-runs-while-HOLD."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "tools/research/admission/http-availability-adapter.ts",
+        "tools/research/admission/http-availability-adapter.test.ts",
+        "tools/research/admission/inference-limit-resolution.ts",
+        "tools/research/admission/inference-limit-resolution.test.ts",
+        "tools/research/admission/safety-admission.ts",
+        "tools/research/admission/safety-admission.test.ts",
+        "tools/research/orchestrate/run-cycle.ts",
+        "tools/research/orchestrate/run-cycle.test.ts",
+        "tools/research/orchestrate/cli.ts",
+        "tools/research/orchestrate/cli-reuse.test.ts"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "TypeScript validation passed; 437/438 tests passed (1 pre-existing platform skip); validated 274 canonical records."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "A real, wired SourceAvailabilityAdapter is used by the normal WU045 CLI path, uses only the Source's canonical_reference, returns only existing AvailabilityStatus values, and preserves fail-closed freshness semantics; private/missing/unverifiable Sources still HOLD.",
+          "result": "passed",
+          "evidence": "http-availability-adapter.ts + http-availability-adapter.test.ts; cli.ts wiring; existing private/missing HOLD paths regression-verified unchanged."
+        },
+        {
+          "criterion": "CLAIM_INFERENCE_LIMITS_PRESENT remains blocking until an explicit, local/workbench-only human resolution record matches the exact base SHA, subject, candidate content, inference_limits, and finding; any mismatch fails closed.",
+          "result": "passed",
+          "evidence": "inference-limit-resolution.ts + inference-limit-resolution.test.ts; safety-admission.test.ts resolution-wiring tests."
+        },
+        {
+          "criterion": "Only CLAIM_INFERENCE_LIMITS_PRESENT is overridable by this mechanism; all other safety findings remain non-overridable.",
+          "result": "passed",
+          "evidence": "safety-admission.test.ts: 'a resolution never suppresses any other blocking finding' and 'never suppresses SOURCE_UNAVAILABLE' tests."
+        },
+        {
+          "criterion": "Resolution enables continuation to independent review/Human Gate only, never canonical approval; inference limits remain intact in all downstream artifacts.",
+          "result": "passed",
+          "evidence": "run-cycle.test.ts: 'an exact-match resolution lets a claim with inference limits reach the independent reviewer'; resolution module doc/contract states acceptance is not canonical approval."
+        },
+        {
+          "criterion": "Focused regression tests cover real availability outcomes, freshness, unresolved-HOLD, exact-match eligibility, staleness/mismatch invalidation, non-overridable blockers, and reviewer-does-not-run-while-HOLD.",
+          "result": "passed",
+          "evidence": "32 new focused tests across http-availability-adapter.test.ts, inference-limit-resolution.test.ts, safety-admission.test.ts, run-cycle.test.ts."
+        },
+        {
+          "criterion": "npm run research:check and git diff --check pass; no canonical/public research write occurs.",
+          "result": "passed",
+          "evidence": "research:validate reports 274 canonical records unchanged; no research/** file touched."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-16T12:02:47.460Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
@@ -7226,8 +7303,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-09-16T11:48:51.473Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-16T12:02:47.460Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8891,6 +8968,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-16T11:48:43.912Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C051",
+      "current": {
+        "observationId": "sha256:9c43d82320ba7053d54c73293e4e366718bd7bc38d391c6359502081fa76fc08",
+        "checkpointId": "C051",
+        "workUnitId": "WU053",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-16T12:02:47.460Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-16T12:02:47.460Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:9c43d82320ba7053d54c73293e4e366718bd7bc38d391c6359502081fa76fc08",
+          "checkpointId": "C051",
+          "workUnitId": "WU053",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-16T12:02:47.460Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-16T12:02:47.460Z"
         }
       ]
     }
