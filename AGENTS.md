@@ -130,6 +130,10 @@ Work through a branch and pull request unless the task explicitly defines anothe
 
 Do not push directly to protected `main` or bypass repository protections unless explicitly authorized by the repository owner.
 
+### Pull-request creation
+
+Agents creating pull requests must read and follow `.github/PULL_REQUEST_TEMPLATE.md`. Task-specific requirements populate that structure rather than replacing it. For multiline Markdown PR bodies, use a structured API body or `gh pr create --body-file`; do not construct them through shell-escaped inline strings. After creating or updating a PR, re-read the live PR body to verify it was stored correctly.
+
 Before handing work back:
 - inspect the complete diff;
 - run relevant deterministic validation;
