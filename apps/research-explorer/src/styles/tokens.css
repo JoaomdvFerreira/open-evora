@@ -33,6 +33,37 @@
   --p-color-error-line: oklch(85% 0.06 25);
   --p-color-error-surface: oklch(97% 0.02 25);
 
+  /* WU053 — bounded topic-tone primitives (presentation.ts/topicMapping.ts
+     tones only). Restrained, paired with paper-like tints so they read as
+     the same "Warm Ledger" surface family as the rest of the foundation
+     rather than a saturated categorical palette; every use still pairs the
+     tone with an explicit PT-PT text label (foundations.md "Colour and
+     contrast intent"). */
+  --p-color-topic-mobility: oklch(45% 0.13 255);
+  --p-color-topic-mobility-surface: oklch(95% 0.02 255);
+  --p-color-topic-access: oklch(48% 0.11 282);
+  --p-color-topic-access-surface: oklch(95% 0.02 282);
+  --p-color-topic-urban: oklch(42% 0.1 308);
+  --p-color-topic-urban-surface: oklch(95% 0.02 308);
+  --p-color-topic-housing: oklch(46% 0.12 332);
+  --p-color-topic-housing-surface: oklch(95% 0.02 332);
+  --p-color-topic-care: oklch(45% 0.14 355);
+  --p-color-topic-care-surface: oklch(95% 0.02 355);
+  --p-color-topic-health: oklch(42% 0.13 18);
+  --p-color-topic-health-surface: oklch(95% 0.02 18);
+  --p-color-topic-education: oklch(45% 0.15 42);
+  --p-color-topic-education-surface: oklch(95% 0.03 42);
+  --p-color-topic-employment: oklch(43% 0.11 65);
+  --p-color-topic-employment-surface: oklch(95% 0.02 65);
+  --p-color-topic-economy: oklch(40% 0.09 90);
+  --p-color-topic-economy-surface: oklch(95% 0.02 90);
+  --p-color-topic-environment: var(--p-color-status-affirmed);
+  --p-color-topic-environment-surface: oklch(95% 0.03 145);
+  --p-color-topic-public-space: oklch(45% 0.12 190);
+  --p-color-topic-public-space-surface: oklch(95% 0.02 190);
+  --p-color-topic-digital: oklch(40% 0.1 222);
+  --p-color-topic-digital-surface: oklch(95% 0.02 222);
+
   /* ---- Primitives: type families -------------------------------------
      Fontsource packages provide the local font files; DS-04B evaluates
      Public Sans for the interface role in place of production's Inter
@@ -158,4 +189,31 @@
 
   /* Minimum interactive target */
   --target-min: var(--p-tap-min);
+
+  /* WU053 — topic tone semantic roles, consumed only by styles/topic.css
+     (TopicBadge.tsx). Presentation-only; never a canonical domain enum. */
+  --color-topic-mobility-ink: var(--p-color-topic-mobility);
+  --color-topic-mobility-surface: var(--p-color-topic-mobility-surface);
+  --color-topic-access-ink: var(--p-color-topic-access);
+  --color-topic-access-surface: var(--p-color-topic-access-surface);
+  --color-topic-urban-ink: var(--p-color-topic-urban);
+  --color-topic-urban-surface: var(--p-color-topic-urban-surface);
+  --color-topic-housing-ink: var(--p-color-topic-housing);
+  --color-topic-housing-surface: var(--p-color-topic-housing-surface);
+  --color-topic-care-ink: var(--p-color-topic-care);
+  --color-topic-care-surface: var(--p-color-topic-care-surface);
+  --color-topic-health-ink: var(--p-color-topic-health);
+  --color-topic-health-surface: var(--p-color-topic-health-surface);
+  --color-topic-education-ink: var(--p-color-topic-education);
+  --color-topic-education-surface: var(--p-color-topic-education-surface);
+  --color-topic-employment-ink: var(--p-color-topic-employment);
+  --color-topic-employment-surface: var(--p-color-topic-employment-surface);
+  --color-topic-economy-ink: var(--p-color-topic-economy);
+  --color-topic-economy-surface: var(--p-color-topic-economy-surface);
+  --color-topic-environment-ink: var(--p-color-topic-environment);
+  --color-topic-environment-surface: var(--p-color-topic-environment-surface);
+  --color-topic-public-space-ink: var(--p-color-topic-public-space);
+  --color-topic-public-space-surface: var(--p-color-topic-public-space-surface);
+  --color-topic-digital-ink: var(--p-color-topic-digital);
+  --color-topic-digital-surface: var(--p-color-topic-digital-surface);
 }

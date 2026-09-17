@@ -1,4 +1,5 @@
 import { publicCompactEnumLabel } from "../presentation/presentation";
+import { evidenceVisual, validationVisual } from "./stateVisuals";
 
 /**
  * DS-04D Slice 3B — Problem domain: `validation_status` and `evidence_status`,
@@ -22,6 +23,14 @@ import { publicCompactEnumLabel } from "../presentation/presentation";
  * (Problem lifecycle — see ProblemLifecycleStatus.tsx): "Evidência
  * insuficiente" is a lifecycle value and does not belong to this dimension
  * (catalogue, same card).
+ *
+ * WU053 adds a per-value tone+icon to the `reading` chip only
+ * (stateVisuals.ts's `validationVisual`/`evidenceVisual`) — text remains the
+ * sole required carrier. `validation_status` and `evidence_status` resolve
+ * through separate lookups and separate CSS class prefixes
+ * (`--validation-*` / `--evidence-*`), and both stay distinct from lifecycle
+ * `status`'s own `--lifecycle-*` prefix in ProblemLifecycleStatus.tsx, so no
+ * two dimensions ever share one rendered tone+icon+class combination.
  *
  * Three forms are implemented, matching current production evidence:
  * - `overview` — plain caption/value pair (Overview.tsx's
@@ -91,8 +100,12 @@ function InvestigationDimensionStatus({ field, value, form }: { field: "validati
     );
   }
 
+  const { tone, icon: Icon } = field === "validation_status" ? validationVisual(value) : evidenceVisual(value);
+  const dimensionClass = field === "validation_status" ? "validation" : "evidence";
+
   return (
-    <span className="prb-status-chip ui-inline-label" aria-label={`${caption}: ${label}`}>
+    <span className={`prb-status-chip prb-status-chip--${dimensionClass}-${tone} ui-inline-label`} aria-label={`${caption}: ${label}`}>
+      <Icon className="prb-status-chip-icon" />
       <span className="prb-status-chip-caption">{caption}:</span>
       <span className="prb-status-chip-value">{label}</span>
     </span>

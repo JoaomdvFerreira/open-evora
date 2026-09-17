@@ -1,0 +1,29 @@
+/* WU053 — Open Évora logo lockup (presentation/Logo.tsx). Owner-approved
+   raster identity (aqueduct + tower + sun mark + wordmark), transparent
+   background. Explicit intrinsic width/height on the underlying <img>
+   elements prevent layout shift; these rules scale the rendered box
+   responsively while preserving aspect ratio. */
+
+.oe-logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.oe-logo-full {
+  display: block;
+  height: 2.2em;
+  width: auto;
+  max-width: 100%;
+}
+
+.oe-logo-mark {
+  display: block;
+  height: 1.6em;
+  width: 1.6em;
+  flex-shrink: 0;
+}
+
+.oe-logo--compact .oe-logo-mark {
+  height: 1.4em;
+  width: 1.4em;
+}

@@ -201,6 +201,59 @@
   font-weight: var(--text-interface-label-weight);
 }
 
+/* =========================================================================
+   WU053 — per-value tone + icon for the `reading` chip of the three
+   Problem state dimensions (lifecycle status / validation_status /
+   evidence_status). Colour is never the sole carrier: the caption/value
+   text above is unchanged and remains the primary carrier; tone/icon only
+   reinforce it (foundations.md "Colour and contrast intent";
+   component-visual-contract.md "Status always has explicit text").
+
+   Each dimension keeps its own class prefix (--lifecycle-*, --validation-*,
+   --evidence-*) so the three dimensions never collapse into one shared
+   semantic tone scale, even where the underlying tone name (e.g. "affirmed")
+   repeats conceptually across dimensions — component-visual-contract.md
+   "the three dimensions remain visually distinguishable from one another
+   with no merged indicator". Tone tokens are the same restrained feedback
+   roles already defined by tokens.css (`--color-feedback-*`); no new colour
+   primitives are introduced here beyond one additional muted/neutral ink
+   role reused from the existing ink scale. */
+.prb-status-chip-icon {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+
+.prb-status-chip--lifecycle-open .prb-status-chip-icon,
+.prb-status-chip--validation-open .prb-status-chip-icon,
+.prb-status-chip--evidence-open .prb-status-chip-icon {
+  color: var(--color-feedback-pending);
+}
+
+.prb-status-chip--lifecycle-affirmed .prb-status-chip-icon,
+.prb-status-chip--validation-affirmed .prb-status-chip-icon,
+.prb-status-chip--evidence-affirmed .prb-status-chip-icon {
+  color: var(--color-feedback-affirmed);
+}
+
+.prb-status-chip--lifecycle-partial .prb-status-chip-icon,
+.prb-status-chip--validation-partial .prb-status-chip-icon,
+.prb-status-chip--evidence-partial .prb-status-chip-icon {
+  color: var(--color-feedback-pending);
+}
+
+.prb-status-chip--lifecycle-closed .prb-status-chip-icon,
+.prb-status-chip--validation-closed .prb-status-chip-icon,
+.prb-status-chip--evidence-closed .prb-status-chip-icon {
+  color: var(--color-ink-muted);
+}
+
+.prb-status-chip--lifecycle-neutral .prb-status-chip-icon,
+.prb-status-chip--validation-neutral .prb-status-chip-icon,
+.prb-status-chip--evidence-neutral .prb-status-chip-icon {
+  color: var(--color-ink-muted);
+}
+
 /* .prb-status-technical mirrors RecordDetailPanel.tsx's
    `PrbCanonicalStatePanel` technical-field treatment (production
    `.detail-technical-field`) but is reimplemented on the DS-04B foundation
