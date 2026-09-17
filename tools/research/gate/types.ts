@@ -1,6 +1,6 @@
 /**
  * Structural types for the Human Gate & Post-Approval Orchestration
- * boundary (contract §12). The Human Gate package is a structured JSON
+ * boundary. The Human Gate package is a structured JSON
  * source of truth (OD-C, Option 3) assembled from WU045's Research Change
  * Set plus a readiness-machinery invocation, a rendered Markdown view, and
  * an owner decision bound to the exact package/content-hash/base-SHA by the
@@ -17,7 +17,7 @@ import type { SafetyAdmission } from "../admission/safety-admission.ts";
 /**
  * The Human Gate package (OD-C Option 3): one coherent, inspectable JSON
  * object exposing every element WU046's canonical scope names. This is the
- * exact object HIGH-2's contentHash is computed over and the exact object
+ * exact object the contentHash is computed over and the exact object
  * the Markdown view is rendered from — never a separately re-derived copy
  * of either.
  */
@@ -62,7 +62,7 @@ export interface HumanGatePackage {
   risksAndUncertainties: string[];
   /**
    * A clearly non-authoritative recommendation. AI output can never
-   * constitute approval (contract §12) — this field is structurally and
+   * constitute approval — this field is structurally and
    * visually distinguished from the human decision itself by every
    * consumer (markdown-view.ts, decision.ts) and is never read as if it
    * were one.
@@ -70,7 +70,7 @@ export interface HumanGatePackage {
   nonAuthoritativeRecommendation: string;
 }
 
-/** Deterministic content-hash identity for a Human Gate package (HIGH-2, §12). */
+/** Deterministic content-hash identity for a Human Gate package (HIGH-2). */
 export interface HumanGatePackageIdentity {
   packageId: string;
   schemaVersion: "1";
@@ -98,7 +98,7 @@ export interface HumanGateDecisionInput {
 }
 
 /**
- * The persisted Human Gate decision record (contract §12/D; EVT-301). JSON
+ * The persisted Human Gate decision record (EVT-301). JSON
  * source of truth, stored in the same gitignored cycle directory as the RCS
  * it decides, outside canonical/public research/**. Bound to every field
  * HIGH-2/OD-D require; never transferable across packages.

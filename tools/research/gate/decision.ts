@@ -1,7 +1,7 @@
 /**
- * Human decision submission for the Human Gate (contract §12, HIGH-2
- * approval/content-hash binding protocol; OD-D invalid decision-state
- * combinations table).
+ * Human decision submission for the Human Gate: the HIGH-2
+ * approval/content-hash binding protocol and the OD-D invalid decision-state
+ * combinations table.
  *
  * Implements the complete HIGH-2 flow's submission half (steps 7-12): on
  * decision submission, re-read the JSON source of truth from disk,
@@ -27,9 +27,8 @@ import type {
 } from "./types.ts";
 
 /**
- * OD-D's invalid decision-state combinations table (contract §9, "Invalid
- * decision-state combinations"). No public APPROVE may be recorded while
- * canonicalAcceptance is HOLD_MORE_RESEARCH or REJECT.
+ * OD-D's invalid decision-state combinations table: no public APPROVE may be
+ * recorded while canonicalAcceptance is HOLD_MORE_RESEARCH or REJECT.
  */
 export function isValidDecisionCombination(
   canonicalAcceptance: CanonicalAcceptanceDecision,

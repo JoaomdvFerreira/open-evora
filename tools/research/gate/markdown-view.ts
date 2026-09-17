@@ -1,10 +1,9 @@
 /**
  * Renders the human-readable Markdown view of a Human Gate package (OD-C,
- * Option 3; Human Gate contract §12). Generated
- * from the exact same validated in-memory HumanGatePackage object HIGH-2's
+ * Option 3). Generated
+ * from the exact same validated in-memory HumanGatePackage object the
  * contentHash is computed over (content-hash.ts) — never a re-read or
- * re-derived copy, and never itself the hashed source of truth (the JSON is
- * — HIGH-2 step 4/§12).
+ * re-derived copy, and never itself the hashed source of truth (the JSON is).
  *
  * This is a pure, deterministic presentation function: given the same
  * package object it always produces the same Markdown text. It performs no

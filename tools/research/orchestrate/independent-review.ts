@@ -1,7 +1,6 @@
 /**
  * Deterministic structural validation for the OD-B independent-review
- * output (contract §9 OD-B, strengthened minimum bar points 1-6; §11;
- * §14 case 19). This module
+ * output (strengthened minimum bar points 1-6). This module
  * enforces only points 3-4 (structured outcome + deterministic schema
  * validation) — points 1-2 and 5-6 (separate invocation/role, immutable
  * input, context isolation, self-assessment never counting as review) are
@@ -24,8 +23,8 @@ function isNonEmptyString(value: unknown): value is string {
  * Validates one already-parsed independent-review result object. A missing
  * result (undefined/null) is reported as an explicit error rather than
  * silently treated as absent-but-acceptable — OD-B's non-empty requirement
- * (§11) means "no independent review occurred" must fail closed exactly
- * like a malformed one (§14 case 19).
+ * means "no independent review occurred" must fail closed exactly
+ * like a malformed one.
  */
 export function validateIndependentReview(value: unknown): IndependentReviewValidationResult {
   if (value === undefined || value === null) {

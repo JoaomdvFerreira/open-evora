@@ -1,10 +1,9 @@
 /**
- * Post-approval Git/PR orchestration tests (Human Gate contract §12,
- * OD-E). Exercises the real
+ * Post-approval Git/PR orchestration tests (OD-E). Exercises the real
  * git/gh-invoking code path against a local bare "origin" remote and a fake
- * `gh` executable (test-fake-gh.ts) — never a real GitHub remote, per the
- * contract's requirement that tests must not require destructive
- * interaction with a real repository/remote.
+ * `gh` executable (test-fake-gh.ts) — never a real GitHub remote, since these
+ * tests must not require destructive interaction with a real
+ * repository/remote.
  */
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";

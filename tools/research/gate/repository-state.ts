@@ -1,6 +1,6 @@
 /**
- * Pre-promotion repository-state re-verification (Human Gate contract
- * §12/E). Delegates to canonical-promoter.ts's own
+ * Pre-promotion repository-state re-verification. Delegates to
+ * canonical-promoter.ts's own
  * `assertCanonicalRepositoryState` — the exact check
  * `applyCanonicalIntegrationPlan()` already performs internally — rather
  * than duplicating its Git/clean-tree/HEAD-match logic a second time. This

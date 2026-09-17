@@ -1,9 +1,9 @@
 /**
  * Deterministic structural validation for the OD-B generation manifest
- * (contract §11, OD-B point (a)).
+ * (OD-B point (a)).
  * This never judges the substantive adequacy of the investigation question
  * or rationale — only that the required shape is present, matching every
- * other structural-only check in tools/research/ (§4 stage 18/21).
+ * other structural-only check in tools/research/.
  */
 import { isBoundedRelativePath } from "./path-containment.ts";
 import type { GenerationManifest, ResearchMode } from "./types.ts";

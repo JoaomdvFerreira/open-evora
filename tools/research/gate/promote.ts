@@ -1,5 +1,5 @@
 /**
- * Post-approval orchestration (Human Gate contract §12/F/G/H/I/J). The
+ * Post-approval orchestration. The
  * single, deterministic path from a valid, bound human
  * APPROVE through canonical promotion, validation/build, the LOW-3
  * publication guard, and Git/PR orchestration, terminating at exactly

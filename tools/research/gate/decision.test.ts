@@ -1,8 +1,8 @@
 /**
- * HIGH-2 approval/content-hash binding adversarial tests (Human Gate
- * contract §12) plus OD-D invalid-combination coverage (failure-state
- * coverage list: "malformed/invalid RCS", "changed RCS after review
- * rendering", "changed contentHash", "invalid OD-D decision combination").
+ * Approval/content-hash binding adversarial tests plus invalid
+ * decision-combination coverage (failure-state coverage list:
+ * "malformed/invalid RCS", "changed RCS after review rendering", "changed
+ * contentHash", "invalid OD-D decision combination").
  */
 import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";

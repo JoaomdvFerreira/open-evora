@@ -69,7 +69,7 @@ function isWithinDirectory(directory: string, target: string): boolean {
 }
 
 /**
- * Exported per the Human Gate contract §12: post-approval promotion needs
+ * Exported because post-approval promotion needs
  * to re-verify baseGitSha against current HEAD immediately before
  * attempting promotion, using this exact
  * check rather than a second, parallel implementation of it. This is the

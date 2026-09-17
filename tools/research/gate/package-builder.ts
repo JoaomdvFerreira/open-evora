@@ -1,5 +1,5 @@
 /**
- * Assembles the Human Gate package (OD-C, Option 3; contract §12) from an
+ * Assembles the Human Gate package (OD-C, Option 3) from an
  * already-validated Research Change Set plus a read-only invocation of the existing
  * readiness.ts machinery (EVT-301 WU046 scope transfer).
  *
@@ -12,7 +12,7 @@
  *    ReasonCodes or readiness rules.
  *
  * The returned HumanGatePackage is the exact validated in-memory object
- * both the Markdown view (markdown-view.ts) and the HIGH-2 contentHash
+ * both the Markdown view (markdown-view.ts) and the contentHash
  * (content-hash.ts) are derived from — this module is the single assembly
  * point so those two consumers can never silently diverge.
  */

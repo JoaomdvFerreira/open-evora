@@ -1,6 +1,6 @@
 /**
- * Persistence and structural validation for the Human Gate decision record
- * (Human Gate contract §12/D). Stored as JSON in the same gitignored cycle directory
+ * Persistence and structural validation for the Human Gate decision record.
+ * Stored as JSON in the same gitignored cycle directory
  * as the Research Change Set it decides — outside canonical/public
  * research/** — bound to packageId/contentHash/baseGitSha/actor/timestamp/
  * canonicalAcceptance/publicExplorerPublication.
@@ -127,9 +127,9 @@ export function loadDecisionRecord(cycleDir: string): LoadDecisionRecordResult {
 
 /**
  * Fails closed unless `record` is bound to exactly this package identity.
- * A decision record for one package must never authorize a different one
- * (contract §12/D) — this is the enforcement point every promotion-path
- * caller must use before treating a loaded record as authoritative.
+ * A decision record for one package must never authorize a different one —
+ * this is the enforcement point every promotion-path caller must use before
+ * treating a loaded record as authoritative.
  */
 export function assertDecisionRecordBinding(
   record: HumanGateDecisionRecord,

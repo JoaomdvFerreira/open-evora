@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Local/operator-triggered entry point for the Human Gate & Post-Approval
- * Orchestration contract (§12). Three subcommands, matching the three
- * phases of §12's exact sequence:
+ * Local/operator-triggered entry point for Human Gate & Post-Approval
+ * Orchestration. Three subcommands, matching the three phases of the
+ * gate/approval/promotion sequence:
  *
  *   render   — assembles + validates a Human Gate package from a WU045
  *              Research Change Set, writes the package JSON (source of
@@ -12,7 +12,7 @@
  *   decide   — submits a human decision against the package JSON currently
  *              on disk (HIGH-2 steps 7-12), persisting a decision record on
  *              success or reporting an explicit abort/rejection.
- *   promote  — runs the complete post-approval path (§12/F-J) for a cycle
+ *   promote  — runs the complete post-approval path for a cycle
  *              directory holding both a validated package and a valid,
  *              bound APPROVE decision, terminating at exactly
  *              READY_FOR_OWNER_MERGE or an explicit failure/private-hold.
