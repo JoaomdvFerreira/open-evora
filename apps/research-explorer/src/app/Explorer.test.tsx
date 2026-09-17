@@ -431,7 +431,7 @@ function globalNav(): HTMLElement {
   return screen.getByRole("navigation", { name: "Vistas do Explorador de Investigação" });
 }
 
-describe("Explorer — chrome header (WU054 delta: owner-approved logo)", () => {
+describe("Explorer — chrome header identity", () => {
   it("renders the Open Évora logo alongside the preserved subtitle and primary navigation", async () => {
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });

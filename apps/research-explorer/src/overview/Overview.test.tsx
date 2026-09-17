@@ -82,7 +82,7 @@ describe("Overview — Problem investigation-state dimensions", () => {
   });
 });
 
-describe("Overview — WU054 delta: ordering transparency, search control, topic-filter order", () => {
+describe("Overview — Problem ordering transparency and citizen discovery controls", () => {
   it("shows the ordering transparency note, distinct from the corpus-coverage caveat", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} },
