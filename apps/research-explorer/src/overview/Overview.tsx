@@ -22,6 +22,11 @@ import { MaterialChangeTimeline } from "./MaterialChangeTimeline";
 
 const MATERIAL_CHANGE_PRESENTATION_LIMIT = 5;
 
+interface MaterialChangesState {
+  entries: MaterialChangeEntry[];
+  complete: boolean;
+}
+
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
   malformed: "Índice de registos mal formado",
@@ -50,7 +55,7 @@ export function Overview({
 }) {
   const indexState = useRecordIndex(dataProvider);
   const [citizenProblems, setCitizenProblems] = useState<CitizenProblem[] | null>(null);
-  const [materialChanges, setMaterialChanges] = useState<MaterialChangeEntry[] | null>(null);
+  const [materialChanges, setMaterialChanges] = useState<MaterialChangesState | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const overview = indexState.status === "ready" ? computePublicOverviewData(indexState.records) : null;
@@ -70,16 +75,26 @@ export function Overview({
       summaries.map(async (summary) => {
         try {
           const detail = await dataProvider.getRecord(summary.id);
-          return { problem: toCitizenProblem(summary, detail), source: { summary, detail } satisfies MaterialChangeSource };
+          return {
+            problem: toCitizenProblem(summary, detail),
+            source: { summary, detail } satisfies MaterialChangeSource,
+            materialHistoryLoaded: true,
+          };
         } catch {
           const detail = { id: summary.id, type: summary.type, file: summary.file, record: {}, outgoingEdges: [], incomingEdges: [] };
-          return { problem: toCitizenProblem(summary, detail), source: { summary, detail } satisfies MaterialChangeSource };
+          return {
+            problem: toCitizenProblem(summary, detail),
+            materialHistoryLoaded: false,
+          };
         }
       })
     ).then((loaded) => {
       if (!cancelled) {
         setCitizenProblems(loaded.map(({ problem }) => problem).sort((a, b) => a.id.localeCompare(b.id)));
-        setMaterialChanges(projectMaterialChangeEntries(loaded.map(({ source }) => source)));
+        setMaterialChanges({
+          entries: projectMaterialChangeEntries(loaded.flatMap(({ source }) => source === undefined ? [] : [source])),
+          complete: loaded.every(({ materialHistoryLoaded }) => materialHistoryLoaded),
+        });
       }
     });
     return () => {
@@ -121,8 +136,6 @@ export function Overview({
   const unvalidatedLabel = publicEnumLabel("validation_status", "unvalidated");
   const corroboratedLabel = publicEnumLabel("evidence_status", "corroborated");
   const compactCorroboratedLabel = publicCompactEnumLabel("evidence_status", "corroborated");
-  const recentMaterialChanges = materialChanges?.slice(0, MATERIAL_CHANGE_PRESENTATION_LIMIT) ?? null;
-
   return (
     <section aria-labelledby="overview-heading" className="public-overview shell-frame">
       <h2 id="overview-heading">Visão geral</h2>
@@ -199,10 +212,20 @@ export function Overview({
         <div className="overview-problems-heading">
           <h3 id="material-change-heading">O que mudou recentemente</h3>
         </div>
-        {recentMaterialChanges === null ? (
+        {materialChanges === null ? (
           <ProgressMessage message="A carregar alterações materiais…" />
         ) : (
-          <MaterialChangeTimeline entries={recentMaterialChanges} onExploreProblem={onExploreProblem} />
+          <>
+            {!materialChanges.complete && (
+              <ErrorNotice
+                title="Não foi possível carregar todo o histórico material"
+                message="Não foi possível carregar o detalhe de alguns problemas. As alterações apresentadas podem estar incompletas."
+              />
+            )}
+            {(materialChanges.complete || materialChanges.entries.length > 0) && (
+              <MaterialChangeTimeline entries={materialChanges.entries.slice(0, MATERIAL_CHANGE_PRESENTATION_LIMIT)} onExploreProblem={onExploreProblem} />
+            )}
+          </>
         )}
       </section>
 

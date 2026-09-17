@@ -235,11 +235,41 @@ describe("Overview — error state retry (ODM-021)", () => {
 });
 
 describe("Overview — material-change timeline", () => {
-  it("renders the neutral no-history state without claiming Problems never changed", async () => {
+  it("renders the neutral no-history state only after every Problem detail loads", async () => {
     render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
 
     expect(await screen.findByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeTruthy();
     expect(screen.queryByText(/nunca mudou/i)).toBeNull();
+  });
+
+  it("does not present missing detail reads as a no-history result", async () => {
+    const provider: DataProvider = {
+      ...makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema indisponível", file: "", summaryFields: {} }]),
+      getRecord: async () => { throw new DataLoadError("detalhe indisponível", "network"); },
+    };
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toContain("Não foi possível carregar todo o histórico material");
+    expect(screen.queryByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeNull();
+  });
+
+  it("marks a timeline from partially loaded Problems as incomplete", async () => {
+    const provider: DataProvider = {
+      ...makeProvider([
+        { id: "PRB-1", type: "PRB-", label: "Problema carregado", file: "", summaryFields: {} },
+        { id: "PRB-2", type: "PRB-", label: "Problema indisponível", file: "", summaryFields: {} },
+      ]),
+      getRecord: async (id) => {
+        if (id === "PRB-2") throw new DataLoadError("detalhe indisponível", "network");
+        return { id, type: "PRB-", file: "", record: { title: "Problema carregado", history: [{ date: "2026-04-08", summary: "Alteração carregada." }] }, outgoingEdges: [], incomingEdges: [] };
+      },
+    };
+    render(<Overview dataProvider={provider} {...props} />);
+
+    expect((await screen.findByRole("alert")).textContent).toContain("podem estar incompletas");
+    expect(screen.getByText("Alteração carregada.")).toBeTruthy();
+    expect(screen.queryByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeNull();
   });
 
   it("renders authored history and opens its owning Problem", async () => {
