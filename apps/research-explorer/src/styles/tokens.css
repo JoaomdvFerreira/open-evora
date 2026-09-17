@@ -3,9 +3,9 @@
    docs/design/component-visual-contract.md (DS-03B / Gate C2 PASS).
 
    This file is consumed by both Storybook and the production application (imported by
-   apps/research-explorer/src/main.tsx since DS-05A). Legacy index.css still defines
-   its own separate :root token block; see docs/design/ds-04b-foundation-consolidation-contract.md
-   for the exact legacy-to-semantic migration mapping and status.
+   apps/research-explorer/src/main.tsx since DS-05A). The adopted foundation values below
+   are owner-frozen per docs/design/foundations.md; exact token names/values remain owned
+   by this file, not duplicated into Markdown.
 
    Primitives (--p-*) are raw values with no meaning of their own. Semantic
    roles are the only tokens components/stories should consume. Every value

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Local/operator-triggered orchestration entry point for WU045 automated
- * research preparation (docs/design/m013-launch-automation-contract.md
- * §11, OD-A Option 1). A human runs this once per cycle, supplying the
+ * Local/operator-triggered orchestration entry point for automated
+ * research preparation (OD-A Option 1). A human runs this
+ * once per cycle, supplying the
  * accepted RESEARCH_TRIGGER; it requires no scheduler, cron, or always-on
  * service.
  *
@@ -10,13 +10,13 @@
  * invocations itself (primary authoring, then a fresh, separately-invoked
  * independent review — see run-cycle.ts) rather than requiring an operator
  * to pre-create manifest.json/independent-review.json/candidate YAML. It
- * sequences the already-existing deterministic primitives (§6) and
+ * sequences the already-existing deterministic primitives and
  * structurally validates every AI-produced artifact, producing exactly a
  * READY_FOR_HUMAN_REVIEW Research Change Set (OD-C) or an explicit
  * failure — never a partial "looks ready" package, and never a canonical
  * or public write.
  *
- * AI runtime configuration (OD-A/§2 "do not choose a vendor"): the
+ * AI runtime configuration (OD-A: "do not choose a vendor"): the
  * executable that performs both AI roles is entirely operator-configured
  * via environment variables (see ai-invoker.ts); this module never selects
  * or hard-codes a vendor/model. If unset, this command fails closed with
@@ -192,14 +192,14 @@ async function main(): Promise<void> {
     console.error(
       "FAILED [AI_RUNTIME_NOT_CONFIGURED]: RESEARCH_AI_COMMAND is not set. " +
       "WU045 requires an operator-configured local AI command/process for both the " +
-      "PRIMARY_AUTHOR and INDEPENDENT_REVIEWER invocations (contract §3) and will not " +
+      "PRIMARY_AUTHOR and INDEPENDENT_REVIEWER invocations and will not " +
       "silently fall back to pre-generated files. Set RESEARCH_AI_COMMAND (and optionally " +
       "RESEARCH_AI_ARGS / RESEARCH_AI_TIMEOUT_MS) and re-run."
     );
     process.exitCode = 1;
     return;
   }
-  // A single configured executable may serve both roles (contract §3); each
+  // A single configured executable may serve both roles; each
   // invocation is still a brand-new child process with no shared session —
   // see ai-invoker.ts. Two separate AiInvoker instances are constructed so
   // that, even if a future configuration diverges the two roles' commands,

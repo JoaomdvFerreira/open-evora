@@ -1,11 +1,11 @@
 /**
- * Structural types for the WU045 automated research preparation boundary
- * (docs/design/m013-launch-automation-contract.md §11). These describe the
+ * Structural types for the automated research preparation boundary. These
+ * describe the
  * OD-B structured AI output contract and the OD-C Research Change Set (RCS)
  * assembly — never a semantic research judgement and never a canonical
- * record type. WU045 owns exactly the structural shape below; the human
+ * record type. This module owns exactly the structural shape below; the human
  * Gate 1 decision, the RCS Markdown rendering, and the approval/contentHash
- * binding protocol remain WU046's responsibility (§12).
+ * binding protocol remain the Human Gate's responsibility.
  */
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CanonicalIntegrationReadiness } from "../integration/canonical-integration-review.ts";
@@ -13,14 +13,14 @@ import type { CanonicalIntegrationPlan } from "../integration/canonical-integrat
 import type { ValidationResult } from "../validation/validate.ts";
 import type { SafetyAdmission } from "../admission/safety-admission.ts";
 
-/** Which prompt/mode a cycle was triggered under (§11 orchestration entry point). */
+/** Which prompt/mode a cycle was triggered under (orchestration entry point). */
 export type ResearchMode = "daily-discovery" | "problem-refresh";
 
 /**
- * The accepted normal-path trigger input (WU045-B01 remediation; contract
- * §4 "Normal path must start from the trigger"). An operator supplies this
+ * The accepted normal-path trigger input (WU045-B01 remediation: the normal
+ * path must start from the trigger). An operator supplies this
  * once per cycle; the trigger decision itself is outside the normal-path
- * handoff count (§5 criterion A) — everything from here to
+ * handoff count — everything from here to
  * READY_FOR_HUMAN_REVIEW is orchestrated with zero further human handoffs.
  */
 export interface ResearchTrigger {
@@ -33,7 +33,7 @@ export interface ResearchTrigger {
 
 /**
  * The per-cycle manifest an AI-assisted authoring pass must produce before
- * its candidates are considered structurally ready (OD-B point (a), §11).
+ * its candidates are considered structurally ready (OD-B point (a)).
  * Deterministic tooling validates only shape/presence here — never the
  * substantive adequacy of the investigation question or rationale.
  */
@@ -50,12 +50,12 @@ export interface GenerationManifest {
   rationale: string;
 }
 
-/** The only structurally valid independent-review outcomes (OD-B five-point minimum bar, §9). */
+/** The only structurally valid independent-review outcomes (OD-B five-point minimum bar). */
 export type IndependentReviewOutcome = "CONCUR" | "DISAGREEMENT_FOUND" | "INSUFFICIENT_EVIDENCE";
 
 /**
- * The distinct, structurally-required independent-review result (OD-B,
- * §9/§11). Produced by a separate invocation/role that consumes the
+ * The distinct, structurally-required independent-review result (OD-B).
+ * Produced by a separate invocation/role that consumes the
  * immutable candidate/RCS input without power to revise it — a schema
  * shape only; this module never verifies that a separate invocation
  * actually occurred, which is an orchestration-process requirement
@@ -73,9 +73,9 @@ export interface IndependentReviewResult {
  * — JSON source of truth). This is the exact structural artifact WU045
  * hands to WU046's Human Gate; it is never itself an approval, and it
  * carries no canonical record semantics. `packageId`/`preparationFingerprint`
- * support WU045's own idempotency contract (§11, WU048 case 20) — this is
+ * support WU045's own idempotency guarantee — this is
  * distinct from, and never a substitute for, WU046's separate
- * approval/contentHash binding protocol (§12).
+ * approval/contentHash binding protocol.
  */
 export interface ResearchChangeSet {
   schemaVersion: "1";
@@ -93,7 +93,7 @@ export interface ResearchChangeSet {
   /**
    * Deterministic fingerprint over every field above except `packageId`
    * itself and this field. Identical logical inputs always yield the same
-   * fingerprint (§11 idempotency contract, WU048 case 20). Intentionally
+   * fingerprint. Intentionally
    * excludes any run timestamp: this module records no timestamp field at
    * all, so there is no non-hashed metadata to document.
    */
@@ -121,8 +121,8 @@ export interface AuthoredCandidateFile {
 
 /**
  * The complete structured envelope the PRIMARY_AUTHOR AI invocation must
- * emit on stdout (WU045-B01 remediation; contract §11 primary authoring).
- * Contains everything WU045 needs to materialize the manifest and every
+ * emit on stdout (WU045-B01 remediation). Contains everything WU045 needs
+ * to materialize the manifest and every
  * candidate file the existing deterministic chain requires — the AI
  * process never writes files directly; the orchestrator does, from this
  * validated envelope alone.

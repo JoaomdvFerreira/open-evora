@@ -1,16 +1,16 @@
 /**
- * Assembles the WU045 Research Change Set (OD-C, Option 3 — JSON source of
- * truth; docs/design/m013-launch-automation-contract.md §11). This module
+ * Assembles the Research Change Set (OD-C, Option 3 — JSON source of
+ * truth). This module
  * sequences and structurally validates; it never performs discovery,
  * extraction, or candidate authoring itself, and it never writes canonical
  * research. Every deterministic primitive it calls is imported from its
- * existing home under tools/research/{integration,validation}/ (§6) —
+ * existing home under tools/research/{integration,validation}/ —
  * this module introduces no second delta/validation/readiness
  * implementation.
  *
  * WU045 stops at producing this JSON artifact. The generated human-readable
  * Markdown view and the formal approval/contentHash binding protocol are
- * WU046's responsibility (§12) and are deliberately not implemented here.
+ * WU046's responsibility and are deliberately not implemented here.
  */
 import { classifyCandidateDelta } from "../integration/candidate-delta.ts";
 import { prepareCanonicalIntegrationReview, type CanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
@@ -78,7 +78,7 @@ function preparationFingerprintOf(
  * `baseGitSha` plus the validated manifest/candidate/review content — no
  * timestamp or other run-specific metadata is included or recorded
  * anywhere in the package, so an identical rerun against identical inputs
- * is deterministically identical (§11 idempotency contract, §14 case 20).
+ * is deterministically identical.
  */
 export function assembleResearchChangeSet(
   index: CorpusIndex,
@@ -139,9 +139,9 @@ export function assembleResearchChangeSet(
  * Runs the complete WU045 normal-path sequence for one cycle: structural
  * manifest/independent-review validation, candidate loading, and the
  * existing candidate-delta -> prospective-validation -> canonical-
- * integration-review -> canonical-integration-plan chain (§6, §11). Fails
+ * integration-review -> canonical-integration-plan chain. Fails
  * closed at the first structural problem, reporting exactly which check
- * failed (§11) rather than producing a partial "looks ready" package.
+ * failed rather than producing a partial "looks ready" package.
  *
  * This is the pre-file-based path: it derives `review` itself by loading
  * candidates from `candidatesDir`. run-cycle.ts's AI-driven normal path

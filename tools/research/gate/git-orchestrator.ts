@@ -1,6 +1,5 @@
 /**
- * Post-approval Git/PR orchestration (docs/design/
- * m013-launch-automation-contract.md §12, OD-E). Executes the bounded
+ * Post-approval Git/PR orchestration (OD-E). Executes the bounded
  * deterministic sequence branch -> commit -> push -> PR creation -> CI
  * observation, terminating at exactly READY_FOR_OWNER_MERGE. Never merges,
  * never enables auto-merge, never bypasses branch protection.

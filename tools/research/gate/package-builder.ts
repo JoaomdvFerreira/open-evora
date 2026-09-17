@@ -1,7 +1,6 @@
 /**
- * Assembles the WU046 Human Gate package (OD-C, Option 3; docs/design/
- * m013-launch-automation-contract.md §12) from an already-validated WU045
- * Research Change Set plus a read-only invocation of the existing
+ * Assembles the Human Gate package (OD-C, Option 3) from an
+ * already-validated Research Change Set plus a read-only invocation of the existing
  * readiness.ts machinery (EVT-301 WU046 scope transfer).
  *
  * This module performs pre-Gate analysis only:
@@ -13,7 +12,7 @@
  *    ReasonCodes or readiness rules.
  *
  * The returned HumanGatePackage is the exact validated in-memory object
- * both the Markdown view (markdown-view.ts) and the HIGH-2 contentHash
+ * both the Markdown view (markdown-view.ts) and the contentHash
  * (content-hash.ts) are derived from — this module is the single assembly
  * point so those two consumers can never silently diverge.
  */

@@ -1,7 +1,7 @@
 /**
- * Provider-neutral local AI invocation boundary (WU045-B01 remediation;
- * docs/design/m013-launch-automation-contract.md OD-A, OD-B §9/§11). This
- * module defines the AiInvoker abstraction WU045 uses for both required
+ * Provider-neutral local AI invocation boundary (research automation
+ * contract OD-A, OD-B §9/§11). This
+ * module defines the AiInvoker abstraction used for both required
  * invocation roles — PRIMARY_AUTHOR and INDEPENDENT_REVIEWER — and a
  * production LocalCommandAiInvoker that spawns an operator-configured local
  * command/process per invocation.

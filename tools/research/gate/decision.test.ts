@@ -1,7 +1,6 @@
 /**
- * HIGH-2 approval/content-hash binding adversarial tests (docs/design/
- * m013-launch-automation-contract.md §12) plus OD-D invalid-combination
- * coverage (WU046 acceptance criteria; WU048 failure-state coverage list:
+ * Approval/content-hash binding adversarial tests plus invalid
+ * decision-combination coverage (failure-state coverage list:
  * "malformed/invalid RCS", "changed RCS after review rendering", "changed
  * contentHash", "invalid OD-D decision combination").
  */

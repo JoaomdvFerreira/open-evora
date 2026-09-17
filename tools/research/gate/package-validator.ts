@@ -1,6 +1,6 @@
 /**
- * Full structural validation for an already-assembled Human Gate package
- * (docs/design/m013-launch-automation-contract.md §12). Used by
+ * Full structural validation for an already-assembled Human Gate package.
+ * Used by
  * package-builder.ts immediately after assembly (HIGH-2 step 1) and again
  * by decision.ts on every re-read from disk at decision-submission time
  * (HIGH-2 step 8) — the same validator both times, so "validated" means the

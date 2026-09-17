@@ -1,7 +1,6 @@
 /**
- * LOW-3 deterministic publication guard adversarial tests (docs/design/
- * m013-launch-automation-contract.md §12, independent-review finding
- * LOW-3; WU048 failure-state coverage: "LOW-3 unexpected path"). These
+ * Deterministic publication-guard adversarial tests (independent-review
+ * finding LOW-3; failure-state coverage: "LOW-3 unexpected path"). These
  * demonstrate that an unexpected staged/tracked/untracked file prevents
  * publication, and that the guard is enforced at the Git-publication
  * boundary itself rather than relying only on .gitignore.

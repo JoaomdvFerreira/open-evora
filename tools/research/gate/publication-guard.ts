@@ -1,7 +1,6 @@
 /**
- * LOW-3 deterministic publication guard (docs/design/
- * m013-launch-automation-contract.md §12, independent-review finding
- * LOW-3). Enforced at the Git-publication boundary itself, immediately
+ * LOW-3 deterministic publication guard (independent-review finding LOW-3).
+ * Enforced at the Git-publication boundary itself, immediately
  * before commit/push/PR — not via .gitignore, a pre-commit hook, or
  * developer discipline (those remain additional, not a replacement).
  *

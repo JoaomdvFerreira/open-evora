@@ -1,17 +1,16 @@
 /**
- * WU045-B01 remediation: drives the normal path from an accepted
- * RESEARCH_TRIGGER through both required OD-B AI invocations to
- * READY_FOR_HUMAN_REVIEW, with zero normal-path human handoffs
- * (docs/design/m013-launch-automation-contract.md §4, §5, §11).
+ * Drives the normal path from an accepted RESEARCH_TRIGGER through both
+ * required OD-B AI invocations to READY_FOR_HUMAN_REVIEW, with zero
+ * normal-path human handoffs.
  *
- * Sequence (contract §4):
+ * Sequence:
  *   RESEARCH_TRIGGER
  *   -> PRIMARY AI INVOCATION (role PRIMARY_AUTHOR)
  *   -> validate structured authoring result
  *   -> materialize noncanonical candidate/manifest artifacts into the
  *      gitignored workbench
  *   -> deterministic candidate/delta/validation/readiness/review-plan
- *      preparation (research-change-set.ts, reusing §6 primitives)
+ *      preparation (research-change-set.ts, reusing existing primitives)
  *   -> freeze the immutable reviewer input (reviewer-input.ts)
  *   -> FRESH INDEPENDENT REVIEW AI INVOCATION (role INDEPENDENT_REVIEWER,
  *      a brand-new process — see ai-invoker.ts)
@@ -19,7 +18,7 @@
  *   -> assemble the WU045 Research Change Set
  *   -> READY_FOR_HUMAN_REVIEW
  *
- * No failure branch below ever reaches READY_FOR_HUMAN_REVIEW (contract §9).
+ * No failure branch below ever reaches READY_FOR_HUMAN_REVIEW.
  * This module never calls applyCanonicalIntegrationPlan() and never writes
  * under research/ — see research-change-set.ts, which this module composes
  * with but does not modify.
@@ -91,7 +90,7 @@ function parseJsonStdout(stdout: string, failedCheck: string): { value: unknown 
  * Materializes the validated primary-authoring envelope into the cycle
  * directory: manifest.json plus every candidate YAML file, written by the
  * orchestrator itself (never by the AI process, which only ever returns
- * structured text on stdout — contract §5 "Preferred pattern").
+ * structured text on stdout).
  *
  * `file.path` is untrusted AI-authored input (WU045-B01 independent-review
  * remediation, finding 2). `authoring-envelope.ts`'s structural validation
@@ -177,7 +176,7 @@ export async function continueFromFrozenCandidates(
   inferenceLimitResolutionChecker: InferenceLimitResolutionChecker | undefined,
   now: (() => Date) | undefined
 ): Promise<PreparationOutcome> {
-  // Reuse the existing deterministic review-preparation primitive (§6)
+  // Reuse the existing deterministic review-preparation primitive
   // directly, purely to obtain the candidates/deltas/validation/readiness
   // the reviewer input requires before any independent-review result
   // exists. This performs no canonical write and duplicates no logic —

@@ -4,7 +4,7 @@ Status: **APPROVED — DS-03A / Gate C1 PASS**
 
 Scope: approved component and layout boundaries derived from the current Research Explorer. This document defines a bounded architecture for later implementation. It does not approve exact component APIs, freeze token values, redesign pages, or change production React/CSS.
 
-The current implementation is the primary evidence for current-state claims. The DS-01 audit in `docs/design/audits/ds-01-current-state/audit.md` remains a useful baseline, but code that changed after that snapshot takes precedence. In particular, `RecordsExplorer` now renders the records list and a selected full-page detail mutually exclusively; `.records-explorer` no longer contains a persistent table-and-detail split.
+The current implementation is the primary evidence for current-state claims. In particular, `RecordsExplorer` now renders the records list and a selected full-page detail mutually exclusively; `.records-explorer` no longer contains a persistent table-and-detail split.
 
 ## 1. Architecture principles
 
