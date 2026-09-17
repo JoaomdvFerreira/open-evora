@@ -82,13 +82,6 @@ main {
 
 /* Public first-contact Overview: reuses the Explorer's restrained surfaces,
    typography roles, native disclosure, and text-first navigation. */
-.overview-introduction {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.2rem;
-  line-height: 1.6;
-  max-width: 48rem;
-}
-
 .overview-independence,
 .overview-trust,
 .overview-status-explanation {
@@ -886,9 +879,18 @@ main.explorer-shell {
   letter-spacing: -0.01em;
 }
 
-.explorer-brand {
-  color: var(--color-ink-primary);
-  font-weight: 700;
+/* WU054 delta — owner-approved logo (presentation/Logo.tsx) adopted into the
+   chrome header in place of the earlier text-only wordmark. `--full` is the
+   default responsive form; `--compact` (mark-only) takes over once the
+   compact breakpoint hides the subtitle below, keeping the header from
+   crowding the nav at narrow widths. */
+/* `.explorer-logo--compact` needs to win over logo.css's own `.oe-logo {
+   display: inline-flex }` base rule despite loading before it (main.tsx
+   import order) — matched by pairing the class with itself for specificity,
+   the same technique this file already documents at main.tsx's DS-05J
+   note for `.problem-reading-rail`. */
+.explorer-logo--compact.explorer-logo--compact {
+  display: none;
 }
 
 .explorer-subtitle {
@@ -999,22 +1001,6 @@ main.explorer-shell {
   border: 0;
 }
 
-.overview-introduction {
-  max-width: 43rem;
-  margin: 0 0 0.8rem;
-  color: var(--color-ink-primary);
-  font-family: var(--font-reading);
-  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
-  line-height: 1.55;
-}
-
-.overview-introduction + p {
-  max-width: 42rem;
-  margin: 0;
-  color: var(--color-ink-secondary);
-  font-size: 0.97rem;
-}
-
 .overview-mobile-copy {
   display: none;
 }
@@ -1030,7 +1016,7 @@ main.explorer-shell {
 }
 
 .overview-independence {
-  margin: 0;
+  margin: 0 0 1.5rem;
   padding: 0.48rem 0.75rem;
   color: var(--color-ink-secondary);
   font-size: 0.78rem;
@@ -1041,30 +1027,27 @@ main.explorer-shell {
   color: var(--color-ink-primary);
 }
 
-.overview-primary-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: 1rem;
-  margin: 1.35rem 0 2.2rem;
+/* WU054 — citizen-first hero: frozen headline + supporting copy, no
+   photography (out of scope for this slice). */
+.overview-hero {
+  max-width: 44rem;
+  margin: 0 0 2rem;
 }
 
-.overview-primary-actions > p {
+.overview-hero-headline {
+  margin: 0 0 0.5rem;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.overview-hero-supporting {
   margin: 0;
-}
-
-.overview-primary-actions > p:first-child {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.overview-primary-actions > p:last-child {
-  flex: 0 0 auto;
-}
-
-.overview-primary-actions a {
-  font-size: 0.86rem;
-  font-weight: 650;
+  color: var(--color-ink-secondary);
+  font-size: 1.02rem;
+  line-height: 1.55;
 }
 
 .overview-concepts {
@@ -1132,6 +1115,126 @@ main.explorer-shell {
   font-size: 0.75rem;
 }
 
+/* WU054 — coverage caveat (docs/explorerarchitecture.md, AGENTS.md evidence
+   integrity): visible, but deliberately quieter than the hero/heading. */
+.overview-coverage-caveat {
+  max-width: 42rem;
+  margin: 0 0 1.25rem;
+  color: var(--color-ink-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* WU054 delta — ordering transparency note: separate from the corpus-coverage
+   caveat above, and deliberately quieter still (docs/explorerarchitecture.md
+   §4 "human-readable meaning before technical identity"; AGENTS.md evidence
+   integrity — deterministic ID order must never read as a ranking). */
+.overview-ordering-note {
+  max-width: 42rem;
+  margin: 0 0 1.25rem;
+  color: var(--color-ink-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.overview-search {
+  margin: 0 0 0.85rem;
+}
+
+.overview-search-label {
+  display: block;
+  margin: 0 0 0.3rem;
+  color: var(--color-ink-secondary);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+/* WU054 delta — icon-wrapped search input; the icon is a positioned overlay
+   (aria-hidden in icons.tsx), never a replacement for the visible <label>
+   above. */
+.overview-search-input-wrap {
+  position: relative;
+  display: block;
+  max-width: 32rem;
+}
+
+.overview-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  transform: translateY(-50%);
+  color: var(--color-ink-muted);
+  pointer-events: none;
+}
+
+.overview-search-input {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 32rem;
+  min-height: 44px;
+  padding: 0.55rem 0.85rem 0.55rem 2.35rem;
+  color: var(--color-ink-primary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-control, 0.3rem);
+  background: var(--color-surface-raised);
+  font-size: 0.95rem;
+}
+
+.overview-search-input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.overview-topic-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.overview-topic-filter {
+  min-height: 36px;
+  padding: 0.35rem 0.85rem;
+  color: var(--color-ink-secondary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: 999px;
+  background: var(--color-surface-raised);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.overview-topic-filter:hover {
+  border-color: #bbb3a3;
+  background: var(--color-surface-subtle);
+}
+
+.overview-topic-filter:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.overview-topic-filter[aria-pressed="true"] {
+  color: var(--color-surface-raised);
+  border-color: var(--color-ink-primary);
+  background: var(--color-ink-primary);
+  font-weight: 650;
+}
+
+.overview-results-count {
+  margin: 0 0 0.65rem;
+  color: var(--color-ink-muted);
+  font-size: 0.78rem;
+}
+
+.overview-empty-state {
+  margin: 1rem 0;
+  padding: 1rem;
+  color: var(--color-ink-secondary);
+  border: 1px dashed var(--color-separator-standard);
+  border-radius: 0.3rem;
+  background: var(--color-surface-subtle);
+}
+
 .overview-problem-list {
   display: grid;
   gap: 0.5rem;
@@ -1160,6 +1263,13 @@ main.explorer-shell {
   font-size: 0.68rem;
 }
 
+.overview-problem-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0 0 0.4rem;
+}
+
 .overview-problem-list h4 {
   margin: 0.22rem 0 0;
   color: var(--color-ink-primary);
@@ -1168,6 +1278,18 @@ main.explorer-shell {
   font-weight: 400;
   font-synthesis: none;
   line-height: 1.42;
+}
+
+.overview-problem-statement {
+  margin: 0.3rem 0 0;
+  color: var(--color-ink-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.overview-problem-technical-id {
+  display: block;
+  margin: 0.4rem 0 0;
 }
 
 .overview-statuses {
@@ -2178,6 +2300,14 @@ main.explorer-shell {
     border: 0;
   }
 
+  .explorer-logo--full.explorer-logo--full {
+    display: none;
+  }
+
+  .explorer-logo--compact.explorer-logo--compact {
+    display: inline-flex;
+  }
+
   .explorer-navigation {
     width: 100%;
     margin-bottom: 1rem;
@@ -2218,12 +2348,6 @@ main.explorer-shell {
     font-size: 1.65rem;
   }
 
-  .overview-introduction {
-    font-size: 1.08rem;
-    line-height: 1.5;
-  }
-
-  .overview-supporting-copy,
   .overview-desktop-copy {
     display: none;
   }
@@ -2237,15 +2361,28 @@ main.explorer-shell {
     font-size: 0.74rem;
   }
 
-  .overview-primary-actions {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 0.65rem;
-    margin: 1rem 0;
+  .overview-hero {
+    margin: 0 0 1.5rem;
+  }
+
+  .overview-hero-headline {
+    font-size: 1.4rem;
+  }
+
+  .overview-hero-supporting {
+    font-size: 0.92rem;
   }
 
   .overview-concepts {
     display: none;
+  }
+
+  .overview-search-input {
+    max-width: none;
+  }
+
+  .overview-topic-filter {
+    font-size: 0.78rem;
   }
 
   .overview-trust {

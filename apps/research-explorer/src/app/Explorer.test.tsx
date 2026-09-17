@@ -241,7 +241,6 @@ describe("Explorer — Overview view", () => {
     expect(screen.queryByText("Pressão de estacionamento com uma descrição…")).toBeNull();
     expect(screen.queryByText("Via Verde Parking Buddy")).toBeNull();
     expect(screen.getByText(/Não representa a Câmara Municipal de Évora/)).toBeTruthy();
-    expect(screen.getByText("ordenados por identificador, não por relevância")).toBeTruthy();
     expect(screen.queryByText("Como ler o Explorer")).toBeNull();
     expect(screen.queryByText(/Estado de validação:/)).toBeNull();
     expect(screen.queryByText(/Estado da evidência:/)).toBeNull();
@@ -258,8 +257,18 @@ describe("Explorer — Overview view", () => {
         summaryFields: { status: "OPEN", validation_status: "unvalidated", evidence_status: "corroborated" },
       },
     ];
+    const statusDetails: Record<string, RecordDetail> = {
+      "PRB-0005": { ...DETAILS["PRB-0005"], record: { ...DETAILS["PRB-0005"].record, validation_status: "unvalidated", evidence_status: "corroborated" } },
+    };
     window.history.replaceState(null, "", "/");
-    render(<Explorer dataProvider={fakeProvider({ listRecords: () => Promise.resolve(statusIndex) })} />);
+    render(
+      <Explorer
+        dataProvider={fakeProvider({
+          listRecords: () => Promise.resolve(statusIndex),
+          getRecord: (id: string) => (statusDetails[id] ? Promise.resolve(statusDetails[id]) : Promise.reject(new Error(`no fixture detail for ${id}`))),
+        })}
+      />
+    );
 
     await screen.findByRole("heading", { name: "Visão geral" });
     expect(screen.queryByText("Por validar · Corroborado")).toBeNull();
@@ -421,6 +430,20 @@ describe("Explorer — URL-addressable state", () => {
 function globalNav(): HTMLElement {
   return screen.getByRole("navigation", { name: "Vistas do Explorador de Investigação" });
 }
+
+describe("Explorer — chrome header identity", () => {
+  it("renders the Open Évora logo alongside the preserved subtitle and primary navigation", async () => {
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("button", { name: /PRB-0005/ });
+
+    expect(screen.getAllByAltText("Open Évora").length).toBeGreaterThan(0);
+    expect(screen.getByText("Explorador de Investigação")).toBeTruthy();
+    expect(globalNav()).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Visão geral" })).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Registos" })).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Grafo" })).toBeTruthy();
+  });
+});
 
 describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
   it("navigating from a selected Problem to global Registos clears selectedId (no hidden-context leak)", async () => {

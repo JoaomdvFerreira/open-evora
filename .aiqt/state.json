@@ -2621,12 +2621,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-049"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T16:45:48.447Z"
+        "updatedAt": "2026-09-17T19:36:38.532Z"
       },
       {
         "id": "WU055",
@@ -2668,12 +2668,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-051"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T14:58:53.664Z"
+        "updatedAt": "2026-09-17T19:36:38.532Z"
       },
       {
         "id": "WU056",
@@ -7971,17 +7971,121 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-17T16:45:48.447Z",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-17T16:45:48.447Z"
+    },
+    {
+      "id": "C055",
+      "workUnitId": "WU054",
+      "packetId": "PKT-055",
+      "summary": "Closed WU054 Citizen Overview & Discovery after explicit owner visual-gate acceptance. The CitizenProblem projection remains runtime-derived; all required discovery interactions and responsive review passed on the bound Preview.",
+      "completed": [
+        "Implemented the runtime-derived CitizenProblem discovery projection, deterministic neutral ordering, search, presentation-only topic filters, coverage disclaimer, scannable cards, and compact responsive treatment.",
+        "Recorded explicit owner acceptance as EVID-002 / EVT-370, bound to Preview dpl_BrwidZseEMd7Lx7rkXJuxWmggrH2 and source SHA 161d7adb0f7374df2ddf1cef7321d5fa8a8eb7fe.",
+        "Confirmed remote code/architecture review PASS and independent review PASS WITH NOTES; all actionable findings were resolved.",
+        "Confirmed desktop and approximately 360px visual review PASS; search, topic filtering, zero-result state, Problem navigation/return, and TopicBadge production styling work.",
+        "Deferred only the accepted non-blocking integrated-polish observations to WU058: narrow status-dimension separator wrapping and compact mobile logo size."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl",
+        "apps/research-explorer/src/overview/CitizenDiscovery.tsx",
+        "apps/research-explorer/src/overview/Overview.tsx",
+        "apps/research-explorer/src/overview/overviewStats.ts",
+        "apps/research-explorer/src/overview/CitizenDiscovery.stories.tsx",
+        "apps/research-explorer/src/overview/Overview.test.tsx",
+        "apps/research-explorer/src/overview/overviewStats.test.ts",
+        "apps/research-explorer/src/app/Explorer.tsx",
+        "apps/research-explorer/src/app/ExplorerHeader.tsx",
+        "apps/research-explorer/src/app/Explorer.test.tsx",
+        "apps/research-explorer/src/index.css",
+        "apps/research-explorer/src/main.tsx"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "TypeScript check passed."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "552 tests passed; 1 skipped; 0 failed."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Vite production build passed."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 279 canonical records."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "CitizenProblem projection is computed from existing canonical/read-model data with no new persisted store; rebuilding generated artifacts reproduces it deterministically.",
+          "result": "passed",
+          "evidence": "Runtime projection implementation and bound Preview review at 161d7adb0f7374df2ddf1cef7321d5fa8a8eb7fe."
+        },
+        {
+          "criterion": "Problem search and topic filters function against the projection, and topic filters use only the presentation-only mapping with no canonical taxonomy change.",
+          "result": "passed",
+          "evidence": "Owner-confirmed working search and topic filtering; TopicBadge production styling confirmed."
+        },
+        {
+          "criterion": "Problem list ordering is deterministic and does not vary with any ranking/score/urgency/relevance signal.",
+          "result": "passed",
+          "evidence": "Remote code/architecture review PASS; deterministic neutral ordering is implemented and independently reviewed."
+        },
+        {
+          "criterion": "Cards show human-meaningful title/content before the technical PRB ID and include no per-problem photography.",
+          "result": "passed",
+          "evidence": "Remote and independent reviews PASS; desktop and compact owner visual reviews PASS."
+        },
+        {
+          "criterion": "The coverage disclaimer is present and visible on the Overview.",
+          "result": "passed",
+          "evidence": "Desktop and compact owner visual reviews PASS."
+        },
+        {
+          "criterion": "Desktop and compact responsive treatments are implemented and pass rendered review at a representative desktop width and at ~360px.",
+          "result": "passed",
+          "evidence": "Owner visual review PASS at desktop and ~360px on Preview dpl_BrwidZseEMd7Lx7rkXJuxWmggrH2."
+        },
+        {
+          "criterion": "npm run typecheck --prefix apps/research-explorer, npm run test --prefix apps/research-explorer, npm run build --prefix apps/research-explorer, and npm run research:validate pass; git diff --check passes.",
+          "result": "passed",
+          "evidence": "Validation commands recorded above."
+        },
+        {
+          "criterion": "All persistent changes are committed before this work unit is marked done.",
+          "result": "passed",
+          "evidence": "WU054 implementation is committed at 161d7adb0f7374df2ddf1cef7321d5fa8a8eb7fe; the AIQT closure state will be committed immediately after checkpoint creation before closure handoff."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-17T19:36:38.532Z",
       "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-054",
-    "workUnitId": "WU053",
+    "id": "PKT-055",
+    "workUnitId": "WU054",
     "milestoneId": "M015",
-    "createdAt": "2026-09-17T15:29:34.952Z",
+    "createdAt": "2026-09-17T17:33:11.015Z",
     "format": "markdown",
-    "contentHash": "sha256:30e44ba7856b3b3f7235f0b15254e72aa5f6c153aabff99e9aa514cbef8913df",
+    "contentHash": "sha256:e391cc422992be7752b1bdcc5a993df5533823b4fae7d92d2181f48c4a06d56c",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -8000,7 +8104,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-17T16:45:48.447Z",
+  "lastUpdatedAt": "2026-09-17T19:36:38.532Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8113,6 +8217,48 @@
           "externalEvidenceId": "WU047-owner-launch-surface-decision-2026-09-15",
           "importIdentityKey": "sha256:9ffef2e8d99264e897a0d7311a570d54dd6abb536e63ac5f1482e9f418d85afb",
           "importedAt": "2026-09-15T10:27:00.967Z"
+        }
+      },
+      {
+        "evidenceId": "EVID-002",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-owner",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU054",
+          "packetId": "PKT-055",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "feat/wu054-citizen-overview-discovery",
+          "commitSha": "161d7adb0f7374df2ddf1cef7321d5fa8a8eb7fe",
+          "capturedAt": "2026-09-17T19:34:36.448Z"
+        },
+        "reviewer": {
+          "reviewerId": "owner",
+          "reviewerType": "human",
+          "independentContext": "declared_not_independent"
+        },
+        "results": {
+          "reviewResult": "passed",
+          "validationResult": "passed",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Owner visual gate ACCEPTED for WU054. Evidence: remote code/architecture review PASS; independent review PASS WITH NOTES with actionable findings resolved; Preview dpl_BrwidZseEMd7Lx7rkXJuxWmggrH2 at the bound SHA; desktop and ~360px owner visual reviews PASS; search, topic filtering, zero-result state, Problem navigation/return, and TopicBadge production styling confirmed. WU058-only polish observations are non-blocking."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-17T19:34:36.448Z",
+        "recordedAt": "2026-09-17T19:34:37.097Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:3a9e653ccc708ee8913074bcc22a76754fb3e56e9112ac214ffc26a180b47339",
+          "externalEvidenceId": "WU054-owner-visual-acceptance-2026-09-17",
+          "importIdentityKey": "sha256:e2966847e5f945d47293ceb7d1c717d0a524c3b26aec8e876cd1c472089cd9ab",
+          "importedAt": "2026-09-17T19:34:37.097Z"
         }
       }
     ],
@@ -9784,6 +9930,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-17T16:45:48.447Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C055",
+      "current": {
+        "observationId": "sha256:1c9bdaf57b86ca43508b9ae2fd2798def37851ed7ee5ee1afa9fe341cfea653d",
+        "checkpointId": "C055",
+        "workUnitId": "WU054",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-17T19:36:38.532Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-17T19:36:38.532Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:1c9bdaf57b86ca43508b9ae2fd2798def37851ed7ee5ee1afa9fe341cfea653d",
+          "checkpointId": "C055",
+          "workUnitId": "WU054",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-17T19:36:38.532Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-17T19:36:38.532Z"
         }
       ]
     }

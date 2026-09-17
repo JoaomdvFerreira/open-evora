@@ -6,8 +6,8 @@ import { RecordsExplorer } from "../records/RecordsExplorer";
 import { ProblemView } from "../problem/ProblemView";
 import { ProblemHistoryView } from "../problem/ProblemHistoryView";
 import { ReadingGuide } from "../guide/ReadingGuide";
-import { useUnavailableNote } from "../presentation/UnavailableNote";
 import { ProgressMessage } from "../presentation/ProgressMessage";
+import { ExplorerHeader } from "./ExplorerHeader";
 
 // RE-05: lazily imported, not just GraphCanvas's Sigma module inside it —
 // GraphExplorer's own module graph (Graphology + buildGraphModel/neighbourhood/
@@ -31,7 +31,6 @@ interface ExplorerProps {
  */
 export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
   const url = useExplorerUrlState();
-  const { id: grafoNoteId, describedBy: grafoNote } = useUnavailableNote("Em desenvolvimento");
 
   useEffect(() => {
     const selected = url.state.selectedId ? ` ${url.state.selectedId}` : "";
@@ -50,32 +49,11 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
 
   return (
     <>
-      <header className="explorer-chrome">
-        <div className="explorer-chrome-inner shell-frame">
-          <h1>
-            <span className="explorer-brand">Open Évora</span>
-            <span className="explorer-subtitle">Explorador de Investigação</span>
-          </h1>
-          <nav aria-label="Vistas do Explorador de Investigação" className="explorer-navigation">
-            <button type="button" aria-current={url.state.view === "overview" ? "page" : undefined} onClick={() => url.clearSelectionAndSetView("overview")}>
-              Visão geral
-            </button>
-            <button type="button" aria-current={url.state.view === "records" ? "page" : undefined} onClick={() => url.clearSelectionAndSetView("records")}>
-              Registos
-            </button>
-            {/* UX-F: kept focusable (no native `disabled`) so keyboard users can reach it; the
-                explanation is exposed visibly (hover/focus, via .unavailable-note) and associated
-                through aria-describedby rather than relying solely on `title`, which isn't
-                reliably surfaced on keyboard focus. No onClick, so activation is a no-op. */}
-            <span className="unavailable-control">
-              <button type="button" aria-disabled="true" title="Em desenvolvimento" aria-describedby={grafoNoteId}>
-                Grafo
-              </button>
-              {grafoNote}
-            </span>
-          </nav>
-        </div>
-      </header>
+      <ExplorerHeader
+        activeView={url.state.view}
+        onOverview={() => url.clearSelectionAndSetView("overview")}
+        onRecords={() => url.clearSelectionAndSetView("records")}
+      />
 
       {url.state.view === "graph" && <ReadingGuide schemaPrefixes={schemaPrefixes} />}
 
