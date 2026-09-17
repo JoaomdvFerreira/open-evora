@@ -38,10 +38,22 @@
   border-color: var(--color-topic-mobility-ink);
 }
 
+.topic-badge--access {
+  color: var(--color-topic-access-ink);
+  background: var(--color-topic-access-surface);
+  border-color: var(--color-topic-access-ink);
+}
+
 .topic-badge--urban {
   color: var(--color-topic-urban-ink);
   background: var(--color-topic-urban-surface);
   border-color: var(--color-topic-urban-ink);
+}
+
+.topic-badge--housing {
+  color: var(--color-topic-housing-ink);
+  background: var(--color-topic-housing-surface);
+  border-color: var(--color-topic-housing-ink);
 }
 
 .topic-badge--environment {
@@ -62,6 +74,12 @@
   border-color: var(--color-topic-education-ink);
 }
 
+.topic-badge--employment {
+  color: var(--color-topic-employment-ink);
+  background: var(--color-topic-employment-surface);
+  border-color: var(--color-topic-employment-ink);
+}
+
 .topic-badge--economy {
   color: var(--color-topic-economy-ink);
   background: var(--color-topic-economy-surface);
@@ -72,6 +90,12 @@
   color: var(--color-topic-care-ink);
   background: var(--color-topic-care-surface);
   border-color: var(--color-topic-care-ink);
+}
+
+.topic-badge--health {
+  color: var(--color-topic-health-ink);
+  background: var(--color-topic-health-surface);
+  border-color: var(--color-topic-health-ink);
 }
 
 .topic-badge--digital {

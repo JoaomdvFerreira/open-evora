@@ -38,7 +38,7 @@ function IconBase({ children, ...props }: IconProps & { children: React.ReactNod
   );
 }
 
-/** Mobilidade / Acessibilidade (MOB, ACC) — a road/route glyph. */
+/** Mobilidade (MOB) — a road/route glyph. */
 export function IconRoute(props: IconProps) {
   return (
     <IconBase {...props}>
@@ -50,12 +50,36 @@ export function IconRoute(props: IconProps) {
   );
 }
 
-/** Urbanismo / Habitação (URB, HOU) — a building glyph. */
+/** Acessibilidade (ACC) — a wheelchair-access glyph, distinct from the route glyph. */
+export function IconAccess(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="10" cy="5" r="1.4" fill="currentColor" stroke="none" />
+      <path d="M9 8v3.5l-3 4" />
+      <path d="M9 9.5h5" />
+      <path d="M9 11.5 12.5 16" />
+      <path d="M6 16.5a3 3 0 1 0 0-6" />
+    </IconBase>
+  );
+}
+
+/** Urbanismo (URB) — a multi-unit building glyph. */
 export function IconBuilding(props: IconProps) {
   return (
     <IconBase {...props}>
       <rect x="5" y="3" width="10" height="14" rx="1" />
       <path d="M8 7h1M11 7h1M8 10h1M11 10h1M8 13h1M11 13h1" />
+    </IconBase>
+  );
+}
+
+/** Habitação (HOU) — a single house glyph, distinct in silhouette from the URB building block. */
+export function IconHouse(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M4 10.5 10 5l6 5.5" />
+      <path d="M5.5 9.5V16h9V9.5" />
+      <path d="M8.5 16v-4h3v4" />
     </IconBase>
   );
 }
@@ -92,7 +116,7 @@ export function IconBook(props: IconProps) {
   );
 }
 
-/** Emprego / Economia (EMP, ECO) — a briefcase glyph. */
+/** Emprego (EMP) — a briefcase glyph. */
 export function IconBriefcase(props: IconProps) {
   return (
     <IconBase {...props}>
@@ -103,11 +127,31 @@ export function IconBriefcase(props: IconProps) {
   );
 }
 
-/** Social / Saúde (SOC, HEA) — a heart/people glyph. */
+/** Economia (ECO) — a coin glyph, distinct from the EMP briefcase. */
+export function IconCoin(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="10" cy="10" r="6.5" />
+      <path d="M10 6.5v7M8 8.2h2.6a1.4 1.4 0 0 1 0 2.8H8.8a1.4 1.4 0 0 0 0 2.8H12" />
+    </IconBase>
+  );
+}
+
+/** Social (SOC) — a people glyph. */
 export function IconCare(props: IconProps) {
   return (
     <IconBase {...props}>
       <path d="M10 16.2 4.6 11c-1.5-1.5-1.5-3.8 0-5.2 1.4-1.4 3.6-1.4 5 0l.4.4.4-.4c1.4-1.4 3.6-1.4 5 0 1.5 1.4 1.5 3.7 0 5.2L10 16.2Z" />
+    </IconBase>
+  );
+}
+
+/** Saúde (HEA) — a medical-cross glyph, distinct in silhouette from the SOC heart. */
+export function IconHealth(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <rect x="3.5" y="3.5" width="13" height="13" rx="2.5" />
+      <path d="M10 7v6M7 10h6" />
     </IconBase>
   );
 }

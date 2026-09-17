@@ -14,16 +14,46 @@
  * field names and enum values are schema-owned"; AGENTS.md canonical-state
  * integrity — no parallel semantic state).
  *
- * Several canonical codes intentionally share one public label/tone/icon
- * grouping (e.g. MOB+ACC, URB+HOU, EMP+ECO) — this keeps the icon set small
- * and coherent (component-model.md §1.9) without merging or renaming the
- * underlying canonical codes, which remain independently stored on each PRB.
+ * Every audited canonical code gets its own tone + icon (owner gate,
+ * 2026-09-17 review): no two codes share a public visual identity. Related
+ * domains (e.g. MOB/ACC, URB/HOU, EDU/EMP/ECO, SOC/HEA) use adjacent hues on
+ * a restrained, evenly spaced wheel rather than a saturated rainbow — see
+ * the WU053 primitives block in tokens.css — while remaining distinguishable
+ * from each other, and icons reuse the same bounded stroke geometry
+ * (component-model.md §1.9) rather than pulling in a general icon library.
  */
 
 import type { ComponentType, SVGProps } from "react";
-import { IconBook, IconBriefcase, IconBuilding, IconCare, IconLeaf, IconPublicSpace, IconRoute, IconSignal, IconTopicGeneric } from "./icons";
+import {
+  IconAccess,
+  IconBook,
+  IconBriefcase,
+  IconBuilding,
+  IconCare,
+  IconCoin,
+  IconHealth,
+  IconHouse,
+  IconLeaf,
+  IconPublicSpace,
+  IconRoute,
+  IconSignal,
+  IconTopicGeneric,
+} from "./icons";
 
-export type TopicTone = "mobility" | "urban" | "environment" | "public-space" | "education" | "economy" | "care" | "digital" | "neutral";
+export type TopicTone =
+  | "mobility"
+  | "access"
+  | "urban"
+  | "housing"
+  | "environment"
+  | "public-space"
+  | "education"
+  | "employment"
+  | "economy"
+  | "care"
+  | "health"
+  | "digital"
+  | "neutral";
 
 export interface TopicDescriptor {
   /** PT-PT public label for the canonical domain code. Never shown in place of the code in technical inspection. */
@@ -35,16 +65,16 @@ export interface TopicDescriptor {
 
 const TOPIC_MAPPING: Record<string, TopicDescriptor> = {
   MOB: { label: "Mobilidade", tone: "mobility", icon: IconRoute },
-  ACC: { label: "Acessibilidade", tone: "mobility", icon: IconRoute },
+  ACC: { label: "Acessibilidade", tone: "access", icon: IconAccess },
   URB: { label: "Urbanismo", tone: "urban", icon: IconBuilding },
-  HOU: { label: "Habitação", tone: "urban", icon: IconBuilding },
+  HOU: { label: "Habitação", tone: "housing", icon: IconHouse },
+  SOC: { label: "Social", tone: "care", icon: IconCare },
+  HEA: { label: "Saúde", tone: "health", icon: IconHealth },
+  EDU: { label: "Educação", tone: "education", icon: IconBook },
+  EMP: { label: "Emprego", tone: "employment", icon: IconBriefcase },
+  ECO: { label: "Economia", tone: "economy", icon: IconCoin },
   ENV: { label: "Ambiente", tone: "environment", icon: IconLeaf },
   PUB: { label: "Espaço público", tone: "public-space", icon: IconPublicSpace },
-  EDU: { label: "Educação", tone: "education", icon: IconBook },
-  EMP: { label: "Emprego", tone: "economy", icon: IconBriefcase },
-  ECO: { label: "Economia", tone: "economy", icon: IconBriefcase },
-  SOC: { label: "Social", tone: "care", icon: IconCare },
-  HEA: { label: "Saúde", tone: "care", icon: IconCare },
   DIG: { label: "Digital", tone: "digital", icon: IconSignal },
 };
 
