@@ -156,7 +156,16 @@ export function frozenCandidateFingerprint(manifest: GenerationManifest, candida
  * prospective-validation/availability/admission/reviewer/assembly logic —
  * there is no second, parallel implementation of any of those steps.
  */
-async function continueFromFrozenCandidates(
+/**
+ * Exported (beyond this module's own two callers) so a bounded, distinct
+ * orchestration path can re-verify and re-run the exact same prospective-
+ * validation -> freeze -> availability -> admission -> reviewer -> assembly
+ * sequence against frozen candidates it did not itself derive — see
+ * revalidate-frozen-cycle.ts. That module still never invokes
+ * PRIMARY_AUTHOR: it reaches this function the same way resumePreGateHold()
+ * does, by loading an already-frozen manifest/candidates from disk.
+ */
+export async function continueFromFrozenCandidates(
   cycleDir: string,
   baseGitSha: string,
   index: CorpusIndex,
@@ -335,7 +344,7 @@ export async function runResearchCycle(input: RunResearchCycleInput): Promise<Pr
     writeHoldFreeze(input.cycleDir, {
       schemaVersion: "1",
       baseGitSha: input.baseGitSha,
-      trigger: input.trigger,
+      identity: { kind: "TRIGGER", trigger: input.trigger },
       candidateFingerprint: frozenCandidateFingerprint(envelope.manifest, loadResult.candidates),
     });
   }
@@ -349,11 +358,41 @@ export function cycleArtifactsExist(cycleDir: string): boolean {
 
 // --- F3: resumable pre-Gate HOLD ------------------------------------------
 
-/** The on-disk binding record a pre-Gate HOLD leaves behind, verified before any resume. */
+/**
+ * Identifies a HOLD's origin as the normal AI-driven path — resume must
+ * reproduce the same accepted trigger.
+ */
+export interface TriggerHoldIdentity {
+  kind: "TRIGGER";
+  trigger: ResearchTrigger;
+}
+
+/**
+ * Identifies a HOLD's origin as the bounded frozen-cycle base-revalidation
+ * path (see revalidate-frozen-cycle.ts) — resume must reproduce the exact
+ * source cycle and base-transition identity that HOLD was frozen against,
+ * never a trigger (this path never has one).
+ */
+export interface BaseRevalidationHoldIdentity {
+  kind: "BASE_REVALIDATION";
+  sourceCycleDir: string;
+  oldBaseGitSha: string;
+}
+
+export type HoldIdentity = TriggerHoldIdentity | BaseRevalidationHoldIdentity;
+
+/**
+ * The on-disk binding record a pre-Gate HOLD leaves behind, verified before
+ * any resume. One shape, one resume mechanism, for both HOLD origins
+ * (normal-path trigger and base revalidation) — see `identity` — so a HOLD
+ * produced by either path is resumable through the same hold-cli.ts
+ * `resume` operator action rather than maintaining a second, incompatible
+ * freeze/resume protocol.
+ */
 export interface HoldFreezeRecord {
   schemaVersion: "1";
   baseGitSha: string;
-  trigger: ResearchTrigger;
+  identity: HoldIdentity;
   /** frozenCandidateFingerprint() over the exact manifest/candidates this HOLD evaluated. */
   candidateFingerprint: string;
 }
@@ -362,7 +401,14 @@ function holdFreezePath(cycleDir: string): string {
   return join(cycleDir, "hold-freeze.json");
 }
 
-function writeHoldFreeze(cycleDir: string, record: HoldFreezeRecord): void {
+/**
+ * Exported so a bounded, distinct orchestration path that reaches a fresh
+ * HOLD via continueFromFrozenCandidates() (see revalidate-frozen-cycle.ts)
+ * can write the exact same binding-record shape this module's own callers
+ * use, keyed to its own `BaseRevalidationHoldIdentity` — rather than
+ * maintaining a second, incompatible freeze record shape/writer.
+ */
+export function writeHoldFreeze(cycleDir: string, record: HoldFreezeRecord): void {
   writeFileSync(holdFreezePath(cycleDir), `${JSON.stringify(record, null, 2)}\n`, "utf8");
 }
 
@@ -370,19 +416,64 @@ function triggersMatch(a: ResearchTrigger, b: ResearchTrigger): boolean {
   return a.mode === b.mode && a.targetProblemId === b.targetProblemId && a.request === b.request;
 }
 
+function identitiesMatch(a: HoldIdentity, b: HoldIdentity): boolean {
+  if (a.kind !== b.kind) return false;
+  if (a.kind === "TRIGGER" && b.kind === "TRIGGER") return triggersMatch(a.trigger, b.trigger);
+  if (a.kind === "BASE_REVALIDATION" && b.kind === "BASE_REVALIDATION") {
+    return a.sourceCycleDir === b.sourceCycleDir && a.oldBaseGitSha === b.oldBaseGitSha;
+  }
+  return false;
+}
+
 export type HoldFreezeCheckResult =
   | { ok: true; record: HoldFreezeRecord }
   | { ok: false; reason: string };
 
+function isValidHoldIdentityShape(value: unknown): value is HoldIdentity {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const identity = value as Record<string, unknown>;
+  if (identity.kind === "TRIGGER") {
+    return !!identity.trigger && typeof identity.trigger === "object";
+  }
+  if (identity.kind === "BASE_REVALIDATION") {
+    return typeof identity.sourceCycleDir === "string" && typeof identity.oldBaseGitSha === "string";
+  }
+  return false;
+}
+
+/**
+ * Structural check for the pre-PR#127 v1 on-disk shape: schemaVersion "1"
+ * with a flat `trigger` field and no `identity` (every unresolved HOLD
+ * produced by the released normal path before this remediation). Distinct
+ * from `isValidHoldIdentityShape()`, which checks the current in-memory
+ * `HoldIdentity` shape — this checks the legacy on-disk field name.
+ */
+function isValidLegacyTriggerShape(value: unknown): value is ResearchTrigger {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
 /**
  * Reads and validates the hold-freeze binding record at `cycleDir`, if any,
- * and verifies it matches `baseGitSha`/`trigger` exactly. Never throws: a
+ * and verifies it matches `baseGitSha`/`identity` exactly. Never throws: a
  * missing file, malformed JSON, structurally invalid record, or
- * base-SHA/trigger mismatch are all reported as a resume-blocking reason
+ * base-SHA/identity mismatch are all reported as a resume-blocking reason
  * (fail closed) rather than crashing or silently resuming against the wrong
  * identity.
+ *
+ * Backward compatibility (PR #127 remediation, compatibility finding): a
+ * pre-PR#127 v1 record on disk never has `identity` — it has a flat
+ * `trigger` field instead (the normal path's only HOLD origin before the
+ * bounded base-revalidation path existed). Every such HOLD left unresolved
+ * by the currently released normal path must remain resumable after this
+ * change merges. When `record.identity` is absent/invalid, schemaVersion is
+ * "1", and a structurally valid legacy `trigger` is present, that trigger is
+ * normalized in memory to `{ kind: "TRIGGER", trigger }` and checked exactly
+ * as a native `identity` would be. The on-disk file is never rewritten by
+ * this read — only resume's own re-freeze (on a still-HOLD outcome) ever
+ * upgrades it to the new shape. A record with neither a valid `identity` nor
+ * a valid legacy `trigger` remains fail-closed.
  */
-export function readHoldFreeze(cycleDir: string, baseGitSha: string, trigger: ResearchTrigger): HoldFreezeCheckResult {
+export function readHoldFreeze(cycleDir: string, baseGitSha: string, identity: HoldIdentity): HoldFreezeCheckResult {
   const file = holdFreezePath(cycleDir);
   if (!existsSync(file)) {
     return { ok: false, reason: "no pre-Gate HOLD binding record present at this cycle directory (hold-freeze.json)" };
@@ -400,26 +491,31 @@ export function readHoldFreeze(cycleDir: string, baseGitSha: string, trigger: Re
   if (
     record.schemaVersion !== "1" ||
     typeof record.baseGitSha !== "string" ||
-    typeof record.candidateFingerprint !== "string" ||
-    !record.trigger ||
-    typeof record.trigger !== "object"
+    typeof record.candidateFingerprint !== "string"
   ) {
     return { ok: false, reason: "hold-freeze.json is structurally invalid" };
   }
-  const recordTrigger = record.trigger as ResearchTrigger;
+  let recordIdentity: HoldIdentity;
+  if (isValidHoldIdentityShape(record.identity)) {
+    recordIdentity = record.identity;
+  } else if (record.identity === undefined && isValidLegacyTriggerShape(record.trigger)) {
+    recordIdentity = { kind: "TRIGGER", trigger: record.trigger };
+  } else {
+    return { ok: false, reason: "hold-freeze.json is structurally invalid" };
+  }
   if (record.baseGitSha !== baseGitSha) {
     return { ok: false, reason: "hold-freeze.json base Git SHA does not match the resume request" };
   }
-  if (!triggersMatch(recordTrigger, trigger)) {
-    return { ok: false, reason: "hold-freeze.json trigger identity does not match the resume request" };
+  if (!identitiesMatch(recordIdentity, identity)) {
+    return { ok: false, reason: "hold-freeze.json identity does not match the resume request" };
   }
-  return { ok: true, record: record as unknown as HoldFreezeRecord };
+  return { ok: true, record: { ...record, identity: recordIdentity } as unknown as HoldFreezeRecord };
 }
 
-export interface ResumePreGateHoldInput {
+export interface ResumeHoldByIdentityInput {
   index: CorpusIndex;
   baseGitSha: string;
-  trigger: ResearchTrigger;
+  identity: HoldIdentity;
   /** Gitignored cycle directory of the exact prior HOLD (already boundary-checked by the caller). */
   cycleDir: string;
   /** A brand-new invocation target — never the invoker used for the original PRIMARY_AUTHOR call. */
@@ -431,20 +527,28 @@ export interface ResumePreGateHoldInput {
 }
 
 /**
- * F3 (independent-review remediation): resumes an existing pre-Gate HOLD
- * without ever re-invoking PRIMARY_AUTHOR. Reuses the exact frozen
- * manifest/candidates the original run materialized to `cycleDir` — it does
- * not accept a manifest/candidates value from the caller and does not
- * regenerate anything — reruns prospective validation, performs fresh
+ * F3 (independent-review remediation), generalized to also cover the bounded
+ * frozen-cycle base-revalidation path (PR #127 remediation, finding 1):
+ * resumes an existing pre-Gate HOLD — of either origin identified by
+ * `identity` — without ever re-invoking PRIMARY_AUTHOR. Reuses the exact
+ * frozen manifest/candidates the original run materialized to `cycleDir` —
+ * it does not accept a manifest/candidates value from the caller and does
+ * not regenerate anything — reruns prospective validation, performs fresh
  * Source availability checks, and re-evaluates admission with the current
  * inferenceLimitResolutionChecker (so a resolution recorded since the HOLD
  * takes effect). A fresh INDEPENDENT_REVIEWER invocation happens only if
  * admission is now ELIGIBLE.
  *
+ * This is the one shared resume mechanism for both HOLD origins — the normal
+ * AI-driven path (`resumePreGateHold()`, `identity.kind === "TRIGGER"`) and
+ * the base-revalidation path (`resumeRevalidationHold()`,
+ * `identity.kind === "BASE_REVALIDATION"`) — rather than a second,
+ * incompatible freeze/resume protocol for the latter.
+ *
  * Fails closed (returns a FAILED PreparationOutcome, never throws, never
  * proceeds) if:
  *   - no hold-freeze.json binding record exists for this cycle directory;
- *   - it exists but its baseGitSha/trigger do not match this resume request;
+ *   - it exists but its baseGitSha/identity do not match this resume request;
  *   - manifest.json is missing/invalid, or any candidate file is
  *     missing/unreadable/malformed;
  *   - the freshly-reloaded manifest+candidates do not reproduce the exact
@@ -458,8 +562,8 @@ export interface ResumePreGateHoldInput {
  * only ever a resolved CLAIM_INFERENCE_LIMITS_PRESENT (or a Source that is
  * now genuinely available) can turn a resumed HOLD into ELIGIBLE.
  */
-export async function resumePreGateHold(input: ResumePreGateHoldInput): Promise<PreparationOutcome> {
-  const freeze = readHoldFreeze(input.cycleDir, input.baseGitSha, input.trigger);
+export async function resumeHoldByIdentity(input: ResumeHoldByIdentityInput): Promise<PreparationOutcome> {
+  const freeze = readHoldFreeze(input.cycleDir, input.baseGitSha, input.identity);
   if (!freeze.ok) {
     return failed("HOLD_RESUME_IDENTITY_MISMATCH", freeze.reason);
   }
@@ -525,4 +629,47 @@ export async function resumePreGateHold(input: ResumePreGateHoldInput): Promise<
   }
 
   return outcome;
+}
+
+export interface ResumePreGateHoldInput {
+  index: CorpusIndex;
+  baseGitSha: string;
+  trigger: ResearchTrigger;
+  cycleDir: string;
+  reviewerInvoker: AiInvoker;
+  availabilityAdapter?: SourceAvailabilityAdapter;
+  resolveAvailabilityAdapter?: (materialSources: ReadonlyMap<string, Record<string, unknown>>) => Promise<SourceAvailabilityAdapter>;
+  inferenceLimitResolutionChecker?: InferenceLimitResolutionChecker;
+  now?: () => Date;
+}
+
+/** Resumes a normal-path (trigger-originated) pre-Gate HOLD. Thin wrapper over resumeHoldByIdentity(). */
+export async function resumePreGateHold(input: ResumePreGateHoldInput): Promise<PreparationOutcome> {
+  const { trigger, ...rest } = input;
+  return resumeHoldByIdentity({ ...rest, identity: { kind: "TRIGGER", trigger } });
+}
+
+export interface ResumeRevalidationHoldInput {
+  index: CorpusIndex;
+  baseGitSha: string;
+  sourceCycleDir: string;
+  oldBaseGitSha: string;
+  cycleDir: string;
+  reviewerInvoker: AiInvoker;
+  availabilityAdapter?: SourceAvailabilityAdapter;
+  resolveAvailabilityAdapter?: (materialSources: ReadonlyMap<string, Record<string, unknown>>) => Promise<SourceAvailabilityAdapter>;
+  inferenceLimitResolutionChecker?: InferenceLimitResolutionChecker;
+  now?: () => Date;
+}
+
+/**
+ * PR #127 remediation (finding 1): resumes a base-revalidation-originated
+ * pre-Gate HOLD (see revalidate-frozen-cycle.ts) through the exact same
+ * mechanism `resumePreGateHold()` uses for the normal path — thin wrapper
+ * over resumeHoldByIdentity(). `sourceCycleDir`/`oldBaseGitSha` must match
+ * exactly what `revalidateFrozenCycleAtNewBase()` bound this HOLD to.
+ */
+export async function resumeRevalidationHold(input: ResumeRevalidationHoldInput): Promise<PreparationOutcome> {
+  const { sourceCycleDir, oldBaseGitSha, ...rest } = input;
+  return resumeHoldByIdentity({ ...rest, identity: { kind: "BASE_REVALIDATION", sourceCycleDir, oldBaseGitSha } });
 }
