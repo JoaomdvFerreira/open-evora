@@ -1,0 +1,25 @@
+source_id: SRC-0133
+publisher: Município de Évora
+name: Município de Évora — Inauguração da nova Variante Nascente de Évora ao IP2
+  reduz volume de trânsito que atravessa a cidade até 40%
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  domains:
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/inauguracao-da-nova-variante-nascente-de-evora-ao-ip2-reduz-volume-de-transito-que-atravessa-a-cidade-ate-40/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: 2026-09-16

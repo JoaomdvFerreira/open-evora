@@ -1,0 +1,24 @@
+source_id: SRC-0134
+publisher: ODigital
+name: ODigital — Variante Nascente vai reduzir tráfego em Évora
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  domains:
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://odigital.sapo.pt/variante-nascente-reduzir-trafego-evora/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: 2026-09-16
