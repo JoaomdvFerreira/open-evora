@@ -37,15 +37,24 @@
  *      manifest + candidates        -> validateManifest()/loadCandidates(),
  *                                       same as resumePreGateHold().
  *   5. Recompute + verify frozen
- *      fingerprint before reuse     -> frozenCandidateFingerprint() compared
- *                                       against the source RCS's own
- *                                       candidates (the RCS's own
+ *      candidate set before reuse   -> candidateSetsEquivalent() (order-
+ *                                       insensitive, content-exact candidate-
+ *                                       multiset comparison local to this
+ *                                       module) compared against the source
+ *                                       RCS's own candidates (the RCS's own
  *                                       preparationFingerprint already
  *                                       proved internal consistency in step
  *                                       3; this step additionally proves the
  *                                       on-disk manifest/candidates being
  *                                       reloaded are the same content the
- *                                       RCS itself carries).
+ *                                       RCS itself carries — independent of
+ *                                       manifest-order vs. RCS-deterministic-
+ *                                       order, which are two legitimate
+ *                                       orderings of the same set, not drift).
+ *                                       frozenCandidateFingerprint() itself
+ *                                       remains order-sensitive and is still
+ *                                       used, unchanged, for HOLD/resume
+ *                                       identity further below.
  *   6. Old base ancestor of
  *      new base                     -> git merge-base --is-ancestor.
  *   7. research/** diff empty       -> git diff --name-only <old>..<new> --
@@ -145,9 +154,11 @@ import { asValidatedManifest, validateManifest } from "./manifest.ts";
 import { asValidatedResearchChangeSet, validateResearchChangeSet } from "./rcs-validator.ts";
 import { loadCandidates } from "./candidate-loader.ts";
 import { continueFromFrozenCandidates, frozenCandidateFingerprint, writeHoldFreeze } from "./run-cycle.ts";
+import { sha256Hex } from "./fingerprint.ts";
 import type { PreparationOutcome } from "./types.ts";
 import { assertWorkbenchBoundary } from "./workbench-boundary.ts";
 import type { InferenceLimitResolutionChecker, SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
+import type { CandidateRecord } from "../integration/candidate-delta.ts";
 
 const defaultRepoRoot = resolve(fileURLToPath(new URL(".", import.meta.url)), "..", "..", "..");
 
@@ -298,6 +309,42 @@ function loadAndVerifyFrozenSource(sourceCycleDir: string, oldBaseGitSha: string
 }
 
 /**
+ * Order-insensitive, content-exact candidate-multiset fingerprint, local to
+ * this module's SOURCE FILES <-> SOURCE RCS integrity check only.
+ *
+ * frozenCandidateFingerprint() (run-cycle.ts) stays order-sensitive by
+ * design — it is the HOLD/resume binding identity and must not change here.
+ * But the two arrays this module compares for source-integrity purposes
+ * represent the exact same candidate SET under two independently legitimate
+ * orderings: loadCandidates() returns manifest.candidateFiles order, while a
+ * frozen RCS stores CanonicalIntegrationReview candidate order (deterministic
+ * recordFamily/id delta order). Comparing those two orderings with the
+ * order-sensitive fingerprint made source-integrity verification incorrectly
+ * order-sensitive and produced a false-positive SOURCE_CANDIDATE_DRIFT.
+ *
+ * Each CandidateRecord is fingerprinted individually with the project's one
+ * canonical-serialization/SHA-256 convention (fingerprint.ts — the same
+ * convention frozenCandidateFingerprint() itself uses), then the per-record
+ * fingerprints are sorted before comparison. This preserves multiplicity
+ * (a duplicate replacing a distinct record still changes the multiset) while
+ * making the comparison independent of array order.
+ */
+function candidateMultisetFingerprints(candidates: readonly CandidateRecord[]): string[] {
+  return candidates.map((candidate) => sha256Hex(candidate)).sort();
+}
+
+/**
+ * True iff both candidate arrays represent the exact same multiset of
+ * records, regardless of order. Exported for direct unit-level regression
+ * coverage in addition to the full-flow integration tests.
+ */
+export function candidateSetsEquivalent(left: readonly CandidateRecord[], right: readonly CandidateRecord[]): boolean {
+  const leftFingerprints = candidateMultisetFingerprints(left);
+  const rightFingerprints = candidateMultisetFingerprints(right);
+  return leftFingerprints.length === rightFingerprints.length && leftFingerprints.every((fingerprint, index) => fingerprint === rightFingerprints[index]);
+}
+
+/**
  * PR #127 remediation (finding 1): copies the source cycle's already-frozen,
  * already fingerprint-verified manifest.json and candidate YAML files
  * byte-for-byte into `targetCycleDir` — a plain filesystem copy of content
@@ -375,15 +422,19 @@ export async function revalidateFrozenCycleAtNewBase(input: RevalidateFrozenCycl
     return failed("SOURCE_CYCLE_INVALID", source.reason);
   }
 
-  // Requirement 5 continued: recompute the frozen candidate fingerprint from
-  // the reloaded on-disk manifest/candidates and confirm the source RCS's
-  // own candidates were built from exactly this content (never a
-  // second-guessed or edited set). The RCS's candidates are compared
-  // directly rather than a fingerprint comparison across two different
-  // shapes, because sourceRcs.candidates is already the authoritative
-  // reviewed content; frozenCandidateFingerprint() over the *reloaded*
-  // manifest/candidates and over (manifest, sourceRcs.candidates) must
-  // match for reuse to be sound.
+  // Requirement 5 continued: confirm the source RCS's own candidates were
+  // built from exactly the same candidate SET the reloaded on-disk
+  // manifest/candidates produce (never a second-guessed, edited, or replaced
+  // set). This comparison is deliberately order-insensitive but
+  // content-exact (candidateSetsEquivalent()): loadCandidates() returns
+  // manifest.candidateFiles order, while the frozen RCS stores
+  // CanonicalIntegrationReview candidate order (deterministic
+  // recordFamily/id delta order) — two independently legitimate orderings of
+  // the same set, not a sign of drift. Using the order-sensitive
+  // frozenCandidateFingerprint() for this particular comparison produced a
+  // false-positive SOURCE_CANDIDATE_DRIFT whenever those two legitimate
+  // orderings differed; frozenCandidateFingerprint() itself is unchanged and
+  // still order-sensitive for HOLD/resume identity below.
   const candidatesDir = `${input.sourceCycleDir}/candidates`;
   const loadResult = loadCandidates(input.index, candidatesDir, source.manifest.candidateFiles);
   if (loadResult.failures.length > 0) {
@@ -392,15 +443,18 @@ export async function revalidateFrozenCycleAtNewBase(input: RevalidateFrozenCycl
       loadResult.failures.map((failure) => `${failure.file}: ${failure.message}`).join("; ")
     );
   }
-  const reloadedFingerprint = frozenCandidateFingerprint(source.manifest, loadResult.candidates);
-  const rcsFingerprint = frozenCandidateFingerprint(source.manifest, source.candidates);
-  if (reloadedFingerprint !== rcsFingerprint) {
+  if (!candidateSetsEquivalent(loadResult.candidates, source.candidates)) {
     return failed(
       "SOURCE_CANDIDATE_DRIFT",
       "the source cycle's on-disk manifest/candidates no longer match the frozen content its own research-change-set.json carries " +
       "(edited, replaced, or otherwise drifted since the source cycle was frozen)"
     );
   }
+  // Continue computing the existing order-sensitive frozen fingerprint (over
+  // the reloaded manifest/candidates, in manifest.candidateFiles order) for
+  // any new HOLD binding below — this is the exact same identity a normal
+  // HOLD/resume already uses and is untouched by the equivalence check above.
+  const reloadedFingerprint = frozenCandidateFingerprint(source.manifest, loadResult.candidates);
 
   // Requirement 6: old base must be an ancestor of (or equal to) new base.
   const ancestry = verifyOldBaseIsAncestor(input.oldBaseGitSha, input.newBaseGitSha, input.repoRoot ?? defaultRepoRoot);
