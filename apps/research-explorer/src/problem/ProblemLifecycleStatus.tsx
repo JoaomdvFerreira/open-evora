@@ -1,5 +1,6 @@
 import { glossFor, FIELD_CAPTIONS } from "./statusGloss";
 import { publicEnumLabel } from "../presentation/presentation";
+import { lifecycleVisual } from "./stateVisuals";
 
 /**
  * DS-04D Slice 3B — Problem domain: the Problem lifecycle `status` field
@@ -7,12 +8,15 @@ import { publicEnumLabel } from "../presentation/presentation";
  * three approved semantic dimensions named by this slice's task scope and
  * the "Problem lifecycle status — four dimensioned presentations" block of
  * the approved catalogue (docs/design/reference/components/
- * ds-03b-component-catalogue.dc.html §4). The catalogue's own six lifecycle
- * chips (Aberto/Rejeitado/Duplicado/Não digital/Já resolvido/Evidência
- * insuficiente) render flat, with no per-value glyph/tint — that distinguishes
- * `status` from the ordered validation/evidence dimensions in
- * `InvestigationStatus.tsx`, so this stays its own component rather than a
- * shared "investigation state" renderer with a different value set bolted on.
+ * ds-03b-component-catalogue.dc.html §4). WU053 adds a per-value tone+icon
+ * to the `reading` chip only (stateVisuals.ts's `lifecycleVisual`) — text
+ * remains the sole required carrier (the caption/value pair is unchanged),
+ * and the lifecycle dimension's own tone/icon lookup never overlaps with
+ * validation/evidence's (`--lifecycle-*` CSS class prefix, distinct from
+ * `InvestigationStatus.tsx`'s own prefix), keeping the two dimensions
+ * visually distinct as required by component-visual-contract.md. This stays
+ * its own component rather than a shared "investigation state" renderer with
+ * a different value set bolted on.
  *
  * Three forms are implemented, matching current production evidence exactly:
  * - `overview` — plain caption/value pair, no chip anatomy (Overview.tsx's
@@ -89,8 +93,11 @@ export function ProblemLifecycleStatus({ value, form }: ProblemLifecycleStatusPr
     );
   }
 
+  const { tone, icon: Icon } = lifecycleVisual(value);
+
   return (
-    <span className="prb-status-chip ui-inline-label" aria-label={`${readingCaption}: ${label}`}>
+    <span className={`prb-status-chip prb-status-chip--lifecycle-${tone} ui-inline-label`} aria-label={`${readingCaption}: ${label}`}>
+      <Icon className="prb-status-chip-icon" />
       <span className="prb-status-chip-caption">{readingCaption}:</span>
       <span className="prb-status-chip-value">{label}</span>
     </span>

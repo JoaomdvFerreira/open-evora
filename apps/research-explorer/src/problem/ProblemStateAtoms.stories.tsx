@@ -16,7 +16,15 @@ import { ValidationStatus, EvidenceStatus } from "./InvestigationStatus";
    per docs/design/foundations.md "Synthetic design content" — no real
    research findings or claims. No production call site (ProblemView.tsx,
    Overview.tsx, RecordDetailPanel.tsx, ProblemHistoryView.tsx) is modified,
-   migrated, or retired in this slice. */
+   migrated, or retired in this slice.
+
+   WU053 adds a per-value tone+icon to every `reading`-form chip below via
+   domain.css's `.prb-status-chip--{lifecycle,validation,evidence}-{tone}`
+   rules (problem/stateVisuals.ts) — no story markup changes were needed
+   since these stories already render the `reading` form through the
+   production components, which now resolve the icon/tone internally. See
+   `ComparisonSeparateDimensions` below for the three-dimension visual
+   distinctness check the WU053 acceptance criteria requires. */
 
 const meta = {
   title: "Problem State Atoms",

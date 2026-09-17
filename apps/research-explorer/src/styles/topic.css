@@ -1,0 +1,87 @@
+/* WU053 — TopicBadge visual recipe (presentation/TopicBadge.tsx).
+   Consumes the DS-04B Foundation token layer (tokens.css) and the DS-04D
+   Slice 1 generic inline-label anatomy (ui.css/inline-label.css
+   .ui-inline-label) for shared border/radius/padding. This file owns only
+   the topic-tone colour + icon layer: the accessible PT-PT label text is
+   always rendered by TopicBadge.tsx itself and is never optional
+   (foundations.md "Colour and contrast intent" — colour never carries
+   meaning alone).
+
+   A presentation-only recipe over topicMapping.ts's tone keys, not a
+   canonical domain enum — mirrors component-model.md §2.3's Generic UI vs.
+   §2.4 Domain component split: this file supplies appearance only,
+   TopicBadge.tsx/topicMapping.ts retain all label/icon/fallback meaning. */
+
+.topic-badge {
+  gap: var(--p-space-1);
+}
+
+.topic-badge-icon {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+
+.topic-badge-label {
+  font-weight: var(--text-interface-label-weight);
+}
+
+.topic-badge-code {
+  font-family: var(--font-technical);
+  font-size: var(--text-technical-size);
+  color: var(--color-ink-muted);
+}
+
+.topic-badge--mobility {
+  color: var(--color-topic-mobility-ink);
+  background: var(--color-topic-mobility-surface);
+  border-color: var(--color-topic-mobility-ink);
+}
+
+.topic-badge--urban {
+  color: var(--color-topic-urban-ink);
+  background: var(--color-topic-urban-surface);
+  border-color: var(--color-topic-urban-ink);
+}
+
+.topic-badge--environment {
+  color: var(--color-topic-environment-ink);
+  background: var(--color-topic-environment-surface);
+  border-color: var(--color-topic-environment-ink);
+}
+
+.topic-badge--public-space {
+  color: var(--color-topic-public-space-ink);
+  background: var(--color-topic-public-space-surface);
+  border-color: var(--color-topic-public-space-ink);
+}
+
+.topic-badge--education {
+  color: var(--color-topic-education-ink);
+  background: var(--color-topic-education-surface);
+  border-color: var(--color-topic-education-ink);
+}
+
+.topic-badge--economy {
+  color: var(--color-topic-economy-ink);
+  background: var(--color-topic-economy-surface);
+  border-color: var(--color-topic-economy-ink);
+}
+
+.topic-badge--care {
+  color: var(--color-topic-care-ink);
+  background: var(--color-topic-care-surface);
+  border-color: var(--color-topic-care-ink);
+}
+
+.topic-badge--digital {
+  color: var(--color-topic-digital-ink);
+  background: var(--color-topic-digital-surface);
+  border-color: var(--color-topic-digital-ink);
+}
+
+.topic-badge--neutral {
+  color: var(--color-ink-secondary);
+  background: var(--color-surface-subtle);
+  border-color: var(--color-separator-standard);
+}
