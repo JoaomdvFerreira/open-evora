@@ -21,7 +21,7 @@ describe("parseUrlState", () => {
     expect(parseUrlState("?view=not-a-real-view").view).toBe("overview");
   });
 
-  it("recognizes the RE-03 'problem' view", () => {
+  it("recognizes the 'problem' view", () => {
     expect(parseUrlState("?view=problem&id=PRB-0005")).toEqual({
       view: "problem",
       selectedId: "PRB-0005",
@@ -41,11 +41,11 @@ describe("parseUrlState", () => {
     });
   });
 
-  it("UX-F: a graph-depth param round-trips even though 'graph' itself is normalized away below", () => {
+  it("a graph-depth param round-trips even though 'graph' itself is normalized away below", () => {
     expect(parseUrlState("?d=2").graphDepth).toBe(2);
   });
 
-  describe("UX-F: Graph Availability Gate — view=graph is normalized away", () => {
+  describe("Graph Availability Gate — view=graph is normalized away", () => {
     it("a graph URL with a PRB-shaped id normalizes to the Problem view for that id", () => {
       expect(parseUrlState("?view=graph&id=PRB-0005&d=2")).toEqual({
         view: "problem",

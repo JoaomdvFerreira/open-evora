@@ -95,7 +95,7 @@ test("candidate EVD provenance resolves a canonical Source and excludes unrelate
   assert.deepEqual(checked, ["SRC-1"]);
 });
 
-// --- WU053 remediation: CLAIM_INFERENCE_LIMITS_PRESENT pre-Gate human resolution ---
+// --- CLAIM_INFERENCE_LIMITS_PRESENT pre-Gate human resolution -------------
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 const alwaysResolved: InferenceLimitResolutionChecker = { isResolved: () => true };

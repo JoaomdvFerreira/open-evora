@@ -1,8 +1,7 @@
 /**
- * CLI-level tests for the idempotent-reuse decision (WU045-B01
- * independent-review remediation, finding 1). The defect this remediates
- * lived in cli.ts itself — tests against runResearchCycle() alone cannot
- * exercise it, since that function never reads a pre-existing
+ * CLI-level tests for the idempotent-reuse decision. The defect this guards
+ * against lived in cli.ts itself — tests against runResearchCycle() alone
+ * cannot exercise it, since that function never reads a pre-existing
  * research-change-set.json. These tests call tryReuseExistingChangeSet()
  * (exported from cli.ts) directly against real files on disk.
  */
@@ -93,7 +92,7 @@ async function produceGenuineChangeSet(cycleDir: string, outputPath: string): Pr
 
 const IDENTITY = { baseGitSha: SHA, mode: "daily-discovery" as const, targetProblemId: undefined, request: TRIGGER.request };
 
-test("case 1: matching trigger + invalid independentReview.outcome never reaches REUSABLE", async () => {
+test("matching trigger + invalid independentReview.outcome never reaches REUSABLE", async () => {
   await withTempDir(async (cycleDir) => {
     const outputPath = join(cycleDir, "research-change-set.json");
     await produceGenuineChangeSet(cycleDir, outputPath);
@@ -106,7 +105,7 @@ test("case 1: matching trigger + invalid independentReview.outcome never reaches
   });
 });
 
-test("case 2: matching trigger + missing independentReview never reaches REUSABLE", async () => {
+test("matching trigger + missing independentReview never reaches REUSABLE", async () => {
   await withTempDir(async (cycleDir) => {
     const outputPath = join(cycleDir, "research-change-set.json");
     await produceGenuineChangeSet(cycleDir, outputPath);
@@ -119,7 +118,7 @@ test("case 2: matching trigger + missing independentReview never reaches REUSABL
   });
 });
 
-test("case 3: matching trigger + missing candidates never reaches REUSABLE", async () => {
+test("matching trigger + missing candidates never reaches REUSABLE", async () => {
   await withTempDir(async (cycleDir) => {
     const outputPath = join(cycleDir, "research-change-set.json");
     await produceGenuineChangeSet(cycleDir, outputPath);
@@ -132,7 +131,7 @@ test("case 3: matching trigger + missing candidates never reaches REUSABLE", asy
   });
 });
 
-test("case 4: matching trigger + malformed RCS (hand-fabricated, no real fields) never reaches REUSABLE", async () => {
+test("matching trigger + malformed RCS (hand-fabricated, no real fields) never reaches REUSABLE", async () => {
   await withTempDir(async (cycleDir) => {
     const outputPath = join(cycleDir, "research-change-set.json");
     writeFileSync(
@@ -150,7 +149,7 @@ test("case 4: matching trigger + malformed RCS (hand-fabricated, no real fields)
   });
 });
 
-test("case 4b: malformed RCS reuse fails closed without throwing (regression: prior version crashed after printing success)", async () => {
+test("malformed RCS reuse fails closed without throwing (regression: prior version crashed after printing success)", async () => {
   await withTempDir(async (cycleDir) => {
     const outputPath = join(cycleDir, "research-change-set.json");
     writeFileSync(outputPath, JSON.stringify({ baseGitSha: SHA, manifest: { mode: "daily-discovery" } }), "utf8");
@@ -160,7 +159,7 @@ test("case 4b: malformed RCS reuse fails closed without throwing (regression: pr
   });
 });
 
-test("case 4c: non-JSON garbage on disk never reaches REUSABLE and never throws", async () => {
+test("non-JSON garbage on disk never reaches REUSABLE and never throws", async () => {
   await withTempDir(async (cycleDir) => {
     const outputPath = join(cycleDir, "research-change-set.json");
     writeFileSync(outputPath, "not json at all {{{", "utf8");
@@ -171,7 +170,7 @@ test("case 4c: non-JSON garbage on disk never reaches REUSABLE and never throws"
   });
 });
 
-test("case 5: mismatching cycle identity never reaches REUSABLE, even for an otherwise genuine package", async () => {
+test("mismatching cycle identity never reaches REUSABLE, even for an otherwise genuine package", async () => {
   await withTempDir(async (cycleDir) => {
     const outputPath = join(cycleDir, "research-change-set.json");
     await produceGenuineChangeSet(cycleDir, outputPath);
@@ -184,7 +183,7 @@ test("case 5: mismatching cycle identity never reaches REUSABLE, even for an oth
   });
 });
 
-test("case 5b: mismatching baseGitSha never reaches REUSABLE", async () => {
+test("mismatching baseGitSha never reaches REUSABLE", async () => {
   await withTempDir(async (cycleDir) => {
     const outputPath = join(cycleDir, "research-change-set.json");
     await produceGenuineChangeSet(cycleDir, outputPath);
@@ -195,7 +194,7 @@ test("case 5b: mismatching baseGitSha never reaches REUSABLE", async () => {
   });
 });
 
-test("case 6: a genuinely completed identical cycle IS safely reused without any further AI invocation", async () => {
+test("a genuinely completed identical cycle IS safely reused without any further AI invocation", async () => {
   await withTempDir(async (cycleDir) => {
     const outputPath = join(cycleDir, "research-change-set.json");
     await produceGenuineChangeSet(cycleDir, outputPath);

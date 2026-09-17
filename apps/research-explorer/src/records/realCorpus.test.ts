@@ -34,17 +34,17 @@ describe.skipIf(!hasGeneratedData)("Records model — real generated corpus", ()
     expect(result.map((r) => r.id)).toContain("PRB-0005");
   });
 
-  it("ODM-014: finds EVD-000001 by a canonical detail phrase beyond its truncated label ('conectividade rural-urbana')", () => {
+  it("finds EVD-000001 by a canonical detail phrase beyond its truncated label ('conectividade rural-urbana')", () => {
     const result = filterRecords(records, { query: "conectividade rural-urbana", typeFilter: "all" });
     expect(result.map((r) => r.id)).toContain("EVD-000001");
   });
 
-  it("ODM-014: type filtering still narrows searchText matches", () => {
+  it("type filtering still narrows searchText matches", () => {
     const result = filterRecords(records, { query: "conectividade rural-urbana", typeFilter: "PRB-" });
     expect(result.map((r) => r.id)).not.toContain("EVD-000001");
   });
 
-  it("ODM-014: searchText matching remains diacritic/case-insensitive", () => {
+  it("searchText matching remains diacritic/case-insensitive", () => {
     const result = filterRecords(records, { query: "CONECTIVIDADE rural-urbana", typeFilter: "all" });
     expect(result.map((r) => r.id)).toContain("EVD-000001");
   });

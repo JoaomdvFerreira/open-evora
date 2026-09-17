@@ -72,9 +72,8 @@ export function gitFixture(): GitFixture {
  * `gh` executable on PATH backed by a JSON state file the test controls
  * (test-fake-gh.ts). Used by git-orchestrator.test.ts/promote.test.ts to
  * exercise the real branch/commit/push/PR/CI code path end-to-end without
- * ever touching a real GitHub remote — per the contract's requirement that
- * tests must not require destructive interaction with a real repository or
- * remote.
+ * ever touching a real GitHub remote, avoiding destructive interaction with
+ * a real repository or remote.
  */
 export interface FakeGhPr {
   number: number;
@@ -196,7 +195,8 @@ function independentReview(overrides: Partial<IndependentReviewResult> = {}): In
  * Builds a complete, internally-consistent synthetic ResearchChangeSet for
  * a single SRC- CREATE, against an already-loaded CorpusIndex, without
  * going through the full orchestrate/ pipeline (these gate/ tests exercise
- * WU046, not WU045's own already-tested assembly path).
+ * the Human Gate itself, not the orchestrator's own already-tested assembly
+ * path).
  */
 export interface SyntheticRcsOverrides {
   manifest?: Partial<GenerationManifest>;

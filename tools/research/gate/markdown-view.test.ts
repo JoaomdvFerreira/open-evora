@@ -5,7 +5,7 @@ import { gitFixture, loadIndexFor, syntheticHumanGatePackage } from "./test-fixt
 import { computeContentHash, shortFingerprint } from "./content-hash.ts";
 import { renderHumanGateMarkdown } from "./markdown-view.ts";
 
-test("the rendered Markdown view is generated from the exact same validated object HIGH-2 hashes, and exposes packageId/fingerprint/baseGitSha", () => {
+test("the rendered Markdown view is generated from the exact same validated object the content hash is computed over, and exposes packageId/fingerprint/baseGitSha", () => {
   const fixture = gitFixture();
   try {
     const index = loadIndexFor(fixture.research);

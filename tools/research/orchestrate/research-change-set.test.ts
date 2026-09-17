@@ -91,7 +91,7 @@ function writeCandidate(dir: string, filename: string, contents: string): void {
   writeFileSync(join(dir, filename), contents, "utf8");
 }
 
-test("a normal-path cycle reaches READY_FOR_HUMAN_REVIEW with zero manual intervention (WU048 case 1)", () => {
+test("a normal-path cycle reaches READY_FOR_HUMAN_REVIEW with zero manual intervention", () => {
   withTempDir((candidatesDir) => {
     writeCandidate(candidatesDir, "SRC-NEW.yaml", "source_id: SRC-NEW\nname: Synthetic source\n");
 
@@ -115,7 +115,7 @@ test("a normal-path cycle reaches READY_FOR_HUMAN_REVIEW with zero manual interv
   });
 });
 
-test("malformed manifest fails closed before reaching candidate delta/promotion (WU048 case 19)", () => {
+test("malformed manifest fails closed before reaching candidate delta/promotion", () => {
   withTempDir((candidatesDir) => {
     const outcome = prepareResearchChangeSet({
       index: emptyIndex(),
@@ -130,7 +130,7 @@ test("malformed manifest fails closed before reaching candidate delta/promotion 
   });
 });
 
-test("missing independent review fails closed before reaching candidate delta/promotion (WU048 case 19)", () => {
+test("missing independent review fails closed before reaching candidate delta/promotion", () => {
   withTempDir((candidatesDir) => {
     writeCandidate(candidatesDir, "SRC-NEW.yaml", "source_id: SRC-NEW\nname: Synthetic source\n");
     const outcome = prepareResearchChangeSet({
@@ -179,7 +179,7 @@ test("a candidate file the manifest does not list is never loaded, and a missing
   });
 });
 
-test("a structurally invalid candidate is blocked before reaching Gate 1 (WU048 case 6)", () => {
+test("a structurally invalid candidate is blocked before reaching Gate 1", () => {
   withTempDir((candidatesDir) => {
     writeCandidate(candidatesDir, "SRC-NEW.yaml", "source_id: SRC-NEW\n"); // missing required "name"
     const outcome = prepareResearchChangeSet({
@@ -230,7 +230,7 @@ test("no canonical write occurs and no promoter is invoked: the change set carri
   });
 });
 
-test("identical inputs are idempotent: rerun produces the same fingerprint and packageId (WU048 case 20)", () => {
+test("identical inputs are idempotent: rerun produces the same fingerprint and packageId", () => {
   withTempDir((candidatesDir) => {
     writeCandidate(candidatesDir, "SRC-NEW.yaml", "source_id: SRC-NEW\nname: Synthetic source\n");
     const input = {
@@ -251,7 +251,7 @@ test("identical inputs are idempotent: rerun produces the same fingerprint and p
   });
 });
 
-test("WU049 case 20: distinct evaluatedAt values preserve RCS identity for identical material admission", () => {
+test("distinct evaluatedAt values preserve RCS identity for identical material admission", () => {
   const index = materialIndex();
   const review = prepareCanonicalIntegrationReview(SHA, index, [materialCandidate()]);
   const manifest = validManifest({ candidateFiles: ["EVD-MATERIAL.yaml"], claimedRecordIds: ["EVD-MATERIAL"] });
@@ -325,7 +325,7 @@ test("no timestamp or other run-specific metadata is recorded anywhere in the ch
   });
 });
 
-test("independent review disagreement is preserved and surfaced, not auto-resolved (WU048 case 11)", () => {
+test("independent review disagreement is preserved and surfaced, not auto-resolved", () => {
   withTempDir((candidatesDir) => {
     writeCandidate(candidatesDir, "SRC-NEW.yaml", "source_id: SRC-NEW\nname: Synthetic source\n");
     const outcome = prepareResearchChangeSet({

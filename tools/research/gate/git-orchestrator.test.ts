@@ -1,9 +1,8 @@
 /**
- * Post-approval Git/PR orchestration tests (OD-E). Exercises the real
- * git/gh-invoking code path against a local bare "origin" remote and a fake
- * `gh` executable (test-fake-gh.ts) — never a real GitHub remote, since these
- * tests must not require destructive interaction with a real
- * repository/remote.
+ * Post-approval Git/PR orchestration tests. Exercises the real git/gh-invoking
+ * code path against a local bare "origin" remote and a fake `gh` executable
+ * (test-fake-gh.ts) — never a real GitHub remote, since these tests must not
+ * require destructive interaction with a real repository/remote.
  */
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -157,7 +156,7 @@ test("ADVERSARIAL: push failure (remote unreachable) is an explicit failure, nev
   }
 });
 
-test("R1 ADVERSARIAL: existing branch descending from the approved baseGitSha (compatible) resumes safely", () => {
+test("ADVERSARIAL branch reuse: existing branch descending from the approved baseGitSha (compatible) resumes safely", () => {
   const fixture = remoteGitFixture();
   try {
     stageApprovedFile(fixture.research, "sources/SRC-NEW.yaml", "source_id: SRC-NEW\nname: New\n");
@@ -190,7 +189,7 @@ test("R1 ADVERSARIAL: existing branch descending from the approved baseGitSha (c
   }
 });
 
-test("R1 ADVERSARIAL: existing branch with no existing branch at all still succeeds (baseline, no false rejection)", () => {
+test("ADVERSARIAL branch reuse: existing branch with no existing branch at all still succeeds (baseline, no false rejection)", () => {
   const fixture = remoteGitFixture();
   try {
     stageApprovedFile(fixture.research, "sources/SRC-NEW.yaml", "source_id: SRC-NEW\nname: New\n");
@@ -212,7 +211,7 @@ test("R1 ADVERSARIAL: existing branch with no existing branch at all still succe
   }
 });
 
-test("R1 ADVERSARIAL: existing branch with unrelated (disjoint) commit ancestry fails closed before any commit/push/PR", () => {
+test("ADVERSARIAL branch reuse: existing branch with unrelated (disjoint) commit ancestry fails closed before any commit/push/PR", () => {
   const fixture = remoteGitFixture();
   try {
     stageApprovedFile(fixture.research, "sources/SRC-NEW.yaml", "source_id: SRC-NEW\nname: New\n");
@@ -258,7 +257,7 @@ test("R1 ADVERSARIAL: existing branch with unrelated (disjoint) commit ancestry 
   }
 });
 
-test("R1 ADVERSARIAL: existing branch built on a stale/wrong base (real commit, but not the approved baseGitSha's descendant) fails closed", () => {
+test("ADVERSARIAL branch reuse: existing branch built on a stale/wrong base (real commit, but not the approved baseGitSha's descendant) fails closed", () => {
   const fixture = remoteGitFixture();
   try {
     // Advance master past the SHA that will be used as the "approved" base,
@@ -302,7 +301,7 @@ test("R1 ADVERSARIAL: existing branch built on a stale/wrong base (real commit, 
   }
 });
 
-test("R1 ADVERSARIAL: existing branch already holding exactly the expected approved publication commit (State B) resumes safely", () => {
+test("ADVERSARIAL branch reuse: existing branch already holding exactly the expected approved publication commit (State B) resumes safely", () => {
   const fixture = remoteGitFixture();
   try {
     const approvedBaseSha = fixture.head();
@@ -341,15 +340,14 @@ test("R1 ADVERSARIAL: existing branch already holding exactly the expected appro
   }
 });
 
-test("R1 ADVERSARIAL: descendant branch with one unrelated extra file beyond the approved publication result fails closed (original reviewer PoC, permanent regression test)", () => {
+test("ADVERSARIAL branch reuse: descendant branch with one unrelated extra file beyond the approved publication result fails closed (original reviewer PoC, permanent regression test)", () => {
   const fixture = remoteGitFixture();
   try {
     const approvedBaseSha = fixture.head();
     const branch = branchNameForPackage("RCS-extrafileextrafi");
-    // The exact shape the independent reviewer reproduced: baseGitSha ->
-    // unrelated extra commit -> the deterministic WU046 branch. Ancestry of
-    // baseGitSha alone would pass this branch; the content-sensitive tree
-    // comparison must not.
+    // The exact shape a prior review reproduced: baseGitSha -> unrelated
+    // extra commit -> the deterministic branch. Ancestry of baseGitSha alone
+    // would pass this branch; the content-sensitive tree comparison must not.
     execFileSync("git", ["-C", fixture.root, "checkout", "-b", branch]);
     writeFileSync(join(fixture.root, "research", "sources", "SRC-INJECTED.yaml"), "source_id: SRC-INJECTED\nname: Unapproved\n", "utf8");
     execFileSync("git", ["-C", fixture.root, "add", "-A"]);
@@ -383,7 +381,7 @@ test("R1 ADVERSARIAL: descendant branch with one unrelated extra file beyond the
   }
 });
 
-test("R1 ADVERSARIAL: descendant branch with an unauthorized modification to an otherwise-approved path fails closed", () => {
+test("ADVERSARIAL branch reuse: descendant branch with an unauthorized modification to an otherwise-approved path fails closed", () => {
   const fixture = remoteGitFixture();
   try {
     const approvedBaseSha = fixture.head();
@@ -419,7 +417,7 @@ test("R1 ADVERSARIAL: descendant branch with an unauthorized modification to an 
   }
 });
 
-test("R1 ADVERSARIAL: descendant branch missing one approved change fails closed", () => {
+test("ADVERSARIAL branch reuse: descendant branch missing one approved change fails closed", () => {
   const fixture = remoteGitFixture();
   try {
     const approvedBaseSha = fixture.head();
@@ -454,7 +452,7 @@ test("R1 ADVERSARIAL: descendant branch missing one approved change fails closed
   }
 });
 
-test("R1 ADVERSARIAL: descendant branch with an unexpected deletion beyond the approved plan fails closed", () => {
+test("ADVERSARIAL branch reuse: descendant branch with an unexpected deletion beyond the approved plan fails closed", () => {
   const fixture = remoteGitFixture();
   try {
     const approvedBaseSha = fixture.head();
@@ -490,7 +488,7 @@ test("R1 ADVERSARIAL: descendant branch with an unexpected deletion beyond the a
   }
 });
 
-test("R1 ADVERSARIAL: descendant branch with an additional unrelated commit before an otherwise-exact publication commit fails closed (no wider history shape is accepted speculatively)", () => {
+test("ADVERSARIAL branch reuse: descendant branch with an additional unrelated commit before an otherwise-exact publication commit fails closed (no wider history shape is accepted speculatively)", () => {
   const fixture = remoteGitFixture();
   try {
     const approvedBaseSha = fixture.head();
@@ -529,7 +527,7 @@ test("R1 ADVERSARIAL: descendant branch with an additional unrelated commit befo
   }
 });
 
-test("R1 ADVERSARIAL: incompatible existing branch causes zero push and zero PR creation", () => {
+test("ADVERSARIAL branch reuse: incompatible existing branch causes zero push and zero PR creation", () => {
   const fixture = remoteGitFixture();
   try {
     const approvedBaseSha = fixture.head();
@@ -575,7 +573,7 @@ test("R1 ADVERSARIAL: incompatible existing branch causes zero push and zero PR 
   }
 });
 
-test("R1 ADVERSARIAL: retry after a prior compatible partial run (branch created, not yet committed) resumes and completes", () => {
+test("ADVERSARIAL branch reuse: retry after a prior compatible partial run (branch created, not yet committed) resumes and completes", () => {
   const fixture = remoteGitFixture();
   try {
     const approvedBaseSha = fixture.head();
@@ -655,7 +653,7 @@ test("PENDING CI is not itself a failure (READY_FOR_OWNER_MERGE is still reachab
   }
 });
 
-test("R2 ADVERSARIAL: existing PR with expected head + expected base is reused safely (no duplicate created)", () => {
+test("ADVERSARIAL PR reuse: existing PR with expected head + expected base is reused safely (no duplicate created)", () => {
   const fixture = remoteGitFixture();
   try {
     stageApprovedFile(fixture.research, "sources/SRC-NEW.yaml", "source_id: SRC-NEW\nname: New\n");
@@ -684,7 +682,7 @@ test("R2 ADVERSARIAL: existing PR with expected head + expected base is reused s
   }
 });
 
-test("R2 ADVERSARIAL: existing PR with expected head but wrong base fails explicitly — never reused, never retargeted, never duplicated", () => {
+test("ADVERSARIAL PR reuse: existing PR with expected head but wrong base fails explicitly — never reused, never retargeted, never duplicated", () => {
   const fixture = remoteGitFixture();
   try {
     stageApprovedFile(fixture.research, "sources/SRC-NEW.yaml", "source_id: SRC-NEW\nname: New\n");
@@ -716,7 +714,7 @@ test("R2 ADVERSARIAL: existing PR with expected head but wrong base fails explic
   }
 });
 
-test("R2 ADVERSARIAL: multiple PR candidates for the same head branch (ambiguous) fails explicitly rather than picking one", () => {
+test("ADVERSARIAL PR reuse: multiple PR candidates for the same head branch (ambiguous) fails explicitly rather than picking one", () => {
   const fixture = remoteGitFixture();
   try {
     stageApprovedFile(fixture.research, "sources/SRC-NEW.yaml", "source_id: SRC-NEW\nname: New\n");
@@ -749,7 +747,7 @@ test("R2 ADVERSARIAL: multiple PR candidates for the same head branch (ambiguous
   }
 });
 
-test("R2 ADVERSARIAL: malformed gh pr list output (not an array) is treated as no compatible PR, never crashes, never fabricates a match", () => {
+test("ADVERSARIAL PR reuse: malformed gh pr list output (not an array) is treated as no compatible PR, never crashes, never fabricates a match", () => {
   const fixture = remoteGitFixture();
   try {
     stageApprovedFile(fixture.research, "sources/SRC-NEW.yaml", "source_id: SRC-NEW\nname: New\n");
@@ -785,7 +783,7 @@ test("R2 ADVERSARIAL: malformed gh pr list output (not an array) is treated as n
   }
 });
 
-test("R2 ADVERSARIAL: compatible retry (same head + same base, already created by a prior run) resumes without creating a duplicate", () => {
+test("ADVERSARIAL PR reuse: compatible retry (same head + same base, already created by a prior run) resumes without creating a duplicate", () => {
   const fixture = remoteGitFixture();
   try {
     stageApprovedFile(fixture.research, "sources/SRC-NEW.yaml", "source_id: SRC-NEW\nname: New\n");

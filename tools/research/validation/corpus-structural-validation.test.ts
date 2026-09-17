@@ -1,10 +1,9 @@
 /**
- * Regression tests for the WU030 mechanical validation hardening.
+ * Structural corpus validation: list/reference element discipline and
+ * calendar-date validity.
  *
- * ODM-007 (provenance/list element discipline) and ODM-008 (calendar-valid
- * dates) reproduce failures the pre-WU030 validator accepted. These checks are
- * structural only: they never decide evidential adequacy, which stays human
- * (AGENTS.md "Human-owned decisions").
+ * These checks are structural only: they never decide evidential adequacy,
+ * which stays human (AGENTS.md "Human-owned decisions").
  */
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -32,7 +31,7 @@ function prb(index: ReturnType<typeof loadCorpusIndex>, id = "PRB-0001"): Record
   return index.byPrefix.get("PRB-")!.byId.get(id)!.fields as Record<string, any>;
 }
 
-test("ODM-007: the unmodified canonical corpus still validates cleanly", () => {
+test("the unmodified canonical corpus still validates cleanly", () => {
   const index = loadCorpusIndex(root);
   const result = validateCorpusIndex(index);
   assert.deepEqual(result.errors, []);
@@ -45,12 +44,12 @@ test("ODM-007: the unmodified canonical corpus still validates cleanly", () => {
   );
 });
 
-test("ODM-007: provenance.sources rejects an empty list where the schema requires one", () => {
+test("provenance.sources rejects an empty list where the schema requires one", () => {
   const errors = errorsAfter((index) => { evd(index).provenance.sources = []; });
   assert.match(errors, /field "provenance\.sources" must not be empty/);
 });
 
-test("ODM-007: provenance.sources rejects non-string and invalid SRC elements", () => {
+test("provenance.sources rejects non-string and invalid SRC elements", () => {
   const nonString = errorsAfter((index) => { evd(index).provenance.sources = [42]; });
   assert.match(nonString, /field "provenance\.sources\[0\]" must be a string/);
   assert.match(nonString, /contains a non-string reference entry/);
@@ -65,7 +64,7 @@ test("ODM-007: provenance.sources rejects non-string and invalid SRC elements", 
   assert.match(notASource, /references non-existent SRC-\* record "EVD-000001"/);
 });
 
-test("ODM-007: inference_limits accepts [] structurally but rejects non-string items", () => {
+test("inference_limits accepts [] structurally but rejects non-string items", () => {
   const empty = errorsAfter((index) => { evd(index).inference_limits = []; });
   assert.doesNotMatch(empty, /inference_limits/);
 
@@ -76,7 +75,7 @@ test("ODM-007: inference_limits accepts [] structurally but rejects non-string i
   assert.match(nested, /field "inference_limits\[0\]" must be a string/);
 });
 
-test("ODM-007: element-type discipline covers the other declared string lists", () => {
+test("element-type discipline covers the other declared string lists", () => {
   const populations = errorsAfter((index) => { evd(index).scope.populations = [1]; });
   assert.match(populations, /field "scope\.populations\[0\]" must be a string/);
 
@@ -87,7 +86,7 @@ test("ODM-007: element-type discipline covers the other declared string lists", 
   assert.match(affected, /field "affected_populations\[0\]" must be a string/);
 });
 
-test("ODM-008: full YYYY-MM-DD values must be real calendar dates", () => {
+test("full YYYY-MM-DD values must be real calendar dates", () => {
   const impossibleDay = errorsAfter((index) => { evd(index).provenance.extracted_at = "2026-02-30"; });
   assert.match(impossibleDay, /field "provenance\.extracted_at" value "2026-02-30" is not a valid calendar date/);
 
@@ -101,7 +100,7 @@ test("ODM-008: full YYYY-MM-DD values must be real calendar dates", () => {
   assert.doesNotMatch(leap, /provenance\.extracted_at/);
 });
 
-test("ODM-008: supported reduced precision remains valid where the schema allows it", () => {
+test("supported reduced precision remains valid where the schema allows it", () => {
   const year = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2025" }; });
   assert.doesNotMatch(year, /scope\.temporal\.as_of/);
 
@@ -115,7 +114,7 @@ test("ODM-008: supported reduced precision remains valid where the schema allows
   assert.match(fullInvalid, /field "scope\.temporal\.as_of" value "2025-06-31" is not a valid calendar date/);
 });
 
-test("ODM-008: PRB created_at/updated_at are calendar-checked", () => {
+test("PRB created_at/updated_at are calendar-checked", () => {
   const created = errorsAfter((index) => { prb(index).created_at = "2026-04-31"; });
   assert.match(created, /field "created_at" value "2026-04-31" is not a valid calendar date/);
 

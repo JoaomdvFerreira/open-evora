@@ -1,8 +1,8 @@
 /**
  * A fake `gh` CLI used only by git-orchestrator.test.ts / promote.test.ts to
  * exercise the real orchestration code path (spawnSync("gh", ...)) without
- * ever touching the real GitHub API, per the contract's requirement that
- * tests must not require destructive interaction with a real remote.
+ * ever touching the real GitHub API, avoiding destructive interaction with
+ * a real remote.
  *
  * State is kept in a JSON file at $FAKE_GH_STATE (set by the test), so
  * multiple invocations across one orchestration run (pr list, pr create,

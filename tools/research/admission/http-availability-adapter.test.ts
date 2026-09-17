@@ -1,14 +1,14 @@
 /**
- * WU053 remediation regression coverage: the real, production
- * SourceAvailabilityAdapter. Uses only a local, ephemeral-port HTTP server
- * (node:http) — no external network dependency and no live third-party URL.
+ * Regression coverage for the real, production SourceAvailabilityAdapter.
+ * Uses only a local, ephemeral-port HTTP server (node:http) — no external
+ * network dependency and no live third-party URL.
  *
- * Split per independent review (F1): transport behavior (HEAD/GET, status
- * codes, timeout, the 405/501-retry) is tested against the local server via
- * the exported `probe()` directly, since `checkAsync()`'s SSRF guard now
- * fail-closes on loopback (the local test server's own address) before any
- * socket opens — as it must for a real attacker-controlled target too. The
- * guard itself (`isNonPublicAddress`/`resolvePublicAddress`) is tested
+ * Transport behavior (HEAD/GET, status codes, timeout, the 405/501-retry) is
+ * tested separately from the SSRF guard: it is tested against the local
+ * server via the exported `probe()` directly, since `checkAsync()`'s SSRF
+ * guard fail-closes on loopback (the local test server's own address) before
+ * any socket opens — as it must for a real attacker-controlled target too.
+ * The guard itself (`isNonPublicAddress`/`resolvePublicAddress`) is tested
  * separately against controlled addresses via the test-only `resolveAddress`
  * override, never by weakening the guard (no NODE_ENV bypass, no loopback
  * allow-list).
@@ -120,7 +120,7 @@ test("a server that rejects HEAD at the connection level signals retry-with-get"
   );
 });
 
-test("F2: a HEAD response of 405 signals retry-with-get, and the retried GET succeeds", async () => {
+test("a HEAD response of 405 signals retry-with-get, and the retried GET succeeds", async () => {
   const methodsSeen: string[] = [];
   await withServer(
     (req, res) => {
@@ -144,7 +144,7 @@ test("F2: a HEAD response of 405 signals retry-with-get, and the retried GET suc
   );
 });
 
-test("F2: a HEAD response of 501 signals retry-with-get, and the retried GET succeeds", async () => {
+test("a HEAD response of 501 signals retry-with-get, and the retried GET succeeds", async () => {
   const methodsSeen: string[] = [];
   await withServer(
     (req, res) => {
@@ -168,7 +168,7 @@ test("F2: a HEAD response of 501 signals retry-with-get, and the retried GET suc
   );
 });
 
-test("F2: a GET response of 405/501 is reported directly, never retried again", async () => {
+test("a GET response of 405/501 is reported directly, never retried again", async () => {
   const methodsSeen: string[] = [];
   await withServer(
     (req, res) => {
@@ -212,7 +212,7 @@ test("probe pins the connection to the given address rather than re-resolving th
   );
 });
 
-// --- F1: SSRF guard (isNonPublicAddress / resolvePublicAddress) ---------
+// --- SSRF guard (isNonPublicAddress / resolvePublicAddress) -------------
 
 test("isNonPublicAddress blocks loopback, private, link-local, and reserved IPv4 ranges", () => {
   for (const address of ["127.0.0.1", "10.1.2.3", "172.16.0.5", "172.31.255.255", "192.168.1.1", "169.254.1.1", "0.0.0.0", "100.64.0.1", "192.0.2.1", "255.255.255.255"]) {
@@ -273,9 +273,9 @@ test("resolvePublicAddress returns the first address when every resolved address
   assert.equal(result, "93.184.216.34");
 });
 
-// --- F1: end-to-end via checkAsync / resolveAvailabilityAdapter ---------
+// --- end-to-end via checkAsync / resolveAvailabilityAdapter -------------
 
-test("F1: a Source whose canonical_reference is loopback is reported unsupported and never receives a real request, even against a live local server", async () => {
+test("a Source whose canonical_reference is loopback is reported unsupported and never receives a real request, even against a live local server", async () => {
   let requestReceived = false;
   await withServer(
     (_req, res) => {
@@ -292,7 +292,7 @@ test("F1: a Source whose canonical_reference is loopback is reported unsupported
   );
 });
 
-test("F1: a Source whose canonical_reference resolves (via the injected resolver) to a private address is reported unsupported and never opens a socket", async () => {
+test("a Source whose canonical_reference resolves (via the injected resolver) to a private address is reported unsupported and never opens a socket", async () => {
   const adapter = new HttpSourceAvailabilityAdapter({
     now: NOW,
     resolveAddress: async () => [{ address: "10.1.2.3", family: 4 }],
@@ -336,9 +336,9 @@ test("resolveAvailabilityAdapter resolves every material Source's guard decision
   assert.deepEqual(new Set(resolved), new Set(["a.example.invalid", "b.example.invalid"]));
 });
 
-// --- F4: complete IANA special-purpose IPv6 classification --------------
+// --- complete IANA special-purpose IPv6 classification -------------------
 
-test("isNonPublicAddress blocks every IANA special-purpose IPv6 range named by the independent review", () => {
+test("isNonPublicAddress blocks every IANA special-purpose IPv6 range", () => {
   const addresses = [
     "64:ff9b:1::1", // IPv4-IPv6 Translation (64:ff9b:1::/48)
     "100:0:0:1::1", // AMT (100:0:0:1::/64)
@@ -364,7 +364,7 @@ test("isNonPublicAddress blocks the wider IETF Protocol Assignments umbrella (20
   assert.equal(isNonPublicAddress("2606:4700:4700::1111"), false);
 });
 
-test("resolvePublicAddress fails closed when one of several resolved addresses falls in an F4 special-purpose range, even if another is public", async () => {
+test("resolvePublicAddress fails closed when one of several resolved addresses falls in an IANA special-purpose range, even if another is public", async () => {
   const url = new URL("https://mixed-special-purpose.example.invalid/doc");
   const result = await resolvePublicAddress(url, async () => [
     { address: "2606:4700:4700::1111", family: 6 },
@@ -373,7 +373,7 @@ test("resolvePublicAddress fails closed when one of several resolved addresses f
   assert.equal(result, undefined);
 });
 
-// --- F5: IPv6 literals in canonical_reference URLs -----------------------
+// --- IPv6 literals in canonical_reference URLs ----------------------------
 
 test("parseIpv6Literal extracts the address from a bracketed IPv6 literal hostname", () => {
   assert.equal(parseIpv6Literal("[::1]"), "::1");
@@ -416,7 +416,7 @@ test("resolvePublicAddress blocks a loopback IPv6 literal canonical_reference wi
   assert.equal(resolverCalled, false);
 });
 
-test("resolvePublicAddress blocks a non-public IPv6 literal canonical_reference from each named F4 range", async () => {
+test("resolvePublicAddress blocks a non-public IPv6 literal canonical_reference from each named IANA special-purpose range", async () => {
   for (const literal of ["[fc00::1]", "[fe80::1]", "[2001:db8::1]", "[2002::1]", "[3fff::1]", "[5f00::1]"]) {
     const url = new URL(`https://${literal}/doc`);
     const result = await resolvePublicAddress(url, async () => []);
@@ -424,7 +424,7 @@ test("resolvePublicAddress blocks a non-public IPv6 literal canonical_reference 
   }
 });
 
-test("F5 end-to-end: a Source whose canonical_reference is a loopback IPv6 literal is reported unsupported and never receives a real request, even against a live IPv6-loopback server", async () => {
+test("end-to-end: a Source whose canonical_reference is a loopback IPv6 literal is reported unsupported and never receives a real request, even against a live IPv6-loopback server", async () => {
   const server = createServer((_req, res) => {
     res.statusCode = 200;
     res.end();
@@ -441,7 +441,7 @@ test("F5 end-to-end: a Source whose canonical_reference is a loopback IPv6 liter
   }
 });
 
-test("F5: probe() connects correctly given a URL whose authority is a bracketed IPv6 literal (transport layer, matching how F1 separates transport tests from guard tests)", async () => {
+test("probe() connects correctly given a URL whose authority is a bracketed IPv6 literal (transport layer, kept separate from guard tests)", async () => {
   const server = createServer((_req, res) => {
     res.statusCode = 200;
     res.end();
