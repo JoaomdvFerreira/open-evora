@@ -56,7 +56,7 @@ export function CitizenProblemCard({ problem, onExplore }: { problem: CitizenPro
             {problem.evidenceStatus !== null && <span className="overview-status-dimension">{problem.validationStatus !== null && <span aria-hidden="true"> · </span>}<EvidenceStatus value={problem.evidenceStatus} form="overview" /></span>}
           </p>
         )}
-        <button type="button" onClick={() => onExplore(problem.id)}>Explorar →</button>
+        <button type="button" aria-label={`Explorar ${problem.title}`} onClick={() => onExplore(problem.id)}>Explorar →</button>
       </div>
     </li>
   );

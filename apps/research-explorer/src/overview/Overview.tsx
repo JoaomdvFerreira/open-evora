@@ -162,20 +162,22 @@ export function Overview({
         {citizenProblems === null || visibleProblems === null ? (
           <ProgressMessage message="A carregar problemas…" />
         ) : (
-          <div aria-live="polite" aria-atomic="true">
-            {visibleProblems.length === 0 ? (
-              <p className="overview-empty-state">Nenhum problema corresponde à pesquisa ou ao filtro selecionado.</p>
-            ) : (
-              <>
+          <>
+            <div aria-live="polite" aria-atomic="true">
+              {visibleProblems.length === 0 ? (
+                <p className="overview-empty-state">Nenhum problema corresponde à pesquisa ou ao filtro selecionado.</p>
+              ) : (
                 <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} de {formatPublicCount(citizenProblems.length)} problemas</p>
-                <ul className="overview-problem-list">
-                  {visibleProblems.map((problem) => (
-                    <CitizenProblemCard key={problem.id} problem={problem} onExplore={onExploreProblem} />
-                  ))}
-                </ul>
-              </>
+              )}
+            </div>
+            {visibleProblems.length > 0 && (
+              <ul className="overview-problem-list">
+                {visibleProblems.map((problem) => (
+                  <CitizenProblemCard key={problem.id} problem={problem} onExplore={onExploreProblem} />
+                ))}
+              </ul>
             )}
-          </div>
+          </>
         )}
       </section>
 

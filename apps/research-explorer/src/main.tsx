@@ -52,6 +52,7 @@ import "./styles/section-index.css";
 // WU054 delta: the owner-approved Logo (presentation/Logo.tsx), now adopted
 // into the chrome header, needs its own narrow visual recipe.
 import "./styles/logo.css";
+import "./styles/topic.css";
 
 const container = document.getElementById("root");
 if (!container) {

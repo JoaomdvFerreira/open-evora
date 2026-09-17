@@ -13,7 +13,7 @@ const base: CitizenProblem = {
   id: "PRB-EXEMPLO", title: "Percursos diários no centro de Évora",
   problemStatement: "Algumas deslocações entre serviços exigem percursos difíceis de completar a pé.",
   domainCodes: ["MOB"], affectedPopulations: [], geographyArea: "Évora",
-  lifecycleStatus: "active", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: null,
+  lifecycleStatus: "OPEN", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: null,
 };
 
 function Card({ problem }: { problem: CitizenProblem }) {

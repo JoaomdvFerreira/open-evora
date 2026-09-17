@@ -96,6 +96,11 @@ function asString(value: unknown): string | null {
   return typeof value === "string" && value.trim() !== "" ? value : null;
 }
 
+function summaryStringField(summary: RecordSummary, field: string): string | null {
+  const value = summary.summaryFields[field];
+  return typeof value === "string" ? value : null;
+}
+
 /**
  * Projects one canonical PRB detail (`RecordDetail.record`, as read by
  * `DataProvider.getRecord()`) into the fields citizen discovery (search,
@@ -112,9 +117,9 @@ export function toCitizenProblem(summary: RecordSummary, detail: RecordDetail): 
     domainCodes: asStringArray(record.domain),
     affectedPopulations: asStringArray(record.affected_populations),
     geographyArea: typeof record.geography === "object" && record.geography !== null ? asString((record.geography as Record<string, unknown>).area) : null,
-    lifecycleStatus: asString(record.status),
-    validationStatus: asString(record.validation_status),
-    evidenceStatus: asString(record.evidence_status),
+    lifecycleStatus: asString(record.status) ?? summaryStringField(summary, "status"),
+    validationStatus: asString(record.validation_status) ?? summaryStringField(summary, "validation_status"),
+    evidenceStatus: asString(record.evidence_status) ?? summaryStringField(summary, "evidence_status"),
     updatedAt: asString(record.updated_at),
   };
 }

@@ -172,6 +172,19 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
     );
     expect(emptyState.closest('[aria-live="polite"]')).toBe(liveRegion);
   });
+
+  it("keeps Problem cards outside the atomic result announcement and names their actions by title", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const firstAction = await screen.findByRole("button", { name: "Explorar Problema de mobilidade" });
+    expect(screen.getByRole("button", { name: "Explorar Problema digital" })).toBeTruthy();
+    expect(firstAction.textContent).toBe("Explorar →");
+    expect(firstAction.closest('[aria-live="polite"]')).toBeNull();
+  });
 });
 
 describe("Overview — error state retry (ODM-021)", () => {

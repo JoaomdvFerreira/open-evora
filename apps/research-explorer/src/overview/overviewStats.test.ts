@@ -156,6 +156,18 @@ describe("toCitizenProblem", () => {
     expect(problem.title).toBe("Rótulo do índice");
   });
 
+  it("preserves summary state when an unavailable detail has no state fields", () => {
+    const indexSummary = summary({
+      id: "PRB-0008",
+      summaryFields: { status: "OPEN", validation_status: "unvalidated", evidence_status: "corroborated" },
+    });
+    const problem = toCitizenProblem(indexSummary, detail({}));
+
+    expect(problem.lifecycleStatus).toBe("OPEN");
+    expect(problem.validationStatus).toBe("unvalidated");
+    expect(problem.evidenceStatus).toBe("corroborated");
+  });
+
   it("normalizes a single-string domain into a one-element list, matching the list convention", () => {
     const indexSummary = summary({ id: "PRB-0009" });
     const problem = toCitizenProblem(indexSummary, detail({ domain: "MOB" }));
