@@ -114,6 +114,38 @@ This includes force-push, rewriting shared Git history, destructive migration, d
 
 Prefer reversible remediation.
 
+### Repository structure and file creation
+
+Keep the repository structurally lean. Prefer consolidation over file proliferation while preserving legitimate separation of concerns.
+
+Do not create a repository file merely because it is convenient for the current task. Prefer extending an existing canonical document, implementation unit, test file, helper, script, fixture, or module when that responsibility already belongs there.
+
+Create a new file only when:
+1. the repository owner explicitly requests it; or
+2. a genuinely distinct, durable responsibility requires a separate artifact and cannot reasonably belong to an existing one.
+
+Before creating a file, an agent must be able to state the durable responsibility that requires it. "This work needs it", "for this milestone", "for this remediation", "to document this change", or convenience alone are not sufficient justification.
+
+Do not create docs, tests, helper modules, scripts, fixtures, wrappers, reports, contracts, or similar artifacts solely to support or record a transient implementation phase. Historical rationale/provenance belongs in Git/PR history unless an existing canonical document genuinely owns a durable rule.
+
+This does not weaken the file-creation authorization rule in Section 1: new project documentation still requires explicit repository-owner authorization.
+
+### Test durability
+
+Tests must describe durable product, domain, tooling, security, or architectural behaviour/invariants.
+
+Test identity — file names, test/describe names, grouping and comments — must not be primarily tied to a Work Unit, Milestone, PR, remediation, finding ID, incident, acceptance-case number, or implementation phase. Historical provenance belongs in Git/PR history.
+
+Regression tests are valid when they protect a durable behaviour or invariant; name and explain them in terms of that behaviour.
+
+Do not add a new test file when an existing test boundary naturally owns the behaviour. Create a separate test file only for a genuinely distinct durable test boundary.
+
+Do not create no-op/documentation-only tests; assertions must prove behaviour.
+
+Tests should be hermetic: do not depend on ambient developer/CI repository state, global configuration, unrelated filesystem state, network state, ordering, or timing unless that dependency is explicitly the behaviour under test.
+
+Never remove meaningful safeguards or coverage merely to reduce file/test count. LEAN means less structural/history overhead, not weaker validation.
+
 ## 3. Documentation and executable authority
 
 Markdown owns durable methodology, semantics, and architecture only in the document assigned to that domain.
