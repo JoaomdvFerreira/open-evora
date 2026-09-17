@@ -527,8 +527,9 @@ test("inference-limit resolution recorded at the old base/cycle is not accepted 
       // Record the OLD-cycle resolution and resume it to READY, exactly as
       // an operator would via hold-cli.ts's own record-resolution + resume
       // actions, so the source cycle this test revalidates has a genuinely
-      // structurally-valid, previously-reviewed research-change-set.json
-      // (required by this module's own requirement 3).
+      // structurally valid, previously reviewed research-change-set.json:
+      // revalidation requires the source cycle to contain a structurally
+      // valid RCS.
       writeInferenceLimitResolution(
         sourceCycleDir,
         { baseGitSha: oldBase, subjectId: "EVD-NEW", candidateFields: { evidence_id: "EVD-NEW", provenance: { sources: ["SRC-MATERIAL"] }, evidence_nature: "claim", claim_authority: "authoritative", inference_limits: ["a bounded inference limit"] }, inferenceLimits: ["a bounded inference limit"] },
@@ -549,10 +550,11 @@ test("inference-limit resolution recorded at the old base/cycle is not accepted 
       assert.equal(resumeOutcome.status, "READY_FOR_HUMAN_REVIEW", resumeOutcome.status === "FAILED" ? resumeOutcome.message : "");
       writeFileSync(join(sourceCycleDir, "research-change-set.json"), `${JSON.stringify((resumeOutcome as { changeSet: unknown }).changeSet, null, 2)}\n`, "utf8");
 
-      // Requirement 10: revalidating at the NEW base with a checker bound to
-      // the NEW target cycle directory must NOT see the OLD cycle's
-      // resolution — the finding must reappear as a fresh HOLD, never
-      // silently reused across bases/cycles.
+      // Inference-limit resolution is bound to the target cycle/base and
+      // must not be reused from the source cycle: revalidating at the NEW
+      // base with a checker bound to the NEW target cycle directory must
+      // NOT see the OLD cycle's resolution — the finding must reappear as a
+      // fresh HOLD, never silently reused across bases/cycles.
       const revalidateOutcome = await revalidateFrozenCycleAtNewBase({
         sourceCycleDir,
         targetCycleDir,

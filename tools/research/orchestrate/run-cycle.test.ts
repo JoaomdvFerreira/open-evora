@@ -441,14 +441,10 @@ test("materialized artifacts persist the real independent-review result for idem
   });
 });
 
-// Regression: a prior revision of materializeAuthoringEnvelope() let an
-// untrusted candidateFiles[].path escape the cycle directory entirely, up to
-// and including writing into the tracked repository tree. This test
-// reproduces the exact proof-of-concept a prior review used (a deep ../
-// traversal engineered to land at a specific location outside the temp
-// cycle directory) and proves it now fails closed instead of writing
-// anywhere.
-test("PoC regression: a deep ../ traversal write never escapes the cycle directory, even far outside it", async () => {
+// materializeAuthoringEnvelope() must treat candidateFiles[].path as
+// untrusted: an unresolved ../ traversal must never be allowed to write
+// outside the cycle directory, including into the tracked repository tree.
+test("a deep ../ traversal write never escapes the cycle directory, even far outside it", async () => {
   await withTempDir(async (outerDir) => {
     const cycleDir = join(outerDir, "a", "b", "c", "cycle");
     const traversal = "../".repeat(10) + "tmp-escaped-marker.txt";
@@ -486,14 +482,14 @@ test("PoC regression: a deep ../ traversal write never escapes the cycle directo
   });
 });
 
-// Regression: reproduces the exact proof-of-concept that successfully wrote
-// a marker file into the tracked repository tree in a prior review's second
-// proof.
-test("PoC regression: a traversal engineered to land inside the repository root never writes there", async () => {
+// A traversal path may be crafted so its resolved target lands inside the
+// tracked repository tree itself, not merely somewhere outside the cycle
+// directory. That specific shape must also fail closed and never write.
+test("a traversal targeting the repository root never writes there", async () => {
   await withTempDir(async (outerDir) => {
     const cycleDir = join(outerDir, "cycle");
     const repoRoot = resolve(".");
-    const targetInRepo = resolve(repoRoot, "SHOULD_NEVER_BE_CREATED_BY_WU045.txt");
+    const targetInRepo = resolve(repoRoot, "SHOULD_NEVER_BE_CREATED_BY_TRAVERSAL.txt");
     const relPath = relative(join(cycleDir, "candidates"), targetInRepo).split(sep).join("/");
 
     const maliciousEnvelope = {
@@ -528,10 +524,10 @@ test("PoC regression: a traversal engineered to land inside the repository root 
   });
 });
 
-// Regression (read path): a manifest.candidateFiles entry that traverses
+// Read-path invariant: a manifest.candidateFiles entry that traverses
 // outside candidatesDir must never cause an outside file's content to be
 // read and treated as a candidate.
-test("PoC regression: a manifest.candidateFiles traversal entry never reads content from outside the cycle directory", async () => {
+test("a manifest.candidateFiles traversal entry never reads content from outside the cycle directory", async () => {
   await withTempDir(async (outerDir) => {
     const cycleDir = join(outerDir, "cycle");
     mkdirSync(cycleDir, { recursive: true });

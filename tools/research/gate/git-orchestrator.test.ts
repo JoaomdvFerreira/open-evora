@@ -340,14 +340,14 @@ test("ADVERSARIAL branch reuse: existing branch already holding exactly the expe
   }
 });
 
-test("ADVERSARIAL branch reuse: descendant branch with one unrelated extra file beyond the approved publication result fails closed (original reviewer PoC, permanent regression test)", () => {
+test("ADVERSARIAL branch reuse: an existing descendant branch containing unapproved extra content must fail closed", () => {
   const fixture = remoteGitFixture();
   try {
     const approvedBaseSha = fixture.head();
     const branch = branchNameForPackage("RCS-extrafileextrafi");
-    // The exact shape a prior review reproduced: baseGitSha -> unrelated
-    // extra commit -> the deterministic branch. Ancestry of baseGitSha alone
-    // would pass this branch; the content-sensitive tree comparison must not.
+    // baseGitSha -> unrelated extra commit -> the deterministic branch.
+    // Ancestry of baseGitSha alone would pass this branch; the
+    // content-sensitive tree comparison must not.
     execFileSync("git", ["-C", fixture.root, "checkout", "-b", branch]);
     writeFileSync(join(fixture.root, "research", "sources", "SRC-INJECTED.yaml"), "source_id: SRC-INJECTED\nname: Unapproved\n", "utf8");
     execFileSync("git", ["-C", fixture.root, "add", "-A"]);
