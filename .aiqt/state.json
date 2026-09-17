@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M015",
-  "currentWorkUnitId": "WU053",
+  "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
       {
@@ -173,7 +173,7 @@
         "id": "M015",
         "title": "M015 — Citizen-Facing UX Refresh",
         "objective": "Deliver the owner-approved citizen-facing UX refresh for the Research Explorer: a production-ready visual foundation, a runtime-derived Citizen Overview with search/discovery, an authored material-change timeline, a refreshed Problem Reading experience, a shared citizen-facing trust experience, an integrated rendered/accessibility review, and a production release gated on explicit owner acceptance. This milestone is presentation-only: canonical SRC/EVD/PRB semantics, the separate OPEN/validation_status/evidence_status dimensions, and the current static client architecture are preserved unchanged.",
-        "status": "in_progress",
+        "status": "ready",
         "workUnitIds": [
           "WU053",
           "WU054",
@@ -2566,10 +2566,10 @@
           "npm run test --prefix apps/research-explorer",
           "git diff --check"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T15:29:34.952Z"
+        "updatedAt": "2026-09-17T16:45:48.447Z"
       },
       {
         "id": "WU054",
@@ -2621,12 +2621,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-049"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T14:58:53.664Z"
+        "updatedAt": "2026-09-17T16:45:48.447Z"
       },
       {
         "id": "WU055",
@@ -2763,12 +2763,12 @@
           "npm run build --prefix apps/research-explorer",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-050"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T14:58:53.664Z"
+        "updatedAt": "2026-09-17T16:45:48.447Z"
       },
       {
         "id": "WU058",
@@ -7859,6 +7859,120 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt review --mode release",
       "createdAt": "2026-09-16T09:26:33.398Z"
+    },
+    {
+      "id": "C054",
+      "workUnitId": "WU053",
+      "packetId": "PKT-054",
+      "summary": "WU053 Visual Foundation & Identity: adopted the owner-approved PNG Open Évora identity and compact mark, wired derived favicons into all static entry points, built a presentation-only 12-topic mapping audited against every canonical PRB domain code, added a bounded topic palette + icon set, and gave lifecycle status/validation_status/evidence_status their own distinct tone+icon visual treatment without making color the sole meaning carrier. Desktop and 360px responsive treatment captured as visual-gate evidence. Independent review completed and PASS. Owner has given explicit visual-gate acceptance (EVT-362).",
+      "completed": [
+        "Adopted owner-approved PNG Open Évora identity (logo-full.png, logo-mark.png) in Logo.tsx/logo.css, replacing the earlier abstract skyline SVG and a rejected faithful-vectorisation attempt",
+        "Wired favicons (favicon.ico, favicon-16.png, favicon-32.png, apple-touch-icon.png) derived from the approved identity into every static HTML entry point",
+        "Removed the superseded public/logo-mark.svg asset",
+        "Built topicMapping.ts: presentation-only label/tone/icon mapping for all 12 canonical PRB domain codes (MOB, ACC, URB, HOU, SOC, HEA, EDU, EMP, ECO, ENV, PUB, DIG), verified against research/problems/PRB-*.yaml with a safe neutral fallback for unmapped codes",
+        "Added a bounded, evenly-spaced 12-hue topic palette (tokens.css) and matching icon set (icons.tsx) with TopicBadge.tsx rendering label text alongside tone/icon",
+        "Gave Problem lifecycle status, validation_status and evidence_status their own distinct tone+icon visual treatment (stateVisuals.ts, domain.css) scoped to the `reading` chip only, each dimension keeping its own CSS class prefix so no two dimensions share a rendered combination",
+        "Verified color is never the sole meaning carrier: every tone pairs with explicit PT-PT text and a distinct non-color icon shape",
+        "Captured desktop (1440px) and compact (360px) responsive visual-gate evidence for the identity, topic badges, and state visuals",
+        "Recorded explicit repository-owner visual-gate acceptance via .aiqt/runlog.jsonl EVT-362",
+        "Confirmed the pre-existing Storybook publicDir collision as an accepted, out-of-scope infrastructure finding"
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "apps/research-explorer/about/index.html",
+        "apps/research-explorer/contact/index.html",
+        "apps/research-explorer/corrections/index.html",
+        "apps/research-explorer/index.html",
+        "apps/research-explorer/methodology/index.html",
+        "apps/research-explorer/privacy/index.html",
+        "apps/research-explorer/public/logo-mark.svg (deleted)",
+        "apps/research-explorer/src/assets/apple-touch-icon.png",
+        "apps/research-explorer/src/assets/favicon-16.png",
+        "apps/research-explorer/src/assets/favicon-32.png",
+        "apps/research-explorer/src/assets/favicon.ico",
+        "apps/research-explorer/src/assets/logo-full.png",
+        "apps/research-explorer/src/assets/logo-mark.png",
+        "apps/research-explorer/src/presentation/Logo.tsx",
+        "apps/research-explorer/src/presentation/TopicBadge.tsx",
+        "apps/research-explorer/src/presentation/VisualFoundation.stories.tsx",
+        "apps/research-explorer/src/presentation/icons.tsx",
+        "apps/research-explorer/src/presentation/topicMapping.ts",
+        "apps/research-explorer/src/presentation/topicMapping.test.ts",
+        "apps/research-explorer/src/problem/InvestigationStatus.tsx",
+        "apps/research-explorer/src/problem/ProblemLifecycleStatus.tsx",
+        "apps/research-explorer/src/problem/ProblemStateAtoms.stories.tsx",
+        "apps/research-explorer/src/problem/stateVisuals.ts",
+        "apps/research-explorer/src/problem/stateVisuals.test.ts",
+        "apps/research-explorer/src/styles/domain.css",
+        "apps/research-explorer/src/styles/logo.css",
+        "apps/research-explorer/src/styles/tokens.css",
+        "apps/research-explorer/src/styles/topic.css"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "build-data published 279 records/408 edges/0 dangling; typecheck clean; 529 tests passed (1 skipped); vite build succeeded."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "529 tests passed, 1 skipped, 0 failed (included in explorer:build above)."
+        },
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "research:typecheck clean; 497 tests passed, 1 skipped, 0 failed; research:validate OK for 279 records."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors on the final branch diff."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "A production-ready logo/mark exists in the codebase, matches the approved prototype direction, and has explicit owner sign-off.",
+          "result": "passed",
+          "evidence": "Logo.tsx/logo.css render the owner-approved PNG identity (logo-full.png, logo-mark.png) with favicons derived from the same identity wired into every static entry point; sign-off recorded as .aiqt/runlog.jsonl EVT-362."
+        },
+        {
+          "criterion": "The topic label/tone mapping is documented as presentation-only, is derived from an explicit audit of the PRB domain codes actually present in canonical data, and introduces no new canonical taxonomy field.",
+          "result": "passed",
+          "evidence": "topicMapping.ts's header documents the presentation-only contract and 2026-09-17 audit; its 12 keys (MOB, ACC, URB, HOU, SOC, HEA, EDU, EMP, ECO, ENV, PUB, DIG) were independently re-verified against every domain code in research/problems/PRB-*.yaml (exact match, no gaps, no extras); no PRB record or schema field was modified."
+        },
+        {
+          "criterion": "Every canonical lifecycle/validation/evidence state value has an accessible visual treatment where color is never the sole carrier of meaning, and the three dimensions remain visually distinguishable from one another with no merged indicator.",
+          "result": "passed",
+          "evidence": "stateVisuals.ts covers every enum value in research/schemas/problem.schema.json (status, validation_status, evidence_status, independently re-verified); each dimension keeps its own CSS class prefix (--lifecycle-*/--validation-*/--evidence-*) in domain.css and its own lookup table, and every chip renders explicit PT-PT text alongside tone+icon."
+        },
+        {
+          "criterion": "A small, coherent icon set is implemented and reused (not duplicated per surface) across the topic mapping and state visual language.",
+          "result": "passed",
+          "evidence": "icons.tsx defines one bounded icon set on a shared 20x20 stroke geometry, imported by both topicMapping.ts and problem/stateVisuals.ts; no per-surface duplication."
+        },
+        {
+          "criterion": "The repository owner has given explicit visual-gate acceptance of this foundation, recorded before any other work unit in this milestone is marked done.",
+          "result": "passed",
+          "evidence": "EVT-362 recorded prior to this checkpoint; no other M015 work unit has been started or marked done."
+        },
+        {
+          "criterion": "npm run explorer:build, npm run test --prefix apps/research-explorer, and git diff --check pass.",
+          "result": "passed",
+          "evidence": "See validationCommands above."
+        },
+        {
+          "criterion": "All persistent changes are committed before this work unit is marked done.",
+          "result": "passed",
+          "evidence": "Commits 2165653, 16207b4, 67e2d1b, 64eb0d8 on feat/wu053-visual-foundation-identity; git status clean of persistent source changes."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-17T16:45:48.447Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
@@ -7885,8 +7999,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-09-17T15:29:34.952Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-17T16:45:48.447Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -9640,6 +9754,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-16T09:26:33.398Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C054",
+      "current": {
+        "observationId": "sha256:635a7a13a48d7afe87773e83a7a8a4e5f72f77aec0b336c7e6a9bb8e9ada3656",
+        "checkpointId": "C054",
+        "workUnitId": "WU053",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-17T16:45:48.447Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-17T16:45:48.447Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:635a7a13a48d7afe87773e83a7a8a4e5f72f77aec0b336c7e6a9bb8e9ada3656",
+          "checkpointId": "C054",
+          "workUnitId": "WU053",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-17T16:45:48.447Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-17T16:45:48.447Z"
         }
       ]
     }
