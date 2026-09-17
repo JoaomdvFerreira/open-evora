@@ -15,6 +15,7 @@ import { formatPublicCount, publicEnumLabel, publicCompactEnumLabel } from "../p
 import { ValidationStatus, EvidenceStatus } from "../problem/InvestigationStatus";
 import { TopicBadge } from "../presentation/TopicBadge";
 import { describeTopic } from "../presentation/topicMapping";
+import { IconSearch } from "../presentation/icons";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 
@@ -156,16 +157,21 @@ export function Overview({
 
         <p className="overview-coverage-caveat">Os problemas apresentados são os atualmente acompanhados pelo Open Évora. Não constituem um inventário completo dos problemas existentes em Évora.</p>
 
+        <p className="overview-ordering-note">Ordenados por identificador — a ordem não representa prioridade ou relevância.</p>
+
         <div className="overview-search">
           <label htmlFor="overview-search-input" className="overview-search-label">Pesquisar problemas</label>
-          <input
-            id="overview-search-input"
-            type="search"
-            className="overview-search-input"
-            placeholder="Pesquisar por título, descrição, população ou zona…"
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-          />
+          <span className="overview-search-input-wrap">
+            <IconSearch className="overview-search-icon" />
+            <input
+              id="overview-search-input"
+              type="search"
+              className="overview-search-input"
+              placeholder="Pesquisar problemas em Évora…"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+            />
+          </span>
         </div>
 
         {topicCodes.length > 0 && (

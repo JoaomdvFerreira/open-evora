@@ -121,15 +121,18 @@ export function toCitizenProblem(summary: RecordSummary, detail: RecordDetail): 
 
 /**
  * The audited topic filters relevant to the currently loaded Problems only
- * ("Todos" plus one entry per canonical domain code actually present), in
- * `topicMapping.ts` audit order — never a filter for a domain code absent
- * from the loaded corpus, and never a grouping beyond the 12 approved
- * mappings (topicMapping.ts's own neutral fallback covers any future
- * unaudited code without inventing a new public grouping here).
+ * (one entry per canonical domain code actually present; "Todos" is added
+ * separately by the caller and always sorts first). Ordered alphabetically
+ * by each code's PT-PT public label (`describeTopic`, locale-aware compare)
+ * — never a filter for a domain code absent from the loaded corpus, and
+ * never a grouping beyond the 12 approved mappings (topicMapping.ts's own
+ * neutral fallback covers any future unaudited code without inventing a new
+ * public grouping here). This governs topic-filter control order only; PRB
+ * Problem ordering stays the deterministic PRB-ID order throughout.
  */
 export function relevantTopicCodes(problems: CitizenProblem[]): string[] {
   const present = new Set(problems.flatMap((problem) => problem.domainCodes));
-  return [...present].sort((a, b) => a.localeCompare(b));
+  return [...present].sort((a, b) => describeTopic(a).label.localeCompare(describeTopic(b).label, "pt-PT"));
 }
 
 /** A Problem matches a topic filter when that canonical domain code is present among its (possibly multiple) domains. Never reorders or ranks. */

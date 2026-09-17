@@ -431,6 +431,20 @@ function globalNav(): HTMLElement {
   return screen.getByRole("navigation", { name: "Vistas do Explorador de Investigação" });
 }
 
+describe("Explorer — chrome header (WU054 delta: owner-approved logo)", () => {
+  it("renders the Open Évora logo alongside the preserved subtitle and primary navigation", async () => {
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("button", { name: /PRB-0005/ });
+
+    expect(screen.getAllByAltText("Open Évora").length).toBeGreaterThan(0);
+    expect(screen.getByText("Explorador de Investigação")).toBeTruthy();
+    expect(globalNav()).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Visão geral" })).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Registos" })).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Grafo" })).toBeTruthy();
+  });
+});
+
 describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
   it("navigating from a selected Problem to global Registos clears selectedId (no hidden-context leak)", async () => {
     const user = userEvent.setup();

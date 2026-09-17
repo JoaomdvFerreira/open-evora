@@ -191,12 +191,23 @@ function citizenProblem(overrides: Partial<CitizenProblem>): CitizenProblem {
 }
 
 describe("relevantTopicCodes", () => {
-  it("returns only the domain codes actually present among the loaded Problems, sorted", () => {
+  it("returns only the domain codes actually present among the loaded Problems, sorted by PT-PT label", () => {
     const problems = [
       citizenProblem({ id: "PRB-1", domainCodes: ["URB"] }),
       citizenProblem({ id: "PRB-2", domainCodes: ["MOB", "ACC"] }),
     ];
+    // Acessibilidade / Mobilidade / Urbanismo — label order happens to match code order here.
     expect(relevantTopicCodes(problems)).toEqual(["ACC", "MOB", "URB"]);
+  });
+
+  it("orders by PT-PT public label, not by canonical code, when they diverge", () => {
+    // ECO -> "Economia", DIG -> "Digital": alphabetically by label, Digital comes first,
+    // even though the codes DIG/ECO would themselves sort the other way.
+    const problems = [
+      citizenProblem({ id: "PRB-1", domainCodes: ["ECO"] }),
+      citizenProblem({ id: "PRB-2", domainCodes: ["DIG"] }),
+    ];
+    expect(relevantTopicCodes(problems)).toEqual(["DIG", "ECO"]);
   });
 
   it("returns an empty list when no Problem has a domain code", () => {

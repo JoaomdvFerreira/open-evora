@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Overview } from "./Overview";
 import { DataLoadError, type DataProvider, type RecordDetail, type RecordSummary } from "../dataProvider/types";
@@ -79,6 +79,49 @@ describe("Overview — Problem investigation-state dimensions", () => {
     expect(screen.queryByText("Validação:")).toBeNull();
     expect(screen.queryByText("Evidência:")).toBeNull();
     expect(document.querySelector(".overview-statuses")).toBeNull();
+  });
+});
+
+describe("Overview — WU054 delta: ordering transparency, search control, topic-filter order", () => {
+  it("shows the ordering transparency note, distinct from the corpus-coverage caveat", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    expect(screen.getByText("Ordenados por identificador — a ordem não representa prioridade ou relevância.")).toBeTruthy();
+    expect(screen.getByText(/Não constituem um inventário completo/)).toBeTruthy();
+  });
+
+  it("labels the citizen search control per the approved copy", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const input = (await screen.findByLabelText("Pesquisar problemas")) as HTMLInputElement;
+    expect(input.placeholder).toBe("Pesquisar problemas em Évora…");
+  });
+
+  it("orders topic filters alphabetically by PT-PT label, with Todos first", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema de economia", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
+    ]);
+    const detailsProvider: DataProvider = {
+      ...provider,
+      getRecord: async (id) =>
+        id === "PRB-1"
+          ? { id, type: "PRB-", file: "", record: { title: "Problema de economia", domain: ["ECO"] }, outgoingEdges: [], incomingEdges: [] }
+          : { id, type: "PRB-", file: "", record: { title: "Problema digital", domain: ["DIG"] }, outgoingEdges: [], incomingEdges: [] },
+    };
+    render(<Overview dataProvider={detailsProvider} {...props} />);
+
+    const group = await screen.findByRole("group", { name: "Filtrar por tema" });
+    const labels = within(group).getAllByRole("button").map((button) => button.textContent);
+    // Digital before Economia alphabetically, and Todos always leads.
+    expect(labels).toEqual(["Todos", "Digital", "Economia"]);
   });
 });
 

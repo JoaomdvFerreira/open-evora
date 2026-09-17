@@ -879,9 +879,18 @@ main.explorer-shell {
   letter-spacing: -0.01em;
 }
 
-.explorer-brand {
-  color: var(--color-ink-primary);
-  font-weight: 700;
+/* WU054 delta — owner-approved logo (presentation/Logo.tsx) adopted into the
+   chrome header in place of the earlier text-only wordmark. `--full` is the
+   default responsive form; `--compact` (mark-only) takes over once the
+   compact breakpoint hides the subtitle below, keeping the header from
+   crowding the nav at narrow widths. */
+/* `.explorer-logo--compact` needs to win over logo.css's own `.oe-logo {
+   display: inline-flex }` base rule despite loading before it (main.tsx
+   import order) — matched by pairing the class with itself for specificity,
+   the same technique this file already documents at main.tsx's DS-05J
+   note for `.problem-reading-rail`. */
+.explorer-logo--compact.explorer-logo--compact {
+  display: none;
 }
 
 .explorer-subtitle {
@@ -1116,6 +1125,18 @@ main.explorer-shell {
   line-height: 1.5;
 }
 
+/* WU054 delta — ordering transparency note: separate from the corpus-coverage
+   caveat above, and deliberately quieter still (docs/explorerarchitecture.md
+   §4 "human-readable meaning before technical identity"; AGENTS.md evidence
+   integrity — deterministic ID order must never read as a ranking). */
+.overview-ordering-note {
+  max-width: 42rem;
+  margin: 0 0 1.25rem;
+  color: var(--color-ink-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
 .overview-search {
   margin: 0 0 0.85rem;
 }
@@ -1128,12 +1149,30 @@ main.explorer-shell {
   font-weight: 650;
 }
 
+/* WU054 delta — icon-wrapped search input; the icon is a positioned overlay
+   (aria-hidden in icons.tsx), never a replacement for the visible <label>
+   above. */
+.overview-search-input-wrap {
+  position: relative;
+  display: block;
+  max-width: 32rem;
+}
+
+.overview-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  transform: translateY(-50%);
+  color: var(--color-ink-muted);
+  pointer-events: none;
+}
+
 .overview-search-input {
   box-sizing: border-box;
   width: 100%;
   max-width: 32rem;
   min-height: 44px;
-  padding: 0.55rem 0.85rem;
+  padding: 0.55rem 0.85rem 0.55rem 2.35rem;
   color: var(--color-ink-primary);
   border: 1px solid var(--color-separator-standard);
   border-radius: var(--radius-control, 0.3rem);
@@ -2259,6 +2298,14 @@ main.explorer-shell {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+
+  .explorer-logo--full.explorer-logo--full {
+    display: none;
+  }
+
+  .explorer-logo--compact.explorer-logo--compact {
+    display: inline-flex;
   }
 
   .explorer-navigation {

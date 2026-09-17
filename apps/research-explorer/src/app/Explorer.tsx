@@ -8,6 +8,7 @@ import { ProblemHistoryView } from "../problem/ProblemHistoryView";
 import { ReadingGuide } from "../guide/ReadingGuide";
 import { useUnavailableNote } from "../presentation/UnavailableNote";
 import { ProgressMessage } from "../presentation/ProgressMessage";
+import { Logo } from "../presentation/Logo";
 
 // RE-05: lazily imported, not just GraphCanvas's Sigma module inside it —
 // GraphExplorer's own module graph (Graphology + buildGraphModel/neighbourhood/
@@ -53,7 +54,8 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
       <header className="explorer-chrome">
         <div className="explorer-chrome-inner shell-frame">
           <h1>
-            <span className="explorer-brand">Open Évora</span>
+            <Logo form="full" className="explorer-logo explorer-logo--full" />
+            <Logo form="compact" className="explorer-logo explorer-logo--compact" />
             <span className="explorer-subtitle">Explorador de Investigação</span>
           </h1>
           <nav aria-label="Vistas do Explorador de Investigação" className="explorer-navigation">

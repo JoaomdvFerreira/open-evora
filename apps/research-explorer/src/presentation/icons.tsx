@@ -175,6 +175,21 @@ export function IconTopicGeneric(props: IconProps) {
 }
 
 /**
+ * WU054 delta — search glyph, added to this bounded set for the citizen
+ * search control (Overview). `aria-hidden` like every other icon here: the
+ * accessible name always comes from the search control's own visible
+ * `<label>`, never from this glyph.
+ */
+export function IconSearch(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="8.5" cy="8.5" r="5" />
+      <path d="M16 16l-3.6-3.6" />
+    </IconBase>
+  );
+}
+
+/**
  * Non-colour carrier for the OPEN lifecycle value and other in-progress
  * states — an outlined circle, distinct in shape from the filled dot
  * (`IconStateFilled`) and the check/cross glyphs below.
