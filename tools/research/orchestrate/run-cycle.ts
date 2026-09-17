@@ -442,12 +442,36 @@ function isValidHoldIdentityShape(value: unknown): value is HoldIdentity {
 }
 
 /**
+ * Structural check for the pre-PR#127 v1 on-disk shape: schemaVersion "1"
+ * with a flat `trigger` field and no `identity` (every unresolved HOLD
+ * produced by the released normal path before this remediation). Distinct
+ * from `isValidHoldIdentityShape()`, which checks the current in-memory
+ * `HoldIdentity` shape — this checks the legacy on-disk field name.
+ */
+function isValidLegacyTriggerShape(value: unknown): value is ResearchTrigger {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+/**
  * Reads and validates the hold-freeze binding record at `cycleDir`, if any,
  * and verifies it matches `baseGitSha`/`identity` exactly. Never throws: a
  * missing file, malformed JSON, structurally invalid record, or
  * base-SHA/identity mismatch are all reported as a resume-blocking reason
  * (fail closed) rather than crashing or silently resuming against the wrong
  * identity.
+ *
+ * Backward compatibility (PR #127 remediation, compatibility finding): a
+ * pre-PR#127 v1 record on disk never has `identity` — it has a flat
+ * `trigger` field instead (the normal path's only HOLD origin before the
+ * bounded base-revalidation path existed). Every such HOLD left unresolved
+ * by the currently released normal path must remain resumable after this
+ * change merges. When `record.identity` is absent/invalid, schemaVersion is
+ * "1", and a structurally valid legacy `trigger` is present, that trigger is
+ * normalized in memory to `{ kind: "TRIGGER", trigger }` and checked exactly
+ * as a native `identity` would be. The on-disk file is never rewritten by
+ * this read — only resume's own re-freeze (on a still-HOLD outcome) ever
+ * upgrades it to the new shape. A record with neither a valid `identity` nor
+ * a valid legacy `trigger` remains fail-closed.
  */
 export function readHoldFreeze(cycleDir: string, baseGitSha: string, identity: HoldIdentity): HoldFreezeCheckResult {
   const file = holdFreezePath(cycleDir);
@@ -467,19 +491,25 @@ export function readHoldFreeze(cycleDir: string, baseGitSha: string, identity: H
   if (
     record.schemaVersion !== "1" ||
     typeof record.baseGitSha !== "string" ||
-    typeof record.candidateFingerprint !== "string" ||
-    !isValidHoldIdentityShape(record.identity)
+    typeof record.candidateFingerprint !== "string"
   ) {
     return { ok: false, reason: "hold-freeze.json is structurally invalid" };
   }
-  const recordIdentity = record.identity as HoldIdentity;
+  let recordIdentity: HoldIdentity;
+  if (isValidHoldIdentityShape(record.identity)) {
+    recordIdentity = record.identity;
+  } else if (record.identity === undefined && isValidLegacyTriggerShape(record.trigger)) {
+    recordIdentity = { kind: "TRIGGER", trigger: record.trigger };
+  } else {
+    return { ok: false, reason: "hold-freeze.json is structurally invalid" };
+  }
   if (record.baseGitSha !== baseGitSha) {
     return { ok: false, reason: "hold-freeze.json base Git SHA does not match the resume request" };
   }
   if (!identitiesMatch(recordIdentity, identity)) {
     return { ok: false, reason: "hold-freeze.json identity does not match the resume request" };
   }
-  return { ok: true, record: record as unknown as HoldFreezeRecord };
+  return { ok: true, record: { ...record, identity: recordIdentity } as unknown as HoldFreezeRecord };
 }
 
 export interface ResumeHoldByIdentityInput {

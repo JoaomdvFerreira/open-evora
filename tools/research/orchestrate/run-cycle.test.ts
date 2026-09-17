@@ -844,6 +844,170 @@ test("F3 two-run regression: run 1 HOLDs, an exact resolution is recorded, and r
   });
 });
 
+// --- PR #127 compatibility remediation: legacy v1 hold-freeze.json --------
+
+test("F3 backcompat: a legacy pre-PR#127 v1 hold-freeze.json (flat `trigger`, no `identity`) remains resumable without a second PRIMARY_AUTHOR invocation", async () => {
+  await withTempDir(async (cycleDir) => {
+    // Run 1 through the real normal path so manifest.json/candidates on disk
+    // are genuine, then overwrite hold-freeze.json with the exact pre-PR#127
+    // on-disk shape (schemaVersion "1", baseGitSha, trigger, candidateFingerprint
+    // — no `identity` field at all), simulating a HOLD produced by the
+    // currently released normal path before this remediation merges.
+    const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
+    const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome1 = await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewerRun1,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      inferenceLimitResolutionChecker: { isResolved: () => false },
+    });
+    assert.equal(outcome1.status, "PRE_GATE_SAFETY_HOLD");
+    assert.equal(primary.calls.length, 1);
+
+    const currentRecord = JSON.parse(readFileSync(join(cycleDir, "hold-freeze.json"), "utf8"));
+    const legacyV1Record = {
+      schemaVersion: "1",
+      baseGitSha: currentRecord.baseGitSha,
+      trigger: TRIGGER,
+      candidateFingerprint: currentRecord.candidateFingerprint,
+    };
+    assert.equal("identity" in legacyV1Record, false);
+    writeFileSync(join(cycleDir, "hold-freeze.json"), `${JSON.stringify(legacyV1Record, null, 2)}\n`, "utf8");
+
+    // readHoldFreeze() must normalize the legacy `trigger` to `{ kind:
+    // "TRIGGER", trigger }` in memory and accept it, without rewriting the
+    // on-disk file.
+    const freezeCheck = readHoldFreeze(cycleDir, SHA, { kind: "TRIGGER", trigger: TRIGGER });
+    assert.equal(freezeCheck.ok, true);
+    if (freezeCheck.ok) {
+      assert.deepEqual(freezeCheck.record.identity, { kind: "TRIGGER", trigger: TRIGGER });
+    }
+    const onDiskAfterRead = JSON.parse(readFileSync(join(cycleDir, "hold-freeze.json"), "utf8"));
+    assert.deepEqual(onDiskAfterRead, legacyV1Record);
+
+    // Record the exact-match resolution, same as the non-legacy regression.
+    const candidateFields = { evidence_id: "EVD-NEW", provenance: { sources: ["SRC-MATERIAL"] }, evidence_nature: "claim", claim_authority: "authoritative", inference_limits: ["a bounded inference limit"] };
+    writeInferenceLimitResolution(
+      cycleDir,
+      { baseGitSha: SHA, subjectId: "EVD-NEW", candidateFields, inferenceLimits: candidateFields.inference_limits },
+      "owner@example.invalid",
+      "Reviewed and accepted the stated inference limits."
+    );
+
+    // resumePreGateHold() must accept the legacy record when base/trigger/
+    // fingerprint match, never re-invoke PRIMARY_AUTHOR, and reach
+    // READY_FOR_HUMAN_REVIEW via exactly one fresh reviewer invocation.
+    const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const checker = createInferenceLimitResolutionChecker(cycleDir);
+    const outcome2 = await resumePreGateHold({
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      trigger: TRIGGER,
+      cycleDir,
+      reviewerInvoker: reviewerResume,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:05:00.000Z" }) },
+      inferenceLimitResolutionChecker: checker,
+      now: () => new Date("2026-09-15T12:05:00.000Z"),
+    });
+
+    assert.equal(outcome2.status, "READY_FOR_HUMAN_REVIEW", outcome2.status === "FAILED" ? outcome2.message : JSON.stringify(outcome2));
+    assert.equal(primary.calls.length, 1);
+    assert.equal(reviewerResume.calls.length, 1);
+    assert.equal(reviewerResume.calls[0].role, "INDEPENDENT_REVIEWER");
+  });
+});
+
+test("F3 backcompat: a legacy v1 hold-freeze.json with tampered candidates still fails closed on resume", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
+    const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewerRun1,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      inferenceLimitResolutionChecker: { isResolved: () => false },
+    });
+
+    const currentRecord = JSON.parse(readFileSync(join(cycleDir, "hold-freeze.json"), "utf8"));
+    writeFileSync(
+      join(cycleDir, "hold-freeze.json"),
+      `${JSON.stringify({ schemaVersion: "1", baseGitSha: currentRecord.baseGitSha, trigger: TRIGGER, candidateFingerprint: currentRecord.candidateFingerprint }, null, 2)}\n`,
+      "utf8"
+    );
+
+    // Tamper with the frozen candidate after the legacy HOLD was recorded.
+    writeFileSync(
+      join(cycleDir, "candidates", "EVD-NEW.yaml"),
+      "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: claim\nclaim_authority: authoritative\ninference_limits: []\n",
+      "utf8"
+    );
+
+    const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = await resumePreGateHold({
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      trigger: TRIGGER,
+      cycleDir,
+      reviewerInvoker: reviewerResume,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:05:00.000Z" }) },
+      inferenceLimitResolutionChecker: { isResolved: () => true },
+    });
+    assert.equal(outcome.status, "FAILED");
+    if (outcome.status !== "FAILED") return;
+    assert.equal(outcome.failedCheck, "HOLD_RESUME_CANDIDATE_MISMATCH");
+    assert.equal(reviewerResume.calls.length, 0);
+  });
+});
+
+test("F3 backcompat: a legacy v1 hold-freeze.json with a mismatched trigger fails closed on resume", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
+    const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    await runResearchCycle({
+      trigger: TRIGGER,
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      cycleDir,
+      primaryInvoker: primary,
+      reviewerInvoker: reviewerRun1,
+      availabilityAdapter: { check: (sourceId) => ({ sourceId, status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) },
+      now: () => new Date("2026-09-15T12:00:00.000Z"),
+      inferenceLimitResolutionChecker: { isResolved: () => false },
+    });
+
+    const currentRecord = JSON.parse(readFileSync(join(cycleDir, "hold-freeze.json"), "utf8"));
+    writeFileSync(
+      join(cycleDir, "hold-freeze.json"),
+      `${JSON.stringify({ schemaVersion: "1", baseGitSha: currentRecord.baseGitSha, trigger: TRIGGER, candidateFingerprint: currentRecord.candidateFingerprint }, null, 2)}\n`,
+      "utf8"
+    );
+
+    const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = await resumePreGateHold({
+      index: admissionIndex("public"),
+      baseGitSha: SHA,
+      trigger: { mode: "daily-discovery", request: "A completely different request" },
+      cycleDir,
+      reviewerInvoker: reviewerResume,
+      inferenceLimitResolutionChecker: { isResolved: () => true },
+    });
+    assert.equal(outcome.status, "FAILED");
+    if (outcome.status !== "FAILED") return;
+    assert.equal(outcome.failedCheck, "HOLD_RESUME_IDENTITY_MISMATCH");
+    assert.equal(reviewerResume.calls.length, 0);
+  });
+});
+
 test("F3: resuming with a mismatched baseGitSha fails closed without reloading candidates or invoking the reviewer", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
