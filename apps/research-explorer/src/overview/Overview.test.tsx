@@ -6,7 +6,21 @@ import { DataLoadError, type DataProvider, type RecordDetail, type RecordSummary
 
 function makeProvider(index: RecordSummary[]): DataProvider {
   const details: Record<string, RecordDetail> = Object.fromEntries(
-    index.map((summary) => [summary.id, { id: summary.id, type: summary.type, file: summary.file, record: { title: summary.label }, outgoingEdges: [], incomingEdges: [] }])
+    index.map((summary) => [
+      summary.id,
+      {
+        id: summary.id,
+        type: summary.type,
+        file: summary.file,
+        record: {
+          title: summary.label,
+          validation_status: summary.summaryFields.validation_status,
+          evidence_status: summary.summaryFields.evidence_status,
+        },
+        outgoingEdges: [],
+        incomingEdges: [],
+      },
+    ])
   );
   return {
     getManifest: async () => { throw new Error("unused"); },

@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { computeOverviewStats, computePublicOverviewData, formatEvidenceCount, formatProblemCount } from "./overviewStats";
-import type { RecordSummary } from "../dataProvider/types";
+import {
+  computeOverviewStats,
+  computePublicOverviewData,
+  formatEvidenceCount,
+  formatProblemCount,
+  matchesCitizenSearch,
+  matchesTopicFilter,
+  relevantTopicCodes,
+  toCitizenProblem,
+  type CitizenProblem,
+} from "./overviewStats";
+import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 
 function summary(overrides: Partial<RecordSummary>): RecordSummary {
   return { id: "PRB-0001", type: "PRB-", label: "Fixture", file: "research/problems/PRB-0001.yaml", summaryFields: {}, ...overrides };
@@ -104,6 +114,141 @@ describe("computePublicOverviewData", () => {
       { id: "PRB-0002", title: "Earlier problem", validationStatus: "unvalidated", evidenceStatus: "corroborated" },
       { id: "PRB-0010", title: "Later problem", validationStatus: "validated", evidenceStatus: "discovered" },
     ]);
+  });
+});
+
+function detail(record: Record<string, unknown>): RecordDetail {
+  return { id: "PRB-0001", type: "PRB-", file: "research/problems/PRB-0001.yaml", record, outgoingEdges: [], incomingEdges: [] };
+}
+
+describe("toCitizenProblem", () => {
+  it("projects the canonical fields citizen discovery needs, keeping raw stored values", () => {
+    const indexSummary = summary({ id: "PRB-0007", label: "Fallback title" });
+    const problem = toCitizenProblem(indexSummary, detail({
+      title: "Título canónico",
+      problem_statement: "Descrição do problema.",
+      domain: ["MOB", "ACC"],
+      affected_populations: ["residentes", "estudantes"],
+      geography: { level: "municipality", area: "Évora" },
+      status: "OPEN",
+      validation_status: "unvalidated",
+      evidence_status: "corroborated",
+      updated_at: "2026-09-10",
+    }));
+
+    expect(problem).toEqual({
+      id: "PRB-0007",
+      title: "Título canónico",
+      problemStatement: "Descrição do problema.",
+      domainCodes: ["MOB", "ACC"],
+      affectedPopulations: ["residentes", "estudantes"],
+      geographyArea: "Évora",
+      lifecycleStatus: "OPEN",
+      validationStatus: "unvalidated",
+      evidenceStatus: "corroborated",
+      updatedAt: "2026-09-10",
+    });
+  });
+
+  it("falls back to the index summary label when the canonical title is missing", () => {
+    const indexSummary = summary({ id: "PRB-0008", label: "Rótulo do índice" });
+    const problem = toCitizenProblem(indexSummary, detail({}));
+    expect(problem.title).toBe("Rótulo do índice");
+  });
+
+  it("normalizes a single-string domain into a one-element list, matching the list convention", () => {
+    const indexSummary = summary({ id: "PRB-0009" });
+    const problem = toCitizenProblem(indexSummary, detail({ domain: "MOB" }));
+    expect(problem.domainCodes).toEqual(["MOB"]);
+  });
+
+  it("never throws on a detail missing every optional field", () => {
+    const indexSummary = summary({ id: "PRB-0010" });
+    const problem = toCitizenProblem(indexSummary, detail({}));
+    expect(problem.problemStatement).toBeNull();
+    expect(problem.domainCodes).toEqual([]);
+    expect(problem.affectedPopulations).toEqual([]);
+    expect(problem.geographyArea).toBeNull();
+    expect(problem.lifecycleStatus).toBeNull();
+    expect(problem.updatedAt).toBeNull();
+  });
+});
+
+function citizenProblem(overrides: Partial<CitizenProblem>): CitizenProblem {
+  return {
+    id: "PRB-0001",
+    title: "Problema fixture",
+    problemStatement: null,
+    domainCodes: [],
+    affectedPopulations: [],
+    geographyArea: null,
+    lifecycleStatus: null,
+    validationStatus: null,
+    evidenceStatus: null,
+    updatedAt: null,
+    ...overrides,
+  };
+}
+
+describe("relevantTopicCodes", () => {
+  it("returns only the domain codes actually present among the loaded Problems, sorted", () => {
+    const problems = [
+      citizenProblem({ id: "PRB-1", domainCodes: ["URB"] }),
+      citizenProblem({ id: "PRB-2", domainCodes: ["MOB", "ACC"] }),
+    ];
+    expect(relevantTopicCodes(problems)).toEqual(["ACC", "MOB", "URB"]);
+  });
+
+  it("returns an empty list when no Problem has a domain code", () => {
+    expect(relevantTopicCodes([citizenProblem({})])).toEqual([]);
+  });
+
+  it("deduplicates a domain code shared by multiple Problems", () => {
+    const problems = [citizenProblem({ id: "PRB-1", domainCodes: ["MOB"] }), citizenProblem({ id: "PRB-2", domainCodes: ["MOB"] })];
+    expect(relevantTopicCodes(problems)).toEqual(["MOB"]);
+  });
+});
+
+describe("matchesTopicFilter", () => {
+  it("matches every Problem when no topic is selected", () => {
+    expect(matchesTopicFilter(citizenProblem({ domainCodes: ["MOB"] }), null)).toBe(true);
+    expect(matchesTopicFilter(citizenProblem({ domainCodes: [] }), null)).toBe(true);
+  });
+
+  it("matches a multi-domain Problem when the selected code is any one of its domains", () => {
+    const problem = citizenProblem({ domainCodes: ["MOB", "ACC"] });
+    expect(matchesTopicFilter(problem, "MOB")).toBe(true);
+    expect(matchesTopicFilter(problem, "ACC")).toBe(true);
+    expect(matchesTopicFilter(problem, "URB")).toBe(false);
+  });
+});
+
+describe("matchesCitizenSearch", () => {
+  it("matches on title, problem statement, affected populations, geography, and topic label — case- and accent-insensitively", () => {
+    const problem = citizenProblem({
+      title: "Tráfego e estacionamento",
+      problemStatement: "Congestão no centro histórico.",
+      affectedPopulations: ["residentes", "comerciantes"],
+      geographyArea: "Évora",
+      domainCodes: ["MOB"],
+    });
+    expect(matchesCitizenSearch(problem, "trafego")).toBe(true);
+    expect(matchesCitizenSearch(problem, "CONGESTAO")).toBe(true);
+    expect(matchesCitizenSearch(problem, "comerciantes")).toBe(true);
+    expect(matchesCitizenSearch(problem, "evora")).toBe(true);
+    expect(matchesCitizenSearch(problem, "mobilidade")).toBe(true);
+    expect(matchesCitizenSearch(problem, "habitação")).toBe(false);
+  });
+
+  it("matches every Problem for an empty or whitespace-only query", () => {
+    const problem = citizenProblem({ title: "Qualquer coisa" });
+    expect(matchesCitizenSearch(problem, "")).toBe(true);
+    expect(matchesCitizenSearch(problem, "   ")).toBe(true);
+  });
+
+  it("does not match on the technical PRB ID alone", () => {
+    const problem = citizenProblem({ id: "PRB-0042", title: "Outro problema" });
+    expect(matchesCitizenSearch(problem, "PRB-0042")).toBe(false);
   });
 });
 
