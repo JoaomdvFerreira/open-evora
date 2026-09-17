@@ -282,6 +282,7 @@ describe("ProblemView DS-05H — RailSectionIndex/CompactSectionIndex adoption",
     expect(railLinks.map((link) => link.textContent)).toEqual(compactLinks.map((link) => link.textContent));
     expect(railLinks.map((link) => link.getAttribute("href"))).toEqual(compactLinks.map((link) => link.getAttribute("href")));
     expect(railLinks.length).toBeGreaterThan(0);
+    railLinks.forEach((link) => expect(document.querySelector(link.getAttribute("href")!)).toBeTruthy());
   });
 
   it("conditional subsections are present in the index exactly matching rendered content", async () => {
@@ -321,5 +322,53 @@ describe("ProblemView DS-05H — RailSectionIndex/CompactSectionIndex adoption",
     const compactNav = screen.getByRole("navigation", { name: "Nesta página (versão compacta)" });
     const compactDisclosure = compactNav.closest("details")!;
     expect(compactDisclosure).not.toBe(helpDisclosure);
+  });
+});
+
+describe("ProblemView citizen-facing metadata and actions", () => {
+  const recordsWithMetadata: Record<string, RecordDetail> = {
+    ...records,
+    "PRB-1": { ...records["PRB-1"], record: { ...prbRecord, domain: ["MOB", "ACC"], geography: { area: "Évora", level: "city" }, affected_populations: ["Residentes", "Visitantes"], updated_at: "2026-09-01", history: [{ date: "2026-02-01", summary: "Alteração antiga." }, { date: "2026-04-01", summary: "Alteração recente." }] } },
+  };
+  const metadataProvider: DataProvider = { ...provider, getRecord: async (id) => recordsWithMetadata[id] };
+
+  it("binds the public update date to PRB.updated_at and omits it neutrally when absent", async () => {
+    render(<ProblemView {...props} dataProvider={metadataProvider} problemId="PRB-1" />);
+    expect(await screen.findByText("Última atualização do registo")).toBeTruthy();
+    expect(document.querySelector('time[datetime="2026-09-01"]')).toBeTruthy();
+    const missingDateProvider: DataProvider = { ...provider, getRecord: async (id) => ({ ...recordsWithMetadata[id], record: { ...recordsWithMetadata[id].record, updated_at: undefined } }) };
+    const second = render(<ProblemView {...props} dataProvider={missingDateProvider} problemId="PRB-1" />);
+    await screen.findByText("Alteração recente.");
+    expect(screen.getAllByText("Última atualização do registo")).toHaveLength(1);
+    second.unmount();
+  });
+
+  it("uses only authored PRB.history for the recent summary and opens the full History view", async () => {
+    const onViewHistory = vi.fn();
+    render(<ProblemView {...props} dataProvider={metadataProvider} problemId="PRB-1" onViewHistory={onViewHistory} />);
+    const recent = await screen.findByText("Alteração recente.");
+    const older = screen.getByText("Alteração antiga.");
+    expect(recent.compareDocumentPosition(older) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(screen.getAllByRole("button", { name: /Ver histórico completo/ })[0]);
+    expect(onViewHistory).toHaveBeenCalledWith("PRB-1");
+  });
+
+  it("uses Web Share when available", async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "share", { configurable: true, value: share });
+    render(<ProblemView {...props} problemId="PRB-1" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Partilhar" }));
+    await vi.waitFor(() => expect(share).toHaveBeenCalled());
+    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
+  });
+
+  it("copies the current link when Web Share is unavailable", async () => {
+    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+    render(<ProblemView {...props} problemId="PRB-1" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Partilhar" }));
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith(window.location.href));
+    expect(await screen.findByText("Ligação copiada.")).toBeTruthy();
   });
 });

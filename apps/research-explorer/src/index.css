@@ -2752,6 +2752,34 @@ main.explorer-shell {
   margin: 0 0 var(--space-loose);
 }
 
+.problem-identity-heading-row {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-standard);
+}
+
+.problem-share-action button {
+  min-height: auto;
+  white-space: nowrap;
+}
+
+.problem-topic-list,
+.problem-header-states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight);
+  margin: var(--space-standard) 0;
+}
+
+.problem-header-states:empty {
+  display: none;
+}
+
+.problem-recent-history .material-change-timeline {
+  margin-top: 0;
+}
+
 .problem-identity-id {
   margin-bottom: var(--space-tight);
   color: var(--color-ink-faint);
@@ -3103,6 +3131,10 @@ main.explorer-shell {
 
   .problem-identity {
     padding: var(--space-standard);
+  }
+
+  .problem-identity-heading-row {
+    align-items: flex-start;
   }
 
   .evd-identity h1 {

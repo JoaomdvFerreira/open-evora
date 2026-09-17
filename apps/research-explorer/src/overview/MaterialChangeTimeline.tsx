@@ -1,7 +1,7 @@
 import { formatPublicDate } from "../presentation/presentation";
 import type { MaterialChangeEntry } from "./overviewStats";
 
-export function MaterialChangeTimeline({ entries, onExploreProblem }: { entries: MaterialChangeEntry[]; onExploreProblem: (id: string) => void }) {
+export function MaterialChangeTimeline({ entries, onExploreProblem, actionLabel = "Abrir problema →", actionAccessibleLabel }: { entries: MaterialChangeEntry[]; onExploreProblem: (id: string) => void; actionLabel?: string; actionAccessibleLabel?: (entry: MaterialChangeEntry) => string }) {
   if (entries.length === 0) {
     return <p className="material-change-empty-state">Ainda não existem alterações materiais registadas para apresentar.</p>;
   }
@@ -14,8 +14,8 @@ export function MaterialChangeTimeline({ entries, onExploreProblem }: { entries:
           <div className="material-change-content">
             <p className="material-change-problem"><span className="technical-id">{entry.problemId}</span> · {entry.problemTitle}</p>
             <p className="material-change-summary">{entry.summary}</p>
-            <button type="button" onClick={() => onExploreProblem(entry.problemId)} aria-label={`Abrir problema ${entry.problemTitle}`}>
-              Abrir problema →
+            <button type="button" onClick={() => onExploreProblem(entry.problemId)} aria-label={actionAccessibleLabel?.(entry) ?? `Abrir problema ${entry.problemTitle}`}>
+              {actionLabel}
             </button>
           </div>
         </li>

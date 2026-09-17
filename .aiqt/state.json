@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M015",
-  "currentWorkUnitId": null,
+  "currentWorkUnitId": "WU056",
   "workGraph": {
     "milestones": [
       {
@@ -173,7 +173,7 @@
         "id": "M015",
         "title": "M015 — Citizen-Facing UX Refresh",
         "objective": "Deliver the owner-approved citizen-facing UX refresh for the Research Explorer: a production-ready visual foundation, a runtime-derived Citizen Overview with search/discovery, an authored material-change timeline, a refreshed Problem Reading experience, a shared citizen-facing trust experience, an integrated rendered/accessibility review, and a production release gated on explicit owner acceptance. This milestone is presentation-only: canonical SRC/EVD/PRB semantics, the separate OPEN/validation_status/evidence_status dimensions, and the current static client architecture are preserved unchanged.",
-        "status": "ready",
+        "status": "in_progress",
         "workUnitIds": [
           "WU053",
           "WU054",
@@ -2719,12 +2719,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "in_progress",
         "dependencies": [
           "DEP-052"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T20:18:13.101Z"
+        "updatedAt": "2026-09-17T20:21:03.975Z"
       },
       {
         "id": "WU057",
@@ -8162,17 +8162,17 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-17T20:18:13.101Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-17T20:18:13.101Z"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-056",
-    "workUnitId": "WU055",
+    "id": "PKT-057",
+    "workUnitId": "WU056",
     "milestoneId": "M015",
-    "createdAt": "2026-09-17T19:54:00.097Z",
+    "createdAt": "2026-09-17T20:21:03.975Z",
     "format": "markdown",
-    "contentHash": "sha256:059a3cd320e7ef795950ac8bbf34d8f6d2a863971cf2c56c0fcf620d2ad825d0",
+    "contentHash": "sha256:211fdc17435d7f7c8b6f5753ce6c22dbfd558847a6724fe294db341e08989613",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -8190,8 +8190,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-17T20:18:13.101Z",
+  "nextRecommendedCommand": "aiqt checkpoint",
+  "lastUpdatedAt": "2026-09-17T20:21:03.975Z",
   "review": {
     "acknowledgedFindings": [
       {
