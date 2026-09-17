@@ -6,6 +6,8 @@ import "../styles/logo.css";
 import { TopicBadge } from "./TopicBadge";
 import { auditedDomainCodes } from "./topicMapping";
 import { Logo, LogoMark } from "./Logo";
+import { ExplorerHeader } from "../app/ExplorerHeader";
+import "../index.css";
 
 /* WU053 — Visual Foundation & Identity durable review boundary: the
    presentation-only PRB `domain` topic mapping (TopicBadge.tsx/
@@ -104,6 +106,11 @@ export const LogoCompact: Story = {
       </div>
     </StandaloneDemo>
   ),
+};
+
+export const ExplorerIdentityHeader: Story = {
+  name: "Explorer identity header",
+  render: () => <main className="explorer-shell"><ExplorerHeader activeView="overview" onOverview={() => {}} onRecords={() => {}} /></main>,
 };
 
 /* ---- Combined demo page (desktop / compact) ------------------------------ */

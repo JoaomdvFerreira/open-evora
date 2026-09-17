@@ -123,6 +123,55 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
     // Digital before Economia alphabetically, and Todos always leads.
     expect(labels).toEqual(["Todos", "Digital", "Economia"]);
   });
+
+  it("marks the active topic filter with aria-pressed, exclusively", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema de economia", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
+    ]);
+    const detailsProvider: DataProvider = {
+      ...provider,
+      getRecord: async (id) =>
+        id === "PRB-1"
+          ? { id, type: "PRB-", file: "", record: { title: "Problema de economia", domain: ["ECO"] }, outgoingEdges: [], incomingEdges: [] }
+          : { id, type: "PRB-", file: "", record: { title: "Problema digital", domain: ["DIG"] }, outgoingEdges: [], incomingEdges: [] },
+    };
+    const user = userEvent.setup();
+    render(<Overview dataProvider={detailsProvider} {...props} />);
+
+    const group = await screen.findByRole("group", { name: "Filtrar por tema" });
+    const todos = within(group).getByRole("button", { name: "Todos" });
+    const digital = within(group).getByRole("button", { name: "Digital" });
+    expect(todos.getAttribute("aria-pressed")).toBe("true");
+    expect(digital.getAttribute("aria-pressed")).toBe("false");
+
+    await user.click(digital);
+
+    expect(todos.getAttribute("aria-pressed")).toBe("false");
+    expect(digital.getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("announces the result-count and empty-state meaning through a polite live region as search/filter state changes", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const resultsCount = await screen.findByText("2 de 2 problemas");
+    const liveRegion = resultsCount.closest('[aria-live="polite"]');
+    expect(liveRegion).not.toBeNull();
+    expect(liveRegion?.getAttribute("aria-atomic")).toBe("true");
+
+    const input = screen.getByLabelText("Pesquisar problemas");
+    await user.type(input, "inexistente");
+
+    const emptyState = await within(liveRegion as HTMLElement).findByText(
+      "Nenhum problema corresponde à pesquisa ou ao filtro selecionado."
+    );
+    expect(emptyState.closest('[aria-live="polite"]')).toBe(liveRegion);
+  });
 });
 
 describe("Overview — error state retry (ODM-021)", () => {

@@ -12,12 +12,9 @@ import {
   type CitizenProblem,
 } from "./overviewStats";
 import { formatPublicCount, publicEnumLabel, publicCompactEnumLabel } from "../presentation/presentation";
-import { ValidationStatus, EvidenceStatus } from "../problem/InvestigationStatus";
-import { TopicBadge } from "../presentation/TopicBadge";
-import { describeTopic } from "../presentation/topicMapping";
-import { IconSearch } from "../presentation/icons";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { CitizenProblemCard, CitizenSearchControl, TopicFilterGroup } from "./CitizenDiscovery";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -159,91 +156,26 @@ export function Overview({
 
         <p className="overview-ordering-note">Ordenados por identificador — a ordem não representa prioridade ou relevância.</p>
 
-        <div className="overview-search">
-          <label htmlFor="overview-search-input" className="overview-search-label">Pesquisar problemas</label>
-          <span className="overview-search-input-wrap">
-            <IconSearch className="overview-search-icon" />
-            <input
-              id="overview-search-input"
-              type="search"
-              className="overview-search-input"
-              placeholder="Pesquisar problemas em Évora…"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-            />
-          </span>
-        </div>
-
-        {topicCodes.length > 0 && (
-          <div className="overview-topic-filters" role="group" aria-label="Filtrar por tema">
-            <button
-              type="button"
-              className="overview-topic-filter"
-              aria-pressed={activeTopic === null}
-              onClick={() => setActiveTopic(null)}
-            >
-              Todos
-            </button>
-            {topicCodes.map((code) => (
-              <button
-                key={code}
-                type="button"
-                className="overview-topic-filter"
-                aria-pressed={activeTopic === code}
-                onClick={() => setActiveTopic((current) => (current === code ? null : code))}
-              >
-                {describeTopic(code).label}
-              </button>
-            ))}
-          </div>
-        )}
+        <CitizenSearchControl value={searchQuery} onChange={setSearchQuery} />
+        <TopicFilterGroup topicCodes={topicCodes} activeTopic={activeTopic} onChange={setActiveTopic} />
 
         {citizenProblems === null || visibleProblems === null ? (
           <ProgressMessage message="A carregar problemas…" />
-        ) : visibleProblems.length === 0 ? (
-          <p className="overview-empty-state">Nenhum problema corresponde à pesquisa ou ao filtro selecionado.</p>
         ) : (
-          <>
-            <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} de {formatPublicCount(citizenProblems.length)} problemas</p>
-            <ul className="overview-problem-list">
-              {visibleProblems.map((problem) => (
-                <li key={problem.id}>
-                  <div className="overview-problem-identity">
-                    {problem.domainCodes.length > 0 && (
-                      <div className="overview-problem-topics">
-                        {problem.domainCodes.map((code) => (
-                          <TopicBadge key={code} code={code} />
-                        ))}
-                      </div>
-                    )}
-                    <h4 className="overview-problem-title">{problem.title}</h4>
-                    {problem.problemStatement !== null && (
-                      <p className="overview-problem-statement">{problem.problemStatement}</p>
-                    )}
-                    <code className="overview-problem-technical-id">{problem.id}</code>
-                  </div>
-                  <div className="overview-problem-action">
-                    {(problem.validationStatus !== null || problem.evidenceStatus !== null) && (
-                      <p className="overview-statuses">
-                        {problem.validationStatus !== null && (
-                          <span className="overview-status-dimension">
-                            <ValidationStatus value={problem.validationStatus} form="overview" />
-                          </span>
-                        )}
-                        {problem.evidenceStatus !== null && (
-                          <span className="overview-status-dimension">
-                            {problem.validationStatus !== null && <span aria-hidden="true"> · </span>}
-                            <EvidenceStatus value={problem.evidenceStatus} form="overview" />
-                          </span>
-                        )}
-                      </p>
-                    )}
-                    <button type="button" onClick={() => onExploreProblem(problem.id)}>Explorar →</button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </>
+          <div aria-live="polite" aria-atomic="true">
+            {visibleProblems.length === 0 ? (
+              <p className="overview-empty-state">Nenhum problema corresponde à pesquisa ou ao filtro selecionado.</p>
+            ) : (
+              <>
+                <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} de {formatPublicCount(citizenProblems.length)} problemas</p>
+                <ul className="overview-problem-list">
+                  {visibleProblems.map((problem) => (
+                    <CitizenProblemCard key={problem.id} problem={problem} onExplore={onExploreProblem} />
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
         )}
       </section>
 
