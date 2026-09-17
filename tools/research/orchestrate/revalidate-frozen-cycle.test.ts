@@ -9,10 +9,12 @@ import type { CorpusIndex, RecordSchema } from "../core/types.ts";
 import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "./ai-invoker.ts";
 import { resumePreGateHold, resumeRevalidationHold, runResearchCycle } from "./run-cycle.ts";
 import {
+  candidateSetsEquivalent,
   revalidateFrozenCycleAtNewBase,
   verifyNoResearchDrift,
   verifyOldBaseIsAncestor,
 } from "./revalidate-frozen-cycle.ts";
+import type { CandidateRecord } from "../integration/candidate-delta.ts";
 import type { ResearchTrigger } from "./types.ts";
 import { createInferenceLimitResolutionChecker, writeInferenceLimitResolution } from "../admission/inference-limit-resolution.ts";
 import { precheckRepositoryState } from "../gate/repository-state.ts";
@@ -216,6 +218,76 @@ test("verifyNoResearchDrift: reports drift when research/ changed between bases"
     if (!result.drifted) return;
     assert.deepEqual(result.files, ["research/r.yaml"]);
   });
+});
+
+// --- candidateSetsEquivalent (order-insensitive, content-exact multiset comparison) ---
+
+function src(id: string, extra: Record<string, unknown> = {}): CandidateRecord {
+  return { recordFamily: "SRC-", fields: { source_id: id, name: `Synthetic ${id}`, ...extra } };
+}
+function evd(id: string, extra: Record<string, unknown> = {}): CandidateRecord {
+  return { recordFamily: "EVD-", fields: { evidence_id: id, ...extra } };
+}
+function prb(id: string, extra: Record<string, unknown> = {}): CandidateRecord {
+  return { recordFamily: "PRB-", fields: { problem_id: id, ...extra } };
+}
+
+test("candidateSetsEquivalent: same exact records, manifest order != RCS deterministic order => MATCH (no false-positive drift)", () => {
+  const manifestOrder = [src("SRC-A"), src("SRC-B"), evd("EVD-A")];
+  const rcsDeterministicOrder = [evd("EVD-A"), src("SRC-A"), src("SRC-B")];
+  assert.equal(candidateSetsEquivalent(manifestOrder, rcsDeterministicOrder), true);
+});
+
+test("candidateSetsEquivalent: same candidates in arbitrary permutation => accepted", () => {
+  const a = [src("SRC-A"), src("SRC-B"), src("SRC-C"), evd("EVD-A")];
+  const permuted = [evd("EVD-A"), src("SRC-C"), src("SRC-A"), src("SRC-B")];
+  assert.equal(candidateSetsEquivalent(a, permuted), true);
+  // Reflexive/identity case too.
+  assert.equal(candidateSetsEquivalent(a, a), true);
+});
+
+test("candidateSetsEquivalent: one candidate field changed => FAIL", () => {
+  const a = [src("SRC-A"), evd("EVD-A")];
+  const b = [src("SRC-A", { publisher: "Changed publisher" }), evd("EVD-A")];
+  assert.equal(candidateSetsEquivalent(a, b), false);
+});
+
+test("candidateSetsEquivalent: recordFamily change alone => FAIL", () => {
+  const a = [{ recordFamily: "SRC-", fields: { source_id: "X", name: "n" } }];
+  const b = [{ recordFamily: "EVD-", fields: { source_id: "X", name: "n" } }];
+  assert.equal(candidateSetsEquivalent(a, b), false);
+});
+
+test("candidateSetsEquivalent: ID change alone => FAIL", () => {
+  const a = [src("SRC-A")];
+  const b = [src("SRC-B")];
+  assert.equal(candidateSetsEquivalent(a, b), false);
+});
+
+test("candidateSetsEquivalent: missing candidate => FAIL", () => {
+  const a = [src("SRC-A"), src("SRC-B")];
+  const b = [src("SRC-A")];
+  assert.equal(candidateSetsEquivalent(a, b), false);
+});
+
+test("candidateSetsEquivalent: extra candidate => FAIL", () => {
+  const a = [src("SRC-A")];
+  const b = [src("SRC-A"), src("SRC-B")];
+  assert.equal(candidateSetsEquivalent(a, b), false);
+});
+
+test("candidateSetsEquivalent: duplicate candidate replacing a distinct candidate => FAIL (multiplicity preserved)", () => {
+  // Same count, same-looking set at a glance, but B duplicates SRC-A instead
+  // of also carrying the distinct SRC-B the left side has.
+  const a = [src("SRC-A"), src("SRC-B")];
+  const b = [src("SRC-A"), src("SRC-A")];
+  assert.equal(candidateSetsEquivalent(a, b), false);
+});
+
+test("candidateSetsEquivalent: real PRB-0005-shaped ordering (SRC,SRC,SRC,EVD,EVD,PRB manifest order vs EVD,EVD,PRB,SRC,SRC,SRC RCS order) => MATCH", () => {
+  const manifestOrder = [src("SRC-1"), src("SRC-2"), src("SRC-3"), evd("EVD-1"), evd("EVD-2"), prb("PRB-0005")];
+  const rcsOrder = [evd("EVD-1"), evd("EVD-2"), prb("PRB-0005"), src("SRC-1"), src("SRC-2"), src("SRC-3")];
+  assert.equal(candidateSetsEquivalent(manifestOrder, rcsOrder), true);
 });
 
 // --- revalidateFrozenCycleAtNewBase (full sequence) ---
