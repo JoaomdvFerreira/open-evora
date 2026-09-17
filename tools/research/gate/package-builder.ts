@@ -1,7 +1,6 @@
 /**
- * Assembles the WU046 Human Gate package (OD-C, Option 3; docs/design/
- * m013-launch-automation-contract.md §12) from an already-validated WU045
- * Research Change Set plus a read-only invocation of the existing
+ * Assembles the Human Gate package (OD-C, Option 3; contract §12) from an
+ * already-validated Research Change Set plus a read-only invocation of the existing
  * readiness.ts machinery (EVT-301 WU046 scope transfer).
  *
  * This module performs pre-Gate analysis only:

@@ -24,7 +24,7 @@ Three type roles remain semantically distinct:
 
 The hierarchy must preserve clear differences between titles, section headings, body prose, supporting text, metadata labels, and technical identifiers. Body text, metadata, and other essential reading text must not shrink merely to make content fit. Headline typography may use an explicit responsive step when comfortable wrapping requires it.
 
-The current visual candidates are Source Serif 4, Public Sans, and IBM Plex Mono. Their adoption and exact typographic settings are not yet frozen.
+Source Serif 4, Public Sans, and IBM Plex Mono are the adopted type families, per the M010 foundation consolidation (below).
 
 ### Reading measure
 
@@ -70,20 +70,22 @@ The existing responsive model remains valid:
 
 The product boundary remains compact at 767px and below and desktop at 768px and above. Within the desktop product range, the approved 720/44/216 reading composition applies when the available frame can accommodate it. The existing 768–1059px geometry-only fit fallback may recompose the reading layout into one column; it does not activate compact typography or navigation and does not create a third product breakpoint. Compact presentation also recomposes the reading layout into one column, with supporting rail content placed in flow. Recomposition changes measure and layout, not the importance or legibility of the content. Body text, metadata, status text, and other essential reading text must not shrink to force the two-column composition to fit; headlines may use an explicit responsive size step.
 
+## Adopted foundation values (owner-frozen)
+
+The production foundation values actually adopted and verified by the completed M010 consolidation — surface/ink/separator roles, accent and accent-hover, the interface/reading/technical typography roles, migrated spacing roles, migrated radius roles, and target sizing — are owner-frozen. Changing those adopted values requires explicit future design/work authorization; they must not drift through incidental cleanup. Exact implementation token names and values remain owned by production code (`apps/research-explorer/src/styles/tokens.css`) and must not be duplicated into Markdown.
+
 ## Not yet frozen implementation details
 
 The following remain provisional and require implementation work, rendered validation, and human review before they become production facts:
 
-- final font-family selection; Source Serif 4, Public Sans, and IBM Plex Mono remain the current candidates;
-- exact font sizes, weights, line heights, letter spacing, and responsive headline values, including whether any proposed minimum size is sufficient across the full corpus;
+- exact responsive headline values, including whether any proposed minimum size is sufficient across the full corpus;
 - the precise sustained-prose ceiling, including 68ch versus 72ch, and exact supporting-text measures;
-- exact colour values and the final accent/status palette;
-- numeric contrast ratios, which must be measured against final implementation colours and rendered text;
-- exact spacing values or scales, separator weights, radii, borders, and other surface details;
+- the final status palette and numeric contrast ratios, which must be measured against final implementation colours and rendered text;
+- spacing, radius, border, and other surface details not covered by the adopted foundation values above;
 - status glyphs or icons, identifier/status variants, and whether particular states require visually distinct treatments;
 - exact link-decoration and focus-ring measurements;
 - whether the desktop metadata rail should ever become inline for shorter records; this remains deferred by DS-03A / Gate C1;
-- exact React APIs, implementation file structure, CSS class/custom-property names, and token names or values. Approved component and layout boundaries are owned by [the DS-03A component and layout contract](component-model.md).
+- exact React APIs, implementation file structure, and CSS class/custom-property names. Approved component and layout boundaries are owned by [the DS-03A component and layout contract](component-model.md).
 
 These open details must not be inferred from the approved Claude Design HTML or from historical prototypes. They remain candidates until separately implemented, validated, and approved.
 

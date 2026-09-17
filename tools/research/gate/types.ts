@@ -1,7 +1,6 @@
 /**
- * Structural types for the WU046 Human Gate & Post-Approval Orchestration
- * boundary (docs/design/m013-launch-automation-contract.md §12; EVT-301
- * WU046 scope refinement). The Human Gate package is a structured JSON
+ * Structural types for the Human Gate & Post-Approval Orchestration
+ * boundary (contract §12). The Human Gate package is a structured JSON
  * source of truth (OD-C, Option 3) assembled from WU045's Research Change
  * Set plus a readiness-machinery invocation, a rendered Markdown view, and
  * an owner decision bound to the exact package/content-hash/base-SHA by the

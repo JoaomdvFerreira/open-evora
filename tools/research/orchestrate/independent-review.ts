@@ -1,7 +1,7 @@
 /**
  * Deterministic structural validation for the OD-B independent-review
- * output (docs/design/m013-launch-automation-contract.md §9 OD-B,
- * strengthened minimum bar points 1-6; §11; §14 case 19). This module
+ * output (contract §9 OD-B, strengthened minimum bar points 1-6; §11;
+ * §14 case 19). This module
  * enforces only points 3-4 (structured outcome + deterministic schema
  * validation) — points 1-2 and 5-6 (separate invocation/role, immutable
  * input, context isolation, self-assessment never counting as review) are

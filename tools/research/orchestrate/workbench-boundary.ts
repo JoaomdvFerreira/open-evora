@@ -1,7 +1,7 @@
 /**
- * Enforces that WU045 orchestration only ever reads/writes under the
+ * Enforces that research orchestration only ever reads/writes under the
  * existing gitignored, non-canonical, non-public research workbench
- * boundary (docs/design/m013-launch-automation-contract.md §8, §11). This
+ * boundary (contract §8, §11). This
  * is a defense-in-depth structural check inside the orchestrator itself,
  * additional to (never a replacement for) .gitignore and the existing
  * workbench-boundary.test.ts regression test.

@@ -1,6 +1,6 @@
 /**
  * Renders the human-readable Markdown view of a Human Gate package (OD-C,
- * Option 3; docs/design/m013-launch-automation-contract.md §12). Generated
+ * Option 3; Human Gate contract §12). Generated
  * from the exact same validated in-memory HumanGatePackage object HIGH-2's
  * contentHash is computed over (content-hash.ts) — never a re-read or
  * re-derived copy, and never itself the hashed source of truth (the JSON is

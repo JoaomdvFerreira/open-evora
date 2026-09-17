@@ -1,6 +1,6 @@
 /**
- * WU046 post-approval path integration/adversarial tests (docs/design/
- * m013-launch-automation-contract.md §12/F-J). Exercises the real sequence
+ * Post-approval path integration/adversarial tests (Human Gate contract
+ * §12/F-J). Exercises the real sequence
  * — HIGH-2 revalidation -> OD-D branching -> repository-state precheck ->
  * canonical promotion -> post-promotion validation/build -> LOW-3 guard ->
  * Git/PR orchestration -> READY_FOR_OWNER_MERGE — against synthetic

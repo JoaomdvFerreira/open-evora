@@ -1,6 +1,6 @@
 /**
  * Deterministic structural validation for the OD-B generation manifest
- * (docs/design/m013-launch-automation-contract.md §11, OD-B point (a)).
+ * (contract §11, OD-B point (a)).
  * This never judges the substantive adequacy of the investigation question
  * or rationale — only that the required shape is present, matching every
  * other structural-only check in tools/research/ (§4 stage 18/21).

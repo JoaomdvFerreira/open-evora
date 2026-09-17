@@ -1,6 +1,6 @@
 /**
- * Post-approval Git/PR orchestration tests (docs/design/
- * m013-launch-automation-contract.md §12, OD-E). Exercises the real
+ * Post-approval Git/PR orchestration tests (Human Gate contract §12,
+ * OD-E). Exercises the real
  * git/gh-invoking code path against a local bare "origin" remote and a fake
  * `gh` executable (test-fake-gh.ts) — never a real GitHub remote, per the
  * contract's requirement that tests must not require destructive

@@ -1,7 +1,7 @@
 /**
- * Human decision submission for the WU046 Human Gate (docs/design/
- * m013-launch-automation-contract.md §12, HIGH-2 approval/content-hash
- * binding protocol; OD-D invalid decision-state combinations table).
+ * Human decision submission for the Human Gate (contract §12, HIGH-2
+ * approval/content-hash binding protocol; OD-D invalid decision-state
+ * combinations table).
  *
  * Implements the complete HIGH-2 flow's submission half (steps 7-12): on
  * decision submission, re-read the JSON source of truth from disk,

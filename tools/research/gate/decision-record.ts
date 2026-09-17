@@ -1,7 +1,6 @@
 /**
  * Persistence and structural validation for the Human Gate decision record
- * (docs/design/m013-launch-automation-contract.md §12/D; EVT-301 WU046
- * scope refinement). Stored as JSON in the same gitignored cycle directory
+ * (Human Gate contract §12/D). Stored as JSON in the same gitignored cycle directory
  * as the Research Change Set it decides — outside canonical/public
  * research/** — bound to packageId/contentHash/baseGitSha/actor/timestamp/
  * canonicalAcceptance/publicExplorerPublication.

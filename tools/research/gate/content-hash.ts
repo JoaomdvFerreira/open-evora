@@ -1,7 +1,7 @@
 /**
- * HIGH-2 deterministic content-hash binding (docs/design/
- * m013-launch-automation-contract.md §12, independent-review finding
- * HIGH-2). `contentHash` is defined as SHA-256 over the deterministic
+ * HIGH-2 deterministic content-hash binding (Human Gate contract §12,
+ * independent-review finding HIGH-2). `contentHash` is defined as SHA-256
+ * over the deterministic
  * canonical serialization of the validated Human Gate package JSON — never
  * the generated Markdown view.
  *

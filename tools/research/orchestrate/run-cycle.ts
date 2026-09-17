@@ -1,8 +1,7 @@
 /**
- * WU045-B01 remediation: drives the normal path from an accepted
- * RESEARCH_TRIGGER through both required OD-B AI invocations to
- * READY_FOR_HUMAN_REVIEW, with zero normal-path human handoffs
- * (docs/design/m013-launch-automation-contract.md §4, §5, §11).
+ * Drives the normal path from an accepted RESEARCH_TRIGGER through both
+ * required OD-B AI invocations to READY_FOR_HUMAN_REVIEW, with zero
+ * normal-path human handoffs (contract §4, §5, §11).
  *
  * Sequence (contract §4):
  *   RESEARCH_TRIGGER

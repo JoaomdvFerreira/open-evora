@@ -1,6 +1,6 @@
 /**
- * Assembles the WU045 Research Change Set (OD-C, Option 3 — JSON source of
- * truth; docs/design/m013-launch-automation-contract.md §11). This module
+ * Assembles the Research Change Set (OD-C, Option 3 — JSON source of
+ * truth; contract §11). This module
  * sequences and structurally validates; it never performs discovery,
  * extraction, or candidate authoring itself, and it never writes canonical
  * research. Every deterministic primitive it calls is imported from its

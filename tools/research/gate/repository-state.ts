@@ -1,7 +1,6 @@
 /**
- * Pre-promotion repository-state re-verification (docs/design/
- * m013-launch-automation-contract.md §12/E; EVT-301 WU046 scope
- * refinement). Delegates to canonical-promoter.ts's own
+ * Pre-promotion repository-state re-verification (Human Gate contract
+ * §12/E). Delegates to canonical-promoter.ts's own
  * `assertCanonicalRepositoryState` — the exact check
  * `applyCanonicalIntegrationPlan()` already performs internally — rather
  * than duplicating its Git/clean-tree/HEAD-match logic a second time. This

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Local/operator-triggered entry point for WU046 Human Gate & Post-Approval
- * Orchestration (docs/design/m013-launch-automation-contract.md §12).
- * Three subcommands, matching the three phases of §12's exact sequence:
+ * Local/operator-triggered entry point for the Human Gate & Post-Approval
+ * Orchestration contract (§12). Three subcommands, matching the three
+ * phases of §12's exact sequence:
  *
  *   render   — assembles + validates a Human Gate package from a WU045
  *              Research Change Set, writes the package JSON (source of

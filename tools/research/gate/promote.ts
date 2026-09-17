@@ -1,6 +1,6 @@
 /**
- * Post-approval orchestration (docs/design/m013-launch-automation-contract.md
- * §12/F/G/H/I/J). The single, deterministic path from a valid, bound human
+ * Post-approval orchestration (Human Gate contract §12/F/G/H/I/J). The
+ * single, deterministic path from a valid, bound human
  * APPROVE through canonical promotion, validation/build, the LOW-3
  * publication guard, and Git/PR orchestration, terminating at exactly
  * READY_FOR_OWNER_MERGE. This module is the one place these steps are

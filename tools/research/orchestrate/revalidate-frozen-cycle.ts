@@ -23,8 +23,8 @@
  * is no second, parallel implementation of prospective validation,
  * availability revalidation, safety admission, or reviewer/RCS assembly.
  *
- * Per-requirement mapping (docs/design/m013-launch-automation-contract.md
- * §11 fail-closed convention; this module's own task spec):
+ * Per-requirement mapping (contract §11 fail-closed convention; this
+ * module's own task spec):
  *   1. Source cycle immutable       -> only ever read, never written, here.
  *   2. Target is a new gitignored
  *      workbench cycle              -> assertWorkbenchBoundary() + distinct

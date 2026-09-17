@@ -1,11 +1,11 @@
 /**
- * Structural types for the WU045 automated research preparation boundary
- * (docs/design/m013-launch-automation-contract.md §11). These describe the
+ * Structural types for the automated research preparation boundary
+ * (contract §11). These describe the
  * OD-B structured AI output contract and the OD-C Research Change Set (RCS)
  * assembly — never a semantic research judgement and never a canonical
- * record type. WU045 owns exactly the structural shape below; the human
+ * record type. This module owns exactly the structural shape below; the human
  * Gate 1 decision, the RCS Markdown rendering, and the approval/contentHash
- * binding protocol remain WU046's responsibility (§12).
+ * binding protocol remain the Human Gate's responsibility (§12).
  */
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CanonicalIntegrationReadiness } from "../integration/canonical-integration-review.ts";

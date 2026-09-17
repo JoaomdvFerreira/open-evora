@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Local/operator-triggered orchestration entry point for WU045 automated
- * research preparation (docs/design/m013-launch-automation-contract.md
- * §11, OD-A Option 1). A human runs this once per cycle, supplying the
+ * Local/operator-triggered orchestration entry point for automated
+ * research preparation (contract §11, OD-A Option 1). A human runs this
+ * once per cycle, supplying the
  * accepted RESEARCH_TRIGGER; it requires no scheduler, cron, or always-on
  * service.
  *
