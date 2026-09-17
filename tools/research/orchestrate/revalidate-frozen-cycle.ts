@@ -72,16 +72,27 @@
  *                                       the checker at the source cycle.
  *   11. Fresh frozen HOLD if
  *       CLAIM_INFERENCE_LIMITS_PRESENT
- *       remains                     -> continueFromFrozenCandidates() writes
+ *       remains, resumable through
+ *       a supported operator path   -> continueFromFrozenCandidates() writes
  *                                       pre-gate-safety-hold.json into the
  *                                       target cycle directory (same as
  *                                       runResearchCycle()); this module
- *                                       additionally writes its own
+ *                                       additionally writes run-cycle.ts's own
  *                                       hold-freeze.json binding record there
- *                                       (RevalidationHoldFreezeRecord, distinct
- *                                       from run-cycle.ts's trigger-shaped one)
- *                                       so the target cycle carries an
- *                                       explicit, auditable freeze record.
+ *                                       via writeHoldFreeze(), keyed to a
+ *                                       BaseRevalidationHoldIdentity
+ *                                       (sourceCycleDir + oldBaseGitSha) —
+ *                                       the SAME shape/writer the normal path
+ *                                       uses, not a second incompatible
+ *                                       protocol. hold-cli.ts's `resume`
+ *                                       action (resumeRevalidationHold())
+ *                                       resumes it exactly like a normal-path
+ *                                       HOLD: exact-bound to the frozen
+ *                                       candidates, resumable without
+ *                                       PRIMARY_AUTHOR, fresh availability
+ *                                       rechecked, fresh INDEPENDENT_REVIEWER
+ *                                       only after ELIGIBLE (PR #127
+ *                                       remediation, finding 1).
  *   12. Fresh INDEPENDENT_REVIEWER
  *       only after ELIGIBLE         -> continueFromFrozenCandidates()'s own
  *                                       control flow, unchanged.
@@ -101,18 +112,39 @@
  *                                       always assembles a fresh RCS (new
  *                                       packageId/preparationFingerprint,
  *                                       since baseGitSha differs).
+ *   16. Old base bound to source
+ *       RCS (PR #127 remediation,
+ *       finding 2)                  -> loadAndVerifyFrozenSource() requires
+ *                                       sourceRcs.baseGitSha === oldBaseGitSha
+ *                                       exactly; a caller cannot assert an
+ *                                       oldBaseGitSha the source cycle's own
+ *                                       frozen RCS does not corroborate.
+ *   17. Clean working tree before
+ *       loading new-base corpus
+ *       (PR #127 remediation,
+ *       finding 3)                  -> enforced by the caller
+ *                                       (revalidate-cli.ts), which reuses the
+ *                                       existing precheckRepositoryState()
+ *                                       repository-state helper before
+ *                                       loading the canonical corpus.
+ *   18. Target must be genuinely
+ *       new/empty (PR #127
+ *       remediation, finding 4)     -> the target-not-new check rejects any
+ *                                       existing directory entry at all, not
+ *                                       only manifest.json/research-change-
+ *                                       set.json.
  */
-import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFileSync } from "node:child_process";
 
 import type { CorpusIndex } from "../core/types.ts";
 import type { AiInvoker } from "./ai-invoker.ts";
 import { asValidatedManifest, validateManifest } from "./manifest.ts";
 import { asValidatedResearchChangeSet, validateResearchChangeSet } from "./rcs-validator.ts";
 import { loadCandidates } from "./candidate-loader.ts";
-import { continueFromFrozenCandidates, frozenCandidateFingerprint } from "./run-cycle.ts";
+import { continueFromFrozenCandidates, frozenCandidateFingerprint, writeHoldFreeze } from "./run-cycle.ts";
 import type { PreparationOutcome } from "./types.ts";
 import { assertWorkbenchBoundary } from "./workbench-boundary.ts";
 import type { InferenceLimitResolutionChecker, SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
@@ -169,30 +201,6 @@ export function verifyNoResearchDrift(oldBaseGitSha: string, newBaseGitSha: stri
   return files.length === 0 ? { drifted: false } : { drifted: true, files };
 }
 
-/**
- * The on-disk binding record a HOLD reached through this revalidation path
- * leaves behind in the target cycle directory (requirement 11). Distinct
- * from run-cycle.ts's own HoldFreezeRecord (which binds to a ResearchTrigger
- * — meaningless here, since this path is base-identity-driven, not
- * trigger-driven) rather than overloading that shape. This record is
- * informational/audit-only: resuming a revalidation HOLD is out of scope for
- * this bounded path (an owner who resolves the blocking finding re-runs
- * revalidateFrozenCycleAtNewBase() against a fresh target cycle, exactly
- * like the normal path's own operator workflow).
- */
-export interface RevalidationHoldFreezeRecord {
-  schemaVersion: "1";
-  sourceCycleDir: string;
-  oldBaseGitSha: string;
-  newBaseGitSha: string;
-  /** frozenCandidateFingerprint() over the exact manifest/candidates this HOLD evaluated. */
-  candidateFingerprint: string;
-}
-
-function writeRevalidationHoldFreeze(targetCycleDir: string, record: RevalidationHoldFreezeRecord): void {
-  writeFileSync(join(targetCycleDir, "hold-freeze.json"), `${JSON.stringify(record, null, 2)}\n`, "utf8");
-}
-
 export interface RevalidateFrozenCycleInput {
   /** Immutable prior cycle directory whose frozen manifest/candidates/RCS are being revalidated. Read-only. */
   sourceCycleDir: string;
@@ -223,8 +231,18 @@ export interface RevalidateFrozenCycleInput {
  * from disk and confirms the reload reproduces the same frozen content the
  * RCS itself carries. Never throws: every problem is reported so the caller
  * fails closed with an explicit reason.
+ *
+ * PR #127 remediation (finding 2): also binds the caller-supplied
+ * `oldBaseGitSha` to the source RCS's own `baseGitSha` — the caller has no
+ * independent authority to assert what base a frozen cycle was produced
+ * against; that fact is owned exclusively by the source cycle's own frozen,
+ * fingerprint-verified `research-change-set.json`. A caller-supplied
+ * `oldBaseGitSha` that does not match fails closed here, before ancestry or
+ * drift is ever checked (so a caller cannot launder a false "old base"
+ * through a genuinely-ancestor-of-new-base SHA that the source cycle itself
+ * was never actually frozen against).
  */
-function loadAndVerifyFrozenSource(sourceCycleDir: string): { ok: true; manifest: ReturnType<typeof asValidatedManifest>; candidates: ReturnType<typeof loadCandidates>["candidates"] } | { ok: false; reason: string } {
+function loadAndVerifyFrozenSource(sourceCycleDir: string, oldBaseGitSha: string): { ok: true; manifest: ReturnType<typeof asValidatedManifest>; candidates: ReturnType<typeof loadCandidates>["candidates"] } | { ok: false; reason: string } {
   const rcsPath = `${sourceCycleDir}/research-change-set.json`;
   if (!existsSync(rcsPath)) {
     return { ok: false, reason: `no research-change-set.json at source cycle directory ${sourceCycleDir}` };
@@ -240,6 +258,14 @@ function loadAndVerifyFrozenSource(sourceCycleDir: string): { ok: true; manifest
     return { ok: false, reason: `source Research Change Set failed structural validation: ${rcsValidation.errors.join("; ")}` };
   }
   const sourceRcs = asValidatedResearchChangeSet(rawRcs);
+
+  if (sourceRcs.baseGitSha !== oldBaseGitSha) {
+    return {
+      ok: false,
+      reason: `--old-base-git-sha (${oldBaseGitSha}) does not match the source cycle's own frozen baseGitSha (${sourceRcs.baseGitSha}); ` +
+        "the old base must be derived from the validated source Research Change Set, not asserted by the caller",
+    };
+  }
 
   const manifestPath = `${sourceCycleDir}/manifest.json`;
   if (!existsSync(manifestPath)) {
@@ -272,6 +298,30 @@ function loadAndVerifyFrozenSource(sourceCycleDir: string): { ok: true; manifest
 }
 
 /**
+ * PR #127 remediation (finding 1): copies the source cycle's already-frozen,
+ * already fingerprint-verified manifest.json and candidate YAML files
+ * byte-for-byte into `targetCycleDir` — a plain filesystem copy of content
+ * this module has already proven (loadAndVerifyFrozenSource()) reproduces
+ * the exact frozen fingerprint the source RCS carries, never new authoring
+ * and never a re-derivation of content from the corpus. This is only ever
+ * called when the outcome is a fresh PRE_GATE_SAFETY_HOLD at the new base:
+ * resumeHoldByIdentity() (run-cycle.ts) reloads manifest/candidates from
+ * `cycleDir` exactly like a normal-path resume does, so a revalidation HOLD
+ * needs the same on-disk shape a normal-path HOLD already has in order to be
+ * resumable through the same shared mechanism.
+ */
+function materializeFrozenSourceIntoTarget(sourceCycleDir: string, targetCycleDir: string, manifest: ReturnType<typeof asValidatedManifest>): void {
+  writeFileSync(join(targetCycleDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  const targetCandidatesDir = join(targetCycleDir, "candidates");
+  for (const file of manifest.candidateFiles) {
+    const from = join(sourceCycleDir, "candidates", file);
+    const to = join(targetCandidatesDir, file);
+    mkdirSync(dirname(to), { recursive: true });
+    copyFileSync(from, to);
+  }
+}
+
+/**
  * Runs the complete bounded frozen-cycle base revalidation sequence:
  * immutably reload a prior cycle's frozen manifest/candidates, verify the
  * base transition is safe (ancestry + zero `research/**` drift), and hand
@@ -300,14 +350,27 @@ export async function revalidateFrozenCycleAtNewBase(input: RevalidateFrozenCycl
   if (resolve(input.targetCycleDir) === resolve(input.sourceCycleDir)) {
     return failed("TARGET_NOT_DISTINCT", "target cycle directory must be different from the immutable source cycle directory");
   }
-  if (existsSync(`${input.targetCycleDir}/manifest.json`) || existsSync(`${input.targetCycleDir}/research-change-set.json`)) {
-    return failed("TARGET_NOT_NEW", `target cycle directory ${input.targetCycleDir} already contains cycle artifacts; this path requires a new, empty target`);
+  // PR #127 remediation (finding 4): the target must be genuinely new/empty
+  // — any pre-existing entry at all (not only manifest.json/research-change-
+  // set.json) is refused, including a stray resolutions/ directory,
+  // hold-freeze.json, independent-review.json, or any other artifact a prior
+  // (possibly unrelated) run may have left behind.
+  if (existsSync(input.targetCycleDir)) {
+    const entries = readdirSync(input.targetCycleDir);
+    if (entries.length > 0) {
+      return failed(
+        "TARGET_NOT_NEW",
+        `target cycle directory ${input.targetCycleDir} already contains entries (${entries.join(", ")}); this path requires a new, empty target`
+      );
+    }
   }
 
   // Requirements 3-5: source Research Change Set is structurally valid, its
   // exact frozen manifest/candidates reload cleanly, and the reload
-  // reproduces the same frozen content the RCS itself carries.
-  const source = loadAndVerifyFrozenSource(input.sourceCycleDir);
+  // reproduces the same frozen content the RCS itself carries. Requirement
+  // 16 (PR #127 remediation, finding 2): the caller-supplied oldBaseGitSha
+  // is bound to the source RCS's own baseGitSha here.
+  const source = loadAndVerifyFrozenSource(input.sourceCycleDir, input.oldBaseGitSha);
   if (!source.ok) {
     return failed("SOURCE_CYCLE_INVALID", source.reason);
   }
@@ -391,17 +454,26 @@ export async function revalidateFrozenCycleAtNewBase(input: RevalidateFrozenCycl
     input.now
   );
 
-  // Requirement 11: a fresh frozen HOLD is written in the TARGET cycle
-  // (never the immutable source cycle) whenever CLAIM_INFERENCE_LIMITS_PRESENT
-  // — or any other blocking finding — remains at the new base, so the owner
-  // has an explicit, auditable record of exactly what was frozen and
-  // evaluated for this base transition.
+  // Requirement 11 (PR #127 remediation, finding 1): a fresh frozen HOLD is
+  // written in the TARGET cycle (never the immutable source cycle) whenever
+  // CLAIM_INFERENCE_LIMITS_PRESENT — or any other blocking finding — remains
+  // at the new base. The frozen manifest/candidates are also copied
+  // byte-for-byte into the target (materializeFrozenSourceIntoTarget() —
+  // never re-authored, and only ever reached here, on a genuine HOLD; a
+  // successful READY_FOR_HUMAN_REVIEW outcome never materializes these
+  // files, since its research-change-set.json already carries everything).
+  // This reuses run-cycle.ts's own writeHoldFreeze()/HoldFreezeRecord shape
+  // (identity.kind = "BASE_REVALIDATION"), the exact same on-disk shape a
+  // normal-path HOLD uses, so hold-cli.ts's `resume-revalidation` action
+  // (backed by resumeRevalidationHold()) can reload and resume this HOLD
+  // through the same supported operator path — never a second, incompatible
+  // freeze protocol.
   if (outcome.status === "PRE_GATE_SAFETY_HOLD") {
-    writeRevalidationHoldFreeze(input.targetCycleDir, {
+    materializeFrozenSourceIntoTarget(input.sourceCycleDir, input.targetCycleDir, source.manifest);
+    writeHoldFreeze(input.targetCycleDir, {
       schemaVersion: "1",
-      sourceCycleDir: input.sourceCycleDir,
-      oldBaseGitSha: input.oldBaseGitSha,
-      newBaseGitSha: input.newBaseGitSha,
+      baseGitSha: input.newBaseGitSha,
+      identity: { kind: "BASE_REVALIDATION", sourceCycleDir: input.sourceCycleDir, oldBaseGitSha: input.oldBaseGitSha },
       candidateFingerprint: reloadedFingerprint,
     });
   }

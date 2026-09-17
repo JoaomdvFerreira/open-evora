@@ -796,7 +796,7 @@ test("F3 two-run regression: run 1 HOLDs, an exact resolution is recorded, and r
     assert.ok(existsSync(join(cycleDir, "hold-freeze.json")));
     assert.ok(existsSync(join(cycleDir, "manifest.json")));
     assert.ok(existsSync(join(cycleDir, "candidates", "EVD-NEW.yaml")));
-    const freezeCheck = readHoldFreeze(cycleDir, SHA, TRIGGER);
+    const freezeCheck = readHoldFreeze(cycleDir, SHA, { kind: "TRIGGER", trigger: TRIGGER });
     assert.equal(freezeCheck.ok, true);
 
     // --- record the exact-match resolution against the real frozen candidate ---

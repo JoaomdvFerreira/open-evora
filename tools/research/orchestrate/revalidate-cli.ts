@@ -9,9 +9,17 @@
  *
  * This command loads the canonical corpus from the current working tree, so
  * it requires the working tree's current HEAD to equal --new-base-git-sha
- * (checked explicitly, fail-closed) — it performs no checkout of its own,
- * matching every other command in this directory (cli.ts, hold-cli.ts),
- * none of which manipulate Git branch/checkout state either.
+ * AND the working tree to be genuinely clean (PR #127 remediation, finding
+ * 3 — via the existing precheckRepositoryState() helper) — checked
+ * explicitly, fail-closed — it performs no checkout of its own, matching
+ * every other command in this directory (cli.ts, hold-cli.ts), none of
+ * which manipulate Git branch/checkout state either.
+ *
+ * A PRE_GATE_SAFETY_HOLD reached here is resumable through hold-cli.ts's
+ * `resume-revalidation` action (PR #127 remediation, finding 1) — the same
+ * supported operator path the normal AI-driven path's HOLD already uses,
+ * never a second incompatible protocol. An owner may also still choose to
+ * re-run this command against a fresh target cycle instead.
  *
  * Usage:
  *   RESEARCH_AI_COMMAND=<executable> [RESEARCH_AI_ARGS="..."] \
@@ -26,7 +34,6 @@
  */
 import { writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { loadCorpusIndex } from "../core/corpus.ts";
@@ -37,8 +44,8 @@ import { revalidateFrozenCycleAtNewBase } from "./revalidate-frozen-cycle.ts";
 import type { ResearchChangeSet } from "./types.ts";
 import { resolveAvailabilityAdapter } from "../admission/http-availability-adapter.ts";
 import { createInferenceLimitResolutionChecker } from "../admission/inference-limit-resolution.ts";
+import { precheckRepositoryState } from "../gate/repository-state.ts";
 
-const repoRoot = resolve(fileURLToPath(new URL(".", import.meta.url)), "..", "..", "..");
 const FULL_GIT_SHA = /^[0-9a-fA-F]{40}$/;
 
 function buildReadyOutput(changeSet: ResearchChangeSet, outputPath: string): string {
@@ -87,21 +94,17 @@ async function main(): Promise<void> {
   // This command never checks out Git state itself; it only ever reads the
   // corpus already on disk in the current working tree. The corpus it loads
   // is therefore only valid for the NEW base if the working tree's current
-  // HEAD actually is that base — checked explicitly here, fail-closed,
-  // rather than silently trusting the caller's --new-base-git-sha claim.
-  let head: string;
-  try {
-    head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repoRoot, encoding: "utf8" }).trim();
-  } catch (error) {
-    console.error(`FAILED [HEAD_UNRESOLVABLE]: could not resolve the working tree's current HEAD: ${(error as Error).message}`);
-    process.exitCode = 1;
-    return;
-  }
-  if (head !== newBaseGitSha) {
-    console.error(
-      `FAILED [WORKING_TREE_NOT_AT_NEW_BASE]: the working tree's current HEAD (${head}) does not equal --new-base-git-sha ` +
-      `(${newBaseGitSha}). Check out the new base before running this command so the loaded canonical corpus reflects it.`
-    );
+  // HEAD actually is that base, AND the working tree is genuinely clean —
+  // an uncommitted local edit under research/** would otherwise be silently
+  // folded into "the canonical corpus at the new base" without ever having
+  // been committed (PR #127 remediation, finding 3). Reuses the existing
+  // precheckRepositoryState() repository-state helper (gate/repository-
+  // state.ts) — the exact same HEAD-match + whole-working-tree-clean check
+  // applyCanonicalIntegrationPlan() itself performs before any canonical
+  // write — rather than a second, narrower Git-invocation convention.
+  const repositoryState = precheckRepositoryState(researchRoot, newBaseGitSha);
+  if (!repositoryState.ok) {
+    console.error(`FAILED [REPOSITORY_STATE_INVALID]: ${repositoryState.reason}`);
     process.exitCode = 1;
     return;
   }
@@ -155,7 +158,12 @@ async function main(): Promise<void> {
     return;
   }
   if (outcome.status === "PRE_GATE_SAFETY_HOLD") {
-    console.error(`PRE_GATE_SAFETY_HOLD: ${outcome.holdReportPath}`);
+    console.error(
+      `PRE_GATE_SAFETY_HOLD: ${outcome.holdReportPath}\n` +
+      "  Resumable via: node tools/research/orchestrate/hold-cli.ts resume-revalidation " +
+      `--cycle-dir ${targetCycleDir} --source-cycle-dir ${sourceCycleDir} ` +
+      `--old-base-git-sha ${oldBaseGitSha} --new-base-git-sha ${newBaseGitSha}`
+    );
     process.exitCode = 1;
     return;
   }
