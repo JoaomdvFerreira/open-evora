@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M015",
-  "currentWorkUnitId": "WU055",
+  "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
       {
@@ -173,7 +173,7 @@
         "id": "M015",
         "title": "M015 — Citizen-Facing UX Refresh",
         "objective": "Deliver the owner-approved citizen-facing UX refresh for the Research Explorer: a production-ready visual foundation, a runtime-derived Citizen Overview with search/discovery, an authored material-change timeline, a refreshed Problem Reading experience, a shared citizen-facing trust experience, an integrated rendered/accessibility review, and a production release gated on explicit owner acceptance. This milestone is presentation-only: canonical SRC/EVD/PRB semantics, the separate OPEN/validation_status/evidence_status dimensions, and the current static client architecture are preserved unchanged.",
-        "status": "in_progress",
+        "status": "ready",
         "workUnitIds": [
           "WU053",
           "WU054",
@@ -2668,12 +2668,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [
           "DEP-051"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T19:54:00.097Z"
+        "updatedAt": "2026-09-17T20:18:13.101Z"
       },
       {
         "id": "WU056",
@@ -2719,12 +2719,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-052"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T14:58:53.664Z"
+        "updatedAt": "2026-09-17T20:18:13.101Z"
       },
       {
         "id": "WU057",
@@ -8077,6 +8077,93 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt next",
       "createdAt": "2026-09-17T19:36:38.532Z"
+    },
+    {
+      "id": "C056",
+      "workUnitId": "WU055",
+      "packetId": "PKT-056",
+      "summary": "Closed WU055 Material-Change Timeline after explicit owner visual-gate acceptance. The Overview projects only authored PRB.history, preserves the deterministic authored ordering, and makes any incomplete detail-load state explicit rather than treating it as an empty history.",
+      "completed": [
+        "Implemented the Overview material-change timeline as a read-only runtime projection of authored PRB.history only.",
+        "Preserved deterministic ordering: authored date descending, then Problem ID ascending, then authored array position ascending for entries on the same Problem and date.",
+        "Ensured updated_at, Git history, and deployment/build metadata cannot create timeline entries.",
+        "Kept the neutral no-history empty state only for successfully loaded Problem details with genuinely empty authored history.",
+        "Added explicit ErrorNotice feedback when one or more PRB detail reads fail, so a partial timeline cannot masquerade as complete.",
+        "Recorded explicit owner acceptance as EVID-003, bound to Preview dpl_8ooESisDr4kr3wUF2VP73AL11FJt and source SHA 700bc28cfa47c7ccf0c21dc2283331d4b43708aa.",
+        "Recorded the compact technical PRB identifier/separator hierarchy as a non-blocking integrated-review observation for WU058."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl",
+        "apps/research-explorer/src/index.css",
+        "apps/research-explorer/src/overview/MaterialChangeTimeline.stories.tsx",
+        "apps/research-explorer/src/overview/MaterialChangeTimeline.tsx",
+        "apps/research-explorer/src/overview/Overview.test.tsx",
+        "apps/research-explorer/src/overview/Overview.tsx",
+        "apps/research-explorer/src/overview/overviewStats.test.ts",
+        "apps/research-explorer/src/overview/overviewStats.ts"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "TypeScript check passed at accepted implementation SHA 700bc28cfa47c7ccf0c21dc2283331d4b43708aa."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "560 tests passed, 1 skipped, 0 failed at the accepted implementation SHA."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Vite production build passed at the accepted implementation SHA."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 279 canonical records: OK during closure."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors before checkpoint creation."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "The timeline reads only PRB.history and derives no material-change signal from updated_at, Git history, or build/deploy metadata.",
+          "result": "passed",
+          "evidence": "Independent review PASS, semantic/code review PASS, owner acceptance EVID-003, and implementation at 700bc28cfa47c7ccf0c21dc2283331d4b43708aa."
+        },
+        {
+          "criterion": "Ordering is newest-first with a documented, deterministic tie-break for same-dated entries.",
+          "result": "passed",
+          "evidence": "Authored date descending, Problem ID ascending, then authored array position ascending; deterministic tests passed."
+        },
+        {
+          "criterion": "The no-history-entries case renders a correct empty state that makes no claim about the Problem never having changed.",
+          "result": "passed",
+          "evidence": "Successful empty authored histories render the neutral state; failed or partial detail loads render explicit incomplete-history feedback instead."
+        },
+        {
+          "criterion": "npm run typecheck --prefix apps/research-explorer, npm run test --prefix apps/research-explorer, npm run build --prefix apps/research-explorer, and npm run research:validate pass; git diff --check passes.",
+          "result": "passed",
+          "evidence": "Typecheck, 560 passing tests with 1 skipped, production build, canonical research validation, and git diff --check all passed."
+        },
+        {
+          "criterion": "All persistent changes are committed before this work unit is marked done.",
+          "result": "passed",
+          "evidence": "Implementation is committed at 700bc28cfa47c7ccf0c21dc2283331d4b43708aa; AIQT closure state will be committed immediately after checkpoint creation."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-17T20:18:13.101Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
@@ -8103,8 +8190,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-09-17T19:54:00.097Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-17T20:18:13.101Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8259,6 +8346,48 @@
           "externalEvidenceId": "WU054-owner-visual-acceptance-2026-09-17",
           "importIdentityKey": "sha256:e2966847e5f945d47293ceb7d1c717d0a524c3b26aec8e876cd1c472089cd9ab",
           "importedAt": "2026-09-17T19:34:37.097Z"
+        }
+      },
+      {
+        "evidenceId": "EVID-003",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-owner",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU055",
+          "packetId": "PKT-056",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "milestone/m015-citizen-facing-ux-refresh",
+          "commitSha": "700bc28cfa47c7ccf0c21dc2283331d4b43708aa",
+          "capturedAt": "2026-09-17T20:17:20.005Z"
+        },
+        "reviewer": {
+          "reviewerId": "owner",
+          "reviewerType": "human",
+          "independentContext": "declared_not_independent"
+        },
+        "results": {
+          "reviewResult": "passed",
+          "validationResult": "passed",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Owner visual gate ACCEPTED for WU055. Independent and semantic/code reviews PASS. Authored PRB.history is the sole material-change source; ordering is authored date descending, Problem ID ascending, then authored array position ascending. updated_at, Git, and deployment metadata do not create entries; incomplete detail loading cannot present as no history. Preview dpl_8ooESisDr4kr3wUF2VP73AL11FJt is bound to source SHA 700bc28cfa47c7ccf0c21dc2283331d4b43708aa. Desktop and approximately 360px owner visual reviews PASS; owner-confirmed Abrir problema navigation works. 560 tests passed, 1 skipped; typecheck, production build, and git diff --check passed. The compact technical PRB identifier/separator hierarchy is a non-blocking WU058 observation."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-17T20:17:20.005Z",
+        "recordedAt": "2026-09-17T20:17:20.667Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:5dab727cb28dde0f91746d6702b0a3e354d2fb9ca19bf41d4109f4af4c8d69e4",
+          "externalEvidenceId": "WU055-owner-acceptance-2026-09-17",
+          "importIdentityKey": "sha256:eeb0afb7f7eedf57d77f96777f2341e138ac8909ba66ef1c050339aac0ef7a19",
+          "importedAt": "2026-09-17T20:17:20.667Z"
         }
       }
     ],
@@ -9960,6 +10089,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-17T19:36:38.532Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C056",
+      "current": {
+        "observationId": "sha256:4d3693cadb2d585facaeca126d94f838d630d458aa8e9a6a323dcbb27d0e69ad",
+        "checkpointId": "C056",
+        "workUnitId": "WU055",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-17T20:18:13.101Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-17T20:18:13.101Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:4d3693cadb2d585facaeca126d94f838d630d458aa8e9a6a323dcbb27d0e69ad",
+          "checkpointId": "C056",
+          "workUnitId": "WU055",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-17T20:18:13.101Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-17T20:18:13.101Z"
         }
       ]
     }
