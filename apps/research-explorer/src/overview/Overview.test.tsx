@@ -14,6 +14,7 @@ function makeProvider(index: RecordSummary[]): DataProvider {
         file: summary.file,
         record: {
           title: summary.label,
+          status: summary.summaryFields.status,
           validation_status: summary.summaryFields.validation_status,
           evidence_status: summary.summaryFields.evidence_status,
         },
@@ -33,9 +34,24 @@ function makeProvider(index: RecordSummary[]): DataProvider {
 const props = { onExploreProblem: vi.fn(), onViewRecords: vi.fn() };
 
 describe("Overview — Problem investigation-state dimensions", () => {
-  it("renders both Validação and Evidência when both are canonically present", async () => {
+  it("renders lifecycle, validation, and evidence separately when all are canonically present", async () => {
     const provider = makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema com ambas as dimensões", file: "", summaryFields: { validation_status: "unvalidated", evidence_status: "corroborated" } },
+      { id: "PRB-1", type: "PRB-", label: "Problema com todas as dimensões", file: "", summaryFields: { status: "OPEN", validation_status: "unvalidated", evidence_status: "corroborated" } },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const caption = await screen.findByText("Estado do problema");
+    const row = caption.closest(".overview-statuses");
+    expect(row?.textContent).toMatch(/Estado do problema\s*Aberto/);
+    expect(row?.textContent).toMatch(/Validação:\s*Por validar/);
+    expect(row?.textContent).toMatch(/Evidência:\s*Corroborada/);
+    expect(row?.textContent).not.toMatch(/Estado da investigação/);
+    expect(row?.querySelectorAll('[aria-hidden="true"]')).toHaveLength(2);
+  });
+
+  it("omits only the lifecycle dimension when status is null", async () => {
+    const provider = makeProvider([
+      { id: "PRB-2", type: "PRB-", label: "Problema sem estado de ciclo de vida", file: "", summaryFields: { validation_status: "unvalidated", evidence_status: "corroborated" } },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
@@ -43,39 +59,46 @@ describe("Overview — Problem investigation-state dimensions", () => {
     const row = caption.closest(".overview-statuses");
     expect(row?.textContent).toMatch(/Validação:\s*Por validar/);
     expect(row?.textContent).toMatch(/Evidência:\s*Corroborada/);
-  });
-
-  it("omits only the evidence dimension when evidence_status is null", async () => {
-    const provider = makeProvider([
-      { id: "PRB-2", type: "PRB-", label: "Problema sem evidência", file: "", summaryFields: { validation_status: "unvalidated" } },
-    ]);
-    render(<Overview dataProvider={provider} {...props} />);
-
-    const caption = await screen.findByText("Validação:");
-    const row = caption.closest(".overview-statuses");
-    expect(row?.textContent).toMatch(/Validação:\s*Por validar/);
-    expect(screen.queryByText("Evidência:")).toBeNull();
+    expect(screen.queryByText("Estado do problema")).toBeNull();
+    expect(row?.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
   });
 
   it("omits only the validation dimension when validation_status is null", async () => {
     const provider = makeProvider([
-      { id: "PRB-3", type: "PRB-", label: "Problema sem validação", file: "", summaryFields: { evidence_status: "corroborated" } },
+      { id: "PRB-3", type: "PRB-", label: "Problema sem validação", file: "", summaryFields: { status: "OPEN", evidence_status: "corroborated" } },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
-    const caption = await screen.findByText("Evidência:");
+    const caption = await screen.findByText("Estado do problema");
     const row = caption.closest(".overview-statuses");
+    expect(row?.textContent).toMatch(/Estado do problema\s*Aberto/);
     expect(row?.textContent).toMatch(/Evidência:\s*Corroborada/);
     expect(screen.queryByText("Validação:")).toBeNull();
+    expect(row?.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
   });
 
-  it("omits the whole status row when both dimensions are null", async () => {
+  it("omits only the evidence dimension when evidence_status is null", async () => {
+    const provider = makeProvider([
+      { id: "PRB-4", type: "PRB-", label: "Problema sem evidência", file: "", summaryFields: { status: "OPEN", validation_status: "unvalidated" } },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const caption = await screen.findByText("Estado do problema");
+    const row = caption.closest(".overview-statuses");
+    expect(row?.textContent).toMatch(/Estado do problema\s*Aberto/);
+    expect(row?.textContent).toMatch(/Validação:\s*Por validar/);
+    expect(screen.queryByText("Evidência:")).toBeNull();
+    expect(row?.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
+  });
+
+  it("omits the whole status row when all dimensions are null", async () => {
     const provider = makeProvider([
       { id: "PRB-4", type: "PRB-", label: "Problema sem dimensões", file: "", summaryFields: {} },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
     await screen.findByText("PRB-4");
+    expect(screen.queryByText("Estado do problema")).toBeNull();
     expect(screen.queryByText("Validação:")).toBeNull();
     expect(screen.queryByText("Evidência:")).toBeNull();
     expect(document.querySelector(".overview-statuses")).toBeNull();

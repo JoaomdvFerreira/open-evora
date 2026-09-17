@@ -2,6 +2,7 @@ import type { CitizenProblem } from "./overviewStats";
 import { TopicBadge } from "../presentation/TopicBadge";
 import { describeTopic } from "../presentation/topicMapping";
 import { IconSearch } from "../presentation/icons";
+import { ProblemLifecycleStatus } from "../problem/ProblemLifecycleStatus";
 import { ValidationStatus, EvidenceStatus } from "../problem/InvestigationStatus";
 
 export function CitizenSearchControl({ value, onChange, id = "overview-search-input" }: {
@@ -37,6 +38,12 @@ export function TopicFilterGroup({ topicCodes, activeTopic, onChange }: {
 }
 
 export function CitizenProblemCard({ problem, onExplore }: { problem: CitizenProblem; onExplore: (id: string) => void }) {
+  const statusDimensions = [
+    problem.lifecycleStatus !== null && <ProblemLifecycleStatus value={problem.lifecycleStatus} form="overview" />,
+    problem.validationStatus !== null && <ValidationStatus value={problem.validationStatus} form="overview" />,
+    problem.evidenceStatus !== null && <EvidenceStatus value={problem.evidenceStatus} form="overview" />,
+  ].filter(Boolean);
+
   return (
     <li className="citizen-problem-card">
       <div className="overview-problem-identity">
@@ -50,10 +57,14 @@ export function CitizenProblemCard({ problem, onExplore }: { problem: CitizenPro
         <code className="overview-problem-technical-id">{problem.id}</code>
       </div>
       <div className="overview-problem-action">
-        {(problem.validationStatus !== null || problem.evidenceStatus !== null) && (
+        {statusDimensions.length > 0 && (
           <p className="overview-statuses">
-            {problem.validationStatus !== null && <span className="overview-status-dimension"><ValidationStatus value={problem.validationStatus} form="overview" /></span>}
-            {problem.evidenceStatus !== null && <span className="overview-status-dimension">{problem.validationStatus !== null && <span aria-hidden="true"> · </span>}<EvidenceStatus value={problem.evidenceStatus} form="overview" /></span>}
+            {statusDimensions.map((dimension, index) => (
+              <span key={index} className="overview-status-dimension">
+                {index > 0 && <span aria-hidden="true"> · </span>}
+                {dimension}
+              </span>
+            ))}
           </p>
         )}
         <button type="button" aria-label={`Explorar ${problem.title}`} onClick={() => onExplore(problem.id)}>Explorar →</button>
