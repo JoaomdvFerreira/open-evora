@@ -1,6 +1,6 @@
 problem_id: PRB-0005
-created_at: "2026-08-28"
-updated_at: "2026-08-31"
+created_at: 2026-08-28
+updated_at: 2026-09-16
 title: O tráfego automóvel e a pressão de estacionamento entram em conflito com
   a qualidade, a segurança e a legibilidade do espaço pedonal em zonas
   urbanas-chave
@@ -44,12 +44,41 @@ investigation:
         materialmente para os resultados observados. A evidência comparativa não
         estabelece causalidade material em Évora.
       current_action: Não é proporcional prosseguir desafio de deslocação no âmbito
-        atual; a via de informação reabre apenas com evidência local direta capaz
-        de estabelecer contribuição causal material.
+        atual; a via de informação reabre apenas com evidência local direta
+        capaz de estabelecer contribuição causal material.
       evidence:
         - EVD-000105
         - EVD-000106
         - EVD-000107
+    - question: Que efeito observável tem a Variante Nascente de Évora (IP2) no volume
+        e na composição do tráfego de atravessamento na Évora urbana, e existe
+        impacto mensurável nos resultados representados por PRB-0005?
+      why_open: A Variante Nascente de Évora entrou em circulação a 3 de setembro de
+        2026 (cerca de 12,8 km, investimento de 54,9 milhões de euros financiado
+        ao abrigo do PRR), ligando o nó de Évora Nascente (A6/IP7) ao IP2/EN18
+        junto a São Manços, e cria um mecanismo físico para desviar da rede
+        viária urbana o tráfego de atravessamento sem destino em Évora. O
+        Município de Évora estima uma redução de cerca de 30-40% no volume de
+        tráfego na envolvente urbana, sobretudo de veículos pesados, mas esta
+        estimativa é atribuída ao vice-presidente da Câmara e não corresponde a
+        uma medição observada antes/depois; a fonte que a reproduz regista
+        também que a magnitude real só poderia ser avaliada após a entrada em
+        funcionamento da via.
+      latest_result: A pesquisa delimitada realizada não identificou, até 16 de
+        setembro de 2026, um conjunto de dados de contagem de tráfego
+        pós-abertura, comparável e quantitativo, que estabeleça a redução
+        efetivamente registada.
+      current_action: WATCH — monitorizar a disponibilidade de medições de tráfego
+        pós-abertura adequadas; a abertura da via, por si só, não deve ser
+        tratada como impacto realizado, e a estimativa de 30-40% mantém-se
+        distinta de uma medição.
+      resolution_condition: Medição pós-abertura comparável, com geografia, período,
+        linha de base/método e composição de veículos adequados, que permita
+        avaliar o efeito real no volume e na composição do tráfego de
+        atravessamento.
+      evidence:
+        - EVD-000166
+        - EVD-000167
   path:
     initial_signal:
       summary: O planeamento institucional documentou congestionamento, velocidades
@@ -143,6 +172,19 @@ evidence:
     research_roles:
       - COMPARATIVE_MECHANISM
       - COMPARATIVE_RESPONSE
+  - evidence_id: EVD-000166
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
+  - evidence_id: EVD-000167
+    effects:
+      - REFINES
+      - BOUNDS
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
@@ -150,4 +192,16 @@ solution_landscape_status: not_assessed
 status: OPEN
 history:
   - date: 2026-08-31
-    summary: O desafio direto não resolveu se a disponibilidade de informação de estacionamento é uma causa material; o enquadramento físico e operacional de tráfego e estacionamento mantém-se distinto da hipótese informacional, que reabre apenas com evidência local direta de contribuição causal material.
+    summary: O desafio direto não resolveu se a disponibilidade de informação de
+      estacionamento é uma causa material; o enquadramento físico e operacional
+      de tráfego e estacionamento mantém-se distinto da hipótese informacional,
+      que reabre apenas com evidência local direta de contribuição causal
+      material.
+  - date: 2026-09-16
+    summary: A Variante Nascente de Évora (IP2) entrou em funcionamento a 3 de
+      setembro de 2026, criando um desvio físico para o tráfego de
+      atravessamento sem destino em Évora; o Município estima uma redução de
+      30-40% no tráfego urbano envolvente, sobretudo de pesados, mas trata-se de
+      uma estimativa atribuída, não de uma medição, e os efeitos reais
+      pós-abertura permanecem por estabelecer na evidência revista nesta
+      pesquisa delimitada.

@@ -1,0 +1,38 @@
+evidence_id: EVD-000167
+lineage_id: MOB-2026-09-VARIANTE-NASCENTE-TRAFFIC-ESTIMATE
+provenance:
+  sources:
+    - SRC-0133
+    - SRC-0134
+  extracted_at: 2026-09-16
+observation:
+  summary: O vice-presidente da Câmara Municipal de Évora, Jerónimo José, estimou
+    uma redução de cerca de 30-40% no volume de tráfego na envolvente urbana de
+    Évora, em particular de veículos pesados, na sequência da abertura da
+    Variante Nascente ao IP2. O ODigital reproduz a mesma estimativa municipal e
+    regista que a magnitude real só poderia ser avaliada após a entrada em
+    funcionamento da via.
+scope:
+  geography:
+    level: municipality
+    area: Évora, envolvente urbana atravessada por trânsito de atravessamento
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-09
+domains:
+  - MOB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - Os 30-40% correspondem a uma estimativa institucional atribuída ao
+    vice-presidente da Câmara Municipal, não a uma medição de contagens de
+    tráfego antes/depois.
+  - O ODigital não constitui corroboração independente de que uma redução de
+    30-40% tenha sido efetivamente alcançada; reproduz a mesma estimativa
+    municipal e regista explicitamente que a magnitude real só poderia ser
+    avaliada após a entrada em funcionamento da via.
+  - A pesquisa delimitada realizada não identificou um conjunto de dados de
+    contagem de tráfego pós-abertura, comparável e quantitativo, que estabeleça
+    a redução efetivamente registada.
