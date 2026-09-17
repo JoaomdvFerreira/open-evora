@@ -1,16 +1,16 @@
 /**
- * WU053 — Open Évora logo/mark, implementing the approved prototype
- * direction (.research-workbench/visual-references/m015-citizen-ux.png: a
- * skyline/mark preceding the "Open Évora" wordmark in the site header,
- * About page, and footer). Scalable, vector (inline SVG, no raster asset),
- * and designed for a light/neutral background — the mark's ink colour is a
- * single `currentColor`-independent foundation tone (`--color-ink-primary`)
- * plus the existing accent tone, not a colour requiring a dark backdrop.
+ * WU053 — Open Évora logo, using the owner-approved raster identity
+ * (aqueduct + tower + sun mark, "Open Évora" wordmark). The owner rejected
+ * both the earlier abstract skyline mark and a faithful SVG vectorisation
+ * attempt as not matching the approved visual; this renders the approved
+ * PNG directly as a temporary production asset. Faithful SVG vectorisation
+ * is deferred visual-polish work, not part of this slice.
  *
- * `LogoMark` is the compact icon-only form (favicon-style / narrow header /
- * footer use); `Logo` is the full lockup (mark + "Open Évora" wordmark) for
- * ordinary header/About usage. Both share one `<svg>` mark definition so the
- * glyph never drifts between the two forms.
+ * `LogoMark` is the compact, roughly-square mark-only crop (favicon-style /
+ * narrow header / footer use); `Logo` is the full wide lockup (mark +
+ * wordmark) for ordinary header/About usage. Both are transparent-background
+ * PNGs with explicit intrinsic dimensions so layout doesn't shift while the
+ * asset loads.
  *
  * This component is not wired into any production header/page in this work
  * unit — WU053's constraint scope is the visual foundation itself, gated by
@@ -18,26 +18,14 @@
  * surfaces (owned by a later Work Unit in this milestone).
  */
 
-import type { SVGProps } from "react";
+import logoFullSrc from "../assets/logo-full.png";
+import logoMarkSrc from "../assets/logo-mark.png";
 
-type MarkProps = Omit<SVGProps<SVGSVGElement>, "viewBox" | "role">;
+type MarkProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src" | "width" | "height" | "alt">;
 
-/** The bare mark: a stylised skyline (tower + roofline), matching the prototype's header glyph. Scales via `em` sizing. */
+/** The bare mark (aqueduct + tower + sun), cropped square from the approved lockup PNG. */
 export function LogoMark({ title = "Open Évora", ...props }: MarkProps & { title?: string }) {
-  return (
-    <svg viewBox="0 0 32 32" width="1em" height="1em" role="img" aria-label={title} {...props}>
-      <path
-        d="M2 24 L7 14 L10 18 L14 9 L18 17 L21 12 L25 24 Z"
-        fill="none"
-        stroke="var(--color-ink-primary, #201e1a)"
-        strokeWidth="2"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-      <rect x="12.2" y="4.5" width="3.6" height="6.5" rx="0.6" fill="var(--color-accent, #6b3a1f)" />
-      <line x1="2" y1="24" x2="29" y2="24" stroke="var(--color-ink-primary, #201e1a)" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
+  return <img src={logoMarkSrc} width={64} height={64} alt={title} {...props} />;
 }
 
 export interface LogoProps {
@@ -46,7 +34,7 @@ export interface LogoProps {
   className?: string;
 }
 
-/** Full lockup for ordinary application use; `compact` reuses the same mark for narrow/footer placements without duplicating the SVG definition. */
+/** Full lockup for ordinary application use; `compact` reuses the cropped mark asset for narrow/footer placements. */
 export function Logo({ form = "full", className }: LogoProps) {
   if (form === "compact") {
     return (
@@ -58,8 +46,7 @@ export function Logo({ form = "full", className }: LogoProps) {
 
   return (
     <span className={["oe-logo", "oe-logo--full", className].filter(Boolean).join(" ")}>
-      <LogoMark className="oe-logo-mark" title="" aria-hidden="true" />
-      <span className="oe-logo-wordmark">Open Évora</span>
+      <img src={logoFullSrc} width={2172} height={724} alt="Open Évora" className="oe-logo-full" />
     </span>
   );
 }

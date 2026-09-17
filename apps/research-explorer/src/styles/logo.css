@@ -1,28 +1,29 @@
-/* WU053 — Open Évora logo/mark lockup (presentation/Logo.tsx). Light/
-   neutral-background treatment only: ink/accent foundation tones, no dark
-   backdrop assumed. Vector-only (inline SVG); no raster asset. */
+/* WU053 — Open Évora logo lockup (presentation/Logo.tsx). Owner-approved
+   raster identity (aqueduct + tower + sun mark + wordmark), transparent
+   background. Explicit intrinsic width/height on the underlying <img>
+   elements prevent layout shift; these rules scale the rendered box
+   responsively while preserving aspect ratio. */
 
 .oe-logo {
   display: inline-flex;
   align-items: center;
-  gap: var(--p-space-2);
-  color: var(--color-ink-primary);
+}
+
+.oe-logo-full {
+  display: block;
+  height: 2.2em;
+  width: auto;
+  max-width: 100%;
 }
 
 .oe-logo-mark {
-  width: 1.6em;
+  display: block;
   height: 1.6em;
+  width: 1.6em;
   flex-shrink: 0;
 }
 
-.oe-logo-wordmark {
-  font-family: var(--font-reading);
-  font-weight: 600;
-  font-size: 1.15em;
-  letter-spacing: 0.01em;
-}
-
 .oe-logo--compact .oe-logo-mark {
-  width: 1.4em;
   height: 1.4em;
+  width: 1.4em;
 }
