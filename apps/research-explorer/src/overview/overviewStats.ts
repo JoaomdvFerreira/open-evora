@@ -32,6 +32,18 @@ export interface PublicOverviewData {
   problems: OverviewProblem[];
 }
 
+export interface MaterialChangeEntry {
+  problemId: string;
+  problemTitle: string;
+  date: string;
+  summary: string;
+}
+
+export interface MaterialChangeSource {
+  summary: RecordSummary;
+  detail: RecordDetail;
+}
+
 export function formatProblemCount(count: number): string {
   return `${count} ${count === 1 ? "problema" : "problemas"} em investigação`;
 }
@@ -122,6 +134,34 @@ export function toCitizenProblem(summary: RecordSummary, detail: RecordDetail): 
     evidenceStatus: asString(record.evidence_status) ?? summaryStringField(summary, "evidence_status"),
     updatedAt: asString(record.updated_at),
   };
+}
+
+/**
+ * Runtime-only projection of the explicitly authored PRB history used by the
+ * citizen-facing material-change timeline. `updated_at` intentionally plays
+ * no part: an authored history entry is the sole material-change signal.
+ *
+ * Entries sort newest date first. Entries with the same authored date use
+ * Problem ID ascending, then their authored array position ascending. Those
+ * mechanical ties communicate neither importance nor intra-day recency.
+ */
+export function projectMaterialChangeEntries(sources: MaterialChangeSource[]): MaterialChangeEntry[] {
+  const candidates = sources.flatMap(({ summary, detail }) => {
+    if (summary.type !== "PRB-" || !Array.isArray(detail.record.history)) return [];
+    const title = asString(detail.record.title) ?? summary.label;
+    return detail.record.history.flatMap((value, authoredPosition) => {
+      if (value === null || typeof value !== "object" || Array.isArray(value)) return [];
+      const entry = value as Record<string, unknown>;
+      const date = asString(entry.date);
+      const entrySummary = asString(entry.summary);
+      if (date === null || entrySummary === null) return [];
+      return [{ problemId: summary.id, problemTitle: title, date, summary: entrySummary, authoredPosition }];
+    });
+  });
+
+  return candidates
+    .sort((a, b) => b.date.localeCompare(a.date) || a.problemId.localeCompare(b.problemId) || a.authoredPosition - b.authoredPosition)
+    .map(({ authoredPosition: _authoredPosition, ...entry }) => entry);
 }
 
 /**

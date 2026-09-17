@@ -6,6 +6,7 @@ import {
   formatProblemCount,
   matchesCitizenSearch,
   matchesTopicFilter,
+  projectMaterialChangeEntries,
   relevantTopicCodes,
   toCitizenProblem,
   type CitizenProblem,
@@ -183,6 +184,47 @@ describe("toCitizenProblem", () => {
     expect(problem.geographyArea).toBeNull();
     expect(problem.lifecycleStatus).toBeNull();
     expect(problem.updatedAt).toBeNull();
+  });
+});
+
+describe("projectMaterialChangeEntries", () => {
+  it("derives entries only from explicitly authored PRB history", () => {
+    const entries = projectMaterialChangeEntries([
+      { summary: summary({ id: "PRB-0007", label: "Problema canónico" }), detail: detail({ updated_at: "2099-12-31", history: [{ date: "2026-04-08", summary: "Alteração registada." }] }) },
+    ]);
+    expect(entries).toEqual([{ problemId: "PRB-0007", problemTitle: "Problema canónico", date: "2026-04-08", summary: "Alteração registada." }]);
+  });
+
+  it("does not treat updated_at or an absent history as a material change", () => {
+    const entries = projectMaterialChangeEntries([
+      { summary: summary({ id: "PRB-0001" }), detail: detail({ updated_at: "2099-12-31" }) },
+      { summary: summary({ id: "PRB-0002" }), detail: detail({ updated_at: "2099-12-30", history: [] }) },
+    ]);
+    expect(entries).toEqual([]);
+  });
+
+  it("orders authored dates newest first", () => {
+    const entries = projectMaterialChangeEntries([
+      { summary: summary({ id: "PRB-0001" }), detail: detail({ history: [{ date: "2026-01-01", summary: "Mais antigo." }] }) },
+      { summary: summary({ id: "PRB-0002" }), detail: detail({ history: [{ date: "2026-03-01", summary: "Mais recente." }] }) },
+    ]);
+    expect(entries.map((entry) => entry.summary)).toEqual(["Mais recente.", "Mais antigo."]);
+  });
+
+  it("uses Problem ID then authored array position as a non-ranking same-date tie-break", () => {
+    const entries = projectMaterialChangeEntries([
+      { summary: summary({ id: "PRB-0002" }), detail: detail({ history: [{ date: "2026-03-01", summary: "Segundo problema." }] }) },
+      { summary: summary({ id: "PRB-0001" }), detail: detail({ history: [{ date: "2026-03-01", summary: "Primeira posição." }, { date: "2026-03-01", summary: "Segunda posição." }] }) },
+    ]);
+    expect(entries.map((entry) => `${entry.problemId}:${entry.summary}`)).toEqual(["PRB-0001:Primeira posição.", "PRB-0001:Segunda posição.", "PRB-0002:Segundo problema."]);
+  });
+
+  it("does not invent entries from malformed or non-Problem detail", () => {
+    const entries = projectMaterialChangeEntries([
+      { summary: summary({ id: "PRB-0001" }), detail: detail({ history: [{ date: "2026-03-01" }, { summary: "Sem data." }, "texto"] }) },
+      { summary: summary({ id: "EVD-0001", type: "EVD-" }), detail: detail({ history: [{ date: "2026-03-01", summary: "Não é Problem." }] }) },
+    ]);
+    expect(entries).toEqual([]);
   });
 });
 

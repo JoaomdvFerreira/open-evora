@@ -233,3 +233,28 @@ describe("Overview — error state retry (ODM-021)", () => {
     expect(attempts).toBe(2);
   });
 });
+
+describe("Overview — material-change timeline", () => {
+  it("renders the neutral no-history state without claiming Problems never changed", async () => {
+    render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
+
+    expect(await screen.findByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeTruthy();
+    expect(screen.queryByText(/nunca mudou/i)).toBeNull();
+  });
+
+  it("renders authored history and opens its owning Problem", async () => {
+    const onExploreProblem = vi.fn();
+    const provider: DataProvider = {
+      ...makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema do histórico", file: "", summaryFields: {} }]),
+      getRecord: async (id) => ({ id, type: "PRB-", file: "", record: { title: "Problema do histórico", updated_at: "2099-12-31", history: [{ date: "2026-04-08", summary: "Alteração material redigida." }] }, outgoingEdges: [], incomingEdges: [] }),
+    };
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} onExploreProblem={onExploreProblem} onViewRecords={vi.fn()} />);
+
+    const date = await screen.findByText("08/04/2026");
+    expect(date.tagName).toBe("TIME");
+    expect(screen.getByText("Alteração material redigida.")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Abrir problema Problema do histórico" }));
+    expect(onExploreProblem).toHaveBeenCalledWith("PRB-1");
+  });
+});

@@ -9,12 +9,18 @@ import {
   matchesTopicFilter,
   relevantTopicCodes,
   toCitizenProblem,
+  projectMaterialChangeEntries,
   type CitizenProblem,
+  type MaterialChangeEntry,
+  type MaterialChangeSource,
 } from "./overviewStats";
 import { formatPublicCount, publicEnumLabel, publicCompactEnumLabel } from "../presentation/presentation";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { CitizenProblemCard, CitizenSearchControl, TopicFilterGroup } from "./CitizenDiscovery";
+import { MaterialChangeTimeline } from "./MaterialChangeTimeline";
+
+const MATERIAL_CHANGE_PRESENTATION_LIMIT = 5;
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -44,6 +50,7 @@ export function Overview({
 }) {
   const indexState = useRecordIndex(dataProvider);
   const [citizenProblems, setCitizenProblems] = useState<CitizenProblem[] | null>(null);
+  const [materialChanges, setMaterialChanges] = useState<MaterialChangeEntry[] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const overview = indexState.status === "ready" ? computePublicOverviewData(indexState.records) : null;
@@ -52,22 +59,28 @@ export function Overview({
   useEffect(() => {
     if (indexState.status !== "ready") {
       setCitizenProblems(null);
+      setMaterialChanges(null);
       return;
     }
     let cancelled = false;
     setCitizenProblems(null);
+    setMaterialChanges(null);
     const summaries = indexState.records.filter((record) => record.type === "PRB-");
     Promise.all(
       summaries.map(async (summary) => {
         try {
           const detail = await dataProvider.getRecord(summary.id);
-          return toCitizenProblem(summary, detail);
+          return { problem: toCitizenProblem(summary, detail), source: { summary, detail } satisfies MaterialChangeSource };
         } catch {
-          return toCitizenProblem(summary, { id: summary.id, type: summary.type, file: summary.file, record: {}, outgoingEdges: [], incomingEdges: [] });
+          const detail = { id: summary.id, type: summary.type, file: summary.file, record: {}, outgoingEdges: [], incomingEdges: [] };
+          return { problem: toCitizenProblem(summary, detail), source: { summary, detail } satisfies MaterialChangeSource };
         }
       })
-    ).then((problems) => {
-      if (!cancelled) setCitizenProblems(problems.sort((a, b) => a.id.localeCompare(b.id)));
+    ).then((loaded) => {
+      if (!cancelled) {
+        setCitizenProblems(loaded.map(({ problem }) => problem).sort((a, b) => a.id.localeCompare(b.id)));
+        setMaterialChanges(projectMaterialChangeEntries(loaded.map(({ source }) => source)));
+      }
     });
     return () => {
       cancelled = true;
@@ -108,6 +121,7 @@ export function Overview({
   const unvalidatedLabel = publicEnumLabel("validation_status", "unvalidated");
   const corroboratedLabel = publicEnumLabel("evidence_status", "corroborated");
   const compactCorroboratedLabel = publicCompactEnumLabel("evidence_status", "corroborated");
+  const recentMaterialChanges = materialChanges?.slice(0, MATERIAL_CHANGE_PRESENTATION_LIMIT) ?? null;
 
   return (
     <section aria-labelledby="overview-heading" className="public-overview shell-frame">
@@ -178,6 +192,17 @@ export function Overview({
               </ul>
             )}
           </>
+        )}
+      </section>
+
+      <section className="material-change-timeline" aria-labelledby="material-change-heading">
+        <div className="overview-problems-heading">
+          <h3 id="material-change-heading">O que mudou recentemente</h3>
+        </div>
+        {recentMaterialChanges === null ? (
+          <ProgressMessage message="A carregar alterações materiais…" />
+        ) : (
+          <MaterialChangeTimeline entries={recentMaterialChanges} onExploreProblem={onExploreProblem} />
         )}
       </section>
 
