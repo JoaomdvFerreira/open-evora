@@ -3,9 +3,9 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 /**
- * Structural regression for the V2 Record Detail desktop centering defect,
- * corrected again under UX-C: the top-level Record Detail composition now
- * owns the shared 980px outer frame (`.record-detail-layout.shell-frame`),
+ * Structural regression for the Record Detail desktop centering defect: the
+ * top-level Record Detail composition owns the shared 980px outer frame
+ * (`.record-detail-layout.shell-frame`),
  * so Breadcrumb, ContextTabs, and the two-column content share one frame
  * instead of each capping/centering itself independently (which is exactly
  * the drift this test previously caught). This test parses the actual rule
@@ -38,7 +38,7 @@ function hasWidthCap(body: string): boolean {
   return maxWidth !== undefined && maxWidth !== null && maxWidth[1].trim() !== "100%" && maxWidth[1].trim() !== "none";
 }
 
-describe("record-detail layout (shell-frame ownership, UX-C)", () => {
+describe("record-detail layout (shell-frame ownership)", () => {
   it("RecordDetailContent's top-level wrapper carries shell-frame, the single owner of the 980px outer frame", () => {
     const source = readFileSync(path.join(__dirname, "RecordDetailPanel.tsx"), "utf-8");
     expect(source).toMatch(/className="record-detail-layout shell-frame"/);
@@ -74,16 +74,16 @@ describe("record-detail layout (shell-frame ownership, UX-C)", () => {
 });
 
 /**
- * DS-05J: Record Detail and Problem View now adopt the canonical
- * ReadingLayout (`.lyt-reading`/`-main`/`-rail`, styles/reading-layout.css)
- * for their outer reading geometry, replacing the superseded
- * `.record-detail-columns`/`-rail` implementation. `.record-detail-main`
- * remains in production JSX only as a domain/style hook — the active
- * descendant selectors below (`.record-meaning-zone`, `.record-meaning`,
- * `.record-role-fields`, `.record-provenance`) still depend on it — but it
- * no longer carries reading geometry itself.
+ * Record Detail and Problem View adopt the canonical ReadingLayout
+ * (`.lyt-reading`/`-main`/`-rail`, styles/reading-layout.css) for their outer
+ * reading geometry, replacing the superseded `.record-detail-columns`/`-rail`
+ * implementation. `.record-detail-main` remains in production JSX only as a
+ * domain/style hook — the active descendant selectors below
+ * (`.record-meaning-zone`, `.record-meaning`, `.record-role-fields`,
+ * `.record-provenance`) still depend on it — but it no longer carries reading
+ * geometry itself.
  */
-describe("ReadingLayout production adoption (DS-05J)", () => {
+describe("ReadingLayout production adoption", () => {
   const recordDetailSource = readFileSync(path.join(__dirname, "RecordDetailPanel.tsx"), "utf-8");
   const problemViewSource = readFileSync(path.join(__dirname, "..", "problem", "ProblemView.tsx"), "utf-8");
   const indexCss = readFileSync(CSS_PATH, "utf-8");
@@ -208,8 +208,8 @@ describe("ReadingLayout production adoption (DS-05J)", () => {
   });
 
   /**
-   * DS-05J remediation: ProblemReadingRail's own `<aside>` carries both
-   * `lyt-reading-rail` and `problem-reading-rail` on the SAME element
+   * ProblemReadingRail's own `<aside>` carries both `lyt-reading-rail` and
+   * `problem-reading-rail` on the SAME element
    * (unlike Source/EVD, where `.problem-reading-rail` wraps a nested child
    * inside the outer `.lyt-reading-rail` aside). At equal specificity
    * (single class each), CSS source order — not media-query nesting —
@@ -231,15 +231,15 @@ describe("ReadingLayout production adoption (DS-05J)", () => {
 });
 
 /**
- * SUI-03J2B: characterizes the CSS-driven (never JS/viewport) responsive
- * contract governing the SRC "Nesta fonte" desktop rail index
+ * Characterizes the CSS-driven (never JS/viewport) responsive contract
+ * governing the SRC "Nesta fonte" desktop rail index
  * (`.problem-reading-rail`, reused verbatim from Problem View's own desktop
  * reading rail) vs. the compact in-flow index (`.source-compact-section-index`,
  * following the same pattern as `.problem-help-section-index`). Parses raw
  * rule bodies rather than asserting pixel geometry, mirroring the layout
  * characterization style above.
  */
-describe("Source View 'Nesta fonte' index responsive contract (SUI-03J2B, reuses Problem View pattern)", () => {
+describe("Source View 'Nesta fonte' index responsive contract (reuses Problem View pattern)", () => {
   const css = readFileSync(CSS_PATH, "utf-8");
 
   function bodiesInMediaBlock(mediaSelector: string, ruleSelector: string): string[] {
@@ -318,13 +318,13 @@ describe("Source View 'Nesta fonte' index responsive contract (SUI-03J2B, reuses
 });
 
 /**
- * SUI-03K3: characterizes the CSS-driven (never JS/viewport) responsive
- * contract governing the "Abrir fonte original ↗" desktop rail copy
+ * Characterizes the CSS-driven (never JS/viewport) responsive contract
+ * governing the "Abrir fonte original ↗" desktop rail copy
  * (`.source-original-link-rail`) vs. the compact in-flow copy
  * (`.source-original-link-inline`), reusing the exact same media queries as
  * the "Nesta fonte" rail/compact-index pair above.
  */
-describe("Source View 'Abrir fonte original' responsive contract (SUI-03K3)", () => {
+describe("Source View 'Abrir fonte original' responsive contract", () => {
   const css = readFileSync(CSS_PATH, "utf-8");
 
   function bodiesInMediaBlock(mediaSelector: string, ruleSelector: string): string[] {
@@ -399,40 +399,40 @@ describe("Source View 'Abrir fonte original' responsive contract (SUI-03K3)", ()
 });
 
 /**
- * SUI-03K2B: Source View top-level sections reuse the exact PRB editorial
- * section rhythm (`.problem-section` — SUI-03K2A's confirmed root cause of
- * the compressed Source rhythm) via one neutral shared class,
+ * Source View top-level sections reuse the exact PRB editorial section
+ * rhythm (`.problem-section`, the confirmed root cause of the previously
+ * compressed Source rhythm) via one neutral shared class,
  * `.record-editorial-section`, rather than a Source-specific spacing rule or
  * direct coupling to the PRB-branded `.problem-section` class name. Parses
  * the actual rule bodies out of the production stylesheet — no pixel
  * geometry assertions, matching this file's existing characterization style.
  */
-describe("shared editorial-section rhythm (.record-editorial-section, SUI-03K2B)", () => {
+describe("shared editorial-section rhythm (.record-editorial-section)", () => {
   const css = readFileSync(CSS_PATH, "utf-8");
 
   function ruleBodiesForRawPattern(pattern: RegExp): string[] {
     return [...css.matchAll(pattern)].map((match) => match[1]);
   }
 
-  it("1+2. .record-editorial-section shares .problem-section's exact margin-bottom: var(--space-8) rule", () => {
+  it(".record-editorial-section shares .problem-section's exact margin-bottom: var(--space-8) rule", () => {
     const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
     expect(bodies.length).toBeGreaterThan(0);
     expect(bodies[0]).toMatch(/margin-bottom\s*:\s*var\(--space-8\)\s*;/);
   });
 
-  it("3. .record-editorial-section .detail-panel-label shares .problem-section .detail-panel-label's exact margin-bottom: var(--space-3) rule", () => {
+  it(".record-editorial-section .detail-panel-label shares .problem-section .detail-panel-label's exact margin-bottom: var(--space-3) rule", () => {
     const bodies = ruleBodiesForRawPattern(/\.problem-section \.detail-panel-label,\s*\n?\s*\.record-editorial-section \.detail-panel-label\s*\{([^}]*)\}/g);
     expect(bodies.length).toBeGreaterThan(0);
     expect(bodies[0]).toMatch(/margin-bottom\s*:\s*var\(--space-3\)\s*;/);
   });
 
-  it("10. .problem-section's own rule/value is unchanged (still exactly margin-bottom: var(--space-8))", () => {
+  it(".problem-section's own rule/value is unchanged (still exactly margin-bottom: var(--space-8))", () => {
     const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
     expect(bodies.length).toBeGreaterThan(0);
     expect(bodies[0].trim()).toBe("margin-bottom: var(--space-8);");
   });
 
-  it("11. no Source-specific margin value was introduced for these sections (no .source-*-section margin/margin-bottom rule outside .record-editorial-section)", () => {
+  it("no Source-specific margin value was introduced for these sections (no .source-*-section margin/margin-bottom rule outside .record-editorial-section)", () => {
     const sourceSectionClasses = [
       "source-overview-section",
       "source-findings-section",
@@ -452,16 +452,16 @@ describe("shared editorial-section rhythm (.record-editorial-section, SUI-03K2B)
 });
 
 /**
- * SUI-03K2C: Source nested `<h4>` headings (SourceFindingsSection's evidence
- * group headings, SourceInvestigationSection's "Problemas relacionados")
- * reuse the exact PRB nested-heading visual contract
- * (`.problem-current-state-item h4`) via one neutral shared class,
- * `.record-editorial-subheading`, rather than a Source-specific rule or
- * direct coupling to the PRB-branded `.problem-current-state-item` class.
- * Parses the actual rule bodies out of the production stylesheet — no pixel
- * geometry assertions, matching this file's existing characterization style.
+ * Source nested `<h4>` headings (SourceFindingsSection's evidence group
+ * headings, SourceInvestigationSection's "Problemas relacionados") reuse the
+ * exact PRB nested-heading visual contract (`.problem-current-state-item
+ * h4`) via one neutral shared class, `.record-editorial-subheading`, rather
+ * than a Source-specific rule or direct coupling to the PRB-branded
+ * `.problem-current-state-item` class. Parses the actual rule bodies out of
+ * the production stylesheet — no pixel geometry assertions, matching this
+ * file's existing characterization style.
  */
-describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K2C)", () => {
+describe("shared nested-heading treatment (.record-editorial-subheading)", () => {
   const css = readFileSync(CSS_PATH, "utf-8");
 
   function ruleBodiesForRawPattern(pattern: RegExp): string[] {
@@ -470,7 +470,7 @@ describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K
 
   const SHARED_RULE_PATTERN = /\.problem-current-state-item h4,\s*\n?\s*\.record-editorial-subheading\s*\{([^}]*)\}/g;
 
-  it("1+5+6. .record-editorial-subheading shares .problem-current-state-item h4's exact typography values", () => {
+  it(".record-editorial-subheading shares .problem-current-state-item h4's exact typography values", () => {
     const bodies = ruleBodiesForRawPattern(SHARED_RULE_PATTERN);
     expect(bodies.length).toBeGreaterThan(0);
     const body = bodies[0];
@@ -483,18 +483,18 @@ describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K
     expect(body).toMatch(/letter-spacing\s*:\s*0\.03em\s*;/);
   });
 
-  it("2. SourceFindingsSection group h4 headings use .record-editorial-subheading", () => {
+  it("SourceFindingsSection group h4 headings use .record-editorial-subheading", () => {
     const source = readFileSync(path.join(__dirname, "SourceFindingsSection.tsx"), "utf-8");
     expect(source).toMatch(/<h4 className="record-editorial-subheading">Observações com esta fonte de proveniência<\/h4>/);
   });
 
-  it("3+4. SourceInvestigationSection 'Problemas relacionados' uses .record-editorial-subheading as an h4 under the h3 'Na investigação' section", () => {
+  it("SourceInvestigationSection 'Problemas relacionados' uses .record-editorial-subheading as an h4 under the h3 'Na investigação' section", () => {
     const source = readFileSync(path.join(__dirname, "SourceInvestigationSection.tsx"), "utf-8");
     expect(source).toMatch(/<h4 className="record-editorial-subheading">Problemas relacionados<\/h4>/);
     expect(source).toMatch(/<h3 className="detail-panel-label">Na investigação<\/h3>/);
   });
 
-  it("7. no Source top-level h3 (.detail-panel-label) receives the nested-heading class", () => {
+  it("no Source top-level h3 (.detail-panel-label) receives the nested-heading class", () => {
     expect(css).not.toMatch(/\.detail-panel-label[^{]*\.record-editorial-subheading/);
     const findingsSource = readFileSync(path.join(__dirname, "SourceFindingsSection.tsx"), "utf-8");
     const investigationSource = readFileSync(path.join(__dirname, "SourceInvestigationSection.tsx"), "utf-8");
@@ -502,7 +502,7 @@ describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K
     expect(investigationSource).not.toMatch(/<h3 className="[^"]*record-editorial-subheading/);
   });
 
-  it("12. .record-editorial-section spacing rule is unchanged (still exactly margin-bottom: var(--space-8))", () => {
+  it(".record-editorial-section spacing rule is unchanged (still exactly margin-bottom: var(--space-8))", () => {
     const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
     expect(bodies.length).toBeGreaterThan(0);
     expect(bodies[0].trim()).toBe("margin-bottom: var(--space-8);");
@@ -510,15 +510,15 @@ describe("shared nested-heading treatment (.record-editorial-subheading, SUI-03K
 });
 
 /**
- * DS-05H remediation F1: the canonical presentation/CompactSectionIndex
- * deliberately owns `margin: 0` (no composition spacing) — the previous
- * `margin: 0 0 var(--space-6)` separation from following Source/EVD content
- * (formerly supplied by the legacy records/CompactSectionIndex root, which
- * also carried `.problem-help`) must be restored at the domain-owned
+ * The canonical presentation/CompactSectionIndex deliberately owns `margin:
+ * 0` (no composition spacing) — the previous `margin: 0 0 var(--space-6)`
+ * separation from following Source/EVD content (formerly supplied by the
+ * legacy records/CompactSectionIndex root, which also carried
+ * `.problem-help`) must be restored at the domain-owned
  * `.source-compact-section-index`/`.evd-compact-section-index` wrappers
  * instead, not on the generic component.
  */
-describe("Source/EVD compact-index composition spacing (DS-05H remediation F1)", () => {
+describe("Source/EVD compact-index composition spacing", () => {
   const css = readFileSync(CSS_PATH, "utf-8");
 
   function ruleBodiesForRawPattern(pattern: RegExp): string[] {

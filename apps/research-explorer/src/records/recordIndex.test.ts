@@ -36,7 +36,7 @@ describe("recordSearchText", () => {
     expect(text).toContain("secondary");
   });
 
-  it("includes the bounded additional canonical/detail searchText (ODM-014), beyond the truncated label and enum-only summaryFields", () => {
+  it("includes the bounded additional canonical/detail searchText, beyond the truncated label and enum-only summaryFields", () => {
     const record = summary({
       id: "EVD-000200",
       type: "EVD-",
@@ -48,7 +48,7 @@ describe("recordSearchText", () => {
     expect(text).toContain("conectividade rural-urbana");
   });
 
-  it("tolerates a missing searchText field (pre-ODM-014 generated data)", () => {
+  it("tolerates a missing searchText field (older generated data predating this field)", () => {
     const record = summary({ id: "EVD-000201", searchText: undefined });
     expect(() => recordSearchText(record)).not.toThrow();
   });
@@ -75,7 +75,7 @@ describe("filterRecords — search", () => {
     expect(result.map((r) => r.id)).toEqual(["PRB-0005"]);
   });
 
-  it("ODM-014: matches a canonical detail phrase beyond the truncated label/enum summaryFields, via searchText", () => {
+  it("matches a canonical detail phrase beyond the truncated label/enum summaryFields, via searchText", () => {
     const withSearchText: RecordSummary[] = [
       ...RECORDS,
       summary({

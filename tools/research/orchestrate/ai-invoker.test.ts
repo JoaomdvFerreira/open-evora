@@ -81,8 +81,8 @@ test("an invocation for a nonexistent executable is reported as INVOCATION_FAILE
   assert.equal(result.status, "INVOCATION_FAILED");
 });
 
-// WU045-B01 independent-review remediation, finding 4: the spawned AI
-// process must not inherit the orchestrator's full environment by default.
+// The spawned AI process must not inherit the orchestrator's full
+// environment by default.
 test("buildChildEnv drops an unrelated/sensitive variable that is not on the allowlist", () => {
   const child = buildChildEnv({ PATH: "/usr/bin", GITHUB_TOKEN: "super-secret-value", DEPLOY_KEY: "another-secret" });
   assert.equal("GITHUB_TOKEN" in child, false);

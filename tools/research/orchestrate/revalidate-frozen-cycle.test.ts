@@ -132,9 +132,9 @@ const VALID_REVIEW = { schemaVersion: "1", outcome: "CONCUR", rationale: "No dis
  * `baseGitSha` via the real normal path, so its RCS/manifest/candidates are
  * exactly what production would freeze. `baseGitSha` must equal whatever
  * `oldBaseGitSha` a test later passes to revalidateFrozenCycleAtNewBase()
- * (PR #127 remediation, finding 2: the source RCS's own baseGitSha is now
- * bound to the caller-supplied old base) — defaults to OLD_SHA for tests
- * that only exercise the pure Git helpers directly.
+ * (the source RCS's own baseGitSha is bound to the caller-supplied old base)
+ * — defaults to OLD_SHA for tests that only exercise the pure Git helpers
+ * directly.
  */
 async function buildFrozenSourceCycle(sourceCycleDir: string, index: CorpusIndex = emptyIndex(), baseGitSha: string = OLD_SHA): Promise<void> {
   const shared = new SharedInvoker(VALID_ENVELOPE, VALID_REVIEW);
@@ -527,8 +527,9 @@ test("inference-limit resolution recorded at the old base/cycle is not accepted 
       // Record the OLD-cycle resolution and resume it to READY, exactly as
       // an operator would via hold-cli.ts's own record-resolution + resume
       // actions, so the source cycle this test revalidates has a genuinely
-      // structurally-valid, previously-reviewed research-change-set.json
-      // (required by this module's own requirement 3).
+      // structurally valid, previously reviewed research-change-set.json:
+      // revalidation requires the source cycle to contain a structurally
+      // valid RCS.
       writeInferenceLimitResolution(
         sourceCycleDir,
         { baseGitSha: oldBase, subjectId: "EVD-NEW", candidateFields: { evidence_id: "EVD-NEW", provenance: { sources: ["SRC-MATERIAL"] }, evidence_nature: "claim", claim_authority: "authoritative", inference_limits: ["a bounded inference limit"] }, inferenceLimits: ["a bounded inference limit"] },
@@ -549,10 +550,11 @@ test("inference-limit resolution recorded at the old base/cycle is not accepted 
       assert.equal(resumeOutcome.status, "READY_FOR_HUMAN_REVIEW", resumeOutcome.status === "FAILED" ? resumeOutcome.message : "");
       writeFileSync(join(sourceCycleDir, "research-change-set.json"), `${JSON.stringify((resumeOutcome as { changeSet: unknown }).changeSet, null, 2)}\n`, "utf8");
 
-      // Requirement 10: revalidating at the NEW base with a checker bound to
-      // the NEW target cycle directory must NOT see the OLD cycle's
-      // resolution — the finding must reappear as a fresh HOLD, never
-      // silently reused across bases/cycles.
+      // Inference-limit resolution is bound to the target cycle/base and
+      // must not be reused from the source cycle: revalidating at the NEW
+      // base with a checker bound to the NEW target cycle directory must
+      // NOT see the OLD cycle's resolution — the finding must reappear as a
+      // fresh HOLD, never silently reused across bases/cycles.
       const revalidateOutcome = await revalidateFrozenCycleAtNewBase({
         sourceCycleDir,
         targetCycleDir,
@@ -702,10 +704,10 @@ test("no canonical research/** write occurs on a successful revalidation", async
       // The synthetic repo's own research/ content (used only to exercise
       // ancestry/drift) is untouched by this module.
       assert.equal(readFileSync(join(repoDir, "research", "r.yaml"), "utf8"), researchRootBefore);
-      // This repository's own canonical research/ tree has no uncommitted
+      // The synthetic repo's own canonical research/ tree has no uncommitted
       // changes after the run: revalidateFrozenCycleAtNewBase() never writes
-      // canonical research anywhere, including this real repo.
-      const status = execFileSync("git", ["status", "--porcelain", "--", "research/"], { cwd: process.cwd(), encoding: "utf8" }).trim();
+      // canonical research anywhere, including this fixture repo.
+      const status = execFileSync("git", ["status", "--porcelain", "--", "research/"], { cwd: repoDir, encoding: "utf8" }).trim();
       assert.equal(status, "");
     } finally {
       cleanupCycleDir(sourceCycleDir);
@@ -752,7 +754,7 @@ test("target must be a new cycle directory: refuses an already-populated target"
   });
 });
 
-// --- PR #127 remediation, finding 4: target must truly be new/empty ------
+// --- target must truly be new/empty ---------------------------------------
 
 test("target with only a pre-existing resolution artifact is refused as not new", async () => {
   await withTempDir(async (repoDir) => {
@@ -770,9 +772,9 @@ test("target with only a pre-existing resolution artifact is refused as not new"
     try {
       await buildFrozenSourceCycle(sourceCycleDir, emptyIndex(), oldBase);
       // The target contains neither manifest.json nor research-change-set.json
-      // (the only two paths the pre-remediation check inspected) — only a
-      // stray resolutions/ directory left over from some unrelated prior use
-      // of this target path. The remediated check must still refuse it.
+      // (the only two paths a narrower "is this new" check might inspect) —
+      // only a stray resolutions/ directory left over from some unrelated
+      // prior use of this target path. The check must still refuse it.
       mkdirSync(join(targetCycleDir, "resolutions"), { recursive: true });
       writeFileSync(join(targetCycleDir, "resolutions", "EVD-OLD.json"), "{}", "utf8");
 
@@ -795,7 +797,7 @@ test("target with only a pre-existing resolution artifact is refused as not new"
   });
 });
 
-// --- PR #127 remediation, finding 2: old base bound to source RCS --------
+// --- old base bound to source RCS -----------------------------------------
 
 test("ADVERSARIAL: a caller-asserted oldBaseGitSha that the source cycle was never actually frozen against fails closed, even when it is genuinely an ancestor of the new base and research/** never drifted", async () => {
   await withTempDir(async (repoDir) => {
@@ -847,7 +849,7 @@ test("ADVERSARIAL: a caller-asserted oldBaseGitSha that the source cycle was nev
   });
 });
 
-// --- PR #127 remediation, finding 3: clean working tree before loading new-base corpus ---
+// --- clean working tree before loading new-base corpus --------------------
 //
 // revalidate-cli.ts enforces this via precheckRepositoryState() (the same
 // repository-state helper applyCanonicalIntegrationPlan() itself uses)
@@ -875,7 +877,7 @@ test("ADVERSARIAL: HEAD equals the new base but research/** has an uncommitted e
   }
 });
 
-// --- PR #127 remediation, finding 1: revalidation HOLD resolvable/resumable through a supported operator path ---
+// --- revalidation HOLD resolvable/resumable through a supported operator path ---
 
 test("a CLAIM_INFERENCE_LIMITS_PRESENT HOLD produced by revalidation is exact-bound resolved by owner, resumed without PRIMARY_AUTHOR, freshly availability-rechecked, and reaches a fresh INDEPENDENT_REVIEWER only once ELIGIBLE, with the same frozen candidates preserved", async () => {
   await withTempDir(async (repoDir) => {

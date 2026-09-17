@@ -1,10 +1,11 @@
 /**
  * Post-approval promotion-path integration/adversarial tests. Exercises the
  * real sequence
- * — HIGH-2 revalidation -> OD-D branching -> repository-state precheck ->
- * canonical promotion -> post-promotion validation/build -> LOW-3 guard ->
- * Git/PR orchestration -> READY_FOR_OWNER_MERGE — against synthetic
- * fixtures and a fake `gh`, never a real repository/remote.
+ * — package/decision revalidation -> approval-outcome branching ->
+ * repository-state precheck -> canonical promotion -> post-promotion
+ * validation/build -> deterministic publication guard -> Git/PR
+ * orchestration -> READY_FOR_OWNER_MERGE — against synthetic fixtures and a
+ * fake `gh`, never a real repository/remote.
  */
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -86,7 +87,7 @@ test("a valid APPROVE/APPROVE cycle reaches READY_FOR_OWNER_MERGE end-to-end", (
   }
 });
 
-test("OD-D: REJECT canonical never reaches promotion or READY_FOR_OWNER_MERGE", () => {
+test("REJECT canonical never reaches promotion or READY_FOR_OWNER_MERGE", () => {
   const fixture = remoteGitFixture();
   try {
     withTempDir((cycleDir) => {
@@ -111,7 +112,7 @@ test("OD-D: REJECT canonical never reaches promotion or READY_FOR_OWNER_MERGE", 
   }
 });
 
-test("OD-D: HOLD_MORE_RESEARCH never reaches promotion or READY_FOR_OWNER_MERGE", () => {
+test("HOLD_MORE_RESEARCH never reaches promotion or READY_FOR_OWNER_MERGE", () => {
   const fixture = remoteGitFixture();
   try {
     withTempDir((cycleDir) => {
@@ -136,7 +137,7 @@ test("OD-D: HOLD_MORE_RESEARCH never reaches promotion or READY_FOR_OWNER_MERGE"
   }
 });
 
-test("OD-D private-hold: APPROVE canonical + HOLD publication preserves the package privately and never promotes/pushes/opens a PR", () => {
+test("private-hold: APPROVE canonical + HOLD publication preserves the package privately and never promotes/pushes/opens a PR", () => {
   const fixture = remoteGitFixture();
   try {
     withTempDir((cycleDir) => {
@@ -165,7 +166,7 @@ test("OD-D private-hold: APPROVE canonical + HOLD publication preserves the pack
   }
 });
 
-test("OD-D private-hold: APPROVE canonical + REJECT publication also preserves privately without promoting", () => {
+test("private-hold: APPROVE canonical + REJECT publication also preserves privately without promoting", () => {
   const fixture = remoteGitFixture();
   try {
     withTempDir((cycleDir) => {
@@ -296,7 +297,7 @@ test("ADVERSARIAL: a promoter-level failure (CREATE target already exists on dis
       // has on disk at HEAD — canonical-promoter.ts's own prepareWrites()
       // check ("CREATE target has unexpected filesystem state") must
       // reject this, exercising a real promoter-level failure rather than
-      // a WU046-side check.
+      // this post-approval path's own precondition checks.
       setUpApprovedCycle(fixture, cycleDir);
       const index = loadIndexFor(fixture.research);
       const conflictingPkg = syntheticHumanGatePackage(index, fixture.head(), "SRC-BASE");
@@ -393,9 +394,10 @@ test("ADVERSARIAL: a file the post-promotion build/validation step writes unexpe
 
       // The repository-state precheck's clean-tree requirement means a
       // stray file present *before* promotion would already be caught
-      // there, not by LOW-3 — so this test simulates the scenario LOW-3
-      // actually guards against: an unexpected file introduced by the
-      // post-promotion validation/build step itself, appearing only after
+      // there, not by the publication guard — so this test simulates the
+      // scenario the publication guard actually guards against: an
+      // unexpected file introduced by the post-promotion validation/build
+      // step itself, appearing only after
       // promotion has already succeeded and the tree was clean at
       // precheck time.
       const strayFilePath = join(fixture.root, "unexpected-stray-file.txt");
@@ -428,15 +430,6 @@ test("ADVERSARIAL: a file the post-promotion build/validation step writes unexpe
   } finally {
     fixture.cleanup();
   }
-});
-
-test("no failure path anywhere in this suite ever returns READY_FOR_OWNER_MERGE (spot-check across every FAILED/PRIVATE_HOLD case above)", () => {
-  // This test documents the invariant by construction: every other test in
-  // this file that asserts status === "FAILED" or "PRIVATE_HOLD" also
-  // implicitly proves status !== "READY_FOR_OWNER_MERGE" via assert.equal's
-  // exact match. This test exists as an explicit, named anchor for that
-  // property so it is easy to find in a failure-coverage audit.
-  assert.ok(true);
 });
 
 test("promotion is unreachable before a bound APPROVE: a REJECT decision never invokes the promoter (no canonical write occurs)", () => {

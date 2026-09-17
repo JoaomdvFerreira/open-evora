@@ -73,9 +73,9 @@ test("candidateFiles paths that don't match manifest.candidateFiles fail closed"
   assert.match(errors.join("\n"), /paths must exactly match manifest\.candidateFiles/);
 });
 
-// WU045-B01 independent-review remediation, finding 2: candidateFiles[].path
-// is untrusted AI output and must be rejected structurally before any
-// filesystem call, not merely checked for non-empty-string presence.
+// candidateFiles[].path is untrusted AI output and must be rejected
+// structurally before any filesystem call, not merely checked for
+// non-empty-string presence.
 test("a ../escape candidateFiles[].path fails closed at the structural layer", () => {
   const envelope = validEnvelope({
     manifest: {

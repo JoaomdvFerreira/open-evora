@@ -125,7 +125,7 @@ test("one accepted trigger causes exactly two role-specific invocations, primary
   });
 });
 
-test("WU049 HOLD through real orchestration prevents reviewer/RCS and writes a safe private report", async () => {
+test("a private-Source HOLD through real orchestration prevents reviewer/RCS and writes a safe private report", async () => {
   await withTempDir(async (cycleDir) => {
     const corpus = admissionIndex("private");
     const source = corpus.byPrefix.get("SRC-")!.byId.get("SRC-MATERIAL")!.fields;
@@ -172,7 +172,7 @@ test("WU049 HOLD through real orchestration prevents reviewer/RCS and writes a s
   });
 });
 
-test("WU049 valid claim reaches the independent reviewer through real orchestration", async () => {
+test("a valid claim reaches the independent reviewer through real orchestration", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
@@ -441,14 +441,10 @@ test("materialized artifacts persist the real independent-review result for idem
   });
 });
 
-// WU045-B01 independent-review remediation, finding 2 (regression): a prior
-// revision of materializeAuthoringEnvelope() let an untrusted
-// candidateFiles[].path escape the cycle directory entirely, up to and
-// including writing into the tracked repository tree. This test reproduces
-// the exact PoC the independent review used (a deep ../ traversal engineered
-// to land at a specific location outside the temp cycle directory) and
-// proves it now fails closed instead of writing anywhere.
-test("PoC regression: a deep ../ traversal write never escapes the cycle directory, even far outside it", async () => {
+// materializeAuthoringEnvelope() must treat candidateFiles[].path as
+// untrusted: an unresolved ../ traversal must never be allowed to write
+// outside the cycle directory, including into the tracked repository tree.
+test("a deep ../ traversal write never escapes the cycle directory, even far outside it", async () => {
   await withTempDir(async (outerDir) => {
     const cycleDir = join(outerDir, "a", "b", "c", "cycle");
     const traversal = "../".repeat(10) + "tmp-escaped-marker.txt";
@@ -486,14 +482,14 @@ test("PoC regression: a deep ../ traversal write never escapes the cycle directo
   });
 });
 
-// WU045-B01 independent-review remediation, finding 2 (regression):
-// reproduces the exact PoC that successfully wrote a marker file into the
-// tracked repository tree in the independent review's second proof.
-test("PoC regression: a traversal engineered to land inside the repository root never writes there", async () => {
+// A traversal path may be crafted so its resolved target lands inside the
+// tracked repository tree itself, not merely somewhere outside the cycle
+// directory. That specific shape must also fail closed and never write.
+test("a traversal targeting the repository root never writes there", async () => {
   await withTempDir(async (outerDir) => {
     const cycleDir = join(outerDir, "cycle");
     const repoRoot = resolve(".");
-    const targetInRepo = resolve(repoRoot, "SHOULD_NEVER_BE_CREATED_BY_WU045.txt");
+    const targetInRepo = resolve(repoRoot, "SHOULD_NEVER_BE_CREATED_BY_TRAVERSAL.txt");
     const relPath = relative(join(cycleDir, "candidates"), targetInRepo).split(sep).join("/");
 
     const maliciousEnvelope = {
@@ -528,11 +524,10 @@ test("PoC regression: a traversal engineered to land inside the repository root 
   });
 });
 
-// WU045-B01 independent-review remediation, finding 2 (regression, read
-// path): a manifest.candidateFiles entry that traverses outside
-// candidatesDir must never cause an outside file's content to be read and
-// treated as a candidate.
-test("PoC regression: a manifest.candidateFiles traversal entry never reads content from outside the cycle directory", async () => {
+// Read-path invariant: a manifest.candidateFiles entry that traverses
+// outside candidatesDir must never cause an outside file's content to be
+// read and treated as a candidate.
+test("a manifest.candidateFiles traversal entry never reads content from outside the cycle directory", async () => {
   await withTempDir(async (outerDir) => {
     const cycleDir = join(outerDir, "cycle");
     mkdirSync(cycleDir, { recursive: true });
@@ -570,14 +565,13 @@ test("PoC regression: a manifest.candidateFiles traversal entry never reads cont
   });
 });
 
-// WU045-B01 independent-review remediation, finding 3: the final RCS must be
-// provably assembled from the exact same candidates/deltas/validation/
-// readiness snapshot the reviewer evaluated, not a value re-derived from
-// disk afterward. This test mutates the materialized candidate file on disk
-// between the reviewer invocation and final assembly and proves the final
-// package still reflects the frozen snapshot (not the mutated file), which
-// is only possible if assembly carries the frozen snapshot forward rather
-// than re-reading.
+// The final RCS must be provably assembled from the exact same
+// candidates/deltas/validation/readiness snapshot the reviewer evaluated,
+// not a value re-derived from disk afterward. This test mutates the
+// materialized candidate file on disk between the reviewer invocation and
+// final assembly and proves the final package still reflects the frozen
+// snapshot (not the mutated file), which is only possible if assembly
+// carries the frozen snapshot forward rather than re-reading.
 test("the final package reflects the exact snapshot frozen for the reviewer, even if the on-disk file is mutated afterward", async () => {
   await withTempDir(async (cycleDir) => {
     let reviewerSawCandidateName: string | undefined;
@@ -612,7 +606,7 @@ test("the final package reflects the exact snapshot frozen for the reviewer, eve
   });
 });
 
-// --- WU053 remediation: real-adapter resolution hook + pre-Gate resolution wiring ---
+// --- real-adapter resolution hook + pre-Gate resolution wiring ------------
 
 test("resolveAvailabilityAdapter is invoked with exactly the material non-private Source set, and never when availabilityAdapter is supplied directly", async () => {
   await withTempDir(async (cycleDir) => {
@@ -769,9 +763,9 @@ test("identical materialized input/content remains idempotent: rerunning against
   });
 });
 
-// --- F3: resumable pre-Gate HOLD -----------------------------------------
+// --- resumable pre-Gate HOLD -----------------------------------------------
 
-test("F3 two-run regression: run 1 HOLDs, an exact resolution is recorded, and resume reaches READY_FOR_HUMAN_REVIEW without a second PRIMARY_AUTHOR invocation and with the fresh reviewer invoked exactly once", async () => {
+test("two-run regression: run 1 HOLDs, an exact resolution is recorded, and resume reaches READY_FOR_HUMAN_REVIEW without a second PRIMARY_AUTHOR invocation and with the fresh reviewer invoked exactly once", async () => {
   await withTempDir(async (cycleDir) => {
     // --- run 1: normal path, unresolved inference limits -> HOLD ----------
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
@@ -844,15 +838,15 @@ test("F3 two-run regression: run 1 HOLDs, an exact resolution is recorded, and r
   });
 });
 
-// --- PR #127 compatibility remediation: legacy v1 hold-freeze.json --------
+// --- backward compatibility: legacy v1 hold-freeze.json --------------------
 
-test("F3 backcompat: a legacy pre-PR#127 v1 hold-freeze.json (flat `trigger`, no `identity`) remains resumable without a second PRIMARY_AUTHOR invocation", async () => {
+test("backcompat: a legacy v1 hold-freeze.json (flat `trigger`, no `identity`) remains resumable without a second PRIMARY_AUTHOR invocation", async () => {
   await withTempDir(async (cycleDir) => {
     // Run 1 through the real normal path so manifest.json/candidates on disk
-    // are genuine, then overwrite hold-freeze.json with the exact pre-PR#127
+    // are genuine, then overwrite hold-freeze.json with the exact legacy
     // on-disk shape (schemaVersion "1", baseGitSha, trigger, candidateFingerprint
-    // — no `identity` field at all), simulating a HOLD produced by the
-    // currently released normal path before this remediation merges.
+    // — no `identity` field at all), simulating a HOLD produced by an older
+    // normal path, before the current `identity`-carrying shape.
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
     const outcome1 = await runResearchCycle({
@@ -922,7 +916,7 @@ test("F3 backcompat: a legacy pre-PR#127 v1 hold-freeze.json (flat `trigger`, no
   });
 });
 
-test("F3 backcompat: a legacy v1 hold-freeze.json with tampered candidates still fails closed on resume", async () => {
+test("backcompat: a legacy v1 hold-freeze.json with tampered candidates still fails closed on resume", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
@@ -969,7 +963,7 @@ test("F3 backcompat: a legacy v1 hold-freeze.json with tampered candidates still
   });
 });
 
-test("F3 backcompat: a legacy v1 hold-freeze.json with a mismatched trigger fails closed on resume", async () => {
+test("backcompat: a legacy v1 hold-freeze.json with a mismatched trigger fails closed on resume", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
@@ -1008,7 +1002,7 @@ test("F3 backcompat: a legacy v1 hold-freeze.json with a mismatched trigger fail
   });
 });
 
-test("F3: resuming with a mismatched baseGitSha fails closed without reloading candidates or invoking the reviewer", async () => {
+test("resuming with a mismatched baseGitSha fails closed without reloading candidates or invoking the reviewer", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
@@ -1041,7 +1035,7 @@ test("F3: resuming with a mismatched baseGitSha fails closed without reloading c
   });
 });
 
-test("F3: resuming with a mismatched trigger request fails closed", async () => {
+test("resuming with a mismatched trigger request fails closed", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
@@ -1073,7 +1067,7 @@ test("F3: resuming with a mismatched trigger request fails closed", async () => 
   });
 });
 
-test("F3: resuming with no prior HOLD (no hold-freeze.json) fails closed", async () => {
+test("resuming with no prior HOLD (no hold-freeze.json) fails closed", async () => {
   await withTempDir(async (cycleDir) => {
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
     const outcome = await resumePreGateHold({
@@ -1091,7 +1085,7 @@ test("F3: resuming with no prior HOLD (no hold-freeze.json) fails closed", async
   });
 });
 
-test("F3: a candidate file edited after the HOLD was recorded (tamper/staleness) fails closed on resume and never invokes the reviewer", async () => {
+test("a candidate file edited after the HOLD was recorded (tamper/staleness) fails closed on resume and never invokes the reviewer", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
@@ -1131,7 +1125,7 @@ test("F3: a candidate file edited after the HOLD was recorded (tamper/staleness)
   });
 });
 
-test("F3: resuming while the resolution is still absent stays HOLD, does not invoke the reviewer, and never invokes PRIMARY_AUTHOR", async () => {
+test("resuming while the resolution is still absent stays HOLD, does not invoke the reviewer, and never invokes PRIMARY_AUTHOR", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
@@ -1164,7 +1158,7 @@ test("F3: resuming while the resolution is still absent stays HOLD, does not inv
   });
 });
 
-test("F3: no other blocker becomes overridable through resume — a HOLD caused by an unavailable Source stays HOLD even with the inference-limit checker forced true", async () => {
+test("no other blocker becomes overridable through resume — a HOLD caused by an unavailable Source stays HOLD even with the inference-limit checker forced true", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));

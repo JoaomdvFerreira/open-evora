@@ -70,9 +70,9 @@ test("wrong schemaVersion fails closed", () => {
   assert.match(errors.join("\n"), /schemaVersion must be exactly "1"/);
 });
 
-// WU045-B01 independent-review remediation, finding 2: manifest.candidateFiles
-// entries are untrusted AI output consumed directly by loadCandidates()'s
-// filesystem read path, so they must be rejected structurally here too.
+// manifest.candidateFiles entries are untrusted AI output consumed directly
+// by loadCandidates()'s filesystem read path, so they must be rejected
+// structurally here too.
 test("a ../escape entry in candidateFiles fails closed", () => {
   const { errors } = validateManifest(validManifest({ candidateFiles: ["../escape.yaml"] }));
   assert.match(errors.join("\n"), /bounded relative path/);

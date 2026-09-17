@@ -1,6 +1,6 @@
 /**
- * WU053 remediation regression coverage: the local, workbench-only
- * pre-Gate human-resolution mechanism scoped exclusively to
+ * Regression coverage for the local, workbench-only pre-Gate
+ * human-resolution mechanism scoped exclusively to
  * CLAIM_INFERENCE_LIMITS_PRESENT.
  */
 import assert from "node:assert/strict";

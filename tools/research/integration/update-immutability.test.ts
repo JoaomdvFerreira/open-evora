@@ -1,6 +1,6 @@
 /**
- * Regression tests for the WU030 ODM-008 UPDATE/base invariant: a PRB
- * UPDATE candidate may not rewrite the canonical record's `created_at`.
+ * Regression tests for the UPDATE/base invariant: a PRB UPDATE candidate may
+ * not rewrite the canonical record's `created_at`.
  *
  * This is deliberately an integration-time rule rather than a record-schema
  * rule — a standalone PRB with any well-formed `created_at` remains valid on
@@ -22,7 +22,7 @@ function prbCandidate(id: string, mutate: (fields: Record<string, any>) => void)
   return { recordFamily: "PRB-", fields };
 }
 
-test("ODM-008: an UPDATE that changes PRB created_at is rejected", () => {
+test("an UPDATE that changes PRB created_at is rejected", () => {
   const index = loadCorpusIndex(root);
   const candidate = prbCandidate("PRB-0001", (fields) => {
     fields.created_at = "2026-01-01";
@@ -35,7 +35,7 @@ test("ODM-008: an UPDATE that changes PRB created_at is rejected", () => {
   assert.match(errors, /base "2026-08-28" cannot become "2026-01-01"/);
 });
 
-test("ODM-008: an UPDATE that leaves PRB created_at unchanged is accepted", () => {
+test("an UPDATE that leaves PRB created_at unchanged is accepted", () => {
   const index = loadCorpusIndex(root);
   const candidate = prbCandidate("PRB-0001", (fields) => { fields.updated_at = "2026-09-10"; });
   const result = validateCandidateSet(index, [candidate]);
@@ -43,7 +43,7 @@ test("ODM-008: an UPDATE that leaves PRB created_at unchanged is accepted", () =
   assert.deepEqual(result.validation.errors, []);
 });
 
-test("ODM-008: re-quoting an unchanged created_at is a serialization change, not a mutation", () => {
+test("re-quoting an unchanged created_at is a serialization change, not a mutation", () => {
   const index = loadCorpusIndex(root);
   const base = index.byPrefix.get("PRB-")!.byId.get("PRB-0001")!.fields as Record<string, any>;
   const authored = base.created_at instanceof Date
@@ -57,7 +57,7 @@ test("ODM-008: re-quoting an unchanged created_at is a serialization change, not
   assert.doesNotMatch(errors, /immutable on UPDATE/);
 });
 
-test("ODM-008: dropping created_at entirely on UPDATE is rejected", () => {
+test("dropping created_at entirely on UPDATE is rejected", () => {
   const index = loadCorpusIndex(root);
   const candidate = prbCandidate("PRB-0012", (fields) => { delete fields.created_at; });
   const errors = validateCandidateSet(index, [candidate]).validation.errors.join("\n");
@@ -65,7 +65,7 @@ test("ODM-008: dropping created_at entirely on UPDATE is rejected", () => {
   assert.match(errors, /cannot become "\(absent\)"/);
 });
 
-test("ODM-008: immutability is an UPDATE rule only and does not fire for NO_CHANGE", () => {
+test("immutability is an UPDATE rule only and does not fire for NO_CHANGE", () => {
   const index = loadCorpusIndex(root);
   const candidate = prbCandidate("PRB-0011", () => {});
   const result = validateCandidateSet(index, [candidate]);

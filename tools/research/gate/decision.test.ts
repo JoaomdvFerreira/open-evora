@@ -1,8 +1,8 @@
 /**
  * Approval/content-hash binding adversarial tests plus invalid
- * decision-combination coverage (failure-state coverage list:
- * "malformed/invalid RCS", "changed RCS after review rendering", "changed
- * contentHash", "invalid OD-D decision combination").
+ * decision-combination coverage: malformed/invalid RCS, an RCS changed after
+ * review rendering, a changed contentHash, and an invalid canonical
+ * acceptance / publication decision combination.
  */
 import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
@@ -189,27 +189,27 @@ test("structurally invalid (schema-violating) package JSON aborts decision submi
   });
 });
 
-test("OD-D: HOLD canonical + APPROVE publication is an invalid combination", () => {
+test("HOLD canonical + APPROVE publication is an invalid combination", () => {
   assert.equal(isValidDecisionCombination("HOLD_MORE_RESEARCH", "APPROVE"), false);
 });
 
-test("OD-D: REJECT canonical + APPROVE publication is an invalid combination", () => {
+test("REJECT canonical + APPROVE publication is an invalid combination", () => {
   assert.equal(isValidDecisionCombination("REJECT", "APPROVE"), false);
 });
 
-test("OD-D: APPROVE canonical + HOLD publication is a valid combination (private-hold path)", () => {
+test("APPROVE canonical + HOLD publication is a valid combination (private-hold path)", () => {
   assert.equal(isValidDecisionCombination("APPROVE", "HOLD"), true);
 });
 
-test("OD-D: APPROVE canonical + REJECT publication is a valid combination", () => {
+test("APPROVE canonical + REJECT publication is a valid combination", () => {
   assert.equal(isValidDecisionCombination("APPROVE", "REJECT"), true);
 });
 
-test("OD-D: APPROVE canonical + APPROVE publication is the normal-path combined action", () => {
+test("APPROVE canonical + APPROVE publication is the normal-path combined action", () => {
   assert.equal(isValidDecisionCombination("APPROVE", "APPROVE"), true);
 });
 
-test("invalid OD-D combination is rejected before any file is read (fails closed early)", () => {
+test("an invalid canonical-acceptance/publication combination is rejected before any file is read (fails closed early)", () => {
   const fixture = gitFixture();
   try {
     withTempDir((cycleDir) => {

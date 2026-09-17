@@ -1,9 +1,8 @@
 /**
- * Deterministic publication-guard adversarial tests (independent-review
- * finding LOW-3; failure-state coverage: "LOW-3 unexpected path"). These
- * demonstrate that an unexpected staged/tracked/untracked file prevents
- * publication, and that the guard is enforced at the Git-publication
- * boundary itself rather than relying only on .gitignore.
+ * Deterministic publication-guard adversarial tests. These demonstrate that
+ * an unexpected staged/tracked/untracked file prevents publication, and that
+ * the guard is enforced at the Git-publication boundary itself rather than
+ * relying only on .gitignore.
  */
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -118,9 +117,9 @@ test("the guard does not loosen the approved-path set to accommodate an unrelate
   }
 });
 
-// --- R3: -z porcelain parsing correctness (independent-review LOW finding) --
+// --- -z porcelain parsing correctness --------------------------------------
 
-test("R3 ADVERSARIAL: an unexpected path containing a leading space and embedded quote-worthy characters is parsed byte-exact (no quote-decode ambiguity)", () => {
+test("ADVERSARIAL: an unexpected path containing a leading space and embedded quote-worthy characters is parsed byte-exact (no quote-decode ambiguity)", () => {
   const fixture = gitFixture();
   try {
     const targetFile = "research/sources/SRC-NEW.yaml";
@@ -146,7 +145,7 @@ test("R3 ADVERSARIAL: an unexpected path containing a leading space and embedded
   }
 });
 
-test("R3 ADVERSARIAL: Unicode (accented/CJK) paths are parsed byte-exact under -z", () => {
+test("ADVERSARIAL: Unicode (accented/CJK) paths are parsed byte-exact under -z", () => {
   const fixture = gitFixture();
   try {
     const targetFile = "research/sources/SRC-NEW.yaml";
@@ -168,7 +167,7 @@ test("R3 ADVERSARIAL: Unicode (accented/CJK) paths are parsed byte-exact under -
   }
 });
 
-test("R3 ADVERSARIAL: a rename (R status) of an unrelated tracked file flags both the new and the old path, using -z's two-field rename encoding", () => {
+test("ADVERSARIAL: a rename (R status) of an unrelated tracked file flags both the new and the old path, using -z's two-field rename encoding", () => {
   const fixture = gitFixture();
   try {
     const targetFile = "research/sources/SRC-NEW.yaml";
@@ -186,7 +185,7 @@ test("R3 ADVERSARIAL: a rename (R status) of an unrelated tracked file flags bot
   }
 });
 
-test("R3 ADVERSARIAL: a path containing spaces is parsed correctly (not truncated at the first space)", () => {
+test("ADVERSARIAL: a path containing spaces is parsed correctly (not truncated at the first space)", () => {
   const fixture = gitFixture();
   try {
     const targetFile = "research/sources/SRC-NEW.yaml";
@@ -205,7 +204,7 @@ test("R3 ADVERSARIAL: a path containing spaces is parsed correctly (not truncate
   }
 });
 
-test("R3 ADVERSARIAL: a literal ' -> ' substring inside a filename is not misparsed as a rename delimiter (removed entirely by -z's two-field encoding)", () => {
+test("ADVERSARIAL: a literal ' -> ' substring inside a filename is not misparsed as a rename delimiter (removed entirely by -z's two-field encoding)", () => {
   const fixture = gitFixture();
   try {
     const targetFile = "research/sources/SRC-NEW.yaml";

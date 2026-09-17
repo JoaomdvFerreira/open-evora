@@ -59,7 +59,7 @@ test("loadDecisionRecord reports INVALID for a structurally malformed record obj
   });
 });
 
-test("validateDecisionRecord rejects a record whose OD-D combination is invalid, even if otherwise well-formed", () => {
+test("validateDecisionRecord rejects a record whose canonical-acceptance/publication combination is invalid, even if otherwise well-formed", () => {
   const record = validRecord({ canonicalAcceptance: "REJECT", publicExplorerPublication: "APPROVE" });
   const result = validateDecisionRecord(record);
   assert.ok(result.errors.length > 0);

@@ -74,9 +74,9 @@ test("multiple candidate files are all loaded in the order given", () => {
   });
 });
 
-// WU045-B01 independent-review remediation, finding 2: a manifest's
-// candidateFiles entry is untrusted AI-authored input; a traversal/absolute
-// entry must fail closed as a load failure, never actually read the target.
+// A manifest's candidateFiles entry is untrusted AI-authored input; a
+// traversal/absolute entry must fail closed as a load failure, never
+// actually read the target.
 test("a ../escape entry never reads a file outside candidatesDir", () => {
   withTempDir((outerDir) => {
     const dir = join(outerDir, "candidates");

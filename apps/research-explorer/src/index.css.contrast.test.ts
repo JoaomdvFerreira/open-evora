@@ -3,12 +3,12 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 /**
- * ODM-017 — deterministic contrast regression (WU032/WU033 contract): a pure
- * computation over the actual --ink-faintest/background token pair values
- * read from index.css, so a future edit to either token cannot silently
- * regress below WCAG 2.1 AA (4.5:1) without failing this test. No browser
- * needed — see docs/explorerarchitecture.md §6 for when rendered contrast
- * measurement is additionally required.
+ * Deterministic contrast regression: a pure computation over the actual
+ * --ink-faintest/background token pair values read from index.css, so a
+ * future edit to either token cannot silently regress below WCAG 2.1 AA
+ * (4.5:1) without failing this test. No browser needed — see
+ * docs/explorerarchitecture.md §6 for when rendered contrast measurement is
+ * additionally required.
  */
 const CSS_PATH = path.resolve(__dirname, "index.css");
 const css = fs.readFileSync(CSS_PATH, "utf8");
@@ -41,7 +41,7 @@ function contrastRatio(hexA: string, hexB: string): number {
 
 const WCAG_AA_TEXT = 4.5;
 
-describe("index.css — --ink-faintest contrast (ODM-017)", () => {
+describe("index.css — --ink-faintest contrast", () => {
   const inkFaintest = readToken("ink-faintest");
   const backgrounds: [string, string][] = [
     ["canvas", readToken("canvas")],
