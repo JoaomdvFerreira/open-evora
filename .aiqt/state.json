@@ -1,6 +1,6 @@
 {
   "version": "0.8.0",
-  "projectStatus": "review",
+  "projectStatus": "in_progress",
   "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
@@ -167,6 +167,21 @@
           "WU050",
           "WU051",
           "WU052"
+        ]
+      },
+      {
+        "id": "M015",
+        "title": "M015 — Citizen-Facing UX Refresh",
+        "objective": "Deliver the owner-approved citizen-facing UX refresh for the Research Explorer: a production-ready visual foundation, a runtime-derived Citizen Overview with search/discovery, an authored material-change timeline, a refreshed Problem Reading experience, a shared citizen-facing trust experience, an integrated rendered/accessibility review, and a production release gated on explicit owner acceptance. This milestone is presentation-only: canonical SRC/EVD/PRB semantics, the separate OPEN/validation_status/evidence_status dimensions, and the current static client architecture are preserved unchanged.",
+        "status": "ready",
+        "workUnitIds": [
+          "WU053",
+          "WU054",
+          "WU055",
+          "WU056",
+          "WU057",
+          "WU058",
+          "WU059"
         ]
       }
     ],
@@ -2501,6 +2516,343 @@
         ],
         "createdAt": "2026-09-15T13:31:45.422Z",
         "updatedAt": "2026-09-16T09:26:33.398Z"
+      },
+      {
+        "id": "WU053",
+        "milestoneId": "M015",
+        "title": "Visual Foundation & Identity",
+        "objective": "Establish the production-ready visual foundation for the citizen-facing UX refresh: a production-ready Open Évora logo/mark aligned to the approved prototype direction, a presentation-only topic label/tone mapping derived from an audit of current PRB domain codes, an accessible visual language for the canonical lifecycle/validation/evidence state dimensions, and a small coherent icon set, gated by explicit owner visual acceptance before any downstream surface adopts it.",
+        "scope": [
+          "Produce a production-ready Open Évora logo/mark implementing the approved prototype direction.",
+          "Audit the PRB domain codes actually present in the canonical corpus and derive a presentation-only topic label/tone mapping (label text, color, icon) from that audit.",
+          "Define an accessible visual language for each canonical lifecycle/validation/evidence state value, pairing color with a non-color carrier (icon, label text, or pattern) and keeping the three dimensions visually and semantically distinct from one another.",
+          "Design a small, coherent icon set covering the topic mapping and the state visual language identified above.",
+          "Implement the resulting tokens/components/icon set in the existing design-system and styles locations rather than new documentation.",
+          "Present the completed visual foundation to the repository owner for explicit visual-gate acceptance before any other work unit in this milestone adopts it."
+        ],
+        "outOfScope": [
+          "Any semantic merging of OPEN/lifecycle status, validation_status, and evidence_status into a combined representation.",
+          "Any canonical SRC/EVD/PRB schema or taxonomy change; the topic mapping and icon set remain presentation-only.",
+          "Per-problem photography.",
+          "New backend/database or departure from the current static client architecture.",
+          "Adoption of the visual foundation into Overview, Problem View, or Trust surfaces (owned by later work units in this milestone).",
+          "Graph implementation or redesign."
+        ],
+        "acceptanceCriteria": [
+          "A production-ready logo/mark exists in the codebase, matches the approved prototype direction, and has explicit owner sign-off.",
+          "The topic label/tone mapping is documented as presentation-only, is derived from an explicit audit of the PRB domain codes actually present in canonical data, and introduces no new canonical taxonomy field.",
+          "Every canonical lifecycle/validation/evidence state value has an accessible visual treatment where color is never the sole carrier of meaning, and the three dimensions remain visually distinguishable from one another with no merged indicator.",
+          "A small, coherent icon set is implemented and reused (not duplicated per surface) across the topic mapping and state visual language.",
+          "The repository owner has given explicit visual-gate acceptance of this foundation, recorded before any other work unit in this milestone is marked done.",
+          "npm run explorer:build, npm run test --prefix apps/research-explorer, and git diff --check pass.",
+          "All persistent changes are committed before this work unit is marked done."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/datamodel.md",
+          "docs/design/foundations.md",
+          "docs/design/component-visual-contract.md",
+          "the owner-approved citizen-facing UX prototype direction"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/src/styles/",
+          "apps/research-explorer/src/presentation/",
+          "apps/research-explorer/public/",
+          "docs/design/foundations.md"
+        ],
+        "validationCommands": [
+          "npm run explorer:build",
+          "npm run test --prefix apps/research-explorer",
+          "git diff --check"
+        ],
+        "status": "ready",
+        "dependencies": [],
+        "createdAt": "2026-09-17T14:58:53.664Z",
+        "updatedAt": "2026-09-17T14:58:53.664Z"
+      },
+      {
+        "id": "WU054",
+        "milestoneId": "M015",
+        "title": "Citizen Overview & Discovery",
+        "objective": "Build a citizen-first Overview: a runtime-derived CitizenProblem projection with search and topic filters, scannable problem cards, a coverage disclaimer, deterministic neutral ordering, and desktop plus compact responsive treatment, built on the WU-visual-foundation visual language.",
+        "scope": [
+          "Build a runtime-derived CitizenProblem projection from existing canonical/read-model data, with no persisted parallel state.",
+          "Design and implement a citizen-first Overview hero/presentation using the accepted visual foundation.",
+          "Implement problem search over the CitizenProblem projection.",
+          "Implement topic filters using the presentation-only topic mapping from the visual foundation.",
+          "Implement scannable problem cards: human-readable title/content presented before the technical PRB ID, with no per-problem photography.",
+          "Add an explicit coverage disclaimer stating that published Problems are not a complete inventory of Évora's problems.",
+          "Order problems deterministically and neutrally, with no ranking, score, urgency, or relevance ordering.",
+          "Implement desktop (>=768px) and compact (<=767px) responsive treatment per docs/explorerarchitecture.md."
+        ],
+        "outOfScope": [
+          "Any new persisted or parallel state; the projection must remain derivable at runtime from existing canonical/read-model data.",
+          "Ranking, scoring, urgency, or relevance-based ordering of Problems.",
+          "Per-problem photography.",
+          "Individual /problemas/... routes or SEO redesign.",
+          "A public contribution form.",
+          "Graph implementation or redesign."
+        ],
+        "acceptanceCriteria": [
+          "CitizenProblem projection is computed from existing canonical/read-model data with no new persisted store; rebuilding generated artifacts reproduces it deterministically.",
+          "Problem search and topic filters function against the projection, and topic filters use only the presentation-only mapping with no canonical taxonomy change.",
+          "Problem list ordering is deterministic and does not vary with any ranking/score/urgency/relevance signal.",
+          "Cards show human-meaningful title/content before the technical PRB ID and include no per-problem photography.",
+          "The coverage disclaimer is present and visible on the Overview.",
+          "Desktop and compact responsive treatments are implemented and pass rendered review at a representative desktop width and at ~360px.",
+          "npm run typecheck --prefix apps/research-explorer, npm run test --prefix apps/research-explorer, npm run build --prefix apps/research-explorer, and npm run research:validate pass; git diff --check passes.",
+          "All persistent changes are committed before this work unit is marked done."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/datamodel.md"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/src/overview/",
+          "apps/research-explorer/src/dataProvider/",
+          "apps/research-explorer/src/presentation/"
+        ],
+        "validationCommands": [
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run test --prefix apps/research-explorer",
+          "npm run build --prefix apps/research-explorer",
+          "npm run research:validate",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-049"
+        ],
+        "createdAt": "2026-09-17T14:58:53.664Z",
+        "updatedAt": "2026-09-17T14:58:53.664Z"
+      },
+      {
+        "id": "WU055",
+        "milestoneId": "M015",
+        "title": "Material-Change Timeline",
+        "objective": "Surface \"O que mudou recentemente\" on the Overview, derived only from authored PRB.history, newest first with deterministic tie-breaking and a correct empty state.",
+        "scope": [
+          "Implement an \"O que mudou recentemente\" presentation on the Overview.",
+          "Derive entries only from authored PRB.history.",
+          "Order entries newest first with an explicit, deterministic tie-break rule for equally-dated entries.",
+          "Implement a correct empty state for Problems/corpus states with no history entries, making no claim that a Problem without entries never changed."
+        ],
+        "outOfScope": [
+          "Any change to PRB.history's canonical schema or shape.",
+          "Inferring material change from updated_at, Git history, or deployment/build activity.",
+          "Backfilling or fabricating history entries.",
+          "A full historical snapshot, versioning, or audit-log surface."
+        ],
+        "acceptanceCriteria": [
+          "The timeline reads only PRB.history and derives no material-change signal from updated_at, Git history, or build/deploy metadata.",
+          "Ordering is newest-first with a documented, deterministic tie-break for same-dated entries.",
+          "The no-history-entries case renders a correct empty state that makes no claim about the Problem never having changed.",
+          "npm run typecheck --prefix apps/research-explorer, npm run test --prefix apps/research-explorer, npm run build --prefix apps/research-explorer, and npm run research:validate pass; git diff --check passes.",
+          "All persistent changes are committed before this work unit is marked done."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/datamodel.md"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/src/overview/",
+          "apps/research-explorer/src/problem/"
+        ],
+        "validationCommands": [
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run test --prefix apps/research-explorer",
+          "npm run build --prefix apps/research-explorer",
+          "npm run research:validate",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-051"
+        ],
+        "createdAt": "2026-09-17T14:58:53.664Z",
+        "updatedAt": "2026-09-17T14:58:53.664Z"
+      },
+      {
+        "id": "WU056",
+        "milestoneId": "M015",
+        "title": "Problem Reading Refresh",
+        "objective": "Reorganise the Problem View using the approved prototype direction: a stronger header, topic/state presentation, geography/population/update metadata, clearer in-page section navigation, a recent material-history summary linking to full History, and a Share action, while preserving all current Evidence/currentness/limitations/open-questions/contradiction-search/investigation-path/ContextTabs semantics and accessibility.",
+        "scope": [
+          "Reorganise the Problem View header, topic/state presentation (using the visual foundation), and geography/population/update metadata per the approved prototype direction.",
+          "Bind \"Última atualização do registo\" to PRB.updated_at, with copy that does not claim evidence currentness.",
+          "Add clearer in-page section navigation without inventing fake tab state.",
+          "Add a recent material-history summary that reuses the timeline presentation, linking to the full History.",
+          "Add a Share action using the Web Share API when available, falling back to copy-link otherwise.",
+          "Preserve all current Evidence, currentness, limitations, open questions, contradiction search, investigation path, and ContextTabs semantics and accessibility exactly as implemented."
+        ],
+        "outOfScope": [
+          "Any change to PRB/EVD/SRC schemas or canonical research records.",
+          "Any removal or semantic alteration of Evidence, currentness, limitations, open questions, contradiction search, investigation path, or ContextTabs behaviour.",
+          "Individual /problemas/... routes or SEO redesign.",
+          "New canonical statuses such as \"Em investigação\" or \"Em validação\"."
+        ],
+        "acceptanceCriteria": [
+          "The refreshed Problem View uses the accepted visual foundation for topic/state and reuses the material-change timeline presentation for its recent-history summary, linking to full History.",
+          "\"Última atualização do registo\" is bound to PRB.updated_at and its copy makes no evidence-currentness claim.",
+          "Section navigation reflects genuine content sections only; no simulated/fake tab state is introduced.",
+          "Share uses the Web Share API when available and falls back to copy-link otherwise, verified including on an environment lacking Web Share API support.",
+          "Existing Evidence, currentness, limitations, open questions, contradiction search, investigation path, and ContextTabs functional behaviour and accessibility are unchanged, verified by existing or updated tests.",
+          "npm run typecheck --prefix apps/research-explorer, npm run test --prefix apps/research-explorer, npm run build --prefix apps/research-explorer, and npm run research:validate pass; git diff --check passes.",
+          "All persistent changes are committed before this work unit is marked done."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "docs/datamodel.md"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/src/problem/",
+          "apps/research-explorer/src/presentation/"
+        ],
+        "validationCommands": [
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run test --prefix apps/research-explorer",
+          "npm run build --prefix apps/research-explorer",
+          "npm run research:validate",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-052"
+        ],
+        "createdAt": "2026-09-17T14:58:53.664Z",
+        "updatedAt": "2026-09-17T14:58:53.664Z"
+      },
+      {
+        "id": "WU057",
+        "milestoneId": "M015",
+        "title": "Trust Experience",
+        "objective": "Build a shared citizen-facing structure for About / Methodology / Corrections / Contact / Privacy inspired by the approved prototype direction, with responsive desktop/compact composition and an About accountability structure gated on owner-confirmed factual content.",
+        "scope": [
+          "Implement a shared citizen-facing structural template for About / Methodology / Corrections / Contact / Privacy, inspired by the approved prototype direction.",
+          "Implement responsive desktop/compact composition for these surfaces per docs/explorerarchitecture.md.",
+          "Build the About page's accountability structure: maintainer, independence, funding, and publication method sections.",
+          "Populate identity/funding/institutional-relationship content only from facts the repository owner has explicitly confirmed; withhold rather than invent unconfirmed content."
+        ],
+        "outOfScope": [
+          "Publishing any identity/funding/institutional-relationship claim that the owner has not explicitly confirmed.",
+          "A public contribution form.",
+          "New backend/database; these surfaces remain static content."
+        ],
+        "acceptanceCriteria": [
+          "About/Methodology/Corrections/Contact/Privacy share a common citizen-facing structural template and pass rendered review at a representative desktop width and at ~360px.",
+          "The About page's accountability structure (maintainer, independence, funding, publication method) contains only owner-confirmed factual content; any unconfirmed content is flagged to the owner and withheld rather than invented.",
+          "npm run typecheck --prefix apps/research-explorer, npm run test --prefix apps/research-explorer, and npm run build --prefix apps/research-explorer pass; git diff --check passes.",
+          "All persistent changes are committed before this work unit is marked done."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md",
+          "the owner-approved citizen-facing UX prototype direction"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/src/app/",
+          "apps/research-explorer/src/presentation/"
+        ],
+        "validationCommands": [
+          "npm run typecheck --prefix apps/research-explorer",
+          "npm run test --prefix apps/research-explorer",
+          "npm run build --prefix apps/research-explorer",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-050"
+        ],
+        "createdAt": "2026-09-17T14:58:53.664Z",
+        "updatedAt": "2026-09-17T14:58:53.664Z"
+      },
+      {
+        "id": "WU058",
+        "milestoneId": "M015",
+        "title": "Integrated Rendered Review",
+        "objective": "Perform a full integrated rendered, responsive, and accessibility review of every surface changed by this milestone, remediate only findings within this milestone's own scope, and obtain explicit owner visual/product acceptance before release.",
+        "scope": [
+          "Perform a full desktop rendered review of every surface changed by this milestone.",
+          "Perform a compact ~360px rendered review of the same surfaces.",
+          "Perform breakpoint-sensitive checks at the documented 767px/768px boundary where applicable.",
+          "Perform a keyboard/focus and basic accessibility review.",
+          "Perform a first-visit citizen UX review (a citizen with no prior context landing on the Overview).",
+          "Remediate only findings discovered within this milestone's own surfaces.",
+          "Obtain explicit owner visual/product acceptance of the integrated result before release."
+        ],
+        "outOfScope": [
+          "Any new product scope beyond remediating findings raised by this review.",
+          "Remediation of pre-existing, unrelated findings outside this milestone's surfaces."
+        ],
+        "acceptanceCriteria": [
+          "Rendered review is performed and recorded at a representative desktop viewport and at ~360px compact viewport for every surface changed in this milestone.",
+          "Breakpoint-sensitive surfaces are checked at the 767px/768px boundary.",
+          "Keyboard/focus behaviour and basic accessibility are reviewed with no unresolved blocking finding.",
+          "A first-visit citizen UX walkthrough is performed and any blocking finding is remediated within this work unit's own scope only.",
+          "The repository owner has given explicit visual/product acceptance of the integrated result.",
+          "npm run research:check and npm run explorer:build pass after any remediation; git diff --check passes.",
+          "All persistent changes are committed before this work unit is marked done."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md"
+        ],
+        "suggestedFiles": [
+          "apps/research-explorer/"
+        ],
+        "validationCommands": [
+          "npm run research:check",
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-053",
+          "DEP-054"
+        ],
+        "createdAt": "2026-09-17T14:58:53.664Z",
+        "updatedAt": "2026-09-17T14:58:53.664Z"
+      },
+      {
+        "id": "WU059",
+        "milestoneId": "M015",
+        "title": "Production Release & Smoke",
+        "objective": "Release the accepted citizen-facing UX refresh through the normal repository/PR/production workflow, with no feature expansion, and verify it with production smoke checks after deployment.",
+        "scope": [
+          "Follow the normal repository/PR/production workflow to release the accepted milestone, only after the integrated review and explicit owner acceptance from the prior work unit are recorded.",
+          "Perform production smoke verification after deployment.",
+          "Keep the release bounded to exactly what this milestone accepted, with no feature expansion."
+        ],
+        "outOfScope": [
+          "Any feature or product-scope addition during release.",
+          "Bypassing repository protections, direct push to main, or unattested/manual deployment."
+        ],
+        "acceptanceCriteria": [
+          "Release proceeds only after the integrated review's explicit owner acceptance is recorded.",
+          "The release uses the existing PR/protected-merge workflow with no protection bypass.",
+          "Post-deployment production smoke verification confirms the released surfaces are reachable and functioning as accepted.",
+          "No unrelated feature work is introduced during the release.",
+          "git diff --check passes on any release-related change."
+        ],
+        "agentContextRefs": [
+          "AGENTS.md",
+          "docs/explorerarchitecture.md"
+        ],
+        "suggestedFiles": [],
+        "validationCommands": [
+          "npm run explorer:build",
+          "git diff --check"
+        ],
+        "status": "planned",
+        "dependencies": [
+          "DEP-055"
+        ],
+        "createdAt": "2026-09-17T14:58:53.664Z",
+        "updatedAt": "2026-09-17T14:58:53.664Z"
       }
     ],
     "dependencies": [
@@ -2839,6 +3191,55 @@
         "toId": "WU052",
         "type": "blocks",
         "reason": "Independent Go-Live reverification must assess the actual hardened Production release."
+      },
+      {
+        "id": "DEP-049",
+        "fromId": "WU053",
+        "toId": "WU054",
+        "type": "blocks",
+        "reason": "The Overview adopts the accepted visual foundation's topic mapping and state visual language; it must not build against an unaccepted visual direction."
+      },
+      {
+        "id": "DEP-050",
+        "fromId": "WU053",
+        "toId": "WU057",
+        "type": "blocks",
+        "reason": "Trust surfaces adopt the accepted visual foundation and may proceed independently of Overview/Problem View once it is accepted."
+      },
+      {
+        "id": "DEP-051",
+        "fromId": "WU054",
+        "toId": "WU055",
+        "type": "blocks",
+        "reason": "The material-change timeline is surfaced on the Overview built by this work unit."
+      },
+      {
+        "id": "DEP-052",
+        "fromId": "WU055",
+        "toId": "WU056",
+        "type": "blocks",
+        "reason": "The Problem Reading Refresh reuses the timeline's presentation for its recent material-history summary."
+      },
+      {
+        "id": "DEP-053",
+        "fromId": "WU056",
+        "toId": "WU058",
+        "type": "blocks",
+        "reason": "Integrated review assesses the completed Problem View refresh, which transitively requires the visual foundation, Overview, and timeline to be done."
+      },
+      {
+        "id": "DEP-054",
+        "fromId": "WU057",
+        "toId": "WU058",
+        "type": "blocks",
+        "reason": "Integrated review assesses the completed Trust experience alongside the other implementation surfaces."
+      },
+      {
+        "id": "DEP-055",
+        "fromId": "WU058",
+        "toId": "WU059",
+        "type": "blocks",
+        "reason": "Production release is authorized only after the integrated review and explicit owner acceptance are recorded."
       }
     ]
   },
@@ -7456,8 +7857,8 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-16T09:26:33.398Z",
-      "nextRecommendation": "aiqt review --mode release"
+      "nextRecommendation": "aiqt review --mode release",
+      "createdAt": "2026-09-16T09:26:33.398Z"
     }
   ],
   "lastAgentPacket": {
@@ -7484,8 +7885,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt review --mode release",
-  "lastUpdatedAt": "2026-09-16T09:26:33.398Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-17T14:58:53.664Z",
   "review": {
     "acknowledgedFindings": [
       {
