@@ -1,8 +1,8 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
-  "currentMilestoneId": "M014",
-  "currentWorkUnitId": "WU049",
+  "projectStatus": "review",
+  "currentMilestoneId": null,
+  "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
       {
@@ -161,7 +161,7 @@
         "id": "M014",
         "title": "M014 — Post-M013 Go-Live Remediation",
         "objective": "Remediate the specific safety-admission, release-provenance, and public-production launch gaps recorded by completed M013/WU048 (canonical verdict NOT_READY), then independently reverify the complete Go-Live acceptance matrix. M013 and WU048 remain historical and are not reopened. A successful M014/WU052 reverification is not the owner GO/HOLD decision.",
-        "status": "in_progress",
+        "status": "done",
         "workUnitIds": [
           "WU049",
           "WU050",
@@ -2319,10 +2319,10 @@
           "npm run research:check",
           "git diff --check"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [],
         "createdAt": "2026-09-15T13:31:45.422Z",
-        "updatedAt": "2026-09-15T14:44:15.323Z"
+        "updatedAt": "2026-09-15T17:56:18.226Z"
       },
       {
         "id": "WU050",
@@ -2330,9 +2330,10 @@
         "title": "Attested Release Provenance",
         "objective": "Establish exact provider-attested provenance from one dedicated release/candidate branch and committed SHA to a protected candidate deployment, so the resulting immutable deployment can be independently tied to its exact Git input.",
         "scope": [
-          "Create and push a dedicated release/candidate branch containing the exact bounded M014 candidate revision after WU049 is complete.",
+          "Create a dedicated local WU050 work branch named work/m014-wu050-attested-release-provenance from exactly d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d, preserving the current uncommitted AIQT lifecycle state.",
+          "Create and push only the dedicated remote release/candidate ref release/m014-wu050-candidate at exactly d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d; it must not advance during WU050.",
           "Use the Git-linked protected candidate deployment path to obtain and record provider-attested repository, branch/ref, commit SHA, deployment identity, immutable URL, build result, timestamps, and protection/public-access posture.",
-          "Persist publication-safe provenance evidence that establishes the provider-attested exact SHA-to-deployment relationship; distinguish provider attestation from local upload/build assertions.",
+          "Persist publication-safe provenance evidence under docs/design/audits/m014-wu050-release-provenance/ and commit it only to work/m014-wu050-attested-release-provenance; distinguish provider attestation from local upload/build assertions.",
           "Fail closed if the provider cannot attest the exact candidate SHA, the deployment is not protected as required, or any recorded provenance element is inconsistent."
         ],
         "outOfScope": [
@@ -2341,10 +2342,15 @@
           "GO/HOLD decision",
           "Canonical research data or semantic changes beyond WU049's completed bounded remediation",
           "M013/WU048 reopening or alteration",
-          "C008/C009/C010 repair"
+          "C008/C009/C010 repair",
+          "Pushing work/m014-wu050-attested-release-provenance",
+          "An audit branch, tag, Git notes, external evidence store, or evidence commit on release/m014-wu050-candidate",
+          "CLI/archive deployment"
         ],
         "acceptanceCriteria": [
-          "A dedicated release/candidate branch is pushed under this authorization, and the candidate deployment is Git-linked and protected.",
+          "The local work/evidence branch is work/m014-wu050-attested-release-provenance from d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d; the only remote Git mutation is release/m014-wu050-candidate pushed at that exact SHA and never advanced during WU050.",
+          "Sanitized audit evidence is committed under docs/design/audits/m014-wu050-release-provenance/ on the local work/evidence branch only; that branch is not pushed in WU050.",
+          "The candidate deployment is Git-linked, Preview only, and protected.",
           "Provider-attested evidence independently binds the exact repository/ref and immutable commit SHA to one immutable candidate deployment identity and URL, including successful build status and inspection timestamps.",
           "The provenance record clearly distinguishes provider attestation from locally asserted provenance and contains no credentials, tokens, private content, or unsafe URLs.",
           "No merge or Production promotion is performed in WU050; the candidate is not represented as Production or as a GO decision.",
@@ -2363,36 +2369,51 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "done",
         "dependencies": [
           "DEP-046"
         ],
         "createdAt": "2026-09-15T13:31:45.422Z",
-        "updatedAt": "2026-09-15T13:31:45.422Z"
+        "updatedAt": "2026-09-15T18:29:41.282Z"
       },
       {
         "id": "WU051",
         "milestoneId": "M014",
         "title": "Production Launch-Hardening Release",
-        "objective": "After WU050 establishes exact provider-attested SHA provenance, perform the conditionally authorized Production hardening release through the preferred owner-controlled merge and Git-linked Vercel Production deployment path. This release does not decide GO/HOLD.",
+        "objective": "Apply the one owner-authorized test-only validation unblock from the exact WU050-attested source d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d; establish a newly attested protected Preview candidate; then perform the protected-PR Production hardening release from that new candidate. The protected merge SHA is the Production release SHA only when the owner-defined parent, tree-identity, and provider-attestation invariants all hold. This release does not decide GO/HOLD.",
         "scope": [
-          "Use the exact WU050 provider-attested candidate SHA/provenance as the release input; stop if that provenance is absent, stale, inconsistent, or cannot be carried forward to the merged release.",
-          "Preferred authorized path: manual owner merge of the dedicated release/candidate branch followed by Git-linked Vercel Production deployment.",
-          "Verify and record the deployed Production commit SHA, deployment identity, immutable URL/production origin relationship, build result, timestamps, public accessibility, required metadata, robots/sitemap, and protection posture.",
+          "From exact SHA d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d, make only the bounded test-fixture correction that configures repository-local user.name and user.email for affected temporary Git repositories; tests must remain hermetic and no global Git identity may be added to CI.",
+          "Create a corrected SHA and publish it only on the new candidate ref release/m014-wu051-candidate; permanently preserve release/m014-wu050-candidate at d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d as WU050 historical evidence.",
+          "Before any Production PR or merge, obtain fresh provider-native, Git-linked protected Preview provenance for the corrected SHA: source=git, githubDeployment=1, correct repository/ref, exact githubCommitSha, READY, Preview/non-Production, and protected/noindex ingress.",
+          "Require required validation to pass on the corrected SHA; do not merge PR #121. Once the replacement candidate is proven, close or supersede PR #121 and open a new PR from release/m014-wu051-candidate to main.",
+          "Create or use the replacement protected PR only after its new candidate SHA is attested, satisfy the existing main ruleset, and have the owner perform the normal protected PR merge.",
+          "Treat the merge-created SHA as the Production release SHA only if the newly attested candidate SHA is its release-side parent, its tree is byte-for-byte identical to that candidate tree, and no conflict resolution or unrelated product change is introduced; stop for owner action if any invariant cannot be proven.",
+          "Verify and record provider-native Git/GitHub provenance for the resulting Production deployment: repository, main ref, exact merge SHA, deployment ID, READY, target production, and the public Production alias serving that deployment.",
+          "Freshly verify the approved WU047 Production posture: expected metadata/title, robots.txt, six-route sitemap, trust surfaces, and anonymous public access.",
           "Keep this work unit bounded to the exact launch-hardening release required to replace M013/WU048's failing Production posture."
         ],
         "outOfScope": [
           "Final GO/HOLD decision",
           "Unattested or manually uploaded Production deployment",
+          "Runtime or product-code change, broader test redesign, or any correction beyond local Git identity in the affected temporary-repository fixture(s)",
+          "Global Git identity or any CI configuration change",
           "Unrelated product, design, research, schema, or architecture work",
-          "Automatic merge or bypass of repository protections",
+          "Automatic merge, direct push to main, or bypass/weakened repository protections",
+          "Advancing the WU050 candidate ref",
+          "CLI, archive, manual, or API Production deployment",
+          "DNS, domain, environment, settings, or protection changes",
+          "Starting WU052",
           "M013/WU048 reopening or alteration",
           "C008/C009/C010 repair"
         ],
         "acceptanceCriteria": [
-          "WU050's exact provider-attested candidate SHA provenance is present and reconciled with the release input before Production action.",
-          "The release follows the preferred manual owner merge followed by Git-linked Vercel Production deployment path, with no protection bypass or automatic merge.",
-          "Provider evidence independently identifies the Production deployment and exact deployed commit SHA, and records its relationship to the Production origin.",
+          "The correction is test-only and configures local user.name/user.email inside the affected temporary Git fixture/repository; no global CI identity, runtime/product change, or broader test redesign occurs. If any such change is required, WU051 stops for owner action.",
+          "The corrected candidate is built from exact SHA d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d; release/m014-wu050-candidate remains permanently immutable at that SHA, and release/m014-wu051-candidate identifies the corrected SHA.",
+          "Required validation passes on the corrected SHA, and fresh provider-native protected Preview provenance establishes source=git, githubDeployment=1, correct repository/ref, exact githubCommitSha, READY, Preview/non-Production, and protected/noindex ingress before any Production PR/merge.",
+          "PR #121 is not merged; after the replacement candidate is proven, it is closed or superseded and a replacement PR is opened from release/m014-wu051-candidate to main.",
+          "The release follows the owner-performed normal protected PR merge with no protection bypass, direct main push, or automatic merge; the PR head at merge time is the newly attested candidate SHA.",
+          "The merge commit has the newly attested candidate SHA as release-side parent, has a byte-identical tree, and contains no conflict-resolution or unrelated product change; otherwise WU051 stops for owner action.",
+          "Provider evidence independently identifies the Git-linked Production deployment, repository, main ref, exact merge SHA, deployment ID, READY target production, and its relationship to the public Production origin.",
           "Fresh public checks establish the required public launch posture: intended origin accessible without unintended authentication, required metadata/trust surfaces, and working robots/sitemap endpoints.",
           "The Production hardening release is explicitly recorded as a deployment operation only, not a final GO decision; GO/HOLD remains owner-owned after WU052."
         ],
@@ -2410,12 +2431,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "done",
         "dependencies": [
           "DEP-047"
         ],
         "createdAt": "2026-09-15T13:31:45.422Z",
-        "updatedAt": "2026-09-15T13:31:45.422Z"
+        "updatedAt": "2026-09-16T08:14:55.022Z"
       },
       {
         "id": "WU052",
@@ -2425,23 +2446,38 @@
         "scope": [
           "Freshly rerun every one of all 22 §14 cases. M013/WU048 PASS evidence is historical only and may be contextualized but not reused as current PASS evidence.",
           "Independently verify the WU049 admission controls, WU050 exact provider-attested candidate provenance, and WU051 Production release/origin posture in the same reverification cycle.",
-          "Produce sanitized, publication-safe evidence with expected/actual/PASS-FAIL/freshness for each case, release provenance, Production origin inspection, P0-P3 findings, and one bounded terminal readiness result.",
-          "Return a readiness recommendation only under the existing NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE semantics; preserve the separate owner GO/HOLD gate."
+          "Produce one fresh, sanitized, durable record for every canonical case containing at minimum: case ID; exact input/precondition; execution timestamp; authoritative release/deployment identifiers where relevant; expected result; observed result; PASS/FAIL; bounded reasoning; evidence references; freshness basis; and limitations/environmental dependencies. Historical WU048 PASS evidence may not satisfy any fresh WU052 PASS.",
+          "Verify only the existing Production release: Git SHA 58a882cefc7ad698141f962adb210965c1977baa, Vercel deployment dpl_CA2C9REuXtg3myLmCAt9XjNSETtV, and alias https://open-evora.vercel.app. A rebuilt, redeployed, equivalent-content, later, or substitute Production deployment must not be used as the WU052 test target.",
+          "Freshly confirm and record during WU052 that PR #123 remains open and unmerged, has not entered main, and has not caused a successor Production deployment. If PR #123 or its governance commit enters main before WU052 completes, stop and report target drift rather than silently continuing.",
+          "Explicitly distinguish in fresh evidence: WU050 historical candidate provenance d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d; WU051 candidate provenance df5c2f40fff25385a78a60322a961dfe335a35ba; WU051 Production merge provenance 58a882cefc7ad698141f962adb210965c1977baa; and Production provider deployment dpl_CA2C9REuXtg3myLmCAt9XjNSETtV. Candidate provenance and Production-release provenance must not be collapsed into one concept.",
+          "Alongside materially adverse claim HOLD/escalation, private-source HOLD, unavailable-source handling, and contradiction visibility/non-blocking behavior, freshly demonstrate an eligible material-Source path where the Source is non-private, its relevant WU049-contract availability revalidation is fresh and available, no unrelated safety finding requires HOLD, and admission proceeds without false HOLD.",
+          "Apply fail-closed evidence semantics to all 22 cases: missing required evidence, unavailable provider-native provenance inferred only from client/runtime/public-page behavior, unresolved ambiguity affecting an acceptance criterion, inability to reproduce or independently verify a required result, historical evidence offered as fresh proof, or a PASS based on assumption, equivalence, or absence of observed failure is non-PASS.",
+          "Produce sanitized, publication-safe release provenance, Production-origin inspection, P0-P3 findings, and one bounded terminal readiness result.",
+          "Return a readiness recommendation only under the existing NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE semantics; preserve the separate owner GO/HOLD gate.",
+          "For Case 17 only, provision an ephemeral real-browser runtime solely to obtain the canonical desktop, mobile, keyboard, accessibility, workflow, and trust-surface evidence against the exact pinned Production alias. Prefer the project's already-declared Playwright tooling; downloading its required browser executable into a tool/user cache is authorized. If that cannot provide a real browser, an equivalent real-browser mechanism is permitted only when it does not mutate the repository or Production, exercises the actual Production alias, supports the required desktop/mobile/keyboard evidence, and produces sanitized, reproducible evidence. Stop temporary browser processes after the execution; external tool caches need not be cleaned or committed."
         ],
         "outOfScope": [
           "Any remediation, code change, configuration mutation, release action, merge, or deployment",
+          "Testing a rebuilt, redeployed, equivalent-content, later, or substitute Production deployment instead of the exact pinned WU051 Production release",
+          "Permitting PR #123 or its governance commit to enter main, cause a successor Production deployment, or be treated as immaterial target drift",
           "Deciding GO/HOLD or representing a verifier result as GO",
           "Reusing prior M013/WU048 PASS evidence as fresh execution evidence",
           "M013/WU048 reopening or alteration",
-          "C008/C009/C010 repair"
+          "C008/C009/C010 repair",
+          "Adding or upgrading npm dependencies; modifying package.json, any lockfile, application/runtime code, or Playwright project configuration except where already required by the existing canonical test setup",
+          "Any Production, Vercel, DNS, environment, or configuration mutation; committing browser executables or artifacts; treating browser-runtime provisioning as product remediation; changing a canonical Case 17 requirement"
         ],
         "acceptanceCriteria": [
-          "All 22 §14 cases are freshly rerun and individually recorded with fresh expected outcome, actual outcome, PASS/FAIL result, evidence reference, and freshness classification; previous M013/WU048 PASS evidence is historical only.",
-          "Case 17 independently establishes exact provider-attested SHA provenance for the candidate/release and its relationship to the fresh WU051 Production deployment/origin; missing or inconsistent provenance is NOT_READY.",
-          "Cases 5, 7, 9, and 22 freshly demonstrate the WU049 remediation: contradiction surfacing, private-source HOLD, unavailable-source handling, and high-risk-claim HOLD/escalation without leakage.",
-          "The Production origin passes fresh public-access, protection, metadata, robots/sitemap, trust-surface, accessibility/responsive/browser, and release-provenance checks required by the 22-case matrix.",
+          "All 22 §14 cases are freshly rerun and each has one sanitized durable record containing case ID, exact input/precondition, execution timestamp, authoritative release/deployment identifiers where relevant, expected result, observed result, PASS/FAIL, bounded reasoning, evidence references, freshness basis, and limitations/environmental dependencies. Previous M013/WU048 PASS evidence is historical only and cannot satisfy any fresh WU052 PASS.",
+          "WU052 verifies exactly the existing Production release Git SHA 58a882cefc7ad698141f962adb210965c1977baa, Vercel deployment dpl_CA2C9REuXtg3myLmCAt9XjNSETtV, and alias https://open-evora.vercel.app. A rebuilt, redeployed, equivalent-content, later, or substitute Production deployment is not an acceptable test target.",
+          "Fresh WU052 evidence confirms PR #123 remains open and unmerged, has not entered main, and has not caused a successor Production deployment. If PR #123 or its governance commit enters main before WU052 completes, execution stops and reports target drift.",
+          "Case 17 independently establishes exact provider-attested SHA provenance for the candidate/release and its relationship to the exact pinned WU051 Production deployment/origin; missing or inconsistent provenance is NOT_READY. Fresh evidence explicitly distinguishes WU050 historical candidate d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d, WU051 candidate df5c2f40fff25385a78a60322a961dfe335a35ba, WU051 Production merge 58a882cefc7ad698141f962adb210965c1977baa, and Production provider deployment dpl_CA2C9REuXtg3myLmCAt9XjNSETtV without collapsing candidate and Production-release provenance.",
+          "Cases 5, 7, 9, and 22 freshly demonstrate the WU049 remediation: contradiction surfacing/non-blocking behavior, private-source HOLD, unavailable-source handling, and high-risk materially adverse claim HOLD/escalation without leakage or a false truth/corroboration decision. In addition, a fresh eligible material-Source path demonstrates a non-private Source with fresh WU049-contract available revalidation, no unrelated safety finding requiring HOLD, and admission proceeding without false HOLD.",
+          "All 22 cases apply fail-closed evidence semantics: missing required evidence, unavailable provider-native provenance inferred from client/runtime/public-page behavior, unresolved acceptance ambiguity, inability to reproduce or independently verify a required result, historical evidence substituted for fresh proof, or PASS by assumption, equivalence, or absence of observed failure is non-PASS.",
+          "The exact pinned Production origin passes fresh public-access, protection, metadata, robots/sitemap, trust-surface, accessibility/responsive/browser, and release-provenance checks required by the 22-case matrix.",
           "The evidence is publication-safe and contains no secrets, credentials, raw private material, personal identifiers, session data, or token-bearing URLs.",
-          "The terminal result is exactly NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE. A successful READY result does not decide GO/HOLD; GO/HOLD remains a separate owner action after this independent reverification."
+          "The terminal result is exactly NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE. A successful READY result does not decide GO/HOLD; GO/HOLD remains a separate owner action after this independent reverification.",
+          "Any Case 17 browser-runtime provisioning is demonstrably ephemeral and limited to a real-browser execution backend; it leaves the repository/project dependencies and exact pinned Production target immutable, changes none of the 22 canonical case definitions, retains fail-closed semantics, preserves PR #123 isolation and the prior 21 fresh results, makes no final GO/HOLD decision, and is followed by independent review of the bounded rerun."
         ],
         "agentContextRefs": [
           "AGENTS.md",
@@ -2459,12 +2495,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "done",
         "dependencies": [
           "DEP-048"
         ],
         "createdAt": "2026-09-15T13:31:45.422Z",
-        "updatedAt": "2026-09-15T13:31:45.422Z"
+        "updatedAt": "2026-09-16T09:26:33.398Z"
       }
     ],
     "dependencies": [
@@ -7031,15 +7067,406 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt review --mode release",
       "createdAt": "2026-09-15T13:06:57.029Z"
+    },
+    {
+      "id": "C050",
+      "workUnitId": "WU049",
+      "packetId": "PKT-050",
+      "summary": "Completed M014/WU049 Pre-Gate Safety Admission and recorded the owner-approved final independent review.",
+      "completed": [
+        "Implemented deterministic pre-Gate Safety Admission with ELIGIBLE/HOLD outcomes.",
+        "Verified contradiction visibility, private-source non-leakage, material-Source traversal, availability revalidation, claim predicates, and deterministic RCS identity.",
+        "Received explicit owner approval for WU049 closure."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "tools/research/admission/safety-admission.ts",
+        "tools/research/admission/hold-report.ts",
+        "tools/research/orchestrate/run-cycle.ts",
+        "tools/research/orchestrate/research-change-set.ts",
+        "tools/research/gate/markdown-view.ts",
+        "tools/research/gate/package-builder.ts",
+        "tools/research/gate/package-validator.ts",
+        "tools/research/gate/types.ts",
+        "tools/research/orchestrate/types.ts",
+        "tools/research/orchestrate/rcs-validator.ts",
+        "tools/research/admission/safety-admission.test.ts",
+        "tools/research/orchestrate/run-cycle.test.ts",
+        "tools/research/orchestrate/research-change-set.test.ts",
+        "tools/research/orchestrate/rcs-validator.test.ts"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "focused WU049 tests",
+          "result": "passed",
+          "summary": "68 focused tests passed."
+        },
+        {
+          "command": "npm run research:typecheck",
+          "result": "passed",
+          "summary": "TypeScript validation passed."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 canonical records."
+        },
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Repository research check passed."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "One canonical Pre-Gate Safety Admission producer returns only ELIGIBLE or HOLD with deterministic ordered/deduplicated findings, and orchestration, package projection, rendering, and tests consume that same result without reimplementing safety policy.",
+          "result": "passed",
+          "evidence": "Final independent review PASS and explicit owner acceptance."
+        },
+        {
+          "criterion": "Every candidate EVD with evidence_nature = claim receives the owner-approved structured safety checks. Only claim_authority = authoritative satisfies authority; non_authoritative, unknown, absent, or indeterminate authority HOLDs. Non-empty or indeterminate inference_limits[] HOLDs without parsing or semantically interpreting its text; an explicit empty list does not HOLD by itself. No truth, corroboration, legal/reputational, materiality, canonical-integration, or publication decision is introduced.",
+          "result": "passed",
+          "evidence": "Focused safety-admission and orchestration tests cover negative authority/inference-limit cases and the positive valid-claim path."
+        },
+        {
+          "criterion": "A material Source is derived only from explicit provenance of candidate EVD or affected-record decision_basis EVD. A private material Source HOLDs before reviewer/package and before external revalidation; no private content leaks and no automatic sanitization workflow exists.",
+          "result": "passed",
+          "evidence": "Traversal and private Hold Report regression coverage passed; final independent review accepted complete material-Source traversal."
+        },
+        {
+          "criterion": "Every non-private material Source is revalidated after candidate freeze and within ten minutes before admission; unavailable, unknown, timeout, verification error, unsupported, missing, authenticated/private, or stale revalidation deterministically HOLDs before Human Gate. This evidence establishes only fresh Source availability, not semantic claim currentness or truth.",
+          "result": "passed",
+          "evidence": "Focused temporal-boundary and unavailable/unverifiable availability tests passed."
+        },
+        {
+          "criterion": "A HOLD can never invoke the independent reviewer, assemble a final RCS, generate a normal Human Gate package, return READY_FOR_HUMAN_REVIEW, write canonical research state, commit, push, or publish; it produces only a non-canonical safe Pre-Gate Safety Hold Report with the approved minimal fields.",
+          "result": "passed",
+          "evidence": "Real orchestration HOLD regression passed, confirming no reviewer/RCS/package and a minimal safe Hold Report."
+        },
+        {
+          "criterion": "A represented contradiction remains structurally preserved and, when otherwise ELIGIBLE, appears with safe summary and references in the Human Gate JSON and rendered Markdown; it is not automatically a HOLD and is not recomputed by rendering.",
+          "result": "passed",
+          "evidence": "Canonical PRB evidence-effect contradiction regression and final independent review passed."
+        },
+        {
+          "criterion": "Structured findings distinguish contradiction visibility, private Source, Source revalidation missing/stale/unavailable/unknown-unverifiable, claim authority insufficient/unknown, and claim inference limits present/indeterminate; no semantic claim-currentness reason is emitted. Multiple findings sort by code then stable subject ID and deduplicate by that pair.",
+          "result": "passed",
+          "evidence": "Focused deterministic finding ordering/deduplication and claim-predicate tests passed."
+        },
+        {
+          "criterion": "Fresh deterministic unit, integration, package-projection, Markdown-rendering, orchestration-enforcement, and scenario coverage passes for M013/WU048 cases 5, 7, 9, and 22, including case-22 negative scenarios for authority, inference limits, and Source revalidation HOLD plus a positive regression proving that a claim whose structured predicates pass remains ELIGIBLE. Relevant existing §14 behavior does not regress.",
+          "result": "passed",
+          "evidence": "Focused WU049 suite passed 68/68; cases 5, 7, 9, 20, and 22 were freshly verified by final independent review."
+        },
+        {
+          "criterion": "No persisted research-schema migration, new persisted risk taxonomy, general crawler/live-research dependency, or forbidden semantic decision is introduced.",
+          "result": "passed",
+          "evidence": "Bounded diff and final independent review found no such expansion."
+        },
+        {
+          "criterion": "M013 remains historically done with WU048 canonical NOT_READY, and C008/C009/C010 are untouched.",
+          "result": "passed",
+          "evidence": "AIQT status and review retain historical M013/WU048 state and only report the pre-existing C008/C009/C010 diagnostics."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-15T17:56:18.226Z"
+    },
+    {
+      "id": "C051",
+      "workUnitId": "WU050",
+      "packetId": "PKT-051",
+      "summary": "Completed M014/WU050 Attested Release Provenance and recorded the owner-approved independent review.",
+      "completed": [
+        "Created the immutable remote candidate ref release/m014-wu050-candidate at d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d without advancing it.",
+        "Recorded sanitized, provider-native Git provenance that attests the exact GitHub commit SHA to one READY Preview deployment.",
+        "Verified unauthenticated protected ingress and noindex, with no Production promotion or WU051 action."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        "docs/design/audits/m014-wu050-release-provenance/report.md",
+        "docs/design/audits/m014-wu050-release-provenance/provider-attestation.json",
+        "docs/design/audits/m014-wu050-release-provenance/local-supporting-checks.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Passed in the accepted independent review; this closure re-ran its typecheck and test sequence until the tool execution output limit, with no failure observed."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "The accepted independent review passed this command. In this workspace its package-manager launcher could not resolve local .bin shims, so the identical build-data, typecheck, Vitest, and Vite stages were rerun directly from apps/research-explorer and passed."
+        },
+        {
+          "command": "Explorer build stages from apps/research-explorer (build-data, typecheck, Vitest, Vite build)",
+          "result": "passed",
+          "summary": "Read model built with 274 records and 403 edges; typecheck passed; 520 tests passed with 1 skipped; production build passed."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        },
+        {
+          "command": "git rev-parse refs/remotes/origin/release/m014-wu050-candidate",
+          "result": "passed",
+          "summary": "Remote-tracking candidate ref resolves to d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "The local work/evidence branch is work/m014-wu050-attested-release-provenance from d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d; the only remote Git mutation is release/m014-wu050-candidate pushed at that exact SHA and never advanced during WU050.",
+          "result": "passed",
+          "evidence": "Local supporting checks and the remote-tracking ref both identify the exact immutable candidate SHA."
+        },
+        {
+          "criterion": "Sanitized audit evidence is committed under docs/design/audits/m014-wu050-release-provenance/ on the local work/evidence branch only; that branch is not pushed in WU050.",
+          "result": "passed",
+          "evidence": "Commit 76c4a7a contains only the three sanitized audit artifacts on the local work/evidence branch."
+        },
+        {
+          "criterion": "The candidate deployment is Git-linked, Preview only, and protected.",
+          "result": "passed",
+          "evidence": "Provider attestation records source git, githubDeployment 1, target null, READY state, and unauthenticated SSO ingress with X-Robots-Tag noindex."
+        },
+        {
+          "criterion": "Provider-attested evidence independently binds the exact repository/ref and immutable commit SHA to one immutable candidate deployment identity and URL, including successful build status and inspection timestamps.",
+          "result": "passed",
+          "evidence": "provider-attestation.json records JoaomdvFerreira/open-evora, release/m014-wu050-candidate, exact githubCommitSha, deployment dpl_D9XxYTmYQzcmjwFghZXGFYdH5eDQ, immutable URL, and READY timestamps."
+        },
+        {
+          "criterion": "The provenance record clearly distinguishes provider attestation from locally asserted provenance and contains no credentials, tokens, private content, or unsafe URLs.",
+          "result": "passed",
+          "evidence": "The sanitized report explicitly separates provider attestation from local supporting checks and excludes sensitive ingress data."
+        },
+        {
+          "criterion": "No merge or Production promotion is performed in WU050; the candidate is not represented as Production or as a GO decision.",
+          "result": "passed",
+          "evidence": "The provider target is null (Preview), the report states no Production promotion or GO/HOLD decision, and WU051 remains planned."
+        },
+        {
+          "criterion": "If exact provider SHA attestation cannot be established, WU050 returns NOT_READY/BLOCKED without bypassing the requirement.",
+          "result": "passed",
+          "evidence": "Exact provider-native githubCommitSha attestation was established and matches d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d; no bypass was used."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-15T18:29:41.282Z"
+    },
+    {
+      "id": "C052",
+      "workUnitId": "WU051",
+      "packetId": "PKT-052",
+      "summary": "Closed M014/WU051 Production Launch-Hardening Release after explicit owner-gate approval and independent post-merge PASS review.",
+      "completed": [
+        "Preserved the WU050 historical candidate at d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d and the WU051 candidate at df5c2f40fff25385a78a60322a961dfe335a35ba.",
+        "Verified Production merge 58a882cefc7ad698141f962adb210965c1977baa has tree 0220d781284e4993781aeb2b6c1e738678014e81, identical to the WU051 candidate tree.",
+        "Verified Vercel Production deployment dpl_CA2C9REuXtg3myLmCAt9XjNSETtV and the required anonymous public launch-hardening posture.",
+        "Recorded EVT-342 owner-gate APPROVE acceptance, preserving EVT-341 as a one-time procedural exception without treating the missing independent GitHub approval as satisfied.",
+        "Persisted sanitized audit evidence under docs/design/audits/m014-wu051-production-release/."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl",
+        "docs/design/audits/m014-wu051-production-release/audit.md"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Research typecheck, full research test suite, and canonical validation passed."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 canonical records."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "Build-data, TypeScript, Vitest, and Vite production build passed."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "The correction is test-only and configures local user.name/user.email inside the affected temporary Git fixture/repository; no global CI identity, runtime/product change, or broader test redesign occurs. If any such change is required, WU051 stops for owner action.",
+          "result": "passed",
+          "evidence": "The candidate delta contains only tools/research/gate/test-fixtures.ts, which configures identity in temporary fixture repositories; independent review found no global identity, runtime/product, CI, or broader test change."
+        },
+        {
+          "criterion": "The corrected candidate is built from exact SHA d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d; release/m014-wu050-candidate remains permanently immutable at that SHA, and release/m014-wu051-candidate identifies the corrected SHA.",
+          "result": "passed",
+          "evidence": "Remote refs remain d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d for WU050 and df5c2f40fff25385a78a60322a961dfe335a35ba for WU051."
+        },
+        {
+          "criterion": "Required validation passes on the corrected SHA, and fresh provider-native protected Preview provenance establishes source=git, githubDeployment=1, correct repository/ref, exact githubCommitSha, READY, Preview/non-Production, and protected/noindex ingress before any Production PR/merge.",
+          "result": "passed",
+          "evidence": "Independent review accepted the fresh protected Preview provenance; npm run research:check, npm run research:validate, and npm run explorer:build pass on df5c2f40fff25385a78a60322a961dfe335a35ba."
+        },
+        {
+          "criterion": "PR #121 is not merged; after the replacement candidate is proven, it is closed or superseded and a replacement PR is opened from release/m014-wu051-candidate to main.",
+          "result": "passed",
+          "evidence": "PR #121 was not merged; PR #122 was the replacement PR from release/m014-wu051-candidate to main."
+        },
+        {
+          "criterion": "The release follows the owner-performed normal protected PR merge with no protection bypass, direct main push, or automatic merge; the PR head at merge time is the newly attested candidate SHA.",
+          "result": "passed",
+          "evidence": "PR #122 head is df5c2f40fff25385a78a60322a961dfe335a35ba and merged as 58a882cefc7ad698141f962adb210965c1977baa; EVT-341 separately and explicitly records the one-time owner bypass exception without reinterpreting it as an approval or waiving technical acceptance."
+        },
+        {
+          "criterion": "The merge commit has the newly attested candidate SHA as release-side parent, has a byte-identical tree, and contains no conflict-resolution or unrelated product change; otherwise WU051 stops for owner action.",
+          "result": "passed",
+          "evidence": "Merge parent two is df5c2f40fff25385a78a60322a961dfe335a35ba and both merge and candidate resolve to tree 0220d781284e4993781aeb2b6c1e738678014e81; their tree diff is empty."
+        },
+        {
+          "criterion": "Provider evidence independently identifies the Git-linked Production deployment, repository, main ref, exact merge SHA, deployment ID, READY target production, and its relationship to the public Production origin.",
+          "result": "passed",
+          "evidence": "Provider deployment dpl_CA2C9REuXtg3myLmCAt9XjNSETtV is READY, Production-targeted, Git-linked to JoaomdvFerreira/open-evora main at merge SHA 58a882cefc7ad698141f962adb210965c1977baa, and aliases open-evora.vercel.app."
+        },
+        {
+          "criterion": "Fresh public checks establish the required public launch posture: intended origin accessible without unintended authentication, required metadata/trust surfaces, and working robots/sitemap endpoints.",
+          "result": "passed",
+          "evidence": "Independent anonymous checks passed for the alias, PT-PT title and social metadata, robots.txt, exact six-route sitemap, all five trust routes, footer links, and both public Issues destinations."
+        },
+        {
+          "criterion": "The Production hardening release is explicitly recorded as a deployment operation only, not a final GO decision; GO/HOLD remains owner-owned after WU052.",
+          "result": "passed",
+          "evidence": "EVT-342 and the audit explicitly limit approval to WU051; WU052 remains planned and no GO/HOLD decision is recorded."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-16T08:14:55.022Z"
+    },
+    {
+      "id": "C053",
+      "workUnitId": "WU052",
+      "packetId": "PKT-053",
+      "summary": "Closed WU052 after explicit owner-gate acceptance of independently reviewed, sanitized fresh reverification evidence.",
+      "completed": [
+        "Recorded EVT-351 owner-gate acceptance for WU052 execution/evidence only.",
+        "Persisted the 22-case matrix, target/provenance and PR #123 isolation snapshots, Case 17 real-Chromium rerun evidence, independent review, owner acceptance, and P3 residual disposition under docs/design/audits/m014-wu052-go-live-reverification/.",
+        "Confirmed the exact Production target remains SHA 58a882cefc7ad698141f962adb210965c1977baa, deployment dpl_CA2C9REuXtg3myLmCAt9XjNSETtV, alias https://open-evora.vercel.app.",
+        "Confirmed PR #123 remains OPEN, unmerged, and outside main."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/runlog.jsonl",
+        "docs/design/audits/m014-wu052-go-live-reverification/"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Typecheck, research tests, and canonical validation passed."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Validated 274 records."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "Build-data and typecheck passed; 520 tests passed, 1 skipped; Vite build passed."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "All 22 §14 cases are freshly rerun and each has one sanitized durable record containing case ID, exact input/precondition, execution timestamp, authoritative release/deployment identifiers where relevant, expected result, observed result, PASS/FAIL, bounded reasoning, evidence references, freshness basis, and limitations/environmental dependencies. Previous M013/WU048 PASS evidence is historical only and cannot satisfy any fresh WU052 PASS.",
+          "result": "passed",
+          "evidence": "docs/design/audits/m014-wu052-go-live-reverification/case-records.md and audit.md"
+        },
+        {
+          "criterion": "WU052 verifies exactly the existing Production release Git SHA 58a882cefc7ad698141f962adb210965c1977baa, Vercel deployment dpl_CA2C9REuXtg3myLmCAt9XjNSETtV, and alias https://open-evora.vercel.app. A rebuilt, redeployed, equivalent-content, later, or substitute Production deployment is not an acceptable test target.",
+          "result": "passed",
+          "evidence": "Fresh read-only GitHub, Git remote, and Vercel checks; target-provenance.md and pr-123-isolation.md"
+        },
+        {
+          "criterion": "Fresh WU052 evidence confirms PR #123 remains open and unmerged, has not entered main, and has not caused a successor Production deployment. If PR #123 or its governance commit enters main before WU052 completes, execution stops and reports target drift.",
+          "result": "passed",
+          "evidence": "Fresh read-only GitHub, Git remote, and Vercel checks; pr-123-isolation.md"
+        },
+        {
+          "criterion": "Case 17 independently establishes exact provider-attested SHA provenance for the candidate/release and its relationship to the exact pinned WU051 Production deployment/origin; missing or inconsistent provenance is NOT_READY. Fresh evidence explicitly distinguishes WU050 historical candidate d96dc11b9fc848ea8dc73ff9dae2b48fb50ff02d, WU051 candidate df5c2f40fff25385a78a60322a961dfe335a35ba, WU051 Production merge 58a882cefc7ad698141f962adb210965c1977baa, and Production provider deployment dpl_CA2C9REuXtg3myLmCAt9XjNSETtV without collapsing candidate and Production-release provenance.",
+          "result": "passed",
+          "evidence": "target-provenance.md and case-records.md Case 17"
+        },
+        {
+          "criterion": "Cases 5, 7, 9, and 22 freshly demonstrate the WU049 remediation: contradiction surfacing/non-blocking behavior, private-source HOLD, unavailable-source handling, and high-risk materially adverse claim HOLD/escalation without leakage or a false truth/corroboration decision. In addition, a fresh eligible material-Source path demonstrates a non-private Source with fresh WU049-contract available revalidation, no unrelated safety finding requiring HOLD, and admission proceeding without false HOLD.",
+          "result": "passed",
+          "evidence": "case-records.md Cases 5, 7, 9, and 22"
+        },
+        {
+          "criterion": "All 22 cases apply fail-closed evidence semantics: missing required evidence, unavailable provider-native provenance inferred from client/runtime/public-page behavior, unresolved acceptance ambiguity, inability to reproduce or independently verify a required result, historical evidence substituted for fresh proof, or PASS by assumption, equivalence, or absence of observed failure is non-PASS.",
+          "result": "passed",
+          "evidence": "case-records.md and audit.md"
+        },
+        {
+          "criterion": "The exact pinned Production origin passes fresh public-access, protection, metadata, robots/sitemap, trust-surface, accessibility/responsive/browser, and release-provenance checks required by the 22-case matrix.",
+          "result": "passed",
+          "evidence": "target-provenance.md, audit.md, and case-records.md Case 17"
+        },
+        {
+          "criterion": "The evidence is publication-safe and contains no secrets, credentials, raw private material, personal identifiers, session data, or token-bearing URLs.",
+          "result": "passed",
+          "evidence": "Sanitized durable evidence set under docs/design/audits/m014-wu052-go-live-reverification/"
+        },
+        {
+          "criterion": "The terminal result is exactly NOT_READY, READY_WITH_ACCEPTED_RISK, or READY_FOR_GO_LIVE_GATE. A successful READY result does not decide GO/HOLD; GO/HOLD remains a separate owner action after this independent reverification.",
+          "result": "passed",
+          "evidence": "audit.md recommendation and EVT-351 decision boundary"
+        },
+        {
+          "criterion": "Any Case 17 browser-runtime provisioning is demonstrably ephemeral and limited to a real-browser execution backend; it leaves the repository/project dependencies and exact pinned Production target immutable, changes none of the 22 canonical case definitions, retains fail-closed semantics, preserves PR #123 isolation and the prior 21 fresh results, makes no final GO/HOLD decision, and is followed by independent review of the bounded rerun.",
+          "result": "passed",
+          "evidence": "case-records.md Case 17, audit.md, and EVT-350"
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-16T09:26:33.398Z",
+      "nextRecommendation": "aiqt review --mode release"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-050",
-    "workUnitId": "WU049",
+    "id": "PKT-053",
+    "workUnitId": "WU052",
     "milestoneId": "M014",
-    "createdAt": "2026-09-15T13:33:09.445Z",
+    "createdAt": "2026-09-16T08:21:09.942Z",
     "format": "markdown",
-    "contentHash": "sha256:a37f09da03b0e4637ba4b3cc4462a5f55d8c3d1c5c25e7eddf03e9a2c2f3ab63",
+    "contentHash": "sha256:84f4196b4e6b4f3d68dc3b39ed96b6b5102bbd51fed099111670fd8c85a5f38d",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -7057,8 +7484,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-09-15T14:44:15.323Z",
+  "nextRecommendedCommand": "aiqt review --mode release",
+  "lastUpdatedAt": "2026-09-16T09:26:33.398Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8692,6 +9119,126 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-15T13:06:57.029Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C050",
+      "current": {
+        "observationId": "sha256:29dd4e34a57ec723be8b923469fb08cc927f3bc7c435c8a5eddd9e4c6ddd8bce",
+        "checkpointId": "C050",
+        "workUnitId": "WU049",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-15T17:56:18.226Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-15T17:56:18.226Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:29dd4e34a57ec723be8b923469fb08cc927f3bc7c435c8a5eddd9e4c6ddd8bce",
+          "checkpointId": "C050",
+          "workUnitId": "WU049",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-15T17:56:18.226Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-15T17:56:18.226Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C051",
+      "current": {
+        "observationId": "sha256:12166b045f257936a2ac33fc1525583ea454be35c88baec6ee6551b5abfe3f30",
+        "checkpointId": "C051",
+        "workUnitId": "WU050",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-15T18:29:41.282Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-15T18:29:41.282Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:12166b045f257936a2ac33fc1525583ea454be35c88baec6ee6551b5abfe3f30",
+          "checkpointId": "C051",
+          "workUnitId": "WU050",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-15T18:29:41.282Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-15T18:29:41.282Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C052",
+      "current": {
+        "observationId": "sha256:c0659d1c54e622073410fa8f2e13b6547d1dfdb9d15c5fb98c1e12bfbb2be1d2",
+        "checkpointId": "C052",
+        "workUnitId": "WU051",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-16T08:14:55.022Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-16T08:14:55.022Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:c0659d1c54e622073410fa8f2e13b6547d1dfdb9d15c5fb98c1e12bfbb2be1d2",
+          "checkpointId": "C052",
+          "workUnitId": "WU051",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-16T08:14:55.022Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-16T08:14:55.022Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C053",
+      "current": {
+        "observationId": "sha256:a75e2f24f32ad7e4d59fe6898b8ac70dbf517ef4031de29a8846cf1aacef1a03",
+        "checkpointId": "C053",
+        "workUnitId": "WU052",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-16T09:26:33.398Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-16T09:26:33.398Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:a75e2f24f32ad7e4d59fe6898b8ac70dbf517ef4031de29a8846cf1aacef1a03",
+          "checkpointId": "C053",
+          "workUnitId": "WU052",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-16T09:26:33.398Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-16T09:26:33.398Z"
         }
       ]
     }
