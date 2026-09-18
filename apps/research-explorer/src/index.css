@@ -994,15 +994,21 @@ main.explorer-shell {
 }
 
 /* Editorial content/media Hero band: a two-column grid, not a flex row —
-   copy+metrics occupy the left ~64% column and the photograph spans the
-   full height of that same region as one tall right-hand mass (~32%),
-   rather than a small figure that only sits beside the opening lines.
-   Text remains the primary element; the media column now participates as a
-   genuine vertical peer of copy+metrics together, matching the reference
-   composition rather than the previous roughly-equal two-column split. */
+   copy+metrics occupy the left column and the photograph spans the full
+   height of that same region as one tall right-hand mass, rather than a
+   small figure that only sits beside the opening lines. Text remains the
+   primary element; the media column now participates as a genuine vertical
+   peer of copy+metrics together, matching the reference composition rather
+   than the previous roughly-equal two-column split.
+   Delta (visual-completion pass 3) — the left column widens further
+   (2.4fr) and the media column grows in step (1.35fr, wider floor) so the
+   photograph reads as a substantially wider, more landscape mass instead
+   of a narrow tall strip; the headline column's effective width is what
+   lets the headline settle onto two lines at 1440 without shrinking type
+   or an inserted `<br>`. */
 .overview-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.8fr) minmax(280px, 0.9fr);
+  grid-template-columns: minmax(0, 2.4fr) minmax(360px, 1.35fr);
   align-items: stretch;
   gap: var(--space-section);
   padding: var(--space-loose) var(--space-section) var(--space-loose);
@@ -1013,7 +1019,6 @@ main.explorer-shell {
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  max-width: 40rem;
 }
 
 .overview-hero-eyebrow {
@@ -1056,48 +1061,37 @@ main.explorer-shell {
   line-height: 1.55;
 }
 
-/* Media composition — the photograph is now a major visual mass filling
-   its grid column and spanning the same vertical region as copy+metrics,
-   not a small figure attached beside the opening lines. Two pale warm
-   circular forms (CSS pseudo-elements only, no SVG artwork) sit behind/
-   around the frame as deliberate background geometry; the image itself
-   keeps a meaningful asymmetrical lower boundary via `clip-path` so it
-   reads as a designed Hero media region rather than a rectangle with one
-   corner cut off. The image fills its column at a fixed target height
-   (§6, ~210–250px) via `object-fit: cover` rather than tracking the
-   derivative's intrinsic aspect-ratio, so it participates in the full
-   height of the Hero row instead of settling to a short strip. */
+/* Media composition — the photograph is a major visual mass filling its
+   grid column, wider and more landscape-proportioned than tall, spanning
+   the same vertical region as copy+metrics rather than a small figure
+   attached beside the opening lines.
+   Delta (visual-completion pass 3) — simplified to one broad soft warm
+   background shape (a single CSS pseudo-element, no SVG artwork) bleeding
+   off the upper-right corner, replacing the previous two-circle geometry,
+   so the right side reads as one intentional editorial composition. The
+   image itself keeps a smoother single-cut asymmetric lower-left boundary
+   via `clip-path` (one diagonal instead of the previous multi-point notch)
+   and a shorter, wider target height so it reads landscape rather than a
+   tall strip; `object-fit: cover` still fills that height regardless of
+   the derivative's intrinsic aspect-ratio. */
 .overview-hero-media-composition {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   height: 100%;
-  min-height: 15rem;
+  min-height: 13rem;
 }
 
 .overview-hero-media-composition::before {
   content: "";
   position: absolute;
-  top: -1.75rem;
-  right: -2rem;
-  width: 68%;
-  height: 60%;
+  top: -2.5rem;
+  right: -3rem;
+  width: 88%;
+  height: 78%;
   border-radius: 50%;
   background: var(--color-surface-subtle);
-  z-index: 0;
-}
-
-.overview-hero-media-composition::after {
-  content: "";
-  position: absolute;
-  right: 8%;
-  bottom: -1.5rem;
-  width: 42%;
-  height: 38%;
-  border-radius: 50%;
-  background: var(--color-surface-subtle);
-  opacity: 0.7;
   z-index: 0;
 }
 
@@ -1114,9 +1108,9 @@ main.explorer-shell {
 }
 
 .overview-hero-media img {
-  height: clamp(210px, 22vw, 250px);
+  height: clamp(170px, 15vw, 210px);
   border-radius: var(--radius-surface);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 12% 100%, 0 80%, 0 15%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 12% 100%, 0 78%);
   object-fit: cover;
   object-position: center 42%;
 }
@@ -1211,8 +1205,12 @@ main.explorer-shell {
   white-space: nowrap;
 }
 
+/* Delta (visual-completion pass 3) — widened from 11rem now that the Hero
+   content column itself is wider (§1): the ongoing-investigation statement
+   reads as one short line rather than collapsing into a narrow multi-line
+   column. */
 .overview-metric--ongoing {
-  max-width: 11rem;
+  max-width: 16rem;
 }
 
 .overview-metric--ongoing .overview-metric-text {
