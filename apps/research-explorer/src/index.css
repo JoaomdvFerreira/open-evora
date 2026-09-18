@@ -48,8 +48,8 @@ main {
 .trust-navigation a[aria-current="page"] { border-left-color: var(--color-feedback-affirmed); color: var(--color-ink-primary); font-weight: var(--text-interface-label-weight); text-decoration: none; }
 .trust-back { margin: 0 0 var(--space-loose); font-family: var(--font-interface); font-size: var(--text-interface-label-size); }
 .trust-summary { margin: var(--space-tight) 0 0; color: var(--color-ink-secondary); font-family: var(--font-interface); font-size: var(--text-interface-body-size); line-height: var(--text-interface-body-line-height); }
-.trust-content { margin-top: var(--space-section); }
-.trust-content section + section { margin-top: var(--space-section); }
+.trust-content { margin-top: var(--space-loose); }
+.trust-content section + section { margin-top: var(--space-loose); }
 .trust-content h2 { margin: 0 0 var(--space-standard); font-family: var(--font-interface); font-size: var(--text-interface-heading-size); line-height: var(--text-interface-heading-line-height); }
 .trust-content p { margin: 0 0 var(--space-standard); }
 .trust-facts { margin: 0; border-top: 1px solid var(--color-separator-faint); }
@@ -1302,6 +1302,10 @@ main.explorer-shell {
   line-height: 1.45;
 }
 
+.material-change-problem-id::after {
+  content: " · ";
+}
+
 .material-change-summary {
   margin-top: 0.35rem !important;
   color: var(--color-ink-secondary);
@@ -2426,6 +2430,11 @@ main.explorer-shell {
     display: inline-flex;
   }
 
+  .explorer-logo--compact .oe-logo-mark {
+    height: 1.75rem;
+    width: 1.75rem;
+  }
+
   .explorer-navigation {
     width: 100%;
     margin-bottom: 1rem;
@@ -2511,6 +2520,15 @@ main.explorer-shell {
   .material-change-item {
     grid-template-columns: 1fr;
     gap: 0.25rem;
+  }
+
+  .material-change-problem-id,
+  .material-change-problem-title {
+    display: block;
+  }
+
+  .material-change-problem-id::after {
+    content: none;
   }
 
   .overview-trust {
@@ -3174,6 +3192,11 @@ main.explorer-shell {
 
   .problem-identity-heading-row {
     align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .problem-share-action {
+    align-self: flex-start;
   }
 
   .evd-identity h1 {

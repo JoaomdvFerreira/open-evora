@@ -23,12 +23,12 @@ const TRUST_PAGES: Record<TrustPagePath, TrustPageContent> = {
   "/about": {
     heading: "Sobre o Open Évora",
     summary: "Um projeto independente.",
-    body: <><section aria-labelledby="about-accountability"><h2 id="about-accountability">Responsabilidade</h2><dl className="trust-facts"><div><dt>Responsável</dt><dd>Projeto Open Évora</dd></div><div><dt>Independência</dt><dd>Projeto independente</dd></div><div><dt>Financiamento</dt><dd>Autofinanciado</dd></div></dl></section><section aria-labelledby="about-publication"><h2 id="about-publication">Como é publicado</h2><p>O conteúdo é proveniente do corpus de investigação com controlo de versões, passa pelo processo existente de validação e revisão e é publicado através do Research Explorer. A proveniência, as limitações e a incerteza são apresentadas de forma explícita.</p></section></>,
+    body: <><section aria-labelledby="about-accountability"><h2 id="about-accountability">Responsabilidade</h2><dl className="trust-facts"><div><dt>Responsável</dt><dd>Projeto Open Évora</dd></div><div><dt>Independência</dt><dd>Projeto independente</dd></div><div><dt>Financiamento</dt><dd>Autofinanciado</dd></div></dl></section><section aria-labelledby="about-publication"><h2 id="about-publication">Como é publicado</h2><p>O conteúdo é proveniente do corpus de investigação com controlo de versões, passa pelo processo existente de validação e revisão e é publicado através do Explorador de Investigação. A proveniência, as limitações e a incerteza são apresentadas de forma explícita.</p></section></>,
   },
   "/methodology": {
     heading: "Metodologia",
-    summary: "Como o Explorer apresenta investigação e evidência.",
-    body: <><p>O Research Explorer organiza investigação a partir de fontes identificadas e evidência rastreável. Sempre que relevante, distingue factos observados, evidência local, fontes externas, inferências e limitações da informação disponível.</p><p>Os registos são sujeitos a validação antes de serem integrados no conjunto de dados canónico e publicados. A existência de uma fonte não significa que todas as conclusões possíveis a partir dessa fonte estejam estabelecidas; o Explorer procura tornar explícitos o âmbito e os limites da evidência apresentada.</p></>,
+    summary: "Como o Explorador de Investigação apresenta investigação e evidência.",
+    body: <><p>O Explorador de Investigação organiza investigação a partir de fontes identificadas e evidência rastreável. Sempre que relevante, distingue factos observados, evidência local, fontes externas, inferências e limitações da informação disponível.</p><p>Os registos são sujeitos a validação antes de serem integrados no conjunto de dados canónico e publicados. A existência de uma fonte não significa que todas as conclusões possíveis a partir dessa fonte estejam estabelecidas; o Explorador procura tornar explícitos o âmbito e os limites da evidência apresentada.</p></>,
   },
   "/corrections": {
     heading: "Correções",
@@ -42,8 +42,8 @@ const TRUST_PAGES: Record<TrustPagePath, TrustPageContent> = {
   },
   "/privacy": {
     heading: "Privacidade",
-    summary: "O que é necessário para consultar o Research Explorer.",
-    body: <><p>O Research Explorer pode ser consultado sem criar uma conta ou fornecer diretamente dados pessoais ao Open Évora.</p><p>O serviço é alojado através de infraestrutura de terceiros, que pode processar dados técnicos necessários ao funcionamento e segurança do serviço, como endereços IP e registos de acesso, de acordo com as respetivas políticas.</p><p>O Open Évora não deve introduzir formulários de recolha de dados pessoais, analytics adicionais, cookies não essenciais ou mecanismos semelhantes sem rever e atualizar previamente esta informação.</p></>,
+    summary: "O que é necessário para consultar o Explorador de Investigação.",
+    body: <><p>O Explorador de Investigação pode ser consultado sem criar uma conta ou fornecer diretamente dados pessoais ao Open Évora.</p><p>O serviço é alojado através de infraestrutura de terceiros, que pode processar dados técnicos necessários ao funcionamento e segurança do serviço, como endereços IP e registos de acesso, de acordo com as respetivas políticas.</p><p>O Open Évora não deve introduzir formulários de recolha de dados pessoais, analytics adicionais, cookies não essenciais ou mecanismos semelhantes sem rever e atualizar previamente esta informação.</p></>,
   },
 };
 
@@ -54,9 +54,9 @@ export function trustPageForPath(pathname: string): TrustPageContent | null {
 
 export function TrustPage({ page }: { page: TrustPageContent }) {
   const currentPath = TRUST_NAVIGATION.find(({ path }) => TRUST_PAGES[path] === page)?.path;
-  return <div className="trust-experience shell-frame"><header className="trust-header"><a href="/" className="trust-brand" aria-label="Open Évora — Research Explorer"><Logo form="full" /><span>Research Explorer</span></a></header><div className="trust-layout"><nav className="trust-navigation" aria-label="Informação sobre o Open Évora"><p>Informação</p><ul>{TRUST_NAVIGATION.map(({ path, label }) => <li key={path}><a href={path} aria-current={currentPath === path ? "page" : undefined}>{label}</a></li>)}</ul></nav><article className="trust-page"><p className="trust-back"><a href="/">← Explorar problemas</a></p><h1>{page.heading}</h1><p className="trust-summary">{page.summary}</p><div className="trust-content">{page.body}</div></article></div></div>;
+  return <div className="trust-experience shell-frame"><header className="trust-header"><a href="/" className="trust-brand" aria-label="Open Évora — Explorador de Investigação"><Logo form="full" /><span>Explorador de Investigação</span></a></header><div className="trust-layout"><nav className="trust-navigation" aria-label="Informação sobre o Open Évora"><p>Informação</p><ul>{TRUST_NAVIGATION.map(({ path, label }) => <li key={path}><a href={path} aria-current={currentPath === path ? "page" : undefined}>{label}</a></li>)}</ul></nav><article className="trust-page"><p className="trust-back"><a href="/">← Explorar problemas</a></p><h1>{page.heading}</h1><p className="trust-summary">{page.summary}</p><div className="trust-content">{page.body}</div></article></div></div>;
 }
 
 export function PublicFooter() {
-  return <footer className="public-footer" aria-label="Informação sobre o Open Évora"><div className="public-footer-inner shell-frame"><a href="/">Research Explorer</a>{TRUST_NAVIGATION.map(({ path, label }) => <a key={path} href={path}>{label}</a>)}</div></footer>;
+  return <footer className="public-footer" aria-label="Informação sobre o Open Évora"><div className="public-footer-inner shell-frame"><a href="/">Explorador de Investigação</a>{TRUST_NAVIGATION.map(({ path, label }) => <a key={path} href={path}>{label}</a>)}</div></footer>;
 }

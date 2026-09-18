@@ -26,6 +26,7 @@ it("renders the owner-confirmed About accountability facts in the shared trust s
   render(<App dataProvider={provider} />);
 
   expect(screen.getByRole("heading", { name: "Sobre o Open Évora" })).toBeTruthy();
+  expect(screen.getByRole("link", { name: "Open Évora — Explorador de Investigação" })).toBeTruthy();
   expect(screen.getByText("Projeto Open Évora")).toBeTruthy();
   expect(screen.getByText("Projeto independente")).toBeTruthy();
   expect(screen.getByText("Autofinanciado")).toBeTruthy();
