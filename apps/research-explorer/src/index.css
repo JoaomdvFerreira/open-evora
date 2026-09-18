@@ -993,22 +993,27 @@ main.explorer-shell {
   overflow: hidden;
 }
 
-/* Editorial content/media Hero band: text (eyebrow, headline, supporting
-   copy, metrics) on the left at roughly 58% width, the Évora photograph
-   composed into the right ~42%. Text remains the primary element — the
-   media column stays visually subordinate even though it now participates
-   much more directly in the composition than the old isolated figure. */
+/* Editorial content/media Hero band: a two-column grid, not a flex row —
+   copy+metrics occupy the left ~64% column and the photograph spans the
+   full height of that same region as one tall right-hand mass (~32%),
+   rather than a small figure that only sits beside the opening lines.
+   Text remains the primary element; the media column now participates as a
+   genuine vertical peer of copy+metrics together, matching the reference
+   composition rather than the previous roughly-equal two-column split. */
 .overview-hero {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(280px, 0.9fr);
+  align-items: stretch;
   gap: var(--space-section);
-  padding: var(--space-section) var(--space-section) var(--space-loose);
+  padding: var(--space-loose) var(--space-section) var(--space-loose);
 }
 
 .overview-hero-content {
-  flex: 1 1 58%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-width: 0;
-  max-width: 34rem;
+  max-width: 40rem;
 }
 
 .overview-hero-eyebrow {
@@ -1023,54 +1028,76 @@ main.explorer-shell {
 
 .overview-hero-headline {
   margin: 0 0 0.65rem;
+  max-width: none;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
   font-size: clamp(1.6rem, 3.6vw, 2.3rem);
   font-weight: 600;
   line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
-/* Delta §1 — a larger reading-first headline once the frame has genuine
+/* Delta §1/§4 — a larger reading-first headline once the frame has genuine
    room, an explicit responsive step rather than an unbounded vw scale
-   (foundations.md "Typography roles and reading hierarchy"). A strong
-   two-line editorial composition at wide desktop. */
+   (foundations.md "Typography roles and reading hierarchy"). The wider
+   left column (§3) gives this room to settle into two strong lines instead
+   of wrapping after "Investigamos". */
 @media (min-width: 1200px) {
   .overview-hero-headline {
-    font-size: 2.75rem;
+    font-size: 2.6rem;
   }
 }
 
 .overview-hero-supporting {
   margin: 0 0 var(--space-loose);
-  max-width: var(--measure-supporting, 44ch);
+  max-width: 42rem;
   color: var(--color-ink-secondary);
   font-size: 1.02rem;
   line-height: 1.55;
 }
 
-/* Media composition — the photograph now participates directly in the
-   upper-right band rather than sitting in an isolated rectangle. A pale
-   warm circular form behind the frame (CSS pseudo-element only, no SVG
-   artwork) reads as deliberate background geometry; the image itself is
-   clipped with one restrained organic mask on its lower edge so it does
-   not read as a plain cropped rectangle. `aspect-ratio` matches the
-   derivative's intrinsic 700x291 geometry so reserved space is exact and
-   introduces no layout shift while the image loads. */
+/* Media composition — the photograph is now a major visual mass filling
+   its grid column and spanning the same vertical region as copy+metrics,
+   not a small figure attached beside the opening lines. Two pale warm
+   circular forms (CSS pseudo-elements only, no SVG artwork) sit behind/
+   around the frame as deliberate background geometry; the image itself
+   keeps a meaningful asymmetrical lower boundary via `clip-path` so it
+   reads as a designed Hero media region rather than a rectangle with one
+   corner cut off. The image fills its column at a fixed target height
+   (§6, ~210–250px) via `object-fit: cover` rather than tracking the
+   derivative's intrinsic aspect-ratio, so it participates in the full
+   height of the Hero row instead of settling to a short strip. */
 .overview-hero-media-composition {
   position: relative;
-  flex: 0 0 min(42%, 26rem);
-  padding-top: var(--space-loose);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  min-height: 15rem;
 }
 
 .overview-hero-media-composition::before {
   content: "";
   position: absolute;
-  top: -1.5rem;
-  right: -1.5rem;
-  width: 70%;
-  height: 70%;
+  top: -1.75rem;
+  right: -2rem;
+  width: 68%;
+  height: 60%;
   border-radius: 50%;
   background: var(--color-surface-subtle);
+  z-index: 0;
+}
+
+.overview-hero-media-composition::after {
+  content: "";
+  position: absolute;
+  right: 8%;
+  bottom: -1.5rem;
+  width: 42%;
+  height: 38%;
+  border-radius: 50%;
+  background: var(--color-surface-subtle);
+  opacity: 0.7;
   z-index: 0;
 }
 
@@ -1084,13 +1111,12 @@ main.explorer-shell {
 .overview-hero-media img {
   display: block;
   width: 100%;
-  height: auto;
 }
 
 .overview-hero-media img {
-  aspect-ratio: 700 / 291;
+  height: clamp(210px, 22vw, 250px);
   border-radius: var(--radius-surface);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 12% 100%, 0 78%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 12% 100%, 0 80%, 0 15%);
   object-fit: cover;
   object-position: center 42%;
 }
@@ -1110,16 +1136,20 @@ main.explorer-shell {
   color: inherit;
 }
 
-/* Delta pass 2 — metrics now sit inside the Hero content column, directly
+/* Delta pass 2/3 — metrics sit inside the Hero content column, directly
    below the supporting copy, as an integrated editorial facts row rather
    than a separate banded section. Each metric pairs a restrained circular
    icon with its value/label; a vertical hairline separates metrics at wide
-   desktop. Plain semantic list — value and label stay separate elements. */
+   desktop. Plain semantic list — value and label stay separate elements.
+   `flex-wrap: nowrap` at desktop is deliberate (§9): the wider left column
+   now gives all three metrics room to sit in one row without wrapping —
+   fixing that belongs to the grid proportions above, not to letting the
+   third item fall onto its own line. */
 .overview-metrics {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.9rem 1.75rem;
+  gap: 0.9rem 1.5rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1128,23 +1158,26 @@ main.explorer-shell {
 .overview-metric {
   display: flex;
   align-items: center;
+  min-width: 0;
   gap: 0.6rem;
   margin: 0;
   padding: 0;
 }
 
 .overview-metric + .overview-metric {
-  padding-left: 1.75rem;
+  padding-left: 1.5rem;
   border-left: 1px solid var(--color-separator-faint);
 }
 
+/* §10 — icon backplates read as a deliberate hierarchy device at wide
+   desktop: 40–44px, up from the previous 2.1rem (~34px). */
 .overview-metric-icon-backplate {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 2.1rem;
-  height: 2.1rem;
+  width: 2.6rem;
+  height: 2.6rem;
   border-radius: 50%;
   background: var(--color-surface-subtle);
 }
@@ -1152,12 +1185,13 @@ main.explorer-shell {
 .overview-metric-icon {
   display: block;
   color: var(--color-accent);
-  font-size: 1.05rem;
+  font-size: 1.2rem;
 }
 
 .overview-metric-text {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   line-height: 1.2;
 }
 
@@ -1167,12 +1201,18 @@ main.explorer-shell {
   font-size: 1.4rem;
   font-weight: 600;
   line-height: 1.15;
+  white-space: nowrap;
 }
 
 .overview-metric-label {
   color: var(--color-ink-secondary);
   font-family: var(--font-interface);
   font-size: var(--text-interface-label-size);
+  white-space: nowrap;
+}
+
+.overview-metric--ongoing {
+  max-width: 11rem;
 }
 
 .overview-metric--ongoing .overview-metric-text {
@@ -1181,6 +1221,7 @@ main.explorer-shell {
   font-family: var(--font-interface);
   font-size: var(--text-interface-body-size);
   font-style: italic;
+  white-space: normal;
 }
 
 /* Trust/value row — the lower band of the same composition, separated from
@@ -1193,7 +1234,7 @@ main.explorer-shell {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.75rem;
   margin: 0;
-  padding: var(--space-loose) var(--space-section);
+  padding: var(--space-standard) var(--space-section);
   border-top: 1px solid var(--color-separator-faint);
   background: var(--color-surface-subtle);
 }
@@ -1211,13 +1252,16 @@ main.explorer-shell {
   border-left: 0;
 }
 
+/* §11 — a modest refinement only: kept visibly stronger than the Hero
+   metric icon circles (2.6rem) now that those have also grown, without a
+   substantial redesign of the trust row itself. */
 .overview-trust-icon-backplate {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 2.625rem;
-  height: 2.625rem;
+  width: 2.85rem;
+  height: 2.85rem;
   border-radius: 50%;
   background: var(--color-surface-raised);
 }
@@ -2805,24 +2849,35 @@ main.explorer-shell {
   }
 }
 
-/* Overview top-surface at the 768px boundary (§9): reduce media width and
-   Hero padding first rather than letting the desktop two-column shape
-   destabilise or silently wrap. If the third metric would still orphan its
-   left border on its own line at this width, recompose metrics into a
-   deliberate 2+1 shape (two metrics share a row, the ongoing statement
-   moves to its own full-width row without a dangling border) instead of
-   leaving that to flex-wrap. */
+/* Overview top-surface at the 768–1023px band (§14): copy-left/media-right
+   stays stable (still the same grid, narrower right column), with gap and
+   padding reduced deliberately rather than letting the wide-desktop
+   proportions destabilise or silently wrap. If the third metric would
+   still orphan its left border on its own line at this width, recompose
+   metrics into a deliberate 2+1 shape (two metrics share a row, the
+   ongoing statement moves to its own full-width row without a dangling
+   border) instead of leaving that to flex-wrap. */
 @media (min-width: 768px) and (max-width: 1023px) {
   .overview-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.7fr);
     gap: var(--space-loose);
     padding: var(--space-loose) var(--space-loose) 0;
   }
 
+  .overview-hero-content {
+    max-width: none;
+  }
+
   .overview-hero-media-composition {
-    flex-basis: min(36%, 18rem);
+    min-height: 12rem;
+  }
+
+  .overview-hero-media img {
+    height: clamp(160px, 26vw, 210px);
   }
 
   .overview-metrics {
+    flex-wrap: wrap;
     gap: 0.75rem 1.25rem;
   }
 
@@ -2832,8 +2887,14 @@ main.explorer-shell {
 
   .overview-metric--ongoing {
     flex-basis: 100%;
+    max-width: none;
     padding-left: 0;
     border-left: 0;
+  }
+
+  .overview-metric-value,
+  .overview-metric-label {
+    white-space: normal;
   }
 
   .overview-trust {
@@ -2990,6 +3051,15 @@ main.explorer-shell {
   .overview-metric--ongoing {
     padding-left: 0;
     border-left: 0;
+  }
+
+  .overview-metric--ongoing {
+    max-width: none;
+  }
+
+  .overview-metric-value,
+  .overview-metric-label {
+    white-space: normal;
   }
 
   .overview-metric-value {

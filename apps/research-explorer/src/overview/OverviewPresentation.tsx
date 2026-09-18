@@ -105,8 +105,8 @@ export function OverviewPresentation({
             <div className="overview-hero-media-composition">
               <figure className="overview-hero-media">
                 <picture>
-                  <source type="image/avif" srcSet={`${heroEvora700Avif} 700w, ${heroEvora1000Avif} 1000w`} sizes="min(42vw, 30rem)" />
-                  <source type="image/webp" srcSet={`${heroEvora700Webp} 700w, ${heroEvora1000Webp} 1000w`} sizes="min(42vw, 30rem)" />
+                  <source type="image/avif" srcSet={`${heroEvora700Avif} 700w, ${heroEvora1000Avif} 1000w`} sizes="min(32vw, 24rem)" />
+                  <source type="image/webp" srcSet={`${heroEvora700Webp} 700w, ${heroEvora1000Webp} 1000w`} sizes="min(32vw, 24rem)" />
                   <img src={heroEvora700} width={700} height={291} alt="" loading="eager" fetchPriority="high" />
                 </picture>
               </figure>
