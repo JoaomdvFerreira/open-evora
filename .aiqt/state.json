@@ -1,7 +1,7 @@
 {
   "version": "0.8.0",
-  "projectStatus": "in_progress",
-  "currentMilestoneId": "M015",
+  "projectStatus": "review",
+  "currentMilestoneId": null,
   "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
@@ -173,7 +173,7 @@
         "id": "M015",
         "title": "M015 — Citizen-Facing UX Refresh",
         "objective": "Deliver the owner-approved citizen-facing UX refresh for the Research Explorer: a production-ready visual foundation, a runtime-derived Citizen Overview with search/discovery, an authored material-change timeline, a refreshed Problem Reading experience, a shared citizen-facing trust experience, an integrated rendered/accessibility review, and a production release gated on explicit owner acceptance. This milestone is presentation-only: canonical SRC/EVD/PRB semantics, the separate OPEN/validation_status/evidence_status dimensions, and the current static client architecture are preserved unchanged.",
-        "status": "ready",
+        "status": "done",
         "workUnitIds": [
           "WU053",
           "WU054",
@@ -2847,12 +2847,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-055"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-18T08:21:06.952Z"
+        "updatedAt": "2026-09-18T09:01:31.945Z"
       }
     ],
     "dependencies": [
@@ -8411,17 +8411,84 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-18T08:21:06.952Z",
-      "nextRecommendation": "aiqt next"
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-18T08:21:06.952Z"
+    },
+    {
+      "id": "C060",
+      "workUnitId": "WU059",
+      "packetId": "PKT-060",
+      "summary": "Released the accepted M015 citizen-facing UX refresh to the reported Production deployment and completed the bounded post-deployment closure validation.",
+      "completed": [
+        "Recorded the reported READY Production deployment dpl_Hg2EsK1rTUMzRcsKLTB41GBBwGxM and its main provenance at c87a8d25adc9969d034610bd26d6988f67c9198f.",
+        "Recorded reported published-manifest provenance at the same SHA and reported completed Production HTTP/static smoke PASS.",
+        "Created a clean detached worktree at the exact SHA, installed the existing Research Explorer lockfile dependencies, and ran npm run explorer:build PASS.",
+        "Removed the temporary validation worktree."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm ci --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Completed in a clean detached worktree at c87a8d25adc9969d034610bd26d6988f67c9198f using the existing app lockfile."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "In the same clean worktree, data build, typecheck, Vitest, and production build passed; the read-model sourceCommit was c87a8d25adc9969d034610bd26d6988f67c9198f."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors in the AIQT closure state."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Release proceeds only after the integrated review's explicit owner acceptance is recorded.",
+          "result": "passed",
+          "evidence": "Existing WU058 integrated owner acceptance is preserved; EVID-009 records this release closure without claiming a new browser review."
+        },
+        {
+          "criterion": "The release uses the existing PR/protected-merge workflow with no protection bypass.",
+          "result": "passed",
+          "evidence": "Reported Production provenance is main at c87a8d25adc9969d034610bd26d6988f67c9198f; no deployment or protection mutation was performed in this closure."
+        },
+        {
+          "criterion": "Post-deployment production smoke verification confirms the released surfaces are reachable and functioning as accepted.",
+          "result": "passed",
+          "evidence": "Completed Production HTTP/static smoke PASS was supplied for the READY production deployment and recorded in EVID-009."
+        },
+        {
+          "criterion": "No unrelated feature work is introduced during the release.",
+          "result": "passed",
+          "evidence": "Only AIQT lifecycle/evidence state is changed; no runtime or product code, configuration, lockfile, or deployment setting was modified."
+        },
+        {
+          "criterion": "git diff --check passes on any release-related change.",
+          "result": "passed",
+          "evidence": "Executed against the AIQT-only closure diff."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-18T09:01:31.945Z",
+      "nextRecommendation": "aiqt review --mode release"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-059",
-    "workUnitId": "WU058",
+    "id": "PKT-060",
+    "workUnitId": "WU059",
     "milestoneId": "M015",
-    "createdAt": "2026-09-18T06:52:57.981Z",
+    "createdAt": "2026-09-18T08:34:27.374Z",
     "format": "markdown",
-    "contentHash": "sha256:fbef5ef6c96126074f4ff210ce3ab159d03c0bb85b70ff9cf5398369312ad047",
+    "contentHash": "sha256:4529d668728755948818bd35f9d4c3314d0a465e1933a33de91f57b9785e87f4",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -8439,8 +8506,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-18T08:21:06.952Z",
+  "nextRecommendedCommand": "aiqt review --mode release",
+  "lastUpdatedAt": "2026-09-18T09:01:31.945Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8847,6 +8914,48 @@
           "externalEvidenceId": "WU058-integrated-review-contract-2026-09-18",
           "importIdentityKey": "sha256:882dc37df2599957a2a5d83dda945aa6922a89944c456819728b16b80e29c5b5",
           "importedAt": "2026-09-18T08:18:23.576Z"
+        }
+      },
+      {
+        "evidenceId": "EVID-009",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-release-closure",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU059",
+          "packetId": "PKT-060",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "main",
+          "commitSha": "c87a8d25adc9969d034610bd26d6988f67c9198f",
+          "capturedAt": "2026-09-18T09:00:44.7923105Z"
+        },
+        "reviewer": {
+          "reviewerId": "codex",
+          "reviewerType": "human",
+          "independentContext": "unknown"
+        },
+        "results": {
+          "reviewResult": "not_run",
+          "validationResult": "passed",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Production deployment dpl_Hg2EsK1rTUMzRcsKLTB41GBBwGxM is reported READY, target production, from main at c87a8d25adc9969d034610bd26d6988f67c9198f. Published manifest provenance is reported at the same SHA. Completed Production HTTP/static smoke is reported PASS. Codex did not perform browser review. Codex independently created a clean detached worktree at the exact SHA, ran npm ci --prefix apps/research-explorer, then npm run explorer:build PASS: data build, typecheck, Vitest, and production build completed; the generated read model reported sourceCommit c87a8d25adc9969d034610bd26d6988f67c9198f."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-18T09:00:44.7923105Z",
+        "recordedAt": "2026-09-18T09:00:45.656Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:05e43c4cd5012bc561eb8f2342ad6284ba42081295dcfb045fd0fceba5403bc0",
+          "externalEvidenceId": "WU059-production-release-closure-2026-09-18",
+          "importIdentityKey": "sha256:b6246cdffaf7fbfb86634810f20129626d51fc0829a5b575a5044811c08ba78d",
+          "importedAt": "2026-09-18T09:00:45.656Z"
         }
       }
     ],
@@ -10668,6 +10777,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-18T08:21:06.952Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C060",
+      "current": {
+        "observationId": "sha256:5faef6e2bd5cbdd995f90163b3949a4e4a9e2f17bb8a08faf360f8add9bdb09c",
+        "checkpointId": "C060",
+        "workUnitId": "WU059",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-18T09:01:31.945Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-18T09:01:31.945Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:5faef6e2bd5cbdd995f90163b3949a4e4a9e2f17bb8a08faf360f8add9bdb09c",
+          "checkpointId": "C060",
+          "workUnitId": "WU059",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-18T09:01:31.945Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-18T09:01:31.945Z"
         }
       ]
     }
