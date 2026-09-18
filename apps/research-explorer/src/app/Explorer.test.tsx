@@ -234,7 +234,7 @@ describe("Explorer — Overview view", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
 
     await screen.findByRole("heading", { name: "Visão geral" });
-    expect(screen.getByRole("region", { name: "Problemas em investigação (1)" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Explorar problemas" })).toBeTruthy();
     expect(screen.getByText(/1 problema em investigação · 1 registo de evidência/)).toBeTruthy();
     expect(await screen.findByText("Pressão de estacionamento com uma descrição canónica completa que não pode ser truncada")).toBeTruthy();
     expect(screen.getByRole("list")).toBeTruthy();

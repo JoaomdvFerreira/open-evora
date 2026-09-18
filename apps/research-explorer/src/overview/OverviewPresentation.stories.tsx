@@ -10,7 +10,6 @@ import {
   type CitizenProblem,
   type MaterialChangeEntry,
 } from "./overviewStats";
-import { publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
 
 const meta = { title: "Overview/Full composition" } satisfies Meta;
 export default meta;
@@ -71,12 +70,6 @@ const materialChangeEntries: MaterialChangeEntry[] = [
   { problemId: "PRB-XXXX-4", problemTitle: "Disponibilidade de consultas de cuidados primários", date: "2026-02-20", summary: "Nova evidência institucional foi associada a este problema." },
 ];
 
-const unvalidatedLabel = publicEnumLabel("validation_status", "unvalidated");
-const corroboratedLabel = publicEnumLabel("evidence_status", "corroborated");
-const compactCorroboratedLabel = publicCompactEnumLabel("evidence_status", "corroborated");
-
-const sharedLabels = { unvalidatedLabel, corroboratedLabel, compactCorroboratedLabel };
-
 function useOverviewState(initial: { search?: string; topic?: string | null; source?: CitizenProblem[] } = {}) {
   const source = initial.source ?? problems;
   const [searchQuery, setSearchQuery] = useState(initial.search ?? "");
@@ -122,7 +115,6 @@ function FullOverview({
       materialChangePresentationLimit={MATERIAL_CHANGE_PRESENTATION_LIMIT}
       onExploreProblem={() => {}}
       onViewRecords={() => {}}
-      {...sharedLabels}
     />
   );
 }

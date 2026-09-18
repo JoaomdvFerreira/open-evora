@@ -30,9 +30,6 @@ export function OverviewPresentation({
   onTopicChange,
   materialChanges,
   materialChangePresentationLimit,
-  unvalidatedLabel,
-  corroboratedLabel,
-  compactCorroboratedLabel,
   onExploreProblem,
   onViewRecords,
 }: {
@@ -47,9 +44,6 @@ export function OverviewPresentation({
   onTopicChange: (code: string | null) => void;
   materialChanges: MaterialChangesPresentationState | null;
   materialChangePresentationLimit: number;
-  unvalidatedLabel: string;
-  corroboratedLabel: string;
-  compactCorroboratedLabel: string;
   onExploreProblem: (id: string) => void;
   onViewRecords: () => void;
 }) {
@@ -82,16 +76,7 @@ export function OverviewPresentation({
         </div>
       </section>
 
-      <details className="overview-status-explanation">
-        <summary>
-          <span className="overview-desktop-copy">Os problemas abaixo estão confirmados? O que significam os estados?</span>
-          <span className="overview-mobile-copy">O que é isto, e os problemas estão confirmados?</span>
-        </summary>
-        <p className="overview-desktop-copy">Nenhum problema listado é uma conclusão fechada. <strong>{unvalidatedLabel}</strong> significa que a validação formal ainda está pendente — não que o problema seja falso. <strong>{corroboratedLabel}</strong> descreve o estado atual da evidência reunida; não torna o problema uma conclusão encerrada.</p>
-        <p className="overview-mobile-copy">Este Explorador dá acesso a evidências e incertezas — não é um serviço oficial. <strong>{unvalidatedLabel}</strong> não significa falso; <strong>{compactCorroboratedLabel}</strong> descreve o estado atual da evidência, não uma conclusão fechada.</p>
-      </details>
-
-      <section id="overview-problemas" aria-label={`Problemas em investigação (${formatPublicCount(problemCount)})`}>
+      <section id="overview-problemas" aria-label="Explorar problemas">
         <CitizenSearchControl value={searchQuery} onChange={onSearchChange} />
         <TopicFilterGroup topicCodes={topicCodes} activeTopic={activeTopic} onChange={onTopicChange} />
 
@@ -134,7 +119,7 @@ export function OverviewPresentation({
               />
             )}
             {(materialChanges.complete || materialChanges.entries.length > 0) && (
-              <MaterialChangeTimeline entries={materialChanges.entries.slice(0, materialChangePresentationLimit)} onExploreProblem={onExploreProblem} />
+              <MaterialChangeTimeline entries={materialChanges.entries.slice(0, materialChangePresentationLimit)} onExploreProblem={onExploreProblem} variant="overview" />
             )}
           </>
         )}

@@ -12,7 +12,6 @@ import {
   type MaterialChangeEntry,
   type MaterialChangeSource,
 } from "./overviewStats";
-import { publicEnumLabel, publicCompactEnumLabel } from "../presentation/presentation";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { OverviewPresentation } from "./OverviewPresentation";
@@ -130,9 +129,6 @@ export function Overview({
 
   if (overview === null) return null;
 
-  const unvalidatedLabel = publicEnumLabel("validation_status", "unvalidated");
-  const corroboratedLabel = publicEnumLabel("evidence_status", "corroborated");
-  const compactCorroboratedLabel = publicCompactEnumLabel("evidence_status", "corroborated");
   return (
     <OverviewPresentation
       problemCount={overview.problemCount}
@@ -146,9 +142,6 @@ export function Overview({
       onTopicChange={setActiveTopic}
       materialChanges={materialChanges}
       materialChangePresentationLimit={MATERIAL_CHANGE_PRESENTATION_LIMIT}
-      unvalidatedLabel={unvalidatedLabel}
-      corroboratedLabel={corroboratedLabel}
-      compactCorroboratedLabel={compactCorroboratedLabel}
       onExploreProblem={onExploreProblem}
       onViewRecords={onViewRecords}
     />

@@ -4,7 +4,6 @@ import "../index.css";
 import "../styles/topic.css";
 import { CitizenProblemCard, CitizenSearchControl, TopicFilterGroup } from "./CitizenDiscovery";
 import type { CitizenProblem } from "./overviewStats";
-import { publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
 
 const meta = { title: "Citizen discovery" } satisfies Meta;
 export default meta;
@@ -23,7 +22,12 @@ function Card({ problem }: { problem: CitizenProblem }) {
 
 export const ProblemSingleTopic: Story = { render: () => <Card problem={base} /> };
 export const ProblemMultipleTopics: Story = { render: () => <Card problem={{ ...base, domainCodes: ["MOB", "PUB"] }} /> };
-export const ProblemLongContent: Story = { render: () => <Card problem={{ ...base, title: "Dificuldades persistentes nas deslocações quotidianas entre bairros, equipamentos e serviços no centro de Évora", problemStatement: "Pessoas que atravessam a cidade para aceder a serviços essenciais descrevem interrupções e desvios frequentes. A extensão e as causas destas dificuldades continuam por apurar; esta descrição serve apenas para testar a apresentação de conteúdo longo." }} /> };
+const longContentProblem: CitizenProblem = { ...base, title: "Dificuldades persistentes nas deslocações quotidianas entre bairros, equipamentos e serviços no centro de Évora", problemStatement: "Pessoas que atravessam a cidade para aceder a serviços essenciais descrevem interrupções e desvios frequentes, com impacto desproporcional em quem depende de transporte público ou percursos pedonais para tarefas do quotidiano. A extensão e as causas destas dificuldades continuam por apurar; esta descrição serve apenas para testar a apresentação de conteúdo longo, incluindo o comportamento do excerto visual sobre o problem_statement canónico integral." };
+export const ProblemLongContent: Story = { render: () => <Card problem={longContentProblem} /> };
+export const ProblemLongContentCompact: Story = {
+  globals: { viewport: { value: "reviewCompact" } },
+  render: () => <Card problem={longContentProblem} />,
+};
 export const ProblemEvidenceOnly: Story = { render: () => <Card problem={{ ...base, validationStatus: null }} /> };
 export const ProblemValidationOnly: Story = { render: () => <Card problem={{ ...base, evidenceStatus: null }} /> };
 export const ProblemUnknownDomain: Story = { render: () => <Card problem={{ ...base, domainCodes: ["future-domain"], validationStatus: null, evidenceStatus: null }} /> };
@@ -48,9 +52,6 @@ export const FiltersSelected: Story = { render: () => <Filters initial="MOB" /> 
 export const ControlsCompact: Story = { render: () => <div style={{ width: 360, maxWidth: "100%" }}><Search /><Filters initial="MOB" /></div> };
 
 function OverviewPresentationDirection({ problem = base }: { problem?: CitizenProblem }) {
-  const unvalidatedLabel = publicEnumLabel("validation_status", "unvalidated");
-  const corroboratedLabel = publicEnumLabel("evidence_status", "corroborated");
-  const compactCorroboratedLabel = publicCompactEnumLabel("evidence_status", "corroborated");
   return (
     <main className="public-overview" style={{ width: "min(100%, 980px)", maxWidth: "100%", margin: "0 auto", paddingInline: "2rem" }}>
       <section aria-label="Direção de apresentação da visão geral">
@@ -69,13 +70,7 @@ function OverviewPresentationDirection({ problem = base }: { problem?: CitizenPr
           <div><h2>Proveniência e incerteza</h2><p>Cada registo mantém a sua origem. O que ainda não sabemos é registado explicitamente, não escondido.</p></div>
         </section>
 
-        <details className="overview-status-explanation" open>
-          <summary>Os problemas abaixo estão confirmados? O que significam os estados?</summary>
-          <p className="overview-desktop-copy">Nenhum problema listado é uma conclusão fechada. <strong>{unvalidatedLabel}</strong> significa que a validação formal ainda está pendente — não que o problema seja falso. <strong>{corroboratedLabel}</strong> descreve o estado atual da evidência reunida; não torna o problema uma conclusão encerrada.</p>
-          <p className="overview-mobile-copy">Este Explorador dá acesso a evidências e incertezas — não é um serviço oficial. <strong>{unvalidatedLabel}</strong> não significa falso; <strong>{compactCorroboratedLabel}</strong> descreve o estado atual da evidência, não uma conclusão fechada.</p>
-        </details>
-
-        <section aria-label="Problemas em investigação">
+        <section aria-label="Explorar problemas">
           <Search />
           <Filters initial="MOB" />
           <p className="overview-coverage-caveat">Os problemas apresentados são os atualmente acompanhados pelo Open Évora. Não constituem um inventário completo dos problemas existentes em Évora.</p>

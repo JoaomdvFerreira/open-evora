@@ -109,8 +109,7 @@ main {
 
 /* Public first-contact Overview: reuses the Explorer's restrained surfaces,
    typography roles, native disclosure, and text-first navigation. */
-.overview-independence,
-.overview-status-explanation {
+.overview-independence {
   border: 1px solid #ccc;
   background: #f7f6f3;
   padding: 0.75rem 1rem;
@@ -130,15 +129,6 @@ main {
 
 .overview-concepts p {
   margin-top: 0;
-}
-
-.overview-status-explanation {
-  margin: 1.5rem 0;
-}
-
-.overview-status-explanation summary {
-  cursor: pointer;
-  font-weight: bold;
 }
 
 .overview-problems-heading {
@@ -907,9 +897,8 @@ main.explorer-shell {
 
 /* WU054 delta — owner-approved logo (presentation/Logo.tsx) adopted into the
    chrome header in place of the earlier text-only wordmark. `--full` is the
-   default responsive form; `--compact` (mark-only) takes over once the
-   compact breakpoint hides the subtitle below, keeping the header from
-   crowding the nav at narrow widths. */
+   default responsive form; `--compact` (mark-only) takes over at the compact
+   breakpoint, keeping the header from crowding the nav at narrow widths. */
 /* `.explorer-logo--compact` needs to win over logo.css's own `.oe-logo {
    display: inline-flex }` base rule despite loading before it (main.tsx
    import order) — matched by pairing the class with itself for specificity,
@@ -920,13 +909,14 @@ main.explorer-shell {
 }
 
 .manifest-summary {
-  max-width: 58rem;
-  margin: 1.5rem auto 0;
+  margin: 1.5rem 0 0;
   padding-top: 0.85rem;
   border-top: 1px solid var(--color-separator-faint);
   color: var(--color-ink-muted);
-  font-family: var(--font-technical);
-  font-size: 0.72rem;
+  font-family: var(--recipe-technical-meta-family);
+  font-size: var(--recipe-technical-meta-size);
+  font-weight: var(--recipe-technical-meta-weight);
+  line-height: var(--recipe-technical-meta-line-height);
 }
 
 .explorer-navigation {
@@ -998,8 +988,7 @@ main.explorer-shell {
   font-size: 0.82rem;
 }
 
-.reading-guide summary,
-.overview-status-explanation summary {
+.reading-guide summary {
   color: var(--color-ink-secondary);
   font-weight: 650;
 }
@@ -1024,8 +1013,7 @@ main.explorer-shell {
   display: none;
 }
 
-.overview-independence,
-.overview-status-explanation {
+.overview-independence {
   box-sizing: border-box;
   max-width: none;
   border-color: var(--color-separator-standard);
@@ -1088,16 +1076,6 @@ main.explorer-shell {
   color: var(--color-ink-secondary);
   font-size: 0.86rem;
   line-height: 1.55;
-}
-
-.overview-status-explanation {
-  margin: 0 0 2rem;
-  padding: 0.7rem 0.85rem;
-  font-size: 0.84rem;
-}
-
-.overview-status-explanation p {
-  color: var(--color-ink-secondary);
 }
 
 .overview-problems-heading {
@@ -1239,13 +1217,13 @@ main.explorer-shell {
   background: var(--color-surface-subtle);
 }
 
-/* MaterialChangeTimeline owns its own vertical-timeline treatment here,
-   independent of any caller's section/boundary styling (AGENTS.md
-   canonical-state integrity; callers are Overview and ProblemView's
-   "Alterações materiais recentes"). A thin rule connects each marker to the
-   next, restrained rather than decorative. */
+/* MaterialChangeTimeline's default variant (ProblemView's "Alterações
+   materiais recentes") — preserves the pre-existing date-column/content
+   presentation, independent of any caller's section/boundary styling
+   (AGENTS.md canonical-state integrity). Overview's vertical-timeline
+   treatment lives in `.material-change-list--overview` below and must not
+   leak into this default. */
 .material-change-list {
-  position: relative;
   display: grid;
   gap: 0;
   margin: 0;
@@ -1253,47 +1231,18 @@ main.explorer-shell {
   list-style: none;
 }
 
-.material-change-list::before {
-  position: absolute;
-  top: 0.5rem;
-  bottom: 0.5rem;
-  left: 0.28rem;
-  width: 1px;
-  background: var(--color-separator-standard);
-  content: "";
-}
-
 .material-change-item {
-  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.3rem;
-  padding: 0 0 1.25rem 1.4rem;
-}
-
-.material-change-item:last-child {
-  padding-bottom: 0;
-}
-
-.material-change-item::before {
-  position: absolute;
-  top: 0.42rem;
-  left: 0;
-  width: 0.58rem;
-  height: 0.58rem;
-  border: 2px solid var(--color-surface-reading);
-  border-radius: 50%;
-  background: var(--color-accent);
-  box-shadow: 0 0 0 1px var(--color-separator-standard);
-  content: "";
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-separator-faint);
 }
 
 .material-change-date {
   color: var(--color-ink-muted);
-  font-family: var(--font-interface);
-  font-size: 0.72rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-size: 0.78rem;
+  line-height: 1.5;
 }
 
 .material-change-content p {
@@ -1301,25 +1250,22 @@ main.explorer-shell {
 }
 
 .material-change-problem {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.material-change-problem-title {
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: 1.02rem;
-  font-weight: 600;
-  line-height: 1.4;
+  font-size: 0.93rem;
+  line-height: 1.45;
 }
 
 .material-change-problem-id.material-change-problem-id {
   color: var(--color-ink-faint);
 }
 
+.material-change-problem-id::after {
+  content: " · ";
+}
+
 .material-change-summary {
-  margin-top: 0.3rem !important;
+  margin-top: 0.35rem !important;
   color: var(--color-ink-secondary);
   font-size: 0.86rem;
   line-height: 1.55;
@@ -1327,13 +1273,13 @@ main.explorer-shell {
 
 .material-change-content button {
   min-height: auto;
-  margin-top: 0.55rem;
+  margin-top: 0.5rem;
   padding: 0.25rem 0;
   color: var(--color-accent-hover);
   border: 0;
   background: transparent;
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
 }
 
@@ -1455,7 +1401,6 @@ main.explorer-shell {
 .overview-closing-actions {
   margin: 1.25rem 0 0;
   padding-top: 1rem;
-  border-top: 1px solid var(--color-separator-faint);
 }
 
 .overview-closing-actions button {
@@ -1477,8 +1422,10 @@ main.explorer-shell {
 .overview-corpus-context {
   margin: 1.4rem 0 0;
   color: var(--color-ink-muted);
-  font-family: var(--font-technical);
-  font-size: 0.68rem;
+  font-family: var(--recipe-technical-meta-family);
+  font-size: var(--recipe-technical-meta-size);
+  font-weight: var(--recipe-technical-meta-weight);
+  line-height: var(--recipe-technical-meta-line-height);
 }
 
 /* Overview visual-completion: header/discovery/material-change adoption.
@@ -1526,7 +1473,6 @@ main.explorer-shell {
 }
 
 .overview-search {
-  max-width: 42rem;
   margin-bottom: 1rem;
 }
 
@@ -1592,8 +1538,15 @@ main.explorer-shell {
   line-height: 1.36;
 }
 
+/* Overview cards show a deterministic visual excerpt of the canonical
+   problem_statement (line-clamp only — the full statement stays in the DOM,
+   searchable, and unchanged; ProblemView continues to render it in full). */
 .overview-problem-statement {
   max-width: var(--measure-reading);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   font-size: var(--text-interface-body-size);
   line-height: var(--text-interface-body-line-height);
 }
@@ -1623,7 +1576,6 @@ main.explorer-shell {
 }
 
 .overview-problem-action .overview-problem-explore,
-.material-change-content .material-change-action,
 .overview-closing-actions button {
   min-height: var(--target-min);
   padding: 0.25rem 0;
@@ -1636,22 +1588,115 @@ main.explorer-shell {
 }
 
 .overview-problem-action .overview-problem-explore:hover,
-.material-change-content .material-change-action:hover,
 .overview-closing-actions button:hover {
   color: var(--color-accent);
   text-decoration-thickness: 2px;
 }
 
-/* Overview's own boundary around MaterialChangeTimeline — deliberate,
-   full-width separation from the Problems discovery region above it.
-   MaterialChangeTimeline itself (`.material-change-list`/`-item`, above)
-   owns only its internal vertical-timeline treatment, not this section
-   boundary, so ProblemView's reuse of the same component is unaffected. */
+/* Overview's own vertical-timeline treatment for MaterialChangeTimeline —
+   scoped to `.material-change-list--overview` (set only by
+   `variant="overview"`) so ProblemView's default "Alterações materiais
+   recentes" presentation above is unaffected. A thin rule connects each
+   marker to the next, restrained rather than decorative. */
+.material-change-list--overview {
+  position: relative;
+}
+
+.material-change-list--overview::before {
+  position: absolute;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  left: 0.28rem;
+  width: 1px;
+  background: var(--color-separator-standard);
+  content: "";
+}
+
+.material-change-list--overview .material-change-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.3rem;
+  padding: 0 0 1.25rem 1.4rem;
+  border-bottom: 0;
+}
+
+.material-change-list--overview .material-change-item:last-child {
+  padding-bottom: 0;
+}
+
+.material-change-list--overview .material-change-item::before {
+  position: absolute;
+  top: 0.42rem;
+  left: 0;
+  width: 0.58rem;
+  height: 0.58rem;
+  border: 2px solid var(--color-surface-reading);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-separator-standard);
+  content: "";
+}
+
+.material-change-list--overview .material-change-date {
+  font-family: var(--font-interface);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.material-change-list--overview .material-change-problem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.material-change-list--overview .material-change-problem-title {
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.material-change-list--overview .material-change-problem-id::after {
+  content: none;
+}
+
+.material-change-list--overview .material-change-summary {
+  margin-top: 0.3rem !important;
+}
+
+.material-change-list--overview .material-change-content .material-change-action,
+.overview-closing-actions button {
+  min-height: var(--target-min);
+  padding: 0.25rem 0;
+  color: var(--color-accent-hover);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+.material-change-list--overview .material-change-content .material-change-action:hover,
+.overview-closing-actions button:hover {
+  color: var(--color-accent);
+  text-decoration-thickness: 2px;
+}
+
+/* Overview's own separation from MaterialChangeTimeline — spacing/rhythm
+   only, no separator rule (see the compact-viewport rhythm reduction below).
+   MaterialChangeTimeline itself owns only its internal presentation, not
+   this section's separation, so ProblemView's reuse of the component is
+   unaffected. */
 .overview-material-change-section {
   max-width: none;
   margin-top: var(--space-section);
   padding-top: var(--space-loose);
-  border-top: 1px solid var(--color-separator-standard);
 }
 
 .overview-material-change-section > h3 {
@@ -1666,14 +1711,6 @@ main.explorer-shell {
 .overview-material-change-section .material-change-list,
 .overview-material-change-section .material-change-empty-state {
   max-width: var(--measure-reading);
-}
-
-.overview-status-explanation {
-  max-width: var(--measure-reading);
-  padding: var(--space-standard);
-  border-left: 3px solid var(--color-separator-emphasis);
-  border-radius: 0;
-  background: var(--color-surface-subtle);
 }
 
 .overview-closing-actions {
@@ -2742,22 +2779,6 @@ main.explorer-shell {
 
   .overview-topic-filter {
     font-size: 0.78rem;
-  }
-
-  .overview-status-explanation {
-    margin-bottom: 1.25rem;
-  }
-
-  .overview-status-explanation summary {
-    font-size: 0.72rem;
-  }
-
-  .overview-status-explanation p.overview-mobile-copy {
-    display: block;
-    margin: 0.55rem 0 0;
-    color: var(--color-ink-secondary);
-    font-size: 0.75rem;
-    line-height: 1.5;
   }
 
   .overview-problems-heading {

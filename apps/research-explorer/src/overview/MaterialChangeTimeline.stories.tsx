@@ -20,17 +20,36 @@ function ReadingShell({ children }: { children: ReactNode }) {
   return <div style={{ maxWidth: 720, padding: 24 }}>{children}</div>;
 }
 
-export const MultipleEntries: Story = { args: { entries, onExploreProblem: () => {} }, render: (args) => <ReadingShell><MaterialChangeTimeline {...args} /></ReadingShell> };
-export const SameDateOrder: Story = { args: { entries: [{ ...entries[0], problemId: "PRB-XXXX-3", date: "2026-04-08" }, { ...entries[1], problemId: "PRB-XXXX-4", date: "2026-04-08" }], onExploreProblem: () => {} }, render: (args) => <ReadingShell><MaterialChangeTimeline {...args} /></ReadingShell> };
-export const LongSummary: Story = { args: { entries: [{ ...entries[0], summary: "Esta é uma descrição deliberadamente longa para confirmar que uma alteração material redigida continua legível sem cortar o conteúdo nem provocar colisões na linha temporal, incluindo em larguras de leitura mais reduzidas." }], onExploreProblem: () => {} }, render: (args) => <ReadingShell><MaterialChangeTimeline {...args} /></ReadingShell> };
+export const DefaultVariant: Story = {
+  name: "default/shared presentation",
+  args: { entries, onExploreProblem: () => {}, variant: "default" },
+  render: (args) => <ReadingShell><MaterialChangeTimeline {...args} /></ReadingShell>,
+};
+export const OverviewVariant: Story = {
+  name: "Overview variant",
+  args: { entries, onExploreProblem: () => {}, variant: "overview" },
+  render: (args) => <ReadingShell><MaterialChangeTimeline {...args} /></ReadingShell>,
+};
+export const MultipleEntries: Story = { args: { entries, onExploreProblem: () => {}, variant: "overview" }, render: (args) => <ReadingShell><MaterialChangeTimeline {...args} /></ReadingShell> };
+export const SameDateOrder: Story = { args: { entries: [{ ...entries[0], problemId: "PRB-XXXX-3", date: "2026-04-08" }, { ...entries[1], problemId: "PRB-XXXX-4", date: "2026-04-08" }], onExploreProblem: () => {}, variant: "overview" }, render: (args) => <ReadingShell><MaterialChangeTimeline {...args} /></ReadingShell> };
+export const LongSummary: Story = {
+  name: "long summary",
+  args: { entries: [{ ...entries[0], summary: "Esta é uma descrição deliberadamente longa para confirmar que uma alteração material redigida continua legível sem cortar o conteúdo nem provocar colisões na linha temporal, incluindo em larguras de leitura mais reduzidas." }], onExploreProblem: () => {}, variant: "overview" },
+  render: (args) => <ReadingShell><MaterialChangeTimeline {...args} /></ReadingShell>,
+};
 export const CompactWidth: Story = {
-  args: { entries, onExploreProblem: () => {} },
+  name: "360 compact",
+  args: { entries, onExploreProblem: () => {}, variant: "overview" },
   globals: { viewport: { value: "reviewCompact" } },
   render: (args) => <MaterialChangeTimeline {...args} />,
 };
 export const ContentStress: Story = {
-  args: { entries: [{ ...entries[0], problemId: "PRB-XXXX-5", problemTitle: "Um problema com um título muito extenso para verificar a hierarquia entre a leitura humana e o identificador técnico", summary: "Uma descrição longa de alteração material confirma que a linha mantém uma leitura clara quando a explicação exige várias linhas, sem perder a data, o problema a que se refere ou a ação disponível." }], onExploreProblem: () => {} },
+  args: { entries: [{ ...entries[0], problemId: "PRB-XXXX-5", problemTitle: "Um problema com um título muito extenso para verificar a hierarquia entre a leitura humana e o identificador técnico", summary: "Uma descrição longa de alteração material confirma que a linha mantém uma leitura clara quando a explicação exige várias linhas, sem perder a data, o problema a que se refere ou a ação disponível." }], onExploreProblem: () => {}, variant: "overview" },
   globals: { viewport: { value: "reviewCompact" } },
   render: (args) => <MaterialChangeTimeline {...args} />,
 };
-export const Empty: Story = { args: { entries: [], onExploreProblem: () => {} }, render: (args) => <ReadingShell><MaterialChangeTimeline {...args} /></ReadingShell> };
+export const Empty: Story = {
+  name: "empty",
+  args: { entries: [], onExploreProblem: () => {} },
+  render: (args) => <ReadingShell><MaterialChangeTimeline {...args} /></ReadingShell>,
+};
