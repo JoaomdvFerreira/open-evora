@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M015",
-  "currentWorkUnitId": "WU056",
+  "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
       {
@@ -173,7 +173,7 @@
         "id": "M015",
         "title": "M015 — Citizen-Facing UX Refresh",
         "objective": "Deliver the owner-approved citizen-facing UX refresh for the Research Explorer: a production-ready visual foundation, a runtime-derived Citizen Overview with search/discovery, an authored material-change timeline, a refreshed Problem Reading experience, a shared citizen-facing trust experience, an integrated rendered/accessibility review, and a production release gated on explicit owner acceptance. This milestone is presentation-only: canonical SRC/EVD/PRB semantics, the separate OPEN/validation_status/evidence_status dimensions, and the current static client architecture are preserved unchanged.",
-        "status": "in_progress",
+        "status": "ready",
         "workUnitIds": [
           "WU053",
           "WU054",
@@ -2719,12 +2719,12 @@
           "npm run research:validate",
           "git diff --check"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [
           "DEP-052"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T20:21:03.975Z"
+        "updatedAt": "2026-09-18T06:00:39.875Z"
       },
       {
         "id": "WU057",
@@ -8164,6 +8164,108 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt next",
       "createdAt": "2026-09-17T20:18:13.101Z"
+    },
+    {
+      "id": "C057",
+      "workUnitId": "WU056",
+      "packetId": "PKT-057",
+      "summary": "Closed WU056 Problem Reading Refresh after explicit owner visual-gate acceptance. The refreshed Problem View preserves canonical evidence semantics and the existing trust/investigation surfaces while providing genuine section navigation, a bounded authored-history summary, and Share.",
+      "completed": [
+        "Refreshed the Problem View header, topic/state presentation, geography/population metadata, and in-page structure using the accepted visual foundation.",
+        "Bound Última atualização do registo only to PRB.updated_at, without presenting it as evidence currentness.",
+        "Implemented genuine section-anchor navigation and a recent material-history summary that reuses the timeline presentation and links to full History.",
+        "Implemented Share with Web Share API support and copy-link fallback.",
+        "Preserved Evidence, currentness, limitations, open questions, contradiction search, investigation path, and ContextTabs semantics and accessibility.",
+        "Recorded owner visual-gate acceptance in EVID-004, bound to Preview dpl_72zHANHfet5Bdu5Gdtuze1gevXSd and implementation SHA 4588e5784751223fa4330d6566e0da66dc0fae85.",
+        "Recorded two non-blocking integrated-polish observations for WU058: compact Share/title competition and dense desktop Nesta página hierarchy."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl",
+        "apps/research-explorer/src/index.css",
+        "apps/research-explorer/src/overview/MaterialChangeTimeline.tsx",
+        "apps/research-explorer/src/problem/ProblemIdentityHeader.stories.tsx",
+        "apps/research-explorer/src/problem/ProblemIdentityHeader.tsx",
+        "apps/research-explorer/src/problem/ProblemView.test.tsx",
+        "apps/research-explorer/src/problem/ProblemView.tsx",
+        "apps/research-explorer/src/problem/ShareAction.tsx"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "TypeScript check passed at accepted implementation SHA 4588e5784751223fa4330d6566e0da66dc0fae85."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "565 tests passed, 1 skipped, 0 failed at the accepted implementation SHA."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Vite production build passed at the accepted implementation SHA."
+        },
+        {
+          "command": "npm run research:validate",
+          "result": "passed",
+          "summary": "Canonical research validation passed at the accepted implementation SHA."
+        },
+        {
+          "command": "npm run storybook --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Storybook validation passed at the accepted implementation SHA."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "No whitespace errors before checkpoint creation."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "The refreshed Problem View uses the accepted visual foundation for topic/state and reuses the material-change timeline presentation for its recent-history summary, linking to full History.",
+          "result": "passed",
+          "evidence": "Independent review PASS, code/semantic review PASS, and owner visual-gate acceptance EVID-004 at accepted implementation SHA 4588e5784751223fa4330d6566e0da66dc0fae85."
+        },
+        {
+          "criterion": "\"Última atualização do registo\" is bound to PRB.updated_at and its copy makes no evidence-currentness claim.",
+          "result": "passed",
+          "evidence": "Owner acceptance EVID-004 confirms PRB.updated_at is presented only as Última atualização do registo."
+        },
+        {
+          "criterion": "Section navigation reflects genuine content sections only; no simulated/fake tab state is introduced.",
+          "result": "passed",
+          "evidence": "Owner-confirmed real section-anchor navigation works; independent and code/semantic reviews passed."
+        },
+        {
+          "criterion": "Share uses the Web Share API when available and falls back to copy-link otherwise, verified including on an environment lacking Web Share API support.",
+          "result": "passed",
+          "evidence": "Owner-confirmed Share works; tests and reviews passed, including the fallback behaviour."
+        },
+        {
+          "criterion": "Existing Evidence, currentness, limitations, open questions, contradiction search, investigation path, and ContextTabs functional behaviour and accessibility are unchanged, verified by existing or updated tests.",
+          "result": "passed",
+          "evidence": "EVID-004 confirms canonical semantics and all named surfaces remain present; 565 tests passed, 1 skipped."
+        },
+        {
+          "criterion": "npm run typecheck --prefix apps/research-explorer, npm run test --prefix apps/research-explorer, npm run build --prefix apps/research-explorer, and npm run research:validate pass; git diff --check passes.",
+          "result": "passed",
+          "evidence": "Typecheck, 565 passing tests with 1 skipped, production build, research validation, Storybook, and git diff --check all passed."
+        },
+        {
+          "criterion": "All persistent changes are committed before this work unit is marked done.",
+          "result": "passed",
+          "evidence": "Implementation is committed at 4588e5784751223fa4330d6566e0da66dc0fae85; AIQT closure state will be committed immediately after checkpoint creation."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-18T06:00:39.875Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
@@ -8190,8 +8292,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-09-17T20:21:03.975Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-18T06:00:39.875Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8388,6 +8490,48 @@
           "externalEvidenceId": "WU055-owner-acceptance-2026-09-17",
           "importIdentityKey": "sha256:eeb0afb7f7eedf57d77f96777f2341e138ac8909ba66ef1c050339aac0ef7a19",
           "importedAt": "2026-09-17T20:17:20.667Z"
+        }
+      },
+      {
+        "evidenceId": "EVID-004",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-owner",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU056",
+          "packetId": "PKT-057",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "milestone/m015-citizen-facing-ux-refresh",
+          "commitSha": "4588e5784751223fa4330d6566e0da66dc0fae85",
+          "capturedAt": "2026-09-18T00:00:00.000Z"
+        },
+        "reviewer": {
+          "reviewerId": "owner",
+          "reviewerType": "human",
+          "independentContext": "declared_not_independent"
+        },
+        "results": {
+          "reviewResult": "passed",
+          "validationResult": "passed",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Owner visual gate ACCEPTED for WU056. Independent review and code/semantic review PASS. Preview dpl_72zHANHfet5Bdu5Gdtuze1gevXSd is bound to source SHA 4588e5784751223fa4330d6566e0da66dc0fae85. Desktop and ~360px owner visual reviews PASS; real section-anchor navigation, full History navigation, Share, and return to Problem were confirmed. Canonical semantics are preserved: PRB.updated_at is presented only as ?ltima atualiza??o do registo; PRB.history remains the sole material-change source; Evidence/currentness/limitations/open questions/investigation path remain present. 565 tests passed, 1 skipped; typecheck, build, research:validate, Storybook, and git diff --check passed. The compact Share/title competition and dense desktop Nesta p?gina index are non-blocking WU058 observations."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-18T00:00:00.000Z",
+        "recordedAt": "2026-09-18T05:59:22.152Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:5b0243183f6573b58911ad17f3fa65767dd52daf81f7fc5bd636e6e49b212366",
+          "externalEvidenceId": "WU056-owner-visual-acceptance-2026-09-18",
+          "importIdentityKey": "sha256:9bca527ddc8b80bd1feaf5c11f8620733fc987d2b272e58e8fe34eee01c471d0",
+          "importedAt": "2026-09-18T05:59:22.152Z"
         }
       }
     ],
@@ -10119,6 +10263,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-17T20:18:13.101Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C057",
+      "current": {
+        "observationId": "sha256:50aa1432390b46e1bf9ddf2b309a704fde18012c6d2a0f72ffd3bbefb1ec3ee8",
+        "checkpointId": "C057",
+        "workUnitId": "WU056",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-18T06:00:39.875Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-18T06:00:39.875Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:50aa1432390b46e1bf9ddf2b309a704fde18012c6d2a0f72ffd3bbefb1ec3ee8",
+          "checkpointId": "C057",
+          "workUnitId": "WU056",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-18T06:00:39.875Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-18T06:00:39.875Z"
         }
       ]
     }
