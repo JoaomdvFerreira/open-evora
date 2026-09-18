@@ -4,6 +4,7 @@ import "../index.css";
 import "../styles/topic.css";
 import { CitizenProblemCard, CitizenSearchControl, TopicFilterGroup } from "./CitizenDiscovery";
 import type { CitizenProblem } from "./overviewStats";
+import { publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
 
 const meta = { title: "Citizen discovery" } satisfies Meta;
 export default meta;
@@ -44,11 +45,17 @@ export const FiltersSelected: Story = { render: () => <Filters initial="MOB" /> 
 export const ControlsCompact: Story = { render: () => <div style={{ width: 360, maxWidth: "100%" }}><Search /><Filters initial="MOB" /></div> };
 
 function OverviewPresentationDirection({ compact = false, problem = base }: { compact?: boolean; problem?: CitizenProblem }) {
+  const unvalidatedLabel = publicEnumLabel("validation_status", "unvalidated");
+  const corroboratedLabel = publicEnumLabel("evidence_status", "corroborated");
+  const compactCorroboratedLabel = publicCompactEnumLabel("evidence_status", "corroborated");
   return (
     <main className="public-overview" style={{ width: compact ? 360 : "min(100%, 980px)", maxWidth: "100%", margin: "0 auto", paddingInline: compact ? "1rem" : "2rem" }}>
       <section aria-label="Direção de apresentação da visão geral">
         <div className="overview-hero">
-          <p className="overview-independence"><strong>Open Évora</strong> é uma iniciativa independente de investigação cívica.</p>
+          <p className="overview-independence">
+            <span className="overview-desktop-copy"><strong>Projeto independente.</strong> Não representa a Câmara Municipal de Évora nem qualquer entidade oficial; não é um serviço ou plataforma municipal oficial.</span>
+            <span className="overview-mobile-copy">Projeto independente — não oficial</span>
+          </p>
           <h1 className="overview-hero-headline">Investigamos problemas práticos que afetam Évora.</h1>
           <p className="overview-hero-supporting">Reunimos fontes e evidência para mostrar o que sabemos, o que ainda não sabemos e o que mudou.</p>
         </div>
@@ -61,12 +68,14 @@ function OverviewPresentationDirection({ compact = false, problem = base }: { co
 
         <details className="overview-status-explanation" open>
           <summary>Os problemas abaixo estão confirmados? O que significam os estados?</summary>
-          <p>Nenhum problema listado é uma conclusão fechada. <strong>Por validar</strong> significa que a validação formal ainda está pendente — não que o problema seja falso. <strong>Corroborada</strong> descreve o estado atual da evidência reunida; não torna o problema uma conclusão encerrada.</p>
+          <p className="overview-desktop-copy">Nenhum problema listado é uma conclusão fechada. <strong>{unvalidatedLabel}</strong> significa que a validação formal ainda está pendente — não que o problema seja falso. <strong>{corroboratedLabel}</strong> descreve o estado atual da evidência reunida; não torna o problema uma conclusão encerrada.</p>
+          <p className="overview-mobile-copy">Este Explorador dá acesso a evidências e incertezas — não é um serviço oficial. <strong>{unvalidatedLabel}</strong> não significa falso; <strong>{compactCorroboratedLabel}</strong> descreve o estado atual da evidência, não uma conclusão fechada.</p>
         </details>
 
         <section aria-labelledby="direction-problems-heading">
           <div className="overview-problems-heading"><h2 id="direction-problems-heading">Problemas em investigação</h2></div>
           <p className="overview-coverage-caveat">Os problemas apresentados são os atualmente acompanhados pelo Open Évora. Não constituem um inventário completo dos problemas existentes em Évora.</p>
+          <p className="overview-ordering-note">Ordenados por identificador — a ordem não representa prioridade ou relevância.</p>
           <Search />
           <Filters initial="MOB" />
           <Card problem={problem} />
