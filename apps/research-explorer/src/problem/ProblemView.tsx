@@ -1,12 +1,10 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef } from "react";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordIndex } from "../records/useRecordIndex";
 import { useProblemProjection } from "./useProblemProjection";
 import type { EvidenceWithSources } from "./problemProjection";
 import { summarizeEffects } from "./effectSummary";
 import { DISCLOSURE_FIELDS, DISCLOSURE_FIELD_LABELS, glossFor, type FieldGloss } from "./statusGloss";
-import { ProblemLifecycleStatus } from "./ProblemLifecycleStatus";
-import { ValidationStatus, EvidenceStatus } from "./InvestigationStatus";
 import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { describeType, formatTypedId } from "../presentation/typeGlossary";
@@ -21,6 +19,9 @@ import { EmptyState } from "../presentation/EmptyState";
 import { RailSectionIndex } from "../presentation/RailSectionIndex";
 import { CompactSectionIndex } from "../presentation/CompactSectionIndex";
 import type { SectionIndexEntry } from "../presentation/SectionIndexEntry";
+import { ProblemIdentityHeader } from "./ProblemIdentityHeader";
+import { MaterialChangeTimeline } from "../overview/MaterialChangeTimeline";
+import type { MaterialChangeEntry } from "../overview/overviewStats";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -31,8 +32,6 @@ const ERROR_TITLES: Record<string, string> = {
   invalid_id: "Identificador de Problema inválido",
 };
 
-/** PI-02B header: compact canonical investigation-state chips — status, evidence_status, validation_status only, per scope. */
-const HEADER_STATE_FIELDS = ["status", "evidence_status", "validation_status"] as const;
 
 function fieldValue(record: Record<string, unknown>, key: string): string | null {
   const value = record[key];
@@ -379,6 +378,15 @@ const PROBLEM_SECTION_ENTRIES: readonly ProblemSectionEntry[] = [
       { id: "problem-percurso-delimitacao", label: "Delimitação", present: (record) => investigationPathStages(record).some((stage) => stage.key === "delimitation") },
     ],
   },
+  {
+    id: "problem-historico-recente",
+    label: "Alterações materiais recentes",
+    present: (record) => Array.isArray(record.history) && record.history.some((value) => {
+      const entry = recordValue(value);
+      return entry !== null && fieldValue(entry, "date") !== null && fieldValue(entry, "summary") !== null;
+    }),
+    subsections: [],
+  },
 ] as const;
 
 interface ProblemSectionIndexEntry {
@@ -502,46 +510,6 @@ function ProblemCompactSectionIndex({ record }: { record: Record<string, unknown
  * carries no compact/duplicate indicator for them. Every item is omitted,
  * not fabricated, when its canonical field is absent.
  */
-function ProblemHeader({
-  problemId,
-  record,
-  headingRef,
-}: {
-  problemId: string;
-  record: Record<string, unknown>;
-  headingRef: RefObject<HTMLHeadingElement>;
-}) {
-  const title = fieldValue(record, "title") ?? problemId;
-  const problemStatement = fieldValue(record, "problem_statement");
-  const geography = geographySummary(record);
-  const affectedPopulations = stringValues(record.affected_populations);
-
-  return (
-    <div className="problem-identity">
-      <div className="problem-identity-id">{problemId}</div>
-      <h2 ref={headingRef} id="problem-heading" tabIndex={-1} className="problem-identity-title">
-        {title}
-      </h2>
-      {problemStatement && <p className="problem-statement problem-header-statement">{problemStatement}</p>}
-
-      <dl className="problem-header-facts">
-        {geography && (
-          <div className="problem-header-fact">
-            <dt>Onde</dt>
-            <dd>{geography}</dd>
-          </div>
-        )}
-        {affectedPopulations.length > 0 && (
-          <div className="problem-header-fact">
-            <dt>Quem é afetado</dt>
-            <dd>{affectedPopulations.join(", ")}</dd>
-          </div>
-        )}
-      </dl>
-    </div>
-  );
-}
-
 /**
  * PI-02F1 follow-up: "Estado atual"'s entire content is derived from optional
  * `decision_basis` fields (manifestation.summary, consequence.summary,
@@ -550,6 +518,21 @@ function ProblemHeader({
  * section's own render and `PROBLEM_SECTION_ENTRIES` so the two can never
  * disagree about presence.
  */
+function recentMaterialHistory(record: Record<string, unknown>, problemId: string, title: string): MaterialChangeEntry[] {
+  if (!Array.isArray(record.history)) return [];
+  return record.history.map(recordValue).filter((entry): entry is Record<string, unknown> => entry !== null).flatMap((entry) => {
+    const date = fieldValue(entry, "date");
+    const summary = fieldValue(entry, "summary");
+    return date && summary ? [{ problemId, problemTitle: title, date, summary }] : [];
+  }).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+}
+
+function ProblemRecentHistory({ record, problemId, title, onViewHistory }: { record: Record<string, unknown>; problemId: string; title: string; onViewHistory: (id: string) => void }) {
+  const entries = recentMaterialHistory(record, problemId, title);
+  if (entries.length === 0) return null;
+  return <section id="problem-historico-recente" aria-labelledby="problem-historico-recente-heading" className="problem-section problem-recent-history"><h3 id="problem-historico-recente-heading" className="detail-panel-label">Alterações materiais recentes</h3><MaterialChangeTimeline entries={entries} onExploreProblem={onViewHistory} actionLabel="Ver histórico completo →" actionAccessibleLabel={(entry) => `Ver histórico completo de ${entry.problemTitle}`} /></section>;
+}
+
 function hasCurrentStateContent(record: Record<string, unknown>): boolean {
   return (
     decisionBasisField(record, "manifestation", "summary") !== null ||
@@ -580,16 +563,6 @@ function ProblemCurrentStateSection({ record }: { record: Record<string, unknown
   return (
     <section id="problem-estado-atual" aria-label="Estado atual" className="problem-section">
       <h3 className="detail-panel-label">Estado atual</h3>
-
-      <div className="status-chip-row">
-        {HEADER_STATE_FIELDS.map((key) => {
-          const value = fieldValue(record, key);
-          if (value === null) return null;
-          if (key === "status") return <ProblemLifecycleStatus key={key} value={value} form="reading" />;
-          if (key === "evidence_status") return <EvidenceStatus key={key} value={value} form="reading" />;
-          return <ValidationStatus key={key} value={value} form="reading" />;
-        })}
-      </div>
 
       {manifestationSummary && (
         <div id="problem-estado-observamos" className="problem-current-state-item">
@@ -1000,6 +973,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
   const { problem, evidence } = state.projection;
   const record = problem.record as Record<string, unknown>;
   const independenceAssessment = decisionBasisText(record, "independence_assessment");
+  const title = fieldValue(record, "title") ?? problem.id;
 
   return (
     <article aria-labelledby="problem-heading" className="problem-view shell-frame">
@@ -1012,7 +986,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
 
       <div className="lyt-reading" data-rail="present">
         <div className="record-detail-main lyt-reading-main">
-          <ProblemHeader problemId={problem.id} record={record} headingRef={headingRef} />
+          <ProblemIdentityHeader problemId={problem.id} title={title} statement={fieldValue(record, "problem_statement")} geography={geographySummary(record)} affectedPopulations={stringValues(record.affected_populations)} updatedAt={fieldValue(record, "updated_at")} topics={stringValues(record.domain)} status={fieldValue(record, "status")} evidenceStatus={fieldValue(record, "evidence_status")} validationStatus={fieldValue(record, "validation_status")} headingRef={headingRef} />
           <p className="problem-file-path">
             <code>{problem.file}</code>
           </p>
@@ -1047,6 +1021,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
           <ProblemOpenQuestionsSection record={record} evidence={evidence} onOpenGeneric={onOpenGeneric} />
 
           <ProblemPathSection record={record} evidence={evidence} onOpenGeneric={onOpenGeneric} />
+          <ProblemRecentHistory record={record} problemId={problem.id} title={title} onViewHistory={onViewHistory} />
         </div>
 
         <ProblemReadingRail record={record} />

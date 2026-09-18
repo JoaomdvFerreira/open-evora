@@ -233,3 +233,58 @@ describe("Overview — error state retry (ODM-021)", () => {
     expect(attempts).toBe(2);
   });
 });
+
+describe("Overview — material-change timeline", () => {
+  it("renders the neutral no-history state only after every Problem detail loads", async () => {
+    render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
+
+    expect(await screen.findByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeTruthy();
+    expect(screen.queryByText(/nunca mudou/i)).toBeNull();
+  });
+
+  it("does not present missing detail reads as a no-history result", async () => {
+    const provider: DataProvider = {
+      ...makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema indisponível", file: "", summaryFields: {} }]),
+      getRecord: async () => { throw new DataLoadError("detalhe indisponível", "network"); },
+    };
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toContain("Não foi possível carregar todo o histórico material");
+    expect(screen.queryByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeNull();
+  });
+
+  it("marks a timeline from partially loaded Problems as incomplete", async () => {
+    const provider: DataProvider = {
+      ...makeProvider([
+        { id: "PRB-1", type: "PRB-", label: "Problema carregado", file: "", summaryFields: {} },
+        { id: "PRB-2", type: "PRB-", label: "Problema indisponível", file: "", summaryFields: {} },
+      ]),
+      getRecord: async (id) => {
+        if (id === "PRB-2") throw new DataLoadError("detalhe indisponível", "network");
+        return { id, type: "PRB-", file: "", record: { title: "Problema carregado", history: [{ date: "2026-04-08", summary: "Alteração carregada." }] }, outgoingEdges: [], incomingEdges: [] };
+      },
+    };
+    render(<Overview dataProvider={provider} {...props} />);
+
+    expect((await screen.findByRole("alert")).textContent).toContain("podem estar incompletas");
+    expect(screen.getByText("Alteração carregada.")).toBeTruthy();
+    expect(screen.queryByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeNull();
+  });
+
+  it("renders authored history and opens its owning Problem", async () => {
+    const onExploreProblem = vi.fn();
+    const provider: DataProvider = {
+      ...makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema do histórico", file: "", summaryFields: {} }]),
+      getRecord: async (id) => ({ id, type: "PRB-", file: "", record: { title: "Problema do histórico", updated_at: "2099-12-31", history: [{ date: "2026-04-08", summary: "Alteração material redigida." }] }, outgoingEdges: [], incomingEdges: [] }),
+    };
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} onExploreProblem={onExploreProblem} onViewRecords={vi.fn()} />);
+
+    const date = await screen.findByText("08/04/2026");
+    expect(date.tagName).toBe("TIME");
+    expect(screen.getByText("Alteração material redigida.")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Abrir problema Problema do histórico" }));
+    expect(onExploreProblem).toHaveBeenCalledWith("PRB-1");
+  });
+});

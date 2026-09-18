@@ -18,7 +18,20 @@ it("renders the approved privacy surface without a data dependency", () => {
 
   expect(screen.getByRole("heading", { name: "Privacidade" })).toBeTruthy();
   expect(screen.getByText(/sem criar uma conta/)).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Correções" }).getAttribute("href")).toBe("/corrections");
+  expect(screen.getAllByRole("link", { name: "Correções" }).every((link) => link.getAttribute("href") === "/corrections")).toBe(true);
+});
+
+it("renders the owner-confirmed About accountability facts in the shared trust structure", () => {
+  window.history.replaceState(null, "", "/about");
+  render(<App dataProvider={provider} />);
+
+  expect(screen.getByRole("heading", { name: "Sobre o Open Évora" })).toBeTruthy();
+  expect(screen.getByRole("link", { name: "Open Évora — Explorador de Investigação" })).toBeTruthy();
+  expect(screen.getByText("Projeto Open Évora")).toBeTruthy();
+  expect(screen.getByText("Projeto independente")).toBeTruthy();
+  expect(screen.getByText("Autofinanciado")).toBeTruthy();
+  expect(screen.getAllByRole("link", { name: "Sobre" }).some((link) => link.getAttribute("aria-current") === "page")).toBe(true);
+  expect(screen.getAllByRole("link", { name: "Metodologia" }).every((link) => link.getAttribute("href") === "/methodology")).toBe(true);
 });
 
 it("renders the approved corrections action to the canonical public Issues page", () => {
