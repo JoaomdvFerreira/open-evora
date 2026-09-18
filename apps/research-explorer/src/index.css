@@ -977,19 +977,34 @@ main.explorer-shell {
   border: 0;
 }
 
-/* Overview visual-completion (delta §1/§2) — editorial content/media Hero.
-   Text remains the primary element throughout: the media column is a
-   subordinate, deliberately bounded editorial photograph, never a full-bleed
-   banner and never a headline backdrop. The row recomposes to one column at
-   the compact boundary rather than shrinking; the media figure is not
-   rendered there at all (OverviewPresentation.tsx), so no derivative is
-   fetched needlessly. Composition stays inside the canonical `.shell-frame`
-   — no independent full-width media treatment. */
+/* Overview top-surface recomposition — Hero, metrics, and the trust/value
+   row now read as one editorial panel rather than three stacked areas
+   (docs/design/component-model.md §2.2 layout primitives stay CSS-first;
+   this is a domain-owned Overview recipe, not a new shared primitive).
+   Restrained boundary only: a hairline rule plus the warm-paper reading
+   surface, no shadow, no SaaS-card treatment. Internal bands (Hero /
+   metrics / trust) are separated by hairline rules of their own so the
+   panel reads as deliberate structure, not a single undifferentiated box.
+   Composition stays inside the canonical `.shell-frame`. */
+.overview-top-surface {
+  margin: 0 0 var(--space-section);
+  border: 1px solid var(--color-separator-faint);
+  border-radius: var(--radius-surface);
+  background: var(--color-surface-reading);
+  overflow: hidden;
+}
+
+/* Editorial content/media Hero band. Text remains the primary element
+   throughout: the media column is a subordinate, deliberately bounded
+   editorial photograph, never a full-bleed banner and never a headline
+   backdrop. The row recomposes to one column at the compact boundary
+   rather than shrinking; the media figure is not rendered there at all
+   (OverviewPresentation.tsx), so no derivative is fetched needlessly. */
 .overview-hero {
   display: flex;
   align-items: center;
   gap: var(--space-section);
-  margin: 0 0 var(--space-loose);
+  padding: var(--space-section) var(--space-section) var(--space-loose);
 }
 
 .overview-hero-content {
@@ -1037,11 +1052,14 @@ main.explorer-shell {
   line-height: 1.55;
 }
 
-/* Media column — fixed proportion of the 980px shell frame (roughly the
-   40/60 split named in delta §1), never wider than the text column's
-   editorial weight. `aspect-ratio` matches the derivative's own intrinsic
-   700x291 geometry so the reserved space is exact and introduces no layout
-   shift while the image loads. */
+/* Media column — fixed proportion of the panel (roughly the 40/60 split
+   named in delta §1), never wider than the text column's editorial weight.
+   `aspect-ratio` matches the derivative's own intrinsic 700x291 geometry so
+   the reserved space is exact and introduces no layout shift while the
+   image loads. The wrapper carries a restrained clipped lower-inner corner
+   (delta §2 "bounded shaped media wrapper") — one static clip-path, not a
+   shape system — so the photograph reads as an integrated bounded block
+   rather than a plain rectangle, while staying subordinate to the text. */
 .overview-hero-media {
   flex: 0 0 min(38%, 22rem);
   margin: 0;
@@ -1057,6 +1075,7 @@ main.explorer-shell {
 .overview-hero-media img {
   aspect-ratio: 700 / 291;
   border-radius: var(--radius-surface);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 1.25rem 100%, 0 calc(100% - 1.25rem));
   object-fit: cover;
   object-position: center 42%;
 }
@@ -1072,18 +1091,20 @@ main.explorer-shell {
   color: inherit;
 }
 
-/* Delta §5 — deliberate metrics list directly below the Hero: only
-   problemCount, evidenceCount, and the ongoing-investigation statement.
-   Plain semantic list, not cardified — value and label are separate
-   elements so each metric reads as two deliberate facts rather than one
-   run-on sentence. */
+/* Delta §5 — deliberate metrics band, integrated as the surface's second
+   row directly below the Hero. Only problemCount, evidenceCount, and the
+   ongoing-investigation statement. Plain semantic list, not cardified —
+   value and label are separate elements so each metric reads as two
+   deliberate facts rather than one run-on sentence. A hairline top rule
+   separates this band from the Hero band above it. */
 .overview-metrics {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.5rem 2rem;
-  margin: 0 0 var(--space-loose);
-  padding: 0;
+  margin: 0;
+  padding: var(--space-loose) var(--space-section);
+  border-top: 1px solid var(--color-separator-faint);
   list-style: none;
 }
 
@@ -1123,19 +1144,20 @@ main.explorer-shell {
   font-style: italic;
 }
 
-/* Delta §6 — three editorial trust/value columns, replacing the previous
-   Problemas/Evidência/Proveniência concepts grid. Warm paper surface,
-   deliberately not SaaS-style cardification: a shared top/bottom rule
-   frames the row and a restrained vertical divider separates columns;
-   individual tiles carry no border/shadow/background of their own. */
+/* Delta §6 — three editorial trust/value columns, integrated as the
+   surface's third and final band. Warm paper surface, deliberately not
+   SaaS-style cardification: a hairline top rule separates this band from
+   the metrics band above it, and a restrained vertical divider separates
+   columns; individual tiles carry no border/shadow/background of their
+   own. */
 .overview-trust {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.5rem;
-  margin: 0 0 var(--space-section);
-  padding: 1.75rem 0;
+  margin: 0;
+  padding: var(--space-loose) var(--space-section);
   border-top: 1px solid var(--color-separator-faint);
-  border-bottom: 1px solid var(--color-separator-faint);
+  background: var(--color-surface-subtle);
 }
 
 .overview-trust-tile {
@@ -1148,11 +1170,24 @@ main.explorer-shell {
   border-left: 0;
 }
 
+/* Restrained circular icon backplate (delta §4 "subtle circular icon
+   backplates"). Styling-only change over the existing icon set — no new
+   glyphs. */
+.overview-trust-icon-backplate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0 0 0.6rem;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+}
+
 .overview-trust-icon {
   display: block;
-  margin: 0 0 0.6rem;
   color: var(--color-accent);
-  font-size: 1.35rem;
+  font-size: 1.2rem;
 }
 
 .overview-trust-tile h3 {
@@ -2728,6 +2763,24 @@ main.explorer-shell {
   }
 }
 
+/* Overview top-surface at 768px (delta §5): the desktop metrics band
+   (gap 0.5rem 2rem, three items) can wrap at the exact 768px boundary once
+   Hero padding/media are accounted for, which would silently orphan the
+   evidenceCount item's left border on its own line. Recompose the band
+   deliberately instead of letting flex-wrap decide: a tighter row gap keeps
+   all three items on one line without touching the desktop/compact rules
+   above and below this band. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .overview-metrics {
+    gap: 0.5rem 1.25rem;
+  }
+
+  .overview-metric + .overview-metric,
+  .overview-metric--ongoing {
+    padding-left: 1.25rem;
+  }
+}
+
 @media (max-width: 767px) {
   main.explorer-shell {
     padding: 0 1rem 2rem;
@@ -2826,9 +2879,17 @@ main.explorer-shell {
     font-size: 1.65rem;
   }
 
+  /* Compact top-surface (<=767px): still one coherent panel, but every
+     internal band drops to a single stacked reading flow with no photo
+     (delta §5 360px "no photo if omitting it remains the stronger compact
+     solution") and no orphan vertical separators. */
+  .overview-top-surface {
+    border-radius: var(--radius-control);
+  }
+
   .overview-hero {
     display: block;
-    margin: 0 0 1.25rem;
+    padding: var(--space-loose) var(--space-standard);
   }
 
   .overview-hero-content {
@@ -2856,8 +2917,10 @@ main.explorer-shell {
   }
 
   .overview-metrics {
-    gap: 0.6rem 1rem;
-    margin: 0 0 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: var(--space-standard) var(--space-standard);
   }
 
   .overview-metric,
@@ -2874,7 +2937,7 @@ main.explorer-shell {
   .overview-trust {
     grid-template-columns: 1fr;
     gap: 1rem;
-    padding: 1.25rem 0;
+    padding: var(--space-loose) var(--space-standard);
   }
 
   .overview-trust-tile {

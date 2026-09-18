@@ -65,57 +65,59 @@ export function OverviewPresentation({
     <section aria-labelledby="overview-heading" className="public-overview shell-frame">
       <h2 id="overview-heading">Visão geral</h2>
 
-      <div className="overview-hero">
-        <div className="overview-hero-content">
-          <p className="overview-hero-eyebrow">Projeto independente — não oficial</p>
-          <h3 className="overview-hero-headline">Investigamos problemas práticos que afetam Évora.</h3>
-          <p className="overview-hero-supporting">Reunimos fontes e evidência para mostrar o que sabemos, o que ainda não sabemos e o que mudou.</p>
+      <div className="overview-top-surface">
+        <div className="overview-hero">
+          <div className="overview-hero-content">
+            <p className="overview-hero-eyebrow">Projeto independente — não oficial</p>
+            <h3 className="overview-hero-headline">Investigamos problemas práticos que afetam Évora.</h3>
+            <p className="overview-hero-supporting">Reunimos fontes e evidência para mostrar o que sabemos, o que ainda não sabemos e o que mudou.</p>
+          </div>
+
+          {!isNarrowViewport && (
+            <figure className="overview-hero-media">
+              <picture>
+                <source type="image/avif" srcSet={`${heroEvora700Avif} 700w, ${heroEvora1000Avif} 1000w`} sizes="352px" />
+                <source type="image/webp" srcSet={`${heroEvora700Webp} 700w, ${heroEvora1000Webp} 1000w`} sizes="352px" />
+                <img src={heroEvora700} width={700} height={291} alt="" loading="eager" fetchPriority="high" />
+              </picture>
+              <figcaption className="overview-hero-attribution">
+                Fotografia: <a href="https://commons.wikimedia.org/wiki/user:Christian_G%C3%A4nshirt" target="_blank" rel="noopener noreferrer">Christian Gänshirt</a> ·{" "}
+                <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> · adaptada para apresentação
+              </figcaption>
+            </figure>
+          )}
         </div>
 
-        {!isNarrowViewport && (
-          <figure className="overview-hero-media">
-            <picture>
-              <source type="image/avif" srcSet={`${heroEvora700Avif} 700w, ${heroEvora1000Avif} 1000w`} sizes="352px" />
-              <source type="image/webp" srcSet={`${heroEvora700Webp} 700w, ${heroEvora1000Webp} 1000w`} sizes="352px" />
-              <img src={heroEvora700} width={700} height={291} alt="" loading="eager" fetchPriority="high" />
-            </picture>
-            <figcaption className="overview-hero-attribution">
-              Fotografia: <a href="https://commons.wikimedia.org/wiki/user:Christian_G%C3%A4nshirt" target="_blank" rel="noopener noreferrer">Christian Gänshirt</a> ·{" "}
-              <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> · adaptada para apresentação
-            </figcaption>
-          </figure>
-        )}
+        <ul className="overview-metrics" aria-label="Números da investigação">
+          <li className="overview-metric">
+            <span className="overview-metric-value">{problemCount}</span>
+            <span className="overview-metric-label">{problemCountLabel(problemCount)}</span>
+          </li>
+          <li className="overview-metric">
+            <span className="overview-metric-value">{evidenceCount}</span>
+            <span className="overview-metric-label">{evidenceCountLabel(evidenceCount)}</span>
+          </li>
+          <li className="overview-metric overview-metric--ongoing">Investigação em atualização contínua</li>
+        </ul>
+
+        <section className="overview-trust" aria-label="Como trabalhamos">
+          <div className="overview-trust-tile">
+            <span className="overview-trust-icon-backplate"><IconSource className="overview-trust-icon" /></span>
+            <h3>Fontes identificadas</h3>
+            <p>Cada leitura remete para registos identificáveis e mantém a proveniência.</p>
+          </div>
+          <div className="overview-trust-tile">
+            <span className="overview-trust-icon-backplate"><IconTransparency className="overview-trust-icon" /></span>
+            <h3>Com transparência</h3>
+            <p>Mostramos o que sabemos, o que ainda não sabemos e o que mudou.</p>
+          </div>
+          <div className="overview-trust-tile">
+            <span className="overview-trust-icon-backplate"><IconCompass className="overview-trust-icon" /></span>
+            <h3>Para uma Évora mais informada</h3>
+            <p>Organizamos a investigação para tornar problemas e mudanças mais fáceis de acompanhar.</p>
+          </div>
+        </section>
       </div>
-
-      <ul className="overview-metrics" aria-label="Números da investigação">
-        <li className="overview-metric">
-          <span className="overview-metric-value">{problemCount}</span>
-          <span className="overview-metric-label">{problemCountLabel(problemCount)}</span>
-        </li>
-        <li className="overview-metric">
-          <span className="overview-metric-value">{evidenceCount}</span>
-          <span className="overview-metric-label">{evidenceCountLabel(evidenceCount)}</span>
-        </li>
-        <li className="overview-metric overview-metric--ongoing">Investigação em atualização contínua</li>
-      </ul>
-
-      <section className="overview-trust" aria-label="Como trabalhamos">
-        <div className="overview-trust-tile">
-          <IconSource className="overview-trust-icon" />
-          <h3>Fontes identificadas</h3>
-          <p>Cada leitura remete para registos identificáveis e mantém a proveniência.</p>
-        </div>
-        <div className="overview-trust-tile">
-          <IconTransparency className="overview-trust-icon" />
-          <h3>Com transparência</h3>
-          <p>Mostramos o que sabemos, o que ainda não sabemos e o que mudou.</p>
-        </div>
-        <div className="overview-trust-tile">
-          <IconCompass className="overview-trust-icon" />
-          <h3>Para uma Évora mais informada</h3>
-          <p>Organizamos a investigação para tornar problemas e mudanças mais fáceis de acompanhar.</p>
-        </div>
-      </section>
 
       <section className="overview-material-change-section" aria-labelledby="material-change-heading">
         <h3 id="material-change-heading">O que mudou recentemente</h3>
