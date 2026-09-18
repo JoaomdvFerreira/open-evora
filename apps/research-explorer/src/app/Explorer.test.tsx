@@ -236,8 +236,9 @@ describe("Explorer — Overview view", () => {
     await screen.findByRole("heading", { name: "Visão geral" });
     const discoveryRegion = screen.getByRole("region", { name: "Explorar problemas" });
     expect(discoveryRegion).toBeTruthy();
-    expect(screen.getByText("1 Problema acompanhado")).toBeTruthy();
-    expect(screen.getByText("1 Registo de evidência")).toBeTruthy();
+    const metricValues = screen.getAllByText("1", { selector: ".overview-metric-value" });
+    expect(metricValues[0].closest(".overview-metric")?.querySelector(".overview-metric-label")?.textContent).toBe("Problema acompanhado");
+    expect(metricValues[1].closest(".overview-metric")?.querySelector(".overview-metric-label")?.textContent).toBe("Registo de evidência");
     expect(await screen.findByText("Pressão de estacionamento com uma descrição canónica completa que não pode ser truncada")).toBeTruthy();
     expect(within(discoveryRegion).getByRole("list")).toBeTruthy();
     expect(screen.queryByText("Pressão de estacionamento com uma descrição…")).toBeNull();
