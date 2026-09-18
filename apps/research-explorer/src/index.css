@@ -1469,6 +1469,257 @@ main.explorer-shell {
   font-size: 0.68rem;
 }
 
+/* Overview visual-completion Phase A: shared component candidates are refined
+   here for Storybook review only. Overview.tsx keeps its present composition;
+   its later presentation boundary may adopt the reviewed relationships. */
+.explorer-chrome {
+  min-height: 4.75rem;
+  border-bottom-color: var(--color-separator-standard);
+  background: var(--color-surface-reading);
+}
+
+.explorer-chrome-inner {
+  gap: var(--space-standard);
+}
+
+.explorer-chrome-inner > h1.explorer-identity {
+  gap: 0.7rem;
+}
+
+.explorer-logo--full .oe-logo-full {
+  height: 1.75rem;
+}
+
+.explorer-subtitle {
+  padding-left: 0.7rem;
+  border-left: 1px solid var(--color-separator-standard);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  line-height: var(--text-interface-label-line-height);
+}
+
+.explorer-navigation {
+  gap: 0.2rem;
+}
+
+.explorer-navigation .explorer-navigation-action {
+  min-height: var(--target-min);
+  padding: 0.7rem 0.8rem 0.64rem;
+  border-bottom-width: 2px;
+  color: var(--color-ink-secondary);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+}
+
+.explorer-navigation .explorer-navigation-action[aria-current="page"] {
+  color: var(--color-ink-primary);
+}
+
+.explorer-navigation .explorer-navigation-action[aria-current="page"]::after {
+  right: 0.8rem;
+  left: 0.8rem;
+  height: 2px;
+}
+
+.overview-search {
+  max-width: 42rem;
+  margin-bottom: 1rem;
+}
+
+.overview-search-label {
+  margin-bottom: 0.42rem;
+  color: var(--color-ink-primary);
+  font-size: var(--text-interface-label-size);
+  letter-spacing: 0.015em;
+}
+
+.overview-search-input-wrap,
+.overview-search-input {
+  max-width: none;
+}
+
+.overview-search-input {
+  min-height: var(--target-min);
+  border-color: var(--color-separator-emphasis);
+  border-radius: var(--radius-control);
+  font-size: var(--text-interface-body-size);
+}
+
+.overview-topic-filters {
+  gap: 0.45rem;
+  margin-bottom: 1.25rem;
+}
+
+.overview-topic-filter {
+  min-height: var(--target-min);
+  padding: 0.38rem 0.7rem;
+  border-radius: var(--radius-control);
+  font-size: var(--text-interface-label-size);
+}
+
+.overview-topic-filter[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+.overview-problem-list {
+  gap: 0;
+  border-top: 1px solid var(--color-separator-faint);
+}
+
+.overview-problem-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-standard);
+  padding: 1.1rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-separator-faint);
+  border-radius: 0;
+}
+
+.overview-problem-list li:hover {
+  border-color: var(--color-separator-standard);
+  background: transparent;
+}
+
+.overview-problem-list h4 {
+  margin-top: 0.08rem;
+  font-size: 1.08rem;
+  line-height: 1.36;
+}
+
+.overview-problem-statement {
+  max-width: var(--measure-reading);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.overview-problem-technical-id {
+  margin-top: 0.48rem;
+}
+
+.overview-statuses {
+  align-items: flex-end;
+  max-width: 16rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  text-align: right;
+  font-size: var(--text-interface-label-size);
+  line-height: var(--text-interface-label-line-height);
+}
+
+.overview-status-dimension + .overview-status-dimension {
+  margin-left: 0.25rem;
+}
+
+.overview-problem-action {
+  align-self: end;
+  gap: 0.55rem;
+}
+
+.overview-problem-action .overview-problem-explore,
+.material-change-content .material-change-action,
+.overview-closing-actions button {
+  min-height: var(--target-min);
+  padding: 0.25rem 0;
+  color: var(--color-accent-hover);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+.overview-problem-action .overview-problem-explore:hover,
+.material-change-content .material-change-action:hover,
+.overview-closing-actions button:hover {
+  color: var(--color-accent);
+  text-decoration-thickness: 2px;
+}
+
+.material-change-timeline {
+  max-width: var(--measure-reading);
+  margin-top: var(--space-section);
+}
+
+.material-change-item {
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: var(--space-standard);
+  padding: 1.15rem 0;
+}
+
+.material-change-date {
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+}
+
+.material-change-problem {
+  font-size: 1.05rem;
+}
+
+.material-change-summary {
+  max-width: var(--measure-reading);
+  font-size: var(--text-interface-body-size);
+}
+
+.overview-status-explanation {
+  max-width: var(--measure-reading);
+  padding: var(--space-standard);
+  border-left: 3px solid var(--color-separator-emphasis);
+  border-radius: 0;
+  background: var(--color-surface-subtle);
+}
+
+.overview-trust {
+  max-width: var(--measure-reading);
+  margin-top: var(--space-section);
+  padding-top: var(--space-standard);
+  border-top: 1px solid var(--color-separator-faint);
+}
+
+.overview-closing-actions {
+  max-width: var(--measure-reading);
+  margin-top: var(--space-loose);
+}
+
+@media (max-width: 767px) {
+  .explorer-chrome {
+    min-height: 0;
+  }
+
+  .explorer-chrome-inner {
+    gap: 0;
+  }
+
+  .explorer-subtitle {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .overview-problem-list li {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 0;
+  }
+
+  .overview-statuses {
+    align-items: flex-start;
+    max-width: none;
+    text-align: left;
+  }
+
+  .overview-problem-action {
+    align-self: auto;
+  }
+
+  .material-change-item {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+}
+
 /* Records keeps its current search/select/detail workflow while giving the
    scanning surface a lighter, intentional treatment. */
 .records-explorer {

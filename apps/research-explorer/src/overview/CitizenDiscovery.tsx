@@ -11,7 +11,7 @@ export function CitizenSearchControl({ value, onChange, id = "overview-search-in
   id?: string;
 }) {
   return (
-    <div className="overview-search">
+    <div className="overview-search" role="search">
       <label htmlFor={id} className="overview-search-label">Pesquisar problemas</label>
       <span className="overview-search-input-wrap">
         <IconSearch className="overview-search-icon" />
@@ -67,7 +67,7 @@ export function CitizenProblemCard({ problem, onExplore }: { problem: CitizenPro
             ))}
           </p>
         )}
-        <button type="button" aria-label={`Explorar ${problem.title}`} onClick={() => onExplore(problem.id)}>Explorar →</button>
+        <button type="button" className="overview-problem-explore" aria-label={`Explorar ${problem.title}`} onClick={() => onExplore(problem.id)}>Explorar →</button>
       </div>
     </li>
   );

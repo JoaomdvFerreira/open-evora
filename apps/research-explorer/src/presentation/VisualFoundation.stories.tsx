@@ -113,6 +113,11 @@ export const ExplorerIdentityHeader: Story = {
   render: () => <main className="explorer-shell"><ExplorerHeader activeView="overview" onOverview={() => {}} onRecords={() => {}} /></main>,
 };
 
+export const ExplorerIdentityHeaderCompact: Story = {
+  name: "Explorer identity header — compact",
+  render: () => <div style={{ width: 360, maxWidth: "100%" }}><main className="explorer-shell"><ExplorerHeader activeView="records" onOverview={() => {}} onRecords={() => {}} /></main></div>,
+};
+
 /* ---- Combined demo page (desktop / compact) ------------------------------ */
 function CombinedVisualFoundationPage() {
   return (

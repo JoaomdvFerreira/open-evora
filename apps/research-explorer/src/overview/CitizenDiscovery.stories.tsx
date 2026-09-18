@@ -42,3 +42,46 @@ function Filters({ initial = null }: { initial?: string | null }) {
 export const FiltersDefault: Story = { render: () => <Filters /> };
 export const FiltersSelected: Story = { render: () => <Filters initial="MOB" /> };
 export const ControlsCompact: Story = { render: () => <div style={{ width: 360, maxWidth: "100%" }}><Search /><Filters initial="MOB" /></div> };
+
+function OverviewPresentationDirection({ compact = false, problem = base }: { compact?: boolean; problem?: CitizenProblem }) {
+  return (
+    <main className="public-overview" style={{ width: compact ? 360 : "min(100%, 980px)", maxWidth: "100%", margin: "0 auto", paddingInline: compact ? "1rem" : "2rem" }}>
+      <section aria-label="Direção de apresentação da visão geral">
+        <div className="overview-hero">
+          <p className="overview-independence"><strong>Open Évora</strong> é uma iniciativa independente de investigação cívica.</p>
+          <h1 className="overview-hero-headline">Investigamos problemas práticos que afetam Évora.</h1>
+          <p className="overview-hero-supporting">Reunimos fontes e evidência para mostrar o que sabemos, o que ainda não sabemos e o que mudou.</p>
+        </div>
+
+        <section className="overview-concepts" aria-label="O que contém o Explorador">
+          <div><h2>Problemas</h2><p>Fricções cívicas identificadas a partir de evidência — com o que já se sabe e o que ainda não se sabe.</p></div>
+          <div><h2>Evidência</h2><p>Registos individuais — institucionais, públicos, comunitários e de intervenientes — que sustentam, contestam ou atualizam cada leitura.</p></div>
+          <div><h2>Proveniência e incerteza</h2><p>Cada registo mantém a sua origem. O que ainda não sabemos é registado explicitamente, não escondido.</p></div>
+        </section>
+
+        <details className="overview-status-explanation" open>
+          <summary>Os problemas abaixo estão confirmados? O que significam os estados?</summary>
+          <p>Nenhum problema listado é uma conclusão fechada. <strong>Por validar</strong> significa que a validação formal ainda está pendente — não que o problema seja falso. <strong>Corroborada</strong> descreve o estado atual da evidência reunida; não torna o problema uma conclusão encerrada.</p>
+        </details>
+
+        <section aria-labelledby="direction-problems-heading">
+          <div className="overview-problems-heading"><h2 id="direction-problems-heading">Problemas em investigação</h2></div>
+          <p className="overview-coverage-caveat">Os problemas apresentados são os atualmente acompanhados pelo Open Évora. Não constituem um inventário completo dos problemas existentes em Évora.</p>
+          <Search />
+          <Filters initial="MOB" />
+          <Card problem={problem} />
+        </section>
+
+        <p className="overview-trust"><strong>Base explícita.</strong> Cada leitura remete para registos identificáveis e para a evidência que a sustenta, refina, contesta ou atualiza. A proveniência é preservada e rastreável, sem implicar que toda a evidência tenha a mesma força.</p>
+        <p className="overview-closing-actions"><button type="button">Ver todos os registos →</button></p>
+      </section>
+    </main>
+  );
+}
+
+export const OverviewPresentationDesktop: Story = { name: "Overview presentation direction — desktop", render: () => <OverviewPresentationDirection /> };
+export const OverviewPresentationCompact: Story = { name: "Overview presentation direction — compact", render: () => <OverviewPresentationDirection compact /> };
+export const OverviewPresentationContentStress: Story = {
+  name: "Overview presentation direction — content stress",
+  render: () => <div style={{ width: 360, maxWidth: "100%" }}><OverviewPresentationDirection compact problem={{ ...base, id: "PRB-XXXX", domainCodes: ["MOB", "PUB", "future-domain"], title: "Dificuldades persistentes nas deslocações quotidianas entre bairros, equipamentos e serviços no centro de Évora", problemStatement: "Pessoas que atravessam a cidade para aceder a serviços essenciais descrevem interrupções e desvios frequentes. A extensão e as causas destas dificuldades continuam por apurar; esta descrição serve apenas para testar a apresentação de conteúdo longo." }} /></div>,
+};

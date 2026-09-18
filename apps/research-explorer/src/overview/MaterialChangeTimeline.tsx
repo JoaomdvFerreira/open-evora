@@ -14,7 +14,7 @@ export function MaterialChangeTimeline({ entries, onExploreProblem, actionLabel 
           <div className="material-change-content">
             <p className="material-change-problem"><span className="technical-id material-change-problem-id">{entry.problemId}</span><span className="material-change-problem-title">{entry.problemTitle}</span></p>
             <p className="material-change-summary">{entry.summary}</p>
-            <button type="button" onClick={() => onExploreProblem(entry.problemId)} aria-label={actionAccessibleLabel?.(entry) ?? `Abrir problema ${entry.problemTitle}`}>
+            <button type="button" className="material-change-action" onClick={() => onExploreProblem(entry.problemId)} aria-label={actionAccessibleLabel?.(entry) ?? `Abrir problema ${entry.problemTitle}`}>
               {actionLabel}
             </button>
           </div>
