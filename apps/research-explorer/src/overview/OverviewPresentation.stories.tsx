@@ -27,37 +27,37 @@ const MATERIAL_CHANGE_PRESENTATION_LIMIT = 5;
  */
 const problems: CitizenProblem[] = [
   {
-    id: "PRB-0001", title: "Percursos pedonais entre bairros e serviços",
+    id: "PRB-XXXX-1", title: "Percursos pedonais entre bairros e serviços",
     problemStatement: "Pessoas que se deslocam a pé entre bairros residenciais e serviços essenciais descrevem passeios interrompidos e desvios frequentes.",
     domainCodes: ["MOB"], affectedPopulations: ["Pessoas idosas", "Pessoas com mobilidade reduzida"], geographyArea: "Évora",
     lifecycleStatus: "OPEN", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-04-08",
   },
   {
-    id: "PRB-0002", title: "Acesso a informação de estacionamento",
+    id: "PRB-XXXX-2", title: "Acesso a informação de estacionamento",
     problemStatement: "A informação pública sobre disponibilidade de estacionamento está dispersa por múltiplas fontes desatualizadas.",
     domainCodes: ["MOB", "PUB"], affectedPopulations: [], geographyArea: "Centro histórico",
     lifecycleStatus: "OPEN", validationStatus: null, evidenceStatus: "corroborated", updatedAt: "2026-03-12",
   },
   {
-    id: "PRB-0003", title: "Continuidade dos horários de recolha de resíduos",
+    id: "PRB-XXXX-3", title: "Continuidade dos horários de recolha de resíduos",
     problemStatement: null,
     domainCodes: ["ENV"], affectedPopulations: [], geographyArea: null,
     lifecycleStatus: "OPEN", validationStatus: "unvalidated", evidenceStatus: null, updatedAt: null,
   },
   {
-    id: "PRB-0004", title: "Disponibilidade de consultas de cuidados primários",
+    id: "PRB-XXXX-4", title: "Disponibilidade de consultas de cuidados primários",
     problemStatement: "Utentes reportam tempos de espera prolongados para marcação de consultas em centros de saúde locais.",
     domainCodes: ["HEA"], affectedPopulations: ["Famílias com crianças pequenas"], geographyArea: "Évora",
-    lifecycleStatus: "UNDER_REVIEW", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-02-20",
+    lifecycleStatus: "INSUFFICIENT_EVIDENCE", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-02-20",
   },
   {
-    id: "PRB-0005", title: "Dificuldades persistentes nas deslocações quotidianas entre bairros, equipamentos e serviços públicos no centro histórico e periferia de Évora",
+    id: "PRB-XXXX-5", title: "Dificuldades persistentes nas deslocações quotidianas entre bairros, equipamentos e serviços públicos no centro histórico e periferia de Évora",
     problemStatement: "Pessoas que atravessam a cidade para aceder a serviços essenciais descrevem interrupções e desvios frequentes, com impacto desproporcional em quem depende de transporte público ou percursos pedonais para tarefas do quotidiano, incluindo deslocações a serviços de saúde, educação e comércio local.",
     domainCodes: ["MOB", "PUB", "HEA"], affectedPopulations: ["Pessoas idosas", "Pessoas com mobilidade reduzida", "Famílias com crianças pequenas"], geographyArea: "Évora e freguesias limítrofes",
     lifecycleStatus: "OPEN", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-04-01",
   },
   {
-    id: "PRB-0006", title: "Sinalização de obras em espaço público",
+    id: "PRB-XXXX-6", title: "Sinalização de obras em espaço público",
     problemStatement: "Obras em curso no espaço público carecem de sinalização consistente para peões e condutores.",
     domainCodes: ["future-domain"], affectedPopulations: [], geographyArea: "Évora",
     lifecycleStatus: null, validationStatus: null, evidenceStatus: null, updatedAt: null,
@@ -65,10 +65,10 @@ const problems: CitizenProblem[] = [
 ];
 
 const materialChangeEntries: MaterialChangeEntry[] = [
-  { problemId: "PRB-0001", problemTitle: "Percursos pedonais entre bairros e serviços", date: "2026-04-08", summary: "Foi registada uma alteração material na leitura atual do problema." },
-  { problemId: "PRB-0005", problemTitle: "Dificuldades persistentes nas deslocações quotidianas", date: "2026-04-01", summary: "A evidência reunida passou a ser apresentada com uma limitação adicional." },
-  { problemId: "PRB-0002", problemTitle: "Acesso a informação de estacionamento", date: "2026-03-12", summary: "O estado de validação foi atualizado após revisão da evidência disponível." },
-  { problemId: "PRB-0004", problemTitle: "Disponibilidade de consultas de cuidados primários", date: "2026-02-20", summary: "Nova evidência institucional foi associada a este problema." },
+  { problemId: "PRB-XXXX-1", problemTitle: "Percursos pedonais entre bairros e serviços", date: "2026-04-08", summary: "Foi registada uma alteração material na leitura atual do problema." },
+  { problemId: "PRB-XXXX-5", problemTitle: "Dificuldades persistentes nas deslocações quotidianas", date: "2026-04-01", summary: "A evidência reunida passou a ser apresentada com uma limitação adicional." },
+  { problemId: "PRB-XXXX-2", problemTitle: "Acesso a informação de estacionamento", date: "2026-03-12", summary: "O estado de validação foi atualizado após revisão da evidência disponível." },
+  { problemId: "PRB-XXXX-4", problemTitle: "Disponibilidade de consultas de cuidados primários", date: "2026-02-20", summary: "Nova evidência institucional foi associada a este problema." },
 ];
 
 const unvalidatedLabel = publicEnumLabel("validation_status", "unvalidated");
@@ -190,23 +190,23 @@ export const EmptyMaterialHistory: Story = {
 const stressProblems: CitizenProblem[] = [
   ...problems,
   {
-    id: "PRB-0007", title: "Fiabilidade dos horários de transporte público interurbano",
+    id: "PRB-XXXX-7", title: "Fiabilidade dos horários de transporte público interurbano",
     problemStatement: "Utentes de transporte público interurbano descrevem atrasos frequentes e falta de informação em tempo real, com impacto acrescido para quem depende exclusivamente deste serviço para aceder a emprego, educação e cuidados de saúde fora do centro urbano.",
     domainCodes: ["MOB", "PUB", "HEA", "future-domain"], affectedPopulations: ["Pessoas idosas", "Pessoas com mobilidade reduzida", "Famílias com crianças pequenas", "Trabalhadores deslocados"], geographyArea: "Évora e concelhos limítrofes",
     lifecycleStatus: "OPEN", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-04-10",
   },
   {
-    id: "PRB-0008", title: "Acessibilidade de edifícios públicos municipais",
+    id: "PRB-XXXX-8", title: "Acessibilidade de edifícios públicos municipais",
     problemStatement: "Vários edifícios de atendimento público carecem de rampas, elevadores ou sinalética acessível.",
     domainCodes: ["PUB"], affectedPopulations: ["Pessoas com mobilidade reduzida"], geographyArea: "Évora",
-    lifecycleStatus: "UNDER_REVIEW", validationStatus: null, evidenceStatus: "corroborated", updatedAt: "2026-01-15",
+    lifecycleStatus: "INSUFFICIENT_EVIDENCE", validationStatus: null, evidenceStatus: "corroborated", updatedAt: "2026-01-15",
   },
 ];
 
 const stressMaterialChanges: MaterialChangeEntry[] = [
   ...materialChangeEntries,
-  { problemId: "PRB-0007", problemTitle: "Fiabilidade dos horários de transporte público interurbano", date: "2026-04-10", summary: "Uma descrição longa de alteração material confirma que a linha mantém uma leitura clara quando a explicação exige várias linhas, sem perder a data, o problema a que se refere ou a ação disponível." },
-  { problemId: "PRB-0008", problemTitle: "Acessibilidade de edifícios públicos municipais", date: "2026-01-15", summary: "Foi associada evidência adicional relativa às condições de acessibilidade reportadas." },
+  { problemId: "PRB-XXXX-7", problemTitle: "Fiabilidade dos horários de transporte público interurbano", date: "2026-04-10", summary: "Uma descrição longa de alteração material confirma que a linha mantém uma leitura clara quando a explicação exige várias linhas, sem perder a data, o problema a que se refere ou a ação disponível." },
+  { problemId: "PRB-XXXX-8", problemTitle: "Acessibilidade de edifícios públicos municipais", date: "2026-01-15", summary: "Foi associada evidência adicional relativa às condições de acessibilidade reportadas." },
 ];
 
 export const RealisticMaximumContentStress: Story = {
