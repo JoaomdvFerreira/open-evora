@@ -27,7 +27,10 @@ export const ProblemLongContent: Story = { render: () => <Card problem={{ ...bas
 export const ProblemEvidenceOnly: Story = { render: () => <Card problem={{ ...base, validationStatus: null }} /> };
 export const ProblemValidationOnly: Story = { render: () => <Card problem={{ ...base, evidenceStatus: null }} /> };
 export const ProblemUnknownDomain: Story = { render: () => <Card problem={{ ...base, domainCodes: ["future-domain"], validationStatus: null, evidenceStatus: null }} /> };
-export const ProblemCompact: Story = { render: () => <div style={{ width: 360, maxWidth: "100%" }}><Card problem={{ ...base, domainCodes: ["MOB", "PUB"] }} /></div> };
+export const ProblemCompact: Story = {
+  globals: { viewport: { value: "reviewCompact" } },
+  render: () => <Card problem={{ ...base, domainCodes: ["MOB", "PUB"] }} />,
+};
 
 function Search({ initial = "" }: { initial?: string }) {
   const [value, setValue] = useState(initial);
@@ -44,12 +47,12 @@ export const FiltersDefault: Story = { render: () => <Filters /> };
 export const FiltersSelected: Story = { render: () => <Filters initial="MOB" /> };
 export const ControlsCompact: Story = { render: () => <div style={{ width: 360, maxWidth: "100%" }}><Search /><Filters initial="MOB" /></div> };
 
-function OverviewPresentationDirection({ compact = false, problem = base }: { compact?: boolean; problem?: CitizenProblem }) {
+function OverviewPresentationDirection({ problem = base }: { problem?: CitizenProblem }) {
   const unvalidatedLabel = publicEnumLabel("validation_status", "unvalidated");
   const corroboratedLabel = publicEnumLabel("evidence_status", "corroborated");
   const compactCorroboratedLabel = publicCompactEnumLabel("evidence_status", "corroborated");
   return (
-    <main className="public-overview" style={{ width: compact ? 360 : "min(100%, 980px)", maxWidth: "100%", margin: "0 auto", paddingInline: compact ? "1rem" : "2rem" }}>
+    <main className="public-overview" style={{ width: "min(100%, 980px)", maxWidth: "100%", margin: "0 auto", paddingInline: "2rem" }}>
       <section aria-label="Direção de apresentação da visão geral">
         <div className="overview-hero">
           <p className="overview-independence">
@@ -88,9 +91,18 @@ function OverviewPresentationDirection({ compact = false, problem = base }: { co
   );
 }
 
-export const OverviewPresentationDesktop: Story = { name: "Overview presentation direction — desktop", render: () => <OverviewPresentationDirection /> };
-export const OverviewPresentationCompact: Story = { name: "Overview presentation direction — compact", render: () => <OverviewPresentationDirection compact /> };
+export const OverviewPresentationDesktop: Story = {
+  name: "Overview presentation direction — desktop",
+  globals: { viewport: { value: "reviewDesktop" } },
+  render: () => <OverviewPresentationDirection />,
+};
+export const OverviewPresentationCompact: Story = {
+  name: "Overview presentation direction — compact",
+  globals: { viewport: { value: "reviewCompact" } },
+  render: () => <OverviewPresentationDirection />,
+};
 export const OverviewPresentationContentStress: Story = {
   name: "Overview presentation direction — content stress",
-  render: () => <div style={{ width: 360, maxWidth: "100%" }}><OverviewPresentationDirection compact problem={{ ...base, id: "PRB-XXXX", domainCodes: ["MOB", "PUB", "future-domain"], title: "Dificuldades persistentes nas deslocações quotidianas entre bairros, equipamentos e serviços no centro de Évora", problemStatement: "Pessoas que atravessam a cidade para aceder a serviços essenciais descrevem interrupções e desvios frequentes. A extensão e as causas destas dificuldades continuam por apurar; esta descrição serve apenas para testar a apresentação de conteúdo longo." }} /></div>,
+  globals: { viewport: { value: "reviewCompact" } },
+  render: () => <OverviewPresentationDirection problem={{ ...base, id: "PRB-XXXX", domainCodes: ["MOB", "PUB", "future-domain"], title: "Dificuldades persistentes nas deslocações quotidianas entre bairros, equipamentos e serviços no centro de Évora", problemStatement: "Pessoas que atravessam a cidade para aceder a serviços essenciais descrevem interrupções e desvios frequentes. A extensão e as causas destas dificuldades continuam por apurar; esta descrição serve apenas para testar a apresentação de conteúdo longo." }} />,
 };
