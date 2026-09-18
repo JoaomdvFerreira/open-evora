@@ -267,3 +267,45 @@ export function IconCompass(props: IconProps) {
     </IconBase>
   );
 }
+
+/**
+ * Overview metrics row — three presentation-only glyphs distinct from the
+ * trust-row set above, so "problems tracked", "evidence records", and
+ * "ongoing investigation" each read as a distinct concept marker rather than
+ * reusing IconSource/IconCompass out of their trust-row context. Same
+ * bounded, `aria-hidden` treatment as every icon in this file — the metric's
+ * own visible value/label text carries all meaning.
+ */
+
+/** Problemas acompanhados — a single-sheet record glyph, distinct from IconSource's multi-line document. */
+export function IconProblemRecord(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M6 3.5h6l3 3v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-12a1 1 0 0 1 1-1Z" />
+      <path d="M12 3.5v3h3" />
+      <circle cx="8.7" cy="11.6" r="0.9" fill="currentColor" stroke="none" />
+      <path d="M11 11.6h3" />
+    </IconBase>
+  );
+}
+
+/** Registos de evidência — a stacked-records/database glyph. */
+export function IconEvidenceStack(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <ellipse cx="10" cy="5.2" rx="6" ry="2.2" />
+      <path d="M4 5.2v4.4c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2V5.2" />
+      <path d="M4 9.6V14c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2V9.6" />
+    </IconBase>
+  );
+}
+
+/** Investigação em atualização contínua — an upward trend glyph. */
+export function IconTrendUp(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M3.5 14 8 9.2l3 3L16.5 6" />
+      <path d="M12.5 6h4v4" />
+    </IconBase>
+  );
+}

@@ -977,40 +977,38 @@ main.explorer-shell {
   border: 0;
 }
 
-/* Overview top-surface recomposition — Hero, metrics, and the trust/value
-   row now read as one editorial panel rather than three stacked areas
-   (docs/design/component-model.md §2.2 layout primitives stay CSS-first;
-   this is a domain-owned Overview recipe, not a new shared primitive).
-   Restrained boundary only: a hairline rule plus the warm-paper reading
-   surface, no shadow, no SaaS-card treatment. Internal bands (Hero /
-   metrics / trust) are separated by hairline rules of their own so the
-   panel reads as deliberate structure, not a single undifferentiated box.
-   Composition stays inside the canonical `.shell-frame`. */
+/* Overview top-surface recomposition (visual-completion pass 2) — Hero,
+   metrics, and the trust/value row read as one designed editorial
+   composition, not a bordered wrapper around the three previous stacked
+   layouts. The outer surface itself carries no visible card border: the
+   warm reading surface plus one hairline rule ahead of the trust row are
+   the only boundary signals (docs/design/component-model.md §2.2 layout
+   primitives stay CSS-first; this remains a domain-owned Overview recipe,
+   not a new shared primitive). Composition stays inside the canonical
+   `.shell-frame` — no narrower max-width is introduced around it. */
 .overview-top-surface {
+  position: relative;
   margin: 0 0 var(--space-section);
-  border: 1px solid var(--color-separator-faint);
   border-radius: var(--radius-surface);
-  background: var(--color-surface-reading);
   overflow: hidden;
 }
 
-/* Editorial content/media Hero band. Text remains the primary element
-   throughout: the media column is a subordinate, deliberately bounded
-   editorial photograph, never a full-bleed banner and never a headline
-   backdrop. The row recomposes to one column at the compact boundary
-   rather than shrinking; the media figure is not rendered there at all
-   (OverviewPresentation.tsx), so no derivative is fetched needlessly. */
+/* Editorial content/media Hero band: text (eyebrow, headline, supporting
+   copy, metrics) on the left at roughly 58% width, the Évora photograph
+   composed into the right ~42%. Text remains the primary element — the
+   media column stays visually subordinate even though it now participates
+   much more directly in the composition than the old isolated figure. */
 .overview-hero {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-section);
   padding: var(--space-section) var(--space-section) var(--space-loose);
 }
 
 .overview-hero-content {
-  flex: 1 1 auto;
+  flex: 1 1 58%;
   min-width: 0;
-  max-width: 40rem;
+  max-width: 34rem;
 }
 
 .overview-hero-eyebrow {
@@ -1027,41 +1025,58 @@ main.explorer-shell {
   margin: 0 0 0.65rem;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+  font-size: clamp(1.6rem, 3.6vw, 2.3rem);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 /* Delta §1 — a larger reading-first headline once the frame has genuine
    room, an explicit responsive step rather than an unbounded vw scale
-   (foundations.md "Typography roles and reading hierarchy"). The 980px
-   shell frame itself does not grow past this width, but the two-column
-   Hero's text side benefits from a stronger size once viewport chrome
-   around it is no longer cramped. */
+   (foundations.md "Typography roles and reading hierarchy"). A strong
+   two-line editorial composition at wide desktop. */
 @media (min-width: 1200px) {
   .overview-hero-headline {
-    font-size: 2.5rem;
+    font-size: 2.75rem;
   }
 }
 
 .overview-hero-supporting {
-  margin: 0;
+  margin: 0 0 var(--space-loose);
   max-width: var(--measure-supporting, 44ch);
   color: var(--color-ink-secondary);
   font-size: 1.02rem;
   line-height: 1.55;
 }
 
-/* Media column — fixed proportion of the panel (roughly the 40/60 split
-   named in delta §1), never wider than the text column's editorial weight.
-   `aspect-ratio` matches the derivative's own intrinsic 700x291 geometry so
-   the reserved space is exact and introduces no layout shift while the
-   image loads. The wrapper carries a restrained clipped lower-inner corner
-   (delta §2 "bounded shaped media wrapper") — one static clip-path, not a
-   shape system — so the photograph reads as an integrated bounded block
-   rather than a plain rectangle, while staying subordinate to the text. */
+/* Media composition — the photograph now participates directly in the
+   upper-right band rather than sitting in an isolated rectangle. A pale
+   warm circular form behind the frame (CSS pseudo-element only, no SVG
+   artwork) reads as deliberate background geometry; the image itself is
+   clipped with one restrained organic mask on its lower edge so it does
+   not read as a plain cropped rectangle. `aspect-ratio` matches the
+   derivative's intrinsic 700x291 geometry so reserved space is exact and
+   introduces no layout shift while the image loads. */
+.overview-hero-media-composition {
+  position: relative;
+  flex: 0 0 min(42%, 26rem);
+  padding-top: var(--space-loose);
+}
+
+.overview-hero-media-composition::before {
+  content: "";
+  position: absolute;
+  top: -1.5rem;
+  right: -1.5rem;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: var(--color-surface-subtle);
+  z-index: 0;
+}
+
 .overview-hero-media {
-  flex: 0 0 min(38%, 22rem);
+  position: relative;
+  z-index: 1;
   margin: 0;
 }
 
@@ -1075,15 +1090,19 @@ main.explorer-shell {
 .overview-hero-media img {
   aspect-ratio: 700 / 291;
   border-radius: var(--radius-surface);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 1.25rem 100%, 0 calc(100% - 1.25rem));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 12% 100%, 0 78%);
   object-fit: cover;
   object-position: center 42%;
 }
 
+/* Quiet editorial metadata, aligned to the media region it documents — not
+   a determinant of the media composition's shape. */
 .overview-hero-attribution {
-  margin: 0.4rem 0 0;
+  position: relative;
+  z-index: 1;
+  margin: 0.5rem 0 0;
   color: var(--color-ink-muted);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   line-height: 1.4;
 }
 
@@ -1091,42 +1110,63 @@ main.explorer-shell {
   color: inherit;
 }
 
-/* Delta §5 — deliberate metrics band, integrated as the surface's second
-   row directly below the Hero. Only problemCount, evidenceCount, and the
-   ongoing-investigation statement. Plain semantic list, not cardified —
-   value and label are separate elements so each metric reads as two
-   deliberate facts rather than one run-on sentence. A hairline top rule
-   separates this band from the Hero band above it. */
+/* Delta pass 2 — metrics now sit inside the Hero content column, directly
+   below the supporting copy, as an integrated editorial facts row rather
+   than a separate banded section. Each metric pairs a restrained circular
+   icon with its value/label; a vertical hairline separates metrics at wide
+   desktop. Plain semantic list — value and label stay separate elements. */
 .overview-metrics {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem 2rem;
+  align-items: center;
+  gap: 0.9rem 1.75rem;
   margin: 0;
-  padding: var(--space-loose) var(--space-section);
-  border-top: 1px solid var(--color-separator-faint);
+  padding: 0;
   list-style: none;
 }
 
 .overview-metric {
   display: flex;
-  align-items: baseline;
-  gap: 0.45rem;
+  align-items: center;
+  gap: 0.6rem;
   margin: 0;
   padding: 0;
 }
 
 .overview-metric + .overview-metric {
-  padding-left: 2rem;
+  padding-left: 1.75rem;
   border-left: 1px solid var(--color-separator-faint);
+}
+
+.overview-metric-icon-backplate {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--color-surface-subtle);
+}
+
+.overview-metric-icon {
+  display: block;
+  color: var(--color-accent);
+  font-size: 1.05rem;
+}
+
+.overview-metric-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
 }
 
 .overview-metric-value {
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.15;
 }
 
 .overview-metric-label {
@@ -1135,25 +1175,23 @@ main.explorer-shell {
   font-size: var(--text-interface-label-size);
 }
 
-.overview-metric--ongoing {
-  padding-left: 2rem;
-  border-left: 1px solid var(--color-separator-faint);
+.overview-metric--ongoing .overview-metric-text {
+  justify-content: center;
   color: var(--color-ink-muted);
   font-family: var(--font-interface);
   font-size: var(--text-interface-body-size);
   font-style: italic;
 }
 
-/* Delta §6 — three editorial trust/value columns, integrated as the
-   surface's third and final band. Warm paper surface, deliberately not
-   SaaS-style cardification: a hairline top rule separates this band from
-   the metrics band above it, and a restrained vertical divider separates
-   columns; individual tiles carry no border/shadow/background of their
-   own. */
+/* Trust/value row — the lower band of the same composition, separated from
+   the Hero band by one hairline rule and a subtle warm surface shift.
+   Three equal editorial columns, restrained vertical separators, no
+   individual tile borders/shadows. Icon sits beside the heading/copy
+   rather than stacked above it. */
 .overview-trust {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.5rem;
+  gap: 1.75rem;
   margin: 0;
   padding: var(--space-loose) var(--space-section);
   border-top: 1px solid var(--color-separator-faint);
@@ -1161,7 +1199,10 @@ main.explorer-shell {
 }
 
 .overview-trust-tile {
-  padding-left: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding-left: 1.75rem;
   border-left: 1px solid var(--color-separator-faint);
 }
 
@@ -1170,16 +1211,13 @@ main.explorer-shell {
   border-left: 0;
 }
 
-/* Restrained circular icon backplate (delta §4 "subtle circular icon
-   backplates"). Styling-only change over the existing icon set — no new
-   glyphs. */
 .overview-trust-icon-backplate {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  margin: 0 0 0.6rem;
+  width: 2.625rem;
+  height: 2.625rem;
   border-radius: 50%;
   background: var(--color-surface-raised);
 }
@@ -1187,14 +1225,18 @@ main.explorer-shell {
 .overview-trust-icon {
   display: block;
   color: var(--color-accent);
-  font-size: 1.2rem;
+  font-size: 1.35rem;
+}
+
+.overview-trust-tile-text {
+  min-width: 0;
 }
 
 .overview-trust-tile h3 {
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.3rem;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 600;
 }
 
@@ -1202,7 +1244,7 @@ main.explorer-shell {
   margin: 0;
   color: var(--color-ink-secondary);
   font-size: 0.86rem;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 
 .overview-problems-heading {
@@ -2763,21 +2805,40 @@ main.explorer-shell {
   }
 }
 
-/* Overview top-surface at 768px (delta §5): the desktop metrics band
-   (gap 0.5rem 2rem, three items) can wrap at the exact 768px boundary once
-   Hero padding/media are accounted for, which would silently orphan the
-   evidenceCount item's left border on its own line. Recompose the band
-   deliberately instead of letting flex-wrap decide: a tighter row gap keeps
-   all three items on one line without touching the desktop/compact rules
-   above and below this band. */
+/* Overview top-surface at the 768px boundary (§9): reduce media width and
+   Hero padding first rather than letting the desktop two-column shape
+   destabilise or silently wrap. If the third metric would still orphan its
+   left border on its own line at this width, recompose metrics into a
+   deliberate 2+1 shape (two metrics share a row, the ongoing statement
+   moves to its own full-width row without a dangling border) instead of
+   leaving that to flex-wrap. */
 @media (min-width: 768px) and (max-width: 1023px) {
-  .overview-metrics {
-    gap: 0.5rem 1.25rem;
+  .overview-hero {
+    gap: var(--space-loose);
+    padding: var(--space-loose) var(--space-loose) 0;
   }
 
-  .overview-metric + .overview-metric,
-  .overview-metric--ongoing {
+  .overview-hero-media-composition {
+    flex-basis: min(36%, 18rem);
+  }
+
+  .overview-metrics {
+    gap: 0.75rem 1.25rem;
+  }
+
+  .overview-metric + .overview-metric {
     padding-left: 1.25rem;
+  }
+
+  .overview-metric--ongoing {
+    flex-basis: 100%;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .overview-trust {
+    gap: 1.25rem;
+    padding: var(--space-loose);
   }
 }
 
@@ -2879,26 +2940,28 @@ main.explorer-shell {
     font-size: 1.65rem;
   }
 
-  /* Compact top-surface (<=767px): still one coherent panel, but every
-     internal band drops to a single stacked reading flow with no photo
-     (delta §5 360px "no photo if omitting it remains the stronger compact
-     solution") and no orphan vertical separators. */
+  /* Compact top-surface (<=767px): still one coherent composition, but no
+     oversized visual card — every internal band drops to a single stacked
+     reading flow with no photo (§10 "no decorative media geometry that
+     creates empty dead space") and no orphan vertical separators. Metrics
+     become deliberate stacked facts, each keeping its circular icon. */
   .overview-top-surface {
     border-radius: var(--radius-control);
   }
 
   .overview-hero {
     display: block;
-    padding: var(--space-loose) var(--space-standard);
+    padding: var(--space-loose) var(--space-standard) 0;
   }
 
   .overview-hero-content {
     max-width: 100%;
   }
 
-  /* The media figure is not rendered at this boundary at all
-     (OverviewPresentation.tsx's useNarrowViewport gate) — this rule is a
+  /* The media figure/composition is not rendered at this boundary at all
+     (OverviewPresentation.tsx's useNarrowViewport gate) — these rules are a
      defensive backstop only, never the mechanism that avoids the fetch. */
+  .overview-hero-media-composition,
   .overview-hero-media {
     display: none;
   }
@@ -2919,11 +2982,10 @@ main.explorer-shell {
   .overview-metrics {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.6rem;
-    padding: var(--space-standard) var(--space-standard);
+    gap: 0.75rem;
+    padding: var(--space-standard) 0 var(--space-loose);
   }
 
-  .overview-metric,
   .overview-metric + .overview-metric,
   .overview-metric--ongoing {
     padding-left: 0;
@@ -2931,7 +2993,7 @@ main.explorer-shell {
   }
 
   .overview-metric-value {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
   }
 
   .overview-trust {

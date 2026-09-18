@@ -4,7 +4,14 @@ import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { CitizenProblemCard, CitizenSearchControl, TopicFilterGroup } from "./CitizenDiscovery";
 import { MaterialChangeTimeline } from "./MaterialChangeTimeline";
-import { IconCompass, IconSource, IconTransparency } from "../presentation/icons";
+import {
+  IconCompass,
+  IconEvidenceStack,
+  IconProblemRecord,
+  IconSource,
+  IconTransparency,
+  IconTrendUp,
+} from "../presentation/icons";
 import { useNarrowViewport } from "../records/useNarrowViewport";
 import heroEvora700 from "../assets/overview/hero-evora-700.jpg";
 import heroEvora700Avif from "../assets/overview/hero-evora-700.avif";
@@ -71,50 +78,67 @@ export function OverviewPresentation({
             <p className="overview-hero-eyebrow">Projeto independente — não oficial</p>
             <h3 className="overview-hero-headline">Investigamos problemas práticos que afetam Évora.</h3>
             <p className="overview-hero-supporting">Reunimos fontes e evidência para mostrar o que sabemos, o que ainda não sabemos e o que mudou.</p>
+
+            <ul className="overview-metrics" aria-label="Números da investigação">
+              <li className="overview-metric">
+                <span className="overview-metric-icon-backplate" aria-hidden="true"><IconProblemRecord className="overview-metric-icon" /></span>
+                <span className="overview-metric-text">
+                  <span className="overview-metric-value">{problemCount}</span>
+                  <span className="overview-metric-label">{problemCountLabel(problemCount)}</span>
+                </span>
+              </li>
+              <li className="overview-metric">
+                <span className="overview-metric-icon-backplate" aria-hidden="true"><IconEvidenceStack className="overview-metric-icon" /></span>
+                <span className="overview-metric-text">
+                  <span className="overview-metric-value">{evidenceCount}</span>
+                  <span className="overview-metric-label">{evidenceCountLabel(evidenceCount)}</span>
+                </span>
+              </li>
+              <li className="overview-metric overview-metric--ongoing">
+                <span className="overview-metric-icon-backplate" aria-hidden="true"><IconTrendUp className="overview-metric-icon" /></span>
+                <span className="overview-metric-text">Investigação em atualização contínua</span>
+              </li>
+            </ul>
           </div>
 
           {!isNarrowViewport && (
-            <figure className="overview-hero-media">
-              <picture>
-                <source type="image/avif" srcSet={`${heroEvora700Avif} 700w, ${heroEvora1000Avif} 1000w`} sizes="352px" />
-                <source type="image/webp" srcSet={`${heroEvora700Webp} 700w, ${heroEvora1000Webp} 1000w`} sizes="352px" />
-                <img src={heroEvora700} width={700} height={291} alt="" loading="eager" fetchPriority="high" />
-              </picture>
-              <figcaption className="overview-hero-attribution">
+            <div className="overview-hero-media-composition">
+              <figure className="overview-hero-media">
+                <picture>
+                  <source type="image/avif" srcSet={`${heroEvora700Avif} 700w, ${heroEvora1000Avif} 1000w`} sizes="min(42vw, 30rem)" />
+                  <source type="image/webp" srcSet={`${heroEvora700Webp} 700w, ${heroEvora1000Webp} 1000w`} sizes="min(42vw, 30rem)" />
+                  <img src={heroEvora700} width={700} height={291} alt="" loading="eager" fetchPriority="high" />
+                </picture>
+              </figure>
+              <p className="overview-hero-attribution">
                 Fotografia: <a href="https://commons.wikimedia.org/wiki/user:Christian_G%C3%A4nshirt" target="_blank" rel="noopener noreferrer">Christian Gänshirt</a> ·{" "}
                 <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> · adaptada para apresentação
-              </figcaption>
-            </figure>
+              </p>
+            </div>
           )}
         </div>
 
-        <ul className="overview-metrics" aria-label="Números da investigação">
-          <li className="overview-metric">
-            <span className="overview-metric-value">{problemCount}</span>
-            <span className="overview-metric-label">{problemCountLabel(problemCount)}</span>
-          </li>
-          <li className="overview-metric">
-            <span className="overview-metric-value">{evidenceCount}</span>
-            <span className="overview-metric-label">{evidenceCountLabel(evidenceCount)}</span>
-          </li>
-          <li className="overview-metric overview-metric--ongoing">Investigação em atualização contínua</li>
-        </ul>
-
         <section className="overview-trust" aria-label="Como trabalhamos">
           <div className="overview-trust-tile">
-            <span className="overview-trust-icon-backplate"><IconSource className="overview-trust-icon" /></span>
-            <h3>Fontes identificadas</h3>
-            <p>Cada leitura remete para registos identificáveis e mantém a proveniência.</p>
+            <span className="overview-trust-icon-backplate" aria-hidden="true"><IconSource className="overview-trust-icon" /></span>
+            <div className="overview-trust-tile-text">
+              <h3>Fontes identificadas</h3>
+              <p>Cada leitura remete para registos identificáveis e mantém a proveniência.</p>
+            </div>
           </div>
           <div className="overview-trust-tile">
-            <span className="overview-trust-icon-backplate"><IconTransparency className="overview-trust-icon" /></span>
-            <h3>Com transparência</h3>
-            <p>Mostramos o que sabemos, o que ainda não sabemos e o que mudou.</p>
+            <span className="overview-trust-icon-backplate" aria-hidden="true"><IconTransparency className="overview-trust-icon" /></span>
+            <div className="overview-trust-tile-text">
+              <h3>Com transparência</h3>
+              <p>Mostramos o que sabemos, o que ainda não sabemos e o que mudou.</p>
+            </div>
           </div>
           <div className="overview-trust-tile">
-            <span className="overview-trust-icon-backplate"><IconCompass className="overview-trust-icon" /></span>
-            <h3>Para uma Évora mais informada</h3>
-            <p>Organizamos a investigação para tornar problemas e mudanças mais fáceis de acompanhar.</p>
+            <span className="overview-trust-icon-backplate" aria-hidden="true"><IconCompass className="overview-trust-icon" /></span>
+            <div className="overview-trust-tile-text">
+              <h3>Para uma Évora mais informada</h3>
+              <p>Organizamos a investigação para tornar problemas e mudanças mais fáceis de acompanhar.</p>
+            </div>
           </div>
         </section>
       </div>
