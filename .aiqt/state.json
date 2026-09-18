@@ -2763,12 +2763,12 @@
           "npm run build --prefix apps/research-explorer",
           "git diff --check"
         ],
-        "status": "ready",
+        "status": "done",
         "dependencies": [
           "DEP-050"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T16:45:48.447Z"
+        "updatedAt": "2026-09-18T06:48:21.848Z"
       },
       {
         "id": "WU058",
@@ -2809,13 +2809,13 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-053",
           "DEP-054"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T14:58:53.664Z"
+        "updatedAt": "2026-09-18T06:48:21.848Z"
       },
       {
         "id": "WU059",
@@ -8264,17 +8264,89 @@
         }
       ],
       "finalWorkUnitStatus": "done",
-      "createdAt": "2026-09-18T06:00:39.875Z",
+      "nextRecommendation": "aiqt next",
+      "createdAt": "2026-09-18T06:00:39.875Z"
+    },
+    {
+      "id": "C058",
+      "workUnitId": "WU057",
+      "packetId": "PKT-058",
+      "summary": "Closed WU057 Trust Experience after explicit owner visual acceptance. The shared Trust structure and owner-confirmed About accountability content passed rendered desktop and approximately 360px review on the accepted Preview.",
+      "completed": [
+        "Implemented the shared citizen-facing Trust structure for About, Methodology, Corrections, Contact, and Privacy.",
+        "Implemented responsive desktop and compact composition for these Trust surfaces.",
+        "Built the About accountability structure using only owner-confirmed factual content.",
+        "Recorded owner acceptance as EVID-005, bound to Preview dpl_HpMD6bikk5AYTeJnymSmP6mFEjNs and accepted implementation SHA fc57fa7e3abda1147600891de4017ba1df734c99.",
+        "Recorded the independent conditional PASS and subsequent owner rendered desktop and approximately 360px PASS reviews.",
+        "Deferred only non-blocking integrated-review observations to WU058: Research Explorer / Explorador de Investigação wording consistency and desktop vertical rhythm on short Trust pages."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl",
+        "apps/research-explorer/src/app/TrustPage.test.tsx",
+        "apps/research-explorer/src/app/TrustPage.tsx",
+        "apps/research-explorer/src/index.css"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run typecheck --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Passed for the accepted implementation."
+        },
+        {
+          "command": "npm run test --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Passed for the accepted implementation."
+        },
+        {
+          "command": "npm run build --prefix apps/research-explorer",
+          "result": "passed",
+          "summary": "Passed for the accepted implementation."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "Passed before checkpoint creation."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "About/Methodology/Corrections/Contact/Privacy share a common citizen-facing structural template and pass rendered review at a representative desktop width and at ~360px.",
+          "result": "passed",
+          "evidence": "Shared Trust structure approved; owner rendered desktop and approximately 360px reviews passed on Preview dpl_HpMD6bikk5AYTeJnymSmP6mFEjNs."
+        },
+        {
+          "criterion": "The About page's accountability structure (maintainer, independence, funding, publication method) contains only owner-confirmed factual content; any unconfirmed content is flagged to the owner and withheld rather than invented.",
+          "result": "passed",
+          "evidence": "Owner approved the About accountability content."
+        },
+        {
+          "criterion": "npm run typecheck --prefix apps/research-explorer, npm run test --prefix apps/research-explorer, and npm run build --prefix apps/research-explorer pass; git diff --check passes.",
+          "result": "passed",
+          "evidence": "Validation already passed for the accepted implementation; git diff --check passed before checkpoint creation."
+        },
+        {
+          "criterion": "All persistent changes are committed before this work unit is marked done.",
+          "result": "passed",
+          "evidence": "Implementation is committed at fc57fa7e3abda1147600891de4017ba1df734c99; AIQT closure state will be committed immediately after checkpoint creation before closure handoff."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-18T06:48:21.848Z",
       "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
-    "id": "PKT-057",
-    "workUnitId": "WU056",
+    "id": "PKT-058",
+    "workUnitId": "WU057",
     "milestoneId": "M015",
-    "createdAt": "2026-09-17T20:21:03.975Z",
+    "createdAt": "2026-09-18T06:24:53.168Z",
     "format": "markdown",
-    "contentHash": "sha256:211fdc17435d7f7c8b6f5753ce6c22dbfd558847a6724fe294db341e08989613",
+    "contentHash": "sha256:4339dffd4c5fcc8a97a8c891ed5252fc7d4f549057477da3c55b3a0869884aae",
     "sourceCommand": "aiqt next",
     "renderedSections": [
       "scope",
@@ -8293,7 +8365,7 @@
     }
   },
   "nextRecommendedCommand": "aiqt next",
-  "lastUpdatedAt": "2026-09-18T06:00:39.875Z",
+  "lastUpdatedAt": "2026-09-18T06:48:21.848Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8532,6 +8604,48 @@
           "externalEvidenceId": "WU056-owner-visual-acceptance-2026-09-18",
           "importIdentityKey": "sha256:9bca527ddc8b80bd1feaf5c11f8620733fc987d2b272e58e8fe34eee01c471d0",
           "importedAt": "2026-09-18T05:59:22.152Z"
+        }
+      },
+      {
+        "evidenceId": "EVID-005",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-owner",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU057",
+          "packetId": "PKT-058",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "milestone/m015-citizen-facing-ux-refresh",
+          "commitSha": "fc57fa7e3abda1147600891de4017ba1df734c99",
+          "capturedAt": "2026-09-18T00:00:00.000Z"
+        },
+        "reviewer": {
+          "reviewerId": "owner",
+          "reviewerType": "human",
+          "independentContext": "declared_not_independent"
+        },
+        "results": {
+          "reviewResult": "passed",
+          "validationResult": "passed",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Owner visual gate ACCEPTED for WU057. Independent review was conditional PASS with rendered capture as the only missing item; the owner then completed rendered desktop and approximately 360px reviews with PASS. The shared Trust structure and About accountability content are approved. Preview dpl_HpMD6bikk5AYTeJnymSmP6mFEjNs is bound to implementation SHA fc57fa7e3abda1147600891de4017ba1df734c99. Existing required validation passed. Deferred non-blocking WU058 observations only: Research Explorer / Explorador de Investiga??o wording consistency and desktop vertical rhythm on short Trust pages."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-18T00:00:00.000Z",
+        "recordedAt": "2026-09-18T06:47:20.765Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:69c3550afc8e1a800bac48d140832022e4ad110e7a4dbd33aa7a529abf79e62b",
+          "externalEvidenceId": "WU057-owner-rendered-acceptance-2026-09-18",
+          "importIdentityKey": "sha256:480edeb8e62a8115d1778797019bab68ff06036a70911bfb6b97c61d808bacb1",
+          "importedAt": "2026-09-18T06:47:20.765Z"
         }
       }
     ],
@@ -10293,6 +10407,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-18T06:00:39.875Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C058",
+      "current": {
+        "observationId": "sha256:9f6b234b9ddbe3cd951a7f94512b037f9c9e650bb947895c5a12d4ac21beadec",
+        "checkpointId": "C058",
+        "workUnitId": "WU057",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-18T06:48:21.848Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-18T06:48:21.848Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:9f6b234b9ddbe3cd951a7f94512b037f9c9e650bb947895c5a12d4ac21beadec",
+          "checkpointId": "C058",
+          "workUnitId": "WU057",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-18T06:48:21.848Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-18T06:48:21.848Z"
         }
       ]
     }
