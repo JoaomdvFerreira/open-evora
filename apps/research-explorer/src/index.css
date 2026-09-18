@@ -110,7 +110,6 @@ main {
 /* Public first-contact Overview: reuses the Explorer's restrained surfaces,
    typography roles, native disclosure, and text-first navigation. */
 .overview-independence,
-.overview-trust,
 .overview-status-explanation {
   border: 1px solid #ccc;
   background: #f7f6f3;
@@ -920,13 +919,6 @@ main.explorer-shell {
   display: none;
 }
 
-.explorer-subtitle {
-  color: var(--color-ink-secondary);
-  font-size: 0.85rem;
-  font-weight: 400;
-  letter-spacing: 0;
-}
-
 .manifest-summary {
   max-width: 58rem;
   margin: 1.5rem auto 0;
@@ -1033,7 +1025,6 @@ main.explorer-shell {
 }
 
 .overview-independence,
-.overview-trust,
 .overview-status-explanation {
   box-sizing: border-box;
   max-width: none;
@@ -1097,20 +1088,6 @@ main.explorer-shell {
   color: var(--color-ink-secondary);
   font-size: 0.86rem;
   line-height: 1.55;
-}
-
-.overview-trust {
-  margin: 1rem 0 1.25rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-ink-secondary);
-  font-size: 0.85rem;
-  line-height: 1.6;
-}
-
-.overview-trust strong {
-  color: var(--color-ink-primary);
 }
 
 .overview-status-explanation {
@@ -1262,14 +1239,13 @@ main.explorer-shell {
   background: var(--color-surface-subtle);
 }
 
-.material-change-timeline {
-  max-width: 48rem;
-  margin: 2.25rem 0 0;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--color-separator-faint);
-}
-
+/* MaterialChangeTimeline owns its own vertical-timeline treatment here,
+   independent of any caller's section/boundary styling (AGENTS.md
+   canonical-state integrity; callers are Overview and ProblemView's
+   "Alterações materiais recentes"). A thin rule connects each marker to the
+   next, restrained rather than decorative. */
 .material-change-list {
+  position: relative;
   display: grid;
   gap: 0;
   margin: 0;
@@ -1277,18 +1253,47 @@ main.explorer-shell {
   list-style: none;
 }
 
+.material-change-list::before {
+  position: absolute;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  left: 0.28rem;
+  width: 1px;
+  background: var(--color-separator-standard);
+  content: "";
+}
+
 .material-change-item {
+  position: relative;
   display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr);
-  gap: 1rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--color-separator-faint);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.3rem;
+  padding: 0 0 1.25rem 1.4rem;
+}
+
+.material-change-item:last-child {
+  padding-bottom: 0;
+}
+
+.material-change-item::before {
+  position: absolute;
+  top: 0.42rem;
+  left: 0;
+  width: 0.58rem;
+  height: 0.58rem;
+  border: 2px solid var(--color-surface-reading);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-separator-standard);
+  content: "";
 }
 
 .material-change-date {
   color: var(--color-ink-muted);
-  font-size: 0.78rem;
-  line-height: 1.5;
+  font-family: var(--font-interface);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .material-change-content p {
@@ -1296,18 +1301,25 @@ main.explorer-shell {
 }
 
 .material-change-problem {
-  color: var(--color-ink-primary);
-  font-family: var(--font-reading);
-  font-size: 0.93rem;
-  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
 }
 
-.material-change-problem-id::after {
-  content: " · ";
+.material-change-problem-title {
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.material-change-problem-id.material-change-problem-id {
+  color: var(--color-ink-faint);
 }
 
 .material-change-summary {
-  margin-top: 0.35rem !important;
+  margin-top: 0.3rem !important;
   color: var(--color-ink-secondary);
   font-size: 0.86rem;
   line-height: 1.55;
@@ -1315,13 +1327,13 @@ main.explorer-shell {
 
 .material-change-content button {
   min-height: auto;
-  margin-top: 0.5rem;
+  margin-top: 0.55rem;
   padding: 0.25rem 0;
   color: var(--color-accent-hover);
   border: 0;
   background: transparent;
   font-size: 0.78rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -1469,11 +1481,11 @@ main.explorer-shell {
   font-size: 0.68rem;
 }
 
-/* Overview visual-completion Phase A: shared component candidates are refined
-   here for Storybook review only. Overview.tsx keeps its present composition;
-   its later presentation boundary may adopt the reviewed relationships. */
+/* Overview visual-completion: header/discovery/material-change adoption.
+   Explorer.tsx/Overview.tsx render these class names directly — this is the
+   production presentation, not a Storybook-only preview. */
 .explorer-chrome {
-  min-height: 4.75rem;
+  min-height: 3.25rem;
   border-bottom-color: var(--color-separator-standard);
   background: var(--color-surface-reading);
 }
@@ -1487,15 +1499,7 @@ main.explorer-shell {
 }
 
 .explorer-logo--full .oe-logo-full {
-  height: 1.75rem;
-}
-
-.explorer-subtitle {
-  padding-left: 0.7rem;
-  border-left: 1px solid var(--color-separator-standard);
-  font-family: var(--font-interface);
-  font-size: var(--text-interface-label-size);
-  line-height: var(--text-interface-label-line-height);
+  height: 1.4rem;
 }
 
 .explorer-navigation {
@@ -1504,7 +1508,7 @@ main.explorer-shell {
 
 .explorer-navigation .explorer-navigation-action {
   min-height: var(--target-min);
-  padding: 0.7rem 0.8rem 0.64rem;
+  padding: 0.5rem 0.8rem;
   border-bottom-width: 2px;
   color: var(--color-ink-secondary);
   font-size: var(--text-interface-label-size);
@@ -1638,30 +1642,30 @@ main.explorer-shell {
   text-decoration-thickness: 2px;
 }
 
-.material-change-timeline {
-  max-width: var(--measure-reading);
+/* Overview's own boundary around MaterialChangeTimeline — deliberate,
+   full-width separation from the Problems discovery region above it.
+   MaterialChangeTimeline itself (`.material-change-list`/`-item`, above)
+   owns only its internal vertical-timeline treatment, not this section
+   boundary, so ProblemView's reuse of the same component is unaffected. */
+.overview-material-change-section {
+  max-width: none;
   margin-top: var(--space-section);
+  padding-top: var(--space-loose);
+  border-top: 1px solid var(--color-separator-standard);
 }
 
-.material-change-item {
-  grid-template-columns: 8.5rem minmax(0, 1fr);
-  gap: var(--space-standard);
-  padding: 1.15rem 0;
+.overview-material-change-section > h3 {
+  margin: 0 0 var(--space-standard);
+  color: var(--color-ink-secondary);
+  font-size: 0.77rem;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
 }
 
-.material-change-date {
-  font-family: var(--font-interface);
-  font-size: var(--text-interface-label-size);
-  font-weight: var(--text-interface-label-weight);
-}
-
-.material-change-problem {
-  font-size: 1.05rem;
-}
-
-.material-change-summary {
+.overview-material-change-section .material-change-list,
+.overview-material-change-section .material-change-empty-state {
   max-width: var(--measure-reading);
-  font-size: var(--text-interface-body-size);
 }
 
 .overview-status-explanation {
@@ -1670,13 +1674,6 @@ main.explorer-shell {
   border-left: 3px solid var(--color-separator-emphasis);
   border-radius: 0;
   background: var(--color-surface-subtle);
-}
-
-.overview-trust {
-  max-width: var(--measure-reading);
-  margin-top: var(--space-section);
-  padding-top: var(--space-standard);
-  border-top: 1px solid var(--color-separator-faint);
 }
 
 .overview-closing-actions {
@@ -1691,11 +1688,6 @@ main.explorer-shell {
 
   .explorer-chrome-inner {
     gap: 0;
-  }
-
-  .explorer-subtitle {
-    padding-left: 0;
-    border-left: 0;
   }
 
   .overview-problem-list li {
@@ -1715,9 +1707,9 @@ main.explorer-shell {
     align-self: auto;
   }
 
-  .material-change-item {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
+  .overview-material-change-section {
+    margin-top: var(--space-loose);
+    padding-top: var(--space-standard);
   }
 }
 
@@ -2657,21 +2649,9 @@ main.explorer-shell {
 
   .explorer-chrome-inner > h1 {
     min-height: 1rem;
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 1rem;
     border-bottom: 1px solid var(--color-separator-standard);
     font-size: 0.8125rem;
-  }
-
-  .explorer-subtitle {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
   }
 
   .explorer-logo--full.explorer-logo--full {
@@ -2762,29 +2742,6 @@ main.explorer-shell {
 
   .overview-topic-filter {
     font-size: 0.78rem;
-  }
-
-  .material-change-timeline {
-    margin-top: 1.75rem;
-    padding-top: 1.25rem;
-  }
-
-  .material-change-item {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
-  }
-
-  .material-change-problem-id,
-  .material-change-problem-title {
-    display: block;
-  }
-
-  .material-change-problem-id::after {
-    content: none;
-  }
-
-  .overview-trust {
-    display: none;
   }
 
   .overview-status-explanation {
@@ -3083,10 +3040,6 @@ main.explorer-shell {
 
 .problem-header-states:empty {
   display: none;
-}
-
-.problem-recent-history .material-change-timeline {
-  margin-top: 0;
 }
 
 .problem-identity-id {

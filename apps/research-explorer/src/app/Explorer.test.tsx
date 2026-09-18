@@ -234,7 +234,7 @@ describe("Explorer — Overview view", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
 
     await screen.findByRole("heading", { name: "Visão geral" });
-    expect(screen.getByText("Problemas em investigação (1)")).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Problemas em investigação (1)" })).toBeTruthy();
     expect(screen.getByText(/1 problema em investigação · 1 registo de evidência/)).toBeTruthy();
     expect(await screen.findByText("Pressão de estacionamento com uma descrição canónica completa que não pode ser truncada")).toBeTruthy();
     expect(screen.getByRole("list")).toBeTruthy();
@@ -432,12 +432,11 @@ function globalNav(): HTMLElement {
 }
 
 describe("Explorer — chrome header identity", () => {
-  it("renders the Open Évora logo alongside the preserved subtitle and primary navigation", async () => {
+  it("renders the Open Évora logo alongside primary navigation", async () => {
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
     expect(screen.getAllByAltText("Open Évora").length).toBeGreaterThan(0);
-    expect(screen.getByText("Explorador de Investigação")).toBeTruthy();
     expect(globalNav()).toBeTruthy();
     expect(within(globalNav()).getByRole("button", { name: "Visão geral" })).toBeTruthy();
     expect(within(globalNav()).getByRole("button", { name: "Registos" })).toBeTruthy();

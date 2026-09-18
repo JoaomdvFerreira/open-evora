@@ -91,17 +91,13 @@ export function OverviewPresentation({
         <p className="overview-mobile-copy">Este Explorador dá acesso a evidências e incertezas — não é um serviço oficial. <strong>{unvalidatedLabel}</strong> não significa falso; <strong>{compactCorroboratedLabel}</strong> descreve o estado atual da evidência, não uma conclusão fechada.</p>
       </details>
 
-      <section id="overview-problemas" aria-labelledby="overview-problemas-heading">
-        <div className="overview-problems-heading">
-          <h3 id="overview-problemas-heading">Problemas em investigação ({formatPublicCount(problemCount)})</h3>
-        </div>
+      <section id="overview-problemas" aria-label={`Problemas em investigação (${formatPublicCount(problemCount)})`}>
+        <CitizenSearchControl value={searchQuery} onChange={onSearchChange} />
+        <TopicFilterGroup topicCodes={topicCodes} activeTopic={activeTopic} onChange={onTopicChange} />
 
         <p className="overview-coverage-caveat">Os problemas apresentados são os atualmente acompanhados pelo Open Évora. Não constituem um inventário completo dos problemas existentes em Évora.</p>
 
         <p className="overview-ordering-note">Ordenados por identificador — a ordem não representa prioridade ou relevância.</p>
-
-        <CitizenSearchControl value={searchQuery} onChange={onSearchChange} />
-        <TopicFilterGroup topicCodes={topicCodes} activeTopic={activeTopic} onChange={onTopicChange} />
 
         {citizenProblems === null || visibleProblems === null ? (
           <ProgressMessage message="A carregar problemas…" />
@@ -125,10 +121,8 @@ export function OverviewPresentation({
         )}
       </section>
 
-      <section className="material-change-timeline" aria-labelledby="material-change-heading">
-        <div className="overview-problems-heading">
-          <h3 id="material-change-heading">O que mudou recentemente</h3>
-        </div>
+      <section className="overview-material-change-section" aria-labelledby="material-change-heading">
+        <h3 id="material-change-heading">O que mudou recentemente</h3>
         {materialChanges === null ? (
           <ProgressMessage message="A carregar alterações materiais…" />
         ) : (
@@ -145,8 +139,6 @@ export function OverviewPresentation({
           </>
         )}
       </section>
-
-      <p className="overview-trust"><strong>Base explícita.</strong> Cada leitura remete para registos identificáveis e para a evidência que a sustenta, refina, contesta ou atualiza. A proveniência é preservada e rastreável, sem implicar que toda a evidência tenha a mesma força.</p>
 
       <p className="overview-closing-actions">
         <button type="button" onClick={onViewRecords}>Ver todos os registos →</button>

@@ -75,16 +75,14 @@ function OverviewPresentationDirection({ problem = base }: { problem?: CitizenPr
           <p className="overview-mobile-copy">Este Explorador dá acesso a evidências e incertezas — não é um serviço oficial. <strong>{unvalidatedLabel}</strong> não significa falso; <strong>{compactCorroboratedLabel}</strong> descreve o estado atual da evidência, não uma conclusão fechada.</p>
         </details>
 
-        <section aria-labelledby="direction-problems-heading">
-          <div className="overview-problems-heading"><h2 id="direction-problems-heading">Problemas em investigação</h2></div>
-          <p className="overview-coverage-caveat">Os problemas apresentados são os atualmente acompanhados pelo Open Évora. Não constituem um inventário completo dos problemas existentes em Évora.</p>
-          <p className="overview-ordering-note">Ordenados por identificador — a ordem não representa prioridade ou relevância.</p>
+        <section aria-label="Problemas em investigação">
           <Search />
           <Filters initial="MOB" />
+          <p className="overview-coverage-caveat">Os problemas apresentados são os atualmente acompanhados pelo Open Évora. Não constituem um inventário completo dos problemas existentes em Évora.</p>
+          <p className="overview-ordering-note">Ordenados por identificador — a ordem não representa prioridade ou relevância.</p>
           <Card problem={problem} />
         </section>
 
-        <p className="overview-trust"><strong>Base explícita.</strong> Cada leitura remete para registos identificáveis e para a evidência que a sustenta, refina, contesta ou atualiza. A proveniência é preservada e rastreável, sem implicar que toda a evidência tenha a mesma força.</p>
         <p className="overview-closing-actions"><button type="button">Ver todos os registos →</button></p>
       </section>
     </main>

@@ -13,7 +13,6 @@ export function ExplorerHeader({ activeView, onOverview, onRecords }: {
         <h1 className="explorer-identity">
           <Logo form="full" className="explorer-logo explorer-logo--full" />
           <Logo form="compact" className="explorer-logo explorer-logo--compact" />
-          <span className="explorer-subtitle">Explorador de Investigação</span>
         </h1>
         <nav aria-label="Vistas do Explorador de Investigação" className="explorer-navigation">
           <button type="button" className="explorer-navigation-action" aria-current={activeView === "overview" ? "page" : undefined} onClick={onOverview}>Visão geral</button>
