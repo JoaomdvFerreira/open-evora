@@ -229,3 +229,41 @@ export function IconStateClosed(props: IconProps) {
     </IconBase>
   );
 }
+
+/**
+ * Overview visual-completion — three presentation-only trust-row glyphs.
+ * Each is a generic, neutral concept marker (not a status/effect/topic
+ * value) for the Overview trust/value row; like every icon above they are
+ * `aria-hidden`, and the row's own heading/copy carries all meaning.
+ */
+
+/** Fontes identificadas — a document/record glyph, distinct from IconBook (EDU topic). */
+export function IconSource(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M6 3.5h6l3 3v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-12a1 1 0 0 1 1-1Z" />
+      <path d="M12 3.5v3h3" />
+      <path d="M7.5 11h5M7.5 13.5h5M7.5 8.5h2" />
+    </IconBase>
+  );
+}
+
+/** Com transparência — an open-eye glyph. */
+export function IconTransparency(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M2.5 10c1.8-3 4.6-4.6 7.5-4.6S15.7 7 17.5 10c-1.8 3-4.6 4.6-7.5 4.6S4.3 13 2.5 10Z" />
+      <circle cx="10" cy="10" r="2.2" />
+    </IconBase>
+  );
+}
+
+/** Para uma Évora mais informada — a compass/orientation glyph, distinct from the topic/state glyph set. */
+export function IconCompass(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="10" cy="10" r="6.5" />
+      <path d="M12.3 7.7 11 11l-3.3 1.3L9 9Z" fill="currentColor" stroke="none" />
+    </IconBase>
+  );
+}

@@ -44,14 +44,18 @@ export interface MaterialChangeSource {
   detail: RecordDetail;
 }
 
-/** Metrics-strip label — PT-PT singular only for one, plural for zero or more than one. */
-export function formatProblemCount(count: number): string {
-  return `${count} ${count === 1 ? "Problema acompanhado" : "Problemas acompanhados"}`;
+/**
+ * Metrics label only (value rendered separately in markup — Overview
+ * visual-completion delta §5). PT-PT singular only for one, plural for zero
+ * or more than one.
+ */
+export function problemCountLabel(count: number): string {
+  return count === 1 ? "Problema acompanhado" : "Problemas acompanhados";
 }
 
-/** Metrics-strip label — PT-PT singular only for one, plural for zero or more than one. */
-export function formatEvidenceCount(count: number): string {
-  return `${count} ${count === 1 ? "Registo de evidência" : "Registos de evidência"}`;
+/** Metrics label only — PT-PT singular only for one, plural for zero or more than one. */
+export function evidenceCountLabel(count: number): string {
+  return count === 1 ? "Registo de evidência" : "Registos de evidência";
 }
 
 /**

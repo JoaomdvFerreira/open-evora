@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   computeOverviewStats,
   computePublicOverviewData,
-  formatEvidenceCount,
-  formatProblemCount,
+  evidenceCountLabel,
   matchesCitizenSearch,
   matchesTopicFilter,
+  problemCountLabel,
   projectMaterialChangeEntries,
   relevantTopicCodes,
   toCitizenProblem,
@@ -317,13 +317,13 @@ describe("matchesCitizenSearch", () => {
   });
 });
 
-describe("public Overview metrics-strip count grammar", () => {
+describe("public Overview metrics count grammar", () => {
   it("uses PT-PT singular only for one, and plural for zero or more than one", () => {
-    expect(formatProblemCount(0)).toBe("0 Problemas acompanhados");
-    expect(formatProblemCount(1)).toBe("1 Problema acompanhado");
-    expect(formatProblemCount(2)).toBe("2 Problemas acompanhados");
-    expect(formatEvidenceCount(0)).toBe("0 Registos de evidência");
-    expect(formatEvidenceCount(1)).toBe("1 Registo de evidência");
-    expect(formatEvidenceCount(2)).toBe("2 Registos de evidência");
+    expect(problemCountLabel(0)).toBe("Problemas acompanhados");
+    expect(problemCountLabel(1)).toBe("Problema acompanhado");
+    expect(problemCountLabel(2)).toBe("Problemas acompanhados");
+    expect(evidenceCountLabel(0)).toBe("Registos de evidência");
+    expect(evidenceCountLabel(1)).toBe("Registo de evidência");
+    expect(evidenceCountLabel(2)).toBe("Registos de evidência");
   });
 });

@@ -1,8 +1,19 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Overview } from "./Overview";
+import { NARROW_BREAKPOINT_PX } from "../records/useNarrowViewport";
 import { DataLoadError, type DataProvider, type RecordDetail, type RecordSummary } from "../dataProvider/types";
+
+function setInnerWidth(width: number) {
+  Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: width });
+}
+
+const ORIGINAL_WIDTH = window.innerWidth;
+
+afterEach(() => {
+  setInnerWidth(ORIGINAL_WIDTH);
+});
 
 function makeProvider(index: RecordSummary[]): DataProvider {
   const details: Record<string, RecordDetail> = Object.fromEntries(
@@ -291,5 +302,44 @@ describe("Overview — material-change timeline", () => {
     expect(screen.getByText("Alteração material redigida.")).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Abrir problema Problema do histórico" }));
     expect(onExploreProblem).toHaveBeenCalledWith("PRB-1");
+  });
+});
+
+describe("Overview — Hero media (visual-completion delta §2/§7)", () => {
+  it("renders the Hero photograph as decorative (empty alt) with independent attribution at desktop widths", async () => {
+    setInnerWidth(NARROW_BREAKPOINT_PX + 1);
+    render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
+
+    await screen.findByText("Investigamos problemas práticos que afetam Évora.");
+    const image = document.querySelector(".overview-hero-media img");
+    expect(image?.getAttribute("alt")).toBe("");
+    expect(screen.getByText("Christian Gänshirt").tagName).toBe("A");
+    expect(screen.getByText("CC BY-SA 4.0").tagName).toBe("A");
+  });
+
+  it("omits the Hero photograph entirely at/below the compact breakpoint, not merely hides it visually", async () => {
+    setInnerWidth(NARROW_BREAKPOINT_PX);
+    render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
+
+    await screen.findByText("Investigamos problemas práticos que afetam Évora.");
+    expect(document.querySelector(".overview-hero-media")).toBeNull();
+  });
+});
+
+describe("Overview — metrics value/label separation (visual-completion delta §5)", () => {
+  it("renders each count metric's numeric value and PT-PT label as separate elements", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const problemMetric = (await screen.findByText("2", { selector: ".overview-metric-value" })).closest(".overview-metric");
+    expect(problemMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Problemas acompanhados");
+
+    const evidenceValue = screen.getAllByText("0", { selector: ".overview-metric-value" })[0];
+    expect(evidenceValue.closest(".overview-metric")?.querySelector(".overview-metric-label")?.textContent).toBe("Registos de evidência");
+
+    expect(screen.getByText("Investigação em atualização contínua").textContent).toBe("Investigação em atualização contínua");
   });
 });
