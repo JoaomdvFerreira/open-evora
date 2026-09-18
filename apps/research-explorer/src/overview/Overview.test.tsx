@@ -106,15 +106,20 @@ describe("Overview — Problem investigation-state dimensions", () => {
 });
 
 describe("Overview — Problem ordering transparency and citizen discovery controls", () => {
-  it("shows the ordering transparency note, distinct from the corpus-coverage caveat", async () => {
+  it("orders Problem cards by ascending PRB ID string order, neutrally, regardless of load order", async () => {
     const provider = makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} },
+      { id: "PRB-9", type: "PRB-", label: "Problema nove", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
+      { id: "PRB-10", type: "PRB-", label: "Problema dez", file: "", summaryFields: {} },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
-    await screen.findByText("Problema");
-    expect(screen.getByText("Ordenados por identificador — a ordem não representa prioridade ou relevância.")).toBeTruthy();
-    expect(screen.getByText(/Não constituem um inventário completo/)).toBeTruthy();
+    await screen.findByText("Problema dois");
+    const titles = screen.getAllByRole("heading", { level: 4 }).map((heading) => heading.textContent);
+    // Plain string comparison ("PRB-10" < "PRB-2" < "PRB-9") — the point under
+    // test is that rendered order always matches ID.localeCompare, never
+    // fetch/resolution order, not that it is numeric.
+    expect(titles).toEqual(["Problema dez", "Problema dois", "Problema nove"]);
   });
 
   it("labels the citizen search control per the approved copy", async () => {

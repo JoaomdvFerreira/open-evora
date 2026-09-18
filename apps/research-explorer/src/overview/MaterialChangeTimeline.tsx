@@ -3,11 +3,11 @@ import type { MaterialChangeEntry } from "./overviewStats";
 
 /**
  * `default` preserves ProblemView's pre-existing "Alterações materiais
- * recentes" presentation; `overview` is Overview's vertical-timeline
- * treatment. Both variants keep identical ordered-list semantics, callbacks,
+ * recentes" presentation; `overview` is Overview's horizontal scroll-snap
+ * rail. Both variants keep identical ordered-list semantics, callbacks,
  * empty state, and PRB.history-only data contract — see
  * `.material-change-list`/`-item` (default) vs `.material-change-list--overview`
- * (overview) in index.css.
+ * (overview, CSS overflow/scroll-snap only, no JS carousel) in index.css.
  */
 export function MaterialChangeTimeline({ entries, onExploreProblem, actionLabel = "Abrir problema →", actionAccessibleLabel, variant = "default" }: { entries: MaterialChangeEntry[]; onExploreProblem: (id: string) => void; actionLabel?: string; actionAccessibleLabel?: (entry: MaterialChangeEntry) => string; variant?: "default" | "overview" }) {
   if (entries.length === 0) {

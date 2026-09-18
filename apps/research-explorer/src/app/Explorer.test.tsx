@@ -234,13 +234,15 @@ describe("Explorer — Overview view", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
 
     await screen.findByRole("heading", { name: "Visão geral" });
-    expect(screen.getByRole("region", { name: "Explorar problemas" })).toBeTruthy();
-    expect(screen.getByText(/1 problema em investigação · 1 registo de evidência/)).toBeTruthy();
+    const discoveryRegion = screen.getByRole("region", { name: "Explorar problemas" });
+    expect(discoveryRegion).toBeTruthy();
+    expect(screen.getByText("1 Problema acompanhado")).toBeTruthy();
+    expect(screen.getByText("1 Registo de evidência")).toBeTruthy();
     expect(await screen.findByText("Pressão de estacionamento com uma descrição canónica completa que não pode ser truncada")).toBeTruthy();
-    expect(screen.getByRole("list")).toBeTruthy();
+    expect(within(discoveryRegion).getByRole("list")).toBeTruthy();
     expect(screen.queryByText("Pressão de estacionamento com uma descrição…")).toBeNull();
     expect(screen.queryByText("Via Verde Parking Buddy")).toBeNull();
-    expect(screen.getByText(/Não representa a Câmara Municipal de Évora/)).toBeTruthy();
+    expect(screen.getByText("Projeto independente — não oficial")).toBeTruthy();
     expect(screen.queryByText("Como ler o Explorer")).toBeNull();
     expect(screen.queryByText(/Estado de validação:/)).toBeNull();
     expect(screen.queryByText(/Estado da evidência:/)).toBeNull();

@@ -317,13 +317,13 @@ describe("matchesCitizenSearch", () => {
   });
 });
 
-describe("public Overview count grammar", () => {
+describe("public Overview metrics-strip count grammar", () => {
   it("uses PT-PT singular only for one, and plural for zero or more than one", () => {
-    expect(formatProblemCount(0)).toBe("0 problemas em investigação");
-    expect(formatProblemCount(1)).toBe("1 problema em investigação");
-    expect(formatProblemCount(2)).toBe("2 problemas em investigação");
-    expect(formatEvidenceCount(0)).toBe("0 registos de evidência");
-    expect(formatEvidenceCount(1)).toBe("1 registo de evidência");
-    expect(formatEvidenceCount(2)).toBe("2 registos de evidência");
+    expect(formatProblemCount(0)).toBe("0 Problemas acompanhados");
+    expect(formatProblemCount(1)).toBe("1 Problema acompanhado");
+    expect(formatProblemCount(2)).toBe("2 Problemas acompanhados");
+    expect(formatEvidenceCount(0)).toBe("0 Registos de evidência");
+    expect(formatEvidenceCount(1)).toBe("1 Registo de evidência");
+    expect(formatEvidenceCount(2)).toBe("2 Registos de evidência");
   });
 });

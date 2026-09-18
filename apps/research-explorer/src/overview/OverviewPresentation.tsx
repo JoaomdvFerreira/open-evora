@@ -51,59 +51,31 @@ export function OverviewPresentation({
     <section aria-labelledby="overview-heading" className="public-overview shell-frame">
       <h2 id="overview-heading">Visão geral</h2>
 
-      <p className="overview-independence">
-        <span className="overview-desktop-copy"><strong>Projeto independente.</strong> Não representa a Câmara Municipal de Évora nem qualquer entidade oficial; não é um serviço ou plataforma municipal oficial.</span>
-        <span className="overview-mobile-copy">Projeto independente — não oficial</span>
-      </p>
-
       <div className="overview-hero">
+        <p className="overview-hero-eyebrow">Projeto independente — não oficial</p>
         <h3 className="overview-hero-headline">Investigamos problemas práticos que afetam Évora.</h3>
         <p className="overview-hero-supporting">Reunimos fontes e evidência para mostrar o que sabemos, o que ainda não sabemos e o que mudou.</p>
       </div>
 
-      <section className="overview-concepts" aria-label="O que contém o Explorador">
-        <div>
-          <h3>Problemas</h3>
-          <p>Fricções cívicas identificadas a partir de evidência — com o que já se sabe e o que ainda não se sabe.</p>
+      <ul className="overview-metrics" aria-label="Números da investigação">
+        <li className="overview-metric">{formatProblemCount(problemCount)}</li>
+        <li className="overview-metric">{formatEvidenceCount(evidenceCount)}</li>
+        <li className="overview-metric overview-metric--ongoing">Investigação em atualização contínua</li>
+      </ul>
+
+      <section className="overview-trust" aria-label="Como trabalhamos">
+        <div className="overview-trust-tile">
+          <h3>Fontes identificadas</h3>
+          <p>Cada leitura remete para registos identificáveis e mantém a proveniência.</p>
         </div>
-        <div>
-          <h3>Evidência</h3>
-          <p>Registos individuais — institucionais, públicos, comunitários e de intervenientes — que sustentam, contestam ou atualizam cada leitura.</p>
+        <div className="overview-trust-tile">
+          <h3>Com transparência</h3>
+          <p>Mostramos o que sabemos, o que ainda não sabemos e o que mudou.</p>
         </div>
-        <div>
-          <h3>Proveniência e incerteza</h3>
-          <p>Cada registo mantém a sua origem. O que ainda não sabemos é registado explicitamente, não escondido.</p>
+        <div className="overview-trust-tile">
+          <h3>Para uma Évora mais informada</h3>
+          <p>Organizamos a investigação para tornar problemas e mudanças mais fáceis de acompanhar.</p>
         </div>
-      </section>
-
-      <section id="overview-problemas" aria-label="Explorar problemas">
-        <CitizenSearchControl value={searchQuery} onChange={onSearchChange} />
-        <TopicFilterGroup topicCodes={topicCodes} activeTopic={activeTopic} onChange={onTopicChange} />
-
-        <p className="overview-coverage-caveat">Os problemas apresentados são os atualmente acompanhados pelo Open Évora. Não constituem um inventário completo dos problemas existentes em Évora.</p>
-
-        <p className="overview-ordering-note">Ordenados por identificador — a ordem não representa prioridade ou relevância.</p>
-
-        {citizenProblems === null || visibleProblems === null ? (
-          <ProgressMessage message="A carregar problemas…" />
-        ) : (
-          <>
-            <div aria-live="polite" aria-atomic="true">
-              {visibleProblems.length === 0 ? (
-                <p className="overview-empty-state">Nenhum problema corresponde à pesquisa ou ao filtro selecionado.</p>
-              ) : (
-                <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} de {formatPublicCount(citizenProblems.length)} problemas</p>
-              )}
-            </div>
-            {visibleProblems.length > 0 && (
-              <ul className="overview-problem-list">
-                {visibleProblems.map((problem) => (
-                  <CitizenProblemCard key={problem.id} problem={problem} onExplore={onExploreProblem} />
-                ))}
-              </ul>
-            )}
-          </>
-        )}
       </section>
 
       <section className="overview-material-change-section" aria-labelledby="material-change-heading">
@@ -125,11 +97,34 @@ export function OverviewPresentation({
         )}
       </section>
 
-      <p className="overview-closing-actions">
-        <button type="button" onClick={onViewRecords}>Ver todos os registos →</button>
-      </p>
+      <section id="overview-problemas" aria-label="Explorar problemas">
+        <CitizenSearchControl value={searchQuery} onChange={onSearchChange} />
+        <TopicFilterGroup topicCodes={topicCodes} activeTopic={activeTopic} onChange={onTopicChange} />
 
-      <p className="overview-corpus-context">{formatProblemCount(problemCount)} · {formatEvidenceCount(evidenceCount)} · investigação em atualização contínua</p>
+        {citizenProblems === null || visibleProblems === null ? (
+          <ProgressMessage message="A carregar problemas…" />
+        ) : (
+          <>
+            <div className="overview-results-toolbar">
+              <div aria-live="polite" aria-atomic="true">
+                {visibleProblems.length === 0 ? (
+                  <p className="overview-empty-state">Nenhum problema corresponde à pesquisa ou ao filtro selecionado.</p>
+                ) : (
+                  <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} de {formatPublicCount(citizenProblems.length)} problemas</p>
+                )}
+              </div>
+              <button type="button" className="overview-records-action" onClick={onViewRecords}>Ver todos os registos →</button>
+            </div>
+            {visibleProblems.length > 0 && (
+              <ul className="overview-problem-list">
+                {visibleProblems.map((problem) => (
+                  <CitizenProblemCard key={problem.id} problem={problem} onExplore={onExploreProblem} />
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+      </section>
     </section>
   );
 }

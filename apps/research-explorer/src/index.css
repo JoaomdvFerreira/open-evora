@@ -109,28 +109,6 @@ main {
 
 /* Public first-contact Overview: reuses the Explorer's restrained surfaces,
    typography roles, native disclosure, and text-first navigation. */
-.overview-independence {
-  border: 1px solid #ccc;
-  background: #f7f6f3;
-  padding: 0.75rem 1rem;
-  max-width: 52rem;
-}
-
-.overview-concepts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  margin: 1.5rem 0;
-}
-
-.overview-concepts h3 {
-  margin-bottom: 0.35rem;
-}
-
-.overview-concepts p {
-  margin-top: 0;
-}
-
 .overview-problems-heading {
   display: flex;
   align-items: baseline;
@@ -195,12 +173,6 @@ main {
   margin: 0 0 0.5rem;
 }
 
-.overview-corpus-context {
-  color: #555;
-  font-size: 0.9rem;
-  margin: 1.5rem 0;
-}
-
 /* Desktop-first split view; stacks on narrower laptop/tablet widths rather
    than compressing both panes unreadably. */
 .records-explorer {
@@ -234,10 +206,6 @@ main {
 
   .records-pagination button {
     min-height: 44px;
-  }
-
-  .overview-concepts {
-    grid-template-columns: 1fr;
   }
 
   .overview-problems-heading,
@@ -1009,35 +977,23 @@ main.explorer-shell {
   border: 0;
 }
 
-.overview-mobile-copy {
-  display: none;
-}
-
-.overview-independence {
-  box-sizing: border-box;
-  max-width: none;
-  border-color: var(--color-separator-standard);
-  border-radius: 0.3rem;
-  background: var(--color-surface-subtle);
-}
-
-.overview-independence {
-  margin: 0 0 1.5rem;
-  padding: 0.48rem 0.75rem;
-  color: var(--color-ink-secondary);
-  font-size: 0.78rem;
-  line-height: 1.45;
-}
-
-.overview-independence strong {
-  color: var(--color-ink-primary);
-}
-
 /* WU054 — citizen-first hero: frozen headline + supporting copy, no
-   photography (out of scope for this slice). */
+   photography (out of scope for this slice). The independence statement is
+   folded in as a concise eyebrow (Overview visual-completion, delta §1) —
+   `.overview-independence` and its desktop/mobile copy split are retired. */
 .overview-hero {
   max-width: 44rem;
-  margin: 0 0 2rem;
+  margin: 0 0 1.5rem;
+}
+
+.overview-hero-eyebrow {
+  margin: 0 0 0.6rem;
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .overview-hero-headline {
@@ -1056,15 +1012,49 @@ main.explorer-shell {
   line-height: 1.55;
 }
 
-.overview-concepts {
+/* Delta §2 — deliberate metrics strip directly below the Hero: only
+   problemCount, evidenceCount, and the ongoing-investigation statement.
+   Plain text/list, not cardified — a restrained Cluster-like row. */
+.overview-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1.5rem;
+  margin: 0 0 1.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.overview-metric {
+  margin: 0;
+  padding: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  font-weight: 650;
+}
+
+.overview-metric--ongoing {
+  color: var(--color-ink-muted);
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Delta §3 — three restrained value/trust tiles, replacing the previous
+   Problemas/Evidência/Proveniência concepts grid. Warm/green surface,
+   deliberately not SaaS-style cardification: a shared top/bottom rule frames
+   the row, individual tiles carry no border/shadow of their own. */
+.overview-trust {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.5rem;
-  margin: 0 0 1.25rem;
+  margin: 0 0 var(--space-section);
   padding: 1.5rem 0;
   border-top: 1px solid var(--color-separator-faint);
   border-bottom: 1px solid var(--color-separator-faint);
 }
 
-.overview-concepts h3 {
+.overview-trust-tile h3 {
   margin: 0 0 0.35rem;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
@@ -1072,7 +1062,8 @@ main.explorer-shell {
   font-weight: 600;
 }
 
-.overview-concepts p {
+.overview-trust-tile p {
+  margin: 0;
   color: var(--color-ink-secondary);
   font-size: 0.86rem;
   line-height: 1.55;
@@ -1095,28 +1086,6 @@ main.explorer-shell {
   margin: 0;
   color: var(--color-ink-muted);
   font-size: 0.75rem;
-}
-
-/* WU054 — coverage caveat (docs/explorerarchitecture.md, AGENTS.md evidence
-   integrity): visible, but deliberately quieter than the hero/heading. */
-.overview-coverage-caveat {
-  max-width: 42rem;
-  margin: 0 0 1.25rem;
-  color: var(--color-ink-muted);
-  font-size: 0.82rem;
-  line-height: 1.5;
-}
-
-/* WU054 delta — ordering transparency note: separate from the corpus-coverage
-   caveat above, and deliberately quieter still (docs/explorerarchitecture.md
-   §4 "human-readable meaning before technical identity"; AGENTS.md evidence
-   integrity — deterministic ID order must never read as a ranking). */
-.overview-ordering-note {
-  max-width: 42rem;
-  margin: 0 0 1.25rem;
-  color: var(--color-ink-muted);
-  font-size: 0.78rem;
-  line-height: 1.5;
 }
 
 .overview-search {
@@ -1202,10 +1171,46 @@ main.explorer-shell {
   font-weight: 650;
 }
 
-.overview-results-count {
+/* Delta §7 — compact results toolbar: result count (still inside its
+   aria-live/aria-atomic boundary in OverviewPresentation.tsx) plus the
+   Records action, moved here from the page bottom. The action sits outside
+   the live region and must not visually dominate the count. */
+.overview-results-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 1rem;
   margin: 0 0 0.65rem;
+}
+
+.overview-results-count {
+  margin: 0;
   color: var(--color-ink-muted);
   font-size: 0.78rem;
+}
+
+.overview-records-action {
+  flex: 0 0 auto;
+  min-height: auto;
+  padding: 0;
+  color: var(--color-accent-hover);
+  border: 0;
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.overview-records-action:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.overview-records-action:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .overview-empty-state {
@@ -1398,36 +1403,6 @@ main.explorer-shell {
   text-underline-offset: 0.16em;
 }
 
-.overview-closing-actions {
-  margin: 1.25rem 0 0;
-  padding-top: 1rem;
-}
-
-.overview-closing-actions button {
-  padding: 0;
-  color: var(--color-ink-primary);
-  border: 0;
-  background: transparent;
-  font-size: 0.86rem;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-.overview-closing-actions button:hover {
-  color: var(--color-accent-hover);
-  text-decoration: underline;
-  text-underline-offset: 0.16em;
-}
-
-.overview-corpus-context {
-  margin: 1.4rem 0 0;
-  color: var(--color-ink-muted);
-  font-family: var(--recipe-technical-meta-family);
-  font-size: var(--recipe-technical-meta-size);
-  font-weight: var(--recipe-technical-meta-weight);
-  line-height: var(--recipe-technical-meta-line-height);
-}
-
 /* Overview visual-completion: header/discovery/material-change adoption.
    Explorer.tsx/Overview.tsx render these class names directly — this is the
    production presentation, not a Storybook-only preview. */
@@ -1575,8 +1550,7 @@ main.explorer-shell {
   gap: 0.55rem;
 }
 
-.overview-problem-action .overview-problem-explore,
-.overview-closing-actions button {
+.overview-problem-action .overview-problem-explore {
   min-height: var(--target-min);
   padding: 0.25rem 0;
   color: var(--color-accent-hover);
@@ -1587,55 +1561,56 @@ main.explorer-shell {
   text-underline-offset: 0.16em;
 }
 
-.overview-problem-action .overview-problem-explore:hover,
-.overview-closing-actions button:hover {
+.overview-problem-action .overview-problem-explore:hover {
   color: var(--color-accent);
   text-decoration-thickness: 2px;
 }
 
-/* Overview's own vertical-timeline treatment for MaterialChangeTimeline —
-   scoped to `.material-change-list--overview` (set only by
-   `variant="overview"`) so ProblemView's default "Alterações materiais
-   recentes" presentation above is unaffected. A thin rule connects each
-   marker to the next, restrained rather than decorative. */
-.material-change-list--overview {
-  position: relative;
+/* Overview's own separation from MaterialChangeTimeline — spacing/rhythm
+   only, no separator rule (see the compact-viewport rhythm reduction below).
+   MaterialChangeTimeline itself owns only its internal presentation, not
+   this section's separation, so ProblemView's reuse of the component is
+   unaffected. */
+.overview-material-change-section {
+  max-width: none;
+  margin-top: var(--space-section);
+  padding-top: var(--space-loose);
 }
 
-.material-change-list--overview::before {
-  position: absolute;
-  top: 0.5rem;
-  bottom: 0.5rem;
-  left: 0.28rem;
-  width: 1px;
-  background: var(--color-separator-standard);
-  content: "";
+/* Delta §5 — Overview's own horizontal scroll-snap rail for
+   MaterialChangeTimeline, scoped to `.material-change-list--overview` (set
+   only by `variant="overview"`) so ProblemView's default "Alterações
+   materiais recentes" presentation above is unaffected. Plain CSS overflow
+   and scroll-snap only — no JS carousel, autoplay, pagination dots, or
+   Previous/Next controls; the semantic `<ol>/<li>` list is unchanged.
+   `grid-auto-columns` targets ~2.5–3 visible cards on desktop. The bleed
+   margin matches `main.explorer-shell`'s own horizontal padding (2rem
+   desktop, reset to 1rem below the 767px breakpoint) — the same technique
+   `.explorer-chrome` already uses — so the rail can scroll to the shell's
+   true edge without creating page-level horizontal overflow. */
+.material-change-list--overview {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(15rem, calc((100% - 2 * var(--space-loose)) / 2.6));
+  gap: var(--space-loose);
+  margin: 0 -2rem;
+  padding: 0.15rem 2rem 0.85rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
 }
 
 .material-change-list--overview .material-change-item {
-  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  align-content: start;
   gap: 0.3rem;
-  padding: 0 0 1.25rem 1.4rem;
-  border-bottom: 0;
-}
-
-.material-change-list--overview .material-change-item:last-child {
-  padding-bottom: 0;
-}
-
-.material-change-list--overview .material-change-item::before {
-  position: absolute;
-  top: 0.42rem;
-  left: 0;
-  width: 0.58rem;
-  height: 0.58rem;
-  border: 2px solid var(--color-surface-reading);
-  border-radius: 50%;
-  background: var(--color-accent);
-  box-shadow: 0 0 0 1px var(--color-separator-standard);
-  content: "";
+  padding: 1rem 1.1rem 1.2rem;
+  border: 1px solid var(--color-separator-faint);
+  border-radius: var(--radius-surface);
+  background: var(--color-surface-raised);
+  scroll-snap-align: start;
 }
 
 .material-change-list--overview .material-change-date {
@@ -1666,12 +1641,17 @@ main.explorer-shell {
   content: none;
 }
 
+/* Presentation-only visual clamp (~3 lines) so rail cards stay compact — the
+   full canonical summary remains in the DOM, unchanged and unclamped. */
 .material-change-list--overview .material-change-summary {
   margin-top: 0.3rem !important;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
-.material-change-list--overview .material-change-content .material-change-action,
-.overview-closing-actions button {
+.material-change-list--overview .material-change-content .material-change-action {
   min-height: var(--target-min);
   padding: 0.25rem 0;
   color: var(--color-accent-hover);
@@ -1682,21 +1662,9 @@ main.explorer-shell {
   text-underline-offset: 0.16em;
 }
 
-.material-change-list--overview .material-change-content .material-change-action:hover,
-.overview-closing-actions button:hover {
+.material-change-list--overview .material-change-content .material-change-action:hover {
   color: var(--color-accent);
   text-decoration-thickness: 2px;
-}
-
-/* Overview's own separation from MaterialChangeTimeline — spacing/rhythm
-   only, no separator rule (see the compact-viewport rhythm reduction below).
-   MaterialChangeTimeline itself owns only its internal presentation, not
-   this section's separation, so ProblemView's reuse of the component is
-   unaffected. */
-.overview-material-change-section {
-  max-width: none;
-  margin-top: var(--space-section);
-  padding-top: var(--space-loose);
 }
 
 .overview-material-change-section > h3 {
@@ -1708,14 +1676,11 @@ main.explorer-shell {
   text-transform: uppercase;
 }
 
-.overview-material-change-section .material-change-list,
+/* The rail itself intentionally spans the available width (more than the
+   reading measure) so ~2.5–3 cards are visible; only the empty state keeps
+   the reading-measure cap. */
 .overview-material-change-section .material-change-empty-state {
   max-width: var(--measure-reading);
-}
-
-.overview-closing-actions {
-  max-width: var(--measure-reading);
-  margin-top: var(--space-loose);
 }
 
 @media (max-width: 767px) {
@@ -1747,6 +1712,22 @@ main.explorer-shell {
   .overview-material-change-section {
     margin-top: var(--space-loose);
     padding-top: var(--space-standard);
+  }
+
+  /* Compact rail: ~one card plus a peek of the next, natural touch
+     scrolling, no forced snap/interaction trap. Bleed matches
+     main.explorer-shell's compact 1rem horizontal padding above. */
+  .material-change-list--overview {
+    grid-auto-columns: 84%;
+    gap: var(--space-standard);
+    margin: 0 -1rem;
+    padding: 0.15rem 1rem 0.85rem;
+    scroll-snap-type: x proximity;
+  }
+
+  .overview-results-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
@@ -2744,21 +2725,12 @@ main.explorer-shell {
     font-size: 1.65rem;
   }
 
-  .overview-desktop-copy {
-    display: none;
-  }
-
-  .overview-mobile-copy {
-    display: inline;
-  }
-
-  .overview-independence {
-    display: block;
-    font-size: 0.74rem;
-  }
-
   .overview-hero {
-    margin: 0 0 1.5rem;
+    margin: 0 0 1.25rem;
+  }
+
+  .overview-hero-eyebrow {
+    font-size: 0.7rem;
   }
 
   .overview-hero-headline {
@@ -2769,8 +2741,15 @@ main.explorer-shell {
     font-size: 0.92rem;
   }
 
-  .overview-concepts {
-    display: none;
+  .overview-metrics {
+    gap: 0.3rem 1rem;
+    margin: 0 0 1.25rem;
+  }
+
+  .overview-trust {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.25rem 0;
   }
 
   .overview-search-input {
