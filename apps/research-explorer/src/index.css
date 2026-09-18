@@ -1700,6 +1700,7 @@ main.explorer-shell {
 
   .overview-problem-list li {
     display: flex;
+    flex-direction: column;
     gap: 0.75rem;
     padding: 1rem 0;
   }
