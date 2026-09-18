@@ -2,7 +2,7 @@
   "version": "0.8.0",
   "projectStatus": "in_progress",
   "currentMilestoneId": "M015",
-  "currentWorkUnitId": "WU058",
+  "currentWorkUnitId": null,
   "workGraph": {
     "milestones": [
       {
@@ -173,7 +173,7 @@
         "id": "M015",
         "title": "M015 — Citizen-Facing UX Refresh",
         "objective": "Deliver the owner-approved citizen-facing UX refresh for the Research Explorer: a production-ready visual foundation, a runtime-derived Citizen Overview with search/discovery, an authored material-change timeline, a refreshed Problem Reading experience, a shared citizen-facing trust experience, an integrated rendered/accessibility review, and a production release gated on explicit owner acceptance. This milestone is presentation-only: canonical SRC/EVD/PRB semantics, the separate OPEN/validation_status/evidence_status dimensions, and the current static client architecture are preserved unchanged.",
-        "status": "in_progress",
+        "status": "ready",
         "workUnitIds": [
           "WU053",
           "WU054",
@@ -2809,13 +2809,13 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "in_progress",
+        "status": "done",
         "dependencies": [
           "DEP-053",
           "DEP-054"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-18T06:52:57.981Z"
+        "updatedAt": "2026-09-18T08:21:06.952Z"
       },
       {
         "id": "WU059",
@@ -2847,12 +2847,12 @@
           "npm run explorer:build",
           "git diff --check"
         ],
-        "status": "planned",
+        "status": "ready",
         "dependencies": [
           "DEP-055"
         ],
         "createdAt": "2026-09-17T14:58:53.664Z",
-        "updatedAt": "2026-09-17T14:58:53.664Z"
+        "updatedAt": "2026-09-18T08:21:06.952Z"
       }
     ],
     "dependencies": [
@@ -8338,6 +8338,81 @@
       "finalWorkUnitStatus": "done",
       "nextRecommendation": "aiqt next",
       "createdAt": "2026-09-18T06:48:21.848Z"
+    },
+    {
+      "id": "C059",
+      "workUnitId": "WU058",
+      "packetId": "PKT-059",
+      "summary": "WU058 integrated rendered-review checkpoint. Existing review evidence is EVID-006, EVID-007, and EVID-008; npm run research:check and git diff --check were additionally run for the required deterministic validation.",
+      "completed": [
+        "Recorded the accepted integrated-review evidence in the AIQT checkpoint contract.",
+        "Completed the required deterministic research validation and diff check."
+      ],
+      "notCompleted": [],
+      "filesChanged": [
+        ".aiqt/state.json",
+        ".aiqt/runlog.jsonl"
+      ],
+      "issues": [],
+      "validationResult": "passed",
+      "acceptanceCriteriaResult": "passed",
+      "validationCommands": [
+        {
+          "command": "npm run research:check",
+          "result": "passed",
+          "summary": "Passed after sandbox worker permission was granted."
+        },
+        {
+          "command": "npm run explorer:build",
+          "result": "passed",
+          "summary": "Passed in a clean temporary worktree detached at 98061c98efff690741320a5361bc5cf0954e8b93; recorded in EVID-007."
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "summary": "Passed for the AIQT closure-state changes."
+        }
+      ],
+      "acceptanceCriteria": [
+        {
+          "criterion": "Rendered review is performed and recorded at a representative desktop viewport and at ~360px compact viewport for every surface changed in this milestone.",
+          "result": "passed",
+          "evidence": "Owner desktop and ~360px rendered reviews: PASS; EVID-008."
+        },
+        {
+          "criterion": "Breakpoint-sensitive surfaces are checked at the 767px/768px boundary.",
+          "result": "passed",
+          "evidence": "Owner 767px/768px breakpoint review: PASS; EVID-008."
+        },
+        {
+          "criterion": "Keyboard/focus behaviour and basic accessibility are reviewed with no unresolved blocking finding.",
+          "result": "passed",
+          "evidence": "Independent code/accessibility review and owner keyboard/focus confirmation: PASS; EVID-008."
+        },
+        {
+          "criterion": "A first-visit citizen UX walkthrough is performed and any blocking finding is remediated within this work unit's own scope only.",
+          "result": "passed",
+          "evidence": "Owner first-visit UX confirmation: PASS; EVID-008."
+        },
+        {
+          "criterion": "The repository owner has given explicit visual/product acceptance of the integrated result.",
+          "result": "passed",
+          "evidence": "Owner acceptance at the accepted SHA: EVID-006."
+        },
+        {
+          "criterion": "npm run research:check and npm run explorer:build pass after any remediation; git diff --check passes.",
+          "result": "passed",
+          "evidence": "research:check and diff --check passed for closure; clean-worktree explorer:build PASS: EVID-007."
+        },
+        {
+          "criterion": "All persistent changes are committed before this work unit is marked done.",
+          "result": "passed",
+          "evidence": "The AIQT closure state will be committed immediately after checkpoint capture."
+        }
+      ],
+      "finalWorkUnitStatus": "done",
+      "createdAt": "2026-09-18T08:21:06.952Z",
+      "nextRecommendation": "aiqt next"
     }
   ],
   "lastAgentPacket": {
@@ -8364,8 +8439,8 @@
       "includesSourceControlGuidance": true
     }
   },
-  "nextRecommendedCommand": "aiqt checkpoint",
-  "lastUpdatedAt": "2026-09-18T06:52:57.981Z",
+  "nextRecommendedCommand": "aiqt next",
+  "lastUpdatedAt": "2026-09-18T08:21:06.952Z",
   "review": {
     "acknowledgedFindings": [
       {
@@ -8646,6 +8721,132 @@
           "externalEvidenceId": "WU057-owner-rendered-acceptance-2026-09-18",
           "importIdentityKey": "sha256:480edeb8e62a8115d1778797019bab68ff06036a70911bfb6b97c61d808bacb1",
           "importedAt": "2026-09-18T06:47:20.765Z"
+        }
+      },
+      {
+        "evidenceId": "EVID-006",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-owner",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU058",
+          "packetId": "PKT-059",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "milestone/m015-citizen-facing-ux-refresh",
+          "commitSha": "98061c98efff690741320a5361bc5cf0954e8b93",
+          "capturedAt": "2026-09-18T07:58:55.9602862Z"
+        },
+        "reviewer": {
+          "reviewerId": "owner",
+          "reviewerType": "human",
+          "independentContext": "declared_not_independent"
+        },
+        "results": {
+          "reviewResult": "passed",
+          "validationResult": "passed",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Already-given owner visual/product acceptance of the integrated M015 result is recorded for WU058 at accepted SHA 98061c98efff690741320a5361bc5cf0954e8b93. This record does not claim a browser review by the recording agent."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-18T07:58:55.9602862Z",
+        "recordedAt": "2026-09-18T07:58:56.908Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:2fb70b19fb1f9fef2ac029f234d3a97f13c17e0be50ecbc9723c766d2a5823ee",
+          "externalEvidenceId": "WU058-owner-visual-product-acceptance-2026-09-18",
+          "importIdentityKey": "sha256:82d853a9076130936ab50f2e44552950e9dd669e81367dde96fb5466b2604982",
+          "importedAt": "2026-09-18T07:58:56.908Z"
+        }
+      },
+      {
+        "evidenceId": "EVID-007",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-build-verification",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU058",
+          "packetId": "PKT-059",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "milestone/m015-citizen-facing-ux-refresh",
+          "commitSha": "98061c98efff690741320a5361bc5cf0954e8b93",
+          "capturedAt": "2026-09-18T07:59:05.8061728Z"
+        },
+        "reviewer": {
+          "reviewerId": "codex",
+          "reviewerType": "human",
+          "independentContext": "unknown"
+        },
+        "results": {
+          "reviewResult": "passed",
+          "validationResult": "passed",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Clean temporary worktree at C:/Users/Jo?o/AppData/Local/Temp/open-evora-wu058-98061c98 was detached at 98061c98efff690741320a5361bc5cf0954e8b93. After npm ci at the root and apps/research-explorer, exactly npm run explorer:build passed: data build, typecheck, tests, and production build completed. The clean worktree status was empty."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-18T07:59:05.8061728Z",
+        "recordedAt": "2026-09-18T07:59:06.785Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:bb27203751a2334a0a1dbfebc1e92168b47961a974197280b7c0f3095c754e4d",
+          "externalEvidenceId": "WU058-clean-worktree-explorer-build-2026-09-18",
+          "importIdentityKey": "sha256:547e2a22d33bdfccc9ddcfccbd041ea62060a49c865aff74c4de4d0f4a0f31b1",
+          "importedAt": "2026-09-18T07:59:06.785Z"
+        }
+      },
+      {
+        "evidenceId": "EVID-008",
+        "contractVersion": "1.0",
+        "provider": {
+          "providerId": "open-evora-owner",
+          "providerType": "human",
+          "trustLevel": "self_reported"
+        },
+        "workflowBinding": {
+          "workUnitId": "WU058",
+          "packetId": "PKT-059",
+          "implementationRootId": "open-evora"
+        },
+        "codeBinding": {
+          "branch": "milestone/m015-citizen-facing-ux-refresh",
+          "commitSha": "98061c98efff690741320a5361bc5cf0954e8b93",
+          "capturedAt": "2026-09-18T08:00:00.000Z"
+        },
+        "reviewer": {
+          "reviewerId": "owner",
+          "reviewerType": "human",
+          "independentContext": "declared_not_independent"
+        },
+        "results": {
+          "reviewResult": "passed",
+          "validationResult": "passed",
+          "acceptanceCriteriaResult": "passed",
+          "summary": "Checkpoint-contract record of existing accepted WU058 evidence at SHA 98061c98efff690741320a5361bc5cf0954e8b93: owner desktop rendered review PASS; owner ~360px rendered review PASS; owner 767px/768px breakpoint review PASS; independent code/accessibility review PASS; owner keyboard/focus confirmation PASS; owner first-visit UX confirmation PASS. This record adds no new review or execution. Clean-worktree npm run explorer:build PASS is recorded separately as EVID-007."
+        },
+        "sourceFindings": [],
+        "decisionEscalationIds": [],
+        "artifactReferences": [],
+        "observedAt": "2026-09-18T08:00:00.000Z",
+        "recordedAt": "2026-09-18T08:18:23.576Z",
+        "importProvenance": {
+          "adapterId": "manual-evidence-json@1",
+          "sourcePayloadDigest": "sha256:ec709151caf55e34281a9347b3f7436691a37be5fcceb4ece006abcf733228f1",
+          "externalEvidenceId": "WU058-integrated-review-contract-2026-09-18",
+          "importIdentityKey": "sha256:882dc37df2599957a2a5d83dda945aa6922a89944c456819728b16b80e29c5b5",
+          "importedAt": "2026-09-18T08:18:23.576Z"
         }
       }
     ],
@@ -10437,6 +10638,36 @@
           "issueKeys": [],
           "summary": "No active evidence gate policy is configured.",
           "recordedAt": "2026-09-18T06:48:21.848Z"
+        }
+      ]
+    },
+    {
+      "protocolVersion": "aiqt-checkpoint-evidence-advisory@1",
+      "checkpointId": "C059",
+      "current": {
+        "observationId": "sha256:264e06ad391719eb744fdc22da80926f66c21c20f71f63d41ed8799c53b080ac",
+        "checkpointId": "C059",
+        "workUnitId": "WU058",
+        "trigger": "checkpoint",
+        "evaluationStatus": "not_configured",
+        "overallResult": null,
+        "asOf": "2026-09-18T08:21:06.952Z",
+        "issueKeys": [],
+        "summary": "No active evidence gate policy is configured.",
+        "recordedAt": "2026-09-18T08:21:06.952Z"
+      },
+      "history": [
+        {
+          "observationId": "sha256:264e06ad391719eb744fdc22da80926f66c21c20f71f63d41ed8799c53b080ac",
+          "checkpointId": "C059",
+          "workUnitId": "WU058",
+          "trigger": "checkpoint",
+          "evaluationStatus": "not_configured",
+          "overallResult": null,
+          "asOf": "2026-09-18T08:21:06.952Z",
+          "issueKeys": [],
+          "summary": "No active evidence gate policy is configured.",
+          "recordedAt": "2026-09-18T08:21:06.952Z"
         }
       ]
     }
