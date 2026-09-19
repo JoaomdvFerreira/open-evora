@@ -43,6 +43,10 @@ export function OverviewPresentation({
   totalRecords,
   citizenProblems,
   visibleProblems,
+  paginatedProblems,
+  currentPage,
+  pageCount,
+  onPageChange,
   searchQuery,
   onSearchChange,
   topicFilter,
@@ -66,7 +70,13 @@ export function OverviewPresentation({
   /** manifest.totalRecords — the same canonical corpus count as App.tsx's "Corpus: X registos" summary. `null` when the caller has none to give (e.g. a test); the metric is then omitted rather than fabricated. */
   totalRecords: number | null;
   citizenProblems: CitizenProblem[] | null;
+  /** The full filtered+sorted result set (pre-pagination) — its length is the sole source for the results header's "X de Y problemas" count, never `paginatedProblems.length`. */
   visibleProblems: CitizenProblem[] | null;
+  /** `visibleProblems` sliced to the current page (Overview visual-completion — pagination) — this is what actually renders as rows. */
+  paginatedProblems: CitizenProblem[] | null;
+  currentPage: number;
+  pageCount: number;
+  onPageChange: (page: number) => void;
   searchQuery: string;
   onSearchChange: (value: string) => void;
   /** Filter-rail state (Overview visual-completion — editorial list redesign). Each of the four rail groups (TEMA/EVIDÊNCIA/VALIDAÇÃO/ESTADO) is controlled independently — `Overview.tsx` composes them together with `searchQuery` into `visibleProblems`; this component never filters on its own. */
@@ -278,25 +288,48 @@ export function OverviewPresentation({
 
             <div className="overview-results">
               <div className="overview-results-header">
-                <div aria-live="polite" aria-atomic="true">
-                  {visibleProblems.length === 0 ? (
-                    <p className="overview-empty-state">Nenhum problema corresponde à pesquisa.</p>
-                  ) : (
-                    <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} de {formatPublicCount(citizenProblems.length)} problemas</p>
-                  )}
+                <div className="overview-results-header-summary">
+                  <div aria-live="polite" aria-atomic="true">
+                    {visibleProblems.length === 0 ? (
+                      <p className="overview-empty-state">Nenhum problema corresponde à pesquisa.</p>
+                    ) : (
+                      <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} de {formatPublicCount(citizenProblems.length)} problemas</p>
+                    )}
+                  </div>
+                  <p className="overview-results-filter-summary">
+                    {activeFilterSummary.length === 0 ? "sem filtros ativos" : activeFilterSummary.join(" · ")}
+                  </p>
                 </div>
-                <p className="overview-results-filter-summary">
-                  {activeFilterSummary.length === 0 ? "sem filtros ativos" : activeFilterSummary.join(" · ")}
-                </p>
                 <SortControl value={sortOrder} onChange={onSortOrderChange} />
               </div>
 
               {visibleProblems.length > 0 && (
                 <ul className="overview-problem-list">
-                  {visibleProblems.map((problem) => (
+                  {(paginatedProblems ?? []).map((problem) => (
                     <ProblemRow key={problem.id} problem={problem} onExplore={onExploreProblem} />
                   ))}
                 </ul>
+              )}
+
+              {/* Pagination footer (Overview visual-completion): only when
+                  there is more than one page — a single-page result set gets
+                  no footer at all, never a disabled/no-op one. Lives inside
+                  `.overview-results`, the same column the results header and
+                  problem rows already share, so its horizontal padding
+                  matches theirs by construction rather than a duplicated
+                  width calculation. */}
+              {pageCount > 1 && (
+                <div className="overview-pagination-footer">
+                  <p className="overview-pagination-status">Página {currentPage} de {pageCount}</p>
+                  <div className="overview-pagination-actions">
+                    <button type="button" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1}>
+                      Anterior
+                    </button>
+                    <button type="button" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= pageCount}>
+                      Seguinte
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </div>

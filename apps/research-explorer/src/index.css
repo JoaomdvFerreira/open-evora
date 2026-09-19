@@ -914,11 +914,17 @@ main.explorer-shell {
 }
 
 .public-overview {
-  /* Bottom padding removed outright: the Overview-specific zero-gap
-     treatment (see `main.explorer-shell`/`.public-footer` below) makes the
-     global PublicFooter begin immediately after Overview's problem list,
-     with no page/shell/footer spacing left to insert between them. */
-  padding: 2.75rem 0 0;
+  /* Header→Hero spacing (Overview visual-completion, layout fix pass):
+     the section itself owns a flat 16px top/bottom rhythm rather than the
+     previous larger, asymmetric gap — no separate margin on `.explorer-
+     chrome`/`main.explorer-shell` contributes to this, so this padding is
+     the entire Header→Hero gap. Bottom padding is intentionally non-zero
+     here (unlike the former treatment): the Overview-specific zero-gap
+     treatment below (see `main.explorer-shell`/`.public-footer`) already
+     neutralizes the *shared* shell/footer spacing layers, so this section's
+     own 16px bottom padding is what now sits between the problem list and
+     the global PublicFooter, not a competing second gap. */
+  padding: 1rem 0;
 }
 
 .public-overview > h2 {
@@ -1784,10 +1790,22 @@ main.explorer-shell {
   min-width: 0;
 }
 
+/* Structural two-group layout (results-header wrapping fix): the header
+   holds exactly two flex items — the left summary group (count + active-
+   filter summary) and the right sort control — laid out with
+   `justify-content: space-between` rather than three independent flex
+   items sharing one wrapping line. The former structure let the sort
+   control's own `margin-left: auto` interact with `flex-wrap: wrap` across
+   three siblings, which could push it onto its own line even when the row
+   had enough width; grouping the left content removes that interaction
+   entirely. `flex-wrap: wrap` still applies to these two groups, so genuine
+   narrow-width wrapping (compact viewports) is unaffected — no width is
+   hard-coded. */
 .overview-results-header {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
+  justify-content: space-between;
   gap: var(--space-tight) var(--space-standard);
   /* TARGET: 14px 0 14px 32px, aligned to the same content axes as the
      problem rows below (count/filter summary left, sort control right).
@@ -1795,6 +1813,14 @@ main.explorer-shell {
      here, so the sort control shares the Hero/ruler right axis. */
   padding: 0.875rem 0 0.875rem 2rem;
   border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.overview-results-header-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-tight) var(--space-standard);
+  min-width: 0;
 }
 
 .overview-results-count {
@@ -1812,7 +1838,11 @@ main.explorer-shell {
 }
 
 .overview-sort-control {
-  margin: 0 0 0 auto;
+  /* Right-alignment now comes from the two-group `justify-content:
+     space-between` on `.overview-results-header` (see that rule's note);
+     no auto-margin needed on this, the header's only right-side item. */
+  margin: 0;
+  flex-shrink: 0;
   color: var(--color-ink-muted);
   font-family: var(--font-technical);
   font-size: 0.78rem;
@@ -1959,28 +1989,80 @@ main.explorer-shell {
   font-size: 0.78rem;
 }
 
-/* Overview-specific zero-gap treatment: the owner wants no whitespace
-   between the end of Overview's problem list and the global PublicFooter.
-   This neutralizes, for Overview only, every layer that contributes bottom
-   spacing before the footer — `.public-overview`'s own bottom padding, and
-   the shared `main.explorer-shell` bottom padding / `.public-footer` top
+/* Pagination footer (Overview visual-completion — pagination): lives inside
+   `.overview-results`, the same column as the results header and problem
+   rows, so it shares their width by construction — no separate max-width or
+   margin calculation. Reuses the results header's own horizontal padding
+   (`2rem` left, no right inset — same "shell owns the right edge" pattern
+   documented on `.overview-results-header`) and a matching vertical rhythm,
+   so the two read as the same structural row family. Flat/editorial: a
+   single top hairline (the same separator token the results header's own
+   bottom border uses) and no background/radius/shadow — never a card. */
+.overview-pagination-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-tight) var(--space-standard);
+  padding: 0.875rem 0 0.875rem 2rem;
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.overview-pagination-status {
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 0.78rem;
+}
+
+.overview-pagination-actions {
+  display: flex;
+  gap: var(--space-tight);
+}
+
+.overview-pagination-actions button {
+  min-height: var(--target-min);
+  padding: 0.35rem 0.85rem;
+  color: var(--color-ink-secondary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  background: none;
+  font: inherit;
+  font-size: var(--text-interface-label-size);
+  cursor: pointer;
+}
+
+.overview-pagination-actions button:hover:not(:disabled) {
+  background: var(--color-surface-subtle);
+}
+
+.overview-pagination-actions button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.overview-pagination-actions button:disabled {
+  color: var(--color-ink-muted);
+  border-color: var(--color-separator-faint);
+  cursor: not-allowed;
+}
+
+/* Overview-specific zero-gap treatment: neutralizes, for Overview only, the
+   *shared* layers that would otherwise add a second gap before the global
+   PublicFooter on top of `.public-overview`'s own bottom padding — the
+   shared `main.explorer-shell` bottom padding and `.public-footer` top
    margin — without changing those shared primitives' behaviour on Records/
-   Problem/History/Graph or any other view. `body:has(.public-overview)`
-   scopes the two shared-primitive overrides to exactly the pages that
-   render Overview, using the DOM's own presence of the Overview section
-   rather than a sibling-order assumption (App.tsx renders `main.explorer-
-   shell` and `PublicFooter` as siblings with no shared Overview-aware
-   ancestor to hang a class on). No negative margins, transforms, absolute
-   positioning, or viewport-height hacks — every value below is a plain,
-   non-negative box-model reset. The last problem row's own hairline
-   (`.overview-problem-row`'s `border-bottom`) and the global footer's own
-   `border-top` are both untouched, so the content/footer transition is
-   still marked — this treatment removes whitespace only, never the
-   existing visual separators. The former `.overview-results-footer` count
-   line this treatment used to target was removed as redundant with the
-   results header's own count (filter-rail correction pass §1); the problem
-   list (`.overview-problem-list`, already the last element before the
-   global footer once that line was removed) is the zero-gap target now. */
+   Problem/History/Graph or any other view. `.public-overview`'s own 16px
+   bottom padding (see that rule) is therefore the entire, deliberate gap
+   before the footer now, not zero — this no longer removes all whitespace
+   before the footer, only the duplicate contribution from these shared
+   layers. `body:has(.public-overview)` scopes the two shared-primitive
+   overrides to exactly the pages that render Overview, using the DOM's own
+   presence of the Overview section rather than a sibling-order assumption
+   (App.tsx renders `main.explorer-shell` and `PublicFooter` as siblings with
+   no shared Overview-aware ancestor to hang a class on). No negative
+   margins, transforms, absolute positioning, or viewport-height hacks —
+   every value below is a plain, non-negative box-model reset. */
 body:has(.public-overview) main.explorer-shell {
   padding-bottom: 0;
 }
@@ -2148,8 +2230,14 @@ body:has(.public-overview) .public-footer {
     align-items: flex-start;
   }
 
-  .overview-sort-control {
-    margin-left: 0;
+  /* Matches `.overview-problem-row-link`'s own compact inset drop above —
+     the pagination footer shares the results column's left axis at every
+     viewport, and that axis loses its 2rem inset once the rail stacks above
+     instead of beside it. */
+  .overview-pagination-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.875rem 0;
   }
 
   .overview-material-change-section {
@@ -3175,7 +3263,7 @@ body:has(.public-overview) .public-footer {
   }
 
   .public-overview {
-    padding-top: 0.8rem;
+    padding: 1rem 0;
   }
 
   .public-overview > h2 {

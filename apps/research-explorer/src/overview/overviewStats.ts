@@ -444,6 +444,38 @@ export function sortProblems(problems: CitizenProblem[], order: ProblemSortOrder
   });
 }
 
+/** Fixed page size for the Overview problem list (Overview visual-completion — pagination). Not user-configurable. */
+export const OVERVIEW_PROBLEMS_PER_PAGE = 10;
+
+/**
+ * Total page count for a given result count at the fixed page size, never
+ * less than 1 (an empty result set still has "page 1 of 1" as its neutral
+ * state, and callers gate the pagination footer's visibility separately —
+ * see `OverviewPresentation`'s own note on when the footer renders at all).
+ */
+export function overviewPageCount(resultCount: number): number {
+  return Math.max(1, Math.ceil(resultCount / OVERVIEW_PROBLEMS_PER_PAGE));
+}
+
+/**
+ * Slices the already filtered+sorted Problem list to one page. Pagination is
+ * strictly the last step of the pipeline (search → filters → sort →
+ * pagination — Overview visual-completion): callers must only ever call this
+ * against `sortProblems`'s own output, never against the unsorted/unfiltered
+ * `citizenProblems`, so the result-count semantics stay a single, unambiguous
+ * "total filtered results" everywhere else in Overview (the results header's
+ * count is deliberately computed from the pre-pagination list, not this
+ * slice). `page` is clamped to the valid `[1, overviewPageCount(...)]` range
+ * so a stale page number (e.g. after a filter shrinks the result set) never
+ * produces an out-of-range or empty slice.
+ */
+export function paginateProblems(problems: CitizenProblem[], page: number): CitizenProblem[] {
+  const pageCount = overviewPageCount(problems.length);
+  const clampedPage = Math.min(Math.max(1, page), pageCount);
+  const start = (clampedPage - 1) * OVERVIEW_PROBLEMS_PER_PAGE;
+  return problems.slice(start, start + OVERVIEW_PROBLEMS_PER_PAGE);
+}
+
 /**
  * Citizen-facing search fields only, per WU054 scope: title, problem
  * statement, affected populations, geography, and the PT-PT topic label

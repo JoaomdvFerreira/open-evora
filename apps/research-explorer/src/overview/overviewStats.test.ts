@@ -15,6 +15,8 @@ import {
   matchesLifecycleGroupFilter,
   matchesTopicFilter,
   matchesValidationFilter,
+  overviewPageCount,
+  paginateProblems,
   problemCountLabel,
   projectMaterialChangeEntries,
   projectRecentDistinctProblems,
@@ -602,6 +604,50 @@ describe("sortProblems", () => {
     const original = [...problems];
     sortProblems(problems, "id");
     expect(problems).toEqual(original);
+  });
+});
+
+describe("overviewPageCount / paginateProblems", () => {
+  function idList(count: number): CitizenProblem[] {
+    return Array.from({ length: count }, (_, index) => citizenProblem({ id: `PRB-${String(index + 1).padStart(4, "0")}` }));
+  }
+
+  it("reports one page for a result count at or under the fixed page size", () => {
+    expect(overviewPageCount(0)).toBe(1);
+    expect(overviewPageCount(1)).toBe(1);
+    expect(overviewPageCount(10)).toBe(1);
+  });
+
+  it("reports additional pages once the result count exceeds the fixed page size", () => {
+    expect(overviewPageCount(11)).toBe(2);
+    expect(overviewPageCount(20)).toBe(2);
+    expect(overviewPageCount(21)).toBe(3);
+  });
+
+  it("slices at most 10 problems for page 1", () => {
+    const problems = idList(25);
+    const page1 = paginateProblems(problems, 1);
+    expect(page1.length).toBe(10);
+    expect(page1.map((p) => p.id)).toEqual(problems.slice(0, 10).map((p) => p.id));
+  });
+
+  it("renders the remaining problems on page 2", () => {
+    const problems = idList(25);
+    const page2 = paginateProblems(problems, 2);
+    expect(page2.length).toBe(10);
+    expect(page2.map((p) => p.id)).toEqual(problems.slice(10, 20).map((p) => p.id));
+  });
+
+  it("renders only the remainder on the final, partial page", () => {
+    const problems = idList(25);
+    const page3 = paginateProblems(problems, 3);
+    expect(page3.map((p) => p.id)).toEqual(problems.slice(20, 25).map((p) => p.id));
+  });
+
+  it("clamps an out-of-range page number to the nearest valid page rather than returning an empty slice", () => {
+    const problems = idList(15);
+    expect(paginateProblems(problems, 99).map((p) => p.id)).toEqual(problems.slice(10, 15).map((p) => p.id));
+    expect(paginateProblems(problems, 0).map((p) => p.id)).toEqual(problems.slice(0, 10).map((p) => p.id));
   });
 });
 

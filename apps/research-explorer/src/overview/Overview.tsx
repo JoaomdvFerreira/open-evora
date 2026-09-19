@@ -8,6 +8,8 @@ import {
   matchesLifecycleGroupFilter,
   matchesTopicFilter,
   matchesValidationFilter,
+  overviewPageCount,
+  paginateProblems,
   sortProblems,
   toCitizenProblem,
   projectMaterialChangeEntries,
@@ -73,6 +75,12 @@ export function Overview({
   // `status` field.
   const [lifecycleFilter, setLifecycleFilter] = useState<LifecycleGroup | null>(null);
   const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("id");
+  // Pagination (Overview visual-completion): applies strictly after search,
+  // filters, and sort (see overviewStats.ts's `paginateProblems`). Resets to
+  // page 1 whenever any of those upstream inputs change, below, so a stale
+  // page number never survives a search/filter/sort change that shrinks or
+  // reorders the result set.
+  const [currentPage, setCurrentPage] = useState(1);
   const overview = indexState.status === "ready" ? computePublicOverviewData(indexState.records) : null;
   const problemIds = overview?.problems.map((problem) => problem.id).join("|") ?? "";
 
@@ -131,6 +139,16 @@ export function Overview({
     return sortProblems(matched, sortOrder);
   }, [citizenProblems, searchQuery, topicFilter, evidenceFilter, validationFilter, lifecycleFilter, sortOrder]);
 
+  // Reset to page 1 whenever search, any filter, or sort changes — never on
+  // a page-count shrink alone from unrelated causes (e.g. a re-fetch), since
+  // `paginateProblems` already clamps a stale page number defensively.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, topicFilter, evidenceFilter, validationFilter, lifecycleFilter, sortOrder]);
+
+  const pageCount = visibleProblems === null ? 1 : overviewPageCount(visibleProblems.length);
+  const paginatedProblems = visibleProblems === null ? null : paginateProblems(visibleProblems, currentPage);
+
   if (indexState.status === "loading") {
     return <div className="shell-frame shell-frame--wide"><ProgressMessage message="A carregar visão geral…" /></div>;
   }
@@ -162,6 +180,10 @@ export function Overview({
       totalRecords={totalRecords ?? null}
       citizenProblems={citizenProblems}
       visibleProblems={visibleProblems}
+      paginatedProblems={paginatedProblems}
+      currentPage={currentPage}
+      pageCount={pageCount}
+      onPageChange={setCurrentPage}
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
       topicFilter={topicFilter}

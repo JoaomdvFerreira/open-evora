@@ -9,6 +9,8 @@ import {
   matchesLifecycleGroupFilter,
   matchesTopicFilter,
   matchesValidationFilter,
+  overviewPageCount,
+  paginateProblems,
   sortProblems,
   type CitizenProblem,
   type LifecycleGroup,
@@ -82,6 +84,7 @@ function useOverviewState(initial: { search?: string; source?: CitizenProblem[] 
   const [validationFilter, setValidationFilter] = useState<string | null>(null);
   const [lifecycleFilter, setLifecycleFilter] = useState<LifecycleGroup | null>(null);
   const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("id");
+  const [currentPage, setCurrentPage] = useState(1);
   const visibleProblems = useMemo(() => {
     const matched = source.filter(
       (problem) =>
@@ -93,11 +96,14 @@ function useOverviewState(initial: { search?: string; source?: CitizenProblem[] 
     );
     return sortProblems(matched, sortOrder);
   }, [source, searchQuery, topicFilter, evidenceFilter, validationFilter, lifecycleFilter, sortOrder]);
+  const pageCount = overviewPageCount(visibleProblems.length);
+  const paginatedProblems = paginateProblems(visibleProblems, currentPage);
   return {
     searchQuery, setSearchQuery, visibleProblems, source,
     topicFilter, setTopicFilter, evidenceFilter, setEvidenceFilter,
     validationFilter, setValidationFilter, lifecycleFilter, setLifecycleFilter,
     sortOrder, setSortOrder,
+    currentPage, setCurrentPage, pageCount, paginatedProblems,
   };
 }
 
@@ -117,6 +123,7 @@ function FullOverview({
   const state = useOverviewState({ search, source });
   const citizenProblems = citizenProblemsOverride !== undefined ? citizenProblemsOverride : state.source;
   const visibleProblems = visibleProblemsOverride !== undefined ? visibleProblemsOverride : state.visibleProblems;
+  const paginatedProblems = visibleProblemsOverride !== undefined ? visibleProblemsOverride : state.paginatedProblems;
   return (
     <OverviewPresentation
       problemCount={state.source.length}
@@ -125,6 +132,10 @@ function FullOverview({
       totalRecords={279}
       citizenProblems={citizenProblems}
       visibleProblems={visibleProblems}
+      paginatedProblems={paginatedProblems}
+      currentPage={state.currentPage}
+      pageCount={state.pageCount}
+      onPageChange={state.setCurrentPage}
       searchQuery={state.searchQuery}
       onSearchChange={state.setSearchQuery}
       topicFilter={state.topicFilter}

@@ -372,6 +372,140 @@ describe("Overview — results-footer removal", () => {
   });
 });
 
+describe("Overview — problem-list pagination", () => {
+  function makeManyProblems(count: number, overrides: (index: number) => Partial<RecordSummary["summaryFields"]> = () => ({})) {
+    return Array.from({ length: count }, (_, index) => {
+      const id = `PRB-${String(index + 1).padStart(4, "0")}`;
+      return { id, type: "PRB-" as const, label: `Problema ${String(index + 1).padStart(2, "0")}`, file: "", summaryFields: overrides(index) };
+    });
+  }
+
+  it("renders at most 10 problem rows on page 1 even when more results are available", async () => {
+    render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
+
+    await screen.findByText("25 de 25 problemas");
+    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(10);
+  });
+
+  it("renders the remaining problems when moving to page 2", async () => {
+    const user = userEvent.setup();
+    render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
+
+    await screen.findByText("25 de 25 problemas");
+    await user.click(screen.getByRole("button", { name: "Seguinte" }));
+
+    expect(await screen.findByText("Problema 11")).toBeTruthy();
+    expect(screen.queryByText("Problema 01")).toBeNull();
+    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(10);
+  });
+
+  it("paginates the already filtered and sorted result set, not the full unfiltered corpus", async () => {
+    // 15 OPEN + 5 REJECTED: filtering to Aberto must leave exactly 15 results
+    // (2 pages), never mixing in the closed problems that pagination would
+    // otherwise still be slicing from if filtering ran after pagination.
+    const problems = [
+      ...makeManyProblems(15, () => ({ status: "OPEN" })),
+      ...makeManyProblems(5, () => ({ status: "REJECTED" })).map((p, i) => ({ ...p, id: `PRB-CLOSED-${i}` })),
+    ];
+    const user = userEvent.setup();
+    render(<Overview dataProvider={makeProvider(problems)} {...props} />);
+
+    await screen.findByText("20 de 20 problemas");
+    const estadoGroup = screen.getByRole("group", { name: "Estado" });
+    await user.click(within(estadoGroup).getByRole("button", { name: /Aberto/ }));
+
+    expect(await screen.findByText("15 de 20 problemas")).toBeTruthy();
+    expect(screen.getByText("Página 1 de 2")).toBeTruthy();
+    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(10);
+  });
+
+  it("resets to page 1 when the search query changes", async () => {
+    const user = userEvent.setup();
+    render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
+
+    await screen.findByText("25 de 25 problemas");
+    await user.click(screen.getByRole("button", { name: "Seguinte" }));
+    await screen.findByText("Página 2 de 3");
+
+    await user.type(screen.getByLabelText("Pesquisar problemas"), "Problema");
+    await screen.findByText("Página 1 de 3");
+  });
+
+  it("resets to page 1 when a filter changes", async () => {
+    const user = userEvent.setup();
+    render(<Overview dataProvider={makeProvider(makeManyProblems(25, () => ({ status: "OPEN" })))} {...props} />);
+
+    await screen.findByText("25 de 25 problemas");
+    await user.click(screen.getByRole("button", { name: "Seguinte" }));
+    await screen.findByText("Página 2 de 3");
+
+    const estadoGroup = screen.getByRole("group", { name: "Estado" });
+    await user.click(within(estadoGroup).getByRole("button", { name: /Aberto/ }));
+    await screen.findByText("Página 1 de 3");
+  });
+
+  it("resets to page 1 when the sort order changes", async () => {
+    const user = userEvent.setup();
+    render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
+
+    await screen.findByText("25 de 25 problemas");
+    await user.click(screen.getByRole("button", { name: "Seguinte" }));
+    await screen.findByText("Página 2 de 3");
+
+    await user.selectOptions(screen.getByLabelText("Ordenar por"), "última atualização");
+    await screen.findByText("Página 1 de 3");
+  });
+
+  it("keeps the results-header count as the total filtered count, not the current page's row count", async () => {
+    render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
+
+    expect(await screen.findByText("25 de 25 problemas")).toBeTruthy();
+  });
+
+  it("renders no pagination footer when the result set fits on one page", async () => {
+    render(<Overview dataProvider={makeProvider(makeManyProblems(10))} {...props} />);
+
+    await screen.findByText("10 de 10 problemas");
+    expect(document.querySelector(".overview-pagination-footer")).toBeNull();
+  });
+
+  it("renders the pagination footer only once there are more than 10 results", async () => {
+    render(<Overview dataProvider={makeProvider(makeManyProblems(11))} {...props} />);
+
+    await screen.findByText("11 de 11 problemas");
+    expect(document.querySelector(".overview-pagination-footer")).not.toBeNull();
+    expect(screen.getByText("Página 1 de 2")).toBeTruthy();
+  });
+
+  it("disables Anterior on the first page and Seguinte on the final page", async () => {
+    const user = userEvent.setup();
+    render(<Overview dataProvider={makeProvider(makeManyProblems(11))} {...props} />);
+
+    await screen.findByText("11 de 11 problemas");
+    const previous = screen.getByRole("button", { name: "Anterior" }) as HTMLButtonElement;
+    const next = screen.getByRole("button", { name: "Seguinte" }) as HTMLButtonElement;
+    expect(previous.disabled).toBe(true);
+    expect(next.disabled).toBe(false);
+
+    await user.click(next);
+    await screen.findByText("Página 2 de 2");
+    expect((screen.getByRole("button", { name: "Anterior" }) as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByRole("button", { name: "Seguinte" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+});
+
+describe("Overview — results header structural layout", () => {
+  it("groups the result count and active-filter summary together, apart from the sort control, so only two flex items share the header row", async () => {
+    render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
+
+    const count = await screen.findByText("1 de 1 problemas");
+    const header = count.closest(".overview-results-header") as HTMLElement;
+    expect(header.children.length).toBe(2);
+    expect(count.closest(".overview-results-header-summary")).not.toBeNull();
+    expect(header.querySelector(".overview-sort-control")?.parentElement).toBe(header);
+  });
+});
+
 describe("Overview — error state retry (ODM-021)", () => {
   it("retries a failed listRecords load and recovers", async () => {
     let attempts = 0;
