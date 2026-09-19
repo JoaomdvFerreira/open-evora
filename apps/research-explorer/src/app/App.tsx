@@ -66,7 +66,7 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
 
         {state.status === "ready" && (
           <>
-            <Explorer dataProvider={dataProvider} schemaPrefixes={state.manifest.schemaPrefixes} />
+            <Explorer dataProvider={dataProvider} schemaPrefixes={state.manifest.schemaPrefixes} totalRecords={state.manifest.totalRecords} />
             <div className="shell-frame">
               <p className="manifest-summary">
                 Corpus: {formatPublicCount(state.manifest.totalRecords)} registos · esta versão publicada dos dados foi gerada em{" "}

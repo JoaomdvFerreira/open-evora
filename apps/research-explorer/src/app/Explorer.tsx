@@ -21,6 +21,8 @@ interface ExplorerProps {
   dataProvider: DataProvider;
   /** manifest.schemaPrefixes — passed down so the reading guide's type list is data-driven, not hardcoded. */
   schemaPrefixes?: string[];
+  /** manifest.totalRecords — the same canonical corpus count shown in App.tsx's "Corpus: X registos" summary, passed down so Overview's metrics row can reuse it instead of computing a competing total. */
+  totalRecords?: number;
 }
 
 /**
@@ -29,7 +31,7 @@ interface ExplorerProps {
  * via useExplorerUrlState and passes it down as controlled props —
  * Overview/RecordsExplorer/ProblemView own no competing copy of this state.
  */
-export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
+export function Explorer({ dataProvider, schemaPrefixes, totalRecords }: ExplorerProps) {
   const url = useExplorerUrlState();
 
   useEffect(() => {
@@ -60,6 +62,7 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
       {url.state.view === "overview" && (
         <Overview
           dataProvider={dataProvider}
+          totalRecords={totalRecords}
           onExploreProblem={(id) => url.setViewAndSelection("problem", id)}
           onViewRecords={() => url.setView("records")}
         />

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPublicCount, formatPublicDate, formatPublicDateTime, formatPublicPartialDate, publicCompactEnumLabel, publicEnumLabel, publicFieldCaption, publicTriStateLabel } from "./presentation";
+import { formatPublicCount, formatPublicDate, formatPublicDateTime, formatPublicPartialDate, formatPublicRelativeDays, publicCompactEnumLabel, publicEnumLabel, publicFieldCaption, publicTriStateLabel } from "./presentation";
 
 describe("PT-PT public presentation terminology", () => {
   it("uses field-aware PRB validation labels", () => {
@@ -260,5 +260,31 @@ describe("formatPublicPartialDate", () => {
 
   it("leaves formatPublicDate behavior unchanged for full date values", () => {
     expect(formatPublicDate("2024-08-25")).not.toBe("");
+  });
+});
+
+describe("formatPublicRelativeDays", () => {
+  it("renders the whole-day PT-PT phrasing for an elapsed date", () => {
+    const now = new Date("2026-04-12T09:00:00Z");
+    expect(formatPublicRelativeDays("2026-04-08", now)).toBe("há 4 dias");
+  });
+
+  it("uses the singular for exactly one elapsed day", () => {
+    const now = new Date("2026-04-09T09:00:00Z");
+    expect(formatPublicRelativeDays("2026-04-08", now)).toBe("há 1 dia");
+  });
+
+  it("renders 'hoje' for the same calendar day, regardless of time of day", () => {
+    const now = new Date("2026-04-08T23:00:00Z");
+    expect(formatPublicRelativeDays("2026-04-08T02:00:00Z", now)).toBe("hoje");
+  });
+
+  it("never reports a future date as elapsed", () => {
+    const now = new Date("2026-04-01T00:00:00Z");
+    expect(formatPublicRelativeDays("2026-04-08", now)).toBe("hoje");
+  });
+
+  it("falls back to the original value for an unparseable date, like formatPublicDate", () => {
+    expect(formatPublicRelativeDays("not-a-date")).toBe("not-a-date");
   });
 });

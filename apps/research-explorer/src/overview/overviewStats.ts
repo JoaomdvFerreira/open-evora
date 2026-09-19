@@ -1,6 +1,6 @@
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { normalizeForSearch } from "../records/normalize";
-import { describeTopic } from "../presentation/topicMapping";
+import { describeTopic, auditedDomainCodes } from "../presentation/topicMapping";
 
 export interface TypeCount {
   type: string;
@@ -29,6 +29,7 @@ export interface OverviewProblem {
 export interface PublicOverviewData {
   problemCount: number;
   evidenceCount: number;
+  sourceCount: number;
   problems: OverviewProblem[];
 }
 
@@ -37,6 +38,7 @@ export interface MaterialChangeEntry {
   problemTitle: string;
   date: string;
   summary: string;
+  domainCodes: string[];
 }
 
 export interface MaterialChangeSource {
@@ -59,6 +61,28 @@ export function evidenceCountLabel(count: number): string {
 }
 
 /**
+ * Metrics label only, for the canonical `SRC-` record count (docs/datamodel.md
+ * §1 — a Source is "an identifiable origin from which information is
+ * obtained"). Same counting pattern as `evidenceCount` (a plain `record.type`
+ * count over the loaded index), never a separately derived total. PT-PT
+ * singular only for one, plural for zero or more than one.
+ */
+export function sourceCountLabel(count: number): string {
+  return count === 1 ? "Fonte primária" : "Fontes primárias";
+}
+
+/**
+ * Metrics label only, for the same canonical corpus count already shown
+ * elsewhere as "Corpus: X registos" (manifest.totalRecords) — not a
+ * separately computed total, so this label is never attached to a value
+ * derived any other way. PT-PT singular only for one, plural for zero or
+ * more than one.
+ */
+export function totalRecordsLabel(count: number): string {
+  return count === 1 ? "Registo total" : "Registos totais";
+}
+
+/**
  * The public first-contact projection. It deliberately uses only index
  * summaries: canonical PRB title/identity and schema-derived status fields.
  * It is not persisted and does not introduce an Overview-specific dataset.
@@ -77,6 +101,7 @@ export function computePublicOverviewData(records: RecordSummary[]): PublicOverv
   return {
     problemCount: problems.length,
     evidenceCount: records.filter((record) => record.type === "EVD-").length,
+    sourceCount: records.filter((record) => record.type === "SRC-").length,
     problems,
   };
 }
@@ -155,13 +180,14 @@ export function projectMaterialChangeEntries(sources: MaterialChangeSource[]): M
   const candidates = sources.flatMap(({ summary, detail }) => {
     if (summary.type !== "PRB-" || !Array.isArray(detail.record.history)) return [];
     const title = asString(detail.record.title) ?? summary.label;
+    const domainCodes = asStringArray(detail.record.domain);
     return detail.record.history.flatMap((value, authoredPosition) => {
       if (value === null || typeof value !== "object" || Array.isArray(value)) return [];
       const entry = value as Record<string, unknown>;
       const date = asString(entry.date);
       const entrySummary = asString(entry.summary);
       if (date === null || entrySummary === null) return [];
-      return [{ problemId: summary.id, problemTitle: title, date, summary: entrySummary, authoredPosition }];
+      return [{ problemId: summary.id, problemTitle: title, date, summary: entrySummary, domainCodes, authoredPosition }];
     });
   });
 
@@ -186,9 +212,207 @@ export function relevantTopicCodes(problems: CitizenProblem[]): string[] {
   return [...present].sort((a, b) => describeTopic(a).label.localeCompare(describeTopic(b).label, "pt-PT"));
 }
 
+export interface TopicCategoryCount {
+  code: string;
+  count: number;
+}
+
+/**
+ * The `limit` canonical domain codes with the highest Problem counts, for the
+ * Hero's lightweight category shortcuts (Overview visual-completion delta
+ * §4) — a distinct ranking from `relevantTopicCodes` above, which lists every
+ * present code alphabetically for the full topic-filter control. One Problem
+ * carrying multiple domain codes counts once toward each of its codes (the
+ * same "any one of its domains" membership `matchesTopicFilter` already
+ * uses), never toward only one chosen "primary" domain (AGENTS.md
+ * "Human-owned decisions" — this presentation layer does not pick a primary
+ * domain). Ties break by the same PT-PT label order as `relevantTopicCodes`,
+ * a stable, deterministic, non-ranking tie-break rather than load/insertion
+ * order.
+ */
+export function topCategoryCounts(problems: CitizenProblem[], limit: number): TopicCategoryCount[] {
+  const counts = new Map<string, number>();
+  for (const problem of problems) {
+    for (const code of problem.domainCodes) {
+      counts.set(code, (counts.get(code) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([code, count]) => ({ code, count }))
+    .sort((a, b) => b.count - a.count || describeTopic(a.code).label.localeCompare(describeTopic(b.code).label, "pt-PT"))
+    .slice(0, limit);
+}
+
 /** A Problem matches a topic filter when that canonical domain code is present among its (possibly multiple) domains. Never reorders or ranks. */
 export function matchesTopicFilter(problem: CitizenProblem, topicCode: string | null): boolean {
   return topicCode === null || problem.domainCodes.includes(topicCode);
+}
+
+/**
+ * Editorial problem-list filter rail (Overview visual-completion — editorial
+ * list redesign). Each of the three investigation-state dimensions
+ * (`lifecycleStatus`/`validationStatus`/`evidenceStatus`) gets its own
+ * single-select filter, backed by its own canonical field — never collapsed
+ * into one mixed "state" filter (AGENTS.md canonical-state integrity; the
+ * three fields are distinct, non-ranked dimensions, matching
+ * ProblemLifecycleStatus.tsx/InvestigationStatus.tsx's own separation).
+ * These three helpers are intentionally parallel to `matchesTopicFilter`
+ * above, not a generic "matches any field" abstraction, so each dimension's
+ * own null-handling and field access stays explicit and typed.
+ */
+export function matchesLifecycleFilter(problem: CitizenProblem, status: string | null): boolean {
+  return status === null || problem.lifecycleStatus === status;
+}
+
+export function matchesValidationFilter(problem: CitizenProblem, status: string | null): boolean {
+  return status === null || problem.validationStatus === status;
+}
+
+export function matchesEvidenceFilter(problem: CitizenProblem, status: string | null): boolean {
+  return status === null || problem.evidenceStatus === status;
+}
+
+export interface ValueCount {
+  value: string;
+  count: number;
+}
+
+/**
+ * Per-value counts of one investigation-state dimension across the given
+ * Problems, for the filter rail's inline counts (TARGET's "Aberto 8" /
+ * "Corroborada 5" pattern). `null` values (the dimension genuinely absent on
+ * that Problem) are never counted toward any option — there is no "sem
+ * estado" filter option, matching how the editorial row (CitizenDiscovery.tsx's
+ * `ProblemRow`) already omits a null dimension entirely rather than inventing
+ * a placeholder value.
+ * Options are returned in descending count order, tie-broken by the
+ * canonical value itself (ascending, locale-stable) for a deterministic,
+ * non-ranking order — this rail never orders options by presumed severity or
+ * workflow precedence.
+ */
+export function countByDimension(problems: CitizenProblem[], field: "lifecycleStatus" | "validationStatus" | "evidenceStatus"): ValueCount[] {
+  const counts = new Map<string, number>();
+  for (const problem of problems) {
+    const value = problem[field];
+    if (value === null) continue;
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
+}
+
+/**
+ * Zero-filled counts across a fixed canonical value set (e.g. the full
+ * `evidence_status`/`validation_status` enum from `stateVisuals.ts`), unlike
+ * `countByDimension` above, which lists only values actually present among
+ * the given Problems. The filter rail needs the complete project filter
+ * vocabulary — every canonical value stays a stable, always-rendered option
+ * even when its count is 0 — so the rail's option set never changes shape as
+ * the visible result subset changes. Order follows `canonicalValues`
+ * (schema/enum declaration order), not count, since these are not a
+ * count-ranked list the way `countByDimension`'s presence-only counts are.
+ */
+export function countByCanonicalValues(problems: CitizenProblem[], field: "lifecycleStatus" | "validationStatus" | "evidenceStatus", canonicalValues: string[]): ValueCount[] {
+  const counts = new Map<string, number>();
+  for (const value of canonicalValues) counts.set(value, 0);
+  for (const problem of problems) {
+    const value = problem[field];
+    if (value === null || !counts.has(value)) continue;
+    counts.set(value, counts.get(value)! + 1);
+  }
+  return canonicalValues.map((value) => ({ value, count: counts.get(value) ?? 0 }));
+}
+
+/**
+ * The full canonical TEMA vocabulary (every audited `domain` code —
+ * `topicMapping.ts`'s `auditedDomainCodes()`), in the same deterministic
+ * PT-PT label order `relevantTopicCodes` already uses — unlike
+ * `relevantTopicCodes`, which lists only codes present among the currently
+ * loaded Problems. The filter rail needs the complete project topic
+ * vocabulary, not only values present in the visible result subset.
+ */
+export function allTopicCodes(): string[] {
+  return [...auditedDomainCodes()].sort((a, b) => describeTopic(a).label.localeCompare(describeTopic(b).label, "pt-PT"));
+}
+
+/**
+ * ESTADO's lifecycle grouping: the canonical `status` enum
+ * (`research/schemas/problem.schema.json`) has exactly one value meaning the
+ * investigation has not reached a terminal outcome (`OPEN` — see
+ * `statusGloss.ts`'s own "ainda não atingiu um dos resultados terminais"
+ * explanation for `OPEN`); every other enumerated value (`REJECTED`,
+ * `DUPLICATE`, `NON_DIGITAL`, `ALREADY_SOLVED`, `INSUFFICIENT_EVIDENCE`) is
+ * one of those terminal outcomes. This groups the six-value canonical enum
+ * into the two lifecycle states the rail must expose — never a third bucket,
+ * and never a group named after — or containing — an evidence/validation
+ * concept such as "Evidência insuficiente" (`INSUFFICIENT_EVIDENCE` groups
+ * under "Fechado" here like every other non-`OPEN` value; it is not treated
+ * as its own ESTADO option). This is presentation grouping only: the stored
+ * `lifecycleStatus` value itself is never rewritten, and `matchesLifecycleFilter`
+ * above (exact-value matching) is untouched for any future caller needing
+ * the raw six-value filter.
+ */
+export type LifecycleGroup = "OPEN" | "CLOSED";
+
+export function lifecycleGroupOf(status: string): LifecycleGroup {
+  return status === "OPEN" ? "OPEN" : "CLOSED";
+}
+
+/** A Problem matches an ESTADO group filter when its own lifecycle status groups into that value (`lifecycleGroupOf`). Parallel to `matchesLifecycleFilter`, but against the grouped dimension. */
+export function matchesLifecycleGroupFilter(problem: CitizenProblem, group: LifecycleGroup | null): boolean {
+  return group === null || (problem.lifecycleStatus !== null && lifecycleGroupOf(problem.lifecycleStatus) === group);
+}
+
+const LIFECYCLE_GROUP_LABELS: Record<LifecycleGroup, string> = { OPEN: "Aberto", CLOSED: "Fechado" };
+
+/**
+ * Zero-filled ESTADO rail counts across the fixed two-value lifecycle group
+ * vocabulary (`Aberto`/`Fechado`), grouping `countByCanonicalValues`'s
+ * six-value canonical counts down to the two groups `lifecycleGroupOf`
+ * defines. Order is always Aberto then Fechado, matching
+ * `LIFECYCLE_GROUP_LABELS`/the task's required ESTADO option order.
+ */
+export function countByLifecycleGroup(problems: CitizenProblem[]): ValueCount[] {
+  const counts: Record<LifecycleGroup, number> = { OPEN: 0, CLOSED: 0 };
+  for (const problem of problems) {
+    if (problem.lifecycleStatus === null) continue;
+    counts[lifecycleGroupOf(problem.lifecycleStatus)] += 1;
+  }
+  return (Object.keys(LIFECYCLE_GROUP_LABELS) as LifecycleGroup[]).map((group) => ({ value: group, count: counts[group] }));
+}
+
+/** PT-PT label for a lifecycle group value (`Aberto`/`Fechado`) — the ESTADO rail's own two-value vocabulary, not a general enum label (`publicEnumLabel` continues to own the raw six-value `status` labels elsewhere). */
+export function lifecycleGroupLabel(group: LifecycleGroup): string {
+  return LIFECYCLE_GROUP_LABELS[group];
+}
+
+export type ProblemSortOrder = "id" | "updatedAt";
+
+/**
+ * The editorial list's two sort orders. `"id"` is the existing deterministic
+ * PRB-ID ascending order (unchanged default, matches every other Problem
+ * ordering in Overview/Records). `"updatedAt"` orders by canonical
+ * `CitizenProblem.updatedAt` descending (most recently updated first); a
+ * `null` updatedAt sorts last (genuinely unknown recency, never assumed to
+ * be "oldest" via a fabricated date); same-date entries — and every null —
+ * break ties by ascending PRB ID, the same neutral tie-break
+ * `projectMaterialChangeEntries` already uses, so the order stays fully
+ * deterministic. This is a distinct field/label from the Hero ruler's
+ * "Última alteração" (the authored material-change date) — see
+ * OverviewPresentation.tsx's own note against conflating the two.
+ */
+export function sortProblems(problems: CitizenProblem[], order: ProblemSortOrder): CitizenProblem[] {
+  const sorted = [...problems];
+  if (order === "id") {
+    return sorted.sort((a, b) => a.id.localeCompare(b.id));
+  }
+  return sorted.sort((a, b) => {
+    if (a.updatedAt === b.updatedAt) return a.id.localeCompare(b.id);
+    if (a.updatedAt === null) return 1;
+    if (b.updatedAt === null) return -1;
+    return b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id);
+  });
 }
 
 /**

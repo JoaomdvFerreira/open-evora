@@ -250,7 +250,12 @@ describe("Explorer — Overview view", () => {
     expect(screen.getByRole("button", { name: "Visão geral" }).getAttribute("aria-current")).toBe("page");
   });
 
-  it("UX-D §4: renders Validação and Evidência as two explicitly labeled dimensions, not an unlabeled combination", async () => {
+  it("UX-D §4: renders Evidência as its own explicitly labeled dimension in the row, never merged with Validação", async () => {
+    // The editorial problem-list row (Overview visual-completion) shows
+    // evidenceStatus inline via the restrained reading chip; validationStatus
+    // stays available only through the canonical VALIDAÇÃO filter rail, not
+    // repeated per row (never merged, never dropped — just not duplicated at
+    // this density).
     const statusIndex: RecordSummary[] = [
       {
         id: "PRB-0005",
@@ -276,11 +281,11 @@ describe("Explorer — Overview view", () => {
     await screen.findByRole("heading", { name: "Visão geral" });
     expect(screen.queryByText("Por validar · Corroborado")).toBeNull();
     expect(screen.queryByText("Por validar · Corroborada")).toBeNull();
-    const statusRow = await screen.findByText("Validação:");
-    expect(statusRow.closest(".overview-statuses")?.textContent).toMatch(/Validação:\s*Por validar/);
     // F01: compact label agrees grammatically with "Evidência" (feminine), not "Corroborado".
-    expect(statusRow.closest(".overview-statuses")?.textContent).toMatch(/Evidência:\s*Corroborada/);
-    expect(statusRow.closest(".overview-statuses")?.textContent).not.toMatch(/Evidência:\s*Corroborado\b/);
+    const evidenceChip = await screen.findByText("Evidência:");
+    expect(evidenceChip.closest(".prb-status-chip")?.textContent).toMatch(/Evidência:\s*Corroborada/);
+    expect(evidenceChip.closest(".prb-status-chip")?.textContent).not.toMatch(/Evidência:\s*Corroborado\b/);
+    expect(screen.queryByText("Validação:")).toBeNull();
   });
 
   it("opens the exact PRB in Problem View when Explore is selected", async () => {

@@ -1,19 +1,8 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Overview } from "./Overview";
-import { NARROW_BREAKPOINT_PX } from "../records/useNarrowViewport";
 import { DataLoadError, type DataProvider, type RecordDetail, type RecordSummary } from "../dataProvider/types";
-
-function setInnerWidth(width: number) {
-  Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: width });
-}
-
-const ORIGINAL_WIDTH = window.innerWidth;
-
-afterEach(() => {
-  setInnerWidth(ORIGINAL_WIDTH);
-});
 
 function makeProvider(index: RecordSummary[]): DataProvider {
   const details: Record<string, RecordDetail> = Object.fromEntries(
@@ -45,74 +34,63 @@ function makeProvider(index: RecordSummary[]): DataProvider {
 const props = { onExploreProblem: vi.fn(), onViewRecords: vi.fn() };
 
 describe("Overview — Problem investigation-state dimensions", () => {
-  it("renders lifecycle, validation, and evidence separately when all are canonically present", async () => {
+  // The editorial problem-list row (Overview visual-completion) shows two of
+  // the three investigation-state dimensions inline: evidenceStatus via the
+  // existing restrained `reading` chip, lifecycleStatus as plain secondary
+  // text (no caption prefix, no chip — the row's own position already reads
+  // as "this Problem's state"). validationStatus is deliberately not
+  // repeated per row: it remains available through the canonical VALIDAÇÃO
+  // filter rail (Overview.test.tsx's filter-rail assertions cover it), never
+  // merged into either of the other two dimensions.
+  it("renders evidenceStatus (chip) and lifecycleStatus (plain text) independently when both are canonically present", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema com todas as dimensões", file: "", summaryFields: { status: "OPEN", validation_status: "unvalidated", evidence_status: "corroborated" } },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
-    const caption = await screen.findByText("Estado do problema");
-    const row = caption.closest(".overview-statuses");
-    expect(row?.textContent).toMatch(/Estado do problema\s*Aberto/);
-    expect(row?.textContent).toMatch(/Validação:\s*Por validar/);
-    expect(row?.textContent).toMatch(/Evidência:\s*Corroborada/);
-    expect(row?.textContent).not.toMatch(/Estado da investigação/);
-    expect(row?.querySelectorAll('[aria-hidden="true"]')).toHaveLength(2);
+    const row = (await screen.findByText("PRB-1")).closest(".overview-problem-row-meta");
+    expect(row?.querySelector(".prb-status-chip")?.textContent).toMatch(/Evidência:\s*Corroborada/);
+    expect(within(row as HTMLElement).getByText("Aberto")).toBeTruthy();
+    // Never the concatenated caption+value adjacency the row used to render.
+    expect(row?.textContent).not.toMatch(/Estado do problema\s*Aberto/);
+    expect(row?.textContent).not.toMatch(/Validação:/);
   });
 
-  it("omits only the lifecycle dimension when status is null", async () => {
+  it("omits only the lifecycle text when status is null", async () => {
     const provider = makeProvider([
       { id: "PRB-2", type: "PRB-", label: "Problema sem estado de ciclo de vida", file: "", summaryFields: { validation_status: "unvalidated", evidence_status: "corroborated" } },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
-    const caption = await screen.findByText("Validação:");
-    const row = caption.closest(".overview-statuses");
-    expect(row?.textContent).toMatch(/Validação:\s*Por validar/);
-    expect(row?.textContent).toMatch(/Evidência:\s*Corroborada/);
-    expect(screen.queryByText("Estado do problema")).toBeNull();
-    expect(row?.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
+    const row = (await screen.findByText("PRB-2")).closest(".overview-problem-row-meta");
+    expect(row?.querySelector(".prb-status-chip")?.textContent).toMatch(/Evidência:\s*Corroborada/);
+    // Scoped to the row itself — the page-wide "Aberto" text in the ESTADO
+    // filter rail's own always-rendered option (filter-rail correction pass
+    // §3, complete vocabulary regardless of this Problem's own lifecycle
+    // status) is unrelated to this assertion.
+    expect(within(row as HTMLElement).queryByText("Aberto")).toBeNull();
   });
 
-  it("omits only the validation dimension when validation_status is null", async () => {
-    const provider = makeProvider([
-      { id: "PRB-3", type: "PRB-", label: "Problema sem validação", file: "", summaryFields: { status: "OPEN", evidence_status: "corroborated" } },
-    ]);
-    render(<Overview dataProvider={provider} {...props} />);
-
-    const caption = await screen.findByText("Estado do problema");
-    const row = caption.closest(".overview-statuses");
-    expect(row?.textContent).toMatch(/Estado do problema\s*Aberto/);
-    expect(row?.textContent).toMatch(/Evidência:\s*Corroborada/);
-    expect(screen.queryByText("Validação:")).toBeNull();
-    expect(row?.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
-  });
-
-  it("omits only the evidence dimension when evidence_status is null", async () => {
+  it("omits only the evidence chip when evidence_status is null", async () => {
     const provider = makeProvider([
       { id: "PRB-4", type: "PRB-", label: "Problema sem evidência", file: "", summaryFields: { status: "OPEN", validation_status: "unvalidated" } },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
-    const caption = await screen.findByText("Estado do problema");
-    const row = caption.closest(".overview-statuses");
-    expect(row?.textContent).toMatch(/Estado do problema\s*Aberto/);
-    expect(row?.textContent).toMatch(/Validação:\s*Por validar/);
-    expect(screen.queryByText("Evidência:")).toBeNull();
-    expect(row?.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
+    const row = (await screen.findByText("PRB-4")).closest(".overview-problem-row-meta");
+    expect(within(row as HTMLElement).getByText("Aberto")).toBeTruthy();
+    expect(row?.querySelector(".prb-status-chip")).toBeNull();
   });
 
-  it("omits the whole status row when all dimensions are null", async () => {
+  it("omits both the evidence chip and lifecycle text when both dimensions are null", async () => {
     const provider = makeProvider([
       { id: "PRB-4", type: "PRB-", label: "Problema sem dimensões", file: "", summaryFields: {} },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
-    await screen.findByText("PRB-4");
-    expect(screen.queryByText("Estado do problema")).toBeNull();
-    expect(screen.queryByText("Validação:")).toBeNull();
-    expect(screen.queryByText("Evidência:")).toBeNull();
-    expect(document.querySelector(".overview-statuses")).toBeNull();
+    const row = (await screen.findByText("PRB-4")).closest(".overview-problem-row-meta");
+    expect(row?.querySelector(".prb-status-chip")).toBeNull();
+    expect(row?.querySelector(".overview-problem-row-lifecycle")).toBeNull();
   });
 });
 
@@ -143,54 +121,18 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
     expect(input.placeholder).toBe("Pesquisar problemas em Évora…");
   });
 
-  it("orders topic filters alphabetically by PT-PT label, with Todos first", async () => {
+  it("labels the Hero primary action with the canonical Problem count and points it at the in-page Problem list", async () => {
     const provider = makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema de economia", file: "", summaryFields: {} },
-      { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
+      { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
     ]);
-    const detailsProvider: DataProvider = {
-      ...provider,
-      getRecord: async (id) =>
-        id === "PRB-1"
-          ? { id, type: "PRB-", file: "", record: { title: "Problema de economia", domain: ["ECO"] }, outgoingEdges: [], incomingEdges: [] }
-          : { id, type: "PRB-", file: "", record: { title: "Problema digital", domain: ["DIG"] }, outgoingEdges: [], incomingEdges: [] },
-    };
-    render(<Overview dataProvider={detailsProvider} {...props} />);
+    render(<Overview dataProvider={provider} {...props} />);
 
-    const group = await screen.findByRole("group", { name: "Filtrar por tema" });
-    const labels = within(group).getAllByRole("button").map((button) => button.textContent);
-    // Digital before Economia alphabetically, and Todos always leads.
-    expect(labels).toEqual(["Todos", "Digital", "Economia"]);
+    const cta = await screen.findByRole("link", { name: "Ver os 2 problemas" });
+    expect(cta.getAttribute("href")).toBe("#overview-problemas");
   });
 
-  it("marks the active topic filter with aria-pressed, exclusively", async () => {
-    const provider = makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema de economia", file: "", summaryFields: {} },
-      { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
-    ]);
-    const detailsProvider: DataProvider = {
-      ...provider,
-      getRecord: async (id) =>
-        id === "PRB-1"
-          ? { id, type: "PRB-", file: "", record: { title: "Problema de economia", domain: ["ECO"] }, outgoingEdges: [], incomingEdges: [] }
-          : { id, type: "PRB-", file: "", record: { title: "Problema digital", domain: ["DIG"] }, outgoingEdges: [], incomingEdges: [] },
-    };
-    const user = userEvent.setup();
-    render(<Overview dataProvider={detailsProvider} {...props} />);
-
-    const group = await screen.findByRole("group", { name: "Filtrar por tema" });
-    const todos = within(group).getByRole("button", { name: "Todos" });
-    const digital = within(group).getByRole("button", { name: "Digital" });
-    expect(todos.getAttribute("aria-pressed")).toBe("true");
-    expect(digital.getAttribute("aria-pressed")).toBe("false");
-
-    await user.click(digital);
-
-    expect(todos.getAttribute("aria-pressed")).toBe("false");
-    expect(digital.getAttribute("aria-pressed")).toBe("true");
-  });
-
-  it("announces the result-count and empty-state meaning through a polite live region as search/filter state changes", async () => {
+  it("announces the result-count and empty-state meaning through a polite live region as search state changes", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
@@ -207,22 +149,77 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
     await user.type(input, "inexistente");
 
     const emptyState = await within(liveRegion as HTMLElement).findByText(
-      "Nenhum problema corresponde à pesquisa ou ao filtro selecionado."
+      "Nenhum problema corresponde à pesquisa."
     );
     expect(emptyState.closest('[aria-live="polite"]')).toBe(liveRegion);
   });
 
-  it("keeps Problem cards outside the atomic result announcement and names their actions by title", async () => {
+  it("keeps Problem rows outside the atomic result announcement and names each row's primary action by title", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
+    // The whole row is the primary click action (Overview visual-completion —
+    // editorial list redesign), named by the Problem's title, same as the
+    // former dedicated "Explorar →" action was.
     const firstAction = await screen.findByRole("button", { name: "Explorar Problema de mobilidade" });
     expect(screen.getByRole("button", { name: "Explorar Problema digital" })).toBeTruthy();
-    expect(firstAction.textContent).toBe("Explorar →");
     expect(firstAction.closest('[aria-live="polite"]')).toBeNull();
+  });
+});
+
+describe("Overview — filter rail vocabulary (filter-rail correction pass)", () => {
+  // The rail must expose the complete project filter vocabulary, not only
+  // values present in the currently visible/loaded result subset — this is a
+  // single-Problem fixture, deliberately carrying only one value per
+  // dimension, so every other canonical option below is provable as present
+  // with a genuinely zero count rather than merely absent from the fixture.
+  const singleProblemProvider = () =>
+    makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema único", file: "", summaryFields: { status: "OPEN", validation_status: "validated", evidence_status: "corroborated" } },
+    ]);
+
+  it("shows every canonical evidence_status/validation_status option, zero-filled, not only the value present on loaded Problems", async () => {
+    render(<Overview dataProvider={singleProblemProvider()} {...props} />);
+    await screen.findByText("Problema único");
+
+    const evidenceGroup = screen.getByRole("group", { name: "Evidência" });
+    expect(within(evidenceGroup).getByRole("button", { name: /Identificada/ }).textContent).toMatch(/0$/);
+    expect(within(evidenceGroup).getByRole("button", { name: /Corroborada/ }).textContent).toMatch(/1$/);
+
+    const validationGroup = screen.getByRole("group", { name: "Validação" });
+    expect(within(validationGroup).getByRole("button", { name: /Por validar/ }).textContent).toMatch(/0$/);
+    expect(within(validationGroup).getByRole("button", { name: /Parcialmente validada/ }).textContent).toMatch(/0$/);
+    expect(within(validationGroup).getByRole("button", { name: /Validada/ }).textContent).toMatch(/1$/);
+  });
+
+  it("exposes ESTADO as only Aberto/Fechado, never a raw lifecycle status or an evidence/validation concept", async () => {
+    render(<Overview dataProvider={singleProblemProvider()} {...props} />);
+    await screen.findByText("Problema único");
+
+    const estadoGroup = screen.getByRole("group", { name: "Estado" });
+    const options = within(estadoGroup).getAllByRole("button").map((button) => button.textContent?.replace(/\s+/g, " ").trim());
+    expect(options).toEqual(["Todos 1", "Aberto 1", "Fechado 0"]);
+    expect(within(estadoGroup).queryByText(/Evidência insuficiente/)).toBeNull();
+  });
+
+  it("composes the ESTADO group filter with search/other rail filters, matching every closed status, not just the one loaded", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema aberto", file: "", summaryFields: { status: "OPEN" } },
+      { id: "PRB-2", type: "PRB-", label: "Problema rejeitado", file: "", summaryFields: { status: "REJECTED" } },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+    await screen.findByText("Problema rejeitado");
+
+    const estadoGroup = screen.getByRole("group", { name: "Estado" });
+    await user.click(within(estadoGroup).getByRole("button", { name: /Fechado/ }));
+
+    expect(await screen.findByText("1 de 2 problemas")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Explorar Problema rejeitado" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Explorar Problema aberto" })).toBeNull();
   });
 });
 
@@ -251,82 +248,16 @@ describe("Overview — error state retry (ODM-021)", () => {
 });
 
 describe("Overview — material-change timeline", () => {
-  it("renders the neutral no-history state only after every Problem detail loads", async () => {
+  it("renders the neutral no-history state in the Hero recent-updates panel only after every Problem detail loads", async () => {
     render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
 
-    expect(await screen.findByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeTruthy();
+    await screen.findByText("Atualizado recentemente");
+    expect(screen.getByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeTruthy();
     expect(screen.queryByText(/nunca mudou/i)).toBeNull();
   });
-
-  it("does not present missing detail reads as a no-history result", async () => {
-    const provider: DataProvider = {
-      ...makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema indisponível", file: "", summaryFields: {} }]),
-      getRecord: async () => { throw new DataLoadError("detalhe indisponível", "network"); },
-    };
-    render(<Overview dataProvider={provider} {...props} />);
-
-    const alert = await screen.findByRole("alert");
-    expect(alert.textContent).toContain("Não foi possível carregar todo o histórico material");
-    expect(screen.queryByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeNull();
-  });
-
-  it("marks a timeline from partially loaded Problems as incomplete", async () => {
-    const provider: DataProvider = {
-      ...makeProvider([
-        { id: "PRB-1", type: "PRB-", label: "Problema carregado", file: "", summaryFields: {} },
-        { id: "PRB-2", type: "PRB-", label: "Problema indisponível", file: "", summaryFields: {} },
-      ]),
-      getRecord: async (id) => {
-        if (id === "PRB-2") throw new DataLoadError("detalhe indisponível", "network");
-        return { id, type: "PRB-", file: "", record: { title: "Problema carregado", history: [{ date: "2026-04-08", summary: "Alteração carregada." }] }, outgoingEdges: [], incomingEdges: [] };
-      },
-    };
-    render(<Overview dataProvider={provider} {...props} />);
-
-    expect((await screen.findByRole("alert")).textContent).toContain("podem estar incompletas");
-    expect(screen.getByText("Alteração carregada.")).toBeTruthy();
-    expect(screen.queryByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeNull();
-  });
-
-  it("renders authored history and opens its owning Problem", async () => {
-    const onExploreProblem = vi.fn();
-    const provider: DataProvider = {
-      ...makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema do histórico", file: "", summaryFields: {} }]),
-      getRecord: async (id) => ({ id, type: "PRB-", file: "", record: { title: "Problema do histórico", updated_at: "2099-12-31", history: [{ date: "2026-04-08", summary: "Alteração material redigida." }] }, outgoingEdges: [], incomingEdges: [] }),
-    };
-    const user = userEvent.setup();
-    render(<Overview dataProvider={provider} onExploreProblem={onExploreProblem} onViewRecords={vi.fn()} />);
-
-    const date = await screen.findByText("08/04/2026");
-    expect(date.tagName).toBe("TIME");
-    expect(screen.getByText("Alteração material redigida.")).toBeTruthy();
-    await user.click(screen.getByRole("button", { name: "Abrir problema Problema do histórico" }));
-    expect(onExploreProblem).toHaveBeenCalledWith("PRB-1");
-  });
 });
 
-describe("Overview — Hero media (visual-completion delta §2/§7)", () => {
-  it("renders the Hero photograph as decorative (empty alt) with independent attribution at desktop widths", async () => {
-    setInnerWidth(NARROW_BREAKPOINT_PX + 1);
-    render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
-
-    await screen.findByText("Investigamos problemas práticos que afetam Évora.");
-    const image = document.querySelector(".overview-hero-media img");
-    expect(image?.getAttribute("alt")).toBe("");
-    expect(screen.getByText("Christian Gänshirt").tagName).toBe("A");
-    expect(screen.getByText("CC BY-SA 4.0").tagName).toBe("A");
-  });
-
-  it("omits the Hero photograph entirely at/below the compact breakpoint, not merely hides it visually", async () => {
-    setInnerWidth(NARROW_BREAKPOINT_PX);
-    render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
-
-    await screen.findByText("Investigamos problemas práticos que afetam Évora.");
-    expect(document.querySelector(".overview-hero-media")).toBeNull();
-  });
-});
-
-describe("Overview — metrics value/label separation (visual-completion delta §5)", () => {
+describe("Overview — metrics value/label separation", () => {
   it("renders each count metric's numeric value and PT-PT label as separate elements", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
@@ -339,7 +270,123 @@ describe("Overview — metrics value/label separation (visual-completion delta �
 
     const evidenceValue = screen.getAllByText("0", { selector: ".overview-metric-value" })[0];
     expect(evidenceValue.closest(".overview-metric")?.querySelector(".overview-metric-label")?.textContent).toBe("Registos de evidência");
+  });
+});
 
-    expect(screen.getByText("Investigação em atualização contínua").textContent).toBe("Investigação em atualização contínua");
+describe("Overview — Hero recent-updates preview", () => {
+  it("shows at most 5 authored material-change entries, each with its PRB id, canonical last-updated date, and topic", async () => {
+    // updated_at deliberately differs from the authored history entry's own
+    // date, so a passing assertion on "08/04/2026" proves the canonical
+    // updatedAt is what renders here, not MaterialChangeEntry.date.
+    const provider: DataProvider = {
+      ...makeProvider([
+        { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
+        { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
+        { id: "PRB-3", type: "PRB-", label: "Problema três", file: "", summaryFields: {} },
+        { id: "PRB-4", type: "PRB-", label: "Problema quatro", file: "", summaryFields: {} },
+        { id: "PRB-5", type: "PRB-", label: "Problema cinco", file: "", summaryFields: {} },
+        { id: "PRB-6", type: "PRB-", label: "Problema seis", file: "", summaryFields: {} },
+      ]),
+      getRecord: async (id) => ({
+        id,
+        type: "PRB-",
+        file: "",
+        record: { title: `Problema ${id}`, domain: ["MOB"], updated_at: "2026-04-08", history: [{ date: "2026-01-01", summary: "Alteração material registada." }] },
+        outgoingEdges: [],
+        incomingEdges: [],
+      }),
+    };
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Atualizado recentemente");
+    const recentList = document.querySelector(".overview-hero-recent-list") as HTMLElement;
+    const items = recentList.querySelectorAll("li");
+    expect(items.length).toBe(5);
+
+    const firstItem = items[0];
+    expect(within(firstItem as HTMLElement).getByText("PRB-1")).toBeTruthy();
+    expect(within(firstItem as HTMLElement).getByText("08/04/2026").tagName).toBe("TIME");
+    expect(within(firstItem as HTMLElement).getByText(/Mobilidade/)).toBeTruthy();
+
+    expect(screen.queryByRole("link", { name: "Ver tudo" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Abrir o explorador" })).toBeNull();
+  });
+
+  it("opens Records from the recent-updates panel's 'Ver tudo' action, alongside the heading", async () => {
+    const onViewRecords = vi.fn();
+    render(
+      <Overview
+        dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])}
+        onExploreProblem={vi.fn()}
+        onViewRecords={onViewRecords}
+      />
+    );
+
+    const heading = await screen.findByText("Atualizado recentemente");
+    const viewAll = screen.getByRole("button", { name: "Ver tudo" });
+    expect(heading.closest(".overview-hero-recent-header")).toBe(viewAll.closest(".overview-hero-recent-header"));
+
+    await userEvent.setup().click(viewAll);
+    expect(onViewRecords).toHaveBeenCalledTimes(1);
+  });
+
+  it("omits the date rather than fabricating one when the canonical updatedAt is genuinely unavailable", async () => {
+    const provider: DataProvider = {
+      ...makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]),
+      getRecord: async (id) => ({
+        id,
+        type: "PRB-",
+        file: "",
+        record: { title: "Problema sem updated_at", history: [{ date: "2026-04-08", summary: "Alteração material registada." }] },
+        outgoingEdges: [],
+        incomingEdges: [],
+      }),
+    };
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Atualizado recentemente");
+    const recentList = document.querySelector(".overview-hero-recent-list") as HTMLElement;
+    expect(within(recentList).getByText("PRB-1")).toBeTruthy();
+    expect(recentList.querySelector("time")).toBeNull();
+  });
+
+  it("exposes the existing incomplete-history meaning when a Problem detail failed to load", async () => {
+    const provider: DataProvider = {
+      listRecords: async () => [
+        { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
+        { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
+      ],
+      getManifest: async () => { throw new Error("unused"); },
+      getEdges: async () => [],
+      getRecord: async (id) => {
+        if (id === "PRB-2") throw new Error("falha ao carregar PRB-2");
+        return { id, type: "PRB-", file: "", record: { title: "Problema um", updated_at: "2026-04-08", history: [{ date: "2026-04-08", summary: "Alteração material registada." }] }, outgoingEdges: [], incomingEdges: [] };
+      },
+    };
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Atualizado recentemente");
+    expect(screen.getByText(/Histórico recente incompleto/)).toBeTruthy();
+  });
+
+  it("opens a recent-update item's owning Problem", async () => {
+    const onExploreProblem = vi.fn();
+    const provider: DataProvider = {
+      ...makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]),
+      getRecord: async (id) => ({
+        id,
+        type: "PRB-",
+        file: "",
+        record: { title: "Problema do histórico", history: [{ date: "2026-04-08", summary: "Alteração material registada." }] },
+        outgoingEdges: [],
+        incomingEdges: [],
+      }),
+    };
+    render(<Overview dataProvider={provider} onExploreProblem={onExploreProblem} onViewRecords={vi.fn()} />);
+
+    const recentList = await screen.findByText("Atualizado recentemente").then(() => document.querySelector(".overview-hero-recent-list") as HTMLElement);
+    const item = within(recentList).getByText("Problema do histórico");
+    await userEvent.setup().click(item);
+    expect(onExploreProblem).toHaveBeenCalledWith("PRB-1");
   });
 });

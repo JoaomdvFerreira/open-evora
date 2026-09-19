@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import "../index.css";
 import "../styles/topic.css";
-import { CitizenProblemCard, CitizenSearchControl, TopicFilterGroup } from "./CitizenDiscovery";
+import { CitizenSearchControl, ProblemRow, TopicFilterGroup } from "./CitizenDiscovery";
 import type { CitizenProblem } from "./overviewStats";
 
 const meta = { title: "Citizen discovery" } satisfies Meta;
@@ -17,7 +17,7 @@ const base: CitizenProblem = {
 };
 
 function Card({ problem }: { problem: CitizenProblem }) {
-  return <ul className="overview-problem-list" style={{ padding: 0, margin: 0, listStyle: "none" }}><CitizenProblemCard problem={problem} onExplore={() => {}} /></ul>;
+  return <ul className="overview-problem-list" style={{ padding: 0, margin: 0, listStyle: "none" }}><ProblemRow problem={problem} onExplore={() => {}} /></ul>;
 }
 
 export const ProblemSingleTopic: Story = { render: () => <Card problem={base} /> };

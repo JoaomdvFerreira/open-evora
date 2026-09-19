@@ -5,17 +5,20 @@ import "../styles/topic.css";
 import { OverviewPresentation } from "./OverviewPresentation";
 import {
   matchesCitizenSearch,
+  matchesEvidenceFilter,
+  matchesLifecycleGroupFilter,
   matchesTopicFilter,
-  relevantTopicCodes,
+  matchesValidationFilter,
+  sortProblems,
   type CitizenProblem,
+  type LifecycleGroup,
   type MaterialChangeEntry,
+  type ProblemSortOrder,
 } from "./overviewStats";
 
 const meta = { title: "Overview/Full composition" } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-const MATERIAL_CHANGE_PRESENTATION_LIMIT = 5;
 
 /**
  * Realistic multi-problem fixture. Every problem id is a synthetic PRB-XXXX
@@ -64,55 +67,77 @@ const problems: CitizenProblem[] = [
 ];
 
 const materialChangeEntries: MaterialChangeEntry[] = [
-  { problemId: "PRB-XXXX-1", problemTitle: "Percursos pedonais entre bairros e serviços", date: "2026-04-08", summary: "Foi registada uma alteração material na leitura atual do problema." },
-  { problemId: "PRB-XXXX-5", problemTitle: "Dificuldades persistentes nas deslocações quotidianas", date: "2026-04-01", summary: "A evidência reunida passou a ser apresentada com uma limitação adicional." },
-  { problemId: "PRB-XXXX-2", problemTitle: "Acesso a informação de estacionamento", date: "2026-03-12", summary: "O estado de validação foi atualizado após revisão da evidência disponível." },
-  { problemId: "PRB-XXXX-4", problemTitle: "Disponibilidade de consultas de cuidados primários", date: "2026-02-20", summary: "Nova evidência institucional foi associada a este problema." },
+  { problemId: "PRB-XXXX-1", problemTitle: "Percursos pedonais entre bairros e serviços", date: "2026-04-08", summary: "Foi registada uma alteração material na leitura atual do problema.", domainCodes: ["MOB"] },
+  { problemId: "PRB-XXXX-5", problemTitle: "Dificuldades persistentes nas deslocações quotidianas", date: "2026-04-01", summary: "A evidência reunida passou a ser apresentada com uma limitação adicional.", domainCodes: ["MOB", "PUB", "HEA"] },
+  { problemId: "PRB-XXXX-2", problemTitle: "Acesso a informação de estacionamento", date: "2026-03-12", summary: "O estado de validação foi atualizado após revisão da evidência disponível.", domainCodes: ["MOB", "PUB"] },
+  { problemId: "PRB-XXXX-4", problemTitle: "Disponibilidade de consultas de cuidados primários", date: "2026-02-20", summary: "Nova evidência institucional foi associada a este problema.", domainCodes: ["HEA"] },
+  { problemId: "PRB-XXXX-6", problemTitle: "Sinalização de obras em espaço público", date: "2026-01-15", summary: "Foi registada uma alteração material na leitura atual do problema.", domainCodes: ["future-domain"] },
 ];
 
-function useOverviewState(initial: { search?: string; topic?: string | null; source?: CitizenProblem[] } = {}) {
+function useOverviewState(initial: { search?: string; source?: CitizenProblem[] } = {}) {
   const source = initial.source ?? problems;
   const [searchQuery, setSearchQuery] = useState(initial.search ?? "");
-  const [activeTopic, setActiveTopic] = useState<string | null>(initial.topic ?? null);
-  const topicCodes = useMemo(() => relevantTopicCodes(source), [source]);
-  const visibleProblems = useMemo(
-    () => source.filter((problem) => matchesTopicFilter(problem, activeTopic) && matchesCitizenSearch(problem, searchQuery)),
-    [source, activeTopic, searchQuery]
-  );
-  return { searchQuery, setSearchQuery, activeTopic, setActiveTopic, topicCodes, visibleProblems, source };
+  const [topicFilter, setTopicFilter] = useState<string | null>(null);
+  const [evidenceFilter, setEvidenceFilter] = useState<string | null>(null);
+  const [validationFilter, setValidationFilter] = useState<string | null>(null);
+  const [lifecycleFilter, setLifecycleFilter] = useState<LifecycleGroup | null>(null);
+  const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("id");
+  const visibleProblems = useMemo(() => {
+    const matched = source.filter(
+      (problem) =>
+        matchesCitizenSearch(problem, searchQuery) &&
+        matchesTopicFilter(problem, topicFilter) &&
+        matchesEvidenceFilter(problem, evidenceFilter) &&
+        matchesValidationFilter(problem, validationFilter) &&
+        matchesLifecycleGroupFilter(problem, lifecycleFilter)
+    );
+    return sortProblems(matched, sortOrder);
+  }, [source, searchQuery, topicFilter, evidenceFilter, validationFilter, lifecycleFilter, sortOrder]);
+  return {
+    searchQuery, setSearchQuery, visibleProblems, source,
+    topicFilter, setTopicFilter, evidenceFilter, setEvidenceFilter,
+    validationFilter, setValidationFilter, lifecycleFilter, setLifecycleFilter,
+    sortOrder, setSortOrder,
+  };
 }
 
 function FullOverview({
   source = problems,
   search,
-  topic,
   citizenProblemsOverride,
   visibleProblemsOverride,
   materialChanges = { entries: materialChangeEntries, complete: true },
 }: {
   source?: CitizenProblem[];
   search?: string;
-  topic?: string | null;
   citizenProblemsOverride?: CitizenProblem[] | null;
   visibleProblemsOverride?: CitizenProblem[] | null;
   materialChanges?: { entries: MaterialChangeEntry[]; complete: boolean } | null;
 }) {
-  const state = useOverviewState({ search, topic, source });
+  const state = useOverviewState({ search, source });
   const citizenProblems = citizenProblemsOverride !== undefined ? citizenProblemsOverride : state.source;
   const visibleProblems = visibleProblemsOverride !== undefined ? visibleProblemsOverride : state.visibleProblems;
   return (
     <OverviewPresentation
       problemCount={state.source.length}
       evidenceCount={41}
+      sourceCount={17}
+      totalRecords={279}
       citizenProblems={citizenProblems}
       visibleProblems={visibleProblems}
       searchQuery={state.searchQuery}
       onSearchChange={state.setSearchQuery}
-      topicCodes={state.topicCodes}
-      activeTopic={state.activeTopic}
-      onTopicChange={state.setActiveTopic}
+      topicFilter={state.topicFilter}
+      onTopicFilterChange={state.setTopicFilter}
+      evidenceFilter={state.evidenceFilter}
+      onEvidenceFilterChange={state.setEvidenceFilter}
+      validationFilter={state.validationFilter}
+      onValidationFilterChange={state.setValidationFilter}
+      lifecycleFilter={state.lifecycleFilter}
+      onLifecycleFilterChange={state.setLifecycleFilter}
+      sortOrder={state.sortOrder}
+      onSortOrderChange={state.setSortOrder}
       materialChanges={materialChanges}
-      materialChangePresentationLimit={MATERIAL_CHANGE_PRESENTATION_LIMIT}
       onExploreProblem={() => {}}
       onViewRecords={() => {}}
     />
@@ -147,12 +172,6 @@ export const ActiveSearch: Story = {
   name: "active search",
   globals: { viewport: { value: "reviewDesktop" } },
   render: () => <FullOverview search="Évora" />,
-};
-
-export const ActiveTopicFilter: Story = {
-  name: "active topic filter",
-  globals: { viewport: { value: "reviewDesktop" } },
-  render: () => <FullOverview topic="MOB" />,
 };
 
 export const NoResults: Story = {
@@ -197,8 +216,8 @@ const stressProblems: CitizenProblem[] = [
 
 const stressMaterialChanges: MaterialChangeEntry[] = [
   ...materialChangeEntries,
-  { problemId: "PRB-XXXX-7", problemTitle: "Fiabilidade dos horários de transporte público interurbano", date: "2026-04-10", summary: "Uma descrição longa de alteração material confirma que a linha mantém uma leitura clara quando a explicação exige várias linhas, sem perder a data, o problema a que se refere ou a ação disponível." },
-  { problemId: "PRB-XXXX-8", problemTitle: "Acessibilidade de edifícios públicos municipais", date: "2026-01-15", summary: "Foi associada evidência adicional relativa às condições de acessibilidade reportadas." },
+  { problemId: "PRB-XXXX-7", problemTitle: "Fiabilidade dos horários de transporte público interurbano", date: "2026-04-10", summary: "Uma descrição longa de alteração material confirma que a linha mantém uma leitura clara quando a explicação exige várias linhas, sem perder a data, o problema a que se refere ou a ação disponível.", domainCodes: ["MOB", "PUB", "HEA", "future-domain"] },
+  { problemId: "PRB-XXXX-8", problemTitle: "Acessibilidade de edifícios públicos municipais", date: "2026-01-15", summary: "Foi associada evidência adicional relativa às condições de acessibilidade reportadas.", domainCodes: ["PUB"] },
 ];
 
 export const RealisticMaximumContentStress: Story = {

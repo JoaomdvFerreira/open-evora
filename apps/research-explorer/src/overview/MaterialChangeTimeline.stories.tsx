@@ -9,16 +9,16 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const entries: MaterialChangeEntry[] = [
-  { problemId: "PRB-XXXX-1", problemTitle: "Percursos pedonais entre serviços", date: "2026-04-08", summary: "Foi registada uma alteração material na leitura atual do problema." },
-  { problemId: "PRB-XXXX-2", problemTitle: "Acesso a informação de estacionamento", date: "2026-03-12", summary: "A evidência reunida passou a ser apresentada com uma limitação adicional." },
+  { problemId: "PRB-XXXX-1", problemTitle: "Percursos pedonais entre serviços", date: "2026-04-08", summary: "Foi registada uma alteração material na leitura atual do problema.", domainCodes: ["MOB"] },
+  { problemId: "PRB-XXXX-2", problemTitle: "Acesso a informação de estacionamento", date: "2026-03-12", summary: "A evidência reunida passou a ser apresentada com uma limitação adicional.", domainCodes: ["MOB", "PUB"] },
 ];
 
 const manyEntries: MaterialChangeEntry[] = [
   ...entries,
-  { problemId: "PRB-XXXX-3", problemTitle: "Continuidade dos horários de recolha de resíduos", date: "2026-02-20", summary: "Nova evidência institucional foi associada a este problema." },
-  { problemId: "PRB-XXXX-4", problemTitle: "Disponibilidade de consultas de cuidados primários", date: "2026-01-15", summary: "O estado de validação foi atualizado após revisão da evidência disponível." },
-  { problemId: "PRB-XXXX-5", problemTitle: "Sinalização de obras em espaço público", date: "2025-12-02", summary: "Foi associada evidência adicional relativa às condições de acessibilidade reportadas." },
-  { problemId: "PRB-XXXX-6", problemTitle: "Fiabilidade dos horários de transporte público interurbano", date: "2025-11-18", summary: "Uma nova fonte institucional foi identificada e associada à leitura atual." },
+  { problemId: "PRB-XXXX-3", problemTitle: "Continuidade dos horários de recolha de resíduos", date: "2026-02-20", summary: "Nova evidência institucional foi associada a este problema.", domainCodes: ["ENV"] },
+  { problemId: "PRB-XXXX-4", problemTitle: "Disponibilidade de consultas de cuidados primários", date: "2026-01-15", summary: "O estado de validação foi atualizado após revisão da evidência disponível.", domainCodes: ["HEA"] },
+  { problemId: "PRB-XXXX-5", problemTitle: "Sinalização de obras em espaço público", date: "2025-12-02", summary: "Foi associada evidência adicional relativa às condições de acessibilidade reportadas.", domainCodes: ["PUB"] },
+  { problemId: "PRB-XXXX-6", problemTitle: "Fiabilidade dos horários de transporte público interurbano", date: "2025-11-18", summary: "Uma nova fonte institucional foi identificada e associada à leitura atual.", domainCodes: ["MOB", "PUB"] },
 ];
 
 // Reading-shell width (--layout-reading-main, styles/reading-layout.css):

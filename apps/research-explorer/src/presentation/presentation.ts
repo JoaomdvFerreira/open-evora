@@ -101,6 +101,33 @@ export function formatPublicDate(isoValue: string): string {
   return Number.isNaN(date.valueOf()) ? isoValue : new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium" }).format(date);
 }
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * PT-PT relative-day phrasing for a canonical date (e.g. the latest
+ * material-change date), such as "há 4 dias" — for the Hero footer's
+ * latest-update summary (Overview visual-completion delta §4). Pure
+ * presentation only: it never derives *which* date is "latest" — the caller
+ * supplies both the canonical date and the reference instant to compare it
+ * against (defaulting to `Date.now()`), so the function stays deterministic
+ * and testable. Compares whole calendar days (UTC) rather than raw
+ * millisecond deltas, since canonical change dates carry no time component.
+ * Falls back to the original value, like `formatPublicDate`, when it cannot
+ * be parsed, and never reports a negative ("future") day count as elapsed.
+ */
+export function formatPublicRelativeDays(isoDate: string, now: Date = new Date()): string {
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.valueOf())) return isoDate;
+
+  const dateDay = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+  const nowDay = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const days = Math.round((nowDay - dateDay) / MS_PER_DAY);
+
+  if (days <= 0) return "hoje";
+  if (days === 1) return "há 1 dia";
+  return `há ${days} dias`;
+}
+
 const YEAR_ONLY = /^\d{4}$/;
 const YEAR_MONTH = /^\d{4}-\d{2}$/;
 const YEAR_MONTH_DAY = /^\d{4}-\d{2}-\d{2}$/;
