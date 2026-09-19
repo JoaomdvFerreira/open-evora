@@ -274,7 +274,7 @@ describe("Overview — metrics value/label separation", () => {
 });
 
 describe("Overview — Hero recent-updates preview", () => {
-  it("shows at most 5 authored material-change entries, each with its PRB id, canonical last-updated date, and topic", async () => {
+  it("shows at most 4 authored material-change entries, each with its PRB id, canonical last-updated date, and topic", async () => {
     // updated_at deliberately differs from the authored history entry's own
     // date, so a passing assertion on "08/04/2026" proves the canonical
     // updatedAt is what renders here, not MaterialChangeEntry.date.
@@ -301,7 +301,7 @@ describe("Overview — Hero recent-updates preview", () => {
     await screen.findByText("Atualizado recentemente");
     const recentList = document.querySelector(".overview-hero-recent-list") as HTMLElement;
     const items = recentList.querySelectorAll("li");
-    expect(items.length).toBe(5);
+    expect(items.length).toBe(4);
 
     const firstItem = items[0];
     expect(within(firstItem as HTMLElement).getByText("PRB-1")).toBeTruthy();

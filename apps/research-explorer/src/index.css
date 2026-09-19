@@ -914,7 +914,13 @@ main.explorer-shell {
 }
 
 .public-overview {
-  padding: 2.75rem 0 2rem;
+  /* Bottom padding kept deliberately small: `.overview-results-footer`
+     already closes the discovery section with its own 28px of padding, and
+     the shared `main.explorer-shell`/`.public-footer` rules (untouched —
+     they are not Overview-specific) add further separation before the
+     global footer. This value only trims the section's own excess, it does
+     not remove the gap outright. */
+  padding: 2.75rem 0 1rem;
 }
 
 .public-overview > h2 {
