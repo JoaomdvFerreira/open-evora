@@ -170,10 +170,10 @@ export function OverviewPresentation({
               <span className="overview-hero-eyebrow-dot" aria-hidden="true">•</span> Projeto independente — não oficial
             </span>
           </p>
-          <h3 className="overview-hero-headline">Investigamos problemas práticos que afetam Évora.</h3>
+          <h3 className="overview-hero-headline">Évora, problema a problema.</h3>
           <p className="overview-hero-supporting">
-            Reunimos fontes e evidência para mostrar o que sabemos, o que ainda não sabemos e o que mudou.
-            Cada leitura remete para registos identificáveis.
+            Acompanhamos questões concretas da cidade e ligamos cada leitura às fontes, evidência e registos que a
+            sustentam.
           </p>
 
           <div className="overview-hero-search-row">

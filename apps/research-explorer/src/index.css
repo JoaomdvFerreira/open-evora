@@ -915,16 +915,16 @@ main.explorer-shell {
 
 .public-overview {
   /* Header→Hero spacing (Overview visual-completion, layout fix pass):
-     the section itself owns a flat 16px top/bottom rhythm rather than the
+     the section itself owns a flat 16px top rhythm rather than the
      previous larger, asymmetric gap — no separate margin on `.explorer-
      chrome`/`main.explorer-shell` contributes to this, so this padding is
-     the entire Header→Hero gap. Bottom padding is intentionally non-zero
-     here (unlike the former treatment): the Overview-specific zero-gap
-     treatment below (see `main.explorer-shell`/`.public-footer`) already
-     neutralizes the *shared* shell/footer spacing layers, so this section's
-     own 16px bottom padding is what now sits between the problem list and
-     the global PublicFooter, not a competing second gap. */
-  padding: 1rem 0;
+     the entire Header→Hero gap. Bottom padding is zero: the
+     Overview-specific zero-gap treatment below (see `main.explorer-shell`/
+     `.public-footer`) already neutralizes the *shared* shell/footer
+     spacing layers, so the pagination/results column now flows directly
+     into the global PublicFooter, whose own border provides the visual
+     separation — not a competing second gap. */
+  padding: 1rem 0 0;
 }
 
 .public-overview > h2 {
@@ -3263,7 +3263,7 @@ body:has(.public-overview) .public-footer {
   }
 
   .public-overview {
-    padding: 1rem 0;
+    padding: 1rem 0 0;
   }
 
   .public-overview > h2 {
