@@ -29,6 +29,9 @@ it("retries a failed startup manifest load", async () => {
   const alert = await screen.findByRole("alert");
   expect(alert.textContent).toContain("temporary manifest failure");
   await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
+  // Manifest summary is omitted on Overview (Overview visual completion —
+  // it has its own metrics ruler); navigate to Registos, where it still renders.
+  await user.click(await screen.findByRole("button", { name: "Registos" }));
   expect(await screen.findByText(/Corpus: 0/)).toBeTruthy();
   expect(attempts).toBe(2);
 });
@@ -61,8 +64,12 @@ it("qualifies the manifest timestamp as build/generation time, distinct from res
     getRecord: () => Promise.reject(new Error("not used")),
     getEdges: () => Promise.resolve([]),
   };
+  const user = userEvent.setup();
   render(<App dataProvider={provider} />);
 
+  // Manifest summary is omitted on Overview (Overview visual completion —
+  // it has its own metrics ruler); navigate to Registos, where it still renders.
+  await user.click(await screen.findByRole("button", { name: "Registos" }));
   const summary = await screen.findByText(/Corpus: 0/);
   expect(summary.textContent).toContain("não indica a atualidade da investigação");
   const time = summary.querySelector("time");

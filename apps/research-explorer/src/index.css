@@ -1118,6 +1118,13 @@ main.explorer-shell {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
+  /* `.overview-search-input` is `box-sizing: border-box`, so its 44px
+     `min-height` is a total height. This `<a>` never set `box-sizing`, so it
+     stayed at the initial `content-box` and rendered ~21px taller than the
+     search field — the same 44px `min-height` plus the vertical padding on
+     top, rather than as its total height. Match the search control's box
+     model so both size to the same control height. */
+  box-sizing: border-box;
   min-height: var(--target-min);
   padding: 0.65rem 1.3rem;
   border-radius: var(--radius-control);
@@ -3200,6 +3207,12 @@ main.explorer-shell {
   }
 
   .overview-hero-cta {
+    /* `align-items: stretch` on the now-column `.overview-hero-search-row`
+       doesn't reliably size an `inline-flex` item to the container's cross
+       axis, so the CTA was rendering at its content width instead of
+       matching the full-width search input above it. Force it explicitly. */
+    display: flex;
+    width: 100%;
     justify-content: center;
   }
 

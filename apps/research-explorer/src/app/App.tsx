@@ -3,7 +3,6 @@ import type { DataProvider } from "../dataProvider/types";
 import { StaticDataProvider } from "../dataProvider/StaticDataProvider";
 import { loadExplorerStartupState, type ExplorerStartupState } from "./startup";
 import { Explorer } from "./Explorer";
-import { formatPublicCount, formatPublicDateTime } from "../presentation/presentation";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { PublicFooter, TrustPage, trustPageForPath } from "./TrustPage";
@@ -65,16 +64,12 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
         )}
 
         {state.status === "ready" && (
-          <>
-            <Explorer dataProvider={dataProvider} schemaPrefixes={state.manifest.schemaPrefixes} totalRecords={state.manifest.totalRecords} />
-            <div className="shell-frame">
-              <p className="manifest-summary">
-                Corpus: {formatPublicCount(state.manifest.totalRecords)} registos · esta versão publicada dos dados foi gerada em{" "}
-                <time dateTime={state.manifest.generatedAt}>{formatPublicDateTime(state.manifest.generatedAt)}</time>{" "}
-                (não indica a atualidade da investigação)
-              </p>
-            </div>
-          </>
+          <Explorer
+            dataProvider={dataProvider}
+            schemaPrefixes={state.manifest.schemaPrefixes}
+            totalRecords={state.manifest.totalRecords}
+            generatedAt={state.manifest.generatedAt}
+          />
         )}</>}
       </main>
       <PublicFooter />
