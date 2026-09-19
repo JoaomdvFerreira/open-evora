@@ -914,17 +914,19 @@ main.explorer-shell {
 }
 
 .public-overview {
-  /* Header→Hero spacing (Overview visual-completion, layout fix pass):
-     the section itself owns a flat 16px top rhythm rather than the
-     previous larger, asymmetric gap — no separate margin on `.explorer-
-     chrome`/`main.explorer-shell` contributes to this, so this padding is
-     the entire Header→Hero gap. Bottom padding is zero: the
-     Overview-specific zero-gap treatment below (see `main.explorer-shell`/
-     `.public-footer`) already neutralizes the *shared* shell/footer
-     spacing layers, so the pagination/results column now flows directly
-     into the global PublicFooter, whose own border provides the visual
-     separation — not a competing second gap. */
-  padding: 1rem 0 0;
+  /* Header→Hero spacing (Overview visual-completion, layout fix pass): the
+     Overview starts immediately after the global Header — no external top
+     padding/margin here, and no separate margin on `.explorer-chrome`/
+     `main.explorer-shell` contributes one either, so there is no gap left
+     to close. Any breathing room the Hero needs lives inside the Hero
+     itself (`.overview-hero-content`/`.overview-hero-recent` padding
+     below), never as space between Header and page. Bottom padding is
+     zero: the Overview-specific zero-gap treatment below (see
+     `main.explorer-shell`/`.public-footer`) already neutralizes the
+     *shared* shell/footer spacing layers, so the pagination/results column
+     now flows directly into the global PublicFooter, whose own border
+     provides the visual separation — not a competing second gap. */
+  padding: 0;
 }
 
 .public-overview > h2 {
@@ -1161,12 +1163,20 @@ main.explorer-shell {
   outline-offset: 2px;
 }
 
-/* Wraps the "Ou entre por:" intro and the shortcut chips on one row (TARGET). */
+/* Wraps the "Ou entre por:" intro and the shortcut chips on one row (TARGET).
+   `width: 100%` matches `.overview-hero-search-row`'s own explicit full
+   width — `.overview-hero-content` is a column flex container with
+   `align-items: start`, so without it this row would shrink-wrap to its
+   content instead of spanning the same content edge the search input and
+   CTA row already stretch to. That shared right edge is what keeps this
+   row's right edge aligned with the CTA button's, using the existing Hero
+   flex column rather than a manual offset. */
 .overview-category-shortcuts-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .overview-category-shortcuts-intro {
@@ -3260,10 +3270,6 @@ body:has(.public-overview) .public-footer {
   .reading-guide {
     margin-top: var(--space-3);
     font-size: 0.76rem;
-  }
-
-  .public-overview {
-    padding: 1rem 0 0;
   }
 
   .public-overview > h2 {
