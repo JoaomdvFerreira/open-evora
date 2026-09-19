@@ -52,29 +52,43 @@ describe("TopicFilterGroup", () => {
  * above, which stays the full reusable filter control. It renders whatever
  * ranked categories the caller passes (`topCategoryCounts` in
  * overviewStats.ts owns count/order); these tests protect only its own
- * rendering contract.
+ * rendering contract. Each chip forwards the canonical `domain` code to
+ * `onSelectCategory` — the same callback OverviewPresentation.tsx wires to
+ * the TEMA filter rail's own setter (Overview.test.tsx's Hero
+ * category-filter regression covers that end-to-end composition) — and
+ * still points at the in-page problem list, since selecting a filter and
+ * moving the reader to the list are both still needed on click.
  */
 describe("CategoryShortcuts", () => {
   it("renders each category's PT-PT label and count, in the order given by the caller", () => {
-    render(<CategoryShortcuts categories={[{ code: "MOB", count: 3 }, { code: "PUB", count: 2 }]} />);
+    render(<CategoryShortcuts categories={[{ code: "MOB", count: 3 }, { code: "PUB", count: 2 }]} onSelectCategory={vi.fn()} />);
 
     const list = screen.getByRole("list", { name: "Atalhos por tema" });
     const items = within(list).getAllByRole("listitem");
     expect(items.map((item) => item.textContent?.replace(/\s+/g, " ").trim())).toEqual(["Mobilidade 3", "Espaço público 2"]);
   });
 
-  it("links each shortcut to the in-page problem list rather than applying a filter itself", () => {
-    render(<CategoryShortcuts categories={[{ code: "MOB", count: 1 }]} />);
+  it("links each shortcut to the in-page problem list", () => {
+    render(<CategoryShortcuts categories={[{ code: "MOB", count: 1 }]} onSelectCategory={vi.fn()} />);
     expect(screen.getByRole("link", { name: /Mobilidade/ }).getAttribute("href")).toBe("#overview-problemas");
   });
 
+  it("calls onSelectCategory with the canonical domain code, never the PT-PT display label, on click", async () => {
+    const onSelectCategory = vi.fn();
+    const user = userEvent.setup();
+    render(<CategoryShortcuts categories={[{ code: "MOB", count: 1 }]} onSelectCategory={onSelectCategory} />);
+
+    await user.click(screen.getByRole("link", { name: /Mobilidade/ }));
+    expect(onSelectCategory).toHaveBeenCalledWith("MOB");
+  });
+
   it("introduces the shortcuts with an 'Ou entre por:' label", () => {
-    render(<CategoryShortcuts categories={[{ code: "MOB", count: 1 }]} />);
+    render(<CategoryShortcuts categories={[{ code: "MOB", count: 1 }]} onSelectCategory={vi.fn()} />);
     expect(screen.getByText("Ou entre por:")).toBeTruthy();
   });
 
   it("renders nothing when there are no categories to show", () => {
-    const { container } = render(<CategoryShortcuts categories={[]} />);
+    const { container } = render(<CategoryShortcuts categories={[]} onSelectCategory={vi.fn()} />);
     expect(container.firstChild).toBeNull();
   });
 });
@@ -130,6 +144,65 @@ describe("FilterRailGroup", () => {
   it("renders nothing when there are no options for this dimension", () => {
     const { container } = render(<FilterRailGroup label="Estado" options={[]} totalCount={0} activeValue={null} onChange={vi.fn()} />);
     expect(container.firstChild).toBeNull();
+  });
+
+  /**
+   * `showAllOption={false}` (filter-rail correction pass §3) — EVIDÊNCIA/
+   * VALIDAÇÃO/ESTADO no longer expose a visible "Todos" reset row, while
+   * TEMA (the default, `showAllOption` omitted) keeps it. The internal
+   * no-filter (`null`) state is unaffected either way: it stays reachable by
+   * clicking the currently-selected option again, since that toggle-off
+   * behaviour above does not depend on the "Todos" row at all.
+   */
+  it("omits the 'Todos' row when showAllOption is false, without affecting the other options", () => {
+    render(
+      <FilterRailGroup
+        label="Evidência"
+        options={[{ value: "corroborated", text: "Corroborada", count: 5 }]}
+        totalCount={5}
+        activeValue={null}
+        onChange={vi.fn()}
+        showAllOption={false}
+      />
+    );
+
+    const group = screen.getByRole("group", { name: "Evidência" });
+    expect(within(group).queryByText("Todos")).toBeNull();
+    expect(within(group).getByRole("button", { name: /Corroborada/ })).toBeTruthy();
+  });
+
+  it("clicking the already-selected option clears the filter back to null even with showAllOption false, and no option then appears selected", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <FilterRailGroup
+        label="Evidência"
+        options={[{ value: "corroborated", text: "Corroborada", count: 5 }]}
+        totalCount={5}
+        activeValue="corroborated"
+        onChange={onChange}
+        showAllOption={false}
+      />
+    );
+
+    const active = screen.getByRole("button", { name: /Corroborada/ });
+    expect(active.getAttribute("aria-pressed")).toBe("true");
+
+    await user.click(active);
+    expect(onChange).toHaveBeenCalledWith(null);
+
+    rerender(
+      <FilterRailGroup
+        label="Evidência"
+        options={[{ value: "corroborated", text: "Corroborada", count: 5 }]}
+        totalCount={5}
+        activeValue={null}
+        onChange={onChange}
+        showAllOption={false}
+      />
+    );
+    const group = screen.getByRole("group", { name: "Evidência" });
+    expect(within(group).getAllByRole("button").every((button) => button.getAttribute("aria-pressed") === "false")).toBe(true);
   });
 });
 

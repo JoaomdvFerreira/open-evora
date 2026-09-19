@@ -201,8 +201,43 @@ describe("Overview — filter rail vocabulary (filter-rail correction pass)", ()
 
     const estadoGroup = screen.getByRole("group", { name: "Estado" });
     const options = within(estadoGroup).getAllByRole("button").map((button) => button.textContent?.replace(/\s+/g, " ").trim());
-    expect(options).toEqual(["Todos 1", "Aberto 1", "Fechado 0"]);
+    expect(options).toEqual(["Aberto 1", "Fechado 0"]);
     expect(within(estadoGroup).queryByText(/Evidência insuficiente/)).toBeNull();
+  });
+
+  // Filter-rail correction pass §3: EVIDÊNCIA/VALIDAÇÃO/ESTADO no longer show
+  // a visible "Todos" reset row (their internal no-filter state stays reachable
+  // by clicking the active option again — see the "clears" test below); TEMA
+  // keeps its visible "Todos" as the explicit topic-filter reset.
+  it("shows no visible 'Todos' option in Evidência/Validação/Estado, while Tema keeps it", async () => {
+    render(<Overview dataProvider={singleProblemProvider()} {...props} />);
+    await screen.findByText("Problema único");
+
+    expect(within(screen.getByRole("group", { name: "Tema" })).getByRole("button", { name: /^Todos/ })).toBeTruthy();
+    expect(within(screen.getByRole("group", { name: "Evidência" })).queryByRole("button", { name: /^Todos/ })).toBeNull();
+    expect(within(screen.getByRole("group", { name: "Validação" })).queryByRole("button", { name: /^Todos/ })).toBeNull();
+    expect(within(screen.getByRole("group", { name: "Estado" })).queryByRole("button", { name: /^Todos/ })).toBeNull();
+  });
+
+  it("clicking the already-selected Evidência/Validação/Estado option clears that dimension back to its internal no-filter state, leaving no option selected", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema aberto corroborado", file: "", summaryFields: { status: "OPEN", validation_status: "validated", evidence_status: "corroborated" } },
+      { id: "PRB-2", type: "PRB-", label: "Problema fechado por validar", file: "", summaryFields: { status: "REJECTED", validation_status: "unvalidated", evidence_status: "discovered" } },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+    await screen.findByText("Problema aberto corroborado");
+
+    const estadoGroup = screen.getByRole("group", { name: "Estado" });
+    const aberto = within(estadoGroup).getByRole("button", { name: /Aberto/ });
+    await user.click(aberto);
+    expect(aberto.getAttribute("aria-pressed")).toBe("true");
+    expect(await screen.findByText("1 de 2 problemas")).toBeTruthy();
+
+    await user.click(aberto);
+    expect(aberto.getAttribute("aria-pressed")).toBe("false");
+    expect(within(estadoGroup).getAllByRole("button").every((button) => button.getAttribute("aria-pressed") === "false")).toBe(true);
+    expect(await screen.findByText("2 de 2 problemas")).toBeTruthy();
   });
 
   it("composes the ESTADO group filter with search/other rail filters, matching every closed status, not just the one loaded", async () => {
@@ -220,6 +255,120 @@ describe("Overview — filter rail vocabulary (filter-rail correction pass)", ()
     expect(await screen.findByText("1 de 2 problemas")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Explorar Problema rejeitado" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Explorar Problema aberto" })).toBeNull();
+  });
+});
+
+describe("Overview — Hero category shortcut filtering", () => {
+  // Root cause regression: the Hero "Ou entre por:" shortcuts used to be
+  // plain in-page anchors with no filter side effect at all. Clicking one
+  // must now drive the exact same canonical TEMA/topic filter state the
+  // rail's own TEMA group owns — never a second, parallel category-filter
+  // implementation — so the two controls always agree on the result set.
+  it("clicking a Hero category shortcut selects the matching TEMA option, filters to that canonical topic, and updates the results count and active-filter summary", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema de espaço público", file: "", summaryFields: {} },
+    ]);
+    provider.getRecord = async (id) => ({
+      id,
+      type: "PRB-",
+      file: "",
+      record: { title: id === "PRB-1" ? "Problema de mobilidade" : "Problema de espaço público", domain: id === "PRB-1" ? ["MOB"] : ["PUB"] },
+      outgoingEdges: [],
+      incomingEdges: [],
+    });
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+    await screen.findByText("Problema de mobilidade");
+
+    const shortcut = screen.getByRole("link", { name: /Mobilidade/ });
+    await user.click(shortcut);
+
+    // Same canonical TEMA option in the rail is now selected.
+    const temaGroup = screen.getByRole("group", { name: "Tema" });
+    expect(within(temaGroup).getByRole("button", { name: /Mobilidade/ }).getAttribute("aria-pressed")).toBe("true");
+
+    // Only the matching-topic Problem remains visible; the header count and
+    // active-filter summary both update accordingly.
+    expect(await screen.findByText("1 de 2 problemas")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Explorar Problema de mobilidade" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Explorar Problema de espaço público" })).toBeNull();
+    expect(screen.getByText("Mobilidade", { selector: ".overview-results-filter-summary" })).toBeTruthy();
+  });
+
+  it("produces the same visible result set as selecting the same topic directly in the TEMA rail", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema de espaço público", file: "", summaryFields: {} },
+    ]);
+    provider.getRecord = async (id) => ({
+      id,
+      type: "PRB-",
+      file: "",
+      record: { title: id === "PRB-1" ? "Problema de mobilidade" : "Problema de espaço público", domain: id === "PRB-1" ? ["MOB"] : ["PUB"] },
+      outgoingEdges: [],
+      incomingEdges: [],
+    });
+    const user = userEvent.setup();
+
+    const viaShortcut = render(<Overview dataProvider={provider} {...props} />);
+    await screen.findByText("Problema de mobilidade");
+    await user.click(screen.getByRole("link", { name: /Mobilidade/ }));
+    const viaShortcutIds = (await screen.findAllByRole("button", { name: /^Explorar/ })).map((button) => button.getAttribute("aria-label"));
+    viaShortcut.unmount();
+
+    const viaRail = render(<Overview dataProvider={provider} {...props} />);
+    await screen.findByText("Problema de mobilidade");
+    const temaGroup = screen.getByRole("group", { name: "Tema" });
+    await user.click(within(temaGroup).getByRole("button", { name: /Mobilidade/ }));
+    const viaRailIds = (await screen.findAllByRole("button", { name: /^Explorar/ })).map((button) => button.getAttribute("aria-label"));
+    viaRail.unmount();
+
+    expect(viaShortcutIds).toEqual(["Explorar Problema de mobilidade"]);
+    expect(viaShortcutIds).toEqual(viaRailIds);
+  });
+
+  it("composes the Hero category shortcut's TEMA filter with search, Evidência, Validação, and Estado", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Mobilidade corroborada aberta", file: "", summaryFields: { status: "OPEN", evidence_status: "corroborated" } },
+      { id: "PRB-2", type: "PRB-", label: "Mobilidade discovered fechada", file: "", summaryFields: { status: "REJECTED", evidence_status: "discovered" } },
+      { id: "PRB-3", type: "PRB-", label: "Espaço público corroborado aberto", file: "", summaryFields: { status: "OPEN", evidence_status: "corroborated" } },
+    ]);
+    provider.getRecord = async (id) => {
+      const domain = id === "PRB-3" ? ["PUB"] : ["MOB"];
+      const title = id === "PRB-1" ? "Mobilidade corroborada aberta" : id === "PRB-2" ? "Mobilidade discovered fechada" : "Espaço público corroborado aberto";
+      return { id, type: "PRB-", file: "", record: { title, domain, status: id === "PRB-2" ? "REJECTED" : "OPEN", evidence_status: id === "PRB-2" ? "discovered" : "corroborated" }, outgoingEdges: [], incomingEdges: [] };
+    };
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+    await screen.findByText("Mobilidade corroborada aberta");
+
+    await user.click(screen.getByRole("link", { name: /Mobilidade/ }));
+    const evidenceGroup = screen.getByRole("group", { name: "Evidência" });
+    await user.click(within(evidenceGroup).getByRole("button", { name: /Corroborada/ }));
+
+    expect(await screen.findByText("1 de 3 problemas")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Explorar Mobilidade corroborada aberta" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Explorar Mobilidade discovered fechada" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Explorar Espaço público corroborado aberto" })).toBeNull();
+  });
+});
+
+describe("Overview — results-footer removal", () => {
+  // The former visual "X de Y" footer under the problem list was redundant
+  // with the results header's own count (`overview-results-count`) and has
+  // been removed outright (filter-rail correction pass §1); the header count
+  // remains the sole result-count surface.
+  it("does not render a results-footer count below the problem list", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("2 de 2 problemas");
+    expect(document.querySelector(".overview-results-footer")).toBeNull();
+    expect(document.querySelectorAll(".overview-results-count").length).toBe(1);
   });
 });
 

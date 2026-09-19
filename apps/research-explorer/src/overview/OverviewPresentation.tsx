@@ -171,7 +171,7 @@ export function OverviewPresentation({
             <a className="overview-hero-cta" href="#overview-problemas">Ver os {formatPublicCount(problemCount)} problemas</a>
           </div>
 
-          <CategoryShortcuts categories={categoryShortcuts} />
+          <CategoryShortcuts categories={categoryShortcuts} onSelectCategory={onTopicFilterChange} />
         </div>
 
         <div className="overview-hero-recent" aria-labelledby="overview-hero-recent-heading">
@@ -271,9 +271,9 @@ export function OverviewPresentation({
                 Overview.tsx's `visibleProblems`; no second filtering model. */}
             <aside className="overview-filter-rail" aria-label="Filtrar problemas">
               <FilterRailGroup label="Tema" options={topicOptions} totalCount={allProblems.length} activeValue={topicFilter} onChange={onTopicFilterChange} />
-              <FilterRailGroup label="Evidência" options={evidenceOptions} totalCount={allProblems.length} activeValue={evidenceFilter} onChange={onEvidenceFilterChange} />
-              <FilterRailGroup label="Validação" options={validationOptions} totalCount={allProblems.length} activeValue={validationFilter} onChange={onValidationFilterChange} />
-              <FilterRailGroup label="Estado" options={lifecycleOptions} totalCount={allProblems.length} activeValue={lifecycleFilter} onChange={(value) => onLifecycleFilterChange(value as LifecycleGroup | null)} />
+              <FilterRailGroup label="Evidência" options={evidenceOptions} totalCount={allProblems.length} activeValue={evidenceFilter} onChange={onEvidenceFilterChange} showAllOption={false} />
+              <FilterRailGroup label="Validação" options={validationOptions} totalCount={allProblems.length} activeValue={validationFilter} onChange={onValidationFilterChange} showAllOption={false} />
+              <FilterRailGroup label="Estado" options={lifecycleOptions} totalCount={allProblems.length} activeValue={lifecycleFilter} onChange={(value) => onLifecycleFilterChange(value as LifecycleGroup | null)} showAllOption={false} />
             </aside>
 
             <div className="overview-results">
@@ -292,18 +292,11 @@ export function OverviewPresentation({
               </div>
 
               {visibleProblems.length > 0 && (
-                <>
-                  <ul className="overview-problem-list">
-                    {visibleProblems.map((problem) => (
-                      <ProblemRow key={problem.id} problem={problem} onExplore={onExploreProblem} />
-                    ))}
-                  </ul>
-                  {/* Restrained footer count only — filter/sort/search state is plain
-                      component state in Overview.tsx, not persisted in the URL, so it
-                      is not guaranteed to survive a Problem-navigation round trip; this
-                      footer makes no claim to the contrary. */}
-                  <p className="overview-results-footer">{formatPublicCount(visibleProblems.length)} de {formatPublicCount(citizenProblems.length)}</p>
-                </>
+                <ul className="overview-problem-list">
+                  {visibleProblems.map((problem) => (
+                    <ProblemRow key={problem.id} problem={problem} onExplore={onExploreProblem} />
+                  ))}
+                </ul>
               )}
             </div>
           </div>

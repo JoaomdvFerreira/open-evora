@@ -24,12 +24,19 @@ export function CitizenSearchControl({ value, onChange, id = "overview-search-in
  * Compact Hero shortcut chips (Overview visual-completion delta §4) — a
  * lightweight affordance distinct from `TopicFilterGroup` below, which
  * remains the full reusable topic-filter control for a dedicated
- * search/exploration page. Each chip links to the in-page problem list
- * (`#overview-problemas`, the same in-page exploration target the Hero
- * search action reuses) rather than applying a filter itself — this
- * component never invents a second filter/search implementation.
+ * search/exploration page. Each chip sets the *same canonical TEMA filter
+ * state the filter rail owns* (`onSelectCategory`, called with the
+ * canonical `domain` code — never the PT-PT display label — exactly like
+ * `FilterRailGroup`'s own `onChange`) and then moves the reader to the
+ * in-page problem list (`#overview-problemas`, the same in-page target the
+ * Hero search action reuses). There is no second filter/search
+ * implementation here — this component only ever forwards the canonical
+ * code it was given to the caller's single TEMA filter state.
  */
-export function CategoryShortcuts({ categories }: { categories: TopicCategoryCount[] }) {
+export function CategoryShortcuts({ categories, onSelectCategory }: {
+  categories: TopicCategoryCount[];
+  onSelectCategory: (code: string) => void;
+}) {
   if (categories.length === 0) return null;
   return (
     <div className="overview-category-shortcuts-row">
@@ -37,7 +44,11 @@ export function CategoryShortcuts({ categories }: { categories: TopicCategoryCou
       <ul className="overview-category-shortcuts" aria-label="Atalhos por tema">
         {categories.map(({ code, count }) => (
           <li key={code}>
-            <a className="overview-category-shortcut" href="#overview-problemas">
+            <a
+              className="overview-category-shortcut"
+              href="#overview-problemas"
+              onClick={() => onSelectCategory(code)}
+            >
               {describeTopic(code).label} <span className="overview-category-shortcut-count">{count}</span>
             </a>
           </li>
@@ -93,32 +104,43 @@ export function SortControl({ value, onChange, id = "overview-sort" }: {
 /**
  * One filter-rail group (TEMA / EVIDÊNCIA / VALIDAÇÃO / ESTADO) in the
  * editorial problem-list redesign. Every group is single-select with an
- * always-present "Todos" option and an inline count per option (TARGET's
- * "Aberto 8" pattern), backed by whichever canonical field/count list the
- * caller supplies — this component holds no field-specific logic itself, so
- * the four rail groups stay visually identical while each still composes
- * against its own distinct canonical dimension (`overviewStats.ts`'s
- * `countByDimension`/`relevantTopicCodes`+`topCategoryCounts` own that
- * per-field counting; this component only renders whatever list it is
- * given). Never collapses two dimensions into one group — the caller renders
- * one `FilterRailGroup` per dimension, each with its own `aria-label`.
+ * inline count per option (TARGET's "Aberto 8" pattern), backed by whichever
+ * canonical field/count list the caller supplies — this component holds no
+ * field-specific logic itself, so the four rail groups stay visually
+ * identical while each still composes against its own distinct canonical
+ * dimension (`overviewStats.ts`'s `countByDimension`/`relevantTopicCodes`+
+ * `topCategoryCounts` own that per-field counting; this component only
+ * renders whatever list it is given). Never collapses two dimensions into
+ * one group — the caller renders one `FilterRailGroup` per dimension, each
+ * with its own `aria-label`.
+ *
+ * `showAllOption` (default `true`) controls whether a visible "Todos" reset
+ * row is rendered (filter-rail correction pass §3) — TEMA keeps it as the
+ * explicit topic reset; EVIDÊNCIA/VALIDAÇÃO/ESTADO omit it since their
+ * internal no-filter (`null`) state is still reachable by clicking the
+ * currently-selected option again, which already toggles back to `null`
+ * below regardless of `showAllOption`. Hiding the row never removes the
+ * no-filter state itself, only this one extra permanent entry point to it.
  */
-export function FilterRailGroup({ label, options, totalCount, activeValue, onChange }: {
+export function FilterRailGroup({ label, options, totalCount, activeValue, onChange, showAllOption = true }: {
   label: string;
   options: { value: string; text: string; count: number }[];
   /** The unfiltered "Todos" count — the total Problems this dimension could ever match, not affected by this group's own selection. */
   totalCount: number;
   activeValue: string | null;
   onChange: (value: string | null) => void;
+  showAllOption?: boolean;
 }) {
   if (options.length === 0) return null;
   return (
     <div className="overview-filter-rail-group" role="group" aria-label={label}>
       <h3 className="overview-filter-rail-heading">{label}</h3>
       <div className="overview-filter-rail-options">
-        <button type="button" className="overview-filter-rail-option" aria-pressed={activeValue === null} onClick={() => onChange(null)}>
-          <span>Todos</span> <span className="overview-filter-rail-count">{totalCount}</span>
-        </button>
+        {showAllOption && (
+          <button type="button" className="overview-filter-rail-option" aria-pressed={activeValue === null} onClick={() => onChange(null)}>
+            <span>Todos</span> <span className="overview-filter-rail-count">{totalCount}</span>
+          </button>
+        )}
         {options.map(({ value, text, count }) => (
           <button key={value} type="button" className="overview-filter-rail-option" aria-pressed={activeValue === value} onClick={() => onChange(activeValue === value ? null : value)}>
             <span>{text}</span> <span className="overview-filter-rail-count">{count}</span>
