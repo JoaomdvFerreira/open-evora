@@ -197,6 +197,35 @@ export function projectMaterialChangeEntries(sources: MaterialChangeSource[]): M
 }
 
 /**
+ * The Hero "Atualizado recentemente" panel's own projection: at most `limit`
+ * *distinct Problems*, not material-change events. `projectMaterialChangeEntries`
+ * is already sorted newest-first and may carry several entries for the same
+ * PRB (a Problem can author more than one material-change history entry); this
+ * keeps only each PRB's newest entry — first occurrence per `problemId`, since
+ * the input is already newest-first — and only then applies `limit`, so a PRB
+ * with several recent entries can never itself crowd out other distinct
+ * Problems from the panel (the caller's bug this fixes: slicing the raw
+ * newest-first list before deduplicating could render the same PRB twice and
+ * show fewer than `limit` distinct Problems). Deduplicates by the canonical
+ * `problemId` only, never by title (two distinct PRBs may legitimately share a
+ * title). This is Hero-panel presentation shaping only — it creates no new
+ * semantic state and never mutates or drops the canonical entries themselves;
+ * `projectMaterialChangeEntries`'s full, undeduplicated result remains the
+ * canonical material-change projection for every other caller.
+ */
+export function projectRecentDistinctProblems(entries: MaterialChangeEntry[], limit: number): MaterialChangeEntry[] {
+  const seen = new Set<string>();
+  const distinct: MaterialChangeEntry[] = [];
+  for (const entry of entries) {
+    if (seen.has(entry.problemId)) continue;
+    seen.add(entry.problemId);
+    distinct.push(entry);
+    if (distinct.length >= limit) break;
+  }
+  return distinct;
+}
+
+/**
  * The audited topic filters relevant to the currently loaded Problems only
  * (one entry per canonical domain code actually present; "Todos" is added
  * separately by the caller and always sorts first). Ordered alphabetically

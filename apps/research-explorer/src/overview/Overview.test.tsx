@@ -312,6 +312,46 @@ describe("Overview — Hero recent-updates preview", () => {
     expect(screen.queryByRole("link", { name: "Abrir o explorador" })).toBeNull();
   });
 
+  it("renders a Problem with multiple material-change entries once, using its newest entry, without crowding out other distinct Problems", async () => {
+    // PRB-0007 authored two material-change entries (newest 2026-04-08, older
+    // 2026-02-01); PRB-0003/0002/0001 authored one each. The panel must show
+    // 4 distinct PRBs — PRB-0007 once, at its newest date — never PRB-0007
+    // twice at the expense of a fifth distinct Problem.
+    const histories: Record<string, { date: string; summary: string }[]> = {
+      "PRB-0007": [
+        { date: "2026-04-08", summary: "PRB-0007 mais recente." },
+        { date: "2026-02-01", summary: "PRB-0007 mais antiga." },
+      ],
+      "PRB-0003": [{ date: "2026-03-01", summary: "PRB-0003 alteração." }],
+      "PRB-0002": [{ date: "2026-02-15", summary: "PRB-0002 alteração." }],
+      "PRB-0001": [{ date: "2026-01-01", summary: "PRB-0001 alteração." }],
+    };
+    const provider: DataProvider = {
+      ...makeProvider(
+        Object.keys(histories).map((id) => ({ id, type: "PRB-", label: `Problema ${id}`, file: "", summaryFields: {} }))
+      ),
+      getRecord: async (id) => ({
+        id,
+        type: "PRB-",
+        file: "",
+        record: { title: `Problema ${id}`, history: histories[id] },
+        outgoingEdges: [],
+        incomingEdges: [],
+      }),
+    };
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Atualizado recentemente");
+    const recentList = document.querySelector(".overview-hero-recent-list") as HTMLElement;
+    const items = recentList.querySelectorAll("li");
+    expect(items.length).toBe(4);
+
+    const renderedIds = [...items].map((item) => item.querySelector(".technical-id")?.textContent);
+    expect(renderedIds).toEqual(["PRB-0007", "PRB-0003", "PRB-0002", "PRB-0001"]);
+    // Newest entry retained, not the older one, for the deduplicated PRB.
+    expect(within(items[0] as HTMLElement).getByText("Problema PRB-0007")).toBeTruthy();
+  });
+
   it("opens Records from the recent-updates panel's 'Ver tudo' action, alongside the heading", async () => {
     const onViewRecords = vi.fn();
     render(

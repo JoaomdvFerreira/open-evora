@@ -5,6 +5,7 @@ import {
   evidenceCountLabel,
   lifecycleGroupLabel,
   problemCountLabel,
+  projectRecentDistinctProblems,
   sourceCountLabel,
   topCategoryCounts,
   totalRecordsLabel,
@@ -88,7 +89,10 @@ export function OverviewPresentation({
   // former lower "O que mudou recentemente" section was a duplicate of this
   // Hero panel and was removed). It reuses the same authored material-change
   // projection (no second data source — AGENTS.md canonical-state
-  // integrity). The title stays the sole primary clickable line. Below it,
+  // integrity), narrowed to distinct Problems via `projectRecentDistinctProblems`
+  // (deduplicates by canonical PRB id, keeping each Problem's newest entry,
+  // before the 4-item limit — see that helper's own note on why order
+  // matters here). The title stays the sole primary clickable line. Below it,
   // two secondary lines: (1) a topic/domain line joining every canonical
   // `domain` code the entry actually carries via the existing
   // `describeTopic` label lookup — all of the entry's codes are shown, never
@@ -103,7 +107,7 @@ export function OverviewPresentation({
   // existing canonical date formatter (`formatPublicDate`). No TopicBadge/pill
   // in this compact Hero list — domain is rendered as plain restrained text
   // here, not as the discovery list's colored badge.
-  const recentUpdates = materialChanges?.entries.slice(0, RECENT_UPDATES_LIMIT) ?? [];
+  const recentUpdates = materialChanges ? projectRecentDistinctProblems(materialChanges.entries, RECENT_UPDATES_LIMIT) : [];
   const updatedAtByProblemId = new Map((citizenProblems ?? []).map((problem) => [problem.id, problem.updatedAt]));
   const categoryShortcuts = topCategoryCounts(citizenProblems ?? [], CATEGORY_SHORTCUT_LIMIT);
   // materialChanges.entries is already sorted newest-first (projectMaterialChangeEntries),

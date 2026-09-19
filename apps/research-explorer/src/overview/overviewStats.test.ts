@@ -17,12 +17,14 @@ import {
   matchesValidationFilter,
   problemCountLabel,
   projectMaterialChangeEntries,
+  projectRecentDistinctProblems,
   relevantTopicCodes,
   sortProblems,
   sourceCountLabel,
   toCitizenProblem,
   topCategoryCounts,
   type CitizenProblem,
+  type MaterialChangeEntry,
 } from "./overviewStats";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { auditedDomainCodes, describeTopic } from "../presentation/topicMapping";
@@ -247,6 +249,57 @@ describe("projectMaterialChangeEntries", () => {
       { summary: summary({ id: "EVD-0001", type: "EVD-" }), detail: detail({ history: [{ date: "2026-03-01", summary: "Não é Problem." }] }) },
     ]);
     expect(entries).toEqual([]);
+  });
+});
+
+function materialChangeEntry(overrides: Partial<MaterialChangeEntry>): MaterialChangeEntry {
+  return { problemId: "PRB-0001", problemTitle: "Fixture", date: "2026-01-01", summary: "Alteração.", domainCodes: [], ...overrides };
+}
+
+describe("projectRecentDistinctProblems", () => {
+  // Reproduces the Hero "Atualizado recentemente" duplicate-PRB bug: a Problem
+  // that authored more than one material-change entry must render once, using
+  // its newest entry, and must not crowd out other distinct Problems.
+  it("renders a PRB with duplicate material-change entries once, keeping only its newest entry", () => {
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0007", date: "2026-04-08", summary: "Mais recente." }),
+      materialChangeEntry({ problemId: "PRB-0007", date: "2026-02-01", summary: "Mais antiga." }),
+    ];
+    const distinct = projectRecentDistinctProblems(entries, 4);
+    expect(distinct).toEqual([materialChangeEntry({ problemId: "PRB-0007", date: "2026-04-08", summary: "Mais recente." })]);
+  });
+
+  it("deduplicates before applying the limit, so distinct Problems are not crowded out by one PRB's repeated entries", () => {
+    // Input is already newest-first, as projectMaterialChangeEntries produces it.
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0007", date: "2026-04-08", summary: "PRB-0007 mais recente." }),
+      materialChangeEntry({ problemId: "PRB-0007", date: "2026-04-01", summary: "PRB-0007 mais antiga." }),
+      materialChangeEntry({ problemId: "PRB-0003", date: "2026-03-01" }),
+      materialChangeEntry({ problemId: "PRB-0002", date: "2026-02-01" }),
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-01-01" }),
+    ];
+    const distinct = projectRecentDistinctProblems(entries, 4);
+    expect(distinct.map((entry) => entry.problemId)).toEqual(["PRB-0007", "PRB-0003", "PRB-0002", "PRB-0001"]);
+    // A naive slice-then-dedupe would instead render PRB-0007 twice and only
+    // 3 distinct Problems for a limit of 4 — this proves dedupe ran first.
+    expect(distinct).toHaveLength(4);
+  });
+
+  it("shows up to 4 distinct Problems when at least that many are present", () => {
+    const entries = ["PRB-0005", "PRB-0004", "PRB-0003", "PRB-0002", "PRB-0001"].map((problemId, index) =>
+      materialChangeEntry({ problemId, date: `2026-0${5 - index}-01` })
+    );
+    const distinct = projectRecentDistinctProblems(entries, 4);
+    expect(distinct.map((entry) => entry.problemId)).toEqual(["PRB-0005", "PRB-0004", "PRB-0003", "PRB-0002"]);
+  });
+
+  it("deduplicates by the canonical Problem id, never by title", () => {
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0002", problemTitle: "Mesmo título", date: "2026-03-01" }),
+      materialChangeEntry({ problemId: "PRB-0001", problemTitle: "Mesmo título", date: "2026-02-01" }),
+    ];
+    const distinct = projectRecentDistinctProblems(entries, 4);
+    expect(distinct.map((entry) => entry.problemId)).toEqual(["PRB-0002", "PRB-0001"]);
   });
 });
 

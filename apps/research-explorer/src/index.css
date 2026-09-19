@@ -914,13 +914,12 @@ main.explorer-shell {
 }
 
 .public-overview {
-  /* Bottom padding kept deliberately small: `.overview-results-footer`
-     already closes the discovery section with its own 28px of padding, and
-     the shared `main.explorer-shell`/`.public-footer` rules (untouched —
-     they are not Overview-specific) add further separation before the
-     global footer. This value only trims the section's own excess, it does
-     not remove the gap outright. */
-  padding: 2.75rem 0 1rem;
+  /* Bottom padding removed outright: the Overview-specific zero-gap
+     treatment (see `.overview-results-footer`/`main.explorer-shell`/
+     `.public-footer` below) makes the global PublicFooter begin immediately
+     after Overview's results/footer region, with no page/shell/footer
+     spacing left to insert between them. */
+  padding: 2.75rem 0 0;
 }
 
 .public-overview > h2 {
@@ -1965,11 +1964,42 @@ main.explorer-shell {
   margin: 0;
   /* TARGET: 14px 0 28px 32px, aligned to the same content axes as the
      results header and problem rows above. Right inset is owned by the
-     shell's page alignment, not duplicated here. */
+     shell's page alignment, not duplicated here. Bottom padding is removed
+     by the Overview-specific zero-gap treatment below (design/
+     overview-visual-completion): this element is the last thing before the
+     global PublicFooter, which must now begin immediately after it. */
   padding: 0.875rem 0 1.75rem 2rem;
   color: var(--color-ink-muted);
   font-family: var(--font-technical);
   font-size: 0.78rem;
+}
+
+/* Overview-specific zero-gap treatment: the owner wants no whitespace
+   between the end of Overview's results/footer region and the global
+   PublicFooter. This neutralizes, for Overview only, every layer that
+   contributes bottom spacing before the footer — `.overview-results-footer`'s
+   own bottom padding, `.public-overview`'s bottom padding, and the shared
+   `main.explorer-shell` bottom padding / `.public-footer` top margin — without
+   changing those shared primitives' behaviour on Records/Problem/History/
+   Graph or any other view. `body:has(.public-overview)` scopes the two shared-
+   primitive overrides to exactly the pages that render Overview, using the
+   DOM's own presence of the Overview section rather than a sibling-order
+   assumption (App.tsx renders `main.explorer-shell` and `PublicFooter` as
+   siblings with no shared Overview-aware ancestor to hang a class on). No
+   negative margins, transforms, absolute positioning, or viewport-height
+   hacks — every value below is a plain, non-negative box-model reset. The
+   footer's own internal padding/border is untouched, so its top border still
+   marks the content/footer transition. */
+.public-overview .overview-results-footer {
+  padding-bottom: 0;
+}
+
+body:has(.public-overview) main.explorer-shell {
+  padding-bottom: 0;
+}
+
+body:has(.public-overview) .public-footer {
+  margin-top: 0;
 }
 
 /* Overview's own separation from MaterialChangeTimeline — spacing/rhythm
