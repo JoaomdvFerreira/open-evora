@@ -110,12 +110,12 @@ export const LogoCompact: Story = {
 
 export const ExplorerIdentityHeader: Story = {
   name: "Explorer identity header",
-  render: () => <main className="explorer-shell"><ExplorerHeader activeView="overview" onOverview={() => {}} onRecords={() => {}} /></main>,
+  render: () => <main className="explorer-shell"><ExplorerHeader activeView="overview" activeTypeFilter="all" onProblemas={() => {}} onFontes={() => {}} /></main>,
 };
 
 export const ExplorerIdentityHeaderCompact: Story = {
   name: "Explorer identity header — compact",
-  render: () => <div style={{ width: 360, maxWidth: "100%" }}><main className="explorer-shell"><ExplorerHeader activeView="records" onOverview={() => {}} onRecords={() => {}} /></main></div>,
+  render: () => <div style={{ width: 360, maxWidth: "100%" }}><main className="explorer-shell"><ExplorerHeader activeView="records" activeTypeFilter="SRC-" onProblemas={() => {}} onFontes={() => {}} /></main></div>,
 };
 
 /* ---- Combined demo page (desktop / compact) ------------------------------ */

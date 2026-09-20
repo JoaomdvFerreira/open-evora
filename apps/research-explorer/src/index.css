@@ -57,17 +57,74 @@ main {
 .trust-facts dt { color: var(--color-ink-muted); font-family: var(--font-interface); font-size: var(--text-interface-label-size); font-weight: var(--text-interface-label-weight); }
 .trust-facts dd { margin: 0; }
 
+/* Editorial three-area footer (Overview final redesign, Phase 3B §6):
+   identity/supporting copy on the left, PROJETO and DADOS link groups on
+   the right. Global — TrustPage.tsx renders this beneath the Explorer and
+   every TrustPage, so nothing here depends on `.public-overview` being
+   present; the Overview-specific zero-gap treatment (`body:has(.public-
+   overview) .public-footer`, above) stays purely additive. */
 .public-footer {
   margin: 2rem 0 0;
-  padding: 1rem 2rem;
-  border-top: 1px solid #ccc;
-  font-size: 0.9rem;
+  padding: var(--space-loose) 2rem;
+  border-top: 1px solid var(--color-separator-standard);
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
 }
 
 .public-footer-inner {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  gap: var(--space-loose) var(--space-section);
+  justify-content: space-between;
+}
+
+.public-footer-identity {
+  min-width: 0;
+  max-width: 28rem;
+}
+
+.public-footer-brand {
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-primary);
+  font-weight: var(--text-interface-label-weight);
+}
+
+.public-footer-summary {
+  margin: 0;
+  color: var(--color-ink-muted);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.public-footer-group {
+  min-width: 8rem;
+}
+
+.public-footer-group > p {
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-muted);
+  font-weight: var(--text-interface-label-weight);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.public-footer-group ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.public-footer-group a {
+  color: var(--color-ink-secondary);
+  text-decoration: none;
+}
+
+.public-footer-group a:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
 }
 
 .skip-link {
@@ -801,6 +858,34 @@ main.explorer-shell {
   min-height: inherit;
 }
 
+/* Public chrome CTA (Overview final redesign, Phase 3B §4): a normal link,
+   visually restrained — no filled button/card treatment absent from the
+   approved TARGET. `.explorer-navigation` already flexes to fill the space
+   between the brand and this CTA via the parent's `space-between`. */
+.explorer-cta {
+  align-self: center;
+  flex-shrink: 0;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--color-separator-emphasis);
+  border-radius: var(--radius-control);
+  color: var(--color-ink-primary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.explorer-cta:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
+.explorer-cta:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .explorer-chrome-inner > h1 {
   align-self: center;
 }
@@ -848,7 +933,8 @@ main.explorer-shell {
   padding: 0;
 }
 
-.explorer-navigation button {
+.explorer-navigation button,
+.explorer-navigation a {
   position: relative;
   display: flex;
   align-items: center;
@@ -858,9 +944,11 @@ main.explorer-shell {
   border: 0;
   border-radius: 0;
   font-size: 0.88rem;
+  text-decoration: none;
 }
 
-.explorer-navigation button:hover {
+.explorer-navigation button:hover,
+.explorer-navigation a:hover {
   color: var(--color-ink-primary);
   background: var(--color-surface-subtle);
 }
@@ -2952,6 +3040,15 @@ body:has(.public-overview) .public-footer {
     padding-left: 1rem;
   }
 
+  .public-footer-inner {
+    flex-direction: column;
+    gap: var(--space-loose);
+  }
+
+  .public-footer-identity {
+    max-width: 100%;
+  }
+
   .explorer-chrome {
     position: sticky;
     top: 0;
@@ -2990,15 +3087,32 @@ body:has(.public-overview) .public-footer {
 
   .explorer-navigation {
     width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+  }
+
+  /* Compact chrome (task §5): brand stays its own row (above); nav and the
+     CTA each become a deliberate full-width row rather than being squeezed
+     into the brand row or wrapping unpredictably. No hamburger, no fixed
+     positioning — plain block stacking inside the already-sticky chrome. */
+  .explorer-cta {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 0;
+    padding: 0.6rem 1rem;
+    border-width: 0;
+    border-top: 1px solid var(--color-separator-standard);
+    border-radius: 0;
   }
 
   .explorer-navigation button,
+  .explorer-navigation a,
   .explorer-navigation .unavailable-control {
     flex: 1 1 0;
   }
 
-  .explorer-navigation button {
+  .explorer-navigation button,
+  .explorer-navigation a {
     justify-content: center;
     padding-right: 0.35rem;
     padding-left: 0.35rem;
@@ -3010,7 +3124,8 @@ body:has(.public-overview) .public-footer {
     width: 100%;
   }
 
-  .explorer-navigation button[aria-current="page"]::after {
+  .explorer-navigation button[aria-current="page"]::after,
+  .explorer-navigation a[aria-current="page"]::after {
     right: 0.35rem;
     left: 0.35rem;
   }

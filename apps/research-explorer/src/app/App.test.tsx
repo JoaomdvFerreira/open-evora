@@ -30,8 +30,9 @@ it("retries a failed startup manifest load", async () => {
   expect(alert.textContent).toContain("temporary manifest failure");
   await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
   // Manifest summary is omitted on Overview (Overview visual completion —
-  // it has its own metrics ruler); navigate to Registos, where it still renders.
-  await user.click(await screen.findByRole("button", { name: "Registos" }));
+  // it has its own metrics ruler); navigate to Records (via the header's
+  // Fontes action), where it still renders.
+  await user.click(await screen.findByRole("button", { name: "Fontes" }));
   expect(await screen.findByText(/Corpus: 0/)).toBeTruthy();
   expect(attempts).toBe(2);
 });
@@ -54,7 +55,7 @@ it("moves focus to the main content when the skip link is activated", async () =
   expect(document.activeElement).toBe(document.getElementById("main-content"));
 
   await user.tab();
-  expect(document.activeElement).toBe(screen.getByRole("button", { name: "Visão geral" }));
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: "Problemas" }));
 });
 
 it("qualifies the manifest timestamp as build/generation time, distinct from research currentness (ODM-020)", async () => {
@@ -68,8 +69,9 @@ it("qualifies the manifest timestamp as build/generation time, distinct from res
   render(<App dataProvider={provider} />);
 
   // Manifest summary is omitted on Overview (Overview visual completion —
-  // it has its own metrics ruler); navigate to Registos, where it still renders.
-  await user.click(await screen.findByRole("button", { name: "Registos" }));
+  // it has its own metrics ruler); navigate to Records (via the header's
+  // Fontes action), where it still renders.
+  await user.click(await screen.findByRole("button", { name: "Fontes" }));
   const summary = await screen.findByText(/Corpus: 0/);
   expect(summary.textContent).toContain("não indica a atualidade da investigação");
   const time = summary.querySelector("time");

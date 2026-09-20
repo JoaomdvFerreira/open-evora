@@ -56,8 +56,9 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
     <>
       <ExplorerHeader
         activeView={url.state.view}
-        onOverview={() => url.clearSelectionAndSetView("overview")}
-        onRecords={() => url.clearSelectionAndSetView("records")}
+        activeTypeFilter={url.state.typeFilter}
+        onProblemas={() => url.clearSelectionAndSetView("overview")}
+        onFontes={url.goToSourcesInRecords}
       />
 
       {url.state.view === "graph" && <ReadingGuide schemaPrefixes={schemaPrefixes} />}

@@ -1,5 +1,5 @@
-import { afterEach, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+import { render, screen, within } from "@testing-library/react";
 import { App } from "./App";
 import type { DataProvider } from "../dataProvider/types";
 
@@ -40,4 +40,49 @@ it("renders the approved corrections action to the canonical public Issues page"
 
   expect(screen.getByRole("heading", { name: "Correções" })).toBeTruthy();
   expect(screen.getByRole("link", { name: /GitHub Issues do projeto Open Évora/ }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
+});
+
+describe("PublicFooter — editorial identity/PROJETO/DADOS structure (Overview final redesign, Phase 3B §6)", () => {
+  it("renders the identity heading and supporting copy", () => {
+    window.history.replaceState(null, "", "/about");
+    render(<App dataProvider={provider} />);
+
+    const footer = screen.getByRole("contentinfo");
+    expect(within(footer).getByText("Open Évora")).toBeTruthy();
+    expect(within(footer).getByText(/Projeto independente de investigação cívica\. Não oficial\./)).toBeTruthy();
+  });
+
+  it("renders the PROJETO and DADOS groups with truthful existing destinations", () => {
+    window.history.replaceState(null, "", "/about");
+    render(<App dataProvider={provider} />);
+
+    const footer = screen.getByRole("contentinfo");
+    const projeto = within(footer).getByRole("navigation", { name: "Projeto" });
+    expect(within(projeto).getByRole("link", { name: "Método" }).getAttribute("href")).toBe("/methodology");
+    expect(within(projeto).getByRole("link", { name: "Sobre" }).getAttribute("href")).toBe("/about");
+    expect(within(projeto).getByRole("link", { name: "Correções" }).getAttribute("href")).toBe("/corrections");
+
+    const dados = within(footer).getByRole("navigation", { name: "Dados" });
+    expect(within(dados).getByRole("link", { name: "Fontes" }).getAttribute("href")).toBe("/?view=records&type=SRC-");
+    expect(within(dados).getByRole("link", { name: "Contactar" }).getAttribute("href")).toBe("/contact");
+    expect(within(dados).getByRole("link", { name: "Privacidade" }).getAttribute("href")).toBe("/privacy");
+  });
+
+  it("never reintroduces 'Fontes primárias' terminology or an unsupported CSV download link", () => {
+    window.history.replaceState(null, "", "/about");
+    render(<App dataProvider={provider} />);
+
+    const footer = screen.getByRole("contentinfo");
+    expect(within(footer).queryByText(/Fontes primárias/)).toBeNull();
+    expect(within(footer).queryByRole("link", { name: /Descarregar CSV/ })).toBeNull();
+  });
+
+  it("renders correctly beneath every TrustPage, not only the Explorer", () => {
+    for (const path of ["/about", "/methodology", "/corrections", "/contact", "/privacy"]) {
+      window.history.replaceState(null, "", path);
+      const { unmount } = render(<App dataProvider={provider} />);
+      expect(screen.getByRole("contentinfo")).toBeTruthy();
+      unmount();
+    }
+  });
 });

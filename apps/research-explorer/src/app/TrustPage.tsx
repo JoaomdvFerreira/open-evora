@@ -57,6 +57,42 @@ export function TrustPage({ page }: { page: TrustPageContent }) {
   return <div className="trust-experience shell-frame"><header className="trust-header"><a href="/" className="trust-brand" aria-label="Open Évora — Explorador de Investigação"><Logo form="full" /><span>Explorador de Investigação</span></a></header><div className="trust-layout"><nav className="trust-navigation" aria-label="Informação sobre o Open Évora"><p>Informação</p><ul>{TRUST_NAVIGATION.map(({ path, label }) => <li key={path}><a href={path} aria-current={currentPath === path ? "page" : undefined}>{label}</a></li>)}</ul></nav><article className="trust-page"><p className="trust-back"><a href="/">← Explorar problemas</a></p><h1>{page.heading}</h1><p className="trust-summary">{page.summary}</p><div className="trust-content">{page.body}</div></article></div></div>;
 }
 
+/**
+ * Editorial three-area footer (Overview final redesign, Phase 3B §6):
+ * identity/supporting copy, then PROJETO and DADOS link groups. Global —
+ * rendered beneath the Explorer and every TrustPage (App.tsx) — so it does
+ * not depend on `.public-overview` being present; the Overview-specific
+ * zero-gap treatment lives entirely in index.css and stays additive to this
+ * structure. Every link below is a real existing destination: `Fontes` opens
+ * the same Records+SRC- filtered set as the header's Fontes action, as an
+ * ordinary path/query navigation (this is a cross-page footer, not the
+ * live Explorer's own SPA state).
+ */
 export function PublicFooter() {
-  return <footer className="public-footer" aria-label="Informação sobre o Open Évora"><div className="public-footer-inner shell-frame"><a href="/">Explorador de Investigação</a>{TRUST_NAVIGATION.map(({ path, label }) => <a key={path} href={path}>{label}</a>)}</div></footer>;
+  return (
+    <footer className="public-footer" aria-label="Informação sobre o Open Évora">
+      <div className="public-footer-inner shell-frame">
+        <div className="public-footer-identity">
+          <p className="public-footer-brand">Open Évora</p>
+          <p className="public-footer-summary">Projeto independente de investigação cívica. Não oficial. Todo o conteúdo remete para fontes identificáveis.</p>
+        </div>
+        <nav className="public-footer-group" aria-label="Projeto">
+          <p>Projeto</p>
+          <ul>
+            <li><a href="/methodology">Método</a></li>
+            <li><a href="/about">Sobre</a></li>
+            <li><a href="/corrections">Correções</a></li>
+          </ul>
+        </nav>
+        <nav className="public-footer-group" aria-label="Dados">
+          <p>Dados</p>
+          <ul>
+            <li><a href="/?view=records&type=SRC-">Fontes</a></li>
+            <li><a href="/contact">Contactar</a></li>
+            <li><a href="/privacy">Privacidade</a></li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+  );
 }

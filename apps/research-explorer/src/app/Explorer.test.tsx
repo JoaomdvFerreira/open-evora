@@ -250,7 +250,7 @@ describe("Explorer — Overview view", () => {
     expect(screen.queryByText("Como ler o Explorer")).toBeNull();
     expect(screen.queryByText(/Estado de validação:/)).toBeNull();
     expect(screen.queryByText(/Estado da evidência:/)).toBeNull();
-    expect(screen.getByRole("button", { name: "Visão geral" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("button", { name: "Problemas" }).getAttribute("aria-current")).toBe("page");
   });
 
   it("UX-D §4: renders Evidência as its own explicitly labeled dimension in the row, never merged with Validação", async () => {
@@ -302,14 +302,14 @@ describe("Explorer — Overview view", () => {
     expect(window.location.search).toContain("id=PRB-0005");
   });
 
-  it("keeps explicit Records navigation available from the root Overview", async () => {
+  it("keeps explicit Records navigation available from the root Overview via the header's Fontes action", async () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    await user.click(await screen.findByRole("button", { name: "Registos" }));
+    await user.click(await screen.findByRole("button", { name: "Fontes" }));
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Registos" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("button", { name: "Fontes" }).getAttribute("aria-current")).toBe("page");
   });
 });
 
@@ -341,7 +341,6 @@ describe("Explorer — URL-addressable state", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
-    await user.click(screen.getByRole("button", { name: "Registos" }));
     await user.selectOptions(screen.getByLabelText("Tipo"), "all");
     expect(pushSpy).not.toHaveBeenCalled();
 
@@ -436,118 +435,164 @@ describe("Explorer — URL-addressable state", () => {
     expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
     expect(screen.getByRole("button", { name: /EVD-000105/ })).toBeTruthy();
   });
+
+  describe("Fontes — combined Records + canonical-Source URL-state navigation (Overview final redesign, Phase 3B §2)", () => {
+    it("is a single history entry that sets view=records, clears selection/query, and filters to SRC-", async () => {
+      const user = userEvent.setup();
+      window.history.replaceState(null, "", "/?view=problem&id=PRB-0005&q=stale-query&type=EVD-");
+      const pushSpy = vi.spyOn(window.history, "pushState");
+      render(<Explorer dataProvider={fakeProvider()} />);
+      await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+
+      await user.click(screen.getByRole("button", { name: "Fontes" }));
+
+      expect(pushSpy).toHaveBeenCalledTimes(1);
+      expect(window.location.search).toContain("view=records");
+      expect(window.location.search).not.toContain("id=PRB-0005");
+      expect(window.location.search).not.toContain("q=stale-query");
+      expect(window.location.search).toContain("type=SRC-");
+      expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
+      expect((await screen.findByLabelText("Pesquisar") as HTMLInputElement).value).toBe("");
+      expect((screen.getByLabelText("Tipo") as HTMLSelectElement).value).toBe("SRC-");
+      pushSpy.mockRestore();
+    });
+
+    it("leaves unrelated existing state (graph depth) untouched", async () => {
+      const user = userEvent.setup();
+      window.history.replaceState(null, "", "/?view=records&q=PRB&type=PRB-&d=2");
+      render(<Explorer dataProvider={fakeProvider()} />);
+      await screen.findByRole("button", { name: /PRB-0005/ });
+
+      await user.click(screen.getByRole("button", { name: "Fontes" }));
+
+      await screen.findByRole("heading", { name: "Registos" });
+      expect(window.location.search).toContain("d=2");
+    });
+
+    it("is active only when Records is filtered to SRC-, not for other Records contexts", async () => {
+      window.history.replaceState(null, "", "/?view=records&type=PRB-");
+      const { unmount: unmountPrb } = render(<Explorer dataProvider={fakeProvider()} />);
+      await screen.findByRole("button", { name: /PRB-0005/ });
+
+      expect(within(globalNav()).getByRole("button", { name: "Fontes" }).getAttribute("aria-current")).toBeNull();
+      unmountPrb();
+
+      window.history.replaceState(null, "", "/?view=records&type=SRC-");
+      render(<Explorer dataProvider={fakeProvider()} />);
+      await screen.findByRole("button", { name: /SRC-0092/ });
+      expect(within(globalNav()).getByRole("button", { name: "Fontes" }).getAttribute("aria-current")).toBe("page");
+    });
+  });
 });
 
 function globalNav(): HTMLElement {
-  return screen.getByRole("navigation", { name: "Vistas do Explorador de Investigação" });
+  return screen.getByRole("navigation", { name: "Navegação principal" });
 }
 
 describe("Explorer — chrome header identity", () => {
-  it("renders the Open Évora logo alongside primary navigation", async () => {
+  it("renders the Open Évora logo alongside the public chrome navigation", async () => {
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
     expect(screen.getAllByAltText("Open Évora").length).toBeGreaterThan(0);
     expect(globalNav()).toBeTruthy();
-    expect(within(globalNav()).getByRole("button", { name: "Visão geral" })).toBeTruthy();
-    expect(within(globalNav()).getByRole("button", { name: "Registos" })).toBeTruthy();
-    expect(within(globalNav()).getByRole("button", { name: "Grafo" })).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Problemas" })).toBeTruthy();
+    expect(within(globalNav()).getByRole("link", { name: "Método" })).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Fontes" })).toBeTruthy();
+    expect(within(globalNav()).getByRole("link", { name: "Sobre" })).toBeTruthy();
+    expect(within(globalNav()).queryByRole("button", { name: "Visão geral" })).toBeNull();
+    expect(within(globalNav()).queryByRole("button", { name: "Registos" })).toBeNull();
+    expect(within(globalNav()).queryByRole("button", { name: "Grafo" })).toBeNull();
+  });
+
+  it("renders Método/Sobre as ordinary pathname links and the CTA as a normal link to Contact", async () => {
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("button", { name: /PRB-0005/ });
+
+    expect(within(globalNav()).getByRole("link", { name: "Método" }).getAttribute("href")).toBe("/methodology");
+    expect(within(globalNav()).getByRole("link", { name: "Sobre" }).getAttribute("href")).toBe("/about");
+    expect(screen.getByRole("link", { name: "Contribuir com evidência" }).getAttribute("href")).toBe("/contact");
+  });
+
+  it("Problemas' active state covers Overview, Problem detail, and Problem history alike", async () => {
+    window.history.replaceState(null, "", "/");
+    const { unmount: unmountOverview } = render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("heading", { name: "Visão geral" });
+    expect(within(globalNav()).getByRole("button", { name: "Problemas" }).getAttribute("aria-current")).toBe("page");
+    unmountOverview();
+
+    window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
+    const { unmount: unmountProblem } = render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+    expect(within(globalNav()).getByRole("button", { name: "Problemas" }).getAttribute("aria-current")).toBe("page");
+    unmountProblem();
+
+    window.history.replaceState(null, "", "/?view=history&id=PRB-0005");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+    expect(within(globalNav()).getByRole("button", { name: "Problemas" }).getAttribute("aria-current")).toBe("page");
   });
 });
 
 describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
-  it("navigating from a selected Problem to global Registos clears selectedId (no hidden-context leak)", async () => {
+  it("navigating from a selected Problem to global Fontes clears selectedId (no hidden-context leak)", async () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Registos" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Fontes" }));
 
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
     expect(window.location.search).toContain("view=records");
     expect(window.location.search).not.toContain("id=PRB-0005");
-    // Records renders its table, not a still-selected Record Detail.
-    expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
+    // Records renders its table, filtered to the canonical Source type.
+    expect(screen.getByRole("button", { name: /SRC-0092/ })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /PRB-0005/ })).toBeNull();
   });
 
-  it("UX-F: GlobalNav Grafo is visible, focusable, and aria-disabled — activation cannot navigate away from the current Problem view", async () => {
-    const user = userEvent.setup();
-    window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
-    render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
-
-    const grafoButton = within(globalNav()).getByRole("button", { name: "Grafo" }) as HTMLButtonElement;
-    // Not natively `disabled` — must remain reachable by keyboard (Tab) so
-    // a keyboard user can discover the "Em desenvolvimento" explanation at all.
-    expect(grafoButton.disabled).toBe(false);
-    expect(grafoButton.getAttribute("aria-disabled")).toBe("true");
-    expect(grafoButton.getAttribute("title")).toBe("Em desenvolvimento");
-
-    // UX-F accessibility fix: `title` alone isn't reliably exposed to keyboard
-    // focus, so the explanation must also be reachable via aria-describedby,
-    // pointing at a real, non-empty, on-page element with that text.
-    const describedById = grafoButton.getAttribute("aria-describedby");
-    expect(describedById).toBeTruthy();
-    const grafoNote = document.getElementById(describedById!);
-    expect(grafoNote).not.toBeNull();
-    expect(grafoNote!.textContent).toBe("Em desenvolvimento");
-
-    grafoButton.focus();
-    expect(document.activeElement).toBe(grafoButton);
-
-    await user.click(grafoButton);
-    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
-    expect(window.location.search).toContain("view=problem");
-    expect(window.location.search).toContain("id=PRB-0005");
-
-    await user.keyboard("{Enter}");
-    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
-    expect(window.location.search).toContain("view=problem");
-    expect(window.location.search).toContain("id=PRB-0005");
-
-    await user.keyboard(" ");
-    expect(screen.queryByRole("heading", { name: "Grafo", level: 2 })).toBeNull();
-    expect(window.location.search).toContain("view=problem");
-    expect(window.location.search).toContain("id=PRB-0005");
-  });
-
-  it("UX-F: GlobalNav Visão geral / Registos remain fully navigable, unaffected by Grafo's aria-disabled state", async () => {
+  it("GlobalNav Problemas / Fontes remain fully navigable", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Registos" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Fontes" }));
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Visão geral" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Problemas" }));
     await screen.findByRole("heading", { name: "Visão geral" });
-    expect(within(globalNav()).getByRole("button", { name: "Visão geral" }).getAttribute("aria-current")).toBe("page");
+    expect(within(globalNav()).getByRole("button", { name: "Problemas" }).getAttribute("aria-current")).toBe("page");
   });
 
-  it("navigating from a selected Record Detail to global Visão geral clears the hidden selectedId", async () => {
+  it("navigating from a selected Record Detail to global Problemas clears the hidden selectedId", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
     expect(window.location.search).toContain("id=PRB-0005");
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Visão geral" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Problemas" }));
 
     await screen.findByRole("heading", { name: "Visão geral" });
     expect(window.location.search).not.toContain("id=PRB-0005");
   });
 
-  it("does not erase existing Records search/type-filter state when navigating away and back via GlobalNav", async () => {
+  it("does not erase existing Records search/type-filter state when navigating away via GlobalNav Problemas and back via browser history", async () => {
+    // GlobalNav has no plain "go back to Records as it was" destination —
+    // Fontes deliberately clears query/type to always open the complete
+    // Source set (task spec §2). This proves Problemas' own navigation
+    // (clearSelectionAndSetView) doesn't mutate the Records state it left
+    // behind; a browser Back still restores it unchanged.
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/?view=records&q=PRB&type=PRB-");
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Visão geral" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Problemas" }));
     await screen.findByRole("heading", { name: "Visão geral" });
-    await user.click(within(globalNav()).getByRole("button", { name: "Registos" }));
 
+    window.history.back();
+    await waitFor(() => expect(window.location.search).toContain("q=PRB"));
     expect((await screen.findByLabelText("Pesquisar") as HTMLInputElement).value).toBe("PRB");
     expect((screen.getByLabelText("Tipo") as HTMLSelectElement).value).toBe("PRB-");
   });
@@ -582,7 +627,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Visão geral" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Problemas" }));
     await screen.findByRole("heading", { name: "Visão geral" });
 
     window.history.back();
