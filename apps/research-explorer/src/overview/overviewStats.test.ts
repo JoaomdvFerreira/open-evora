@@ -4,7 +4,7 @@ import {
   computeOverviewStats,
   computePublicOverviewData,
   evidenceCountLabel,
-  formatMaterialChangeMarkerDate,
+  formatOverviewCompactDate,
   getLisbonCivilDate,
   isDateInCivilWeekOf,
   isMaterialChangeInCivilWeek,
@@ -565,18 +565,18 @@ describe("problemIdsAlteredInCivilWeek", () => {
   });
 });
 
-describe("formatMaterialChangeMarkerDate", () => {
+describe("formatOverviewCompactDate", () => {
   it("renders a compact PT-PT DD/MM presentation", () => {
-    expect(formatMaterialChangeMarkerDate("2026-08-31")).toBe("31/08");
+    expect(formatOverviewCompactDate("2026-08-31")).toBe("31/08");
   });
 
   it("pads single-digit day and month", () => {
-    expect(formatMaterialChangeMarkerDate("2026-01-05")).toBe("05/01");
+    expect(formatOverviewCompactDate("2026-01-05")).toBe("05/01");
   });
 
   it("falls back to the raw value for a malformed date", () => {
-    expect(formatMaterialChangeMarkerDate("not-a-date")).toBe("not-a-date");
-    expect(formatMaterialChangeMarkerDate("2026-13-01")).toBe("2026-13-01");
+    expect(formatOverviewCompactDate("not-a-date")).toBe("not-a-date");
+    expect(formatOverviewCompactDate("2026-13-01")).toBe("2026-13-01");
   });
 });
 
@@ -721,42 +721,42 @@ describe("overviewPageCount / paginateProblems", () => {
     return Array.from({ length: count }, (_, index) => citizenProblem({ id: `PRB-${String(index + 1).padStart(4, "0")}` }));
   }
 
-  it("reports one page for a result count at or under the fixed page size", () => {
+  it("reports one page for a result count at or under the fixed page size (20)", () => {
     expect(overviewPageCount(0)).toBe(1);
     expect(overviewPageCount(1)).toBe(1);
-    expect(overviewPageCount(10)).toBe(1);
+    expect(overviewPageCount(20)).toBe(1);
   });
 
   it("reports additional pages once the result count exceeds the fixed page size", () => {
-    expect(overviewPageCount(11)).toBe(2);
-    expect(overviewPageCount(20)).toBe(2);
-    expect(overviewPageCount(21)).toBe(3);
+    expect(overviewPageCount(21)).toBe(2);
+    expect(overviewPageCount(40)).toBe(2);
+    expect(overviewPageCount(41)).toBe(3);
   });
 
-  it("slices at most 10 problems for page 1", () => {
-    const problems = idList(25);
+  it("slices at most 20 problems for page 1", () => {
+    const problems = idList(45);
     const page1 = paginateProblems(problems, 1);
-    expect(page1.length).toBe(10);
-    expect(page1.map((p) => p.id)).toEqual(problems.slice(0, 10).map((p) => p.id));
+    expect(page1.length).toBe(20);
+    expect(page1.map((p) => p.id)).toEqual(problems.slice(0, 20).map((p) => p.id));
   });
 
   it("renders the remaining problems on page 2", () => {
-    const problems = idList(25);
+    const problems = idList(45);
     const page2 = paginateProblems(problems, 2);
-    expect(page2.length).toBe(10);
-    expect(page2.map((p) => p.id)).toEqual(problems.slice(10, 20).map((p) => p.id));
+    expect(page2.length).toBe(20);
+    expect(page2.map((p) => p.id)).toEqual(problems.slice(20, 40).map((p) => p.id));
   });
 
   it("renders only the remainder on the final, partial page", () => {
-    const problems = idList(25);
+    const problems = idList(45);
     const page3 = paginateProblems(problems, 3);
-    expect(page3.map((p) => p.id)).toEqual(problems.slice(20, 25).map((p) => p.id));
+    expect(page3.map((p) => p.id)).toEqual(problems.slice(40, 45).map((p) => p.id));
   });
 
   it("clamps an out-of-range page number to the nearest valid page rather than returning an empty slice", () => {
-    const problems = idList(15);
-    expect(paginateProblems(problems, 99).map((p) => p.id)).toEqual(problems.slice(10, 15).map((p) => p.id));
-    expect(paginateProblems(problems, 0).map((p) => p.id)).toEqual(problems.slice(0, 10).map((p) => p.id));
+    const problems = idList(25);
+    expect(paginateProblems(problems, 99).map((p) => p.id)).toEqual(problems.slice(20, 25).map((p) => p.id));
+    expect(paginateProblems(problems, 0).map((p) => p.id)).toEqual(problems.slice(0, 20).map((p) => p.id));
   });
 });
 

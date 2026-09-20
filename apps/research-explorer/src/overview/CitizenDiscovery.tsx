@@ -1,9 +1,9 @@
 import type { CitizenProblem, MaterialChangeEntry, ProblemSortOrder, TopicCategoryCount } from "./overviewStats";
-import { formatMaterialChangeMarkerDate } from "./overviewStats";
+import { formatOverviewCompactDate } from "./overviewStats";
 import { describeTopic } from "../presentation/topicMapping";
 import { IconSearch, IconTrendUp } from "../presentation/icons";
 import { EvidenceStatus } from "../problem/InvestigationStatus";
-import { formatPublicDate, publicEnumLabel } from "../presentation/presentation";
+import { publicEnumLabel } from "../presentation/presentation";
 
 export function CitizenSearchControl({ value, onChange, id = "overview-search-input" }: {
   value: string;
@@ -199,6 +199,14 @@ export function SortControl({ value, onChange, id = "overview-sort" }: {
  * a value (the former "Estado do problemaAberto" adjacency) — each meta
  * fragment is its own flex/inline-flex item.
  *
+ * The row's `updatedAt` date renders in TARGET's compact `DD/MM` form
+ * (Overview final redesign, Phase 3A, §5 — `formatOverviewCompactDate`,
+ * shared with the material-change marker's own compact date below, though the
+ * two remain distinct signals), while `<time dateTime>` keeps the full
+ * canonical `YYYY-MM-DD` value. Scoped to this row only —
+ * ProblemView/Records/History keep the shared `formatPublicDate` full-year
+ * presentation untouched.
+ *
  * Topics render as quiet inline text (`describeTopic(code).label`, joined),
  * not `TopicBadge` chip UI — this list is metadata under the row, not a
  * filterable control; the filter rail already owns the chip-like affordance
@@ -230,7 +238,7 @@ export function SortControl({ value, onChange, id = "overview-sort" }: {
  * generic copy naming only that *something* material changed and *when*,
  * never a categorical change-type label the canonical model cannot support
  * (no "NOVO REGISTO DE EVIDÊNCIA"/"ESTADO ALTERADO" — see this file's module
- * doc and overviewStats.ts's `formatMaterialChangeMarkerDate`). The marker
+ * doc and overviewStats.ts's `formatOverviewCompactDate`). The marker
  * date is `latestChange.date` (the authored material-change date), never
  * `problem.updatedAt` — the two remain separate signals throughout Overview.
  * The variant never turns the row into a card: same flat full-width link,
@@ -245,7 +253,7 @@ export function ProblemRow({ problem, onExplore, latestChange }: { problem: Citi
         {latestChange !== undefined && (
           <p className="overview-problem-row-change-marker">
             <IconTrendUp />
-            <span>ALTERAÇÃO REGISTADA</span> · <time dateTime={latestChange.date}>{formatMaterialChangeMarkerDate(latestChange.date)}</time>
+            <span>ALTERAÇÃO REGISTADA</span> · <time dateTime={latestChange.date}>{formatOverviewCompactDate(latestChange.date)}</time>
           </p>
         )}
         <div className="overview-problem-row-meta">
@@ -255,7 +263,7 @@ export function ProblemRow({ problem, onExplore, latestChange }: { problem: Citi
             <span className="overview-problem-row-lifecycle">{publicEnumLabel("status", problem.lifecycleStatus)}</span>
           )}
           {problem.updatedAt !== null && (
-            <time className="overview-problem-row-date" dateTime={problem.updatedAt}>{formatPublicDate(problem.updatedAt)}</time>
+            <time className="overview-problem-row-date" dateTime={problem.updatedAt}>{formatOverviewCompactDate(problem.updatedAt)}</time>
           )}
         </div>
         <h4 className="overview-problem-title">{problem.title}</h4>

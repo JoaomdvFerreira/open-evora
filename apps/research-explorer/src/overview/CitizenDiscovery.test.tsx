@@ -302,13 +302,15 @@ describe("ProblemRow", () => {
     expect(onExplore).toHaveBeenCalledWith("PRB-EXEMPLO");
   });
 
-  it("shows the PRB id and the canonical updatedAt date, omitting the date when it is genuinely unavailable", () => {
+  it("shows the PRB id and the canonical updatedAt date in TARGET's compact DD/MM form, with the full YYYY-MM-DD value in dateTime, omitting the date when it is genuinely unavailable", () => {
     const { rerender } = render(<ul><ProblemRow problem={rowProblem} onExplore={vi.fn()} /></ul>);
     expect(screen.getByText("PRB-EXEMPLO")).toBeTruthy();
-    expect(screen.getByText("08/04/2026").tagName).toBe("TIME");
+    const rowDate = screen.getByText("08/04");
+    expect(rowDate.tagName).toBe("TIME");
+    expect(rowDate.getAttribute("dateTime")).toBe("2026-04-08");
 
     rerender(<ul><ProblemRow problem={{ ...rowProblem, updatedAt: null }} onExplore={vi.fn()} /></ul>);
-    expect(screen.queryByText("08/04/2026")).toBeNull();
+    expect(screen.queryByText("08/04")).toBeNull();
   });
 
   it("omits the problem statement and topic list when the Problem carries none", () => {
@@ -369,9 +371,12 @@ describe("ProblemRow — material-change treatment", () => {
     const markerDate = marker?.querySelector("time");
     expect(markerDate?.textContent).toBe("31/08");
     expect(markerDate?.getAttribute("dateTime")).toBe("2026-08-31");
-    // The row's own updatedAt date remains a separate element with the full
-    // canonical presentation — never overwritten or merged with the marker.
-    expect(screen.getByText("08/04/2026").tagName).toBe("TIME");
+    // The row's own updatedAt date remains a separate element, also compact
+    // (TARGET) but with the full canonical value in dateTime — never
+    // overwritten or merged with the marker's own date.
+    const rowDate = screen.getByText("08/04");
+    expect(rowDate.tagName).toBe("TIME");
+    expect(rowDate.getAttribute("dateTime")).toBe("2026-04-08");
   });
 
   it("preserves the row's single full-row click target and primary action when changed", async () => {

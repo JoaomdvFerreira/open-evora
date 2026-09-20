@@ -38,7 +38,7 @@ function openDrawer() {
   return screen.getByRole("button", { name: /^Filtros/ });
 }
 
-/** Mirrors overviewStats.ts's `formatMaterialChangeMarkerDate` (compact PT-PT `DD/MM`) for asserting a row marker's rendered date against a `YYYY-MM-DD` fixture. */
+/** Mirrors overviewStats.ts's `formatOverviewCompactDate` (compact PT-PT `DD/MM`) for asserting a row marker's rendered date against a `YYYY-MM-DD` fixture. */
 function formatMarkerDate(date: string): string {
   const [, month, day] = date.split("-");
   return `${day}/${month}`;
@@ -475,15 +475,15 @@ describe("Overview — toolbar result count and sort", () => {
   });
 
   it("reflects visibleProblems.length, never the paginated slice length", async () => {
-    const problems = Array.from({ length: 15 }, (_, index) => {
+    const problems = Array.from({ length: 25 }, (_, index) => {
       const id = `PRB-${String(index + 1).padStart(4, "0")}`;
       return { id, type: "PRB-" as const, label: `Problema ${String(index + 1).padStart(2, "0")}`, file: "", summaryFields: {} };
     });
     render(<Overview dataProvider={makeProvider(problems)} {...props} />);
 
-    // 15 filtered results, even though only 10 rows render on page 1.
-    expect(await screen.findByText("15 problemas")).toBeTruthy();
-    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(10);
+    // 25 filtered results, even though only 20 rows render on page 1.
+    expect(await screen.findByText("25 problemas")).toBeTruthy();
+    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(20);
   });
 
   it("does not render the former active-filter-summary text line", async () => {
@@ -526,31 +526,31 @@ describe("Overview — problem-list pagination", () => {
     });
   }
 
-  it("renders at most 10 problem rows on page 1 even when more results are available", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
+  it("renders at most 20 problem rows on page 1 even when more results are available", async () => {
+    render(<Overview dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
 
-    await screen.findByText("25 problemas");
-    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(10);
+    await screen.findByText("45 problemas");
+    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(20);
   });
 
   it("renders the remaining problems when moving to page 2", async () => {
     const user = userEvent.setup();
-    render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
+    render(<Overview dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
 
-    await screen.findByText("25 problemas");
+    await screen.findByText("45 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
 
-    expect(await screen.findByText("Problema 11")).toBeTruthy();
+    expect(await screen.findByText("Problema 21")).toBeTruthy();
     expect(screen.queryByText("Problema 01")).toBeNull();
-    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(10);
+    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(20);
   });
 
   it("paginates the already filtered and sorted result set, not the full unfiltered corpus", async () => {
-    const problems = makeManyProblems(15);
+    const problems = makeManyProblems(25);
     const user = userEvent.setup();
     render(<Overview dataProvider={makeProvider(problems)} {...props} />);
 
-    await screen.findByText("15 problemas");
+    await screen.findByText("25 problemas");
     await user.type(screen.getByLabelText("Pesquisar problemas"), "Problema 0");
 
     expect(await screen.findByText("9 problemas")).toBeTruthy();
@@ -559,79 +559,124 @@ describe("Overview — problem-list pagination", () => {
 
   it("resets to page 1 when the search query changes", async () => {
     const user = userEvent.setup();
-    render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
+    render(<Overview dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
 
-    await screen.findByText("25 problemas");
+    await screen.findByText("45 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
-    await screen.findByText("Página 2 de 3");
+    await screen.findByText(/^Página 2 de 3/);
 
     await user.type(screen.getByLabelText("Pesquisar problemas"), "Problema");
-    await screen.findByText("Página 1 de 3");
+    await screen.findByText(/^Página 1 de 3/);
   });
 
   it("resets to page 1 when the topic filter changes", async () => {
-    const provider = makeProvider(makeManyProblems(25));
+    const provider = makeProvider(makeManyProblems(45));
     provider.getRecord = async (id) => ({ id, type: "PRB-", file: "", record: { title: id, domain: ["MOB"] }, outgoingEdges: [], incomingEdges: [] });
     const user = userEvent.setup();
     render(<Overview dataProvider={provider} {...props} />);
 
-    await screen.findByText("25 problemas");
+    await screen.findByText("45 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
-    await screen.findByText("Página 2 de 3");
+    await screen.findByText(/^Página 2 de 3/);
 
     await user.click(openDrawer());
     const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
     await user.click(within(drawer).getByRole("button", { name: /^Mobilidade/ }));
-    await screen.findByText("Página 1 de 3");
+    await screen.findByText(/^Página 1 de 3/);
   });
 
   it("resets to page 1 when the sort order changes", async () => {
     const user = userEvent.setup();
-    render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
+    render(<Overview dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
 
-    await screen.findByText("25 problemas");
+    await screen.findByText("45 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
-    await screen.findByText("Página 2 de 3");
+    await screen.findByText(/^Página 2 de 3/);
 
     await user.selectOptions(screen.getByLabelText("Ordenar por"), "última atualização");
-    await screen.findByText("Página 1 de 3");
+    await screen.findByText(/^Página 1 de 3/);
   });
 
   it("keeps the toolbar count as the total filtered count, not the current page's row count", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
+    render(<Overview dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
 
-    expect(await screen.findByText("25 problemas")).toBeTruthy();
+    expect(await screen.findByText("45 problemas")).toBeTruthy();
   });
 
-  it("renders no pagination footer when the result set fits on one page", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(10))} {...props} />);
+  it("renders no pagination controls when the filtered result set fits on one page (<=20 results)", async () => {
+    render(<Overview dataProvider={makeProvider(makeManyProblems(20))} {...props} />);
 
-    await screen.findByText("10 problemas");
-    expect(document.querySelector(".overview-pagination-footer")).toBeNull();
+    await screen.findByText("20 problemas");
+    expect(document.querySelector(".overview-pagination-actions")).toBeNull();
   });
 
-  it("renders the pagination footer only once there are more than 10 results", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(11))} {...props} />);
+  it("still paginates once the filtered result set exceeds 20 results", async () => {
+    render(<Overview dataProvider={makeProvider(makeManyProblems(21))} {...props} />);
 
-    await screen.findByText("11 problemas");
-    expect(document.querySelector(".overview-pagination-footer")).not.toBeNull();
-    expect(screen.getByText("Página 1 de 2")).toBeTruthy();
+    await screen.findByText("21 problemas");
+    expect(document.querySelector(".overview-pagination-actions")).not.toBeNull();
+    expect(screen.getByText("Página 1 de 2 · 21 problemas")).toBeTruthy();
   });
 
   it("disables Anterior on the first page and Seguinte on the final page", async () => {
     const user = userEvent.setup();
-    render(<Overview dataProvider={makeProvider(makeManyProblems(11))} {...props} />);
+    render(<Overview dataProvider={makeProvider(makeManyProblems(21))} {...props} />);
 
-    await screen.findByText("11 problemas");
+    await screen.findByText("21 problemas");
     const previous = screen.getByRole("button", { name: "Anterior" }) as HTMLButtonElement;
     const next = screen.getByRole("button", { name: "Seguinte" }) as HTMLButtonElement;
     expect(previous.disabled).toBe(true);
     expect(next.disabled).toBe(false);
 
     await user.click(next);
-    await screen.findByText("Página 2 de 2");
+    await screen.findByText("Página 2 de 2 · 21 problemas");
     expect((screen.getByRole("button", { name: "Anterior" }) as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByRole("button", { name: "Seguinte" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+});
+
+describe("Overview — end-of-results row", () => {
+  function makeManyProblems(count: number) {
+    return Array.from({ length: count }, (_, index) => {
+      const id = `PRB-${String(index + 1).padStart(4, "0")}`;
+      return { id, type: "PRB-" as const, label: `Problema ${String(index + 1).padStart(2, "0")}`, file: "", summaryFields: {} };
+    });
+  }
+
+  it("renders the truthful N de N problemas status for a single-page result set", async () => {
+    render(<Overview dataProvider={makeProvider(makeManyProblems(6))} {...props} />);
+
+    await screen.findByText("6 problemas");
+    expect(screen.getByText("6 de 6 problemas")).toBeTruthy();
+  });
+
+  it("renders no end-of-results row when there are zero results", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    await user.type(screen.getByLabelText("Pesquisar problemas"), "inexistente");
+
+    await screen.findByText("Nenhum problema corresponde à pesquisa.");
+    expect(document.querySelector(".overview-end-of-results")).toBeNull();
+  });
+
+  it("links Propor um problema to /contact in the end-of-results row", async () => {
+    render(<Overview dataProvider={makeProvider(makeManyProblems(6))} {...props} />);
+
+    await screen.findByText("6 problemas");
+    const link = screen.getByRole("link", { name: "Propor um problema" }) as HTMLAnchorElement;
+    expect(link.getAttribute("href")).toBe("/contact");
+  });
+
+  it("keeps Propor um problema available on a multi-page result set alongside the paginator", async () => {
+    render(<Overview dataProvider={makeProvider(makeManyProblems(21))} {...props} />);
+
+    await screen.findByText("21 problemas");
+    expect(screen.getByRole("link", { name: "Propor um problema" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Anterior" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Seguinte" })).toBeTruthy();
   });
 });
 
@@ -917,7 +962,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
 
   it("resets to page 1 when the shortcut selection changes", async () => {
     const monday = thisWeekMonday();
-    const problems = Array.from({ length: 25 }, (_, index) => {
+    const problems = Array.from({ length: 45 }, (_, index) => {
       const id = `PRB-${String(index + 1).padStart(4, "0")}`;
       return { id, label: `Problema ${String(index + 1).padStart(2, "0")}`, history: [{ date: monday, summary: "Alteração." }] };
     });
@@ -925,13 +970,13 @@ describe("Overview — Alterados esta semana shortcut", () => {
     const user = userEvent.setup();
     render(<Overview dataProvider={provider} {...props} />);
 
-    await screen.findByText("25 problemas");
+    await screen.findByText("45 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
-    await screen.findByText("Página 2 de 3");
+    await screen.findByText(/^Página 2 de 3/);
 
     await user.click(openDrawer());
     await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
-    await screen.findByText("Página 1 de 3");
+    await screen.findByText(/^Página 1 de 3/);
   });
 
   it("gives Filtros the restrained active state and names the shortcut in its accessible name when selected and the drawer is closed", async () => {

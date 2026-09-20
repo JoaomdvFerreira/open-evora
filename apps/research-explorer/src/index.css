@@ -1354,10 +1354,13 @@ main.explorer-shell {
   background: var(--color-accent);
 }
 
-/* Final always-visible toolbar (Overview final redesign, Phase 1 — delta
-   §3): Filtros + search on the left, result count + sort on the right.
-   Visible whether the category drawer is open or closed — this row never
-   moves or disappears when the drawer toggles. */
+/* Final always-visible toolbar (Overview final redesign, Phase 1 — delta §3;
+   final alignment pass, Phase 3A §6): Filtros, search, and the result count
+   read as one left-hand group — the count visually follows the search area
+   rather than grouping with sort on the far right — while sort stays aligned
+   toward the right edge on its own. Visible whether the category drawer is
+   open or closed — this row never moves or disappears when the drawer
+   toggles. */
 .overview-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -1389,6 +1392,7 @@ main.explorer-shell {
   align-items: baseline;
   gap: var(--space-tight) var(--space-standard);
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* Result count (visual-convergence pass): de-emphasised secondary text —
@@ -1552,19 +1556,23 @@ main.explorer-shell {
 
 /* Flat editorial-list treatment (Overview visual-completion — TARGET
    reference): no per-row card border/outline/radius, no gaps between rows —
-   each row is only separated by this one bottom hairline. A restrained
-   alternating row background (even rows only, TARGET's own "#f7f4e9 /
-   transparent" pattern) helps scanning across a dense list without
-   reintroducing a card outline. */
+   each row is only separated by this one bottom hairline. Row-density pass
+   (Overview final redesign, Phase 3A, §4) strengthens that hairline from
+   `--color-separator-faint` to `--color-separator-standard` so a denser list
+   still reads as clearly divided rows, matching TARGET's separator weight. A
+   restrained alternating row background (even rows only, TARGET's own
+   "#f7f4e9 / transparent" pattern) helps scanning across a dense list
+   without reintroducing a card outline. */
 .overview-problem-row {
-  border-bottom: 1px solid var(--color-separator-faint);
+  border-bottom: 1px solid var(--color-separator-standard);
 }
 
 .overview-problem-row:nth-child(even) {
   background: var(--color-surface-subtle);
 }
 
-/* Row density (Overview visual-completion, visual-convergence pass): a
+/* Row density (Overview visual-completion, visual-convergence pass; tightened
+   further in the Overview final redesign, Phase 3A, §4 row-density pass): a
    single vertical `padding` on the existing row link, no left/right inset
    of its own — the row's content shares the same primary left content axis
    as the Hero, toolbar, and category drawer, all aligned to the shell's own
@@ -1573,7 +1581,7 @@ main.explorer-shell {
 .overview-problem-row-link {
   display: block;
   width: 100%;
-  padding: 1rem 0;
+  padding: 0.75rem 0;
   color: inherit;
   border: 0;
   background: none;
@@ -1615,7 +1623,7 @@ main.explorer-shell {
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.4rem;
   color: var(--color-accent-hover);
   font-family: var(--font-interface);
   font-size: 0.76rem;
@@ -1639,8 +1647,8 @@ main.explorer-shell {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.4rem;
+  gap: 0.5rem;
+  margin-bottom: 0.32rem;
 }
 
 .overview-problem-row-meta .overview-problem-technical-id {
@@ -1695,9 +1703,12 @@ main.explorer-shell {
 
 /* Overview rows show a deterministic visual excerpt of the canonical
    problem_statement (line-clamp only — the full statement stays in the DOM,
-   searchable, and unchanged; ProblemView continues to render it in full). */
+   searchable, and unchanged; ProblemView continues to render it in full).
+   Title-to-summary spacing tightened in the row-density pass (Phase 3A, §4:
+   0.3rem → 0.22rem) to match TARGET's compact editorial rhythm. */
 .overview-problem-statement {
   max-width: var(--measure-reading);
+  margin: 0.22rem 0 0;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1710,24 +1721,29 @@ main.explorer-shell {
   margin-top: 0.48rem;
 }
 
+/* Summary-to-topic spacing tightened in the row-density pass (Phase 3A, §4:
+   0.45rem → 0.35rem). */
 .overview-problem-row .overview-problem-topics {
-  margin: 0.45rem 0 0;
+  margin: 0.35rem 0 0;
   color: var(--color-ink-muted);
   font-family: var(--font-technical);
   font-size: 0.78rem;
 }
 
-/* Pagination footer (Overview visual-completion — pagination): lives inside
-   `.overview-results`, the same column as the toolbar and problem rows, so
-   it shares their width by construction — no separate max-width or margin
-   calculation. Reuses the toolbar's own horizontal padding (no left/right
-   inset beyond the shared shell padding — the single primary content axis
-   also shared by the Hero, toolbar, category drawer, and problem rows) and
-   a matching vertical rhythm, so the two read as the same structural row
-   family. Flat/editorial: a single top hairline (the same separator token
-   the toolbar's own bottom border uses) and no background/radius/shadow —
-   never a card. */
-.overview-pagination-footer {
+/* End-of-results row (Overview final redesign, Phase 3A, §2/§3 — replaces
+   the former pagination-only footer): lives inside `.overview-results`, the
+   same column as the toolbar and problem rows, so it shares their width by
+   construction — no separate max-width or margin calculation. Reuses the
+   toolbar's own horizontal padding (no left/right inset beyond the shared
+   shell padding — the single primary content axis also shared by the Hero,
+   toolbar, category drawer, and problem rows) and a matching vertical
+   rhythm, so the two read as the same structural row family. Flat/editorial:
+   a single top hairline (the same separator token the toolbar's own bottom
+   border uses) and no background/radius/shadow — never a card. Renders
+   whenever there is at least one visible result (never only when paginated),
+   so its status text and `Propor um problema` CTA are always available
+   together at the end of the list. */
+.overview-end-of-results {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1737,8 +1753,8 @@ main.explorer-shell {
   border-top: 1px solid var(--color-separator-standard);
 }
 
-.overview-pagination-status {
-  margin: 0;
+.overview-end-of-results-status {
+  margin: 0 auto 0 0;
   color: var(--color-ink-muted);
   font-family: var(--font-technical);
   font-size: 0.78rem;
@@ -1774,6 +1790,39 @@ main.explorer-shell {
   color: var(--color-ink-muted);
   border-color: var(--color-separator-faint);
   cursor: not-allowed;
+}
+
+/* `Propor um problema` (Overview final redesign, Phase 3A, §3) — a
+   restrained outlined link, matching the toolbar/drawer's existing
+   control-outline language (same border/radius/hover pattern as
+   `.overview-filtros-toggle`/`.overview-category-drawer-option`) rather than
+   a filled primary-action button. A normal navigation link to the existing
+   `/contact` route — no button semantics, no modal, no form. */
+.overview-propose-problem {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding: 0.4rem 0.85rem;
+  color: var(--color-ink-secondary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  background: none;
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.overview-propose-problem:hover {
+  color: var(--color-ink-primary);
+  border-color: var(--color-ink-primary);
+  background: var(--color-surface-subtle);
+}
+
+.overview-propose-problem:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
 }
 
 /* Overview-specific zero-gap treatment: neutralizes, for Overview only, the
@@ -1939,7 +1988,7 @@ body:has(.public-overview) .public-footer {
   }
 
   .overview-problem-row-link {
-    padding: 1rem 0;
+    padding: 0.75rem 0;
   }
 
   .overview-statuses {
@@ -1949,12 +1998,22 @@ body:has(.public-overview) .public-footer {
   }
 
   /* Matches `.overview-problem-row-link`'s own compact inset drop above —
-     the pagination footer shares the results column's left axis at every
-     viewport. */
-  .overview-pagination-footer {
+     the end-of-results row shares the results column's left axis at every
+     viewport. Status, paginator (when present), and the CTA stack cleanly
+     rather than compressing onto one line (§7). */
+  .overview-end-of-results {
     flex-direction: column;
     align-items: flex-start;
     padding: 0.875rem 0;
+  }
+
+  .overview-end-of-results-status {
+    margin-right: 0;
+  }
+
+  .overview-propose-problem {
+    width: 100%;
+    justify-content: center;
   }
 
   .overview-material-change-section {

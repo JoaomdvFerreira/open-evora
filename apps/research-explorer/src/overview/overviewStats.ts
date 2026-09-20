@@ -400,18 +400,24 @@ export function latestMaterialChangeInCivilWeekByProblem(
 }
 
 /**
- * Compact PT-PT `DD/MM` presentation for the row-level material-change
- * marker (Overview final redesign, Phase 2, §4) — e.g. `31/08`. Deliberately
- * separate from the shared `formatPublicDate`/`formatPublicDateTime`
- * (presentation.ts): those render the full `dateStyle: "medium"` PT-PT date
- * used across every other surface, and changing their output would ripple
- * into pages this task must not touch. This formatter is Overview's own,
- * scoped to the row marker only; the full canonical date remains available
- * in the marker's own `dateTime` attribute wherever this is used. Falls back
- * to the raw input, like the shared formatters do, when it cannot be parsed
- * as a valid calendar day.
+ * Compact PT-PT `DD/MM` presentation shared by Overview's two distinct
+ * compact-date surfaces — the row-level material-change marker (Overview
+ * final redesign, Phase 2, §4) and the problem-row `updatedAt` date (Overview
+ * final redesign, Phase 3A, §5) — e.g. `31/08`. Deliberately separate from
+ * the shared `formatPublicDate`/`formatPublicDateTime` (presentation.ts):
+ * those render the full `dateStyle: "medium"` PT-PT date used across every
+ * other surface (ProblemView, Records, History), and changing their output
+ * would ripple into pages this task must not touch. This formatter is
+ * Overview's own, scoped to these two row-level surfaces only; the full
+ * canonical date remains available in each caller's own `dateTime` attribute.
+ * Falls back to the raw input, like the shared formatters do, when it cannot
+ * be parsed as a valid calendar day. One shared implementation, not two
+ * parallel date parsers, even though the two concepts it serves — "when this
+ * Problem was last updated" vs. "when a material change was authored" —
+ * remain distinct signals throughout Overview (see `ProblemRow`'s own doc
+ * comment).
  */
-export function formatMaterialChangeMarkerDate(date: string): string {
+export function formatOverviewCompactDate(date: string): string {
   if (!CIVIL_WEEK_DATE.test(date)) return date;
   const [year, month, day] = date.split("-").map(Number);
   if (month < 1 || month > 12) return date;
@@ -497,8 +503,15 @@ export function sortProblems(problems: CitizenProblem[], order: ProblemSortOrder
   });
 }
 
-/** Fixed page size for the Overview problem list (Overview visual-completion — pagination). Not user-configurable. */
-export const OVERVIEW_PROBLEMS_PER_PAGE = 10;
+/**
+ * Fixed page size for the Overview problem list (Overview visual-completion —
+ * pagination; raised from 10 to 20 in the Overview final redesign, Phase 3A,
+ * §1, so the current small corpus reads as one continuous editorial list
+ * rather than introducing pagination unnecessarily). Not user-configurable.
+ * Pagination infrastructure itself is unchanged: a filtered result set that
+ * still exceeds this size continues to paginate exactly as before.
+ */
+export const OVERVIEW_PROBLEMS_PER_PAGE = 20;
 
 /**
  * Total page count for a given result count at the fixed page size, never

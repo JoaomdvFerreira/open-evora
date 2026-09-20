@@ -145,13 +145,13 @@ export function OverviewPresentation({
             activeTopicLabel={activeTopicLabel}
           />
           <CitizenSearchControl value={searchQuery} onChange={onSearchChange} />
-        </div>
-        <div className="overview-toolbar-meta">
           <div aria-live="polite" aria-atomic="true">
             {citizenProblems !== null && visibleProblems !== null && (
               <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} problemas</p>
             )}
           </div>
+        </div>
+        <div className="overview-toolbar-meta">
           <SortControl value={sortOrder} onChange={onSortOrderChange} />
         </div>
       </div>
@@ -183,20 +183,42 @@ export function OverviewPresentation({
               </ul>
             )}
 
-            {/* Pagination footer (Overview visual-completion): only when
-                there is more than one page — a single-page result set gets
-                no footer at all, never a disabled/no-op one. */}
-            {pageCount > 1 && (
-              <div className="overview-pagination-footer">
-                <p className="overview-pagination-status">Página {currentPage} de {pageCount}</p>
-                <div className="overview-pagination-actions">
-                  <button type="button" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1}>
-                    Anterior
-                  </button>
-                  <button type="button" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= pageCount}>
-                    Seguinte
-                  </button>
-                </div>
+            {/* End-of-results row (Overview final redesign, Phase 3A, §2/§3):
+                renders whenever there is at least one visible result — unlike
+                the former pagination-only footer, which rendered nothing at
+                all for a single-page result set. The status copy is
+                deliberately truthful about what is and is not currently
+                rendered: a single-page result set reads "N de N problemas"
+                (every filtered result is on this one page), while a
+                multi-page result set reads "Página X de Y · N problemas" —
+                never a count that could be misread as "results currently
+                rendered" or "results loaded so far" (§2). This status is
+                informational only, not a second live region — the toolbar's
+                own `aria-live` count above already announces filter/search
+                changes (§8). `Propor um problema` (§3) is a normal outbound
+                link to the existing `/contact` route, not a new submission
+                workflow — the Contact page already owns public
+                questions/suggestions/problems. */}
+            {visibleProblems.length > 0 && (
+              <div className="overview-end-of-results">
+                <p className="overview-end-of-results-status">
+                  {pageCount > 1
+                    ? `Página ${currentPage} de ${pageCount} · ${formatPublicCount(visibleProblems.length)} problemas`
+                    : `${formatPublicCount(visibleProblems.length)} de ${formatPublicCount(visibleProblems.length)} problemas`}
+                </p>
+                {pageCount > 1 && (
+                  <div className="overview-pagination-actions">
+                    <button type="button" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1}>
+                      Anterior
+                    </button>
+                    <button type="button" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= pageCount}>
+                      Seguinte
+                    </button>
+                  </div>
+                )}
+                <a className="overview-propose-problem" href="/contact">
+                  Propor um problema
+                </a>
               </div>
             )}
           </div>
