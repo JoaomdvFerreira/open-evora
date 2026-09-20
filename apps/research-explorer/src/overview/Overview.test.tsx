@@ -31,17 +31,20 @@ function makeProvider(index: RecordSummary[]): DataProvider {
   };
 }
 
-const props = { onExploreProblem: vi.fn(), onViewRecords: vi.fn() };
+const props = { onExploreProblem: vi.fn() };
+
+function openDrawer() {
+  return screen.getByRole("button", { name: /^Filtros/ });
+}
 
 describe("Overview — Problem investigation-state dimensions", () => {
   // The editorial problem-list row (Overview visual-completion) shows two of
   // the three investigation-state dimensions inline: evidenceStatus via the
   // existing restrained `reading` chip, lifecycleStatus as plain secondary
   // text (no caption prefix, no chip — the row's own position already reads
-  // as "this Problem's state"). validationStatus is deliberately not
-  // repeated per row: it remains available through the canonical VALIDAÇÃO
-  // filter rail (Overview.test.tsx's filter-rail assertions cover it), never
-  // merged into either of the other two dimensions.
+  // as "this Problem's state"). validationStatus is not shown on the row or
+  // anywhere else in Overview (Overview final redesign, Phase 1 removes
+  // non-topic filtering, including validation, outright).
   it("renders evidenceStatus (chip) and lifecycleStatus (plain text) independently when both are canonically present", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema com todas as dimensões", file: "", summaryFields: { status: "OPEN", validation_status: "unvalidated", evidence_status: "corroborated" } },
@@ -64,10 +67,6 @@ describe("Overview — Problem investigation-state dimensions", () => {
 
     const row = (await screen.findByText("PRB-2")).closest(".overview-problem-row-meta");
     expect(row?.querySelector(".prb-status-chip")?.textContent).toMatch(/Evidência:\s*Corroborada/);
-    // Scoped to the row itself — the page-wide "Aberto" text in the ESTADO
-    // filter rail's own always-rendered option (filter-rail correction pass
-    // §3, complete vocabulary regardless of this Problem's own lifecycle
-    // status) is unrelated to this assertion.
     expect(within(row as HTMLElement).queryByText("Aberto")).toBeNull();
   });
 
@@ -94,6 +93,95 @@ describe("Overview — Problem investigation-state dimensions", () => {
   });
 });
 
+describe("Overview — final Hero", () => {
+  it("renders the final eyebrow, headline, and supporting copy", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    expect(screen.getByText("Projeto independente — não oficial")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Problemas práticos que afetam Évora." })).toBeTruthy();
+    expect(screen.getByText("O que sabemos, o que falta saber, e a fonte de cada afirmação.")).toBeTruthy();
+  });
+
+  it("renders exactly the three intended Hero metric concepts — problems, evidence records, primary sources", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
+      { id: "EVD-1", type: "EVD-", label: "Evidência um", file: "", summaryFields: {} },
+      { id: "EVD-2", type: "EVD-", label: "Evidência dois", file: "", summaryFields: {} },
+      { id: "EVD-3", type: "EVD-", label: "Evidência três", file: "", summaryFields: {} },
+      { id: "SRC-1", type: "SRC-", label: "Fonte", file: "", summaryFields: {} },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const problemMetric = (await screen.findByText("2", { selector: ".overview-metric-value" })).closest(".overview-metric");
+    expect(problemMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Problemas acompanhados");
+
+    const evidenceMetric = screen.getByText("3", { selector: ".overview-metric-value" }).closest(".overview-metric");
+    expect(evidenceMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Registos de evidência");
+
+    const sourceMetric = screen.getByText("1", { selector: ".overview-metric-value" }).closest(".overview-metric");
+    expect(sourceMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Fonte primária");
+
+    expect(document.querySelectorAll(".overview-metric").length).toBe(3);
+    expect(screen.queryByText(/Registo total|Registos totais/)).toBeNull();
+  });
+
+  it("does not render the removed Hero recent-updates surface", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    expect(screen.queryByText("Atualizado recentemente")).toBeNull();
+    expect(document.querySelector(".overview-hero-recent")).toBeNull();
+  });
+
+  it("does not render search inside the Hero", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    expect(document.querySelector(".overview-hero .overview-search")).toBeNull();
+    // Search still renders, in the toolbar.
+    expect(screen.getByLabelText("Pesquisar problemas")).toBeTruthy();
+  });
+
+  it("does not render the old Hero category shortcuts", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    expect(screen.queryByText("Ou entre por:")).toBeNull();
+    expect(document.querySelector(".overview-category-shortcuts")).toBeNull();
+  });
+});
+
+describe("Overview — permanent filter rail and non-topic filters removed", () => {
+  it("does not render the permanent filter rail", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    expect(document.querySelector(".overview-filter-rail")).toBeNull();
+    expect(screen.queryByRole("group", { name: "Evidência" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Validação" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Estado" })).toBeNull();
+  });
+
+  it("does not render evidence/validation/lifecycle filter controls anywhere, including inside the open category drawer", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    await user.click(openDrawer());
+
+    expect(screen.queryByRole("button", { name: /Aberto/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Corroborada/ })).toBeNull();
+  });
+});
+
 describe("Overview — Problem ordering transparency and citizen discovery controls", () => {
   it("orders Problem cards by ascending PRB ID string order, neutrally, regardless of load order", async () => {
     const provider = makeProvider([
@@ -105,34 +193,18 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
 
     await screen.findByText("Problema dois");
     const titles = screen.getAllByRole("heading", { level: 4 }).map((heading) => heading.textContent);
-    // Plain string comparison ("PRB-10" < "PRB-2" < "PRB-9") — the point under
-    // test is that rendered order always matches ID.localeCompare, never
-    // fetch/resolution order, not that it is numeric.
     expect(titles).toEqual(["Problema dez", "Problema dois", "Problema nove"]);
   });
 
-  it("labels the citizen search control per the approved copy", async () => {
-    const provider = makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} },
-    ]);
+  it("labels the toolbar search control per the approved copy", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
     render(<Overview dataProvider={provider} {...props} />);
 
     const input = (await screen.findByLabelText("Pesquisar problemas")) as HTMLInputElement;
     expect(input.placeholder).toBe("Pesquisar problemas em Évora…");
   });
 
-  it("labels the Hero primary action with the canonical Problem count and points it at the in-page Problem list", async () => {
-    const provider = makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
-      { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
-    ]);
-    render(<Overview dataProvider={provider} {...props} />);
-
-    const cta = await screen.findByRole("link", { name: "Ver os 2 problemas" });
-    expect(cta.getAttribute("href")).toBe("#overview-problemas");
-  });
-
-  it("announces the result-count and empty-state meaning through a polite live region as search state changes", async () => {
+  it("announces the toolbar result count and empty-state meaning as search state changes", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
@@ -140,7 +212,7 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
     const user = userEvent.setup();
     render(<Overview dataProvider={provider} {...props} />);
 
-    const resultsCount = await screen.findByText("2 de 2 problemas");
+    const resultsCount = await screen.findByText("2 problemas");
     const liveRegion = resultsCount.closest('[aria-live="polite"]');
     expect(liveRegion).not.toBeNull();
     expect(liveRegion?.getAttribute("aria-atomic")).toBe("true");
@@ -148,10 +220,9 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
     const input = screen.getByLabelText("Pesquisar problemas");
     await user.type(input, "inexistente");
 
-    const emptyState = await within(liveRegion as HTMLElement).findByText(
-      "Nenhum problema corresponde à pesquisa."
-    );
-    expect(emptyState.closest('[aria-live="polite"]')).toBe(liveRegion);
+    await within(liveRegion as HTMLElement).findByText("0 problemas");
+    const emptyState = await screen.findByText("Nenhum problema corresponde à pesquisa.");
+    expect(emptyState).toBeTruthy();
   });
 
   it("keeps Problem rows outside the atomic result announcement and names each row's primary action by title", async () => {
@@ -161,174 +232,127 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
-    // The whole row is the primary click action (Overview visual-completion —
-    // editorial list redesign), named by the Problem's title, same as the
-    // former dedicated "Explorar →" action was.
     const firstAction = await screen.findByRole("button", { name: "Explorar Problema de mobilidade" });
     expect(screen.getByRole("button", { name: "Explorar Problema digital" })).toBeTruthy();
     expect(firstAction.closest('[aria-live="polite"]')).toBeNull();
   });
 });
 
-describe("Overview — filter rail vocabulary (filter-rail correction pass)", () => {
-  // The rail must expose the complete project filter vocabulary, not only
-  // values present in the currently visible/loaded result subset — this is a
-  // single-Problem fixture, deliberately carrying only one value per
-  // dimension, so every other canonical option below is provable as present
-  // with a genuinely zero count rather than merely absent from the fixture.
-  const singleProblemProvider = () =>
-    makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema único", file: "", summaryFields: { status: "OPEN", validation_status: "validated", evidence_status: "corroborated" } },
-    ]);
+describe("Overview — Filtros disclosure and category drawer", () => {
+  it("starts collapsed, with Filtros exposing aria-expanded=false", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    render(<Overview dataProvider={provider} {...props} />);
 
-  it("shows every canonical evidence_status/validation_status option, zero-filled, not only the value present on loaded Problems", async () => {
-    render(<Overview dataProvider={singleProblemProvider()} {...props} />);
-    await screen.findByText("Problema único");
-
-    const evidenceGroup = screen.getByRole("group", { name: "Evidência" });
-    expect(within(evidenceGroup).getByRole("button", { name: /Identificada/ }).textContent).toMatch(/0$/);
-    expect(within(evidenceGroup).getByRole("button", { name: /Corroborada/ }).textContent).toMatch(/1$/);
-
-    const validationGroup = screen.getByRole("group", { name: "Validação" });
-    expect(within(validationGroup).getByRole("button", { name: /Por validar/ }).textContent).toMatch(/0$/);
-    expect(within(validationGroup).getByRole("button", { name: /Parcialmente validada/ }).textContent).toMatch(/0$/);
-    expect(within(validationGroup).getByRole("button", { name: /Validada/ }).textContent).toMatch(/1$/);
+    await screen.findByText("Problema");
+    expect(openDrawer().getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("group", { name: "Filtrar por tema" })).toBeNull();
   });
 
-  it("exposes ESTADO as only Aberto/Fechado, never a raw lifecycle status or an evidence/validation concept", async () => {
-    render(<Overview dataProvider={singleProblemProvider()} {...props} />);
-    await screen.findByText("Problema único");
-
-    const estadoGroup = screen.getByRole("group", { name: "Estado" });
-    const options = within(estadoGroup).getAllByRole("button").map((button) => button.textContent?.replace(/\s+/g, " ").trim());
-    expect(options).toEqual(["Aberto 1", "Fechado 0"]);
-    expect(within(estadoGroup).queryByText(/Evidência insuficiente/)).toBeNull();
-  });
-
-  // Filter-rail correction pass §3: EVIDÊNCIA/VALIDAÇÃO/ESTADO no longer show
-  // a visible "Todos" reset row (their internal no-filter state stays reachable
-  // by clicking the active option again — see the "clears" test below); TEMA
-  // keeps its visible "Todos" as the explicit topic-filter reset.
-  it("shows no visible 'Todos' option in Evidência/Validação/Estado, while Tema keeps it", async () => {
-    render(<Overview dataProvider={singleProblemProvider()} {...props} />);
-    await screen.findByText("Problema único");
-
-    expect(within(screen.getByRole("group", { name: "Tema" })).getByRole("button", { name: /^Todos/ })).toBeTruthy();
-    expect(within(screen.getByRole("group", { name: "Evidência" })).queryByRole("button", { name: /^Todos/ })).toBeNull();
-    expect(within(screen.getByRole("group", { name: "Validação" })).queryByRole("button", { name: /^Todos/ })).toBeNull();
-    expect(within(screen.getByRole("group", { name: "Estado" })).queryByRole("button", { name: /^Todos/ })).toBeNull();
-  });
-
-  it("clicking the already-selected Evidência/Validação/Estado option clears that dimension back to its internal no-filter state, leaving no option selected", async () => {
-    const provider = makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema aberto corroborado", file: "", summaryFields: { status: "OPEN", validation_status: "validated", evidence_status: "corroborated" } },
-      { id: "PRB-2", type: "PRB-", label: "Problema fechado por validar", file: "", summaryFields: { status: "REJECTED", validation_status: "unvalidated", evidence_status: "discovered" } },
-    ]);
+  it("opens the drawer on click, exposing aria-expanded=true, and closes it on a second click", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
     const user = userEvent.setup();
     render(<Overview dataProvider={provider} {...props} />);
-    await screen.findByText("Problema aberto corroborado");
 
-    const estadoGroup = screen.getByRole("group", { name: "Estado" });
-    const aberto = within(estadoGroup).getByRole("button", { name: /Aberto/ });
-    await user.click(aberto);
-    expect(aberto.getAttribute("aria-pressed")).toBe("true");
-    expect(await screen.findByText("1 de 2 problemas")).toBeTruthy();
+    await screen.findByText("Problema");
+    const toggle = openDrawer();
+    await user.click(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("group", { name: "Filtrar por tema" })).toBeTruthy();
 
-    await user.click(aberto);
-    expect(aberto.getAttribute("aria-pressed")).toBe("false");
-    expect(within(estadoGroup).getAllByRole("button").every((button) => button.getAttribute("aria-pressed") === "false")).toBe(true);
-    expect(await screen.findByText("2 de 2 problemas")).toBeTruthy();
+    await user.click(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("group", { name: "Filtrar por tema" })).toBeNull();
   });
 
-  it("composes the ESTADO group filter with search/other rail filters, matching every closed status, not just the one loaded", async () => {
+  it("renders the complete canonical topic vocabulary with real, unfiltered counts, not only topics present on loaded Problems", async () => {
     const provider = makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema aberto", file: "", summaryFields: { status: "OPEN" } },
-      { id: "PRB-2", type: "PRB-", label: "Problema rejeitado", file: "", summaryFields: { status: "REJECTED" } },
+      { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
     ]);
+    provider.getRecord = async (id) => ({
+      id, type: "PRB-", file: "", record: { title: "Problema de mobilidade", domain: ["MOB"] }, outgoingEdges: [], incomingEdges: [],
+    });
     const user = userEvent.setup();
     render(<Overview dataProvider={provider} {...props} />);
-    await screen.findByText("Problema rejeitado");
 
-    const estadoGroup = screen.getByRole("group", { name: "Estado" });
-    await user.click(within(estadoGroup).getByRole("button", { name: /Fechado/ }));
+    await screen.findByText("Problema de mobilidade");
+    await user.click(openDrawer());
 
-    expect(await screen.findByText("1 de 2 problemas")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Explorar Problema rejeitado" })).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Explorar Problema aberto" })).toBeNull();
+    const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
+    expect(within(drawer).getByRole("button", { name: /^Mobilidade/ }).textContent).toMatch(/1$/);
+    // A topic absent from the loaded Problems is still rendered, with a genuinely zero count.
+    expect(within(drawer).getByRole("button", { name: /^Digital/ }).textContent).toMatch(/0$/);
   });
-});
 
-describe("Overview — Hero category shortcut filtering", () => {
-  // Root cause regression: the Hero "Ou entre por:" shortcuts used to be
-  // plain in-page anchors with no filter side effect at all. Clicking one
-  // must now drive the exact same canonical TEMA/topic filter state the
-  // rail's own TEMA group owns — never a second, parallel category-filter
-  // implementation — so the two controls always agree on the result set.
-  it("clicking a Hero category shortcut selects the matching TEMA option, filters to that canonical topic, and updates the results count and active-filter summary", async () => {
+  it("selecting Todos clears the topic filter (topicFilter === null)", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema de espaço público", file: "", summaryFields: {} },
     ]);
     provider.getRecord = async (id) => ({
-      id,
-      type: "PRB-",
-      file: "",
+      id, type: "PRB-", file: "",
       record: { title: id === "PRB-1" ? "Problema de mobilidade" : "Problema de espaço público", domain: id === "PRB-1" ? ["MOB"] : ["PUB"] },
-      outgoingEdges: [],
-      incomingEdges: [],
+      outgoingEdges: [], incomingEdges: [],
     });
     const user = userEvent.setup();
     render(<Overview dataProvider={provider} {...props} />);
+
     await screen.findByText("Problema de mobilidade");
+    await user.click(openDrawer());
+    const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
+    await user.click(within(drawer).getByRole("button", { name: /^Mobilidade/ }));
+    expect(await screen.findByText("1 problemas")).toBeTruthy();
 
-    const shortcut = screen.getByRole("link", { name: /Mobilidade/ });
-    await user.click(shortcut);
+    await user.click(within(drawer).getByRole("button", { name: /^Todos/ }));
+    expect(await screen.findByText("2 problemas")).toBeTruthy();
+  });
 
-    // Same canonical TEMA option in the rail is now selected.
-    const temaGroup = screen.getByRole("group", { name: "Tema" });
-    expect(within(temaGroup).getByRole("button", { name: /Mobilidade/ }).getAttribute("aria-pressed")).toBe("true");
+  it("selecting a category filters correctly and leaves the drawer open", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema de espaço público", file: "", summaryFields: {} },
+    ]);
+    provider.getRecord = async (id) => ({
+      id, type: "PRB-", file: "",
+      record: { title: id === "PRB-1" ? "Problema de mobilidade" : "Problema de espaço público", domain: id === "PRB-1" ? ["MOB"] : ["PUB"] },
+      outgoingEdges: [], incomingEdges: [],
+    });
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
 
-    // Only the matching-topic Problem remains visible; the header count and
-    // active-filter summary both update accordingly.
-    expect(await screen.findByText("1 de 2 problemas")).toBeTruthy();
+    await screen.findByText("Problema de mobilidade");
+    const toggle = openDrawer();
+    await user.click(toggle);
+    const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
+    await user.click(within(drawer).getByRole("button", { name: /^Mobilidade/ }));
+
+    expect(await screen.findByText("1 problemas")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Explorar Problema de mobilidade" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Explorar Problema de espaço público" })).toBeNull();
-    expect(screen.getByText("Mobilidade", { selector: ".overview-results-filter-summary" })).toBeTruthy();
+    // The drawer stays open.
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("group", { name: "Filtrar por tema" })).toBeTruthy();
   });
 
-  it("produces the same visible result set as selecting the same topic directly in the TEMA rail", async () => {
-    const provider = makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
-      { id: "PRB-2", type: "PRB-", label: "Problema de espaço público", file: "", summaryFields: {} },
-    ]);
+  it("gives Filtros a restrained active state and exposes the active category in its accessible name when the drawer is closed", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} }]);
     provider.getRecord = async (id) => ({
-      id,
-      type: "PRB-",
-      file: "",
-      record: { title: id === "PRB-1" ? "Problema de mobilidade" : "Problema de espaço público", domain: id === "PRB-1" ? ["MOB"] : ["PUB"] },
-      outgoingEdges: [],
-      incomingEdges: [],
+      id, type: "PRB-", file: "", record: { title: "Problema de mobilidade", domain: ["MOB"] }, outgoingEdges: [], incomingEdges: [],
     });
     const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
 
-    const viaShortcut = render(<Overview dataProvider={provider} {...props} />);
     await screen.findByText("Problema de mobilidade");
-    await user.click(screen.getByRole("link", { name: /Mobilidade/ }));
-    const viaShortcutIds = (await screen.findAllByRole("button", { name: /^Explorar/ })).map((button) => button.getAttribute("aria-label"));
-    viaShortcut.unmount();
+    const toggle = openDrawer();
+    await user.click(toggle);
+    const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
+    await user.click(within(drawer).getByRole("button", { name: /^Mobilidade/ }));
+    await user.click(toggle);
 
-    const viaRail = render(<Overview dataProvider={provider} {...props} />);
-    await screen.findByText("Problema de mobilidade");
-    const temaGroup = screen.getByRole("group", { name: "Tema" });
-    await user.click(within(temaGroup).getByRole("button", { name: /Mobilidade/ }));
-    const viaRailIds = (await screen.findAllByRole("button", { name: /^Explorar/ })).map((button) => button.getAttribute("aria-label"));
-    viaRail.unmount();
-
-    expect(viaShortcutIds).toEqual(["Explorar Problema de mobilidade"]);
-    expect(viaShortcutIds).toEqual(viaRailIds);
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getByRole("button", { name: /Filtros — Mobilidade/ })).toBeTruthy();
   });
 
-  it("composes the Hero category shortcut's TEMA filter with search, Evidência, Validação, and Estado", async () => {
+  it("composes search, category selection, and sort together", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Mobilidade corroborada aberta", file: "", summaryFields: { status: "OPEN", evidence_status: "corroborated" } },
       { id: "PRB-2", type: "PRB-", label: "Mobilidade discovered fechada", file: "", summaryFields: { status: "REJECTED", evidence_status: "discovered" } },
@@ -337,38 +361,93 @@ describe("Overview — Hero category shortcut filtering", () => {
     provider.getRecord = async (id) => {
       const domain = id === "PRB-3" ? ["PUB"] : ["MOB"];
       const title = id === "PRB-1" ? "Mobilidade corroborada aberta" : id === "PRB-2" ? "Mobilidade discovered fechada" : "Espaço público corroborado aberto";
-      return { id, type: "PRB-", file: "", record: { title, domain, status: id === "PRB-2" ? "REJECTED" : "OPEN", evidence_status: id === "PRB-2" ? "discovered" : "corroborated" }, outgoingEdges: [], incomingEdges: [] };
+      return { id, type: "PRB-", file: "", record: { title, domain, status: id === "PRB-2" ? "REJECTED" : "OPEN" }, outgoingEdges: [], incomingEdges: [] };
     };
     const user = userEvent.setup();
     render(<Overview dataProvider={provider} {...props} />);
     await screen.findByText("Mobilidade corroborada aberta");
 
-    await user.click(screen.getByRole("link", { name: /Mobilidade/ }));
-    const evidenceGroup = screen.getByRole("group", { name: "Evidência" });
-    await user.click(within(evidenceGroup).getByRole("button", { name: /Corroborada/ }));
+    await user.click(openDrawer());
+    const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
+    await user.click(within(drawer).getByRole("button", { name: /^Mobilidade/ }));
+    await user.type(screen.getByLabelText("Pesquisar problemas"), "corroborada");
 
-    expect(await screen.findByText("1 de 3 problemas")).toBeTruthy();
+    expect(await screen.findByText("1 problemas")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Explorar Mobilidade corroborada aberta" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Explorar Mobilidade discovered fechada" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Explorar Espaço público corroborado aberto" })).toBeNull();
   });
+
+  it("renders every category option as an individually wrappable inline control (no fixed-width overflow container)", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    await user.click(openDrawer());
+    const drawer = document.querySelector(".overview-category-drawer") as HTMLElement;
+    // The drawer's CSS (`.overview-category-drawer { flex-wrap: wrap }`,
+    // index.css) provides the actual narrow-width wrapping behaviour; this
+    // asserts the DOM contract that CSS relies on — every option (Todos plus
+    // each canonical topic) is its own sibling element, never pre-joined
+    // into one unbreakable string.
+    expect(drawer.children.length).toBeGreaterThan(1);
+    expect([...drawer.children].every((child) => child.tagName === "BUTTON")).toBe(true);
+  });
 });
 
-describe("Overview — results-footer removal", () => {
-  // The former visual "X de Y" footer under the problem list was redundant
-  // with the results header's own count (`overview-results-count`) and has
-  // been removed outright (filter-rail correction pass §1); the header count
-  // remains the sole result-count surface.
-  it("does not render a results-footer count below the problem list", async () => {
+describe("Overview — toolbar result count and sort", () => {
+  it("shows the filtered total in the toolbar's compact presentation", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
-    await screen.findByText("2 de 2 problemas");
-    expect(document.querySelector(".overview-results-footer")).toBeNull();
-    expect(document.querySelectorAll(".overview-results-count").length).toBe(1);
+    expect(await screen.findByText("2 problemas")).toBeTruthy();
+  });
+
+  it("reflects visibleProblems.length, never the paginated slice length", async () => {
+    const problems = Array.from({ length: 15 }, (_, index) => {
+      const id = `PRB-${String(index + 1).padStart(4, "0")}`;
+      return { id, type: "PRB-" as const, label: `Problema ${String(index + 1).padStart(2, "0")}`, file: "", summaryFields: {} };
+    });
+    render(<Overview dataProvider={makeProvider(problems)} {...props} />);
+
+    // 15 filtered results, even though only 10 rows render on page 1.
+    expect(await screen.findByText("15 problemas")).toBeTruthy();
+    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(10);
+  });
+
+  it("does not render the former active-filter-summary text line", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    expect(screen.queryByText("sem filtros ativos")).toBeNull();
+    expect(document.querySelector(".overview-results-filter-summary")).toBeNull();
+  });
+
+  it("still applies the existing sort ordering via the toolbar sort control", async () => {
+    const provider: DataProvider = {
+      ...makeProvider([
+        { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
+        { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
+      ]),
+      getRecord: async (id) => ({
+        id, type: "PRB-", file: "",
+        record: { title: id === "PRB-1" ? "Problema um" : "Problema dois", updated_at: id === "PRB-1" ? "2026-01-01" : "2026-06-01" },
+        outgoingEdges: [], incomingEdges: [],
+      }),
+    };
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema um");
+    await user.selectOptions(screen.getByLabelText("Ordenar por"), "última atualização");
+
+    const titles = screen.getAllByRole("heading", { level: 4 }).map((heading) => heading.textContent);
+    expect(titles).toEqual(["Problema dois", "Problema um"]);
   });
 });
 
@@ -383,7 +462,7 @@ describe("Overview — problem-list pagination", () => {
   it("renders at most 10 problem rows on page 1 even when more results are available", async () => {
     render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
 
-    await screen.findByText("25 de 25 problemas");
+    await screen.findByText("25 problemas");
     expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(10);
   });
 
@@ -391,7 +470,7 @@ describe("Overview — problem-list pagination", () => {
     const user = userEvent.setup();
     render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
 
-    await screen.findByText("25 de 25 problemas");
+    await screen.findByText("25 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
 
     expect(await screen.findByText("Problema 11")).toBeTruthy();
@@ -400,30 +479,22 @@ describe("Overview — problem-list pagination", () => {
   });
 
   it("paginates the already filtered and sorted result set, not the full unfiltered corpus", async () => {
-    // 15 OPEN + 5 REJECTED: filtering to Aberto must leave exactly 15 results
-    // (2 pages), never mixing in the closed problems that pagination would
-    // otherwise still be slicing from if filtering ran after pagination.
-    const problems = [
-      ...makeManyProblems(15, () => ({ status: "OPEN" })),
-      ...makeManyProblems(5, () => ({ status: "REJECTED" })).map((p, i) => ({ ...p, id: `PRB-CLOSED-${i}` })),
-    ];
+    const problems = makeManyProblems(15);
     const user = userEvent.setup();
     render(<Overview dataProvider={makeProvider(problems)} {...props} />);
 
-    await screen.findByText("20 de 20 problemas");
-    const estadoGroup = screen.getByRole("group", { name: "Estado" });
-    await user.click(within(estadoGroup).getByRole("button", { name: /Aberto/ }));
+    await screen.findByText("15 problemas");
+    await user.type(screen.getByLabelText("Pesquisar problemas"), "Problema 0");
 
-    expect(await screen.findByText("15 de 20 problemas")).toBeTruthy();
-    expect(screen.getByText("Página 1 de 2")).toBeTruthy();
-    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(10);
+    expect(await screen.findByText("9 problemas")).toBeTruthy();
+    expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(9);
   });
 
   it("resets to page 1 when the search query changes", async () => {
     const user = userEvent.setup();
     render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
 
-    await screen.findByText("25 de 25 problemas");
+    await screen.findByText("25 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
     await screen.findByText("Página 2 de 3");
 
@@ -431,16 +502,19 @@ describe("Overview — problem-list pagination", () => {
     await screen.findByText("Página 1 de 3");
   });
 
-  it("resets to page 1 when a filter changes", async () => {
+  it("resets to page 1 when the topic filter changes", async () => {
+    const provider = makeProvider(makeManyProblems(25));
+    provider.getRecord = async (id) => ({ id, type: "PRB-", file: "", record: { title: id, domain: ["MOB"] }, outgoingEdges: [], incomingEdges: [] });
     const user = userEvent.setup();
-    render(<Overview dataProvider={makeProvider(makeManyProblems(25, () => ({ status: "OPEN" })))} {...props} />);
+    render(<Overview dataProvider={provider} {...props} />);
 
-    await screen.findByText("25 de 25 problemas");
+    await screen.findByText("25 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
     await screen.findByText("Página 2 de 3");
 
-    const estadoGroup = screen.getByRole("group", { name: "Estado" });
-    await user.click(within(estadoGroup).getByRole("button", { name: /Aberto/ }));
+    await user.click(openDrawer());
+    const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
+    await user.click(within(drawer).getByRole("button", { name: /^Mobilidade/ }));
     await screen.findByText("Página 1 de 3");
   });
 
@@ -448,7 +522,7 @@ describe("Overview — problem-list pagination", () => {
     const user = userEvent.setup();
     render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
 
-    await screen.findByText("25 de 25 problemas");
+    await screen.findByText("25 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
     await screen.findByText("Página 2 de 3");
 
@@ -456,23 +530,23 @@ describe("Overview — problem-list pagination", () => {
     await screen.findByText("Página 1 de 3");
   });
 
-  it("keeps the results-header count as the total filtered count, not the current page's row count", async () => {
+  it("keeps the toolbar count as the total filtered count, not the current page's row count", async () => {
     render(<Overview dataProvider={makeProvider(makeManyProblems(25))} {...props} />);
 
-    expect(await screen.findByText("25 de 25 problemas")).toBeTruthy();
+    expect(await screen.findByText("25 problemas")).toBeTruthy();
   });
 
   it("renders no pagination footer when the result set fits on one page", async () => {
     render(<Overview dataProvider={makeProvider(makeManyProblems(10))} {...props} />);
 
-    await screen.findByText("10 de 10 problemas");
+    await screen.findByText("10 problemas");
     expect(document.querySelector(".overview-pagination-footer")).toBeNull();
   });
 
   it("renders the pagination footer only once there are more than 10 results", async () => {
     render(<Overview dataProvider={makeProvider(makeManyProblems(11))} {...props} />);
 
-    await screen.findByText("11 de 11 problemas");
+    await screen.findByText("11 problemas");
     expect(document.querySelector(".overview-pagination-footer")).not.toBeNull();
     expect(screen.getByText("Página 1 de 2")).toBeTruthy();
   });
@@ -481,7 +555,7 @@ describe("Overview — problem-list pagination", () => {
     const user = userEvent.setup();
     render(<Overview dataProvider={makeProvider(makeManyProblems(11))} {...props} />);
 
-    await screen.findByText("11 de 11 problemas");
+    await screen.findByText("11 problemas");
     const previous = screen.getByRole("button", { name: "Anterior" }) as HTMLButtonElement;
     const next = screen.getByRole("button", { name: "Seguinte" }) as HTMLButtonElement;
     expect(previous.disabled).toBe(true);
@@ -491,18 +565,6 @@ describe("Overview — problem-list pagination", () => {
     await screen.findByText("Página 2 de 2");
     expect((screen.getByRole("button", { name: "Anterior" }) as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByRole("button", { name: "Seguinte" }) as HTMLButtonElement).disabled).toBe(true);
-  });
-});
-
-describe("Overview — results header structural layout", () => {
-  it("groups the result count and active-filter summary together, apart from the sort control, so only two flex items share the header row", async () => {
-    render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
-
-    const count = await screen.findByText("1 de 1 problemas");
-    const header = count.closest(".overview-results-header") as HTMLElement;
-    expect(header.children.length).toBe(2);
-    expect(count.closest(".overview-results-header-summary")).not.toBeNull();
-    expect(header.querySelector(".overview-sort-control")?.parentElement).toBe(header);
   });
 });
 
@@ -527,188 +589,5 @@ describe("Overview — error state retry (ODM-021)", () => {
 
     await screen.findByText("PRB-9");
     expect(attempts).toBe(2);
-  });
-});
-
-describe("Overview — material-change timeline", () => {
-  it("renders the neutral no-history state in the Hero recent-updates panel only after every Problem detail loads", async () => {
-    render(<Overview dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])} {...props} />);
-
-    await screen.findByText("Atualizado recentemente");
-    expect(screen.getByText("Ainda não existem alterações materiais registadas para apresentar.")).toBeTruthy();
-    expect(screen.queryByText(/nunca mudou/i)).toBeNull();
-  });
-});
-
-describe("Overview — metrics value/label separation", () => {
-  it("renders each count metric's numeric value and PT-PT label as separate elements", async () => {
-    const provider = makeProvider([
-      { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
-      { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
-    ]);
-    render(<Overview dataProvider={provider} {...props} />);
-
-    const problemMetric = (await screen.findByText("2", { selector: ".overview-metric-value" })).closest(".overview-metric");
-    expect(problemMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Problemas acompanhados");
-
-    const evidenceValue = screen.getAllByText("0", { selector: ".overview-metric-value" })[0];
-    expect(evidenceValue.closest(".overview-metric")?.querySelector(".overview-metric-label")?.textContent).toBe("Registos de evidência");
-  });
-});
-
-describe("Overview — Hero recent-updates preview", () => {
-  it("shows at most 3 authored material-change entries, each with its PRB id, canonical last-updated date, and topic", async () => {
-    // updated_at deliberately differs from the authored history entry's own
-    // date, so a passing assertion on "08/04/2026" proves the canonical
-    // updatedAt is what renders here, not MaterialChangeEntry.date.
-    const provider: DataProvider = {
-      ...makeProvider([
-        { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
-        { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
-        { id: "PRB-3", type: "PRB-", label: "Problema três", file: "", summaryFields: {} },
-        { id: "PRB-4", type: "PRB-", label: "Problema quatro", file: "", summaryFields: {} },
-        { id: "PRB-5", type: "PRB-", label: "Problema cinco", file: "", summaryFields: {} },
-        { id: "PRB-6", type: "PRB-", label: "Problema seis", file: "", summaryFields: {} },
-      ]),
-      getRecord: async (id) => ({
-        id,
-        type: "PRB-",
-        file: "",
-        record: { title: `Problema ${id}`, domain: ["MOB"], updated_at: "2026-04-08", history: [{ date: "2026-01-01", summary: "Alteração material registada." }] },
-        outgoingEdges: [],
-        incomingEdges: [],
-      }),
-    };
-    render(<Overview dataProvider={provider} {...props} />);
-
-    await screen.findByText("Atualizado recentemente");
-    const recentList = document.querySelector(".overview-hero-recent-list") as HTMLElement;
-    const items = recentList.querySelectorAll("li");
-    expect(items.length).toBe(3);
-
-    const firstItem = items[0];
-    expect(within(firstItem as HTMLElement).getByText("PRB-1")).toBeTruthy();
-    expect(within(firstItem as HTMLElement).getByText("08/04/2026").tagName).toBe("TIME");
-    expect(within(firstItem as HTMLElement).getByText(/Mobilidade/)).toBeTruthy();
-
-    expect(screen.queryByRole("link", { name: "Ver tudo" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Abrir o explorador" })).toBeNull();
-  });
-
-  it("renders a Problem with multiple material-change entries once, using its newest entry, without crowding out other distinct Problems", async () => {
-    // PRB-0007 authored two material-change entries (newest 2026-04-08, older
-    // 2026-02-01); PRB-0003/0002 authored one each. The panel must show
-    // 3 distinct PRBs — PRB-0007 once, at its newest date — never PRB-0007
-    // twice at the expense of a fourth distinct Problem.
-    const histories: Record<string, { date: string; summary: string }[]> = {
-      "PRB-0007": [
-        { date: "2026-04-08", summary: "PRB-0007 mais recente." },
-        { date: "2026-02-01", summary: "PRB-0007 mais antiga." },
-      ],
-      "PRB-0003": [{ date: "2026-03-01", summary: "PRB-0003 alteração." }],
-      "PRB-0002": [{ date: "2026-02-15", summary: "PRB-0002 alteração." }],
-    };
-    const provider: DataProvider = {
-      ...makeProvider(
-        Object.keys(histories).map((id) => ({ id, type: "PRB-", label: `Problema ${id}`, file: "", summaryFields: {} }))
-      ),
-      getRecord: async (id) => ({
-        id,
-        type: "PRB-",
-        file: "",
-        record: { title: `Problema ${id}`, history: histories[id] },
-        outgoingEdges: [],
-        incomingEdges: [],
-      }),
-    };
-    render(<Overview dataProvider={provider} {...props} />);
-
-    await screen.findByText("Atualizado recentemente");
-    const recentList = document.querySelector(".overview-hero-recent-list") as HTMLElement;
-    const items = recentList.querySelectorAll("li");
-    expect(items.length).toBe(3);
-
-    const renderedIds = [...items].map((item) => item.querySelector(".technical-id")?.textContent);
-    expect(renderedIds).toEqual(["PRB-0007", "PRB-0003", "PRB-0002"]);
-    // Newest entry retained, not the older one, for the deduplicated PRB.
-    expect(within(items[0] as HTMLElement).getByText("Problema PRB-0007")).toBeTruthy();
-  });
-
-  it("opens Records from the recent-updates panel's 'Ver tudo' action, alongside the heading", async () => {
-    const onViewRecords = vi.fn();
-    render(
-      <Overview
-        dataProvider={makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }])}
-        onExploreProblem={vi.fn()}
-        onViewRecords={onViewRecords}
-      />
-    );
-
-    const heading = await screen.findByText("Atualizado recentemente");
-    const viewAll = screen.getByRole("button", { name: "Ver tudo" });
-    expect(heading.closest(".overview-hero-recent-header")).toBe(viewAll.closest(".overview-hero-recent-header"));
-
-    await userEvent.setup().click(viewAll);
-    expect(onViewRecords).toHaveBeenCalledTimes(1);
-  });
-
-  it("omits the date rather than fabricating one when the canonical updatedAt is genuinely unavailable", async () => {
-    const provider: DataProvider = {
-      ...makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]),
-      getRecord: async (id) => ({
-        id,
-        type: "PRB-",
-        file: "",
-        record: { title: "Problema sem updated_at", history: [{ date: "2026-04-08", summary: "Alteração material registada." }] },
-        outgoingEdges: [],
-        incomingEdges: [],
-      }),
-    };
-    render(<Overview dataProvider={provider} {...props} />);
-
-    await screen.findByText("Atualizado recentemente");
-    const recentList = document.querySelector(".overview-hero-recent-list") as HTMLElement;
-    expect(within(recentList).getByText("PRB-1")).toBeTruthy();
-    expect(recentList.querySelector("time")).toBeNull();
-  });
-
-  it("exposes the existing incomplete-history meaning when a Problem detail failed to load", async () => {
-    const provider: DataProvider = {
-      listRecords: async () => [
-        { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
-        { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
-      ],
-      getManifest: async () => { throw new Error("unused"); },
-      getEdges: async () => [],
-      getRecord: async (id) => {
-        if (id === "PRB-2") throw new Error("falha ao carregar PRB-2");
-        return { id, type: "PRB-", file: "", record: { title: "Problema um", updated_at: "2026-04-08", history: [{ date: "2026-04-08", summary: "Alteração material registada." }] }, outgoingEdges: [], incomingEdges: [] };
-      },
-    };
-    render(<Overview dataProvider={provider} {...props} />);
-
-    await screen.findByText("Atualizado recentemente");
-    expect(screen.getByText(/Histórico recente incompleto/)).toBeTruthy();
-  });
-
-  it("opens a recent-update item's owning Problem", async () => {
-    const onExploreProblem = vi.fn();
-    const provider: DataProvider = {
-      ...makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]),
-      getRecord: async (id) => ({
-        id,
-        type: "PRB-",
-        file: "",
-        record: { title: "Problema do histórico", history: [{ date: "2026-04-08", summary: "Alteração material registada." }] },
-        outgoingEdges: [],
-        incomingEdges: [],
-      }),
-    };
-    render(<Overview dataProvider={provider} onExploreProblem={onExploreProblem} onViewRecords={vi.fn()} />);
-
-    const recentList = await screen.findByText("Atualizado recentemente").then(() => document.querySelector(".overview-hero-recent-list") as HTMLElement);
-    const item = within(recentList).getByText("Problema do histórico");
-    await userEvent.setup().click(item);
-    expect(onExploreProblem).toHaveBeenCalledWith("PRB-1");
   });
 });

@@ -919,13 +919,13 @@ main.explorer-shell {
      padding/margin here, and no separate margin on `.explorer-chrome`/
      `main.explorer-shell` contributes one either, so there is no gap left
      to close. Any breathing room the Hero needs lives inside the Hero
-     itself (`.overview-hero-content`/`.overview-hero-recent` padding
-     below), never as space between Header and page. Bottom padding is
-     zero: the Overview-specific zero-gap treatment below (see
-     `main.explorer-shell`/`.public-footer`) already neutralizes the
-     *shared* shell/footer spacing layers, so the pagination/results column
-     now flows directly into the global PublicFooter, whose own border
-     provides the visual separation — not a competing second gap. */
+     itself (`.overview-hero` padding below), never as space between Header
+     and page. Bottom padding is zero: the Overview-specific zero-gap
+     treatment below (see `main.explorer-shell`/`.public-footer`) already
+     neutralizes the *shared* shell/footer spacing layers, so the
+     pagination/results column now flows directly into the global
+     PublicFooter, whose own border provides the visual separation — not a
+     competing second gap. */
   padding: 0;
 }
 
@@ -941,35 +941,25 @@ main.explorer-shell {
   border: 0;
 }
 
-/* Overview top-surface — the approved editorial Hero (design/
-   overview-visual-completion TARGET, "Overview → Full composition → 1440
-   desktop"): a two-column grid, copy+metrics+CTA on the left, a compact
-   "Atualizado recentemente" preview on the right. Composition stays inside
-   the canonical `.shell-frame` — no narrower max-width is introduced
-   around it. Both columns share the same reading-paper surface (no white
-   backplate on the left block) so the Hero reads as one unified
-   composition; no outer border/shadow — the radius alone plus the shared
-   surface tone are the only boundary signal (docs/design/component-model.md
-   §2.2 layout primitives stay CSS-first; this remains a domain-owned
-   Overview recipe, not a new shared primitive). Desktop-first per the
-   approved delta §7; only enough compact handling to avoid breakage lives
-   in the <=767px block below. */
-.overview-top-surface {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
-  gap: 0;
-  margin: 0;
+/* Overview Hero — final macro-structure (Overview final redesign, Phase 1,
+   delta §1): one editorial content column, aligned left, with deliberate
+   negative space on the right — no second Hero column, no permanent right-
+   side panel. Composition stays inside the canonical `.shell-frame` — no
+   narrower max-width is introduced around it. */
+.overview-hero {
+  padding: var(--space-loose) var(--space-standard) var(--space-loose) 0;
   border-radius: var(--radius-surface) var(--radius-surface) 0 0;
   background: var(--color-surface-reading);
-  overflow: hidden;
 }
 
 .overview-hero-content {
   display: flex;
   flex-direction: column;
   align-items: start;
-  padding: var(--space-loose) var(--space-standard) var(--space-loose) 0;
-  padding-right: 24px;
+  /* Caps the content column so the negative space on the right (TARGET) is
+     the deliberate remainder of the Hero's own width, not a fluid full-width
+     paragraph measure. */
+  max-width: 40rem;
 }
 
 .overview-hero-eyebrow {
@@ -1020,12 +1010,11 @@ main.explorer-shell {
   line-height: 1.55;
 }
 
-/* Metric columns side by side (value stacked above label), separated by a
-   vertical hairline. Now the Hero's bottom ruler (`.overview-hero-ruler`,
-   TARGET) rather than a block inside the main Hero column — the canonical
-   dynamic counts (problems, evidence) plus the corpus total
-   (manifest.totalRecords, the same value as App.tsx's "Corpus: X registos"
-   summary; never a separately computed total). */
+/* Hero metrics (TARGET): three compact inline counts, value stacked above
+   label, separated by a vertical hairline. Exactly the three metric
+   concepts required (delta §1 "Hero metrics") — problem count, evidence-
+   record count, primary-source count — never a fourth "total records"
+   metric here. */
 .overview-metrics {
   display: flex;
   flex-wrap: wrap;
@@ -1060,309 +1049,6 @@ main.explorer-shell {
   color: var(--color-ink-secondary);
   font-family: var(--font-interface);
   font-size: var(--text-interface-label-size);
-}
-
-/* Thin footer strip attached directly under the Hero (TARGET) — a restrained
-   ruler across the full top-surface width, below both columns, immediately
-   adjacent (no gap — Overview visual-completion delta §5 removes the outer
-   spacing between the Hero and this strip). Metrics sit on the left, the
-   latest-update summary on the right, both on one row at desktop. Shares the
-   Hero's reading-paper surface and picks up the bottom corners the Hero
-   itself no longer rounds on this edge. */
-.overview-hero-ruler {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem var(--space-standard);
-  padding: 0.85rem 0;
-  border-top: 1px solid var(--color-separator-faint);
-  border-radius: 0 0 var(--radius-surface) var(--radius-surface);
-  background: var(--color-surface-subtle);
-}
-
-.overview-hero-ruler .overview-metrics {
-  flex: 1 1 auto;
-  align-items: baseline;
-  width: auto;
-}
-
-.overview-hero-ruler .overview-metric {
-  flex-direction: row;
-  align-items: baseline;
-  gap: 0.35rem;
-}
-
-.overview-hero-ruler .overview-metric-value {
-  font-size: 0.95rem;
-}
-
-.overview-hero-ruler .overview-metric-label {
-  font-size: 0.8rem;
-}
-
-.overview-hero-ruler-latest {
-  flex: 0 0 auto;
-  margin: 0;
-  color: var(--color-accent-hover);
-  font-family: var(--font-interface);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-/* Search input plus the primary Hero action, side by side at desktop
-   (TARGET) — the button is the Hero's primary CTA, immediately to the right
-   of the search input, not a separate block below the metrics. */
-.overview-hero-search-row {
-  display: flex;
-  align-items: stretch;
-  gap: 0.6rem;
-  width: 100%;
-  margin: 0 0 var(--space-standard);
-}
-
-.overview-hero-search-row .overview-search {
-  flex: 1 1 auto;
-  margin: 0;
-}
-
-.overview-hero-cta {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  /* `.overview-search-input` is `box-sizing: border-box`, so its 44px
-     `min-height` is a total height. This `<a>` never set `box-sizing`, so it
-     stayed at the initial `content-box` and rendered ~21px taller than the
-     search field — the same 44px `min-height` plus the vertical padding on
-     top, rather than as its total height. Match the search control's box
-     model so both size to the same control height. */
-  box-sizing: border-box;
-  min-height: var(--target-min);
-  padding: 0.65rem 1.3rem;
-  border-radius: var(--radius-control);
-  background: var(--color-accent);
-  color: var(--color-surface-raised);
-  font-family: var(--font-interface);
-  font-size: var(--text-interface-label-size);
-  font-weight: 650;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-.overview-hero-cta:hover {
-  background: var(--color-accent-hover);
-  /* Pins the CTA's own white-on-clay text color against the generic `a:hover`
-     rule above, which would otherwise swap it to `--color-accent` — a clay
-     tone close enough to this hover background (`--color-accent-hover`,
-     clay-dark) to read as low-contrast/near-invisible. */
-  color: var(--color-surface-raised);
-}
-
-.overview-hero-cta:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-/* Wraps the "Ou entre por:" intro and the shortcut chips on one row (TARGET).
-   `width: 100%` matches `.overview-hero-search-row`'s own explicit full
-   width — `.overview-hero-content` is a column flex container with
-   `align-items: start`, so without it this row would shrink-wrap to its
-   content instead of spanning the same content edge the search input and
-   CTA row already stretch to. That shared right edge is what keeps this
-   row's right edge aligned with the CTA button's, using the existing Hero
-   flex column rather than a manual offset. */
-.overview-category-shortcuts-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-.overview-category-shortcuts-intro {
-  color: var(--color-ink-muted);
-  font-family: var(--font-interface);
-  font-size: 0.82rem;
-}
-
-/* Compact category shortcuts (TARGET) — a lightweight Hero affordance, not
-   the full reusable `.overview-topic-filters` filter bar (kept intact below
-   for a dedicated search/exploration page). Each chip is a plain in-page
-   link, never a second filter/search implementation. */
-.overview-category-shortcuts {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.overview-category-shortcut {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  min-height: 32px;
-  padding: 0.3rem 0.75rem;
-  color: var(--color-ink-secondary);
-  border: 1px solid var(--color-separator-standard);
-  border-radius: var(--radius-control);
-  background: var(--color-surface-raised);
-  font-family: var(--font-interface);
-  font-size: 0.82rem;
-  text-decoration: none;
-}
-
-.overview-category-shortcut:hover {
-  border-color: #bbb3a3;
-  background: var(--color-surface-subtle);
-}
-
-.overview-category-shortcut:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 1px;
-}
-
-.overview-category-shortcut-count {
-  color: var(--color-ink-muted);
-  font-size: 0.76rem;
-}
-
-/* Right column — the "Atualizado recentemente" preview. Same reading-paper
-   surface as the left column; a single hairline central divider (not a
-   tonal shift) is what separates the two blocks, matching the TARGET. */
-.overview-hero-recent {
-  padding: var(--space-loose) 0 var(--space-loose) var(--space-standard);
-  padding-left: 24px;
-  border-left: 1px solid var(--color-separator-faint);
-}
-
-/* Heading and "Ver tudo" share one top row (TARGET); the supporting label
-   sits on its own line below, spanning the full column width. */
-.overview-hero-recent-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-standard);
-}
-
-.overview-hero-recent-header h3 {
-  margin: 0 0 var(--space-standard);
-  color: var(--color-ink-muted);
-  font-family: var(--font-interface);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-}
-
-.overview-hero-recent-viewall {
-  flex: 0 0 auto;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-accent-hover);
-  font-family: var(--font-interface);
-  font-size: var(--text-interface-label-size);
-  font-weight: 500;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.16em;
-  cursor: pointer;
-}
-
-.overview-hero-recent-viewall:hover {
-  color: var(--color-accent);
-}
-
-.overview-hero-recent-viewall:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-/* Restrained stacked list (TARGET) — a thin hairline between rows is the
-   only structure; no timeline dot/rail (replaced per Overview
-   visual-completion delta §3). */
-.overview-hero-recent-list {
-  display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.overview-hero-recent-list li {
-  border-top: 1px solid var(--color-separator-faint);
-}
-
-.overview-hero-recent-list li:last-child {
-  border-bottom: 1px solid var(--color-separator-faint);
-}
-
-.overview-hero-recent-item {
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  gap: 0.3rem;
-  width: 100%;
-  min-height: auto;
-  padding: 0.75rem 0;
-  border: 0;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-}
-
-.overview-hero-recent-item-title {
-  color: var(--color-accent-hover);
-  font-family: var(--font-reading);
-  font-size: 0.95rem;
-  line-height: 1.4;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.16em;
-}
-
-.overview-hero-recent-item:hover .overview-hero-recent-item-title {
-  color: var(--color-accent);
-}
-
-.overview-hero-recent-item:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-/* Single secondary line (TARGET): PRB id and topic(s) on the left, the
-   change date at the right edge of the same row — replacing the former
-   two-line topics-then-meta split. Every canonical domain code the entry
-   carries is joined as plain restrained text (no TopicBadge/pill in this
-   compact Hero list); the title above remains the sole primary clickable
-   line. */
-.overview-hero-recent-item-meta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  width: 100%;
-  gap: 0.3rem 0.45rem;
-  color: var(--color-ink-muted);
-  font-family: var(--font-interface);
-  font-size: 0.72rem;
-}
-
-.overview-hero-recent-item-meta time {
-  font-family: var(--font-technical);
-}
-
-.overview-hero-recent-item-identity {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.overview-hero-recent-item-topics {
-  color: var(--color-ink-muted);
 }
 
 .overview-search {
@@ -1453,19 +1139,6 @@ main.explorer-shell {
   border-color: var(--color-ink-primary);
   background: var(--color-ink-primary);
   font-weight: 650;
-}
-
-/* Delta §7 — compact results toolbar: result count (still inside its
-   aria-live/aria-atomic boundary in OverviewPresentation.tsx) plus the
-   Records action, moved here from the page bottom. The action sits outside
-   the live region and must not visually dominate the count. */
-.overview-results-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.35rem 1rem;
-  margin: 0 0 0.65rem;
 }
 
 .overview-results-count {
@@ -1691,146 +1364,41 @@ main.explorer-shell {
   background: var(--color-accent);
 }
 
-/* Editorial problem-list redesign (Overview visual-completion — owner-approved
-   TARGET reference): filter rail (narrow, left) + results column (flexible,
-   right), sharing one horizontal boundary, no individual card grid. */
-.overview-discovery {
-  display: grid;
-  grid-template-columns: 15rem minmax(0, 1fr);
-  /* `stretch` (the grid default — no explicit `align-items` needed) is what
-     makes `.overview-filter-rail` span the full row height, including
-     through the final problem row and results footer, so its border-right
-     stays a continuous divider to the bottom of the discovery section. A
-     previous `align-items: start` here sized the rail to only its own
-     (shorter) content instead of the row. No fixed height, viewport-height
-     unit, or absolute positioning is used to achieve this. */
-  border-top: 1px solid var(--color-separator-emphasis);
-}
-
-.overview-filter-rail {
-  /* TARGET desktop geometry: 26px 24px 40px 0. The grid column stays
-     15rem (240px at the 16px root the rest of this file assumes) —
-     unchanged, matching TARGET's 240px rail column. Left inset is owned by
-     the shell's page alignment, not duplicated here, so the rail content
-     shares the Hero/ruler left axis. Not `position: sticky` — a stretched
-     grid item cannot both fill and stick to the same viewport-relative
-     offset without a fixed/viewport-height hack, and full-height stretch is
-     the requirement here, not scroll-following. */
-  padding: 1.625rem 1.5rem 2.5rem 0;
-  border-right: 1px solid var(--color-separator-standard);
-}
-
-/* TARGET group spacing: 26px between groups (a small, deliberate delta
-   from the shared --space-loose 24px token — set locally here, not by
-   changing that token, since it is used elsewhere in this file). */
-.overview-filter-rail-group + .overview-filter-rail-group {
-  margin-top: 1.625rem;
-}
-
-.overview-filter-rail-heading {
-  /* TARGET: 10px heading margin-bottom (a small, deliberate delta from the
-     shared --space-tight 8px token — set locally, token untouched). */
-  margin: 0 0 0.625rem;
-  color: var(--color-ink-muted);
-  font-family: var(--font-technical);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.overview-filter-rail-options {
-  display: flex;
-  flex-direction: column;
-  /* TARGET: 2px option gap. */
-  gap: 2px;
-}
-
-.overview-filter-rail-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-tight);
-  width: 100%;
-  min-height: var(--target-min);
-  /* TARGET: 5px 8px option padding — consistent across every option so
-     row height never varies with label/count length. */
-  padding: 0.3125rem 0.5rem;
-  color: var(--color-ink-secondary);
-  border: 0;
-  border-radius: var(--radius-focus);
-  background: none;
-  font-size: var(--text-interface-body-size);
-  text-align: left;
-  cursor: pointer;
-}
-
-.overview-filter-rail-option:hover {
-  background: var(--color-surface-subtle);
-}
-
-.overview-filter-rail-option:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 1px;
-}
-
-/* Active filter option (TARGET): a subtle tint distinct from the plain
-   `--color-surface-subtle` hover/alternating-row tone above (same
-   `color-mix` accent-tint technique already used by the Hero eyebrow chip,
-   not a new color primitive) plus a stronger label, so the selected option
-   reads clearly against the rest of the rail. Behavior/state model is
-   unchanged — `aria-pressed` remains the only source of this state. */
-.overview-filter-rail-option[aria-pressed="true"] {
-  color: var(--color-ink-primary);
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
-  font-weight: 600;
-}
-
-.overview-filter-rail-count {
-  color: var(--color-ink-muted);
-  font-family: var(--font-technical);
-  font-size: 0.78rem;
-}
-
-/* Left inset now lives on each child's own padding (header/footer/rows all
-   share the 32px content axis per TARGET), not here — this container no
-   longer adds its own padding-left, so those explicit paddings aren't
-   doubled up. */
-.overview-results {
-  min-width: 0;
-}
-
-/* Structural two-group layout (results-header wrapping fix): the header
-   holds exactly two flex items — the left summary group (count + active-
-   filter summary) and the right sort control — laid out with
-   `justify-content: space-between` rather than three independent flex
-   items sharing one wrapping line. The former structure let the sort
-   control's own `margin-left: auto` interact with `flex-wrap: wrap` across
-   three siblings, which could push it onto its own line even when the row
-   had enough width; grouping the left content removes that interaction
-   entirely. `flex-wrap: wrap` still applies to these two groups, so genuine
-   narrow-width wrapping (compact viewports) is unaffected — no width is
-   hard-coded. */
-.overview-results-header {
+/* Final always-visible toolbar (Overview final redesign, Phase 1 — delta
+   §3): Filtros + search on the left, result count + sort on the right.
+   Visible whether the category drawer is open or closed — this row never
+   moves or disappears when the drawer toggles. */
+.overview-toolbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-tight) var(--space-standard);
-  /* TARGET: 14px 0 14px 32px, aligned to the same content axes as the
-     problem rows below (count/filter summary left, sort control right).
-     Right inset is owned by the shell's page alignment, not duplicated
-     here, so the sort control shares the Hero/ruler right axis. */
   padding: 0.875rem 0 0.875rem 2rem;
+  border-top: 1px solid var(--color-separator-emphasis);
   border-bottom: 1px solid var(--color-separator-standard);
 }
 
-.overview-results-header-summary {
+.overview-toolbar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-standard);
+  min-width: 0;
+}
+
+.overview-toolbar-controls .overview-search {
+  width: auto;
+  min-width: 16rem;
+  margin: 0;
+}
+
+.overview-toolbar-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--space-tight) var(--space-standard);
-  min-width: 0;
+  flex-shrink: 0;
 }
 
 .overview-results-count {
@@ -1840,17 +1408,7 @@ main.explorer-shell {
   font-weight: var(--text-interface-label-weight);
 }
 
-.overview-results-filter-summary {
-  margin: 0;
-  color: var(--color-ink-muted);
-  font-family: var(--font-technical);
-  font-size: 0.78rem;
-}
-
 .overview-sort-control {
-  /* Right-alignment now comes from the two-group `justify-content:
-     space-between` on `.overview-results-header` (see that rule's note);
-     no auto-margin needed on this, the header's only right-side item. */
   margin: 0;
   flex-shrink: 0;
   color: var(--color-ink-muted);
@@ -1865,6 +1423,105 @@ main.explorer-shell {
   background: none;
   font: inherit;
   cursor: pointer;
+}
+
+/* `Filtros` disclosure trigger (delta §4): a native button, restrained by
+   default, taking a subtle active-state treatment (`data-active`, set from
+   the accessible-name state Overview.tsx/OverviewPresentation.tsx already
+   track) when a topic filter is active and the drawer is closed — never a
+   separate visible chip/badge beside it. */
+.overview-filtros-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: var(--target-min);
+  padding: 0.4rem 0.85rem;
+  color: var(--color-ink-secondary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-label-size);
+  font-weight: var(--text-interface-label-weight);
+  cursor: pointer;
+}
+
+.overview-filtros-toggle:hover {
+  border-color: #bbb3a3;
+  background: var(--color-surface-subtle);
+}
+
+.overview-filtros-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.overview-filtros-toggle[aria-expanded="true"],
+.overview-filtros-toggle[data-active="true"] {
+  color: var(--color-ink-primary);
+  border-color: var(--color-ink-primary);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+/* Category drawer (delta §5): normal document flow, directly beneath the
+   toolbar, only rendered while open — no modal, no popover, no overlay, no
+   permanent rail. Options wrap safely at narrower widths rather than
+   truncating or overflowing. */
+.overview-category-drawer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: var(--space-standard) 0 var(--space-standard) 2rem;
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.overview-category-drawer-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: var(--target-min);
+  padding: 0.35rem 0.75rem;
+  color: var(--color-ink-secondary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: 999px;
+  background: var(--color-surface-raised);
+  font-family: var(--font-interface);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.overview-category-drawer-option:hover {
+  border-color: #bbb3a3;
+  background: var(--color-surface-subtle);
+}
+
+.overview-category-drawer-option:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.overview-category-drawer-option[aria-pressed="true"] {
+  color: var(--color-surface-raised);
+  border-color: var(--color-ink-primary);
+  background: var(--color-ink-primary);
+  font-weight: 650;
+}
+
+.overview-category-drawer-count {
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 0.76rem;
+}
+
+.overview-category-drawer-option[aria-pressed="true"] .overview-category-drawer-count {
+  color: inherit;
+}
+
+/* Full-width results column (delta §7) — the permanent filter rail's grid
+   allocation is removed entirely; the results column now uses the available
+   TARGET content width on its own. */
+.overview-results {
+  min-width: 0;
 }
 
 .overview-problem-list {
@@ -2000,14 +1657,14 @@ main.explorer-shell {
 }
 
 /* Pagination footer (Overview visual-completion — pagination): lives inside
-   `.overview-results`, the same column as the results header and problem
-   rows, so it shares their width by construction — no separate max-width or
-   margin calculation. Reuses the results header's own horizontal padding
-   (`2rem` left, no right inset — same "shell owns the right edge" pattern
-   documented on `.overview-results-header`) and a matching vertical rhythm,
-   so the two read as the same structural row family. Flat/editorial: a
-   single top hairline (the same separator token the results header's own
-   bottom border uses) and no background/radius/shadow — never a card. */
+   `.overview-results`, the same column as the toolbar and problem rows, so
+   it shares their width by construction — no separate max-width or margin
+   calculation. Reuses the toolbar's own horizontal padding (`2rem` left, no
+   right inset — same "shell owns the right edge" pattern documented on
+   `.overview-toolbar`) and a matching vertical rhythm, so the two read as
+   the same structural row family. Flat/editorial: a single top hairline
+   (the same separator token the toolbar's own bottom border uses) and no
+   background/radius/shadow — never a card. */
 .overview-pagination-footer {
   display: flex;
   flex-wrap: wrap;
@@ -2208,17 +1865,13 @@ body:has(.public-overview) .public-footer {
   }
 
   /* Breakage prevention only (task scope: desktop-1440 is the primary
-     validation surface): the rail stacks above the results column instead of
-     compressing both into an unreadable two-column layout below 768px. */
-  .overview-discovery {
-    display: block;
-  }
-
-  .overview-filter-rail {
-    position: static;
-    padding: var(--space-standard) 0;
-    border-right: 0;
-    border-bottom: 1px solid var(--color-separator-standard);
+     validation surface): the toolbar stacks its two groups instead of
+     compressing Filtros/search/count/sort onto one unreadable row. The
+     toolbar/drawer's shared left inset itself drops in the second compact
+     block below (with the rest of this view's compact padding). */
+  .overview-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .overview-results {
@@ -2235,15 +1888,9 @@ body:has(.public-overview) .public-footer {
     text-align: left;
   }
 
-  .overview-results-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   /* Matches `.overview-problem-row-link`'s own compact inset drop above —
      the pagination footer shares the results column's left axis at every
-     viewport, and that axis loses its 2rem inset once the rail stacks above
-     instead of beside it. */
+     viewport. */
   .overview-pagination-footer {
     flex-direction: column;
     align-items: flex-start;
@@ -3164,24 +2811,6 @@ body:has(.public-overview) .public-footer {
   }
 }
 
-/* Overview top-surface at the 768–1023px band: breakage prevention only,
-   per the approved delta (§7 "desktop first; do not optimise 1024/768/360
-   yet beyond preventing breakage") — the right column's floor is narrowed
-   so the two-column grid does not force horizontal overflow at this
-   width. */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .overview-top-surface {
-    grid-template-columns: minmax(0, 1fr) minmax(240px, 0.8fr);
-  }
-
-  /* Same breakage-prevention-only treatment as the Hero above: narrow the
-     filter rail so the two-column discovery grid does not force horizontal
-     overflow at this width. */
-  .overview-discovery {
-    grid-template-columns: 12rem minmax(0, 1fr);
-  }
-}
-
 @media (max-width: 767px) {
   main.explorer-shell {
     padding: 0 1rem 2rem;
@@ -3276,19 +2905,19 @@ body:has(.public-overview) .public-footer {
     font-size: 1.65rem;
   }
 
-  /* Compact top-surface (<=767px): breakage prevention only per the
-     approved delta (§7 "desktop first; do not optimise 1024/768/360 yet
-     beyond preventing breakage") — the two-column grid collapses to one
-     stacked column so neither the copy nor the recent-updates preview is
-     clipped or overlaps. Not a compact visual pass. */
-  .overview-top-surface {
-    display: block;
+  /* Compact Hero (<=767px): breakage prevention only per the approved delta
+     (§7 "desktop first; do not optimise 1024/768/360 yet beyond preventing
+     breakage") — the single editorial column drops its right padding
+     reservation and the deliberate negative space, so the copy uses the
+     full compact width instead of leaving an unusable narrow column. Not a
+     compact visual pass. */
+  .overview-hero {
+    padding: var(--space-loose) var(--space-standard);
     border-radius: var(--radius-control) var(--radius-control) 0 0;
   }
 
   .overview-hero-content {
     max-width: 100%;
-    padding: var(--space-loose) var(--space-standard);
   }
 
   .overview-hero-headline {
@@ -3301,42 +2930,8 @@ body:has(.public-overview) .public-footer {
 
   .overview-metrics {
     max-width: none;
-  }
-
-  .overview-hero-ruler {
     flex-wrap: wrap;
     row-gap: 0.5rem;
-    padding: 0.85rem var(--space-standard);
-    border-radius: 0 0 var(--radius-control) var(--radius-control);
-  }
-
-  .overview-hero-ruler .overview-metrics {
-    flex-wrap: wrap;
-    row-gap: 0.35rem;
-  }
-
-  /* Breakage prevention only, matching the rest of this compact block: the
-     search input and primary action stack instead of forcing the button to
-     shrink beside a full-width input. */
-  .overview-hero-search-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .overview-hero-cta {
-    /* `align-items: stretch` on the now-column `.overview-hero-search-row`
-       doesn't reliably size an `inline-flex` item to the container's cross
-       axis, so the CTA was rendering at its content width instead of
-       matching the full-width search input above it. Force it explicitly. */
-    display: flex;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .overview-hero-recent {
-    padding: var(--space-loose) var(--space-standard);
-    border-left: 0;
-    border-top: 1px solid var(--color-separator-faint);
   }
 
   .overview-search-input {
@@ -3345,6 +2940,21 @@ body:has(.public-overview) .public-footer {
 
   .overview-topic-filter {
     font-size: 0.78rem;
+  }
+
+  /* Compact toolbar/drawer (<=767px): breakage prevention only, matching
+     the rest of this block — the toolbar's shared 2rem left inset (aligned
+     to the desktop content axis) drops to the compact shell padding, and
+     the search control grows to the full available width instead of
+     forcing a fixed minimum next to Filtros. */
+  .overview-toolbar,
+  .overview-category-drawer {
+    padding: 0.75rem 0;
+  }
+
+  .overview-toolbar-controls .overview-search {
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .overview-problem-row-link {

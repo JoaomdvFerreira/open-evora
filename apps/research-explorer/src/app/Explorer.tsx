@@ -22,7 +22,7 @@ interface ExplorerProps {
   dataProvider: DataProvider;
   /** manifest.schemaPrefixes — passed down so the reading guide's type list is data-driven, not hardcoded. */
   schemaPrefixes?: string[];
-  /** manifest.totalRecords — the same canonical corpus count shown in the "Corpus: X registos" summary below, passed down so Overview's metrics row can reuse it instead of computing a competing total. */
+  /** manifest.totalRecords — the same canonical corpus count shown in the "Corpus: X registos" summary below (every view except Overview, which now has no total-records metric of its own — Overview final redesign, Phase 1). */
   totalRecords?: number;
   /** manifest.generatedAt — read-model build timestamp for the "Corpus: X registos" summary below (ODM-020: build/generation time, distinct from research currentness). */
   generatedAt?: string;
@@ -65,9 +65,7 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
       {url.state.view === "overview" && (
         <Overview
           dataProvider={dataProvider}
-          totalRecords={totalRecords}
           onExploreProblem={(id) => url.setViewAndSelection("problem", id)}
-          onViewRecords={() => url.setView("records")}
         />
       )}
 

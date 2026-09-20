@@ -5,16 +5,11 @@ import "../styles/topic.css";
 import { OverviewPresentation } from "./OverviewPresentation";
 import {
   matchesCitizenSearch,
-  matchesEvidenceFilter,
-  matchesLifecycleGroupFilter,
   matchesTopicFilter,
-  matchesValidationFilter,
   overviewPageCount,
   paginateProblems,
   sortProblems,
   type CitizenProblem,
-  type LifecycleGroup,
-  type MaterialChangeEntry,
   type ProblemSortOrder,
 } from "./overviewStats";
 
@@ -68,40 +63,23 @@ const problems: CitizenProblem[] = [
   },
 ];
 
-const materialChangeEntries: MaterialChangeEntry[] = [
-  { problemId: "PRB-XXXX-1", problemTitle: "Percursos pedonais entre bairros e serviços", date: "2026-04-08", summary: "Foi registada uma alteração material na leitura atual do problema.", domainCodes: ["MOB"] },
-  { problemId: "PRB-XXXX-5", problemTitle: "Dificuldades persistentes nas deslocações quotidianas", date: "2026-04-01", summary: "A evidência reunida passou a ser apresentada com uma limitação adicional.", domainCodes: ["MOB", "PUB", "HEA"] },
-  { problemId: "PRB-XXXX-2", problemTitle: "Acesso a informação de estacionamento", date: "2026-03-12", summary: "O estado de validação foi atualizado após revisão da evidência disponível.", domainCodes: ["MOB", "PUB"] },
-  { problemId: "PRB-XXXX-4", problemTitle: "Disponibilidade de consultas de cuidados primários", date: "2026-02-20", summary: "Nova evidência institucional foi associada a este problema.", domainCodes: ["HEA"] },
-  { problemId: "PRB-XXXX-6", problemTitle: "Sinalização de obras em espaço público", date: "2026-01-15", summary: "Foi registada uma alteração material na leitura atual do problema.", domainCodes: ["future-domain"] },
-];
-
 function useOverviewState(initial: { search?: string; source?: CitizenProblem[] } = {}) {
   const source = initial.source ?? problems;
   const [searchQuery, setSearchQuery] = useState(initial.search ?? "");
   const [topicFilter, setTopicFilter] = useState<string | null>(null);
-  const [evidenceFilter, setEvidenceFilter] = useState<string | null>(null);
-  const [validationFilter, setValidationFilter] = useState<string | null>(null);
-  const [lifecycleFilter, setLifecycleFilter] = useState<LifecycleGroup | null>(null);
   const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("id");
   const [currentPage, setCurrentPage] = useState(1);
   const visibleProblems = useMemo(() => {
     const matched = source.filter(
-      (problem) =>
-        matchesCitizenSearch(problem, searchQuery) &&
-        matchesTopicFilter(problem, topicFilter) &&
-        matchesEvidenceFilter(problem, evidenceFilter) &&
-        matchesValidationFilter(problem, validationFilter) &&
-        matchesLifecycleGroupFilter(problem, lifecycleFilter)
+      (problem) => matchesCitizenSearch(problem, searchQuery) && matchesTopicFilter(problem, topicFilter)
     );
     return sortProblems(matched, sortOrder);
-  }, [source, searchQuery, topicFilter, evidenceFilter, validationFilter, lifecycleFilter, sortOrder]);
+  }, [source, searchQuery, topicFilter, sortOrder]);
   const pageCount = overviewPageCount(visibleProblems.length);
   const paginatedProblems = paginateProblems(visibleProblems, currentPage);
   return {
     searchQuery, setSearchQuery, visibleProblems, source,
-    topicFilter, setTopicFilter, evidenceFilter, setEvidenceFilter,
-    validationFilter, setValidationFilter, lifecycleFilter, setLifecycleFilter,
+    topicFilter, setTopicFilter,
     sortOrder, setSortOrder,
     currentPage, setCurrentPage, pageCount, paginatedProblems,
   };
@@ -112,13 +90,11 @@ function FullOverview({
   search,
   citizenProblemsOverride,
   visibleProblemsOverride,
-  materialChanges = { entries: materialChangeEntries, complete: true },
 }: {
   source?: CitizenProblem[];
   search?: string;
   citizenProblemsOverride?: CitizenProblem[] | null;
   visibleProblemsOverride?: CitizenProblem[] | null;
-  materialChanges?: { entries: MaterialChangeEntry[]; complete: boolean } | null;
 }) {
   const state = useOverviewState({ search, source });
   const citizenProblems = citizenProblemsOverride !== undefined ? citizenProblemsOverride : state.source;
@@ -129,7 +105,6 @@ function FullOverview({
       problemCount={state.source.length}
       evidenceCount={41}
       sourceCount={17}
-      totalRecords={279}
       citizenProblems={citizenProblems}
       visibleProblems={visibleProblems}
       paginatedProblems={paginatedProblems}
@@ -140,17 +115,9 @@ function FullOverview({
       onSearchChange={state.setSearchQuery}
       topicFilter={state.topicFilter}
       onTopicFilterChange={state.setTopicFilter}
-      evidenceFilter={state.evidenceFilter}
-      onEvidenceFilterChange={state.setEvidenceFilter}
-      validationFilter={state.validationFilter}
-      onValidationFilterChange={state.setValidationFilter}
-      lifecycleFilter={state.lifecycleFilter}
-      onLifecycleFilterChange={state.setLifecycleFilter}
       sortOrder={state.sortOrder}
       onSortOrderChange={state.setSortOrder}
-      materialChanges={materialChanges}
       onExploreProblem={() => {}}
-      onViewRecords={() => {}}
     />
   );
 }
@@ -194,19 +161,7 @@ export const NoResults: Story = {
 export const ProblemsLoading: Story = {
   name: "problems loading",
   globals: { viewport: { value: "reviewDesktop" } },
-  render: () => <FullOverview citizenProblemsOverride={null} visibleProblemsOverride={null} materialChanges={null} />,
-};
-
-export const PartialMaterialHistoryFailure: Story = {
-  name: "partial material-history failure",
-  globals: { viewport: { value: "reviewDesktop" } },
-  render: () => <FullOverview materialChanges={{ entries: materialChangeEntries.slice(0, 2), complete: false }} />,
-};
-
-export const EmptyMaterialHistory: Story = {
-  name: "empty material history",
-  globals: { viewport: { value: "reviewDesktop" } },
-  render: () => <FullOverview materialChanges={{ entries: [], complete: true }} />,
+  render: () => <FullOverview citizenProblemsOverride={null} visibleProblemsOverride={null} />,
 };
 
 const stressProblems: CitizenProblem[] = [
@@ -225,14 +180,8 @@ const stressProblems: CitizenProblem[] = [
   },
 ];
 
-const stressMaterialChanges: MaterialChangeEntry[] = [
-  ...materialChangeEntries,
-  { problemId: "PRB-XXXX-7", problemTitle: "Fiabilidade dos horários de transporte público interurbano", date: "2026-04-10", summary: "Uma descrição longa de alteração material confirma que a linha mantém uma leitura clara quando a explicação exige várias linhas, sem perder a data, o problema a que se refere ou a ação disponível.", domainCodes: ["MOB", "PUB", "HEA", "future-domain"] },
-  { problemId: "PRB-XXXX-8", problemTitle: "Acessibilidade de edifícios públicos municipais", date: "2026-01-15", summary: "Foi associada evidência adicional relativa às condições de acessibilidade reportadas.", domainCodes: ["PUB"] },
-];
-
 export const RealisticMaximumContentStress: Story = {
   name: "realistic maximum-content stress",
   globals: { viewport: { value: "reviewCompact" } },
-  render: () => <FullOverview source={stressProblems} materialChanges={{ entries: stressMaterialChanges, complete: true }} />,
+  render: () => <FullOverview source={stressProblems} />,
 };

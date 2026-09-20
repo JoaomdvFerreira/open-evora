@@ -21,39 +21,70 @@ export function CitizenSearchControl({ value, onChange, id = "overview-search-in
 }
 
 /**
- * Compact Hero shortcut chips (Overview visual-completion delta §4) — a
- * lightweight affordance distinct from `TopicFilterGroup` below, which
- * remains the full reusable topic-filter control for a dedicated
- * search/exploration page. Each chip sets the *same canonical TEMA filter
- * state the filter rail owns* (`onSelectCategory`, called with the
- * canonical `domain` code — never the PT-PT display label — exactly like
- * `FilterRailGroup`'s own `onChange`) and then moves the reader to the
- * in-page problem list (`#overview-problemas`, the same in-page target the
- * Hero search action reuses). There is no second filter/search
- * implementation here — this component only ever forwards the canonical
- * code it was given to the caller's single TEMA filter state.
+ * The toolbar's `Filtros` disclosure trigger (Overview final redesign, Phase
+ * 1 — delta §4). A native `<button type="button">`, controlling the category
+ * drawer below it via the standard disclosure pattern (`aria-expanded` +
+ * `aria-controls`, no focus trap, no forced focus movement — see
+ * OverviewPresentation.tsx's drawer-open state, which is local presentation
+ * state only, never URL-synced/persisted). When a topic is active and the
+ * drawer is closed, the trigger takes a restrained active visual state and
+ * exposes the active category's PT-PT label in its own accessible name
+ * (`activeTopicLabel`) — never a separate visible chip/badge next to it,
+ * which TARGET does not show.
  */
-export function CategoryShortcuts({ categories, onSelectCategory }: {
-  categories: TopicCategoryCount[];
-  onSelectCategory: (code: string) => void;
+export function FiltrosToggle({ expanded, onToggle, controlsId, activeTopicLabel, id = "overview-filtros-toggle" }: {
+  expanded: boolean;
+  onToggle: () => void;
+  controlsId: string;
+  /** PT-PT label of the currently active TEMA filter, or `null` when `Todos` (no topic filter). Folded into the accessible name only — never a separate visible badge. */
+  activeTopicLabel: string | null;
+  id?: string;
 }) {
-  if (categories.length === 0) return null;
+  const accessibleName = activeTopicLabel === null ? "Filtros" : `Filtros — ${activeTopicLabel}`;
   return (
-    <div className="overview-category-shortcuts-row">
-      <span className="overview-category-shortcuts-intro">Ou entre por:</span>
-      <ul className="overview-category-shortcuts" aria-label="Atalhos por tema">
-        {categories.map(({ code, count }) => (
-          <li key={code}>
-            <a
-              className="overview-category-shortcut"
-              href="#overview-problemas"
-              onClick={() => onSelectCategory(code)}
-            >
-              {describeTopic(code).label} <span className="overview-category-shortcut-count">{count}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
+    <button
+      type="button"
+      id={id}
+      className="overview-filtros-toggle"
+      aria-expanded={expanded}
+      aria-controls={controlsId}
+      aria-label={accessibleName}
+      data-active={activeTopicLabel !== null}
+      onClick={onToggle}
+    >
+      Filtros
+    </button>
+  );
+}
+
+/**
+ * The category drawer's contents (Overview final redesign, Phase 1 — delta
+ * §5): `Todos` plus the complete canonical TEMA vocabulary, each with a real
+ * count derived from the full unfiltered Problem set (never a fixture, never
+ * a ranked top-N — see overviewStats.ts's `allTopicCodes`/`topCategoryCounts`
+ * doc comments). Rendered in normal document flow directly beneath the
+ * toolbar by the caller (OverviewPresentation.tsx) only while the drawer is
+ * open; this component itself has no open/closed state or animation. Options
+ * wrap safely (`flex-wrap`) rather than truncating at narrower widths.
+ */
+export function CategoryDrawer({ id, categories, activeTopic, onChange, totalCount }: {
+  id: string;
+  categories: TopicCategoryCount[];
+  activeTopic: string | null;
+  onChange: (code: string | null) => void;
+  /** The unfiltered Problem count — `Todos`'s own count, not affected by the current selection. */
+  totalCount: number;
+}) {
+  return (
+    <div id={id} className="overview-category-drawer" role="group" aria-label="Filtrar por tema">
+      <button type="button" className="overview-category-drawer-option" aria-pressed={activeTopic === null} onClick={() => onChange(null)}>
+        <span>Todos</span> <span className="overview-category-drawer-count">{totalCount}</span>
+      </button>
+      {categories.map(({ code, count }) => (
+        <button key={code} type="button" className="overview-category-drawer-option" aria-pressed={activeTopic === code} onClick={() => onChange(activeTopic === code ? null : code)}>
+          <span>{describeTopic(code).label}</span> <span className="overview-category-drawer-count">{count}</span>
+        </button>
+      ))}
     </div>
   );
 }
@@ -83,7 +114,7 @@ const SORT_LABELS: Record<ProblemSortOrder, string> = {
   updatedAt: "última atualização",
 };
 
-/** The results header's sort control — a native `<select>` so it stays a single accessible control without reimplementing listbox semantics. */
+/** The toolbar's sort control — a native `<select>` so it stays a single accessible control without reimplementing listbox semantics. */
 export function SortControl({ value, onChange, id = "overview-sort" }: {
   value: ProblemSortOrder;
   onChange: (order: ProblemSortOrder) => void;
@@ -102,68 +133,17 @@ export function SortControl({ value, onChange, id = "overview-sort" }: {
 }
 
 /**
- * One filter-rail group (TEMA / EVIDÊNCIA / VALIDAÇÃO / ESTADO) in the
- * editorial problem-list redesign. Every group is single-select with an
- * inline count per option (TARGET's "Aberto 8" pattern), backed by whichever
- * canonical field/count list the caller supplies — this component holds no
- * field-specific logic itself, so the four rail groups stay visually
- * identical while each still composes against its own distinct canonical
- * dimension (`overviewStats.ts`'s `countByDimension`/`relevantTopicCodes`+
- * `topCategoryCounts` own that per-field counting; this component only
- * renders whatever list it is given). Never collapses two dimensions into
- * one group — the caller renders one `FilterRailGroup` per dimension, each
- * with its own `aria-label`.
- *
- * `showAllOption` (default `true`) controls whether a visible "Todos" reset
- * row is rendered (filter-rail correction pass §3) — TEMA keeps it as the
- * explicit topic reset; EVIDÊNCIA/VALIDAÇÃO/ESTADO omit it since their
- * internal no-filter (`null`) state is still reachable by clicking the
- * currently-selected option again, which already toggles back to `null`
- * below regardless of `showAllOption`. Hiding the row never removes the
- * no-filter state itself, only this one extra permanent entry point to it.
- */
-export function FilterRailGroup({ label, options, totalCount, activeValue, onChange, showAllOption = true }: {
-  label: string;
-  options: { value: string; text: string; count: number }[];
-  /** The unfiltered "Todos" count — the total Problems this dimension could ever match, not affected by this group's own selection. */
-  totalCount: number;
-  activeValue: string | null;
-  onChange: (value: string | null) => void;
-  showAllOption?: boolean;
-}) {
-  if (options.length === 0) return null;
-  return (
-    <div className="overview-filter-rail-group" role="group" aria-label={label}>
-      <h3 className="overview-filter-rail-heading">{label}</h3>
-      <div className="overview-filter-rail-options">
-        {showAllOption && (
-          <button type="button" className="overview-filter-rail-option" aria-pressed={activeValue === null} onClick={() => onChange(null)}>
-            <span>Todos</span> <span className="overview-filter-rail-count">{totalCount}</span>
-          </button>
-        )}
-        {options.map(({ value, text, count }) => (
-          <button key={value} type="button" className="overview-filter-rail-option" aria-pressed={activeValue === value} onClick={() => onChange(activeValue === value ? null : value)}>
-            <span>{text}</span> <span className="overview-filter-rail-count">{count}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/**
  * One full-width editorial row in the problem list (replaces the former card
  * grid — Overview visual-completion editorial-list redesign, following the
  * owner-approved TARGET reference). The top meta line renders three
  * independent, never-merged signals — PRB id, `evidenceStatus`, and
  * `lifecycleStatus` — plus the canonical `updatedAt` date aligned right.
  * `validationStatus` is deliberately not repeated here: it remains available
- * through the canonical filter rail (VALIDAÇÃO), and TARGET's own compact
- * meta row does not carry a third status term either. Dropping it from the
- * row is a presentation choice only — `matchesValidationFilter` and the
- * VALIDAÇÃO rail group are unaffected (AGENTS.md "Human-owned decisions": no
- * canonical dimension is merged or reinterpreted, one is simply not
- * duplicated at this density).
+ * on the canonical Problem record itself (ProblemView), and TARGET's own
+ * compact meta row does not carry a third status term either. Dropping it
+ * from the row is a presentation choice only (AGENTS.md "Human-owned
+ * decisions": no canonical dimension is merged or reinterpreted, one is
+ * simply not duplicated at this density).
  *
  * `evidenceStatus` uses the existing restrained `reading` chip
  * (InvestigationStatus.tsx's `EvidenceStatus`, bounded `ui-inline-label`

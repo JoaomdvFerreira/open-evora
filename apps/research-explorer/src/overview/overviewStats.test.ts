@@ -3,30 +3,18 @@ import {
   allTopicCodes,
   computeOverviewStats,
   computePublicOverviewData,
-  countByCanonicalValues,
-  countByDimension,
-  countByLifecycleGroup,
   evidenceCountLabel,
-  lifecycleGroupLabel,
-  lifecycleGroupOf,
   matchesCitizenSearch,
-  matchesEvidenceFilter,
-  matchesLifecycleFilter,
-  matchesLifecycleGroupFilter,
   matchesTopicFilter,
-  matchesValidationFilter,
   overviewPageCount,
   paginateProblems,
   problemCountLabel,
   projectMaterialChangeEntries,
-  projectRecentDistinctProblems,
-  relevantTopicCodes,
   sortProblems,
   sourceCountLabel,
   toCitizenProblem,
   topCategoryCounts,
   type CitizenProblem,
-  type MaterialChangeEntry,
 } from "./overviewStats";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { auditedDomainCodes, describeTopic } from "../presentation/topicMapping";
@@ -254,57 +242,6 @@ describe("projectMaterialChangeEntries", () => {
   });
 });
 
-function materialChangeEntry(overrides: Partial<MaterialChangeEntry>): MaterialChangeEntry {
-  return { problemId: "PRB-0001", problemTitle: "Fixture", date: "2026-01-01", summary: "Alteração.", domainCodes: [], ...overrides };
-}
-
-describe("projectRecentDistinctProblems", () => {
-  // Reproduces the Hero "Atualizado recentemente" duplicate-PRB bug: a Problem
-  // that authored more than one material-change entry must render once, using
-  // its newest entry, and must not crowd out other distinct Problems.
-  it("renders a PRB with duplicate material-change entries once, keeping only its newest entry", () => {
-    const entries = [
-      materialChangeEntry({ problemId: "PRB-0007", date: "2026-04-08", summary: "Mais recente." }),
-      materialChangeEntry({ problemId: "PRB-0007", date: "2026-02-01", summary: "Mais antiga." }),
-    ];
-    const distinct = projectRecentDistinctProblems(entries, 4);
-    expect(distinct).toEqual([materialChangeEntry({ problemId: "PRB-0007", date: "2026-04-08", summary: "Mais recente." })]);
-  });
-
-  it("deduplicates before applying the limit, so distinct Problems are not crowded out by one PRB's repeated entries", () => {
-    // Input is already newest-first, as projectMaterialChangeEntries produces it.
-    const entries = [
-      materialChangeEntry({ problemId: "PRB-0007", date: "2026-04-08", summary: "PRB-0007 mais recente." }),
-      materialChangeEntry({ problemId: "PRB-0007", date: "2026-04-01", summary: "PRB-0007 mais antiga." }),
-      materialChangeEntry({ problemId: "PRB-0003", date: "2026-03-01" }),
-      materialChangeEntry({ problemId: "PRB-0002", date: "2026-02-01" }),
-      materialChangeEntry({ problemId: "PRB-0001", date: "2026-01-01" }),
-    ];
-    const distinct = projectRecentDistinctProblems(entries, 4);
-    expect(distinct.map((entry) => entry.problemId)).toEqual(["PRB-0007", "PRB-0003", "PRB-0002", "PRB-0001"]);
-    // A naive slice-then-dedupe would instead render PRB-0007 twice and only
-    // 3 distinct Problems for a limit of 4 — this proves dedupe ran first.
-    expect(distinct).toHaveLength(4);
-  });
-
-  it("shows up to 4 distinct Problems when at least that many are present", () => {
-    const entries = ["PRB-0005", "PRB-0004", "PRB-0003", "PRB-0002", "PRB-0001"].map((problemId, index) =>
-      materialChangeEntry({ problemId, date: `2026-0${5 - index}-01` })
-    );
-    const distinct = projectRecentDistinctProblems(entries, 4);
-    expect(distinct.map((entry) => entry.problemId)).toEqual(["PRB-0005", "PRB-0004", "PRB-0003", "PRB-0002"]);
-  });
-
-  it("deduplicates by the canonical Problem id, never by title", () => {
-    const entries = [
-      materialChangeEntry({ problemId: "PRB-0002", problemTitle: "Mesmo título", date: "2026-03-01" }),
-      materialChangeEntry({ problemId: "PRB-0001", problemTitle: "Mesmo título", date: "2026-02-01" }),
-    ];
-    const distinct = projectRecentDistinctProblems(entries, 4);
-    expect(distinct.map((entry) => entry.problemId)).toEqual(["PRB-0002", "PRB-0001"]);
-  });
-});
-
 function citizenProblem(overrides: Partial<CitizenProblem>): CitizenProblem {
   return {
     id: "PRB-0001",
@@ -320,36 +257,6 @@ function citizenProblem(overrides: Partial<CitizenProblem>): CitizenProblem {
     ...overrides,
   };
 }
-
-describe("relevantTopicCodes", () => {
-  it("returns only the domain codes actually present among the loaded Problems, sorted by PT-PT label", () => {
-    const problems = [
-      citizenProblem({ id: "PRB-1", domainCodes: ["URB"] }),
-      citizenProblem({ id: "PRB-2", domainCodes: ["MOB", "ACC"] }),
-    ];
-    // Acessibilidade / Mobilidade / Urbanismo — label order happens to match code order here.
-    expect(relevantTopicCodes(problems)).toEqual(["ACC", "MOB", "URB"]);
-  });
-
-  it("orders by PT-PT public label, not by canonical code, when they diverge", () => {
-    // ECO -> "Economia", DIG -> "Digital": alphabetically by label, Digital comes first,
-    // even though the codes DIG/ECO would themselves sort the other way.
-    const problems = [
-      citizenProblem({ id: "PRB-1", domainCodes: ["ECO"] }),
-      citizenProblem({ id: "PRB-2", domainCodes: ["DIG"] }),
-    ];
-    expect(relevantTopicCodes(problems)).toEqual(["DIG", "ECO"]);
-  });
-
-  it("returns an empty list when no Problem has a domain code", () => {
-    expect(relevantTopicCodes([citizenProblem({})])).toEqual([]);
-  });
-
-  it("deduplicates a domain code shared by multiple Problems", () => {
-    const problems = [citizenProblem({ id: "PRB-1", domainCodes: ["MOB"] }), citizenProblem({ id: "PRB-2", domainCodes: ["MOB"] })];
-    expect(relevantTopicCodes(problems)).toEqual(["MOB"]);
-  });
-});
 
 describe("topCategoryCounts", () => {
   it("orders domain codes by descending Problem count", () => {
@@ -373,7 +280,7 @@ describe("topCategoryCounts", () => {
     ]);
   });
 
-  it("breaks a count tie by the same deterministic PT-PT label order as relevantTopicCodes", () => {
+  it("breaks a count tie by deterministic PT-PT label order", () => {
     // ECO -> "Economia", DIG -> "Digital": Digital sorts first alphabetically,
     // even though both appear once and the codes themselves sort the other way.
     const problems = [
@@ -414,151 +321,15 @@ describe("matchesTopicFilter", () => {
   });
 });
 
-describe("matchesLifecycleFilter, matchesValidationFilter, matchesEvidenceFilter", () => {
-  it("match every Problem when no value is selected, regardless of a null dimension", () => {
-    expect(matchesLifecycleFilter(citizenProblem({ lifecycleStatus: null }), null)).toBe(true);
-    expect(matchesValidationFilter(citizenProblem({ validationStatus: null }), null)).toBe(true);
-    expect(matchesEvidenceFilter(citizenProblem({ evidenceStatus: null }), null)).toBe(true);
-  });
-
-  it("match only a Problem whose own dimension equals the selected value", () => {
-    expect(matchesLifecycleFilter(citizenProblem({ lifecycleStatus: "OPEN" }), "OPEN")).toBe(true);
-    expect(matchesLifecycleFilter(citizenProblem({ lifecycleStatus: "REJECTED" }), "OPEN")).toBe(false);
-    expect(matchesValidationFilter(citizenProblem({ validationStatus: "validated" }), "validated")).toBe(true);
-    expect(matchesValidationFilter(citizenProblem({ validationStatus: "unvalidated" }), "validated")).toBe(false);
-    expect(matchesEvidenceFilter(citizenProblem({ evidenceStatus: "corroborated" }), "corroborated")).toBe(true);
-    expect(matchesEvidenceFilter(citizenProblem({ evidenceStatus: "discovered" }), "corroborated")).toBe(false);
-  });
-
-  it("never matches a genuinely absent (null) dimension against a selected value", () => {
-    expect(matchesLifecycleFilter(citizenProblem({ lifecycleStatus: null }), "OPEN")).toBe(false);
-    expect(matchesValidationFilter(citizenProblem({ validationStatus: null }), "validated")).toBe(false);
-    expect(matchesEvidenceFilter(citizenProblem({ evidenceStatus: null }), "corroborated")).toBe(false);
-  });
-
-  it("keep the three dimensions independent — filtering by one never depends on another's value", () => {
-    const problem = citizenProblem({ lifecycleStatus: "OPEN", validationStatus: null, evidenceStatus: "corroborated" });
-    expect(matchesLifecycleFilter(problem, "OPEN")).toBe(true);
-    expect(matchesValidationFilter(problem, null)).toBe(true);
-    expect(matchesEvidenceFilter(problem, "corroborated")).toBe(true);
-  });
-});
-
-describe("countByDimension", () => {
-  it("counts each present value across the given Problems, excluding a null dimension from every option", () => {
-    const problems = [
-      citizenProblem({ id: "PRB-1", lifecycleStatus: "OPEN" }),
-      citizenProblem({ id: "PRB-2", lifecycleStatus: "OPEN" }),
-      citizenProblem({ id: "PRB-3", lifecycleStatus: "REJECTED" }),
-      citizenProblem({ id: "PRB-4", lifecycleStatus: null }),
-    ];
-    expect(countByDimension(problems, "lifecycleStatus")).toEqual([
-      { value: "OPEN", count: 2 },
-      { value: "REJECTED", count: 1 },
-    ]);
-  });
-
-  it("orders options by descending count, tie-broken by the canonical value ascending", () => {
-    const problems = [
-      citizenProblem({ id: "PRB-1", evidenceStatus: "discovered" }),
-      citizenProblem({ id: "PRB-2", evidenceStatus: "corroborated" }),
-    ];
-    expect(countByDimension(problems, "evidenceStatus")).toEqual([
-      { value: "corroborated", count: 1 },
-      { value: "discovered", count: 1 },
-    ]);
-  });
-
-  it("returns an empty list when every Problem has a null dimension", () => {
-    expect(countByDimension([citizenProblem({ validationStatus: null })], "validationStatus")).toEqual([]);
-  });
-});
-
 describe("allTopicCodes", () => {
   it("returns the complete canonical TEMA vocabulary, not only codes present among any loaded Problems", () => {
     expect(allTopicCodes().sort()).toEqual([...auditedDomainCodes()].sort());
   });
 
-  it("orders by PT-PT public label, matching relevantTopicCodes's order convention", () => {
+  it("orders by PT-PT public label", () => {
     const codes = allTopicCodes();
     const labels = codes.map((code) => describeTopic(code).label);
     expect(labels).toEqual([...labels].sort((a, b) => a.localeCompare(b, "pt-PT")));
-  });
-});
-
-describe("countByCanonicalValues", () => {
-  it("includes every canonical value even when it has zero matches among the given Problems", () => {
-    const problems = [citizenProblem({ id: "PRB-1", evidenceStatus: "corroborated" })];
-    expect(countByCanonicalValues(problems, "evidenceStatus", ["discovered", "corroborated"])).toEqual([
-      { value: "discovered", count: 0 },
-      { value: "corroborated", count: 1 },
-    ]);
-  });
-
-  it("orders options by the given canonical value order, not by count", () => {
-    const problems = [
-      citizenProblem({ id: "PRB-1", validationStatus: "validated" }),
-      citizenProblem({ id: "PRB-2", validationStatus: "validated" }),
-      citizenProblem({ id: "PRB-3", validationStatus: "unvalidated" }),
-    ];
-    expect(countByCanonicalValues(problems, "validationStatus", ["unvalidated", "partially_validated", "validated"])).toEqual([
-      { value: "unvalidated", count: 1 },
-      { value: "partially_validated", count: 0 },
-      { value: "validated", count: 2 },
-    ]);
-  });
-
-  it("never counts a null dimension toward any canonical value", () => {
-    expect(countByCanonicalValues([citizenProblem({ evidenceStatus: null })], "evidenceStatus", ["discovered", "corroborated"])).toEqual([
-      { value: "discovered", count: 0 },
-      { value: "corroborated", count: 0 },
-    ]);
-  });
-});
-
-describe("lifecycleGroupOf / matchesLifecycleGroupFilter / countByLifecycleGroup / lifecycleGroupLabel", () => {
-  it("groups only OPEN as the open lifecycle group; every other canonical status value groups as closed", () => {
-    expect(lifecycleGroupOf("OPEN")).toBe("OPEN");
-    for (const closedStatus of ["REJECTED", "DUPLICATE", "NON_DIGITAL", "ALREADY_SOLVED", "INSUFFICIENT_EVIDENCE"]) {
-      expect(lifecycleGroupOf(closedStatus)).toBe("CLOSED");
-    }
-  });
-
-  it("labels the two groups Aberto/Fechado, never an evidence/validation concept such as 'Evidência insuficiente'", () => {
-    expect(lifecycleGroupLabel("OPEN")).toBe("Aberto");
-    expect(lifecycleGroupLabel("CLOSED")).toBe("Fechado");
-  });
-
-  it("matches a Problem whose status groups into the selected ESTADO value, regardless of the specific closed status", () => {
-    expect(matchesLifecycleGroupFilter(citizenProblem({ lifecycleStatus: "OPEN" }), "OPEN")).toBe(true);
-    expect(matchesLifecycleGroupFilter(citizenProblem({ lifecycleStatus: "REJECTED" }), "CLOSED")).toBe(true);
-    expect(matchesLifecycleGroupFilter(citizenProblem({ lifecycleStatus: "INSUFFICIENT_EVIDENCE" }), "CLOSED")).toBe(true);
-    expect(matchesLifecycleGroupFilter(citizenProblem({ lifecycleStatus: "OPEN" }), "CLOSED")).toBe(false);
-  });
-
-  it("matches every Problem when no group is selected, and never matches a null dimension against a selected group", () => {
-    expect(matchesLifecycleGroupFilter(citizenProblem({ lifecycleStatus: null }), null)).toBe(true);
-    expect(matchesLifecycleGroupFilter(citizenProblem({ lifecycleStatus: null }), "OPEN")).toBe(false);
-  });
-
-  it("zero-fills both groups, in Aberto-then-Fechado order, and never counts a null dimension", () => {
-    const problems = [
-      citizenProblem({ id: "PRB-1", lifecycleStatus: "OPEN" }),
-      citizenProblem({ id: "PRB-2", lifecycleStatus: "REJECTED" }),
-      citizenProblem({ id: "PRB-3", lifecycleStatus: "DUPLICATE" }),
-      citizenProblem({ id: "PRB-4", lifecycleStatus: null }),
-    ];
-    expect(countByLifecycleGroup(problems)).toEqual([
-      { value: "OPEN", count: 1 },
-      { value: "CLOSED", count: 2 },
-    ]);
-  });
-
-  it("returns zero counts for both groups when no Problem carries a lifecycle status", () => {
-    expect(countByLifecycleGroup([citizenProblem({ lifecycleStatus: null })])).toEqual([
-      { value: "OPEN", count: 0 },
-      { value: "CLOSED", count: 0 },
-    ]);
   });
 });
 

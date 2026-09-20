@@ -1,14 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { CategoryShortcuts, FilterRailGroup, ProblemRow, SortControl, TopicFilterGroup } from "./CitizenDiscovery";
+import { CategoryDrawer, FiltrosToggle, ProblemRow, SortControl, TopicFilterGroup } from "./CitizenDiscovery";
 import type { CitizenProblem } from "./overviewStats";
 
 /**
- * `TopicFilterGroup` is a reusable filter control (not currently rendered by
- * Overview — see Overview delta removing topic filters from that surface)
- * kept available for a dedicated search/exploration page. These tests
- * protect its own durable rendering behaviour independent of any one caller.
+ * `TopicFilterGroup` is a reusable filter control kept available for a
+ * dedicated search/exploration page — Overview's own TEMA filtering renders
+ * through `CategoryDrawer` below instead (Overview final redesign, Phase 1).
+ * These tests protect its own durable rendering behaviour independent of any
+ * one caller.
  */
 describe("TopicFilterGroup", () => {
   it("renders Todos first, then the topic codes in the order given by the caller (relevantTopicCodes owns sort order)", () => {
@@ -47,162 +48,125 @@ describe("TopicFilterGroup", () => {
 });
 
 /**
- * `CategoryShortcuts` is the Hero's lightweight category-shortcut affordance
- * (Overview visual-completion delta §4) — distinct from `TopicFilterGroup`
- * above, which stays the full reusable filter control. It renders whatever
- * ranked categories the caller passes (`topCategoryCounts` in
- * overviewStats.ts owns count/order); these tests protect only its own
- * rendering contract. Each chip forwards the canonical `domain` code to
- * `onSelectCategory` — the same callback OverviewPresentation.tsx wires to
- * the TEMA filter rail's own setter (Overview.test.tsx's Hero
- * category-filter regression covers that end-to-end composition) — and
- * still points at the in-page problem list, since selecting a filter and
- * moving the reader to the list are both still needed on click.
+ * `FiltrosToggle` is the toolbar's disclosure trigger for the category
+ * drawer (Overview final redesign, Phase 1 — delta §4). These tests protect
+ * only its own disclosure contract; `OverviewPresentation.tsx` owns whether
+ * the drawer it controls is actually rendered open/closed.
  */
-describe("CategoryShortcuts", () => {
-  it("renders each category's PT-PT label and count, in the order given by the caller", () => {
-    render(<CategoryShortcuts categories={[{ code: "MOB", count: 3 }, { code: "PUB", count: 2 }]} onSelectCategory={vi.fn()} />);
+describe("FiltrosToggle", () => {
+  it("starts collapsed, exposing aria-expanded=false and aria-controls pointing at the drawer id", () => {
+    render(<FiltrosToggle expanded={false} onToggle={vi.fn()} controlsId="drawer-1" activeTopicLabel={null} />);
 
-    const list = screen.getByRole("list", { name: "Atalhos por tema" });
-    const items = within(list).getAllByRole("listitem");
-    expect(items.map((item) => item.textContent?.replace(/\s+/g, " ").trim())).toEqual(["Mobilidade 3", "Espaço público 2"]);
+    const button = screen.getByRole("button", { name: "Filtros" });
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    expect(button.getAttribute("aria-controls")).toBe("drawer-1");
   });
 
-  it("links each shortcut to the in-page problem list", () => {
-    render(<CategoryShortcuts categories={[{ code: "MOB", count: 1 }]} onSelectCategory={vi.fn()} />);
-    expect(screen.getByRole("link", { name: /Mobilidade/ }).getAttribute("href")).toBe("#overview-problemas");
-  });
-
-  it("calls onSelectCategory with the canonical domain code, never the PT-PT display label, on click", async () => {
-    const onSelectCategory = vi.fn();
+  it("reflects aria-expanded=true and calls onToggle on click", async () => {
+    const onToggle = vi.fn();
     const user = userEvent.setup();
-    render(<CategoryShortcuts categories={[{ code: "MOB", count: 1 }]} onSelectCategory={onSelectCategory} />);
+    render(<FiltrosToggle expanded={true} onToggle={onToggle} controlsId="drawer-1" activeTopicLabel={null} />);
 
-    await user.click(screen.getByRole("link", { name: /Mobilidade/ }));
-    expect(onSelectCategory).toHaveBeenCalledWith("MOB");
+    const button = screen.getByRole("button", { name: "Filtros" });
+    expect(button.getAttribute("aria-expanded")).toBe("true");
+
+    await user.click(button);
+    expect(onToggle).toHaveBeenCalledTimes(1);
   });
 
-  it("introduces the shortcuts with an 'Ou entre por:' label", () => {
-    render(<CategoryShortcuts categories={[{ code: "MOB", count: 1 }]} onSelectCategory={vi.fn()} />);
-    expect(screen.getByText("Ou entre por:")).toBeTruthy();
+  it("folds the active TEMA label into its own accessible name, without a separate visible badge", () => {
+    render(<FiltrosToggle expanded={false} onToggle={vi.fn()} controlsId="drawer-1" activeTopicLabel="Mobilidade" />);
+
+    expect(screen.getByRole("button", { name: "Filtros — Mobilidade" })).toBeTruthy();
+    // Visible label stays the plain "Filtros" text; the active topic is not
+    // rendered as a separate visible chip/badge (TARGET has none).
+    expect(screen.queryByText("Mobilidade")).toBeNull();
   });
 
-  it("renders nothing when there are no categories to show", () => {
-    const { container } = render(<CategoryShortcuts categories={[]} onSelectCategory={vi.fn()} />);
-    expect(container.firstChild).toBeNull();
+  it("takes a restrained active data-state when a topic is active, distinct from aria-expanded", () => {
+    const { rerender } = render(<FiltrosToggle expanded={false} onToggle={vi.fn()} controlsId="drawer-1" activeTopicLabel={null} />);
+    expect(screen.getByRole("button", { name: "Filtros" }).getAttribute("data-active")).toBe("false");
+
+    rerender(<FiltrosToggle expanded={false} onToggle={vi.fn()} controlsId="drawer-1" activeTopicLabel="Mobilidade" />);
+    expect(screen.getByRole("button", { name: "Filtros — Mobilidade" }).getAttribute("data-active")).toBe("true");
   });
 });
 
 /**
- * `FilterRailGroup` is the shared rendering for every filter-rail group
- * (TEMA/EVIDÊNCIA/VALIDAÇÃO/ESTADO — Overview visual-completion editorial
- * list redesign). It holds no field-specific logic itself, so these tests
- * protect only its own generic rendering/toggle contract; which canonical
- * field backs a given group is `OverviewPresentation.tsx`'s responsibility.
+ * `CategoryDrawer` is the drawer's contents — `Todos` plus the complete
+ * canonical TEMA vocabulary, each with a real count (Overview final
+ * redesign, Phase 1 — delta §5). It renders whatever categories the caller
+ * passes (`allTopicCodes`/`topCategoryCounts` in overviewStats.ts own the
+ * complete vocabulary and real counts); these tests protect only its own
+ * rendering/toggle contract.
  */
-describe("FilterRailGroup", () => {
-  it("renders the group label, an always-present 'Todos' option with the total count, and each option with its own count", () => {
+describe("CategoryDrawer", () => {
+  it("renders Todos with the given total count, then each category with its own real count, in the order given by the caller", () => {
     render(
-      <FilterRailGroup
-        label="Estado"
-        options={[{ value: "OPEN", text: "Aberto", count: 8 }, { value: "REJECTED", text: "Rejeitado", count: 1 }]}
-        totalCount={9}
-        activeValue={null}
+      <CategoryDrawer
+        id="drawer-1"
+        categories={[{ code: "MOB", count: 3 }, { code: "PUB", count: 2 }]}
+        activeTopic={null}
         onChange={vi.fn()}
+        totalCount={5}
       />
     );
 
-    const group = screen.getByRole("group", { name: "Estado" });
-    expect(within(group).getByText("Estado")).toBeTruthy();
+    const group = screen.getByRole("group", { name: "Filtrar por tema" });
     const options = within(group).getAllByRole("button").map((button) => button.textContent?.replace(/\s+/g, " ").trim());
-    expect(options).toEqual(["Todos 9", "Aberto 8", "Rejeitado 1"]);
+    expect(options).toEqual(["Todos 5", "Mobilidade 3", "Espaço público 2"]);
   });
 
-  it("marks the active option with aria-pressed, exclusively, and toggles it off on repeat click", async () => {
+  it("marks Todos active when no topic is selected, and the matching category active otherwise, exclusively", () => {
+    const { rerender } = render(
+      <CategoryDrawer id="drawer-1" categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} />
+    );
+    expect(screen.getByRole("button", { name: /^Todos/ }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("button", { name: /Mobilidade/ }).getAttribute("aria-pressed")).toBe("false");
+
+    rerender(<CategoryDrawer id="drawer-1" categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={vi.fn()} totalCount={1} />);
+    expect(screen.getByRole("button", { name: /^Todos/ }).getAttribute("aria-pressed")).toBe("false");
+    expect(screen.getByRole("button", { name: /Mobilidade/ }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("calls onChange with the canonical domain code, never the PT-PT display label, on click", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    const { rerender } = render(
-      <FilterRailGroup label="Estado" options={[{ value: "OPEN", text: "Aberto", count: 1 }]} totalCount={1} activeValue={null} onChange={onChange} />
-    );
+    render(<CategoryDrawer id="drawer-1" categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={onChange} totalCount={1} />);
 
-    const todos = screen.getByRole("button", { name: /Todos/ });
-    const aberto = screen.getByRole("button", { name: /Aberto/ });
-    expect(todos.getAttribute("aria-pressed")).toBe("true");
-    expect(aberto.getAttribute("aria-pressed")).toBe("false");
+    await user.click(screen.getByRole("button", { name: /Mobilidade/ }));
+    expect(onChange).toHaveBeenCalledWith("MOB");
+  });
 
-    await user.click(aberto);
-    expect(onChange).toHaveBeenCalledWith("OPEN");
+  it("clicking the already-selected category clears TEMA back to null (Todos)", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<CategoryDrawer id="drawer-1" categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={onChange} totalCount={1} />);
 
-    rerender(<FilterRailGroup label="Estado" options={[{ value: "OPEN", text: "Aberto", count: 1 }]} totalCount={1} activeValue="OPEN" onChange={onChange} />);
-    expect(screen.getByRole("button", { name: /Todos/ }).getAttribute("aria-pressed")).toBe("false");
-    expect(screen.getByRole("button", { name: /Aberto/ }).getAttribute("aria-pressed")).toBe("true");
-
-    await user.click(screen.getByRole("button", { name: /Aberto/ }));
+    await user.click(screen.getByRole("button", { name: /Mobilidade/ }));
     expect(onChange).toHaveBeenCalledWith(null);
   });
 
-  it("renders nothing when there are no options for this dimension", () => {
-    const { container } = render(<FilterRailGroup label="Estado" options={[]} totalCount={0} activeValue={null} onChange={vi.fn()} />);
-    expect(container.firstChild).toBeNull();
+  it("clicking Todos clears TEMA to null", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<CategoryDrawer id="drawer-1" categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={onChange} totalCount={1} />);
+
+    await user.click(screen.getByRole("button", { name: /^Todos/ }));
+    expect(onChange).toHaveBeenCalledWith(null);
   });
 
-  /**
-   * `showAllOption={false}` (filter-rail correction pass §3) — EVIDÊNCIA/
-   * VALIDAÇÃO/ESTADO no longer expose a visible "Todos" reset row, while
-   * TEMA (the default, `showAllOption` omitted) keeps it. The internal
-   * no-filter (`null`) state is unaffected either way: it stays reachable by
-   * clicking the currently-selected option again, since that toggle-off
-   * behaviour above does not depend on the "Todos" row at all.
-   */
-  it("omits the 'Todos' row when showAllOption is false, without affecting the other options", () => {
+  it("renders every canonical category the caller passes, even one with a genuinely zero count", () => {
     render(
-      <FilterRailGroup
-        label="Evidência"
-        options={[{ value: "corroborated", text: "Corroborada", count: 5 }]}
-        totalCount={5}
-        activeValue={null}
+      <CategoryDrawer
+        id="drawer-1"
+        categories={[{ code: "MOB", count: 0 }]}
+        activeTopic={null}
         onChange={vi.fn()}
-        showAllOption={false}
+        totalCount={0}
       />
     );
-
-    const group = screen.getByRole("group", { name: "Evidência" });
-    expect(within(group).queryByText("Todos")).toBeNull();
-    expect(within(group).getByRole("button", { name: /Corroborada/ })).toBeTruthy();
-  });
-
-  it("clicking the already-selected option clears the filter back to null even with showAllOption false, and no option then appears selected", async () => {
-    const onChange = vi.fn();
-    const user = userEvent.setup();
-    const { rerender } = render(
-      <FilterRailGroup
-        label="Evidência"
-        options={[{ value: "corroborated", text: "Corroborada", count: 5 }]}
-        totalCount={5}
-        activeValue="corroborated"
-        onChange={onChange}
-        showAllOption={false}
-      />
-    );
-
-    const active = screen.getByRole("button", { name: /Corroborada/ });
-    expect(active.getAttribute("aria-pressed")).toBe("true");
-
-    await user.click(active);
-    expect(onChange).toHaveBeenCalledWith(null);
-
-    rerender(
-      <FilterRailGroup
-        label="Evidência"
-        options={[{ value: "corroborated", text: "Corroborada", count: 5 }]}
-        totalCount={5}
-        activeValue={null}
-        onChange={onChange}
-        showAllOption={false}
-      />
-    );
-    const group = screen.getByRole("group", { name: "Evidência" });
-    expect(within(group).getAllByRole("button").every((button) => button.getAttribute("aria-pressed") === "false")).toBe(true);
+    expect(screen.getByRole("button", { name: /Mobilidade/ }).textContent).toMatch(/0$/);
   });
 });
 
