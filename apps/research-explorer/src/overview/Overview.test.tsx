@@ -37,6 +37,12 @@ function openDrawer() {
   return screen.getByRole("button", { name: /^Filtros/ });
 }
 
+/** Mirrors overviewStats.ts's `formatMaterialChangeMarkerDate` (compact PT-PT `DD/MM`) for asserting a row marker's rendered date against a `YYYY-MM-DD` fixture. */
+function formatMarkerDate(date: string): string {
+  const [, month, day] = date.split("-");
+  return `${day}/${month}`;
+}
+
 describe("Overview — Problem investigation-state dimensions", () => {
   // The editorial problem-list row (Overview visual-completion) shows two of
   // the three investigation-state dimensions inline: evidenceStatus via the
@@ -596,15 +602,31 @@ describe("Overview — problem-list pagination", () => {
 });
 
 /**
- * Material-change integration (Overview final redesign, Phase 2). Overview
- * derives both the row-level changed treatment and the `Alterados esta
- * semana` shortcut from the same canonical PRB `history[]` reads it already
- * performs for `CitizenProblem` projection — no second fetch, no
- * `updated_at` fallback. `overviewStats.test.ts` covers the underlying pure
- * helpers directly; these tests protect the end-to-end wiring and the
- * drawer/filter composition rules.
+ * Material-change integration (Overview final redesign, Phase 2;
+ * weekly-emphasis correction). Overview derives both the row-level changed
+ * treatment and the `Alterados esta semana` shortcut from the same canonical
+ * PRB `history[]` reads it already performs for `CitizenProblem` projection
+ * — no second fetch, no `updated_at` fallback — and, since the correction,
+ * from the same `Europe/Lisbon` civil-week membership: a Problem only gets
+ * the changed-row treatment when it also qualifies for the shortcut.
+ * `overviewStats.test.ts` covers the underlying pure helpers directly; these
+ * tests protect the end-to-end wiring and the drawer/filter composition
+ * rules.
  */
 describe("Overview — material-change row treatment", () => {
+  // Built from the real current civil week (today's date, per the harness),
+  // matching the pattern the shortcut tests below already use, so these
+  // fixtures always exercise the actual "this week" semantics rather than a
+  // fixed date that could drift stale relative to "now".
+  function thisWeekMonday(): string {
+    const now = new Date();
+    const day = now.getDay();
+    const daysSinceMonday = day === 0 ? 6 : day - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - daysSinceMonday);
+    return monday.toISOString().slice(0, 10);
+  }
+
   function providerWithHistory(problems: { id: string; label: string; history?: { date: string; summary: string }[]; domain?: string[] }[]): DataProvider {
     const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: {} }));
     return {
@@ -618,9 +640,10 @@ describe("Overview — material-change row treatment", () => {
     };
   }
 
-  it("gives a Problem with canonical history the changed-row variant and a marker with the authored date", async () => {
+  it("gives a Problem changed this civil week the changed-row variant and a marker with the authored date", async () => {
+    const monday = thisWeekMonday();
     const provider = providerWithHistory([
-      { id: "PRB-1", label: "Problema com alteração", history: [{ date: "2026-08-31", summary: "Alteração registada." }] },
+      { id: "PRB-1", label: "Problema com alteração", history: [{ date: monday, summary: "Alteração registada." }] },
       { id: "PRB-2", label: "Problema sem alteração" },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
@@ -629,29 +652,46 @@ describe("Overview — material-change row treatment", () => {
     const changedRow = screen.getByText("Problema com alteração").closest(".overview-problem-row");
     expect(changedRow?.classList.contains("overview-problem-row--changed")).toBe(true);
     expect(within(changedRow as HTMLElement).getByText("ALTERAÇÃO REGISTADA")).toBeTruthy();
-    expect(within(changedRow as HTMLElement).getByText("31/08")).toBeTruthy();
 
     const unchangedRow = screen.getByText("Problema sem alteração").closest(".overview-problem-row");
     expect(unchangedRow?.classList.contains("overview-problem-row--changed")).toBe(false);
     expect(within(unchangedRow as HTMLElement).queryByText("ALTERAÇÃO REGISTADA")).toBeNull();
   });
 
-  it("uses the newest authored history entry when a Problem has more than one", async () => {
+  it("renders a Problem whose only history entry is outside the current civil week on the normal neutral row path", async () => {
+    // A genuinely historical material change — weeks in the past relative to
+    // any real "now" this suite runs under — must not receive the changed-row
+    // treatment or marker (weekly-emphasis correction, §1): row emphasis is
+    // "changed this week", not "has ever had a canonical history entry".
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Problema com histórico antigo", history: [{ date: "2020-01-06", summary: "Alteração histórica." }] },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema com histórico antigo");
+    const row = screen.getByText("Problema com histórico antigo").closest(".overview-problem-row");
+    expect(row?.classList.contains("overview-problem-row--changed")).toBe(false);
+    expect(within(row as HTMLElement).queryByText("ALTERAÇÃO REGISTADA")).toBeNull();
+  });
+
+  it("uses the newest qualifying (this-week) history entry when a Problem has several, never an older one", async () => {
+    const monday = thisWeekMonday();
     const provider = providerWithHistory([
       {
         id: "PRB-1",
         label: "Problema com várias alterações",
         history: [
-          { date: "2026-01-01", summary: "Mais antiga." },
-          { date: "2026-06-15", summary: "Mais recente." },
+          { date: "2020-01-06", summary: "Muito antiga, fora da semana." },
+          { date: monday, summary: "Mais recente qualificável." },
         ],
       },
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema com várias alterações");
-    expect(screen.getByText("15/06")).toBeTruthy();
-    expect(screen.queryByText("01/01")).toBeNull();
+    const row = screen.getByText("Problema com várias alterações").closest(".overview-problem-row");
+    expect(row?.classList.contains("overview-problem-row--changed")).toBe(true);
+    expect(within(row as HTMLElement).getByText(formatMarkerDate(monday))).toBeTruthy();
   });
 
   it("does not block or drop a Problem from the normal list when its detail read fails", async () => {
@@ -726,6 +766,44 @@ describe("Overview — Alterados esta semana shortcut", () => {
     await user.click(openDrawer());
 
     expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).textContent).toMatch(/1$/);
+  });
+
+  it("agrees exactly with the number of changed-row-variant rows rendered (weekly-emphasis correction)", async () => {
+    const monday = thisWeekMonday();
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Alterado esta semana", history: [{ date: monday, summary: "Alteração." }] },
+      { id: "PRB-2", label: "Histórico antigo", history: [{ date: "2020-01-06", summary: "Alteração histórica." }] },
+      { id: "PRB-3", label: "Nunca alterado" },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Alterado esta semana");
+    await user.click(openDrawer());
+
+    const shortcutCount = screen.getByRole("button", { name: /^Alterados esta semana/ }).textContent?.match(/(\d+)$/)?.[1];
+    expect(shortcutCount).toBe("1");
+
+    const changedRows = document.querySelectorAll(".overview-problem-row--changed");
+    expect(changedRows.length).toBe(1);
+    expect(screen.getByText("Alterado esta semana").closest(".overview-problem-row")).toBe(changedRows[0]);
+  });
+
+  it("renders zero changed-row variants when the shortcut truthfully reports 0", async () => {
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Histórico antigo", history: [{ date: "2020-01-06", summary: "Alteração histórica." }] },
+      { id: "PRB-2", label: "Nunca alterado" },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Histórico antigo");
+    await user.click(openDrawer());
+
+    const shortcut = screen.getByRole("button", { name: /^Alterados esta semana/ });
+    expect(shortcut.textContent?.replace(/\s+/g, " ").trim()).toBe("Alterados esta semana 0");
+    expect(document.querySelectorAll(".overview-problem-row--changed").length).toBe(0);
+    expect(screen.queryByText("ALTERAÇÃO REGISTADA")).toBeNull();
   });
 
   it("selecting the shortcut filters to only qualifying Problems and composes with search", async () => {

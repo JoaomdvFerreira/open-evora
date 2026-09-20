@@ -191,16 +191,23 @@ export function projectMaterialChangeEntries(sources: MaterialChangeSource[]): M
 }
 
 /**
- * The single newest material-change entry per Problem (Overview final
- * redesign, Phase 2), keyed by canonical `problemId`. Input must already be
- * `projectMaterialChangeEntries`'s output — this does not re-derive
- * material-change meaning, it only picks one entry per Problem out of an
- * already-projected, already-sorted list. Because that list is sorted newest
- * date first (ties broken by Problem ID then authored array position — see
- * `projectMaterialChangeEntries`'s own doc comment), the first entry seen for
- * a given `problemId` while walking it in order is deterministically its
- * newest, with the exact same same-date tie behaviour already established
- * there — this helper adds no ranking/importance judgement of its own.
+ * The single newest material-change entry per Problem, regardless of age
+ * (Overview final redesign, Phase 2), keyed by canonical `problemId`. Input
+ * must already be `projectMaterialChangeEntries`'s output — this does not
+ * re-derive material-change meaning, it only picks one entry per Problem out
+ * of an already-projected, already-sorted list. Because that list is sorted
+ * newest date first (ties broken by Problem ID then authored array position
+ * — see `projectMaterialChangeEntries`'s own doc comment), the first entry
+ * seen for a given `problemId` while walking it in order is deterministically
+ * its newest, with the exact same same-date tie behaviour already
+ * established there — this helper adds no ranking/importance judgement of
+ * its own.
+ *
+ * Not the Overview row-level changed-treatment source (weekly-emphasis
+ * correction) — that is `latestMaterialChangeInCivilWeekByProblem`, which
+ * additionally requires the entry to fall in the current civil week. This
+ * helper remains available for other, non-recency-scoped historical uses of
+ * "this Problem's most recent authored change".
  */
 export function latestMaterialChangeByProblem(entries: MaterialChangeEntry[]): Map<string, MaterialChangeEntry> {
   const latest = new Map<string, MaterialChangeEntry>();
@@ -212,34 +219,75 @@ export function latestMaterialChangeByProblem(entries: MaterialChangeEntry[]): M
 
 const CIVIL_WEEK_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-/** Milliseconds in a day — used only for whole-day (UTC) civil-week arithmetic below. */
+/** Milliseconds in a day — used only for whole-day (UTC-anchored) civil-week arithmetic below. */
 const MS_PER_CIVIL_DAY = 24 * 60 * 60 * 1000;
 
-/**
- * True when a canonical, day-precision material-change `date`
- * (`YYYY-MM-DD`) falls within the civil week — Monday 00:00 through Sunday
- * 23:59 — containing `referenceDate` (Overview final redesign, Phase 2, §5).
- * A civil week, not a rolling seven days: the window's boundaries are fixed
- * calendar-day cut-offs, computed from `referenceDate`'s own weekday, not
- * "the 7 days up to and including `referenceDate`". `referenceDate` is an
- * injectable parameter (defaulting to `new Date()`) precisely so callers —
- * and unit tests — never depend on wall-clock time implicitly.
- *
- * Both `date` and `referenceDate` are compared as whole calendar days in
- * UTC, matching every other canonical day-precision comparison in this file
- * (canonical dates carry no time component, so there is no local-timezone
- * "now" to reconcile against a UTC-stored date). A malformed/invalid `date`
- * (wrong shape, or a shape that does not round-trip to a real calendar day)
- * is safely excluded — never treated as a match.
- */
-export function isMaterialChangeInCivilWeek(date: string, referenceDate: Date = new Date()): boolean {
-  if (!CIVIL_WEEK_DATE.test(date)) return false;
-  const [year, month, day] = date.split("-").map(Number);
-  if (month < 1 || month > 12) return false;
-  const candidate = new Date(Date.UTC(year, month - 1, day));
-  if (candidate.getUTCFullYear() !== year || candidate.getUTCMonth() !== month - 1 || candidate.getUTCDate() !== day) return false;
+/** `Europe/Lisbon` — the civil-week timezone anchor (Overview final redesign, Phase 2, §3/§5 correction). Every "esta semana" judgement is relative to the calendar in Évora, never the browser/system/UTC timezone. */
+const CIVIL_WEEK_TIMEZONE = "Europe/Lisbon";
 
-  const referenceDay = Date.UTC(referenceDate.getUTCFullYear(), referenceDate.getUTCMonth(), referenceDate.getUTCDate());
+// en-CA formats as YYYY-MM-DD, matching the canonical day-precision shape
+// used everywhere else in this file — no manual field reassembly needed.
+const lisbonCivilDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: CIVIL_WEEK_TIMEZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/**
+ * Parses a `YYYY-MM-DD` string into a UTC-anchored whole-day timestamp, or
+ * `null` when it is malformed or does not round-trip to a real calendar day
+ * (e.g. `2026-02-30`). The UTC anchor here carries no timezone meaning of its
+ * own — it is only a neutral, DST-free axis for whole-day arithmetic between
+ * two already-resolved civil dates (both `isDateInCivilWeekOf`'s arguments
+ * are civil dates already, one canonical, one already resolved to
+ * `Europe/Lisbon` by `getLisbonCivilDate`).
+ */
+function parseCivilDay(date: string): number | null {
+  if (!CIVIL_WEEK_DATE.test(date)) return null;
+  const [year, month, day] = date.split("-").map(Number);
+  if (month < 1 || month > 12) return null;
+  const parsed = Date.UTC(year, month - 1, day);
+  const roundTrip = new Date(parsed);
+  if (roundTrip.getUTCFullYear() !== year || roundTrip.getUTCMonth() !== month - 1 || roundTrip.getUTCDate() !== day) return null;
+  return parsed;
+}
+
+/**
+ * Resolves `referenceDate` (an absolute instant) to its `Europe/Lisbon`
+ * civil calendar date, as `YYYY-MM-DD` (Overview final redesign, Phase 2, §3
+ * correction). This is the one place wall-clock/browser/system timezone
+ * meets Lisbon civil time — `Intl.DateTimeFormat` with an explicit
+ * `timeZone` resolves the correct offset for the given instant regardless of
+ * the host's own timezone, and correctly accounts for Portugal's DST
+ * transitions without this file needing to encode them itself.
+ */
+export function getLisbonCivilDate(referenceDate: Date = new Date()): string {
+  return lisbonCivilDateFormatter.format(referenceDate);
+}
+
+/**
+ * True when a canonical, day-precision material-change `date` (`YYYY-MM-DD`)
+ * falls within the civil week — Monday through Sunday — containing
+ * `referenceCivilDate` (itself a `YYYY-MM-DD` civil date, not an instant).
+ * A civil week, not a rolling seven days: the window's boundaries are fixed
+ * calendar-day cut-offs, computed from `referenceCivilDate`'s own weekday,
+ * not "the 7 days up to and including `referenceCivilDate`".
+ *
+ * Pure whole-day date arithmetic only — no timezone resolution happens here.
+ * Both dates are already civil dates by the time they reach this helper (see
+ * `isMaterialChangeInCivilWeek`, which resolves an instant to its Lisbon
+ * civil date before delegating here), so this stays trivially deterministic
+ * and independently testable against fixed civil-date strings. A
+ * malformed/invalid `date` (wrong shape, or a shape that does not round-trip
+ * to a real calendar day) is safely excluded — never treated as a match.
+ */
+export function isDateInCivilWeekOf(date: string, referenceCivilDate: string): boolean {
+  const candidateDay = parseCivilDay(date);
+  if (candidateDay === null) return false;
+  const referenceDay = parseCivilDay(referenceCivilDate);
+  if (referenceDay === null) return false;
+
   // ISO weekday distance back to Monday: Sunday (getUTCDay() === 0) is 6 days
   // after that week's Monday; Monday (1) through Saturday (6) are (weekday - 1)
   // days after it.
@@ -248,8 +296,22 @@ export function isMaterialChangeInCivilWeek(date: string, referenceDate: Date = 
   const mondayStart = referenceDay - daysSinceMonday * MS_PER_CIVIL_DAY;
   const sundayEnd = mondayStart + 7 * MS_PER_CIVIL_DAY - 1;
 
-  const candidateStart = candidate.getTime();
-  return candidateStart >= mondayStart && candidateStart <= sundayEnd;
+  return candidateDay >= mondayStart && candidateDay <= sundayEnd;
+}
+
+/**
+ * True when a canonical, day-precision material-change `date`
+ * (`YYYY-MM-DD`) falls within the `Europe/Lisbon` civil week containing
+ * `referenceDate` (Overview final redesign, Phase 2, §5; §3 timezone
+ * correction). `referenceDate` is an injectable parameter (defaulting to
+ * `new Date()`) precisely so callers — and unit tests — never depend on
+ * wall-clock time implicitly; it is resolved to its Lisbon civil date via
+ * `getLisbonCivilDate` (correct across Portugal's DST transitions,
+ * independent of the browser/system timezone), and the actual week-boundary
+ * arithmetic is delegated to the pure `isDateInCivilWeekOf`.
+ */
+export function isMaterialChangeInCivilWeek(date: string, referenceDate: Date = new Date()): boolean {
+  return isDateInCivilWeekOf(date, getLisbonCivilDate(referenceDate));
 }
 
 /**
@@ -270,6 +332,34 @@ export function problemIdsAlteredInCivilWeek(entries: MaterialChangeEntry[], ref
     if (isMaterialChangeInCivilWeek(entry.date, referenceDate)) ids.add(entry.problemId);
   }
   return ids;
+}
+
+/**
+ * The single newest THIS-CIVIL-WEEK material-change entry per Problem,
+ * keyed by canonical `problemId` (Overview final redesign, Phase 2 —
+ * weekly-emphasis correction). This is the row-level changed-treatment
+ * projection: unlike `latestMaterialChangeByProblem` (which picks a
+ * Problem's newest entry regardless of age, and remains available for
+ * historical/other surfaces), a Problem contributes an entry here only when
+ * it has at least one qualifying entry in the civil week containing
+ * `referenceDate` — the same `isMaterialChangeInCivilWeek` membership
+ * `problemIdsAlteredInCivilWeek` uses, so the row-level clay
+ * treatment/marker and the `Alterados esta semana` shortcut always agree on
+ * which Problems qualify.
+ *
+ * Filters to qualifying entries first, then reuses
+ * `latestMaterialChangeByProblem`'s existing "first entry seen wins" pick,
+ * so a Problem with multiple qualifying entries this week still gets its
+ * newest qualifying one (never an older entry, and never a non-qualifying
+ * newest entry from outside this week) — the same newest-first,
+ * problemId/authored-position tie-break `projectMaterialChangeEntries`
+ * already establishes, since filtering preserves that order.
+ */
+export function latestMaterialChangeInCivilWeekByProblem(
+  entries: MaterialChangeEntry[],
+  referenceDate: Date = new Date()
+): Map<string, MaterialChangeEntry> {
+  return latestMaterialChangeByProblem(entries.filter((entry) => isMaterialChangeInCivilWeek(entry.date, referenceDate)));
 }
 
 /**

@@ -3,7 +3,7 @@ import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/
 import { useRecordIndex } from "../records/useRecordIndex";
 import {
   computePublicOverviewData,
-  latestMaterialChangeByProblem,
+  latestMaterialChangeInCivilWeekByProblem,
   matchesCitizenSearch,
   matchesTopicFilter,
   overviewPageCount,
@@ -42,15 +42,20 @@ const ERROR_TITLES: Record<string, string> = {
  * Phase 2 reuses that same per-PRB `getRecord()` detail read (never a second
  * fetch) to also project each detail's canonical `history[]` via
  * `projectMaterialChangeEntries`, feeding both the row-level changed
- * treatment (`latestMaterialChangeByProblem`) and the `Alterados esta
- * semana` shortcut (`problemIdsAlteredInCivilWeek`). A PRB whose detail read
- * fails degrades the same way `toCitizenProblem` already does — the
- * existing `catch` substitutes an empty `record: {}`, which carries no
- * `history`, so that Problem simply contributes no material-change entries
- * (row stays on the neutral path, cannot count toward the weekly shortcut)
- * without being dropped from the normal list or blocking anyone else's
- * projection (§9 graceful degradation — never a reinterpretation of
- * `updated_at` as a fallback history signal).
+ * treatment (`latestMaterialChangeInCivilWeekByProblem`) and the `Alterados
+ * esta semana` shortcut (`problemIdsAlteredInCivilWeek`) from the same civil-
+ * week membership (weekly-emphasis correction) — a Problem only ever gets
+ * the changed-row treatment when it also counts toward the shortcut; a
+ * Problem whose only history is outside the current civil week renders on
+ * the normal neutral row path, even though `latestMaterialChangeByProblem`
+ * (kept for other historical uses) would still report an entry for it. A PRB
+ * whose detail read fails degrades the same way `toCitizenProblem` already
+ * does — the existing `catch` substitutes an empty `record: {}`, which
+ * carries no `history`, so that Problem simply contributes no material-
+ * change entries (row stays on the neutral path, cannot count toward the
+ * weekly shortcut) without being dropped from the normal list or blocking
+ * anyone else's projection (§9 graceful degradation — never a
+ * reinterpretation of `updated_at` as a fallback history signal).
  */
 export function Overview({
   dataProvider,
@@ -118,14 +123,17 @@ export function Overview({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- problemIds is a stable content-based key for the summaries above
   }, [dataProvider, indexState.status, problemIds]);
 
-  // Latest material change per Problem (row-level changed treatment) and
-  // the distinct set of Problems qualifying for `Alterados esta semana`
-  // (Overview final redesign, Phase 2, §2/§6) — both derived from the same
-  // `materialChangeEntries` projection, recomputed only when it changes.
+  // This-civil-week latest material change per Problem (row-level changed
+  // treatment) and the distinct set of Problems qualifying for `Alterados
+  // esta semana` (Overview final redesign, Phase 2 — weekly-emphasis
+  // correction) — both derived from the same `materialChangeEntries`
+  // projection under the same civil-week membership
+  // (`latestMaterialChangeInCivilWeekByProblem`/`problemIdsAlteredInCivilWeek`
+  // share `isMaterialChangeInCivilWeek`), recomputed only when it changes.
   // `referenceDate` is intentionally left at its default (`new Date()`):
-  // Overview always evaluates the shortcut against the real current civil
-  // week; only tests inject a fixed reference via the helpers directly.
-  const latestChangeByProblem = useMemo(() => latestMaterialChangeByProblem(materialChangeEntries), [materialChangeEntries]);
+  // Overview always evaluates both against the real current `Europe/Lisbon`
+  // civil week; only tests inject a fixed reference via the helpers directly.
+  const latestChangeByProblem = useMemo(() => latestMaterialChangeInCivilWeekByProblem(materialChangeEntries), [materialChangeEntries]);
   const alteredThisWeekIds = useMemo(() => problemIdsAlteredInCivilWeek(materialChangeEntries), [materialChangeEntries]);
 
   const visibleProblems = useMemo(() => {

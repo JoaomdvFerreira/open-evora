@@ -216,10 +216,13 @@ export function SortControl({ value, onChange, id = "overview-sort" }: {
  * as a single named control for assistive tech (`aria-label` carries the
  * title, exactly as the former "Explorar {title}" action did).
  *
- * `latestChange` (Overview final redesign, Phase 2, §2/§3) is this Problem's
- * newest canonical material-change entry
- * (overviewStats.ts's `latestMaterialChangeByProblem`), or `undefined` for a
- * Problem with no authored history — the caller decides membership, this
+ * `latestChange` (Overview final redesign, Phase 2, §2/§3; weekly-emphasis
+ * correction) is this Problem's newest material-change entry that also falls
+ * in the current `Europe/Lisbon` civil week
+ * (overviewStats.ts's `latestMaterialChangeInCivilWeekByProblem`), or
+ * `undefined` for a Problem with no qualifying entry this week — including a
+ * Problem whose only authored history predates this week, which renders on
+ * this same neutral path. The caller decides membership entirely; this
  * component only renders what it is given. When present, the row takes a
  * restrained `overview-problem-row--changed` variant (pale clay background +
  * a narrow left-edge accent, TARGET's own treatment) and gains a compact
