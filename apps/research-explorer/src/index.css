@@ -898,25 +898,31 @@ main.explorer-shell {
 /* Brand + nav grouped together (visual-convergence pass, §5): nav sits
    directly beside the brand rather than floating independently toward the
    centre of the `space-between` row — only the CTA is pushed to the wide
-   grid's far right edge, by the parent's own `space-between`. */
+   grid's far right edge, by the parent's own `space-between`. Gap widened
+   slightly beyond the shared `--space-loose` token (final desktop-correction
+   pass §4) for clearer brand/nav separation toward TARGET — scoped here
+   since `.explorer-chrome-group` is Header-only. */
 .explorer-chrome-group {
   display: flex;
   align-items: center;
-  gap: var(--space-loose);
+  gap: var(--p-space-6);
   min-width: 0;
 }
 
-/* Public chrome CTA (Overview final redesign, Phase 3B §4): a normal link,
-   visually restrained — no filled button/card treatment absent from the
-   approved TARGET. `.explorer-navigation` already flexes to fill the space
-   between the brand and this CTA via the parent's `space-between`. */
+/* Public chrome CTA (Overview final redesign, Phase 3B §4; converged to a
+   restrained clay/dark-clay treatment in the final desktop-correction pass
+   §7 — the former dark ink border/text read as too high-contrast/near-black
+   against TARGET's light editorial CTA): a normal link, visually restrained
+   — no filled button/card treatment absent from the approved TARGET.
+   `.explorer-navigation` already flexes to fill the space between the brand
+   and this CTA via the parent's `space-between`. */
 .explorer-cta {
   align-self: center;
   flex-shrink: 0;
   padding: 0.4rem 0.85rem;
-  border: 1px solid var(--color-separator-emphasis);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--radius-control);
-  color: var(--color-ink-primary);
+  color: var(--color-accent-hover);
   font-family: var(--font-interface);
   font-size: var(--text-interface-label-size);
   font-weight: var(--text-interface-label-weight);
@@ -927,6 +933,7 @@ main.explorer-shell {
 .explorer-cta:hover {
   border-color: var(--color-accent);
   color: var(--color-accent-hover);
+  background: color-mix(in srgb, var(--color-accent) 7%, transparent);
 }
 
 .explorer-cta:focus-visible {
@@ -1133,7 +1140,7 @@ main.explorer-shell {
 
 .overview-hero-headline {
   margin: 0 0 28px;
-  max-width: 20ch;
+  max-width: 34ch;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
   font-size: clamp(2.4rem, 4.6vw, 74px);
@@ -1145,15 +1152,20 @@ main.explorer-shell {
 /* TARGET's deliberate two-line desktop composition ("Problemas práticos" /
    "que afetam Évora.") — Overview visual-completion, task §2. Structural
    rather than relying on `.overview-hero-headline`'s own `max-width` to
-   accidentally wrap at the right character (that value now only bounds
-   overall measure). Each line is its own inline-block so the accessible
-   text value stays one contiguous string (a space renders between them in
-   the DOM — see OverviewPresentation.tsx) while the two lines reliably stack
-   at the desktop reference width. At compact widths (media query below)
-   this reverts to plain inline flow so the headline wraps naturally instead
-   of forcing these exact two lines where they may no longer fit. */
+   accidentally wrap at the right character — the measure above is now wide
+   enough to hold the longer of the two intended lines at the 74px desktop
+   size, and each line is additionally pinned with `white-space: nowrap` so
+   it can never internally wrap even if the measure is ever tightened again.
+   Each line is its own inline-block so the accessible text value stays one
+   contiguous string (a space renders between them in the DOM — see
+   OverviewPresentation.tsx) while the two lines reliably stack at the
+   desktop reference width. At compact widths (media query below) this
+   reverts to plain inline flow with `white-space: normal` so the headline
+   wraps naturally instead of forcing these exact two lines where they may no
+   longer fit. */
 .overview-hero-headline-line {
   display: inline-block;
+  white-space: nowrap;
 }
 
 .overview-hero-supporting {
@@ -1465,13 +1477,17 @@ main.explorer-shell {
   background: var(--color-surface-reading);
 }
 
-/* ~20px desktop vertical padding (task §5), replacing the earlier
-   min-height-based sizing — the header's height is now the natural result of
-   its own content plus this padding, matching TARGET's more substantial
-   chrome presence. */
+/* Compact desktop vertical padding (visual-completion, final desktop-
+   correction pass §3), tightened from the earlier ~20px: TARGET's Header is
+   visibly shorter, and the nav actions below no longer impose the generic
+   `--target-min` tap-target height on top of this padding, so the header's
+   total height converges toward TARGET without either value alone having to
+   do all the work. The header's height remains the natural result of its own
+   content plus this padding — never a min-height on `.explorer-chrome`
+   itself. */
 .explorer-chrome-inner {
   gap: var(--space-standard);
-  padding: 20px 0;
+  padding: 14px 0;
 }
 
 .explorer-chrome-inner > h1.explorer-identity {
@@ -1503,8 +1519,13 @@ main.explorer-shell {
   gap: 0.2rem;
 }
 
+/* Desktop nav action density (final desktop-correction pass §3): no
+   `min-height` here — the generic `--target-min` (44px) tap-target
+   constraint was the main contributor to the oversized Header, stacked on
+   top of `.explorer-chrome-inner`'s own padding. Controls stay comfortably
+   clickable from the padding alone; the mobile nav (media query below)
+   is unaffected by this desktop-only change. */
 .explorer-navigation .explorer-navigation-action {
-  min-height: var(--target-min);
   padding: 0.5rem 0.8rem;
   border-bottom-width: 2px;
   color: var(--color-ink-secondary);
@@ -1512,14 +1533,26 @@ main.explorer-shell {
   font-weight: var(--text-interface-label-weight);
 }
 
+/* Inactive links (§5): a more muted secondary ink than the shared
+   `--color-ink-secondary` default above, so `Método`/`Fontes`/`Sobre` read
+   clearly as non-active relative to `Problemas` — still legible, not
+   low-contrast decoration. */
+.explorer-navigation .explorer-navigation-action:not([aria-current="page"]) {
+  color: var(--color-ink-muted);
+}
+
 .explorer-navigation .explorer-navigation-action[aria-current="page"] {
   color: var(--color-ink-primary);
 }
 
+/* Active underline (§6): thinner and narrower than the former 2px/full-pad
+   span, so the active state reads as a quiet current-page indicator rather
+   than a dominant bar — `aria-current="page"` remains the actual semantic
+   marker regardless of this visual weight. */
 .explorer-navigation .explorer-navigation-action[aria-current="page"]::after {
-  right: 0.8rem;
-  left: 0.8rem;
-  height: 2px;
+  right: 0.9rem;
+  left: 0.9rem;
+  height: 1px;
 }
 
 .overview-search {
@@ -1604,12 +1637,19 @@ main.explorer-shell {
   min-width: 0;
 }
 
-/* Desktop search width increased toward TARGET's ~440px (task §8). */
+/* Desktop search width (final desktop-correction pass §9): grows to reach
+   TARGET's ~440px at the reference desktop width. The earlier `flex: 1 1
+   320px` basis undersold the 440px max-width — with `Filtros` and the result
+   count also in this `nowrap` row, a 320px basis left the search sized well
+   below its own max-width even where the row had room to spare. A 440px
+   basis lets it actually reach the max-width when space allows, while
+   `min-width`/`flex-shrink` still let it yield first to `Filtros` and the
+   (now shrink-proof, non-wrapping) result count beside it. */
 .overview-toolbar-controls .overview-search {
   width: auto;
   min-width: 16rem;
   max-width: 440px;
-  flex: 1 1 320px;
+  flex: 1 1 440px;
   margin: 0;
 }
 
@@ -1624,12 +1664,20 @@ main.explorer-shell {
 
 /* Result count (visual-convergence pass): de-emphasised secondary text —
    the toolbar's own presence already establishes this as the result total,
-   so it no longer needs primary-ink weight/colour to read clearly. */
+   so it no longer needs primary-ink weight/colour to read clearly.
+   `flex-shrink: 0` + `white-space: nowrap` (final desktop-correction pass
+   §8) keep it intact on the desktop toolbar row — without these, the
+   nowrap row above squeezed the count until "N problemas" itself wrapped
+   internally, rather than never wrapping at all. Not forced at compact
+   widths, where the toolbar row itself already stacks (media query
+   below). */
 .overview-results-count {
   margin: 0;
+  flex-shrink: 0;
   color: var(--color-ink-muted);
   font-size: var(--text-interface-label-size);
   font-weight: 400;
+  white-space: nowrap;
 }
 
 /* Sort control (visual-convergence pass): a quiet editorial control —
@@ -1661,34 +1709,40 @@ main.explorer-shell {
 /* The option text's own truthful "↓" (SORT_LABELS in CitizenDiscovery.tsx)
    is the sole visual direction indicator — the native select's own chevron
    is suppressed so the two never double up (task §8), while this stays a
-   real `<select>` rather than a custom dropdown built for appearance alone. */
+   real `<select>` rather than a custom dropdown built for appearance alone.
+   Contrast lowered and the underline faded in the final desktop-correction
+   pass §13 — `--color-ink-secondary`/the standard separator read too strong
+   next to TARGET's quieter control; this now matches
+   `.overview-sort-control`'s own already-muted ink. */
 .overview-sort-control select {
   appearance: none;
-  color: var(--color-ink-secondary);
+  color: var(--color-ink-muted);
   border: 0;
-  border-bottom: 1px solid var(--color-separator-standard);
+  border-bottom: 1px solid var(--color-separator-faint);
   background: none;
   font: inherit;
   cursor: pointer;
 }
 
 /* `Filtros` disclosure trigger (delta §4; compacted toward TARGET's lower,
-   more rectangular control density in the visual-completion pass, task §5):
-   a native button, restrained by default (transparent-leaning surface, a
-   subtle warm border, small radius), taking a subtle active-state treatment
-   (`data-active`, set from the accessible-name state
-   Overview.tsx/OverviewPresentation.tsx already track) when a topic filter
-   is active and the drawer is closed — never a separate visible chip/badge
-   beside it. The visible box is shorter than the shared `--target-min` tap
-   size (TARGET's compact density is a visual choice, not a WCAG 2.5.5 AAA
-   target this pass is bound to), but padding keeps a comfortable native
-   click/tap area around the text+icon. */
+   more rectangular control density in the visual-completion pass, task §5;
+   nudged back up ~3px in the final desktop-correction pass §11 — the
+   compacted density had overshot TARGET slightly): a native button,
+   restrained by default (transparent-leaning surface, a subtle warm border,
+   small radius), taking a subtle active-state treatment (`data-active`, set
+   from the accessible-name state Overview.tsx/OverviewPresentation.tsx
+   already track) when a topic filter is active and the drawer is closed —
+   never a separate visible chip/badge beside it. The visible box is still
+   shorter than the shared `--target-min` tap size (TARGET's compact density
+   is a visual choice, not a WCAG 2.5.5 AAA target this pass is bound to),
+   but padding keeps a comfortable native click/tap area around the
+   text+icon. */
 .overview-filtros-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.38rem;
-  min-height: 34px;
-  padding: 0.32rem 0.7rem;
+  min-height: 37px;
+  padding: 0.4rem 0.7rem;
   color: var(--color-ink-secondary);
   border: 1px solid var(--color-separator-standard);
   border-radius: var(--p-radius-sm);
@@ -1742,17 +1796,19 @@ main.explorer-shell {
   display: none;
 }
 
-/* Normal (inactive) topic controls (task §9): lower height, transparent
-   background, subtle warm border, compact rectangular geometry — TARGET's
-   density, replacing the earlier taller filled-white-button treatment.
-   `Todos` and the selected state below stay the drawer's one filled/pressed
-   language, unaffected by this. */
+/* Normal (inactive) topic controls (task §9; density nudged back up ~3px in
+   the final desktop-correction pass §12 — TARGET reads slightly less
+   compressed than the earlier value): lower height, transparent background,
+   subtle warm border, compact rectangular geometry — TARGET's density,
+   replacing the earlier taller filled-white-button treatment. `Todos` and
+   the selected state below stay the drawer's one filled/pressed language,
+   unaffected by this. */
 .overview-category-drawer-option {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  min-height: 32px;
-  padding: 5px 10px;
+  min-height: 35px;
+  padding: 7px 11px;
   color: var(--color-ink-secondary);
   border: 1px solid var(--color-separator-standard);
   border-radius: var(--p-radius-sm);
@@ -1810,18 +1866,20 @@ main.explorer-shell {
 
 /* Full-width results column (delta §7) — the permanent filter rail's grid
    allocation is removed entirely; the results column now uses the available
-   TARGET content width on its own. Full-bleed (task §11/§12): the same
-   structural principle `.overview-discovery` already uses — bleeds to the
-   actual viewport/page edge within `main.explorer-shell`'s own horizontal
-   padding, so both the problem-row band (`.overview-problem-list`) and the
-   end-of-results band (`.overview-end-of-results`) it wraps reach the page
-   boundary, while their own inner `shell-frame shell-frame--wide` elements
-   (the row link, the end-of-results inner) keep row CONTENT aligned to the
-   shared 1216px grid — never moving row text to the viewport edge. */
+   TARGET content width on its own. True full-bleed (task §11/§12; corrected
+   in the final desktop-correction pass §14 — the negative margin below
+   cancels `main.explorer-shell`'s own horizontal padding, but a matching
+   compensating `padding` here previously pushed the row bands right back
+   inward by the same amount, so the row background/separators/clay surface
+   never actually reached the true page edge, only back to `main`'s inset).
+   No compensating padding: the negative margin alone lets the row-band
+   backgrounds/separators/accent reach the true viewport edge, while their
+   own inner `shell-frame shell-frame--wide` elements (the row link, the
+   end-of-results inner) keep row CONTENT aligned to the shared 1216px grid —
+   never moving row text to the viewport edge. */
 .overview-results {
   min-width: 0;
   margin: 0 -2rem;
-  padding: 0 2rem;
 }
 
 .overview-problem-list {
@@ -1862,19 +1920,14 @@ main.explorer-shell {
   cursor: pointer;
 }
 
-/* Hover (task §10): never replaces either row surface with white — a normal
-   row stays on its own neutral `--color-surface-reading` base
-   (`.overview-problem-row`), a changed row stays on its own clay surface
-   (`.overview-problem-row--changed`, below); this rule no longer paints a
-   background at all. The restrained substitute cue is the title's own
-   underline (`.overview-problem-list h4`, below) plus the existing
-   `cursor: pointer` — keyboard focus keeps its own separate visible outline
-   (`:focus-visible`, unchanged) regardless of hover. */
-.overview-problem-row-link:hover .overview-problem-title {
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-}
-
+/* Hover (task §10; title underline removed in the final desktop-correction
+   pass §16 — TARGET does not carry this treatment): never replaces either
+   row surface with white — a normal row stays on its own neutral
+   `--color-surface-reading` base (`.overview-problem-row`), a changed row
+   stays on its own clay surface (`.overview-problem-row--changed`, below).
+   Pointer hover now has no dedicated visual cue beyond the existing
+   `cursor: pointer` on the row link — keyboard focus keeps its own separate
+   visible outline (`:focus-visible`, unchanged) regardless of hover. */
 .overview-problem-row-link:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
@@ -2295,10 +2348,13 @@ body:has(.public-overview) .public-footer {
 
   /* Full-bleed bleed matches `main.explorer-shell`'s compact 1rem horizontal
      padding (task §15 — no horizontal overflow), the same technique
-     `.overview-discovery` already uses at this breakpoint. */
+     `.overview-discovery` already uses at this breakpoint. No compensating
+     padding here either (final desktop-correction pass §14's fix applied
+     equivalently at this breakpoint) — the negative margin alone cancels
+     `main`'s inset so row bands reach the true page edge; row CONTENT
+     alignment still comes entirely from the inner `shell-frame` elements. */
   .overview-results {
     margin: 0 -1rem;
-    padding: 0 1rem;
   }
 
   /* Compact row inner padding (task §13 — responsive safety): tighter
@@ -2371,6 +2427,7 @@ body:has(.public-overview) .public-footer {
      the two desktop lines no longer fit. */
   .overview-hero-headline-line {
     display: inline;
+    white-space: normal;
   }
 
   .overview-hero-supporting {
