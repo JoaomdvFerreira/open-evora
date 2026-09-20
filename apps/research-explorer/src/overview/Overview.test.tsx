@@ -104,7 +104,7 @@ describe("Overview — final Hero", () => {
     expect(screen.getByText("O que sabemos, o que falta saber, e a fonte de cada afirmação.")).toBeTruthy();
   });
 
-  it("renders exactly the three intended Hero metric concepts — problems, evidence records, primary sources", async () => {
+  it("renders exactly the three intended Hero metric concepts — problems, evidence records, sources", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
@@ -122,7 +122,7 @@ describe("Overview — final Hero", () => {
     expect(evidenceMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Registos de evidência");
 
     const sourceMetric = screen.getByText("1", { selector: ".overview-metric-value" }).closest(".overview-metric");
-    expect(sourceMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Fonte primária");
+    expect(sourceMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Fonte");
 
     expect(document.querySelectorAll(".overview-metric").length).toBe(3);
     expect(screen.queryByText(/Registo total|Registos totais/)).toBeNull();
@@ -246,6 +246,23 @@ describe("Overview — Filtros disclosure and category drawer", () => {
     await screen.findByText("Problema");
     expect(openDrawer().getAttribute("aria-expanded")).toBe("false");
     expect(screen.queryByRole("group", { name: "Filtrar por tema" })).toBeNull();
+  });
+
+  it("keeps aria-controls resolving to a real, stably-mounted element even while collapsed (hidden, not absent)", async () => {
+    const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema");
+    const toggle = openDrawer();
+    const controlsId = toggle.getAttribute("aria-controls");
+    expect(controlsId).not.toBeNull();
+
+    // The controlled element exists in the DOM while collapsed — never
+    // conditionally unmounted — and is hidden via the native `hidden`
+    // attribute rather than being absent.
+    const controlled = document.getElementById(controlsId as string);
+    expect(controlled).not.toBeNull();
+    expect(controlled?.hidden).toBe(true);
   });
 
   it("opens the drawer on click, exposing aria-expanded=true, and closes it on a second click", async () => {

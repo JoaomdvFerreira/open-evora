@@ -64,11 +64,14 @@ export function evidenceCountLabel(count: number): string {
  * Metrics label only, for the canonical `SRC-` record count (docs/datamodel.md
  * §1 — a Source is "an identifiable origin from which information is
  * obtained"). Same counting pattern as `evidenceCount` (a plain `record.type`
- * count over the loaded index), never a separately derived total. PT-PT
- * singular only for one, plural for zero or more than one.
+ * count over the loaded index), never a separately derived total. The
+ * canonical data model does not classify Sources as primary vs
+ * secondary/additional, so the label names the record type plainly — "Fonte"
+ * / "Fontes", never "primária(s)". PT-PT singular only for one, plural for
+ * zero or more than one.
  */
 export function sourceCountLabel(count: number): string {
-  return count === 1 ? "Fonte primária" : "Fontes primárias";
+  return count === 1 ? "Fonte" : "Fontes";
 }
 
 /**

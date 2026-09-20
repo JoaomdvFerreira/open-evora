@@ -47,7 +47,7 @@ export function OverviewPresentation({
 }: {
   problemCount: number;
   evidenceCount: number;
-  /** Canonical `SRC-` record count (docs/datamodel.md §1) — same counting pattern as `evidenceCount`, shown in the Hero metrics as "fontes primárias". */
+  /** Canonical `SRC-` record count (docs/datamodel.md §1) — same counting pattern as `evidenceCount`, shown in the Hero metrics as "Fontes" (the data model does not classify Sources as primary vs secondary/additional). */
   sourceCount: number;
   citizenProblems: CitizenProblem[] | null;
   /** The full filtered+sorted result set (pre-pagination) — its length is the sole source for the toolbar's "N problemas" count, never `paginatedProblems.length`. */
@@ -134,9 +134,14 @@ export function OverviewPresentation({
         </div>
       </div>
 
-      {drawerOpen && (
-        <CategoryDrawer id={drawerId} categories={categories} activeTopic={topicFilter} onChange={onTopicFilterChange} totalCount={allProblems.length} />
-      )}
+      <CategoryDrawer
+        id={drawerId}
+        hidden={!drawerOpen}
+        categories={categories}
+        activeTopic={topicFilter}
+        onChange={onTopicFilterChange}
+        totalCount={allProblems.length}
+      />
 
       <section id="overview-problemas" aria-label="Explorar problemas">
         {citizenProblems === null || visibleProblems === null ? (

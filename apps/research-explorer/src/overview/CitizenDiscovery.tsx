@@ -26,7 +26,10 @@ export function CitizenSearchControl({ value, onChange, id = "overview-search-in
  * drawer below it via the standard disclosure pattern (`aria-expanded` +
  * `aria-controls`, no focus trap, no forced focus movement — see
  * OverviewPresentation.tsx's drawer-open state, which is local presentation
- * state only, never URL-synced/persisted). When a topic is active and the
+ * state only, never URL-synced/persisted). `aria-controls` always resolves to
+ * the drawer's stable id: the drawer stays mounted and is hidden via the
+ * native `hidden` attribute when collapsed, never removed from the DOM (see
+ * `CategoryDrawer`'s own doc comment). When a topic is active and the
  * drawer is closed, the trigger takes a restrained active visual state and
  * exposes the active category's PT-PT label in its own accessible name
  * (`activeTopicLabel`) — never a separate visible chip/badge next to it,
@@ -63,12 +66,24 @@ export function FiltrosToggle({ expanded, onToggle, controlsId, activeTopicLabel
  * count derived from the full unfiltered Problem set (never a fixture, never
  * a ranked top-N — see overviewStats.ts's `allTopicCodes`/`topCategoryCounts`
  * doc comments). Rendered in normal document flow directly beneath the
- * toolbar by the caller (OverviewPresentation.tsx) only while the drawer is
- * open; this component itself has no open/closed state or animation. Options
- * wrap safely (`flex-wrap`) rather than truncating at narrower widths.
+ * toolbar by the caller (OverviewPresentation.tsx); this component itself has
+ * no open/closed state or animation.
+ *
+ * Always kept mounted at its stable `id` so `FiltrosToggle`'s
+ * `aria-controls` always resolves to a real element, open or collapsed (a
+ * disclosure trigger's `aria-controls` must reference the controlled element
+ * regardless of its current visibility). `hidden` is the sole visibility
+ * switch: the native `hidden` attribute removes the drawer from the
+ * accessibility tree, visual rendering, and the tab order when collapsed,
+ * while `aria-expanded` on the trigger remains the actual source of
+ * disclosure state. When not hidden, the drawer sits in normal document flow
+ * beneath the toolbar exactly as before. Options wrap safely (`flex-wrap`)
+ * rather than truncating at narrower widths.
  */
-export function CategoryDrawer({ id, categories, activeTopic, onChange, totalCount }: {
+export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, totalCount }: {
   id: string;
+  /** True while the disclosure is collapsed — applies the native `hidden` attribute instead of unmounting. */
+  hidden: boolean;
   categories: TopicCategoryCount[];
   activeTopic: string | null;
   onChange: (code: string | null) => void;
@@ -76,7 +91,7 @@ export function CategoryDrawer({ id, categories, activeTopic, onChange, totalCou
   totalCount: number;
 }) {
   return (
-    <div id={id} className="overview-category-drawer" role="group" aria-label="Filtrar por tema">
+    <div id={id} hidden={hidden} className="overview-category-drawer" role="group" aria-label="Filtrar por tema">
       <button type="button" className="overview-category-drawer-option" aria-pressed={activeTopic === null} onClick={() => onChange(null)}>
         <span>Todos</span> <span className="overview-category-drawer-count">{totalCount}</span>
       </button>

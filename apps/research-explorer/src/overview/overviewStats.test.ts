@@ -459,8 +459,8 @@ describe("public Overview metrics count grammar", () => {
     expect(evidenceCountLabel(0)).toBe("Registos de evidência");
     expect(evidenceCountLabel(1)).toBe("Registo de evidência");
     expect(evidenceCountLabel(2)).toBe("Registos de evidência");
-    expect(sourceCountLabel(0)).toBe("Fontes primárias");
-    expect(sourceCountLabel(1)).toBe("Fonte primária");
-    expect(sourceCountLabel(2)).toBe("Fontes primárias");
+    expect(sourceCountLabel(0)).toBe("Fontes");
+    expect(sourceCountLabel(1)).toBe("Fonte");
+    expect(sourceCountLabel(2)).toBe("Fontes");
   });
 });

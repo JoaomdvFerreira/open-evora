@@ -105,6 +105,7 @@ describe("CategoryDrawer", () => {
     render(
       <CategoryDrawer
         id="drawer-1"
+        hidden={false}
         categories={[{ code: "MOB", count: 3 }, { code: "PUB", count: 2 }]}
         activeTopic={null}
         onChange={vi.fn()}
@@ -119,12 +120,12 @@ describe("CategoryDrawer", () => {
 
   it("marks Todos active when no topic is selected, and the matching category active otherwise, exclusively", () => {
     const { rerender } = render(
-      <CategoryDrawer id="drawer-1" categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} />
+      <CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} />
     );
     expect(screen.getByRole("button", { name: /^Todos/ }).getAttribute("aria-pressed")).toBe("true");
     expect(screen.getByRole("button", { name: /Mobilidade/ }).getAttribute("aria-pressed")).toBe("false");
 
-    rerender(<CategoryDrawer id="drawer-1" categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={vi.fn()} totalCount={1} />);
+    rerender(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={vi.fn()} totalCount={1} />);
     expect(screen.getByRole("button", { name: /^Todos/ }).getAttribute("aria-pressed")).toBe("false");
     expect(screen.getByRole("button", { name: /Mobilidade/ }).getAttribute("aria-pressed")).toBe("true");
   });
@@ -132,7 +133,7 @@ describe("CategoryDrawer", () => {
   it("calls onChange with the canonical domain code, never the PT-PT display label, on click", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    render(<CategoryDrawer id="drawer-1" categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={onChange} totalCount={1} />);
+    render(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={onChange} totalCount={1} />);
 
     await user.click(screen.getByRole("button", { name: /Mobilidade/ }));
     expect(onChange).toHaveBeenCalledWith("MOB");
@@ -141,7 +142,7 @@ describe("CategoryDrawer", () => {
   it("clicking the already-selected category clears TEMA back to null (Todos)", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    render(<CategoryDrawer id="drawer-1" categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={onChange} totalCount={1} />);
+    render(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={onChange} totalCount={1} />);
 
     await user.click(screen.getByRole("button", { name: /Mobilidade/ }));
     expect(onChange).toHaveBeenCalledWith(null);
@@ -150,7 +151,7 @@ describe("CategoryDrawer", () => {
   it("clicking Todos clears TEMA to null", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    render(<CategoryDrawer id="drawer-1" categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={onChange} totalCount={1} />);
+    render(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={onChange} totalCount={1} />);
 
     await user.click(screen.getByRole("button", { name: /^Todos/ }));
     expect(onChange).toHaveBeenCalledWith(null);
@@ -160,6 +161,7 @@ describe("CategoryDrawer", () => {
     render(
       <CategoryDrawer
         id="drawer-1"
+        hidden={false}
         categories={[{ code: "MOB", count: 0 }]}
         activeTopic={null}
         onChange={vi.fn()}
@@ -167,6 +169,29 @@ describe("CategoryDrawer", () => {
       />
     );
     expect(screen.getByRole("button", { name: /Mobilidade/ }).textContent).toMatch(/0$/);
+  });
+
+  it("stays mounted at its stable id when hidden, using the native hidden attribute rather than unmounting", () => {
+    const { rerender } = render(
+      <CategoryDrawer id="drawer-1" hidden={true} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} />
+    );
+
+    // Collapsed: present in the DOM at its stable id, but hidden — absent
+    // from the accessibility tree and not keyboard-focusable — and never
+    // visible (this is what makes FiltrosToggle's aria-controls always
+    // resolve to a real element, per the disclosure contract).
+    const collapsed = document.getElementById("drawer-1");
+    expect(collapsed).not.toBeNull();
+    expect(collapsed?.hidden).toBe(true);
+    expect(screen.queryByRole("group", { name: "Filtrar por tema" })).toBeNull();
+
+    rerender(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} />);
+
+    // Open: the same element, now unhidden and back in normal document flow.
+    const open = document.getElementById("drawer-1");
+    expect(open).toBe(collapsed);
+    expect(open?.hidden).toBe(false);
+    expect(screen.getByRole("group", { name: "Filtrar por tema" })).toBeTruthy();
   });
 });
 

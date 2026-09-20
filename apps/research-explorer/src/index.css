@@ -1464,15 +1464,21 @@ main.explorer-shell {
 }
 
 /* Category drawer (delta §5): normal document flow, directly beneath the
-   toolbar, only rendered while open — no modal, no popover, no overlay, no
-   permanent rail. Options wrap safely at narrower widths rather than
-   truncating or overflowing. */
+   toolbar, kept mounted at a stable id and hidden via the native `hidden`
+   attribute while collapsed (never removed from the DOM — the disclosure
+   trigger's aria-controls must always resolve to a real element) — no modal,
+   no popover, no overlay, no permanent rail. Options wrap safely at narrower
+   widths rather than truncating or overflowing. */
 .overview-category-drawer {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: var(--space-standard) 0 var(--space-standard) 2rem;
   border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.overview-category-drawer[hidden] {
+  display: none;
 }
 
 .overview-category-drawer-option {
