@@ -236,9 +236,12 @@ describe("Explorer — Overview view", () => {
     await screen.findByRole("heading", { name: "Visão geral" });
     const discoveryRegion = screen.getByRole("region", { name: "Explorar problemas" });
     expect(discoveryRegion).toBeTruthy();
+    // Compact inline metric presentation (visual-convergence pass): value
+    // and label share one line, e.g. "1 problema" — no separate stacked
+    // label element.
     const metricValues = screen.getAllByText("1", { selector: ".overview-metric-value" });
-    expect(metricValues[0].closest(".overview-metric")?.querySelector(".overview-metric-label")?.textContent).toBe("Problema acompanhado");
-    expect(metricValues[1].closest(".overview-metric")?.querySelector(".overview-metric-label")?.textContent).toBe("Registo de evidência");
+    expect(metricValues[0].closest(".overview-metric")?.textContent).toBe("1 problema");
+    expect(metricValues[1].closest(".overview-metric")?.textContent).toBe("1 Registo de evidência");
     expect(await screen.findByText("Pressão de estacionamento com uma descrição canónica completa que não pode ser truncada")).toBeTruthy();
     expect(within(discoveryRegion).getByRole("list")).toBeTruthy();
     expect(screen.queryByText("Pressão de estacionamento com uma descrição…")).toBeNull();

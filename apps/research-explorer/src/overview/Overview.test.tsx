@@ -115,14 +115,17 @@ describe("Overview — final Hero", () => {
     ]);
     render(<Overview dataProvider={provider} {...props} />);
 
+    // Compact inline metric presentation (visual-convergence pass): value
+    // and label share one line, e.g. "2 problemas" — no separate stacked
+    // label element.
     const problemMetric = (await screen.findByText("2", { selector: ".overview-metric-value" })).closest(".overview-metric");
-    expect(problemMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Problemas acompanhados");
+    expect(problemMetric?.textContent).toBe("2 problemas");
 
     const evidenceMetric = screen.getByText("3", { selector: ".overview-metric-value" }).closest(".overview-metric");
-    expect(evidenceMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Registos de evidência");
+    expect(evidenceMetric?.textContent).toBe("3 Registos de evidência");
 
     const sourceMetric = screen.getByText("1", { selector: ".overview-metric-value" }).closest(".overview-metric");
-    expect(sourceMetric?.querySelector(".overview-metric-label")?.textContent).toBe("Fonte");
+    expect(sourceMetric?.textContent).toBe("1 Fonte");
 
     expect(document.querySelectorAll(".overview-metric").length).toBe(3);
     expect(screen.queryByText(/Registo total|Registos totais/)).toBeNull();
@@ -281,7 +284,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
     expect(screen.queryByRole("group", { name: "Filtrar por tema" })).toBeNull();
   });
 
-  it("renders the complete canonical topic vocabulary with real, unfiltered counts, not only topics present on loaded Problems", async () => {
+  it("renders only topics with a real, unfiltered count greater than zero, with their real counts", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
     ]);
@@ -296,8 +299,12 @@ describe("Overview — Filtros disclosure and category drawer", () => {
 
     const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
     expect(within(drawer).getByRole("button", { name: /^Mobilidade/ }).textContent).toMatch(/1$/);
-    // A topic absent from the loaded Problems is still rendered, with a genuinely zero count.
-    expect(within(drawer).getByRole("button", { name: /^Digital/ }).textContent).toMatch(/0$/);
+    // A canonical topic with a genuinely zero current count is not rendered
+    // (visual-convergence pass, delta §5) — the vocabulary reduction is
+    // presentation-only, not a canonical-data change: `topCategoryCounts`
+    // itself still returns every audited topic with its real count (see
+    // overviewStats.test.ts).
+    expect(within(drawer).queryByRole("button", { name: /^Digital/ })).toBeNull();
   });
 
   it("selecting Todos clears the topic filter (topicFilter === null)", async () => {
@@ -397,6 +404,9 @@ describe("Overview — Filtros disclosure and category drawer", () => {
 
   it("renders every category option as an individually wrappable inline control (no fixed-width overflow container)", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
+    provider.getRecord = async (id) => ({
+      id, type: "PRB-", file: "", record: { title: "Problema", domain: ["MOB"] }, outgoingEdges: [], incomingEdges: [],
+    });
     const user = userEvent.setup();
     render(<Overview dataProvider={provider} {...props} />);
 

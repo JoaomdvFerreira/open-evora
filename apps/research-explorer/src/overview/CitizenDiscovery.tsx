@@ -62,12 +62,15 @@ export function FiltrosToggle({ expanded, onToggle, controlsId, activeTopicLabel
 
 /**
  * The category drawer's contents (Overview final redesign, Phase 1 — delta
- * §5): `Todos` plus the complete canonical TEMA vocabulary, each with a real
+ * §5, narrowed by the visual-convergence pass): `Todos` plus the canonical
+ * TEMA topics that currently have at least one Problem, each with a real
  * count derived from the full unfiltered Problem set (never a fixture, never
- * a ranked top-N — see overviewStats.ts's `allTopicCodes`/`topCategoryCounts`
- * doc comments). Rendered in normal document flow directly beneath the
- * toolbar by the caller (OverviewPresentation.tsx); this component itself has
- * no open/closed state or animation.
+ * a ranked/truncated top-N — see overviewStats.ts's
+ * `allTopicCodes`/`topCategoryCounts` doc comments; the zero-count filtering
+ * itself is presentation-only and lives in the caller, OverviewPresentation.tsx,
+ * not here or in overviewStats.ts). Rendered in normal document flow directly
+ * beneath the toolbar by the caller; this component itself has no open/closed
+ * state or animation.
  *
  * Always kept mounted at its stable `id` so `FiltrosToggle`'s
  * `aria-controls` always resolves to a real element, open or collapsed (a

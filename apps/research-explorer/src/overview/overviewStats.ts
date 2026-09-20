@@ -48,11 +48,13 @@ export interface MaterialChangeSource {
 
 /**
  * Metrics label only (value rendered separately in markup — Overview
- * visual-completion delta §5). PT-PT singular only for one, plural for zero
- * or more than one.
+ * visual-completion delta §5). Plain "problema"/"problemas" — the compact
+ * inline Hero metric presentation (visual-convergence pass) reads as
+ * "6 problemas", not the longer "Problemas acompanhados" phrasing. PT-PT
+ * singular only for one, plural for zero or more than one.
  */
 export function problemCountLabel(count: number): string {
-  return count === 1 ? "Problema acompanhado" : "Problemas acompanhados";
+  return count === 1 ? "problema" : "problemas";
 }
 
 /** Metrics label only — PT-PT singular only for one, plural for zero or more than one. */

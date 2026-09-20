@@ -70,16 +70,21 @@ export function OverviewPresentation({
   const drawerId = useId();
 
   // Category drawer vocabulary (Overview final redesign, Phase 1 — delta
-  // §5): the complete canonical TEMA vocabulary, in the same stable
-  // deterministic order every phase of Overview has used, each with a real
-  // count derived from the full unfiltered Problem set — never a fixture,
-  // never a ranked/truncated top-N (the drawer replaces the former Hero
-  // top-4 category shortcuts entirely; see overviewStats.ts's
-  // `allTopicCodes`/`topCategoryCounts`).
+  // §5, narrowed by the visual-convergence pass): the canonical TEMA
+  // vocabulary and each topic's real count still come from the full
+  // unfiltered Problem set — never a fixture, never a ranked/truncated
+  // top-N (see overviewStats.ts's `allTopicCodes`/`topCategoryCounts`). What
+  // changed is presentation only: a canonical topic with a genuinely zero
+  // current count is not rendered (TARGET), so the visible vocabulary tracks
+  // the current problem set without any hardcoded topic list or top-N limit
+  // — a topic reappears on its own the moment a Problem carries it. `Todos`
+  // is never filtered by this rule; it always renders.
   const allProblems = citizenProblems ?? [];
   const topicCodes = allTopicCodes();
   const topicCounts = new Map(topCategoryCounts(allProblems, topicCodes.length).map(({ code, count }) => [code, count]));
-  const categories = topicCodes.map((code) => ({ code, count: topicCounts.get(code) ?? 0 }));
+  const categories = topicCodes
+    .map((code) => ({ code, count: topicCounts.get(code) ?? 0 }))
+    .filter(({ count }) => count > 0);
   const activeTopicLabel = topicFilter === null ? null : describeTopic(topicFilter).label;
 
   return (
@@ -98,16 +103,13 @@ export function OverviewPresentation({
 
           <ul className="overview-metrics" aria-label="Números da investigação">
             <li className="overview-metric">
-              <span className="overview-metric-value">{problemCount}</span>
-              <span className="overview-metric-label">{problemCountLabel(problemCount)}</span>
+              <span className="overview-metric-value">{problemCount}</span> {problemCountLabel(problemCount)}
             </li>
             <li className="overview-metric">
-              <span className="overview-metric-value">{evidenceCount}</span>
-              <span className="overview-metric-label">{evidenceCountLabel(evidenceCount)}</span>
+              <span className="overview-metric-value">{evidenceCount}</span> {evidenceCountLabel(evidenceCount)}
             </li>
             <li className="overview-metric">
-              <span className="overview-metric-value">{sourceCount}</span>
-              <span className="overview-metric-label">{sourceCountLabel(sourceCount)}</span>
+              <span className="overview-metric-value">{sourceCount}</span> {sourceCountLabel(sourceCount)}
             </li>
           </ul>
         </div>
