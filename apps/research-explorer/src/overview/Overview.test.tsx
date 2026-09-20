@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Overview } from "./Overview";
 import { DataLoadError, type DataProvider, type RecordDetail, type RecordSummary } from "../dataProvider/types";
+import { getLisbonCivilDate, isDateInCivilWeekOf } from "./overviewStats";
 
 function makeProvider(index: RecordSummary[]): DataProvider {
   const details: Record<string, RecordDetail> = Object.fromEntries(
@@ -41,6 +42,39 @@ function openDrawer() {
 function formatMarkerDate(date: string): string {
   const [, month, day] = date.split("-");
   return `${day}/${month}`;
+}
+
+/**
+ * `YYYY-MM-DD` one calendar day before `date`, via whole-day UTC-anchored
+ * arithmetic — used only to walk backward from today's Lisbon civil date to
+ * find that week's Monday below. Carries no timezone meaning of its own,
+ * matching the same neutral UTC-anchored axis `overviewStats.ts`'s internal
+ * `parseCivilDay` already uses for civil-date arithmetic.
+ */
+function previousCivilDate(date: string): string {
+  const [year, month, day] = date.split("-").map(Number);
+  const previous = new Date(Date.UTC(year, month - 1, day - 1));
+  return previous.toISOString().slice(0, 10);
+}
+
+/**
+ * The Monday of the civil week containing the real current `Europe/Lisbon`
+ * civil date (Lisbon-date-boundary hardening, §3) — replaces a former
+ * `Date.getDay()`/host-local-calendar helper that made these fixtures depend
+ * on the machine/CI timezone. Walks backward from today's Lisbon civil date
+ * one day at a time using only the production `getLisbonCivilDate`/
+ * `isDateInCivilWeekOf` helpers (never a second, test-local timezone
+ * interpretation) until the previous day falls outside the current civil
+ * week — that day is Monday, the unique lower boundary `isDateInCivilWeekOf`
+ * already enforces.
+ */
+function thisWeekMonday(): string {
+  const today = getLisbonCivilDate();
+  let monday = today;
+  while (isDateInCivilWeekOf(previousCivilDate(monday), today)) {
+    monday = previousCivilDate(monday);
+  }
+  return monday;
 }
 
 describe("Overview — Problem investigation-state dimensions", () => {
@@ -614,19 +648,6 @@ describe("Overview — problem-list pagination", () => {
  * rules.
  */
 describe("Overview — material-change row treatment", () => {
-  // Built from the real current civil week (today's date, per the harness),
-  // matching the pattern the shortcut tests below already use, so these
-  // fixtures always exercise the actual "this week" semantics rather than a
-  // fixed date that could drift stale relative to "now".
-  function thisWeekMonday(): string {
-    const now = new Date();
-    const day = now.getDay();
-    const daysSinceMonday = day === 0 ? 6 : day - 1;
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - daysSinceMonday);
-    return monday.toISOString().slice(0, 10);
-  }
-
   function providerWithHistory(problems: { id: string; label: string; history?: { date: string; summary: string }[]; domain?: string[] }[]): DataProvider {
     const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: {} }));
     return {
@@ -716,18 +737,6 @@ describe("Overview — material-change row treatment", () => {
 });
 
 describe("Overview — Alterados esta semana shortcut", () => {
-  // Built from the real current civil week (today's date, per the harness)
-  // so the fixture always exercises the shortcut's actual semantics rather
-  // than a value that could drift stale relative to "now".
-  function thisWeekMonday(): string {
-    const now = new Date();
-    const day = now.getDay();
-    const daysSinceMonday = day === 0 ? 6 : day - 1;
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - daysSinceMonday);
-    return monday.toISOString().slice(0, 10);
-  }
-
   function providerWithHistory(problems: { id: string; label: string; history?: { date: string; summary: string }[]; domain?: string[] }[]): DataProvider {
     const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: {} }));
     return {
@@ -940,6 +949,120 @@ describe("Overview — Alterados esta semana shortcut", () => {
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
     expect(screen.getByRole("button", { name: "Filtros — Alterados esta semana" })).toBeTruthy();
     expect(toggle.getAttribute("data-active")).toBe("true");
+  });
+});
+
+/**
+ * Lisbon civil-date-boundary hardening: Overview owns exactly one current
+ * `Europe/Lisbon` civil-date value (`useLisbonCivilDate`) and derives both
+ * the row-level changed treatment and the `Alterados esta semana`
+ * shortcut/count from that same value, rather than each calling
+ * `new Date()`/`getLisbonCivilDate()` independently. These tests protect
+ * that shared-input agreement and the boundary-crossing refresh behaviour;
+ * `overviewStats.test.ts` covers the underlying civil-date-input helpers
+ * directly.
+ */
+describe("Overview — Lisbon civil-date-boundary hardening", () => {
+  function providerWithHistory(problems: { id: string; label: string; history?: { date: string; summary: string }[]; domain?: string[] }[]): DataProvider {
+    const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: {} }));
+    return {
+      getManifest: async () => { throw new Error("unused"); },
+      listRecords: async () => index,
+      getEdges: async () => [],
+      getRecord: async (id) => {
+        const p = problems.find((entry) => entry.id === id)!;
+        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], history: p.history }, outgoingEdges: [], incomingEdges: [] };
+      },
+    };
+  }
+
+  it("keeps the shortcut count and the changed-row count in agreement across a Sunday-to-Monday civil-week boundary", async () => {
+    // A material change dated the Sunday immediately before this week's
+    // Monday: outside the current civil week, so both projections must agree
+    // it does not qualify — proving they are being evaluated against the
+    // same reference civil date, not two independently-resolved ones that
+    // could disagree right at the boundary.
+    const monday = thisWeekMonday();
+    const previousSunday = previousCivilDate(monday);
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Alterado no domingo anterior", history: [{ date: previousSunday, summary: "Antes da semana atual." }] },
+      { id: "PRB-2", label: "Alterado na segunda-feira desta semana", history: [{ date: monday, summary: "Nesta semana." }] },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Alterado na segunda-feira desta semana");
+    await user.click(openDrawer());
+
+    const shortcutCount = screen.getByRole("button", { name: /^Alterados esta semana/ }).textContent?.match(/(\d+)$/)?.[1];
+    expect(shortcutCount).toBe("1");
+
+    const changedRows = document.querySelectorAll(".overview-problem-row--changed");
+    expect(changedRows.length).toBe(1);
+    expect(screen.getByText("Alterado na segunda-feira desta semana").closest(".overview-problem-row")).toBe(changedRows[0]);
+
+    const sundayRow = screen.getByText("Alterado no domingo anterior").closest(".overview-problem-row");
+    expect(sundayRow?.classList.contains("overview-problem-row--changed")).toBe(false);
+  });
+
+  it("refreshes the weekly projection when the Lisbon civil date crosses into a new day, without remounting", async () => {
+    const monday = thisWeekMonday();
+    // One civil week forward from this week's Monday, via the same
+    // whole-day UTC-anchored arithmetic `previousCivilDate` already uses
+    // (carries no timezone meaning of its own).
+    const [year, month, day] = monday.split("-").map(Number);
+    const followingMonday = new Date(Date.UTC(year, month - 1, day + 7)).toISOString().slice(0, 10);
+
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Problema com alteração futura", history: [{ date: followingMonday, summary: "Alteração da próxima semana." }] },
+    ]);
+
+    // Fake timers are enabled before mount, so the interval timer
+    // `useLisbonCivilDate` registers on mount is itself the fake one (a
+    // real timer registered before `vi.useFakeTimers()` would keep running
+    // on the real clock and never fire from `advanceTimersByTimeAsync`
+    // below). Fake timers do not block microtasks/Promises, so the
+    // component's async provider reads still resolve normally. `fireEvent`
+    // (not `userEvent`) is used throughout once fake timers are active,
+    // since `userEvent`'s own internal delay simulation depends on a
+    // running clock.
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date(`${monday}T12:00:00.000Z`));
+      render(<Overview dataProvider={provider} {...props} />);
+      // The provider's reads resolve via microtasks, not timers, so a plain
+      // `act`-flush (no time advance) is enough to settle the initial data
+      // load under fake timers — `screen.findByText`'s own internal polling
+      // uses `setTimeout` and would otherwise stall with the clock frozen.
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      expect(screen.getByText("Problema com alteração futura")).toBeTruthy();
+      fireEvent.click(openDrawer());
+
+      // Still this week's Monday: the following week's entry does not
+      // qualify yet.
+      expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).textContent).toMatch(/0$/);
+      expect(document.querySelectorAll(".overview-problem-row--changed").length).toBe(0);
+
+      // Advance wall-clock time to the following Monday and let the
+      // interval timer inside `useLisbonCivilDate` observe the change — the
+      // component itself is never remounted or re-rendered by this call
+      // alone; only the timer firing triggers the state update. Wrapped in
+      // `act` so the resulting `setState` inside the timer callback is
+      // flushed into a render before the assertions below read the DOM.
+      vi.setSystemTime(new Date(`${followingMonday}T12:00:00.000Z`));
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(60_000);
+      });
+
+      expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).textContent).toMatch(/1$/);
+      const changedRow = screen.getByText("Problema com alteração futura").closest(".overview-problem-row");
+      expect(changedRow?.classList.contains("overview-problem-row--changed")).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

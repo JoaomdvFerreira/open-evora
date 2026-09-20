@@ -309,6 +309,11 @@ export function isDateInCivilWeekOf(date: string, referenceCivilDate: string): b
  * `getLisbonCivilDate` (correct across Portugal's DST transitions,
  * independent of the browser/system timezone), and the actual week-boundary
  * arithmetic is delegated to the pure `isDateInCivilWeekOf`.
+ *
+ * A `Date`-instant convenience wrapper only — callers that already hold a
+ * resolved Lisbon civil date (e.g. Overview's own shared civil-date state,
+ * see §1 hardening) should call `isDateInCivilWeekOf` directly instead of
+ * reconstructing an instant merely to re-resolve it here.
  */
 export function isMaterialChangeInCivilWeek(date: string, referenceDate: Date = new Date()): boolean {
   return isDateInCivilWeekOf(date, getLisbonCivilDate(referenceDate));
@@ -317,35 +322,51 @@ export function isMaterialChangeInCivilWeek(date: string, referenceDate: Date = 
 /**
  * Distinct Problems (by canonical `problemId`) with at least one
  * material-change entry whose authored `date` falls in the civil week
- * containing `referenceDate` (Overview final redesign, Phase 2, §6) — the
- * `Alterados esta semana` shortcut's count/filter set. Counts a Problem once
- * regardless of how many qualifying entries it has this week (never a raw
- * entry count). Takes the full projected entry list, not
+ * containing `referenceCivilDate` (a `YYYY-MM-DD` Lisbon civil date, not an
+ * instant — Overview final redesign, Phase 2, §6; civil-date-input hardening)
+ * — the `Alterados esta semana` shortcut's count/filter set. Counts a
+ * Problem once regardless of how many qualifying entries it has this week
+ * (never a raw entry count). Takes the full projected entry list, not
  * `latestMaterialChangeByProblem`'s output, because a Problem's single
  * newest entry could predate this week even while an older-but-still-this-
  * week entry exists — membership in the shortcut is "has a qualifying entry
- * this week", not "was most recently changed this week".
+ * this week", not "was most recently changed this week". Pure civil-date
+ * arithmetic only (via `isDateInCivilWeekOf`) — no timezone resolution
+ * happens here.
  */
-export function problemIdsAlteredInCivilWeek(entries: MaterialChangeEntry[], referenceDate: Date = new Date()): Set<string> {
+export function problemIdsAlteredInCivilWeekOf(entries: MaterialChangeEntry[], referenceCivilDate: string): Set<string> {
   const ids = new Set<string>();
   for (const entry of entries) {
-    if (isMaterialChangeInCivilWeek(entry.date, referenceDate)) ids.add(entry.problemId);
+    if (isDateInCivilWeekOf(entry.date, referenceCivilDate)) ids.add(entry.problemId);
   }
   return ids;
 }
 
 /**
+ * `Date`-instant convenience wrapper over `problemIdsAlteredInCivilWeekOf`
+ * (resolves `referenceDate` to its Lisbon civil date via `getLisbonCivilDate`
+ * first). Callers that already hold a resolved Lisbon civil date should call
+ * `problemIdsAlteredInCivilWeekOf` directly instead of reconstructing an
+ * instant merely to re-resolve it here.
+ */
+export function problemIdsAlteredInCivilWeek(entries: MaterialChangeEntry[], referenceDate: Date = new Date()): Set<string> {
+  return problemIdsAlteredInCivilWeekOf(entries, getLisbonCivilDate(referenceDate));
+}
+
+/**
  * The single newest THIS-CIVIL-WEEK material-change entry per Problem,
- * keyed by canonical `problemId` (Overview final redesign, Phase 2 —
- * weekly-emphasis correction). This is the row-level changed-treatment
+ * keyed by canonical `problemId`, for the civil week containing
+ * `referenceCivilDate` (a `YYYY-MM-DD` Lisbon civil date, not an instant —
+ * Overview final redesign, Phase 2 — weekly-emphasis correction;
+ * civil-date-input hardening). This is the row-level changed-treatment
  * projection: unlike `latestMaterialChangeByProblem` (which picks a
  * Problem's newest entry regardless of age, and remains available for
  * historical/other surfaces), a Problem contributes an entry here only when
- * it has at least one qualifying entry in the civil week containing
- * `referenceDate` — the same `isMaterialChangeInCivilWeek` membership
- * `problemIdsAlteredInCivilWeek` uses, so the row-level clay
- * treatment/marker and the `Alterados esta semana` shortcut always agree on
- * which Problems qualify.
+ * it has at least one qualifying entry in that civil week — the same
+ * `isDateInCivilWeekOf` membership `problemIdsAlteredInCivilWeekOf` uses, so
+ * the row-level clay treatment/marker and the `Alterados esta semana`
+ * shortcut always agree on which Problems qualify whenever both are derived
+ * from the same `referenceCivilDate`.
  *
  * Filters to qualifying entries first, then reuses
  * `latestMaterialChangeByProblem`'s existing "first entry seen wins" pick,
@@ -353,13 +374,29 @@ export function problemIdsAlteredInCivilWeek(entries: MaterialChangeEntry[], ref
  * newest qualifying one (never an older entry, and never a non-qualifying
  * newest entry from outside this week) — the same newest-first,
  * problemId/authored-position tie-break `projectMaterialChangeEntries`
- * already establishes, since filtering preserves that order.
+ * already establishes, since filtering preserves that order. Pure civil-date
+ * arithmetic only — no timezone resolution happens here.
+ */
+export function latestMaterialChangeInCivilWeekOfByProblem(
+  entries: MaterialChangeEntry[],
+  referenceCivilDate: string
+): Map<string, MaterialChangeEntry> {
+  return latestMaterialChangeByProblem(entries.filter((entry) => isDateInCivilWeekOf(entry.date, referenceCivilDate)));
+}
+
+/**
+ * `Date`-instant convenience wrapper over
+ * `latestMaterialChangeInCivilWeekOfByProblem` (resolves `referenceDate` to
+ * its Lisbon civil date via `getLisbonCivilDate` first). Callers that already
+ * hold a resolved Lisbon civil date should call
+ * `latestMaterialChangeInCivilWeekOfByProblem` directly instead of
+ * reconstructing an instant merely to re-resolve it here.
  */
 export function latestMaterialChangeInCivilWeekByProblem(
   entries: MaterialChangeEntry[],
   referenceDate: Date = new Date()
 ): Map<string, MaterialChangeEntry> {
-  return latestMaterialChangeByProblem(entries.filter((entry) => isMaterialChangeInCivilWeek(entry.date, referenceDate)));
+  return latestMaterialChangeInCivilWeekOfByProblem(entries, getLisbonCivilDate(referenceDate));
 }
 
 /**

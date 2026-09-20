@@ -10,12 +10,14 @@ import {
   isMaterialChangeInCivilWeek,
   latestMaterialChangeByProblem,
   latestMaterialChangeInCivilWeekByProblem,
+  latestMaterialChangeInCivilWeekOfByProblem,
   matchesCitizenSearch,
   matchesTopicFilter,
   overviewPageCount,
   paginateProblems,
   problemCountLabel,
   problemIdsAlteredInCivilWeek,
+  problemIdsAlteredInCivilWeekOf,
   projectMaterialChangeEntries,
   sortProblems,
   sourceCountLabel,
@@ -286,6 +288,58 @@ describe("latestMaterialChangeByProblem", () => {
   });
 });
 
+describe("latestMaterialChangeInCivilWeekOfByProblem", () => {
+  // Civil-date-input primitive (Lisbon date-boundary hardening, §2) —
+  // "2026-03-04" (Wednesday)'s civil week is Monday 2026-03-02 through
+  // Sunday 2026-03-08. Pure civil-date arithmetic only: no `Date` instant,
+  // no timezone resolution.
+  const referenceCivilDate = "2026-03-04";
+
+  it("carries no entry for a Problem whose only history is outside the current civil week", () => {
+    const entries = [materialChangeEntry({ problemId: "PRB-0001", date: "2026-01-15" })];
+    expect(latestMaterialChangeInCivilWeekOfByProblem(entries, referenceCivilDate).has("PRB-0001")).toBe(false);
+  });
+
+  it("carries the qualifying entry for a Problem changed inside the current civil week", () => {
+    const entries = [materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-05", summary: "Alteração desta semana." })];
+    const latest = latestMaterialChangeInCivilWeekOfByProblem(entries, referenceCivilDate);
+    expect(latest.get("PRB-0001")?.summary).toBe("Alteração desta semana.");
+  });
+
+  it("uses the newest qualifying entry, never an older entry, when a Problem has several this week", () => {
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-06", summary: "Mais recente desta semana." }),
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-02", summary: "Mais antiga desta semana." }),
+    ];
+    const latest = latestMaterialChangeInCivilWeekOfByProblem(entries, referenceCivilDate);
+    expect(latest.get("PRB-0001")?.summary).toBe("Mais recente desta semana.");
+  });
+
+  it("agrees exactly with problemIdsAlteredInCivilWeekOf's membership for the same supplied civil date", () => {
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-05" }),
+      materialChangeEntry({ problemId: "PRB-0002", date: "2026-01-01" }),
+    ];
+    const latestKeys = new Set(latestMaterialChangeInCivilWeekOfByProblem(entries, referenceCivilDate).keys());
+    expect(latestKeys).toEqual(problemIdsAlteredInCivilWeekOf(entries, referenceCivilDate));
+  });
+
+  it("moving the supplied reference civil date from Sunday to the following Monday changes weekly membership correctly", () => {
+    // 2026-03-08 is the Sunday closing the 2026-03-02..2026-03-08 civil
+    // week; 2026-03-09 is the following Monday, opening a new civil week.
+    // A Problem changed on 2026-03-08 must qualify under the Sunday
+    // reference and stop qualifying the instant the reference crosses into
+    // the following Monday.
+    const entries = [materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-08" })];
+    expect(latestMaterialChangeInCivilWeekOfByProblem(entries, "2026-03-08").has("PRB-0001")).toBe(true);
+    expect(latestMaterialChangeInCivilWeekOfByProblem(entries, "2026-03-09").has("PRB-0001")).toBe(false);
+  });
+
+  it("returns an empty map for an empty entry list", () => {
+    expect(latestMaterialChangeInCivilWeekOfByProblem([], referenceCivilDate).size).toBe(0);
+  });
+});
+
 describe("latestMaterialChangeInCivilWeekByProblem", () => {
   const wednesday = new Date(Date.UTC(2026, 2, 4)); // civil week 2026-03-02..2026-03-08 (Lisbon)
 
@@ -441,6 +495,42 @@ describe("isDateInCivilWeekOf", () => {
   it("safely excludes a malformed candidate or reference civil date", () => {
     expect(isDateInCivilWeekOf("not-a-date", "2026-03-04")).toBe(false);
     expect(isDateInCivilWeekOf("2026-03-04", "not-a-date")).toBe(false);
+  });
+});
+
+describe("problemIdsAlteredInCivilWeekOf", () => {
+  // Civil-date-input primitive (Lisbon date-boundary hardening, §2) — no
+  // `Date` instant, no timezone resolution, just civil-date arithmetic via
+  // `isDateInCivilWeekOf`.
+  const referenceCivilDate = "2026-03-04"; // civil week 2026-03-02..2026-03-08
+
+  it("counts each qualifying Problem once, deduplicated by problemId", () => {
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-02" }),
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-05" }),
+      materialChangeEntry({ problemId: "PRB-0002", date: "2026-03-08" }),
+    ];
+    const ids = problemIdsAlteredInCivilWeekOf(entries, referenceCivilDate);
+    expect(ids).toEqual(new Set(["PRB-0001", "PRB-0002"]));
+  });
+
+  it("excludes a Problem whose only entries fall outside the civil week", () => {
+    const entries = [materialChangeEntry({ problemId: "PRB-0001", date: "2026-02-20" })];
+    expect(problemIdsAlteredInCivilWeekOf(entries, referenceCivilDate).size).toBe(0);
+  });
+
+  it("moving the supplied reference civil date from Sunday to the following Monday changes weekly membership correctly", () => {
+    // Mirrors latestMaterialChangeInCivilWeekOfByProblem's own boundary
+    // test, at the shortcut-membership layer: the two must agree exactly at
+    // this same boundary (see the "count and changed-row projection remain
+    // aligned" Overview-level regression).
+    const entries = [materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-08" })];
+    expect(problemIdsAlteredInCivilWeekOf(entries, "2026-03-08").has("PRB-0001")).toBe(true);
+    expect(problemIdsAlteredInCivilWeekOf(entries, "2026-03-09").has("PRB-0001")).toBe(false);
+  });
+
+  it("returns an empty set for no entries", () => {
+    expect(problemIdsAlteredInCivilWeekOf([], referenceCivilDate).size).toBe(0);
   });
 });
 

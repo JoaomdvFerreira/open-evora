@@ -3,12 +3,13 @@ import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/
 import { useRecordIndex } from "../records/useRecordIndex";
 import {
   computePublicOverviewData,
-  latestMaterialChangeInCivilWeekByProblem,
+  getLisbonCivilDate,
+  latestMaterialChangeInCivilWeekOfByProblem,
   matchesCitizenSearch,
   matchesTopicFilter,
   overviewPageCount,
   paginateProblems,
-  problemIdsAlteredInCivilWeek,
+  problemIdsAlteredInCivilWeekOf,
   projectMaterialChangeEntries,
   sortProblems,
   toCitizenProblem,
@@ -27,6 +28,41 @@ const ERROR_TITLES: Record<string, string> = {
   network: "Falha ao carregar a visão geral",
 };
 
+// How often Overview re-checks whether the Europe/Lisbon civil date has
+// rolled over while mounted (Overview final redesign, Phase 2 — Lisbon
+// date-boundary hardening). Day/week-boundary staleness is the only thing
+// this guards against, so a coarse interval is sufficient; this never
+// updates state unless the resolved civil date actually changed (see
+// `useLisbonCivilDate` below).
+const LISBON_CIVIL_DATE_POLL_INTERVAL_MS = 60_000;
+
+/**
+ * Overview's single source of "what is today, in the Europe/Lisbon civil
+ * calendar" (Lisbon date-boundary hardening). Both the `Alterados esta
+ * semana` shortcut and the row-level changed treatment must agree on exactly
+ * the same civil date, so this is the one place either is read from — never
+ * a separate implicit `new Date()` inside each projection.
+ *
+ * A lightweight interval timer re-resolves `getLisbonCivilDate()` and only
+ * calls `setState` when the resolved civil date actually differs from the
+ * current one, so a mounted Overview picks up a Lisbon civil-day/week
+ * rollover without requiring a remount or an unrelated re-render to trigger
+ * it. The timer is cleared on unmount.
+ */
+function useLisbonCivilDate(): string {
+  const [civilDate, setCivilDate] = useState(() => getLisbonCivilDate());
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const next = getLisbonCivilDate();
+      setCivilDate((current) => (current === next ? current : next));
+    }, LISBON_CIVIL_DATE_POLL_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  return civilDate;
+}
+
 /**
  * Citizen-first Overview (WU054; final macro-structure per Overview final
  * redesign, Phase 1; material-change integration per Phase 2). Loads the
@@ -42,20 +78,24 @@ const ERROR_TITLES: Record<string, string> = {
  * Phase 2 reuses that same per-PRB `getRecord()` detail read (never a second
  * fetch) to also project each detail's canonical `history[]` via
  * `projectMaterialChangeEntries`, feeding both the row-level changed
- * treatment (`latestMaterialChangeInCivilWeekByProblem`) and the `Alterados
- * esta semana` shortcut (`problemIdsAlteredInCivilWeek`) from the same civil-
- * week membership (weekly-emphasis correction) — a Problem only ever gets
- * the changed-row treatment when it also counts toward the shortcut; a
- * Problem whose only history is outside the current civil week renders on
- * the normal neutral row path, even though `latestMaterialChangeByProblem`
- * (kept for other historical uses) would still report an entry for it. A PRB
- * whose detail read fails degrades the same way `toCitizenProblem` already
- * does — the existing `catch` substitutes an empty `record: {}`, which
- * carries no `history`, so that Problem simply contributes no material-
- * change entries (row stays on the neutral path, cannot count toward the
- * weekly shortcut) without being dropped from the normal list or blocking
- * anyone else's projection (§9 graceful degradation — never a
- * reinterpretation of `updated_at` as a fallback history signal).
+ * treatment (`latestMaterialChangeInCivilWeekOfByProblem`) and the
+ * `Alterados esta semana` shortcut (`problemIdsAlteredInCivilWeekOf`) from
+ * the same civil-week membership (weekly-emphasis correction) — a Problem
+ * only ever gets the changed-row treatment when it also counts toward the
+ * shortcut; a Problem whose only history is outside the current civil week
+ * renders on the normal neutral row path, even though
+ * `latestMaterialChangeByProblem` (kept for other historical uses) would
+ * still report an entry for it. Both projections are derived from the same
+ * `useLisbonCivilDate()` value (Lisbon date-boundary hardening) rather than
+ * each calling `new Date()`/`getLisbonCivilDate()` independently, so they can
+ * never disagree even at the instant the civil date rolls over. A PRB whose
+ * detail read fails degrades the same way `toCitizenProblem` already does —
+ * the existing `catch` substitutes an empty `record: {}`, which carries no
+ * `history`, so that Problem simply contributes no material-change entries
+ * (row stays on the neutral path, cannot count toward the weekly shortcut)
+ * without being dropped from the normal list or blocking anyone else's
+ * projection (§9 graceful degradation — never a reinterpretation of
+ * `updated_at` as a fallback history signal).
  */
 export function Overview({
   dataProvider,
@@ -67,6 +107,10 @@ export function Overview({
   const indexState = useRecordIndex(dataProvider);
   const [citizenProblems, setCitizenProblems] = useState<CitizenProblem[] | null>(null);
   const [materialChangeEntries, setMaterialChangeEntries] = useState<MaterialChangeEntry[]>([]);
+  // The one current Europe/Lisbon civil date Overview evaluates every
+  // "esta semana" judgement against (Lisbon date-boundary hardening) — see
+  // `useLisbonCivilDate`'s own doc comment.
+  const lisbonCivilDate = useLisbonCivilDate();
   const [searchQuery, setSearchQuery] = useState("");
   // TEMA is the sole remaining normal Overview filter dimension (Overview
   // final redesign, Phase 1, delta §6) — EVIDÊNCIA/VALIDAÇÃO/ESTADO were
@@ -126,15 +170,21 @@ export function Overview({
   // This-civil-week latest material change per Problem (row-level changed
   // treatment) and the distinct set of Problems qualifying for `Alterados
   // esta semana` (Overview final redesign, Phase 2 — weekly-emphasis
-  // correction) — both derived from the same `materialChangeEntries`
-  // projection under the same civil-week membership
-  // (`latestMaterialChangeInCivilWeekByProblem`/`problemIdsAlteredInCivilWeek`
-  // share `isMaterialChangeInCivilWeek`), recomputed only when it changes.
-  // `referenceDate` is intentionally left at its default (`new Date()`):
-  // Overview always evaluates both against the real current `Europe/Lisbon`
-  // civil week; only tests inject a fixed reference via the helpers directly.
-  const latestChangeByProblem = useMemo(() => latestMaterialChangeInCivilWeekByProblem(materialChangeEntries), [materialChangeEntries]);
-  const alteredThisWeekIds = useMemo(() => problemIdsAlteredInCivilWeek(materialChangeEntries), [materialChangeEntries]);
+  // correction; Lisbon date-boundary hardening) — both derived from the same
+  // `materialChangeEntries` projection AND the same `lisbonCivilDate` value
+  // (never each calling `new Date()`/`getLisbonCivilDate()` on its own),
+  // recomputed whenever either changes. Using the civil-date-input helpers
+  // directly (`latestMaterialChangeInCivilWeekOfByProblem`/
+  // `problemIdsAlteredInCivilWeekOf`) avoids converting the shared civil date
+  // back into an artificial instant merely to re-resolve it.
+  const latestChangeByProblem = useMemo(
+    () => latestMaterialChangeInCivilWeekOfByProblem(materialChangeEntries, lisbonCivilDate),
+    [materialChangeEntries, lisbonCivilDate]
+  );
+  const alteredThisWeekIds = useMemo(
+    () => problemIdsAlteredInCivilWeekOf(materialChangeEntries, lisbonCivilDate),
+    [materialChangeEntries, lisbonCivilDate]
+  );
 
   const visibleProblems = useMemo(() => {
     if (!citizenProblems) return null;
