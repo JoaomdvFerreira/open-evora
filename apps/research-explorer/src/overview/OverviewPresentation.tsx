@@ -110,28 +110,30 @@ export function OverviewPresentation({
       <h2 id="overview-heading">Visão geral</h2>
 
       <div className="overview-hero">
-        <div className="overview-hero-content shell-frame shell-frame--wide">
-          <p className="overview-hero-eyebrow">
-            <span className="overview-hero-eyebrow-chip">
-              <span className="overview-hero-eyebrow-dot" aria-hidden="true">•</span> Projeto independente — não oficial
-            </span>
-          </p>
-          <h3 className="overview-hero-headline">Problemas práticos que afetam Évora.</h3>
-          <p className="overview-hero-supporting">O que sabemos, o que falta saber, e a fonte de cada afirmação.</p>
+        <div className="shell-frame shell-frame--wide">
+          <div className="overview-hero-content">
+            <p className="overview-hero-eyebrow">
+              <span className="overview-hero-eyebrow-chip">
+                <span className="overview-hero-eyebrow-dot" aria-hidden="true">•</span> Projeto independente — não oficial
+              </span>
+            </p>
+            <h3 className="overview-hero-headline">Problemas práticos que afetam Évora.</h3>
+            <p className="overview-hero-supporting">O que sabemos, o que falta saber, e a fonte de cada afirmação.</p>
 
-          <ul className="overview-metrics" aria-label="Números da investigação">
-            <li className="overview-metric">
-              <span className="overview-metric-value">{problemCount}</span> {problemCountLabel(problemCount)}
-            </li>
-            <li className="overview-metric">
-              <span className="overview-metric-value">{evidenceCount}</span> {evidenceCountLabel(evidenceCount)}
-            </li>
-            <li className="overview-metric">
-              <span className="overview-metric-value">{sourceCount}</span> {sourceCountLabel(sourceCount)}
-            </li>
-          </ul>
+            <ul className="overview-metrics" aria-label="Números da investigação">
+              <li className="overview-metric">
+                <span className="overview-metric-value">{problemCount}</span> {problemCountLabel(problemCount)}
+              </li>
+              <li className="overview-metric">
+                <span className="overview-metric-value">{evidenceCount}</span> {evidenceCountLabel(evidenceCount)}
+              </li>
+              <li className="overview-metric">
+                <span className="overview-metric-value">{sourceCount}</span> {sourceCountLabel(sourceCount)}
+              </li>
+            </ul>
+          </div>
+          {/* Deliberate negative space (TARGET) — no replacement content. */}
         </div>
-        {/* Deliberate negative space (TARGET) — no replacement content. */}
       </div>
 
       {/* Discovery band (visual-convergence pass, §7/§8): one full-width warm

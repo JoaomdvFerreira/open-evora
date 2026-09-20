@@ -1067,11 +1067,14 @@ main.explorer-shell {
    delta §1; desktop padding/type converged toward TARGET in the visual-
    convergence pass): one editorial content column, aligned left, with
    deliberate negative space on the right — no second Hero column, no
-   permanent right-side panel. `.overview-hero-content` itself carries the
-   shared `shell-frame shell-frame--wide` grid (OverviewPresentation.tsx); its
-   own `max-width` below narrows the column further within that grid, so the
-   right-side space stays the deliberate remainder of the *shared* wide grid,
-   not a second independent width. */
+   permanent right-side panel. The shared `shell-frame shell-frame--wide`
+   grid wraps `.overview-hero-content` as its own element
+   (OverviewPresentation.tsx) rather than being applied to it directly, so
+   the shared ~1216px frame and the narrower editorial column below are two
+   separate responsibilities: the frame sets the shared left axis, and
+   `.overview-hero-content`'s own `max-width` narrows the column within it —
+   the right-side space stays the deliberate remainder of the *shared* wide
+   grid, not a second independent width. */
 .overview-hero {
   padding: 104px 0 88px;
   background: var(--color-surface-reading);
