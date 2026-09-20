@@ -71,7 +71,7 @@ export function TrustPage({ page }: { page: TrustPageContent }) {
 export function PublicFooter() {
   return (
     <footer className="public-footer" aria-label="Informação sobre o Open Évora">
-      <div className="public-footer-inner shell-frame">
+      <div className="public-footer-inner shell-frame shell-frame--wide">
         <div className="public-footer-identity">
           <p className="public-footer-brand">Open Évora</p>
           <p className="public-footer-summary">Projeto independente de investigação cívica. Não oficial. Todo o conteúdo remete para fontes identificáveis.</p>

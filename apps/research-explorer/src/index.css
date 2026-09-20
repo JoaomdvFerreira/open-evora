@@ -57,15 +57,21 @@ main {
 .trust-facts dt { color: var(--color-ink-muted); font-family: var(--font-interface); font-size: var(--text-interface-label-size); font-weight: var(--text-interface-label-weight); }
 .trust-facts dd { margin: 0; }
 
-/* Editorial three-area footer (Overview final redesign, Phase 3B §6):
-   identity/supporting copy on the left, PROJETO and DADOS link groups on
-   the right. Global — TrustPage.tsx renders this beneath the Explorer and
-   every TrustPage, so nothing here depends on `.public-overview` being
-   present; the Overview-specific zero-gap treatment (`body:has(.public-
-   overview) .public-footer`, above) stays purely additive. */
+/* Editorial three-area footer (Overview final redesign, Phase 3B §6;
+   converged to a full-width warm band + shared wide grid in the
+   visual-convergence pass, task §12): identity/supporting copy on the left,
+   PROJETO and DADOS link groups pushed to the right. Global — TrustPage.tsx
+   renders this beneath the Explorer and every TrustPage, so nothing here
+   depends on `.public-overview` being present; the Overview-specific
+   zero-gap treatment (`body:has(.public-overview) .public-footer`, above)
+   stays purely additive. `.public-footer` is now the full-width band (warm
+   surface + full-width top rule); `.public-footer-inner` carries the shared
+   `shell-frame shell-frame--wide` grid (TrustPage.tsx) for its actual
+   content alignment — the same left/right axes as Header/Hero/rows. */
 .public-footer {
   margin: 2rem 0 0;
-  padding: var(--space-loose) 2rem;
+  padding: 44px 2rem 52px;
+  background: var(--color-surface-subtle);
   border-top: 1px solid var(--color-separator-standard);
   color: var(--color-ink-secondary);
   font-family: var(--font-interface);
@@ -75,43 +81,53 @@ main {
 .public-footer-inner {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-loose) var(--space-section);
+  gap: var(--space-loose) 56px;
   justify-content: space-between;
 }
 
 .public-footer-identity {
   min-width: 0;
-  max-width: 28rem;
+  max-width: 40ch;
 }
 
+/* Brand (task §12): reading serif ~18px/~600, distinct from the interface
+   sans used by the rest of the footer. */
 .public-footer-brand {
   margin: 0 0 var(--space-tight);
   color: var(--color-ink-primary);
-  font-weight: var(--text-interface-label-weight);
+  font-family: var(--font-reading);
+  font-size: 18px;
+  font-weight: 600;
 }
 
+/* Body (task §12): ~13.5px/1.62. */
 .public-footer-summary {
   margin: 0;
   color: var(--color-ink-muted);
-  line-height: var(--text-interface-body-line-height);
+  font-size: 13.5px;
+  line-height: 1.62;
 }
 
 .public-footer-group {
   min-width: 8rem;
 }
 
+/* Group headings (task §12): technical/mono, ~11.5px, uppercase, restrained
+   tracking. */
 .public-footer-group > p {
   margin: 0 0 var(--space-tight);
   color: var(--color-ink-muted);
-  font-weight: var(--text-interface-label-weight);
+  font-family: var(--font-technical);
+  font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  font-size: 0.72rem;
+  font-size: 11.5px;
 }
 
+/* Link vertical gap (task §12): ~8px. */
 .public-footer-group ul {
   display: grid;
-  gap: 0.35rem;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -678,9 +694,12 @@ code {
      reused as the header's inner-content frame so chrome stays full-bleed while its
      content aligns with every surface's own max width beneath it. */
   --shell-content-max: 980px;
-  /* Overview-only experimental wide shell (design/overview-visual-completion) —
-     see `.shell-frame--wide` below. Not adopted by any other surface. */
-  --shell-content-max-wide: 1280px;
+  /* Overview-only wide shell (design/overview-visual-completion — visual
+     convergence pass): matches the approved TARGET's ~1216px inner content
+     width. At the ~1440px reference viewport this auto-centers to TARGET's
+     own ~112px effective side margins without a separate margin token — see
+     `.shell-frame--wide` below. Not adopted by any other surface. */
+  --shell-content-max-wide: 1216px;
 
   /* Semantic typography recipes — design-system.md §2. Primitives only;
      no component selectors consume these yet (V1/V2/V3 reconciliation). */
@@ -839,23 +858,38 @@ main.explorer-shell {
   margin-right: auto;
 }
 
-/* Experimental wide variant (design/overview-visual-completion) — evaluates
-   whether the Overview composition benefits from a 1280px shell instead of
-   the canonical 980px above. Reuses the same width/centring primitive and
-   gutter system; only the max-width token differs. Overview-only for now:
-   no other `.shell-frame` consumer (Header, Records, Graph, Problem View,
-   Footer, breadcrumbs) opts into it. If validated, promote by widening
-   `--shell-content-max` itself rather than keeping two tokens. */
+/* Wide shell variant (design/overview-visual-completion — visual convergence
+   pass): the one shared ~1216px wide grid for Header, Overview Hero,
+   discovery, problem rows, end-of-results, and Footer content — so chrome
+   and Overview content visibly share the same left/right axes (task §4).
+   Reuses the same width/centring primitive and gutter system as the
+   canonical 980px `.shell-frame` above; only the max-width token differs.
+   Records/Problem View/Graph body content remains on the narrower canonical
+   980px frame — this pass does not touch their content width, only the
+   global chrome (Header/Footer) that surrounds every view. If validated
+   further, promote by widening `--shell-content-max` itself rather than
+   keeping two tokens. */
 .shell-frame--wide {
   max-width: var(--shell-content-max-wide);
 }
 
 .explorer-chrome-inner {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   justify-content: space-between;
   gap: 2rem;
   min-height: inherit;
+}
+
+/* Brand + nav grouped together (visual-convergence pass, §5): nav sits
+   directly beside the brand rather than floating independently toward the
+   centre of the `space-between` row — only the CTA is pushed to the wide
+   grid's far right edge, by the parent's own `space-between`. */
+.explorer-chrome-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-loose);
+  min-width: 0;
 }
 
 /* Public chrome CTA (Overview final redesign, Phase 3B §4): a normal link,
@@ -1030,13 +1064,16 @@ main.explorer-shell {
 }
 
 /* Overview Hero — final macro-structure (Overview final redesign, Phase 1,
-   delta §1): one editorial content column, aligned left, with deliberate
-   negative space on the right — no second Hero column, no permanent right-
-   side panel. Composition stays inside the canonical `.shell-frame` — no
-   narrower max-width is introduced around it. */
+   delta §1; desktop padding/type converged toward TARGET in the visual-
+   convergence pass): one editorial content column, aligned left, with
+   deliberate negative space on the right — no second Hero column, no
+   permanent right-side panel. `.overview-hero-content` itself carries the
+   shared `shell-frame shell-frame--wide` grid (OverviewPresentation.tsx); its
+   own `max-width` below narrows the column further within that grid, so the
+   right-side space stays the deliberate remainder of the *shared* wide grid,
+   not a second independent width. */
 .overview-hero {
-  padding: var(--space-loose) var(--space-standard) var(--space-loose) 0;
-  border-radius: var(--radius-surface) var(--radius-surface) 0 0;
+  padding: 104px 0 88px;
   background: var(--color-surface-reading);
 }
 
@@ -1044,20 +1081,18 @@ main.explorer-shell {
   display: flex;
   flex-direction: column;
   align-items: start;
-  /* Caps the content column so the negative space on the right (TARGET) is
-     the deliberate remainder of the Hero's own width, not a fluid full-width
-     paragraph measure. */
   max-width: 40rem;
 }
 
 .overview-hero-eyebrow {
-  margin: 0 0 var(--space-standard);
+  margin: 0 0 34px;
 }
 
 /* Restrained outlined pill, matching the approved reference: an
    accent-colored border/text and the accent color itself at low opacity as
    the fill (derived from the existing tokens, not a new color), using the
-   shared control radius rather than a fully rounded pill. */
+   shared control radius rather than a fully rounded pill. Technical/mono, per
+   TARGET's restrained-eyebrow treatment (task §6). */
 .overview-hero-eyebrow-chip {
   display: inline-flex;
   align-items: center;
@@ -1067,9 +1102,9 @@ main.explorer-shell {
   border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--radius-control);
   background: color-mix(in srgb, var(--color-accent) 7%, transparent);
-  font-family: var(--font-interface);
-  font-size: 0.74rem;
-  font-weight: 600;
+  font-family: var(--font-technical);
+  font-size: 12.5px;
+  font-weight: 500;
   letter-spacing: 0.01em;
 }
 
@@ -1080,42 +1115,43 @@ main.explorer-shell {
 }
 
 .overview-hero-headline {
-  margin: 0 0 var(--space-standard);
-  max-width: 22ch;
+  margin: 0 0 28px;
+  max-width: 16ch;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: clamp(2.4rem, 4.2vw, 3.4rem);
+  font-size: clamp(2.4rem, 4.6vw, 74px);
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.06;
   letter-spacing: -0.01em;
 }
 
 .overview-hero-supporting {
-  margin: 0 0 var(--space-loose);
-  max-width: 34ch;
+  margin: 0 0 46px;
+  max-width: 42ch;
   color: var(--color-ink-secondary);
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-family: var(--font-reading);
+  font-size: 21px;
+  line-height: 1.6;
 }
 
 /* Hero metrics (visual-convergence pass, TARGET): compact inline phrases —
-   "6 problemas", value and label sharing one line, small restrained
-   interface type, no card/panel treatment and no large serif metric
-   numbers (contrast the former stacked value-over-label presentation this
-   replaces). Exactly the three metric concepts required (delta §1 "Hero
-   metrics") — problem count, evidence-record count, source count — never a
-   fourth "total records" metric here. */
+   "6 problemas", value and label sharing one line, technical/mono type, no
+   card/panel treatment and no large serif metric numbers (contrast the
+   former stacked value-over-label presentation this replaces). Exactly the
+   three metric concepts required (delta §1 "Hero metrics") — problem count,
+   evidence-record count, source count — never a fourth "total records"
+   metric here. */
 .overview-metrics {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 1.25rem;
+  gap: 0.35rem 28px;
   margin: 0;
   padding: 0;
   width: 100%;
   list-style: none;
-  color: var(--color-ink-secondary);
-  font-family: var(--font-interface);
-  font-size: var(--text-interface-body-size);
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13px;
 }
 
 .overview-metric {
@@ -1225,8 +1261,13 @@ main.explorer-shell {
   font-size: 0.78rem;
 }
 
+/* `margin-top`/`margin-bottom` only (never the `margin` shorthand) — this
+   element also carries `shell-frame shell-frame--wide` (OverviewPresentation
+   .tsx) for the shared wide-grid alignment, and the shorthand would
+   overwrite that rule's own auto left/right centring margins. */
 .overview-empty-state {
-  margin: 1rem 0;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
   padding: 1rem;
   color: var(--color-ink-secondary);
   border: 1px dashed var(--color-separator-standard);
@@ -1367,21 +1408,30 @@ main.explorer-shell {
    Explorer.tsx/Overview.tsx render these class names directly — this is the
    production presentation, not a Storybook-only preview. */
 .explorer-chrome {
-  min-height: 3.25rem;
+  min-height: 0;
   border-bottom-color: var(--color-separator-standard);
   background: var(--color-surface-reading);
 }
 
+/* ~20px desktop vertical padding (task §5), replacing the earlier
+   min-height-based sizing — the header's height is now the natural result of
+   its own content plus this padding, matching TARGET's more substantial
+   chrome presence. */
 .explorer-chrome-inner {
   gap: var(--space-standard);
+  padding: 20px 0;
 }
 
 .explorer-chrome-inner > h1.explorer-identity {
   gap: 0.7rem;
 }
 
+/* Site identity given substantially more presence than the earlier compact
+   treatment (task §5 — "~20px visual scale, existing reading/serif
+   character"): the full lockup's rendered mark+wordmark height grows from
+   1.4rem to keep the identity legible as the header's own leading element. */
 .explorer-logo--full .oe-logo-full {
-  height: 1.4rem;
+  height: 1.75rem;
 }
 
 .explorer-navigation {
@@ -1442,22 +1492,38 @@ main.explorer-shell {
   background: var(--color-accent);
 }
 
-/* Final always-visible toolbar (Overview final redesign, Phase 1 — delta §3;
-   final alignment pass, Phase 3A §6): Filtros, search, and the result count
-   read as one left-hand group — the count visually follows the search area
-   rather than grouping with sort on the far right — while sort stays aligned
-   toward the right edge on its own. Visible whether the category drawer is
-   open or closed — this row never moves or disappears when the drawer
-   toggles. */
+/* Discovery band (visual-convergence pass, §7/§8): one full-width warm band
+   — a subtly distinct surface from the Hero/results above/below it — holding
+   the toolbar and the category drawer as a single composition. Bleeds to the
+   viewport edge the same way `.explorer-chrome` already does within
+   `main.explorer-shell`'s own padding; `.overview-toolbar`/
+   `.overview-category-drawer` each carry the shared `shell-frame
+   shell-frame--wide` inner column (OverviewPresentation.tsx) for their actual
+   content alignment. */
+.overview-discovery {
+  margin: 0 -2rem;
+  padding: 0 2rem;
+  background: var(--color-surface-subtle);
+  border-top: 1px solid var(--color-separator-standard);
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+/* Toolbar (Overview final redesign, Phase 1 — delta §3; final alignment
+   pass, Phase 3A §6; visual-convergence pass §8): Filtros, search, and the
+   result count read as one left-hand group — the count visually follows the
+   search area rather than grouping with sort on the far right — while sort
+   stays aligned toward the right edge on its own. Visible whether the
+   category drawer is open or closed — this row never moves or disappears
+   when the drawer toggles. No border of its own — the band above owns the
+   surface's top/bottom edges, and no separator sits between this row and the
+   drawer beneath it (task §8 — "read as ONE composition"). */
 .overview-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-tight) var(--space-standard);
-  padding: 0.875rem 0;
-  border-top: 1px solid var(--color-separator-emphasis);
-  border-bottom: 1px solid var(--color-separator-standard);
+  padding: 14px 0;
 }
 
 .overview-toolbar-controls {
@@ -1468,9 +1534,12 @@ main.explorer-shell {
   min-width: 0;
 }
 
+/* Desktop search width increased toward TARGET's ~440px (task §8). */
 .overview-toolbar-controls .overview-search {
   width: auto;
   min-width: 16rem;
+  max-width: 440px;
+  flex: 1 1 320px;
   margin: 0;
 }
 
@@ -1493,15 +1562,15 @@ main.explorer-shell {
   font-weight: 400;
 }
 
-/* Sort control (visual-convergence pass): reduced visual weight to match
-   the result count — still a native `<select>` with its accessible label,
-   just quieter type than the earlier interface-label-sized treatment. */
+/* Sort control (visual-convergence pass): a quiet editorial control —
+   technical/mono, de-emphasised, still a native `<select>` with its own
+   accessible `<label>` (task §8 — "preserve accessible sort labelling"). */
 .overview-sort-control {
   margin: 0;
   flex-shrink: 0;
   color: var(--color-ink-muted);
   font-family: var(--font-technical);
-  font-size: 0.76rem;
+  font-size: 13px;
 }
 
 .overview-sort-control select {
@@ -1513,17 +1582,18 @@ main.explorer-shell {
   cursor: pointer;
 }
 
-/* `Filtros` disclosure trigger (delta §4): a native button, restrained by
-   default, taking a subtle active-state treatment (`data-active`, set from
-   the accessible-name state Overview.tsx/OverviewPresentation.tsx already
-   track) when a topic filter is active and the drawer is closed — never a
-   separate visible chip/badge beside it. */
+/* `Filtros` disclosure trigger (delta §4; compacted toward TARGET's control
+   density in the visual-convergence pass, §8): a native button, restrained
+   by default, taking a subtle active-state treatment (`data-active`, set
+   from the accessible-name state Overview.tsx/OverviewPresentation.tsx
+   already track) when a topic filter is active and the drawer is closed —
+   never a separate visible chip/badge beside it. */
 .overview-filtros-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   min-height: var(--target-min);
-  padding: 0.4rem 0.85rem;
+  padding: 0.35rem 0.75rem;
   color: var(--color-ink-secondary);
   border: 1px solid var(--color-separator-standard);
   border-radius: var(--radius-control);
@@ -1551,18 +1621,20 @@ main.explorer-shell {
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
-/* Category drawer (delta §5): normal document flow, directly beneath the
-   toolbar, kept mounted at a stable id and hidden via the native `hidden`
-   attribute while collapsed (never removed from the DOM — the disclosure
-   trigger's aria-controls must always resolve to a real element) — no modal,
-   no popover, no overlay, no permanent rail. Options wrap safely at narrower
-   widths rather than truncating or overflowing. */
+/* Category drawer (delta §5; visual-convergence pass §8/§9): normal
+   document flow, directly beneath the toolbar, kept mounted at a stable id
+   and hidden via the native `hidden` attribute while collapsed (never
+   removed from the DOM — the disclosure trigger's aria-controls must always
+   resolve to a real element) — no modal, no popover, no overlay, no
+   permanent rail. Options wrap safely at narrower widths rather than
+   truncating or overflowing. No border of its own — the discovery band
+   above owns the shared surface's edges, and there is deliberately no
+   separator between this and the toolbar above it. */
 .overview-category-drawer {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: var(--space-standard) 0;
-  border-bottom: 1px solid var(--color-separator-standard);
+  gap: 8px;
+  padding: 0 0 var(--space-standard);
 }
 
 .overview-category-drawer[hidden] {
@@ -1574,13 +1646,13 @@ main.explorer-shell {
   align-items: center;
   gap: 0.35rem;
   min-height: var(--target-min);
-  padding: 0.3rem 0.6rem;
+  padding: 6px 12px;
   color: var(--color-ink-secondary);
   border: 1px solid var(--color-separator-standard);
   border-radius: var(--radius-control);
   background: var(--color-surface-raised);
   font-family: var(--font-interface);
-  font-size: 0.82rem;
+  font-size: 13.5px;
   cursor: pointer;
 }
 
@@ -1604,7 +1676,7 @@ main.explorer-shell {
 .overview-category-drawer-count {
   color: var(--color-ink-muted);
   font-family: var(--font-technical);
-  font-size: 0.76rem;
+  font-size: 12px;
 }
 
 .overview-category-drawer-option[aria-pressed="true"] .overview-category-drawer-count {
@@ -1642,34 +1714,31 @@ main.explorer-shell {
   border-top: 0;
 }
 
-/* Flat editorial-list treatment (Overview visual-completion — TARGET
-   reference): no per-row card border/outline/radius, no gaps between rows —
-   each row is only separated by this one bottom hairline. Row-density pass
-   (Overview final redesign, Phase 3A, §4) strengthens that hairline from
-   `--color-separator-faint` to `--color-separator-standard` so a denser list
-   still reads as clearly divided rows, matching TARGET's separator weight. A
-   restrained alternating row background (even rows only, TARGET's own
-   "#f7f4e9 / transparent" pattern) helps scanning across a dense list
-   without reintroducing a card outline. */
+/* Full-width editorial-list treatment (Overview visual-completion — TARGET
+   reference; visual-convergence pass §10): each row is a full-width
+   horizontal surface — one common neutral background, no per-row card
+   border/outline/radius, no gaps between rows, separated only by a subtle
+   full-width bottom hairline. Zebra striping (the former even/odd
+   alternating background) is removed outright (task §10). Row content
+   itself is aligned to the shared wide grid via `.overview-problem-row-link`
+   below (CitizenDiscovery.tsx), which now carries `shell-frame
+   shell-frame--wide` directly — the row (`<li>`) supplies the full-width
+   band, the link inside it supplies the centred content column. */
 .overview-problem-row {
+  background: var(--color-surface-reading);
   border-bottom: 1px solid var(--color-separator-standard);
 }
 
-.overview-problem-row:nth-child(even) {
-  background: var(--color-surface-subtle);
-}
-
 /* Row density (Overview visual-completion, visual-convergence pass; tightened
-   further in the Overview final redesign, Phase 3A, §4 row-density pass): a
-   single vertical `padding` on the existing row link, no left/right inset
-   of its own — the row's content shares the same primary left content axis
-   as the Hero, toolbar, and category drawer, all aligned to the shell's own
-   padding rather than each introducing a second inset. Left/right insets
-   are owned by the shell's page alignment, not duplicated here. */
+   further in the Overview final redesign, Phase 3A, §4 row-density pass;
+   desktop vertical padding converged to ~26px in the visual-convergence
+   pass, task §10). No left/right inset of its own beyond what the shared
+   `shell-frame--wide` grid already provides — the row's content shares the
+   same primary axis as the Hero, discovery band, and end-of-results. */
 .overview-problem-row-link {
   display: block;
   width: 100%;
-  padding: 0.75rem 0;
+  padding: 26px 0;
   color: inherit;
   border: 0;
   background: none;
@@ -1687,35 +1756,33 @@ main.explorer-shell {
   outline-offset: -2px;
 }
 
-/* Changed-row variant (Overview final redesign, Phase 2, §3): a Problem with
-   a canonical material-change entry gets a restrained pale clay background
-   and a narrow clay accent on the row's left edge — TARGET's own treatment —
-   layered on top of, never replacing, the row's existing flat/full-width
-   link structure and click target. Deliberately restrained: no border,
-   radius, or shadow beyond the one left-edge accent, so the row never reads
-   as a card. Takes precedence over the plain even/odd alternating background
-   (below) so a changed row's own treatment stays visible either way. */
+/* Changed-row variant (Overview final redesign, Phase 2, §3; converged to a
+   full-width band treatment in the visual-convergence pass, task §10): a
+   Problem with a canonical material-change entry gets a full-width pale
+   clay background across the entire row surface (the `<li>`, not only its
+   inner content column) and a ~3px clay accent at the full row boundary —
+   TARGET's own treatment — layered on top of, never replacing, the row's
+   existing flat/full-width link structure and click target. Deliberately
+   restrained: no border, radius, or shadow beyond the one left-edge accent,
+   so the row never reads as a card. */
 .overview-problem-row--changed {
   background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface-reading));
   border-left: 3px solid var(--color-accent);
 }
 
-.overview-problem-row--changed .overview-problem-row-link {
-  padding-left: 0.75rem;
-}
-
 /* Compact marker naming truthfully only that a material change was
    registered, plus its authored date — never a categorical change-type
-   label the canonical model cannot support (ProblemRow's own doc comment). */
+   label the canonical model cannot support (ProblemRow's own doc comment).
+   ~11.5px technical/mono, restrained clay treatment (task §10). */
 .overview-problem-row-change-marker {
   display: flex;
   align-items: center;
   gap: 0.3rem;
   margin: 0 0 0.4rem;
   color: var(--color-accent-hover);
-  font-family: var(--font-interface);
-  font-size: 0.76rem;
-  font-weight: 650;
+  font-family: var(--font-technical);
+  font-size: 11.5px;
+  font-weight: 500;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
@@ -1730,13 +1797,14 @@ main.explorer-shell {
    plain secondary text, and the canonical updatedAt date aligned right — four
    independent fragments, never concatenated into one caption+value string
    (the former "Estado do problemaAberto" adjacency). validationStatus is
-   deliberately not repeated here; see ProblemRow's own doc comment. */
+   deliberately not repeated here; see ProblemRow's own doc comment.
+   ~12px gap below (task §10), converged from the earlier looser spacing. */
 .overview-problem-row-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.32rem;
+  margin-bottom: 12px;
 }
 
 .overview-problem-row-meta .overview-problem-technical-id {
@@ -1781,64 +1849,68 @@ main.explorer-shell {
   font-size: 0.78rem;
 }
 
+/* Title (task §10): ~19px/1.36 reading serif, ~8px gap below the meta line
+   above it (`.overview-problem-row-meta`'s own margin-bottom) and ~8px gap
+   above the summary below it. */
 .overview-problem-list h4 {
   margin-top: 0;
+  margin-bottom: 8px;
   font-family: var(--font-reading);
-  font-size: 1.2rem;
+  font-size: 19px;
   font-weight: 500;
-  line-height: 1.34;
+  line-height: 1.36;
 }
 
 /* Overview rows show a deterministic visual excerpt of the canonical
    problem_statement (line-clamp only — the full statement stays in the DOM,
    searchable, and unchanged; ProblemView continues to render it in full).
-   Title-to-summary spacing tightened in the row-density pass (Phase 3A, §4:
-   0.3rem → 0.22rem) to match TARGET's compact editorial rhythm. */
+   Converged toward TARGET in the visual-convergence pass (task §10):
+   ~13.5px/1.62, max ~74ch. */
 .overview-problem-statement {
-  max-width: var(--measure-reading);
-  margin: 0.22rem 0 0;
+  max-width: 74ch;
+  margin: 0;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  font-size: var(--text-interface-body-size);
-  line-height: var(--text-interface-body-line-height);
+  font-size: 13.5px;
+  line-height: 1.62;
 }
 
 .overview-problem-technical-id {
   margin-top: 0.48rem;
 }
 
-/* Summary-to-topic spacing tightened in the row-density pass (Phase 3A, §4:
-   0.45rem → 0.35rem). */
+/* Topics (task §10): technical/mono ~12.5px with ~10px top gap. */
 .overview-problem-row .overview-problem-topics {
-  margin: 0.35rem 0 0;
+  margin: 10px 0 0;
   color: var(--color-ink-muted);
   font-family: var(--font-technical);
-  font-size: 0.78rem;
+  font-size: 12.5px;
 }
 
 /* End-of-results row (Overview final redesign, Phase 3A, §2/§3 — replaces
-   the former pagination-only footer): lives inside `.overview-results`, the
-   same column as the toolbar and problem rows, so it shares their width by
-   construction — no separate max-width or margin calculation. Reuses the
-   toolbar's own horizontal padding (no left/right inset beyond the shared
-   shell padding — the single primary content axis also shared by the Hero,
-   toolbar, category drawer, and problem rows) and a matching vertical
-   rhythm, so the two read as the same structural row family. Flat/editorial:
-   a single top hairline (the same separator token the toolbar's own bottom
-   border uses) and no background/radius/shadow — never a card. Renders
-   whenever there is at least one visible result (never only when paginated),
-   so its status text and `Propor um problema` CTA are always available
-   together at the end of the list. */
+   the former pagination-only footer; converged to the shared wide grid in
+   the visual-convergence pass, task §11): `.overview-end-of-results-inner`
+   carries the same `shell-frame shell-frame--wide` column as every other
+   band (OverviewPresentation.tsx), so it shares their left/right axes by
+   construction — no separate max-width or margin calculation. Flat/
+   editorial: a single top hairline (the same separator token the toolbar's
+   own bottom border uses) and no background/radius/shadow — never a card.
+   Renders whenever there is at least one visible result (never only when
+   paginated), so its status text and `Propor um problema` CTA are always
+   available together at the end of the list. */
 .overview-end-of-results {
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.overview-end-of-results-inner {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-tight) var(--space-standard);
-  padding: 0.875rem 0;
-  border-top: 1px solid var(--color-separator-standard);
+  padding: 36px 0 40px;
 }
 
 .overview-end-of-results-status {
@@ -2061,6 +2133,19 @@ body:has(.public-overview) .public-footer {
 
   .explorer-chrome-inner {
     gap: 0;
+    padding: var(--space-standard) 0;
+  }
+
+  .explorer-chrome-group {
+    gap: var(--space-tight);
+  }
+
+  /* `.overview-discovery`'s bleed matches `main.explorer-shell`'s compact
+     1rem horizontal padding, the same technique `.material-change-list
+     --overview` already uses below. */
+  .overview-discovery {
+    margin: 0 -1rem;
+    padding: 0 1rem;
   }
 
   /* Breakage prevention only (task scope: desktop-1440 is the primary
@@ -2071,10 +2156,18 @@ body:has(.public-overview) .public-footer {
     align-items: flex-start;
   }
 
+  .overview-toolbar-controls .overview-search {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
   .overview-results {
     padding-left: 0;
   }
 
+  /* Compact row inner padding (task §13 — responsive safety): tighter
+     vertical rhythm than the ~26px desktop value above. */
   .overview-problem-row-link {
     padding: 0.75rem 0;
   }
@@ -2089,7 +2182,7 @@ body:has(.public-overview) .public-footer {
      the end-of-results row shares the results column's left axis at every
      viewport. Status, paginator (when present), and the CTA stack cleanly
      rather than compressing onto one line (§7). */
-  .overview-end-of-results {
+  .overview-end-of-results-inner {
     flex-direction: column;
     align-items: flex-start;
     padding: 0.875rem 0;
@@ -2118,6 +2211,28 @@ body:has(.public-overview) .public-footer {
     margin: 0 -1rem;
     padding: 0.15rem 1rem 0.85rem;
     scroll-snap-type: x proximity;
+  }
+
+  /* Hero spacing/headline scale-down (task §13 — responsive safety, not a
+     mobile redesign): the desktop 104/88px padding and 74px headline
+     converge back toward the pre-existing compact-friendly clamp() range. */
+  .overview-hero {
+    padding: var(--space-loose) 0;
+  }
+
+  .overview-hero-eyebrow {
+    margin-bottom: var(--space-standard);
+  }
+
+  .overview-hero-headline {
+    margin-bottom: var(--space-standard);
+    max-width: 22ch;
+    font-size: clamp(2rem, 8vw, 2.4rem);
+  }
+
+  .overview-hero-supporting {
+    margin-bottom: var(--space-loose);
+    font-size: 1.02rem;
   }
 
 }

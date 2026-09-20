@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import {
-  allTopicCodes,
   evidenceCountLabel,
+  MAX_OVERVIEW_TOPIC_SHORTCUTS,
   problemCountLabel,
   sourceCountLabel,
   topCategoryCounts,
@@ -81,22 +81,20 @@ export function OverviewPresentation({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerId = useId();
 
-  // Category drawer vocabulary (Overview final redesign, Phase 1 — delta
-  // §5, narrowed by the visual-convergence pass): the canonical TEMA
-  // vocabulary and each topic's real count still come from the full
-  // unfiltered Problem set — never a fixture, never a ranked/truncated
-  // top-N (see overviewStats.ts's `allTopicCodes`/`topCategoryCounts`). What
-  // changed is presentation only: a canonical topic with a genuinely zero
-  // current count is not rendered (TARGET), so the visible vocabulary tracks
-  // the current problem set without any hardcoded topic list or top-N limit
-  // — a topic reappears on its own the moment a Problem carries it. `Todos`
-  // is never filtered by this rule; it always renders.
+  // Category drawer vocabulary (Overview final redesign, Phase 1 — delta §5;
+  // narrowed to a top-5 shortlist in the visual-convergence pass, TARGET's
+  // "Todos + top 5 real topics + Alterados esta semana" composition): the
+  // top 5 canonical TEMA topics by real, unfiltered Problem count — never a
+  // hardcoded topic list, and never TARGET's own fixture topic names.
+  // `topCategoryCounts` already ranks by real descending count with a
+  // deterministic PT-PT-label tie-break (overviewStats.ts's own doc
+  // comment); this reuses that projection directly rather than re-deriving
+  // ranking here. A topic with a genuinely zero current count cannot appear
+  // in a top-5-by-count ranking, so the earlier explicit zero-count filter
+  // is subsumed by the limit itself. `Todos` is never subject to this limit
+  // — it always renders, over the full unfiltered Problem count.
   const allProblems = citizenProblems ?? [];
-  const topicCodes = allTopicCodes();
-  const topicCounts = new Map(topCategoryCounts(allProblems, topicCodes.length).map(({ code, count }) => [code, count]));
-  const categories = topicCodes
-    .map((code) => ({ code, count: topicCounts.get(code) ?? 0 }))
-    .filter(({ count }) => count > 0);
+  const categories = topCategoryCounts(allProblems, MAX_OVERVIEW_TOPIC_SHORTCUTS);
   // `Filtros`'s active state/accessible name reflects either category-drawer
   // selection (Overview final redesign, Phase 2, §8) — the two are already
   // mutually exclusive (`Overview.tsx` owns that), so at most one label ever
@@ -108,11 +106,11 @@ export function OverviewPresentation({
       : describeTopic(topicFilter).label;
 
   return (
-    <section aria-labelledby="overview-heading" className="public-overview shell-frame shell-frame--wide">
+    <section aria-labelledby="overview-heading" className="public-overview">
       <h2 id="overview-heading">Visão geral</h2>
 
       <div className="overview-hero">
-        <div className="overview-hero-content">
+        <div className="overview-hero-content shell-frame shell-frame--wide">
           <p className="overview-hero-eyebrow">
             <span className="overview-hero-eyebrow-chip">
               <span className="overview-hero-eyebrow-dot" aria-hidden="true">•</span> Projeto independente — não oficial
@@ -136,45 +134,54 @@ export function OverviewPresentation({
         {/* Deliberate negative space (TARGET) — no replacement content. */}
       </div>
 
-      <div className="overview-toolbar">
-        <div className="overview-toolbar-controls">
-          <FiltrosToggle
-            expanded={drawerOpen}
-            onToggle={() => setDrawerOpen((open) => !open)}
-            controlsId={drawerId}
-            activeTopicLabel={activeTopicLabel}
-          />
-          <CitizenSearchControl value={searchQuery} onChange={onSearchChange} />
-          <div aria-live="polite" aria-atomic="true">
-            {citizenProblems !== null && visibleProblems !== null && (
-              <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} problemas</p>
-            )}
+      {/* Discovery band (visual-convergence pass, §7/§8): one full-width warm
+          band housing the toolbar and the category drawer as a single
+          composition — no strong separator between them (the drawer's own
+          top border is removed below; the band's outer rule is the only
+          edge). Content stays aligned to the shared wide grid via the same
+          `shell-frame shell-frame--wide` inner column every other band
+          uses. */}
+      <div className="overview-discovery">
+        <div className="overview-toolbar shell-frame shell-frame--wide">
+          <div className="overview-toolbar-controls">
+            <FiltrosToggle
+              expanded={drawerOpen}
+              onToggle={() => setDrawerOpen((open) => !open)}
+              controlsId={drawerId}
+              activeTopicLabel={activeTopicLabel}
+            />
+            <CitizenSearchControl value={searchQuery} onChange={onSearchChange} />
+            <div aria-live="polite" aria-atomic="true">
+              {citizenProblems !== null && visibleProblems !== null && (
+                <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} problemas</p>
+              )}
+            </div>
+          </div>
+          <div className="overview-toolbar-meta">
+            <SortControl value={sortOrder} onChange={onSortOrderChange} />
           </div>
         </div>
-        <div className="overview-toolbar-meta">
-          <SortControl value={sortOrder} onChange={onSortOrderChange} />
-        </div>
-      </div>
 
-      <CategoryDrawer
-        id={drawerId}
-        hidden={!drawerOpen}
-        categories={categories}
-        activeTopic={topicFilter}
-        onChange={onTopicFilterChange}
-        totalCount={allProblems.length}
-        alteredThisWeekSelected={alteredThisWeekSelected}
-        alteredThisWeekCount={alteredThisWeekCount}
-        onAlteredThisWeekChange={onAlteredThisWeekChange}
-      />
+        <CategoryDrawer
+          id={drawerId}
+          hidden={!drawerOpen}
+          categories={categories}
+          activeTopic={topicFilter}
+          onChange={onTopicFilterChange}
+          totalCount={allProblems.length}
+          alteredThisWeekSelected={alteredThisWeekSelected}
+          alteredThisWeekCount={alteredThisWeekCount}
+          onAlteredThisWeekChange={onAlteredThisWeekChange}
+        />
+      </div>
 
       <section id="overview-problemas" aria-label="Explorar problemas">
         {citizenProblems === null || visibleProblems === null ? (
-          <ProgressMessage message="A carregar problemas…" />
+          <div className="shell-frame shell-frame--wide"><ProgressMessage message="A carregar problemas…" /></div>
         ) : (
           <div className="overview-results">
             {visibleProblems.length === 0 ? (
-              <p className="overview-empty-state">Nenhum problema corresponde à pesquisa.</p>
+              <p className="overview-empty-state shell-frame shell-frame--wide">Nenhum problema corresponde à pesquisa.</p>
             ) : (
               <ul className="overview-problem-list">
                 {(paginatedProblems ?? []).map((problem) => (
@@ -198,27 +205,30 @@ export function OverviewPresentation({
                 changes (§8). `Propor um problema` (§3) is a normal outbound
                 link to the existing `/contact` route, not a new submission
                 workflow — the Contact page already owns public
-                questions/suggestions/problems. */}
+                questions/suggestions/problems. Full-width band (§11), same
+                shared wide grid as every other band. */}
             {visibleProblems.length > 0 && (
               <div className="overview-end-of-results">
-                <p className="overview-end-of-results-status">
-                  {pageCount > 1
-                    ? `Página ${currentPage} de ${pageCount} · ${formatPublicCount(visibleProblems.length)} problemas`
-                    : `${formatPublicCount(visibleProblems.length)} de ${formatPublicCount(visibleProblems.length)} problemas`}
-                </p>
-                {pageCount > 1 && (
-                  <div className="overview-pagination-actions">
-                    <button type="button" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1}>
-                      Anterior
-                    </button>
-                    <button type="button" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= pageCount}>
-                      Seguinte
-                    </button>
-                  </div>
-                )}
-                <a className="overview-propose-problem" href="/contact">
-                  Propor um problema
-                </a>
+                <div className="overview-end-of-results-inner shell-frame shell-frame--wide">
+                  <p className="overview-end-of-results-status">
+                    {pageCount > 1
+                      ? `Página ${currentPage} de ${pageCount} · ${formatPublicCount(visibleProblems.length)} problemas`
+                      : `${formatPublicCount(visibleProblems.length)} de ${formatPublicCount(visibleProblems.length)} problemas`}
+                  </p>
+                  {pageCount > 1 && (
+                    <div className="overview-pagination-actions">
+                      <button type="button" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1}>
+                        Anterior
+                      </button>
+                      <button type="button" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= pageCount}>
+                        Seguinte
+                      </button>
+                    </div>
+                  )}
+                  <a className="overview-propose-problem" href="/contact">
+                    Propor um problema
+                  </a>
+                </div>
               </div>
             )}
           </div>

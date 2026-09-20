@@ -22,17 +22,19 @@ export function ExplorerHeader({ activeView, activeTypeFilter, onProblemas, onFo
   const isFontes = activeView === "records" && activeTypeFilter === "SRC-";
   return (
     <header className="explorer-chrome">
-      <div className="explorer-chrome-inner shell-frame">
-        <h1 className="explorer-identity">
-          <Logo form="full" className="explorer-logo explorer-logo--full" />
-          <Logo form="compact" className="explorer-logo explorer-logo--compact" />
-        </h1>
-        <nav aria-label="Navegação principal" className="explorer-navigation">
-          <button type="button" className="explorer-navigation-action" aria-current={isProblemas ? "page" : undefined} onClick={onProblemas}>Problemas</button>
-          <a className="explorer-navigation-action" href="/methodology">Método</a>
-          <button type="button" className="explorer-navigation-action" aria-current={isFontes ? "page" : undefined} onClick={onFontes}>Fontes</button>
-          <a className="explorer-navigation-action" href="/about">Sobre</a>
-        </nav>
+      <div className="explorer-chrome-inner shell-frame shell-frame--wide">
+        <div className="explorer-chrome-group">
+          <h1 className="explorer-identity">
+            <Logo form="full" className="explorer-logo explorer-logo--full" />
+            <Logo form="compact" className="explorer-logo explorer-logo--compact" />
+          </h1>
+          <nav aria-label="Navegação principal" className="explorer-navigation">
+            <button type="button" className="explorer-navigation-action" aria-current={isProblemas ? "page" : undefined} onClick={onProblemas}>Problemas</button>
+            <a className="explorer-navigation-action" href="/methodology">Método</a>
+            <button type="button" className="explorer-navigation-action" aria-current={isFontes ? "page" : undefined} onClick={onFontes}>Fontes</button>
+            <a className="explorer-navigation-action" href="/about">Sobre</a>
+          </nav>
+        </div>
         <a className="explorer-cta" href="/contact">Contribuir com evidência</a>
       </div>
     </header>

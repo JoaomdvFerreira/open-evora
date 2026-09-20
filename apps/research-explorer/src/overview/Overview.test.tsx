@@ -495,7 +495,27 @@ describe("Overview — toolbar result count and sort", () => {
     expect(document.querySelector(".overview-results-filter-summary")).toBeNull();
   });
 
-  it("still applies the existing sort ordering via the toolbar sort control", async () => {
+  it("defaults to updatedAt descending (Overview visual-convergence pass)", async () => {
+    const provider: DataProvider = {
+      ...makeProvider([
+        { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
+        { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
+      ]),
+      getRecord: async (id) => ({
+        id, type: "PRB-", file: "",
+        record: { title: id === "PRB-1" ? "Problema um" : "Problema dois", updated_at: id === "PRB-1" ? "2026-01-01" : "2026-06-01" },
+        outgoingEdges: [], incomingEdges: [],
+      }),
+    };
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema um");
+    expect((screen.getByLabelText("Ordenar por") as HTMLSelectElement).value).toBe("updatedAt");
+    const titles = screen.getAllByRole("heading", { level: 4 }).map((heading) => heading.textContent);
+    expect(titles).toEqual(["Problema dois", "Problema um"]);
+  });
+
+  it("still applies the identifier order via the toolbar sort control", async () => {
     const provider: DataProvider = {
       ...makeProvider([
         { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
@@ -511,10 +531,10 @@ describe("Overview — toolbar result count and sort", () => {
     render(<Overview dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema um");
-    await user.selectOptions(screen.getByLabelText("Ordenar por"), "última atualização");
+    await user.selectOptions(screen.getByLabelText("Ordenar por"), "Identificador ↑");
 
     const titles = screen.getAllByRole("heading", { level: 4 }).map((heading) => heading.textContent);
-    expect(titles).toEqual(["Problema dois", "Problema um"]);
+    expect(titles).toEqual(["Problema um", "Problema dois"]);
   });
 });
 
@@ -593,7 +613,10 @@ describe("Overview — problem-list pagination", () => {
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
     await screen.findByText(/^Página 2 de 3/);
 
-    await user.selectOptions(screen.getByLabelText("Ordenar por"), "última atualização");
+    // Default order is already updatedAt (Overview visual-convergence
+    // pass), so this must switch to the other order (id) to genuinely
+    // exercise a sort-order change.
+    await user.selectOptions(screen.getByLabelText("Ordenar por"), "Identificador ↑");
     await screen.findByText(/^Página 1 de 3/);
   });
 
@@ -954,7 +977,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
     await screen.findByText("Problema A");
     await user.click(openDrawer());
     await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
-    await user.selectOptions(screen.getByLabelText("Ordenar por"), "última atualização");
+    await user.selectOptions(screen.getByLabelText("Ordenar por"), "Última atualização ↓");
 
     const titles = screen.getAllByRole("heading", { level: 4 }).map((heading) => heading.textContent);
     expect(titles).toEqual(["Problema B", "Problema A"]);

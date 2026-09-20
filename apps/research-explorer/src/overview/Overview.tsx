@@ -119,7 +119,15 @@ export function Overview({
   // selection: selecting one clears the other, and `Todos` clears both.
   const [topicFilter, setTopicFilter] = useState<string | null>(null);
   const [alteredThisWeekSelected, setAlteredThisWeekSelected] = useState(false);
-  const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("id");
+  // Default sort (Overview visual-convergence pass): existing `updatedAt`
+  // descending — the Problem's own canonical `updatedAt`, most recently
+  // updated first, null-last, deterministic ties (sortProblems's own doc
+  // comment). Rendered as "Última atualização ↓" (CitizenDiscovery.tsx's
+  // SortControl) — deliberately not "última alteração", which names the Hero
+  // ruler's authored material-change date, a different canonical signal (see
+  // OverviewPresentation.tsx). `id` remains available as the alternative
+  // order via SortControl.
+  const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("updatedAt");
   // Pagination (Overview visual-completion): applies strictly after search,
   // filters, and sort (see overviewStats.ts's `paginateProblems`). Resets to
   // page 1 whenever any of those upstream inputs change, below, so a stale

@@ -112,7 +112,7 @@ export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, 
   onAlteredThisWeekChange: (selected: boolean) => void;
 }) {
   return (
-    <div id={id} hidden={hidden} className="overview-category-drawer" role="group" aria-label="Filtrar por tema">
+    <div id={id} hidden={hidden} className="overview-category-drawer shell-frame shell-frame--wide" role="group" aria-label="Filtrar por tema">
       <button type="button" className="overview-category-drawer-option" aria-pressed={activeTopic === null && !alteredThisWeekSelected} onClick={() => onChange(null)}>
         <span>Todos</span> <span className="overview-category-drawer-count">{totalCount}</span>
       </button>
@@ -149,13 +149,18 @@ export function TopicFilterGroup({ topicCodes, activeTopic, onChange }: {
   );
 }
 
+// Direction arrows are a truthful restatement of sortProblems's own fixed
+// per-order direction (Overview visual-convergence pass — quiet editorial
+// control, TARGET's "Última atualização ↓" wording) — neither order is
+// user-toggleable between ascending/descending, so the arrow is part of each
+// option's label, not a separate control.
 const SORT_LABELS: Record<ProblemSortOrder, string> = {
-  id: "identificador",
+  id: "Identificador ↑",
   // Deliberately not "última alteração" — that phrase names the Hero
   // ruler's authored material-change date (a different canonical signal;
   // see OverviewPresentation.tsx). This sorts by the Problem's own
   // `updatedAt`, so it is labelled "última atualização" instead.
-  updatedAt: "última atualização",
+  updatedAt: "Última atualização ↓",
 };
 
 /** The toolbar's sort control — a native `<select>` so it stays a single accessible control without reimplementing listbox semantics. */
@@ -249,7 +254,7 @@ export function ProblemRow({ problem, onExplore, latestChange }: { problem: Citi
   const rowClassName = latestChange !== undefined ? "overview-problem-row overview-problem-row--changed" : "overview-problem-row";
   return (
     <li className={rowClassName}>
-      <button type="button" className="overview-problem-row-link" aria-label={`Explorar ${problem.title}`} onClick={() => onExplore(problem.id)}>
+      <button type="button" className="overview-problem-row-link shell-frame shell-frame--wide" aria-label={`Explorar ${problem.title}`} onClick={() => onExplore(problem.id)}>
         {latestChange !== undefined && (
           <p className="overview-problem-row-change-marker">
             <IconTrendUp />

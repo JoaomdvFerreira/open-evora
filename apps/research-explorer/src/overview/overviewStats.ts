@@ -432,6 +432,15 @@ export interface TopicCategoryCount {
 }
 
 /**
+ * The category drawer's normal-topic shortlist size (Overview
+ * visual-convergence pass — TARGET's "Todos + top 5 real topics + Alterados
+ * esta semana" composition). Bounds `topCategoryCounts`'s own `limit`
+ * parameter for that one caller; `Todos` and `Alterados esta semana` are
+ * never subject to this cap — see OverviewPresentation.tsx.
+ */
+export const MAX_OVERVIEW_TOPIC_SHORTCUTS = 5;
+
+/**
  * The `limit` canonical domain codes with the highest Problem counts. Used by
  * the category drawer (Overview final redesign, Phase 1) to compute each
  * topic's real, unfiltered count — callers pass `allTopicCodes().length` as

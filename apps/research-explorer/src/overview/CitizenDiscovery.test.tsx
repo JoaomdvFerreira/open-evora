@@ -260,8 +260,9 @@ describe("SortControl", () => {
     render(<SortControl value="id" onChange={vi.fn()} />);
     const select = screen.getByLabelText("Ordenar por") as HTMLSelectElement;
     const optionLabels = Array.from(select.options).map((option) => option.textContent);
-    expect(optionLabels).toEqual(["identificador", "última atualização"]);
+    expect(optionLabels).toEqual(["Identificador ↑", "Última atualização ↓"]);
     expect(optionLabels).not.toContain("última alteração");
+    expect(optionLabels?.every((label) => !label?.toLowerCase().includes("última alteração"))).toBe(true);
   });
 
   it("reflects the given order as selected and reports a change", async () => {
@@ -272,7 +273,7 @@ describe("SortControl", () => {
     const select = screen.getByLabelText("Ordenar por") as HTMLSelectElement;
     expect(select.value).toBe("id");
 
-    await user.selectOptions(select, "última atualização");
+    await user.selectOptions(select, "Última atualização ↓");
     expect(onChange).toHaveBeenCalledWith("updatedAt");
   });
 });
