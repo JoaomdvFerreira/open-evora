@@ -10,6 +10,7 @@ import {
   paginateProblems,
   sortProblems,
   type CitizenProblem,
+  type MaterialChangeEntry,
   type ProblemSortOrder,
 } from "./overviewStats";
 
@@ -63,10 +64,20 @@ const problems: CitizenProblem[] = [
   },
 ];
 
+/**
+ * A representative material change on one fixture Problem (Overview final
+ * redesign, Phase 2) — enough for the full-composition stories to show the
+ * changed-row treatment in context, alongside every other row state above.
+ */
+const latestChangeByProblem = new Map<string, MaterialChangeEntry>([
+  ["PRB-XXXX-2", { problemId: "PRB-XXXX-2", problemTitle: "Acesso a informação de estacionamento", date: "2026-08-31", summary: "Fonte adicional incorporada.", domainCodes: ["MOB", "PUB"] }],
+]);
+
 function useOverviewState(initial: { search?: string; source?: CitizenProblem[] } = {}) {
   const source = initial.source ?? problems;
   const [searchQuery, setSearchQuery] = useState(initial.search ?? "");
   const [topicFilter, setTopicFilter] = useState<string | null>(null);
+  const [alteredThisWeekSelected, setAlteredThisWeekSelected] = useState(false);
   const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("id");
   const [currentPage, setCurrentPage] = useState(1);
   const visibleProblems = useMemo(() => {
@@ -80,6 +91,7 @@ function useOverviewState(initial: { search?: string; source?: CitizenProblem[] 
   return {
     searchQuery, setSearchQuery, visibleProblems, source,
     topicFilter, setTopicFilter,
+    alteredThisWeekSelected, setAlteredThisWeekSelected,
     sortOrder, setSortOrder,
     currentPage, setCurrentPage, pageCount, paginatedProblems,
   };
@@ -90,11 +102,13 @@ function FullOverview({
   search,
   citizenProblemsOverride,
   visibleProblemsOverride,
+  withMaterialChanges = false,
 }: {
   source?: CitizenProblem[];
   search?: string;
   citizenProblemsOverride?: CitizenProblem[] | null;
   visibleProblemsOverride?: CitizenProblem[] | null;
+  withMaterialChanges?: boolean;
 }) {
   const state = useOverviewState({ search, source });
   const citizenProblems = citizenProblemsOverride !== undefined ? citizenProblemsOverride : state.source;
@@ -115,6 +129,10 @@ function FullOverview({
       onSearchChange={state.setSearchQuery}
       topicFilter={state.topicFilter}
       onTopicFilterChange={state.setTopicFilter}
+      alteredThisWeekSelected={state.alteredThisWeekSelected}
+      onAlteredThisWeekChange={state.setAlteredThisWeekSelected}
+      alteredThisWeekCount={withMaterialChanges ? latestChangeByProblem.size : 0}
+      latestChangeByProblem={withMaterialChanges ? latestChangeByProblem : new Map()}
       sortOrder={state.sortOrder}
       onSortOrderChange={state.setSortOrder}
       onExploreProblem={() => {}}
@@ -184,4 +202,11 @@ export const RealisticMaximumContentStress: Story = {
   name: "realistic maximum-content stress",
   globals: { viewport: { value: "reviewCompact" } },
   render: () => <FullOverview source={stressProblems} />,
+};
+
+/** Material-change integration (Overview final redesign, Phase 2): one row (PRB-XXXX-2) carries the changed-row variant and marker, shown alongside every other row state. */
+export const MaterialChangeRow: Story = {
+  name: "material change — row treatment",
+  globals: { viewport: { value: "reviewDesktop" } },
+  render: () => <FullOverview withMaterialChanges />,
 };

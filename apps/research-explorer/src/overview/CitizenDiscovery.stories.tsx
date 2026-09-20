@@ -3,7 +3,7 @@ import { useState } from "react";
 import "../index.css";
 import "../styles/topic.css";
 import { CitizenSearchControl, ProblemRow, TopicFilterGroup } from "./CitizenDiscovery";
-import type { CitizenProblem } from "./overviewStats";
+import type { CitizenProblem, MaterialChangeEntry } from "./overviewStats";
 
 const meta = { title: "Citizen discovery" } satisfies Meta;
 export default meta;
@@ -16,11 +16,13 @@ const base: CitizenProblem = {
   lifecycleStatus: "OPEN", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: null,
 };
 
-function Card({ problem }: { problem: CitizenProblem }) {
-  return <ul className="overview-problem-list" style={{ padding: 0, margin: 0, listStyle: "none" }}><ProblemRow problem={problem} onExplore={() => {}} /></ul>;
+function Card({ problem, latestChange }: { problem: CitizenProblem; latestChange?: MaterialChangeEntry }) {
+  return <ul className="overview-problem-list" style={{ padding: 0, margin: 0, listStyle: "none" }}><ProblemRow problem={problem} onExplore={() => {}} latestChange={latestChange} /></ul>;
 }
 
 export const ProblemSingleTopic: Story = { render: () => <Card problem={base} /> };
+const changedEntry: MaterialChangeEntry = { problemId: base.id, problemTitle: base.title, date: "2026-08-31", summary: "Fonte adicional incorporada.", domainCodes: base.domainCodes };
+export const ProblemChanged: Story = { render: () => <Card problem={base} latestChange={changedEntry} /> };
 export const ProblemMultipleTopics: Story = { render: () => <Card problem={{ ...base, domainCodes: ["MOB", "PUB"] }} /> };
 const longContentProblem: CitizenProblem = { ...base, title: "Dificuldades persistentes nas deslocações quotidianas entre bairros, equipamentos e serviços no centro de Évora", problemStatement: "Pessoas que atravessam a cidade para aceder a serviços essenciais descrevem interrupções e desvios frequentes, com impacto desproporcional em quem depende de transporte público ou percursos pedonais para tarefas do quotidiano. A extensão e as causas destas dificuldades continuam por apurar; esta descrição serve apenas para testar a apresentação de conteúdo longo, incluindo o comportamento do excerto visual sobre o problem_statement canónico integral." };
 export const ProblemLongContent: Story = { render: () => <Card problem={longContentProblem} /> };

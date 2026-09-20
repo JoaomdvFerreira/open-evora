@@ -1,6 +1,7 @@
-import type { CitizenProblem, ProblemSortOrder, TopicCategoryCount } from "./overviewStats";
+import type { CitizenProblem, MaterialChangeEntry, ProblemSortOrder, TopicCategoryCount } from "./overviewStats";
+import { formatMaterialChangeMarkerDate } from "./overviewStats";
 import { describeTopic } from "../presentation/topicMapping";
-import { IconSearch } from "../presentation/icons";
+import { IconSearch, IconTrendUp } from "../presentation/icons";
 import { EvidenceStatus } from "../problem/InvestigationStatus";
 import { formatPublicDate, publicEnumLabel } from "../presentation/presentation";
 
@@ -29,17 +30,18 @@ export function CitizenSearchControl({ value, onChange, id = "overview-search-in
  * state only, never URL-synced/persisted). `aria-controls` always resolves to
  * the drawer's stable id: the drawer stays mounted and is hidden via the
  * native `hidden` attribute when collapsed, never removed from the DOM (see
- * `CategoryDrawer`'s own doc comment). When a topic is active and the
- * drawer is closed, the trigger takes a restrained active visual state and
- * exposes the active category's PT-PT label in its own accessible name
- * (`activeTopicLabel`) — never a separate visible chip/badge next to it,
- * which TARGET does not show.
+ * `CategoryDrawer`'s own doc comment). When a topic — or the `Alterados esta
+ * semana` shortcut (Phase 2, §8; the two are mutually exclusive, so at most
+ * one ever applies) — is active and the drawer is closed, the trigger takes
+ * a restrained active visual state and exposes the active selection's PT-PT
+ * label in its own accessible name (`activeTopicLabel`) — never a separate
+ * visible chip/badge next to it, which TARGET does not show.
  */
 export function FiltrosToggle({ expanded, onToggle, controlsId, activeTopicLabel, id = "overview-filtros-toggle" }: {
   expanded: boolean;
   onToggle: () => void;
   controlsId: string;
-  /** PT-PT label of the currently active TEMA filter, or `null` when `Todos` (no topic filter). Folded into the accessible name only — never a separate visible badge. */
+  /** PT-PT label of the currently active category-drawer selection (a TEMA topic or `Alterados esta semana`), or `null` when `Todos`/neither is active. Folded into the accessible name only — never a separate visible badge. */
   activeTopicLabel: string | null;
   id?: string;
 }) {
@@ -82,8 +84,19 @@ export function FiltrosToggle({ expanded, onToggle, controlsId, activeTopicLabel
  * disclosure state. When not hidden, the drawer sits in normal document flow
  * beneath the toolbar exactly as before. Options wrap safely (`flex-wrap`)
  * rather than truncating at narrower widths.
+ *
+ * `Alterados esta semana` (Overview final redesign, Phase 2, §5) renders
+ * last, after every normal topic — it is not a topic and carries no
+ * canonical domain code, so it gets its own button/handler pair rather than
+ * being folded into `categories`. It always renders, including at a
+ * truthful count of `0` (§6 — intentional, never hidden or faked), and takes
+ * a visually distinct (`overview-category-drawer-option--shortcut`) but
+ * still restrained treatment. Selection here and normal-topic selection are
+ * mutually exclusive; `Overview.tsx` owns that exclusivity via the two
+ * separate `onChange`/`onAlteredThisWeekChange` callbacks, this component
+ * only reflects whichever is currently active.
  */
-export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, totalCount }: {
+export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, totalCount, alteredThisWeekSelected, alteredThisWeekCount, onAlteredThisWeekChange }: {
   id: string;
   /** True while the disclosure is collapsed — applies the native `hidden` attribute instead of unmounting. */
   hidden: boolean;
@@ -92,10 +105,15 @@ export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, 
   onChange: (code: string | null) => void;
   /** The unfiltered Problem count — `Todos`'s own count, not affected by the current selection. */
   totalCount: number;
+  /** Whether the `Alterados esta semana` shortcut is the current selection. */
+  alteredThisWeekSelected: boolean;
+  /** Distinct-Problem count for the shortcut — rendered even when `0`. */
+  alteredThisWeekCount: number;
+  onAlteredThisWeekChange: (selected: boolean) => void;
 }) {
   return (
     <div id={id} hidden={hidden} className="overview-category-drawer" role="group" aria-label="Filtrar por tema">
-      <button type="button" className="overview-category-drawer-option" aria-pressed={activeTopic === null} onClick={() => onChange(null)}>
+      <button type="button" className="overview-category-drawer-option" aria-pressed={activeTopic === null && !alteredThisWeekSelected} onClick={() => onChange(null)}>
         <span>Todos</span> <span className="overview-category-drawer-count">{totalCount}</span>
       </button>
       {categories.map(({ code, count }) => (
@@ -103,6 +121,14 @@ export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, 
           <span>{describeTopic(code).label}</span> <span className="overview-category-drawer-count">{count}</span>
         </button>
       ))}
+      <button
+        type="button"
+        className="overview-category-drawer-option overview-category-drawer-option--shortcut"
+        aria-pressed={alteredThisWeekSelected}
+        onClick={() => onAlteredThisWeekChange(!alteredThisWeekSelected)}
+      >
+        <span>Alterados esta semana</span> <span className="overview-category-drawer-count">{alteredThisWeekCount}</span>
+      </button>
     </div>
   );
 }
@@ -189,11 +215,36 @@ export function SortControl({ value, onChange, id = "overview-sort" }: {
  * the row), matching TARGET's row-as-link treatment, while staying reachable
  * as a single named control for assistive tech (`aria-label` carries the
  * title, exactly as the former "Explorar {title}" action did).
+ *
+ * `latestChange` (Overview final redesign, Phase 2, §2/§3) is this Problem's
+ * newest canonical material-change entry
+ * (overviewStats.ts's `latestMaterialChangeByProblem`), or `undefined` for a
+ * Problem with no authored history — the caller decides membership, this
+ * component only renders what it is given. When present, the row takes a
+ * restrained `overview-problem-row--changed` variant (pale clay background +
+ * a narrow left-edge accent, TARGET's own treatment) and gains a compact
+ * marker near its top reading "ALTERAÇÃO REGISTADA · DD/MM" — truthful
+ * generic copy naming only that *something* material changed and *when*,
+ * never a categorical change-type label the canonical model cannot support
+ * (no "NOVO REGISTO DE EVIDÊNCIA"/"ESTADO ALTERADO" — see this file's module
+ * doc and overviewStats.ts's `formatMaterialChangeMarkerDate`). The marker
+ * date is `latestChange.date` (the authored material-change date), never
+ * `problem.updatedAt` — the two remain separate signals throughout Overview.
+ * The variant never turns the row into a card: same flat full-width link,
+ * same click target, same hover/focus treatment, only the background/edge
+ * and the added marker change.
  */
-export function ProblemRow({ problem, onExplore }: { problem: CitizenProblem; onExplore: (id: string) => void }) {
+export function ProblemRow({ problem, onExplore, latestChange }: { problem: CitizenProblem; onExplore: (id: string) => void; latestChange?: MaterialChangeEntry }) {
+  const rowClassName = latestChange !== undefined ? "overview-problem-row overview-problem-row--changed" : "overview-problem-row";
   return (
-    <li className="overview-problem-row">
+    <li className={rowClassName}>
       <button type="button" className="overview-problem-row-link" aria-label={`Explorar ${problem.title}`} onClick={() => onExplore(problem.id)}>
+        {latestChange !== undefined && (
+          <p className="overview-problem-row-change-marker">
+            <IconTrendUp />
+            <span>ALTERAÇÃO REGISTADA</span> · <time dateTime={latestChange.date}>{formatMaterialChangeMarkerDate(latestChange.date)}</time>
+          </p>
+        )}
         <div className="overview-problem-row-meta">
           <code className="overview-problem-technical-id">{problem.id}</code>
           {problem.evidenceStatus !== null && <EvidenceStatus value={problem.evidenceStatus} form="reading" />}

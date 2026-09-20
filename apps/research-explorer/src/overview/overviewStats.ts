@@ -190,6 +190,109 @@ export function projectMaterialChangeEntries(sources: MaterialChangeSource[]): M
     .map(({ authoredPosition: _authoredPosition, ...entry }) => entry);
 }
 
+/**
+ * The single newest material-change entry per Problem (Overview final
+ * redesign, Phase 2), keyed by canonical `problemId`. Input must already be
+ * `projectMaterialChangeEntries`'s output — this does not re-derive
+ * material-change meaning, it only picks one entry per Problem out of an
+ * already-projected, already-sorted list. Because that list is sorted newest
+ * date first (ties broken by Problem ID then authored array position — see
+ * `projectMaterialChangeEntries`'s own doc comment), the first entry seen for
+ * a given `problemId` while walking it in order is deterministically its
+ * newest, with the exact same same-date tie behaviour already established
+ * there — this helper adds no ranking/importance judgement of its own.
+ */
+export function latestMaterialChangeByProblem(entries: MaterialChangeEntry[]): Map<string, MaterialChangeEntry> {
+  const latest = new Map<string, MaterialChangeEntry>();
+  for (const entry of entries) {
+    if (!latest.has(entry.problemId)) latest.set(entry.problemId, entry);
+  }
+  return latest;
+}
+
+const CIVIL_WEEK_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Milliseconds in a day — used only for whole-day (UTC) civil-week arithmetic below. */
+const MS_PER_CIVIL_DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * True when a canonical, day-precision material-change `date`
+ * (`YYYY-MM-DD`) falls within the civil week — Monday 00:00 through Sunday
+ * 23:59 — containing `referenceDate` (Overview final redesign, Phase 2, §5).
+ * A civil week, not a rolling seven days: the window's boundaries are fixed
+ * calendar-day cut-offs, computed from `referenceDate`'s own weekday, not
+ * "the 7 days up to and including `referenceDate`". `referenceDate` is an
+ * injectable parameter (defaulting to `new Date()`) precisely so callers —
+ * and unit tests — never depend on wall-clock time implicitly.
+ *
+ * Both `date` and `referenceDate` are compared as whole calendar days in
+ * UTC, matching every other canonical day-precision comparison in this file
+ * (canonical dates carry no time component, so there is no local-timezone
+ * "now" to reconcile against a UTC-stored date). A malformed/invalid `date`
+ * (wrong shape, or a shape that does not round-trip to a real calendar day)
+ * is safely excluded — never treated as a match.
+ */
+export function isMaterialChangeInCivilWeek(date: string, referenceDate: Date = new Date()): boolean {
+  if (!CIVIL_WEEK_DATE.test(date)) return false;
+  const [year, month, day] = date.split("-").map(Number);
+  if (month < 1 || month > 12) return false;
+  const candidate = new Date(Date.UTC(year, month - 1, day));
+  if (candidate.getUTCFullYear() !== year || candidate.getUTCMonth() !== month - 1 || candidate.getUTCDate() !== day) return false;
+
+  const referenceDay = Date.UTC(referenceDate.getUTCFullYear(), referenceDate.getUTCMonth(), referenceDate.getUTCDate());
+  // ISO weekday distance back to Monday: Sunday (getUTCDay() === 0) is 6 days
+  // after that week's Monday; Monday (1) through Saturday (6) are (weekday - 1)
+  // days after it.
+  const referenceWeekday = new Date(referenceDay).getUTCDay();
+  const daysSinceMonday = referenceWeekday === 0 ? 6 : referenceWeekday - 1;
+  const mondayStart = referenceDay - daysSinceMonday * MS_PER_CIVIL_DAY;
+  const sundayEnd = mondayStart + 7 * MS_PER_CIVIL_DAY - 1;
+
+  const candidateStart = candidate.getTime();
+  return candidateStart >= mondayStart && candidateStart <= sundayEnd;
+}
+
+/**
+ * Distinct Problems (by canonical `problemId`) with at least one
+ * material-change entry whose authored `date` falls in the civil week
+ * containing `referenceDate` (Overview final redesign, Phase 2, §6) — the
+ * `Alterados esta semana` shortcut's count/filter set. Counts a Problem once
+ * regardless of how many qualifying entries it has this week (never a raw
+ * entry count). Takes the full projected entry list, not
+ * `latestMaterialChangeByProblem`'s output, because a Problem's single
+ * newest entry could predate this week even while an older-but-still-this-
+ * week entry exists — membership in the shortcut is "has a qualifying entry
+ * this week", not "was most recently changed this week".
+ */
+export function problemIdsAlteredInCivilWeek(entries: MaterialChangeEntry[], referenceDate: Date = new Date()): Set<string> {
+  const ids = new Set<string>();
+  for (const entry of entries) {
+    if (isMaterialChangeInCivilWeek(entry.date, referenceDate)) ids.add(entry.problemId);
+  }
+  return ids;
+}
+
+/**
+ * Compact PT-PT `DD/MM` presentation for the row-level material-change
+ * marker (Overview final redesign, Phase 2, §4) — e.g. `31/08`. Deliberately
+ * separate from the shared `formatPublicDate`/`formatPublicDateTime`
+ * (presentation.ts): those render the full `dateStyle: "medium"` PT-PT date
+ * used across every other surface, and changing their output would ripple
+ * into pages this task must not touch. This formatter is Overview's own,
+ * scoped to the row marker only; the full canonical date remains available
+ * in the marker's own `dateTime` attribute wherever this is used. Falls back
+ * to the raw input, like the shared formatters do, when it cannot be parsed
+ * as a valid calendar day.
+ */
+export function formatMaterialChangeMarkerDate(date: string): string {
+  if (!CIVIL_WEEK_DATE.test(date)) return date;
+  const [year, month, day] = date.split("-").map(Number);
+  if (month < 1 || month > 12) return date;
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (parsed.getUTCFullYear() !== year || parsed.getUTCMonth() !== month - 1 || parsed.getUTCDate() !== day) return date;
+  return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}`;
+}
+
 export interface TopicCategoryCount {
   code: string;
   count: number;

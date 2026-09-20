@@ -6,6 +6,7 @@ import {
   sourceCountLabel,
   topCategoryCounts,
   type CitizenProblem,
+  type MaterialChangeEntry,
   type ProblemSortOrder,
 } from "./overviewStats";
 import { formatPublicCount } from "../presentation/presentation";
@@ -41,6 +42,10 @@ export function OverviewPresentation({
   onSearchChange,
   topicFilter,
   onTopicFilterChange,
+  alteredThisWeekSelected,
+  onAlteredThisWeekChange,
+  alteredThisWeekCount,
+  latestChangeByProblem,
   sortOrder,
   onSortOrderChange,
   onExploreProblem,
@@ -59,9 +64,16 @@ export function OverviewPresentation({
   onPageChange: (page: number) => void;
   searchQuery: string;
   onSearchChange: (value: string) => void;
-  /** The sole remaining Overview filter dimension (Overview final redesign, Phase 1 — delta §6 removes evidence/validation/lifecycle filtering outright). `Overview.tsx` composes this together with `searchQuery` into `visibleProblems`; this component never filters on its own. */
+  /** The normal TEMA filter dimension (Overview final redesign, Phase 1 — delta §6 removes evidence/validation/lifecycle filtering outright). `Overview.tsx` composes this together with `searchQuery`/`alteredThisWeekSelected` into `visibleProblems`; this component never filters on its own. */
   topicFilter: string | null;
   onTopicFilterChange: (value: string | null) => void;
+  /** The `Alterados esta semana` category-drawer shortcut (Overview final redesign, Phase 2, §5) — mutually exclusive with `topicFilter`; `Overview.tsx` owns that exclusivity, this component only renders/toggles the current selection. */
+  alteredThisWeekSelected: boolean;
+  onAlteredThisWeekChange: (selected: boolean) => void;
+  /** Distinct-Problem count for the shortcut (Phase 2, §6) — rendered even when `0` (intentional; never hidden or fabricated). */
+  alteredThisWeekCount: number;
+  /** Each Problem's newest material-change entry, keyed by `problemId` (Phase 2, §2/§3) — `undefined` for a Problem with no canonical history, which renders on the unchanged neutral row path. */
+  latestChangeByProblem: Map<string, MaterialChangeEntry>;
   sortOrder: ProblemSortOrder;
   onSortOrderChange: (order: ProblemSortOrder) => void;
   onExploreProblem: (id: string) => void;
@@ -85,7 +97,15 @@ export function OverviewPresentation({
   const categories = topicCodes
     .map((code) => ({ code, count: topicCounts.get(code) ?? 0 }))
     .filter(({ count }) => count > 0);
-  const activeTopicLabel = topicFilter === null ? null : describeTopic(topicFilter).label;
+  // `Filtros`'s active state/accessible name reflects either category-drawer
+  // selection (Overview final redesign, Phase 2, §8) — the two are already
+  // mutually exclusive (`Overview.tsx` owns that), so at most one label ever
+  // applies here.
+  const activeTopicLabel = alteredThisWeekSelected
+    ? "Alterados esta semana"
+    : topicFilter === null
+      ? null
+      : describeTopic(topicFilter).label;
 
   return (
     <section aria-labelledby="overview-heading" className="public-overview shell-frame shell-frame--wide">
@@ -143,6 +163,9 @@ export function OverviewPresentation({
         activeTopic={topicFilter}
         onChange={onTopicFilterChange}
         totalCount={allProblems.length}
+        alteredThisWeekSelected={alteredThisWeekSelected}
+        alteredThisWeekCount={alteredThisWeekCount}
+        onAlteredThisWeekChange={onAlteredThisWeekChange}
       />
 
       <section id="overview-problemas" aria-label="Explorar problemas">
@@ -155,7 +178,7 @@ export function OverviewPresentation({
             ) : (
               <ul className="overview-problem-list">
                 {(paginatedProblems ?? []).map((problem) => (
-                  <ProblemRow key={problem.id} problem={problem} onExplore={onExploreProblem} />
+                  <ProblemRow key={problem.id} problem={problem} onExplore={onExploreProblem} latestChange={latestChangeByProblem.get(problem.id)} />
                 ))}
               </ul>
             )}

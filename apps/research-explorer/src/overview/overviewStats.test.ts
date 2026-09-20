@@ -4,17 +4,22 @@ import {
   computeOverviewStats,
   computePublicOverviewData,
   evidenceCountLabel,
+  formatMaterialChangeMarkerDate,
+  isMaterialChangeInCivilWeek,
+  latestMaterialChangeByProblem,
   matchesCitizenSearch,
   matchesTopicFilter,
   overviewPageCount,
   paginateProblems,
   problemCountLabel,
+  problemIdsAlteredInCivilWeek,
   projectMaterialChangeEntries,
   sortProblems,
   sourceCountLabel,
   toCitizenProblem,
   topCategoryCounts,
   type CitizenProblem,
+  type MaterialChangeEntry,
 } from "./overviewStats";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { auditedDomainCodes, describeTopic } from "../presentation/topicMapping";
@@ -239,6 +244,133 @@ describe("projectMaterialChangeEntries", () => {
       { summary: summary({ id: "EVD-0001", type: "EVD-" }), detail: detail({ history: [{ date: "2026-03-01", summary: "Não é Problem." }] }) },
     ]);
     expect(entries).toEqual([]);
+  });
+});
+
+function materialChangeEntry(overrides: Partial<MaterialChangeEntry>): MaterialChangeEntry {
+  return { problemId: "PRB-0001", problemTitle: "Problema fixture", date: "2026-03-01", summary: "Alteração registada.", domainCodes: [], ...overrides };
+}
+
+describe("latestMaterialChangeByProblem", () => {
+  it("picks the single newest entry per Problem, keyed by problemId", () => {
+    // projectMaterialChangeEntries's own contract: newest date first.
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-01", summary: "Mais recente." }),
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-01-01", summary: "Mais antigo." }),
+      materialChangeEntry({ problemId: "PRB-0002", date: "2026-02-01", summary: "Único." }),
+    ];
+    const latest = latestMaterialChangeByProblem(entries);
+    expect(latest.get("PRB-0001")?.summary).toBe("Mais recente.");
+    expect(latest.get("PRB-0002")?.summary).toBe("Único.");
+  });
+
+  it("is deterministic under the same-date tie order projectMaterialChangeEntries already establishes", () => {
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-01", summary: "Primeira posição." }),
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-01", summary: "Segunda posição." }),
+    ];
+    expect(latestMaterialChangeByProblem(entries).get("PRB-0001")?.summary).toBe("Primeira posição.");
+  });
+
+  it("carries no entry for a Problem absent from the projected list", () => {
+    const latest = latestMaterialChangeByProblem([materialChangeEntry({ problemId: "PRB-0001" })]);
+    expect(latest.has("PRB-0002")).toBe(false);
+    expect(latest.size).toBe(1);
+  });
+
+  it("returns an empty map for an empty entry list", () => {
+    expect(latestMaterialChangeByProblem([]).size).toBe(0);
+  });
+});
+
+describe("isMaterialChangeInCivilWeek", () => {
+  // Reference: Wednesday 2026-03-04. Its civil week is Monday 2026-03-02
+  // through Sunday 2026-03-08.
+  const wednesday = new Date(Date.UTC(2026, 2, 4));
+
+  it("includes the Monday boundary", () => {
+    expect(isMaterialChangeInCivilWeek("2026-03-02", wednesday)).toBe(true);
+  });
+
+  it("includes the Sunday boundary", () => {
+    expect(isMaterialChangeInCivilWeek("2026-03-08", wednesday)).toBe(true);
+  });
+
+  it("excludes the previous Sunday", () => {
+    expect(isMaterialChangeInCivilWeek("2026-03-01", wednesday)).toBe(false);
+  });
+
+  it("excludes the following Monday", () => {
+    expect(isMaterialChangeInCivilWeek("2026-03-09", wednesday)).toBe(false);
+  });
+
+  it("includes a mid-week date in the same civil week", () => {
+    expect(isMaterialChangeInCivilWeek("2026-03-04", wednesday)).toBe(true);
+  });
+
+  it("computes the correct civil week when the reference date is itself a Sunday", () => {
+    const sunday = new Date(Date.UTC(2026, 2, 8));
+    expect(isMaterialChangeInCivilWeek("2026-03-02", sunday)).toBe(true);
+    expect(isMaterialChangeInCivilWeek("2026-03-09", sunday)).toBe(false);
+  });
+
+  it("safely excludes a malformed or invalid date", () => {
+    expect(isMaterialChangeInCivilWeek("not-a-date", wednesday)).toBe(false);
+    expect(isMaterialChangeInCivilWeek("2026-13-01", wednesday)).toBe(false);
+    expect(isMaterialChangeInCivilWeek("2026-02-30", wednesday)).toBe(false);
+    expect(isMaterialChangeInCivilWeek("", wednesday)).toBe(false);
+  });
+
+  it("does not use a rolling seven days — a date 7 days before the reference but outside the civil week is excluded", () => {
+    // 2026-02-25 is exactly 7 days before 2026-03-04, but falls in the prior
+    // civil week (2026-02-23 to 2026-03-01), not the current one.
+    expect(isMaterialChangeInCivilWeek("2026-02-25", wednesday)).toBe(false);
+  });
+});
+
+describe("problemIdsAlteredInCivilWeek", () => {
+  const wednesday = new Date(Date.UTC(2026, 2, 4)); // civil week 2026-03-02..2026-03-08
+
+  it("counts each qualifying Problem once, deduplicated by problemId", () => {
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-02" }),
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-05" }),
+      materialChangeEntry({ problemId: "PRB-0002", date: "2026-03-08" }),
+    ];
+    const ids = problemIdsAlteredInCivilWeek(entries, wednesday);
+    expect(ids).toEqual(new Set(["PRB-0001", "PRB-0002"]));
+  });
+
+  it("excludes a Problem whose only entries fall outside the civil week", () => {
+    const entries = [materialChangeEntry({ problemId: "PRB-0001", date: "2026-02-20" })];
+    expect(problemIdsAlteredInCivilWeek(entries, wednesday).size).toBe(0);
+  });
+
+  it("includes a Problem with at least one qualifying entry even if its newest entry is older", () => {
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-04-01" }), // newest, outside this week
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-06" }), // older, but in this civil week
+    ];
+    expect(problemIdsAlteredInCivilWeek(entries, wednesday).has("PRB-0001")).toBe(true);
+  });
+
+  it("returns an empty set for no entries", () => {
+    expect(problemIdsAlteredInCivilWeek([], wednesday).size).toBe(0);
+  });
+});
+
+describe("formatMaterialChangeMarkerDate", () => {
+  it("renders a compact PT-PT DD/MM presentation", () => {
+    expect(formatMaterialChangeMarkerDate("2026-08-31")).toBe("31/08");
+  });
+
+  it("pads single-digit day and month", () => {
+    expect(formatMaterialChangeMarkerDate("2026-01-05")).toBe("05/01");
+  });
+
+  it("falls back to the raw value for a malformed date", () => {
+    expect(formatMaterialChangeMarkerDate("not-a-date")).toBe("not-a-date");
+    expect(formatMaterialChangeMarkerDate("2026-13-01")).toBe("2026-13-01");
   });
 });
 

@@ -595,6 +595,276 @@ describe("Overview — problem-list pagination", () => {
   });
 });
 
+/**
+ * Material-change integration (Overview final redesign, Phase 2). Overview
+ * derives both the row-level changed treatment and the `Alterados esta
+ * semana` shortcut from the same canonical PRB `history[]` reads it already
+ * performs for `CitizenProblem` projection — no second fetch, no
+ * `updated_at` fallback. `overviewStats.test.ts` covers the underlying pure
+ * helpers directly; these tests protect the end-to-end wiring and the
+ * drawer/filter composition rules.
+ */
+describe("Overview — material-change row treatment", () => {
+  function providerWithHistory(problems: { id: string; label: string; history?: { date: string; summary: string }[]; domain?: string[] }[]): DataProvider {
+    const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: {} }));
+    return {
+      getManifest: async () => { throw new Error("unused"); },
+      listRecords: async () => index,
+      getEdges: async () => [],
+      getRecord: async (id) => {
+        const p = problems.find((entry) => entry.id === id)!;
+        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], history: p.history }, outgoingEdges: [], incomingEdges: [] };
+      },
+    };
+  }
+
+  it("gives a Problem with canonical history the changed-row variant and a marker with the authored date", async () => {
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Problema com alteração", history: [{ date: "2026-08-31", summary: "Alteração registada." }] },
+      { id: "PRB-2", label: "Problema sem alteração" },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema com alteração");
+    const changedRow = screen.getByText("Problema com alteração").closest(".overview-problem-row");
+    expect(changedRow?.classList.contains("overview-problem-row--changed")).toBe(true);
+    expect(within(changedRow as HTMLElement).getByText("ALTERAÇÃO REGISTADA")).toBeTruthy();
+    expect(within(changedRow as HTMLElement).getByText("31/08")).toBeTruthy();
+
+    const unchangedRow = screen.getByText("Problema sem alteração").closest(".overview-problem-row");
+    expect(unchangedRow?.classList.contains("overview-problem-row--changed")).toBe(false);
+    expect(within(unchangedRow as HTMLElement).queryByText("ALTERAÇÃO REGISTADA")).toBeNull();
+  });
+
+  it("uses the newest authored history entry when a Problem has more than one", async () => {
+    const provider = providerWithHistory([
+      {
+        id: "PRB-1",
+        label: "Problema com várias alterações",
+        history: [
+          { date: "2026-01-01", summary: "Mais antiga." },
+          { date: "2026-06-15", summary: "Mais recente." },
+        ],
+      },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema com várias alterações");
+    expect(screen.getByText("15/06")).toBeTruthy();
+    expect(screen.queryByText("01/01")).toBeNull();
+  });
+
+  it("does not block or drop a Problem from the normal list when its detail read fails", async () => {
+    const provider = providerWithHistory([{ id: "PRB-1", label: "Problema saudável" }]);
+    provider.getRecord = async (id) => {
+      if (id === "PRB-2") throw new Error("falha ao ler PRB-2");
+      return { id, type: "PRB-", file: "", record: { title: "Problema saudável" }, outgoingEdges: [], incomingEdges: [] };
+    };
+    provider.listRecords = async () => [
+      { id: "PRB-1", type: "PRB-", label: "Problema saudável", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema com falha de leitura", file: "", summaryFields: {} },
+    ];
+    render(<Overview dataProvider={provider} {...props} />);
+
+    // Both Problems remain in the list; the failed one just never gets the
+    // changed-row treatment (its fallback empty record carries no history).
+    await screen.findByText("Problema saudável");
+    expect(screen.getByText("2 problemas")).toBeTruthy();
+    const failedRow = screen.getByText("Problema com falha de leitura").closest(".overview-problem-row");
+    expect(failedRow?.classList.contains("overview-problem-row--changed")).toBe(false);
+  });
+});
+
+describe("Overview — Alterados esta semana shortcut", () => {
+  // Built from the real current civil week (today's date, per the harness)
+  // so the fixture always exercises the shortcut's actual semantics rather
+  // than a value that could drift stale relative to "now".
+  function thisWeekMonday(): string {
+    const now = new Date();
+    const day = now.getDay();
+    const daysSinceMonday = day === 0 ? 6 : day - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - daysSinceMonday);
+    return monday.toISOString().slice(0, 10);
+  }
+
+  function providerWithHistory(problems: { id: string; label: string; history?: { date: string; summary: string }[]; domain?: string[] }[]): DataProvider {
+    const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: {} }));
+    return {
+      getManifest: async () => { throw new Error("unused"); },
+      listRecords: async () => index,
+      getEdges: async () => [],
+      getRecord: async (id) => {
+        const p = problems.find((entry) => entry.id === id)!;
+        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], history: p.history }, outgoingEdges: [], incomingEdges: [] };
+      },
+    };
+  }
+
+  it("always renders the shortcut in the open drawer, including at a truthful count of 0", async () => {
+    const provider = providerWithHistory([{ id: "PRB-1", label: "Problema sem alterações" }]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema sem alterações");
+    await user.click(openDrawer());
+
+    const shortcut = screen.getByRole("button", { name: /^Alterados esta semana/ });
+    expect(shortcut.textContent?.replace(/\s+/g, " ").trim()).toBe("Alterados esta semana 0");
+  });
+
+  it("counts distinct Problems with a qualifying entry this civil week, not raw entry count", async () => {
+    const monday = thisWeekMonday();
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Duas alterações esta semana", history: [{ date: monday, summary: "Primeira." }, { date: monday, summary: "Segunda." }] },
+      { id: "PRB-2", label: "Sem alterações" },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Duas alterações esta semana");
+    await user.click(openDrawer());
+
+    expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).textContent).toMatch(/1$/);
+  });
+
+  it("selecting the shortcut filters to only qualifying Problems and composes with search", async () => {
+    const monday = thisWeekMonday();
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Mobilidade alterada", history: [{ date: monday, summary: "Alteração." }] },
+      { id: "PRB-2", label: "Mobilidade sem alteração" },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Mobilidade alterada");
+    await user.click(openDrawer());
+    await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
+
+    expect(await screen.findByText("1 problemas")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Explorar Mobilidade alterada" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Explorar Mobilidade sem alteração" })).toBeNull();
+
+    await user.type(screen.getByLabelText("Pesquisar problemas"), "inexistente");
+    expect(await screen.findByText("0 problemas")).toBeTruthy();
+  });
+
+  it("selecting a normal topic clears the shortcut selection", async () => {
+    const monday = thisWeekMonday();
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Problema alterado", domain: ["MOB"], history: [{ date: monday, summary: "Alteração." }] },
+      { id: "PRB-2", label: "Outro problema", domain: ["PUB"] },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema alterado");
+    await user.click(openDrawer());
+    await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
+    expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("true");
+
+    await user.click(screen.getByRole("button", { name: /^Mobilidade/ }));
+    expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("false");
+    expect(screen.getByRole("button", { name: /^Mobilidade/ }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("selecting the shortcut clears the normal topic selection", async () => {
+    const monday = thisWeekMonday();
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Problema alterado", domain: ["MOB"], history: [{ date: monday, summary: "Alteração." }] },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema alterado");
+    await user.click(openDrawer());
+    await user.click(screen.getByRole("button", { name: /^Mobilidade/ }));
+    expect(screen.getByRole("button", { name: /^Mobilidade/ }).getAttribute("aria-pressed")).toBe("true");
+
+    await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
+    expect(screen.getByRole("button", { name: /^Mobilidade/ }).getAttribute("aria-pressed")).toBe("false");
+    expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("selecting Todos clears both the topic filter and the shortcut", async () => {
+    const monday = thisWeekMonday();
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Problema alterado", domain: ["MOB"], history: [{ date: monday, summary: "Alteração." }] },
+    ]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema alterado");
+    await user.click(openDrawer());
+    await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
+    expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("true");
+
+    await user.click(screen.getByRole("button", { name: /^Todos/ }));
+    expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("false");
+    expect(screen.getByRole("button", { name: /^Todos/ }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("sort continues to compose with the shortcut selection", async () => {
+    const monday = thisWeekMonday();
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Problema A", history: [{ date: monday, summary: "Alteração." }] },
+      { id: "PRB-2", label: "Problema B", history: [{ date: monday, summary: "Alteração." }] },
+    ]);
+    provider.getRecord = async (id) => {
+      const base = id === "PRB-1"
+        ? { title: "Problema A", history: [{ date: monday, summary: "Alteração." }], updated_at: "2026-01-01" }
+        : { title: "Problema B", history: [{ date: monday, summary: "Alteração." }], updated_at: "2026-06-01" };
+      return { id, type: "PRB-", file: "", record: base, outgoingEdges: [], incomingEdges: [] };
+    };
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema A");
+    await user.click(openDrawer());
+    await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
+    await user.selectOptions(screen.getByLabelText("Ordenar por"), "última atualização");
+
+    const titles = screen.getAllByRole("heading", { level: 4 }).map((heading) => heading.textContent);
+    expect(titles).toEqual(["Problema B", "Problema A"]);
+  });
+
+  it("resets to page 1 when the shortcut selection changes", async () => {
+    const monday = thisWeekMonday();
+    const problems = Array.from({ length: 25 }, (_, index) => {
+      const id = `PRB-${String(index + 1).padStart(4, "0")}`;
+      return { id, label: `Problema ${String(index + 1).padStart(2, "0")}`, history: [{ date: monday, summary: "Alteração." }] };
+    });
+    const provider = providerWithHistory(problems);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("25 problemas");
+    await user.click(screen.getByRole("button", { name: "Seguinte" }));
+    await screen.findByText("Página 2 de 3");
+
+    await user.click(openDrawer());
+    await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
+    await screen.findByText("Página 1 de 3");
+  });
+
+  it("gives Filtros the restrained active state and names the shortcut in its accessible name when selected and the drawer is closed", async () => {
+    const monday = thisWeekMonday();
+    const provider = providerWithHistory([{ id: "PRB-1", label: "Problema alterado", history: [{ date: monday, summary: "Alteração." }] }]);
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema alterado");
+    const toggle = openDrawer();
+    await user.click(toggle);
+    await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
+    await user.click(toggle);
+
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getByRole("button", { name: "Filtros — Alterados esta semana" })).toBeTruthy();
+    expect(toggle.getAttribute("data-active")).toBe("true");
+  });
+});
+
 describe("Overview — error state retry (ODM-021)", () => {
   it("retries a failed listRecords load and recovers", async () => {
     let attempts = 0;

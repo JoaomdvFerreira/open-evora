@@ -1519,6 +1519,25 @@ main.explorer-shell {
   color: inherit;
 }
 
+/* `Alterados esta semana` shortcut (Overview final redesign, Phase 2, §5/§6):
+   renders last, after every normal topic option, with a subtly distinct
+   (never dominant) unselected treatment — a pale clay tint and clay text,
+   the same `color-mix` pattern `.overview-filtros-toggle[data-active="true"]`
+   already uses — so it reads as a related-but-different kind of option
+   without competing visually with the topic vocabulary. Selected state
+   reuses the drawer's one shared "pressed" treatment above, keeping a single
+   selected-state language across every drawer option. */
+.overview-category-drawer-option--shortcut {
+  color: var(--color-accent-hover);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+}
+
+.overview-category-drawer-option--shortcut:hover {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
 /* Full-width results column (delta §7) — the permanent filter rail's grid
    allocation is removed entirely; the results column now uses the available
    TARGET content width on its own. */
@@ -1570,6 +1589,45 @@ main.explorer-shell {
 .overview-problem-row-link:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
+}
+
+/* Changed-row variant (Overview final redesign, Phase 2, §3): a Problem with
+   a canonical material-change entry gets a restrained pale clay background
+   and a narrow clay accent on the row's left edge — TARGET's own treatment —
+   layered on top of, never replacing, the row's existing flat/full-width
+   link structure and click target. Deliberately restrained: no border,
+   radius, or shadow beyond the one left-edge accent, so the row never reads
+   as a card. Takes precedence over the plain even/odd alternating background
+   (below) so a changed row's own treatment stays visible either way. */
+.overview-problem-row--changed {
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface-reading));
+  border-left: 3px solid var(--color-accent);
+}
+
+.overview-problem-row--changed .overview-problem-row-link {
+  padding-left: 0.75rem;
+}
+
+/* Compact marker naming truthfully only that a material change was
+   registered, plus its authored date — never a categorical change-type
+   label the canonical model cannot support (ProblemRow's own doc comment). */
+.overview-problem-row-change-marker {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0 0 0.5rem;
+  color: var(--color-accent-hover);
+  font-family: var(--font-interface);
+  font-size: 0.76rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.overview-problem-row-change-marker time {
+  text-transform: none;
+  font-family: var(--font-technical);
+  font-weight: 500;
 }
 
 /* Top meta line: PRB id, the evidenceStatus reading chip, lifecycleStatus as

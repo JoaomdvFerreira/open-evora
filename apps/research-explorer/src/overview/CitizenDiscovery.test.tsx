@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CategoryDrawer, FiltrosToggle, ProblemRow, SortControl, TopicFilterGroup } from "./CitizenDiscovery";
-import type { CitizenProblem } from "./overviewStats";
+import type { CitizenProblem, MaterialChangeEntry } from "./overviewStats";
 
 /**
  * `TopicFilterGroup` is a reusable filter control kept available for a
@@ -100,8 +100,14 @@ describe("FiltrosToggle", () => {
  * complete vocabulary and real counts); these tests protect only its own
  * rendering/toggle contract.
  */
+// Shared defaults for the `Alterados esta semana` shortcut props — most
+// `CategoryDrawer` tests below exercise normal-topic behaviour and are
+// unconcerned with the shortcut itself, which gets its own dedicated tests
+// further down.
+const drawerShortcutDefaults = { alteredThisWeekSelected: false, alteredThisWeekCount: 0, onAlteredThisWeekChange: vi.fn() };
+
 describe("CategoryDrawer", () => {
-  it("renders Todos with the given total count, then each category with its own real count, in the order given by the caller", () => {
+  it("renders Todos with the given total count, then each category with its own real count, then the Alterados esta semana shortcut, in that order", () => {
     render(
       <CategoryDrawer
         id="drawer-1"
@@ -110,22 +116,24 @@ describe("CategoryDrawer", () => {
         activeTopic={null}
         onChange={vi.fn()}
         totalCount={5}
+        {...drawerShortcutDefaults}
+        alteredThisWeekCount={4}
       />
     );
 
     const group = screen.getByRole("group", { name: "Filtrar por tema" });
     const options = within(group).getAllByRole("button").map((button) => button.textContent?.replace(/\s+/g, " ").trim());
-    expect(options).toEqual(["Todos 5", "Mobilidade 3", "Espaço público 2"]);
+    expect(options).toEqual(["Todos 5", "Mobilidade 3", "Espaço público 2", "Alterados esta semana 4"]);
   });
 
   it("marks Todos active when no topic is selected, and the matching category active otherwise, exclusively", () => {
     const { rerender } = render(
-      <CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} />
+      <CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} {...drawerShortcutDefaults} />
     );
     expect(screen.getByRole("button", { name: /^Todos/ }).getAttribute("aria-pressed")).toBe("true");
     expect(screen.getByRole("button", { name: /Mobilidade/ }).getAttribute("aria-pressed")).toBe("false");
 
-    rerender(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={vi.fn()} totalCount={1} />);
+    rerender(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={vi.fn()} totalCount={1} {...drawerShortcutDefaults} />);
     expect(screen.getByRole("button", { name: /^Todos/ }).getAttribute("aria-pressed")).toBe("false");
     expect(screen.getByRole("button", { name: /Mobilidade/ }).getAttribute("aria-pressed")).toBe("true");
   });
@@ -133,7 +141,7 @@ describe("CategoryDrawer", () => {
   it("calls onChange with the canonical domain code, never the PT-PT display label, on click", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    render(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={onChange} totalCount={1} />);
+    render(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={onChange} totalCount={1} {...drawerShortcutDefaults} />);
 
     await user.click(screen.getByRole("button", { name: /Mobilidade/ }));
     expect(onChange).toHaveBeenCalledWith("MOB");
@@ -142,7 +150,7 @@ describe("CategoryDrawer", () => {
   it("clicking the already-selected category clears TEMA back to null (Todos)", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    render(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={onChange} totalCount={1} />);
+    render(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={onChange} totalCount={1} {...drawerShortcutDefaults} />);
 
     await user.click(screen.getByRole("button", { name: /Mobilidade/ }));
     expect(onChange).toHaveBeenCalledWith(null);
@@ -151,7 +159,7 @@ describe("CategoryDrawer", () => {
   it("clicking Todos clears TEMA to null", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    render(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={onChange} totalCount={1} />);
+    render(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic="MOB" onChange={onChange} totalCount={1} {...drawerShortcutDefaults} />);
 
     await user.click(screen.getByRole("button", { name: /^Todos/ }));
     expect(onChange).toHaveBeenCalledWith(null);
@@ -166,6 +174,7 @@ describe("CategoryDrawer", () => {
         activeTopic={null}
         onChange={vi.fn()}
         totalCount={0}
+        {...drawerShortcutDefaults}
       />
     );
     expect(screen.getByRole("button", { name: /Mobilidade/ }).textContent).toMatch(/0$/);
@@ -173,7 +182,7 @@ describe("CategoryDrawer", () => {
 
   it("stays mounted at its stable id when hidden, using the native hidden attribute rather than unmounting", () => {
     const { rerender } = render(
-      <CategoryDrawer id="drawer-1" hidden={true} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} />
+      <CategoryDrawer id="drawer-1" hidden={true} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} {...drawerShortcutDefaults} />
     );
 
     // Collapsed: present in the DOM at its stable id, but hidden — absent
@@ -185,13 +194,64 @@ describe("CategoryDrawer", () => {
     expect(collapsed?.hidden).toBe(true);
     expect(screen.queryByRole("group", { name: "Filtrar por tema" })).toBeNull();
 
-    rerender(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} />);
+    rerender(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 1 }]} activeTopic={null} onChange={vi.fn()} totalCount={1} {...drawerShortcutDefaults} />);
 
     // Open: the same element, now unhidden and back in normal document flow.
     const open = document.getElementById("drawer-1");
     expect(open).toBe(collapsed);
     expect(open?.hidden).toBe(false);
     expect(screen.getByRole("group", { name: "Filtrar por tema" })).toBeTruthy();
+  });
+});
+
+/**
+ * `Alterados esta semana` (Overview final redesign, Phase 2, §5/§6) —
+ * `CategoryDrawer`'s own rendering/toggle contract for the shortcut option.
+ * Overview.tsx's mutual-exclusivity wiring (selecting it clears the normal
+ * topic filter and vice versa) is covered end-to-end in Overview.test.tsx.
+ */
+describe("CategoryDrawer — Alterados esta semana shortcut", () => {
+  it("always renders the shortcut, including at a truthful count of 0", () => {
+    render(
+      <CategoryDrawer id="drawer-1" hidden={false} categories={[]} activeTopic={null} onChange={vi.fn()} totalCount={0} {...drawerShortcutDefaults} alteredThisWeekCount={0} />
+    );
+    const shortcut = screen.getByRole("button", { name: /Alterados esta semana/ });
+    expect(shortcut.textContent?.replace(/\s+/g, " ").trim()).toBe("Alterados esta semana 0");
+  });
+
+  it("reflects aria-pressed from alteredThisWeekSelected", () => {
+    const { rerender } = render(
+      <CategoryDrawer id="drawer-1" hidden={false} categories={[]} activeTopic={null} onChange={vi.fn()} totalCount={0} {...drawerShortcutDefaults} />
+    );
+    expect(screen.getByRole("button", { name: /Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("false");
+
+    rerender(
+      <CategoryDrawer id="drawer-1" hidden={false} categories={[]} activeTopic={null} onChange={vi.fn()} totalCount={0} {...drawerShortcutDefaults} alteredThisWeekSelected={true} />
+    );
+    expect(screen.getByRole("button", { name: /Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("calls onAlteredThisWeekChange(true) on click when unselected, and onAlteredThisWeekChange(false) when already selected", async () => {
+    const onAlteredThisWeekChange = vi.fn();
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <CategoryDrawer id="drawer-1" hidden={false} categories={[]} activeTopic={null} onChange={vi.fn()} totalCount={0} {...drawerShortcutDefaults} onAlteredThisWeekChange={onAlteredThisWeekChange} />
+    );
+    await user.click(screen.getByRole("button", { name: /Alterados esta semana/ }));
+    expect(onAlteredThisWeekChange).toHaveBeenCalledWith(true);
+
+    rerender(
+      <CategoryDrawer id="drawer-1" hidden={false} categories={[]} activeTopic={null} onChange={vi.fn()} totalCount={0} {...drawerShortcutDefaults} alteredThisWeekSelected={true} onAlteredThisWeekChange={onAlteredThisWeekChange} />
+    );
+    await user.click(screen.getByRole("button", { name: /Alterados esta semana/ }));
+    expect(onAlteredThisWeekChange).toHaveBeenCalledWith(false);
+  });
+
+  it("marks Todos as not pressed while the shortcut is selected, even though activeTopic is also null", () => {
+    render(
+      <CategoryDrawer id="drawer-1" hidden={false} categories={[]} activeTopic={null} onChange={vi.fn()} totalCount={3} {...drawerShortcutDefaults} alteredThisWeekSelected={true} />
+    );
+    expect(screen.getByRole("button", { name: /^Todos/ }).getAttribute("aria-pressed")).toBe("false");
   });
 });
 
@@ -272,5 +332,55 @@ describe("ProblemRow", () => {
     const topics = screen.getByText("Mobilidade, Espaço público");
     expect(topics.tagName).toBe("P");
     expect(topics.querySelector(".topic-badge")).toBeNull();
+  });
+});
+
+const rowLatestChange: MaterialChangeEntry = {
+  problemId: "PRB-EXEMPLO", problemTitle: rowProblem.title, date: "2026-08-31", summary: "Alteração registada.", domainCodes: ["MOB"],
+};
+
+/**
+ * The row-level material-change treatment (Overview final redesign, Phase
+ * 2, §3/§4) — the changed-row variant and its compact marker. Membership
+ * (whether a Problem has a `latestChange`) is decided entirely by the
+ * caller; these tests protect only `ProblemRow`'s own rendering contract for
+ * whatever it is given.
+ */
+describe("ProblemRow — material-change treatment", () => {
+  it("gets no changed-row variant or marker when latestChange is not given", () => {
+    render(<ul><ProblemRow problem={rowProblem} onExplore={vi.fn()} /></ul>);
+
+    expect(document.querySelector(".overview-problem-row--changed")).toBeNull();
+    expect(screen.queryByText("ALTERAÇÃO REGISTADA")).toBeNull();
+  });
+
+  it("gets the changed-row variant and renders the marker when latestChange is given", () => {
+    render(<ul><ProblemRow problem={rowProblem} onExplore={vi.fn()} latestChange={rowLatestChange} /></ul>);
+
+    const row = document.querySelector(".overview-problem-row--changed");
+    expect(row).not.toBeNull();
+    expect(within(row as HTMLElement).getByText("ALTERAÇÃO REGISTADA")).toBeTruthy();
+  });
+
+  it("renders the marker using the authored material-change date, compactly, distinct from the row's own updatedAt date", () => {
+    render(<ul><ProblemRow problem={rowProblem} onExplore={vi.fn()} latestChange={rowLatestChange} /></ul>);
+
+    const marker = screen.getByText("ALTERAÇÃO REGISTADA").closest(".overview-problem-row-change-marker");
+    const markerDate = marker?.querySelector("time");
+    expect(markerDate?.textContent).toBe("31/08");
+    expect(markerDate?.getAttribute("dateTime")).toBe("2026-08-31");
+    // The row's own updatedAt date remains a separate element with the full
+    // canonical presentation — never overwritten or merged with the marker.
+    expect(screen.getByText("08/04/2026").tagName).toBe("TIME");
+  });
+
+  it("preserves the row's single full-row click target and primary action when changed", async () => {
+    const onExplore = vi.fn();
+    const user = userEvent.setup();
+    render(<ul><ProblemRow problem={rowProblem} onExplore={onExplore} latestChange={rowLatestChange} /></ul>);
+
+    const action = screen.getByRole("button", { name: "Explorar Percursos diários no centro de Évora" });
+    await user.click(action);
+    expect(onExplore).toHaveBeenCalledWith("PRB-EXEMPLO");
   });
 });
