@@ -20,7 +20,7 @@ import { CategoryShortcuts, CitizenSearchControl, FilterRailGroup, ProblemRow, S
 import { describeTopic } from "../presentation/topicMapping";
 import { canonicalEvidenceValues, canonicalValidationValues } from "../problem/stateVisuals";
 
-const RECENT_UPDATES_LIMIT = 4;
+const RECENT_UPDATES_LIMIT = 3;
 const CATEGORY_SHORTCUT_LIMIT = 4;
 
 export interface MaterialChangesPresentationState {

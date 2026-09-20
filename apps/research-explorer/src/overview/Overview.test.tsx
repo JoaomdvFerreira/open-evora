@@ -557,7 +557,7 @@ describe("Overview — metrics value/label separation", () => {
 });
 
 describe("Overview — Hero recent-updates preview", () => {
-  it("shows at most 4 authored material-change entries, each with its PRB id, canonical last-updated date, and topic", async () => {
+  it("shows at most 3 authored material-change entries, each with its PRB id, canonical last-updated date, and topic", async () => {
     // updated_at deliberately differs from the authored history entry's own
     // date, so a passing assertion on "08/04/2026" proves the canonical
     // updatedAt is what renders here, not MaterialChangeEntry.date.
@@ -584,7 +584,7 @@ describe("Overview — Hero recent-updates preview", () => {
     await screen.findByText("Atualizado recentemente");
     const recentList = document.querySelector(".overview-hero-recent-list") as HTMLElement;
     const items = recentList.querySelectorAll("li");
-    expect(items.length).toBe(4);
+    expect(items.length).toBe(3);
 
     const firstItem = items[0];
     expect(within(firstItem as HTMLElement).getByText("PRB-1")).toBeTruthy();
@@ -597,9 +597,9 @@ describe("Overview — Hero recent-updates preview", () => {
 
   it("renders a Problem with multiple material-change entries once, using its newest entry, without crowding out other distinct Problems", async () => {
     // PRB-0007 authored two material-change entries (newest 2026-04-08, older
-    // 2026-02-01); PRB-0003/0002/0001 authored one each. The panel must show
-    // 4 distinct PRBs — PRB-0007 once, at its newest date — never PRB-0007
-    // twice at the expense of a fifth distinct Problem.
+    // 2026-02-01); PRB-0003/0002 authored one each. The panel must show
+    // 3 distinct PRBs — PRB-0007 once, at its newest date — never PRB-0007
+    // twice at the expense of a fourth distinct Problem.
     const histories: Record<string, { date: string; summary: string }[]> = {
       "PRB-0007": [
         { date: "2026-04-08", summary: "PRB-0007 mais recente." },
@@ -607,7 +607,6 @@ describe("Overview — Hero recent-updates preview", () => {
       ],
       "PRB-0003": [{ date: "2026-03-01", summary: "PRB-0003 alteração." }],
       "PRB-0002": [{ date: "2026-02-15", summary: "PRB-0002 alteração." }],
-      "PRB-0001": [{ date: "2026-01-01", summary: "PRB-0001 alteração." }],
     };
     const provider: DataProvider = {
       ...makeProvider(
@@ -627,10 +626,10 @@ describe("Overview — Hero recent-updates preview", () => {
     await screen.findByText("Atualizado recentemente");
     const recentList = document.querySelector(".overview-hero-recent-list") as HTMLElement;
     const items = recentList.querySelectorAll("li");
-    expect(items.length).toBe(4);
+    expect(items.length).toBe(3);
 
     const renderedIds = [...items].map((item) => item.querySelector(".technical-id")?.textContent);
-    expect(renderedIds).toEqual(["PRB-0007", "PRB-0003", "PRB-0002", "PRB-0001"]);
+    expect(renderedIds).toEqual(["PRB-0007", "PRB-0003", "PRB-0002"]);
     // Newest entry retained, not the older one, for the deduplicated PRB.
     expect(within(items[0] as HTMLElement).getByText("Problema PRB-0007")).toBeTruthy();
   });
