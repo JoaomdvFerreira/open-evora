@@ -1,8 +1,103 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { CategoryDrawer, FiltrosToggle, ProblemRow, SortControl, TopicFilterGroup } from "./CitizenDiscovery";
+import { CategoryDrawer, CitizenSearchControl, FiltrosToggle, ProblemRow, SortControl, TopicFilterGroup } from "./CitizenDiscovery";
 import type { CitizenProblem, MaterialChangeEntry } from "./overviewStats";
+
+/**
+ * `CitizenSearchControl`'s real Cmd/Ctrl+K focus shortcut (Overview
+ * visual-completion, task §6/§16). Covers: both modifier keys focus the
+ * input; the current query is preserved (never cleared/reset); the
+ * shortcut does not hijack another unrelated editable field; and the
+ * `keydown` listener is torn down on unmount (no leaked global handler).
+ * `fireEvent` targets `window` directly since the listener is attached
+ * there, matching CitizenDiscovery.tsx's own implementation.
+ */
+describe("CitizenSearchControl — Cmd/Ctrl+K shortcut", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("focuses the search input on Ctrl+K, preventing the browser default", () => {
+    render(<CitizenSearchControl value="" onChange={vi.fn()} />);
+    const input = screen.getByLabelText("Pesquisar problemas") as HTMLInputElement;
+    input.blur();
+    expect(document.activeElement).not.toBe(input);
+
+    const event = new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true });
+    const prevented = !window.dispatchEvent(event);
+
+    expect(document.activeElement).toBe(input);
+    expect(prevented).toBe(true);
+  });
+
+  it("focuses the search input on Meta+K (macOS Cmd+K)", () => {
+    render(<CitizenSearchControl value="" onChange={vi.fn()} />);
+    const input = screen.getByLabelText("Pesquisar problemas") as HTMLInputElement;
+
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true, cancelable: true }));
+
+    expect(document.activeElement).toBe(input);
+  });
+
+  it("preserves the current query — focusing never clears or alters value", () => {
+    render(<CitizenSearchControl value="iluminação" onChange={vi.fn()} />);
+    const input = screen.getByLabelText("Pesquisar problemas") as HTMLInputElement;
+
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true }));
+
+    expect(document.activeElement).toBe(input);
+    expect(input.value).toBe("iluminação");
+  });
+
+  it("does not hijack the shortcut while a foreign input/textarea/select/contenteditable is focused", () => {
+    render(
+      <div>
+        <CitizenSearchControl value="" onChange={vi.fn()} />
+        <input aria-label="Outro campo" />
+      </div>
+    );
+    const searchInput = screen.getByLabelText("Pesquisar problemas") as HTMLInputElement;
+    const otherInput = screen.getByLabelText("Outro campo") as HTMLInputElement;
+    otherInput.focus();
+    expect(document.activeElement).toBe(otherInput);
+
+    const event = new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true });
+    Object.defineProperty(event, "target", { value: otherInput, enumerable: true });
+    const prevented = !window.dispatchEvent(event);
+
+    // The shortcut leaves the foreign field alone: focus stays put and the
+    // browser default (e.g. a native "find" binding) is not suppressed.
+    expect(document.activeElement).toBe(otherInput);
+    expect(document.activeElement).not.toBe(searchInput);
+    expect(prevented).toBe(false);
+  });
+
+  it("still honours the shortcut when the Overview search input itself already has focus", () => {
+    render(<CitizenSearchControl value="" onChange={vi.fn()} />);
+    const input = screen.getByLabelText("Pesquisar problemas") as HTMLInputElement;
+    input.focus();
+
+    const event = new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true });
+    Object.defineProperty(event, "target", { value: input, enumerable: true });
+    const prevented = !window.dispatchEvent(event);
+
+    expect(document.activeElement).toBe(input);
+    expect(prevented).toBe(true);
+  });
+
+  it("cleans up its keydown listener on unmount — no focus, no preventDefault, after the component is gone", () => {
+    const { unmount } = render(<CitizenSearchControl value="" onChange={vi.fn()} />);
+    const input = screen.getByLabelText("Pesquisar problemas") as HTMLInputElement;
+    input.blur();
+    unmount();
+
+    const event = new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true, cancelable: true });
+    const prevented = !window.dispatchEvent(event);
+
+    expect(prevented).toBe(false);
+  });
+});
 
 /**
  * `TopicFilterGroup` is a reusable filter control kept available for a

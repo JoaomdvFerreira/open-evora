@@ -58,15 +58,19 @@ export function TrustPage({ page }: { page: TrustPageContent }) {
 }
 
 /**
- * Editorial three-area footer (Overview final redesign, Phase 3B §6):
- * identity/supporting copy, then PROJETO and DADOS link groups. Global —
- * rendered beneath the Explorer and every TrustPage (App.tsx) — so it does
- * not depend on `.public-overview` being present; the Overview-specific
- * zero-gap treatment lives entirely in index.css and stays additive to this
- * structure. Every link below is a real existing destination: `Fontes` opens
- * the same Records+SRC- filtered set as the header's Fontes action, as an
- * ordinary path/query navigation (this is a cross-page footer, not the
- * live Explorer's own SPA state).
+ * Editorial footer (Overview final redesign, Phase 3B §6; converged to a
+ * two-region horizontal distribution in the visual-completion pass, task
+ * §13): identity/supporting copy on the left, PROJETO and DADOS grouped into
+ * one `.public-footer-groups` unit pushed to the right — rather than three
+ * areas independently distributed across the width — so the two navigation
+ * columns read as a single right-hand group with their own internal ~56px
+ * gap. Global — rendered beneath the Explorer and every TrustPage (App.tsx)
+ * — so it does not depend on `.public-overview` being present; the
+ * Overview-specific zero-gap treatment lives entirely in index.css and stays
+ * additive to this structure. Every link below is a real existing
+ * destination: `Fontes` opens the same Records+SRC- filtered set as the
+ * header's Fontes action, as an ordinary path/query navigation (this is a
+ * cross-page footer, not the live Explorer's own SPA state).
  */
 export function PublicFooter() {
   return (
@@ -76,22 +80,24 @@ export function PublicFooter() {
           <p className="public-footer-brand">Open Évora</p>
           <p className="public-footer-summary">Projeto independente de investigação cívica. Não oficial. Todo o conteúdo remete para fontes identificáveis.</p>
         </div>
-        <nav className="public-footer-group" aria-label="Projeto">
-          <p>Projeto</p>
-          <ul>
-            <li><a href="/methodology">Método</a></li>
-            <li><a href="/about">Sobre</a></li>
-            <li><a href="/corrections">Correções</a></li>
-          </ul>
-        </nav>
-        <nav className="public-footer-group" aria-label="Dados">
-          <p>Dados</p>
-          <ul>
-            <li><a href="/?view=records&type=SRC-">Fontes</a></li>
-            <li><a href="/contact">Contactar</a></li>
-            <li><a href="/privacy">Privacidade</a></li>
-          </ul>
-        </nav>
+        <div className="public-footer-groups">
+          <nav className="public-footer-group" aria-label="Projeto">
+            <p>Projeto</p>
+            <ul>
+              <li><a href="/methodology">Método</a></li>
+              <li><a href="/about">Sobre</a></li>
+              <li><a href="/corrections">Correções</a></li>
+            </ul>
+          </nav>
+          <nav className="public-footer-group" aria-label="Dados">
+            <p>Dados</p>
+            <ul>
+              <li><a href="/?view=records&type=SRC-">Fontes</a></li>
+              <li><a href="/contact">Contactar</a></li>
+              <li><a href="/privacy">Privacidade</a></li>
+            </ul>
+          </nav>
+        </div>
       </div>
     </footer>
   );

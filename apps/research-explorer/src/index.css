@@ -57,15 +57,18 @@ main {
 .trust-facts dt { color: var(--color-ink-muted); font-family: var(--font-interface); font-size: var(--text-interface-label-size); font-weight: var(--text-interface-label-weight); }
 .trust-facts dd { margin: 0; }
 
-/* Editorial three-area footer (Overview final redesign, Phase 3B §6;
-   converged to a full-width warm band + shared wide grid in the
-   visual-convergence pass, task §12): identity/supporting copy on the left,
-   PROJETO and DADOS link groups pushed to the right. Global — TrustPage.tsx
-   renders this beneath the Explorer and every TrustPage, so nothing here
-   depends on `.public-overview` being present; the Overview-specific
-   zero-gap treatment (`body:has(.public-overview) .public-footer`, above)
-   stays purely additive. `.public-footer` is now the full-width band (warm
-   surface + full-width top rule); `.public-footer-inner` carries the shared
+/* Editorial footer (Overview final redesign, Phase 3B §6; converged to a
+   full-width warm band + shared wide grid in the visual-convergence pass,
+   task §12; PROJETO/DADOS grouped into one right-hand unit in the
+   visual-completion pass, task §13): identity/supporting copy on the left,
+   `.public-footer-groups` (PROJETO + DADOS together) pushed to the right as
+   a single group — two flex children, not three areas distributed across
+   the width. Global — TrustPage.tsx renders this beneath the Explorer and
+   every TrustPage, so nothing here depends on `.public-overview` being
+   present; the Overview-specific zero-gap treatment
+   (`body:has(.public-overview) .public-footer`, above) stays purely
+   additive. `.public-footer` is now the full-width band (warm surface +
+   full-width top rule); `.public-footer-inner` carries the shared
    `shell-frame shell-frame--wide` grid (TrustPage.tsx) for its actual
    content alignment — the same left/right axes as Header/Hero/rows. */
 .public-footer {
@@ -88,6 +91,17 @@ main {
 .public-footer-identity {
   min-width: 0;
   max-width: 40ch;
+}
+
+/* PROJETO + DADOS as one right-hand group (task §13) — `justify-content:
+   space-between` on `.public-footer-inner` above pushes this whole group to
+   the right, and the ~56px gap between the two nav columns lives here
+   (matching the existing ~56px target, previously carried by
+   `.public-footer-inner`'s own gap when there were three flex children). */
+.public-footer-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-loose) 56px;
 }
 
 /* Brand (task §12): reading serif ~18px/~600, distinct from the interface
@@ -1119,13 +1133,27 @@ main.explorer-shell {
 
 .overview-hero-headline {
   margin: 0 0 28px;
-  max-width: 16ch;
+  max-width: 20ch;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
   font-size: clamp(2.4rem, 4.6vw, 74px);
   font-weight: 600;
   line-height: 1.06;
   letter-spacing: -0.01em;
+}
+
+/* TARGET's deliberate two-line desktop composition ("Problemas práticos" /
+   "que afetam Évora.") — Overview visual-completion, task §2. Structural
+   rather than relying on `.overview-hero-headline`'s own `max-width` to
+   accidentally wrap at the right character (that value now only bounds
+   overall measure). Each line is its own inline-block so the accessible
+   text value stays one contiguous string (a space renders between them in
+   the DOM — see OverviewPresentation.tsx) while the two lines reliably stack
+   at the desktop reference width. At compact widths (media query below)
+   this reverts to plain inline flow so the headline wraps naturally instead
+   of forcing these exact two lines where they may no longer fit. */
+.overview-hero-headline-line {
+  display: inline-block;
 }
 
 .overview-hero-supporting {
@@ -1203,6 +1231,27 @@ main.explorer-shell {
   left: 0.85rem;
   transform: translateY(-50%);
   color: var(--color-ink-muted);
+  pointer-events: none;
+}
+
+/* Cmd/Ctrl+K affordance (Overview visual-completion, task §6) — a small,
+   restrained `<kbd>` at the input's right end, purely visual (`aria-hidden`
+   in CitizenDiscovery.tsx; the shortcut itself works regardless of whether
+   this is visible). Never intercepts pointer events, matching the search
+   icon's own `pointer-events: none` above. */
+.overview-search-shortcut {
+  position: absolute;
+  top: 50%;
+  right: 0.7rem;
+  transform: translateY(-50%);
+  padding: 0.12rem 0.4rem;
+  color: var(--color-ink-muted);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--p-radius-sm);
+  background: var(--color-surface-subtle);
+  font-family: var(--font-technical);
+  font-size: 11px;
+  line-height: 1.4;
   pointer-events: none;
 }
 
@@ -1437,6 +1486,19 @@ main.explorer-shell {
   height: 1.75rem;
 }
 
+/* Desktop textual wordmark (Overview visual-completion, task §3): replaces
+   the compact graphic mark as the desktop Header identity — TARGET's
+   substantially greater visual presence, using the existing reading/serif
+   family at ~20px, restrained bold weight, grouped with the nav via the
+   parent `.explorer-chrome-group`'s own gap (never a separate margin here). */
+.oe-logo--wordmark {
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
 .explorer-navigation {
   gap: 0.2rem;
 }
@@ -1473,6 +1535,7 @@ main.explorer-shell {
 
 .overview-search-input {
   min-height: var(--target-min);
+  padding-right: 3.4rem;
   border-color: var(--color-separator-emphasis);
   border-radius: var(--radius-control);
   font-size: var(--text-interface-body-size);
@@ -1522,16 +1585,20 @@ main.explorer-shell {
    drawer beneath it (task §8 — "read as ONE composition"). */
 .overview-toolbar {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-tight) var(--space-standard);
   padding: 14px 0;
 }
 
+/* Filtros, search, and the result count kept on one desktop row (task §4) —
+   `nowrap` plus `min-width: 0` lets the search control's own `flex: 1 1
+   320px` shrink instead of wrapping the count onto a second line. Reverts to
+   `wrap` at compact widths (media query below), where the row stacks. */
 .overview-toolbar-controls {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--space-standard);
   min-width: 0;
@@ -1576,7 +1643,27 @@ main.explorer-shell {
   font-size: 13px;
 }
 
+/* `Ordenar por` stays available to assistive tech but is not visibly
+   rendered (task §8) — same visually-hidden technique the search label
+   already uses elsewhere in this file. */
+.overview-sort-control-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The option text's own truthful "↓" (SORT_LABELS in CitizenDiscovery.tsx)
+   is the sole visual direction indicator — the native select's own chevron
+   is suppressed so the two never double up (task §8), while this stays a
+   real `<select>` rather than a custom dropdown built for appearance alone. */
 .overview-sort-control select {
+  appearance: none;
   color: var(--color-ink-secondary);
   border: 0;
   border-bottom: 1px solid var(--color-separator-standard);
@@ -1585,26 +1672,37 @@ main.explorer-shell {
   cursor: pointer;
 }
 
-/* `Filtros` disclosure trigger (delta §4; compacted toward TARGET's control
-   density in the visual-convergence pass, §8): a native button, restrained
-   by default, taking a subtle active-state treatment (`data-active`, set
-   from the accessible-name state Overview.tsx/OverviewPresentation.tsx
-   already track) when a topic filter is active and the drawer is closed —
-   never a separate visible chip/badge beside it. */
+/* `Filtros` disclosure trigger (delta §4; compacted toward TARGET's lower,
+   more rectangular control density in the visual-completion pass, task §5):
+   a native button, restrained by default (transparent-leaning surface, a
+   subtle warm border, small radius), taking a subtle active-state treatment
+   (`data-active`, set from the accessible-name state
+   Overview.tsx/OverviewPresentation.tsx already track) when a topic filter
+   is active and the drawer is closed — never a separate visible chip/badge
+   beside it. The visible box is shorter than the shared `--target-min` tap
+   size (TARGET's compact density is a visual choice, not a WCAG 2.5.5 AAA
+   target this pass is bound to), but padding keeps a comfortable native
+   click/tap area around the text+icon. */
 .overview-filtros-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  min-height: var(--target-min);
-  padding: 0.35rem 0.75rem;
+  gap: 0.38rem;
+  min-height: 34px;
+  padding: 0.32rem 0.7rem;
   color: var(--color-ink-secondary);
   border: 1px solid var(--color-separator-standard);
-  border-radius: var(--radius-control);
-  background: var(--color-surface-raised);
+  border-radius: var(--p-radius-sm);
+  background: transparent;
   font-family: var(--font-interface);
   font-size: var(--text-interface-label-size);
   font-weight: var(--text-interface-label-weight);
   cursor: pointer;
+}
+
+.overview-filtros-toggle-icon {
+  flex-shrink: 0;
+  color: var(--color-ink-muted);
+  font-size: 0.95em;
 }
 
 .overview-filtros-toggle:hover {
@@ -1644,16 +1742,21 @@ main.explorer-shell {
   display: none;
 }
 
+/* Normal (inactive) topic controls (task §9): lower height, transparent
+   background, subtle warm border, compact rectangular geometry — TARGET's
+   density, replacing the earlier taller filled-white-button treatment.
+   `Todos` and the selected state below stay the drawer's one filled/pressed
+   language, unaffected by this. */
 .overview-category-drawer-option {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  min-height: var(--target-min);
-  padding: 6px 12px;
+  min-height: 32px;
+  padding: 5px 10px;
   color: var(--color-ink-secondary);
   border: 1px solid var(--color-separator-standard);
-  border-radius: var(--radius-control);
-  background: var(--color-surface-raised);
+  border-radius: var(--p-radius-sm);
+  background: transparent;
   font-family: var(--font-interface);
   font-size: 13.5px;
   cursor: pointer;
@@ -1707,9 +1810,18 @@ main.explorer-shell {
 
 /* Full-width results column (delta §7) — the permanent filter rail's grid
    allocation is removed entirely; the results column now uses the available
-   TARGET content width on its own. */
+   TARGET content width on its own. Full-bleed (task §11/§12): the same
+   structural principle `.overview-discovery` already uses — bleeds to the
+   actual viewport/page edge within `main.explorer-shell`'s own horizontal
+   padding, so both the problem-row band (`.overview-problem-list`) and the
+   end-of-results band (`.overview-end-of-results`) it wraps reach the page
+   boundary, while their own inner `shell-frame shell-frame--wide` elements
+   (the row link, the end-of-results inner) keep row CONTENT aligned to the
+   shared 1216px grid — never moving row text to the viewport edge. */
 .overview-results {
   min-width: 0;
+  margin: 0 -2rem;
+  padding: 0 2rem;
 }
 
 .overview-problem-list {
@@ -1750,8 +1862,17 @@ main.explorer-shell {
   cursor: pointer;
 }
 
-.overview-problem-row-link:hover {
-  background: var(--color-surface-raised);
+/* Hover (task §10): never replaces either row surface with white — a normal
+   row stays on its own neutral `--color-surface-reading` base
+   (`.overview-problem-row`), a changed row stays on its own clay surface
+   (`.overview-problem-row--changed`, below); this rule no longer paints a
+   background at all. The restrained substitute cue is the title's own
+   underline (`.overview-problem-list h4`, below) plus the existing
+   `cursor: pointer` — keyboard focus keeps its own separate visible outline
+   (`:focus-visible`, unchanged) regardless of hover. */
+.overview-problem-row-link:hover .overview-problem-title {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .overview-problem-row-link:focus-visible {
@@ -2159,14 +2280,25 @@ body:has(.public-overview) .public-footer {
     align-items: flex-start;
   }
 
+  /* Responsive safety (task §15): the desktop one-row grouping (task §4) is
+     not forced here — Filtros/search/count wrap normally instead of
+     compressing onto one unreadable row. */
+  .overview-toolbar-controls {
+    flex-wrap: wrap;
+  }
+
   .overview-toolbar-controls .overview-search {
     width: 100%;
     min-width: 0;
     max-width: none;
   }
 
+  /* Full-bleed bleed matches `main.explorer-shell`'s compact 1rem horizontal
+     padding (task §15 — no horizontal overflow), the same technique
+     `.overview-discovery` already uses at this breakpoint. */
   .overview-results {
-    padding-left: 0;
+    margin: 0 -1rem;
+    padding: 0 1rem;
   }
 
   /* Compact row inner padding (task §13 — responsive safety): tighter
@@ -2231,6 +2363,14 @@ body:has(.public-overview) .public-footer {
     margin-bottom: var(--space-standard);
     max-width: 22ch;
     font-size: clamp(2rem, 8vw, 2.4rem);
+  }
+
+  /* Responsive safety (task §15): the desktop two-line grouping is not
+     forced at compact widths — each line reverts to plain inline flow so
+     the headline wraps naturally instead of overflowing or clipping when
+     the two desktop lines no longer fit. */
+  .overview-hero-headline-line {
+    display: inline;
   }
 
   .overview-hero-supporting {
@@ -3286,7 +3426,16 @@ body:has(.public-overview) .public-footer {
     row-gap: 0.5rem;
   }
 
+  /* Compact search (task §15): the Cmd/Ctrl+K affordance is a desktop-only
+     hint — hidden here rather than crowding the compact input, which also
+     lets the input drop the desktop-only right padding reserved for it. The
+     shortcut itself keeps working at every width. */
+  .overview-search-shortcut {
+    display: none;
+  }
+
   .overview-search-input {
+    padding-right: 0.85rem;
     max-width: none;
   }
 

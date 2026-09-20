@@ -309,3 +309,18 @@ export function IconTrendUp(props: IconProps) {
     </IconBase>
   );
 }
+
+/**
+ * Overview visual-completion (task §5) — the `Filtros` disclosure trigger's
+ * hamburger/menu glyph (CitizenDiscovery.tsx's `FiltrosToggle`), three plain
+ * horizontal bars. `aria-hidden` like every other icon in this file — the
+ * trigger's own accessible name (plain text plus the active-topic label)
+ * carries all meaning, never this glyph alone.
+ */
+export function IconMenu(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M4 6h12M4 10h12M4 14h12" />
+    </IconBase>
+  );
+}

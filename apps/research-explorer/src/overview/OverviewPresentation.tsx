@@ -117,7 +117,10 @@ export function OverviewPresentation({
                 <span className="overview-hero-eyebrow-dot" aria-hidden="true">•</span> Projeto independente — não oficial
               </span>
             </p>
-            <h3 className="overview-hero-headline">Problemas práticos que afetam Évora.</h3>
+            <h3 className="overview-hero-headline">
+              <span className="overview-hero-headline-line">Problemas práticos</span>{" "}
+              <span className="overview-hero-headline-line">que afetam Évora.</span>
+            </h3>
             <p className="overview-hero-supporting">O que sabemos, o que falta saber, e a fonte de cada afirmação.</p>
 
             <ul className="overview-metrics" aria-label="Números da investigação">

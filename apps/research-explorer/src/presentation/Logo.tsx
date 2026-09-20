@@ -29,17 +29,25 @@ export function LogoMark({ title = "Open Évora", ...props }: MarkProps & { titl
 }
 
 export interface LogoProps {
-  /** `full` — mark + wordmark lockup (header/About usage). `compact` — mark only, wrapped with the same accessible name (narrow header/footer usage). */
-  form?: "full" | "compact";
+  /** `full` — mark + wordmark raster lockup (About/TrustPage usage). `compact` — mark only, wrapped with the same accessible name (narrow header/footer usage). `wordmark` — a textual "Open Évora" lockup (Overview visual-completion, task §3): the desktop Header identity, converged toward TARGET's textual presence using the existing reading/serif typography rather than the compact raster mark, which reads with substantially less visual weight at header scale. */
+  form?: "full" | "compact" | "wordmark";
   className?: string;
 }
 
-/** Full lockup for ordinary application use; `compact` reuses the cropped mark asset for narrow/footer placements. */
+/** Full lockup for ordinary application use; `compact` reuses the cropped mark asset for narrow/footer placements; `wordmark` is the text-based desktop Header identity. */
 export function Logo({ form = "full", className }: LogoProps) {
   if (form === "compact") {
     return (
       <span className={["oe-logo", "oe-logo--compact", className].filter(Boolean).join(" ")}>
         <LogoMark className="oe-logo-mark" />
+      </span>
+    );
+  }
+
+  if (form === "wordmark") {
+    return (
+      <span className={["oe-logo", "oe-logo--wordmark", className].filter(Boolean).join(" ")}>
+        Open Évora
       </span>
     );
   }

@@ -1,21 +1,83 @@
+import { useEffect, useRef } from "react";
 import type { CitizenProblem, MaterialChangeEntry, ProblemSortOrder, TopicCategoryCount } from "./overviewStats";
 import { formatOverviewCompactDate } from "./overviewStats";
 import { describeTopic } from "../presentation/topicMapping";
-import { IconSearch, IconTrendUp } from "../presentation/icons";
+import { IconMenu, IconSearch, IconTrendUp } from "../presentation/icons";
 import { EvidenceStatus } from "../problem/InvestigationStatus";
 import { publicEnumLabel } from "../presentation/presentation";
 
+/** True on a Mac keyboard layout (Cmd-based shortcut copy), false everywhere
+ * else (Ctrl-based) — read once per render rather than cached at module
+ * scope, so tests can stub `navigator.platform`/`userAgent` per case. Falls
+ * back to the non-Mac (`Ctrl`) copy when neither signal is available (e.g. a
+ * non-browser test environment). */
+function isMacPlatform(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const platform = navigator.platform ?? "";
+  const userAgent = navigator.userAgent ?? "";
+  return /Mac|iPhone|iPod|iPad/.test(platform) || /Mac OS X/.test(userAgent);
+}
+
+/** True when `target` is an element the Cmd/Ctrl+K search-focus shortcut
+ * must never hijack while it is being actively edited (task §6) — any other
+ * input/textarea/select/contenteditable, but never the Overview search input
+ * itself (`searchInputId`), which the shortcut always targets regardless of
+ * whether it already has focus. */
+function isForeignEditableTarget(target: EventTarget | null, searchInputId: string): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.id === searchInputId) return false;
+  if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return true;
+  return target.isContentEditable;
+}
+
+/**
+ * Overview citizen search (Overview visual-completion, task §6): the
+ * existing icon-wrapped input, now also reachable via a real `Cmd+K`
+ * (macOS)/`Ctrl+K` (Windows/Linux) focus shortcut — a small restrained
+ * `<kbd>` affordance at the input's right end states which, truthfully
+ * per-platform. The shortcut only ever moves focus to this input and
+ * preserves whatever query is already typed (`value` is owned by the caller,
+ * untouched here); it never opens a command palette or triggers a search
+ * itself. Global `keydown` listener, scoped to this mounted instance and
+ * torn down on unmount — never hijacks the shortcut while another editable
+ * element (a foreign input/textarea/select/contenteditable) has focus, per
+ * `isForeignEditableTarget` above, since Records/ProblemView etc. have their
+ * own text fields the shortcut must leave alone.
+ */
 export function CitizenSearchControl({ value, onChange, id = "overview-search-input" }: {
   value: string;
   onChange: (value: string) => void;
   id?: string;
 }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const isShortcut = event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey);
+      if (!isShortcut) return;
+      if (isForeignEditableTarget(event.target, id)) return;
+      event.preventDefault();
+      inputRef.current?.focus();
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [id]);
+
   return (
     <div className="overview-search" role="search">
       <label htmlFor={id} className="overview-search-label">Pesquisar problemas</label>
       <span className="overview-search-input-wrap">
         <IconSearch className="overview-search-icon" />
-        <input id={id} type="search" className="overview-search-input" placeholder="Pesquisar problemas em Évora…" value={value} onChange={(event) => onChange(event.target.value)} />
+        <input
+          ref={inputRef}
+          id={id}
+          type="search"
+          className="overview-search-input"
+          placeholder="Pesquisar problemas em Évora…"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+        <kbd className="overview-search-shortcut" aria-hidden="true">{isMacPlatform() ? "⌘K" : "Ctrl K"}</kbd>
       </span>
     </div>
   );
@@ -57,6 +119,7 @@ export function FiltrosToggle({ expanded, onToggle, controlsId, activeTopicLabel
       data-active={activeTopicLabel !== null}
       onClick={onToggle}
     >
+      <IconMenu className="overview-filtros-toggle-icon" />
       Filtros
     </button>
   );
@@ -163,7 +226,18 @@ const SORT_LABELS: Record<ProblemSortOrder, string> = {
   updatedAt: "Última atualização ↓",
 };
 
-/** The toolbar's sort control — a native `<select>` so it stays a single accessible control without reimplementing listbox semantics. */
+/**
+ * The toolbar's sort control (visual-completion pass, task §8) — a single
+ * quiet editorial affordance reading as just "Última atualização ↓", rather
+ * than the earlier visible "Ordenar por  Última atualização ↓ ▼" stack.
+ * `Ordenar por` stays a real `<label>` associated to the `<select>` (visually
+ * hidden via the same clip technique the search label already uses, never
+ * removed from the accessible name), and the option text's own truthful "↓"
+ * remains the sole visual direction indicator — the native select's own
+ * chevron is suppressed (`appearance: none` in index.css) so the two never
+ * double up. Still a native `<select>`, not a custom dropdown, so listbox
+ * semantics/keyboard behaviour stay exactly what the browser already
+ * provides. */
 export function SortControl({ value, onChange, id = "overview-sort" }: {
   value: ProblemSortOrder;
   onChange: (order: ProblemSortOrder) => void;
@@ -171,7 +245,7 @@ export function SortControl({ value, onChange, id = "overview-sort" }: {
 }) {
   return (
     <p className="overview-sort-control">
-      <label htmlFor={id}>Ordenar por</label>{" "}
+      <label htmlFor={id} className="overview-sort-control-label">Ordenar por</label>
       <select id={id} value={value} onChange={(event) => onChange(event.target.value as ProblemSortOrder)}>
         {(Object.entries(SORT_LABELS) as [ProblemSortOrder, string][]).map(([order, text]) => (
           <option key={order} value={order}>{text}</option>

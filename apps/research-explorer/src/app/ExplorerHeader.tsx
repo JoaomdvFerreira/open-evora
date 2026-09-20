@@ -25,7 +25,7 @@ export function ExplorerHeader({ activeView, activeTypeFilter, onProblemas, onFo
       <div className="explorer-chrome-inner shell-frame shell-frame--wide">
         <div className="explorer-chrome-group">
           <h1 className="explorer-identity">
-            <Logo form="full" className="explorer-logo explorer-logo--full" />
+            <Logo form="wordmark" className="explorer-logo explorer-logo--full" />
             <Logo form="compact" className="explorer-logo explorer-logo--compact" />
           </h1>
           <nav aria-label="Navegação principal" className="explorer-navigation">
