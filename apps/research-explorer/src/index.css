@@ -1637,19 +1637,16 @@ main.explorer-shell {
   min-width: 0;
 }
 
-/* Desktop search width (final desktop-correction pass §9): grows to reach
-   TARGET's ~440px at the reference desktop width. The earlier `flex: 1 1
-   320px` basis undersold the 440px max-width — with `Filtros` and the result
-   count also in this `nowrap` row, a 320px basis left the search sized well
-   below its own max-width even where the row had room to spare. A 440px
-   basis lets it actually reach the max-width when space allows, while
-   `min-width`/`flex-shrink` still let it yield first to `Filtros` and the
-   (now shrink-proof, non-wrapping) result count beside it. */
+/* Desktop search width: doubled to ~880px per owner request (was TARGET's
+   ~440px, final desktop-correction pass §9). `flex-basis` doubled alongside
+   `max-width` so it actually reaches the new width when space allows, not
+   just bounds it; `min-width`/`flex-shrink` still let it yield first to
+   `Filtros` and the (shrink-proof, non-wrapping) result count beside it. */
 .overview-toolbar-controls .overview-search {
   width: auto;
   min-width: 16rem;
-  max-width: 440px;
-  flex: 1 1 440px;
+  max-width: 880px;
+  flex: 1 1 880px;
   margin: 0;
 }
 
