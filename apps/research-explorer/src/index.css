@@ -3377,42 +3377,54 @@ body:has(.public-overview) .public-footer {
     display: block;
   }
 
-  /* Overview desktop-fit correction (768px-1059px): below the 1216px
-     `--shell-content-max-wide` frame, `.shell-frame--wide`'s own auto
-     margins stop supplying any gutter (they only centre once the viewport
-     exceeds the frame's max-width) and the class carries no padding of its
-     own — so every Overview band that relies on it for content alignment
-     (Hero, toolbar, drawer, row content, end-of-results) sits flush against
-     the true viewport edge in this band, and the (`overview-toolbar`'s
-     `nowrap` + fixed `.overview-search` min-width) toolbar row no longer
-     has enough room, producing document-level horizontal overflow. This
-     block gives each of those five surfaces the same explicit inner
-     content gutter without touching `.shell-frame--wide` itself (Header's
-     `.explorer-chrome-inner` and Footer's `.public-footer-inner` already
-     get their gutter from their own full-bleed parent's compensating
-     padding — `.explorer-chrome`/`.public-footer` — so they are unaffected
-     and unchanged here). Full-bleed band/background/separator surfaces
-     (`.overview-discovery`, `.overview-results`, `.overview-problem-row`,
-     `.overview-problem-row--changed`, `.overview-end-of-results`) are
-     deliberately not touched — only the inner content elements below are. */
-  .overview-hero > .shell-frame--wide,
-  .overview-toolbar,
-  .overview-category-drawer,
-  .overview-problem-row-link,
-  .overview-end-of-results-inner {
-    padding-left: var(--overview-fit-gutter, 24px);
-    padding-right: var(--overview-fit-gutter, 24px);
+  /* Overview desktop-fit grid (768px-1059px, visual-completion final
+     convergence pass): TARGET at 1024 uses a deliberately narrower
+     intermediate content column than the >=1060 ~1216px wide frame produces
+     at this width — below that frame's own max-width, `.shell-frame--wide`'s
+     auto margins stop supplying any gutter of their own (they only centre
+     once the viewport exceeds the frame's max-width), so every surface that
+     shares the frame for content alignment sat flush against the true
+     viewport edge in this band. Rather than gutter five surfaces
+     independently (each capable of drifting out of alignment), one shared
+     `--overview-fit-gutter` custom property is applied to `.shell-frame--
+     wide` itself — the single primitive Header (`.explorer-chrome-inner`),
+     Hero, discovery toolbar, category drawer, problem-row content,
+     end-of-results content, and Footer (`.public-footer-inner`) already all
+     compose (OverviewPresentation.tsx, ExplorerHeader.tsx, TrustPage.tsx),
+     so this one rule keeps every one of them on the same left/right inner
+     axes by construction instead of by seven separate declarations. The
+     `clamp()` scales proportionally with the viewport rather than jumping at
+     1024 specifically: ~24px at the 768px boundary (matching the previous
+     safety gutter so nothing regresses there) rising to ~55px at 1024px,
+     which — stacked on top of the existing ~32px outer page padding every
+     one of these surfaces already sits inside (the shell's own horizontal
+     padding, and `.explorer-chrome`/`.public-footer`'s matching padding) —
+     lands the total inset from the true 1024px viewport edge in TARGET's
+     ~80-90px range; it stays flat at its 58px ceiling from there to the
+     1059px boundary. Full-bleed band/background/separator surfaces
+     (`.explorer-chrome`, `.overview-discovery`, `.overview-results`,
+     `.overview-problem-row`, `.overview-problem-row--changed`, `.overview-
+     end-of-results`, `.public-footer`) are deliberately not touched — only
+     the shared inner grid is inset. */
+  .shell-frame--wide {
+    --overview-fit-gutter: clamp(24px, 12vw - 68px, 58px);
+    padding-left: var(--overview-fit-gutter);
+    padding-right: var(--overview-fit-gutter);
+    box-sizing: border-box;
   }
 
   /* Hero fit: desktop typography/copy/metrics stay exactly as approved at
      >=1060px (no rule below touches size, weight, family, or content) —
      only the >=1060 spacious vertical rhythm (104px/88px band padding, the
-     46px/28px content gaps) is reduced for this narrower fit range, and the
-     two-line headline is allowed to recompose (`white-space: normal`) since
-     the 34ch measure plus the reduced viewport can no longer reliably fit
-     both approved lines verbatim without risking the same overflow this
-     pass removes elsewhere. Metrics already wrap naturally
-     (`.overview-metrics`'s base `flex-wrap: wrap`, unchanged). */
+     46px/28px content gaps) is reduced for this narrower fit range. The
+     authored two-line composition ("Problemas práticos" / "que afetam
+     Évora.") is restored within this band (task §6) — the new fit grid
+     above narrows the column but the headline's own 34ch measure still
+     comfortably holds the longer of the two lines at this band's type
+     scale, so the >=1060 `display: inline-block` / `white-space: nowrap`
+     per-line rules are left in effect rather than overridden to `normal`
+     wrapping. Metrics already wrap naturally (`.overview-metrics`'s base
+     `flex-wrap: wrap`, unchanged). */
   .overview-hero {
     padding: 48px 0;
   }
@@ -3423,11 +3435,6 @@ body:has(.public-overview) .public-footer {
 
   .overview-hero-headline {
     margin-bottom: 18px;
-  }
-
-  .overview-hero-headline-line {
-    display: inline;
-    white-space: normal;
   }
 
   .overview-hero-supporting {
@@ -3443,8 +3450,10 @@ body:has(.public-overview) .public-footer {
      forcing overflow at its content's natural width, and the search
      control's own floor drops from the >=1060 16rem/440px pair (which by
      itself exceeds this band's available width alongside Filtros + the
-     result count) to a still-usable 200px/none so it shrinks instead of
-     forcing the row wider than the viewport. */
+     result count) to an intermediate desktop-fit measure — ~300-340px at
+     1024 (task §8) — so it reads as a deliberately narrower control rather
+     than desktop's full-width search, while still shrinking further before
+     it would force the row wider than the viewport. */
   .overview-toolbar {
     flex-wrap: wrap;
     row-gap: var(--space-tight);
@@ -3458,29 +3467,24 @@ body:has(.public-overview) .public-footer {
 
   .overview-toolbar-controls .overview-search {
     min-width: 200px;
-    max-width: none;
-    flex-basis: 200px;
+    max-width: 320px;
+    flex-basis: 320px;
   }
 
   /* Category drawer: geometry hardening only — same top-5/counts/ordering,
-     wraps within the new safe gutter above instead of the un-gutted
+     wraps within the new shared fit grid above instead of the un-gutted
      `.shell-frame--wide` measure, with no fixed minimum width that could
      exceed the available band. */
   .overview-category-drawer {
-    box-sizing: border-box;
     max-width: 100%;
   }
 
   /* Problem rows: metadata/title/statement/topics wrap naturally inside the
-     new safe gutter instead of expanding the row past the viewport — the
-     row BAND (`.overview-problem-row`), the changed-row clay background and
-     its 3px accent (`.overview-problem-row--changed`, both full-bleed and
-     untouched above) still span the true viewport edge; only this inner
-     content link is inset. */
-  .overview-problem-row-link {
-    box-sizing: border-box;
-  }
-
+     new shared fit grid instead of expanding the row past the viewport —
+     the row BAND (`.overview-problem-row`), the changed-row clay background
+     and its 3px accent (`.overview-problem-row--changed`, both full-bleed
+     and untouched above) still span the true viewport edge; only this inner
+     content link is inset (via `.shell-frame--wide` above). */
   .overview-problem-row-meta {
     row-gap: 0.35rem;
   }
@@ -3488,11 +3492,9 @@ body:has(.public-overview) .public-footer {
   /* End-of-results: the outer band stays full width (`.overview-end-of-
      results`, untouched above); `.overview-end-of-results-inner` already
      wraps (`flex-wrap: wrap` + `justify-content: space-between`, base
-     rule) — the new gutter is what actually keeps `Propor um problema`
-     inside the viewport instead of touching/overflowing its true edge. */
-  .overview-end-of-results-inner {
-    box-sizing: border-box;
-  }
+     rule) — the shared fit grid above is what actually keeps `Propor um
+     problema` inside the viewport instead of touching/overflowing its true
+     edge. */
 }
 
 @media (max-width: 767px) {

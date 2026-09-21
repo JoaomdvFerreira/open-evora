@@ -4,8 +4,10 @@ import { describe, expect, it } from "vitest";
 
 /**
  * Overview desktop-fit correction (768px-1059px) — CSS-contract regression:
- * confirms the intermediate geometry-only fallback that hardens Overview's
- * Hero/toolbar/drawer/row/end-of-results gutters lives inside the existing
+ * confirms the shared desktop-fit grid — one `--overview-fit-gutter` inset
+ * applied to `.shell-frame--wide`, the single primitive Header, Hero,
+ * discovery toolbar, category drawer, problem-row content, end-of-results
+ * content, and Footer all already compose — lives inside the existing
  * `@media (min-width: 768px) and (max-width: 1059px)` band (no new product
  * breakpoint introduced), and that it stays distinct from both the approved
  * >=1060px base rules and the separate <=767px compact block. Deliberately
@@ -35,16 +37,22 @@ function intermediateBlock(): string {
 describe("index.css — Overview desktop-fit fallback (768px-1059px) isolation", () => {
   const block = intermediateBlock();
 
-  it("hardens Hero/toolbar/drawer/row/end-of-results geometry inside the existing intermediate band only", () => {
-    for (const selector of [
-      ".overview-hero > .shell-frame--wide",
-      ".overview-toolbar",
-      ".overview-category-drawer",
-      ".overview-problem-row-link",
-      ".overview-end-of-results-inner",
-    ]) {
+  it("applies one shared fit-grid gutter to the primitive every gutted surface composes, plus the bounded Hero/toolbar geometry corrections, inside the existing intermediate band only", () => {
+    for (const selector of [".shell-frame--wide", ".overview-hero", ".overview-toolbar", ".overview-toolbar-controls", ".overview-category-drawer"]) {
       expect(block).toContain(selector);
     }
+    // The shared gutter is a single custom property set once on the shared
+    // primitive — not restated per surface, which is what keeps every
+    // gutted band (Header, Hero, toolbar, drawer, rows, end-of-results,
+    // Footer) on the same left/right axes by construction rather than by
+    // separately-maintained declarations that could drift apart.
+    expect(block.match(/--overview-fit-gutter:/g)?.length ?? 0).toBe(1);
+  });
+
+  it("keeps the shared fit-grid gutter proportional to the viewport (clamp/vw-based), not a single fixed pixel value", () => {
+    const gutterDeclaration = block.match(/--overview-fit-gutter:\s*([^;]+);/)?.[1] ?? "";
+    expect(gutterDeclaration).toMatch(/clamp\(/);
+    expect(gutterDeclaration).toMatch(/vw/);
   });
 
   it("does not introduce a new product breakpoint — only one 768px-1059px media query exists", () => {
@@ -65,5 +73,10 @@ describe("index.css — Overview desktop-fit fallback (768px-1059px) isolation",
   it("stays isolated from the separate <=767px compact block (no compact-only selectors leak into the intermediate band)", () => {
     expect(block).not.toContain(".overview-search-shortcut");
     expect(block).not.toContain("main.explorer-shell");
+  });
+
+  it("does not leak the fit-grid gutter to >=1060px — `.shell-frame--wide` is declared as a bare top-level rule only once, outside any media query", () => {
+    const topLevelDeclarations = css.match(/^\.shell-frame--wide\s*\{/gm) ?? [];
+    expect(topLevelDeclarations.length).toBe(1);
   });
 });
