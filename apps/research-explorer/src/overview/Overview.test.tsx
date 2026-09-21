@@ -144,7 +144,7 @@ describe("Overview — final Hero", () => {
     expect(screen.getByText("O que sabemos, o que falta saber, e a fonte de cada afirmação.")).toBeTruthy();
   });
 
-  it("renders exactly the three intended Hero metric concepts — problems, evidence records, sources", async () => {
+  it("renders exactly the four intended Hero metric concepts — problems, evidence records, sources, total corpus records", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
@@ -156,10 +156,10 @@ describe("Overview — final Hero", () => {
     render(<Overview dataProvider={provider} {...props} />);
 
     // Compact inline metric presentation (visual-convergence pass): value
-    // and label share one line, e.g. "2 problemas" — no separate stacked
-    // label element.
+    // and label share one line, e.g. "2 PROBLEMAS" — no separate stacked
+    // label element. Problem label is uppercase (owner request).
     const problemMetric = (await screen.findByText("2", { selector: ".overview-metric-value" })).closest(".overview-metric");
-    expect(problemMetric?.textContent).toBe("2 problemas");
+    expect(problemMetric?.textContent).toBe("2 PROBLEMAS");
 
     const evidenceMetric = screen.getByText("3", { selector: ".overview-metric-value" }).closest(".overview-metric");
     expect(evidenceMetric?.textContent).toBe("3 Registos de evidência");
@@ -167,8 +167,12 @@ describe("Overview — final Hero", () => {
     const sourceMetric = screen.getByText("1", { selector: ".overview-metric-value" }).closest(".overview-metric");
     expect(sourceMetric?.textContent).toBe("1 Fonte");
 
-    expect(document.querySelectorAll(".overview-metric").length).toBe(3);
-    expect(screen.queryByText(/Registo total|Registos totais/)).toBeNull();
+    // Total corpus record count (owner request) — every record in the
+    // loaded index regardless of type: 2 PRB + 3 EVD + 1 SRC = 6.
+    const totalMetric = screen.getByText("6", { selector: ".overview-metric-value" }).closest(".overview-metric");
+    expect(totalMetric?.textContent).toBe("6 Total de registos");
+
+    expect(document.querySelectorAll(".overview-metric").length).toBe(4);
   });
 
   it("does not render the removed Hero recent-updates surface", async () => {

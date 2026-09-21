@@ -258,6 +258,7 @@ export function Overview({
       problemCount={overview.problemCount}
       evidenceCount={overview.evidenceCount}
       sourceCount={overview.sourceCount}
+      totalRecordCount={overview.totalRecordCount}
       citizenProblems={citizenProblems}
       visibleProblems={visibleProblems}
       paginatedProblems={paginatedProblems}

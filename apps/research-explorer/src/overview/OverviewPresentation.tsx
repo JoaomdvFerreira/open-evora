@@ -5,6 +5,7 @@ import {
   problemCountLabel,
   sourceCountLabel,
   topCategoryCounts,
+  totalRecordCountLabel,
   type CitizenProblem,
   type MaterialChangeEntry,
   type ProblemSortOrder,
@@ -32,6 +33,7 @@ export function OverviewPresentation({
   problemCount,
   evidenceCount,
   sourceCount,
+  totalRecordCount,
   citizenProblems,
   visibleProblems,
   paginatedProblems,
@@ -54,6 +56,8 @@ export function OverviewPresentation({
   evidenceCount: number;
   /** Canonical `SRC-` record count (docs/datamodel.md §1) — same counting pattern as `evidenceCount`, shown in the Hero metrics as "Fontes" (the data model does not classify Sources as primary vs secondary/additional). */
   sourceCount: number;
+  /** The canonical corpus total — every record in the loaded index, every type (the same figure `manifest.totalRecords` reports elsewhere as "Corpus: X registos" — see overviewStats.ts's `PublicOverviewData` doc comment). Shown in the Hero metrics as "Total de registos". */
+  totalRecordCount: number;
   citizenProblems: CitizenProblem[] | null;
   /** The full filtered+sorted result set (pre-pagination) — its length is the sole source for the toolbar's "N problemas" count, never `paginatedProblems.length`. */
   visibleProblems: CitizenProblem[] | null;
@@ -132,6 +136,9 @@ export function OverviewPresentation({
               </li>
               <li className="overview-metric">
                 <span className="overview-metric-value">{sourceCount}</span> {sourceCountLabel(sourceCount)}
+              </li>
+              <li className="overview-metric">
+                <span className="overview-metric-value">{totalRecordCount}</span> {totalRecordCountLabel()}
               </li>
             </ul>
           </div>

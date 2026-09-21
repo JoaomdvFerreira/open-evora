@@ -23,6 +23,7 @@ import {
   sourceCountLabel,
   toCitizenProblem,
   topCategoryCounts,
+  totalRecordCountLabel,
   type CitizenProblem,
   type MaterialChangeEntry,
 } from "./overviewStats";
@@ -128,6 +129,7 @@ describe("computePublicOverviewData", () => {
     expect(data.problemCount).toBe(2);
     expect(data.evidenceCount).toBe(2);
     expect(data.sourceCount).toBe(1);
+    expect(data.totalRecordCount).toBe(5);
     expect(data.problems).toEqual([
       { id: "PRB-0002", title: "Earlier problem", validationStatus: "unvalidated", evidenceStatus: "corroborated" },
       { id: "PRB-0010", title: "Later problem", validationStatus: "validated", evidenceStatus: "discovered" },
@@ -791,14 +793,18 @@ describe("matchesCitizenSearch", () => {
 
 describe("public Overview metrics count grammar", () => {
   it("uses PT-PT singular only for one, and plural for zero or more than one", () => {
-    expect(problemCountLabel(0)).toBe("problemas");
-    expect(problemCountLabel(1)).toBe("problema");
-    expect(problemCountLabel(2)).toBe("problemas");
+    expect(problemCountLabel(0)).toBe("PROBLEMAS");
+    expect(problemCountLabel(1)).toBe("PROBLEMA");
+    expect(problemCountLabel(2)).toBe("PROBLEMAS");
     expect(evidenceCountLabel(0)).toBe("Registos de evidência");
     expect(evidenceCountLabel(1)).toBe("Registo de evidência");
     expect(evidenceCountLabel(2)).toBe("Registos de evidência");
     expect(sourceCountLabel(0)).toBe("Fontes");
     expect(sourceCountLabel(1)).toBe("Fonte");
     expect(sourceCountLabel(2)).toBe("Fontes");
+  });
+
+  it("uses a fixed phrase for the total corpus record count, regardless of count", () => {
+    expect(totalRecordCountLabel()).toBe("Total de registos");
   });
 });

@@ -237,10 +237,10 @@ describe("Explorer — Overview view", () => {
     const discoveryRegion = screen.getByRole("region", { name: "Explorar problemas" });
     expect(discoveryRegion).toBeTruthy();
     // Compact inline metric presentation (visual-convergence pass): value
-    // and label share one line, e.g. "1 problema" — no separate stacked
-    // label element.
+    // and label share one line, e.g. "1 PROBLEMA" — no separate stacked
+    // label element. Problem label is uppercase (owner request).
     const metricValues = screen.getAllByText("1", { selector: ".overview-metric-value" });
-    expect(metricValues[0].closest(".overview-metric")?.textContent).toBe("1 problema");
+    expect(metricValues[0].closest(".overview-metric")?.textContent).toBe("1 PROBLEMA");
     expect(metricValues[1].closest(".overview-metric")?.textContent).toBe("1 Registo de evidência");
     expect(await screen.findByText("Pressão de estacionamento com uma descrição canónica completa que não pode ser truncada")).toBeTruthy();
     expect(within(discoveryRegion).getByRole("list")).toBeTruthy();

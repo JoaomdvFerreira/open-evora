@@ -30,6 +30,13 @@ export interface PublicOverviewData {
   problemCount: number;
   evidenceCount: number;
   sourceCount: number;
+  /** The canonical corpus total — every record in the loaded index, every
+   * type, same plain `records.length` count `manifest.totalRecords` itself
+   * reports for the "Corpus: X registos" summary shown on every other view
+   * (Explorer.tsx) — not a separately derived figure. Restored to the Hero
+   * metrics ruler on owner request; every other view continues to read its
+   * own total from the manifest, unaffected. */
+  totalRecordCount: number;
   problems: OverviewProblem[];
 }
 
@@ -48,13 +55,13 @@ export interface MaterialChangeSource {
 
 /**
  * Metrics label only (value rendered separately in markup — Overview
- * visual-completion delta §5). Plain "problema"/"problemas" — the compact
- * inline Hero metric presentation (visual-convergence pass) reads as
- * "6 problemas", not the longer "Problemas acompanhados" phrasing. PT-PT
- * singular only for one, plural for zero or more than one.
+ * visual-completion delta §5). Uppercase "PROBLEMA"/"PROBLEMAS" (owner
+ * request) — the compact inline Hero metric presentation (visual-convergence
+ * pass) reads as "6 PROBLEMAS", not the longer "Problemas acompanhados"
+ * phrasing. PT-PT singular only for one, plural for zero or more than one.
  */
 export function problemCountLabel(count: number): string {
-  return count === 1 ? "problema" : "problemas";
+  return count === 1 ? "PROBLEMA" : "PROBLEMAS";
 }
 
 /** Metrics label only — PT-PT singular only for one, plural for zero or more than one. */
@@ -77,6 +84,18 @@ export function sourceCountLabel(count: number): string {
 }
 
 /**
+ * Metrics label only, for the canonical corpus total (`totalRecordCount` —
+ * every record in the loaded index, every type). Unlike the other metric
+ * labels, this is a fixed phrase rather than a count-dependent singular/
+ * plural — "Total de registo" reads as broken PT-PT for a count of one, so
+ * "Total de registos" is used at every count, matching how the same figure
+ * already reads elsewhere as "Corpus: X registos" (Explorer.tsx).
+ */
+export function totalRecordCountLabel(): string {
+  return "Total de registos";
+}
+
+/**
  * The public first-contact projection. It deliberately uses only index
  * summaries: canonical PRB title/identity and schema-derived status fields.
  * It is not persisted and does not introduce an Overview-specific dataset.
@@ -96,6 +115,7 @@ export function computePublicOverviewData(records: RecordSummary[]): PublicOverv
     problemCount: problems.length,
     evidenceCount: records.filter((record) => record.type === "EVD-").length,
     sourceCount: records.filter((record) => record.type === "SRC-").length,
+    totalRecordCount: records.length,
     problems,
   };
 }

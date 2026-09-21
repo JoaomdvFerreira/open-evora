@@ -119,6 +119,7 @@ function FullOverview({
       problemCount={state.source.length}
       evidenceCount={41}
       sourceCount={17}
+      totalRecordCount={state.source.length + 41 + 17}
       citizenProblems={citizenProblems}
       visibleProblems={visibleProblems}
       paginatedProblems={paginatedProblems}
