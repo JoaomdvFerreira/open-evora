@@ -78,7 +78,11 @@ function useOverviewState(initial: { search?: string; source?: CitizenProblem[] 
   const [searchQuery, setSearchQuery] = useState(initial.search ?? "");
   const [topicFilter, setTopicFilter] = useState<string | null>(null);
   const [alteredThisWeekSelected, setAlteredThisWeekSelected] = useState(false);
-  const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("id");
+  // Default sort (Storybook fidelity correction): matches production
+  // Overview.tsx's own initial state — "updatedAt" descending, rendered as
+  // "Última atualização ↓" — not "id". `id` remains available via the
+  // existing SortControl.
+  const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("updatedAt");
   const [currentPage, setCurrentPage] = useState(1);
   const visibleProblems = useMemo(() => {
     const matched = source.filter(
@@ -141,46 +145,67 @@ function FullOverview({
   );
 }
 
+/**
+ * Storybook-only faithful reproduction of production's outer shell (App.tsx
+ * renders Overview inside exactly `<main id="main-content"
+ * className="explorer-shell">`). Overview's full-bleed rules (e.g. the
+ * negative margins on discovery/results) intentionally rely on the
+ * horizontal padding `.explorer-shell` itself owns in index.css — without
+ * this real shell class around it, a story has no such padding to bleed
+ * against, which can produce false horizontal scrolling and clip PRB ids,
+ * dates, or row content that render correctly in production. This wrapper
+ * introduces no Storybook-only CSS of its own (no duplicated padding, no
+ * overflow hiding) — it only reuses the production `explorer-shell` class so
+ * `index.css`'s real rules apply exactly as they do outside Storybook.
+ */
+function FullOverviewShell(props: Parameters<typeof FullOverview>[0]) {
+  return (
+    <main className="explorer-shell">
+      <FullOverview {...props} />
+    </main>
+  );
+}
+
 export const Desktop1440: Story = {
   name: "1440 desktop",
   globals: { viewport: { value: "reviewDesktop" } },
-  render: () => <FullOverview />,
+  render: () => <FullOverviewShell />,
 };
 
 export const Desktop1024Fit: Story = {
   name: "1024 desktop-fit",
   globals: { viewport: { value: "reviewDesktopFit" } },
-  render: () => <FullOverview />,
+  render: () => <FullOverviewShell />,
 };
 
 export const Boundary768: Story = {
   name: "768 boundary",
   globals: { viewport: { value: "reviewBoundary" } },
-  render: () => <FullOverview />,
+  render: () => <FullOverviewShell />,
 };
 
 export const Compact360: Story = {
   name: "360 compact",
   globals: { viewport: { value: "reviewCompact" } },
-  render: () => <FullOverview />,
+  render: () => <FullOverviewShell />,
 };
 
 export const ActiveSearch: Story = {
   name: "active search",
   globals: { viewport: { value: "reviewDesktop" } },
-  render: () => <FullOverview search="Évora" />,
+  render: () => <FullOverviewShell search="Évora" />,
 };
 
 export const NoResults: Story = {
   name: "no results",
   globals: { viewport: { value: "reviewDesktop" } },
-  render: () => <FullOverview search="xyz-sem-correspondencia" />,
+  render: () => <FullOverviewShell search="xyz-sem-correspondencia" />,
 };
 
 export const ProblemsLoading: Story = {
   name: "problems loading",
   globals: { viewport: { value: "reviewDesktop" } },
-  render: () => <FullOverview citizenProblemsOverride={null} visibleProblemsOverride={null} />,
+  render: () => <FullOverviewShell citizenProblemsOverride={null} visibleProblemsOverride={null} />,
 };
 
 const stressProblems: CitizenProblem[] = [
@@ -202,12 +227,12 @@ const stressProblems: CitizenProblem[] = [
 export const RealisticMaximumContentStress: Story = {
   name: "realistic maximum-content stress",
   globals: { viewport: { value: "reviewCompact" } },
-  render: () => <FullOverview source={stressProblems} />,
+  render: () => <FullOverviewShell source={stressProblems} />,
 };
 
 /** Material-change integration (Overview final redesign, Phase 2): one row (PRB-XXXX-2) carries the changed-row variant and marker, shown alongside every other row state. */
 export const MaterialChangeRow: Story = {
   name: "material change — row treatment",
   globals: { viewport: { value: "reviewDesktop" } },
-  render: () => <FullOverview withMaterialChanges />,
+  render: () => <FullOverviewShell withMaterialChanges />,
 };
