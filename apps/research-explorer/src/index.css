@@ -3436,6 +3436,38 @@ body:has(.public-overview) .public-footer {
     box-sizing: border-box;
   }
 
+  /* Header density (final Header-density correction pass): the >=1060 base
+     rules already converged the Header's horizontal grid/axes — this band
+     inherits that composition untouched (only the fit-grid padding-inline
+     above applies horizontally) but still reads as an undersized utility bar
+     next to TARGET's desktop editorial presence at 1024. A bounded,
+     desktop-fit-scale increase only: band height, wordmark, nav and CTA all
+     move a modest step up from the >=1060 base values here — nowhere near
+     the structurally different <=767 compact treatment (stacked layout,
+     graphic mark, full-width rows). Horizontal padding/inset, grouping and
+     gap are untouched; only vertical/typographic density changes. */
+  .explorer-chrome-inner {
+    /* `padding-block` only (not shorthand `padding`), so this rule — which
+       cascades after the fit-grid rule above — raises just the vertical
+       padding without resetting that rule's `padding-left`/`padding-right`
+       inset back to 0. */
+    padding-block: 10px;
+  }
+
+  .oe-logo--wordmark {
+    font-size: 22px;
+  }
+
+  .explorer-navigation .explorer-navigation-action {
+    padding: 0.4rem 0.85rem;
+    font-size: 14px;
+  }
+
+  .explorer-cta {
+    padding: 0.4rem 1rem;
+    font-size: 14px;
+  }
+
   /* Hero fit: desktop typography/copy/metrics stay exactly as approved at
      >=1060px (no rule below touches size, weight, family, or content) —
      only the >=1060 spacious vertical rhythm (104px/88px band padding, the
