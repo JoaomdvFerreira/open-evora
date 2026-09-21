@@ -452,20 +452,14 @@ export interface TopicCategoryCount {
 }
 
 /**
- * The category drawer's normal-topic shortlist size (Overview
- * visual-convergence pass — TARGET's "Todos + top 5 real topics + Alterados
- * esta semana" composition). Bounds `topCategoryCounts`'s own `limit`
- * parameter for that one caller; `Todos` and `Alterados esta semana` are
- * never subject to this cap — see OverviewPresentation.tsx.
- */
-export const MAX_OVERVIEW_TOPIC_SHORTCUTS = 5;
-
-/**
  * The `limit` canonical domain codes with the highest Problem counts. Used by
  * the category drawer (Overview final redesign, Phase 1) to compute each
- * topic's real, unfiltered count — callers pass `allTopicCodes().length` as
- * `limit` there so every audited topic is represented, not only a ranked
- * top-N. One Problem carrying multiple domain codes counts once toward each
+ * topic's real, unfiltered count. `OverviewPresentation.tsx` passes no
+ * effective limit (`Number.POSITIVE_INFINITY`) so every topic present in at
+ * least one currently loaded Problem is shown — a top-5 presentation cap
+ * shipped briefly in the visual-convergence pass but was removed as a
+ * production regression (topics beyond the top 5 were unreachable from the
+ * drawer). One Problem carrying multiple domain codes counts once toward each
  * of its codes (the same "any one of its domains" membership
  * `matchesTopicFilter` already uses), never toward only one chosen "primary"
  * domain (AGENTS.md "Human-owned decisions" — this presentation layer does
