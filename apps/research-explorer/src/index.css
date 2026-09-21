@@ -1128,7 +1128,7 @@ main.explorer-shell {
   display: flex;
   flex-direction: column;
   align-items: start;
-  max-width: 40rem;
+  max-width: 50rem;
 }
 
 .overview-hero-eyebrow {
@@ -1193,7 +1193,7 @@ main.explorer-shell {
 
 .overview-hero-supporting {
   margin: 0 0 46px;
-  max-width: 42ch;
+  max-width: 62ch;
   color: var(--color-ink-secondary);
   font-family: var(--font-reading);
   font-size: 21px;
