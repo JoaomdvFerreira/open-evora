@@ -49,7 +49,7 @@ describe("PublicFooter — editorial identity/PROJETO/DADOS structure (Overview 
 
     const footer = screen.getByRole("contentinfo");
     expect(within(footer).getByText("Open Évora")).toBeTruthy();
-    expect(within(footer).getByText(/Projeto independente de investigação cívica\. Não oficial\./)).toBeTruthy();
+    expect(within(footer).getByText(/Projecto independente de investigação cívica\. Sem ligação à/)).toBeTruthy();
   });
 
   it("renders the PROJETO and DADOS groups with truthful existing destinations", () => {

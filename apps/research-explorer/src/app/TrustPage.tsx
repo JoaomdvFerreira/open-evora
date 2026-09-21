@@ -78,7 +78,7 @@ export function PublicFooter() {
       <div className="public-footer-inner shell-frame shell-frame--wide">
         <div className="public-footer-identity">
           <p className="public-footer-brand">Open Évora</p>
-          <p className="public-footer-summary">Projeto independente de investigação cívica. Não oficial. Todo o conteúdo remete para fontes identificáveis.</p>
+          <p className="public-footer-summary">Projecto independente de investigação cívica. Sem ligação à<br />autarquia. Todo o conteúdo remete para fontes verificáveis.</p>
         </div>
         <div className="public-footer-groups">
           <nav className="public-footer-group" aria-label="Projeto">
