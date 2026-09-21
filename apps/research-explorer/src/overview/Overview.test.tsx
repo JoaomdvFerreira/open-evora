@@ -156,10 +156,10 @@ describe("Overview — final Hero", () => {
     render(<Overview dataProvider={provider} {...props} />);
 
     // Compact inline metric presentation (visual-convergence pass): value
-    // and label share one line, e.g. "2 PROBLEMAS" — no separate stacked
-    // label element. Problem label is uppercase (owner request).
+    // and label share one line, e.g. "2 Problemas" — no separate stacked
+    // label element.
     const problemMetric = (await screen.findByText("2", { selector: ".overview-metric-value" })).closest(".overview-metric");
-    expect(problemMetric?.textContent).toBe("2 PROBLEMAS");
+    expect(problemMetric?.textContent).toBe("2 Problemas");
 
     const evidenceMetric = screen.getByText("3", { selector: ".overview-metric-value" }).closest(".overview-metric");
     expect(evidenceMetric?.textContent).toBe("3 Registos de evidência");

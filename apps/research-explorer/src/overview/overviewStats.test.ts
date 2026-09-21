@@ -793,9 +793,9 @@ describe("matchesCitizenSearch", () => {
 
 describe("public Overview metrics count grammar", () => {
   it("uses PT-PT singular only for one, and plural for zero or more than one", () => {
-    expect(problemCountLabel(0)).toBe("PROBLEMAS");
-    expect(problemCountLabel(1)).toBe("PROBLEMA");
-    expect(problemCountLabel(2)).toBe("PROBLEMAS");
+    expect(problemCountLabel(0)).toBe("Problemas");
+    expect(problemCountLabel(1)).toBe("Problema");
+    expect(problemCountLabel(2)).toBe("Problemas");
     expect(evidenceCountLabel(0)).toBe("Registos de evidência");
     expect(evidenceCountLabel(1)).toBe("Registo de evidência");
     expect(evidenceCountLabel(2)).toBe("Registos de evidência");
