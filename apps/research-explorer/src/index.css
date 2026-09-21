@@ -3944,18 +3944,21 @@ body:has(.public-overview) .public-footer {
 
   /* Compact Hero (<=767px, visual-completion compact pass, task §3/§4;
      tightened further in the visual-convergence pass, task §4; tightened
-     again in the final density pass, task §5): vertical padding only — no
-     horizontal padding of its own. `main.explorer-shell`'s own compact 1rem
-     gutter (base rule above) is the Hero's sole horizontal inset, the same
-     axis discovery/rows/Footer already share, so Hero text starts flush
-     with the rest of the page instead of sitting behind a second, redundant
-     inset (never reintroducing that double gutter). Every internal gap
-     below is reduced again from the visual-convergence pass's values — the
-     headline hierarchy/copy/metric count are untouched, only the rhythm
-     between them converges further toward TARGET's noticeably shorter
-     compact Hero. */
+     again in the final density pass, task §5; RESTORED in the final compact
+     fixes pass, task §2): vertical padding only — no horizontal padding of
+     its own. `main.explorer-shell`'s own compact 1rem gutter (base rule
+     above) is the Hero's sole horizontal inset, the same axis discovery/
+     rows/Footer already share, so Hero text starts flush with the rest of
+     the page instead of sitting behind a second, redundant inset (never
+     reintroducing that double gutter). The density pass's vertical padding
+     had been compressed too far — TARGET keeps deliberate editorial
+     breathing room both above the eyebrow (separation from Header) and below
+     the metrics (separation from the discovery divider); this raises only
+     the section's own top/bottom padding-block back toward that room. Every
+     internal gap/margin between eyebrow/headline/copy/metrics stays
+     untouched, as does every child's typography. */
   .overview-hero {
-    padding: 0.65rem 0 0.85rem;
+    padding: 1.35rem 0 1.55rem;
   }
 
   .overview-hero-content {
@@ -4052,24 +4055,35 @@ body:has(.public-overview) .public-footer {
 
   /* Compact category rail (visual-completion compact pass, task §10; density
      + scrollbar converged toward TARGET in the visual-convergence pass, task
-     §11/§12): when Filtros is open, topic options render as ONE horizontally
-     scrollable rail — `flex-wrap: nowrap` plus each option's own
-     `flex: 0 0 auto` (below) so chips keep their intrinsic width instead of
-     wrapping into several rows. Collapsed-by-default state is untouched
-     (drawerOpen stays `false` initially — OverviewPresentation.tsx's own
-     local state); this only changes how the drawer looks once opened. Local
-     overflow only: the rail itself may scroll horizontally, the page must
-     not — `overflow-x: hidden` on any ancestor is deliberately not used to
-     achieve that (task §15), this rail's own bounded `overflow-x: auto` is
-     the sole scroll container. Negative-margin bleed matches
-     `.overview-discovery`'s own compact 1rem gutter above so the rail can
-     use the full viewport width for scrolling while its content still
-     starts flush with the shared content axis. */
+     §11/§12; CORRECTED in the final compact fixes pass, task §4/§5/§6): when
+     Filtros is open, topic options render as ONE horizontally scrollable
+     rail — `flex-wrap: nowrap` plus each option's own `flex: 0 0 auto`
+     (below) so chips keep their intrinsic width instead of wrapping into
+     several rows. Collapsed-by-default state is untouched (drawerOpen stays
+     `false` initially — OverviewPresentation.tsx's own local state); this
+     only changes how the drawer looks once opened. Local overflow only: the
+     rail itself may scroll horizontally, the page must not — `overflow-x:
+     hidden` on any ancestor is deliberately not used to achieve that (task
+     §15), this rail's own bounded `overflow-x: auto` is the sole scroll
+     container.
+
+     The earlier negative-margin bleed (`margin: 0 -1rem` + `padding: ... 1rem
+     ...`) was wrong: it took the SCROLL CONTAINER itself out to the true
+     viewport edge and relied on its own inner padding to push the first chip
+     back onto the content axis, which also put the scrollbar track flush
+     against the viewport edge instead of the content column. The drawer
+     already sits inside `main.explorer-shell`'s own compact 1rem gutter
+     (base rule above) — the same containing block `.overview-toolbar` (no
+     horizontal margin/padding of its own here either) and Search/Filtros
+     share — so no horizontal margin or padding is needed at all: the drawer
+     box, its first chip, and its scrollbar track all start on that same
+     shared compact content axis. Horizontal scrolling stays local to the
+     rail's own bounded `overflow-x: auto`; only vertical padding remains,
+     for rail rhythm. */
   .overview-category-drawer {
     flex-wrap: nowrap;
     gap: 0.32rem;
-    margin: 0 -1rem;
-    padding: 0.45rem 1rem 0.6rem;
+    padding: 0.45rem 0 0.6rem;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;

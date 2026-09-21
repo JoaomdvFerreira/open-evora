@@ -131,6 +131,21 @@ describe("index.css — compact Hero gutter/density (<=767px, task §3/§4)", ()
       expect(declaration).toMatch(/padding:\s*\S+\s+0(\s|;)/);
     }
   });
+
+  /** Final compact fixes pass, task §2/§3: the section itself must own
+   * deliberate top/bottom whitespace (separation from Header above, from the
+   * discovery divider below) — a real editorial breathing-room value, not
+   * the density pass's over-compressed `0.65rem`/`0.85rem`. Only the
+   * section's own padding-block changes; internal margins/gaps and every
+   * child's typography stay whatever the surrounding rules already set. */
+  it("owns explicit, non-trivial top and bottom section padding (restored breathing room, not the over-compressed density-pass values)", () => {
+    const heroBody = bodyFromAnyBlock(blocks, ".overview-hero");
+    const match = heroBody.match(/padding:\s*([\d.]+)rem\s+0\s+([\d.]+)rem/);
+    expect(match).not.toBeNull();
+    const [, topRem, bottomRem] = match as RegExpMatchArray;
+    expect(Number(topRem)).toBeGreaterThan(1);
+    expect(Number(bottomRem)).toBeGreaterThan(1);
+  });
 });
 
 describe("index.css — compact metrics as a vertical technical list (<=767px, task §6)", () => {
@@ -214,16 +229,25 @@ describe("index.css — compact category rail (<=767px, task §10)", () => {
     }
   });
 
-  /** Final alignment pass, task §4/§5: the rail's own bleed (`margin: 0
-   * -1rem`) must re-add exactly the same 1rem it cancels (`padding: ...
-   * 1rem`), so its first chip starts on the same shared compact content
-   * axis as Search/Filtros/row content (all inset by `main.explorer-
-   * shell`'s own compact 1rem gutter) — never a narrower box of its own
-   * that would also need its own left inset. */
-  it("bleeds full width and re-establishes exactly the shared 1rem gutter as its own start padding (never a narrower rail box)", () => {
+  /** Final compact fixes pass, task §4/§5/§6: the rail must NOT be a
+   * full-bleed scroll viewport — it stays inside `main.explorer-shell`'s own
+   * compact 1rem gutter (the same containing block Search/Filtros/row
+   * content share), so its first chip and its own box both start on that
+   * same shared compact content axis without any horizontal margin/padding
+   * of the drawer's own (no negative-margin bleed, no re-added horizontal
+   * padding double-insetting the chips). */
+  it("has no negative horizontal margin and no horizontal padding of its own — the drawer box shares the compact content axis directly", () => {
     const drawerBody = bodyFromAnyBlock(blocks, ".overview-category-drawer");
-    expect(drawerBody).toMatch(/margin:\s*0\s+-1rem/);
-    expect(drawerBody).toMatch(/padding:\s*\S+\s+1rem/);
+    expect(drawerBody).not.toMatch(/margin:\s*[^;]*-1rem/);
+    expect(drawerBody).not.toMatch(/margin-(left|right):\s*-/);
+    const paddingDeclarations = drawerBody.match(/padding:\s*([^;]+);/g) ?? [];
+    expect(paddingDeclarations.length).toBeGreaterThan(0);
+    for (const declaration of paddingDeclarations) {
+      // A vertical-only `padding` shorthand always writes an explicit `0`
+      // horizontal term (`<top> 0 <bottom>` or `<top> 0`) — same convention
+      // `.overview-hero`'s own vertical-only compact padding uses.
+      expect(declaration).toMatch(/padding:\s*\S+\s+0(\s|;)/);
+    }
   });
 });
 
