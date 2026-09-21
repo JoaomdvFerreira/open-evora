@@ -1,31 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
-import type { DataProvider } from "../dataProvider/types";
+import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordIndex } from "../records/useRecordIndex";
 import {
   computePublicOverviewData,
-  formatEvidenceCount,
-  formatProblemCount,
+  getLisbonCivilDate,
+  latestMaterialChangeInCivilWeekOfByProblem,
   matchesCitizenSearch,
   matchesTopicFilter,
-  relevantTopicCodes,
-  toCitizenProblem,
+  overviewPageCount,
+  paginateProblems,
+  problemIdsAlteredInCivilWeekOf,
   projectMaterialChangeEntries,
+  sortProblems,
+  toCitizenProblem,
   type CitizenProblem,
   type MaterialChangeEntry,
-  type MaterialChangeSource,
+  type ProblemSortOrder,
 } from "./overviewStats";
-import { formatPublicCount, publicEnumLabel, publicCompactEnumLabel } from "../presentation/presentation";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
-import { CitizenProblemCard, CitizenSearchControl, TopicFilterGroup } from "./CitizenDiscovery";
-import { MaterialChangeTimeline } from "./MaterialChangeTimeline";
-
-const MATERIAL_CHANGE_PRESENTATION_LIMIT = 5;
-
-interface MaterialChangesState {
-  entries: MaterialChangeEntry[];
-  complete: boolean;
-}
+import { OverviewPresentation } from "./OverviewPresentation";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -34,68 +28,146 @@ const ERROR_TITLES: Record<string, string> = {
   network: "Falha ao carregar a visão geral",
 };
 
+// How often Overview re-checks whether the Europe/Lisbon civil date has
+// rolled over while mounted (Overview final redesign, Phase 2 — Lisbon
+// date-boundary hardening). Day/week-boundary staleness is the only thing
+// this guards against, so a coarse interval is sufficient; this never
+// updates state unless the resolved civil date actually changed (see
+// `useLisbonCivilDate` below).
+const LISBON_CIVIL_DATE_POLL_INTERVAL_MS = 60_000;
+
 /**
- * Citizen-first Overview (WU054). Loads the same index.json summaries as
- * before, then resolves each PRB's full canonical detail once (the same
- * `getRecord()` reads the previous Overview already performed only to
- * resolve titles) and projects each into a runtime-only `CitizenProblem`
- * (overviewStats.ts's `toCitizenProblem`) — never persisted, never a second
- * parallel data path. Search and topic filters operate purely client-side
- * over that projection; PRB ID order is the deterministic neutral ordering
- * throughout, unaffected by search/filter/ranking.
+ * Overview's single source of "what is today, in the Europe/Lisbon civil
+ * calendar" (Lisbon date-boundary hardening). Both the `Alterados esta
+ * semana` shortcut and the row-level changed treatment must agree on exactly
+ * the same civil date, so this is the one place either is read from — never
+ * a separate implicit `new Date()` inside each projection.
+ *
+ * A lightweight interval timer re-resolves `getLisbonCivilDate()` and only
+ * calls `setState` when the resolved civil date actually differs from the
+ * current one, so a mounted Overview picks up a Lisbon civil-day/week
+ * rollover without requiring a remount or an unrelated re-render to trigger
+ * it. The timer is cleared on unmount.
+ */
+function useLisbonCivilDate(): string {
+  const [civilDate, setCivilDate] = useState(() => getLisbonCivilDate());
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const next = getLisbonCivilDate();
+      setCivilDate((current) => (current === next ? current : next));
+    }, LISBON_CIVIL_DATE_POLL_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  return civilDate;
+}
+
+/**
+ * Citizen-first Overview (WU054; final macro-structure per Overview final
+ * redesign, Phase 1; material-change integration per Phase 2). Loads the
+ * same index.json summaries as before, then resolves each PRB's full
+ * canonical detail once (the same `getRecord()` reads the previous Overview
+ * already performed only to resolve titles) and projects each into a
+ * runtime-only `CitizenProblem` (overviewStats.ts's `toCitizenProblem`) —
+ * never persisted, never a second parallel data path. Search and topic
+ * filters operate purely client-side over that projection; PRB ID order is
+ * the deterministic neutral ordering throughout, unaffected by
+ * search/filter/ranking.
+ *
+ * Phase 2 reuses that same per-PRB `getRecord()` detail read (never a second
+ * fetch) to also project each detail's canonical `history[]` via
+ * `projectMaterialChangeEntries`, feeding both the row-level changed
+ * treatment (`latestMaterialChangeInCivilWeekOfByProblem`) and the
+ * `Alterados esta semana` shortcut (`problemIdsAlteredInCivilWeekOf`) from
+ * the same civil-week membership (weekly-emphasis correction) — a Problem
+ * only ever gets the changed-row treatment when it also counts toward the
+ * shortcut; a Problem whose only history is outside the current civil week
+ * renders on the normal neutral row path, even though
+ * `latestMaterialChangeByProblem` (kept for other historical uses) would
+ * still report an entry for it. Both projections are derived from the same
+ * `useLisbonCivilDate()` value (Lisbon date-boundary hardening) rather than
+ * each calling `new Date()`/`getLisbonCivilDate()` independently, so they can
+ * never disagree even at the instant the civil date rolls over. A PRB whose
+ * detail read fails degrades the same way `toCitizenProblem` already does —
+ * the existing `catch` substitutes an empty `record: {}`, which carries no
+ * `history`, so that Problem simply contributes no material-change entries
+ * (row stays on the neutral path, cannot count toward the weekly shortcut)
+ * without being dropped from the normal list or blocking anyone else's
+ * projection (§9 graceful degradation — never a reinterpretation of
+ * `updated_at` as a fallback history signal).
  */
 export function Overview({
   dataProvider,
   onExploreProblem,
-  onViewRecords,
 }: {
   dataProvider: DataProvider;
   onExploreProblem: (id: string) => void;
-  onViewRecords: () => void;
 }) {
   const indexState = useRecordIndex(dataProvider);
   const [citizenProblems, setCitizenProblems] = useState<CitizenProblem[] | null>(null);
-  const [materialChanges, setMaterialChanges] = useState<MaterialChangesState | null>(null);
+  const [materialChangeEntries, setMaterialChangeEntries] = useState<MaterialChangeEntry[]>([]);
+  // The one current Europe/Lisbon civil date Overview evaluates every
+  // "esta semana" judgement against (Lisbon date-boundary hardening) — see
+  // `useLisbonCivilDate`'s own doc comment.
+  const lisbonCivilDate = useLisbonCivilDate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTopic, setActiveTopic] = useState<string | null>(null);
+  // TEMA is the sole remaining normal Overview filter dimension (Overview
+  // final redesign, Phase 1, delta §6) — EVIDÊNCIA/VALIDAÇÃO/ESTADO were
+  // removed outright, not moved into the category drawer. `Alterados esta
+  // semana` (Phase 2, §7) is a separate, mutually-exclusive shortcut
+  // selection: selecting one clears the other, and `Todos` clears both.
+  const [topicFilter, setTopicFilter] = useState<string | null>(null);
+  const [alteredThisWeekSelected, setAlteredThisWeekSelected] = useState(false);
+  // Default sort (Overview visual-convergence pass): existing `updatedAt`
+  // descending — the Problem's own canonical `updatedAt`, most recently
+  // updated first, null-last, deterministic ties (sortProblems's own doc
+  // comment). Rendered as "Última atualização ↓" (CitizenDiscovery.tsx's
+  // SortControl) — deliberately not "última alteração", which names the Hero
+  // ruler's authored material-change date, a different canonical signal (see
+  // OverviewPresentation.tsx). `id` remains available as the alternative
+  // order via SortControl.
+  const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("updatedAt");
+  // Pagination (Overview visual-completion): applies strictly after search,
+  // filters, and sort (see overviewStats.ts's `paginateProblems`). Resets to
+  // page 1 whenever any of those upstream inputs change, below, so a stale
+  // page number never survives a search/filter/sort change that shrinks or
+  // reorders the result set.
+  const [currentPage, setCurrentPage] = useState(1);
   const overview = indexState.status === "ready" ? computePublicOverviewData(indexState.records) : null;
   const problemIds = overview?.problems.map((problem) => problem.id).join("|") ?? "";
 
   useEffect(() => {
     if (indexState.status !== "ready") {
       setCitizenProblems(null);
-      setMaterialChanges(null);
+      setMaterialChangeEntries([]);
       return;
     }
     let cancelled = false;
     setCitizenProblems(null);
-    setMaterialChanges(null);
+    setMaterialChangeEntries([]);
     const summaries = indexState.records.filter((record) => record.type === "PRB-");
     Promise.all(
       summaries.map(async (summary) => {
         try {
           const detail = await dataProvider.getRecord(summary.id);
-          return {
-            problem: toCitizenProblem(summary, detail),
-            source: { summary, detail } satisfies MaterialChangeSource,
-            materialHistoryLoaded: true,
-          };
+          return { summary, detail };
         } catch {
-          const detail = { id: summary.id, type: summary.type, file: summary.file, record: {}, outgoingEdges: [], incomingEdges: [] };
-          return {
-            problem: toCitizenProblem(summary, detail),
-            materialHistoryLoaded: false,
-          };
+          const detail: RecordDetail = { id: summary.id, type: summary.type, file: summary.file, record: {}, outgoingEdges: [], incomingEdges: [] };
+          return { summary, detail };
         }
       })
-    ).then((loaded) => {
-      if (!cancelled) {
-        setCitizenProblems(loaded.map(({ problem }) => problem).sort((a, b) => a.id.localeCompare(b.id)));
-        setMaterialChanges({
-          entries: projectMaterialChangeEntries(loaded.flatMap(({ source }) => source === undefined ? [] : [source])),
-          complete: loaded.every(({ materialHistoryLoaded }) => materialHistoryLoaded),
-        });
-      }
+    ).then((resolved: { summary: RecordSummary; detail: RecordDetail }[]) => {
+      if (cancelled) return;
+      setCitizenProblems(
+        resolved.map(({ summary, detail }) => toCitizenProblem(summary, detail)).sort((a, b) => a.id.localeCompare(b.id))
+      );
+      // Same resolved detail reads, reused rather than re-fetched (§1/§9) —
+      // a Problem whose read failed above contributes an empty `record: {}`
+      // here too, which `projectMaterialChangeEntries` already treats as "no
+      // authored history" (see its own doc comment), never as a fallback
+      // material-change signal.
+      setMaterialChangeEntries(projectMaterialChangeEntries(resolved));
     });
     return () => {
       cancelled = true;
@@ -103,20 +175,68 @@ export function Overview({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- problemIds is a stable content-based key for the summaries above
   }, [dataProvider, indexState.status, problemIds]);
 
-  const topicCodes = useMemo(() => (citizenProblems ? relevantTopicCodes(citizenProblems) : []), [citizenProblems]);
+  // This-civil-week latest material change per Problem (row-level changed
+  // treatment) and the distinct set of Problems qualifying for `Alterados
+  // esta semana` (Overview final redesign, Phase 2 — weekly-emphasis
+  // correction; Lisbon date-boundary hardening) — both derived from the same
+  // `materialChangeEntries` projection AND the same `lisbonCivilDate` value
+  // (never each calling `new Date()`/`getLisbonCivilDate()` on its own),
+  // recomputed whenever either changes. Using the civil-date-input helpers
+  // directly (`latestMaterialChangeInCivilWeekOfByProblem`/
+  // `problemIdsAlteredInCivilWeekOf`) avoids converting the shared civil date
+  // back into an artificial instant merely to re-resolve it.
+  const latestChangeByProblem = useMemo(
+    () => latestMaterialChangeInCivilWeekOfByProblem(materialChangeEntries, lisbonCivilDate),
+    [materialChangeEntries, lisbonCivilDate]
+  );
+  const alteredThisWeekIds = useMemo(
+    () => problemIdsAlteredInCivilWeekOf(materialChangeEntries, lisbonCivilDate),
+    [materialChangeEntries, lisbonCivilDate]
+  );
 
   const visibleProblems = useMemo(() => {
     if (!citizenProblems) return null;
-    return citizenProblems.filter((problem) => matchesTopicFilter(problem, activeTopic) && matchesCitizenSearch(problem, searchQuery));
-  }, [citizenProblems, activeTopic, searchQuery]);
+    const matched = citizenProblems.filter(
+      (problem) =>
+        matchesCitizenSearch(problem, searchQuery) &&
+        matchesTopicFilter(problem, topicFilter) &&
+        (!alteredThisWeekSelected || alteredThisWeekIds.has(problem.id))
+    );
+    return sortProblems(matched, sortOrder);
+  }, [citizenProblems, searchQuery, topicFilter, alteredThisWeekSelected, alteredThisWeekIds, sortOrder]);
+
+  // Reset to page 1 whenever search, either category-drawer selection, or
+  // sort changes — never on a page-count shrink alone from unrelated causes
+  // (e.g. a re-fetch), since `paginateProblems` already clamps a stale page
+  // number defensively.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, topicFilter, alteredThisWeekSelected, sortOrder]);
+
+  // Category-drawer shortcut selections are mutually exclusive with the
+  // normal TEMA topic filter (§7): selecting a topic clears the shortcut;
+  // selecting the shortcut clears the topic; and `Todos` — `topicFilter` set
+  // to `null` via the existing `onTopicFilterChange` path, which
+  // `CategoryDrawer`'s own `Todos` button always calls — clears both.
+  const handleTopicFilterChange = (value: string | null) => {
+    setTopicFilter(value);
+    setAlteredThisWeekSelected(false);
+  };
+  const handleAlteredThisWeekChange = (selected: boolean) => {
+    setAlteredThisWeekSelected(selected);
+    if (selected) setTopicFilter(null);
+  };
+
+  const pageCount = visibleProblems === null ? 1 : overviewPageCount(visibleProblems.length);
+  const paginatedProblems = visibleProblems === null ? null : paginateProblems(visibleProblems, currentPage);
 
   if (indexState.status === "loading") {
-    return <div className="shell-frame"><ProgressMessage message="A carregar visão geral…" /></div>;
+    return <div className="shell-frame shell-frame--wide"><ProgressMessage message="A carregar visão geral…" /></div>;
   }
 
   if (indexState.status === "error") {
     return (
-      <div className="shell-frame">
+      <div className="shell-frame shell-frame--wide">
         <ErrorNotice
           titleAs="h2"
           title={ERROR_TITLES[indexState.error.kind] ?? "Não foi possível carregar a visão geral"}
@@ -133,109 +253,29 @@ export function Overview({
 
   if (overview === null) return null;
 
-  const unvalidatedLabel = publicEnumLabel("validation_status", "unvalidated");
-  const corroboratedLabel = publicEnumLabel("evidence_status", "corroborated");
-  const compactCorroboratedLabel = publicCompactEnumLabel("evidence_status", "corroborated");
   return (
-    <section aria-labelledby="overview-heading" className="public-overview shell-frame">
-      <h2 id="overview-heading">Visão geral</h2>
-
-      <p className="overview-independence">
-        <span className="overview-desktop-copy"><strong>Projeto independente.</strong> Não representa a Câmara Municipal de Évora nem qualquer entidade oficial; não é um serviço ou plataforma municipal oficial.</span>
-        <span className="overview-mobile-copy">Projeto independente — não oficial</span>
-      </p>
-
-      <div className="overview-hero">
-        <h3 className="overview-hero-headline">Investigamos problemas práticos que afetam Évora.</h3>
-        <p className="overview-hero-supporting">Reunimos fontes e evidência para mostrar o que sabemos, o que ainda não sabemos e o que mudou.</p>
-      </div>
-
-      <section className="overview-concepts" aria-label="O que contém o Explorador">
-        <div>
-          <h3>Problemas</h3>
-          <p>Fricções cívicas identificadas a partir de evidência — com o que já se sabe e o que ainda não se sabe.</p>
-        </div>
-        <div>
-          <h3>Evidência</h3>
-          <p>Registos individuais — institucionais, públicos, comunitários e de intervenientes — que sustentam, contestam ou atualizam cada leitura.</p>
-        </div>
-        <div>
-          <h3>Proveniência e incerteza</h3>
-          <p>Cada registo mantém a sua origem. O que ainda não sabemos é registado explicitamente, não escondido.</p>
-        </div>
-      </section>
-
-      <details className="overview-status-explanation">
-        <summary>
-          <span className="overview-desktop-copy">Os problemas abaixo estão confirmados? O que significam os estados?</span>
-          <span className="overview-mobile-copy">O que é isto, e os problemas estão confirmados?</span>
-        </summary>
-        <p className="overview-desktop-copy">Nenhum problema listado é uma conclusão fechada. <strong>{unvalidatedLabel}</strong> significa que a validação formal ainda está pendente — não que o problema seja falso. <strong>{corroboratedLabel}</strong> descreve o estado atual da evidência reunida; não torna o problema uma conclusão encerrada.</p>
-        <p className="overview-mobile-copy">Este Explorador dá acesso a evidências e incertezas — não é um serviço oficial. <strong>{unvalidatedLabel}</strong> não significa falso; <strong>{compactCorroboratedLabel}</strong> descreve o estado atual da evidência, não uma conclusão fechada.</p>
-      </details>
-
-      <section id="overview-problemas" aria-labelledby="overview-problemas-heading">
-        <div className="overview-problems-heading">
-          <h3 id="overview-problemas-heading">Problemas em investigação ({formatPublicCount(overview.problemCount)})</h3>
-        </div>
-
-        <p className="overview-coverage-caveat">Os problemas apresentados são os atualmente acompanhados pelo Open Évora. Não constituem um inventário completo dos problemas existentes em Évora.</p>
-
-        <p className="overview-ordering-note">Ordenados por identificador — a ordem não representa prioridade ou relevância.</p>
-
-        <CitizenSearchControl value={searchQuery} onChange={setSearchQuery} />
-        <TopicFilterGroup topicCodes={topicCodes} activeTopic={activeTopic} onChange={setActiveTopic} />
-
-        {citizenProblems === null || visibleProblems === null ? (
-          <ProgressMessage message="A carregar problemas…" />
-        ) : (
-          <>
-            <div aria-live="polite" aria-atomic="true">
-              {visibleProblems.length === 0 ? (
-                <p className="overview-empty-state">Nenhum problema corresponde à pesquisa ou ao filtro selecionado.</p>
-              ) : (
-                <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} de {formatPublicCount(citizenProblems.length)} problemas</p>
-              )}
-            </div>
-            {visibleProblems.length > 0 && (
-              <ul className="overview-problem-list">
-                {visibleProblems.map((problem) => (
-                  <CitizenProblemCard key={problem.id} problem={problem} onExplore={onExploreProblem} />
-                ))}
-              </ul>
-            )}
-          </>
-        )}
-      </section>
-
-      <section className="material-change-timeline" aria-labelledby="material-change-heading">
-        <div className="overview-problems-heading">
-          <h3 id="material-change-heading">O que mudou recentemente</h3>
-        </div>
-        {materialChanges === null ? (
-          <ProgressMessage message="A carregar alterações materiais…" />
-        ) : (
-          <>
-            {!materialChanges.complete && (
-              <ErrorNotice
-                title="Não foi possível carregar todo o histórico material"
-                message="Não foi possível carregar o detalhe de alguns problemas. As alterações apresentadas podem estar incompletas."
-              />
-            )}
-            {(materialChanges.complete || materialChanges.entries.length > 0) && (
-              <MaterialChangeTimeline entries={materialChanges.entries.slice(0, MATERIAL_CHANGE_PRESENTATION_LIMIT)} onExploreProblem={onExploreProblem} />
-            )}
-          </>
-        )}
-      </section>
-
-      <p className="overview-trust"><strong>Base explícita.</strong> Cada leitura remete para registos identificáveis e para a evidência que a sustenta, refina, contesta ou atualiza. A proveniência é preservada e rastreável, sem implicar que toda a evidência tenha a mesma força.</p>
-
-      <p className="overview-closing-actions">
-        <button type="button" onClick={onViewRecords}>Ver todos os registos →</button>
-      </p>
-
-      <p className="overview-corpus-context">{formatProblemCount(overview.problemCount)} · {formatEvidenceCount(overview.evidenceCount)} · investigação em atualização contínua</p>
-    </section>
+    <OverviewPresentation
+      problemCount={overview.problemCount}
+      evidenceCount={overview.evidenceCount}
+      sourceCount={overview.sourceCount}
+      totalRecordCount={overview.totalRecordCount}
+      citizenProblems={citizenProblems}
+      visibleProblems={visibleProblems}
+      paginatedProblems={paginatedProblems}
+      currentPage={currentPage}
+      pageCount={pageCount}
+      onPageChange={setCurrentPage}
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      topicFilter={topicFilter}
+      onTopicFilterChange={handleTopicFilterChange}
+      alteredThisWeekSelected={alteredThisWeekSelected}
+      onAlteredThisWeekChange={handleAlteredThisWeekChange}
+      alteredThisWeekCount={alteredThisWeekIds.size}
+      latestChangeByProblem={latestChangeByProblem}
+      sortOrder={sortOrder}
+      onSortOrderChange={setSortOrder}
+      onExploreProblem={onExploreProblem}
+    />
   );
 }

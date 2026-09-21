@@ -520,10 +520,11 @@ function ProblemCompactSectionIndex({ record }: { record: Record<string, unknown
  */
 function recentMaterialHistory(record: Record<string, unknown>, problemId: string, title: string): MaterialChangeEntry[] {
   if (!Array.isArray(record.history)) return [];
+  const domainCodes = stringValues(record.domain);
   return record.history.map(recordValue).filter((entry): entry is Record<string, unknown> => entry !== null).flatMap((entry) => {
     const date = fieldValue(entry, "date");
     const summary = fieldValue(entry, "summary");
-    return date && summary ? [{ problemId, problemTitle: title, date, summary }] : [];
+    return date && summary ? [{ problemId, problemTitle: title, date, summary, domainCodes }] : [];
   }).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
 }
 

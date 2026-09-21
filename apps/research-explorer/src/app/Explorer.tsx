@@ -8,6 +8,7 @@ import { ProblemHistoryView } from "../problem/ProblemHistoryView";
 import { ReadingGuide } from "../guide/ReadingGuide";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ExplorerHeader } from "./ExplorerHeader";
+import { formatPublicCount, formatPublicDateTime } from "../presentation/presentation";
 
 // RE-05: lazily imported, not just GraphCanvas's Sigma module inside it —
 // GraphExplorer's own module graph (Graphology + buildGraphModel/neighbourhood/
@@ -21,6 +22,10 @@ interface ExplorerProps {
   dataProvider: DataProvider;
   /** manifest.schemaPrefixes — passed down so the reading guide's type list is data-driven, not hardcoded. */
   schemaPrefixes?: string[];
+  /** manifest.totalRecords — the same canonical corpus count shown in the "Corpus: X registos" summary below (every view except Overview, which now has no total-records metric of its own — Overview final redesign, Phase 1). */
+  totalRecords?: number;
+  /** manifest.generatedAt — read-model build timestamp for the "Corpus: X registos" summary below (ODM-020: build/generation time, distinct from research currentness). */
+  generatedAt?: string;
 }
 
 /**
@@ -29,7 +34,7 @@ interface ExplorerProps {
  * via useExplorerUrlState and passes it down as controlled props —
  * Overview/RecordsExplorer/ProblemView own no competing copy of this state.
  */
-export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
+export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generatedAt }: ExplorerProps) {
   const url = useExplorerUrlState();
 
   useEffect(() => {
@@ -51,8 +56,9 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
     <>
       <ExplorerHeader
         activeView={url.state.view}
-        onOverview={() => url.clearSelectionAndSetView("overview")}
-        onRecords={() => url.clearSelectionAndSetView("records")}
+        activeTypeFilter={url.state.typeFilter}
+        onProblemas={() => url.clearSelectionAndSetView("overview")}
+        onFontes={url.goToSourcesInRecords}
       />
 
       {url.state.view === "graph" && <ReadingGuide schemaPrefixes={schemaPrefixes} />}
@@ -61,7 +67,6 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
         <Overview
           dataProvider={dataProvider}
           onExploreProblem={(id) => url.setViewAndSelection("problem", id)}
-          onViewRecords={() => url.setView("records")}
         />
       )}
 
@@ -117,6 +122,22 @@ export function Explorer({ dataProvider, schemaPrefixes }: ExplorerProps) {
             onViewHistory={(id) => url.setViewAndSelection("history", id)}
           />
         </Suspense>
+      )}
+
+      {/* Global manifest/build summary — every view except Overview, which
+          replaced it with its own editorial metrics ruler (Overview visual
+          completion). Kept here rather than duplicated per view: still a
+          single canonical rendering of manifest.totalRecords/generatedAt,
+          not a competing corpus figure (AGENTS.md canonical-state
+          integrity). */}
+      {url.state.view !== "overview" && totalRecords !== undefined && generatedAt !== undefined && (
+        <div className="shell-frame">
+          <p className="manifest-summary">
+            Corpus: {formatPublicCount(totalRecords)} registos · esta versão publicada dos dados foi gerada em{" "}
+            <time dateTime={generatedAt}>{formatPublicDateTime(generatedAt)}</time>{" "}
+            (não indica a atualidade da investigação)
+          </p>
+        </div>
       )}
     </>
   );

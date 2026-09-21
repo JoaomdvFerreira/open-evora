@@ -1,6 +1,6 @@
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { normalizeForSearch } from "../records/normalize";
-import { describeTopic } from "../presentation/topicMapping";
+import { describeTopic, auditedDomainCodes } from "../presentation/topicMapping";
 
 export interface TypeCount {
   type: string;
@@ -29,6 +29,14 @@ export interface OverviewProblem {
 export interface PublicOverviewData {
   problemCount: number;
   evidenceCount: number;
+  sourceCount: number;
+  /** The canonical corpus total — every record in the loaded index, every
+   * type, same plain `records.length` count `manifest.totalRecords` itself
+   * reports for the "Corpus: X registos" summary shown on every other view
+   * (Explorer.tsx) — not a separately derived figure. Restored to the Hero
+   * metrics ruler on owner request; every other view continues to read its
+   * own total from the manifest, unaffected. */
+  totalRecordCount: number;
   problems: OverviewProblem[];
 }
 
@@ -37,6 +45,7 @@ export interface MaterialChangeEntry {
   problemTitle: string;
   date: string;
   summary: string;
+  domainCodes: string[];
 }
 
 export interface MaterialChangeSource {
@@ -44,12 +53,46 @@ export interface MaterialChangeSource {
   detail: RecordDetail;
 }
 
-export function formatProblemCount(count: number): string {
-  return `${count} ${count === 1 ? "problema" : "problemas"} em investigação`;
+/**
+ * Metrics label only (value rendered separately in markup — Overview
+ * visual-completion delta §5). Plain "Problema"/"Problemas" — the compact
+ * inline Hero metric presentation (visual-convergence pass) reads as
+ * "6 Problemas", not the longer "Problemas acompanhados" phrasing. PT-PT
+ * singular only for one, plural for zero or more than one.
+ */
+export function problemCountLabel(count: number): string {
+  return count === 1 ? "Problema" : "Problemas";
 }
 
-export function formatEvidenceCount(count: number): string {
-  return `${count} ${count === 1 ? "registo" : "registos"} de evidência`;
+/** Metrics label only — PT-PT singular only for one, plural for zero or more than one. */
+export function evidenceCountLabel(count: number): string {
+  return count === 1 ? "Registo de evidência" : "Registos de evidência";
+}
+
+/**
+ * Metrics label only, for the canonical `SRC-` record count (docs/datamodel.md
+ * §1 — a Source is "an identifiable origin from which information is
+ * obtained"). Same counting pattern as `evidenceCount` (a plain `record.type`
+ * count over the loaded index), never a separately derived total. The
+ * canonical data model does not classify Sources as primary vs
+ * secondary/additional, so the label names the record type plainly — "Fonte"
+ * / "Fontes", never "primária(s)". PT-PT singular only for one, plural for
+ * zero or more than one.
+ */
+export function sourceCountLabel(count: number): string {
+  return count === 1 ? "Fonte" : "Fontes";
+}
+
+/**
+ * Metrics label only, for the canonical corpus total (`totalRecordCount` —
+ * every record in the loaded index, every type). Unlike the other metric
+ * labels, this is a fixed phrase rather than a count-dependent singular/
+ * plural — "Total de registo" reads as broken PT-PT for a count of one, so
+ * "Total de registos" is used at every count, matching how the same figure
+ * already reads elsewhere as "Corpus: X registos" (Explorer.tsx).
+ */
+export function totalRecordCountLabel(): string {
+  return "Total de registos";
 }
 
 /**
@@ -71,6 +114,8 @@ export function computePublicOverviewData(records: RecordSummary[]): PublicOverv
   return {
     problemCount: problems.length,
     evidenceCount: records.filter((record) => record.type === "EVD-").length,
+    sourceCount: records.filter((record) => record.type === "SRC-").length,
+    totalRecordCount: records.length,
     problems,
   };
 }
@@ -149,13 +194,14 @@ export function projectMaterialChangeEntries(sources: MaterialChangeSource[]): M
   const candidates = sources.flatMap(({ summary, detail }) => {
     if (summary.type !== "PRB-" || !Array.isArray(detail.record.history)) return [];
     const title = asString(detail.record.title) ?? summary.label;
+    const domainCodes = asStringArray(detail.record.domain);
     return detail.record.history.flatMap((value, authoredPosition) => {
       if (value === null || typeof value !== "object" || Array.isArray(value)) return [];
       const entry = value as Record<string, unknown>;
       const date = asString(entry.date);
       const entrySummary = asString(entry.summary);
       if (date === null || entrySummary === null) return [];
-      return [{ problemId: summary.id, problemTitle: title, date, summary: entrySummary, authoredPosition }];
+      return [{ problemId: summary.id, problemTitle: title, date, summary: entrySummary, domainCodes, authoredPosition }];
     });
   });
 
@@ -165,24 +211,364 @@ export function projectMaterialChangeEntries(sources: MaterialChangeSource[]): M
 }
 
 /**
- * The audited topic filters relevant to the currently loaded Problems only
- * (one entry per canonical domain code actually present; "Todos" is added
- * separately by the caller and always sorts first). Ordered alphabetically
- * by each code's PT-PT public label (`describeTopic`, locale-aware compare)
- * — never a filter for a domain code absent from the loaded corpus, and
- * never a grouping beyond the 12 approved mappings (topicMapping.ts's own
- * neutral fallback covers any future unaudited code without inventing a new
- * public grouping here). This governs topic-filter control order only; PRB
- * Problem ordering stays the deterministic PRB-ID order throughout.
+ * The single newest material-change entry per Problem, regardless of age
+ * (Overview final redesign, Phase 2), keyed by canonical `problemId`. Input
+ * must already be `projectMaterialChangeEntries`'s output — this does not
+ * re-derive material-change meaning, it only picks one entry per Problem out
+ * of an already-projected, already-sorted list. Because that list is sorted
+ * newest date first (ties broken by Problem ID then authored array position
+ * — see `projectMaterialChangeEntries`'s own doc comment), the first entry
+ * seen for a given `problemId` while walking it in order is deterministically
+ * its newest, with the exact same same-date tie behaviour already
+ * established there — this helper adds no ranking/importance judgement of
+ * its own.
+ *
+ * Not the Overview row-level changed-treatment source (weekly-emphasis
+ * correction) — that is `latestMaterialChangeInCivilWeekByProblem`, which
+ * additionally requires the entry to fall in the current civil week. This
+ * helper remains available for other, non-recency-scoped historical uses of
+ * "this Problem's most recent authored change".
  */
-export function relevantTopicCodes(problems: CitizenProblem[]): string[] {
-  const present = new Set(problems.flatMap((problem) => problem.domainCodes));
-  return [...present].sort((a, b) => describeTopic(a).label.localeCompare(describeTopic(b).label, "pt-PT"));
+export function latestMaterialChangeByProblem(entries: MaterialChangeEntry[]): Map<string, MaterialChangeEntry> {
+  const latest = new Map<string, MaterialChangeEntry>();
+  for (const entry of entries) {
+    if (!latest.has(entry.problemId)) latest.set(entry.problemId, entry);
+  }
+  return latest;
+}
+
+const CIVIL_WEEK_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Milliseconds in a day — used only for whole-day (UTC-anchored) civil-week arithmetic below. */
+const MS_PER_CIVIL_DAY = 24 * 60 * 60 * 1000;
+
+/** `Europe/Lisbon` — the civil-week timezone anchor (Overview final redesign, Phase 2, §3/§5 correction). Every "esta semana" judgement is relative to the calendar in Évora, never the browser/system/UTC timezone. */
+const CIVIL_WEEK_TIMEZONE = "Europe/Lisbon";
+
+// en-CA formats as YYYY-MM-DD, matching the canonical day-precision shape
+// used everywhere else in this file — no manual field reassembly needed.
+const lisbonCivilDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: CIVIL_WEEK_TIMEZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/**
+ * Parses a `YYYY-MM-DD` string into a UTC-anchored whole-day timestamp, or
+ * `null` when it is malformed or does not round-trip to a real calendar day
+ * (e.g. `2026-02-30`). The UTC anchor here carries no timezone meaning of its
+ * own — it is only a neutral, DST-free axis for whole-day arithmetic between
+ * two already-resolved civil dates (both `isDateInCivilWeekOf`'s arguments
+ * are civil dates already, one canonical, one already resolved to
+ * `Europe/Lisbon` by `getLisbonCivilDate`).
+ */
+function parseCivilDay(date: string): number | null {
+  if (!CIVIL_WEEK_DATE.test(date)) return null;
+  const [year, month, day] = date.split("-").map(Number);
+  if (month < 1 || month > 12) return null;
+  const parsed = Date.UTC(year, month - 1, day);
+  const roundTrip = new Date(parsed);
+  if (roundTrip.getUTCFullYear() !== year || roundTrip.getUTCMonth() !== month - 1 || roundTrip.getUTCDate() !== day) return null;
+  return parsed;
+}
+
+/**
+ * Resolves `referenceDate` (an absolute instant) to its `Europe/Lisbon`
+ * civil calendar date, as `YYYY-MM-DD` (Overview final redesign, Phase 2, §3
+ * correction). This is the one place wall-clock/browser/system timezone
+ * meets Lisbon civil time — `Intl.DateTimeFormat` with an explicit
+ * `timeZone` resolves the correct offset for the given instant regardless of
+ * the host's own timezone, and correctly accounts for Portugal's DST
+ * transitions without this file needing to encode them itself.
+ */
+export function getLisbonCivilDate(referenceDate: Date = new Date()): string {
+  return lisbonCivilDateFormatter.format(referenceDate);
+}
+
+/**
+ * True when a canonical, day-precision material-change `date` (`YYYY-MM-DD`)
+ * falls within the civil week — Monday through Sunday — containing
+ * `referenceCivilDate` (itself a `YYYY-MM-DD` civil date, not an instant).
+ * A civil week, not a rolling seven days: the window's boundaries are fixed
+ * calendar-day cut-offs, computed from `referenceCivilDate`'s own weekday,
+ * not "the 7 days up to and including `referenceCivilDate`".
+ *
+ * Pure whole-day date arithmetic only — no timezone resolution happens here.
+ * Both dates are already civil dates by the time they reach this helper (see
+ * `isMaterialChangeInCivilWeek`, which resolves an instant to its Lisbon
+ * civil date before delegating here), so this stays trivially deterministic
+ * and independently testable against fixed civil-date strings. A
+ * malformed/invalid `date` (wrong shape, or a shape that does not round-trip
+ * to a real calendar day) is safely excluded — never treated as a match.
+ */
+export function isDateInCivilWeekOf(date: string, referenceCivilDate: string): boolean {
+  const candidateDay = parseCivilDay(date);
+  if (candidateDay === null) return false;
+  const referenceDay = parseCivilDay(referenceCivilDate);
+  if (referenceDay === null) return false;
+
+  // ISO weekday distance back to Monday: Sunday (getUTCDay() === 0) is 6 days
+  // after that week's Monday; Monday (1) through Saturday (6) are (weekday - 1)
+  // days after it.
+  const referenceWeekday = new Date(referenceDay).getUTCDay();
+  const daysSinceMonday = referenceWeekday === 0 ? 6 : referenceWeekday - 1;
+  const mondayStart = referenceDay - daysSinceMonday * MS_PER_CIVIL_DAY;
+  const sundayEnd = mondayStart + 7 * MS_PER_CIVIL_DAY - 1;
+
+  return candidateDay >= mondayStart && candidateDay <= sundayEnd;
+}
+
+/**
+ * True when a canonical, day-precision material-change `date`
+ * (`YYYY-MM-DD`) falls within the `Europe/Lisbon` civil week containing
+ * `referenceDate` (Overview final redesign, Phase 2, §5; §3 timezone
+ * correction). `referenceDate` is an injectable parameter (defaulting to
+ * `new Date()`) precisely so callers — and unit tests — never depend on
+ * wall-clock time implicitly; it is resolved to its Lisbon civil date via
+ * `getLisbonCivilDate` (correct across Portugal's DST transitions,
+ * independent of the browser/system timezone), and the actual week-boundary
+ * arithmetic is delegated to the pure `isDateInCivilWeekOf`.
+ *
+ * A `Date`-instant convenience wrapper only — callers that already hold a
+ * resolved Lisbon civil date (e.g. Overview's own shared civil-date state,
+ * see §1 hardening) should call `isDateInCivilWeekOf` directly instead of
+ * reconstructing an instant merely to re-resolve it here.
+ */
+export function isMaterialChangeInCivilWeek(date: string, referenceDate: Date = new Date()): boolean {
+  return isDateInCivilWeekOf(date, getLisbonCivilDate(referenceDate));
+}
+
+/**
+ * Distinct Problems (by canonical `problemId`) with at least one
+ * material-change entry whose authored `date` falls in the civil week
+ * containing `referenceCivilDate` (a `YYYY-MM-DD` Lisbon civil date, not an
+ * instant — Overview final redesign, Phase 2, §6; civil-date-input hardening)
+ * — the `Alterados esta semana` shortcut's count/filter set. Counts a
+ * Problem once regardless of how many qualifying entries it has this week
+ * (never a raw entry count). Takes the full projected entry list, not
+ * `latestMaterialChangeByProblem`'s output, because a Problem's single
+ * newest entry could predate this week even while an older-but-still-this-
+ * week entry exists — membership in the shortcut is "has a qualifying entry
+ * this week", not "was most recently changed this week". Pure civil-date
+ * arithmetic only (via `isDateInCivilWeekOf`) — no timezone resolution
+ * happens here.
+ */
+export function problemIdsAlteredInCivilWeekOf(entries: MaterialChangeEntry[], referenceCivilDate: string): Set<string> {
+  const ids = new Set<string>();
+  for (const entry of entries) {
+    if (isDateInCivilWeekOf(entry.date, referenceCivilDate)) ids.add(entry.problemId);
+  }
+  return ids;
+}
+
+/**
+ * `Date`-instant convenience wrapper over `problemIdsAlteredInCivilWeekOf`
+ * (resolves `referenceDate` to its Lisbon civil date via `getLisbonCivilDate`
+ * first). Callers that already hold a resolved Lisbon civil date should call
+ * `problemIdsAlteredInCivilWeekOf` directly instead of reconstructing an
+ * instant merely to re-resolve it here.
+ */
+export function problemIdsAlteredInCivilWeek(entries: MaterialChangeEntry[], referenceDate: Date = new Date()): Set<string> {
+  return problemIdsAlteredInCivilWeekOf(entries, getLisbonCivilDate(referenceDate));
+}
+
+/**
+ * The single newest THIS-CIVIL-WEEK material-change entry per Problem,
+ * keyed by canonical `problemId`, for the civil week containing
+ * `referenceCivilDate` (a `YYYY-MM-DD` Lisbon civil date, not an instant —
+ * Overview final redesign, Phase 2 — weekly-emphasis correction;
+ * civil-date-input hardening). This is the row-level changed-treatment
+ * projection: unlike `latestMaterialChangeByProblem` (which picks a
+ * Problem's newest entry regardless of age, and remains available for
+ * historical/other surfaces), a Problem contributes an entry here only when
+ * it has at least one qualifying entry in that civil week — the same
+ * `isDateInCivilWeekOf` membership `problemIdsAlteredInCivilWeekOf` uses, so
+ * the row-level clay treatment/marker and the `Alterados esta semana`
+ * shortcut always agree on which Problems qualify whenever both are derived
+ * from the same `referenceCivilDate`.
+ *
+ * Filters to qualifying entries first, then reuses
+ * `latestMaterialChangeByProblem`'s existing "first entry seen wins" pick,
+ * so a Problem with multiple qualifying entries this week still gets its
+ * newest qualifying one (never an older entry, and never a non-qualifying
+ * newest entry from outside this week) — the same newest-first,
+ * problemId/authored-position tie-break `projectMaterialChangeEntries`
+ * already establishes, since filtering preserves that order. Pure civil-date
+ * arithmetic only — no timezone resolution happens here.
+ */
+export function latestMaterialChangeInCivilWeekOfByProblem(
+  entries: MaterialChangeEntry[],
+  referenceCivilDate: string
+): Map<string, MaterialChangeEntry> {
+  return latestMaterialChangeByProblem(entries.filter((entry) => isDateInCivilWeekOf(entry.date, referenceCivilDate)));
+}
+
+/**
+ * `Date`-instant convenience wrapper over
+ * `latestMaterialChangeInCivilWeekOfByProblem` (resolves `referenceDate` to
+ * its Lisbon civil date via `getLisbonCivilDate` first). Callers that already
+ * hold a resolved Lisbon civil date should call
+ * `latestMaterialChangeInCivilWeekOfByProblem` directly instead of
+ * reconstructing an instant merely to re-resolve it here.
+ */
+export function latestMaterialChangeInCivilWeekByProblem(
+  entries: MaterialChangeEntry[],
+  referenceDate: Date = new Date()
+): Map<string, MaterialChangeEntry> {
+  return latestMaterialChangeInCivilWeekOfByProblem(entries, getLisbonCivilDate(referenceDate));
+}
+
+/**
+ * Compact PT-PT `DD/MM` presentation shared by Overview's two distinct
+ * compact-date surfaces — the row-level material-change marker (Overview
+ * final redesign, Phase 2, §4) and the problem-row `updatedAt` date (Overview
+ * final redesign, Phase 3A, §5) — e.g. `31/08`. Deliberately separate from
+ * the shared `formatPublicDate`/`formatPublicDateTime` (presentation.ts):
+ * those render the full `dateStyle: "medium"` PT-PT date used across every
+ * other surface (ProblemView, Records, History), and changing their output
+ * would ripple into pages this task must not touch. This formatter is
+ * Overview's own, scoped to these two row-level surfaces only; the full
+ * canonical date remains available in each caller's own `dateTime` attribute.
+ * Falls back to the raw input, like the shared formatters do, when it cannot
+ * be parsed as a valid calendar day. One shared implementation, not two
+ * parallel date parsers, even though the two concepts it serves — "when this
+ * Problem was last updated" vs. "when a material change was authored" —
+ * remain distinct signals throughout Overview (see `ProblemRow`'s own doc
+ * comment).
+ */
+export function formatOverviewCompactDate(date: string): string {
+  if (!CIVIL_WEEK_DATE.test(date)) return date;
+  const [year, month, day] = date.split("-").map(Number);
+  if (month < 1 || month > 12) return date;
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (parsed.getUTCFullYear() !== year || parsed.getUTCMonth() !== month - 1 || parsed.getUTCDate() !== day) return date;
+  return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}`;
+}
+
+export interface TopicCategoryCount {
+  code: string;
+  count: number;
+}
+
+/**
+ * The category drawer's normal-topic shortlist size (Overview
+ * visual-convergence pass — TARGET's "Todos + top 5 real topics + Alterados
+ * esta semana" composition). Bounds `topCategoryCounts`'s own `limit`
+ * parameter for that one caller; `Todos` and `Alterados esta semana` are
+ * never subject to this cap — see OverviewPresentation.tsx.
+ */
+export const MAX_OVERVIEW_TOPIC_SHORTCUTS = 5;
+
+/**
+ * The `limit` canonical domain codes with the highest Problem counts. Used by
+ * the category drawer (Overview final redesign, Phase 1) to compute each
+ * topic's real, unfiltered count — callers pass `allTopicCodes().length` as
+ * `limit` there so every audited topic is represented, not only a ranked
+ * top-N. One Problem carrying multiple domain codes counts once toward each
+ * of its codes (the same "any one of its domains" membership
+ * `matchesTopicFilter` already uses), never toward only one chosen "primary"
+ * domain (AGENTS.md "Human-owned decisions" — this presentation layer does
+ * not pick a primary domain). Ties break by PT-PT label order (locale-aware
+ * compare via `describeTopic`), a stable, deterministic, non-ranking
+ * tie-break rather than load/insertion order.
+ */
+export function topCategoryCounts(problems: CitizenProblem[], limit: number): TopicCategoryCount[] {
+  const counts = new Map<string, number>();
+  for (const problem of problems) {
+    for (const code of problem.domainCodes) {
+      counts.set(code, (counts.get(code) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([code, count]) => ({ code, count }))
+    .sort((a, b) => b.count - a.count || describeTopic(a.code).label.localeCompare(describeTopic(b.code).label, "pt-PT"))
+    .slice(0, limit);
 }
 
 /** A Problem matches a topic filter when that canonical domain code is present among its (possibly multiple) domains. Never reorders or ranks. */
 export function matchesTopicFilter(problem: CitizenProblem, topicCode: string | null): boolean {
   return topicCode === null || problem.domainCodes.includes(topicCode);
+}
+
+/**
+ * The full canonical TEMA vocabulary (every audited `domain` code —
+ * `topicMapping.ts`'s `auditedDomainCodes()`), in deterministic PT-PT public
+ * label order (locale-aware compare via `describeTopic`) — the category
+ * drawer's complete, stable topic ordering (Overview final redesign, Phase
+ * 1). Every audited code is included regardless of whether any currently
+ * loaded Problem carries it, so the drawer's option set never changes shape
+ * as the visible result subset changes.
+ */
+export function allTopicCodes(): string[] {
+  return [...auditedDomainCodes()].sort((a, b) => describeTopic(a).label.localeCompare(describeTopic(b).label, "pt-PT"));
+}
+
+export type ProblemSortOrder = "id" | "updatedAt";
+
+/**
+ * The editorial list's two sort orders. `"id"` is the existing deterministic
+ * PRB-ID ascending order (unchanged default, matches every other Problem
+ * ordering in Overview/Records). `"updatedAt"` orders by canonical
+ * `CitizenProblem.updatedAt` descending (most recently updated first); a
+ * `null` updatedAt sorts last (genuinely unknown recency, never assumed to
+ * be "oldest" via a fabricated date); same-date entries — and every null —
+ * break ties by ascending PRB ID, the same neutral tie-break
+ * `projectMaterialChangeEntries` already uses, so the order stays fully
+ * deterministic. This is a distinct field/label from the Hero ruler's
+ * "Última alteração" (the authored material-change date) — see
+ * OverviewPresentation.tsx's own note against conflating the two.
+ */
+export function sortProblems(problems: CitizenProblem[], order: ProblemSortOrder): CitizenProblem[] {
+  const sorted = [...problems];
+  if (order === "id") {
+    return sorted.sort((a, b) => a.id.localeCompare(b.id));
+  }
+  return sorted.sort((a, b) => {
+    if (a.updatedAt === b.updatedAt) return a.id.localeCompare(b.id);
+    if (a.updatedAt === null) return 1;
+    if (b.updatedAt === null) return -1;
+    return b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id);
+  });
+}
+
+/**
+ * Fixed page size for the Overview problem list (Overview visual-completion —
+ * pagination; raised from 10 to 20 in the Overview final redesign, Phase 3A,
+ * §1, so the current small corpus reads as one continuous editorial list
+ * rather than introducing pagination unnecessarily). Not user-configurable.
+ * Pagination infrastructure itself is unchanged: a filtered result set that
+ * still exceeds this size continues to paginate exactly as before.
+ */
+export const OVERVIEW_PROBLEMS_PER_PAGE = 20;
+
+/**
+ * Total page count for a given result count at the fixed page size, never
+ * less than 1 (an empty result set still has "page 1 of 1" as its neutral
+ * state, and callers gate the pagination footer's visibility separately —
+ * see `OverviewPresentation`'s own note on when the footer renders at all).
+ */
+export function overviewPageCount(resultCount: number): number {
+  return Math.max(1, Math.ceil(resultCount / OVERVIEW_PROBLEMS_PER_PAGE));
+}
+
+/**
+ * Slices the already filtered+sorted Problem list to one page. Pagination is
+ * strictly the last step of the pipeline (search → filters → sort →
+ * pagination — Overview visual-completion): callers must only ever call this
+ * against `sortProblems`'s own output, never against the unsorted/unfiltered
+ * `citizenProblems`, so the result-count semantics stay a single, unambiguous
+ * "total filtered results" everywhere else in Overview (the results header's
+ * count is deliberately computed from the pre-pagination list, not this
+ * slice). `page` is clamped to the valid `[1, overviewPageCount(...)]` range
+ * so a stale page number (e.g. after a filter shrinks the result set) never
+ * produces an out-of-range or empty slice.
+ */
+export function paginateProblems(problems: CitizenProblem[], page: number): CitizenProblem[] {
+  const pageCount = overviewPageCount(problems.length);
+  const clampedPage = Math.min(Math.max(1, page), pageCount);
+  const start = (clampedPage - 1) * OVERVIEW_PROBLEMS_PER_PAGE;
+  return problems.slice(start, start + OVERVIEW_PROBLEMS_PER_PAGE);
 }
 
 /**

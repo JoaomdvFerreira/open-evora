@@ -33,12 +33,15 @@ import { evidenceVisual, validationVisual } from "./stateVisuals";
  * two dimensions ever share one rendered tone+icon+class combination.
  *
  * Three forms are implemented, matching current production evidence:
- * - `overview` — plain caption/value pair (Overview.tsx's
- *   `problemStatusDimensions()`/`.overview-status-dimension`, which already
- *   renders both fields this way, using `publicCompactEnumLabel`).
+ * - `overview` — plain caption/value pair (the approved DS-03B catalogue's
+ *   "Overview summary" cell for these fields, using `publicCompactEnumLabel`;
+ *   exercised today by ProblemStateAtoms.stories.tsx's catalogue coverage —
+ *   the Overview problem-list row itself uses `reading` for `evidence_status`
+ *   and does not render `validation_status` per row at all, see
+ *   CitizenDiscovery.tsx's `ProblemRow`).
  * - `reading` — the bounded inline-label chip (ProblemView.tsx's
- *   `StatusChip`, `.status-chip`, the current production reading form for
- *   both fields via `HEADER_STATE_FIELDS`).
+ *   `StatusChip`, `.status-chip`, and CitizenDiscovery.tsx's `ProblemRow`,
+ *   which reuses it for `evidence_status`).
  * - `technical` — raw canonical field:value pair
  *   (RecordDetailPanel.tsx's `PrbCanonicalStatePanel`, reimplemented here as
  *   `.prb-status-technical-field` in domain.css on the DS-04B foundation

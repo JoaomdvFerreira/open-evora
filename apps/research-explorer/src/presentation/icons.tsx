@@ -229,3 +229,98 @@ export function IconStateClosed(props: IconProps) {
     </IconBase>
   );
 }
+
+/**
+ * Overview visual-completion — three presentation-only trust-row glyphs.
+ * Each is a generic, neutral concept marker (not a status/effect/topic
+ * value) for the Overview trust/value row; like every icon above they are
+ * `aria-hidden`, and the row's own heading/copy carries all meaning.
+ */
+
+/** Fontes identificadas — a document/record glyph, distinct from IconBook (EDU topic). */
+export function IconSource(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M6 3.5h6l3 3v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-12a1 1 0 0 1 1-1Z" />
+      <path d="M12 3.5v3h3" />
+      <path d="M7.5 11h5M7.5 13.5h5M7.5 8.5h2" />
+    </IconBase>
+  );
+}
+
+/** Com transparência — an open-eye glyph. */
+export function IconTransparency(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M2.5 10c1.8-3 4.6-4.6 7.5-4.6S15.7 7 17.5 10c-1.8 3-4.6 4.6-7.5 4.6S4.3 13 2.5 10Z" />
+      <circle cx="10" cy="10" r="2.2" />
+    </IconBase>
+  );
+}
+
+/** Para uma Évora mais informada — a compass/orientation glyph, distinct from the topic/state glyph set. */
+export function IconCompass(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="10" cy="10" r="6.5" />
+      <path d="M12.3 7.7 11 11l-3.3 1.3L9 9Z" fill="currentColor" stroke="none" />
+    </IconBase>
+  );
+}
+
+/**
+ * Overview metrics row — three presentation-only glyphs distinct from the
+ * trust-row set above, so "problems tracked", "evidence records", and
+ * "ongoing investigation" each read as a distinct concept marker rather than
+ * reusing IconSource/IconCompass out of their trust-row context. Same
+ * bounded, `aria-hidden` treatment as every icon in this file — the metric's
+ * own visible value/label text carries all meaning.
+ */
+
+/** Problemas acompanhados — a single-sheet record glyph, distinct from IconSource's multi-line document. */
+export function IconProblemRecord(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M6 3.5h6l3 3v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-12a1 1 0 0 1 1-1Z" />
+      <path d="M12 3.5v3h3" />
+      <circle cx="8.7" cy="11.6" r="0.9" fill="currentColor" stroke="none" />
+      <path d="M11 11.6h3" />
+    </IconBase>
+  );
+}
+
+/** Registos de evidência — a stacked-records/database glyph. */
+export function IconEvidenceStack(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <ellipse cx="10" cy="5.2" rx="6" ry="2.2" />
+      <path d="M4 5.2v4.4c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2V5.2" />
+      <path d="M4 9.6V14c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2V9.6" />
+    </IconBase>
+  );
+}
+
+/** Investigação em atualização contínua — an upward trend glyph. */
+export function IconTrendUp(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M3.5 14 8 9.2l3 3L16.5 6" />
+      <path d="M12.5 6h4v4" />
+    </IconBase>
+  );
+}
+
+/**
+ * Overview visual-completion (task §5) — the `Filtros` disclosure trigger's
+ * hamburger/menu glyph (CitizenDiscovery.tsx's `FiltrosToggle`), three plain
+ * horizontal bars. `aria-hidden` like every other icon in this file — the
+ * trigger's own accessible name (plain text plus the active-topic label)
+ * carries all meaning, never this glyph alone.
+ */
+export function IconMenu(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M4 6h12M4 10h12M4 14h12" />
+    </IconBase>
+  );
+}

@@ -18,10 +18,10 @@ import "../index.css";
    justified here rather than reusing an unrelated existing file
    (AGENTS.md §2 "Repository structure and file creation" — a genuinely
    distinct, durable responsibility). Synthetic PT-PT content only; no real
-   research findings. No production call site (Explorer.tsx header,
-   Overview.tsx, ProblemView.tsx, TrustPage.tsx) is modified, migrated, or
-   adopted in this slice — WU053's constraint scope is the visual foundation
-   itself, gated by owner visual-review, not surface adoption. */
+   research findings. The Explorer chrome header is now adopted in
+   production (ExplorerHeader.tsx); these two stories render it directly, so
+   they stay in sync with production by construction rather than by a
+   parallel preview copy. */
 
 const meta = {
   title: "Visual Foundation",
@@ -110,7 +110,12 @@ export const LogoCompact: Story = {
 
 export const ExplorerIdentityHeader: Story = {
   name: "Explorer identity header",
-  render: () => <main className="explorer-shell"><ExplorerHeader activeView="overview" onOverview={() => {}} onRecords={() => {}} /></main>,
+  render: () => <main className="explorer-shell"><ExplorerHeader activeView="overview" activeTypeFilter="all" onProblemas={() => {}} onFontes={() => {}} /></main>,
+};
+
+export const ExplorerIdentityHeaderCompact: Story = {
+  name: "Explorer identity header — compact",
+  render: () => <div style={{ width: 360, maxWidth: "100%" }}><main className="explorer-shell"><ExplorerHeader activeView="records" activeTypeFilter="SRC-" onProblemas={() => {}} onFontes={() => {}} /></main></div>,
 };
 
 /* ---- Combined demo page (desktop / compact) ------------------------------ */

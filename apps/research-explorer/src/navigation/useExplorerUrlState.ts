@@ -88,5 +88,12 @@ export function useExplorerUrlState() {
     // RecordsExplorer's own breadcrumb, which clears selectedId via
     // setSelectedId while already on view=records.
     clearSelectionAndSetView: (view: ExplorerView) => push({ ...state, view, selectedId: null }),
+    // One combined history entry for the header's "Fontes" destination:
+    // Records filtered to the canonical Source type, always the complete
+    // set — never sequential setView/setTypeFilter calls, which would each
+    // close over the same stale `state` and could leave a leftover search
+    // query or a different type filter from wherever the user came from
+    // (Overview final redesign, Phase 3B §2).
+    goToSourcesInRecords: () => push({ ...state, view: "records", selectedId: null, query: "", typeFilter: "SRC-" }),
   };
 }
