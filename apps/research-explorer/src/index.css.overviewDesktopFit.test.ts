@@ -136,6 +136,30 @@ describe("index.css — Overview desktop-fit fallback (768px-1059px) isolation",
     expect(block).not.toContain("main.explorer-shell");
   });
 
+  it("keeps the toolbar's controls group (Filtros + search + count) as one deterministic non-wrapping unit, so only the whole group — never the result count alone — can recompose onto its own row (768 boundary correction, task §2)", () => {
+    const controlsBody = ruleBodyContaining(block, ".overview-toolbar-controls");
+    expect(controlsBody).toMatch(/flex-wrap:\s*nowrap/);
+
+    const countWrapperBody = ruleBodyContaining(block, ".overview-toolbar-controls > div[aria-live]");
+    expect(countWrapperBody).toMatch(/flex-shrink:\s*0/);
+  });
+
+  it("scopes the search's narrower 768-boundary width to a `clamp()` reaching the existing ~320px 1024 ceiling, rather than one fixed smaller measure (task §3)", () => {
+    const searchBody = ruleBodyContaining(block, ".overview-toolbar-controls .overview-search");
+    expect(searchBody).toMatch(/max-width:\s*clamp\([^)]*320px\)/);
+    expect(searchBody).toMatch(/min-width:\s*0/);
+  });
+
+  it("keeps the Footer in a horizontal desktop-fit composition at 768-1059 — identity narrows and inter-column gaps tighten, but nothing forces the stacked/column layout reserved for <=767px (task §6)", () => {
+    expect(block).not.toMatch(/\.public-footer-inner\s*\{[^}]*flex-direction:\s*column/);
+
+    const identityBody = ruleBodyContaining(block, ".public-footer-identity");
+    expect(identityBody).toMatch(/max-width:\s*40ch/);
+
+    const groupsBody = ruleBodyContaining(block, ".public-footer-groups");
+    expect(groupsBody).toMatch(/gap:/);
+  });
+
   it("leaves >=1060px generic `.shell-frame--wide` behaviour untouched — it is declared as a bare top-level rule only once, outside any media query", () => {
     const topLevelDeclarations = css.match(/^\.shell-frame--wide\s*\{/gm) ?? [];
     expect(topLevelDeclarations.length).toBe(1);

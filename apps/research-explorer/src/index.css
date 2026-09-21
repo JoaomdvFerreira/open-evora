@@ -3504,19 +3504,20 @@ body:has(.public-overview) .public-footer {
     margin-bottom: 28px;
   }
 
-  /* Toolbar fit: desktop controls/semantics/labels stay unchanged — only
-     geometry hardens. `flex-wrap: wrap` is a safety net so the row
-     recomposes onto a second line before it would otherwise overflow (it
-     still renders as the approved single row whenever the shrunk children
-     actually fit, matching >=1060 behaviour); `.overview-toolbar-controls`
-     gets `min-width: 0` so it can actually shrink inside the row instead of
-     forcing overflow at its content's natural width, and the search
-     control's own floor drops from the >=1060 16rem/440px pair (which by
-     itself exceeds this band's available width alongside Filtros + the
-     result count) to an intermediate desktop-fit measure — ~300-340px at
-     1024 (task §8) — so it reads as a deliberately narrower control rather
-     than desktop's full-width search, while still shrinking further before
-     it would force the row wider than the viewport. */
+  /* Toolbar fit (768 boundary correction): desktop controls/semantics/labels
+     stay unchanged — only geometry hardens. `flex-wrap: wrap` on both rows
+     remains a safety net so the composition recomposes deliberately before
+     it would otherwise overflow, but the wrap unit is now the whole
+     controls group (Filtros + search + count) against sort — never the
+     result count alone. Previously the count sat in an unstyled `div`
+     (the `aria-live` wrapper) with no `flex-shrink`/`white-space` control of
+     its own, so once the search's old 200-320px floor left no spare width,
+     that bare div — being the last/smallest flex item — wrapped onto its
+     own line by itself while sort stayed on the first row (task §2). It is
+     shrink-proof and non-wrapping here, matching `.overview-results-count`'s
+     own base desktop treatment, so the row either fits as one deliberate
+     line or the ENTIRE controls group (task §4's left-hand group) recomposes
+     as one onto its own row beneath sort — never just the count. */
   .overview-toolbar {
     flex-wrap: wrap;
     row-gap: var(--space-tight);
@@ -3524,14 +3525,36 @@ body:has(.public-overview) .public-footer {
 
   .overview-toolbar-controls {
     min-width: 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     row-gap: var(--space-tight);
   }
 
+  .overview-toolbar-controls > div[aria-live] {
+    flex-shrink: 0;
+  }
+
+  .overview-toolbar-controls > div[aria-live] .overview-results-count {
+    white-space: nowrap;
+  }
+
+  /* Search width near 768 (task §3): the >=1060 rule already yields to
+     Filtros/the fit `.overview-toolbar-controls > div[aria-live]` inside
+     `.overview-toolbar-controls`'s row, so the search's own floor for this
+     band scales progressively between the accepted ~320px measure at 1024
+     and a narrower ~260px near the 768 lower boundary — rather than one
+     fixed measure that would either stay too wide near 768 (the prior fixed
+     320px floor) or unnecessarily shrink the already-approved 1024 width.
+     `23.4375vw + 80px` is the linear interpolation solved so the clamp
+     resolves to exactly 320px (the accepted 1024 measure, also the ceiling)
+     at 1024px and ~260px at the 768px floor — within the task's 240-270px
+     target range — without hard-coding a second breakpoint. `min-width: 0`
+     is preserved so the control can still yield further if a fallback
+     two-row composition is what actually fits. */
   .overview-toolbar-controls .overview-search {
-    min-width: 200px;
-    max-width: 320px;
-    flex-basis: 320px;
+    min-width: 0;
+    max-width: clamp(240px, 23.4375vw + 80px, 320px);
+    flex-basis: clamp(240px, 23.4375vw + 80px, 320px);
+    flex-shrink: 1;
   }
 
   /* Category drawer: geometry hardening only — same top-5/counts/ordering,
@@ -3561,6 +3584,37 @@ body:has(.public-overview) .public-footer {
      rule) — the shared fit grid above is what actually keeps `Propor um
      problema` inside the viewport instead of touching/overflowing its true
      edge. */
+
+  /* Footer fit (768 boundary correction, task §6): the >=1060 base rule
+     (`.public-footer-inner`'s `flex-wrap: wrap` + identity's unconstrained
+     `max-width: 64ch` ≈ 576px, alongside `.public-footer-groups`' own
+     ~56px-gapped PROJETO/DADOS columns) has enough combined natural width to
+     exceed this band's narrower fit-grid column, so the wrap this band
+     inherited from >=1060 was landing here too — identity dropping to its
+     own row with PROJETO/DADOS beneath it, rather than staying in the
+     desktop-fit horizontal composition this band is still in. Nothing about
+     the >=1060 rule itself changes (the `flex-wrap: wrap` safety net stays,
+     for genuine overflow); this band only narrows identity's own ceiling
+     and tightens the inter-column gaps so the existing three-part row
+     actually fits at this band's available width instead of relying on
+     >=1060's roomier ~56px gap and unconstrained identity measure. */
+  .public-footer-inner {
+    gap: var(--space-standard) 28px;
+  }
+
+  .public-footer-identity {
+    max-width: 40ch;
+    flex-shrink: 1;
+  }
+
+  .public-footer-groups {
+    gap: var(--space-standard) 28px;
+    flex-shrink: 0;
+  }
+
+  .public-footer-group {
+    min-width: 7rem;
+  }
 }
 
 @media (max-width: 767px) {
