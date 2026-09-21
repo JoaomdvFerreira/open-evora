@@ -250,7 +250,7 @@ describe("Explorer — Overview view", () => {
     expect(screen.queryByText("Como ler o Explorer")).toBeNull();
     expect(screen.queryByText(/Estado de validação:/)).toBeNull();
     expect(screen.queryByText(/Estado da evidência:/)).toBeNull();
-    expect(screen.getByRole("button", { name: "Problemas" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("button", { name: "Problemas", hidden: true }).getAttribute("aria-current")).toBe("page");
   });
 
   it("UX-D §4: renders Evidência as its own explicitly labeled dimension in the row, never merged with Validação", async () => {
@@ -307,9 +307,9 @@ describe("Explorer — Overview view", () => {
     window.history.replaceState(null, "", "/");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    await user.click(await screen.findByRole("button", { name: "Fontes" }));
+    await user.click(await screen.findByRole("button", { name: "Fontes", hidden: true }));
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Fontes" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("button", { name: "Fontes", hidden: true }).getAttribute("aria-current")).toBe("page");
   });
 });
 
@@ -444,7 +444,7 @@ describe("Explorer — URL-addressable state", () => {
       render(<Explorer dataProvider={fakeProvider()} />);
       await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
-      await user.click(screen.getByRole("button", { name: "Fontes" }));
+      await user.click(screen.getByRole("button", { name: "Fontes", hidden: true }));
 
       expect(pushSpy).toHaveBeenCalledTimes(1);
       expect(window.location.search).toContain("view=records");
@@ -463,7 +463,7 @@ describe("Explorer — URL-addressable state", () => {
       render(<Explorer dataProvider={fakeProvider()} />);
       await screen.findByRole("button", { name: /PRB-0005/ });
 
-      await user.click(screen.getByRole("button", { name: "Fontes" }));
+      await user.click(screen.getByRole("button", { name: "Fontes", hidden: true }));
 
       await screen.findByRole("heading", { name: "Registos" });
       expect(window.location.search).toContain("d=2");
@@ -474,19 +474,27 @@ describe("Explorer — URL-addressable state", () => {
       const { unmount: unmountPrb } = render(<Explorer dataProvider={fakeProvider()} />);
       await screen.findByRole("button", { name: /PRB-0005/ });
 
-      expect(within(globalNav()).getByRole("button", { name: "Fontes" }).getAttribute("aria-current")).toBeNull();
+      expect(within(globalNav()).getByRole("button", { name: "Fontes", hidden: true }).getAttribute("aria-current")).toBeNull();
       unmountPrb();
 
       window.history.replaceState(null, "", "/?view=records&type=SRC-");
       render(<Explorer dataProvider={fakeProvider()} />);
       await screen.findByRole("button", { name: /SRC-0092/ });
-      expect(within(globalNav()).getByRole("button", { name: "Fontes" }).getAttribute("aria-current")).toBe("page");
+      expect(within(globalNav()).getByRole("button", { name: "Fontes", hidden: true }).getAttribute("aria-current")).toBe("page");
     });
   });
 });
 
+// `{ hidden: true }` (visual-completion compact pass, task §2): the global
+// nav now lives inside `.explorer-chrome-menu`, collapsed by default (native
+// `hidden` attribute) and shown at >=768px only via a CSS override jsdom
+// does not evaluate (no layout/media-query engine — see ExplorerHeader.tsx's
+// own module doc). These tests exercise routing/business-logic wiring, not
+// the disclosure itself (covered separately by ExplorerHeader.test.tsx), so
+// hidden elements must be included here exactly as production's own
+// >=768px desktop rendering always shows them.
 function globalNav(): HTMLElement {
-  return screen.getByRole("navigation", { name: "Navegação principal" });
+  return screen.getByRole("navigation", { name: "Navegação principal", hidden: true });
 }
 
 describe("Explorer — chrome header identity", () => {
@@ -496,10 +504,10 @@ describe("Explorer — chrome header identity", () => {
 
     expect(screen.getAllByAltText("Open Évora").length).toBeGreaterThan(0);
     expect(globalNav()).toBeTruthy();
-    expect(within(globalNav()).getByRole("button", { name: "Problemas" })).toBeTruthy();
-    expect(within(globalNav()).getByRole("link", { name: "Método" })).toBeTruthy();
-    expect(within(globalNav()).getByRole("button", { name: "Fontes" })).toBeTruthy();
-    expect(within(globalNav()).getByRole("link", { name: "Sobre" })).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true })).toBeTruthy();
+    expect(within(globalNav()).getByRole("link", { name: "Método", hidden: true })).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Fontes", hidden: true })).toBeTruthy();
+    expect(within(globalNav()).getByRole("link", { name: "Sobre", hidden: true })).toBeTruthy();
     expect(within(globalNav()).queryByRole("button", { name: "Visão geral" })).toBeNull();
     expect(within(globalNav()).queryByRole("button", { name: "Registos" })).toBeNull();
     expect(within(globalNav()).queryByRole("button", { name: "Grafo" })).toBeNull();
@@ -509,28 +517,28 @@ describe("Explorer — chrome header identity", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
-    expect(within(globalNav()).getByRole("link", { name: "Método" }).getAttribute("href")).toBe("/methodology");
-    expect(within(globalNav()).getByRole("link", { name: "Sobre" }).getAttribute("href")).toBe("/about");
-    expect(screen.getByRole("link", { name: "Contribuir com evidência" }).getAttribute("href")).toBe("/contact");
+    expect(within(globalNav()).getByRole("link", { name: "Método", hidden: true }).getAttribute("href")).toBe("/methodology");
+    expect(within(globalNav()).getByRole("link", { name: "Sobre", hidden: true }).getAttribute("href")).toBe("/about");
+    expect(screen.getByRole("link", { name: "Contribuir com evidência", hidden: true }).getAttribute("href")).toBe("/contact");
   });
 
   it("Problemas' active state covers Overview, Problem detail, and Problem history alike", async () => {
     window.history.replaceState(null, "", "/");
     const { unmount: unmountOverview } = render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("heading", { name: "Visão geral" });
-    expect(within(globalNav()).getByRole("button", { name: "Problemas" }).getAttribute("aria-current")).toBe("page");
+    expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }).getAttribute("aria-current")).toBe("page");
     unmountOverview();
 
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
     const { unmount: unmountProblem } = render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
-    expect(within(globalNav()).getByRole("button", { name: "Problemas" }).getAttribute("aria-current")).toBe("page");
+    expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }).getAttribute("aria-current")).toBe("page");
     unmountProblem();
 
     window.history.replaceState(null, "", "/?view=history&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
-    expect(within(globalNav()).getByRole("button", { name: "Problemas" }).getAttribute("aria-current")).toBe("page");
+    expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }).getAttribute("aria-current")).toBe("page");
   });
 });
 
@@ -541,7 +549,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Fontes" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Fontes", hidden: true }));
 
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
     expect(window.location.search).toContain("view=records");
@@ -556,12 +564,12 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Fontes" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Fontes", hidden: true }));
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Problemas" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }));
     await screen.findByRole("heading", { name: "Visão geral" });
-    expect(within(globalNav()).getByRole("button", { name: "Problemas" }).getAttribute("aria-current")).toBe("page");
+    expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }).getAttribute("aria-current")).toBe("page");
   });
 
   it("navigating from a selected Record Detail to global Problemas clears the hidden selectedId", async () => {
@@ -571,7 +579,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     await screen.findByText("Estrutura técnica completa");
     expect(window.location.search).toContain("id=PRB-0005");
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Problemas" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }));
 
     await screen.findByRole("heading", { name: "Visão geral" });
     expect(window.location.search).not.toContain("id=PRB-0005");
@@ -588,7 +596,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Problemas" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }));
     await screen.findByRole("heading", { name: "Visão geral" });
 
     window.history.back();
@@ -627,7 +635,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Problemas" }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }));
     await screen.findByRole("heading", { name: "Visão geral" });
 
     window.history.back();

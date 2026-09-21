@@ -21,7 +21,14 @@ describe("Overview/Full composition story shell", () => {
     expect(main).not.toBeNull();
     const header = main?.querySelector("header.explorer-chrome") ?? null;
     expect(header).not.toBeNull();
-    expect(screen.getAllByRole("button", { name: "Problemas" })[0].getAttribute("aria-current")).toBe("page");
+    // `{ hidden: true }` (visual-completion compact pass, task §2): the nav
+    // group now sits inside `.explorer-chrome-menu`, collapsed by default
+    // (native `hidden` attribute) and only shown at >=768px via a CSS
+    // override jsdom does not evaluate (no layout/media-query engine) — this
+    // is a structural DOM check, not a real accessibility-tree visibility
+    // assertion, so hidden elements must be included here, same as the
+    // `querySelector` reads elsewhere in this test.
+    expect(screen.getAllByRole("button", { name: "Problemas", hidden: true })[0].getAttribute("aria-current")).toBe("page");
 
     // Real PublicFooter, rendered outside main.explorer-shell.
     const footer = container.querySelector("footer.public-footer");
