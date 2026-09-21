@@ -2126,19 +2126,19 @@ main.explorer-shell {
   cursor: not-allowed;
 }
 
-/* `Propor um problema` (Overview final redesign, Phase 3A, §3) — a
-   restrained outlined link, matching the toolbar/drawer's existing
-   control-outline language (same border/radius/hover pattern as
-   `.overview-filtros-toggle`/`.overview-category-drawer-option`) rather than
-   a filled primary-action button. A normal navigation link to the existing
-   `/contact` route — no button semantics, no modal, no form. */
+/* `Propor um problema` (Overview final redesign, Phase 3A, §3) — matches
+   `.explorer-cta`'s (`Contribuir com evidência`) restrained clay/dark-clay
+   treatment exactly (owner request), rather than the earlier neutral-ink
+   outline: same border/text colour, hover fill, and no min-height (padding
+   alone sets the density, as `.explorer-cta` already does). Still a normal
+   navigation link to the existing `/contact` route — no button semantics,
+   no modal, no form. */
 .overview-propose-problem {
   display: inline-flex;
   align-items: center;
-  min-height: var(--target-min);
   padding: 0.4rem 0.85rem;
-  color: var(--color-ink-secondary);
-  border: 1px solid var(--color-separator-standard);
+  color: var(--color-accent-hover);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--radius-control);
   background: none;
   font-family: var(--font-interface);
@@ -2149,9 +2149,9 @@ main.explorer-shell {
 }
 
 .overview-propose-problem:hover {
-  color: var(--color-ink-primary);
-  border-color: var(--color-ink-primary);
-  background: var(--color-surface-subtle);
+  color: var(--color-accent-hover);
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 7%, transparent);
 }
 
 .overview-propose-problem:focus-visible {
