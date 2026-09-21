@@ -1630,9 +1630,17 @@ main.explorer-shell {
 /* Filtros, search, and the result count kept on one desktop row (task §4) —
    `nowrap` plus `min-width: 0` lets the search control's own `flex: 1 1
    320px` shrink instead of wrapping the count onto a second line. Reverts to
-   `wrap` at compact widths (media query below), where the row stacks. */
+   `wrap` at compact widths (media query below), where the row stacks.
+   `flex: 1 1 auto` (fix): this is the actual flex item inside
+   `.overview-toolbar`'s `space-between` row — without its own `flex-grow` it
+   only ever shrank to its content's natural width, so the search's `flex: 1
+   1 880px` below had no spare parent width to claim and stayed near its
+   `min-width` regardless of the desktop search-width value. Growing this
+   container is what actually lets the search reach 880px when the row has
+   room. */
 .overview-toolbar-controls {
   display: flex;
+  flex: 1 1 auto;
   flex-wrap: nowrap;
   align-items: center;
   gap: var(--space-standard);
