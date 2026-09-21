@@ -114,10 +114,13 @@ main {
   font-weight: 600;
 }
 
-/* Body (task §12): ~13.5px/1.62. The line break is an explicit `<br />`
-   in the markup (TrustPage.tsx) at the owner-specified split point, not
-   CSS-driven wrapping — `.public-footer-identity`'s max-width only needs
-   to stay wide enough that the first line never wraps again on its own. */
+/* Body (task §12; de-hardcoded in the final alignment pass, task §8): ~13.5
+   px/1.62. The line break is now purely CSS-driven wrapping against
+   `.public-footer-identity`'s own max-width (base rule + its <=767px
+   override) — the former explicit `<br />` in the markup (TrustPage.tsx)
+   forced the same split at every width regardless of available space, which
+   read as an unnaturally early break at 360px; removing it lets the browser
+   wrap wherever the actual container width allows, at every breakpoint. */
 .public-footer-summary {
   margin: 0;
   color: var(--color-ink-muted);
@@ -1733,6 +1736,14 @@ main.explorer-shell {
   white-space: nowrap;
 }
 
+/* Compact numeric-only presentation (task §6): at >=768px the full "N
+   problemas" span renders exactly as before this pass, and the numeric-only
+   span stays out of the layout/accessibility tree entirely. The <=767px
+   block below is the sole place that swaps which span is visible. */
+.overview-results-count-compact {
+  display: none;
+}
+
 /* Sort control (visual-convergence pass): a quiet editorial control —
    technical/mono, de-emphasised, still a native `<select>` with its own
    accessible `<label>` (task §8 — "preserve accessible sort labelling"). */
@@ -2445,6 +2456,30 @@ body:has(.public-overview) .public-footer {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  /* Compact numeric-only result count (final alignment pass, task §6):
+     TARGET's much shorter "6" in place of "6 problemas" — the full phrase
+     stays truthfully in the accessible tree via the same visually-hidden
+     clip technique `.overview-sort-control-label` already uses (never
+     `display: none`, which would drop it from screen readers too), while
+     only the numeric span actually renders. `aria-hidden` on the compact
+     span (OverviewPresentation.tsx) keeps assistive tech from announcing
+     the number a second time alongside the full phrase. */
+  .overview-results-count-full {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .overview-results-count-compact {
+    display: inline;
   }
 
   /* Sort (task §8/§9): the sole `1fr` track, so it is what absorbs/yields

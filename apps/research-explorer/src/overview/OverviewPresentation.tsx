@@ -165,7 +165,26 @@ export function OverviewPresentation({
             <CitizenSearchControl value={searchQuery} onChange={onSearchChange} />
             <div aria-live="polite" aria-atomic="true">
               {citizenProblems !== null && visibleProblems !== null && (
-                <p className="overview-results-count">{formatPublicCount(visibleProblems.length)} problemas</p>
+                <p className="overview-results-count">
+                  {/* Compact numeric-only presentation (Overview visual-
+                      completion, final alignment pass, task §6): TARGET's
+                      "6" chip-like treatment replaces "N problemas" visually
+                      at <=767px only — presentation-only, this changes
+                      neither the count model nor the live-region semantics
+                      above. Two spans render the exact same truthful count
+                      at every width; CSS alone (index.css, <=767px block)
+                      decides which one is visible, so >=768px keeps
+                      rendering identically to before this pass. The full
+                      phrase always stays in the accessibility tree via the
+                      same visually-hidden clip technique
+                      `.overview-sort-control-label` already uses (never
+                      `display: none`, which would also remove it from
+                      screen readers) — `aria-hidden` on the compact span
+                      stops the visible short text from being announced a
+                      second time alongside it. */}
+                  <span className="overview-results-count-full">{formatPublicCount(visibleProblems.length)} problemas</span>
+                  <span className="overview-results-count-compact" aria-hidden="true">{formatPublicCount(visibleProblems.length)}</span>
+                </p>
               )}
             </div>
           </div>

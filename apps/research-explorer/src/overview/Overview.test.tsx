@@ -272,6 +272,32 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
     expect(emptyState).toBeTruthy();
   });
 
+  /** Final alignment pass, task §6: TARGET's compact (<=767px) toolbar shows
+   * the result count as the bare number ("6") rather than "6 problemas" —
+   * CSS-only presentation (index.css) swaps which of two sibling spans is
+   * visible per breakpoint, so the DOM/testing-library contract asserted
+   * here holds at every viewport: both the full phrase and the bare number
+   * are always present, and the full phrase stays inside the same
+   * `aria-live`/`aria-atomic` live region as before (jsdom does not apply
+   * CSS layout, so this only verifies the markup contract the CSS then
+   * presents differently — see index.css.compactOverview.test.ts for the
+   * CSS-side regression). */
+  it("keeps the full accessible result-count phrase in the live region alongside a numeric-only presentation span", async () => {
+    const provider = makeProvider([
+      { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
+    ]);
+    render(<Overview dataProvider={provider} {...props} />);
+
+    const fullPhrase = await screen.findByText("2 problemas");
+    expect(fullPhrase.classList.contains("overview-results-count-full")).toBe(true);
+    const liveRegion = fullPhrase.closest('[aria-live="polite"]');
+    expect(liveRegion).not.toBeNull();
+
+    const numericSpan = within(liveRegion as HTMLElement).getByText("2", { selector: ".overview-results-count-compact" });
+    expect(numericSpan.getAttribute("aria-hidden")).toBe("true");
+  });
+
   it("keeps Problem rows outside the atomic result announcement and names each row's primary action by title", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },

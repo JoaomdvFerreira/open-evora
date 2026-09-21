@@ -77,6 +77,29 @@ describe("PublicFooter — editorial identity/PROJETO/DADOS structure (Overview 
     expect(within(footer).queryByRole("link", { name: /Descarregar CSV/ })).toBeNull();
   });
 
+  /** Final alignment pass, task §8: the compact 360px summary line was
+   * breaking unnaturally early ("Sem ligação à" / "autarquia...") because
+   * the markup forced the split with an explicit `<br />` at every width,
+   * not because the container was too narrow to hold more. The fix removes
+   * the hardcoded split so wrapping is driven purely by CSS
+   * (`.public-footer-identity`'s max-width, base + <=767px rules) — this
+   * regression guards the markup side of that fix: the exact copy stays a
+   * single contiguous text node with no manual break, so the DOM never
+   * reintroduces an author-picked split point regardless of viewport. */
+  it("renders the summary copy as one continuous text node, with no manual line break forcing a split point at every width", () => {
+    window.history.replaceState(null, "", "/about");
+    render(<App dataProvider={provider} />);
+
+    const footer = screen.getByRole("contentinfo");
+    const summary = within(footer).getByText(
+      "Projecto independente de investigação cívica. Sem ligação à autarquia. Todo o conteúdo remete para fontes verificáveis.",
+    );
+    expect(summary.tagName).toBe("P");
+    expect(summary.querySelector("br")).toBeNull();
+    expect(summary.childNodes.length).toBe(1);
+    expect(summary.childNodes[0]?.nodeType).toBe(Node.TEXT_NODE);
+  });
+
   it("renders correctly beneath every TrustPage, not only the Explorer", () => {
     for (const path of ["/about", "/methodology", "/corrections", "/contact", "/privacy"]) {
       window.history.replaceState(null, "", path);

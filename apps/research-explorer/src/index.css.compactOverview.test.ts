@@ -213,6 +213,18 @@ describe("index.css — compact category rail (<=767px, task §10)", () => {
       expect(combined).not.toMatch(re);
     }
   });
+
+  /** Final alignment pass, task §4/§5: the rail's own bleed (`margin: 0
+   * -1rem`) must re-add exactly the same 1rem it cancels (`padding: ...
+   * 1rem`), so its first chip starts on the same shared compact content
+   * axis as Search/Filtros/row content (all inset by `main.explorer-
+   * shell`'s own compact 1rem gutter) — never a narrower box of its own
+   * that would also need its own left inset. */
+  it("bleeds full width and re-establishes exactly the shared 1rem gutter as its own start padding (never a narrower rail box)", () => {
+    const drawerBody = bodyFromAnyBlock(blocks, ".overview-category-drawer");
+    expect(drawerBody).toMatch(/margin:\s*0\s+-1rem/);
+    expect(drawerBody).toMatch(/padding:\s*\S+\s+1rem/);
+  });
 });
 
 describe("index.css — compact category-rail scrollbar is scoped to the rail only (<=767px, task §12)", () => {
@@ -263,6 +275,42 @@ describe("index.css — compact Footer stacks PROJETO/DADOS vertically (<=767px,
 
     const groupsBody = bodyFromAnyBlock(blocks, ".public-footer-groups");
     expect(groupsBody).toMatch(/flex-direction:\s*column/);
+  });
+});
+
+describe("index.css — compact result count is presented as a bare number while the full phrase stays accessible (<=767px, task §6)", () => {
+  const blocks = compactBlocks();
+
+  it("hides the full '<count> problemas' span visually (clip technique, never display:none) and shows the numeric-only span", () => {
+    const fullBody = bodyFromAnyBlock(blocks, ".overview-results-count-full");
+    expect(fullBody).toMatch(/clip:\s*rect\(0,\s*0,\s*0,\s*0\)/);
+    expect(fullBody).not.toMatch(/display:\s*none/);
+
+    const compactBody = bodyFromAnyBlock(blocks, ".overview-results-count-compact");
+    expect(compactBody).toMatch(/display:\s*inline/);
+  });
+
+  it("keeps the numeric-only span hidden by default outside the compact block (base rule), so >=768px never renders it", () => {
+    const withoutCompactBlocks = blocks.reduce((acc, block) => acc.replace(block, ""), css);
+    const baseBody = ruleBodyContaining(withoutCompactBlocks, ".overview-results-count-compact");
+    expect(baseBody).toMatch(/display:\s*none/);
+  });
+});
+
+describe("index.css — compact Footer summary is not constrained by an inappropriate narrow max-width (<=767px, task §8)", () => {
+  const blocks = compactBlocks();
+
+  it("gives `.public-footer-identity` the available compact content width rather than a narrow desktop-derived measure", () => {
+    const identityBody = bodyFromAnyBlock(blocks, ".public-footer-identity");
+    expect(identityBody).toMatch(/max-width:\s*100%/);
+  });
+
+  it("never re-imposes a `ch`-based measure on the compact summary/identity (that belongs to the >=768px bands only)", () => {
+    for (const selector of [".public-footer-identity", ".public-footer-summary"]) {
+      if (!anyBlockHasRuleFor(blocks, selector)) continue;
+      const body = bodyFromAnyBlock(blocks, selector);
+      expect(body).not.toMatch(/max-width:\s*\d+ch/);
+    }
   });
 });
 
