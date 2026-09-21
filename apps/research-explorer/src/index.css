@@ -2386,18 +2386,25 @@ body:has(.public-overview) .public-footer {
     padding: 0 1rem;
   }
 
-  /* Compact discovery composition (visual-completion compact pass, task §7):
-     an explicit CSS Grid — search full width on its own row, then Filtros /
-     the live count / sort sharing a second row — replacing the earlier
-     column stack (which read as Filtros / search / count / sort, four
-     separate rows). `.overview-toolbar-controls`/`.overview-toolbar-meta`
+  /* Compact discovery composition (visual-completion compact pass, task §7;
+     corrected to a robust explicit 3-area grid in the visual-convergence
+     pass, task §8 — the former `auto 1fr auto` column set let the sort
+     `<select>`'s own intrinsic content width (its longest option text) run
+     past the row's available space, since neither `count` nor `sort` had
+     anywhere to yield; at 360 this visually collided "[Filtros] 6
+     problemasÚltima atualização ↓" into itself). Search sits full width on
+     its own row; Filtros / the live count / sort share a second row as
+     `auto auto 1fr` — Filtros and the count keep their intrinsic (nowrap)
+     widths, and the remaining space is the sort column's own track, so sort
+     is what yields first instead of overflowing past the viewport.
+     `.overview-toolbar-controls`/`.overview-toolbar-meta`
      (CitizenDiscovery.tsx/OverviewPresentation.tsx) are unwrapped via
      `display: contents` below so their children become direct grid items
      here without any DOM/state change — search/filter/sort ownership is
      untouched, only presentation placement. */
   .overview-toolbar {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto auto 1fr;
     grid-template-areas:
       "search search search"
       "filtros count sort";
@@ -2424,7 +2431,9 @@ body:has(.public-overview) .public-footer {
   /* The live-region count wrapper (task §9 — "count remains truthful and
      uses the existing live-region semantics"): no markup change, only grid
      placement via the same `[aria-live]` attribute selector the desktop-fit
-     band already uses for this element. */
+     band already uses for this element. Its own `auto` column track (above)
+     sizes to this content's intrinsic nowrap width, never sharing space
+     with — or being overrun by — the sort column beside it. */
   .overview-toolbar-controls > div[aria-live] {
     grid-area: count;
     justify-self: start;
@@ -2435,11 +2444,35 @@ body:has(.public-overview) .public-footer {
   .overview-results-count {
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
+  /* Sort (task §8/§9): the sole `1fr` track, so it is what absorbs/yields
+     available width — Filtros and the count beside it never lose space to
+     it. `min-width: 0` lets the grid item itself shrink below the native
+     `<select>`'s intrinsic content width; `.overview-sort-control select`
+     below is what actually keeps the shrunk box legible instead of clipping
+     asymmetrically. */
   .overview-sort-control {
     grid-area: sort;
+    min-width: 0;
     justify-self: end;
+    max-width: 100%;
+  }
+
+  /* The full accessible option text (and the full desktop visible text) is
+     unchanged — screen readers still announce the complete "Última
+     atualização ↓" option regardless of the select's rendered width. Only
+     the compact VISUAL box is bounded/truncated (task §9 — "presentation-
+     only compact label equivalent to the same meaning"), so it can never
+     force the grid row wider than the viewport or collide with the count
+     beside it. */
+  .overview-sort-control select {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* Full-bleed bleed matches `main.explorer-shell`'s compact 1rem horizontal
@@ -2459,14 +2492,17 @@ body:has(.public-overview) .public-footer {
     text-align: left;
   }
 
-  /* Matches `.overview-problem-row-link`'s own compact inset drop above —
-     the end-of-results row shares the results column's left axis at every
-     viewport. Status, paginator (when present), and the CTA stack cleanly
-     rather than compressing onto one line (§7). */
+  /* Shares the results column's left axis at every viewport — the same
+     compact 1rem content gutter the row-content fix below restores to
+     `.overview-problem-row-link` (task §13/§18's shared compact content
+     axis), now that both sit inside the same full-bleed `.overview-results`
+     band. Status, paginator (when present), and the CTA stack cleanly
+     rather than compressing onto one line (§7); vertical whitespace
+     trimmed further (task §16). */
   .overview-end-of-results-inner {
     flex-direction: column;
     align-items: flex-start;
-    padding: 0.875rem 0;
+    padding: 0.7rem 1rem;
   }
 
   .overview-end-of-results-status {
@@ -3665,28 +3701,48 @@ body:has(.public-overview) .public-footer {
   .trust-facts > div { grid-template-columns: 1fr; gap: 0.2rem; }
   .trust-content { overflow-wrap: anywhere; }
 
+  /* Footer density (task §17): top/bottom padding and every internal gap
+     reduced from the first compact pass's desktop-carried values — CURRENT
+     is still much taller than TARGET at this width. Copy/links/routes and
+     the vertical PROJETO/DADOS group structure (below) are unchanged, only
+     the rhythm between them. */
   .public-footer {
-    padding-right: 1rem;
-    padding-left: 1rem;
+    padding: 28px 1rem 34px;
   }
 
   .public-footer-inner {
     flex-direction: column;
-    gap: var(--space-loose);
+    gap: 1.1rem;
   }
 
   .public-footer-identity {
     max-width: 100%;
   }
 
+  .public-footer-brand {
+    margin-bottom: 0.3rem;
+  }
+
+  .public-footer-summary {
+    line-height: 1.48;
+  }
+
   /* True vertical Footer (task §14): PROJETO/DADOS stack under identity
      instead of remaining a horizontal two-column group — `.public-footer-
      inner`'s own column stack above already separates identity from this
      whole group; this additionally stacks PROJETO above DADOS within it,
-     preserving section order and tightening the inter-group gap. */
+     preserving section order and tightening the inter-group gap (task §17). */
   .public-footer-groups {
     flex-direction: column;
-    gap: var(--space-loose);
+    gap: 0.9rem;
+  }
+
+  .public-footer-group > p {
+    margin-bottom: 0.4rem;
+  }
+
+  .public-footer-group ul {
+    gap: 6px;
   }
 
   /* Compact Header (<=767px, visual-completion compact pass, task §2):
@@ -3701,12 +3757,18 @@ body:has(.public-overview) .public-footer {
     background: var(--color-surface-reading);
   }
 
+  /* Row height (visual-convergence pass, task §3): closed-Header density
+     nudged down from the first compact pass's `0.6rem` vertical padding —
+     TARGET's closed row reads noticeably lower. Still comfortably above the
+     hamburger's own `--target-min`-adjacent floor below, so the row's
+     rendered height is governed by the toggle's tap size, not squeezed
+     under it. */
   .explorer-chrome-inner {
     flex-wrap: wrap;
     align-items: center;
     gap: 0;
     max-width: none;
-    padding: 0.6rem 1rem;
+    padding: 0.45rem 1rem;
   }
 
   .explorer-chrome-group {
@@ -3732,26 +3794,32 @@ body:has(.public-overview) .public-footer {
     display: none;
   }
 
+  /* Wordmark size (task §3): slightly smaller than the first compact pass's
+     17px, converging toward TARGET's lighter closed identity. */
   .oe-logo--wordmark {
-    font-size: 17px;
+    font-size: 15.5px;
   }
 
-  /* Hamburger toggle (task §2): native button, real tap target, no fixed
+  /* Hamburger toggle (task §2/§3): native button, real tap target, no fixed
      positioning of its own — it is simply the header row's second (and, by
-     `margin-left: auto`, right-pushed) flex item. */
+     `margin-left: auto`, right-pushed) flex item. Dimensions/padding/icon
+     size reduced modestly from the first compact pass's 44px
+     (`--target-min`) floor — still a real ~40px box, comfortably within
+     WCAG 2.5.5's AA (24px) and close to its AAA guidance, not the generic
+     `--target-min` token TARGET's own lighter control does not carry. */
   .explorer-menu-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: var(--target-min);
-    min-height: var(--target-min);
+    min-width: 40px;
+    min-height: 40px;
     margin-left: auto;
     padding: 0;
     color: var(--color-ink-primary);
     border: 1px solid var(--color-separator-standard);
     border-radius: var(--radius-control);
     background: none;
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     cursor: pointer;
   }
 
@@ -3833,18 +3901,19 @@ body:has(.public-overview) .public-footer {
     font-size: 1.65rem;
   }
 
-  /* Compact Hero (<=767px, visual-completion compact pass, task §3/§4):
-     vertical padding only — no horizontal padding of its own. `main.
-     explorer-shell`'s own compact 1rem gutter (base rule above) is the
-     Hero's sole horizontal inset, the same axis discovery/rows/Footer
-     already share, so Hero text starts flush with the rest of the page
-     instead of sitting behind a second, redundant inset. Vertical rhythm
-     converges toward TARGET's tighter compact density (§4): shorter
-     top/bottom padding than the earlier "responsive safety" value, and the
-     single editorial column drops its `max-width`/negative-space
-     reservation so copy uses the full compact measure. */
+  /* Compact Hero (<=767px, visual-completion compact pass, task §3/§4;
+     tightened further in the visual-convergence pass, task §4): vertical
+     padding only — no horizontal padding of its own. `main.explorer-shell`'s
+     own compact 1rem gutter (base rule above) is the Hero's sole horizontal
+     inset, the same axis discovery/rows/Footer already share, so Hero text
+     starts flush with the rest of the page instead of sitting behind a
+     second, redundant inset (never reintroducing that double gutter). Every
+     internal gap below is reduced from the first compact pass's values —
+     the headline hierarchy/copy/metric count are untouched, only the
+     rhythm between them converges toward TARGET's noticeably shorter
+     compact Hero. */
   .overview-hero {
-    padding: var(--space-standard) 0 var(--space-loose);
+    padding: 0.85rem 0 1.1rem;
   }
 
   .overview-hero-content {
@@ -3852,30 +3921,38 @@ body:has(.public-overview) .public-footer {
   }
 
   .overview-hero-eyebrow {
-    margin-bottom: 0.65rem;
+    margin-bottom: 0.5rem;
   }
 
   .overview-hero-headline {
-    margin-bottom: 0.65rem;
+    margin-bottom: 0.5rem;
     font-size: 1.5rem;
   }
 
+  /* Supporting copy (task §6): font-size/line-height trimmed slightly from
+     the desktop 21px/1.6 — still the reading/serif role, still legible
+     contrast, just less vertical weight than the desktop measure carries
+     over unchanged at compact. */
   .overview-hero-supporting {
-    margin-bottom: 1.1rem;
+    margin-bottom: 0.85rem;
     max-width: 100%;
+    font-size: 15.5px;
+    line-height: 1.5;
   }
 
-  /* Compact metrics (task §6): one deliberate vertical technical list —
+  /* Compact metrics (task §6/§7): one deliberate vertical technical list —
      replacing the desktop inline-wrap phrase row — rather than the earlier
      irregular multi-column wrap this same `flex-wrap: wrap` produced at 360.
      All four existing metrics stay (never dropping `Total de registos`);
      values remain the same dynamic props, only the compact presentation
-     changes. */
+     changes. Gap/line-height tightened further (task §7) so the group reads
+     as one small technical list rather than four separate blocks. */
   .overview-metrics {
     display: flex;
     flex-direction: column;
     max-width: none;
-    gap: 0.4rem;
+    gap: 0.3rem;
+    line-height: 1.25;
   }
 
   /* Compact search (task §15): the Cmd/Ctrl+K affordance is a desktop-only
@@ -3901,46 +3978,91 @@ body:has(.public-overview) .public-footer {
     padding: 0.75rem 0;
   }
 
-  /* Compact category rail (visual-completion compact pass, task §10): when
-     Filtros is open, topic options render as ONE horizontally scrollable
-     rail — `flex-wrap: nowrap` plus each option's own `flex: 0 0 auto`
-     (below) so chips keep their intrinsic width instead of wrapping into
-     several rows. Collapsed-by-default state is untouched (drawerOpen stays
-     `false` initially — OverviewPresentation.tsx's own local state); this
-     only changes how the drawer looks once opened. Local overflow only: the
-     rail itself may scroll horizontally, the page must not — `overflow-x:
-     hidden` on any ancestor is deliberately not used to achieve that (task
-     §15), this rail's own bounded `overflow-x: auto` is the sole scroll
-     container. Negative-margin bleed matches `.overview-discovery`'s own
-     compact 1rem gutter above so the rail can use the full viewport width
-     for scrolling while its content still starts flush with the shared
-     content axis. */
+  /* Compact category rail (visual-completion compact pass, task §10; density
+     + scrollbar converged toward TARGET in the visual-convergence pass, task
+     §11/§12): when Filtros is open, topic options render as ONE horizontally
+     scrollable rail — `flex-wrap: nowrap` plus each option's own
+     `flex: 0 0 auto` (below) so chips keep their intrinsic width instead of
+     wrapping into several rows. Collapsed-by-default state is untouched
+     (drawerOpen stays `false` initially — OverviewPresentation.tsx's own
+     local state); this only changes how the drawer looks once opened. Local
+     overflow only: the rail itself may scroll horizontally, the page must
+     not — `overflow-x: hidden` on any ancestor is deliberately not used to
+     achieve that (task §15), this rail's own bounded `overflow-x: auto` is
+     the sole scroll container. Negative-margin bleed matches
+     `.overview-discovery`'s own compact 1rem gutter above so the rail can
+     use the full viewport width for scrolling while its content still
+     starts flush with the shared content axis. */
   .overview-category-drawer {
     flex-wrap: nowrap;
-    gap: 0.5rem;
+    gap: 0.4rem;
     margin: 0 -1rem;
-    padding: 0.75rem 1rem;
+    padding: 0.6rem 1rem 0.75rem;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    /* Discreet local scrollbar (task §12): a slim, low-contrast bar rather
+       than the browser's default heavy horizontal scrollbar — scoped
+       strictly to this rail via the class selectors below, never the page
+       scrollbar or any other horizontal scroller in the app. Progressive
+       enhancement only: Firefox honours `scrollbar-width`/`scrollbar-color`
+       directly; WebKit/Blink honour the `::-webkit-scrollbar*` rules below;
+       a browser supporting neither still gets the fully usable native
+       scrollbar this rule set is refining, not hiding. */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-separator-standard) transparent;
   }
 
+  .overview-category-drawer::-webkit-scrollbar {
+    height: 5px;
+  }
+
+  .overview-category-drawer::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .overview-category-drawer::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--color-separator-standard);
+  }
+
+  /* Chip density (task §11): lower height and tighter padding than the
+     desktop/first-compact-pass option, plus a slightly smaller
+     text/count size — TARGET's noticeably more compact strip. Labels are
+     never truncated, only the box around them tightened. */
   .overview-category-drawer-option {
     flex: 0 0 auto;
+    min-height: 29px;
+    padding: 4px 9px;
+    font-size: 12.5px;
   }
 
-  /* Row-density pass (visual-completion compact pass, task §11): a real
+  .overview-category-drawer-count {
+    font-size: 11px;
+  }
+
+  /* Row-density pass (visual-completion compact pass, task §11; corrected +
+     tightened further in the visual-convergence pass, task §13/§14): a real
      compact tightening, not desktop squeezed narrow — reduces vertical row
      padding, meta/gap rhythm, status-chip and technical-text sizes, while
      preserving every row's content, click target, and changed-row clay
-     background/accent (both untouched above, full-width bands unaffected). */
+     background/accent (both untouched above, full-width bands unaffected).
+     Horizontal inset restored (task §13 — the earlier compact rule set only
+     vertical padding here, so row content sat flush against the true
+     viewport edge underneath `.overview-results`'s own edge-to-edge negative
+     margin above, with nothing to reintroduce a content gutter): matches
+     `main.explorer-shell`'s compact 1rem gutter, the same axis Hero/
+     discovery/Footer content already share, while the row BAND itself
+     (`.overview-problem-row`, the changed-row clay background, and its
+     left-edge accent, all untouched above) stays at the true full-bleed
+     viewport edge — only this inner content link is inset. */
   .overview-problem-row-link {
-    padding: 0.85rem 0;
+    padding: 0.7rem 1rem;
   }
 
   .overview-problem-row-meta {
-    gap: 0.4rem;
-    margin-bottom: 8px;
+    gap: 0.35rem;
+    margin-bottom: 6px;
   }
 
   /* Status chip (evidenceStatus, `reading` form — InvestigationStatus.tsx,
@@ -3949,33 +4071,33 @@ body:has(.public-overview) .public-footer {
      .prb-status-chip-caption` above already uses — ProblemView's own reuse
      of the same chip is unaffected. */
   .overview-problem-row-meta .prb-status-chip {
-    padding: 2px 6px;
-    font-size: 11px;
+    padding: 1px 5px;
+    font-size: 10.5px;
   }
 
   .overview-problem-row-lifecycle {
-    font-size: 11px;
+    font-size: 10.5px;
   }
 
   .overview-problem-row-date {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
   }
 
   .overview-problem-list h4 {
-    margin-bottom: 6px;
-    font-size: 0.94rem;
-    line-height: 1.3;
+    margin-bottom: 5px;
+    font-size: 0.92rem;
+    line-height: 1.28;
   }
 
   .overview-problem-statement {
     margin-bottom: 0;
     font-size: 12.5px;
-    line-height: 1.5;
+    line-height: 1.46;
   }
 
   .overview-problem-row .overview-problem-topics {
-    margin-top: 7px;
-    font-size: 11px;
+    margin-top: 6px;
+    font-size: 10.5px;
   }
 
   /* Material-change marker density (task §11/§12 — no fabricated TARGET

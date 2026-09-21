@@ -161,6 +161,24 @@ describe("index.css — compact discovery grid (<=767px, task §7/§9)", () => {
     expect(bodyFromAnyBlock(blocks, ".overview-toolbar-controls > div[aria-live]")).toMatch(/grid-area:\s*count/);
     expect(bodyFromAnyBlock(blocks, ".overview-sort-control")).toMatch(/grid-area:\s*sort/);
   });
+
+  /** Regression for the row-2 "[Filtros]  6 problemasÚltima atualização ↓"
+   * collision defect: Filtros and the count must each own an intrinsic-width
+   * (`auto`) column, and sort must be the sole `1fr` track that actually
+   * yields when space is tight, never sharing an ambiguous flexible column
+   * with the count beside it (visual-convergence pass, task §8). */
+  it("gives Filtros and the count their own intrinsic-width columns and sort the sole flexible column — never `auto 1fr auto` sharing sort's growth with count", () => {
+    const toolbarBody = bodyFromAnyBlock(blocks, ".overview-toolbar");
+    expect(toolbarBody).toMatch(/grid-template-columns:\s*auto\s+auto\s+1fr/);
+  });
+
+  it("keeps the result count nowrap and the sort control's own box boundable, so neither can grow into the other", () => {
+    expect(bodyFromAnyBlock(blocks, ".overview-results-count")).toMatch(/white-space:\s*nowrap/);
+    const sortControlBody = bodyFromAnyBlock(blocks, ".overview-sort-control");
+    expect(sortControlBody).toMatch(/min-width:\s*0/);
+    const sortSelectBody = bodyFromAnyBlock(blocks, ".overview-sort-control select");
+    expect(sortSelectBody).toMatch(/max-width:\s*100%/);
+  });
 });
 
 describe("index.css — compact category rail (<=767px, task §10)", () => {
@@ -184,6 +202,45 @@ describe("index.css — compact category rail (<=767px, task §10)", () => {
       const re = new RegExp(`(^|[^-\\w])${escaped}\\s*\\{[^}]*overflow-x:\\s*hidden`, "m");
       expect(combined).not.toMatch(re);
     }
+  });
+});
+
+describe("index.css — compact category-rail scrollbar is scoped to the rail only (<=767px, task §12)", () => {
+  const blocks = compactBlocks();
+
+  it("restrains the rail's own scrollbar (progressive scrollbar-width/color + WebKit selectors)", () => {
+    const drawerBody = bodyFromAnyBlock(blocks, ".overview-category-drawer");
+    expect(drawerBody).toMatch(/scrollbar-width:\s*thin/);
+    expect(anyBlockHasRuleFor(blocks, ".overview-category-drawer::-webkit-scrollbar")).toBe(true);
+  });
+
+  it("never applies WebKit scrollbar restraint to an unrelated selector (scoped strictly to the rail)", () => {
+    const combined = blocks.join("\n");
+    const webkitScrollbarSelectors = combined.match(/[^\n{}]*::-webkit-scrollbar[^\n{}]*\{/g) ?? [];
+    expect(webkitScrollbarSelectors.length).toBeGreaterThan(0);
+    for (const selector of webkitScrollbarSelectors) {
+      expect(selector).toMatch(/\.overview-category-drawer::-webkit-scrollbar/);
+    }
+  });
+});
+
+describe("index.css — compact row content has an inner gutter while the row band stays full-bleed (<=767px, task §13)", () => {
+  const blocks = compactBlocks();
+
+  it("insets row CONTENT with the shared compact 1rem gutter", () => {
+    const linkBody = bodyFromAnyBlock(blocks, ".overview-problem-row-link");
+    expect(linkBody).toMatch(/padding:\s*\S+\s+1rem/);
+  });
+
+  it("never gives the row BAND (`.overview-problem-row`/`--changed`) a compact horizontal inset of its own — only the full-bleed `.overview-results` negative-margin bleed applies", () => {
+    for (const selector of [".overview-problem-row", ".overview-problem-row--changed"]) {
+      expect(anyBlockHasRuleFor(blocks, selector)).toBe(false);
+    }
+  });
+
+  it("keeps the end-of-results content on the same compact gutter as row content", () => {
+    const endOfResultsBody = bodyFromAnyBlock(blocks, ".overview-end-of-results-inner");
+    expect(endOfResultsBody).toMatch(/padding:\s*\S+\s+1rem/);
   });
 });
 
