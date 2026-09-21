@@ -1483,19 +1483,16 @@ main.explorer-shell {
    Explorer.tsx/Overview.tsx render these class names directly — this is the
    production presentation, not a Storybook-only preview. */
 .explorer-chrome {
-  min-height: 0;
+  min-height: 67px;
   border-bottom-color: var(--color-separator-standard);
   background: var(--color-surface-reading);
 }
 
-/* Compact desktop vertical padding (visual-completion, final desktop-
-   correction pass §3), tightened from the earlier ~20px: TARGET's Header is
-   visibly shorter, and the nav actions below no longer impose the generic
-   `--target-min` tap-target height on top of this padding, so the header's
-   total height converges toward TARGET without either value alone having to
-   do all the work. The header's height remains the natural result of its own
-   content plus this padding — never a min-height on `.explorer-chrome`
-   itself. */
+/* Desktop vertical padding (visual-completion, final desktop-correction
+   pass §3; header height increased again per owner request to converge on
+   `.explorer-chrome`'s `min-height: 67px` above). The nav actions below
+   still impose no generic `--target-min` tap-target height on top of this
+   padding. */
 .explorer-chrome-inner {
   gap: var(--space-standard);
   padding: 6px 0;
@@ -1505,6 +1502,8 @@ main.explorer-shell {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  padding-bottom: 0;
+  margin-bottom: 0;
 }
 
 /* Site identity given substantially more presence than the earlier compact
