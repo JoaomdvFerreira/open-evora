@@ -5,6 +5,7 @@ import { describeTopic } from "../presentation/topicMapping";
 import { IconMenu, IconSearch, IconTrendUp } from "../presentation/icons";
 import { EvidenceStatus } from "../problem/InvestigationStatus";
 import { publicEnumLabel } from "../presentation/presentation";
+import { useNarrowViewport } from "../records/useNarrowViewport";
 
 /** True on a Mac keyboard layout (Cmd-based shortcut copy), false everywhere
  * else (Ctrl-based) — read once per render rather than cached at module
@@ -226,28 +227,71 @@ const SORT_LABELS: Record<ProblemSortOrder, string> = {
   updatedAt: "Última atualização ↓",
 };
 
+// Compact (<=767px) visible option text (visual-convergence pass, task §3):
+// a deliberate short editorial equivalent — never a CSS text-overflow
+// ellipsis of the full label — reusing the same truthful direction arrow.
+// `updatedAt`'s value/semantics and `id`'s alternative are both unchanged;
+// only the rendered option text shortens. Screen readers still get the full
+// meaning via `SORT_LABELS_ACCESSIBLE` below regardless of viewport width.
+const SORT_LABELS_COMPACT: Record<ProblemSortOrder, string> = {
+  id: "ID ↑",
+  updatedAt: "alteração ↓",
+};
+
+// Full accessible sort-order names, independent of which visible option text
+// is currently rendered — folded into the `<select>`'s own `aria-label` so
+// the compact short text never narrows the accessible meaning (task §3).
+const SORT_LABELS_ACCESSIBLE: Record<ProblemSortOrder, string> = {
+  id: "Identificador, ordem ascendente",
+  updatedAt: "Última atualização, mais recente primeiro",
+};
+
 /**
- * The toolbar's sort control (visual-completion pass, task §8) — a single
- * quiet editorial affordance reading as just "Última atualização ↓", rather
- * than the earlier visible "Ordenar por  Última atualização ↓ ▼" stack.
- * `Ordenar por` stays a real `<label>` associated to the `<select>` (visually
- * hidden via the same clip technique the search label already uses, never
- * removed from the accessible name), and the option text's own truthful "↓"
- * remains the sole visual direction indicator — the native select's own
- * chevron is suppressed (`appearance: none` in index.css) so the two never
- * double up. Still a native `<select>`, not a custom dropdown, so listbox
- * semantics/keyboard behaviour stay exactly what the browser already
- * provides. */
+ * The toolbar's sort control (visual-completion pass, task §8; compact label
+ * corrected in the visual-convergence pass, task §3): a single quiet
+ * editorial affordance reading as just "Última atualização ↓" at >=768px,
+ * unchanged from before this pass. `Ordenar por` stays a real `<label>`
+ * associated to the `<select>` (visually hidden via the same clip technique
+ * the search label already uses, never removed from the accessible name),
+ * and the option text's own truthful "↓" remains the sole visual direction
+ * indicator — the native select's own chevron is suppressed (`appearance:
+ * none` in index.css) so the two never double up. Still a native `<select>`,
+ * not a custom dropdown, so listbox semantics/keyboard behaviour stay
+ * exactly what the browser already provides.
+ *
+ * Compact presentation (<=767px, task §3): CURRENT let the native `<select>`
+ * clip "Última atua..." via CSS `text-overflow: ellipsis` — visually
+ * unfinished, and the browser's own popup listbox still showed the truncated
+ * text too, since ellipsis only hides overflow, it never shortens the actual
+ * option string. TARGET's `alteração ↓` is a deliberately short label
+ * instead: `useNarrowViewport` (the same existing `<=767px` breakpoint
+ * `RecordsTable` already tracks) picks `SORT_LABELS_COMPACT` in place of the
+ * full `SORT_LABELS` text for the rendered `<option>`s only — `value`
+ * (`ProblemSortOrder`) and `onChange` are completely untouched, so
+ * `updatedAt`'s semantics and `id` as the alternative order are both
+ * preserved unchanged. At >=768px the `<select>` renders exactly as before
+ * this pass (full option text, name from the associated `<label>`, no
+ * `aria-label`) — the shortened text and the supplementing `aria-label`
+ * (`SORT_LABELS_ACCESSIBLE`, restating the full order name so the accessible
+ * name never shrinks to the short visible text) apply ONLY while
+ * `isNarrow`. */
 export function SortControl({ value, onChange, id = "overview-sort" }: {
   value: ProblemSortOrder;
   onChange: (order: ProblemSortOrder) => void;
   id?: string;
 }) {
+  const isNarrow = useNarrowViewport();
+  const labels = isNarrow ? SORT_LABELS_COMPACT : SORT_LABELS;
   return (
     <p className="overview-sort-control">
       <label htmlFor={id} className="overview-sort-control-label">Ordenar por</label>
-      <select id={id} value={value} onChange={(event) => onChange(event.target.value as ProblemSortOrder)}>
-        {(Object.entries(SORT_LABELS) as [ProblemSortOrder, string][]).map(([order, text]) => (
+      <select
+        id={id}
+        value={value}
+        aria-label={isNarrow ? `Ordenar por: ${SORT_LABELS_ACCESSIBLE[value]}` : undefined}
+        onChange={(event) => onChange(event.target.value as ProblemSortOrder)}
+      >
+        {(Object.entries(labels) as [ProblemSortOrder, string][]).map(([order, text]) => (
           <option key={order} value={order}>{text}</option>
         ))}
       </select>

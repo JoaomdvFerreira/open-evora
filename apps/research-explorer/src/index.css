@@ -2460,18 +2460,18 @@ body:has(.public-overview) .public-footer {
     max-width: 100%;
   }
 
-  /* The full accessible option text (and the full desktop visible text) is
-     unchanged — screen readers still announce the complete "Última
-     atualização ↓" option regardless of the select's rendered width. Only
-     the compact VISUAL box is bounded/truncated (task §9 — "presentation-
-     only compact label equivalent to the same meaning"), so it can never
-     force the grid row wider than the viewport or collide with the count
-     beside it. */
+  /* Compact sort label (visual-convergence pass, task §3): SortControl now
+     renders a deliberately short option string at this width ("alteração
+     ↓"/"ID ↑", CitizenDiscovery.tsx's `SORT_LABELS_COMPACT`) instead of
+     relying on CSS to clip the full desktop text — so `text-overflow:
+     ellipsis` is no longer needed here and is deliberately removed (an
+     ellipsis on already-short text would only add visual noise). `nowrap` +
+     `max-width: 100%` remain: they keep the (now short) text on one line and
+     stop the box from forcing the grid row wider than the viewport, without
+     ever truncating it. */
   .overview-sort-control select {
     min-width: 0;
     max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
@@ -2502,7 +2502,8 @@ body:has(.public-overview) .public-footer {
   .overview-end-of-results-inner {
     flex-direction: column;
     align-items: flex-start;
-    padding: 0.7rem 1rem;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
   }
 
   .overview-end-of-results-status {
@@ -2512,6 +2513,7 @@ body:has(.public-overview) .public-footer {
   .overview-propose-problem {
     width: 100%;
     justify-content: center;
+    padding: 0.5rem 0.85rem;
   }
 
   .overview-material-change-section {
@@ -3701,18 +3703,18 @@ body:has(.public-overview) .public-footer {
   .trust-facts > div { grid-template-columns: 1fr; gap: 0.2rem; }
   .trust-content { overflow-wrap: anywhere; }
 
-  /* Footer density (task §17): top/bottom padding and every internal gap
-     reduced from the first compact pass's desktop-carried values — CURRENT
-     is still much taller than TARGET at this width. Copy/links/routes and
-     the vertical PROJETO/DADOS group structure (below) are unchanged, only
-     the rhythm between them. */
+  /* Footer density (task §17; tightened further in the final density pass,
+     task §15): top/bottom padding and every internal gap reduced again from
+     the visual-convergence pass's values — CURRENT is still taller than
+     TARGET at this width. Copy/links/routes and the vertical PROJETO/DADOS
+     group structure (below) are unchanged, only the rhythm between them. */
   .public-footer {
-    padding: 28px 1rem 34px;
+    padding: 20px 1rem 26px;
   }
 
   .public-footer-inner {
     flex-direction: column;
-    gap: 1.1rem;
+    gap: 0.85rem;
   }
 
   .public-footer-identity {
@@ -3720,29 +3722,31 @@ body:has(.public-overview) .public-footer {
   }
 
   .public-footer-brand {
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.22rem;
   }
 
   .public-footer-summary {
-    line-height: 1.48;
+    font-size: 12.5px;
+    line-height: 1.4;
   }
 
   /* True vertical Footer (task §14): PROJETO/DADOS stack under identity
      instead of remaining a horizontal two-column group — `.public-footer-
      inner`'s own column stack above already separates identity from this
      whole group; this additionally stacks PROJETO above DADOS within it,
-     preserving section order and tightening the inter-group gap (task §17). */
+     preserving section order and tightening the inter-group gap (task §17;
+     tightened again in the final density pass, task §15). */
   .public-footer-groups {
     flex-direction: column;
-    gap: 0.9rem;
+    gap: 0.65rem;
   }
 
   .public-footer-group > p {
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.3rem;
   }
 
   .public-footer-group ul {
-    gap: 6px;
+    gap: 5px;
   }
 
   /* Compact Header (<=767px, visual-completion compact pass, task §2):
@@ -3757,18 +3761,18 @@ body:has(.public-overview) .public-footer {
     background: var(--color-surface-reading);
   }
 
-  /* Row height (visual-convergence pass, task §3): closed-Header density
-     nudged down from the first compact pass's `0.6rem` vertical padding —
-     TARGET's closed row reads noticeably lower. Still comfortably above the
-     hamburger's own `--target-min`-adjacent floor below, so the row's
-     rendered height is governed by the toggle's tap size, not squeezed
-     under it. */
+  /* Row height (visual-convergence pass, task §3; nudged again in the final
+     density pass, task §4): closed-Header density lowered further from the
+     visual-convergence pass's `0.45rem` vertical padding — TARGET's closed
+     row reads lower still. Still comfortably above the hamburger's own
+     36px floor below, so the row's rendered height is governed by the
+     toggle's tap size, not squeezed under it. */
   .explorer-chrome-inner {
     flex-wrap: wrap;
     align-items: center;
     gap: 0;
     max-width: none;
-    padding: 0.45rem 1rem;
+    padding: 0.36rem 1rem;
   }
 
   .explorer-chrome-group {
@@ -3794,32 +3798,34 @@ body:has(.public-overview) .public-footer {
     display: none;
   }
 
-  /* Wordmark size (task §3): slightly smaller than the first compact pass's
-     17px, converging toward TARGET's lighter closed identity. */
+  /* Wordmark size (task §3; nudged again in the final density pass, task
+     §4): slightly smaller than the visual-convergence pass's 15.5px,
+     converging further toward TARGET's lighter closed identity. */
   .oe-logo--wordmark {
-    font-size: 15.5px;
+    font-size: 14.5px;
   }
 
-  /* Hamburger toggle (task §2/§3): native button, real tap target, no fixed
-     positioning of its own — it is simply the header row's second (and, by
-     `margin-left: auto`, right-pushed) flex item. Dimensions/padding/icon
-     size reduced modestly from the first compact pass's 44px
-     (`--target-min`) floor — still a real ~40px box, comfortably within
-     WCAG 2.5.5's AA (24px) and close to its AAA guidance, not the generic
-     `--target-min` token TARGET's own lighter control does not carry. */
+  /* Hamburger toggle (task §2/§3; nudged again in the final density pass,
+     task §4): native button, real tap target, no fixed positioning of its
+     own — it is simply the header row's second (and, by `margin-left:
+     auto`, right-pushed) flex item. Dimensions/padding/icon size reduced
+     modestly again from the visual-convergence pass's 40px box — still a
+     real 36px box, comfortably within WCAG 2.5.5 AA's 24px floor, not the
+     generic `--target-min` token TARGET's own lighter control does not
+     carry. */
   .explorer-menu-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 36px;
+    min-height: 36px;
     margin-left: auto;
     padding: 0;
     color: var(--color-ink-primary);
     border: 1px solid var(--color-separator-standard);
     border-radius: var(--radius-control);
     background: none;
-    font-size: 1.05rem;
+    font-size: 0.98rem;
     cursor: pointer;
   }
 
@@ -3902,18 +3908,19 @@ body:has(.public-overview) .public-footer {
   }
 
   /* Compact Hero (<=767px, visual-completion compact pass, task §3/§4;
-     tightened further in the visual-convergence pass, task §4): vertical
-     padding only — no horizontal padding of its own. `main.explorer-shell`'s
-     own compact 1rem gutter (base rule above) is the Hero's sole horizontal
-     inset, the same axis discovery/rows/Footer already share, so Hero text
-     starts flush with the rest of the page instead of sitting behind a
-     second, redundant inset (never reintroducing that double gutter). Every
-     internal gap below is reduced from the first compact pass's values —
-     the headline hierarchy/copy/metric count are untouched, only the
-     rhythm between them converges toward TARGET's noticeably shorter
+     tightened further in the visual-convergence pass, task §4; tightened
+     again in the final density pass, task §5): vertical padding only — no
+     horizontal padding of its own. `main.explorer-shell`'s own compact 1rem
+     gutter (base rule above) is the Hero's sole horizontal inset, the same
+     axis discovery/rows/Footer already share, so Hero text starts flush
+     with the rest of the page instead of sitting behind a second, redundant
+     inset (never reintroducing that double gutter). Every internal gap
+     below is reduced again from the visual-convergence pass's values — the
+     headline hierarchy/copy/metric count are untouched, only the rhythm
+     between them converges further toward TARGET's noticeably shorter
      compact Hero. */
   .overview-hero {
-    padding: 0.85rem 0 1.1rem;
+    padding: 0.65rem 0 0.85rem;
   }
 
   .overview-hero-content {
@@ -3921,38 +3928,54 @@ body:has(.public-overview) .public-footer {
   }
 
   .overview-hero-eyebrow {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
   }
 
+  /* Eyebrow chip density (task §5): shorter vertical padding than the
+     desktop/base 0.3rem 0.7rem, converging the pill itself toward TARGET's
+     lower closed-eyebrow height. */
+  .overview-hero-eyebrow-chip {
+    padding: 0.2rem 0.55rem;
+    font-size: 11.5px;
+  }
+
+  /* Compact headline (task §6): a modest reduction from the visual-
+     convergence pass's 1.5rem/unset line-height — font-family/weight/
+     wording/two-line editorial hierarchy (`.overview-hero-headline-line`)
+     are all untouched, and the headline stays clearly dominant over the
+     supporting copy below it. */
   .overview-hero-headline {
-    margin-bottom: 0.5rem;
-    font-size: 1.5rem;
+    margin-bottom: 0.4rem;
+    font-size: 1.35rem;
+    line-height: 1.14;
   }
 
-  /* Supporting copy (task §6): font-size/line-height trimmed slightly from
-     the desktop 21px/1.6 — still the reading/serif role, still legible
-     contrast, just less vertical weight than the desktop measure carries
-     over unchanged at compact. */
+  /* Supporting copy (task §6/§7): font-size/line-height trimmed further from
+     the visual-convergence pass's 15.5px/1.5 — still the reading/serif role,
+     still legible contrast, aiming for a concise two/three-line editorial
+     introduction at 360 per TARGET. */
   .overview-hero-supporting {
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.65rem;
     max-width: 100%;
-    font-size: 15.5px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.42;
   }
 
-  /* Compact metrics (task §6/§7): one deliberate vertical technical list —
+  /* Compact metrics (task §6/§7/§8): one deliberate vertical technical list —
      replacing the desktop inline-wrap phrase row — rather than the earlier
      irregular multi-column wrap this same `flex-wrap: wrap` produced at 360.
      All four existing metrics stay (never dropping `Total de registos`);
      values remain the same dynamic props, only the compact presentation
-     changes. Gap/line-height tightened further (task §7) so the group reads
-     as one small technical list rather than four separate blocks. */
+     changes. Font-size/gap/line-height tightened again (task §8) so the
+     group reads as one small, dense technical block rather than four
+     separate lines. */
   .overview-metrics {
     display: flex;
     flex-direction: column;
     max-width: none;
-    gap: 0.3rem;
-    line-height: 1.25;
+    gap: 0.22rem;
+    font-size: 12px;
+    line-height: 1.2;
   }
 
   /* Compact search (task §15): the Cmd/Ctrl+K affordance is a desktop-only
@@ -3963,8 +3986,12 @@ body:has(.public-overview) .public-footer {
     display: none;
   }
 
+  /* Search control density (task §9): a modest height/padding reduction
+     from the shared 37px/0.4rem base — full-width row, icon, and placeholder
+     are all unchanged, only the box itself is lower. */
   .overview-search-input {
-    padding-right: 0.85rem;
+    min-height: 34px;
+    padding: 0.32rem 0.85rem 0.32rem 2.1rem;
     max-width: none;
   }
 
@@ -3972,10 +3999,20 @@ body:has(.public-overview) .public-footer {
     font-size: 0.78rem;
   }
 
+  /* Filtros toggle density (task §9): matches the search input's own
+     lowered compact height so the two still read as one row when the
+     toolbar grid places them side by side — menu icon and disclosure
+     semantics are unchanged. */
+  .overview-filtros-toggle {
+    min-height: 34px;
+    padding: 0.32rem 0.6rem;
+  }
+
   /* Compact toolbar vertical rhythm (<=767px, task §9): tightened padding
-     around the new two-row grid above. */
+     around the new two-row grid above, reduced again in the final density
+     pass. */
   .overview-toolbar {
-    padding: 0.75rem 0;
+    padding: 0.55rem 0;
   }
 
   /* Compact category rail (visual-completion compact pass, task §10; density
@@ -3995,9 +4032,9 @@ body:has(.public-overview) .public-footer {
      starts flush with the shared content axis. */
   .overview-category-drawer {
     flex-wrap: nowrap;
-    gap: 0.4rem;
+    gap: 0.32rem;
     margin: 0 -1rem;
-    padding: 0.6rem 1rem 0.75rem;
+    padding: 0.45rem 1rem 0.6rem;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
@@ -4026,19 +4063,20 @@ body:has(.public-overview) .public-footer {
     background: var(--color-separator-standard);
   }
 
-  /* Chip density (task §11): lower height and tighter padding than the
-     desktop/first-compact-pass option, plus a slightly smaller
-     text/count size — TARGET's noticeably more compact strip. Labels are
-     never truncated, only the box around them tightened. */
+  /* Chip density (task §11; tightened again in the final density pass, task
+     §10): lower height and tighter padding than the desktop/first-compact-
+     pass option, plus a slightly smaller text/count size — TARGET's
+     noticeably more compact strip. Labels are never truncated, only the box
+     around them tightened. */
   .overview-category-drawer-option {
     flex: 0 0 auto;
-    min-height: 29px;
-    padding: 4px 9px;
-    font-size: 12.5px;
+    min-height: 26px;
+    padding: 3px 8px;
+    font-size: 12px;
   }
 
   .overview-category-drawer-count {
-    font-size: 11px;
+    font-size: 10.5px;
   }
 
   /* Row-density pass (visual-completion compact pass, task §11; corrected +
@@ -4057,12 +4095,20 @@ body:has(.public-overview) .public-footer {
      left-edge accent, all untouched above) stays at the true full-bleed
      viewport edge — only this inner content link is inset. */
   .overview-problem-row-link {
-    padding: 0.7rem 1rem;
+    padding: 0.55rem 1rem;
   }
 
   .overview-problem-row-meta {
-    gap: 0.35rem;
-    margin-bottom: 6px;
+    gap: 0.3rem;
+    margin-bottom: 5px;
+  }
+
+  /* PRB id density (final density pass, task §12): scoped to the Overview
+     row only, same scoping technique the status chip/lifecycle/date rules
+     already use here — ProblemView/Records/History keep the shared
+     `--recipe-technical-id-size` token untouched. */
+  .overview-problem-row-meta .overview-problem-technical-id {
+    font-size: 10px;
   }
 
   /* Status chip (evidenceStatus, `reading` form — InvestigationStatus.tsx,
@@ -4072,40 +4118,40 @@ body:has(.public-overview) .public-footer {
      of the same chip is unaffected. */
   .overview-problem-row-meta .prb-status-chip {
     padding: 1px 5px;
-    font-size: 10.5px;
+    font-size: 10px;
   }
 
   .overview-problem-row-lifecycle {
-    font-size: 10.5px;
+    font-size: 10px;
   }
 
   .overview-problem-row-date {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
   }
 
   .overview-problem-list h4 {
-    margin-bottom: 5px;
-    font-size: 0.92rem;
-    line-height: 1.28;
+    margin-bottom: 4px;
+    font-size: 0.88rem;
+    line-height: 1.24;
   }
 
   .overview-problem-statement {
     margin-bottom: 0;
-    font-size: 12.5px;
-    line-height: 1.46;
+    font-size: 12px;
+    line-height: 1.42;
   }
 
   .overview-problem-row .overview-problem-topics {
-    margin-top: 6px;
-    font-size: 10.5px;
+    margin-top: 5px;
+    font-size: 10px;
   }
 
   /* Material-change marker density (task §11/§12 — no fabricated TARGET
      labels; the truthful canonical "ALTERAÇÃO REGISTADA · DD/MM" text is
      unchanged, only its compact size/gap). */
   .overview-problem-row-change-marker {
-    margin-bottom: 0.3rem;
-    font-size: 10.5px;
+    margin-bottom: 0.25rem;
+    font-size: 10px;
   }
 
   /* Sticky compact header (F4, extended by ODM-016B): anchor-target sections

@@ -371,6 +371,58 @@ describe("SortControl", () => {
     await user.selectOptions(select, "Última atualização ↓");
     expect(onChange).toHaveBeenCalledWith("updatedAt");
   });
+
+  /**
+   * Compact (<=767px) presentation — visual-convergence pass, task §3/§20.
+   * `useNarrowViewport` tracks `window.innerWidth` directly (no matchMedia
+   * in jsdom), so these cases set it the same way
+   * `useNarrowViewport.test.ts` already does, rather than resizing an
+   * actual viewport.
+   */
+  describe("at <=767px", () => {
+    function setInnerWidth(width: number) {
+      Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: width });
+    }
+    const ORIGINAL_WIDTH = window.innerWidth;
+
+    afterEach(() => {
+      setInnerWidth(ORIGINAL_WIDTH);
+    });
+
+    it("renders a deliberately short label — never the desktop text truncated — while still selecting the updatedAt order", async () => {
+      setInnerWidth(360);
+      const onChange = vi.fn();
+      const user = userEvent.setup();
+      render(<SortControl value="id" onChange={onChange} />);
+
+      const select = screen.getByRole("combobox") as HTMLSelectElement;
+      const optionLabels = Array.from(select.options).map((option) => option.textContent);
+      expect(optionLabels).toEqual(["ID ↑", "alteração ↓"]);
+      // Never a truncated fragment of the full desktop text (e.g. "Última atua...").
+      expect(optionLabels.some((label) => label?.includes("…") || label?.includes("..."))).toBe(false);
+
+      await user.selectOptions(select, "alteração ↓");
+      expect(onChange).toHaveBeenCalledWith("updatedAt");
+    });
+
+    it("keeps Identifier selectable by its short compact label", async () => {
+      setInnerWidth(360);
+      const onChange = vi.fn();
+      const user = userEvent.setup();
+      render(<SortControl value="updatedAt" onChange={onChange} />);
+
+      const select = screen.getByRole("combobox") as HTMLSelectElement;
+      await user.selectOptions(select, "ID ↑");
+      expect(onChange).toHaveBeenCalledWith("id");
+    });
+
+    it("preserves the full accessible order name via aria-label even though the visible option text is short", () => {
+      setInnerWidth(360);
+      render(<SortControl value="updatedAt" onChange={vi.fn()} />);
+      const select = screen.getByRole("combobox") as HTMLSelectElement;
+      expect(select.getAttribute("aria-label")).toMatch(/Última atualização/);
+    });
+  });
 });
 
 const rowProblem: CitizenProblem = {

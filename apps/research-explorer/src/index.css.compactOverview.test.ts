@@ -179,6 +179,16 @@ describe("index.css — compact discovery grid (<=767px, task §7/§9)", () => {
     const sortSelectBody = bodyFromAnyBlock(blocks, ".overview-sort-control select");
     expect(sortSelectBody).toMatch(/max-width:\s*100%/);
   });
+
+  /** Regression for the accidental-ellipsis compact sort label (visual-
+   * convergence pass, task §3): the compact box is still bounded (nowrap +
+   * max-width, above) but no longer relies on CSS `text-overflow: ellipsis`
+   * to shorten the visible text — SortControl.tsx now renders a deliberately
+   * short option string ("alteração ↓"/"ID ↑") at this width instead. */
+  it("does not truncate the compact sort select with text-overflow: ellipsis", () => {
+    const sortSelectBody = bodyFromAnyBlock(blocks, ".overview-sort-control select");
+    expect(sortSelectBody).not.toMatch(/text-overflow:\s*ellipsis/);
+  });
 });
 
 describe("index.css — compact category rail (<=767px, task §10)", () => {
