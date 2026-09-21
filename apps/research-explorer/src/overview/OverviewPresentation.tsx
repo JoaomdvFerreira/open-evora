@@ -1,7 +1,6 @@
 import { useId, useState } from "react";
 import {
   evidenceCountLabel,
-  MAX_OVERVIEW_TOPIC_SHORTCUTS,
   problemCountLabel,
   sourceCountLabel,
   topCategoryCounts,
@@ -85,20 +84,22 @@ export function OverviewPresentation({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerId = useId();
 
-  // Category drawer vocabulary (Overview final redesign, Phase 1 — delta §5;
-  // narrowed to a top-5 shortlist in the visual-convergence pass, TARGET's
-  // "Todos + top 5 real topics + Alterados esta semana" composition): the
-  // top 5 canonical TEMA topics by real, unfiltered Problem count — never a
-  // hardcoded topic list, and never TARGET's own fixture topic names.
-  // `topCategoryCounts` already ranks by real descending count with a
-  // deterministic PT-PT-label tie-break (overviewStats.ts's own doc
-  // comment); this reuses that projection directly rather than re-deriving
-  // ranking here. A topic with a genuinely zero current count cannot appear
-  // in a top-5-by-count ranking, so the earlier explicit zero-count filter
-  // is subsumed by the limit itself. `Todos` is never subject to this limit
-  // — it always renders, over the full unfiltered Problem count.
+  // Category drawer vocabulary (Overview final redesign, Phase 1 — delta
+  // §5): every canonical TEMA topic that is present in at least one
+  // currently loaded Problem, with its real, unfiltered count — never a
+  // hardcoded topic list. The presentation-cap top-5 shortlist from the
+  // visual-convergence pass was a production regression (topics beyond the
+  // top 5 were unreachable from the drawer) and has been removed; passing
+  // no effective limit here shows every populated topic, still ordered by
+  // `topCategoryCounts`'s own real descending count with a deterministic
+  // PT-PT-label tie-break (overviewStats.ts's own doc comment) — this
+  // reuses that projection directly rather than re-deriving ranking here.
+  // A topic with a genuinely zero current count still cannot appear (the
+  // projection only ever counts topics a loaded Problem actually carries).
+  // `Todos` is never subject to any limit — it always renders, over the
+  // full unfiltered Problem count.
   const allProblems = citizenProblems ?? [];
-  const categories = topCategoryCounts(allProblems, MAX_OVERVIEW_TOPIC_SHORTCUTS);
+  const categories = topCategoryCounts(allProblems, Number.POSITIVE_INFINITY);
   // `Filtros`'s active state/accessible name reflects either category-drawer
   // selection (Overview final redesign, Phase 2, §8) — the two are already
   // mutually exclusive (`Overview.tsx` owns that), so at most one label ever
@@ -121,11 +122,17 @@ export function OverviewPresentation({
                 <span className="overview-hero-eyebrow-dot" aria-hidden="true">•</span> Projeto independente — não oficial
               </span>
             </p>
-            <h3 className="overview-hero-headline">
-              <span className="overview-hero-headline-line">Problemas práticos</span>{" "}
-              <span className="overview-hero-headline-line">que afetam Évora.</span>
-            </h3>
-            <p className="overview-hero-supporting">O que sabemos, o que falta saber, e a fonte de cada afirmação.</p>
+            {/* Approved Hero copy update (production-polish pass): a single
+                sentence, no forced line split — the earlier two-span
+                `.overview-hero-headline-line` technique existed to pin a
+                specific two-line break for the previous two-clause
+                headline (see index.css's own doc comments on that class)
+                and is deliberately not reused here. This is copy only; the
+                headline wraps naturally at every breakpoint via
+                `.overview-hero-headline`'s existing `max-width` and normal
+                inline flow. */}
+            <h3 className="overview-hero-headline">Problemas de Évora, documentados com evidência.</h3>
+            <p className="overview-hero-supporting">O que sabemos, o que falta confirmar e as fontes que sustentam cada conclusão.</p>
 
             <ul className="overview-metrics" aria-label="Números da investigação">
               <li className="overview-metric">

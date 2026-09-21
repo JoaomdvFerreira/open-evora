@@ -1531,6 +1531,7 @@ main.explorer-shell {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  margin-top: 0;
   padding-bottom: 0;
   margin-bottom: 0;
 }
@@ -1568,7 +1569,8 @@ main.explorer-shell {
    clickable from the padding alone; the mobile nav (media query below)
    is unaffected by this desktop-only change. */
 .explorer-navigation .explorer-navigation-action {
-  padding: 0.3rem 0.8rem;
+  padding-block: 0;
+  padding-inline: 0.8rem;
   color: var(--color-ink-secondary);
   font-size: var(--text-interface-label-size);
   font-weight: var(--text-interface-label-weight);
@@ -2219,6 +2221,7 @@ main.explorer-shell {
 .overview-propose-problem {
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
   padding: 0.3rem 0.85rem;
   color: var(--color-accent-hover);
   border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
@@ -3571,7 +3574,8 @@ body:has(.public-overview) .public-footer {
   }
 
   .explorer-navigation .explorer-navigation-action {
-    padding: 0.4rem 0.85rem;
+    padding-block: 0;
+    padding-inline: 0.85rem;
     font-size: 14px;
   }
 

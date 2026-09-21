@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { Overview } from "./Overview";
 import { DataLoadError, type DataProvider, type RecordDetail, type RecordSummary } from "../dataProvider/types";
 import { getLisbonCivilDate, isDateInCivilWeekOf } from "./overviewStats";
+import { describeTopic } from "../presentation/topicMapping";
 
 function makeProvider(index: RecordSummary[]): DataProvider {
   const details: Record<string, RecordDetail> = Object.fromEntries(
@@ -140,8 +141,11 @@ describe("Overview — final Hero", () => {
 
     await screen.findByText("Problema");
     expect(screen.getByText("Projeto independente — não oficial")).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Problemas práticos que afetam Évora." })).toBeTruthy();
-    expect(screen.getByText("O que sabemos, o que falta saber, e a fonte de cada afirmação.")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Problemas de Évora, documentados com evidência." })).toBeTruthy();
+    expect(screen.getByText("O que sabemos, o que falta confirmar e as fontes que sustentam cada conclusão.")).toBeTruthy();
+    // Old copy must not linger (production-polish Hero copy update).
+    expect(screen.queryByText("Problemas práticos que afetam Évora.")).toBeNull();
+    expect(screen.queryByText("O que sabemos, o que falta saber, e a fonte de cada afirmação.")).toBeNull();
   });
 
   it("renders exactly the four intended Hero metric concepts — problems, evidence records, sources, total corpus records", async () => {
@@ -375,6 +379,29 @@ describe("Overview — Filtros disclosure and category drawer", () => {
     // itself still returns every audited topic with its real count (see
     // overviewStats.test.ts).
     expect(within(drawer).queryByRole("button", { name: /^Digital/ })).toBeNull();
+  });
+
+  it("shows every populated topic, not just the top 5 (production-polish topic-cap removal)", async () => {
+    // Seven distinct populated topics — more than the former top-5 shortlist
+    // cap — each carried by exactly one Problem so every one of them is
+    // genuinely present, not fabricated.
+    const domains = ["MOB", "URB", "ACC", "ENV", "PUB", "EMP", "EDU"];
+    const problems = domains.map((domain, index) => ({ id: `PRB-${index + 1}`, type: "PRB-" as const, label: `Problema ${domain}`, file: "", summaryFields: {} }));
+    const provider = makeProvider(problems);
+    provider.getRecord = async (id) => {
+      const index = problems.findIndex((p) => p.id === id);
+      return { id, type: "PRB-", file: "", record: { title: problems[index].label, domain: [domains[index]] }, outgoingEdges: [], incomingEdges: [] };
+    };
+    const user = userEvent.setup();
+    render(<Overview dataProvider={provider} {...props} />);
+
+    await screen.findByText("Problema MOB");
+    await user.click(openDrawer());
+
+    const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
+    for (const domain of domains) {
+      expect(within(drawer).getByRole("button", { name: new RegExp(`^${describeTopic(domain).label}`) })).toBeTruthy();
+    }
   });
 
   it("selecting Todos clears the topic filter (topicFilter === null)", async () => {
