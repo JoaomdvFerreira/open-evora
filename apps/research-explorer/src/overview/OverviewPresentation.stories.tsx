@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import "../index.css";
 import "../styles/topic.css";
 import { OverviewPresentation } from "./OverviewPresentation";
+import { ExplorerHeader } from "../app/ExplorerHeader";
+import { PublicFooter } from "../app/TrustPage";
 import {
   matchesCitizenSearch,
   matchesTopicFilter,
@@ -146,23 +148,44 @@ function FullOverview({
 }
 
 /**
- * Storybook-only faithful reproduction of production's outer shell (App.tsx
- * renders Overview inside exactly `<main id="main-content"
- * className="explorer-shell">`). Overview's full-bleed rules (e.g. the
- * negative margins on discovery/results) intentionally rely on the
- * horizontal padding `.explorer-shell` itself owns in index.css — without
- * this real shell class around it, a story has no such padding to bleed
- * against, which can produce false horizontal scrolling and clip PRB ids,
- * dates, or row content that render correctly in production. This wrapper
- * introduces no Storybook-only CSS of its own (no duplicated padding, no
- * overflow hiding) — it only reuses the production `explorer-shell` class so
+ * Storybook-only faithful reproduction of production's complete public
+ * Overview page/chrome hierarchy — not just Overview's own body. Production
+ * composes this as (App.tsx + Explorer.tsx): a `<main id="main-content"
+ * className="explorer-shell">` containing `ExplorerHeader` followed by
+ * `Overview`, with `PublicFooter` rendered as a sibling *outside* that main
+ * shell. This wrapper reproduces the same hierarchy using the real
+ * `ExplorerHeader`/`PublicFooter` components (not recreated markup) around
+ * the controlled `FullOverview` fixture, so Full composition stories are a
+ * truthful full-page review surface rather than Overview's body alone.
+ *
+ * Overview's full-bleed rules (e.g. the negative margins on
+ * discovery/results) intentionally rely on the horizontal padding
+ * `.explorer-shell` itself owns in index.css — without this real shell class
+ * around it, a story has no such padding to bleed against, which can
+ * produce false horizontal scrolling and clip PRB ids, dates, or row
+ * content that render correctly in production. This wrapper introduces no
+ * Storybook-only CSS of its own (no duplicated padding, no overflow
+ * hiding) — it only reuses the production `explorer-shell`/chrome classes so
  * `index.css`'s real rules apply exactly as they do outside Storybook.
+ *
+ * Header fixture state: `activeView="overview"` with no active Sources type
+ * filter, matching the truthful Overview state Explorer.tsx itself passes
+ * (Problemas reads as the active nav item; Fontes does not). The
+ * onProblemas/onFontes callbacks are SPA URL-state navigation in production
+ * (see Explorer.tsx) — here they are stable no-ops since this fixture has no
+ * URL/routing machinery to navigate.
  */
+const noop = () => {};
+
 function FullOverviewShell(props: Parameters<typeof FullOverview>[0]) {
   return (
-    <main className="explorer-shell">
-      <FullOverview {...props} />
-    </main>
+    <>
+      <main className="explorer-shell">
+        <ExplorerHeader activeView="overview" activeTypeFilter="" onProblemas={noop} onFontes={noop} />
+        <FullOverview {...props} />
+      </main>
+      <PublicFooter />
+    </>
   );
 }
 
