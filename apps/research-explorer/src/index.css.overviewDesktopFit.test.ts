@@ -4,15 +4,22 @@ import { describe, expect, it } from "vitest";
 
 /**
  * Overview desktop-fit correction (768px-1059px) — CSS-contract regression:
- * confirms the shared desktop-fit grid — one `--overview-fit-gutter` inset
- * applied to `.shell-frame--wide`, the single primitive Header, Hero,
- * discovery toolbar, category drawer, problem-row content, end-of-results
- * content, and Footer all already compose — lives inside the existing
- * `@media (min-width: 768px) and (max-width: 1059px)` band (no new product
- * breakpoint introduced), and that it stays distinct from both the approved
- * >=1060px base rules and the separate <=767px compact block. Deliberately
- * does not assert on any specific pixel value (task scope) — only on
- * structural placement/isolation.
+ * confirms the shared desktop-fit grid gives every gutted surface the same
+ * viewport-relative content axis, rather than padding the generic
+ * `.shell-frame--wide` primitive directly (which produced two different
+ * axes, since not every `.shell-frame--wide` instance shares the same
+ * containing block — Header/Hero/toolbar/drawer/Footer inners sit inside
+ * the shell's own ~2rem outer padding, while the problem-row link and
+ * end-of-results inner sit inside `.overview-results`, whose negative
+ * margin cancels that outer padding so they start from the true viewport
+ * edge instead). One `--overview-fit-content-inset` viewport-relative inset
+ * is applied per containing context: the residual/additional amount for
+ * shell-inset surfaces, the full amount for full-bleed result inners. Lives
+ * inside the existing `@media (min-width: 768px) and (max-width: 1059px)`
+ * band (no new product breakpoint introduced) and stays distinct from both
+ * the approved >=1060px base rules and the separate <=767px compact block.
+ * Deliberately does not assert on any specific pixel value (task scope) —
+ * only on structural placement/isolation.
  */
 const CSS_PATH = path.resolve(__dirname, "index.css");
 const css = fs.readFileSync(CSS_PATH, "utf8");
@@ -34,25 +41,79 @@ function intermediateBlock(): string {
   throw new Error("Unbalanced @media block");
 }
 
+/** Extracts the declaration block belonging to the (first) rule whose
+ * selector list contains `selector` as one of its comma-separated members,
+ * scoped to the given source (the intermediate block). Fails if no such
+ * rule exists. Strips `/* ... *\/` comments first (a selector-list capture
+ * would otherwise run backward into a preceding comment's own prose, which
+ * can itself mention selector-like text), then walks each top-level
+ * `selector-list { body }` pair. */
+function ruleBodyContaining(source: string, selector: string): string {
+  const withoutComments = source.replace(/\/\*[\s\S]*?\*\//g, "");
+  const rulePattern = /([^{}]+)\{([^{}]*)\}/g;
+  let match: RegExpExecArray | null;
+  while ((match = rulePattern.exec(withoutComments)) !== null) {
+    const selectorList = match[1];
+    const members = selectorList.split(",").map((s) => s.trim());
+    if (members.includes(selector)) {
+      return match[2];
+    }
+  }
+  expect.fail(`expected a rule targeting ${selector} inside the intermediate block`);
+}
+
 describe("index.css — Overview desktop-fit fallback (768px-1059px) isolation", () => {
   const block = intermediateBlock();
 
-  it("applies one shared fit-grid gutter to the primitive every gutted surface composes, plus the bounded Hero/toolbar geometry corrections, inside the existing intermediate band only", () => {
-    for (const selector of [".shell-frame--wide", ".overview-hero", ".overview-toolbar", ".overview-toolbar-controls", ".overview-category-drawer"]) {
-      expect(block).toContain(selector);
-    }
-    // The shared gutter is a single custom property set once on the shared
-    // primitive — not restated per surface, which is what keeps every
-    // gutted band (Header, Hero, toolbar, drawer, rows, end-of-results,
-    // Footer) on the same left/right axes by construction rather than by
-    // separately-maintained declarations that could drift apart.
-    expect(block.match(/--overview-fit-gutter:/g)?.length ?? 0).toBe(1);
+  it("does not use `.shell-frame--wide` as the intermediate fit-gutter owner", () => {
+    // The generic primitive must retain its normal (bare, top-level) meaning
+    // — no page-specific responsive padding applied to it directly, which
+    // is what previously produced two different viewport-relative axes
+    // depending on which containing block each `.shell-frame--wide`
+    // instance happened to sit in.
+    expect(block).not.toMatch(/\.shell-frame--wide\s*\{[^}]*padding/);
   });
 
-  it("keeps the shared fit-grid gutter proportional to the viewport (clamp/vw-based), not a single fixed pixel value", () => {
-    const gutterDeclaration = block.match(/--overview-fit-gutter:\s*([^;]+);/)?.[1] ?? "";
-    expect(gutterDeclaration).toMatch(/clamp\(/);
-    expect(gutterDeclaration).toMatch(/vw/);
+  it("defines one viewport-relative fit content-inset custom property in the intermediate block", () => {
+    const declarations = block.match(/--overview-fit-content-inset:\s*([^;]+);/g) ?? [];
+    expect(declarations.length).toBeGreaterThan(0);
+    for (const declaration of declarations) {
+      expect(declaration).toMatch(/clamp\(/);
+      expect(declaration).toMatch(/vw/);
+    }
+  });
+
+  it("gives normal shell-inset surfaces only the residual inset beyond the existing shell outer padding", () => {
+    // Header, Hero, toolbar, category drawer, and Footer inners already sit
+    // inside the shell's own ~2rem outer horizontal padding before reaching
+    // their own `.shell-frame--wide` — they must receive `content inset -
+    // shell outer inset`, not the full inset (which would double-count the
+    // outer padding and shift them off the shared axis).
+    for (const selector of [".explorer-chrome-inner", ".overview-toolbar", ".overview-category-drawer", ".public-footer-inner"]) {
+      const body = ruleBodyContaining(block, selector);
+      expect(body).toMatch(/--overview-fit-content-inset/);
+      expect(body).toMatch(/padding-left:\s*calc\(var\(--overview-fit-content-inset\)\s*-\s*2rem\)/);
+      expect(body).toMatch(/padding-right:\s*calc\(var\(--overview-fit-content-inset\)\s*-\s*2rem\)/);
+    }
+  });
+
+  it("gives the Hero's own inner frame the residual inset, scoped to the Hero (not every `.shell-frame--wide` instance)", () => {
+    const body = ruleBodyContaining(block, ".overview-hero > .shell-frame--wide");
+    expect(body).toMatch(/--overview-fit-content-inset/);
+    expect(body).toMatch(/padding-left:\s*calc\(var\(--overview-fit-content-inset\)\s*-\s*2rem\)/);
+  });
+
+  it("gives full-bleed result inners the FULL fit content inset, with no residual/subtracted term", () => {
+    // `.overview-results` cancels the shell's outer padding via a negative
+    // margin, so these inners start from the true viewport edge — they must
+    // receive the whole inset, not `calc(... - 2rem)`.
+    for (const selector of [".overview-problem-row-link", ".overview-end-of-results-inner"]) {
+      const body = ruleBodyContaining(block, selector);
+      expect(body).toMatch(/--overview-fit-content-inset/);
+      expect(body).toMatch(/padding-left:\s*var\(--overview-fit-content-inset\)/);
+      expect(body).toMatch(/padding-right:\s*var\(--overview-fit-content-inset\)/);
+      expect(body).not.toMatch(/calc\(/);
+    }
   });
 
   it("does not introduce a new product breakpoint — only one 768px-1059px media query exists", () => {
@@ -75,8 +136,11 @@ describe("index.css — Overview desktop-fit fallback (768px-1059px) isolation",
     expect(block).not.toContain("main.explorer-shell");
   });
 
-  it("does not leak the fit-grid gutter to >=1060px — `.shell-frame--wide` is declared as a bare top-level rule only once, outside any media query", () => {
+  it("leaves >=1060px generic `.shell-frame--wide` behaviour untouched — it is declared as a bare top-level rule only once, outside any media query", () => {
     const topLevelDeclarations = css.match(/^\.shell-frame--wide\s*\{/gm) ?? [];
     expect(topLevelDeclarations.length).toBe(1);
+    const baseRuleMatch = css.match(/^\.shell-frame--wide\s*\{([^}]*)\}/m);
+    expect(baseRuleMatch).toBeTruthy();
+    expect(baseRuleMatch![1]).not.toMatch(/padding/);
   });
 });

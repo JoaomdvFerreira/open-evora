@@ -3377,39 +3377,62 @@ body:has(.public-overview) .public-footer {
     display: block;
   }
 
-  /* Overview desktop-fit grid (768px-1059px, visual-completion final
-     convergence pass): TARGET at 1024 uses a deliberately narrower
-     intermediate content column than the >=1060 ~1216px wide frame produces
-     at this width — below that frame's own max-width, `.shell-frame--wide`'s
-     auto margins stop supplying any gutter of their own (they only centre
-     once the viewport exceeds the frame's max-width), so every surface that
-     shares the frame for content alignment sat flush against the true
-     viewport edge in this band. Rather than gutter five surfaces
-     independently (each capable of drifting out of alignment), one shared
-     `--overview-fit-gutter` custom property is applied to `.shell-frame--
-     wide` itself — the single primitive Header (`.explorer-chrome-inner`),
-     Hero, discovery toolbar, category drawer, problem-row content,
-     end-of-results content, and Footer (`.public-footer-inner`) already all
-     compose (OverviewPresentation.tsx, ExplorerHeader.tsx, TrustPage.tsx),
-     so this one rule keeps every one of them on the same left/right inner
-     axes by construction instead of by seven separate declarations. The
-     `clamp()` scales proportionally with the viewport rather than jumping at
-     1024 specifically: ~24px at the 768px boundary (matching the previous
-     safety gutter so nothing regresses there) rising to ~55px at 1024px,
-     which — stacked on top of the existing ~32px outer page padding every
-     one of these surfaces already sits inside (the shell's own horizontal
-     padding, and `.explorer-chrome`/`.public-footer`'s matching padding) —
-     lands the total inset from the true 1024px viewport edge in TARGET's
-     ~80-90px range; it stays flat at its 58px ceiling from there to the
-     1059px boundary. Full-bleed band/background/separator surfaces
-     (`.explorer-chrome`, `.overview-discovery`, `.overview-results`,
-     `.overview-problem-row`, `.overview-problem-row--changed`, `.overview-
-     end-of-results`, `.public-footer`) are deliberately not touched — only
-     the shared inner grid is inset. */
-  .shell-frame--wide {
-    --overview-fit-gutter: clamp(24px, 12vw - 68px, 58px);
-    padding-left: var(--overview-fit-gutter);
-    padding-right: var(--overview-fit-gutter);
+  /* Overview desktop-fit grid (768px-1059px, visual-completion structural
+     correction): TARGET at 1024 uses a deliberately narrower intermediate
+     content column than the >=1060 ~1216px wide frame produces at this
+     width — below that frame's own max-width, `.shell-frame--wide`'s auto
+     margins stop supplying any gutter of their own (they only centre once
+     the viewport exceeds the frame's max-width), so every surface that
+     shares the frame for content alignment sat flush against its own
+     containing block's edge in this band.
+
+     `.shell-frame--wide` is NOT the fit-gutter owner here — it is a generic
+     width/centring primitive reused by surfaces whose containing block
+     differs: Header/Hero/toolbar/drawer/Footer inners already sit inside
+     the outer explorer shell's own (and `.explorer-chrome`/`.public-footer`'s
+     matching) ~32px outer horizontal padding before reaching their own
+     `.shell-frame--wide`, while the problem-row link and end-of-results
+     inner sit inside `.overview-results`, whose `margin: 0 -2rem` cancels
+     that same outer padding locally — so THEIR `.shell-frame--wide` starts
+     at the true viewport edge instead. Padding `.shell-frame--wide` itself
+     by a single gutter therefore produced two different viewport-relative
+     axes (row/end-of-results content sitting ~32px further outward than
+     Header/Hero/toolbar/drawer/Footer content) rather than one shared grid.
+
+     The fix defines one viewport-relative content inset —
+     `--overview-fit-content-inset`, the TRUE distance from the viewport
+     edge to the content axis — once, and applies it per containing context
+     below: surfaces already inside the ~32px shell outer inset receive only
+     the REMAINING inset (`content inset - shell outer inset`, via `calc()`
+     against the real existing outer padding rather than a duplicated
+     number); true full-bleed surfaces receive the full inset. Both resolve
+     to the same left/right viewport-relative axes as a result. The
+     `clamp()` scales proportionally with the viewport rather than jumping
+     at 1024 specifically: ~32px at the 768px boundary (matching shell
+     outer inset, so the calc()-derived surfaces get ~0 additional padding
+     there, same as before) rising to ~87px at 1024px — preserving TARGET's
+     existing ~80-90px effective content inset — and staying flat at its
+     90px ceiling from there to the 1059px boundary. Full-bleed band/
+     background/separator surfaces (`.explorer-chrome`, `.overview-
+     discovery`, `.overview-results`, `.overview-problem-row`, `.overview-
+     problem-row--changed`, `.overview-end-of-results`, `.public-footer`)
+     are deliberately not touched — only inner content alignment changes. */
+  .explorer-chrome-inner,
+  .overview-hero > .shell-frame--wide,
+  .overview-toolbar,
+  .overview-category-drawer,
+  .public-footer-inner {
+    --overview-fit-content-inset: clamp(32px, 22.9vw - 148px, 90px);
+    padding-left: calc(var(--overview-fit-content-inset) - 2rem);
+    padding-right: calc(var(--overview-fit-content-inset) - 2rem);
+    box-sizing: border-box;
+  }
+
+  .overview-problem-row-link,
+  .overview-end-of-results-inner {
+    --overview-fit-content-inset: clamp(32px, 22.9vw - 148px, 90px);
+    padding-left: var(--overview-fit-content-inset);
+    padding-right: var(--overview-fit-content-inset);
     box-sizing: border-box;
   }
 
@@ -3472,7 +3495,7 @@ body:has(.public-overview) .public-footer {
   }
 
   /* Category drawer: geometry hardening only — same top-5/counts/ordering,
-     wraps within the new shared fit grid above instead of the un-gutted
+     wraps within the new shared fit grid above instead of the un-inset
      `.shell-frame--wide` measure, with no fixed minimum width that could
      exceed the available band. */
   .overview-category-drawer {
@@ -3484,7 +3507,10 @@ body:has(.public-overview) .public-footer {
      the row BAND (`.overview-problem-row`), the changed-row clay background
      and its 3px accent (`.overview-problem-row--changed`, both full-bleed
      and untouched above) still span the true viewport edge; only this inner
-     content link is inset (via `.shell-frame--wide` above). */
+     content link is inset (via `.overview-problem-row-link`'s own full
+     `--overview-fit-content-inset` above, since it starts from the true
+     viewport edge inside `.overview-results`, not the shell's outer
+     inset). */
   .overview-problem-row-meta {
     row-gap: 0.35rem;
   }
