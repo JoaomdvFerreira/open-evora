@@ -3916,8 +3916,7 @@ body:has(.public-overview) .public-footer {
   }
 
   .explorer-navigation button,
-  .explorer-navigation a,
-  .explorer-navigation .unavailable-control {
+  .explorer-navigation a {
     width: 100%;
   }
 
@@ -3927,10 +3926,6 @@ body:has(.public-overview) .public-footer {
     padding: 0.7rem 1rem;
     font-size: 0.85rem;
     text-align: left;
-  }
-
-  .explorer-navigation .unavailable-control button {
-    width: 100%;
   }
 
   .reading-guide {
