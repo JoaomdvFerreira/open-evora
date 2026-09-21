@@ -3458,6 +3458,14 @@ body:has(.public-overview) .public-footer {
     font-size: 22px;
   }
 
+  /* Removes the identity block's own rendered bottom padding within this
+     band — the extra vertical presence for the header band comes solely
+     from `.explorer-chrome-inner`'s `padding-block` above, not from a
+     second, stacked padding on the identity element itself. */
+  .explorer-identity {
+    padding-bottom: 0;
+  }
+
   .explorer-navigation .explorer-navigation-action {
     padding: 0.4rem 0.85rem;
     font-size: 14px;
