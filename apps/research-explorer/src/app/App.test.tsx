@@ -43,8 +43,8 @@ it("retries a failed startup manifest load", async () => {
 
 // F06 regression: the skip link must bypass ExplorerHeader's global
 // navigation, not merely land at the top of the shared <main> landmark that
-// still wraps both header and content (see App.tsx's SKIP_TARGET_ID doc
-// comment, and Explorer.tsx's own skip-target node placed right after
+// still wraps both header and content (see skipTarget.ts's SKIP_TARGET_ID
+// doc comment, and Explorer.tsx's own skip-target node placed right after
 // ExplorerHeader).
 describe("App — skip link bypasses global navigation (F06)", () => {
   const provider: DataProvider = {

@@ -6,16 +6,7 @@ import { Explorer } from "./Explorer";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { PublicFooter, TrustPage, trustPageForPath } from "./TrustPage";
-
-/**
- * F06: the skip link's real destination — after ExplorerHeader's global
- * navigation in document order (Explorer.tsx places its own focusable node
- * with this id right after the header), not the top of the shared
- * `<main id="main-content">` landmark that still wraps both. The
- * loading/error/trust-page branches below each supply their own element
- * with this id too, since ExplorerHeader isn't mounted in those states.
- */
-export const SKIP_TARGET_ID = "explorer-content-start";
+import { SKIP_TARGET_ID } from "./skipTarget";
 
 const defaultProvider: DataProvider = new StaticDataProvider();
 

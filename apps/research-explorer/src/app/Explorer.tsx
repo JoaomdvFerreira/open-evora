@@ -9,7 +9,7 @@ import { ReadingGuide } from "../guide/ReadingGuide";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ExplorerHeader } from "./ExplorerHeader";
 import { formatPublicCount, formatPublicDateTime } from "../presentation/presentation";
-import { SKIP_TARGET_ID } from "./App";
+import { SKIP_TARGET_ID } from "./skipTarget";
 
 // RE-05: lazily imported, not just GraphCanvas's Sigma module inside it —
 // GraphExplorer's own module graph (Graphology + buildGraphModel/neighbourhood/
@@ -72,8 +72,8 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
       {/* F06: the skip link's real destination — after global navigation in
           document order, so activating it bypasses ExplorerHeader entirely
           rather than merely landing at the top of the shared <main> that
-          still wraps both (see App.tsx's own SKIP_TARGET_ID doc comment). No
-          visual footprint: an empty, unstyled, focusable node. */}
+          still wraps both (see skipTarget.ts's own SKIP_TARGET_ID doc
+          comment). No visual footprint: an empty, unstyled, focusable node. */}
       <div id={SKIP_TARGET_ID} tabIndex={-1} />
 
       {url.state.view === "graph" && <ReadingGuide schemaPrefixes={schemaPrefixes} />}
