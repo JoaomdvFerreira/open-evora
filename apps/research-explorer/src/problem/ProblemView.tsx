@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type MutableRefObject } from "react";
 import { applyInitialFragment } from "../navigation/applyInitialFragment";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordIndex } from "../records/useRecordIndex";
@@ -928,33 +928,42 @@ interface ProblemContentProps {
   onOpenGeneric: (id: string) => void;
   onBackToOverview: () => void;
   onViewHistory: (id: string) => void;
+  initialFragmentConsideredRef: MutableRefObject<boolean>;
 }
 
-function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToOverview, onViewHistory }: ProblemContentProps) {
+/**
+ * F16: keyed by `problemId` at its call site in `ProblemView` — a genuine
+ * per-PRB identity boundary. Changing PRB unmounts this instance and mounts a
+ * fresh one, so a still-in-flight or late-resolving projection for the
+ * previous PRB can never be committed, focused, or recorded as "focused"
+ * under the newly requested PRB's identity: there is no shared component
+ * instance left for it to write into. `useProblemProjection`'s own `idle`
+ * state on the fresh instance's first render (before its effect schedules
+ * `loading`) is what the newly selected PRB shows while resolving — never the
+ * previous PRB's stale `ready` projection.
+ */
+function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToOverview, onViewHistory, initialFragmentConsideredRef }: ProblemContentProps) {
   const state = useProblemProjection(dataProvider, lookup, problemId);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
   const focusedEntryRef = useRef<string | null>(null);
-  // F07: whether an initial-URL fragment (e.g. a direct
-  // `?view=problem&id=PRB-0005#problem-evidencia` load) has already been
-  // considered, exactly once for this mounted ProblemContent instance — not
-  // once per PRB. A later in-app PRB->PRB navigation (ContextTabs, a related
-  // reference) must never re-read `window.location.hash` and hijack that
-  // navigation's own heading focus with a fragment that belonged to the
-  // instance's original load.
-  const initialFragmentConsideredRef = useRef(false);
 
   useEffect(() => {
     if (focusedEntryRef.current === problemId) return;
     if (state.status === "ready") {
-      // F07: on this instance's first-ever ready transition only, give a
-      // direct deep link's requested section the chance to win over the
-      // generic heading focus — reusing the same shared
+      // F07: on this ProblemView mount's first-ever ready transition only,
+      // give a direct deep link's requested section the chance to win over
+      // the generic heading focus — reusing the same shared
       // applyInitialFragment() RecordDetailPanel already uses, never a
       // second fragment-lookup implementation. A missing/absent/malformed
       // hash (including one for an element that doesn't exist on this PRB)
       // fails safely and falls through to the existing heading-focus
-      // fallback below.
+      // fallback below. `initialFragmentConsideredRef` is owned by
+      // `ProblemView`, not this (per-PRB, remounted) component, so a later
+      // in-app PRB->PRB navigation — which mounts a brand-new
+      // `ProblemContent` instance (F16) — still never re-reads
+      // `window.location.hash` and hijacks its own heading focus with a
+      // fragment that belonged to the mount's original load.
       const isInitialReadyTransition = !initialFragmentConsideredRef.current;
       initialFragmentConsideredRef.current = true;
       const appliedInitialFragment = isInitialReadyTransition && applyInitialFragment();
@@ -1073,6 +1082,13 @@ interface ProblemViewProps {
  */
 export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewHistory }: ProblemViewProps) {
   const indexState = useRecordIndex(dataProvider);
+  // F07/F16: owned here, not inside `ProblemContent`, because that component
+  // is now keyed by `problemId` (F16) and remounts fresh on every PRB
+  // change — this flag must survive across those remounts for the same
+  // `ProblemView` mount so a later in-app PRB->PRB navigation still never
+  // re-reads `window.location.hash` and reapplies a fragment that belonged
+  // only to this mount's original load.
+  const initialFragmentConsideredRef = useRef(false);
 
   if (indexState.status === "loading") {
     return <div className="shell-frame"><ProgressMessage message="A carregar…" /></div>;
@@ -1124,12 +1140,19 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
 
   return (
     <ProblemContent
+      // F16: identity boundary — remounts ProblemContent (and therefore
+      // useProblemProjection's state and every focus ref inside it) fresh on
+      // every PRB change, so a still-in-flight or late-resolving projection
+      // for the previously selected PRB can never be committed, focused, or
+      // marked "focused" under the newly requested PRB's identity.
+      key={problemId}
       dataProvider={dataProvider}
       lookup={indexState.lookup}
       problemId={problemId}
       onOpenGeneric={onOpenGeneric}
       onBackToOverview={onBackToOverview}
       onViewHistory={onViewHistory}
+      initialFragmentConsideredRef={initialFragmentConsideredRef}
     />
   );
 }
