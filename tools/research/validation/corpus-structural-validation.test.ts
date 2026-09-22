@@ -104,14 +104,38 @@ test("supported reduced precision remains valid where the schema allows it", () 
   const year = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2025" }; });
   assert.doesNotMatch(year, /scope\.temporal\.as_of/);
 
+  const yearMonthJan = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2025-01" }; });
+  assert.doesNotMatch(yearMonthJan, /scope\.temporal\.as_of/);
+
+  const yearMonthDec = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2025-12" }; });
+  assert.doesNotMatch(yearMonthDec, /scope\.temporal\.as_of/);
+
   const yearMonth = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2025-06" }; });
   assert.doesNotMatch(yearMonth, /scope\.temporal\.as_of/);
 
   const fullValid = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2025-06-15" }; });
   assert.doesNotMatch(fullValid, /scope\.temporal\.as_of/);
 
+  const leapDay = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2024-02-29" }; });
+  assert.doesNotMatch(leapDay, /scope\.temporal\.as_of/);
+
   const fullInvalid = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2025-06-31" }; });
   assert.match(fullInvalid, /field "scope\.temporal\.as_of" value "2025-06-31" is not a valid calendar date/);
+});
+
+test("reduced-precision YYYY-MM values with an impossible month are rejected", () => {
+  const zero = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2026-00" }; });
+  assert.match(zero, /field "scope\.temporal\.as_of" value "2026-00" is not a valid calendar month/);
+
+  const thirteen = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2026-13" }; });
+  assert.match(thirteen, /field "scope\.temporal\.as_of" value "2026-13" is not a valid calendar month/);
+
+  const ninetyNine = errorsAfter((index) => { evd(index).scope.temporal = { as_of: "2026-99" }; });
+  assert.match(ninetyNine, /field "scope\.temporal\.as_of" value "2026-99" is not a valid calendar month/);
+
+  // Precision is preserved exactly: no day is fabricated, and the rejection
+  // does not silently upgrade the value into a full-date error instead.
+  assert.doesNotMatch(zero, /is not a valid calendar date/);
 });
 
 test("PRB created_at/updated_at are calendar-checked", () => {

@@ -95,10 +95,16 @@ export function formatPublicDateTime(isoValue: string): string {
   return Number.isNaN(date.valueOf()) ? isoValue : new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
-/** For date-only canonical values (e.g. `temporal.last_checked_at`, `YYYY-MM-DD`) — `formatPublicDateTime`'s `timeStyle` would fabricate a local-timezone time no canonical field carries. */
+/**
+ * For date-only canonical values (e.g. `temporal.last_checked_at`, `YYYY-MM-DD`) — `formatPublicDateTime`'s
+ * `timeStyle` would fabricate a local-timezone time no canonical field carries. A bare `YYYY-MM-DD` is a civil
+ * date, not an instant: parsing it with `new Date(isoValue)` reads it as UTC midnight, and formatting that
+ * instant in the runtime's local timezone can shift it to the previous calendar day for negative UTC offsets.
+ * Formats in `timeZone: "UTC"` so the authored year/month/day render unchanged regardless of runtime timezone.
+ */
 export function formatPublicDate(isoValue: string): string {
   const date = new Date(isoValue);
-  return Number.isNaN(date.valueOf()) ? isoValue : new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium" }).format(date);
+  return Number.isNaN(date.valueOf()) ? isoValue : new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium", timeZone: "UTC" }).format(date);
 }
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;

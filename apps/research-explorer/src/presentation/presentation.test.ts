@@ -263,6 +263,52 @@ describe("formatPublicPartialDate", () => {
   });
 });
 
+describe("formatPublicDate", () => {
+  // A canonical date-only value (e.g. `temporal.last_checked_at`) is an
+  // authored civil date, not an instant — it must render as the same
+  // year/month/day regardless of the runtime's local timezone. Mutating
+  // process.env.TZ around each assertion (rather than relying on the
+  // machine/CI's ambient timezone) is what makes this deterministic and
+  // reproducible on any host: Node/ICU read TZ per Intl call, with no
+  // caching that would make this flaky.
+  function withTimeZone<T>(tz: string, run: () => T): T {
+    const original = process.env.TZ;
+    try {
+      process.env.TZ = tz;
+      return run();
+    } finally {
+      if (original === undefined) delete process.env.TZ;
+      else process.env.TZ = original;
+    }
+  }
+
+  it("preserves the authored civil date under a negative UTC offset (the old bug: 21/09/2026)", () => {
+    const result = withTimeZone("America/New_York", () => formatPublicDate("2026-09-22"));
+    expect(result).toBe("22/09/2026");
+    expect(result).not.toBe("21/09/2026");
+  });
+
+  it("preserves the authored civil date under a positive UTC offset", () => {
+    const result = withTimeZone("Pacific/Kiritimati", () => formatPublicDate("2026-09-22"));
+    expect(result).toBe("22/09/2026");
+  });
+
+  it("preserves the authored civil date under UTC itself", () => {
+    const result = withTimeZone("UTC", () => formatPublicDate("2026-09-22"));
+    expect(result).toBe("22/09/2026");
+  });
+
+  it("renders a valid leap-day canonical date correctly regardless of timezone", () => {
+    const result = withTimeZone("America/New_York", () => formatPublicDate("2024-02-29"));
+    expect(result).toBe("29/02/2024");
+  });
+
+  it("retains the documented fallback for malformed/unsupported input", () => {
+    expect(formatPublicDate("not-a-date")).toBe("not-a-date");
+    expect(formatPublicDate("")).toBe("");
+  });
+});
+
 describe("formatPublicRelativeDays", () => {
   it("renders the whole-day PT-PT phrasing for an elapsed date", () => {
     const now = new Date("2026-04-12T09:00:00Z");

@@ -199,19 +199,27 @@ function validateNonEmptyListFields(file: string, record: RecordFields, schema: 
 }
 
 /**
- * Rejects calendar-impossible full dates (ODM-008) such as 2026-02-30 or
- * 2026-99-99, which the field's `patterns` regex alone cannot detect.
- * Reduced precision that the field's own pattern permits (YYYY, YYYY-MM) is
- * deliberately left untouched, so supported precision is preserved.
+ * Rejects calendar-impossible dates (ODM-008) that the field's `patterns`
+ * regex alone cannot detect — full dates such as 2026-02-30 or 2026-99-99,
+ * and reduced-precision year-month values with an impossible month such as
+ * 2026-99 or 2026-00. Year-only precision (YYYY) has no month/day component
+ * to be impossible, so it is left untouched. This never fabricates a missing
+ * day for YYYY-MM or otherwise converts reduced precision into a full date;
+ * authored precision is preserved exactly, matching the field's own pattern.
  */
 function validateCalendarDateFields(file: string, record: RecordFields, schema: RecordSchema, errors: string[]): void {
   for (const field of schema.calendarDateFields || []) {
     const value = getRecordField(record, field);
     if (typeof value !== "string") continue; // absence or non-string type is other rules' concern
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) continue; // reduced precision stays as the pattern allows
-    if (!isFullCalendarDate(value)) {
-      errors.push(`[${file}] field "${field}" value "${value}" is not a valid calendar date`);
-    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      if (!isFullCalendarDate(value)) {
+        errors.push(`[${file}] field "${field}" value "${value}" is not a valid calendar date`);
+      }
+    } else if (/^\d{4}-\d{2}$/.test(value)) {
+      if (!isValidCalendarMonth(value)) {
+        errors.push(`[${file}] field "${field}" value "${value}" is not a valid calendar month`);
+      }
+    } // year-only (YYYY) or anything else is other rules' (patterns) concern
   }
 }
 
@@ -267,6 +275,13 @@ function isFullCalendarDate(value: string): boolean {
   const [year, month, day] = value.split("-").map(Number);
   const date = new Date(Date.UTC(year, month - 1, day));
   return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
+
+/** Rejects a reduced-precision YYYY-MM value whose month is outside 01-12 (e.g. 2026-00, 2026-99). */
+function isValidCalendarMonth(value: string): boolean {
+  if (!/^\d{4}-\d{2}$/.test(value)) return false;
+  const [, month] = value.split("-").map(Number);
+  return month >= 1 && month <= 12;
 }
 
 function validatePrbObjectKeys(
