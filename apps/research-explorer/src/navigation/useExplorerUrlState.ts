@@ -17,6 +17,18 @@ import type { GraphDepth } from "../graph/neighbourhood";
  * returned event-handler functions, never during render or inside a
  * setState updater — safe under StrictMode's double-invocation of render
  * and reducers.
+ *
+ * F08: `window.location.hash` is deliberately not part of `ExplorerUrlState`
+ * — it stays a browser/document-fragment concern (see
+ * navigation/applyInitialFragment.ts), not query-param application state.
+ * But every history write below reconstructs the URL from pathname+search
+ * alone, so writing it naively drops an existing hash. The rule this module
+ * applies: a write that only *canonicalizes* the current location (the
+ * normalization effect below, and `replace`'s own continuous same-context
+ * refinement, e.g. typing a search query) preserves the hash exactly;
+ * `push` — a genuine navigation to a different view/record — does not carry
+ * it over, since a fragment scoped to the previous content may no longer
+ * make sense on the new one.
  */
 export function useExplorerUrlState() {
   const [state, setState] = useState<ExplorerUrlState>(() => parseUrlState(window.location.search));
@@ -34,10 +46,13 @@ export function useExplorerUrlState() {
   // Correct it in place via replaceState (no new history entry) whenever it
   // no longer matches the serialized, normalized state — covers a direct
   // navigation, a bookmark, and a browser Back/Forward onto a stale URL.
+  // F08: this only ever canonicalizes the query string for the same
+  // location, so the existing hash (if any) is preserved exactly rather than
+  // reconstructed away.
   useEffect(() => {
     const normalizedSearch = serializeUrlState(state);
     if (window.location.search !== normalizedSearch) {
-      window.history.replaceState(null, "", normalizedSearch || window.location.pathname);
+      window.history.replaceState(null, "", (normalizedSearch || window.location.pathname) + window.location.hash);
     }
   }, [state]);
 
@@ -49,6 +64,10 @@ export function useExplorerUrlState() {
     return parseUrlState(serializeUrlState(next));
   }
 
+  // F08: a genuine navigation to different content — the previous location's
+  // fragment (if any) is scoped to content that may no longer exist/apply on
+  // the new URL, so it is intentionally not carried over (existing semantics,
+  // matching native same-document navigation to a fragment-less URL).
   function push(next: ExplorerUrlState) {
     const normalized = normalize(next);
     if (serializeUrlState(normalized) === serializeUrlState(state)) return;
@@ -56,10 +75,14 @@ export function useExplorerUrlState() {
     setState(normalized);
   }
 
+  // F08: continuous refinement of the same view/context (e.g. typing a
+  // search query) — not "intentional navigation to another view/record", so
+  // an existing hash is preserved exactly, matching the normalization
+  // effect's own same-location rule above.
   function replace(next: ExplorerUrlState) {
     const normalized = normalize(next);
     if (serializeUrlState(normalized) === serializeUrlState(state)) return;
-    window.history.replaceState(null, "", serializeUrlState(normalized) || window.location.pathname);
+    window.history.replaceState(null, "", (serializeUrlState(normalized) || window.location.pathname) + window.location.hash);
     setState(normalized);
   }
 

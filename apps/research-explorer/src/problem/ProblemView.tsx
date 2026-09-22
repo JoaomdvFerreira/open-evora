@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { applyInitialFragment } from "../navigation/applyInitialFragment";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordIndex } from "../records/useRecordIndex";
 import { useProblemProjection } from "./useProblemProjection";
@@ -934,11 +935,32 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
   const headingRef = useRef<HTMLHeadingElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
   const focusedEntryRef = useRef<string | null>(null);
+  // F07: whether an initial-URL fragment (e.g. a direct
+  // `?view=problem&id=PRB-0005#problem-evidencia` load) has already been
+  // considered, exactly once for this mounted ProblemContent instance — not
+  // once per PRB. A later in-app PRB->PRB navigation (ContextTabs, a related
+  // reference) must never re-read `window.location.hash` and hijack that
+  // navigation's own heading focus with a fragment that belonged to the
+  // instance's original load.
+  const initialFragmentConsideredRef = useRef(false);
 
   useEffect(() => {
     if (focusedEntryRef.current === problemId) return;
     if (state.status === "ready") {
-      headingRef.current?.focus();
+      // F07: on this instance's first-ever ready transition only, give a
+      // direct deep link's requested section the chance to win over the
+      // generic heading focus — reusing the same shared
+      // applyInitialFragment() RecordDetailPanel already uses, never a
+      // second fragment-lookup implementation. A missing/absent/malformed
+      // hash (including one for an element that doesn't exist on this PRB)
+      // fails safely and falls through to the existing heading-focus
+      // fallback below.
+      const isInitialReadyTransition = !initialFragmentConsideredRef.current;
+      initialFragmentConsideredRef.current = true;
+      const appliedInitialFragment = isInitialReadyTransition && applyInitialFragment();
+      if (!appliedInitialFragment) {
+        headingRef.current?.focus();
+      }
       focusedEntryRef.current = problemId;
     } else if (state.status === "error") {
       errorRef.current?.focus();

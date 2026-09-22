@@ -64,6 +64,79 @@ function useLisbonCivilDate(): string {
 }
 
 /**
+ * F03: Overview's discovery/browse context — search, topic filter, the
+ * `Alterados esta semana` shortcut, sort order, and page. Lifted out of
+ * `Overview` itself (WU054/Overview final redesign state, formerly local
+ * `useState` here) so `Explorer` — which stays mounted across the
+ * view=overview/view=problem transition, unlike `Overview` — is the one
+ * authoritative owner. `Overview` unmounts whenever a PRB is opened and
+ * remounts fresh on return (view switch, browser Back, or the Problem
+ * breadcrumb); without this, all discovery context a citizen configured was
+ * silently reset. This hook owns no data loading/projection — only the
+ * discovery inputs and their existing mutual-exclusion/page-reset rules —
+ * so `Overview` remains the single place that turns them into
+ * `visibleProblems`.
+ */
+export function useOverviewDiscoveryState() {
+  const [searchQuery, setSearchQuery] = useState("");
+  // TEMA is the sole remaining normal Overview filter dimension (Overview
+  // final redesign, Phase 1, delta §6) — EVIDÊNCIA/VALIDAÇÃO/ESTADO were
+  // removed outright, not moved into the category drawer. `Alterados esta
+  // semana` (Phase 2, §7) is a separate, mutually-exclusive shortcut
+  // selection: selecting one clears the other, and `Todos` clears both.
+  const [topicFilter, setTopicFilter] = useState<string | null>(null);
+  const [alteredThisWeekSelected, setAlteredThisWeekSelected] = useState(false);
+  // Default sort (Overview visual-convergence pass): existing `updatedAt`
+  // descending — the Problem's own canonical `updatedAt`, most recently
+  // updated first, null-last, deterministic ties (sortProblems's own doc
+  // comment). Rendered as "Última atualização ↓" (CitizenDiscovery.tsx's
+  // SortControl) — deliberately not "última alteração", which names the Hero
+  // ruler's authored material-change date, a different canonical signal (see
+  // OverviewPresentation.tsx). `id` remains available as the alternative
+  // order via SortControl.
+  const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("updatedAt");
+  // Pagination (Overview visual-completion): applies strictly after search,
+  // filters, and sort (see overviewStats.ts's `paginateProblems`). Resets to
+  // page 1 whenever any of those upstream inputs change, below, so a stale
+  // page number never survives a search/filter/sort change that shrinks or
+  // reorders the result set.
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Category-drawer shortcut selections are mutually exclusive with the
+  // normal TEMA topic filter (§7): selecting a topic clears the shortcut;
+  // selecting the shortcut clears the topic; and `Todos` — `topicFilter` set
+  // to `null` via the existing `onTopicFilterChange` path, which
+  // `CategoryDrawer`'s own `Todos` button always calls — clears both.
+  const handleTopicFilterChange = (value: string | null) => {
+    setTopicFilter(value);
+    setAlteredThisWeekSelected(false);
+  };
+  const handleAlteredThisWeekChange = (selected: boolean) => {
+    setAlteredThisWeekSelected(selected);
+    if (selected) setTopicFilter(null);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, topicFilter, alteredThisWeekSelected, sortOrder]);
+
+  return {
+    searchQuery,
+    setSearchQuery,
+    topicFilter,
+    onTopicFilterChange: handleTopicFilterChange,
+    alteredThisWeekSelected,
+    onAlteredThisWeekChange: handleAlteredThisWeekChange,
+    sortOrder,
+    setSortOrder,
+    currentPage,
+    setCurrentPage,
+  };
+}
+
+export type OverviewDiscoveryState = ReturnType<typeof useOverviewDiscoveryState>;
+
+/**
  * Citizen-first Overview (WU054; final macro-structure per Overview final
  * redesign, Phase 1; material-change integration per Phase 2). Loads the
  * same index.json summaries as before, then resolves each PRB's full
@@ -96,13 +169,21 @@ function useLisbonCivilDate(): string {
  * without being dropped from the normal list or blocking anyone else's
  * projection (§9 graceful degradation — never a reinterpretation of
  * `updated_at` as a fallback history signal).
+ *
+ * F03: the discovery inputs (search/topic/weekly-shortcut/sort/page) are a
+ * controlled `discovery` prop (`useOverviewDiscoveryState`, above) rather
+ * than local state, so `Explorer` — which stays mounted across
+ * Overview/Problem view switches — remains the one authoritative owner and
+ * that context survives Overview's own unmount/remount.
  */
 export function Overview({
   dataProvider,
   onExploreProblem,
+  discovery,
 }: {
   dataProvider: DataProvider;
   onExploreProblem: (id: string) => void;
+  discovery: OverviewDiscoveryState;
 }) {
   const indexState = useRecordIndex(dataProvider);
   const [citizenProblems, setCitizenProblems] = useState<CitizenProblem[] | null>(null);
@@ -111,29 +192,18 @@ export function Overview({
   // "esta semana" judgement against (Lisbon date-boundary hardening) — see
   // `useLisbonCivilDate`'s own doc comment.
   const lisbonCivilDate = useLisbonCivilDate();
-  const [searchQuery, setSearchQuery] = useState("");
-  // TEMA is the sole remaining normal Overview filter dimension (Overview
-  // final redesign, Phase 1, delta §6) — EVIDÊNCIA/VALIDAÇÃO/ESTADO were
-  // removed outright, not moved into the category drawer. `Alterados esta
-  // semana` (Phase 2, §7) is a separate, mutually-exclusive shortcut
-  // selection: selecting one clears the other, and `Todos` clears both.
-  const [topicFilter, setTopicFilter] = useState<string | null>(null);
-  const [alteredThisWeekSelected, setAlteredThisWeekSelected] = useState(false);
-  // Default sort (Overview visual-convergence pass): existing `updatedAt`
-  // descending — the Problem's own canonical `updatedAt`, most recently
-  // updated first, null-last, deterministic ties (sortProblems's own doc
-  // comment). Rendered as "Última atualização ↓" (CitizenDiscovery.tsx's
-  // SortControl) — deliberately not "última alteração", which names the Hero
-  // ruler's authored material-change date, a different canonical signal (see
-  // OverviewPresentation.tsx). `id` remains available as the alternative
-  // order via SortControl.
-  const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("updatedAt");
-  // Pagination (Overview visual-completion): applies strictly after search,
-  // filters, and sort (see overviewStats.ts's `paginateProblems`). Resets to
-  // page 1 whenever any of those upstream inputs change, below, so a stale
-  // page number never survives a search/filter/sort change that shrinks or
-  // reorders the result set.
-  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    searchQuery,
+    setSearchQuery,
+    topicFilter,
+    onTopicFilterChange: handleTopicFilterChange,
+    alteredThisWeekSelected,
+    onAlteredThisWeekChange: handleAlteredThisWeekChange,
+    sortOrder,
+    setSortOrder,
+    currentPage,
+    setCurrentPage,
+  } = discovery;
   const overview = indexState.status === "ready" ? computePublicOverviewData(indexState.records) : null;
   const problemIds = overview?.problems.map((problem) => problem.id).join("|") ?? "";
 
@@ -204,28 +274,6 @@ export function Overview({
     );
     return sortProblems(matched, sortOrder);
   }, [citizenProblems, searchQuery, topicFilter, alteredThisWeekSelected, alteredThisWeekIds, sortOrder]);
-
-  // Reset to page 1 whenever search, either category-drawer selection, or
-  // sort changes — never on a page-count shrink alone from unrelated causes
-  // (e.g. a re-fetch), since `paginateProblems` already clamps a stale page
-  // number defensively.
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, topicFilter, alteredThisWeekSelected, sortOrder]);
-
-  // Category-drawer shortcut selections are mutually exclusive with the
-  // normal TEMA topic filter (§7): selecting a topic clears the shortcut;
-  // selecting the shortcut clears the topic; and `Todos` — `topicFilter` set
-  // to `null` via the existing `onTopicFilterChange` path, which
-  // `CategoryDrawer`'s own `Todos` button always calls — clears both.
-  const handleTopicFilterChange = (value: string | null) => {
-    setTopicFilter(value);
-    setAlteredThisWeekSelected(false);
-  };
-  const handleAlteredThisWeekChange = (selected: boolean) => {
-    setAlteredThisWeekSelected(selected);
-    if (selected) setTopicFilter(null);
-  };
 
   const pageCount = visibleProblems === null ? 1 : overviewPageCount(visibleProblems.length);
   const paginatedProblems = visibleProblems === null ? null : paginateProblems(visibleProblems, currentPage);

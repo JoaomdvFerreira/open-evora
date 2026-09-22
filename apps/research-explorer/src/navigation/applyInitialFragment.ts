@@ -8,24 +8,32 @@
  * and without hijacking ordinary user scrolling on any later navigation
  * (call this only on the transition into the first ready content, not on
  * every content change).
+ *
+ * F07: returns whether a fragment target was actually found and focused, so
+ * a caller with its own default-focus fallback (e.g. ProblemView focusing
+ * its heading) can apply that fallback only when this returns `false` —
+ * covering "no hash", "malformed hash", and "hash for a missing element"
+ * alike, all of which must fail safely into that same fallback rather than
+ * throwing or fabricating a target.
  */
-export function applyInitialFragment(): void {
+export function applyInitialFragment(): boolean {
   const hash = window.location.hash;
-  if (!hash || hash.length <= 1) return;
+  if (!hash || hash.length <= 1) return false;
 
   let id: string;
   try {
     id = decodeURIComponent(hash.slice(1));
   } catch {
-    return;
+    return false;
   }
 
   const target = document.getElementById(id);
-  if (!target) return;
+  if (!target) return false;
 
   target.scrollIntoView();
   if (!target.hasAttribute("tabindex")) {
     target.setAttribute("tabindex", "-1");
   }
   target.focus({ preventScroll: true });
+  return true;
 }

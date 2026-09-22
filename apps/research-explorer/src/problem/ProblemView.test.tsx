@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { ProblemView } from "./ProblemView";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
@@ -33,6 +33,11 @@ const prbRecord = {
 };
 const records: Record<string, RecordDetail> = {
   "PRB-1": { id: "PRB-1", type: "PRB-", file: "", outgoingEdges: ["1", "2", "3"].map((id, ordinal) => ({ field: "evidence", ordinal, to: `EVD-${id}` })), incomingEdges: [], record: prbRecord },
+  // F07: a second, minimal PRB fixture — used only to exercise ordinary
+  // in-app PRB->PRB navigation on an already-mounted ProblemView (see the
+  // "does not repeatedly reapply" test below); never mixed into the
+  // vNext/AR-05/etc. suites above, which are all scoped to PRB-1.
+  "PRB-2": { id: "PRB-2", type: "PRB-", file: "", outgoingEdges: [], incomingEdges: [], record: { title: "Segundo problema" } },
   ...Object.fromEntries(["1", "2", "3"].map((id) => [`EVD-${id}`, {
     id: `EVD-${id}`, type: "EVD-", file: "", incomingEdges: [], outgoingEdges: [{ field: "provenance.sources", ordinal: 0, to: `SRC-${id}` }],
     record: { observation: { summary: `Observação ${id}.` }, provenance: { sources: [`SRC-${id}`] } },
@@ -370,5 +375,83 @@ describe("ProblemView citizen-facing metadata and actions", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Partilhar" }));
     await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith(window.location.href));
     expect(await screen.findByText("Ligação copiada.")).toBeTruthy();
+  });
+});
+
+/**
+ * F07: a direct PRB deep link that also carries a URL fragment (e.g.
+ * `?view=problem&id=PRB-0005#problem-evidencia`) must have that requested
+ * section receive the initial scroll/focus once it exists — the generic
+ * "focus the Problem heading on first ready content" behaviour
+ * (ProblemContent's own effect, above) must be the fallback only, never
+ * override a fragment that was actually applied. Reuses the shared
+ * `applyInitialFragment` (navigation/applyInitialFragment.ts) — the same
+ * helper Generic Record Detail already uses — rather than a second
+ * fragment-lookup implementation; see that module's own tests for the
+ * lower-level scroll/tabindex/decode-failure contract this builds on.
+ */
+describe("ProblemView — initial-fragment focus vs. heading fallback (F07)", () => {
+  beforeEach(() => {
+    // jsdom does not implement scrollIntoView (see applyInitialFragment's own
+    // test file, which stubs it the same way for the same reason).
+    Element.prototype.scrollIntoView = vi.fn() as unknown as typeof Element.prototype.scrollIntoView;
+  });
+
+  afterEach(() => {
+    window.location.hash = "";
+  });
+
+  it("applies a valid initial fragment target instead of focusing the heading", async () => {
+    window.location.hash = "#problem-evidencia";
+    render(<ProblemView {...props} problemId="PRB-1" />);
+
+    const evidenceSection = await screen.findByLabelText("Evidência");
+    await vi.waitFor(() => expect(document.activeElement).toBe(evidenceSection));
+
+    const heading = screen.getByRole("heading", { name: /Problema de teste/ });
+    expect(document.activeElement).not.toBe(heading);
+  });
+
+  it("falls back to focusing the heading when the URL carries no fragment", async () => {
+    window.location.hash = "";
+    render(<ProblemView {...props} problemId="PRB-1" />);
+
+    const heading = await screen.findByRole("heading", { name: /Problema de teste/ });
+    await vi.waitFor(() => expect(document.activeElement).toBe(heading));
+  });
+
+  it("falls back to focusing the heading when the fragment target does not exist on this PRB", async () => {
+    window.location.hash = "#does-not-exist-on-this-prb";
+    render(<ProblemView {...props} problemId="PRB-1" />);
+
+    const heading = await screen.findByRole("heading", { name: /Problema de teste/ });
+    await vi.waitFor(() => expect(document.activeElement).toBe(heading));
+  });
+
+  it("fails safely on a malformed hash and still falls back to the heading, without throwing", async () => {
+    window.location.hash = "#%E0%A4%A";
+
+    expect(() => render(<ProblemView {...props} problemId="PRB-1" />)).not.toThrow();
+    const heading = await screen.findByRole("heading", { name: /Problema de teste/ });
+    await vi.waitFor(() => expect(document.activeElement).toBe(heading));
+  });
+
+  it("does not repeatedly reapply the initial fragment or hijack focus on later in-app PRB navigation", async () => {
+    window.location.hash = "#problem-evidencia";
+    const { rerender } = render(<ProblemView {...props} problemId="PRB-1" />);
+
+    const evidenceSection = await screen.findByLabelText("Evidência");
+    await vi.waitFor(() => expect(document.activeElement).toBe(evidenceSection));
+    const scrollIntoView = Element.prototype.scrollIntoView as ReturnType<typeof vi.fn>;
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+
+    // The hash is still present in the URL (ordinary in-app navigation never
+    // clears it here — that is F08's concern), but a subsequent PRB selection
+    // on the same mounted ProblemView instance must never re-read it and
+    // re-scroll back to the original fragment target — the initial-fragment
+    // application is a one-time, first-ready-transition behaviour.
+    rerender(<ProblemView {...props} problemId="PRB-2" />);
+    await screen.findByRole("heading", { name: "Segundo problema" });
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
   });
 });
