@@ -52,9 +52,15 @@ export function trustPageForPath(pathname: string): TrustPageContent | null {
   return Object.prototype.hasOwnProperty.call(TRUST_PAGES, normalized) ? TRUST_PAGES[normalized as TrustPagePath] : null;
 }
 
-export function TrustPage({ page }: { page: TrustPageContent }) {
+/**
+ * F06: `skipTargetId`, when supplied, lands on the `<article>` — after this
+ * page's own `trust-navigation` in document order — so App.tsx's skip link
+ * bypasses trust-page navigation exactly as it bypasses ExplorerHeader on the
+ * live Explorer, never a second competing main landmark.
+ */
+export function TrustPage({ page, skipTargetId }: { page: TrustPageContent; skipTargetId?: string }) {
   const currentPath = TRUST_NAVIGATION.find(({ path }) => TRUST_PAGES[path] === page)?.path;
-  return <div className="trust-experience shell-frame"><header className="trust-header"><a href="/" className="trust-brand" aria-label="Open Évora — Explorador de Investigação"><Logo form="full" /><span>Explorador de Investigação</span></a></header><div className="trust-layout"><nav className="trust-navigation" aria-label="Informação sobre o Open Évora"><p>Informação</p><ul>{TRUST_NAVIGATION.map(({ path, label }) => <li key={path}><a href={path} aria-current={currentPath === path ? "page" : undefined}>{label}</a></li>)}</ul></nav><article className="trust-page"><p className="trust-back"><a href="/">← Explorar problemas</a></p><h1>{page.heading}</h1><p className="trust-summary">{page.summary}</p><div className="trust-content">{page.body}</div></article></div></div>;
+  return <div className="trust-experience shell-frame"><header className="trust-header"><a href="/" className="trust-brand" aria-label="Open Évora — Explorador de Investigação"><Logo form="full" /><span>Explorador de Investigação</span></a></header><div className="trust-layout"><nav className="trust-navigation" aria-label="Informação sobre o Open Évora"><p>Informação</p><ul>{TRUST_NAVIGATION.map(({ path, label }) => <li key={path}><a href={path} aria-current={currentPath === path ? "page" : undefined}>{label}</a></li>)}</ul></nav><article id={skipTargetId} tabIndex={skipTargetId ? -1 : undefined} className="trust-page"><p className="trust-back"><a href="/">← Explorar problemas</a></p><h1>{page.heading}</h1><p className="trust-summary">{page.summary}</p><div className="trust-content">{page.body}</div></article></div></div>;
 }
 
 /**

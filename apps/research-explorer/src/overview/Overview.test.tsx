@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
+﻿import { describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Overview } from "./Overview";
+import { Overview, useOverviewDiscoveryState } from "./Overview";
 import { DataLoadError, type DataProvider, type RecordDetail, type RecordSummary } from "../dataProvider/types";
 import { getLisbonCivilDate, isDateInCivilWeekOf } from "./overviewStats";
 import { describeTopic } from "../presentation/topicMapping";
@@ -34,6 +34,22 @@ function makeProvider(index: RecordSummary[]): DataProvider {
 }
 
 const props = { onExploreProblem: vi.fn() };
+
+/**
+ * F03: production lifts Overview's discovery state to Explorer
+ * (`useOverviewDiscoveryState`) so it survives Overview's own unmount/remount
+ * across the view=overview <-> view=problem transition — `Overview` itself
+ * now takes `discovery` as a controlled prop rather than owning it. Most of
+ * this suite exercises `Overview`'s own rendering/filtering behaviour in
+ * isolation, where a freshly created discovery state each render is
+ * equivalent to the old local `useState`; the state-preservation behaviour
+ * itself is covered at the `Explorer` integration level (Explorer.test.tsx),
+ * the highest level that can actually unmount/remount Overview.
+ */
+function OverviewFixture(props: { dataProvider: DataProvider; onExploreProblem: (id: string) => void }) {
+  const discovery = useOverviewDiscoveryState();
+  return <Overview {...props} discovery={discovery} />;
+}
 
 function openDrawer() {
   return screen.getByRole("button", { name: /^Filtros/ });
@@ -90,7 +106,7 @@ describe("Overview — Problem investigation-state dimensions", () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema com todas as dimensões", file: "", summaryFields: { status: "OPEN", validation_status: "unvalidated", evidence_status: "corroborated" } },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     const row = (await screen.findByText("PRB-1")).closest(".overview-problem-row-meta");
     expect(row?.querySelector(".prb-status-chip")?.textContent).toMatch(/Evidência:\s*Corroborada/);
@@ -104,7 +120,7 @@ describe("Overview — Problem investigation-state dimensions", () => {
     const provider = makeProvider([
       { id: "PRB-2", type: "PRB-", label: "Problema sem estado de ciclo de vida", file: "", summaryFields: { validation_status: "unvalidated", evidence_status: "corroborated" } },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     const row = (await screen.findByText("PRB-2")).closest(".overview-problem-row-meta");
     expect(row?.querySelector(".prb-status-chip")?.textContent).toMatch(/Evidência:\s*Corroborada/);
@@ -115,7 +131,7 @@ describe("Overview — Problem investigation-state dimensions", () => {
     const provider = makeProvider([
       { id: "PRB-4", type: "PRB-", label: "Problema sem evidência", file: "", summaryFields: { status: "OPEN", validation_status: "unvalidated" } },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     const row = (await screen.findByText("PRB-4")).closest(".overview-problem-row-meta");
     expect(within(row as HTMLElement).getByText("Aberto")).toBeTruthy();
@@ -126,7 +142,7 @@ describe("Overview — Problem investigation-state dimensions", () => {
     const provider = makeProvider([
       { id: "PRB-4", type: "PRB-", label: "Problema sem dimensões", file: "", summaryFields: {} },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     const row = (await screen.findByText("PRB-4")).closest(".overview-problem-row-meta");
     expect(row?.querySelector(".prb-status-chip")).toBeNull();
@@ -137,7 +153,7 @@ describe("Overview — Problem investigation-state dimensions", () => {
 describe("Overview — final Hero", () => {
   it("renders the final eyebrow, headline, and supporting copy", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     expect(screen.getByText("Projeto independente — não oficial")).toBeTruthy();
@@ -157,7 +173,7 @@ describe("Overview — final Hero", () => {
       { id: "EVD-3", type: "EVD-", label: "Evidência três", file: "", summaryFields: {} },
       { id: "SRC-1", type: "SRC-", label: "Fonte", file: "", summaryFields: {} },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     // Compact inline metric presentation (visual-convergence pass): value
     // and label share one line, e.g. "2 Problemas" — no separate stacked
@@ -181,7 +197,7 @@ describe("Overview — final Hero", () => {
 
   it("does not render the removed Hero recent-updates surface", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     expect(screen.queryByText("Atualizado recentemente")).toBeNull();
@@ -190,7 +206,7 @@ describe("Overview — final Hero", () => {
 
   it("does not render search inside the Hero", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     expect(document.querySelector(".overview-hero .overview-search")).toBeNull();
@@ -200,7 +216,7 @@ describe("Overview — final Hero", () => {
 
   it("does not render the old Hero category shortcuts", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     expect(screen.queryByText("Ou entre por:")).toBeNull();
@@ -211,7 +227,7 @@ describe("Overview — final Hero", () => {
 describe("Overview — permanent filter rail and non-topic filters removed", () => {
   it("does not render the permanent filter rail", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     expect(document.querySelector(".overview-filter-rail")).toBeNull();
@@ -223,7 +239,7 @@ describe("Overview — permanent filter rail and non-topic filters removed", () 
   it("does not render evidence/validation/lifecycle filter controls anywhere, including inside the open category drawer", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     await user.click(openDrawer());
@@ -240,7 +256,7 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
       { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
       { id: "PRB-10", type: "PRB-", label: "Problema dez", file: "", summaryFields: {} },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema dois");
     const titles = screen.getAllByRole("heading", { level: 4 }).map((heading) => heading.textContent);
@@ -249,7 +265,7 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
 
   it("labels the toolbar search control per the approved copy", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     const input = (await screen.findByLabelText("Pesquisar problemas")) as HTMLInputElement;
     expect(input.placeholder).toBe("Pesquisar problemas em Évora…");
@@ -261,7 +277,7 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
       { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
     ]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     const resultsCount = await screen.findByText("2 problemas");
     const liveRegion = resultsCount.closest('[aria-live="polite"]');
@@ -291,7 +307,7 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
       { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     const fullPhrase = await screen.findByText("2 problemas");
     expect(fullPhrase.classList.contains("overview-results-count-full")).toBe(true);
@@ -307,7 +323,7 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
       { id: "PRB-1", type: "PRB-", label: "Problema de mobilidade", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema digital", file: "", summaryFields: {} },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     const firstAction = await screen.findByRole("button", { name: "Explorar Problema de mobilidade" });
     expect(screen.getByRole("button", { name: "Explorar Problema digital" })).toBeTruthy();
@@ -318,7 +334,7 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
 describe("Overview — Filtros disclosure and category drawer", () => {
   it("starts collapsed, with Filtros exposing aria-expanded=false", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     expect(openDrawer().getAttribute("aria-expanded")).toBe("false");
@@ -327,7 +343,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
 
   it("keeps aria-controls resolving to a real, stably-mounted element even while collapsed (hidden, not absent)", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     const toggle = openDrawer();
@@ -345,7 +361,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
   it("opens the drawer on click, exposing aria-expanded=true, and closes it on a second click", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     const toggle = openDrawer();
@@ -366,7 +382,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
       id, type: "PRB-", file: "", record: { title: "Problema de mobilidade", domain: ["MOB"] }, outgoingEdges: [], incomingEdges: [],
     });
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema de mobilidade");
     await user.click(openDrawer());
@@ -393,7 +409,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
       return { id, type: "PRB-", file: "", record: { title: problems[index].label, domain: [domains[index]] }, outgoingEdges: [], incomingEdges: [] };
     };
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema MOB");
     await user.click(openDrawer());
@@ -415,7 +431,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
       outgoingEdges: [], incomingEdges: [],
     });
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema de mobilidade");
     await user.click(openDrawer());
@@ -438,7 +454,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
       outgoingEdges: [], incomingEdges: [],
     });
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema de mobilidade");
     const toggle = openDrawer();
@@ -460,7 +476,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
       id, type: "PRB-", file: "", record: { title: "Problema de mobilidade", domain: ["MOB"] }, outgoingEdges: [], incomingEdges: [],
     });
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema de mobilidade");
     const toggle = openDrawer();
@@ -485,7 +501,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
       return { id, type: "PRB-", file: "", record: { title, domain, status: id === "PRB-2" ? "REJECTED" : "OPEN" }, outgoingEdges: [], incomingEdges: [] };
     };
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
     await screen.findByText("Mobilidade corroborada aberta");
 
     await user.click(openDrawer());
@@ -505,7 +521,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
       id, type: "PRB-", file: "", record: { title: "Problema", domain: ["MOB"] }, outgoingEdges: [], incomingEdges: [],
     });
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     await user.click(openDrawer());
@@ -526,7 +542,7 @@ describe("Overview — toolbar result count and sort", () => {
       { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     expect(await screen.findByText("2 problemas")).toBeTruthy();
   });
@@ -536,7 +552,7 @@ describe("Overview — toolbar result count and sort", () => {
       const id = `PRB-${String(index + 1).padStart(4, "0")}`;
       return { id, type: "PRB-" as const, label: `Problema ${String(index + 1).padStart(2, "0")}`, file: "", summaryFields: {} };
     });
-    render(<Overview dataProvider={makeProvider(problems)} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(problems)} {...props} />);
 
     // 25 filtered results, even though only 20 rows render on page 1.
     expect(await screen.findByText("25 problemas")).toBeTruthy();
@@ -545,7 +561,7 @@ describe("Overview — toolbar result count and sort", () => {
 
   it("does not render the former active-filter-summary text line", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     expect(screen.queryByText("sem filtros ativos")).toBeNull();
@@ -564,7 +580,7 @@ describe("Overview — toolbar result count and sort", () => {
         outgoingEdges: [], incomingEdges: [],
       }),
     };
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema um");
     expect((screen.getByLabelText("Ordenar por") as HTMLSelectElement).value).toBe("updatedAt");
@@ -585,7 +601,7 @@ describe("Overview — toolbar result count and sort", () => {
       }),
     };
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema um");
     await user.selectOptions(screen.getByLabelText("Ordenar por"), "Identificador ↑");
@@ -604,7 +620,7 @@ describe("Overview — problem-list pagination", () => {
   }
 
   it("renders at most 20 problem rows on page 1 even when more results are available", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
 
     await screen.findByText("45 problemas");
     expect(screen.getAllByRole("listitem").filter((item) => item.classList.contains("overview-problem-row")).length).toBe(20);
@@ -612,7 +628,7 @@ describe("Overview — problem-list pagination", () => {
 
   it("renders the remaining problems when moving to page 2", async () => {
     const user = userEvent.setup();
-    render(<Overview dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
 
     await screen.findByText("45 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
@@ -625,7 +641,7 @@ describe("Overview — problem-list pagination", () => {
   it("paginates the already filtered and sorted result set, not the full unfiltered corpus", async () => {
     const problems = makeManyProblems(25);
     const user = userEvent.setup();
-    render(<Overview dataProvider={makeProvider(problems)} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(problems)} {...props} />);
 
     await screen.findByText("25 problemas");
     await user.type(screen.getByLabelText("Pesquisar problemas"), "Problema 0");
@@ -636,7 +652,7 @@ describe("Overview — problem-list pagination", () => {
 
   it("resets to page 1 when the search query changes", async () => {
     const user = userEvent.setup();
-    render(<Overview dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
 
     await screen.findByText("45 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
@@ -650,7 +666,7 @@ describe("Overview — problem-list pagination", () => {
     const provider = makeProvider(makeManyProblems(45));
     provider.getRecord = async (id) => ({ id, type: "PRB-", file: "", record: { title: id, domain: ["MOB"] }, outgoingEdges: [], incomingEdges: [] });
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("45 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
@@ -664,7 +680,7 @@ describe("Overview — problem-list pagination", () => {
 
   it("resets to page 1 when the sort order changes", async () => {
     const user = userEvent.setup();
-    render(<Overview dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
 
     await screen.findByText("45 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
@@ -678,20 +694,20 @@ describe("Overview — problem-list pagination", () => {
   });
 
   it("keeps the toolbar count as the total filtered count, not the current page's row count", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(45))} {...props} />);
 
     expect(await screen.findByText("45 problemas")).toBeTruthy();
   });
 
   it("renders no pagination controls when the filtered result set fits on one page (<=20 results)", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(20))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(20))} {...props} />);
 
     await screen.findByText("20 problemas");
     expect(document.querySelector(".overview-pagination-actions")).toBeNull();
   });
 
   it("still paginates once the filtered result set exceeds 20 results", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(21))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(21))} {...props} />);
 
     await screen.findByText("21 problemas");
     expect(document.querySelector(".overview-pagination-actions")).not.toBeNull();
@@ -700,7 +716,7 @@ describe("Overview — problem-list pagination", () => {
 
   it("disables Anterior on the first page and Seguinte on the final page", async () => {
     const user = userEvent.setup();
-    render(<Overview dataProvider={makeProvider(makeManyProblems(21))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(21))} {...props} />);
 
     await screen.findByText("21 problemas");
     const previous = screen.getByRole("button", { name: "Anterior" }) as HTMLButtonElement;
@@ -724,7 +740,7 @@ describe("Overview — end-of-results row", () => {
   }
 
   it("renders the truthful N de N problemas status for a single-page result set", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(6))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(6))} {...props} />);
 
     await screen.findByText("6 problemas");
     expect(screen.getByText("6 de 6 problemas")).toBeTruthy();
@@ -733,7 +749,7 @@ describe("Overview — end-of-results row", () => {
   it("renders no end-of-results row when there are zero results", async () => {
     const provider = makeProvider([{ id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} }]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema");
     await user.type(screen.getByLabelText("Pesquisar problemas"), "inexistente");
@@ -743,7 +759,7 @@ describe("Overview — end-of-results row", () => {
   });
 
   it("links Propor um problema to /contact in the end-of-results row", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(6))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(6))} {...props} />);
 
     await screen.findByText("6 problemas");
     const link = screen.getByRole("link", { name: "Propor um problema" }) as HTMLAnchorElement;
@@ -751,7 +767,7 @@ describe("Overview — end-of-results row", () => {
   });
 
   it("keeps Propor um problema available on a multi-page result set alongside the paginator", async () => {
-    render(<Overview dataProvider={makeProvider(makeManyProblems(21))} {...props} />);
+    render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(21))} {...props} />);
 
     await screen.findByText("21 problemas");
     expect(screen.getByRole("link", { name: "Propor um problema" })).toBeTruthy();
@@ -792,7 +808,7 @@ describe("Overview — material-change row treatment", () => {
       { id: "PRB-1", label: "Problema com alteração", history: [{ date: monday, summary: "Alteração registada." }] },
       { id: "PRB-2", label: "Problema sem alteração" },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema com alteração");
     const changedRow = screen.getByText("Problema com alteração").closest(".overview-problem-row");
@@ -812,7 +828,7 @@ describe("Overview — material-change row treatment", () => {
     const provider = providerWithHistory([
       { id: "PRB-1", label: "Problema com histórico antigo", history: [{ date: "2020-01-06", summary: "Alteração histórica." }] },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema com histórico antigo");
     const row = screen.getByText("Problema com histórico antigo").closest(".overview-problem-row");
@@ -832,7 +848,7 @@ describe("Overview — material-change row treatment", () => {
         ],
       },
     ]);
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema com várias alterações");
     const row = screen.getByText("Problema com várias alterações").closest(".overview-problem-row");
@@ -850,7 +866,7 @@ describe("Overview — material-change row treatment", () => {
       { id: "PRB-1", type: "PRB-", label: "Problema saudável", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema com falha de leitura", file: "", summaryFields: {} },
     ];
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     // Both Problems remain in the list; the failed one just never gets the
     // changed-row treatment (its fallback empty record carries no history).
@@ -878,7 +894,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
   it("always renders the shortcut in the open drawer, including at a truthful count of 0", async () => {
     const provider = providerWithHistory([{ id: "PRB-1", label: "Problema sem alterações" }]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema sem alterações");
     await user.click(openDrawer());
@@ -894,7 +910,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
       { id: "PRB-2", label: "Sem alterações" },
     ]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Duas alterações esta semana");
     await user.click(openDrawer());
@@ -910,7 +926,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
       { id: "PRB-3", label: "Nunca alterado" },
     ]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Alterado esta semana");
     await user.click(openDrawer());
@@ -929,7 +945,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
       { id: "PRB-2", label: "Nunca alterado" },
     ]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Histórico antigo");
     await user.click(openDrawer());
@@ -947,7 +963,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
       { id: "PRB-2", label: "Mobilidade sem alteração" },
     ]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Mobilidade alterada");
     await user.click(openDrawer());
@@ -968,7 +984,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
       { id: "PRB-2", label: "Outro problema", domain: ["PUB"] },
     ]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema alterado");
     await user.click(openDrawer());
@@ -986,7 +1002,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
       { id: "PRB-1", label: "Problema alterado", domain: ["MOB"], history: [{ date: monday, summary: "Alteração." }] },
     ]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema alterado");
     await user.click(openDrawer());
@@ -1004,7 +1020,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
       { id: "PRB-1", label: "Problema alterado", domain: ["MOB"], history: [{ date: monday, summary: "Alteração." }] },
     ]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema alterado");
     await user.click(openDrawer());
@@ -1029,7 +1045,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
       return { id, type: "PRB-", file: "", record: base, outgoingEdges: [], incomingEdges: [] };
     };
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema A");
     await user.click(openDrawer());
@@ -1048,7 +1064,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
     });
     const provider = providerWithHistory(problems);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("45 problemas");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
@@ -1063,7 +1079,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
     const monday = thisWeekMonday();
     const provider = providerWithHistory([{ id: "PRB-1", label: "Problema alterado", history: [{ date: monday, summary: "Alteração." }] }]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Problema alterado");
     const toggle = openDrawer();
@@ -1114,7 +1130,7 @@ describe("Overview — Lisbon civil-date-boundary hardening", () => {
       { id: "PRB-2", label: "Alterado na segunda-feira desta semana", history: [{ date: monday, summary: "Nesta semana." }] },
     ]);
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     await screen.findByText("Alterado na segunda-feira desta semana");
     await user.click(openDrawer());
@@ -1154,7 +1170,7 @@ describe("Overview — Lisbon civil-date-boundary hardening", () => {
     vi.useFakeTimers();
     try {
       vi.setSystemTime(new Date(`${monday}T12:00:00.000Z`));
-      render(<Overview dataProvider={provider} {...props} />);
+      render(<OverviewFixture dataProvider={provider} {...props} />);
       // The provider's reads resolve via microtasks, not timers, so a plain
       // `act`-flush (no time advance) is enough to settle the initial data
       // load under fake timers — `screen.findByText`'s own internal polling
@@ -1204,7 +1220,7 @@ describe("Overview — error state retry (ODM-021)", () => {
       getRecord: async (id) => ({ id, type: "PRB-", file: "", record: { title: "Problema recuperado" }, outgoingEdges: [], incomingEdges: [] }),
     };
     const user = userEvent.setup();
-    render(<Overview dataProvider={provider} {...props} />);
+    render(<OverviewFixture dataProvider={provider} {...props} />);
 
     const alert = await screen.findByRole("alert");
     expect(alert.textContent).toContain("falha temporária");

@@ -1,7 +1,7 @@
 import { Suspense, lazy, useEffect } from "react";
 import type { DataProvider } from "../dataProvider/types";
 import { useExplorerUrlState } from "../navigation/useExplorerUrlState";
-import { Overview } from "../overview/Overview";
+import { Overview, useOverviewDiscoveryState } from "../overview/Overview";
 import { RecordsExplorer } from "../records/RecordsExplorer";
 import { ProblemView } from "../problem/ProblemView";
 import { ProblemHistoryView } from "../problem/ProblemHistoryView";
@@ -9,6 +9,7 @@ import { ReadingGuide } from "../guide/ReadingGuide";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ExplorerHeader } from "./ExplorerHeader";
 import { formatPublicCount, formatPublicDateTime } from "../presentation/presentation";
+import { SKIP_TARGET_ID } from "./App";
 
 // RE-05: lazily imported, not just GraphCanvas's Sigma module inside it —
 // GraphExplorer's own module graph (Graphology + buildGraphModel/neighbourhood/
@@ -33,9 +34,16 @@ interface ExplorerProps {
  * Owns URL-synced state (view, selected record, search query, type filter)
  * via useExplorerUrlState and passes it down as controlled props —
  * Overview/RecordsExplorer/ProblemView own no competing copy of this state.
+ *
+ * F03: also owns Overview's discovery/browse context
+ * (`useOverviewDiscoveryState`) for the same reason — Explorer stays mounted
+ * across the view=overview <-> view=problem transition, while Overview
+ * itself unmounts/remounts on every such switch, so Explorer is the one
+ * stable owner that can survive that and hand the same state back.
  */
 export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generatedAt }: ExplorerProps) {
   const url = useExplorerUrlState();
+  const overviewDiscovery = useOverviewDiscoveryState();
 
   useEffect(() => {
     const selected = url.state.selectedId ? ` ${url.state.selectedId}` : "";
@@ -61,12 +69,20 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
         onFontes={url.goToSourcesInRecords}
       />
 
+      {/* F06: the skip link's real destination — after global navigation in
+          document order, so activating it bypasses ExplorerHeader entirely
+          rather than merely landing at the top of the shared <main> that
+          still wraps both (see App.tsx's own SKIP_TARGET_ID doc comment). No
+          visual footprint: an empty, unstyled, focusable node. */}
+      <div id={SKIP_TARGET_ID} tabIndex={-1} />
+
       {url.state.view === "graph" && <ReadingGuide schemaPrefixes={schemaPrefixes} />}
 
       {url.state.view === "overview" && (
         <Overview
           dataProvider={dataProvider}
           onExploreProblem={(id) => url.setViewAndSelection("problem", id)}
+          discovery={overviewDiscovery}
         />
       )}
 

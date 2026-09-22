@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
@@ -41,34 +41,91 @@ it("retries a failed startup manifest load", async () => {
   expect(attempts).toBe(2);
 });
 
-it("moves focus to the main content when the skip link is activated", async () => {
+// F06 regression: the skip link must bypass ExplorerHeader's global
+// navigation, not merely land at the top of the shared <main> landmark that
+// still wraps both header and content (see App.tsx's SKIP_TARGET_ID doc
+// comment, and Explorer.tsx's own skip-target node placed right after
+// ExplorerHeader).
+describe("App — skip link bypasses global navigation (F06)", () => {
   const provider: DataProvider = {
     getManifest: () => Promise.resolve(manifest),
     listRecords: () => Promise.resolve([]),
     getRecord: () => Promise.reject(new Error("not used")),
     getEdges: () => Promise.resolve([]),
   };
-  const user = userEvent.setup();
-  render(<App dataProvider={provider} />);
 
-  await user.tab();
-  const skipLink = screen.getByRole("link", { name: "Saltar para o conteúdo" });
-  expect(document.activeElement).toBe(skipLink);
+  it("keeps exactly one <main> landmark, with the skip target after global navigation in document order", async () => {
+    render(<App dataProvider={provider} />);
+    await screen.findByRole("button", { name: "Abrir menu" });
 
-  await user.keyboard("{Enter}");
-  expect(document.activeElement).toBe(document.getElementById("main-content"));
+    expect(screen.getAllByRole("main")).toHaveLength(1);
+    const nav = screen.getByRole("navigation", { name: "Navegação principal", hidden: true });
+    const skipTarget = document.getElementById("explorer-content-start");
+    expect(skipTarget).not.toBeNull();
+    expect(skipTarget).not.toBe(nav);
+    expect(nav.compareDocumentPosition(skipTarget!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 
-  // The Header's own first interactive element (visual-completion compact
-  // pass, task §2): jsdom has no media-query/layout engine, so it cannot
-  // evaluate the `>=768px` CSS override that keeps nav/CTA visible on real
-  // desktop — every render here behaves like the collapsed compact state,
-  // where the menu toggle (not the now `hidden`-attributed "Problemas") is
-  // the first genuinely focusable element after the identity heading. This
-  // is also the true compact-viewport tab order in a real browser; only the
-  // >=768px case (not reproducible in jsdom) differs, and is covered
-  // instead by ExplorerHeader.test.tsx's own disclosure-behaviour tests.
-  await user.tab();
-  expect(document.activeElement).toBe(screen.getByRole("button", { name: "Abrir menu" }));
+  it("activating the skip link focuses the content target, not the global navigation container", async () => {
+    const user = userEvent.setup();
+    render(<App dataProvider={provider} />);
+    await screen.findByRole("button", { name: "Abrir menu" });
+
+    await user.tab();
+    const skipLink = screen.getByRole("link", { name: "Saltar para o conteúdo" });
+    expect(document.activeElement).toBe(skipLink);
+
+    await user.keyboard("{Enter}");
+    const skipTarget = document.getElementById("explorer-content-start");
+    expect(document.activeElement).toBe(skipTarget);
+    expect(document.activeElement).not.toBe(screen.getByRole("navigation", { name: "Navegação principal", hidden: true }));
+    // Never the header's own menu toggle — activating the skip link must not
+    // require the keyboard user to traverse global nav at all.
+    expect(document.activeElement).not.toBe(screen.getByRole("button", { name: "Abrir menu" }));
+  });
+
+  it("keeps a valid skip destination while the startup manifest is still loading", async () => {
+    const pendingProvider: DataProvider = {
+      getManifest: () => new Promise(() => {}),
+      listRecords: () => Promise.resolve([]),
+      getRecord: () => Promise.reject(new Error("not used")),
+      getEdges: () => Promise.resolve([]),
+    };
+    render(<App dataProvider={pendingProvider} />);
+
+    await screen.findByRole("status");
+    const skipTarget = document.getElementById("explorer-content-start");
+    expect(skipTarget).not.toBeNull();
+    expect(skipTarget?.getAttribute("tabindex")).toBe("-1");
+  });
+
+  it("keeps a valid skip destination on a startup error", async () => {
+    const erroringProvider: DataProvider = {
+      getManifest: () => Promise.reject(new DataLoadError("boom", "network")),
+      listRecords: () => Promise.resolve([]),
+      getRecord: () => Promise.reject(new Error("not used")),
+      getEdges: () => Promise.resolve([]),
+    };
+    render(<App dataProvider={erroringProvider} />);
+
+    await screen.findByRole("alert");
+    const skipTarget = document.getElementById("explorer-content-start");
+    expect(skipTarget).not.toBeNull();
+    expect(skipTarget?.getAttribute("role")).toBe("alert");
+  });
+
+  it("keeps a valid accessible skip destination on a public trust page, after that page's own navigation", async () => {
+    window.history.pushState(null, "", "/about");
+    render(<App dataProvider={provider} />);
+
+    const trustNav = await screen.findByRole("navigation", { name: "Informação sobre o Open Évora" });
+    const skipTarget = document.getElementById("explorer-content-start");
+    expect(skipTarget).not.toBeNull();
+    expect(trustNav.compareDocumentPosition(skipTarget!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getAllByRole("main")).toHaveLength(1);
+
+    window.history.pushState(null, "", "/");
+  });
 });
 
 it("qualifies the manifest timestamp as build/generation time, distinct from research currentness (ODM-020)", async () => {

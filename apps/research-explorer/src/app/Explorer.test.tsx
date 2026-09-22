@@ -78,6 +78,10 @@ function fakeProvider(overrides: Partial<DataProvider> = {}): DataProvider {
 }
 
 beforeEach(() => {
+  // jsdom does not implement scrollIntoView — only exercised when a test's
+  // URL carries a real, resolvable fragment (F07/F08's applyInitialFragment
+  // path below); harmless no-op stub for every other test.
+  Element.prototype.scrollIntoView = vi.fn() as unknown as typeof Element.prototype.scrollIntoView;
   // Most workflow tests exercise the existing Records flow explicitly; root
   // routing itself is covered in the Overview suite below.
   window.history.replaceState(null, "", "/?view=records");
@@ -830,6 +834,268 @@ describe("Explorer — Problem view (RE-03)", () => {
 
     expect(screen.queryByRole("link", { name: /Orientação completa do Explorer/ })).toBeNull();
     expect(document.querySelector('a[href="#reading-guide"]')).toBeNull();
+  });
+});
+
+/**
+ * F03: Overview owns important discovery context (search, topic filter, the
+ * `Alterados esta semana` shortcut, sort order, current page) that used to
+ * live as `Overview`'s own local `useState` — reset on every remount.
+ * Opening a PRB unmounts Overview (Explorer switches to view=problem);
+ * returning (browser Back, or the Problem breadcrumb's "Visão geral") used
+ * to mount a fresh Overview instance with that context lost. This state now
+ * lives in `Explorer` (`useOverviewDiscoveryState`, overview/Overview.tsx),
+ * which stays mounted across the switch, so it survives. A bounded synthetic
+ * fixture (30 PRBs across two topics, `PRB-0021` on) exercises a second page
+ * — the shared `INDEX`/`DETAILS` fixtures above are too small for that,
+ * never canonical research data.
+ */
+describe("Explorer — Overview discovery-context preservation across Problem navigation (F03)", () => {
+  function makeDiscoveryProblems(count: number): { index: RecordSummary[]; details: Record<string, RecordDetail> } {
+    const index: RecordSummary[] = [];
+    const details: Record<string, RecordDetail> = {};
+    const today = new Date().toISOString().slice(0, 10);
+    for (let i = 1; i <= count; i += 1) {
+      const id = `PRB-${String(i).padStart(4, "0")}`;
+      const domain = i % 2 === 0 ? "PUB" : "MOB";
+      const title = i === 1 ? "Pressão de estacionamento em Évora" : `Problema sintético ${String(i).padStart(2, "0")}`;
+      index.push({ id, type: "PRB-", label: title, file: "", summaryFields: {} });
+      details[id] = {
+        id,
+        type: "PRB-",
+        file: "",
+        // PRB-0001 alone carries a this-week material change, so the
+        // `Alterados esta semana` shortcut (test C below) has exactly one
+        // real result to open, rather than filtering to zero.
+        record: { title, domain: [domain], history: i === 1 ? [{ date: today, summary: "Alteração desta semana." }] : undefined },
+        outgoingEdges: [],
+        incomingEdges: [],
+      };
+    }
+    return { index, details };
+  }
+
+  function discoveryProvider(count: number): DataProvider {
+    const { index, details } = makeDiscoveryProblems(count);
+    return {
+      getManifest: () => Promise.reject(new Error("not used")),
+      listRecords: () => Promise.resolve(index),
+      getRecord: (id: string) => (details[id] ? Promise.resolve(details[id]) : Promise.reject(new Error(`no fixture detail for ${id}`))),
+      getEdges: () => Promise.resolve([]),
+    };
+  }
+
+  function overviewDrawer() {
+    return screen.getByRole("button", { name: /^Filtros/ });
+  }
+
+  /** Configures search + topic filter + sort in the open Overview, leaving a non-default, non-page-1 state ready to assert against after returning. */
+  async function configureOverviewDiscovery(user: ReturnType<typeof userEvent.setup>) {
+    await screen.findByText("30 problemas");
+    await user.type(screen.getByLabelText("Pesquisar problemas"), "sintético");
+    await user.click(overviewDrawer());
+    const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
+    await user.click(within(drawer).getByRole("button", { name: /^Mobilidade/ }));
+    await user.selectOptions(screen.getByLabelText("Ordenar por"), "Identificador ↑");
+  }
+
+  it("A: preserves search/filter/sort across Overview -> PRB -> browser Back", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/");
+    render(<Explorer dataProvider={discoveryProvider(30)} />);
+
+    await configureOverviewDiscovery(user);
+    const search = screen.getByLabelText("Pesquisar problemas") as HTMLInputElement;
+    expect(search.value).toBe("sintético");
+
+    await user.click(screen.getAllByRole("button", { name: /Explorar/ })[0]);
+    await screen.findByRole("heading", { name: /Problema sintético/ });
+
+    window.history.back();
+    await screen.findByRole("heading", { name: "Visão geral" });
+
+    expect((screen.getByLabelText("Pesquisar problemas") as HTMLInputElement).value).toBe("sintético");
+    // The category drawer's own open/closed state is transient presentation
+    // state (never preserved, per F03's scope) — the restored active
+    // category is asserted via Filtros' own restrained active-state naming
+    // (existing behaviour, Overview.test.tsx's "gives Filtros a restrained
+    // active state" case) rather than by reaching into a collapsed drawer.
+    expect(screen.getByRole("button", { name: /Filtros — Mobilidade/ })).toBeTruthy();
+    expect((screen.getByLabelText("Ordenar por") as HTMLSelectElement).value).toBe("id");
+  });
+
+  it("B: preserves search/filter/sort across Overview -> PRB -> the Problem breadcrumb's Visão geral", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/");
+    render(<Explorer dataProvider={discoveryProvider(30)} />);
+
+    await configureOverviewDiscovery(user);
+
+    await user.click(screen.getAllByRole("button", { name: /Explorar/ })[0]);
+    await screen.findByRole("heading", { name: /Problema sintético/ });
+
+    const breadcrumb = screen.getByLabelText("Localização");
+    await user.click(within(breadcrumb).getByRole("button", { name: "Visão geral" }));
+    await screen.findByRole("heading", { name: "Visão geral" });
+
+    expect((screen.getByLabelText("Pesquisar problemas") as HTMLInputElement).value).toBe("sintético");
+    expect(screen.getByRole("button", { name: /Filtros — Mobilidade/ })).toBeTruthy();
+    expect((screen.getByLabelText("Ordenar por") as HTMLSelectElement).value).toBe("id");
+  });
+
+  it("C: preserved topic/weekly-shortcut mutual exclusion survives the round trip", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/");
+    render(<Explorer dataProvider={discoveryProvider(30)} />);
+
+    await screen.findByText("30 problemas");
+    await user.click(overviewDrawer());
+    const drawer = screen.getByRole("group", { name: "Filtrar por tema" });
+    await user.click(within(drawer).getByRole("button", { name: /^Alterados esta semana/ }));
+    expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("true");
+    await screen.findByText("1 problemas");
+
+    await user.click(screen.getAllByRole("button", { name: /Explorar/ })[0]);
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+
+    window.history.back();
+    await screen.findByRole("heading", { name: "Visão geral" });
+
+    // The shortcut selection survived the round trip (asserted via Filtros'
+    // own restrained active-state naming, since the drawer itself is
+    // transient/collapsed again on remount — see test A's own comment);
+    // selecting a normal topic must still clear it, exactly as before
+    // Overview ever unmounted.
+    expect(screen.getByRole("button", { name: /Filtros — Alterados esta semana/ })).toBeTruthy();
+    await user.click(overviewDrawer());
+    const reopenedDrawer = screen.getByRole("group", { name: "Filtrar por tema" });
+    expect(within(reopenedDrawer).getByRole("button", { name: /^Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("true");
+
+    await user.click(within(reopenedDrawer).getByRole("button", { name: /^Mobilidade/ }));
+    expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("false");
+    expect(screen.getByRole("button", { name: /^Mobilidade/ }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("D: a preserved-upstream discovery-input change still resets pagination to page 1", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/");
+    render(<Explorer dataProvider={discoveryProvider(30)} />);
+
+    await screen.findByText("30 problemas");
+    await user.click(screen.getByRole("button", { name: "Seguinte" }));
+    await screen.findByText(/^Página 2 de 2/);
+
+    await user.click(screen.getAllByRole("button", { name: /Explorar/ })[0]);
+    await screen.findByRole("heading", { name: /Problema/ });
+    window.history.back();
+    await screen.findByRole("heading", { name: "Visão geral" });
+
+    // Page 2 itself survived the round trip (page is part of the preserved
+    // discovery context)...
+    await screen.findByText(/^Página 2 de 2/);
+
+    // ...but changing a preserved upstream input (search) still resets to
+    // page 1 — the existing page-reset rule keeps applying to the lifted
+    // state exactly as it did to Overview's own former local state.
+    await user.type(screen.getByLabelText("Pesquisar problemas"), "sintético");
+    await screen.findByText(/^Página 1 de/);
+  });
+});
+
+/**
+ * F08: `useExplorerUrlState`'s own normalization (correcting the address bar
+ * to the canonical serialized query string, via replaceState) reconstructs
+ * the URL from pathname+search alone — naively dropping any existing
+ * `window.location.hash` in the process. A direct deep link like
+ * `?id=EVD-000105&view=records#evd-limits` can have its query param order
+ * canonicalized before the asynchronously rendered `#evd-limits` target is
+ * ready, silently losing the fragment before F07's applyInitialFragment ever
+ * gets a chance to use it. See useExplorerUrlState.ts's own F08 doc comment
+ * for the same-location-vs-genuine-navigation distinction these tests cover.
+ */
+describe("Explorer — URL normalization preserves window.location.hash (F08)", () => {
+  afterEach(() => {
+    window.location.hash = "";
+  });
+
+  it("preserves a valid hash while normalizing reordered query parameters on initial load", async () => {
+    window.history.replaceState(null, "", "/?id=EVD-000105&view=records#evd-limits");
+    render(<Explorer dataProvider={fakeProvider()} />);
+
+    await screen.findByText(/Via Verde/);
+    expect(window.location.hash).toBe("#evd-limits");
+    // The query itself was still canonicalized (view before id) — the
+    // normalization actually ran, this isn't merely an untouched URL.
+    expect(window.location.search.indexOf("view=")).toBeLessThan(window.location.search.indexOf("id="));
+  });
+
+  it("preserves a valid hash while UX-F's view=graph normalization rewrites the query", async () => {
+    window.history.replaceState(null, "", "/?view=graph&id=PRB-0005#problem-evidencia");
+    render(<Explorer dataProvider={fakeProvider()} />);
+
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+    expect(window.location.search).toContain("view=problem");
+    expect(window.location.hash).toBe("#problem-evidencia");
+  });
+
+  it("preserves a valid hash across a popstate-driven normalization", async () => {
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("button", { name: /PRB-0005/ });
+
+    window.history.pushState(null, "", "/?id=EVD-000105&view=records#evd-limits");
+    window.location.hash = "#evd-limits";
+    window.dispatchEvent(new PopStateEvent("popstate"));
+
+    await waitFor(() => expect(window.location.search.indexOf("view=")).toBeLessThan(window.location.search.indexOf("id=")));
+    expect(window.location.hash).toBe("#evd-limits");
+  });
+
+  it("typing a search query (replace, same-context refinement) preserves an existing hash", async () => {
+    window.history.replaceState(null, "", "/?view=records#evd-limits");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("button", { name: /PRB-0005/ });
+
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText("Pesquisar"), "PRB");
+
+    expect(window.location.search).toContain("q=PRB");
+    expect(window.location.hash).toBe("#evd-limits");
+  });
+
+  it("a genuine navigation to a different record (push) does not carry over an unrelated stale fragment", async () => {
+    window.history.replaceState(null, "", "/?view=records#evd-limits");
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+
+    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    await screen.findByText("Estrutura técnica completa");
+
+    expect(window.location.search).toContain("id=PRB-0005");
+    expect(window.location.hash).toBe("");
+  });
+
+  /**
+   * F07 + F08 end-to-end invariant: a direct PRB deep link's
+   * `URL query + #section` must survive (1) URL parsing, (2) URL
+   * normalization, (3) asynchronous PRB loading, (4) initial fragment
+   * application, and (5) default focus management, ending with the
+   * requested section focused/scrolled — never overridden by the generic
+   * heading-focus fallback, and never lost to F08's own normalization along
+   * the way. The un-normalized param order (`id` before `view`) exercises
+   * both bugs' real-world trigger at once.
+   */
+  it("a direct PRB deep link with a reordered query and a section fragment ends with that section focused, not the heading", async () => {
+    window.history.replaceState(null, "", "/?id=PRB-0005&view=problem#problem-evidencia");
+    render(<Explorer dataProvider={fakeProvider()} />);
+
+    const evidenceSection = await screen.findByLabelText("Evidência");
+    await waitFor(() => expect(document.activeElement).toBe(evidenceSection));
+
+    // (2) normalization ran (canonical view-before-id order) without (8)
+    // losing the fragment, and (5) the heading was never the final focus.
+    expect(window.location.search.indexOf("view=")).toBeLessThan(window.location.search.indexOf("id="));
+    expect(window.location.hash).toBe("#problem-evidencia");
+    expect(document.activeElement).not.toBe(screen.getByRole("heading", { name: /Pressão de estacionamento/ }));
   });
 });
 

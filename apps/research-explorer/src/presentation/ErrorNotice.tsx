@@ -37,14 +37,16 @@ export interface ErrorNoticeProps {
   titleAs?: "p" | "h2" | "h3";
   /** Forwarded to the `role="alert"` root so a caller can keep it as its own focus-entry target. */
   tabIndex?: number;
+  /** Forwarded to the `role="alert"` root — lets a caller target this element directly (e.g. a skip-link destination). */
+  id?: string;
 }
 
 export const ErrorNotice = forwardRef<HTMLDivElement, ErrorNoticeProps>(function ErrorNotice(
-  { title, message, action, titleAs: TitleTag = "p", tabIndex },
+  { title, message, action, titleAs: TitleTag = "p", tabIndex, id },
   ref
 ) {
   return (
-    <div ref={ref} role="alert" tabIndex={tabIndex} className="ui-error-notice">
+    <div ref={ref} id={id} role="alert" tabIndex={tabIndex} className="ui-error-notice">
       <TitleTag className="ui-error-notice-title">{title}</TitleTag>
       <p className="ui-error-notice-message">{message}</p>
       {action}
