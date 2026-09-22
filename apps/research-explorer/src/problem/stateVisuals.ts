@@ -65,18 +65,3 @@ export function validationVisual(value: string): StateVisual {
 export function evidenceVisual(value: string): StateVisual {
   return EVIDENCE_VISUALS[value] ?? NEUTRAL_FALLBACK;
 }
-
-/** The canonical `status` enum values this module covers (`research/schemas/problem.schema.json`), in schema order — for callers needing the full lifecycle value set, not just the tone lookup. Same "own list of the keys it already maintains" pattern as `topicMapping.ts`'s `auditedDomainCodes()`. */
-export function canonicalLifecycleValues(): string[] {
-  return Object.keys(LIFECYCLE_VISUALS);
-}
-
-/** The canonical `validation_status` enum values this module covers, in schema order. */
-export function canonicalValidationValues(): string[] {
-  return Object.keys(VALIDATION_VISUALS);
-}
-
-/** The canonical `evidence_status` enum values this module covers, in schema order. */
-export function canonicalEvidenceValues(): string[] {
-  return Object.keys(EVIDENCE_VISUALS);
-}

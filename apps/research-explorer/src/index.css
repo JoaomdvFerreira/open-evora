@@ -431,16 +431,6 @@ tr[aria-selected="true"] {
   text-underline-offset: 0.16em;
 }
 
-.record-type-context {
-  color: #555;
-  font-size: 0.85rem;
-  margin: 0 0 0.35rem;
-}
-
-.record-type-context code {
-  font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, monospace;
-}
-
 .record-meaning {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.15rem;
@@ -573,46 +563,6 @@ code {
   overflow-x: auto;
 }
 
-/* Contribution chips (REDUX-002) — every canonical value, including
-   CONTRADICTS, shares identical border weight/padding/background/font size.
-   Never give any one value structural or colour emphasis over another.
-   V3: restated on V1 tokens/IBM Plex Mono per Prototype B's chip anatomy. */
-.effect-chip-wrap {
-  position: relative;
-  display: inline-flex;
-  margin-right: var(--space-tight);
-}
-
-/* PI-02F3: effect-label help — same visible-on-hover/focus tooltip
-   pattern as .unavailable-note (UX-F), reused here so keyboard focus exposes
-   the explanation exactly as pointer hover does. */
-.effect-chip-note {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translate(-50%, 4px);
-  z-index: 1;
-  width: max-content;
-  max-width: 220px;
-  padding: 3px 8px;
-  color: var(--color-surface-reading);
-  background: var(--color-ink-primary);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-interface);
-  font-size: 12px;
-  line-height: 1.4;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.1s ease;
-}
-
-.effect-chip-wrap:hover .effect-chip-note,
-.effect-chip:focus-visible ~ .effect-chip-note {
-  opacity: 1;
-  visibility: visible;
-}
-
 .evidence-item-header {
   display: flex;
   justify-content: space-between;
@@ -705,8 +655,6 @@ code {
   --space-9: 48px;
   --space-10: 64px;
   --space-11: 90px;
-  --control-height: 40px;
-  --tap-min: 44px;
   --radius-sm: 3px;
   --radius-md: 4px;
   --radius-lg: 5px;
@@ -3032,12 +2980,6 @@ body:has(.public-overview) .public-footer {
   margin: 0 0 var(--space-standard);
 }
 
-.detail-type-kind {
-  color: var(--color-ink-faint);
-  font-family: var(--recipe-technical-id-family);
-  font-size: var(--recipe-technical-id-size);
-}
-
 .record-detail-main .record-meaning-zone {
   max-width: none;
   margin-bottom: var(--space-8);
@@ -3055,11 +2997,6 @@ body:has(.public-overview) .public-footer {
 .record-detail-main .record-role-fields {
   align-items: center;
   gap: var(--space-3);
-}
-
-.detail-effect-target {
-  color: var(--color-ink-muted);
-  font-size: 13px;
 }
 
 .record-detail-main .record-provenance {
@@ -3272,68 +3209,6 @@ body:has(.public-overview) .public-footer {
   font-family: var(--recipe-interface-body-family);
   font-size: var(--recipe-interface-body-size);
   line-height: var(--recipe-interface-body-line-height);
-}
-
-/* UX-E bounded quick-read: reuses the .record-provenance box treatment so
-   it reads as the same family of "compact canonical summary" surface. */
-.record-quick-read {
-  border: 1px solid var(--color-separator-standard);
-  border-radius: var(--radius-surface);
-  background: var(--color-surface-subtle);
-  padding: var(--space-standard) var(--space-loose);
-  margin: 0 0 var(--space-loose);
-}
-
-.record-quick-read-title {
-  margin: 0 0 var(--space-tight);
-  font-weight: 600;
-  color: var(--color-ink-primary);
-}
-
-.record-quick-read-grid {
-  display: grid;
-  grid-template-columns: 160px 1fr;
-  row-gap: var(--space-tight);
-  column-gap: var(--space-standard);
-  margin: 0;
-  font-size: 14px;
-}
-
-.record-quick-read-item {
-  display: contents;
-}
-
-.record-quick-read-item dt {
-  color: var(--color-ink-muted);
-}
-
-.record-quick-read-item dd {
-  margin: 0;
-  color: var(--color-ink-primary);
-}
-
-.record-quick-read-relations {
-  list-style: none;
-  margin: var(--space-3) 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  font-size: 14px;
-}
-
-.record-quick-read-relations button {
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--color-accent-hover);
-  cursor: pointer;
-  text-decoration: underline;
-  font: inherit;
-}
-
-.record-quick-read-relations button:hover {
-  color: var(--color-accent);
 }
 
 .record-detail-relations {
@@ -4618,19 +4493,6 @@ body:has(.public-overview) .public-footer {
   color: var(--color-ink-primary);
   font-size: 14px;
   line-height: 1.5;
-}
-
-/* PI-02C §2 "O que sustenta esta leitura" — corroboration_statement reuses
-   the editorial-body treatment of .problem-statement; independence_assessment
-   reuses the existing .problem-current-state-item labelled-block pattern. */
-.problem-support-statement {
-  max-width: none;
-  margin: 0 0 var(--space-loose);
-  color: var(--color-ink-primary);
-  font-family: var(--recipe-editorial-body-family);
-  font-size: var(--recipe-editorial-body-size);
-  font-weight: var(--recipe-editorial-body-weight);
-  line-height: var(--recipe-editorial-body-line-height);
 }
 
 /* PI-02C §3 evidence groups (Evidência que suporta / que limita a conclusão /
