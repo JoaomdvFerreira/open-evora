@@ -38,6 +38,9 @@ const records: Record<string, RecordDetail> = {
   // "does not repeatedly reapply" test below); never mixed into the
   // vNext/AR-05/etc. suites above, which are all scoped to PRB-1.
   "PRB-2": { id: "PRB-2", type: "PRB-", file: "", outgoingEdges: [], incomingEdges: [], record: { title: "Segundo problema" } },
+  // F16: a third minimal PRB fixture — used only by the A->B->C rapid-chain
+  // transition regression below.
+  "PRB-3": { id: "PRB-3", type: "PRB-", file: "", outgoingEdges: [], incomingEdges: [], record: { title: "Terceiro problema" } },
   ...Object.fromEntries(["1", "2", "3"].map((id) => [`EVD-${id}`, {
     id: `EVD-${id}`, type: "EVD-", file: "", incomingEdges: [], outgoingEdges: [{ field: "provenance.sources", ordinal: 0, to: `SRC-${id}` }],
     record: { observation: { summary: `Observação ${id}.` }, provenance: { sources: [`SRC-${id}`] } },
@@ -453,5 +456,147 @@ describe("ProblemView — initial-fragment focus vs. heading fallback (F07)", ()
     rerender(<ProblemView {...props} problemId="PRB-2" />);
     await screen.findByRole("heading", { name: "Segundo problema" });
     expect(scrollIntoView).toHaveBeenCalledTimes(1);
+  });
+});
+
+/**
+ * F16: rapid/in-place PRB->PRB navigation (a new `problemId` arriving before
+ * the previous PRB's projection load has settled) must never let the
+ * previous PRB's `ready` projection be presented as though it belongs to the
+ * newly requested PRB, and must never skip focusing the newly loaded PRB's
+ * own heading once it becomes ready. Uses a controllable `getRecord` so each
+ * PRB's load can be resolved independently and out of request order,
+ * reproducing the race directly rather than only asserting the final static
+ * state.
+ */
+describe("ProblemView — PRB transition identity/focus integrity (F16)", () => {
+  // Only PRB-* lookups (the projection's own root fetch) are held back —
+  // their linked EVD/SRC lookups resolve immediately — so each test controls
+  // exactly the race under test (when a PRB's own projection settles)
+  // without needing to separately track and resolve every downstream fetch.
+  function deferredProvider() {
+    const pending = new Map<string, { resolve: (detail: RecordDetail) => void; reject: (error: unknown) => void }>();
+    const dataProvider: DataProvider = {
+      getManifest: async () => { throw Error("unused"); },
+      listRecords: async () => index,
+      getEdges: async () => [],
+      getRecord: (id) =>
+        id.startsWith("PRB-")
+          ? new Promise<RecordDetail>((resolve, reject) => {
+              pending.set(id, { resolve, reject });
+            })
+          : Promise.resolve(records[id]),
+    };
+    return {
+      dataProvider,
+      resolve(id: string) {
+        pending.get(id)?.resolve(records[id]);
+        pending.delete(id);
+      },
+      reject(id: string, error: unknown) {
+        pending.get(id)?.reject(error);
+        pending.delete(id);
+      },
+    };
+  }
+
+  it("does not present the previous PRB's ready content as the newly requested PRB's state, and focuses the new PRB once ready", async () => {
+    const { dataProvider, resolve } = deferredProvider();
+    const { rerender } = render(<ProblemView {...props} dataProvider={dataProvider} problemId="PRB-1" />);
+    await screen.findByText("A carregar Problema PRB-1…");
+
+    resolve("PRB-1");
+    await screen.findByRole("heading", { name: /Problema de teste/ });
+
+    // Navigate to PRB-2 before its own load settles.
+    rerender(<ProblemView {...props} dataProvider={dataProvider} problemId="PRB-2" />);
+    await screen.findByText("A carregar Problema PRB-2…");
+
+    // PRB-1's heading/content must not still be presented as PRB-2's ready state.
+    expect(screen.queryByRole("heading", { name: /Problema de teste/ })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Segundo problema" })).toBeNull();
+
+    resolve("PRB-2");
+    const heading = await screen.findByRole("heading", { name: "Segundo problema" });
+    await vi.waitFor(() => expect(document.activeElement).toBe(heading));
+  });
+
+  it("does not let a cancelled previous PRB's late completion replace the new PRB or steal its focus", async () => {
+    const { dataProvider, resolve } = deferredProvider();
+    const { rerender } = render(<ProblemView {...props} dataProvider={dataProvider} problemId="PRB-1" />);
+    await screen.findByText("A carregar Problema PRB-1…");
+
+    rerender(<ProblemView {...props} dataProvider={dataProvider} problemId="PRB-2" />);
+    await screen.findByText("A carregar Problema PRB-2…");
+    resolve("PRB-2");
+    const heading = await screen.findByRole("heading", { name: "Segundo problema" });
+    await vi.waitFor(() => expect(document.activeElement).toBe(heading));
+
+    // The stale PRB-1 request finally resolves after PRB-2 is already ready
+    // and focused — it must not overwrite the rendered PRB or steal focus.
+    resolve("PRB-1");
+    await new Promise((r) => setTimeout(r, 0));
+    expect(screen.getByRole("heading", { name: "Segundo problema" })).toBeTruthy();
+    expect(document.activeElement).toBe(heading);
+  });
+
+  it("resolves a rapid A -> B -> C chain on C, with B unable to win late", async () => {
+    const { dataProvider, resolve } = deferredProvider();
+    const { rerender } = render(<ProblemView {...props} dataProvider={dataProvider} problemId="PRB-1" />);
+    await screen.findByText("A carregar Problema PRB-1…");
+    rerender(<ProblemView {...props} dataProvider={dataProvider} problemId="PRB-2" />);
+    await screen.findByText("A carregar Problema PRB-2…");
+    rerender(<ProblemView {...props} dataProvider={dataProvider} problemId="PRB-3" />);
+    await screen.findByText("A carregar Problema PRB-3…");
+
+    resolve("PRB-3");
+    const heading = await screen.findByRole("heading", { name: "Terceiro problema" });
+    await vi.waitFor(() => expect(document.activeElement).toBe(heading));
+
+    // B (and A) resolving late must not win over the already-rendered C.
+    resolve("PRB-2");
+    resolve("PRB-1");
+    await new Promise((r) => setTimeout(r, 0));
+    expect(screen.getByRole("heading", { name: "Terceiro problema" })).toBeTruthy();
+    expect(document.activeElement).toBe(heading);
+  });
+
+  it("keeps an error associated with the ID whose load failed, and retry correct, across a PRB transition", async () => {
+    const { dataProvider, resolve, reject } = deferredProvider();
+    const { rerender } = render(<ProblemView {...props} dataProvider={dataProvider} problemId="PRB-1" />);
+    await screen.findByText("A carregar Problema PRB-1…");
+
+    rerender(<ProblemView {...props} dataProvider={dataProvider} problemId="PRB-2" />);
+    await screen.findByText("A carregar Problema PRB-2…");
+    reject("PRB-2", new Error("network failure"));
+    await screen.findByText("Falha ao carregar o Problema");
+
+    // The earlier PRB-1 request resolving after the error must not clear it
+    // or replace PRB-2's error state.
+    resolve("PRB-1");
+    await new Promise((r) => setTimeout(r, 0));
+    expect(screen.getByText("Falha ao carregar o Problema")).toBeTruthy();
+  });
+
+  it("still applies a direct-load fragment target over heading focus (H2/F07 unaffected)", async () => {
+    Element.prototype.scrollIntoView = vi.fn() as unknown as typeof Element.prototype.scrollIntoView;
+    window.location.hash = "#problem-evidencia";
+    try {
+      render(<ProblemView {...props} problemId="PRB-1" />);
+      const evidenceSection = await screen.findByLabelText("Evidência");
+      await vi.waitFor(() => expect(document.activeElement).toBe(evidenceSection));
+      expect(screen.queryByRole("heading", { name: /Problema de teste/ })).not.toBe(document.activeElement);
+    } finally {
+      window.location.hash = "";
+    }
+  });
+
+  it("focuses the newly selected PRB's heading on ordinary navigation without a hash (H2/F07 unaffected)", async () => {
+    const { rerender } = render(<ProblemView {...props} problemId="PRB-1" />);
+    await screen.findByRole("heading", { name: /Problema de teste/ });
+
+    rerender(<ProblemView {...props} problemId="PRB-2" />);
+    const heading = await screen.findByRole("heading", { name: "Segundo problema" });
+    await vi.waitFor(() => expect(document.activeElement).toBe(heading));
   });
 });
