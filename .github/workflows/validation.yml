@@ -17,4 +17,5 @@ jobs:
       - run: npm ci
       - run: npm ci --prefix apps/research-explorer
       - run: npm run research:check
+      - run: npm run build-data:test --prefix apps/research-explorer
       - run: npm run explorer:build
