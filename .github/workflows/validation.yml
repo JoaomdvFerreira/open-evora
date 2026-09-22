@@ -19,3 +19,4 @@ jobs:
       - run: npm run research:check
       - run: npm run build-data:test --prefix apps/research-explorer
       - run: npm run explorer:build
+      - run: npm run build-storybook --prefix apps/research-explorer
