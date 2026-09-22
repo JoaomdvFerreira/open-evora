@@ -91,10 +91,12 @@ export interface RecordSchema {
   /** Dotted array paths that must not be empty when the field is present. */
   nonEmptyListFields?: string[];
   /**
-   * Dotted paths whose full `YYYY-MM-DD` values must be real calendar dates.
-   * Precision permitted by the field's own `patterns` entry is preserved:
-   * a schema allowing `YYYY` or `YYYY-MM` keeps accepting them, and only a
-   * complete date is calendar-checked.
+   * Dotted paths whose calendar-checkable values must be real calendar
+   * dates/months. Precision permitted by the field's own `patterns` entry
+   * is preserved: a schema allowing `YYYY` keeps accepting any year
+   * unchecked (no month/day component to be impossible), `YYYY-MM` is
+   * checked for a valid month (01-12), and a complete `YYYY-MM-DD` is
+   * checked as a real calendar date.
    */
   calendarDateFields?: string[];
 }
