@@ -180,6 +180,14 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(screen.getByText("2", { selector: "strong" })).toBeTruthy();
   });
 
+  it("renders hero topics as non-interactive text, never as navigable links", () => {
+    const record = { title: "T", domain: ["MOB"] };
+    const { container } = renderPrb(record, []);
+    const topics = requireElement(container, ".prb-identity-topics");
+    expect(within(topics).queryByRole("link")).toBeNull();
+    expect(container.querySelector(".prb-identity-topic-link")?.tagName).toBe("SPAN");
+  });
+
   it("keeps compact/mobile content complete — every section renders regardless of viewport-only CSS", () => {
     const record = {
       title: "Título completo",

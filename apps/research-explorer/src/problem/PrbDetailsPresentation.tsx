@@ -102,9 +102,9 @@ function PrbIdentityHeader({ data }: { data: PrbDetailsData }) {
                     ·
                   </span>
                 )}
-                <a href={`#${topic}`} className="prb-identity-topic-link">
+                <span className="prb-identity-topic-link">
                   {describeTopic(topic).label}
-                </a>
+                </span>
               </span>
             ))}
           </span>

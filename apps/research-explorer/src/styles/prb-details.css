@@ -133,8 +133,8 @@
   background: var(--color-accent);
 }
 
-/* Approved restrained text-link topic treatment — plain underlined links
-   separated by a middot, never TopicBadge pills. */
+/* Approved restrained text topic treatment — plain underlined non-interactive
+   text separated by a middot, never TopicBadge pills. */
 .prb-identity-topics {
   display: flex;
   flex-wrap: wrap;
@@ -156,11 +156,6 @@
   color: var(--color-ink-secondary);
   text-decoration: none;
   border-bottom: 1px solid var(--color-separator-standard);
-}
-
-.prb-identity-topic-link:hover {
-  color: var(--color-accent-hover);
-  border-bottom-color: var(--color-accent);
 }
 
 .prb-identity-updated {
