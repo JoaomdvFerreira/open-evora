@@ -102,7 +102,7 @@ describe("prbDetailsProjection — canonical mapping for the generic PRB Details
 
   it("supports multiple research roles and multiple sources on one evidence relationship", () => {
     const evidence = [evd("EVD-1", "Obs", ["REFINES", "BOUNDS"], ["LOCAL_OBSERVATION", "EXISTING_RESPONSE"], ["Município de Évora", "ODigital"])];
-    const [item] = knownEvidenceStatements(problem({}, evidence));
+    const [item] = knownEvidenceStatements(problem({}, evidence), ["EVD-1"]);
     expect(item.effects).toEqual(["REFINES", "BOUNDS"]);
     expect(item.researchRoles).toEqual(["LOCAL_OBSERVATION", "EXISTING_RESPONSE"]);
     expect(item.sourcePublishers).toEqual(["Município de Évora", "ODigital"]);
@@ -115,10 +115,16 @@ describe("prbDetailsProjection — canonical mapping for the generic PRB Details
     expect(items.map((item) => item.evidenceId)).toEqual(["EVD-3", "EVD-1"]);
   });
 
-  it("returns every linked evidence item, in projection order, when no subset is supplied", () => {
+  it("selects no knowledge items when the caller supplies no evidence-id selection — no implicit render-all fallback", () => {
     const evidence = [evd("EVD-1", "Obs 1"), evd("EVD-2", "Obs 2")];
     const items = knownEvidenceStatements(problem({}, evidence));
-    expect(items.map((item) => item.evidenceId)).toEqual(["EVD-1", "EVD-2"]);
+    expect(items).toEqual([]);
+  });
+
+  it("selects no knowledge items when the caller supplies an empty evidence-id selection", () => {
+    const evidence = [evd("EVD-1", "Obs 1"), evd("EVD-2", "Obs 2")];
+    const items = knownEvidenceStatements(problem({}, evidence), []);
+    expect(items).toEqual([]);
   });
 
   it("derives singular/plural-relevant counts directly from canonical presence, never a fabricated default", () => {

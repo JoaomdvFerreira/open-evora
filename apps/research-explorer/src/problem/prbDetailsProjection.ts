@@ -53,17 +53,20 @@ export interface PrbEvidenceRelationship {
 }
 
 /**
- * "O que sabemos até agora" statements. `evidenceIds`, when supplied, is a
- * caller-chosen subset (PD-02A's PRB-0005 Storybook fixture uses exactly
- * EVD-000139/EVD-000003/EVD-000105/EVD-000167 — a fixture-only selection,
- * not a production ranking rule); production callers omit it and receive
- * every linked evidence item in the PRB's own authored `evidence[]` order.
+ * "O que sabemos até agora" statements. `evidenceIds` is a caller-chosen
+ * subset, in caller order (PD-02A's PRB-0005 Storybook fixture selects
+ * exactly EVD-000139/EVD-000003/EVD-000105/EVD-000167 — a fixture-only
+ * choice, not a production ranking rule). This module owns no production
+ * selection policy for this section: a caller that omits `evidenceIds`, or
+ * passes an empty list, gets no selected knowledge items — never every
+ * linked evidence item as an implicit default. Choosing the production
+ * selection is a decision for the caller, not this projection.
  */
 export function knownEvidenceStatements(projection: ProblemProjection, evidenceIds?: string[]): PrbEvidenceRelationship[] {
   const byId = new Map(projection.evidence.map((item) => [item.detail.id, item]));
   const ordered: EvidenceWithSources[] = evidenceIds
     ? evidenceIds.map((id) => byId.get(id)).filter((item): item is EvidenceWithSources => item !== undefined)
-    : projection.evidence;
+    : [];
 
   return ordered.map((item) => {
     const evidenceRecord = item.detail.record;
@@ -186,11 +189,11 @@ export interface PrbDetailsData {
 
 /**
  * Assembles the full PrbDetailsPresentation prop set from a resolved
- * ProblemProjection. `knownEvidenceIds`, when supplied, narrows "O que
- * sabemos até agora" to a caller-chosen subset (see knownEvidenceStatements);
- * every other section always reflects the PRB's complete canonical content,
- * per the task's "use the full canonical authored content, not shortened
- * HTML copy" requirement.
+ * ProblemProjection, except "O que sabemos até agora" (see
+ * knownEvidenceStatements, called separately by the caller with its own
+ * evidence-id selection). Every section here always reflects the PRB's
+ * complete canonical content, per the task's "use the full canonical
+ * authored content, not shortened HTML copy" requirement.
  */
 export function buildPrbDetailsData(projection: ProblemProjection): PrbDetailsData {
   const record = projection.problem.record;

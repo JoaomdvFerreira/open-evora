@@ -143,7 +143,7 @@ function PrbIdentityHeader({ data }: { data: PrbDetailsData }) {
   );
 }
 
-/** "O que sabemos até agora" — one authored observation statement per evidence item, each linked to its evidence record and relationship metadata. Content and count come entirely from `knownEvidence`; the caller decides which/how many items to pass (production: every linked item; PRB-0005 Storybook fixture: a caller-chosen subset). */
+/** "O que sabemos até agora" — one authored observation statement per evidence item, each linked to its evidence record and relationship metadata. Content and count come entirely from `knownEvidence`; this component owns no selection policy — the caller decides which/how many items to pass (PRB-0005 Storybook fixture: a caller-chosen subset; the section renders nothing when the caller passes none). */
 function PrbKnownEvidenceSection({
   knownEvidence,
   onOpenGeneric,
