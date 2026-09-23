@@ -1,0 +1,564 @@
+/* PD-02A — generic public PRB Details composition (PrbDetailsPresentation.tsx).
+   Approved visual reference: docs/design/reference/prb-details/ (README is
+   the authority contract). Layout/hierarchy/spacing/responsive behaviour
+   follow the approved 1440/1024/768/360 references; content, counts, and
+   field presence remain entirely canonical-data-driven (prbDetailsProjection.ts).
+
+   Reuses the shared `.lyt-reading`/`.lyt-reading-main`/`.lyt-reading-rail`
+   geometry (styles/reading-layout.css) and DS-04B foundation tokens
+   (styles/tokens.css) rather than introducing a parallel layout system. */
+
+.prb-details-view {
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-section);
+}
+
+/* ---- Identity header --------------------------------------------------- */
+
+.prb-identity {
+  margin-bottom: var(--space-section);
+}
+
+.prb-identity-eyebrow-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-tight) var(--space-loose);
+  margin-bottom: var(--space-loose);
+}
+
+.prb-identity-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-tight);
+  color: var(--color-accent-hover);
+  font-family: var(--font-interface);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.prb-identity-eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.prb-identity-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight);
+}
+
+.prb-identity-updated {
+  margin-left: auto;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13.5px;
+}
+
+.prb-identity-heading-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-loose);
+  margin-bottom: var(--space-loose);
+}
+
+.prb-identity-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--text-reading-h1-size);
+  font-weight: var(--text-reading-h1-weight);
+  line-height: var(--text-reading-h1-line-height);
+  letter-spacing: -0.01em;
+}
+
+.prb-identity-statement {
+  max-width: var(--measure-reading);
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-reading);
+  font-size: var(--text-reading-body-size);
+  line-height: var(--text-reading-body-line-height);
+}
+
+/* ---- Investigation state + scope row ------------------------------------ */
+
+.prb-state-scope-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  margin: 0 0 var(--space-section);
+  padding: var(--space-loose) 0;
+  border-top: 1px solid var(--color-separator-emphasis);
+  border-bottom: 1px solid var(--color-separator-standard);
+  background: var(--color-surface-subtle);
+}
+
+.prb-state-block {
+  padding-right: var(--space-loose);
+  border-right: 1px solid var(--color-separator-standard);
+}
+
+.prb-state-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-loose);
+  margin: 0;
+}
+
+.prb-state-item {
+  padding-right: var(--space-loose);
+  border-right: 1px solid var(--color-separator-standard);
+}
+
+.prb-state-item:last-child {
+  border-right: 0;
+  padding-right: 0;
+}
+
+.prb-state-item dt {
+  margin: 0 0 var(--space-1);
+  color: var(--color-ink-muted);
+  font-size: 14px;
+}
+
+.prb-scope-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight) var(--space-6);
+  align-items: baseline;
+}
+
+.prb-scope-metric {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-tight);
+  color: inherit;
+  text-decoration: none;
+}
+
+.prb-scope-metric:hover {
+  text-decoration: underline;
+}
+
+.prb-scope-metric-value {
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.prb-scope-metric-label {
+  color: var(--color-ink-secondary);
+  font-size: 15px;
+}
+
+/* ---- Shared section intro ------------------------------------------------ */
+
+.prb-section {
+  margin: 0 0 var(--space-section);
+}
+
+.prb-section-intro-note {
+  margin: var(--space-1) 0 0;
+  color: var(--color-ink-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ---- "O que sabemos até agora" ------------------------------------------ */
+
+.prb-known-evidence-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prb-known-evidence-item {
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--color-separator-faint);
+}
+
+.prb-known-evidence-item:first-child {
+  padding-top: 0;
+}
+
+.prb-known-evidence-statement {
+  max-width: 60ch;
+  margin: 0 0 var(--space-standard);
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--text-reading-h2-size);
+  line-height: 1.5;
+}
+
+.prb-evidence-meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-tight) var(--space-6);
+  font-size: 15.5px;
+}
+
+.prb-evidence-meta-group {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-tight);
+}
+
+.prb-evidence-meta-caption {
+  color: var(--color-ink-muted);
+  font-size: 14px;
+}
+
+.prb-evidence-meta-values {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.prb-evidence-meta > .rec-identifier {
+  margin-left: auto;
+}
+
+/* ---- "O que ainda não sabemos" (open questions) -------------------------- */
+
+.prb-open-question-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prb-open-question-item {
+  padding: var(--space-6) 0;
+  border-top: 2px solid var(--color-separator-standard);
+}
+
+.prb-open-question-item:first-child {
+  border-top-color: var(--color-accent);
+}
+
+.prb-open-question-index {
+  margin-bottom: var(--space-3);
+  color: var(--color-accent-hover);
+  font-family: var(--font-technical);
+  font-size: 13px;
+}
+
+.prb-open-question-text {
+  max-width: 40ch;
+  margin: 0 0 var(--space-loose);
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--text-reading-h2-size);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.prb-open-question-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: var(--space-6);
+}
+
+.prb-open-question-field h3 {
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.prb-open-question-field p {
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.prb-open-question-evidence-refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight) var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prb-contribute-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-tight) var(--space-5);
+  padding-top: var(--space-loose);
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-reading);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.prb-contribute-prompt a {
+  font-family: var(--font-interface);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ---- "Percurso da investigação" ------------------------------------------ */
+
+.prb-path-section {
+  padding-top: var(--space-section);
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.prb-path-heading {
+  margin: 0 0 var(--space-6);
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--text-reading-h2-size);
+  font-weight: 600;
+}
+
+.prb-path-stage-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prb-path-stage {
+  padding-top: var(--space-standard);
+  border-top: 1px solid var(--color-separator-faint);
+}
+
+.prb-path-stage:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.prb-path-stage-index {
+  display: block;
+  margin-bottom: var(--space-tight);
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13.5px;
+}
+
+.prb-path-stage-label {
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--text-reading-h3-size);
+  font-weight: 600;
+}
+
+.prb-path-stage p {
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-secondary);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+/* ---- "Evidência e auditoria" --------------------------------------------- */
+
+.prb-audit-section {
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-loose);
+  margin-top: var(--space-section);
+  margin-bottom: 0;
+  border-top: 1px solid var(--color-separator-emphasis);
+  background: var(--color-surface-subtle);
+}
+
+.prb-audit-heading {
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--text-reading-h2-size);
+  font-weight: 600;
+}
+
+.prb-audit-intro {
+  max-width: 64ch;
+  margin: 0 0 var(--space-loose);
+  color: var(--color-ink-secondary);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.prb-audit-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: var(--space-6) 0;
+  border-top: 1px solid var(--color-separator-faint);
+}
+
+.prb-audit-row h4 {
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--text-reading-h3-size);
+  font-weight: 600;
+}
+
+.prb-audit-row p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.prb-audit-evidence-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-tight) var(--space-5);
+  color: var(--color-ink-secondary);
+  font-size: 16px;
+}
+
+.prb-audit-effect-tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight) var(--space-5);
+}
+
+.prb-audit-effect-tally-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.prb-audit-open-records {
+  min-height: var(--target-min);
+  padding: 0 var(--space-5);
+  color: var(--color-ink-primary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.prb-audit-open-records:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
+.prb-audit-dimension-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-separator-faint);
+}
+
+.prb-audit-dimension-grid h5 {
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.prb-audit-dimension-grid dl {
+  display: grid;
+  gap: var(--space-tight) var(--space-standard);
+  margin: 0;
+}
+
+.prb-audit-dimension-grid dd {
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-size: 15.5px;
+  line-height: 1.5;
+}
+
+/* ---- Compact section index wrapper --------------------------------------- */
+
+.prb-compact-section-index {
+  display: none;
+  margin: 0 0 var(--space-3);
+}
+
+/* ---- Responsive: fit fallback (768-1059px) and compact (<=767px) --------- */
+
+@media (min-width: 768px) and (max-width: 1059px) {
+  .prb-reading-rail {
+    display: none;
+  }
+
+  .prb-compact-section-index {
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .prb-reading-rail {
+    display: none;
+  }
+
+  .prb-compact-section-index {
+    display: block;
+  }
+
+  .prb-details-view {
+    padding-top: var(--space-loose);
+    padding-bottom: var(--space-loose);
+  }
+
+  .prb-identity {
+    margin-bottom: var(--space-6);
+  }
+
+  .prb-identity-title {
+    font-size: var(--text-reading-h1-size-compact);
+  }
+
+  .prb-identity-updated {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+
+  .prb-state-scope-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-loose);
+  }
+
+  .prb-state-block {
+    padding-right: 0;
+    padding-bottom: var(--space-loose);
+    border-right: 0;
+    border-bottom: 1px solid var(--color-separator-standard);
+  }
+
+  .prb-open-question-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-loose);
+  }
+
+  .prb-audit-dimension-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .prb-audit-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .prb-audit-open-records {
+    width: 100%;
+  }
+}

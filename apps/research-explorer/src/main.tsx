@@ -53,6 +53,11 @@ import "./styles/section-index.css";
 // into the chrome header, needs its own narrow visual recipe.
 import "./styles/logo.css";
 import "./styles/topic.css";
+// PD-02A: the generic PRB Details Storybook composition's own visual recipe
+// (PrbDetailsPresentation.tsx). Not yet reachable from production routing —
+// see docs/design/reference/prb-details/README.md — imported here only so
+// production and Storybook share one stylesheet rather than duplicating it.
+import "./styles/prb-details.css";
 
 const container = document.getElementById("root");
 if (!container) {
