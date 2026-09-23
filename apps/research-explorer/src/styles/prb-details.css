@@ -56,8 +56,6 @@
   --prb-effect-refines-mark: #7d9170;
   --prb-effect-bounds-ink: #5c5648;
   --prb-effect-bounds-mark: #a39c88;
-  --prb-effect-contradicts-ink: oklch(40% 0.06 250);
-  --prb-effect-contradicts-mark: oklch(58% 0.06 250);
   --prb-effect-neutral-ink: var(--color-ink-secondary);
   --prb-effect-neutral-mark: var(--color-ink-muted);
 
@@ -409,7 +407,9 @@
 
 /* One treatment for every effect occurrence in this view (evidence meta,
    audit tally, "Como verificamos" legend). The marker is aria-hidden and
-   colour is supplemental only: the explicit label text carries the meaning. */
+   colour is supplemental only: the explicit label text carries the meaning.
+   CONTRADICTS has no dedicated tone until an approved reference exercises
+   it — it takes .prb-effect--neutral like any unknown value. */
 .prb-effect {
   display: inline-flex;
   align-items: center;
@@ -430,11 +430,6 @@
 .prb-effect--bounds {
   --prb-effect-ink: var(--prb-effect-bounds-ink);
   --prb-effect-mark: var(--prb-effect-bounds-mark);
-}
-
-.prb-effect--contradicts {
-  --prb-effect-ink: var(--prb-effect-contradicts-ink);
-  --prb-effect-mark: var(--prb-effect-contradicts-mark);
 }
 
 .prb-effect--neutral {
@@ -544,6 +539,21 @@
 
 .prb-evidence-meta > .rec-identifier {
   margin-left: auto;
+}
+
+/* EVD identifiers in this view follow the approved technical-metadata
+   hierarchy: muted technical colour at rest, accent on hover/focus. Scoped
+   to this view's action identifiers only — RecordIdentifier elsewhere keeps
+   its default recipe (domain.css). Still a native button with the shared
+   focus ring. */
+.prb-details-view .rec-identifier--action {
+  color: var(--color-ink-muted);
+  text-decoration-color: currentColor;
+}
+
+.prb-details-view .rec-identifier--action:hover,
+.prb-details-view .rec-identifier--action:focus-visible {
+  color: var(--color-accent-hover);
 }
 
 /* ---- "O que ainda não sabemos" (open questions) -------------------------- */
@@ -819,10 +829,6 @@
   font-weight: 600;
 }
 
-.prb-audit-dimension-grid .research-role-tag-caption {
-  margin-right: var(--space-1);
-}
-
 .prb-audit-open-records,
 .prb-audit-dossier-cta {
   flex: none;
@@ -898,6 +904,21 @@
 .prb-audit-dimension-grid dd {
   margin: 0;
   color: var(--color-ink-secondary);
+}
+
+.prb-audit-role-legend > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prb-audit-role-legend dt {
+  color: var(--color-ink-primary);
+}
+
+.prb-audit-role-legend dt .ui-inline-label {
+  font-weight: inherit;
+  line-height: inherit;
 }
 
 .prb-audit-method-link {

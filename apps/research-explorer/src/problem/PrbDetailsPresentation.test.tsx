@@ -173,6 +173,60 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(path.querySelector('[class*="pending"]')).toBeNull();
   });
 
+  it("renders path stages as sequence number, label and summary only — stage evidence IDs stay on the projection, not in the UI", () => {
+    const record = {
+      title: "T",
+      investigation: {
+        path: { initial_signal: { summary: "Sinal inicial.", evidence: ["EVD-777"] } },
+        open_questions: [{ question: "Q?", evidence: ["EVD-888"] }],
+      },
+    };
+    const projection = baseProjection(record, []);
+    expect(buildPrbDetailsData(projection).pathStages[0].evidenceIds).toEqual(["EVD-777"]);
+    const { container } = renderPrb(record, []);
+    const path = requireElement(container, ".prb-path-stage-list");
+    expect(path.textContent).not.toContain("EVD-777");
+    expect(path.querySelector(".rec-identifier")).toBeNull();
+    expect(within(path).getByText("01")).toBeTruthy();
+    expect(within(path).getByText("Sinal inicial.")).toBeTruthy();
+    // Open questions keep their related evidence.
+    expect(within(requireElement(container, ".prb-open-question-list")).getByRole("button", { name: "Abrir EVD-888" })).toBeTruthy();
+  });
+
+  it("orders known effects Sustenta · Refina · Delimita · Contradiz in metadata and tally, followed by unknown effects in their existing order", () => {
+    const evidence = [
+      evd("EVD-1", "Obs1", ["FUTURE_B", "CONTRADICTS", "BOUNDS", "FUTURE_A", "REFINES", "SUPPORTS"]),
+      evd("EVD-2", "Obs2", ["REFINES"]),
+    ];
+    const { container } = renderPrb({ title: "T" }, evidence, ["EVD-1"]);
+    const effectTexts = (scope: HTMLElement) => Array.from(scope.querySelectorAll(".prb-effect .evd-effect-tag")).map((tag) => tag.textContent?.trim());
+    const expected = ["Sustenta", "Refina", "Delimita", "Contradiz", "FUTURE_B", "FUTURE_A"];
+    expect(effectTexts(requireElement(container, ".prb-known-evidence-list"))).toEqual(expected);
+    const tally = requireElement(container, ".prb-audit-effect-tally");
+    expect(effectTexts(tally)).toEqual(expected);
+    expect(tally.textContent?.replace(/\s+/g, " ").trim()).toBe("Sustenta 1Refina 2Delimita 1Contradiz 1FUTURE_B 1FUTURE_A 1");
+    // Canonical order is untouched.
+    expect(evidence[0].effects).toEqual(["FUTURE_B", "CONTRADICTS", "BOUNDS", "FUTURE_A", "REFINES", "SUPPORTS"]);
+  });
+
+  it("renders Contradiz with the neutral effect treatment and its explicit label", () => {
+    const { container } = renderPrb({ title: "T" }, [evd("EVD-1", "Obs", ["CONTRADICTS"])], ["EVD-1"]);
+    const known = requireElement(container, ".prb-known-evidence-list");
+    expect(within(known).getByText("Contradiz").closest(".prb-effect")?.className).toContain("prb-effect--neutral");
+  });
+
+  it("keeps Como verificamos to the approved examples, while evidence metadata still renders every role", () => {
+    const { container } = renderPrb({ title: "T" }, [evd("EVD-1", "Obs", ["SUPPORTS"], ["PLANNED_RESPONSE"])], ["EVD-1"]);
+    const legend = requireElement(container, ".prb-audit-effect-legend");
+    expect(Array.from(legend.querySelectorAll(".evd-effect-tag")).map((tag) => tag.textContent?.trim())).toEqual(["Sustenta", "Refina", "Delimita"]);
+    const roles = requireElement(container, ".prb-audit-role-legend");
+    expect(Array.from(roles.querySelectorAll("dt")).map((dt) => dt.textContent?.trim())).toEqual(["Observação local", "Resposta existente"]);
+    expect(within(roles).getByText("Dado, medição ou relato recolhido sobre a situação em Évora.")).toBeTruthy();
+    expect(within(roles).getByText("Medida, serviço ou plano que já responde, total ou parcialmente, ao problema.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Ler o método →" }).getAttribute("href")).toBe("/methodology");
+    expect(within(requireElement(container, ".prb-known-evidence-list")).getByText("Resposta planeada")).toBeTruthy();
+  });
+
   it("renders no runtime-summary or fabricated audit narrative beyond already-authored effect/count values", () => {
     const record = { title: "T" };
     const evidence = [evd("EVD-1", "Obs", ["SUPPORTS"]), evd("EVD-2", "Obs2", ["REFINES", "BOUNDS"])];

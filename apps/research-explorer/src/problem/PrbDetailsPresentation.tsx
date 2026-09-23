@@ -278,8 +278,30 @@ function PrbKnownEvidenceSection({
   );
 }
 
-/** Known canonical effect values → this view's restrained effect tone class. Anything else (a future/unrecognised value) falls back to a neutral tone rather than borrowing another effect's colour. */
-const EFFECT_TONE: Record<string, string> = { SUPPORTS: "supports", REFINES: "refines", BOUNDS: "bounds", CONTRADICTS: "contradicts" };
+/**
+ * Known canonical effect values → this view's restrained effect tone class.
+ * CONTRADICTS deliberately has no dedicated tone until an approved design
+ * reference exercises it: it uses the neutral treatment and its explicit
+ * text label carries the meaning. Anything else (a future/unrecognised
+ * value) is neutral too, rather than borrowing another effect's colour.
+ */
+const EFFECT_TONE: Record<string, string> = { SUPPORTS: "supports", REFINES: "refines", BOUNDS: "bounds" };
+
+/** Stable public display order for known effects — a presentation convention only, never a ranking or strength order. */
+const EFFECT_DISPLAY_ORDER = ["SUPPORTS", "REFINES", "BOUNDS", "CONTRADICTS"];
+
+/**
+ * Returns a display-ordered copy of `items` (canonical data is never
+ * mutated): known effects in EFFECT_DISPLAY_ORDER, then unknown/future
+ * effects in their existing relative order (Array.prototype.sort is stable).
+ */
+function inEffectDisplayOrder<T>(items: readonly T[], effectOf: (item: T) => string): T[] {
+  const rank = (item: T) => {
+    const index = EFFECT_DISPLAY_ORDER.indexOf(effectOf(item));
+    return index === -1 ? EFFECT_DISPLAY_ORDER.length : index;
+  };
+  return [...items].sort((a, b) => rank(a) - rank(b));
+}
 
 /**
  * Approved restrained effect treatment for this view: a small square colour
@@ -307,7 +329,7 @@ function EvidenceRelationshipMetaAction({ item, onOpenGeneric }: { item: PrbEvid
         <span className="prb-evidence-meta-group">
           <span className="prb-evidence-meta-caption">{item.effects.length === 1 ? "Efeito" : "Efeitos"}</span>
           <span className="prb-evidence-meta-values prb-evidence-meta-values--effects">
-            {item.effects.map((effect, index) => (
+            {inEffectDisplayOrder(item.effects, (effect) => effect).map((effect, index) => (
               <PrbEffectLabel key={`${effect}-${index}`} effect={effect} />
             ))}
           </span>
@@ -422,9 +444,11 @@ function PrbOpenQuestionsSection({ questions, onOpenGeneric }: { questions: PrbO
  * completion/current/pending state exists in canonical data, so none is
  * rendered here — each stage is an equally-weighted step in a sequence, not
  * a progress indicator. Horizontal at 1440/1024/768, vertical at 360
- * (styles/prb-details.css).
+ * (styles/prb-details.css). The approved presentation shows only sequence
+ * number, stage label and authored summary: each stage's `evidenceIds` stay
+ * available on the projection but are not rendered here.
  */
-function PrbPathSection({ stages, onOpenGeneric }: { stages: PrbPathStage[]; onOpenGeneric: (id: string) => void }) {
+function PrbPathSection({ stages }: { stages: PrbPathStage[] }) {
   if (stages.length === 0) return null;
   return (
     <PrbSection id="prb-percurso" label="Percurso da investigação" note="Sequência dos registos que deram forma ao problema" className="prb-path-section" bleed>
@@ -436,15 +460,6 @@ function PrbPathSection({ stages, onOpenGeneric }: { stages: PrbPathStage[]; onO
             <span className="prb-path-stage-index">{String(index + 1).padStart(2, "0")}</span>
             <h4 className="prb-path-stage-label">{stage.label}</h4>
             <p>{stage.summary}</p>
-            {stage.evidenceIds.length > 0 && (
-              <ul className="prb-open-question-evidence-refs">
-                {stage.evidenceIds.map((id) => (
-                  <li key={id}>
-                    <RecordIdentifier variant="action" id={id} density="compact" onActivate={() => onOpenGeneric(id)} accessibleLabel={`Abrir ${id}`} />
-                  </li>
-                ))}
-              </ul>
-            )}
           </li>
         ))}
       </ol>
@@ -455,8 +470,11 @@ function PrbPathSection({ stages, onOpenGeneric }: { stages: PrbPathStage[]; onO
 /**
  * "Evidência e auditoria" — the audit layer: Toda a evidência (aggregate
  * count/effect tally, never a ranking or strength score), Como verificamos
- * (methodology explanation using the same enum labels rendered throughout
- * this page), and Dossiê canónico (the approved visual CTA only — PDF
+ * (a concise methodology explainer: Sustenta/Refina/Delimita and Observação
+ * local/Resposta existente are illustrative examples of the approved copy,
+ * not the full vocabulary — evidence metadata itself still renders every
+ * canonical effect and research role; "Ler o método" routes to the fuller
+ * methodology), and Dossiê canónico (the approved visual CTA only — PDF
  * generation itself is out of scope). "Abrir os N registos" is kept
  * non-destructive/explicit here: it does not route to the PRB generic-detail
  * record merely because that callback already exists, since the real
@@ -494,7 +512,7 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
                   <>
                     <span aria-hidden="true" className="prb-audit-evidence-summary-sep" />
                     <span className="prb-audit-effect-tally">
-                      {data.effectTally.map(({ value, count }) => (
+                      {inEffectDisplayOrder(data.effectTally, (entry) => entry.value).map(({ value, count }) => (
                         <PrbEffectLabel key={value} effect={value}>
                           {" "}
                           <strong>{formatPublicCount(count)}</strong>
@@ -540,21 +558,24 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
                       <PrbEffectLabel effect="BOUNDS" />
                     </dt>
                     <dd>O registo marca o que fica dentro ou fora do âmbito.</dd>
-                    <dt>
-                      <PrbEffectLabel effect="CONTRADICTS" />
-                    </dt>
-                    <dd>O registo contradiz a formulação do problema.</dd>
                   </dl>
                 </div>
                 <div>
                   <h5>Papel na investigação</h5>
                   <p>Que tipo de contributo o registo representa.</p>
-                  <dl>
-                    {["LOCAL_OBSERVATION", "CONTEXTUAL", "COMPARATIVE_MECHANISM", "COMPARATIVE_RESPONSE", "EXISTING_RESPONSE", "PLANNED_RESPONSE"].map((role) => (
-                      <dd key={role}>
-                        <ResearchRoleTag role={role} variant="standard" />
-                      </dd>
-                    ))}
+                  <dl className="prb-audit-role-legend">
+                    <div>
+                      <dt>
+                        <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />
+                      </dt>
+                      <dd>Dado, medição ou relato recolhido sobre a situação em Évora.</dd>
+                    </div>
+                    <div>
+                      <dt>
+                        <ResearchRoleTag role="EXISTING_RESPONSE" variant="compact" />
+                      </dt>
+                      <dd>Medida, serviço ou plano que já responde, total ou parcialmente, ao problema.</dd>
+                    </div>
                   </dl>
                 </div>
               </div>
@@ -601,7 +622,7 @@ export function PrbDetailsPresentation({ data, knownEvidence, onOpenGeneric, onB
         <PrbOpenQuestionsSection questions={data.openQuestions} onOpenGeneric={onOpenGeneric} />
       </div>
 
-      <PrbPathSection stages={data.pathStages} onOpenGeneric={onOpenGeneric} />
+      <PrbPathSection stages={data.pathStages} />
       <PrbAuditSection data={data} />
     </article>
   );
