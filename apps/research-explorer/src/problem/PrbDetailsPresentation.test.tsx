@@ -84,7 +84,8 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(within(known).getByText("Delimita")).toBeTruthy();
     expect(within(known).getByText("Observação local")).toBeTruthy();
     expect(within(known).getByText("Resposta existente")).toBeTruthy();
-    expect(within(known).getByText("Município de Évora · ODigital")).toBeTruthy();
+    expect(within(known).getByText("Município de Évora")).toBeTruthy();
+    expect(within(known).getByText("ODigital")).toBeTruthy();
   });
 
   it("uses plural meta captions (Efeitos/Papéis/Fontes) only when more than one value is present", () => {
@@ -186,6 +187,56 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     const topics = requireElement(container, ".prb-identity-topics");
     expect(within(topics).queryByRole("link")).toBeNull();
     expect(container.querySelector(".prb-identity-topic-link")?.tagName).toBe("SPAN");
+  });
+
+  it("accents only an outstanding validation step, keeping lifecycle and evidence values neutral", () => {
+    const { container } = renderPrb({ title: "T", status: "OPEN", evidence_status: "discovered", validation_status: "unvalidated" });
+    const accented = Array.from(container.querySelectorAll(".prb-state-value--accent")).map((node) => node.textContent);
+    expect(accented).toEqual(["Por validar"]);
+  });
+
+  it("does not accent a validation value once validation is complete", () => {
+    const { container } = renderPrb({ title: "T", status: "OPEN", validation_status: "validated" });
+    expect(container.querySelector(".prb-state-value--accent")).toBeNull();
+  });
+
+  it("places currentness after the problem statement, carrying the PRB id and the canonical date", () => {
+    const { container } = renderPrb({ title: "T", problem_statement: "Formulação.", updated_at: "2026-03-05" });
+    const statement = requireElement(container, ".prb-identity-statement");
+    const updated = requireElement(container, ".prb-identity-updated");
+    expect(statement.compareDocumentPosition(updated) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(updated.textContent).toMatch(/^PRB-9999 · Atualizado em /);
+    expect(updated.querySelector("time")?.getAttribute("dateTime")).toBe("2026-03-05");
+  });
+
+  it("keeps header utility accessible names as their text, with decorative icons hidden from assistive tech", () => {
+    const { container } = renderPrb({ title: "T" });
+    expect(screen.getByRole("link", { name: "Verificar" }).getAttribute("href")).toBe("#prb-auditoria");
+    expect(screen.getByRole("button", { name: "Partilhar" })).toBeTruthy();
+    const icons = Array.from(container.querySelectorAll(".prb-header-utility-icon, .problem-share-action-icon"));
+    expect(icons.map((icon) => icon.textContent)).toEqual(["↓", "↗"]);
+    for (const icon of icons) expect(icon.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("renders every effect occurrence with its explicit text label, a decorative marker, and a per-effect tone", () => {
+    const evidence = [evd("EVD-1", "Obs", ["SUPPORTS", "REFINES"]), evd("EVD-2", "Obs2", ["BOUNDS", "FUTURE_EFFECT"])];
+    const { container } = renderPrb({ title: "T" }, evidence, ["EVD-1", "EVD-2"]);
+    const known = requireElement(container, ".prb-known-evidence-list");
+    const tally = requireElement(container, ".prb-audit-effect-tally");
+    const legend = requireElement(container, ".prb-audit-effect-legend");
+    for (const scope of [known, tally, legend]) {
+      const labels = Array.from(scope.querySelectorAll(".prb-effect"));
+      expect(labels.length).toBeGreaterThan(0);
+      for (const label of labels) {
+        expect(label.querySelector(".prb-effect-marker")?.getAttribute("aria-hidden")).toBe("true");
+        expect(label.querySelector(".evd-effect-tag")?.textContent?.trim()).not.toBe("");
+      }
+    }
+    expect(within(known).getByText("Sustenta").closest(".prb-effect")?.className).toContain("prb-effect--supports");
+    expect(within(known).getByText("Refina").closest(".prb-effect")?.className).toContain("prb-effect--refines");
+    expect(within(known).getByText("Delimita").closest(".prb-effect")?.className).toContain("prb-effect--bounds");
+    // An unrecognised future effect keeps its raw label and a neutral tone rather than borrowing another effect's colour.
+    expect(within(known).getByText("FUTURE_EFFECT").closest(".prb-effect")?.className).toContain("prb-effect--neutral");
   });
 
   it("keeps compact/mobile content complete — every section renders regardless of viewport-only CSS", () => {

@@ -1,17 +1,66 @@
-/* PD-02A.2 — generic public PRB Details composition (PrbDetailsPresentation.tsx).
+/* PD-02A — generic public PRB Details composition (PrbDetailsPresentation.tsx).
    Approved visual reference: docs/design/reference/prb-details/ (README is
    the authority contract). This view owns its own wide editorial geometry —
    it does not reuse the legacy `.lyt-reading`/`.lyt-reading-rail`/
    `.context-tabs` composition (ProblemView.tsx). Section width comes from
    the shared `.shell-frame.shell-frame--wide` primitive (index.css,
    1216px), the same frame the public Header/Overview hero already use, so
-   this view's content visibly shares their left/right axes.
+   this view's content visibly shares their left/right axes; the shell's own
+   side gutters stay the product source of truth at every width.
 
    Content, counts, and field presence remain entirely canonical-data-driven
    (prbDetailsProjection.ts); only layout/hierarchy/spacing/responsive
-   behaviour follow the approved 1440/1024/768/360 references. */
+   behaviour follow the approved 1440/1024/768/360 references.
+
+   Vertical rhythm, column gaps and the editorial type scale are the exact
+   per-breakpoint reference values, held as view-scoped custom properties
+   below so each breakpoint block only swaps values rather than restating
+   rules. Where a reference value has no equal on the shared spacing scale it
+   is written literally rather than approximated to the nearest token. */
 
 .prb-details-view {
+  /* Hero */
+  --prb-hero-pad-top: 88px;
+  --prb-hero-pad-bottom: 63px;
+  --prb-hero-title-size: 60px;
+  --prb-hero-statement-size: 23px;
+
+  /* Estado / Âmbito band */
+  --prb-state-gutter: 40px;
+  --prb-state-item-gap: 32px;
+  --prb-scope-gap: 40px;
+
+  /* Editorial sections (label column + broad content) */
+  --prb-section-pad-top: 96px;
+  --prb-section-col: 240px;
+  --prb-section-gap: 56px;
+  --prb-evidence-statement-size: 23px;
+  --prb-question-size: 30px;
+  --prb-question-grid-gap: 40px;
+
+  /* Percurso / Auditoria bands */
+  --prb-path-margin-top: 112px;
+  --prb-path-pad-top: 72px;
+  --prb-path-pad-bottom: 104px;
+  --prb-path-stage-gap: 56px;
+  --prb-path-stage-label-size: 24px;
+  --prb-band-heading-size: 34px;
+  --prb-audit-pad-top: 72px;
+  --prb-audit-pad-bottom: 88px;
+  --prb-audit-row-gap: 48px;
+
+  /* Restrained effect tones (see "Effect label" below). */
+  --prb-effect-supports-ink: var(--color-accent-hover);
+  --prb-effect-supports-mark: var(--color-accent);
+  --prb-effect-refines-ink: #4a5c3e;
+  --prb-effect-refines-mark: #7d9170;
+  --prb-effect-bounds-ink: #5c5648;
+  --prb-effect-bounds-mark: #a39c88;
+  --prb-effect-contradicts-ink: oklch(40% 0.06 250);
+  --prb-effect-contradicts-mark: oklch(58% 0.06 250);
+  --prb-effect-neutral-ink: var(--color-ink-secondary);
+  --prb-effect-neutral-mark: var(--color-ink-muted);
+
   padding-bottom: var(--space-8);
 }
 
@@ -29,9 +78,43 @@
 .prb-header {
   display: flex;
   align-items: center;
-  gap: var(--space-loose);
+  gap: 20px;
   flex-wrap: wrap;
-  padding: var(--space-3) 0;
+  padding: 10px 0;
+}
+
+/* Plain technical breadcrumb text — the ancestor is a native <button> for
+   its real behaviour, but carries no control chrome here. */
+.prb-header .ui-breadcrumb {
+  gap: 0.45em;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.prb-breadcrumb-ancestor {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.prb-breadcrumb-ancestor:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.prb-header .ui-breadcrumb-current .rec-identifier {
+  color: var(--color-ink-primary);
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
 }
 
 .prb-view-selector {
@@ -47,7 +130,8 @@
   display: inline-flex;
   align-items: center;
   height: 32px;
-  padding: 0 var(--space-standard);
+  min-height: 0;
+  padding: 0 14px;
   border: 0;
   border-radius: calc(var(--radius-control) - 1px);
   background: transparent;
@@ -68,58 +152,57 @@
 .prb-header-utilities {
   display: flex;
   align-items: center;
-  gap: var(--space-loose);
+  gap: 22px;
   margin-left: auto;
 }
 
-.prb-header-utility {
+.prb-header-utility,
+.prb-header-utilities .problem-share-action button {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-tight);
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--color-accent-hover);
   font-family: var(--font-interface);
   font-size: 13.5px;
   font-weight: 600;
   text-decoration: none;
-}
-
-.prb-header-utility:hover {
-  text-decoration: underline;
-}
-
-.prb-header-utilities .problem-share-action button {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  color: var(--color-accent-hover);
-  font-family: var(--font-interface);
-  font-size: 13.5px;
-  font-weight: 600;
   cursor: pointer;
 }
 
+.prb-header-utility:hover,
 .prb-header-utilities .problem-share-action button:hover {
   text-decoration: underline;
 }
 
 /* ---- Identity header: wide editorial hero -------------------------------- */
 
+/* Grid so currentness (DOM-ordered after the statement) can sit at the
+   eyebrow row's right edge at >=768 and fall below the statement at 360. */
 .prb-identity {
-  padding: var(--space-8) 0 var(--space-8);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 20px;
+  padding: var(--prb-hero-pad-top) 0 var(--prb-hero-pad-bottom);
 }
 
 .prb-identity-eyebrow-row {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: baseline;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--space-tight) var(--space-loose);
-  margin-bottom: var(--space-loose);
+  gap: 12px 20px;
+  margin-bottom: 30px;
 }
 
 .prb-identity-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-tight);
+  gap: 10px;
   color: var(--color-accent-hover);
   font-family: var(--font-interface);
   font-size: 16px;
@@ -138,14 +221,14 @@
 .prb-identity-topics {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-tight);
+  gap: 10px;
   font-size: 16px;
 }
 
 .prb-identity-topic-item {
   display: inline-flex;
   align-items: baseline;
-  gap: var(--space-tight);
+  gap: 10px;
 }
 
 .prb-identity-topic-sep {
@@ -159,17 +242,33 @@
 }
 
 .prb-identity-updated {
-  margin-left: auto;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: baseline;
+  margin: 0;
   color: var(--color-ink-muted);
   font-family: var(--font-technical);
   font-size: 13.5px;
+  white-space: nowrap;
+}
+
+.prb-identity-updated time {
+  color: var(--color-ink-secondary);
+  border-bottom: 1px dashed var(--color-separator-standard);
+}
+
+/* The id prefix belongs to the compact 360 currentness line only; wider
+   widths already show the id in the local header breadcrumb. */
+.prb-identity-updated-id {
+  display: none;
 }
 
 .prb-identity-title {
-  margin: 0 0 var(--space-loose);
+  grid-column: 1 / -1;
+  margin: 0 0 36px;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: 60px;
+  font-size: var(--prb-hero-title-size);
   font-weight: 600;
   line-height: 1.08;
   letter-spacing: -0.02em;
@@ -177,11 +276,11 @@
 }
 
 .prb-identity-statement {
-  max-width: 68ch;
+  grid-column: 1 / -1;
   margin: 0;
   color: var(--color-ink-secondary);
   font-family: var(--font-reading);
-  font-size: 22px;
+  font-size: var(--prb-hero-statement-size);
   line-height: 1.6;
 }
 
@@ -193,19 +292,22 @@
   background: var(--color-surface-subtle);
 }
 
+.prb-state-scope-band .detail-panel-label {
+  margin: 0 0 16px;
+}
+
 .prb-state-scope-row {
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-  gap: var(--space-6);
 }
 
 .prb-state-block {
-  padding: var(--space-6) var(--space-6) var(--space-6) 0;
+  padding: 26px var(--prb-state-gutter) 28px 0;
   border-right: 1px solid var(--color-separator-standard);
 }
 
 .prb-scope-block {
-  padding: var(--space-6) 0;
+  padding: 26px 0 28px var(--prb-state-gutter);
 }
 
 .prb-state-grid {
@@ -214,21 +316,19 @@
 }
 
 .prb-state-item {
-  padding-right: var(--space-6);
-  border-right: 1px solid var(--color-separator-standard);
+  padding: 0 var(--prb-state-item-gap);
+}
+
+.prb-state-item:first-child {
+  padding-left: 0;
 }
 
 .prb-state-item + .prb-state-item {
-  padding-left: var(--space-6);
-}
-
-.prb-state-item:last-child {
-  border-right: 0;
-  padding-right: 0;
+  border-left: 1px solid var(--color-separator-standard);
 }
 
 .prb-state-item dt {
-  margin: 0 0 var(--space-1);
+  margin: 0 0 6px;
   color: var(--color-ink-muted);
   font-size: 14px;
 }
@@ -248,14 +348,14 @@
 .prb-scope-metrics {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-tight) var(--space-6);
+  gap: 8px var(--prb-scope-gap);
   align-items: baseline;
 }
 
 .prb-scope-metric {
   display: flex;
   align-items: baseline;
-  gap: var(--space-tight);
+  gap: 8px;
   color: inherit;
   text-decoration: none;
 }
@@ -267,7 +367,7 @@
 .prb-scope-metric-value {
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: 30px;
+  font-size: 34px;
   font-weight: 600;
   line-height: 1;
 }
@@ -285,20 +385,92 @@
 
 .prb-section-frame {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: var(--space-8);
-  padding: var(--space-8) 0;
+  grid-template-columns: var(--prb-section-col) minmax(0, 1fr);
+  gap: var(--prb-section-gap);
+  padding: var(--prb-section-pad-top) 0 0;
 }
 
 .prb-section-intro {
-  padding-top: var(--space-1);
+  padding-top: 4px;
+}
+
+.prb-section-intro .detail-panel-label {
+  margin: 0;
 }
 
 .prb-section-intro-note {
-  margin: var(--space-1) 0 0;
+  margin: 6px 0 0;
   color: var(--color-ink-muted);
   font-size: 15px;
   line-height: 1.5;
+}
+
+/* ---- Effect label: marker + restrained tone + explicit text -------------- */
+
+/* One treatment for every effect occurrence in this view (evidence meta,
+   audit tally, "Como verificamos" legend). The marker is aria-hidden and
+   colour is supplemental only: the explicit label text carries the meaning. */
+.prb-effect {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--prb-effect-ink);
+}
+
+.prb-effect--supports {
+  --prb-effect-ink: var(--prb-effect-supports-ink);
+  --prb-effect-mark: var(--prb-effect-supports-mark);
+}
+
+.prb-effect--refines {
+  --prb-effect-ink: var(--prb-effect-refines-ink);
+  --prb-effect-mark: var(--prb-effect-refines-mark);
+}
+
+.prb-effect--bounds {
+  --prb-effect-ink: var(--prb-effect-bounds-ink);
+  --prb-effect-mark: var(--prb-effect-bounds-mark);
+}
+
+.prb-effect--contradicts {
+  --prb-effect-ink: var(--prb-effect-contradicts-ink);
+  --prb-effect-mark: var(--prb-effect-contradicts-mark);
+}
+
+.prb-effect--neutral {
+  --prb-effect-ink: var(--prb-effect-neutral-ink);
+  --prb-effect-mark: var(--prb-effect-neutral-mark);
+}
+
+.prb-effect-marker {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  background: var(--prb-effect-mark);
+}
+
+@media (forced-colors: active) {
+  .prb-effect-marker {
+    background: CanvasText;
+  }
+}
+
+/* Approved restrained treatment: effect/research-role values render as
+   plain inline text here, not the generic pill/box anatomy
+   (EvidenceEffectTag/ResearchRoleTag's shared `.ui-inline-label` border +
+   fill). The components' own label/accessible-name semantics stay
+   untouched; this strips only the local box styling within this view. */
+.prb-effect .ui-inline-label,
+.prb-evidence-meta .ui-inline-label,
+.prb-audit-dimension-grid .ui-inline-label {
+  display: inline;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  white-space: normal;
 }
 
 /* ---- "O que sabemos até agora" ------------------------------------------ */
@@ -310,7 +482,7 @@
 }
 
 .prb-known-evidence-item {
-  padding: var(--space-6) 0;
+  padding: 32px 0;
   border-bottom: 1px solid var(--color-separator-faint);
 }
 
@@ -324,10 +496,10 @@
 
 .prb-known-evidence-statement {
   max-width: 60ch;
-  margin: 0 0 var(--space-standard);
+  margin: 0 0 16px;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: 22px;
+  font-size: var(--prb-evidence-statement-size);
   line-height: 1.5;
 }
 
@@ -335,14 +507,14 @@
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: var(--space-tight) var(--space-6);
+  gap: 8px 28px;
   font-size: 15.5px;
 }
 
 .prb-evidence-meta-group {
   display: inline-flex;
   align-items: baseline;
-  gap: var(--space-tight);
+  gap: 8px;
 }
 
 .prb-evidence-meta-caption {
@@ -350,28 +522,24 @@
   font-size: 14px;
 }
 
-/* Approved restrained treatment: effect/research-role values render as
-   plain inline text here, not the generic pill/box anatomy
-   (EvidenceEffectTag/ResearchRoleTag's shared `.ui-inline-label` border +
-   fill) — the caption already establishes the field context, so the pill
-   would conflict with the reference's editorial density. The components'
-   own caption/label semantics stay untouched; this strips only the local
-   box styling within this view's meta row. */
-.prb-evidence-meta .ui-inline-label {
-  display: inline;
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  background: transparent;
-  color: inherit;
-  font-size: inherit;
-  white-space: normal;
-}
-
 .prb-evidence-meta-values {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: var(--space-1) var(--space-3);
+  gap: 4px 8px;
+  color: var(--color-ink-primary);
+}
+
+.prb-evidence-meta-values--effects {
+  gap: 4px 16px;
+  font-weight: 600;
+}
+
+.prb-evidence-meta-source {
+  font-weight: 500;
+}
+
+.prb-evidence-meta-sep {
+  color: var(--color-ink-faint);
 }
 
 .prb-evidence-meta > .rec-identifier {
@@ -387,16 +555,20 @@
 }
 
 .prb-open-question-item {
-  padding: var(--space-6) 0;
-  border-top: 2px solid var(--color-separator-standard);
+  padding: 30px 0 36px;
+  border-top: 1px solid var(--color-separator-standard);
 }
 
 .prb-open-question-item:first-child {
-  border-top-color: var(--color-accent);
+  border-top: 2px solid var(--color-accent);
+}
+
+.prb-open-question-item:last-child {
+  border-bottom: 1px solid var(--color-separator-standard);
 }
 
 .prb-open-question-index {
-  margin-bottom: var(--space-3);
+  margin-bottom: 12px;
   color: var(--color-accent-hover);
   font-family: var(--font-technical);
   font-size: 13px;
@@ -404,10 +576,10 @@
 
 .prb-open-question-text {
   max-width: 40ch;
-  margin: 0 0 var(--space-loose);
+  margin: 0 0 24px;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: 30px;
+  font-size: var(--prb-question-size);
   font-weight: 600;
   line-height: 1.3;
   text-wrap: pretty;
@@ -416,11 +588,11 @@
 .prb-open-question-grid {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.2fr);
-  gap: var(--space-6);
+  gap: var(--prb-question-grid-gap);
 }
 
 .prb-open-question-field h3 {
-  margin: 0 0 var(--space-tight);
+  margin: 0 0 6px;
   color: var(--color-ink-muted);
   font-size: 14px;
   font-weight: 600;
@@ -446,8 +618,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--space-tight) var(--space-5);
-  padding-top: var(--space-loose);
+  gap: 8px 24px;
+  padding-top: 28px;
   margin: 0;
   color: var(--color-ink-secondary);
   font-family: var(--font-reading);
@@ -461,18 +633,22 @@
   font-weight: 600;
 }
 
-/* ---- "Percurso da investigação" — horizontal at desktop widths ---------- */
+/* ---- "Percurso da investigação" — horizontal at >=768 ------------------- */
 
 .prb-path-section {
-  margin-top: var(--space-8);
+  margin-top: var(--prb-path-margin-top);
   border-top: 1px solid var(--color-separator-standard);
 }
 
+.prb-path-section .prb-section-frame {
+  padding: var(--prb-path-pad-top) 0 var(--prb-path-pad-bottom);
+}
+
 .prb-path-heading {
-  margin: 0 0 var(--space-6);
+  margin: 0 0 48px;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: 34px;
+  font-size: var(--prb-band-heading-size);
   font-weight: 600;
   line-height: 1.2;
 }
@@ -480,32 +656,33 @@
 .prb-path-stage-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-8);
-  position: relative;
+  gap: var(--prb-path-stage-gap);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* Neutral equal sequence markers — a connecting line plus one dot per
-   stage, never a completion/current/pending progress indicator. */
-.prb-path-stage-list::before {
+.prb-path-stage {
+  position: relative;
+  padding-top: 36px;
+}
+
+/* Neutral equal sequence markers — one dot per stage plus a connector to
+   the next stage's dot (drawn per stage, so it spans exactly the stages
+   that exist), never a completion/current/pending progress indicator. */
+.prb-path-stage:not(:last-child)::after {
   content: "";
   position: absolute;
   left: 6px;
   top: 5px;
-  right: calc(100% / 3 + 6px);
+  width: calc(100% + var(--prb-path-stage-gap));
   height: 2px;
   background: var(--color-separator-standard);
 }
 
-.prb-path-stage {
-  position: relative;
-  padding-top: var(--space-7);
-}
-
 .prb-path-stage-marker {
   position: absolute;
+  z-index: 1;
   left: 0;
   top: 0;
   width: 12px;
@@ -516,17 +693,17 @@
 
 .prb-path-stage-index {
   display: block;
-  margin-bottom: var(--space-tight);
+  margin-bottom: 10px;
   color: var(--color-ink-muted);
   font-family: var(--font-technical);
   font-size: 13.5px;
 }
 
 .prb-path-stage-label {
-  margin: 0 0 var(--space-tight);
+  margin: 0 0 12px;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: 24px;
+  font-size: var(--prb-path-stage-label-size);
   font-weight: 600;
 }
 
@@ -540,20 +717,23 @@
 /* ---- "Evidência e auditoria" --------------------------------------------- */
 
 .prb-audit-section {
-  margin-top: var(--space-8);
   border-top: 1px solid var(--color-ink-primary);
   background: var(--color-surface-subtle);
 }
 
+.prb-audit-section .prb-section-frame {
+  padding: var(--prb-audit-pad-top) 0 var(--prb-audit-pad-bottom);
+}
+
 .prb-audit-lede {
-  margin-bottom: var(--space-6);
+  margin-bottom: 36px;
 }
 
 .prb-audit-heading {
-  margin: 0 0 var(--space-tight);
+  margin: 0 0 10px;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: 34px;
+  font-size: var(--prb-band-heading-size);
   font-weight: 600;
   line-height: 1.2;
 }
@@ -567,13 +747,16 @@
 }
 
 .prb-audit-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-8);
-  padding: var(--space-6) 0;
-  border-top: 1px solid var(--color-separator-faint);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--prb-audit-row-gap);
+  padding: 34px 0;
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.prb-audit-row > :last-child:not(:first-child) {
+  padding-top: 2px;
 }
 
 .prb-audit-row--first {
@@ -585,7 +768,7 @@
 }
 
 .prb-audit-row h4 {
-  margin: 0 0 var(--space-tight);
+  margin: 0 0 10px;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
   font-size: 24px;
@@ -605,51 +788,46 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--space-tight) var(--space-5);
+  gap: 8px 22px;
   color: var(--color-ink-secondary);
   font-size: 16px;
+}
+
+.prb-audit-evidence-summary strong {
+  color: var(--color-ink-primary);
+  font-weight: 600;
+}
+
+.prb-audit-evidence-summary-sep {
+  align-self: center;
+  width: 1px;
+  height: 14px;
+  background: var(--color-separator-standard);
 }
 
 .prb-audit-effect-tally {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-tight) var(--space-5);
+  gap: 8px 20px;
 }
 
-.prb-audit-effect-tally-item {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-/* Same restrained plain-text treatment as .prb-evidence-meta — the audit
-   dimension legend and effect tally read as plain labels, not pills. */
-.prb-audit-effect-tally .ui-inline-label,
-.prb-audit-dimension-grid .ui-inline-label {
-  display: inline;
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  background: transparent;
+.prb-audit-effect-tally .prb-effect strong {
   color: inherit;
-  font-size: inherit;
-  white-space: normal;
 }
 
 .prb-audit-dimension-grid dt {
   font-weight: 600;
 }
 
-.prb-audit-dimension-grid .research-role-tag-caption,
-.prb-audit-dimension-grid .evd-effect-tag-caption {
+.prb-audit-dimension-grid .research-role-tag-caption {
   margin-right: var(--space-1);
 }
 
 .prb-audit-open-records,
 .prb-audit-dossier-cta {
   flex: none;
-  min-height: var(--target-min);
-  padding: 0 var(--space-5);
+  min-height: 46px;
+  padding: 0 18px;
   border-radius: var(--radius-control);
   font-size: 15px;
   font-weight: 600;
@@ -683,21 +861,21 @@
 .prb-audit-dimension-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--space-6);
-  margin-top: var(--space-5);
-  padding-top: var(--space-5);
+  gap: 40px;
+  margin-top: 22px;
+  padding-top: 22px;
   border-top: 1px solid var(--color-separator-faint);
 }
 
 .prb-audit-dimension-grid h5 {
-  margin: 0 0 var(--space-tight);
+  margin: 0 0 6px;
   color: var(--color-ink-primary);
   font-size: 15px;
   font-weight: 600;
 }
 
 .prb-audit-dimension-grid > div > p {
-  margin: 0 0 var(--space-3);
+  margin: 0 0 12px;
   color: var(--color-ink-secondary);
   font-size: 16.5px;
   line-height: 1.55;
@@ -705,22 +883,28 @@
 
 .prb-audit-dimension-grid dl {
   display: grid;
-  gap: var(--space-tight) var(--space-standard);
+  gap: 10px;
   margin: 0;
+  font-size: 15.5px;
+  line-height: 1.5;
+}
+
+.prb-audit-dimension-grid .prb-audit-effect-legend {
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px 18px;
+  align-items: baseline;
 }
 
 .prb-audit-dimension-grid dd {
   margin: 0;
   color: var(--color-ink-secondary);
-  font-size: 15.5px;
-  line-height: 1.5;
 }
 
 .prb-audit-method-link {
   flex: none;
   display: inline-flex;
   align-items: center;
-  min-height: var(--target-min);
+  min-height: 46px;
   color: var(--color-accent-hover);
   font-size: 15px;
   font-weight: 600;
@@ -735,197 +919,347 @@
 /* ---- Responsive: 1024 fit, 768 boundary, 360 compact --------------------- */
 
 @media (min-width: 1024px) and (max-width: 1439px) {
-  .prb-section-frame {
-    grid-template-columns: 180px minmax(0, 1fr);
-    gap: var(--space-7);
-  }
-
-  .prb-identity-title {
-    font-size: 48px;
-  }
-}
-
-/* 768–1023: label moves into normal content flow, section stacks vertically,
-   matching the approved boundary reference (no left-rail column at this
-   width). */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .prb-identity-title {
-    font-size: 40px;
-  }
-
-  .prb-identity-statement {
-    font-size: 19px;
-  }
-
-  .prb-section-frame {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-  }
-
-  .prb-open-question-text {
-    font-size: 24px;
-  }
-
-  .prb-open-question-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--space-5) var(--space-6);
-  }
-
-  .prb-open-question-grid > .prb-open-question-field:first-child {
-    grid-column: 1 / -1;
-  }
-
-  .prb-path-heading {
-    font-size: 28px;
-  }
-
-  .prb-path-stage-label {
-    font-size: 22px;
-  }
-
-  .prb-audit-heading,
-  .prb-audit-row h4 {
-    font-size: 21px;
-  }
-}
-
-@media (max-width: 767px) {
   .prb-details-view {
-    padding-bottom: var(--space-7);
+    --prb-hero-pad-top: 72px;
+    --prb-hero-pad-bottom: 51px;
+    --prb-hero-title-size: 48px;
+    --prb-hero-statement-size: 21px;
+    --prb-state-gutter: 28px;
+    --prb-state-item-gap: 24px;
+    --prb-scope-gap: 28px;
+    --prb-section-pad-top: 88px;
+    --prb-section-col: 180px;
+    --prb-section-gap: 40px;
+    --prb-evidence-statement-size: 21px;
+    --prb-question-size: 27px;
+    --prb-question-grid-gap: 28px;
+    --prb-path-margin-top: 104px;
+    --prb-path-pad-top: 60px;
+    --prb-path-pad-bottom: 80px;
+    --prb-path-stage-gap: 40px;
+    --prb-band-heading-size: 30px;
+    --prb-audit-pad-top: 60px;
+  }
+}
+
+/* 768–1023: section labels move into normal content flow (no left-rail
+   column), and Estado da investigação / Âmbito stack as two full-width
+   horizontal bands. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .prb-details-view {
+    --prb-hero-pad-top: 64px;
+    --prb-hero-pad-bottom: 46px;
+    --prb-hero-title-size: 40px;
+    --prb-hero-statement-size: 20px;
+    --prb-state-item-gap: 24px;
+    --prb-scope-gap: 28px;
+    --prb-section-pad-top: 80px;
+    --prb-evidence-statement-size: 20px;
+    --prb-question-size: 25px;
+    --prb-path-margin-top: 96px;
+    --prb-path-pad-top: 60px;
+    --prb-path-pad-bottom: 80px;
+    --prb-path-stage-gap: 28px;
+    --prb-path-stage-label-size: 22px;
+    --prb-band-heading-size: 28px;
+    --prb-audit-pad-top: 60px;
+    --prb-audit-row-gap: 28px;
   }
 
-  .prb-details-frame {
-    padding-top: 0;
-  }
-
-  .prb-header {
-    padding: var(--space-3) 0;
-    row-gap: var(--space-tight);
-  }
-
-  .ui-breadcrumb {
-    flex-basis: 100%;
-  }
-
-  .prb-header-utilities {
-    gap: var(--space-standard);
-  }
-
-  .prb-identity {
-    padding: var(--space-7) 0 var(--space-6);
-  }
-
-  .prb-identity-eyebrow-row {
-    margin-bottom: var(--space-3);
-  }
-
-  .prb-identity-topics {
-    margin-bottom: var(--space-6);
-  }
-
-  .prb-identity-updated {
-    margin-left: 0;
-    flex-basis: 100%;
-    order: 3;
-  }
-
-  /* Full-width title — Share is a header utility, never consumes H1 width. */
-  .prb-identity-title {
-    font-size: 29px;
-    line-height: 1.18;
-    letter-spacing: -0.01em;
-  }
-
-  .prb-identity-statement {
-    font-size: 18px;
-  }
-
-  /* Vertical question metadata: state/evidence/validation stack instead of
-     a horizontal rule of columns. */
   .prb-state-scope-row {
     grid-template-columns: minmax(0, 1fr);
-    gap: 0;
   }
 
   .prb-state-block {
-    padding: var(--space-5) 0;
+    padding: 24px 0 22px;
     border-right: 0;
     border-bottom: 1px solid var(--color-separator-standard);
   }
 
   .prb-scope-block {
-    padding: var(--space-5) 0;
-  }
-
-  .prb-state-grid {
-    display: grid;
-    grid-template-columns: 104px 1fr;
-    row-gap: var(--space-tight);
-    align-items: baseline;
-  }
-
-  .prb-state-item {
-    display: contents;
-    border-right: 0;
-    padding: 0;
-  }
-
-  .prb-state-item + .prb-state-item {
-    padding-left: 0;
-  }
-
-  .prb-state-item dt {
-    margin: 0;
-  }
-
-  .prb-scope-metrics {
-    gap: var(--space-tight) var(--space-5);
+    padding: 22px 0 26px;
   }
 
   .prb-section-frame {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-6) 0;
+    gap: 20px;
+  }
+
+  .prb-open-question-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px 32px;
+  }
+
+  .prb-open-question-grid > .prb-open-question-field:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .prb-details-view {
+    --prb-hero-pad-top: 28px;
+    --prb-hero-pad-bottom: 26px;
+    --prb-hero-title-size: 29px;
+    --prb-hero-statement-size: 18px;
+    --prb-section-pad-top: 56px;
+    --prb-evidence-statement-size: 19px;
+    --prb-question-size: 22px;
+    --prb-path-margin-top: 48px;
+    --prb-path-pad-top: 36px;
+    --prb-path-pad-bottom: 40px;
+    --prb-path-stage-label-size: 20px;
+    --prb-band-heading-size: 24px;
+    --prb-audit-pad-top: 36px;
+    --prb-audit-pad-bottom: 40px;
+
+    padding-bottom: var(--space-7);
+  }
+
+  /* Local header: breadcrumb on its own line; Detalhes|Histórico plus an
+     icon-only Partilhar on the next row. Verificar is not part of this row
+     at 360 (the audit section stays in normal page flow). */
+  .prb-header {
+    gap: 8px;
+    padding: 10px 0 8px;
+  }
+
+  .prb-header .ui-breadcrumb {
+    flex-basis: 100%;
+  }
+
+  .prb-view-selector-item {
+    height: 40px;
+  }
+
+  .prb-header-utility--verify {
+    display: none;
+  }
+
+  .prb-header-utilities .problem-share-action button {
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font-size: 17px;
+  }
+
+  .prb-header-utilities .problem-share-action-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Hero: eyebrow, topics, title, statement, then the compact
+     "PRB-xxxx · Atualizado em …" currentness line. */
+  .prb-identity {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .prb-identity-eyebrow-row {
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .prb-identity-eyebrow,
+  .prb-identity-topics {
+    font-size: 15px;
+  }
+
+  .prb-identity-topics {
+    flex-basis: 100%;
+    gap: 8px;
+  }
+
+  .prb-identity-topic-item {
+    gap: 8px;
+  }
+
+  .prb-identity-title {
+    margin-bottom: 18px;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+
+  .prb-identity-updated {
+    grid-column: 1;
+    grid-row: auto;
+    margin-top: 16px;
+    font-size: 13px;
+    white-space: normal;
+  }
+
+  .prb-identity-updated-id {
+    display: inline;
+  }
+
+  /* Estado: stacked label/value rows. Âmbito: three equal columns with
+     vertical dividers, all counts on one row. */
+  .prb-state-scope-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .prb-state-scope-band .detail-panel-label {
+    margin-bottom: 12px;
+  }
+
+  .prb-state-block {
+    padding: 20px 0 18px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-separator-standard);
+  }
+
+  .prb-scope-block {
+    padding: 18px 0;
+  }
+
+  .prb-state-grid {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    row-gap: 10px;
+    align-items: baseline;
+  }
+
+  .prb-state-item {
+    display: contents;
+  }
+
+  .prb-state-item dt {
+    margin: 0;
+    font-size: 16px;
+  }
+
+  .prb-state-value {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .prb-scope-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .prb-scope-metric {
+    display: block;
+    padding-left: 14px;
+    border-left: 1px solid var(--color-separator-standard);
+  }
+
+  .prb-scope-metric:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .prb-scope-metric-value {
+    display: block;
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  .prb-scope-metric-label {
+    display: block;
+    font-size: 14px;
+  }
+
+  .prb-section-frame {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .prb-section-intro-note {
+    font-size: 14.5px;
+  }
+
+  .prb-known-evidence-item {
+    padding: 22px 0;
   }
 
   .prb-known-evidence-statement {
-    font-size: 19px;
+    margin-bottom: 12px;
+  }
+
+  /* Evidence metadata: stable caption/value rows (values stacked one per
+     line), with the EVD identifier below the metadata. */
+  .prb-evidence-meta {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 6px 0;
+    font-size: 15px;
+  }
+
+  .prb-evidence-meta-group {
+    display: contents;
+  }
+
+  .prb-evidence-meta-values {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .prb-evidence-meta-sep {
+    display: none;
+  }
+
+  .prb-evidence-meta > .rec-identifier {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-left: 0;
+    font-size: 13px;
+  }
+
+  .prb-open-question-item {
+    padding: 22px 0 26px;
+  }
+
+  .prb-open-question-index {
+    margin-bottom: 8px;
   }
 
   .prb-open-question-text {
-    font-size: 22px;
+    margin-bottom: 18px;
   }
 
   .prb-open-question-grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-5);
+    gap: 18px;
   }
 
   .prb-open-question-grid > .prb-open-question-field:not(:first-child) {
-    padding-top: var(--space-standard);
+    padding-top: 16px;
     border-top: 1px solid var(--color-separator-faint);
   }
 
   .prb-contribute-prompt {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-tight);
+    gap: 6px;
+    padding-top: 22px;
+    font-size: 18px;
+  }
+
+  .prb-contribute-prompt a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target-min);
   }
 
   /* Vertical timeline: markers connected by a left rail instead of a
      horizontal row. */
+  .prb-path-heading {
+    margin-bottom: 26px;
+  }
+
   .prb-path-stage-list {
     display: flex;
     flex-direction: column;
-    grid-template-columns: none;
-    gap: var(--space-6);
-    padding-left: var(--space-7);
-  }
-
-  .prb-path-stage-list::before {
-    display: none;
+    gap: 28px;
+    padding-left: 28px;
   }
 
   .prb-path-stage {
@@ -933,47 +1267,71 @@
   }
 
   .prb-path-stage-marker {
-    left: calc(-1 * var(--space-7));
+    left: -23px;
+    top: 5px;
   }
 
   .prb-path-stage:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    left: calc(-1 * var(--space-7) + 5px);
-    top: 18px;
-    bottom: calc(-1 * var(--space-6) - 2px);
+    left: -18px;
+    top: 21px;
+    bottom: -32px;
     width: 2px;
-    background: var(--color-separator-standard);
+    height: auto;
   }
 
-  .prb-path-heading {
-    font-size: 24px;
+  .prb-path-stage-index {
+    margin-bottom: 4px;
+    font-size: 13px;
   }
 
   .prb-path-stage-label {
-    font-size: 20px;
+    margin-bottom: 6px;
   }
 
-  .prb-audit-heading,
+  .prb-path-stage p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .prb-audit-lede {
+    margin-bottom: 22px;
+  }
+
+  .prb-audit-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    padding: 24px 0;
+  }
+
+  .prb-audit-row > :last-child:not(:first-child) {
+    padding-top: 0;
+  }
+
   .prb-audit-row h4 {
     font-size: 21px;
   }
 
-  .prb-audit-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-standard);
+  .prb-audit-evidence-summary-sep {
+    display: none;
   }
 
   .prb-audit-dimension-grid {
     grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .prb-audit-method-link {
+    min-height: var(--target-min);
   }
 
   .prb-audit-open-records,
   .prb-audit-dossier-cta {
-    width: 100%;
-    justify-content: center;
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
   }
 }

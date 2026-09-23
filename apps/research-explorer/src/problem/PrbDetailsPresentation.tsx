@@ -4,7 +4,7 @@ import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { RecordIdentifier } from "../records/RecordIdentifier";
 import { Breadcrumb } from "../presentation/Breadcrumb";
 import { describeTopic } from "../presentation/topicMapping";
-import { lifecycleVisual, validationVisual, evidenceVisual } from "./stateVisuals";
+import { validationVisual } from "./stateVisuals";
 import { ShareAction } from "./ShareAction";
 import { formatPublicCount, formatPublicDate, publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
 import type { PrbDetailsData, PrbEvidenceRelationship, PrbOpenQuestion, PrbPathStage } from "./prbDetailsProjection";
@@ -48,7 +48,12 @@ export interface PrbDetailsPresentationProps {
  * public "Problema" tab in this architecture — Detalhes is this view itself,
  * Histórico routes to ProblemHistoryView via `onViewHistory`. "Verificar"
  * jumps to the audit section already on this page; "Partilhar" reuses the
- * existing ShareAction behaviour (Web Share API / copy-link fallback).
+ * existing ShareAction behaviour (Web Share API / copy-link fallback). Both
+ * utilities carry a decorative aria-hidden glyph (↓/↗); their visible text
+ * stays their accessible name. At 360 the breadcrumb takes its own line,
+ * Partilhar collapses to its icon (label kept for assistive tech) and
+ * Verificar is omitted from this row — the audit section itself remains in
+ * normal page flow.
  */
 function PrbHeader({ data, onBackToOverview, onViewHistory }: { data: PrbDetailsData; onBackToOverview: () => void; onViewHistory: (id: string) => void }) {
   return (
@@ -59,7 +64,7 @@ function PrbHeader({ data, onBackToOverview, onViewHistory }: { data: PrbDetails
           {
             key: "visao-geral",
             action: (
-              <button type="button" onClick={onBackToOverview}>
+              <button type="button" className="prb-breadcrumb-ancestor" onClick={onBackToOverview}>
                 Visão geral
               </button>
             ),
@@ -76,15 +81,25 @@ function PrbHeader({ data, onBackToOverview, onViewHistory }: { data: PrbDetails
         </button>
       </div>
       <div className="prb-header-utilities">
-        <a href="#prb-auditoria" className="prb-header-utility">
+        <a href="#prb-auditoria" className="prb-header-utility prb-header-utility--verify">
+          <span aria-hidden="true" className="prb-header-utility-icon">
+            ↓
+          </span>
           Verificar
         </a>
-        <ShareAction title={data.title} />
+        <ShareAction title={data.title} icon="↗" />
       </div>
     </div>
   );
 }
 
+/**
+ * Editorial hero. Currentness ("Atualizado em …") follows the statement in
+ * DOM order: at >=768 the hero grid lifts it into the eyebrow row's right
+ * edge; at 360 it stays below the statement as the compact
+ * "PRB-xxxx · Atualizado em …" line (the id prefix is shown only there —
+ * the local header breadcrumb already carries it at wider widths).
+ */
 function PrbIdentityHeader({ data }: { data: PrbDetailsData }) {
   return (
     <header className="prb-identity">
@@ -109,25 +124,37 @@ function PrbIdentityHeader({ data }: { data: PrbDetailsData }) {
             ))}
           </span>
         )}
-        {data.updatedAt && (
-          <span className="prb-identity-updated">
-            Atualizado em <time dateTime={data.updatedAt}>{formatPublicDate(data.updatedAt)}</time>
-          </span>
-        )}
       </div>
       <h1 id="prb-identity-title" className="prb-identity-title">
         {data.title}
       </h1>
       {data.statement && <p className="prb-identity-statement">{data.statement}</p>}
+      {data.updatedAt && (
+        <p className="prb-identity-updated">
+          <span className="prb-identity-updated-id">{`${data.problemId} · `}</span>
+          Atualizado em <time dateTime={data.updatedAt}>{formatPublicDate(data.updatedAt)}</time>
+        </p>
+      )}
     </header>
   );
 }
 
-/** One "Estado da investigação" / "Âmbito" dimension value — plain text, coloured by semantic tone only where the reference does (never a chip/pill control). Uses the same compact PT-PT label set as the field's own inline-chip form (statusGloss.ts/presentation.ts), matching the terse reference copy ("Identificada", "Por validar"). */
+/**
+ * One "Estado da investigação" dimension value — plain text, never a chip/pill
+ * control. Uses the same compact PT-PT label set as the field's own
+ * inline-chip form (statusGloss.ts/presentation.ts), matching the terse
+ * reference copy ("Identificada", "Por validar").
+ *
+ * Colour hierarchy: lifecycle and evidence values always read neutral; only
+ * an outstanding validation step (validation tone open/partial, e.g. "Por
+ * validar") takes the accent, so the band draws the eye to the one
+ * human-owned step still pending rather than accenting every value. The
+ * explicit text label carries the meaning either way.
+ */
 function PrbStateValue({ field, value }: { field: "status" | "validation_status" | "evidence_status"; value: string }) {
   const label = field === "status" ? publicEnumLabel(field, value) : publicCompactEnumLabel(field, value);
-  const visual = field === "status" ? lifecycleVisual(value) : field === "validation_status" ? validationVisual(value) : evidenceVisual(value);
-  const accent = visual.tone === "open" || visual.tone === "partial";
+  const tone = field === "validation_status" ? validationVisual(value).tone : null;
+  const accent = tone === "open" || tone === "partial";
   return <dd className={accent ? "prb-state-value prb-state-value--accent" : "prb-state-value"}>{label}</dd>;
 }
 
@@ -251,15 +278,37 @@ function PrbKnownEvidenceSection({
   );
 }
 
+/** Known canonical effect values → this view's restrained effect tone class. Anything else (a future/unrecognised value) falls back to a neutral tone rather than borrowing another effect's colour. */
+const EFFECT_TONE: Record<string, string> = { SUPPORTS: "supports", REFINES: "refines", BOUNDS: "bounds", CONTRADICTS: "contradicts" };
+
+/**
+ * Approved restrained effect treatment for this view: a small square colour
+ * marker plus the effect's explicit PT-PT label (EvidenceEffectTag, which
+ * stays the sole label authority), both in an effect-specific restrained
+ * tone. The marker is aria-hidden and colour is supplemental only — the
+ * text label alone carries the meaning. Used identically by evidence
+ * metadata, the audit effect tally and the "Como verificamos" legend.
+ */
+function PrbEffectLabel({ effect, children }: { effect: string; children?: ReactNode }) {
+  const tone = EFFECT_TONE[effect] ?? "neutral";
+  return (
+    <span className={`prb-effect prb-effect--${tone}`}>
+      <span aria-hidden="true" className="prb-effect-marker" />
+      <EvidenceEffectTag effect={effect} variant="compact" />
+      {children}
+    </span>
+  );
+}
+
 function EvidenceRelationshipMetaAction({ item, onOpenGeneric }: { item: PrbEvidenceRelationship; onOpenGeneric: (id: string) => void }) {
   return (
     <div className="prb-evidence-meta">
       {item.effects.length > 0 && (
         <span className="prb-evidence-meta-group">
           <span className="prb-evidence-meta-caption">{item.effects.length === 1 ? "Efeito" : "Efeitos"}</span>
-          <span className="prb-evidence-meta-values">
+          <span className="prb-evidence-meta-values prb-evidence-meta-values--effects">
             {item.effects.map((effect, index) => (
-              <EvidenceEffectTag key={`${effect}-${index}`} effect={effect} variant="compact" />
+              <PrbEffectLabel key={`${effect}-${index}`} effect={effect} />
             ))}
           </span>
         </span>
@@ -267,21 +316,41 @@ function EvidenceRelationshipMetaAction({ item, onOpenGeneric }: { item: PrbEvid
       {item.sourcePublishers.length > 0 && (
         <span className="prb-evidence-meta-group">
           <span className="prb-evidence-meta-caption">{item.sourcePublishers.length === 1 ? "Fonte" : "Fontes"}</span>
-          <span className="prb-evidence-meta-values">{item.sourcePublishers.join(" · ")}</span>
+          <span className="prb-evidence-meta-values">
+            {withMetaSeparators(item.sourcePublishers.map((publisher, index) => (
+              <span key={`${publisher}-${index}`} className="prb-evidence-meta-source">
+                {publisher}
+              </span>
+            )))}
+          </span>
         </span>
       )}
       {item.researchRoles.length > 0 && (
         <span className="prb-evidence-meta-group">
           <span className="prb-evidence-meta-caption">{item.researchRoles.length === 1 ? "Papel" : "Papéis"}</span>
           <span className="prb-evidence-meta-values">
-            {item.researchRoles.map((role, index) => (
+            {withMetaSeparators(item.researchRoles.map((role, index) => (
               <ResearchRoleTag key={`${role}-${index}`} role={role} variant="compact" />
-            ))}
+            )))}
           </span>
         </span>
       )}
       <RecordIdentifier variant="action" id={item.evidenceId} density="compact" onActivate={() => onOpenGeneric(item.evidenceId)} accessibleLabel={`Abrir ${item.evidenceId}`} />
     </div>
+  );
+}
+
+/** Interleaves decorative "·" separators between multiple meta values. Hidden from assistive tech (each value is already its own element) and hidden at 360, where values stack one per line. */
+function withMetaSeparators(values: ReactNode[]): ReactNode[] {
+  return values.flatMap((value, index) =>
+    index === 0
+      ? [value]
+      : [
+          <span key={`sep-${index}`} aria-hidden="true" className="prb-evidence-meta-sep">
+            ·
+          </span>,
+          value,
+        ],
   );
 }
 
@@ -422,13 +491,17 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
                   <strong>{formatPublicCount(data.evidenceEffectCount)}</strong> {data.evidenceEffectCount === 1 ? "efeito" : "efeitos"}
                 </span>
                 {data.effectTally.length > 0 && (
-                  <span className="prb-audit-effect-tally">
-                    {data.effectTally.map(({ value, count }) => (
-                      <span key={value} className="prb-audit-effect-tally-item">
-                        <EvidenceEffectTag effect={value} variant="compact" /> <strong>{formatPublicCount(count)}</strong>
-                      </span>
-                    ))}
-                  </span>
+                  <>
+                    <span aria-hidden="true" className="prb-audit-evidence-summary-sep" />
+                    <span className="prb-audit-effect-tally">
+                      {data.effectTally.map(({ value, count }) => (
+                        <PrbEffectLabel key={value} effect={value}>
+                          {" "}
+                          <strong>{formatPublicCount(count)}</strong>
+                        </PrbEffectLabel>
+                      ))}
+                    </span>
+                  </>
                 )}
               </div>
             </div>
@@ -454,21 +527,21 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
                 <div>
                   <h5>Efeito</h5>
                   <p>Como o registo se relaciona com este problema específico.</p>
-                  <dl>
+                  <dl className="prb-audit-effect-legend">
                     <dt>
-                      <EvidenceEffectTag effect="SUPPORTS" variant="compact" />
+                      <PrbEffectLabel effect="SUPPORTS" />
                     </dt>
                     <dd>O registo apoia diretamente a formulação do problema.</dd>
                     <dt>
-                      <EvidenceEffectTag effect="REFINES" variant="compact" />
+                      <PrbEffectLabel effect="REFINES" />
                     </dt>
                     <dd>O registo torna a formulação mais precisa ou qualifica-a.</dd>
                     <dt>
-                      <EvidenceEffectTag effect="BOUNDS" variant="compact" />
+                      <PrbEffectLabel effect="BOUNDS" />
                     </dt>
                     <dd>O registo marca o que fica dentro ou fora do âmbito.</dd>
                     <dt>
-                      <EvidenceEffectTag effect="CONTRADICTS" variant="compact" />
+                      <PrbEffectLabel effect="CONTRADICTS" />
                     </dt>
                     <dd>O registo contradiz a formulação do problema.</dd>
                   </dl>
