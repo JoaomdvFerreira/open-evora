@@ -1,9 +1,8 @@
 problem_id: PRB-0005
 created_at: 2026-08-28
-updated_at: 2026-09-16
+updated_at: 2026-09-25
 title: O tráfego automóvel e a pressão de estacionamento entram em conflito com
-  a qualidade, a segurança e a legibilidade do espaço pedonal em zonas
-  urbanas-chave
+  a qualidade e a segurança do espaço pedonal em zonas urbanas-chave
 domain:
   - MOB
   - URB
@@ -16,11 +15,12 @@ affected_populations:
   - condutores
   - peões
 problem_statement: Em zonas-chave de Évora, o volume de tráfego, a velocidade
-  dos veículos, a pressão de estacionamento e o estacionamento ilegal geram
-  congestionamento, conflitos de segurança e uma redução da qualidade do espaço
-  pedonal; paralelamente, o PUE recomenda que a distribuição da oferta de
-  estacionamento, as condições de acesso e as tarifas sejam imediatamente
-  compreensíveis para os utilizadores.
+  dos veículos, a pressão de estacionamento e o estacionamento ilegal estão
+  documentados em conjunto com congestionamento, conflitos de segurança e uma
+  redução da qualidade do espaço pedonal, sem que a contribuição relativa de
+  cada fator esteja quantificada; paralelamente, o PUE recomenda que a
+  distribuição da oferta de estacionamento, as condições de acesso e as tarifas
+  sejam imediatamente compreensíveis para os utilizadores.
 causal_reading: "Esta é uma leitura deliberadamente delimitada: os mecanismos
   físicos e operacionais — tráfego, pressão de estacionamento e estacionamento
   ilegal — permanecem distintos de possíveis lacunas de informação. A evidência
@@ -29,30 +29,37 @@ causal_reading: "Esta é uma leitura deliberadamente delimitada: os mecanismos
   observados."
 investigation:
   open_questions:
-    - question: A falta ou inadequação de informação sobre a ocupação e
-        disponibilidade de estacionamento é uma causa material dos resultados
-        observados em PRB-0005 — congestionamento, conflitos de segurança e
-        redução da qualidade do espaço pedonal?
-      why_open: Évora já dispõe de infraestrutura significativa de informação,
-        pagamento e sensores de estacionamento e pode já disponibilizar
-        funcionalidade de previsão de disponibilidade através do Parking Buddy
-        da Via Verde Estacionar. A evidência atual não estabelece, contudo, que
-        a falta de informação sobre a ocupação do estacionamento seja uma causa
-        material dos resultados observados.
-      latest_result: O desafio institucional não produziu evidência que resolva se a
-        disponibilidade de informação sobre estacionamento contribui
-        materialmente para os resultados observados. A evidência comparativa não
-        estabelece causalidade material em Évora.
-      current_action: Não é proporcional prosseguir desafio de deslocação no âmbito
-        atual; a via de informação reabre apenas com evidência local direta
-        capaz de estabelecer contribuição causal material.
+    - question: A falta ou inadequação de informação sobre a ocupação e a
+        disponibilidade de estacionamento é uma causa material do
+        congestionamento, dos conflitos de segurança e da redução da qualidade
+        do espaço pedonal descritos neste problema?
+      why_open: As páginas de serviço da Via Verde Estacionar incluem Évora entre os
+        municípios onde o pagamento do estacionamento na via pública está
+        disponível, e a funcionalidade Parking Buddy do mesmo serviço oferece
+        previsões da probabilidade de encontrar estacionamento; não está, contudo,
+        estabelecido que essas previsões estejam operacionais nas zonas
+        relevantes de Évora, nem com que cobertura, precisão ou adoção. A
+        evidência atual não estabelece que a falta de informação sobre a
+        ocupação do estacionamento seja uma causa material dos resultados
+        observados.
+      latest_result: A investigação realizada não estabeleceu se a disponibilidade de
+        informação sobre estacionamento contribui materialmente para os
+        resultados descritos neste problema, e a evidência comparativa de outras
+        cidades não estabelece essa relação causal em Évora.
+      current_action: O projeto não prossegue, no âmbito atual, a validação desta
+        hipótese ao nível da deslocação, por não ser proporcional.
+      resolution_condition: A questão só é retomada perante evidência local direta
+        capaz de estabelecer contribuição causal material da falta ou
+        inadequação de informação sobre a ocupação e a disponibilidade de
+        estacionamento para os resultados descritos neste problema.
       evidence:
         - EVD-000105
         - EVD-000106
         - EVD-000107
     - question: Que efeito observável tem a Variante Nascente de Évora (IP2) no volume
-        e na composição do tráfego de atravessamento na Évora urbana, e existe
-        impacto mensurável nos resultados representados por PRB-0005?
+        e na composição do tráfego de atravessamento na rede viária urbana de
+        Évora, e existe um impacto mensurável no congestionamento, nos conflitos
+        de segurança e na qualidade do espaço pedonal descritos neste problema?
       why_open: A Variante Nascente de Évora entrou em circulação a 3 de setembro de
         2026 (cerca de 12,8 km, investimento de 54,9 milhões de euros financiado
         ao abrigo do PRR), ligando o nó de Évora Nascente (A6/IP7) ao IP2/EN18
@@ -67,7 +74,8 @@ investigation:
       latest_result: A pesquisa delimitada realizada não identificou, até 16 de
         setembro de 2026, um conjunto de dados de contagem de tráfego
         pós-abertura, comparável e quantitativo, que estabeleça a redução
-        efetivamente registada.
+        efetivamente registada. A redução de 30-40% mantém-se uma estimativa
+        municipal atribuída, e não uma medição antes/depois.
       current_action: WATCH — monitorizar a disponibilidade de medições de tráfego
         pós-abertura adequadas; a abertura da via, por si só, não deve ser
         tratada como impacto realizado, e a estimativa de 30-40% mantém-se
@@ -91,12 +99,15 @@ investigation:
         - EVD-000142
     development:
       summary: O relatório municipal de 2026 mede, para 2025, uma regularidade de 99,5
-        % e um índice de pontualidade IP-5min de 84,4 % no serviço urbano, e
-        atribui atrasos recorrentes a tráfego lento nas principais vias,
-        nomeadamente nos acessos ao Centro Histórico e na circular do Parque
-        Industrial em períodos de ponta. O processo de revisão do PUE registou
-        também participações formais sobre circulação e estacionamento. Estes
-        elementos reforçam a componente de tráfego sem estabelecer que a
+        % e um índice de pontualidade IP-5min de 84,4 % no serviço urbano, e o
+        Município atribui atrasos recorrentes a tráfego lento nas principais
+        vias, nomeadamente nos acessos ao Centro Histórico e na circular do
+        Parque Industrial em períodos de ponta, sem isolar o peso do tráfego face
+        a outros fatores operacionais. A participação preventiva na revisão do
+        PUE registou também, entre outras, participações formais sobre a
+        circulação e o estacionamento na envolvente de uma escola; o registo
+        estabelece que foram apresentadas, não que sejam corretas,
+        representativas ou aprovadas. Nenhum destes elementos estabelece que a
         informação sobre disponibilidade de estacionamento seja uma causa
         material do problema.
       evidence:
@@ -104,18 +115,12 @@ investigation:
         - EVD-000139
         - EVD-000012
     delimitation:
-      summary: >-
-        Foi identificado um problema distinto relativo à degradação e manutenção
-        do pavimento rodoviário, mantido deliberadamente separado deste registo
-        e posteriormente promovido a PRB-0010. Esta decisão preservou em
-        PRB-0005 o enquadramento específico do conflito entre tráfego, pressão
-        de estacionamento e espaço pedonal.
-
-
-        A funcionalidade de previsão de disponibilidade de estacionamento,
-        através do Parking Buddy, e a evidência comparativa proveniente de
-        outros municípios foram integradas na investigação sem que daí se tenha
-        estabelecido causalidade material para Évora.
+      summary: A degradação e a manutenção do pavimento rodoviário foram separadas
+        deste problema e são tratadas em PRB-0010, para manter aqui o foco no
+        conflito entre tráfego, pressão de estacionamento e espaço pedonal. As
+        previsões de disponibilidade do Parking Buddy e a evidência comparativa
+        de outras cidades foram analisadas, mas não estabelecem causalidade
+        material para Évora.
       evidence:
         - EVD-000105
         - EVD-000106
@@ -205,3 +210,10 @@ history:
       uma estimativa atribuída, não de uma medição, e os efeitos reais
       pós-abertura permanecem por estabelecer na evidência revista nesta
       pesquisa delimitada.
+  - date: 2026-09-25
+    summary: A formulação do problema foi delimitada para deixar de atribuir
+      causalidade conjunta aos fatores de tráfego e estacionamento onde a
+      evidência disponível apenas documenta a sua ocorrência em conjunto.
+      Mantém-se documentada a associação com congestionamento, segurança e
+      qualidade do espaço pedonal, mas a contribuição relativa de cada fator não
+      está quantificada.
