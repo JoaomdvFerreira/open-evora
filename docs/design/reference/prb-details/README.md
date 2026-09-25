@@ -15,7 +15,7 @@ PRB Details view, including:
 - PRB navigation
 - editorial hero
 - investigation state and scope
-- current knowledge/evidence
+- current reading (`Leitura atual`)
 - open questions
 - investigation path
 - verification and audit layer
@@ -36,13 +36,30 @@ Do not infer that:
 
 ## Authority
 
-1. Canonical PRB/EVD/SRC data — content and semantics
-2. Existing presentation mappings — public labels
-3. These HTML references — layout, hierarchy, typography, spacing and
-   responsive behaviour
+1. Canonical PRB/EVD/SRC data — content and semantic authority.
+2. Canonical/public presentation mappings — label and meaning authority.
+3. The owner-approved final Storybook PRB Details composition — current
+   rendered-composition authority.
+4. These static HTML references — baseline design artifacts for layout,
+   hierarchy, typography, spacing and responsive behaviour, still useful
+   where not superseded by the approved Storybook deltas below.
 
 If reference content differs from canonical repository data, canonical data
-wins.
+wins. Public PRB architecture (`Detalhes | Histórico`) is owned by
+`docs/explorerarchitecture.md` §3.
 
 The static HTML implementation itself is not a production implementation
-contract.
+contract, and these HTML files are not updated to track the deltas below.
+
+## Approved deltas from the static HTML references
+
+- The standalone selected-evidence "O que sabemos até agora" block is removed.
+- `Leitura atual` renders canonical `causal_reading`.
+- "O que sabemos até agora" now belongs to each open question and renders
+  that question's `latest_result`.
+- Open-question fields remain semantically separate.
+- No arbitrary EVD subset or ranking is presented.
+- The investigation path is vertical at every breakpoint.
+- The responsive open-question layout preserves reading order.
+- The dossier CTA remains visibly disabled until implemented.
+- The audit band is the terminal PRB Details content band before the footer.
