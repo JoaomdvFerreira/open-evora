@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { RecordDetail } from "../dataProvider/types";
 import type { EvidenceWithSources, ProblemProjection } from "./problemProjection";
-import { buildPrbDetailsData, effectTally, investigationPathStages, knownEvidenceStatements, openQuestions } from "./prbDetailsProjection";
+import * as prbDetailsProjection from "./prbDetailsProjection";
+import { buildPrbDetailsData, effectTally, investigationPathStages, openQuestions } from "./prbDetailsProjection";
 
 function evd(id: string, summary: string, effects: string[] = [], researchRoles: string[] = [], sourcePublishers: string[] = []): EvidenceWithSources {
   const detail: RecordDetail = {
@@ -56,6 +57,45 @@ describe("prbDetailsProjection — canonical mapping for the generic PRB Details
     expect(question.currentAction).toBe("WATCH — monitorizar dados adicionais.");
   });
 
+  it("maps every canonical open-question field one-to-one, never merging them into a synthetic summary", () => {
+    const record = {
+      investigation: {
+        open_questions: [
+          {
+            question: "Questão completa?",
+            latest_result: "Resultado mais recente.",
+            why_open: "Motivo em aberto.",
+            resolution_condition: "Condição de resolução.",
+            current_action: "Ação atual.",
+            evidence: ["EVD-1", "EVD-2"],
+          },
+        ],
+      },
+    };
+    expect(openQuestions(record)).toEqual([
+      {
+        question: "Questão completa?",
+        latestResult: "Resultado mais recente.",
+        whyOpen: "Motivo em aberto.",
+        resolutionCondition: "Condição de resolução.",
+        currentAction: "Ação atual.",
+        relatedEvidenceIds: ["EVD-1", "EVD-2"],
+      },
+    ]);
+  });
+
+  it("leaves unauthored open-question fields null/empty, with no fallback prose", () => {
+    const [question] = openQuestions({ investigation: { open_questions: [{ question: "Só a pergunta?" }] } });
+    expect(question).toEqual({
+      question: "Só a pergunta?",
+      latestResult: null,
+      whyOpen: null,
+      resolutionCondition: null,
+      currentAction: null,
+      relatedEvidenceIds: [],
+    });
+  });
+
   it("supports multiple open questions with independently authored fields", () => {
     const record = {
       investigation: {
@@ -100,31 +140,24 @@ describe("prbDetailsProjection — canonical mapping for the generic PRB Details
     ]);
   });
 
-  it("supports multiple research roles and multiple sources on one evidence relationship", () => {
-    const evidence = [evd("EVD-1", "Obs", ["REFINES", "BOUNDS"], ["LOCAL_OBSERVATION", "EXISTING_RESPONSE"], ["Município de Évora", "ODigital"])];
-    const [item] = knownEvidenceStatements(problem({}, evidence), ["EVD-1"]);
-    expect(item.effects).toEqual(["REFINES", "BOUNDS"]);
-    expect(item.researchRoles).toEqual(["LOCAL_OBSERVATION", "EXISTING_RESPONSE"]);
-    expect(item.sourcePublishers).toEqual(["Município de Évora", "ODigital"]);
+  it("projects canonical causal_reading verbatim as the current reading, and null when unauthored", () => {
+    const causalReading = "Leitura causal delimitada: os mecanismos permanecem distintos — sem causalidade estabelecida.";
+    expect(buildPrbDetailsData(problem({ title: "T", causal_reading: causalReading }, [])).causalReading).toBe(causalReading);
+    expect(buildPrbDetailsData(problem({ title: "T" }, [])).causalReading).toBeNull();
   });
 
-  it("narrows known-evidence statements to a caller-supplied evidence-id subset, in the caller's order", () => {
-    const evidence = [evd("EVD-1", "Obs 1"), evd("EVD-2", "Obs 2"), evd("EVD-3", "Obs 3")];
-    const projection = problem({}, evidence);
-    const items = knownEvidenceStatements(projection, ["EVD-3", "EVD-1"]);
-    expect(items.map((item) => item.evidenceId)).toEqual(["EVD-3", "EVD-1"]);
+  it("exposes no caller-selected evidence subset — the Details data carries every linked evidence count and no selection API exists", () => {
+    const evidence = [evd("EVD-1", "Obs 1", ["SUPPORTS"]), evd("EVD-2", "Obs 2", ["REFINES"]), evd("EVD-3", "Obs 3")];
+    const data = buildPrbDetailsData(problem({ title: "T" }, evidence));
+    expect(data.evidenceRecordCount).toBe(3);
+    expect(Object.keys(data)).not.toContain("knownEvidence");
+    expect(Object.keys(prbDetailsProjection)).not.toContain("knownEvidenceStatements");
   });
 
-  it("selects no knowledge items when the caller supplies no evidence-id selection — no implicit render-all fallback", () => {
-    const evidence = [evd("EVD-1", "Obs 1"), evd("EVD-2", "Obs 2")];
-    const items = knownEvidenceStatements(problem({}, evidence));
-    expect(items).toEqual([]);
-  });
-
-  it("selects no knowledge items when the caller supplies an empty evidence-id selection", () => {
-    const evidence = [evd("EVD-1", "Obs 1"), evd("EVD-2", "Obs 2")];
-    const items = knownEvidenceStatements(problem({}, evidence), []);
-    expect(items).toEqual([]);
+  it("carries updated_at as record-edit metadata only, never as a derived currentness assessment", () => {
+    const data = buildPrbDetailsData(problem({ title: "T", updated_at: "2026-09-25" }, [evd("EVD-1", "Obs")]));
+    expect(data.updatedAt).toBe("2026-09-25");
+    expect(Object.keys(data).filter((key) => /current|fresh/i.test(key))).toEqual([]);
   });
 
   it("derives singular/plural-relevant counts directly from canonical presence, never a fabricated default", () => {

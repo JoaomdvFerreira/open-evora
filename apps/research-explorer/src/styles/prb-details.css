@@ -34,7 +34,7 @@
   --prb-section-pad-top: 96px;
   --prb-section-col: 240px;
   --prb-section-gap: 56px;
-  --prb-evidence-statement-size: 23px;
+  --prb-current-reading-size: 23px;
   --prb-question-size: 30px;
   --prb-question-grid-gap: 40px;
 
@@ -177,8 +177,9 @@
 
 /* ---- Identity header: wide editorial hero -------------------------------- */
 
-/* Grid so currentness (DOM-ordered after the statement) can sit at the
-   eyebrow row's right edge at >=768 and fall below the statement at 360. */
+/* Grid so the "Atualizado em …" line (DOM-ordered after the statement) can
+   sit at the eyebrow row's right edge at >=768 and fall below the statement
+   at 360. */
 .prb-identity {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -255,7 +256,7 @@
   border-bottom: 1px dashed var(--color-separator-standard);
 }
 
-/* The id prefix belongs to the compact 360 currentness line only; wider
+/* The id prefix belongs to the compact 360 "Atualizado em …" line only; wider
    widths already show the id in the local header breadcrumb. */
 .prb-identity-updated-id {
   display: none;
@@ -456,7 +457,6 @@
    fill). The components' own label/accessible-name semantics stay
    untouched; this strips only the local box styling within this view. */
 .prb-effect .ui-inline-label,
-.prb-evidence-meta .ui-inline-label,
 .prb-audit-dimension-grid .ui-inline-label {
   display: inline;
   border: 0;
@@ -468,77 +468,15 @@
   white-space: normal;
 }
 
-/* ---- "O que sabemos até agora" ------------------------------------------ */
+/* ---- "Leitura atual" (canonical causal_reading) ------------------------- */
 
-.prb-known-evidence-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.prb-known-evidence-item {
-  padding: 32px 0;
-  border-bottom: 1px solid var(--color-separator-faint);
-}
-
-.prb-known-evidence-item:first-child {
-  padding-top: 0;
-}
-
-.prb-known-evidence-item:last-child {
-  border-bottom: 0;
-}
-
-.prb-known-evidence-statement {
+.prb-current-reading {
   max-width: 60ch;
-  margin: 0 0 16px;
+  margin: 0;
   color: var(--color-ink-primary);
   font-family: var(--font-reading);
-  font-size: var(--prb-evidence-statement-size);
+  font-size: var(--prb-current-reading-size);
   line-height: 1.5;
-}
-
-.prb-evidence-meta {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 8px 28px;
-  font-size: 15.5px;
-}
-
-.prb-evidence-meta-group {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.prb-evidence-meta-caption {
-  color: var(--color-ink-muted);
-  font-size: 14px;
-}
-
-.prb-evidence-meta-values {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px 8px;
-  color: var(--color-ink-primary);
-}
-
-.prb-evidence-meta-values--effects {
-  gap: 4px 16px;
-  font-weight: 600;
-}
-
-.prb-evidence-meta-source {
-  font-weight: 500;
-}
-
-.prb-evidence-meta-sep {
-  color: var(--color-ink-faint);
-}
-
-.prb-evidence-meta > .rec-identifier {
-  margin-left: auto;
 }
 
 /* EVD identifiers in this view follow the approved technical-metadata
@@ -595,10 +533,16 @@
   text-wrap: pretty;
 }
 
+/* Up to five independently authored fields per question: the first present
+   field spans the row, the rest pair in two equal columns. */
 .prb-open-question-grid {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--prb-question-grid-gap);
+}
+
+.prb-open-question-grid > .prb-open-question-field:first-child {
+  grid-column: 1 / -1;
 }
 
 .prb-open-question-field h3 {
@@ -951,7 +895,7 @@
     --prb-section-pad-top: 88px;
     --prb-section-col: 180px;
     --prb-section-gap: 40px;
-    --prb-evidence-statement-size: 21px;
+    --prb-current-reading-size: 21px;
     --prb-question-size: 27px;
     --prb-question-grid-gap: 28px;
     --prb-path-margin-top: 104px;
@@ -975,7 +919,7 @@
     --prb-state-item-gap: 24px;
     --prb-scope-gap: 28px;
     --prb-section-pad-top: 80px;
-    --prb-evidence-statement-size: 20px;
+    --prb-current-reading-size: 20px;
     --prb-question-size: 25px;
     --prb-path-margin-top: 96px;
     --prb-path-pad-top: 60px;
@@ -1008,12 +952,7 @@
   }
 
   .prb-open-question-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 24px 32px;
-  }
-
-  .prb-open-question-grid > .prb-open-question-field:first-child {
-    grid-column: 1 / -1;
   }
 }
 
@@ -1024,7 +963,7 @@
     --prb-hero-title-size: 29px;
     --prb-hero-statement-size: 18px;
     --prb-section-pad-top: 56px;
-    --prb-evidence-statement-size: 19px;
+    --prb-current-reading-size: 19px;
     --prb-question-size: 22px;
     --prb-path-margin-top: 48px;
     --prb-path-pad-top: 36px;
@@ -1074,7 +1013,7 @@
   }
 
   /* Hero: eyebrow, topics, title, statement, then the compact
-     "PRB-xxxx · Atualizado em …" currentness line. */
+     "PRB-xxxx · Atualizado em …" record-edit line. */
   .prb-identity {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1193,45 +1132,6 @@
 
   .prb-section-intro-note {
     font-size: 14.5px;
-  }
-
-  .prb-known-evidence-item {
-    padding: 22px 0;
-  }
-
-  .prb-known-evidence-statement {
-    margin-bottom: 12px;
-  }
-
-  /* Evidence metadata: stable caption/value rows (values stacked one per
-     line), with the EVD identifier below the metadata. */
-  .prb-evidence-meta {
-    display: grid;
-    grid-template-columns: 64px minmax(0, 1fr);
-    gap: 6px 0;
-    font-size: 15px;
-  }
-
-  .prb-evidence-meta-group {
-    display: contents;
-  }
-
-  .prb-evidence-meta-values {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-
-  .prb-evidence-meta-sep {
-    display: none;
-  }
-
-  .prb-evidence-meta > .rec-identifier {
-    grid-column: 1 / -1;
-    justify-self: start;
-    margin-left: 0;
-    font-size: 13px;
   }
 
   .prb-open-question-item {

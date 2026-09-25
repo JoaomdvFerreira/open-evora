@@ -12,7 +12,7 @@ import "../styles/section-index.css";
 import "../styles/topic.css";
 import "../styles/prb-details.css";
 import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
-import { buildPrbDetailsData, knownEvidenceStatements } from "./prbDetailsProjection";
+import { buildPrbDetailsData } from "./prbDetailsProjection";
 import { useProblemProjection } from "./useProblemProjection";
 import { useRecordIndex } from "../records/useRecordIndex";
 import { prb0005DataProvider } from "./prb0005Fixture";
@@ -25,18 +25,6 @@ import type { RecordSummary } from "../dataProvider/types";
 const meta = { title: "Public/PRB Details / PRB0005" } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-/**
- * PD-02A — "O que sabemos até agora" fixture-only evidence selection for the
- * PRB-0005 Storybook composition. This exact 4-item subset (EVD-000139,
- * EVD-000003, EVD-000105, EVD-000167) is a Storybook-fixture choice only —
- * it demonstrates the section with a representative, readable set of
- * statements. It is not a production ranking or selection rule: production
- * usage of PrbDetailsPresentation passes no evidenceIds and renders every
- * evidence item the PRB itself links (see prbDetailsProjection.ts's
- * knownEvidenceStatements — the subset parameter is caller-optional).
- */
-const PRB_0005_KNOWN_EVIDENCE_IDS = ["EVD-000139", "EVD-000003", "EVD-000105", "EVD-000167"];
 
 const noop = () => {};
 
@@ -72,9 +60,8 @@ function Prb0005Details() {
   }
 
   const data = buildPrbDetailsData(projectionState.projection);
-  const knownEvidence = knownEvidenceStatements(projectionState.projection, PRB_0005_KNOWN_EVIDENCE_IDS);
 
-  return <PrbDetailsPresentation data={data} knownEvidence={knownEvidence} onOpenGeneric={noop} onBackToOverview={noop} onViewHistory={noop} />;
+  return <PrbDetailsPresentation data={data} onOpenGeneric={noop} onBackToOverview={noop} onViewHistory={noop} />;
 }
 
 /**

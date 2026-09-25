@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
-import { buildPrbDetailsData, knownEvidenceStatements } from "./prbDetailsProjection";
+import { buildPrbDetailsData } from "./prbDetailsProjection";
 import type { RecordDetail } from "../dataProvider/types";
 import type { EvidenceWithSources, ProblemProjection } from "./problemProjection";
 
@@ -27,11 +27,8 @@ function requireElement(container: ParentNode, selector: string): HTMLElement {
 const noop = vi.fn();
 const handlers = { onOpenGeneric: noop, onBackToOverview: noop, onViewHistory: noop };
 
-function renderPrb(record: Record<string, unknown>, evidence: EvidenceWithSources[] = [], knownEvidenceIds?: string[]) {
-  const projection = baseProjection(record, evidence);
-  const data = buildPrbDetailsData(projection);
-  const knownEvidence = knownEvidenceStatements(projection, knownEvidenceIds);
-  return render(<PrbDetailsPresentation data={data} knownEvidence={knownEvidence} {...handlers} />);
+function renderPrb(record: Record<string, unknown>, evidence: EvidenceWithSources[] = []) {
+  return render(<PrbDetailsPresentation data={buildPrbDetailsData(baseProjection(record, evidence))} {...handlers} />);
 }
 
 describe("PrbDetailsPresentation — generic PRB Details composition", () => {
@@ -75,37 +72,6 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(within(scope).getByText("efeitos")).toBeTruthy();
   });
 
-  it("renders multiple effects, multiple research roles, and multiple sources on one evidence statement", () => {
-    const record = { title: "T" };
-    const evidence = [evd("EVD-1", "Afirmação com múltiplos efeitos.", ["REFINES", "BOUNDS"], ["LOCAL_OBSERVATION", "EXISTING_RESPONSE"], ["Município de Évora", "ODigital"])];
-    const { container } = renderPrb(record, evidence, ["EVD-1"]);
-    const known = requireElement(container, ".prb-known-evidence-list");
-    expect(within(known).getByText("Refina")).toBeTruthy();
-    expect(within(known).getByText("Delimita")).toBeTruthy();
-    expect(within(known).getByText("Observação local")).toBeTruthy();
-    expect(within(known).getByText("Resposta existente")).toBeTruthy();
-    expect(within(known).getByText("Município de Évora")).toBeTruthy();
-    expect(within(known).getByText("ODigital")).toBeTruthy();
-  });
-
-  it("uses plural meta captions (Efeitos/Papéis/Fontes) only when more than one value is present", () => {
-    const record = { title: "T" };
-    const single = [evd("EVD-1", "Uma afirmação.", ["SUPPORTS"], ["LOCAL_OBSERVATION"], ["Fonte Única"])];
-    const { container, unmount } = renderPrb(record, single, ["EVD-1"]);
-    const singleKnown = requireElement(container, ".prb-known-evidence-list");
-    expect(within(singleKnown).getByText("Efeito")).toBeTruthy();
-    expect(within(singleKnown).getByText("Papel")).toBeTruthy();
-    expect(within(singleKnown).getByText("Fonte")).toBeTruthy();
-    unmount();
-
-    const multiple = [evd("EVD-2", "Outra afirmação.", ["REFINES", "BOUNDS"], ["LOCAL_OBSERVATION", "EXISTING_RESPONSE"], ["Fonte A", "Fonte B"])];
-    const { container: container2 } = renderPrb(record, multiple, ["EVD-2"]);
-    const multiKnown = requireElement(container2, ".prb-known-evidence-list");
-    expect(within(multiKnown).getByText("Efeitos")).toBeTruthy();
-    expect(within(multiKnown).getByText("Papéis")).toBeTruthy();
-    expect(within(multiKnown).getByText("Fontes")).toBeTruthy();
-  });
-
   it("renders dynamic question/evidence/effect counts matching what is actually authored", () => {
     const record = {
       title: "T",
@@ -139,24 +105,75 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(screen.getByText("Não é proporcional prosseguir desafio de deslocação no âmbito atual.")).toBeTruthy();
   });
 
-  it("omits the Ação atual block entirely for a question with no canonical current_action, never a fallback", () => {
+  it("renders each canonical open-question field under its own public label", () => {
     const record = {
       title: "T",
-      investigation: { open_questions: [{ question: "Questão sem ação registada?", why_open: "Motivo." }] },
+      investigation: {
+        open_questions: [
+          {
+            question: "Questão completa?",
+            latest_result: "Resultado mais recente registado.",
+            why_open: "Motivo pelo qual continua em aberto.",
+            resolution_condition: "Condição que falta confirmar.",
+            current_action: "Ação que está em curso.",
+            evidence: ["EVD-1"],
+          },
+        ],
+      },
     };
-    renderPrb(record, []);
-    expect(screen.queryByText("Ação atual")).toBeNull();
+    const { container } = renderPrb(record, []);
+    const fields = Array.from(requireElement(container, ".prb-open-question-grid").querySelectorAll(".prb-open-question-field")).map((field) => [
+      field.querySelector("h3")?.textContent,
+      field.querySelector("p")?.textContent ?? field.querySelector(".rec-identifier")?.textContent,
+    ]);
+    expect(fields).toEqual([
+      ["O que sabemos até agora", "Resultado mais recente registado."],
+      ["Porque continua em aberto", "Motivo pelo qual continua em aberto."],
+      ["O que falta confirmar", "Condição que falta confirmar."],
+      ["O que estamos a fazer", "Ação que está em curso."],
+      ["Evidência relacionada", "EVD-1"],
+    ]);
   });
 
-  it("does not attribute a shared publisher to related evidence beyond each item's own resolved sources", () => {
-    const record = { title: "T" };
-    const evidence = [evd("EVD-1", "Primeira afirmação.", ["SUPPORTS"], [], ["Fonte A"]), evd("EVD-2", "Segunda afirmação.", ["REFINES"], [], ["Fonte B"])];
-    renderPrb(record, evidence, ["EVD-1", "EVD-2"]);
-    const items = screen.getAllByRole("listitem").filter((item) => item.className.includes("prb-known-evidence-item"));
-    expect(within(items[0]).getByText("Fonte A")).toBeTruthy();
-    expect(within(items[0]).queryByText("Fonte B")).toBeNull();
-    expect(within(items[1]).getByText("Fonte B")).toBeTruthy();
-    expect(within(items[1]).queryByText("Fonte A")).toBeNull();
+  it("omits each open-question block whose canonical field is absent, never a fallback", () => {
+    const record = {
+      title: "T",
+      investigation: { open_questions: [{ question: "Questão só com motivo?", why_open: "Motivo." }] },
+    };
+    const { container } = renderPrb(record, []);
+    const labels = Array.from(requireElement(container, ".prb-open-question-grid").querySelectorAll("h3")).map((heading) => heading.textContent);
+    expect(labels).toEqual(["Porque continua em aberto"]);
+  });
+
+  it("renders a WATCH current_action verbatim as free text — no parsed badge, posture or hidden token", () => {
+    const watch = "WATCH — monitorizar medições pós-abertura; a abertura, por si só, não é impacto realizado.";
+    const { container } = renderPrb({ title: "T", investigation: { open_questions: [{ question: "Q?", current_action: watch }] } }, []);
+    const field = screen.getByText("O que estamos a fazer").closest(".prb-open-question-field");
+    expect(field?.querySelector("p")?.textContent).toBe(watch);
+    expect(screen.queryByText("WATCH")).toBeNull();
+    expect(container.querySelector('[class*="badge"], [class*="posture"], [class*="watch"]')).toBeNull();
+  });
+
+  it("renders canonical causal_reading verbatim under Leitura atual", () => {
+    const causalReading = "Leitura deliberadamente delimitada — os mecanismos permanecem distintos de possíveis lacunas de informação.";
+    renderPrb({ title: "T", causal_reading: causalReading }, [evd("EVD-1", "Observação que não pertence a esta secção.", ["SUPPORTS"])]);
+    const section = screen.getByRole("region", { name: "Leitura atual" });
+    expect(section.querySelector(".prb-current-reading")?.textContent).toBe(causalReading);
+    // No evidence subset is attached to the current reading.
+    expect(section.querySelector(".rec-identifier")).toBeNull();
+    expect(within(section).queryByText("Observação que não pertence a esta secção.")).toBeNull();
+  });
+
+  it("omits Leitura atual entirely when causal_reading is unauthored", () => {
+    renderPrb({ title: "T" }, [evd("EVD-1", "Obs", ["SUPPORTS"])]);
+    expect(screen.queryByRole("region", { name: "Leitura atual" })).toBeNull();
+  });
+
+  it("has no standalone selected-evidence section — evidence observations never render as page-level statements", () => {
+    const { container } = renderPrb({ title: "T", causal_reading: "Leitura." }, [evd("EVD-1", "Observação da evidência.", ["SUPPORTS"], ["LOCAL_OBSERVATION"], ["Fonte A"])]);
+    expect(screen.queryByRole("heading", { level: 2, name: "O que sabemos até agora" })).toBeNull();
+    expect(container.querySelector("#prb-sabemos, .prb-known-evidence-list, .prb-evidence-meta")).toBeNull();
+    expect(screen.queryByText("Observação da evidência.")).toBeNull();
   });
 
   it("presents investigation-path stages as a neutral sequence, with no completion/current/pending indicator", () => {
@@ -193,15 +210,14 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(within(requireElement(container, ".prb-open-question-list")).getByRole("button", { name: "Abrir EVD-888" })).toBeTruthy();
   });
 
-  it("orders known effects Sustenta · Refina · Delimita · Contradiz in metadata and tally, followed by unknown effects in their existing order", () => {
+  it("orders known effects Sustenta · Refina · Delimita · Contradiz in the tally, followed by unknown effects in their existing order", () => {
     const evidence = [
       evd("EVD-1", "Obs1", ["FUTURE_B", "CONTRADICTS", "BOUNDS", "FUTURE_A", "REFINES", "SUPPORTS"]),
       evd("EVD-2", "Obs2", ["REFINES"]),
     ];
-    const { container } = renderPrb({ title: "T" }, evidence, ["EVD-1"]);
+    const { container } = renderPrb({ title: "T" }, evidence);
     const effectTexts = (scope: HTMLElement) => Array.from(scope.querySelectorAll(".prb-effect .evd-effect-tag")).map((tag) => tag.textContent?.trim());
     const expected = ["Sustenta", "Refina", "Delimita", "Contradiz", "FUTURE_B", "FUTURE_A"];
-    expect(effectTexts(requireElement(container, ".prb-known-evidence-list"))).toEqual(expected);
     const tally = requireElement(container, ".prb-audit-effect-tally");
     expect(effectTexts(tally)).toEqual(expected);
     expect(tally.textContent?.replace(/\s+/g, " ").trim()).toBe("Sustenta 1Refina 2Delimita 1Contradiz 1FUTURE_B 1FUTURE_A 1");
@@ -210,13 +226,13 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
   });
 
   it("renders Contradiz with the neutral effect treatment and its explicit label", () => {
-    const { container } = renderPrb({ title: "T" }, [evd("EVD-1", "Obs", ["CONTRADICTS"])], ["EVD-1"]);
-    const known = requireElement(container, ".prb-known-evidence-list");
-    expect(within(known).getByText("Contradiz").closest(".prb-effect")?.className).toContain("prb-effect--neutral");
+    const { container } = renderPrb({ title: "T" }, [evd("EVD-1", "Obs", ["CONTRADICTS"])]);
+    const tally = requireElement(container, ".prb-audit-effect-tally");
+    expect(within(tally).getByText("Contradiz").closest(".prb-effect")?.className).toContain("prb-effect--neutral");
   });
 
-  it("keeps Como verificamos to the approved examples, while evidence metadata still renders every role", () => {
-    const { container } = renderPrb({ title: "T" }, [evd("EVD-1", "Obs", ["SUPPORTS"], ["PLANNED_RESPONSE"])], ["EVD-1"]);
+  it("keeps Como verificamos to the approved effect and research-role examples", () => {
+    const { container } = renderPrb({ title: "T" }, [evd("EVD-1", "Obs", ["SUPPORTS"], ["PLANNED_RESPONSE"])]);
     const legend = requireElement(container, ".prb-audit-effect-legend");
     expect(Array.from(legend.querySelectorAll(".evd-effect-tag")).map((tag) => tag.textContent?.trim())).toEqual(["Sustenta", "Refina", "Delimita"]);
     const roles = requireElement(container, ".prb-audit-role-legend");
@@ -224,7 +240,6 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(within(roles).getByText("Dado, medição ou relato recolhido sobre a situação em Évora.")).toBeTruthy();
     expect(within(roles).getByText("Medida, serviço ou plano que já responde, total ou parcialmente, ao problema.")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Ler o método →" }).getAttribute("href")).toBe("/methodology");
-    expect(within(requireElement(container, ".prb-known-evidence-list")).getByText("Resposta planeada")).toBeTruthy();
   });
 
   it("renders no runtime-summary or fabricated audit narrative beyond already-authored effect/count values", () => {
@@ -254,13 +269,20 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(container.querySelector(".prb-state-value--accent")).toBeNull();
   });
 
-  it("places currentness after the problem statement, carrying the PRB id and the canonical date", () => {
+  it("places the updated_at record-edit line after the problem statement, carrying the PRB id and the canonical date", () => {
     const { container } = renderPrb({ title: "T", problem_statement: "Formulação.", updated_at: "2026-03-05" });
     const statement = requireElement(container, ".prb-identity-statement");
     const updated = requireElement(container, ".prb-identity-updated");
     expect(statement.compareDocumentPosition(updated) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(updated.textContent).toMatch(/^PRB-9999 · Atualizado em /);
     expect(updated.querySelector("time")?.getAttribute("dateTime")).toBe("2026-03-05");
+  });
+
+  it("presents updated_at only as edit metadata, never as a currentness assessment", () => {
+    const { container } = renderPrb({ title: "T", updated_at: "2026-03-05" });
+    const updated = requireElement(container, ".prb-identity-updated");
+    expect(updated.textContent?.replace(/^PRB-9999 · /, "").replace(/\s+/g, " ").trim()).toMatch(/^Atualizado em \S/);
+    expect(container.textContent).not.toMatch(/Atualidade|ainda atual|continua atual|informação atual/i);
   });
 
   it("keeps header utility accessible names as their text, with decorative icons hidden from assistive tech", () => {
@@ -274,11 +296,10 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
 
   it("renders every effect occurrence with its explicit text label, a decorative marker, and a per-effect tone", () => {
     const evidence = [evd("EVD-1", "Obs", ["SUPPORTS", "REFINES"]), evd("EVD-2", "Obs2", ["BOUNDS", "FUTURE_EFFECT"])];
-    const { container } = renderPrb({ title: "T" }, evidence, ["EVD-1", "EVD-2"]);
-    const known = requireElement(container, ".prb-known-evidence-list");
+    const { container } = renderPrb({ title: "T" }, evidence);
     const tally = requireElement(container, ".prb-audit-effect-tally");
     const legend = requireElement(container, ".prb-audit-effect-legend");
-    for (const scope of [known, tally, legend]) {
+    for (const scope of [tally, legend]) {
       const labels = Array.from(scope.querySelectorAll(".prb-effect"));
       expect(labels.length).toBeGreaterThan(0);
       for (const label of labels) {
@@ -286,11 +307,11 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
         expect(label.querySelector(".evd-effect-tag")?.textContent?.trim()).not.toBe("");
       }
     }
-    expect(within(known).getByText("Sustenta").closest(".prb-effect")?.className).toContain("prb-effect--supports");
-    expect(within(known).getByText("Refina").closest(".prb-effect")?.className).toContain("prb-effect--refines");
-    expect(within(known).getByText("Delimita").closest(".prb-effect")?.className).toContain("prb-effect--bounds");
+    expect(within(tally).getByText("Sustenta").closest(".prb-effect")?.className).toContain("prb-effect--supports");
+    expect(within(tally).getByText("Refina").closest(".prb-effect")?.className).toContain("prb-effect--refines");
+    expect(within(tally).getByText("Delimita").closest(".prb-effect")?.className).toContain("prb-effect--bounds");
     // An unrecognised future effect keeps its raw label and a neutral tone rather than borrowing another effect's colour.
-    expect(within(known).getByText("FUTURE_EFFECT").closest(".prb-effect")?.className).toContain("prb-effect--neutral");
+    expect(within(tally).getByText("FUTURE_EFFECT").closest(".prb-effect")?.className).toContain("prb-effect--neutral");
   });
 
   it("keeps compact/mobile content complete — every section renders regardless of viewport-only CSS", () => {
@@ -298,15 +319,16 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
       title: "Título completo",
       problem_statement: "Formulação completa.",
       status: "OPEN",
+      causal_reading: "Leitura atual registada.",
       investigation: {
         open_questions: [{ question: "Questão aberta?", current_action: "Ação registada." }],
         path: { initial_signal: { summary: "Sinal inicial registado." } },
       },
     };
-    renderPrb(record, [evd("EVD-1", "Afirmação conhecida.", ["SUPPORTS"])], ["EVD-1"]);
+    renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS"])]);
     expect(screen.getByText("Título completo")).toBeTruthy();
     expect(screen.getByText("Formulação completa.")).toBeTruthy();
-    expect(screen.getByText("Afirmação conhecida.")).toBeTruthy();
+    expect(screen.getByText("Leitura atual registada.")).toBeTruthy();
     expect(screen.getByText("Questão aberta?")).toBeTruthy();
     expect(screen.getByText("Ação registada.")).toBeTruthy();
     expect(screen.getByText("Sinal inicial registado.")).toBeTruthy();

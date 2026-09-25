@@ -7,10 +7,10 @@ import { describeTopic } from "../presentation/topicMapping";
 import { validationVisual } from "./stateVisuals";
 import { ShareAction } from "./ShareAction";
 import { formatPublicCount, formatPublicDate, publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
-import type { PrbDetailsData, PrbEvidenceRelationship, PrbOpenQuestion, PrbPathStage } from "./prbDetailsProjection";
+import type { PrbDetailsData, PrbOpenQuestion, PrbPathStage } from "./prbDetailsProjection";
 
 /**
- * PD-02A.2 — generic public PRB Details full-page composition.
+ * Generic public PRB Details full-page composition.
  *
  * Approved visual reference: docs/design/reference/prb-details/ (README is
  * the authority contract). This design applies to every canonical PRB, not
@@ -35,8 +35,6 @@ import type { PrbDetailsData, PrbEvidenceRelationship, PrbOpenQuestion, PrbPathS
  */
 export interface PrbDetailsPresentationProps {
   data: PrbDetailsData;
-  /** "O que sabemos até agora" statements, already resolved to observation text + relationship tags + source publishers. */
-  knownEvidence: PrbEvidenceRelationship[];
   onOpenGeneric: (id: string) => void;
   onBackToOverview: () => void;
   onViewHistory: (id: string) => void;
@@ -94,11 +92,14 @@ function PrbHeader({ data, onBackToOverview, onViewHistory }: { data: PrbDetails
 }
 
 /**
- * Editorial hero. Currentness ("Atualizado em …") follows the statement in
- * DOM order: at >=768 the hero grid lifts it into the eyebrow row's right
- * edge; at 360 it stays below the statement as the compact
- * "PRB-xxxx · Atualizado em …" line (the id prefix is shown only there —
- * the local header breadcrumb already carries it at wider widths).
+ * Editorial hero. The "Atualizado em …" line is canonical `updated_at` —
+ * the date the PRB record was last edited. It is record metadata only, not
+ * a currentness assessment: nothing here infers that the reading is still
+ * current from it. It follows the statement in DOM order: at >=768 the hero
+ * grid lifts it into the eyebrow row's right edge; at 360 it stays below the
+ * statement as the compact "PRB-xxxx · Atualizado em …" line (the id prefix
+ * is shown only there — the local header breadcrumb already carries it at
+ * wider widths).
  */
 function PrbIdentityHeader({ data }: { data: PrbDetailsData }) {
   return (
@@ -216,7 +217,7 @@ function PrbInvestigationStateSection({ data }: { data: PrbDetailsData }) {
  * content flow (styles/prb-details.css). `bleed` wraps the inner frame in
  * `.shell-frame--wide` for a section that is its own full-bleed band
  * (Percurso/Auditoria); sections that already sit inside a caller-supplied
- * wide frame (O que sabemos/O que ainda não sabemos) leave it unset.
+ * wide frame (Leitura atual/O que ainda não sabemos) leave it unset.
  */
 function PrbSection({
   id,
@@ -251,29 +252,12 @@ function PrbSection({
   );
 }
 
-/** "O que sabemos até agora" — one authored observation statement per evidence item, each linked to its evidence record and relationship metadata. Content and count come entirely from `knownEvidence`; this component owns no selection policy — the caller decides which/how many items to pass (PRB-0005 Storybook fixture: a caller-chosen subset). If `knownEvidence` is empty, this section renders nothing — absence of an editorial selection does not mean the PRB has no evidence, so no "Nenhuma evidência associada" fallback is ever shown. */
-function PrbKnownEvidenceSection({
-  knownEvidence,
-  onOpenGeneric,
-}: {
-  knownEvidence: PrbEvidenceRelationship[];
-  onOpenGeneric: (id: string) => void;
-}) {
-  if (knownEvidence.length === 0) return null;
+/** "Leitura atual" — canonical `causal_reading`, rendered verbatim as authored. Never derived from, summarised from, or paired with an evidence subset; omitted entirely when the PRB authors no causal reading. */
+function PrbCurrentReadingSection({ causalReading }: { causalReading: string | null }) {
+  if (!causalReading) return null;
   return (
-    <PrbSection
-      id="prb-sabemos"
-      label="O que sabemos até agora"
-      note={`${formatPublicCount(knownEvidence.length)} ${knownEvidence.length === 1 ? "afirmação" : "afirmações"}, cada uma ligada a um registo de evidência`}
-    >
-      <ul className="prb-known-evidence-list">
-        {knownEvidence.map((item) => (
-          <li key={item.evidenceId} className="prb-known-evidence-item">
-            {item.observationSummary && <p className="prb-known-evidence-statement">{item.observationSummary}</p>}
-            <EvidenceRelationshipMetaAction item={item} onOpenGeneric={onOpenGeneric} />
-          </li>
-        ))}
-      </ul>
+    <PrbSection id="prb-leitura" label="Leitura atual">
+      <p className="prb-current-reading">{causalReading}</p>
     </PrbSection>
   );
 }
@@ -308,8 +292,8 @@ function inEffectDisplayOrder<T>(items: readonly T[], effectOf: (item: T) => str
  * marker plus the effect's explicit PT-PT label (EvidenceEffectTag, which
  * stays the sole label authority), both in an effect-specific restrained
  * tone. The marker is aria-hidden and colour is supplemental only — the
- * text label alone carries the meaning. Used identically by evidence
- * metadata, the audit effect tally and the "Como verificamos" legend.
+ * text label alone carries the meaning. Used identically by the audit
+ * effect tally and the "Como verificamos" legend.
  */
 function PrbEffectLabel({ effect, children }: { effect: string; children?: ReactNode }) {
   const tone = EFFECT_TONE[effect] ?? "neutral";
@@ -322,85 +306,35 @@ function PrbEffectLabel({ effect, children }: { effect: string; children?: React
   );
 }
 
-function EvidenceRelationshipMetaAction({ item, onOpenGeneric }: { item: PrbEvidenceRelationship; onOpenGeneric: (id: string) => void }) {
-  return (
-    <div className="prb-evidence-meta">
-      {item.effects.length > 0 && (
-        <span className="prb-evidence-meta-group">
-          <span className="prb-evidence-meta-caption">{item.effects.length === 1 ? "Efeito" : "Efeitos"}</span>
-          <span className="prb-evidence-meta-values prb-evidence-meta-values--effects">
-            {inEffectDisplayOrder(item.effects, (effect) => effect).map((effect, index) => (
-              <PrbEffectLabel key={`${effect}-${index}`} effect={effect} />
-            ))}
-          </span>
-        </span>
-      )}
-      {item.sourcePublishers.length > 0 && (
-        <span className="prb-evidence-meta-group">
-          <span className="prb-evidence-meta-caption">{item.sourcePublishers.length === 1 ? "Fonte" : "Fontes"}</span>
-          <span className="prb-evidence-meta-values">
-            {withMetaSeparators(item.sourcePublishers.map((publisher, index) => (
-              <span key={`${publisher}-${index}`} className="prb-evidence-meta-source">
-                {publisher}
-              </span>
-            )))}
-          </span>
-        </span>
-      )}
-      {item.researchRoles.length > 0 && (
-        <span className="prb-evidence-meta-group">
-          <span className="prb-evidence-meta-caption">{item.researchRoles.length === 1 ? "Papel" : "Papéis"}</span>
-          <span className="prb-evidence-meta-values">
-            {withMetaSeparators(item.researchRoles.map((role, index) => (
-              <ResearchRoleTag key={`${role}-${index}`} role={role} variant="compact" />
-            )))}
-          </span>
-        </span>
-      )}
-      <RecordIdentifier variant="action" id={item.evidenceId} density="compact" onActivate={() => onOpenGeneric(item.evidenceId)} accessibleLabel={`Abrir ${item.evidenceId}`} />
-    </div>
-  );
-}
-
-/** Interleaves decorative "·" separators between multiple meta values. Hidden from assistive tech (each value is already its own element) and hidden at 360, where values stack one per line. */
-function withMetaSeparators(values: ReactNode[]): ReactNode[] {
-  return values.flatMap((value, index) =>
-    index === 0
-      ? [value]
-      : [
-          <span key={`sep-${index}`} aria-hidden="true" className="prb-evidence-meta-sep">
-            ·
-          </span>,
-          value,
-        ],
-  );
-}
-
 /**
- * One `investigation.open_questions[]` item. `current_action` is rendered as
+ * One `investigation.open_questions[]` item. Each canonical field renders in
+ * its own labelled block only when authored — never merged into a synthetic
+ * summary and never given fallback prose. `current_action` is rendered as
  * authored free text only, exactly as stored — never parsed for a leading
- * "WATCH —"/"STOP —" keyword and never replaced with the approved HTML
- * reference's illustrative "Acompanhar" label, which has no canonical
- * counterpart for every question.
+ * "WATCH —"/"STOP —" keyword, never turned into a badge/posture, and never
+ * replaced with the approved HTML reference's illustrative "Acompanhar"
+ * label, which has no canonical counterpart for every question.
  */
 function OpenQuestionItem({ index, item, onOpenGeneric }: { index: number; item: PrbOpenQuestion; onOpenGeneric: (id: string) => void }) {
+  const fields: { label: string; text: string | null }[] = [
+    { label: "O que sabemos até agora", text: item.latestResult },
+    { label: "Porque continua em aberto", text: item.whyOpen },
+    { label: "O que falta confirmar", text: item.resolutionCondition },
+    { label: "O que estamos a fazer", text: item.currentAction },
+  ];
   return (
     <li className="prb-open-question-item">
       <div className="prb-open-question-index">Questão {index + 1}</div>
       <p className="prb-open-question-text">{item.question}</p>
       <div className="prb-open-question-grid">
-        {item.whatWeUnderstand && (
-          <div className="prb-open-question-field">
-            <h3>O que entendemos</h3>
-            <p>{item.whatWeUnderstand}</p>
-          </div>
-        )}
-        {item.currentAction && (
-          <div className="prb-open-question-field">
-            <h3>Ação atual</h3>
-            <p>{item.currentAction}</p>
-          </div>
-        )}
+        {fields
+          .filter(({ text }) => text)
+          .map(({ label, text }) => (
+            <div key={label} className="prb-open-question-field">
+              <h3>{label}</h3>
+              <p>{text}</p>
+            </div>
+          ))}
         {item.relatedEvidenceIds.length > 0 && (
           <div className="prb-open-question-field">
             <h3>Evidência relacionada</h3>
@@ -602,7 +536,7 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
   );
 }
 
-export function PrbDetailsPresentation({ data, knownEvidence, onOpenGeneric, onBackToOverview, onViewHistory }: PrbDetailsPresentationProps) {
+export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, onViewHistory }: PrbDetailsPresentationProps) {
   return (
     <article aria-labelledby="prb-identity-title" className="prb-details-view">
       <div className="prb-header-band">
@@ -618,7 +552,7 @@ export function PrbDetailsPresentation({ data, knownEvidence, onOpenGeneric, onB
       <PrbInvestigationStateSection data={data} />
 
       <div className="shell-frame shell-frame--wide prb-details-frame">
-        <PrbKnownEvidenceSection knownEvidence={knownEvidence} onOpenGeneric={onOpenGeneric} />
+        <PrbCurrentReadingSection causalReading={data.causalReading} />
         <PrbOpenQuestionsSection questions={data.openQuestions} onOpenGeneric={onOpenGeneric} />
       </div>
 

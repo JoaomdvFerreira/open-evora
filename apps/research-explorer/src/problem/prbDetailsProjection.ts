@@ -1,7 +1,7 @@
 import type { EvidenceWithSources, ProblemProjection } from "./problemProjection";
 
 /**
- * PD-02A — pure canonical-to-presentation mapping for the generic public PRB
+ * Pure canonical-to-presentation mapping for the generic public PRB
  * Details composition (PrbDetailsPresentation.tsx). This module owns no
  * rendering; it only reads a resolved ProblemProjection (already-fetched PRB
  * + linked EVD + linked SRC, from problemProjection.ts) and reshapes it into
@@ -13,7 +13,7 @@ import type { EvidenceWithSources, ProblemProjection } from "./problemProjection
  * reference (docs/design/reference/prb-details/) shows illustrative content
  * with no canonical counterpart (e.g. a "WATCH" badge on every open
  * question), this module simply does not produce it — see current_action
- * below, which is rendered as authored free text only, never parsed into a
+ * below, which is carried as authored free text only, never parsed into a
  * posture/badge.
  */
 
@@ -44,57 +44,23 @@ function scope(record: Record<string, unknown>): PrbScope | null {
   return { area, level };
 }
 
-export interface PrbEvidenceRelationship {
-  evidenceId: string;
-  observationSummary: string | null;
-  effects: string[];
-  researchRoles: string[];
-  sourcePublishers: string[];
-}
-
-/**
- * "O que sabemos até agora" statements. `evidenceIds` is a caller-chosen
- * subset, in caller order (PD-02A's PRB-0005 Storybook fixture selects
- * exactly EVD-000139/EVD-000003/EVD-000105/EVD-000167 — a fixture-only
- * choice, not a production ranking rule). This module owns no production
- * selection policy for this section: a caller that omits `evidenceIds`, or
- * passes an empty list, gets no selected knowledge items — never every
- * linked evidence item as an implicit default. Choosing the production
- * selection is a decision for the caller, not this projection.
- */
-export function knownEvidenceStatements(projection: ProblemProjection, evidenceIds?: string[]): PrbEvidenceRelationship[] {
-  const byId = new Map(projection.evidence.map((item) => [item.detail.id, item]));
-  const ordered: EvidenceWithSources[] = evidenceIds
-    ? evidenceIds.map((id) => byId.get(id)).filter((item): item is EvidenceWithSources => item !== undefined)
-    : [];
-
-  return ordered.map((item) => {
-    const evidenceRecord = item.detail.record;
-    const observation = recordValue(evidenceRecord.observation);
-    return {
-      evidenceId: item.detail.id,
-      observationSummary: observation ? fieldValue(observation, "summary") : null,
-      effects: item.effects ?? [],
-      researchRoles: item.researchRoles ?? [],
-      sourcePublishers: item.sources.map((source) => fieldValue(source.record, "publisher")).filter((value): value is string => value !== null),
-    };
-  });
-}
-
 export interface PrbOpenQuestion {
   question: string;
+  latestResult: string | null;
+  whyOpen: string | null;
+  resolutionCondition: string | null;
   currentAction: string | null;
-  whatWeUnderstand: string | null;
   relatedEvidenceIds: string[];
 }
 
 /**
- * `investigation.open_questions[]` — `why_open` is the canonical field that
- * best matches the reference's "O que entendemos" block; `current_action` is
- * rendered exactly as authored, never parsed for a leading keyword like
- * "WATCH —" and never substituted with reference-only illustrative text
- * (e.g. "Acompanhar") when the field itself carries different authored
- * content or is entirely absent.
+ * `investigation.open_questions[]` — each canonical field maps one-to-one
+ * (`latest_result`, `why_open`, `resolution_condition`, `current_action`,
+ * `evidence`) and stays null/empty when unauthored. Fields are never merged
+ * into a synthetic summary or substituted with fallback prose.
+ * `current_action` is authored free text: it is never parsed for a leading
+ * keyword like "WATCH —", never turned into a posture/badge, and never
+ * replaced with reference-only illustrative text (e.g. "Acompanhar").
  */
 export function openQuestions(record: Record<string, unknown>): PrbOpenQuestion[] {
   const investigation = recordValue(record.investigation);
@@ -108,8 +74,10 @@ export function openQuestions(record: Record<string, unknown>): PrbOpenQuestion[
     if (!item || !question) continue;
     items.push({
       question,
+      latestResult: fieldValue(item, "latest_result"),
+      whyOpen: fieldValue(item, "why_open"),
+      resolutionCondition: fieldValue(item, "resolution_condition"),
       currentAction: fieldValue(item, "current_action"),
-      whatWeUnderstand: fieldValue(item, "why_open"),
       relatedEvidenceIds: stringValues(item.evidence),
     });
   }
@@ -173,8 +141,11 @@ export interface PrbDetailsData {
   problemId: string;
   title: string;
   statement: string | null;
+  /** Canonical `causal_reading`, verbatim — authored text, never derived from evidence. */
+  causalReading: string | null;
   topics: string[];
   geographyScope: PrbScope | null;
+  /** Canonical `updated_at`: the date the PRB record was last edited — record metadata, not a currentness assessment. */
   updatedAt: string | null;
   status: string | null;
   evidenceStatus: string | null;
@@ -188,12 +159,10 @@ export interface PrbDetailsData {
 }
 
 /**
- * Assembles the full PrbDetailsPresentation prop set from a resolved
- * ProblemProjection, except "O que sabemos até agora" (see
- * knownEvidenceStatements, called separately by the caller with its own
- * evidence-id selection). Every section here always reflects the PRB's
- * complete canonical content, per the task's "use the full canonical
- * authored content, not shortened HTML copy" requirement.
+ * Assembles the full PrbDetailsPresentation data from a resolved
+ * ProblemProjection. Every field reflects the PRB's complete canonical
+ * authored content — no caller-selected evidence subset, ranking or
+ * "top evidence" rule exists here, and no shortened reference copy is used.
  */
 export function buildPrbDetailsData(projection: ProblemProjection): PrbDetailsData {
   const record = projection.problem.record;
@@ -203,6 +172,7 @@ export function buildPrbDetailsData(projection: ProblemProjection): PrbDetailsDa
     problemId: projection.problem.id,
     title: fieldValue(record, "title") ?? projection.problem.id,
     statement: fieldValue(record, "problem_statement"),
+    causalReading: fieldValue(record, "causal_reading"),
     topics: stringValues(record.domain),
     geographyScope: scope(record),
     updatedAt: fieldValue(record, "updated_at"),
