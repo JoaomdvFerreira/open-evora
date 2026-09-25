@@ -1,4 +1,4 @@
-import { useSyncExternalStore, type ReactNode } from "react";
+import { useSyncExternalStore, type ReactNode, type RefObject } from "react";
 import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { RecordIdentifier } from "../records/RecordIdentifier";
@@ -19,9 +19,9 @@ import type { PrbDetailsData, PrbOpenQuestion, PrbPathStage } from "./prbDetails
  * fixture (PrbDetailsPresentation.stories.tsx). No PRB-0005-specific logic
  * lives here: every section is schema-driven from PrbDetailsData
  * (prbDetailsProjection.ts) and omits itself when its canonical field is
- * absent, exactly like ProblemView.tsx's established convention.
+ * absent.
  *
- * This view intentionally does not reuse ProblemView.tsx's legacy 720+rail
+ * This view intentionally does not reuse the retired 720+rail Problem
  * presentation architecture (right-side reading rail/CompactSectionIndex
  * "Nesta página"). The approved reference is a wide editorial composition
  * with its own local header (breadcrumb + the shared Detalhes|Histórico
@@ -33,12 +33,21 @@ import type { PrbDetailsData, PrbOpenQuestion, PrbPathStage } from "./prbDetails
  * This component is a pure presentation layer — it receives already-resolved
  * plain data and issues no data fetches of its own, mirroring
  * OverviewPresentation.tsx's split from its data-wiring counterpart.
+ * ProblemView.tsx is its runtime container (`view=problem`).
+ *
+ * Heading outline: the Explorer chrome owns the page-level <h1>, so the PRB
+ * title is an <h2>, top-level sections are <h3>, and nested headings descend
+ * from there. Semantic level never drives appearance — each heading's class
+ * (or its section-scoped selector in styles/prb-details.css) is the visual
+ * authority.
  */
 export interface PrbDetailsPresentationProps {
   data: PrbDetailsData;
   onOpenGeneric: (id: string) => void;
   onBackToOverview: () => void;
   onViewHistory: (id: string) => void;
+  /** Receives the focusable PRB title heading so the container can move focus to it once the async projection resolves. */
+  titleRef?: RefObject<HTMLHeadingElement>;
 }
 
 /**
@@ -95,7 +104,7 @@ function PrbHeader({ data, onBackToOverview, onViewHistory }: { data: PrbDetails
  * is shown only there — the local header breadcrumb already carries it at
  * wider widths).
  */
-function PrbIdentityHeader({ data }: { data: PrbDetailsData }) {
+function PrbIdentityHeader({ data, titleRef }: { data: PrbDetailsData; titleRef?: RefObject<HTMLHeadingElement> }) {
   return (
     <header className="prb-identity">
       <div className="prb-identity-eyebrow-row">
@@ -120,9 +129,9 @@ function PrbIdentityHeader({ data }: { data: PrbDetailsData }) {
           </span>
         )}
       </div>
-      <h1 id="prb-identity-title" className="prb-identity-title">
+      <h2 id="prb-identity-title" ref={titleRef} tabIndex={-1} className="prb-identity-title">
         {data.title}
-      </h1>
+      </h2>
       {data.statement && <p className="prb-identity-statement">{data.statement}</p>}
       {data.updatedAt && (
         <p className="prb-identity-updated">
@@ -159,9 +168,9 @@ function PrbInvestigationStateSection({ data }: { data: PrbDetailsData }) {
     <section id="prb-estado" aria-labelledby="prb-estado-heading" className="prb-state-scope-band">
       <div className="shell-frame shell-frame--wide prb-state-scope-row">
         <div className="prb-state-block">
-          <h2 id="prb-estado-heading" className="detail-panel-label">
+          <h3 id="prb-estado-heading" className="detail-panel-label">
             Estado da investigação
-          </h2>
+          </h3>
           <dl className="prb-state-grid">
             {data.status && (
               <div className="prb-state-item">
@@ -184,7 +193,7 @@ function PrbInvestigationStateSection({ data }: { data: PrbDetailsData }) {
           </dl>
         </div>
         <div className="prb-scope-block">
-          <h2 className="detail-panel-label">Âmbito</h2>
+          <h3 className="detail-panel-label">Âmbito</h3>
           <div className="prb-scope-metrics">
             <a href="#prb-questoes" className="prb-scope-metric">
               <span className="prb-scope-metric-value">{formatPublicCount(data.openQuestionCount)}</span>
@@ -231,9 +240,9 @@ function PrbSection({
   const frame = (
     <div className={bleed ? "shell-frame shell-frame--wide prb-section-frame" : "prb-section-frame"}>
       <div className="prb-section-intro">
-        <h2 id={`${id}-heading`} className="detail-panel-label">
+        <h3 id={`${id}-heading`} className="detail-panel-label">
           {label}
-        </h2>
+        </h3>
         {note && <p className="prb-section-intro-note">{note}</p>}
       </div>
       <div className="prb-section-content">{children}</div>
@@ -330,7 +339,7 @@ function OpenQuestionTextField({ label, text }: { label: string; text: string | 
   if (!text) return null;
   return (
     <div className="prb-open-question-field">
-      <h3>{label}</h3>
+      <h4>{label}</h4>
       <p>{text}</p>
     </div>
   );
@@ -358,7 +367,7 @@ function OpenQuestionItem({ index, item, stacked, onOpenGeneric }: { index: numb
   const currentAction = <OpenQuestionTextField label="O que estamos a fazer" text={item.currentAction} />;
   const relatedEvidence = item.relatedEvidenceIds.length > 0 && (
     <div className="prb-open-question-field">
-      <h3>Evidência relacionada</h3>
+      <h4>Evidência relacionada</h4>
       <ul className="prb-open-question-evidence-refs">
         {item.relatedEvidenceIds.map((id) => (
           <li key={id}>
@@ -441,13 +450,13 @@ function PrbPathSection({ stages }: { stages: PrbPathStage[] }) {
   if (stages.length === 0) return null;
   return (
     <PrbSection id="prb-percurso" label="Percurso da investigação" note="Sequência dos registos que deram forma ao problema" className="prb-path-section" bleed>
-      <h3 className="prb-path-heading">Como chegámos a este problema</h3>
+      <h4 className="prb-path-heading">Como chegámos a este problema</h4>
       <ol className="prb-path-stage-list">
         {stages.map((stage, index) => (
           <li key={stage.key} className="prb-path-stage">
             <span className="prb-path-stage-marker" aria-hidden="true" />
             <span className="prb-path-stage-index">{String(index + 1).padStart(2, "0")}</span>
-            <h4 className="prb-path-stage-label">{stage.label}</h4>
+            <h5 className="prb-path-stage-label">{stage.label}</h5>
             <p>{stage.summary}</p>
           </li>
         ))}
@@ -474,13 +483,13 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
     <section id="prb-auditoria" aria-labelledby="prb-auditoria-heading" className="prb-section prb-audit-section">
       <div className="shell-frame shell-frame--wide prb-section-frame">
         <div className="prb-section-intro">
-          <h2 id="prb-auditoria-heading" className="detail-panel-label">
+          <h3 id="prb-auditoria-heading" className="detail-panel-label">
             Evidência e auditoria
-          </h2>
+          </h3>
         </div>
         <div className="prb-section-content">
           <div className="prb-audit-lede">
-            <h3 className="prb-audit-heading">Verificar esta investigação</h3>
+            <h4 className="prb-audit-heading">Verificar esta investigação</h4>
             <p className="prb-audit-intro">
               Este problema mantém ligações explícitas a registos de evidência e às respetivas fontes. Aqui pode ver como essas relações são classificadas e
               consultar o método usado na investigação.
@@ -489,7 +498,7 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
 
           <div className="prb-audit-row prb-audit-row--first">
             <div>
-              <h4>Toda a evidência</h4>
+              <h5>Toda a evidência</h5>
               <div className="prb-audit-evidence-summary">
                 <span>
                   <strong>{formatPublicCount(data.evidenceRecordCount)}</strong> {data.evidenceRecordCount === 1 ? "registo" : "registos"}
@@ -525,14 +534,14 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
 
           <div className="prb-audit-row">
             <div>
-              <h4>Como verificamos</h4>
+              <h5>Como verificamos</h5>
               <p>
                 Cada ligação entre um registo e este problema é descrita em duas dimensões independentes. Um registo pode ter mais do que um efeito, mais do
                 que um papel e mais do que uma fonte.
               </p>
               <div className="prb-audit-dimension-grid">
                 <div>
-                  <h5>Efeito</h5>
+                  <h6>Efeito</h6>
                   <p>Como o registo se relaciona com este problema específico.</p>
                   <dl className="prb-audit-effect-legend">
                     <dt>
@@ -550,7 +559,7 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
                   </dl>
                 </div>
                 <div>
-                  <h5>Papel na investigação</h5>
+                  <h6>Papel na investigação</h6>
                   <p>Que tipo de contributo o registo representa.</p>
                   <dl className="prb-audit-role-legend">
                     <div>
@@ -576,7 +585,7 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
 
           <div className="prb-audit-row prb-audit-row--dossier">
             <div>
-              <h4>Dossiê canónico</h4>
+              <h5>Dossiê canónico</h5>
               <p>
                 Representação de auditoria de {data.problemId}: problema, questões, evidência, fontes e percurso num único documento.
               </p>
@@ -591,7 +600,7 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
   );
 }
 
-export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, onViewHistory }: PrbDetailsPresentationProps) {
+export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, onViewHistory, titleRef }: PrbDetailsPresentationProps) {
   return (
     <article aria-labelledby="prb-identity-title" className="prb-details-view">
       <div className="prb-header-band">
@@ -601,7 +610,7 @@ export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, 
       </div>
 
       <div className="shell-frame shell-frame--wide prb-details-frame">
-        <PrbIdentityHeader data={data} />
+        <PrbIdentityHeader data={data} titleRef={titleRef} />
       </div>
 
       <PrbInvestigationStateSection data={data} />

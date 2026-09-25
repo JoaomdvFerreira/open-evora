@@ -64,6 +64,13 @@ function recordsHeading(): HTMLElement {
   return screen.getByRole("heading", { name: "Registos" });
 }
 
+/** PRB-0005 with an authored open question that references EVD-000105 — scoped to PRB Details tests so generic Record Detail fixtures stay unchanged. */
+function withOpenQuestionEvidence(): Partial<DataProvider> {
+  const prb = DETAILS["PRB-0005"];
+  const detail: RecordDetail = { ...prb, record: { ...prb.record, investigation: { open_questions: [{ question: "Questão de fixture?", evidence: ["EVD-000105"] }] } } };
+  return { getRecord: (id: string) => (id === "PRB-0005" ? Promise.resolve(detail) : fakeProvider().getRecord(id)) };
+}
+
 function fakeProvider(overrides: Partial<DataProvider> = {}): DataProvider {
   return {
     getManifest: () => Promise.reject(new Error("not used in Explorer tests")),
@@ -652,13 +659,17 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
 });
 
 describe("Explorer — Problem view (RE-03)", () => {
-  it("opens a problem directly via URL, without visiting Records first", async () => {
+  it("opens a problem directly via URL into the PRB Details surface, without visiting Records first", async () => {
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
-    render(<Explorer dataProvider={fakeProvider()} />);
+    render(<Explorer dataProvider={fakeProvider(withOpenQuestionEvidence())} />);
 
-    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
-    const evidenceSection = screen.getByLabelText("Evidência");
-    expect(within(evidenceSection).getByText(/EVD-000105/)).toBeTruthy();
+    const title = await screen.findByRole("heading", { level: 2, name: /Pressão de estacionamento/ });
+    expect(title.id).toBe("prb-identity-title");
+    expect(title.closest("article")?.className).toBe("prb-details-view");
+    expect(screen.getByRole("region", { name: "O que ainda não sabemos" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Evidência e auditoria" })).toBeTruthy();
+    // The retired Problem View presentation is gone from the public route.
+    expect(document.querySelector(".problem-view, .problem-reading-rail, #problem-evidencia")).toBeNull();
   });
 
   it("the PRB Record Detail 'Ver página do problema' action switches to the Problem view for the same ID", async () => {
@@ -782,14 +793,14 @@ describe("Explorer — Problem view (RE-03)", () => {
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
   });
 
-  it("clicking a linked Evidence in the Problem view opens it through the generic Records detail", async () => {
+  it("clicking a related Evidence identifier in PRB Details opens it through the generic Records detail", async () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
-    render(<Explorer dataProvider={fakeProvider()} />);
+    render(<Explorer dataProvider={fakeProvider(withOpenQuestionEvidence())} />);
 
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
-    const evidenceSection = screen.getByLabelText("Evidência");
-    await user.click(within(evidenceSection).getByRole("button", { name: /EVD-000105/ }));
+    const openQuestions = screen.getByRole("region", { name: "O que ainda não sabemos" });
+    await user.click(within(openQuestions).getByRole("button", { name: "Abrir EVD-000105" }));
 
     // V2: opens the Record Detail composition for EVD-000105 (Records view,
     // not Problem view) — not the Records table, since a record is selected.
@@ -825,13 +836,55 @@ describe("Explorer — Problem view (RE-03)", () => {
   // untouched; GraphExplorer.test.tsx / graph/* tests continue to exercise
   // it directly at the component level.
 
-  it("UX-C: Problem View's help/rail no longer link to a #reading-guide that doesn't exist on this surface", async () => {
+  it("UX-C: PRB Details does not link to a #reading-guide that doesn't exist on this surface", async () => {
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
     expect(screen.queryByRole("link", { name: /Orientação completa do Explorer/ })).toBeNull();
     expect(document.querySelector('a[href="#reading-guide"]')).toBeNull();
+  });
+});
+
+describe("Explorer — global manifest summary placement", () => {
+  const manifestProps = { totalRecords: 4, generatedAt: "2026-09-01T10:00:00Z" };
+  const manifestSummary = () => document.querySelector(".manifest-summary");
+
+  it("is absent on PRB Details, whose audit band is the terminal content band", async () => {
+    window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
+    render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
+    await screen.findByRole("region", { name: "Evidência e auditoria" });
+    expect(manifestSummary()).toBeNull();
+    expect(screen.queryByText(/Corpus:/)).toBeNull();
+  });
+
+  it("is absent on Overview", async () => {
+    window.history.replaceState(null, "", "/");
+    render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
+    await screen.findByRole("heading", { name: "Visão geral" });
+    expect(manifestSummary()).toBeNull();
+  });
+
+  it("remains on Records, including Record Detail", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
+    await screen.findByRole("button", { name: /PRB-0005/ });
+    expect(manifestSummary()?.textContent).toContain("Corpus: 4 registos");
+    await user.click(screen.getByRole("button", { name: /EVD-000105/ }));
+    await getDetailPanel();
+    expect(manifestSummary()).toBeTruthy();
+  });
+
+  it("remains on PRB History, and returns when leaving PRB Details for it", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
+    render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
+    const nav = await screen.findByRole("navigation", { name: "Vistas do problema" });
+    expect(manifestSummary()).toBeNull();
+    await user.click(within(nav).getByRole("button", { name: "Histórico" }));
+    await screen.findByText("Não existe histórico material registado para este problema.");
+    expect(window.location.search).toContain("view=history");
+    expect(manifestSummary()?.textContent).toContain("Corpus: 4 registos");
   });
 });
 
@@ -1028,12 +1081,12 @@ describe("Explorer — URL normalization preserves window.location.hash (F08)", 
   });
 
   it("preserves a valid hash while UX-F's view=graph normalization rewrites the query", async () => {
-    window.history.replaceState(null, "", "/?view=graph&id=PRB-0005#problem-evidencia");
+    window.history.replaceState(null, "", "/?view=graph&id=PRB-0005#prb-auditoria");
     render(<Explorer dataProvider={fakeProvider()} />);
 
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
     expect(window.location.search).toContain("view=problem");
-    expect(window.location.hash).toBe("#problem-evidencia");
+    expect(window.location.hash).toBe("#prb-auditoria");
   });
 
   it("preserves a valid hash across a popstate-driven normalization", async () => {
@@ -1083,17 +1136,26 @@ describe("Explorer — URL normalization preserves window.location.hash (F08)", 
    * both bugs' real-world trigger at once.
    */
   it("a direct PRB deep link with a reordered query and a section fragment ends with that section focused, not the heading", async () => {
-    window.history.replaceState(null, "", "/?id=PRB-0005&view=problem#problem-evidencia");
+    window.history.replaceState(null, "", "/?id=PRB-0005&view=problem#prb-auditoria");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    const evidenceSection = await screen.findByLabelText("Evidência");
-    await waitFor(() => expect(document.activeElement).toBe(evidenceSection));
+    const auditSection = await screen.findByRole("region", { name: "Evidência e auditoria" });
+    await waitFor(() => expect(document.activeElement).toBe(auditSection));
 
     // (2) normalization ran (canonical view-before-id order) without (8)
     // losing the fragment, and (5) the heading was never the final focus.
     expect(window.location.search.indexOf("view=")).toBeLessThan(window.location.search.indexOf("id="));
-    expect(window.location.hash).toBe("#problem-evidencia");
+    expect(window.location.hash).toBe("#prb-auditoria");
     expect(document.activeElement).not.toBe(screen.getByRole("heading", { name: /Pressão de estacionamento/ }));
+  });
+
+  it("a direct PRB deep link with a retired Problem View fragment keeps the URL hash but focuses the PRB title", async () => {
+    window.history.replaceState(null, "", "/?view=problem&id=PRB-0005#problem-evidencia");
+    render(<Explorer dataProvider={fakeProvider()} />);
+
+    const title = await screen.findByRole("heading", { level: 2, name: /Pressão de estacionamento/ });
+    await waitFor(() => expect(document.activeElement).toBe(title));
+    expect(window.location.hash).toBe("#problem-evidencia");
   });
 });
 

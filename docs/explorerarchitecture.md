@@ -56,8 +56,6 @@ The public Problem context has exactly two views:
 - `Detalhes`;
 - `Histórico`.
 
-Transition: this is the adopted, owner-approved architecture. Until runtime integration lands, the running Explorer may still expose the earlier `Detalhe | Problema | Histórico` context navigation; that is implementation lag, not a competing contract.
-
 ### 3.2 `Detalhes`
 
 `Detalhes` is the primary public Problem reading and verification surface. It answers:

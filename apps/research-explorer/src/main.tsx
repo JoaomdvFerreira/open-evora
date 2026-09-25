@@ -53,9 +53,11 @@ import "./styles/section-index.css";
 // into the chrome header, needs its own narrow visual recipe.
 import "./styles/logo.css";
 import "./styles/topic.css";
-// PRB-local Detalhes|Histórico navigation (ContextTabs) appearance only —
-// not styles/prb-details.css, which is not yet a production dependency.
-import "./styles/prb-view-selector.css";
+// The public PRB Details composition (PrbDetailsPresentation, rendered by
+// ProblemView). prb-details.css itself imports prb-view-selector.css, so the
+// PRB-local Detalhes|Histórico navigation (ContextTabs) keeps its appearance
+// on ProblemHistoryView too without a second standalone import here.
+import "./styles/prb-details.css";
 
 const container = document.getElementById("root");
 if (!container) {

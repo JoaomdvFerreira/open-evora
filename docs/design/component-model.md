@@ -4,7 +4,7 @@ Status: **APPROVED — DS-03A / Gate C1 PASS**
 
 Scope: approved component and layout boundaries derived from the current Research Explorer. This document defines a bounded architecture for later implementation. It does not approve exact component APIs, freeze token values, redesign pages, or change production React/CSS.
 
-The current implementation is the primary evidence for current-state claims, except where a later owner-approved architecture decision is recorded below. The PRB context contract (`Detalhes | Histórico`) follows `docs/explorerarchitecture.md` §3 and supersedes the three-context model that existed during DS-03A; runtime integration of that decision is pending. In particular, `RecordsExplorer` now renders the records list and a selected full-page detail mutually exclusively; `.records-explorer` no longer contains a persistent table-and-detail split.
+The current implementation is the primary evidence for current-state claims, except where a later owner-approved architecture decision is recorded below. The PRB context contract (`Detalhes | Histórico`) follows `docs/explorerarchitecture.md` §3 and supersedes the three-context model that existed during DS-03A. In particular, `RecordsExplorer` now renders the records list and a selected full-page detail mutually exclusively; `.records-explorer` no longer contains a persistent table-and-detail split.
 
 ## 1. Architecture principles
 

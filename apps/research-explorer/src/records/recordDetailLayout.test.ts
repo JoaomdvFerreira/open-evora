@@ -106,13 +106,9 @@ describe("ReadingLayout production adoption", () => {
     expect(recordDetailSource).not.toMatch(/className="record-detail-rail/);
   });
 
-  it("Problem View uses the same lyt-reading / data-rail=\"present\" / lyt-reading-main composition", () => {
-    expect(problemViewSource).toMatch(/className="lyt-reading" data-rail="present"/);
-    expect(problemViewSource).toMatch(/className="record-detail-main lyt-reading-main"/);
-  });
-
-  it("ProblemReadingRail's <aside> carries lyt-reading-rail problem-reading-rail", () => {
-    expect(problemViewSource).toMatch(/<aside className="lyt-reading-rail problem-reading-rail">/);
+  it("Problem View does not use the ReadingLayout 720+rail composition — PRB Details owns its own wide geometry", () => {
+    expect(problemViewSource).not.toMatch(/lyt-reading/);
+    expect(problemViewSource).not.toMatch(/problem-reading-rail/);
   });
 
   it("Problem View production JSX no longer uses problem-view-columns", () => {

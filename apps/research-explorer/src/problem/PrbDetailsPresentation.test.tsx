@@ -1,3 +1,4 @@
+import { createRef } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
@@ -51,6 +52,63 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     renderPrb({ title: "Título canónico do problema", problem_statement: "Formulação canónica delimitada." });
     expect(screen.getByRole("heading", { name: "Título canónico do problema" })).toBeTruthy();
     expect(screen.getByText("Formulação canónica delimitada.")).toBeTruthy();
+  });
+
+  it("renders the PRB title as a programmatically focusable h2 below the Explorer's page-level h1, exposed through titleRef", () => {
+    const titleRef = createRef<HTMLHeadingElement>();
+    render(<PrbDetailsPresentation data={buildPrbDetailsData(baseProjection({ title: "Título" }, []))} {...handlers} titleRef={titleRef} />);
+    const title = screen.getByRole("heading", { level: 2, name: "Título" });
+    expect(title.id).toBe("prb-identity-title");
+    expect(title.className).toBe("prb-identity-title");
+    expect(title.getAttribute("tabindex")).toBe("-1");
+    expect(titleRef.current).toBe(title);
+    expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
+    expect(screen.getByRole("article").getAttribute("aria-labelledby")).toBe("prb-identity-title");
+  });
+
+  it("keeps a descending heading outline: title h2, top-level sections h3, nested headings below them without skipped levels", () => {
+    const record = {
+      title: "Título",
+      causal_reading: "Leitura.",
+      status: "OPEN",
+      investigation: {
+        open_questions: [{ question: "Q?", why_open: "Motivo.", evidence: ["EVD-1"] }],
+        path: { initial_signal: { summary: "Sinal." } },
+      },
+    };
+    const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS"])]);
+    const outline = Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6")).map((heading) => [Number(heading.tagName[1]), heading.textContent]);
+    expect(outline).toEqual([
+      [2, "Título"],
+      [3, "Estado da investigação"],
+      [3, "Âmbito"],
+      [3, "Leitura atual"],
+      [3, "O que ainda não sabemos"],
+      [4, "Porque continua em aberto"],
+      [4, "Evidência relacionada"],
+      [3, "Percurso da investigação"],
+      [4, "Como chegámos a este problema"],
+      [5, "Sinal inicial"],
+      [3, "Evidência e auditoria"],
+      [4, "Verificar esta investigação"],
+      [5, "Toda a evidência"],
+      [5, "Como verificamos"],
+      [6, "Efeito"],
+      [6, "Papel na investigação"],
+      [5, "Dossiê canónico"],
+    ]);
+    for (let i = 1; i < outline.length; i += 1) {
+      expect((outline[i][0] as number) - (outline[i - 1][0] as number)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("keeps each top-level section labelled by its own h3 heading", () => {
+    renderPrb({ title: "T", causal_reading: "Leitura.", investigation: { open_questions: [{ question: "Q?" }], path: { initial_signal: { summary: "S." } } } });
+    for (const name of ["Estado da investigação", "Leitura atual", "O que ainda não sabemos", "Percurso da investigação", "Evidência e auditoria"]) {
+      const region = screen.getByRole("region", { name });
+      const heading = document.getElementById(region.getAttribute("aria-labelledby")!);
+      expect(heading?.tagName).toBe("H3");
+    }
   });
 
   it("renders state/evidence/validation labels only when their canonical field is present", () => {
@@ -138,7 +196,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     };
     const { container } = renderPrb(record, []);
     const fields = Array.from(requireElement(container, ".prb-open-question-grid").querySelectorAll(".prb-open-question-field")).map((field) => [
-      field.querySelector("h3")?.textContent,
+      field.querySelector("h4")?.textContent,
       field.querySelector("p")?.textContent ?? field.querySelector(".rec-identifier")?.textContent,
     ]);
     expect(fields).toEqual([
@@ -156,7 +214,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
       investigation: { open_questions: [{ question: "Questão só com motivo?", why_open: "Motivo." }] },
     };
     const { container } = renderPrb(record, []);
-    const labels = Array.from(requireElement(container, ".prb-open-question-grid").querySelectorAll("h3")).map((heading) => heading.textContent);
+    const labels = Array.from(requireElement(container, ".prb-open-question-grid").querySelectorAll("h4")).map((heading) => heading.textContent);
     expect(labels).toEqual(["Porque continua em aberto"]);
   });
 
@@ -175,7 +233,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     }
 
     function fieldLabels(scope: Element) {
-      return Array.from(scope.querySelectorAll(":scope > .prb-open-question-field > h3")).map((heading) => heading.textContent);
+      return Array.from(scope.querySelectorAll(":scope > .prb-open-question-field > h4")).map((heading) => heading.textContent);
     }
 
     it("keeps latest_result full-width, then why_open/current_action left and resolution_condition/evidence right", () => {
@@ -205,7 +263,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
       stubWideViewport();
       const { container } = renderPrb({ title: "T", investigation: { open_questions: [{ question: "Q?", why_open: "Motivo." }] } });
       const grid = requireElement(container, ".prb-open-question-grid--stacked");
-      expect(Array.from(grid.querySelectorAll("h3")).map((heading) => heading.textContent)).toEqual(["Porque continua em aberto"]);
+      expect(Array.from(grid.querySelectorAll("h4")).map((heading) => heading.textContent)).toEqual(["Porque continua em aberto"]);
       expect(grid.querySelector(".prb-open-question-stack--secondary")).toBeNull();
     });
 
@@ -244,7 +302,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
 
   it("has no standalone selected-evidence section — evidence observations never render as page-level statements", () => {
     const { container } = renderPrb({ title: "T", causal_reading: "Leitura." }, [evd("EVD-1", "Observação da evidência.", ["SUPPORTS"], ["LOCAL_OBSERVATION"], ["Fonte A"])]);
-    expect(screen.queryByRole("heading", { level: 2, name: "O que sabemos até agora" })).toBeNull();
+    expect(screen.queryByRole("heading", { level: 3, name: "O que sabemos até agora" })).toBeNull();
     expect(container.querySelector("#prb-sabemos, .prb-known-evidence-list, .prb-evidence-meta")).toBeNull();
     expect(screen.queryByText("Observação da evidência.")).toBeNull();
   });
