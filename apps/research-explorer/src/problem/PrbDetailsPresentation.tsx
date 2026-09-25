@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { RecordIdentifier } from "../records/RecordIdentifier";
@@ -307,6 +307,42 @@ function PrbEffectLabel({ effect, children }: { effect: string; children?: React
 }
 
 /**
+ * Open-question fields use two independent vertical stacks at >=1024 and a
+ * single column below. The breakpoint is read in JS rather than CSS alone so
+ * the DOM order always equals the visual order: a flat list cannot flow as
+ * two height-independent columns in CSS, and CSS `order` over stack wrappers
+ * would make the single-column reading order diverge from the visual one.
+ * Must stay in step with the 1024 breakpoint in styles/prb-details.css.
+ * Environments without matchMedia (jsdom) get the single-column order.
+ */
+const OPEN_QUESTION_STACKS_QUERY = "(min-width: 1024px)";
+
+function subscribeOpenQuestionStacks(onChange: () => void) {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {};
+  const query = window.matchMedia(OPEN_QUESTION_STACKS_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+function openQuestionStacksActive() {
+  return typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia(OPEN_QUESTION_STACKS_QUERY).matches;
+}
+
+function useOpenQuestionStacks() {
+  return useSyncExternalStore(subscribeOpenQuestionStacks, openQuestionStacksActive, () => false);
+}
+
+function OpenQuestionTextField({ label, text }: { label: string; text: string | null }) {
+  if (!text) return null;
+  return (
+    <div className="prb-open-question-field">
+      <h3>{label}</h3>
+      <p>{text}</p>
+    </div>
+  );
+}
+
+/**
  * One `investigation.open_questions[]` item. Each canonical field renders in
  * its own labelled block only when authored — never merged into a synthetic
  * summary and never given fallback prose. `current_action` is rendered as
@@ -314,38 +350,60 @@ function PrbEffectLabel({ effect, children }: { effect: string; children?: React
  * "WATCH —"/"STOP —" keyword, never turned into a badge/posture, and never
  * replaced with the approved HTML reference's illustrative "Acompanhar"
  * label, which has no canonical counterpart for every question.
+ *
+ * `latestResult` always spans the full width. Single column (<1024) follows
+ * the semantic order latestResult → whyOpen → resolutionCondition →
+ * currentAction → relatedEvidenceIds; at >=1024 the remaining fields split
+ * into a left stack (whyOpen, currentAction) and a right stack
+ * (resolutionCondition, relatedEvidenceIds) that flow independently.
  */
-function OpenQuestionItem({ index, item, onOpenGeneric }: { index: number; item: PrbOpenQuestion; onOpenGeneric: (id: string) => void }) {
-  const fields: { label: string; text: string | null }[] = [
-    { label: "O que sabemos até agora", text: item.latestResult },
-    { label: "Porque continua em aberto", text: item.whyOpen },
-    { label: "O que falta confirmar", text: item.resolutionCondition },
-    { label: "O que estamos a fazer", text: item.currentAction },
-  ];
+function OpenQuestionItem({ index, item, stacked, onOpenGeneric }: { index: number; item: PrbOpenQuestion; stacked: boolean; onOpenGeneric: (id: string) => void }) {
+  const latestResult = <OpenQuestionTextField label="O que sabemos até agora" text={item.latestResult} />;
+  const whyOpen = <OpenQuestionTextField label="Porque continua em aberto" text={item.whyOpen} />;
+  const resolutionCondition = <OpenQuestionTextField label="O que falta confirmar" text={item.resolutionCondition} />;
+  const currentAction = <OpenQuestionTextField label="O que estamos a fazer" text={item.currentAction} />;
+  const relatedEvidence = item.relatedEvidenceIds.length > 0 && (
+    <div className="prb-open-question-field">
+      <h3>Evidência relacionada</h3>
+      <ul className="prb-open-question-evidence-refs">
+        {item.relatedEvidenceIds.map((id) => (
+          <li key={id}>
+            <RecordIdentifier variant="action" id={id} density="compact" onActivate={() => onOpenGeneric(id)} accessibleLabel={`Abrir ${id}`} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+  const hasPrimaryStack = Boolean(item.whyOpen || item.currentAction);
+  const hasSecondaryStack = Boolean(item.resolutionCondition || item.relatedEvidenceIds.length > 0);
   return (
     <li className="prb-open-question-item">
       <div className="prb-open-question-index">Questão {index + 1}</div>
       <p className="prb-open-question-text">{item.question}</p>
-      <div className="prb-open-question-grid">
-        {fields
-          .filter(({ text }) => text)
-          .map(({ label, text }) => (
-            <div key={label} className="prb-open-question-field">
-              <h3>{label}</h3>
-              <p>{text}</p>
-            </div>
-          ))}
-        {item.relatedEvidenceIds.length > 0 && (
-          <div className="prb-open-question-field">
-            <h3>Evidência relacionada</h3>
-            <ul className="prb-open-question-evidence-refs">
-              {item.relatedEvidenceIds.map((id) => (
-                <li key={id}>
-                  <RecordIdentifier variant="action" id={id} density="compact" onActivate={() => onOpenGeneric(id)} accessibleLabel={`Abrir ${id}`} />
-                </li>
-              ))}
-            </ul>
-          </div>
+      <div className={stacked ? "prb-open-question-grid prb-open-question-grid--stacked" : "prb-open-question-grid"}>
+        {latestResult}
+        {stacked ? (
+          <>
+            {hasPrimaryStack && (
+              <div className="prb-open-question-stack prb-open-question-stack--primary">
+                {whyOpen}
+                {currentAction}
+              </div>
+            )}
+            {hasSecondaryStack && (
+              <div className="prb-open-question-stack prb-open-question-stack--secondary">
+                {resolutionCondition}
+                {relatedEvidence}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {whyOpen}
+            {resolutionCondition}
+            {currentAction}
+            {relatedEvidence}
+          </>
         )}
       </div>
     </li>
@@ -353,6 +411,7 @@ function OpenQuestionItem({ index, item, onOpenGeneric }: { index: number; item:
 }
 
 function PrbOpenQuestionsSection({ questions, onOpenGeneric }: { questions: PrbOpenQuestion[]; onOpenGeneric: (id: string) => void }) {
+  const stacked = useOpenQuestionStacks();
   if (questions.length === 0) return null;
   return (
     <PrbSection
@@ -362,7 +421,7 @@ function PrbOpenQuestionsSection({ questions, onOpenGeneric }: { questions: PrbO
     >
       <ul className="prb-open-question-list">
         {questions.map((item, index) => (
-          <OpenQuestionItem key={index} index={index} item={item} onOpenGeneric={onOpenGeneric} />
+          <OpenQuestionItem key={index} index={index} item={item} stacked={stacked} onOpenGeneric={onOpenGeneric} />
         ))}
       </ul>
       <p className="prb-contribute-prompt">
@@ -377,10 +436,12 @@ function PrbOpenQuestionsSection({ questions, onOpenGeneric }: { questions: PrbO
  * only (initial_signal/development/delimitation, in that fixed order). No
  * completion/current/pending state exists in canonical data, so none is
  * rendered here — each stage is an equally-weighted step in a sequence, not
- * a progress indicator. Horizontal at 1440/1024/768, vertical at 360
- * (styles/prb-details.css). The approved presentation shows only sequence
- * number, stage label and authored summary: each stage's `evidenceIds` stay
- * available on the projection but are not rendered here.
+ * a progress indicator. The same vertical timeline (rail, marker, 01/02/03
+ * sequence number, label, summary) at every width; only spacing and reading
+ * width scale with the breakpoint (styles/prb-details.css). The approved
+ * presentation shows only sequence number, stage label and authored
+ * summary: each stage's `evidenceIds` stay available on the projection but
+ * are not rendered here.
  */
 function PrbPathSection({ stages }: { stages: PrbPathStage[] }) {
   if (stages.length === 0) return null;

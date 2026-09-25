@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
 import { buildPrbDetailsData } from "./prbDetailsProjection";
@@ -145,6 +145,64 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(labels).toEqual(["Porque continua em aberto"]);
   });
 
+  describe("at >=1024 (two independent stacks)", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    function stubWideViewport() {
+      vi.stubGlobal("matchMedia", (query: string) => ({
+        matches: query === "(min-width: 1024px)",
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }));
+    }
+
+    function fieldLabels(scope: Element) {
+      return Array.from(scope.querySelectorAll(":scope > .prb-open-question-field > h3")).map((heading) => heading.textContent);
+    }
+
+    it("keeps latest_result full-width, then why_open/current_action left and resolution_condition/evidence right", () => {
+      stubWideViewport();
+      const { container } = renderPrb({
+        title: "T",
+        investigation: {
+          open_questions: [
+            {
+              question: "Q?",
+              latest_result: "Resultado.",
+              why_open: "Motivo.",
+              resolution_condition: "Condição.",
+              current_action: "Ação.",
+              evidence: ["EVD-1"],
+            },
+          ],
+        },
+      });
+      const grid = requireElement(container, ".prb-open-question-grid--stacked");
+      expect(fieldLabels(grid)).toEqual(["O que sabemos até agora"]);
+      expect(fieldLabels(requireElement(grid, ".prb-open-question-stack--primary"))).toEqual(["Porque continua em aberto", "O que estamos a fazer"]);
+      expect(fieldLabels(requireElement(grid, ".prb-open-question-stack--secondary"))).toEqual(["O que falta confirmar", "Evidência relacionada"]);
+    });
+
+    it("omits absent fields and empty stacks, never a placeholder", () => {
+      stubWideViewport();
+      const { container } = renderPrb({ title: "T", investigation: { open_questions: [{ question: "Q?", why_open: "Motivo." }] } });
+      const grid = requireElement(container, ".prb-open-question-grid--stacked");
+      expect(Array.from(grid.querySelectorAll("h3")).map((heading) => heading.textContent)).toEqual(["Porque continua em aberto"]);
+      expect(grid.querySelector(".prb-open-question-stack--secondary")).toBeNull();
+    });
+
+    it("keeps a WATCH current_action verbatim", () => {
+      stubWideViewport();
+      const watch = "WATCH — monitorizar medições pós-abertura.";
+      const { container } = renderPrb({ title: "T", investigation: { open_questions: [{ question: "Q?", current_action: watch }] } });
+      expect(requireElement(container, ".prb-open-question-stack--primary").querySelector("p")?.textContent).toBe(watch);
+      expect(screen.queryByText("WATCH")).toBeNull();
+    });
+  });
+
   it("renders a WATCH current_action verbatim as free text — no parsed badge, posture or hidden token", () => {
     const watch = "WATCH — monitorizar medições pós-abertura; a abertura, por si só, não é impacto realizado.";
     const { container } = renderPrb({ title: "T", investigation: { open_questions: [{ question: "Q?", current_action: watch }] } }, []);
@@ -188,6 +246,32 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(path.querySelector('[class*="complete"]')).toBeNull();
     expect(path.querySelector('[class*="current"]')).toBeNull();
     expect(path.querySelector('[class*="pending"]')).toBeNull();
+  });
+
+  it("renders path stages in authored stage order with 01/02/03 sequence numbers", () => {
+    const record = {
+      title: "T",
+      investigation: {
+        path: { delimitation: { summary: "Delimitação." }, initial_signal: { summary: "Sinal." }, development: { summary: "Desenvolvimento." } },
+      },
+    };
+    const { container } = renderPrb(record, []);
+    const stages = Array.from(requireElement(container, ".prb-path-stage-list").querySelectorAll(".prb-path-stage")).map((stage) => [
+      stage.querySelector(".prb-path-stage-index")?.textContent,
+      stage.querySelector(".prb-path-stage-label")?.textContent,
+    ]);
+    expect(stages).toEqual([
+      ["01", "Sinal inicial"],
+      ["02", "Desenvolvimento"],
+      ["03", "Delimitação"],
+    ]);
+  });
+
+  it("keeps the dossier download control present but disabled", () => {
+    renderPrb({ title: "T" }, []);
+    const dossier = screen.getByRole("button", { name: "↓ Descarregar dossiê (PDF)" });
+    expect(dossier).toHaveProperty("disabled", true);
+    expect(dossier.getAttribute("aria-disabled")).toBe("true");
   });
 
   it("renders path stages as sequence number, label and summary only — stage evidence IDs stay on the projection, not in the UI", () => {

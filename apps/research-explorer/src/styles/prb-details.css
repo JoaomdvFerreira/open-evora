@@ -42,8 +42,10 @@
   --prb-path-margin-top: 112px;
   --prb-path-pad-top: 72px;
   --prb-path-pad-bottom: 104px;
-  --prb-path-stage-gap: 56px;
+  --prb-path-stage-gap: 48px;
   --prb-path-stage-label-size: 24px;
+  --prb-path-rail-indent: 40px;
+  --prb-path-reading-width: 44rem;
   --prb-band-heading-size: 34px;
   --prb-audit-pad-top: 72px;
   --prb-audit-pad-bottom: 88px;
@@ -533,16 +535,39 @@
   text-wrap: pretty;
 }
 
-/* Up to five independently authored fields per question: the first present
-   field spans the row, the rest pair in two equal columns. */
+/* Up to five independently authored fields per question. Single column by
+   default (semantic order); at >=1024 the component renders the `--stacked`
+   form: latest result full-width, then two independently flowing stacks
+   (PrbDetailsPresentation.tsx, OPEN_QUESTION_STACKS_QUERY). */
 .prb-open-question-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: var(--prb-question-grid-gap);
 }
 
-.prb-open-question-grid > .prb-open-question-field:first-child {
+.prb-open-question-grid--stacked {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.prb-open-question-grid--stacked > .prb-open-question-field {
   grid-column: 1 / -1;
+}
+
+.prb-open-question-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prb-question-grid-gap);
+  min-width: 0;
+}
+
+.prb-open-question-stack--primary {
+  grid-column: 1;
+}
+
+.prb-open-question-stack--secondary {
+  grid-column: 2;
 }
 
 .prb-open-question-field h3 {
@@ -587,7 +612,7 @@
   font-weight: 600;
 }
 
-/* ---- "Percurso da investigação" — horizontal at >=768 ------------------- */
+/* ---- "Percurso da investigação" — vertical timeline at every width ------ */
 
 .prb-path-section {
   margin-top: var(--prb-path-margin-top);
@@ -608,37 +633,38 @@
 }
 
 .prb-path-stage-list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--prb-path-stage-gap);
+  max-width: var(--prb-path-reading-width);
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 var(--prb-path-rail-indent);
 }
 
 .prb-path-stage {
   position: relative;
-  padding-top: 36px;
 }
 
-/* Neutral equal sequence markers — one dot per stage plus a connector to
-   the next stage's dot (drawn per stage, so it spans exactly the stages
-   that exist), never a completion/current/pending progress indicator. */
+/* Neutral equal sequence markers on a left rail — one dot per stage plus a
+   connector down to the next stage's dot (drawn per stage, so it spans
+   exactly the stages that exist), never a completion/current/pending
+   progress indicator. */
 .prb-path-stage:not(:last-child)::after {
   content: "";
   position: absolute;
-  left: 6px;
-  top: 5px;
-  width: calc(100% + var(--prb-path-stage-gap));
-  height: 2px;
+  left: calc(10px - var(--prb-path-rail-indent));
+  top: 21px;
+  bottom: calc(-4px - var(--prb-path-stage-gap));
+  width: 2px;
   background: var(--color-separator-standard);
 }
 
 .prb-path-stage-marker {
   position: absolute;
   z-index: 1;
-  left: 0;
-  top: 0;
+  left: calc(5px - var(--prb-path-rail-indent));
+  top: 5px;
   width: 12px;
   height: 12px;
   border-radius: 50%;
@@ -808,6 +834,16 @@
   opacity: 0.6;
 }
 
+/* Disabled dossier placeholder: quiet outline treatment so it never reads
+   as an active primary CTA, while the label stays legible. */
+.prb-audit-dossier-cta[disabled] {
+  color: var(--color-ink-muted);
+  border-color: var(--color-separator-standard);
+  background: transparent;
+  font-weight: 500;
+  opacity: 1;
+}
+
 .prb-audit-dimension-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -902,6 +938,7 @@
     --prb-path-pad-top: 60px;
     --prb-path-pad-bottom: 80px;
     --prb-path-stage-gap: 40px;
+    --prb-path-rail-indent: 36px;
     --prb-band-heading-size: 30px;
     --prb-audit-pad-top: 60px;
   }
@@ -924,7 +961,8 @@
     --prb-path-margin-top: 96px;
     --prb-path-pad-top: 60px;
     --prb-path-pad-bottom: 80px;
-    --prb-path-stage-gap: 28px;
+    --prb-path-stage-gap: 36px;
+    --prb-path-rail-indent: 36px;
     --prb-path-stage-label-size: 22px;
     --prb-band-heading-size: 28px;
     --prb-audit-pad-top: 60px;
@@ -952,7 +990,7 @@
   }
 
   .prb-open-question-grid {
-    gap: 24px 32px;
+    gap: 24px;
   }
 }
 
@@ -968,6 +1006,9 @@
     --prb-path-margin-top: 48px;
     --prb-path-pad-top: 36px;
     --prb-path-pad-bottom: 40px;
+    --prb-path-stage-gap: 28px;
+    --prb-path-rail-indent: 28px;
+    --prb-path-reading-width: none;
     --prb-path-stage-label-size: 20px;
     --prb-band-heading-size: 24px;
     --prb-audit-pad-top: 36px;
@@ -1147,7 +1188,6 @@
   }
 
   .prb-open-question-grid {
-    grid-template-columns: minmax(0, 1fr);
     gap: 18px;
   }
 
@@ -1170,34 +1210,10 @@
     min-height: var(--target-min);
   }
 
-  /* Vertical timeline: markers connected by a left rail instead of a
-     horizontal row. */
+  /* Vertical timeline: same model as wider widths, compact spacing via the
+     --prb-path-* custom properties above. */
   .prb-path-heading {
     margin-bottom: 26px;
-  }
-
-  .prb-path-stage-list {
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-    padding-left: 28px;
-  }
-
-  .prb-path-stage {
-    padding-top: 0;
-  }
-
-  .prb-path-stage-marker {
-    left: -23px;
-    top: 5px;
-  }
-
-  .prb-path-stage:not(:last-child)::after {
-    left: -18px;
-    top: 21px;
-    bottom: -32px;
-    width: 2px;
-    height: auto;
   }
 
   .prb-path-stage-index {
