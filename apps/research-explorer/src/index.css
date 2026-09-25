@@ -798,11 +798,16 @@ a:hover {
   color: var(--color-accent);
 }
 
+/* `--explorer-shell-gutter` is the shell's own inline gutter (2rem, 1rem
+   <=767px), exposed so a descendant band that must bleed through it (PRB
+   Details' terminal audit band, prb-details.css) stays synchronized with the
+   shell rather than restating the number. */
 main.explorer-shell {
+  --explorer-shell-gutter: 2rem;
   box-sizing: border-box;
   max-width: none;
   margin: 0;
-  padding: 0 2rem 3rem;
+  padding: 0 var(--explorer-shell-gutter) 3rem;
 }
 
 .explorer-chrome {
@@ -3602,7 +3607,8 @@ body:has(.public-overview) .public-footer {
 
 @media (max-width: 767px) {
   main.explorer-shell {
-    padding: 0 1rem 2rem;
+    --explorer-shell-gutter: 1rem;
+    padding: 0 var(--explorer-shell-gutter) 2rem;
   }
 
   .trust-experience { padding-top: var(--space-standard); }

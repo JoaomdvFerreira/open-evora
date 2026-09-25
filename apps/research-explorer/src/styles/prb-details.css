@@ -668,9 +668,33 @@
 
 /* ---- "Evidência e auditoria" --------------------------------------------- */
 
+/* Terminal band (explorerarchitecture.md §3.5): its outer surface (background
+   + top rule) bleeds through `main.explorer-shell`'s inline gutter via the
+   shell's own `--explorer-shell-gutter` (2rem, 1rem <=767px), so it reaches
+   the same outer edges as the full-width PublicFooter. The matching inline
+   padding returns the content box to exactly the shell's content width, so
+   the inner `shell-frame shell-frame--wide` stays the content-alignment
+   owner on the same axes as every other PRB band. The 0px fallback keeps the
+   band in-flow if rendered outside the shell. */
 .prb-audit-section {
+  margin-inline: calc(-1 * var(--explorer-shell-gutter, 0px));
+  padding-inline: var(--explorer-shell-gutter, 0px);
   border-top: 1px solid var(--color-ink-primary);
   background: var(--color-surface-subtle);
+}
+
+/* PRB Details terminal composition: the audit band's own
+   `--prb-audit-pad-bottom` is the sole breathing room before the footer, so
+   the shared layers that would otherwise add a second gap — the shell's
+   bottom padding and the footer's top margin — are neutralized for this
+   surface only (same body:has() scoping as the Overview treatment in
+   index.css; Records/History/Graph/Trust keep both). */
+body:has(.prb-details-view) main.explorer-shell {
+  padding-bottom: 0;
+}
+
+body:has(.prb-details-view) .public-footer {
+  margin-top: 0;
 }
 
 .prb-audit-section .prb-section-frame {
