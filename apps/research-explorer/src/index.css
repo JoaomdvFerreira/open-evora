@@ -3782,11 +3782,14 @@ body:has(.public-overview) .public-footer {
     display: none;
   }
 
+  /* Open-menu separation (<=767px only): block padding keeps the first and
+     last items clear of the menu's top rule and the CTA's own top rule. */
   .explorer-navigation {
     width: 100%;
     flex-direction: column;
     gap: 0;
     margin-bottom: 0;
+    padding-block: 0.4rem;
   }
 
   .explorer-cta {
@@ -3811,6 +3814,19 @@ body:has(.public-overview) .public-footer {
     padding: 0.7rem 1rem;
     font-size: 0.85rem;
     text-align: left;
+  }
+
+  /* Open-menu item rhythm (<=767px only): the desktop density rule
+     `.explorer-navigation .explorer-navigation-action { padding-block: 0 }`
+     (base, above) outranks the element-level rule just above, which left the
+     stacked Problemas/Método/Fontes/Sobre items with no vertical padding.
+     Restated at that same selector so each item gets a comfortable tap row;
+     desktop and the 768px-1059px fit range keep their zero block padding.
+     Border-box so <a> and <button> items resolve to the same row height. */
+  .explorer-navigation .explorer-navigation-action {
+    box-sizing: border-box;
+    min-height: var(--target-min);
+    padding-block: 0.7rem;
   }
 
   .reading-guide {

@@ -128,9 +128,9 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     const record = { title: "T", investigation: { open_questions: [{ question: "Única questão?" }] } };
     const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS"])]);
     const scope = requireElement(container, ".prb-scope-metrics");
-    expect(within(scope).getByText("questão aberta")).toBeTruthy();
-    expect(within(scope).getByText("registo")).toBeTruthy();
-    expect(within(scope).getByText("efeito")).toBeTruthy();
+    expect(within(scope).getByText("Questão aberta")).toBeTruthy();
+    expect(within(scope).getByText("Registo")).toBeTruthy();
+    expect(within(scope).getByText("Efeito")).toBeTruthy();
   });
 
   it("shows plural scope labels when counts exceed one", () => {
@@ -140,9 +140,38 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     };
     const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS", "REFINES"]), evd("EVD-2", "Obs2", ["BOUNDS"])]);
     const scope = requireElement(container, ".prb-scope-metrics");
-    expect(within(scope).getByText("questões abertas")).toBeTruthy();
-    expect(within(scope).getByText("registos")).toBeTruthy();
-    expect(within(scope).getByText("efeitos")).toBeTruthy();
+    expect(within(scope).getByText("Questões abertas")).toBeTruthy();
+    expect(within(scope).getByText("Registos")).toBeTruthy();
+    expect(within(scope).getByText("Efeitos")).toBeTruthy();
+  });
+
+  it("renders all six state/scope dimensions in canonical order, each label before its canonical value", () => {
+    const record = {
+      title: "T",
+      status: "OPEN",
+      evidence_status: "discovered",
+      validation_status: "unvalidated",
+      investigation: { open_questions: [{ question: "Q1?" }, { question: "Q2?" }] },
+    };
+    const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS", "REFINES"]), evd("EVD-2", "Obs2", ["BOUNDS"])]);
+    const band = requireElement(container, ".prb-state-scope-band");
+    const cells = Array.from(band.querySelectorAll(".prb-state-item, .prb-scope-metric")).map((cell) =>
+      Array.from(cell.children).map((child) => child.textContent),
+    );
+    expect(cells).toEqual([
+      ["Estado", "Aberto"],
+      ["Evidência", "Identificada"],
+      ["Validação", "Por validar"],
+      ["Questões abertas", "2"],
+      ["Registos", "2"],
+      ["Efeitos", "3"],
+    ]);
+    const headings = Array.from(band.querySelectorAll("h3")).map((heading) => heading.textContent);
+    expect(headings).toEqual(["Estado da investigação", "Âmbito"]);
+    // Each group heading precedes its own values in DOM order (the six-column layout is CSS-only).
+    expect(band.textContent?.indexOf("Estado da investigação")).toBeLessThan(band.textContent?.indexOf("Aberto") ?? -1);
+    expect(band.textContent?.indexOf("Aberto")).toBeLessThan(band.textContent?.indexOf("Âmbito") ?? -1);
+    expect(band.textContent?.indexOf("Âmbito")).toBeLessThan(band.textContent?.indexOf("Questões abertas") ?? -1);
   });
 
   it("renders dynamic question/evidence/effect counts matching what is actually authored", () => {

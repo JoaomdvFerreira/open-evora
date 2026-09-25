@@ -29,10 +29,14 @@
   --prb-hero-title-size: 60px;
   --prb-hero-statement-size: 23px;
 
-  /* Estado / Âmbito band */
-  --prb-state-gutter: 40px;
-  --prb-state-item-gap: 32px;
-  --prb-scope-gap: 40px;
+  /* Estado / Âmbito band (six-column grid at >=768) */
+  --prb-state-head-pad-top: 28px;
+  --prb-state-head-pad-bottom: 12px;
+  --prb-state-cell-pad-x: 20px;
+  --prb-state-cell-pad-top: 20px;
+  --prb-state-cell-pad-bottom: 24px;
+  --prb-state-label-size: 14px;
+  --prb-state-value-size: 20px;
 
   /* Editorial sections (label column + broad content) */
   --prb-section-pad-top: 96px;
@@ -257,95 +261,121 @@
 
 /* ---- Investigation state + scope full-width flat band -------------------- */
 
+/* One systematic six-column grid at >=768: a group-heading row (Estado da
+   investigação over columns 1–3, Âmbito over 4–6) and a data row of six
+   equal label-over-value cells. The two group wrappers are
+   `display: contents`, so the markup keeps its heading → values order per
+   group (PrbDetailsPresentation.tsx) while both groups share one grid; the
+   <dl> and the metrics group each span three columns and split them into
+   three equal cells. The band is the containing block for the full-width
+   heading/data separator below. */
 .prb-state-scope-band {
+  position: relative;
   border-top: 1px solid var(--color-ink-primary);
   border-bottom: 1px solid var(--color-separator-standard);
   background: var(--color-surface-subtle);
 }
 
-.prb-state-scope-band .detail-panel-label {
-  margin: 0 0 16px;
-}
-
 .prb-state-scope-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
-.prb-state-block {
-  padding: 26px var(--prb-state-gutter) 28px 0;
-  border-right: 1px solid var(--color-separator-standard);
-}
-
+.prb-state-block,
 .prb-scope-block {
-  padding: 26px 0 28px var(--prb-state-gutter);
+  display: contents;
 }
 
-.prb-state-grid {
-  display: flex;
+.prb-state-scope-band .detail-panel-label {
+  grid-row: 1;
+  margin: 0;
+  padding: var(--prb-state-head-pad-top) 0 var(--prb-state-head-pad-bottom);
+}
+
+.prb-state-block > .detail-panel-label {
+  grid-column: 1 / 4;
+}
+
+.prb-scope-block > .detail-panel-label {
+  grid-column: 4 / 7;
+  padding-left: var(--prb-state-cell-pad-x);
+}
+
+.prb-state-grid,
+.prb-scope-metrics {
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
 }
 
-.prb-state-item {
-  padding: 0 var(--prb-state-item-gap);
+.prb-state-grid {
+  grid-column: 1 / 4;
+}
+
+.prb-scope-metrics {
+  grid-column: 4 / 7;
+}
+
+/* Full-width separator between the group-heading row and the data row. Its
+   vertical position is its static position (the top of the data row);
+   left/right resolve against the band's padding box, which the band's
+   gutter bleed ("Full-width band gutter bleed" below) extends to the
+   band's outer edges — so the rule spans the band while every cell stays on
+   the shell-frame axes. */
+.prb-state-grid::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.prb-state-item,
+.prb-scope-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: var(--prb-state-cell-pad-top) var(--prb-state-cell-pad-x) var(--prb-state-cell-pad-bottom);
+  border-left: 1px solid var(--color-separator-standard);
 }
 
 .prb-state-item:first-child {
   padding-left: 0;
+  border-left: 0;
 }
 
-.prb-state-item + .prb-state-item {
-  border-left: 1px solid var(--color-separator-standard);
-}
-
-.prb-state-item dt {
-  margin: 0 0 6px;
+.prb-state-item dt,
+.prb-scope-metric-label {
+  margin: 0;
   color: var(--color-ink-muted);
-  font-size: 14px;
+  font-size: var(--prb-state-label-size);
+  line-height: 1.35;
+  overflow-wrap: break-word;
 }
 
-.prb-state-value {
+.prb-state-value,
+.prb-scope-metric-value {
   margin: 0;
   color: var(--color-ink-primary);
-  font-size: 20px;
+  font-size: var(--prb-state-value-size);
   font-weight: 600;
   line-height: 1.2;
+  overflow-wrap: break-word;
 }
 
 .prb-state-value--accent {
   color: var(--color-accent-hover);
 }
 
-.prb-scope-metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px var(--prb-scope-gap);
-  align-items: baseline;
-}
-
 .prb-scope-metric {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
   color: inherit;
   text-decoration: none;
 }
 
 .prb-scope-metric:hover {
   text-decoration: underline;
-}
-
-.prb-scope-metric-value {
-  color: var(--color-ink-primary);
-  font-family: var(--font-reading);
-  font-size: 34px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.prb-scope-metric-label {
-  color: var(--color-ink-secondary);
-  font-size: 15px;
 }
 
 /* ---- Shared "editorial left label + broad content" section frame -------- */
@@ -374,6 +404,26 @@
   color: var(--color-ink-muted);
   font-size: 15px;
   line-height: 1.5;
+}
+
+/* ---- Full-width band gutter bleed ----------------------------------------- */
+
+/* Every PRB Details band whose surface or rules span the page (local header,
+   Estado/Âmbito, Percurso, Evidência e auditoria) bleeds through
+   `main.explorer-shell`'s inline gutter via the shell's own
+   `--explorer-shell-gutter` (2rem, 1rem <=767px), so its background and
+   horizontal rules reach the same outer edges as the Header/PublicFooter.
+   The matching inline padding returns the content box to exactly the
+   shell's content width, so each band's inner `shell-frame shell-frame--wide`
+   stays the content-alignment owner on unchanged axes. The 0px fallback
+   keeps a band in-flow if rendered outside the shell. Declared after
+   `.prb-section` so its margin reset cannot cancel the bleed. */
+.prb-header-band,
+.prb-state-scope-band,
+.prb-path-section,
+.prb-audit-section {
+  margin-inline: calc(-1 * var(--explorer-shell-gutter, 0px));
+  padding-inline: var(--explorer-shell-gutter, 0px);
 }
 
 /* ---- Effect label: marker + restrained tone + explicit text -------------- */
@@ -669,16 +719,10 @@
 /* ---- "Evidência e auditoria" --------------------------------------------- */
 
 /* Terminal band (explorerarchitecture.md §3.5): its outer surface (background
-   + top rule) bleeds through `main.explorer-shell`'s inline gutter via the
-   shell's own `--explorer-shell-gutter` (2rem, 1rem <=767px), so it reaches
-   the same outer edges as the full-width PublicFooter. The matching inline
-   padding returns the content box to exactly the shell's content width, so
-   the inner `shell-frame shell-frame--wide` stays the content-alignment
-   owner on the same axes as every other PRB band. The 0px fallback keeps the
-   band in-flow if rendered outside the shell. */
+   + top rule) bleeds through the shell gutter with the other full-width
+   bands ("Full-width band gutter bleed" above), so it meets the full-width
+   PublicFooter edge to edge. */
 .prb-audit-section {
-  margin-inline: calc(-1 * var(--explorer-shell-gutter, 0px));
-  padding-inline: var(--explorer-shell-gutter, 0px);
   border-top: 1px solid var(--color-ink-primary);
   background: var(--color-surface-subtle);
 }
@@ -917,9 +961,8 @@ body:has(.prb-details-view) .public-footer {
     --prb-hero-pad-bottom: 51px;
     --prb-hero-title-size: 48px;
     --prb-hero-statement-size: 21px;
-    --prb-state-gutter: 28px;
-    --prb-state-item-gap: 24px;
-    --prb-scope-gap: 28px;
+    --prb-state-cell-pad-x: 16px;
+    --prb-state-value-size: 18px;
     --prb-section-pad-top: 88px;
     --prb-section-col: 180px;
     --prb-section-gap: 40px;
@@ -937,16 +980,20 @@ body:has(.prb-details-view) .public-footer {
 }
 
 /* 768–1023: section labels move into normal content flow (no left-rail
-   column), and Estado da investigação / Âmbito stack as two full-width
-   horizontal bands. */
+   column); Estado da investigação / Âmbito keep the six-column grid with a
+   tighter cell inset and type so the longest canonical value fits its cell. */
 @media (min-width: 768px) and (max-width: 1023px) {
   .prb-details-view {
     --prb-hero-pad-top: 64px;
     --prb-hero-pad-bottom: 46px;
     --prb-hero-title-size: 40px;
     --prb-hero-statement-size: 20px;
-    --prb-state-item-gap: 24px;
-    --prb-scope-gap: 28px;
+    --prb-state-head-pad-top: 24px;
+    --prb-state-cell-pad-x: 12px;
+    --prb-state-cell-pad-top: 18px;
+    --prb-state-cell-pad-bottom: 20px;
+    --prb-state-label-size: 13px;
+    --prb-state-value-size: 16px;
     --prb-section-pad-top: 80px;
     --prb-current-reading-size: 20px;
     --prb-question-size: 25px;
@@ -959,20 +1006,6 @@ body:has(.prb-details-view) .public-footer {
     --prb-band-heading-size: 28px;
     --prb-audit-pad-top: 60px;
     --prb-audit-row-gap: 28px;
-  }
-
-  .prb-state-scope-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .prb-state-block {
-    padding: 24px 0 22px;
-    border-right: 0;
-    border-bottom: 1px solid var(--color-separator-standard);
-  }
-
-  .prb-scope-block {
-    padding: 22px 0 26px;
   }
 
   .prb-section-frame {
@@ -1082,73 +1115,65 @@ body:has(.prb-details-view) .public-footer {
     display: inline;
   }
 
-  /* Estado: stacked label/value rows. Âmbito: three equal columns with
-     vertical dividers, all counts on one row. */
-  .prb-state-scope-row {
-    grid-template-columns: minmax(0, 1fr);
+  /* Estado: stacked label/value rows. Âmbito: three equal label-over-value
+     cells with vertical dividers, all counts on one row. The two groups
+     stack, split by one full-width divider (the scope group's ::before —
+     the same static-position technique as the >=768 heading/data
+     separator, which this width does not draw). */
+  .prb-state-scope-row,
+  .prb-state-block,
+  .prb-scope-block {
+    display: block;
   }
 
   .prb-state-scope-band .detail-panel-label {
-    margin-bottom: 12px;
+    padding: 20px 0 12px;
   }
 
-  .prb-state-block {
-    padding: 20px 0 18px;
-    border-right: 0;
-    border-bottom: 1px solid var(--color-separator-standard);
+  .prb-scope-block > .detail-panel-label {
+    padding-left: 0;
   }
 
-  .prb-scope-block {
-    padding: 18px 0;
+  .prb-state-grid::before {
+    content: none;
+  }
+
+  .prb-scope-block::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--color-separator-standard);
   }
 
   .prb-state-grid {
-    display: grid;
     grid-template-columns: 104px minmax(0, 1fr);
     row-gap: 10px;
     align-items: baseline;
+    padding-bottom: 18px;
   }
 
   .prb-state-item {
     display: contents;
   }
 
-  .prb-state-item dt {
-    margin: 0;
-    font-size: 16px;
-  }
-
+  .prb-state-item dt,
   .prb-state-value {
     font-size: 16px;
     line-height: 1.5;
   }
 
   .prb-scope-metrics {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
+    padding-bottom: 18px;
   }
 
   .prb-scope-metric {
-    display: block;
-    padding-left: 14px;
-    border-left: 1px solid var(--color-separator-standard);
+    padding: 0 0 0 14px;
   }
 
   .prb-scope-metric:first-child {
     padding-left: 0;
     border-left: 0;
-  }
-
-  .prb-scope-metric-value {
-    display: block;
-    font-size: 28px;
-    line-height: 1.1;
-  }
-
-  .prb-scope-metric-label {
-    display: block;
-    font-size: 14px;
   }
 
   .prb-section-frame {

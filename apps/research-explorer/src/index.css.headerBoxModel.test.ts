@@ -8,7 +8,8 @@ import { describe, expect, it } from "vitest";
  * an unwanted top margin, and Header navigation actions
  * (`.explorer-navigation-action`) must carry no vertical padding while
  * keeping their horizontal padding — at both the base/desktop rule and the
- * 768px-1059px fit-range override. Also covers `.overview-propose-problem`'s
+ * 768px-1059px fit-range override — while the compact (<=767px) open menu
+ * restores real vertical padding to its stacked actions. Also covers `.overview-propose-problem`'s
  * `box-sizing: border-box`, which keeps its mobile full-width CTA inside its
  * available layout width once padding/border are taken into account.
  * Deliberately structural only (declared property values, not rendered
@@ -68,6 +69,45 @@ describe("index.css — Header navigation action vertical padding", () => {
     expect(body).toMatch(/padding-block:\s*0\b/);
     expect(body).toMatch(/padding-inline:\s*0\.85rem\b/);
     expect(body).not.toMatch(/padding:\s*[\d.]+\S*\s+[\d.]+\S*;/);
+  });
+});
+
+/** Every top-level `@media (max-width: 767px)` block, concatenated. */
+function compactBlocks(): string {
+  const prelude = "@media (max-width: 767px)";
+  const blocks: string[] = [];
+  let from = 0;
+  for (;;) {
+    const start = css.indexOf(prelude, from);
+    if (start === -1) return blocks.join("\n");
+    const openIndex = css.indexOf("{", start);
+    let depth = 0;
+    for (let i = openIndex; i < css.length; i += 1) {
+      if (css[i] === "{") depth += 1;
+      if (css[i] === "}" && --depth === 0) {
+        blocks.push(css.slice(openIndex + 1, i));
+        from = i + 1;
+        break;
+      }
+    }
+  }
+}
+
+describe("index.css — compact open-menu spacing", () => {
+  it("gives the stacked nav actions vertical padding and a tap-size row at <=767px only", () => {
+    const body = ruleBodyContaining(compactBlocks(), ".explorer-navigation .explorer-navigation-action");
+    expect(body).toMatch(/padding-block:\s*0\.7rem\b/);
+    expect(body).toMatch(/min-height:\s*var\(--target-min\)/);
+    // Links and buttons must share one row height (links default to content-box).
+    expect(body).toMatch(/box-sizing:\s*border-box\b/);
+    // The unconditional (desktop) rule stays zero-block-padding with no min-height.
+    const base = ruleBodyContaining(css, ".explorer-navigation .explorer-navigation-action");
+    expect(base).toMatch(/padding-block:\s*0\b/);
+    expect(base).not.toMatch(/min-height/);
+  });
+
+  it("separates the compact nav list from the menu's top rule and the CTA rule", () => {
+    expect(ruleBodyContaining(compactBlocks(), ".explorer-navigation")).toMatch(/padding-block:\s*0\.4rem\b/);
   });
 });
 

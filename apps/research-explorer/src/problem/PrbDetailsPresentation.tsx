@@ -162,7 +162,11 @@ function PrbStateValue({ field, value }: { field: "status" | "validation_status"
   return <dd className={accent ? "prb-state-value prb-state-value--accent" : "prb-state-value"}>{label}</dd>;
 }
 
-/** Investigation-state + scope full-width flat band — plain caption/value pairs and plain count metrics, not chip-like status controls. All values come directly from canonical fields; no derived posture. */
+/**
+ * Investigation-state + scope full-width flat band — plain caption/value pairs and plain count metrics, not chip-like status controls. All values come directly from canonical fields; no derived posture.
+ *
+ * DOM order stays heading → values per group (Estado da investigação, then Âmbito); at >=768 the stylesheet lays both groups onto one six-column grid (group-heading row + data row) without reordering the markup.
+ */
 function PrbInvestigationStateSection({ data }: { data: PrbDetailsData }) {
   return (
     <section id="prb-estado" aria-labelledby="prb-estado-heading" className="prb-state-scope-band">
@@ -196,16 +200,16 @@ function PrbInvestigationStateSection({ data }: { data: PrbDetailsData }) {
           <h3 className="detail-panel-label">Âmbito</h3>
           <div className="prb-scope-metrics">
             <a href="#prb-questoes" className="prb-scope-metric">
+              <span className="prb-scope-metric-label">{data.openQuestionCount === 1 ? "Questão aberta" : "Questões abertas"}</span>
               <span className="prb-scope-metric-value">{formatPublicCount(data.openQuestionCount)}</span>
-              <span className="prb-scope-metric-label">{data.openQuestionCount === 1 ? "questão aberta" : "questões abertas"}</span>
             </a>
             <a href="#prb-auditoria" className="prb-scope-metric">
+              <span className="prb-scope-metric-label">{data.evidenceRecordCount === 1 ? "Registo" : "Registos"}</span>
               <span className="prb-scope-metric-value">{formatPublicCount(data.evidenceRecordCount)}</span>
-              <span className="prb-scope-metric-label">{data.evidenceRecordCount === 1 ? "registo" : "registos"}</span>
             </a>
             <a href="#prb-auditoria" className="prb-scope-metric">
+              <span className="prb-scope-metric-label">{data.evidenceEffectCount === 1 ? "Efeito" : "Efeitos"}</span>
               <span className="prb-scope-metric-value">{formatPublicCount(data.evidenceEffectCount)}</span>
-              <span className="prb-scope-metric-label">{data.evidenceEffectCount === 1 ? "efeito" : "efeitos"}</span>
             </a>
           </div>
         </div>
