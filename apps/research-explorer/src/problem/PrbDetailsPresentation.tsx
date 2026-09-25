@@ -403,13 +403,13 @@ function PrbPathSection({ stages }: { stages: PrbPathStage[] }) {
 
 /**
  * "Evidência e auditoria" — the audit layer: Toda a evidência (aggregate
- * count/effect tally, never a ranking or strength score), Como verificamos
- * (a concise methodology explainer: Sustenta/Refina/Delimita and Observação
- * local/Resposta existente are illustrative examples of the approved copy,
- * not the full vocabulary — evidence metadata itself still renders every
- * canonical effect and research role; "Ler o método" routes to the fuller
- * methodology), and Dossiê canónico (the approved visual CTA only — PDF
- * generation itself is out of scope). "Abrir os N registos" is kept
+ * evidence-record count and effect tally, never a ranking or strength
+ * score), Como verificamos (a concise methodology explainer:
+ * Sustenta/Refina/Delimita and Observação local/Resposta existente are
+ * illustrative examples of the approved copy, not the full vocabulary;
+ * "Ler o método" routes to the fuller methodology), and Dossiê canónico (a
+ * disabled placeholder CTA only — PDF generation itself is out of scope).
+ * No per-evidence metadata is rendered here. "Abrir os N registos" is kept
  * non-destructive/explicit here: it does not route to the PRB generic-detail
  * record merely because that callback already exists, since the real
  * all-evidence interaction contract is not yet decided.
@@ -427,8 +427,8 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
           <div className="prb-audit-lede">
             <h3 className="prb-audit-heading">Verificar esta investigação</h3>
             <p className="prb-audit-intro">
-              Cada afirmação desta página remete para um registo de evidência e para a sua fonte. Pode consultá-los aqui, perceber como foram classificados e
-              descarregar a versão canónica.
+              Este problema mantém ligações explícitas a registos de evidência e às respetivas fontes. Aqui pode ver como essas relações são classificadas e
+              consultar o método usado na investigação.
             </p>
           </div>
 
