@@ -317,11 +317,7 @@ describe("GraphExplorer", () => {
     expect(within(searchArea).getAllByRole("button")).toHaveLength(12);
   });
 
-  it("keeps the PRB Detalhe/Problema/Histórico switcher wired in dormant Graph code", async () => {
-    const onOpenGeneric = vi.fn();
-    const onViewAsProblem = vi.fn();
-    const onViewHistory = vi.fn();
-    const user = userEvent.setup();
+  it("is not a PRB-local destination: a PRB focus renders no PRB navigation and no Histórico action", async () => {
     render(
       <GraphExplorer
         dataProvider={fakeProvider()}
@@ -330,25 +326,15 @@ describe("GraphExplorer", () => {
         onFocusChange={vi.fn()}
         onClearFocus={vi.fn()}
         onDepthChange={vi.fn()}
-        onOpenGeneric={onOpenGeneric}
-        onViewAsProblem={onViewAsProblem}
-        onViewHistory={onViewHistory}
+        onOpenGeneric={vi.fn()}
+        onViewAsProblem={vi.fn()}
       />
     );
 
-    const switcher = await screen.findByRole("navigation", { name: /PRB-0005/ });
-    // Graph has no matching ContextTab, so its three PRB destinations are
-    // all navigable from this dormant surface.
-    expect(within(switcher).getByRole("button", { name: "Histórico" }).getAttribute("aria-current")).toBeNull();
-
-    await user.click(within(switcher).getByRole("button", { name: "Detalhe" }));
-    expect(onOpenGeneric).toHaveBeenCalledWith("PRB-0005");
-
-    await user.click(within(switcher).getByRole("button", { name: "Problema" }));
-    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0005");
-
-    await user.click(within(switcher).getByRole("button", { name: "Histórico" }));
-    expect(onViewHistory).toHaveBeenCalledWith("PRB-0005");
+    await screen.findByRole("heading", { name: "Nós visíveis" });
+    expect(screen.getByRole("button", { name: "Ver como Problema (contexto completo)" })).toBeTruthy();
+    expect(screen.queryByRole("navigation", { name: "Vistas do problema" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Histórico" })).toBeNull();
   });
 
   it("does not render a PRB context switcher when the Graph focus is a non-PRB record", async () => {

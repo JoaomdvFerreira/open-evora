@@ -8,7 +8,6 @@ import { RecordIdentifier } from "./RecordIdentifier";
 import { Breadcrumb } from "../presentation/Breadcrumb";
 import { findMeaningField } from "./meaningField";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation/presentation";
-import { ContextTabs } from "../navigation/ContextTabs";
 import { SourceOverviewSection } from "./SourceOverviewSection";
 import { SourceFindingsSection } from "./SourceFindingsSection";
 import { SourceCoverageSection } from "./SourceCoverageSection";
@@ -866,7 +865,6 @@ function RecordDetailContent({
   onSelect,
   onBackToRecords,
   onViewAsProblem,
-  onViewHistory,
   onViewInGraph,
 }: {
   dataProvider: DataProvider;
@@ -875,7 +873,6 @@ function RecordDetailContent({
   onSelect: (id: string) => void;
   onBackToRecords: () => void;
   onViewAsProblem: (id: string) => void;
-  onViewHistory: (id: string) => void;
   onViewInGraph: (id: string) => void;
 }) {
   const isPrb = detail.type === "PRB-";
@@ -915,10 +912,6 @@ function RecordDetailContent({
   return (
     <div className="record-detail-layout shell-frame">
       <RecordDetailBreadcrumb detail={detail} onBackToRecords={onBackToRecords} />
-
-      {detail.type === "PRB-" && (
-        <ContextTabs prbId={detail.id} active="detail" onOpenGeneric={onSelect} onViewAsProblem={onViewAsProblem} onViewHistory={onViewHistory} />
-      )}
 
       <div className="lyt-reading" data-rail="present">
         <div className="record-detail-main lyt-reading-main">
@@ -1014,6 +1007,14 @@ function RecordDetailContent({
           {isSrc && <SourceReadingRailIndex record={detail.record} relationContext={sourceRelationContext} />}
           {!isSrc && !isEvd && (
             <div className="detail-rail-actions">
+              {/* Technical inspection of a PRB leads back to its public
+                  page through one ordinary action — not PRB-local
+                  navigation (Detalhes|Histórico lives on that page). */}
+              {isPrb && (
+                <button type="button" onClick={() => onViewAsProblem(detail.id)}>
+                  Ver página do problema
+                </button>
+              )}
               {relatedProblemId && (
                 <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
                   Ver como Problema ({relatedProblemId})
@@ -1040,7 +1041,6 @@ interface RecordDetailPanelProps {
   onSelect: (id: string) => void;
   onBackToRecords: () => void;
   onViewAsProblem: (id: string) => void;
-  onViewHistory: (id: string) => void;
   onViewInGraph: (id: string) => void;
 }
 
@@ -1048,7 +1048,7 @@ interface RecordDetailPanelProps {
  * A failure loading one record's detail is isolated here (useRecordDetail's
  * own state) and never affects the already-loaded Records table/index.
  */
-export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, onBackToRecords, onViewAsProblem, onViewHistory, onViewInGraph }: RecordDetailPanelProps) {
+export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, onBackToRecords, onViewAsProblem, onViewInGraph }: RecordDetailPanelProps) {
   const state = useRecordDetail(dataProvider, selectedId);
   const contentRef = useRef<HTMLDivElement>(null);
   const readyId = state.status === "ready" ? state.detail.id : null;
@@ -1121,7 +1121,6 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
             onSelect={onSelect}
             onBackToRecords={onBackToRecords}
             onViewAsProblem={onViewAsProblem}
-            onViewHistory={onViewHistory}
             onViewInGraph={onViewInGraph}
           />
         </div>

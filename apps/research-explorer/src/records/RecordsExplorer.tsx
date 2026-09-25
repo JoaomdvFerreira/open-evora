@@ -26,7 +26,6 @@ interface RecordsExplorerProps {
   onViewAsProblem: (id: string) => void;
   /** RE-04: switches to the Graph view, focused on the same record. */
   onViewInGraph: (id: string) => void;
-  onViewHistory: (id: string) => void;
   /** V2: breadcrumb "Registos" link — clears the selection, returning to the table. */
   onBackToRecords: () => void;
 }
@@ -52,7 +51,6 @@ export function RecordsExplorer({
   onTypeFilterChange,
   onViewAsProblem,
   onViewInGraph,
-  onViewHistory,
   onBackToRecords,
 }: RecordsExplorerProps) {
   const indexState = useRecordIndex(dataProvider);
@@ -107,7 +105,6 @@ export function RecordsExplorer({
         onSelect={onSelect}
         onBackToRecords={onBackToRecords}
         onViewAsProblem={onViewAsProblem}
-        onViewHistory={onViewHistory}
         onViewInGraph={onViewInGraph}
       />
     );

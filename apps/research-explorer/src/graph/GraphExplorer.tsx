@@ -21,7 +21,6 @@ import type { ResearchGraph } from "./buildGraphModel";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
-import { ContextTabs } from "../navigation/ContextTabs";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -60,8 +59,6 @@ interface GraphExplorerProps {
   onDepthChange: (depth: GraphDepth) => void;
   onOpenGeneric: (id: string) => void;
   onViewAsProblem: (id: string) => void;
-  /** Kept for the dormant Graph surface's shared PRB context switcher. */
-  onViewHistory?: (id: string) => void;
 }
 
 /**
@@ -82,7 +79,6 @@ export function GraphExplorer({
   onDepthChange,
   onOpenGeneric,
   onViewAsProblem,
-  onViewHistory,
 }: GraphExplorerProps) {
   const state = useGraphData(dataProvider);
   const canvasRef = useRef<GraphCanvasHandle>(null);
@@ -219,10 +215,6 @@ export function GraphExplorer({
         Modo de exploração por vizinhança: mostra o registo focado e as suas relações diretas — não o corpus completo. O grafo é
         complementar aos Registos e à vista de Problema, nunca a única forma de aceder a um facto.
       </p>
-
-      {!fullCorpusView && focusSummary?.type === "PRB-" && (
-        <ContextTabs prbId={focusSummary.id} active="graph" onOpenGeneric={onOpenGeneric} onViewAsProblem={onViewAsProblem} onViewHistory={onViewHistory ?? (() => undefined)} />
-      )}
 
       <div className="graph-controls">
         <div>

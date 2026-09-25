@@ -32,6 +32,21 @@ function renderPrb(record: Record<string, unknown>, evidence: EvidenceWithSource
 }
 
 describe("PrbDetailsPresentation — generic PRB Details composition", () => {
+  it("renders the shared Detalhes|Histórico PRB navigation with Detalhes as the current page, not ARIA tabs", () => {
+    const onViewHistory = vi.fn();
+    render(<PrbDetailsPresentation data={buildPrbDetailsData(baseProjection({ title: "T" }, []))} {...handlers} onViewHistory={onViewHistory} />);
+    const nav = screen.getByRole("navigation", { name: "Vistas do problema" });
+    expect(nav.tagName).toBe("NAV");
+    expect(within(nav).getByText("Detalhes").getAttribute("aria-current")).toBe("page");
+    const history = within(nav).getByRole("button", { name: "Histórico" });
+    expect(history.getAttribute("aria-current")).toBeNull();
+    expect(nav.textContent).toBe("DetalhesHistórico");
+    expect(screen.queryByRole("tablist")).toBeNull();
+    expect(screen.queryByRole("tab")).toBeNull();
+    history.click();
+    expect(onViewHistory).toHaveBeenCalledWith("PRB-9999");
+  });
+
   it("renders the canonical title and statement exactly as authored", () => {
     renderPrb({ title: "Título canónico do problema", problem_statement: "Formulação canónica delimitada." });
     expect(screen.getByRole("heading", { name: "Título canónico do problema" })).toBeTruthy();

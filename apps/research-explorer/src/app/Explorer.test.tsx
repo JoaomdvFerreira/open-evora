@@ -609,27 +609,30 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     expect((screen.getByLabelText("Tipo") as HTMLSelectElement).value).toBe("PRB-");
   });
 
-  it("ContextTabs continue preserving PRB identity across Detalhe/Problema, unlike GlobalNav", async () => {
+  it("PRB-local Detalhes|Histórico navigation preserves PRB identity, unlike GlobalNav", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     const detailPanel = await getDetailPanel();
-    const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
+    expect(within(detailPanel).queryByRole("navigation", { name: "Vistas do problema" })).toBeNull();
 
-    await user.click(within(switcher).getByRole("button", { name: "Problema" }));
+    await user.click(await within(detailPanel).findByRole("button", { name: "Ver página do problema" }));
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+    expect(window.location.search).toContain("view=problem");
     expect(window.location.search).toContain("id=PRB-0005");
 
-    const problemSwitcher = await screen.findByRole("navigation", { name: /PRB-0005/ });
-    await user.click(within(problemSwitcher).getByRole("button", { name: "Detalhe" }));
-    const backDetailPanel = await getDetailPanel();
-    const backBreadcrumb = within(backDetailPanel).getByLabelText("Localização");
-    await within(backBreadcrumb).findByText("PRB-0005");
-    expect(window.location.search).toContain("id=PRB-0005");
-
-    await user.click(within(backDetailPanel).getByRole("button", { name: "Histórico" }));
+    const problemNav = await screen.findByRole("navigation", { name: "Vistas do problema" });
+    expect(within(problemNav).getByText("Detalhes").getAttribute("aria-current")).toBe("page");
+    await user.click(within(problemNav).getByRole("button", { name: "Histórico" }));
     expect(await screen.findByText("Não existe histórico material registado para este problema.")).toBeTruthy();
     expect(window.location.search).toContain("view=history");
+    expect(window.location.search).toContain("id=PRB-0005");
+
+    const historyNav = await screen.findByRole("navigation", { name: "Vistas do problema" });
+    expect(within(historyNav).getByText("Histórico").getAttribute("aria-current")).toBe("page");
+    await user.click(within(historyNav).getByRole("button", { name: "Detalhes" }));
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+    expect(window.location.search).toContain("view=problem");
     expect(window.location.search).toContain("id=PRB-0005");
   });
 
@@ -658,14 +661,13 @@ describe("Explorer — Problem view (RE-03)", () => {
     expect(within(evidenceSection).getByText(/EVD-000105/)).toBeTruthy();
   });
 
-  it("the PRB Record Detail context switcher's 'Problema' tab switches to the Problem view for the same ID", async () => {
+  it("the PRB Record Detail 'Ver página do problema' action switches to the Problem view for the same ID", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
 
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     const detailPanel = await getDetailPanel();
-    const switcher = await within(detailPanel).findByRole("navigation", { name: /PRB-0005/ });
-    await user.click(within(switcher).getByRole("button", { name: "Problema" }));
+    await user.click(await within(detailPanel).findByRole("button", { name: "Ver página do problema" }));
 
     const heading = await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
     expect(window.location.search).toContain("view=problem");
@@ -759,19 +761,15 @@ describe("Explorer — Problem view (RE-03)", () => {
     expect(within(breadcrumb).queryByRole("button", { name: "Visão geral" })).toBeNull();
   });
 
-  it("Problem View's Detalhe ContextTab preserves the current PRB id and opens its Record Detail, not the Records list", async () => {
-    const user = userEvent.setup();
+  it("Problem View's PRB-local navigation offers only Detalhes|Histórico — generic Record Detail is not a PRB-local destination", async () => {
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    const switcher = await screen.findByRole("navigation", { name: /PRB-0005/ });
-    await user.click(within(switcher).getByRole("button", { name: "Detalhe" }));
-
-    const detailPanel = await getDetailPanel();
-    const breadcrumb = within(detailPanel).getByLabelText("Localização");
-    await within(breadcrumb).findByText("PRB-0005");
-    expect(window.location.search).toContain("view=records");
-    expect(window.location.search).toContain("id=PRB-0005");
+    const nav = await screen.findByRole("navigation", { name: "Vistas do problema" });
+    expect(nav.textContent).toBe("DetalhesHistórico");
+    expect(within(nav).queryByRole("button", { name: "Detalhe" })).toBeNull();
+    expect(within(nav).queryByRole("button", { name: "Problema" })).toBeNull();
+    expect(screen.queryByRole("tablist")).toBeNull();
   });
 
   it("a Problem-view URL survives reload (bookmark/share)", async () => {

@@ -61,6 +61,16 @@ describe("ProblemView vNext", () => {
     expect(onOpenGeneric).toHaveBeenCalledWith("EVD-1");
   });
 
+  it("renders the two-view Detalhes|Histórico PRB navigation with Detalhes as the current page", async () => {
+    const onViewHistory = vi.fn();
+    render(<ProblemView {...props} problemId="PRB-1" onViewHistory={onViewHistory} />);
+    const nav = await screen.findByRole("navigation", { name: "Vistas do problema" });
+    expect(nav.textContent).toBe("DetalhesHistórico");
+    expect(within(nav).getByText("Detalhes").getAttribute("aria-current")).toBe("page");
+    fireEvent.click(within(nav).getByRole("button", { name: "Histórico" }));
+    expect(onViewHistory).toHaveBeenCalledWith("PRB-1");
+  });
+
   it("groups each linked EVD once as supporting, boundary, or other", async () => {
     render(<ProblemView {...props} problemId="PRB-1" />);
     const support = await screen.findByText("Evidência que suporta (1)");

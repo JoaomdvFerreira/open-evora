@@ -131,7 +131,7 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
         ]}
         current={<RecordIdentifier variant="text" density="compact" id={detail.id} />}
       />
-      <ContextTabs prbId={detail.id} active="history" onOpenGeneric={onOpenGeneric} onViewAsProblem={onViewAsProblem} onViewHistory={() => undefined} />
+      <ContextTabs prbId={detail.id} active="history" onViewDetails={onViewAsProblem} onViewHistory={() => undefined} />
       <section className="problem-section">
         <div className="problem-identity-id">{detail.id}</div>
         <h2 ref={headingRef} id="problem-history-heading" tabIndex={-1} className="problem-identity-title">{title}</h2>

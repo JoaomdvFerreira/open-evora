@@ -6,7 +6,7 @@ import path from "node:path";
  * Structural regression for the Record Detail desktop centering defect: the
  * top-level Record Detail composition owns the shared 980px outer frame
  * (`.record-detail-layout.shell-frame`),
- * so Breadcrumb, ContextTabs, and the two-column content share one frame
+ * so Breadcrumb and the two-column content share one frame
  * instead of each capping/centering itself independently (which is exactly
  * the drift this test previously caught). This test parses the actual rule
  * bodies out of the production stylesheet and asserts the ownership split

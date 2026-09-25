@@ -29,7 +29,7 @@ const provider: DataProvider = { getManifest: async () => { throw Error("unused"
 const lookup = new Map(index.map((item) => [item.id, item]));
 const renderDetail = (detail = evd, onSelect = vi.fn(), onViewAsProblem = vi.fn(), selectedId = "EVD-1") => {
   const fixture: DataProvider = { ...provider, getRecord: async (id) => id === selectedId ? detail : records[id] };
-  render(<RecordDetailPanel dataProvider={fixture} lookup={lookup} selectedId={selectedId} onBackToRecords={vi.fn()} onSelect={onSelect} onViewAsProblem={onViewAsProblem} onViewHistory={vi.fn()} onViewInGraph={vi.fn()} />);
+  render(<RecordDetailPanel dataProvider={fixture} lookup={lookup} selectedId={selectedId} onBackToRecords={vi.fn()} onSelect={onSelect} onViewAsProblem={onViewAsProblem} onViewInGraph={vi.fn()} />);
   return { onSelect, onViewAsProblem };
 };
 
@@ -133,6 +133,22 @@ describe("RecordDetailPanel DS-05I — EmptyState adoption", () => {
     renderDetail(prbNoReferences, vi.fn(), vi.fn(), "PRB-1");
     const message = await screen.findByText("Nenhuma referência canónica registada.");
     expect(message.className).toBe("ui-empty-state-message");
+  });
+
+  it("offers PRB technical inspection one explicit 'Ver página do problema' action instead of PRB-local navigation", async () => {
+    const { onViewAsProblem } = renderDetail(records["PRB-1"], vi.fn(), vi.fn(), "PRB-1");
+    const action = await screen.findByRole("button", { name: "Ver página do problema" });
+    expect(screen.queryByRole("navigation", { name: "Vistas do problema" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Histórico" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Detalhes" })).toBeNull();
+    fireEvent.click(action);
+    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-1");
+  });
+
+  it("does not offer 'Ver página do problema' for a non-PRB record", async () => {
+    renderDetail();
+    await screen.findByText("Evidência é um registo com proveniência e limites explícitos.");
+    expect(screen.queryByRole("button", { name: "Ver página do problema" })).toBeNull();
   });
 
   it("keeps a missing PRB inspector value as field-empty, not EmptyState", async () => {

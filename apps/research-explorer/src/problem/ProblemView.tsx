@@ -1011,7 +1011,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
     <article aria-labelledby="problem-heading" className="problem-view shell-frame">
       <ProblemBreadcrumb problemId={problem.id} onBackToOverview={onBackToOverview} />
 
-      <ContextTabs prbId={problem.id} active="problem" onOpenGeneric={onOpenGeneric} onViewAsProblem={onOpenGeneric} onViewHistory={onViewHistory} />
+      <ContextTabs prbId={problem.id} active="details" onViewDetails={() => undefined} onViewHistory={onViewHistory} />
 
       <ProblemHelpDisclosure record={record} />
       <ProblemCompactSectionIndex record={record} />

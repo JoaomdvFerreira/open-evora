@@ -4165,9 +4165,8 @@ body:has(.public-overview) .public-footer {
 
 /* V3/UX-B: Problem View (design-system.md §1/§2/§3, Prototype B) — an
    editorial reading composition sharing the Breadcrumb pattern with Record
-   Detail and the ContextTabs pattern (Detalhe/Problema/Grafo) unique to
-   PRB-scoped surfaces. UX-B adds a desktop reading rail reusing the same
-   canonical ReadingLayout geometry as Record Detail (DS-05J: `.lyt-reading`/
+   Detail and the PRB-local Detalhes|Histórico navigation (ContextTabs).
+   UX-B adds a desktop reading rail reusing the same canonical ReadingLayout geometry as Record Detail (DS-05J: `.lyt-reading`/
    `-main`/`-rail`, styles/reading-layout.css — 720px main + 44px gap +
    216px rail = 980px), rather than a second bespoke rail width —
    `.problem-view`'s own frame widens from the original 800px main-only
@@ -4226,6 +4225,14 @@ body:has(.public-overview) .public-footer {
   background: var(--color-ink-primary);
   font-weight: 600;
   cursor: default;
+}
+
+/* PRB-local navigation (ContextTabs: Detalhes|Histórico) placement inside
+   the Problem/History article frame — the same vertical spacing the legacy
+   `.context-tabs` row carried. Its appearance is owned by
+   styles/prb-view-selector.css; only placement lives here. */
+.problem-view > .prb-view-selector {
+  margin: var(--space-3) 0 var(--space-loose);
 }
 
 /* UX-F: shared unavailable-control pattern (GlobalNav Grafo, ContextTabs Grafo) —

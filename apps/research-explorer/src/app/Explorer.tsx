@@ -96,7 +96,6 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
           typeFilter={url.state.typeFilter}
           onTypeFilterChange={url.setTypeFilter}
           onViewAsProblem={(id) => url.setViewAndSelection("problem", id)}
-          onViewHistory={(id) => url.setViewAndSelection("history", id)}
           onViewInGraph={(id) => url.setViewAndSelection("graph", id)}
           onBackToRecords={() => url.setSelectedId(null)}
         />
@@ -135,7 +134,6 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
             onDepthChange={url.setGraphDepth}
             onOpenGeneric={(id) => url.setViewAndSelection("records", id)}
             onViewAsProblem={(id) => url.setViewAndSelection("problem", id)}
-            onViewHistory={(id) => url.setViewAndSelection("history", id)}
           />
         </Suspense>
       )}

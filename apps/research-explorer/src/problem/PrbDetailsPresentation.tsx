@@ -3,6 +3,7 @@ import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { RecordIdentifier } from "../records/RecordIdentifier";
 import { Breadcrumb } from "../presentation/Breadcrumb";
+import { ContextTabs } from "../navigation/ContextTabs";
 import { describeTopic } from "../presentation/topicMapping";
 import { validationVisual } from "./stateVisuals";
 import { ShareAction } from "./ShareAction";
@@ -21,10 +22,10 @@ import type { PrbDetailsData, PrbOpenQuestion, PrbPathStage } from "./prbDetails
  * absent, exactly like ProblemView.tsx's established convention.
  *
  * This view intentionally does not reuse ProblemView.tsx's legacy 720+rail
- * presentation architecture (ContextTabs three-tab row, right-side reading
- * rail/CompactSectionIndex "Nesta página"). The approved reference is a wide
- * editorial composition with its own local header (breadcrumb + grouped
- * Detalhes|Histórico selector + Verificar/Partilhar utilities) and a
+ * presentation architecture (right-side reading rail/CompactSectionIndex
+ * "Nesta página"). The approved reference is a wide editorial composition
+ * with its own local header (breadcrumb + the shared Detalhes|Histórico
+ * PRB navigation + Verificar/Partilhar utilities) and a
  * left-label/broad-content section rhythm at desktop widths — see the
  * `.prb-*` classes in styles/prb-details.css, which own this view's own
  * geometry rather than `.lyt-reading`/`.context-tabs`.
@@ -41,10 +42,10 @@ export interface PrbDetailsPresentationProps {
 }
 
 /**
- * Local PRB header: breadcrumb (Visão geral › PRB-xxxx) + grouped
- * Detalhes|Histórico selector + Verificar/Partilhar utilities. There is no
- * public "Problema" tab in this architecture — Detalhes is this view itself,
- * Histórico routes to ProblemHistoryView via `onViewHistory`. "Verificar"
+ * Local PRB header: breadcrumb (Visão geral › PRB-xxxx) + the shared
+ * Detalhes|Histórico PRB navigation (ContextTabs) + Verificar/Partilhar
+ * utilities. Detalhes is this view itself (current page), Histórico routes
+ * to ProblemHistoryView via `onViewHistory`. "Verificar"
  * jumps to the audit section already on this page; "Partilhar" reuses the
  * existing ShareAction behaviour (Web Share API / copy-link fallback). Both
  * utilities carry a decorative aria-hidden glyph (↓/↗); their visible text
@@ -70,14 +71,7 @@ function PrbHeader({ data, onBackToOverview, onViewHistory }: { data: PrbDetails
         ]}
         current={<RecordIdentifier variant="text" density="compact" id={data.problemId} />}
       />
-      <div role="tablist" aria-label="Vistas do problema" className="prb-view-selector">
-        <span role="tab" aria-selected="true" className="prb-view-selector-item prb-view-selector-item--active">
-          Detalhes
-        </span>
-        <button type="button" role="tab" aria-selected="false" className="prb-view-selector-item" onClick={() => onViewHistory(data.problemId)}>
-          Histórico
-        </button>
-      </div>
+      <ContextTabs prbId={data.problemId} active="details" onViewDetails={() => undefined} onViewHistory={onViewHistory} />
       <div className="prb-header-utilities">
         <a href="#prb-auditoria" className="prb-header-utility prb-header-utility--verify">
           <span aria-hidden="true" className="prb-header-utility-icon">
