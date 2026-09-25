@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { validateAuthoringEnvelope } from "./authoring-envelope.ts";
+import { buildPrimaryAuthoringPrompt } from "./primary-prompt.ts";
 
 function validEnvelope(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
@@ -154,4 +155,37 @@ test("a benign nested candidateFiles[].path is accepted", () => {
     candidateFiles: [{ path: "nested/SRC-NEW.yaml", yaml: "source_id: SRC-NEW\n" }],
   });
   assert.deepEqual(validateAuthoringEnvelope(envelope).errors, []);
+});
+
+const PRIMARY_PROMPT = buildPrimaryAuthoringPrompt({ mode: "daily-discovery", request: "Synthetic request." });
+
+test("the primary prompt distinguishes each open-question field by meaning", () => {
+  assert.match(PRIMARY_PROMPT, /latest_result = current result\/knowledge for that question/);
+  assert.match(PRIMARY_PROMPT, /why_open = why it remains unresolved/);
+  assert.match(PRIMARY_PROMPT, /resolution_condition = evidential\/decision condition to resolve or reopen it/);
+  assert.match(PRIMARY_PROMPT, /current_action = current investigation activity/);
+  assert.match(PRIMARY_PROMPT, /WATCH carries no structured posture meaning/);
+});
+
+test("the primary prompt bounds causal strength, currentness and effects/roles independence", () => {
+  assert.match(PRIMARY_PROMPT, /must not assert more causal strength than the linked Evidence and its inference_limits support/);
+  assert.match(PRIMARY_PROMPT, /Do not infer or assert currentness from updated_at, Source\/Evidence dates, or absence of contradiction/);
+  assert.match(PRIMARY_PROMPT, /effects and evidence\[\]\.research_roles are independent/);
+  assert.match(PRIMARY_PROMPT, /never link Evidence merely to rescue unsupported wording/);
+  assert.match(PRIMARY_PROMPT, /existing corpus wording is not a template/);
+});
+
+test("the primary prompt keeps optional fields optional and forbids invented fields", () => {
+  assert.match(PRIMARY_PROMPT, /Do not invent fields\./);
+  assert.match(PRIMARY_PROMPT, /omit them when not explicitly supported; do not invent values/);
+});
+
+test("the primary prompt still states the structured envelope contract the validator enforces", () => {
+  for (const key of ["schemaVersion", "manifest", "mode", "targetProblemId", "investigationQuestion", "candidateFiles", "claimedRecordIds", "rationale", "path", "yaml"]) {
+    assert.ok(PRIMARY_PROMPT.includes(`"${key}"`), `prompt must describe envelope key ${key}`);
+  }
+  assert.match(PRIMARY_PROMPT, /matching exactly this shape \(schemaVersion "1"\)/);
+  assert.match(PRIMARY_PROMPT, /"mode": "daily-discovery" \| "problem-refresh"/);
+  assert.match(PRIMARY_PROMPT, /Do not emit anything on stdout other than this JSON object\./);
+  assert.ok(PRIMARY_PROMPT.trimEnd().endsWith("match one entry in manifest.candidateFiles."), "envelope contract must remain the final instruction");
 });

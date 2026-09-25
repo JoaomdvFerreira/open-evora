@@ -106,6 +106,8 @@ Preserve contradictory Evidence and identify what it challenges: a proposition, 
 
 Do not automatically generalize a bounded contradiction to the entire Problem.
 
+Unresolved or contradictory Evidence may legitimately remain in a Problem when its boundary is stated explicitly. A preserved contradiction is not by itself a candidate defect; the defect is misrepresenting it, leaving it unbounded where it matters, or wording that ignores it.
+
 ### Independence
 
 Do not infer independent corroboration from record count, Source count, different IDs, or different lineage identifiers alone.
@@ -134,6 +136,14 @@ Several observations in one domain may represent different Problems; observation
 Distinguish what already operates, what is planned/announced, and what remains unresolved.
 
 Existing does not prove effective. Planned does not mean implemented. Understanding what exists and determining whether it closes the civic gap are separate conclusions.
+
+### Authoring Problem wording
+
+Field meanings are owned by `docs/datamodel.md` §3. When authoring or revising a Problem:
+- fit the wording to the Evidence and its inference limits; when wording is unsupported, weaken or remove it — do not link Evidence merely to rescue it;
+- do not treat existing corpus wording as a template that licenses equivalent claims elsewhere;
+- do not assert or refresh currentness from edit dates, Source/Evidence dates, or absence of contradiction;
+- whether a semantic change is material, and whether it needs a history entry, is decided under §9; these rules add no new trigger.
 
 ### Structural change
 
