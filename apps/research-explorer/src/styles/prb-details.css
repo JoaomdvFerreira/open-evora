@@ -1,4 +1,4 @@
-/* PD-02A — generic public PRB Details composition (PrbDetailsPresentation.tsx).
+/* Generic public PRB Details composition (PrbDetailsPresentation.tsx).
    Approved visual reference: docs/design/reference/prb-details/ (README is
    the authority contract). This view owns its own wide editorial geometry —
    it does not reuse the legacy `.lyt-reading`/`.lyt-reading-rail`/
@@ -60,8 +60,6 @@
   --prb-effect-bounds-mark: #a39c88;
   --prb-effect-neutral-ink: var(--color-ink-secondary);
   --prb-effect-neutral-mark: var(--color-ink-muted);
-
-  padding-bottom: var(--space-8);
 }
 
 .prb-details-frame {
@@ -408,8 +406,8 @@
 
 /* ---- Effect label: marker + restrained tone + explicit text -------------- */
 
-/* One treatment for every effect occurrence in this view (evidence meta,
-   audit tally, "Como verificamos" legend). The marker is aria-hidden and
+/* One treatment for every effect occurrence in this view (audit tally,
+   "Como verificamos" legend). The marker is aria-hidden and
    colour is supplemental only: the explicit label text carries the meaning.
    CONTRADICTS has no dedicated tone until an approved reference exercises
    it — it takes .prb-effect--neutral like any unknown value. */
@@ -743,10 +741,6 @@
   border-top: 1px solid var(--color-ink-primary);
 }
 
-.prb-audit-row--dossier {
-  border-bottom: 1px solid var(--color-separator-standard);
-}
-
 .prb-audit-row h4 {
   margin: 0 0 10px;
   color: var(--color-ink-primary);
@@ -1013,8 +1007,6 @@
     --prb-band-heading-size: 24px;
     --prb-audit-pad-top: 36px;
     --prb-audit-pad-bottom: 40px;
-
-    padding-bottom: var(--space-7);
   }
 
   /* Local header: breadcrumb on its own line; Detalhes|Histórico plus an

@@ -2,7 +2,7 @@ import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/
 import problemIndex from "../../generated/index.json";
 
 /**
- * PD-02A Storybook fixture — real canonical PRB-0005 content, sourced from
+ * PRB Details Storybook fixture — real canonical PRB-0005 content, sourced from
  * the RE-01 generated read model (apps/research-explorer/generated/,
  * produced by `npm run build-data` from research/problems/PRB-0005.yaml and
  * its linked research/evidence/*.yaml, research/sources/*.yaml). No field is
