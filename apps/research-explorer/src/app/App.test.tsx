@@ -28,14 +28,14 @@ it("retries a failed startup manifest load", async () => {
     getEdges: () => Promise.resolve([]),
   };
   const user = userEvent.setup();
-  window.history.replaceState(null, "", "/?view=records&id=SRC-0001");
+  window.history.replaceState(null, "", "/?view=records&id=WID-0001");
   render(<App dataProvider={provider} />);
 
   const alert = await screen.findByRole("alert");
   expect(alert.textContent).toContain("temporary manifest failure");
   await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
-  // The manifest summary renders on Record Detail (Overview, the Records
-  // landing and the PRB views each end on their own terminal band).
+  // The manifest summary renders on generic Record Detail (Overview, the Records
+  // landing, the PRB views and EVD/SRC Record Detail each end on their own terminal band).
   expect(await screen.findByText(/Corpus: 0/)).toBeTruthy();
   expect(attempts).toBe(2);
 });
@@ -134,7 +134,7 @@ it("qualifies the manifest timestamp as build/generation time, distinct from res
     getRecord: () => Promise.reject(new Error("not used")),
     getEdges: () => Promise.resolve([]),
   };
-  window.history.replaceState(null, "", "/?view=records&id=SRC-0001");
+  window.history.replaceState(null, "", "/?view=records&id=WID-0001");
   render(<App dataProvider={provider} />);
 
   // Rendered on Record Detail — see the preceding test's own comment.

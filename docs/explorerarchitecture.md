@@ -108,7 +108,8 @@ Explorer presentation invariants:
 - The `Histórico` material-history section is likewise its final content band before the public footer.
 - The Records landing's pagination row is likewise its final content band before the public footer.
 - EVD Record Detail's `Origem e auditoria` band is likewise its final content band before the public footer.
-- The global manifest/corpus-generation summary is not appended after `Detalhes`, `Histórico`, the Records landing or EVD Record Detail. Other Record Detail types and Graph may retain it.
+- SRC Record Detail's `Acesso e auditoria` band is likewise its final content band before the public footer.
+- The global manifest/corpus-generation summary is not appended after `Detalhes`, `Histórico`, the Records landing, EVD or SRC Record Detail. Other Record Detail types and Graph may retain it.
 - Corpus-generation timestamps are never presented as investigation currentness.
 
 ## 4. Records presentation
@@ -158,7 +159,7 @@ For PRB `Detalhes`, the approved reference is the owner-approved Storybook compo
 
 Minor non-visual changes do not require a full visual-review cycle.
 
-Source View (SRC) functional/product presentation reached closure at commit `cfd0347`. Visual polish, typography/surface refinement, and optional styling of actionable EVD/PRB identifiers remain intentionally deferred to a future Claude Design pass; the closure did not refresh approved visual-review snapshots, so no final visual approval should be inferred from it.
+For SRC Record Detail, the approved references are the owner-approved 1440/1024/768/360 editorial targets; its Storybook review stories render the production composition against the generated read model.
 
 ## 7. Performance posture
 

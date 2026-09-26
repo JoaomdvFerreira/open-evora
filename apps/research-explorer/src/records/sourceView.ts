@@ -7,9 +7,7 @@
  * dates, or derived judgements (quality/authority/freshness/confidence are
  * out of scope per the data model's boundary section).
  *
- * EVD backlinks, PRB corpus relations, "O que encontrámos", and "Na
- * investigação" are explicitly deferred to SUI-03A2 — see `SourceSections`
- * below for how that later slice plugs in without touching this one.
+ * SRC → EVD → PRB relations are owned by `sourceEvidenceRelations.ts`.
  */
 
 function getString(record: Record<string, unknown>, key: string): string | null {
@@ -18,13 +16,10 @@ function getString(record: Record<string, unknown>, key: string): string | null 
 }
 
 /**
- * SUI-03K3: pure HTTP(S)-URL-validity check, extracted so both the header
- * "Abrir fonte original" CTA eligibility (`publicSourceReferenceUrl` in
- * `RecordDetailPanel.tsx`, which additionally requires `access.level` ===
- * "public" and `access.availability` === "available") and the factual
- * "Referência original" link rendering (`SourceDatesAccessSection`, which
- * must NOT depend on access/publication eligibility) share one definition of
- * "is this string a valid HTTP(S) URL" instead of two independent parsers.
+ * One definition of "is this string a valid HTTP(S) URL", shared by the
+ * "Abrir fonte" eligibility (`publicSourceReferenceUrl`, which additionally
+ * requires a public, available Source) and the factual "Endereço" link,
+ * which must not depend on that access eligibility (`SrcDetail.tsx`).
  */
 export function isHttpUrl(value: string): boolean {
   try {
@@ -177,93 +172,4 @@ export function extractSourceLicensing(record: Record<string, unknown>): SourceL
 
 export function extractSourceCaveats(record: Record<string, unknown>): string[] | null {
   return getStringArray(record, "caveats");
-}
-
-// ---------------------------------------------------------------------------
-// Section presence
-// ---------------------------------------------------------------------------
-
-/**
- * Candidate Source View section IDs. `findings` is always `"present"`
- * (SUI-03J0 — the Source View's "O que encontrámos" area always renders
- * something, so it is never deferred or absent). `investigation` is
- * relation-owned: `"deferred"` without `relationContext`, else `"present"`
- * or `"absent"` depending on `hasRelatedProblem` (SUI-03A2).
- */
-export type SourceSectionId = "overview" | "findings" | "coverage" | "dates-access" | "licensing" | "caveats" | "investigation" | "technical";
-
-export type SourceSectionPresence = "present" | "absent" | "deferred";
-
-export type SourceSectionPresenceMap = Record<SourceSectionId, SourceSectionPresence>;
-
-/**
- * Relation context needed to resolve `investigation` presence (SUI-03A2) —
- * deliberately just the one boolean it needs, not the full
- * `SourceEvidenceRelations` shape, so this module stays free of any
- * dependency on the relation-loading module or DataProvider. Passing this
- * is optional so this function keeps working standalone (SRC-owned presence
- * only) for any caller that hasn't loaded relation context yet.
- */
-export interface SourceSectionRelationContext {
-  /** Whether the Source Section presence model should treat `investigation` as present — true iff at least one PRB explicitly uses a related EVD in `evidence[]`. */
-  hasRelatedProblem: boolean;
-}
-
-/**
- * `overview` and `technical` are unconditional for any valid SRC record —
- * `technical` in particular per the task's own rule ("always available…
- * because the raw canonical record already exists"), not because any
- * specific field is present. The other owned sections are present only when
- * their extracted content is non-empty, so a later rail/index can skip
- * rendering an empty section without re-deriving this logic itself.
- *
- * `investigation` is relation-owned (SUI-03A2): without `relationContext` it
- * stays "deferred" (SUI-03A1 behaviour, unchanged for any caller that hasn't
- * loaded relations yet); with `relationContext` supplied, it is "present"
- * only when `hasRelatedProblem` is true, else "absent".
- *
- * `findings` (SUI-03J0) is always "present", regardless of `relationContext`
- * — the actual Source View's "O que encontrámos" area always renders
- * something (loading, error/retry, evidence, or an explicit empty state), so
- * it never makes sense to defer or hide it from the section index. This is
- * the one shared section-index source for both desktop and mobile; do not
- * add a second section-presence helper elsewhere.
- */
-export function computeSourceSectionPresence(
-  record: Record<string, unknown>,
-  relationContext?: SourceSectionRelationContext
-): SourceSectionPresenceMap {
-  const coverage = extractSourceCoverage(record);
-  const datesAccess = extractSourceDatesAccess(record);
-  const licensing = extractSourceLicensing(record);
-  const caveats = extractSourceCaveats(record);
-
-  const hasCoverage = coverage.geographyLevel !== null || coverage.geographyArea !== null || coverage.temporal !== null || coverage.domains !== null;
-
-  const hasDatesAccess =
-    datesAccess.publishedAt !== null ||
-    datesAccess.updatedAt !== null ||
-    datesAccess.lastCheckedAt !== null ||
-    datesAccess.updateFrequency !== null ||
-    datesAccess.accessLevel !== null ||
-    datesAccess.accessAvailability !== null ||
-    datesAccess.accessMachineReadable !== null ||
-    datesAccess.accessMethod !== null ||
-    datesAccess.accessFormat !== null ||
-    datesAccess.canonicalReference !== null;
-
-  const hasLicensing = licensing.status !== null || licensing.licence !== null || licensing.reuse !== null || licensing.attribution !== null;
-
-  const hasCaveats = caveats !== null;
-
-  return {
-    overview: "present",
-    coverage: hasCoverage ? "present" : "absent",
-    "dates-access": hasDatesAccess ? "present" : "absent",
-    licensing: hasLicensing ? "present" : "absent",
-    caveats: hasCaveats ? "present" : "absent",
-    technical: "present",
-    findings: "present",
-    investigation: relationContext ? (relationContext.hasRelatedProblem ? "present" : "absent") : "deferred",
-  };
 }

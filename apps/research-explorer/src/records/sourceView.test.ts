@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  computeSourceSectionPresence,
   extractSourceCaveats,
   extractSourceCoverage,
   extractSourceDatesAccess,
@@ -164,55 +163,5 @@ describe("extractSourceCaveats", () => {
 
   it("returns null for an empty caveats array, distinct from absent", () => {
     expect(extractSourceCaveats({ ...MINIMAL_SRC, caveats: [] })).toBeNull();
-  });
-});
-
-describe("computeSourceSectionPresence", () => {
-  it("marks overview, coverage, dates-access, licensing, caveats, technical present for the SRC-0093-shaped complete example", () => {
-    const presence = computeSourceSectionPresence(SRC_0093);
-    expect(presence.overview).toBe("present");
-    expect(presence.coverage).toBe("present");
-    expect(presence["dates-access"]).toBe("present");
-    expect(presence.licensing).toBe("present");
-    expect(presence.caveats).toBe("present");
-    expect(presence.technical).toBe("present");
-  });
-
-  it("keeps overview/technical present and marks licensing present (status/reuse are required) but caveats absent, for a minimal valid SRC beyond required fields", () => {
-    const presence = computeSourceSectionPresence(MINIMAL_SRC);
-    expect(presence.overview).toBe("present");
-    expect(presence.technical).toBe("present");
-    // coverage.geography.level is always a required field, so coverage is
-    // always "present" for any valid SRC — there is no all-absent-scope case.
-    expect(presence.coverage).toBe("present");
-    expect(presence.licensing).toBe("present"); // status/reuse are required fields, so always present
-    expect(presence.caveats).toBe("absent");
-  });
-
-  it("marks dates-access present whenever any relevant temporal/access/reference content exists (required temporal.last_checked_at alone is enough)", () => {
-    const presence = computeSourceSectionPresence(MINIMAL_SRC);
-    expect(presence["dates-access"]).toBe("present");
-  });
-
-  it("always marks findings present (even without relationContext) but defers investigation until relation context resolves it, for either fixture", () => {
-    const complete = computeSourceSectionPresence(SRC_0093);
-    const minimal = computeSourceSectionPresence(MINIMAL_SRC);
-    expect(complete.findings).toBe("present");
-    expect(complete.investigation).toBe("deferred");
-    expect(minimal.findings).toBe("present");
-    expect(minimal.investigation).toBe("deferred");
-  });
-
-  // SUI-03A2: findings/investigation presence once relation context is supplied.
-  it("14. marks findings present and investigation present when relation context reports a reachable PRB (SRC-0093 acceptance case)", () => {
-    const presence = computeSourceSectionPresence(SRC_0093, { hasRelatedProblem: true });
-    expect(presence.findings).toBe("present");
-    expect(presence.investigation).toBe("present");
-  });
-
-  it("14. marks findings present but investigation absent when relation context reports no reachable PRB (empty case)", () => {
-    const presence = computeSourceSectionPresence(MINIMAL_SRC, { hasRelatedProblem: false });
-    expect(presence.findings).toBe("present");
-    expect(presence.investigation).toBe("absent");
   });
 });

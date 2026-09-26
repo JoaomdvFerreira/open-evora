@@ -7,7 +7,6 @@
  */
 
 import type { DataProvider, RecordDetail } from "../dataProvider/types";
-import type { SourceSectionRelationContext } from "./sourceView";
 
 const PROVENANCE_SOURCES_FIELD = "provenance.sources";
 const PRB_EVIDENCE_FIELD = "evidence";
@@ -27,6 +26,17 @@ export interface SourceEvidenceRelations {
   uniqueEvidenceCount: number;
   /** PRBs explicitly using one of these EVDs in `evidence[]`. */
   relatedProblems: SourceRelatedProblem[];
+  /**
+   * Canonical PRB `domain` codes per related Problem, read from each PRB
+   * detail after relation resolution (the record index does not carry them).
+   * A Problem whose detail cannot be read, or that has no domain, maps to [].
+   */
+  problemDomainCodes: Record<string, string[]>;
+}
+
+function domainCodesOf(problemDetail: RecordDetail): string[] {
+  const domain = problemDetail.record.domain;
+  return Array.isArray(domain) ? domain.filter((code): code is string => typeof code === "string" && code.trim() !== "") : [];
 }
 
 function evidenceIdsFor(sourceDetail: RecordDetail): string[] {
@@ -55,13 +65,16 @@ export async function loadSourceEvidenceRelations(provider: DataProvider, source
     }
   }
 
+  const relatedProblems = [...relatedProblemsByPrbId.values()];
+  const domainEntries = await Promise.all(relatedProblems.map(async ({ problemId }) => {
+    const codes = await provider.getRecord(problemId).then(domainCodesOf, () => []);
+    return [problemId, codes] as const;
+  }));
+
   return {
     evidence,
     uniqueEvidenceCount: evidenceIds.length,
-    relatedProblems: [...relatedProblemsByPrbId.values()],
+    relatedProblems,
+    problemDomainCodes: Object.fromEntries(domainEntries),
   };
-}
-
-export function toSourceSectionRelationContext(relations: Pick<SourceEvidenceRelations, "relatedProblems">): SourceSectionRelationContext {
-  return { hasRelatedProblem: relations.relatedProblems.length > 0 };
 }

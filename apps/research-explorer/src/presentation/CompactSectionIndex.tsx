@@ -5,10 +5,9 @@ import { SectionIndexList } from "./SectionIndexList";
  * DS-04D Slice 2C — shared Generic UI compact section-index presentation
  * (docs/design/component-model.md §4.3 "Section-index presentation";
  * component-model.md §5.2), extracted from the current in-flow "Nesta
- * página"/"Nesta fonte" compact indexes (`apps/research-explorer/src/
+ * página" compact indexes (`apps/research-explorer/src/
  * problem/ProblemView.tsx`'s `ProblemHelpDisclosure` nav,
- * `apps/research-explorer/src/records/CompactSectionIndex.tsx`,
- * `SourceCompactSectionIndex.tsx`) — a native `<details>`/`<summary>` with
+ * `apps/research-explorer/src/records/CompactSectionIndex.tsx`) — a native `<details>`/`<summary>` with
  * an accessible `<nav>` inside, remaining ordinary in-flow content. This is
  * not a generic `Disclosure` abstraction (component-model.md §4.3, "Native
  * `<details>/<summary>` remains the generic disclosure primitive... A React

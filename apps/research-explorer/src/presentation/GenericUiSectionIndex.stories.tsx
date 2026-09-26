@@ -15,8 +15,8 @@ import { CompactSectionIndex } from "./CompactSectionIndex";
    synthetic labels/hrefs rather than real SRC/EVD/PRB section names, so
    these generic stories do not imply domain ownership (docs/design/
    foundations.md "Synthetic design content"). No production call site
-   (CompactSectionIndex, SourceCompactSectionIndex, problemSectionIndex,
-   sourceSectionIndex, evdSectionIndex, Source/Problem/EVD views) is
+   (CompactSectionIndex, problemSectionIndex, evdSectionIndex,
+   Problem/EVD views) is
    modified, migrated, or retired in this slice. */
 
 const meta = {

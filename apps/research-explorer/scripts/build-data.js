@@ -44,17 +44,17 @@ function getSourceCommit(repoRoot) {
 }
 
 /**
- * Canonical EVD files are republished byte-for-byte under
- * `canonical/<repo-relative file>` so EVD Detail can offer the exact
- * canonical YAML behind the record as a same-origin download. Only EVD
- * records are published; SRC/PRB have no download surface. They are
+ * Canonical EVD and SRC files are republished byte-for-byte under
+ * `canonical/<repo-relative file>` so EVD and SRC Detail can offer the exact
+ * canonical YAML behind the record as a same-origin download. Only records
+ * with a download surface are published; PRB has none. They are
  * copies of the already-public canonical corpus, never re-serialized from the
  * read model, and they version together with the rest of generated/.
  */
 const CANONICAL_DIR = "canonical";
 
 function publishesCanonicalFile(detail) {
-  return detail.type === "EVD-";
+  return detail.type === "EVD-" || detail.type === "SRC-";
 }
 
 function copyCanonicalFile(repoRoot, tmpDir, relFile) {
