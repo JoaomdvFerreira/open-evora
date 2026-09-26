@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
  * carry the compact sticky-header scroll-margin-top offset, not just
  * Problem/Overview (the pre-existing F4 rule). Extends coverage to the EVD/SRC
  * `.record-editorial-section` ids and `#relacoes` (see EvdDetail.tsx,
- * sourceSectionIndex.ts, RecordDetailPanel.tsx) without introducing a new
+ * SrcDetail.tsx, RecordDetailPanel.tsx) without introducing a new
  * mechanism — one rule, the same scroll-margin-top declaration.
  */
 const css = fs.readFileSync(path.resolve(__dirname, "index.css"), "utf8");

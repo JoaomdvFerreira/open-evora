@@ -161,20 +161,20 @@ describe("RecordDetailPanel DS-05I — EmptyState adoption", () => {
   });
 
   it("keeps a missing record title/meaning as non-EmptyState field-empty copy", async () => {
-    const noMeaning: RecordDetail = { id: "SRC-1", type: "SRC-", file: "", record: {}, outgoingEdges: [], incomingEdges: [] };
-    renderDetail(noMeaning, vi.fn(), vi.fn(), "SRC-1");
-    const meaning = await screen.findByText("SRC-1 — sem campo de significado canónico identificado para este tipo de registo.");
+    const noMeaning: RecordDetail = { id: "WID-1", type: "WID-", file: "", record: {}, outgoingEdges: [], incomingEdges: [] };
+    renderDetail(noMeaning, vi.fn(), vi.fn(), "WID-1");
+    const meaning = await screen.findByText("WID-1 — sem campo de significado canónico identificado para este tipo de registo.");
     expect(meaning.className).toContain("field-empty");
   });
 });
 
-describe("RecordDetailPanel DS-05H — Source RailSectionIndex/CompactSectionIndex adoption", () => {
-  const srcMinimal: RecordDetail = {
+describe("RecordDetailPanel — SRC public page and relation authority", () => {
+  const src: RecordDetail = {
     id: "SRC-1",
     type: "SRC-",
-    file: "",
+    file: "research/sources/SRC-1.yaml",
     outgoingEdges: [],
-    incomingEdges: [],
+    incomingEdges: [{ field: "provenance.sources", ordinal: 0, from: "EVD-1" }],
     record: {
       name: "Fonte mínima",
       resource_type: "webpage",
@@ -186,34 +186,22 @@ describe("RecordDetailPanel DS-05H — Source RailSectionIndex/CompactSectionInd
     },
   };
 
-  it("rail and compact expose identical entries from one domain authority (sourceSectionIndex)", async () => {
-    renderDetail(srcMinimal, vi.fn(), vi.fn(), "SRC-1");
-    await screen.findByRole("navigation", { name: "Nesta fonte" });
-
-    const railNav = screen.getByRole("navigation", { name: "Nesta fonte" });
-    const compactNav = screen.getByRole("navigation", { name: "Nesta fonte (versão compacta)" });
-    const railLinks = Array.from(railNav.querySelectorAll("a"));
-    const compactLinks = Array.from(compactNav.querySelectorAll("a"));
-    expect(railLinks.length).toBeGreaterThan(0);
-    expect(railLinks.map((link) => link.textContent)).toEqual(compactLinks.map((link) => link.textContent));
-    expect(railLinks.map((link) => link.getAttribute("href"))).toEqual(compactLinks.map((link) => link.getAttribute("href")));
+  it("renders SRC as its own public page, without the generic reading rail or section index", async () => {
+    renderDetail(src, vi.fn(), vi.fn(), "SRC-1");
+    expect(await screen.findByRole("heading", { level: 1, name: "Fonte mínima" })).toBeTruthy();
+    expect(screen.queryByRole("complementary", { name: "Mais ações" })).toBeNull();
+    expect(screen.queryByRole("navigation", { name: "Nesta fonte" })).toBeNull();
   });
 
-  it("excludes deferred/absent Source sections (no relationContext yet resolved => Na investigação absent, no caveats => Limitações absent)", async () => {
-    renderDetail(srcMinimal, vi.fn(), vi.fn(), "SRC-1");
-    await screen.findByRole("navigation", { name: "Nesta fonte" });
-    expect(screen.queryByRole("link", { name: "Na investigação" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Limitações" })).toBeNull();
-  });
-
-  it("resolved investigation section presence is unchanged: appears once related-Problem relation data resolves", async () => {
-    const srcWithRelatedProblem: RecordDetail = {
-      ...srcMinimal,
-      incomingEdges: [{ field: "provenance.sources", ordinal: 0, from: "EVD-1" }],
-    };
-    renderDetail(srcWithRelatedProblem, vi.fn(), vi.fn(), "SRC-1");
-    await screen.findByRole("navigation", { name: "Nesta fonte" });
-    expect(await screen.findAllByRole("link", { name: "Na investigação" })).not.toHaveLength(0);
+  it("loads SRC → EVD → PRB once through the provider and shares it between the summary, the Observações cell, findings and Na investigação", async () => {
+    renderDetail(src, vi.fn(), vi.fn(), "SRC-1");
+    const investigation = await screen.findByRole("region", { name: "Na investigação" });
+    expect(within(investigation).getByRole("button", { name: "Ver problema PRB-1" })).toBeTruthy();
+    expect(within(investigation).getByText("EVD-1")).toBeTruthy();
+    expect(document.querySelector(".src-meta-cell--usage dd")?.textContent).toBe("1 · 1 problema");
+    expect(screen.getByText("A Open Évora extraiu desta fonte 1 observação, usada em 1 problema.")).toBeTruthy();
+    const findings = screen.getByRole("region", { name: "O que encontrámos" });
+    expect(within(findings).getByText("Observação delimitada.")).toBeTruthy();
   });
 });
 

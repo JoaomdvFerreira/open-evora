@@ -245,32 +245,6 @@ tr[aria-selected="true"] {
   max-width: 45rem;
 }
 
-/* SUI-03B3: Source original-source action, moved from the rail into the
-   Source identity/header area — same action-link visual language as
-   .detail-rail-actions a, scoped to its own inline placement. */
-.record-source-header-action {
-  margin: var(--space-standard) 0 0;
-}
-
-.record-source-header-action a {
-  display: inline-block;
-  min-height: var(--target-min);
-  padding: var(--space-tight) var(--space-3);
-  color: var(--color-ink-primary);
-  border: 1px solid var(--color-separator-standard);
-  border-radius: var(--radius-control);
-  background: var(--color-surface-raised);
-  font-size: 13px;
-  text-decoration: none;
-}
-
-.record-source-header-action a:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent-hover);
-  text-decoration: underline;
-  text-underline-offset: 0.16em;
-}
-
 .record-meaning {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.15rem;
@@ -2856,37 +2830,6 @@ body:has(.public-overview) .public-footer {
   margin: 0 0 var(--space-3);
 }
 
-/* SUI-03J2B: SRC's own compact "Nesta fonte" index reuses the exact same
-   hidden-by-default/compact-visible contract as
-   `.problem-compact-section-index` above — unlike Problem View's disclosure
-   (which stays visible for its own explanatory content beyond the index),
-   the entire SRC compact disclosure *is* the index, so the whole wrapper is
-   gated, not just an inner nav. Same breakpoints, same pattern, no new
-   Source-specific breakpoint. */
-.source-compact-section-index {
-  display: none;
-}
-
-/* DS-05H remediation F1: before DS-05H, Source compact indexes rendered
-   the legacy records/CompactSectionIndex, whose root also carried
-   `.problem-help`'s `margin: 0 0 var(--space-loose)` — the deliberate separation
-   from the following Source content. The canonical
-   presentation/CompactSectionIndex deliberately owns `margin: 0` instead
-   (generic recipe, no composition spacing), so that separation must be
-   restored here at the domain-owned wrapper, not on the generic component. */
-.source-compact-section-index {
-  margin: 0 0 var(--space-loose);
-}
-
-/* SUI-03K3: "Abrir fonte original" desktop-rail copy vs. compact in-flow
-   copy — same exclusive-visibility contract as the rail/compact index pair
-   above (`.problem-reading-rail` / `.source-compact-section-index`). Both
-   copies exist in the DOM (SourceOriginalLinkAction rendered twice); CSS
-   alone decides which one is visible at a given width. */
-.source-original-link-inline {
-  display: none;
-}
-
 /* F1 intermediate reading-layout recomposition (768px-1059px): the
    canonical 720 main + 44 gap + 216 rail composition cannot fit in this
    band without destructively compressing the 720px reading column.
@@ -2907,17 +2850,8 @@ body:has(.public-overview) .public-footer {
     display: block;
   }
 
-  .source-compact-section-index {
-    display: block;
-  }
 
-  .source-original-link-rail {
-    display: none;
-  }
 
-  .source-original-link-inline {
-    display: block;
-  }
 
   /* Overview desktop-fit grid (768px-1059px, visual-completion structural
      correction): TARGET at 1024 uses a deliberately narrower intermediate
@@ -3655,6 +3589,7 @@ body:has(.public-overview) .public-footer {
   .problem-section,
   .record-editorial-section,
   .evd-section,
+  .src-section,
   #relacoes {
     scroll-margin-top: 108px;
   }
@@ -4185,15 +4120,6 @@ body:has(.public-overview) .public-footer {
     display: block;
   }
 
-  .source-compact-section-index {
-    display: block;
-  }
 
-  .source-original-link-rail {
-    display: none;
-  }
 
-  .source-original-link-inline {
-    display: block;
-  }
 }

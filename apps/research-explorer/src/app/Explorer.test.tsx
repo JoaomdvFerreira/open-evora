@@ -951,9 +951,17 @@ describe("Explorer — global manifest summary placement", () => {
     render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
     expect(manifestSummary()).toBeNull();
-    await user.click(screen.getByRole("button", { name: /SRC-0092/ }));
+    await user.click(screen.getByRole("button", { name: /WID-0001/ }));
     await getDetailPanel();
     expect(manifestSummary()?.textContent).toContain("Corpus: 4 registos");
+  });
+
+  it("is absent on SRC Record Detail, whose Acesso e auditoria band is the terminal content band", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
+    await user.click(await screen.findByRole("button", { name: /SRC-0092/ }));
+    await screen.findByRole("region", { name: "Acesso e auditoria" });
+    expect(manifestSummary()).toBeNull();
   });
 
   it("is absent on EVD Record Detail, whose Origem e auditoria band is the terminal content band", async () => {

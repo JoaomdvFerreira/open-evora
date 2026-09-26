@@ -8,40 +8,14 @@ import { RecordIdentifier } from "./RecordIdentifier";
 import { Breadcrumb } from "../presentation/Breadcrumb";
 import { findMeaningField } from "./meaningField";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation/presentation";
-import { SourceOverviewSection } from "./SourceOverviewSection";
-import { SourceFindingsSection } from "./SourceFindingsSection";
-import { SourceCoverageSection } from "./SourceCoverageSection";
-import { SourceDatesAccessSection } from "./SourceDatesAccessSection";
-import { SourceLicensingSection } from "./SourceLicensingSection";
-import { SourceCaveatsSection } from "./SourceCaveatsSection";
-import { SourceInvestigationSection } from "./SourceInvestigationSection";
-import { useSourceEvidenceRelations, type SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
-import { extractSourceCaveats, isHttpUrl } from "./sourceView";
-import { SourceTechnicalSection } from "./SourceTechnicalSection";
-import { SOURCE_SECTION_ANCHOR_IDS, sourceSectionIndex } from "./sourceSectionIndex";
-import { toSourceSectionRelationContext } from "./sourceEvidenceRelations";
-import { SourceCompactSectionIndex } from "./SourceCompactSectionIndex";
-import type { SourceSectionRelationContext } from "./sourceView";
+import { useSourceEvidenceRelations } from "./useSourceEvidenceRelations";
 import { EvdDetail } from "./EvdDetail";
+import { SrcDetail } from "./SrcDetail";
 import { useEvdProblemUses } from "./useEvdProblemUses";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
 import { applyInitialFragment } from "../navigation/applyInitialFragment";
-import { RailSectionIndex } from "../presentation/RailSectionIndex";
-import type { SectionIndexEntry } from "../presentation/SectionIndexEntry";
-import type { SourceSectionIndexEntry } from "./sourceSectionIndex";
-
-/**
- * DS-05H: adapts `sourceSectionIndex`'s already-decided order/presence/
- * labels/anchors into the neutral `SectionIndexEntry` shape the generic
- * `RailSectionIndex` presentation renders — purely a shape adaptation at the
- * presentation boundary (component-model.md §2.3): no sorting,
- * deduplication, or inferred anchor IDs are introduced here.
- */
-function toSectionIndexEntries(sections: SourceSectionIndexEntry[]): SectionIndexEntry[] {
-  return sections.map((section) => ({ key: section.sectionId, label: section.label, href: `#${section.anchorId}` }));
-}
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -232,133 +206,6 @@ function findRelatedProblemId(detail: RecordDetail, lookup: Map<string, RecordSu
     if (lookup.get(id)?.type === "PRB-") return id;
   }
   return null;
-}
-
-/**
- * SUI-02A: SRC-only public provenance-verification action, restored to SRC
- * v2 canonical eligibility semantics (`docs/datamodel.md` §1.1) — the
- * retired v1 `access.public` field no longer governs this. A canonical
- * external HTTP(S) reference qualifies only when the source's own
- * `access.level` is `"public"` and `access.availability` is `"available"`;
- * availability is never inferred from any other field. Anything else
- * (missing reference, non-HTTP(S) scheme, non-public level, or
- * unavailable/unknown availability) renders no action: this is deliberately
- * not a generic auto-linker for arbitrary strings.
- */
-function publicSourceReferenceUrl(record: Record<string, unknown>): string | null {
-  const access = record.access;
-  if (access === null || typeof access !== "object" || Array.isArray(access)) return null;
-  const accessRecord = access as Record<string, unknown>;
-  if (accessRecord.level !== "public") return null;
-  if (accessRecord.availability !== "available") return null;
-  const reference = record.canonical_reference;
-  if (typeof reference !== "string") return null;
-  return isHttpUrl(reference) ? reference : null;
-}
-
-/**
- * SUI-03K3: rendered twice — once for the desktop rail, once for the compact
- * in-flow position — with CSS (`.problem-reading-rail` /
- * `.source-compact-section-index`-style exclusive visibility, reusing the
- * exact same responsive class contract as `SourceReadingRailIndex` /
- * `SourceCompactSectionIndex`) guaranteeing exactly one is ever visible.
- * Eligibility (`publicSourceReferenceUrl`) is unchanged from SUI-02A; only
- * placement/variant selection is new here.
- */
-function SourceOriginalLinkAction({ detail, variant }: { detail: RecordDetail; variant: "rail" | "inline" }) {
-  if (detail.type !== "SRC-") return null;
-  const url = publicSourceReferenceUrl(detail.record);
-  if (url === null) return null;
-  const className =
-    variant === "rail" ? "record-source-header-action source-original-link-rail" : "record-source-header-action source-original-link-inline";
-  return (
-    <p className={className}>
-      <a href={url} target="_blank" rel="noopener noreferrer">
-        Abrir fonte original ↗
-      </a>
-    </p>
-  );
-}
-
-/**
- * SUI-03J1B: "Nesta fonte" desktop rail index — the SRC-only counterpart to
- * `ProblemReadingRail`'s "Nesta página" nav (`ProblemView.tsx`).
- * `sourceSectionIndex` (SUI-03J0) is the sole order/label/anchor/filtering
- * authority; this component never hardcodes a duplicate section list.
- *
- * SUI-03J2B: `relationContext` is now derived once by the caller
- * (`RecordDetailContent`) and passed in, rather than recomputed here — the
- * same resolved value also reaches the compact `SourceCompactSectionIndex`,
- * so both indexes are driven from one `toSourceSectionRelationContext` call.
- *
- * DS-05H: the nav/list anatomy is now the canonical `RailSectionIndex`
- * (component-model.md §4.3); `.problem-reading-rail` still owns this rail's
- * responsive visibility (reused verbatim, no new Source-specific
- * breakpoint), applied to the wrapping element here since `RailSectionIndex`
- * itself owns no responsive behaviour.
- */
-function SourceReadingRailIndex({ record, relationContext }: { record: Record<string, unknown>; relationContext?: SourceSectionRelationContext }) {
-  const sections = sourceSectionIndex(record, relationContext);
-  return (
-    <div className="problem-reading-rail">
-      <h4 className="detail-panel-label">Nesta fonte</h4>
-      <RailSectionIndex label="Nesta fonte" entries={toSectionIndexEntries(sections)} />
-    </div>
-  );
-}
-
-/**
- * SUI-03C2/H2: `SourceFindingsSection` ("O que encontrámos") half of the one
- * shared SRC → EVD relation state (`SourceRelationsState`, owned by
- * `RecordDetailContent` via `useSourceEvidenceRelations` —
- * SUI-03A2's `loadSourceEvidenceRelations` as sole SRC→EVD relation
- * authority). Mirrors `useRecordDetail`'s own loading/error contract: while
- * loading, a loading placeholder renders; on failure, an inline retry
- * affordance renders instead of the zero-EVD empty state, which
- * `SourceFindingsSection` itself only ever renders once relation loading has
- * actually succeeded with zero backlinks.
- */
-function SourceFindings({ state, onSelect }: { state: SourceEvidenceRelationsState & { retry: () => void }; onSelect: (id: string) => void }) {
-  if (state.status === "loading" || state.status === "idle") {
-    return (
-      <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="record-editorial-section source-findings-section">
-        <h3 className="detail-panel-label">O que encontrámos</h3>
-        <ProgressMessage message="A carregar observações da investigação…" />
-      </section>
-    );
-  }
-
-  if (state.status === "error") {
-    return (
-      <section id={SOURCE_SECTION_ANCHOR_IDS.findings} aria-label="O que encontrámos" className="record-editorial-section source-findings-section">
-        <h3 className="detail-panel-label">O que encontrámos</h3>
-        <ErrorNotice
-          title="Não foi possível carregar as observações da investigação ligadas a esta fonte."
-          message=""
-          action={
-            <button type="button" onClick={state.retry}>
-              Tentar novamente
-            </button>
-          }
-        />
-      </section>
-    );
-  }
-
-  return <SourceFindingsSection relations={state.relations} onSelect={onSelect} />;
-}
-
-/**
- * SUI-03H2: `SourceInvestigationSection` ("Na investigação") half of the
- * same shared `SourceRelationsState` `SourceFindings` above consumes — no
- * second relation load. Renders only once relation state is `"ready"`;
- * absent during loading, on error, and (via `SourceInvestigationSection`'s
- * own `relatedProblems.length === 0` check) when ready with no related
- * Problem — never a second loading/error message.
- */
-function SourceInvestigation({ state, onSelect }: { state: SourceEvidenceRelationsState; onSelect: (id: string) => void }) {
-  if (state.status !== "ready") return null;
-  return <SourceInvestigationSection relations={state.relations} onSelect={onSelect} />;
 }
 
 function RecordDetailBreadcrumb({ detail, onBackToRecords }: { detail: RecordDetail; onBackToRecords: () => void }) {
@@ -880,37 +727,27 @@ function RecordDetailContent({
   const isEvd = detail.type === "EVD-";
   const meaning = findMeaningField(detail.record);
   const typeInfo = describeType(detail.type);
-  // SUI-03H2: the one SRC → EVD relation load/state owner for this rendered
-  // SRC detail, shared by `SourceFindings` ("O que encontrámos") and
-  // `SourceInvestigation` ("Na investigação") below — never a second
-  // `useSourceEvidenceRelations`/`loadSourceEvidenceRelations` call for the
-  // same detail. `sourceId` is `null` for non-SRC records, which is this
-  // hook's own no-op contract (see `useSourceEvidenceRelations.ts`).
+  // Each public page owns exactly one relation load: SRC → EVD → PRB for a
+  // Source, EVD → PRB for an Evidence record. `null` is each hook's no-op.
   const sourceRelationsState = useSourceEvidenceRelations(dataProvider, isSrc ? detail.id : null);
   const evdProblemUses = useEvdProblemUses(dataProvider, isEvd ? detail.id : null);
-  // SUI-03J2B: the one `toSourceSectionRelationContext` derivation shared by
-  // both the desktop `SourceReadingRailIndex` and the compact
-  // `SourceCompactSectionIndex` — resolved only once `sourceRelationsState`
-  // is `"ready"`, so `investigation` stays correctly "deferred" (excluded)
-  // while loading/idle/error, matching `computeSourceSectionPresence`'s own
-  // contract. Never recomputed per-index.
-  const sourceRelationContext = isSrc && sourceRelationsState.status === "ready" ? toSourceSectionRelationContext(sourceRelationsState.relations) : undefined;
-  const hasCaveats = isSrc ? extractSourceCaveats(detail.record) !== null : false;
   // Already-explicit, schema-driven classification/status fields (RE-01's
   // `buildSummaryFields()` — every enum-constrained field the record's own
   // schema declares), reused here rather than singling out any one
   // record-type-specific field for special presentation. PRB→EVD effects
   // are rendered in Problem View, so they are not duplicated in this row.
-  // SUI-03K1: SRC never renders this generic chip row — its schema-declared
-  // enum fields (acquisition.method, access.*, licensing.*, scope.geography.level,
-  // …) are already presented via the dedicated Source View sections (Visão
-  // geral, Cobertura, Datas e acesso, Licenciamento), so surfacing them again
-  // here would be redundant and, at compact width, delay the Source content.
-  const roleFields = isSrc ? [] : Object.entries(lookup.get(detail.id)?.summaryFields ?? {});
+  const roleFields = Object.entries(lookup.get(detail.id)?.summaryFields ?? {});
   const relatedProblemId = findRelatedProblemId(detail, lookup);
 
-  // EVD owns its complete public page composition (local header, hero,
-  // editorial sections, terminal audit band) — no generic reading layout/rail.
+  // EVD and SRC each own their complete public page composition (local
+  // header, hero, editorial sections, terminal audit band) — no generic
+  // reading layout/rail.
+  if (isSrc) {
+    return (
+      <SrcDetail detail={detail} lookup={lookup} relations={sourceRelationsState} onSelect={onSelect} onViewAsProblem={onViewAsProblem} onBackToRecords={onBackToRecords} />
+    );
+  }
+
   if (isEvd) {
     return (
       <EvdDetail detail={detail} lookup={lookup} problemUses={evdProblemUses} onSelect={onSelect} onViewAsProblem={onViewAsProblem} onBackToRecords={onBackToRecords} />
@@ -952,20 +789,6 @@ function RecordDetailContent({
             )}
           </section>
 
-          {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} variant="inline" />}
-          {isSrc && <SourceCompactSectionIndex record={detail.record} relationContext={sourceRelationContext} />}
-
-          {isSrc && <SourceOverviewSection record={detail.record} />}
-          {isSrc && <SourceFindings state={sourceRelationsState} onSelect={onSelect} />}
-          {isSrc && <SourceCoverageSection record={detail.record} />}
-          {isSrc && <SourceDatesAccessSection record={detail.record} />}
-          {isSrc && <SourceLicensingSection record={detail.record} />}
-          {isSrc && !hasCaveats && <SourceInvestigation state={sourceRelationsState} onSelect={onSelect} />}
-          {isSrc && <SourceCaveatsSection record={detail.record} />}
-          {isSrc && hasCaveats && <SourceInvestigation state={sourceRelationsState} onSelect={onSelect} />}
-
-          {isSrc && <SourceTechnicalSection record={detail.record} />}
-
           {isPrb ? (
             <>
               <PrbMetadataPanel detail={detail} />
@@ -984,7 +807,7 @@ function RecordDetailContent({
                 <PrbRawTechnicalDisclosure detail={detail} />
               </section>
             </>
-          ) : isSrc ? null : (
+          ) : (
             <>
               <ProvenancePanel detail={detail} />
 
@@ -1006,31 +829,27 @@ function RecordDetailContent({
             <code>{detail.type}</code>
             <p>{typeInfo.description}</p>
           </div>
-          {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} variant="rail" />}
-          {isSrc && <SourceReadingRailIndex record={detail.record} relationContext={sourceRelationContext} />}
-          {!isSrc && (
-            <div className="detail-rail-actions">
-              {/* Technical inspection of a PRB leads back to its public
-                  page through one ordinary action — not PRB-local
-                  navigation (Detalhes|Histórico lives on that page). */}
-              {isPrb && (
-                <button type="button" onClick={() => onViewAsProblem(detail.id)}>
-                  Ver página do problema
-                </button>
-              )}
-              {relatedProblemId && (
-                <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
-                  Ver como Problema ({relatedProblemId})
-                </button>
-              )}
-              {detail.type !== "PRB-" && (
-                <button type="button" onClick={() => onViewInGraph(detail.id)}>
-                  Ver no Grafo
-                </button>
-              )}
-              <span className="detail-rail-file">{detail.file}</span>
-            </div>
-          )}
+          <div className="detail-rail-actions">
+            {/* Technical inspection of a PRB leads back to its public
+                page through one ordinary action — not PRB-local
+                navigation (Detalhes|Histórico lives on that page). */}
+            {isPrb && (
+              <button type="button" onClick={() => onViewAsProblem(detail.id)}>
+                Ver página do problema
+              </button>
+            )}
+            {relatedProblemId && (
+              <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
+                Ver como Problema ({relatedProblemId})
+              </button>
+            )}
+            {detail.type !== "PRB-" && (
+              <button type="button" onClick={() => onViewInGraph(detail.id)}>
+                Ver no Grafo
+              </button>
+            )}
+            <span className="detail-rail-file">{detail.file}</span>
+          </div>
         </aside>
       </div>
     </div>

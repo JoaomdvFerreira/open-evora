@@ -1,0 +1,1112 @@
+/* Public SRC Record Detail (records/SrcDetail.tsx).
+   Owner-approved 1440/1024/768/360 targets: local header band, wide
+   editorial hero, full-bleed six-fact metadata strip (grouped 6-up only at
+   the widest band, 3 × 2 below, 2-up compact), rail + content editorial
+   sections, and a terminal "Acesso e auditoria" band. It shares the EVD
+   Record Detail geometry (240px/56px rail at >=1440, 180px/40px at 1024,
+   in-flow labels below 1024) through its own view-scoped custom properties,
+   so each breakpoint block only swaps values. Content and presence stay
+   entirely canonical-data-driven (SrcDetail.tsx). */
+
+.src-detail-view {
+  --src-hero-pad-top: 96px;
+  --src-hero-pad-bottom: 72px;
+  --src-hero-title-size: 46px;
+  --src-hero-summary-size: 21px;
+  --src-meta-cell-pad-x: 24px;
+  --src-meta-value-size: 19px;
+  --src-section-pad-top: 96px;
+  --src-section-col: 240px;
+  --src-section-gap: 56px;
+  --src-reading-size: 19px;
+  --src-reading-width: 40rem;
+  --src-body-pad-bottom: 112px;
+  --src-audit-pad-top: 80px;
+  --src-audit-pad-bottom: 88px;
+  --src-audit-heading-size: 32px;
+  --src-audit-row-gap: 48px;
+  --src-audit-label-col: 224px;
+}
+
+/* ---- Full-width bands bleed through the shell gutter --------------------- */
+
+.src-header-band,
+.src-meta-band,
+.src-audit {
+  margin-inline: calc(-1 * var(--explorer-shell-gutter, 0px));
+  padding-inline: var(--explorer-shell-gutter, 0px);
+}
+
+/* Terminal composition: the audit band's own bottom padding is the only
+   space before the footer (same scoping as EVD Record Detail). */
+body:has(.src-detail-view) main.explorer-shell {
+  padding-bottom: 0;
+}
+
+body:has(.src-detail-view) .public-footer {
+  margin-top: 0;
+}
+
+/* ---- Local header: breadcrumb + Abrir fonte original / Verificar ----------- */
+
+.src-header-band {
+  border-bottom: 1px solid var(--color-separator-standard);
+  background: var(--color-surface-subtle);
+}
+
+.src-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 44px;
+  padding: 6px 0;
+}
+
+.src-header .ui-breadcrumb {
+  min-width: 0;
+  gap: 0.45em;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.src-breadcrumb-ancestor {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.src-breadcrumb-ancestor:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.src-header .ui-breadcrumb-current .rec-identifier {
+  color: var(--color-ink-primary);
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
+}
+
+.src-header-utilities {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+}
+
+.src-header-utility {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-accent-hover);
+  font-family: var(--font-interface);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.src-header-utility:hover {
+  text-decoration: underline;
+}
+
+/* ---- Hero ------------------------------------------------------------------ */
+
+/* Grid so "Verificada em …" (DOM-ordered after the eyebrow row) sits at the
+   eyebrow row's right edge at >=768 and on its own line at 360. */
+.src-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 20px;
+  padding: var(--src-hero-pad-top) 0 var(--src-hero-pad-bottom);
+}
+
+.src-hero-eyebrow-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 20px;
+  margin-bottom: 30px;
+}
+
+.src-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-accent-hover);
+  font-family: var(--font-interface);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.src-hero-eyebrow-mark {
+  width: 7px;
+  height: 7px;
+  background: var(--color-accent);
+}
+
+.src-hero-publisher {
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: 15px;
+}
+
+.src-hero-checked {
+  align-self: baseline;
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.src-hero-checked time {
+  color: var(--color-ink-primary);
+}
+
+.src-hero-title {
+  grid-column: 1 / -1;
+  max-width: 40rem;
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--src-hero-title-size);
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.src-hero-summary {
+  grid-column: 1 / -1;
+  max-width: 40rem;
+  margin: 28px 0 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-reading);
+  font-size: var(--src-hero-summary-size);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* ---- Metadata strip --------------------------------------------------------- */
+
+/* Presentation-only group row over the six-column strip (widest band only). */
+.src-meta-groups {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  padding-bottom: 12px;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.src-meta-group--coverage { grid-column: 1 / 4; }
+.src-meta-group--access { grid-column: 4 / 6; padding-left: var(--src-meta-cell-pad-x); }
+.src-meta-group--use { grid-column: 6 / 7; padding-left: var(--src-meta-cell-pad-x); }
+
+.src-meta-band {
+  border-top: 1px solid var(--color-separator-standard);
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.src-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin-block: 0;
+}
+
+.src-meta-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 22px var(--src-meta-cell-pad-x) 24px;
+  border-left: 1px solid var(--color-separator-standard);
+}
+
+.src-meta-cell--where {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.src-meta-cell dt {
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+
+.src-meta-cell dd {
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-interface);
+  font-size: var(--src-meta-value-size);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+.src-meta-empty {
+  color: var(--color-ink-muted);
+  font-weight: 400;
+}
+
+.src-reuse {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.src-reuse-mark {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid currentColor;
+}
+
+.src-reuse--attention {
+  color: var(--color-accent-hover);
+}
+
+/* ---- Editorial sections (rail label + content) ------------------------------- */
+
+.src-body {
+  padding-bottom: var(--src-body-pad-bottom);
+}
+
+.src-section {
+  display: grid;
+  grid-template-columns: var(--src-section-col) minmax(0, 1fr);
+  gap: var(--src-section-gap);
+  padding-top: var(--src-section-pad-top);
+}
+
+.src-section-intro {
+  min-width: 0;
+  padding-top: 10px;
+}
+
+.src-section-label {
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-technical);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.src-section--accent .src-section-label {
+  color: var(--color-accent-hover);
+}
+
+.src-section-note {
+  margin: 4px 0 0;
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+.src-section-body {
+  min-width: 0;
+}
+
+/* Shared ruled-list opening: a primary-ink hairline over each list. */
+.src-finding-list,
+.src-problem-list,
+.src-limit-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-ink-primary);
+}
+
+.src-limit-list {
+  border-top-color: var(--color-accent-hover);
+}
+
+/* ---- O que encontrámos -------------------------------------------------------- */
+
+.src-finding {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "head head"
+    "summary summary"
+    "facts problems";
+  align-items: end;
+  column-gap: 24px;
+  padding: 26px 0 28px;
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.src-finding-head {
+  grid-area: head;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  margin: 0 0 10px;
+}
+
+.src-finding-head .rec-identifier,
+.src-finding-problems .rec-identifier {
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.src-finding-head .rec-identifier {
+  color: var(--color-accent-hover);
+}
+
+.src-finding-topics {
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: 14px;
+}
+
+.src-finding-summary {
+  grid-area: summary;
+  max-width: var(--src-reading-width);
+  margin: 0 0 14px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--src-reading-size);
+  line-height: 1.65;
+}
+
+.src-finding-facts,
+.src-finding-problems {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+.src-finding-facts {
+  grid-area: facts;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+}
+
+.src-finding-facts > div,
+.src-finding-problems > div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.src-finding-facts dt,
+.src-finding-problems dt {
+  flex: none;
+  color: var(--color-ink-muted);
+  font-size: 13.5px;
+}
+
+.src-finding-facts dd,
+.src-finding-problems dd {
+  margin: 0;
+  color: var(--color-ink-primary);
+}
+
+/* Presentation-only sentence case for the lower-case canonical phrase. */
+.src-finding-populations::first-letter {
+  text-transform: uppercase;
+}
+
+.src-finding-ids .rec-identifier {
+  color: var(--color-ink-primary);
+  font-size: 13px;
+}
+
+.src-finding-problems {
+  grid-area: problems;
+  justify-self: end;
+}
+
+/* The "Problema" caption is shown only where the id becomes a labelled row (compact). */
+.src-finding-problems dt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.src-finding-problems dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.src-finding-problems .rec-identifier {
+  color: var(--color-ink-muted);
+}
+
+.src-finding-head .rec-identifier:hover,
+.src-finding-problems .rec-identifier:hover,
+.src-finding-problems .rec-identifier:focus-visible {
+  color: var(--color-accent-hover);
+}
+
+/* ---- Na investigação ---------------------------------------------------------- */
+
+.src-problem {
+  display: grid;
+  grid-template-columns: 144px minmax(0, 1fr) auto;
+  grid-template-areas: "id title via";
+  align-items: baseline;
+  column-gap: 24px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.src-problem > .rec-identifier {
+  grid-area: id;
+  justify-self: start;
+  color: var(--color-accent-hover);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.src-problem > .rec-identifier:hover {
+  text-decoration: underline;
+}
+
+.src-problem-title {
+  grid-area: title;
+  justify-self: start;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+
+.src-problem-title:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.src-problem-via {
+  grid-area: via;
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: 13.5px;
+  text-align: right;
+}
+
+.src-problem-via-ids {
+  color: var(--color-ink-secondary);
+  font-family: var(--font-technical);
+  font-size: 13px;
+}
+
+/* ---- Limitações ---------------------------------------------------------------- */
+
+.src-limit {
+  padding: 30px 0;
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.src-limit-index {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--color-accent-hover);
+  font-family: var(--font-technical);
+  font-size: 13px;
+}
+
+.src-limit p {
+  max-width: var(--src-reading-width);
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: 21px;
+  line-height: 1.6;
+}
+
+/* ---- Temas ---------------------------------------------------------------------- */
+
+.src-topic-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: 17px;
+}
+
+.src-topic-list li {
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+/* ---- Acesso e auditoria (terminal band) ------------------------------------------ */
+
+.src-audit {
+  border-top: 1px solid var(--color-ink-primary);
+  background: var(--color-surface-subtle);
+}
+
+/* The band itself carries `.src-section` for the shared anchor scroll offset;
+   its inner frame owns the rail geometry. */
+.src-audit.src-section {
+  display: block;
+  padding-top: 0;
+}
+
+.src-audit-frame {
+  display: grid;
+  grid-template-columns: var(--src-section-col) minmax(0, 1fr);
+  gap: var(--src-section-gap);
+  padding: var(--src-audit-pad-top) 0 var(--src-audit-pad-bottom);
+}
+
+.src-audit-frame > .src-section-intro {
+  padding-top: 8px;
+}
+
+.src-audit-lede {
+  margin-bottom: 36px;
+}
+
+.src-audit-heading {
+  margin: 0 0 10px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--src-audit-heading-size);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.src-audit-intro {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-size: 16.5px;
+  line-height: 1.65;
+}
+
+.src-audit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--src-audit-row-gap);
+  padding: 32px 0;
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.src-audit-lede + .src-audit-row {
+  border-top-color: var(--color-ink-primary);
+}
+
+.src-audit-row--canonical {
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.src-audit-row h4 {
+  margin: 0 0 12px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.src-audit-row > div > p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.src-audit-row > div > p strong {
+  color: var(--color-ink-primary);
+  font-weight: 600;
+}
+
+.src-audit-facts {
+  margin: 0;
+}
+
+.src-audit-facts > div {
+  display: grid;
+  grid-template-columns: var(--src-audit-label-col) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 2px 0;
+  padding: 5px 0;
+}
+
+.src-audit-facts dt {
+  color: var(--color-ink-muted);
+  font-size: 13.5px;
+}
+
+.src-audit-facts dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.src-audit-address {
+  font-family: var(--font-technical);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+a.src-audit-address {
+  color: var(--color-accent-hover);
+  text-underline-offset: 0.2em;
+}
+
+.src-audit-row > div > p.src-audit-canonical-meta {
+  color: var(--color-ink-secondary);
+  font-family: var(--font-technical);
+  font-size: 13px;
+}
+
+.src-audit-canonical-meta code {
+  padding: 0;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  overflow-wrap: anywhere;
+}
+
+.src-audit-secondary-cta,
+.src-audit-primary-cta {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: var(--radius-control);
+  font-family: var(--font-interface);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.src-audit-secondary-cta {
+  border: 1px solid var(--color-separator-standard);
+  background: var(--color-surface-raised);
+  color: var(--color-ink-primary);
+}
+
+.src-audit-secondary-cta:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
+.src-audit-primary-cta {
+  border: 1px solid var(--color-accent-hover);
+  background: var(--color-accent-hover);
+  color: var(--color-surface-reading);
+}
+
+.src-audit-primary-cta:hover {
+  color: var(--color-surface-reading);
+  text-decoration: underline;
+}
+
+.src-audit-method-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  color: var(--color-accent-hover);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.src-audit-method-link:hover {
+  text-decoration: underline;
+}
+
+@media (forced-colors: active) {
+  .src-hero-eyebrow-mark {
+    background: CanvasText;
+  }
+}
+
+/* ---- Responsive: 1024 fit, 768 boundary, 360 compact ------------------------- */
+
+/* Below the widest band the strip is a 3 × 2 grid without group labels. */
+@media (max-width: 1279px) {
+  .src-meta-groups {
+    display: none;
+  }
+
+  .src-meta-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .src-meta-cell--access {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .src-meta-cell--access,
+  .src-meta-cell--reuse,
+  .src-meta-cell--usage {
+    border-top: 1px solid var(--color-separator-standard);
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .src-detail-view {
+    --src-hero-pad-top: 80px;
+    --src-hero-pad-bottom: 64px;
+    --src-hero-title-size: 42px;
+    --src-meta-cell-pad-x: 20px;
+    --src-meta-value-size: 18px;
+    --src-section-pad-top: 88px;
+    --src-section-col: 180px;
+    --src-section-gap: 40px;
+    --src-body-pad-bottom: 96px;
+    --src-audit-pad-top: 68px;
+    --src-audit-heading-size: 30px;
+    --src-audit-label-col: 180px;
+  }
+}
+
+/* Below 1024: no reading rail — section labels enter normal flow with their
+   note beside them; the Problem ids move to the observation's first line. */
+@media (max-width: 1023px) {
+  .src-detail-view {
+    --src-hero-pad-top: 56px;
+    --src-hero-pad-bottom: 56px;
+    --src-hero-title-size: 38px;
+    --src-hero-summary-size: 20px;
+    --src-meta-cell-pad-x: 20px;
+    --src-meta-value-size: 18px;
+    --src-section-pad-top: 64px;
+    --src-reading-width: none;
+    --src-body-pad-bottom: 80px;
+    --src-audit-pad-top: 56px;
+    --src-audit-pad-bottom: 72px;
+    --src-audit-heading-size: 28px;
+    --src-audit-row-gap: 28px;
+    --src-audit-label-col: 160px;
+  }
+
+  .src-hero-summary {
+    max-width: none;
+  }
+
+  .src-header-utility-extra {
+    display: none;
+  }
+
+  .src-section,
+  .src-audit-frame {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .src-section-intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+    padding-top: 0;
+  }
+
+  .src-audit-frame > .src-section-intro {
+    padding-top: 0;
+  }
+
+  .src-section-note {
+    margin: 0;
+  }
+
+  .src-finding {
+    grid-template-areas:
+      "head problems"
+      "summary summary"
+      "facts facts";
+    align-items: baseline;
+  }
+
+  .src-audit-frame {
+    gap: 16px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .src-problem {
+    grid-template-columns: 112px minmax(0, 1fr);
+    grid-template-areas:
+      "id title"
+      "id via";
+    row-gap: 4px;
+  }
+
+  .src-problem-via {
+    text-align: left;
+  }
+}
+
+@media (max-width: 767px) {
+  .src-detail-view {
+    --src-hero-pad-top: 28px;
+    --src-hero-pad-bottom: 30px;
+    --src-hero-title-size: 26px;
+    --src-hero-summary-size: 18px;
+    --src-meta-cell-pad-x: 14px;
+    --src-meta-value-size: 16px;
+    --src-section-pad-top: 44px;
+    --src-reading-size: 18px;
+    --src-body-pad-bottom: 56px;
+    --src-audit-pad-top: 36px;
+    --src-audit-pad-bottom: 40px;
+    --src-audit-heading-size: 24px;
+  }
+
+  /* Breadcrumb and icon-only utilities share one row; each utility keeps
+     its full accessible name (SrcDetail.tsx). */
+  .src-header {
+    gap: 8px;
+    padding: 0;
+  }
+
+  .src-header-utilities {
+    gap: 0;
+  }
+
+  .src-header-utility {
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font-size: 17px;
+  }
+
+  .src-header-utility-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .src-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .src-hero-eyebrow-row {
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .src-hero-eyebrow,
+  .src-hero-publisher {
+    font-size: 14.5px;
+  }
+
+  .src-hero-checked {
+    margin-bottom: 18px;
+    font-size: 12.5px;
+    white-space: normal;
+  }
+
+  .src-hero-title {
+    line-height: 1.25;
+  }
+
+  .src-hero-summary {
+    margin-top: 16px;
+  }
+
+  .src-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "where when"
+      "access reuse"
+      "topics usage";
+  }
+
+  .src-meta-cell--where { grid-area: where; }
+  .src-meta-cell--when { grid-area: when; }
+  .src-meta-cell--topics { grid-area: topics; }
+  .src-meta-cell--access { grid-area: access; }
+  .src-meta-cell--reuse { grid-area: reuse; }
+  .src-meta-cell--usage { grid-area: usage; }
+
+  .src-meta-cell {
+    padding: 14px var(--src-meta-cell-pad-x) 16px;
+  }
+
+  .src-meta-cell--when,
+  .src-meta-cell--reuse,
+  .src-meta-cell--usage {
+    border-left: 1px solid var(--color-separator-standard);
+  }
+
+  .src-meta-cell--where,
+  .src-meta-cell--access,
+  .src-meta-cell--topics {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .src-meta-cell--topics {
+    border-top: 1px solid var(--color-separator-standard);
+  }
+
+  .src-meta-cell dt {
+    font-size: 13px;
+  }
+
+  .src-section {
+    gap: 14px;
+  }
+
+  .src-section-intro {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .src-section-note {
+    font-size: 13.5px;
+  }
+
+  /* One readable flow; facts and Problem ids become labelled rows. */
+  .src-finding {
+    display: block;
+    padding: 22px 0 24px;
+  }
+
+  .src-finding-facts,
+  .src-finding-problems {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: 6px 0;
+  }
+
+  .src-finding-facts > div,
+  .src-finding-problems > div {
+    display: contents;
+  }
+
+  .src-finding-problems {
+    justify-self: auto;
+    margin-top: 6px;
+  }
+
+  .src-finding-problems dt {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .src-finding-problems .rec-identifier {
+    color: var(--color-accent-hover);
+  }
+
+  .src-problem {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "id title"
+      "via via";
+    column-gap: 14px;
+    row-gap: 4px;
+    padding: 18px 0;
+  }
+
+  .src-problem-title {
+    font-size: 18px;
+  }
+
+  .src-problem-via {
+    text-align: left;
+  }
+
+  .src-limit {
+    padding: 22px 0 24px;
+  }
+
+  .src-limit-index {
+    margin-bottom: 8px;
+  }
+
+  .src-limit p {
+    font-size: 18px;
+  }
+
+  .src-topic-list {
+    gap: 12px 18px;
+    font-size: 16px;
+  }
+
+  .src-audit-lede {
+    margin-bottom: 22px;
+  }
+
+  .src-audit-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    padding: 24px 0;
+  }
+
+  .src-audit-row h4 {
+    font-size: 20px;
+  }
+
+  .src-audit-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 4px 0;
+  }
+
+  .src-audit-secondary-cta,
+  .src-audit-primary-cta {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .src-audit-method-link {
+    align-self: flex-start;
+    min-height: var(--target-min);
+  }
+}
