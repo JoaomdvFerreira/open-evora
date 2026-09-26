@@ -17,7 +17,8 @@ it("renders the approved privacy surface without a data dependency", () => {
   render(<App dataProvider={provider} />);
 
   expect(screen.getByRole("heading", { name: "Privacidade" })).toBeTruthy();
-  expect(screen.getByText(/sem criar uma conta/)).toBeTruthy();
+  expect(screen.getByText("Não é necessária.")).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Compromisso" })).toBeTruthy();
   expect(screen.getAllByRole("link", { name: "Correções" }).every((link) => link.getAttribute("href") === "/corrections")).toBe(true);
 });
 
@@ -26,9 +27,9 @@ it("renders the owner-confirmed About accountability facts in the shared trust s
   render(<App dataProvider={provider} />);
 
   expect(screen.getByRole("heading", { name: "Sobre o Open Évora" })).toBeTruthy();
-  expect(screen.getByRole("link", { name: "Open Évora — Explorador de Investigação" })).toBeTruthy();
+  expect(screen.getByRole("navigation", { name: "Navegação principal", hidden: true })).toBeTruthy();
   expect(screen.getByText("Projeto Open Évora")).toBeTruthy();
-  expect(screen.getByText("Projeto independente")).toBeTruthy();
+  expect(screen.getByText("Projeto independente, sem ligação à autarquia")).toBeTruthy();
   expect(screen.getByText("Autofinanciado")).toBeTruthy();
   expect(screen.getAllByRole("link", { name: "Sobre" }).some((link) => link.getAttribute("aria-current") === "page")).toBe(true);
   expect(screen.getAllByRole("link", { name: "Metodologia" }).every((link) => link.getAttribute("href") === "/methodology")).toBe(true);
@@ -40,6 +41,85 @@ it("renders the approved corrections action to the canonical public Issues page"
 
   expect(screen.getByRole("heading", { name: "Correções" })).toBeTruthy();
   expect(screen.getByRole("link", { name: /GitHub Issues do projeto Open Évora/ }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
+  expect(screen.getByRole("link", { name: "Reportar correção no GitHub" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
+  const include = screen.getByRole("region", { name: "O que incluir" });
+  expect(within(include).getAllByRole("listitem")).toHaveLength(3);
+});
+
+const INFORMATION_SEQUENCE = [
+  { path: "/about", label: "Sobre", heading: "Sobre o Open Évora", global: "Sobre" },
+  { path: "/methodology", label: "Metodologia", heading: "Metodologia", global: "Método" },
+  { path: "/corrections", label: "Correções", heading: "Correções", global: "Sobre" },
+  { path: "/contact", label: "Contacto", heading: "Contacto", global: "Sobre" },
+  { path: "/privacy", label: "Privacidade", heading: "Privacidade", global: "Sobre" },
+];
+
+function renderInformationPage(path: string) {
+  window.history.replaceState(null, "", path);
+  return render(<App dataProvider={provider} />);
+}
+
+describe("Information area — shared shell navigation contract", () => {
+  it.each(INFORMATION_SEQUENCE)("$path marks exactly one global header item current: $global", ({ path, global }) => {
+    renderInformationPage(path);
+    const header = screen.getByRole("navigation", { name: "Navegação principal", hidden: true });
+    const current = within(header).getAllByRole("link", { hidden: true }).filter((link) => link.getAttribute("aria-current") === "page");
+    expect(current.map((link) => link.textContent)).toEqual([global]);
+  });
+
+  it("header Problemas/Registos navigate to their Explorer destinations outside the live Explorer", () => {
+    renderInformationPage("/about");
+    const header = screen.getByRole("navigation", { name: "Navegação principal", hidden: true });
+    expect(within(header).getByRole("link", { name: "Problemas", hidden: true }).getAttribute("href")).toBe("/");
+    expect(within(header).getByRole("link", { name: "Registos", hidden: true }).getAttribute("href")).toBe("/?view=records");
+    expect(within(header).getByRole("link", { name: "Método", hidden: true }).getAttribute("href")).toBe("/methodology");
+    expect(within(header).getByRole("link", { name: "Sobre", hidden: true }).getAttribute("href")).toBe("/about");
+  });
+
+  it.each(INFORMATION_SEQUENCE)("$path marks only its own local INFORMAÇÃO item current, in the approved order", ({ path, label }) => {
+    renderInformationPage(path);
+    const local = screen.getByRole("navigation", { name: "Informação sobre o Open Évora" });
+    const links = within(local).getAllByRole("link");
+    expect(links.map((link) => [link.textContent, link.getAttribute("href")])).toEqual(INFORMATION_SEQUENCE.map((entry) => [entry.label, entry.path]));
+    expect(links.filter((link) => link.getAttribute("aria-current") === "page").map((link) => link.textContent)).toEqual([label]);
+  });
+
+  it.each(INFORMATION_SEQUENCE.map((entry, index) => ({ ...entry, previous: INFORMATION_SEQUENCE[index - 1], next: INFORMATION_SEQUENCE[index + 1] })))(
+    "$path links previous/next through the Information sequence",
+    ({ path, heading, previous, next }) => {
+      renderInformationPage(path);
+      expect(screen.getByRole("heading", { level: 1, name: heading })).toBeTruthy();
+      expect(screen.getByRole("link", { name: "← Explorar problemas" }).getAttribute("href")).toBe("/");
+      const sequence = screen.getByRole("navigation", { name: "Páginas de informação" });
+      const links = within(sequence).getAllByRole("link");
+      const expected = [
+        ...(previous ? [{ href: previous.path, rel: "prev", name: `Anterior${previous.label}` }] : []),
+        ...(next ? [{ href: next.path, rel: "next", name: `Seguinte${next.label}` }] : []),
+      ];
+      expect(links.map((link) => ({ href: link.getAttribute("href"), rel: link.getAttribute("rel"), name: link.textContent?.replace(/[←→\s]/g, "") }))).toEqual(
+        expected.map((entry) => ({ ...entry, name: entry.name.replace(/\s/g, "") })),
+      );
+    },
+  );
+});
+
+it("renders the About publication sequence as three ordered steps", () => {
+  renderInformationPage("/about");
+  const section = screen.getByRole("region", { name: "Como é publicado" });
+  expect(within(section).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
+    "01Corpus de investigação com controlo de versões",
+    "02Validação e revisão",
+    "03Publicação no Explorador de Investigação",
+  ]);
+});
+
+it("renders the Contact channels, privacy notice and GitHub action with their existing destinations", () => {
+  renderInformationPage("/contact");
+  expect(screen.getByRole("link", { name: "Issues do repositório do projeto" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
+  const factual = screen.getByText("Correções factuais").nextElementSibling as HTMLElement;
+  expect(within(factual).getByRole("link", { name: "Correções" }).getAttribute("href")).toBe("/corrections");
+  expect(screen.getByRole("note").textContent).toBe("Atenção: Evite publicar dados pessoais ou informação sensível num issue público.");
+  expect(screen.getByRole("link", { name: "Abrir issue no GitHub" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
 });
 
 describe("PublicFooter — editorial identity/PROJETO/DADOS structure (Overview final redesign, Phase 3B §6)", () => {

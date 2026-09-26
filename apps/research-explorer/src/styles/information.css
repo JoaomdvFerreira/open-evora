@@ -1,0 +1,492 @@
+/* Public Information area (TrustPage.tsx): Sobre, Metodologia, Correções,
+   Contacto and Privacidade share one shell — local INFORMAÇÃO navigation,
+   page header, page content and the previous/next sequence — on the shared
+   `.shell-frame.shell-frame--wide` grid (index.css), so the sidebar and the
+   content share the Header/Footer axes. One DOM serves every width: the
+   local navigation is a vertical sidebar at >=1024px and a horizontally
+   scrollable strip above the content below that; <=767px only reflows the
+   content (fact rows stack, the publication steps go vertical, the
+   previous/next links become outlined). Per-breakpoint rhythm/type values
+   are view-scoped custom properties so each breakpoint block only swaps
+   values. */
+
+.info-page {
+  --info-pad-top: 80px;
+  --info-pad-bottom: 88px;
+  --info-sidebar: 220px;
+  --info-measure: 680px;
+  --info-column-gap: clamp(48px, 6.7vw, 96px);
+  --info-title-size: 48px;
+  --info-summary-size: 20px;
+  --info-body-size: 18px;
+  --info-section-gap: 48px;
+  --info-content-gap: 40px;
+  --info-fact-label: 198px;
+
+  display: grid;
+  grid-template-columns: var(--info-sidebar) minmax(0, var(--info-measure));
+  column-gap: var(--info-column-gap);
+  align-items: start;
+  padding-block: var(--info-pad-top) var(--info-pad-bottom);
+}
+
+/* Terminal composition: the page's own bottom padding is the sole breathing
+   room before the footer (same body:has() scoping as Records/Overview). */
+body:has(.info-page) main.explorer-shell {
+  padding-bottom: 0;
+}
+
+body:has(.info-page) .public-footer {
+  margin-top: 0;
+}
+
+/* ---- Local INFORMAÇÃO navigation ------------------------------------------ */
+
+.info-navigation {
+  min-width: 0;
+  font-family: var(--font-interface);
+}
+
+.info-navigation-title {
+  margin: 0 0 16px;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.info-navigation ul {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--color-separator-standard);
+}
+
+.info-navigation a {
+  display: block;
+  margin-left: -1px;
+  padding: 10px 0 10px 16px;
+  border-left: 2px solid transparent;
+  color: var(--color-ink-muted);
+  font-size: 15px;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.info-navigation a:hover {
+  color: var(--color-ink-primary);
+}
+
+.info-navigation a[aria-current="page"] {
+  border-left-color: var(--color-ink-secondary);
+  color: var(--color-ink-primary);
+  font-weight: 600;
+}
+
+/* ---- Page header ---------------------------------------------------------- */
+
+.info-article {
+  min-width: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--info-body-size);
+  line-height: 1.55;
+}
+
+.info-back {
+  margin: 0 0 20px;
+  font-family: var(--font-interface);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.info-title {
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--info-title-size);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.info-summary {
+  margin: 12px 0 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-reading);
+  font-size: var(--info-summary-size);
+  line-height: 1.45;
+}
+
+/* ---- Page content --------------------------------------------------------- */
+
+.info-content {
+  margin-top: var(--info-content-gap);
+  overflow-wrap: break-word;
+}
+
+.info-content p {
+  margin: 0 0 16px;
+}
+
+.info-content > .info-section:not(:first-child) {
+  margin-top: var(--info-section-gap);
+}
+
+.info-section-title {
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-separator-standard);
+  color: var(--color-ink-primary);
+  font-family: var(--font-technical);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* A section whose body is running text keeps the rule-free heading of the
+   targets (Validação, Compromisso): the text reads straight beneath it. */
+.info-section-title:has(+ p) {
+  padding-bottom: 0;
+  border-bottom: 0;
+  margin-bottom: 12px;
+}
+
+/* Editorial key/value rows. The rule above the first row is the section
+   heading's own rule when there is one, otherwise the list's. */
+.info-facts {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.info-section-title + .info-facts {
+  border-top: 0;
+}
+
+.info-facts > div {
+  display: grid;
+  grid-template-columns: var(--info-fact-label) minmax(0, 1fr);
+  column-gap: 24px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-separator-faint);
+}
+
+.info-facts dt {
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.info-facts dd {
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Publication sequence: three columns joined by a rule and → on desktop. */
+.info-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 16px;
+  margin: 0 0 28px;
+  padding: 20px 0 16px;
+  list-style: none;
+  border-bottom: 1px solid var(--color-separator-faint);
+}
+
+.info-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "number connector"
+    "label label";
+  column-gap: 12px;
+  row-gap: 10px;
+  align-items: center;
+  align-content: start;
+}
+
+.info-step-number {
+  grid-area: number;
+  color: var(--color-accent-hover);
+  font-family: var(--font-technical);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.info-step-connector {
+  grid-area: connector;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.info-step-connector::before {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--color-separator-standard);
+}
+
+.info-step:not(:last-child) .info-step-connector::after {
+  content: "→";
+}
+
+.info-step-label {
+  grid-area: label;
+  padding-right: 8px;
+  line-height: 1.4;
+}
+
+/* Numbered requirements (Correções). */
+.info-numbered {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: info-numbered;
+}
+
+.info-numbered li {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr);
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-separator-faint);
+  counter-increment: info-numbered;
+  line-height: 1.45;
+}
+
+.info-numbered li::before {
+  content: counter(info-numbered);
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Subtle notice (Contacto). */
+.info-content .info-notice {
+  margin: 20px 0 0;
+  padding: 12px 16px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-surface-subtle), var(--color-separator-standard) 45%);
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.info-notice strong {
+  color: var(--color-ink-primary);
+  font-weight: 600;
+}
+
+/* Primary external action (dark CTA). */
+.info-content .info-action {
+  margin: 24px 0 0;
+}
+
+.info-action-link {
+  display: inline-block;
+  padding: 11px 16px;
+  border-radius: 2px;
+  background: var(--color-ink-primary);
+  color: var(--color-surface-raised);
+  font-family: var(--font-interface);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.info-action-link:hover {
+  background: var(--color-accent-hover);
+  color: var(--color-surface-raised);
+}
+
+.info-action-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---- Previous / next ------------------------------------------------------ */
+
+.info-sequence {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-separator-standard);
+  font-family: var(--font-interface);
+}
+
+.info-sequence-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  color: var(--color-ink-primary);
+  text-decoration: none;
+}
+
+.info-sequence-link--previous {
+  grid-column: 1;
+  justify-self: start;
+}
+
+.info-sequence-link--next {
+  grid-column: 2;
+  justify-self: end;
+  text-align: right;
+}
+
+.info-sequence-direction {
+  color: var(--color-ink-muted);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.info-sequence-label {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.info-sequence-link:hover .info-sequence-label {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}
+
+/* ---- Below the sidebar composition: horizontal navigation strip ---------- */
+
+@media (max-width: 1023px) {
+  .info-page {
+    --info-pad-top: 48px;
+    --info-pad-bottom: 72px;
+
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 40px;
+  }
+
+  .info-navigation-title {
+    margin-bottom: 8px;
+  }
+
+  .info-navigation ul {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 28px;
+    overflow-x: auto;
+    border-left: 0;
+    border-bottom: 1px solid var(--color-separator-standard);
+    scrollbar-width: none;
+  }
+
+  .info-navigation ul::-webkit-scrollbar {
+    display: none;
+  }
+
+  .info-navigation li {
+    flex: none;
+  }
+
+  .info-navigation a {
+    margin-left: 0;
+    padding: 10px 0 12px;
+    border-left: 0;
+    white-space: nowrap;
+  }
+
+  .info-navigation a[aria-current="page"] {
+    box-shadow: inset 0 -2px 0 var(--color-ink-primary);
+  }
+}
+
+/* ---- Compact reflow ------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  .info-page {
+    --info-pad-top: 32px;
+    --info-pad-bottom: 56px;
+    --info-title-size: 36px;
+    --info-summary-size: 18px;
+    --info-body-size: 17px;
+    --info-section-gap: 40px;
+    --info-content-gap: 32px;
+
+    row-gap: 28px;
+  }
+
+  .info-navigation ul {
+    gap: 22px;
+  }
+
+  .info-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 4px;
+  }
+
+  .info-steps {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0;
+  }
+
+  .info-step {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    grid-template-areas: "number label connector";
+    align-items: baseline;
+    padding: 14px 0;
+  }
+
+  .info-step:not(:last-child) {
+    border-bottom: 1px solid var(--color-separator-faint);
+  }
+
+  .info-step-connector::before {
+    display: none;
+  }
+
+  .info-step:not(:last-child) .info-step-connector::after {
+    content: "↓";
+    font-size: 13px;
+  }
+
+  .info-numbered li {
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+
+  .info-sequence {
+    column-gap: 8px;
+    margin-top: 40px;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .info-sequence-link {
+    padding: 12px 14px;
+    border: 1px solid var(--color-separator-standard);
+    border-radius: 2px;
+  }
+
+  .info-sequence-link--next {
+    justify-self: stretch;
+  }
+
+  .info-sequence-link--previous {
+    justify-self: stretch;
+  }
+}

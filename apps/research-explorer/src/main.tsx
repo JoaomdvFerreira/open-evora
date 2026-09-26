@@ -63,6 +63,9 @@ import "./styles/prb-history.css";
 // The public Records landing (RecordsTable): intro, filters/search, record
 // list and responsive pagination.
 import "./styles/records.css";
+// The public Information area (TrustPage): shared shell for Sobre,
+// Metodologia, Correções, Contacto and Privacidade.
+import "./styles/information.css";
 
 const container = document.getElementById("root");
 if (!container) {
