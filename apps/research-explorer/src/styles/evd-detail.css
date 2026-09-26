@@ -1,0 +1,953 @@
+/* Public EVD Record Detail (records/EvdDetail.tsx).
+   Owner-approved 1440/1024/768/360 targets: local header band, wide
+   editorial hero, full-bleed six-fact metadata strip, rail + content
+   editorial sections, and a terminal "Origem e auditoria" band. It shares
+   the PRB Details editorial geometry (240px/56px rail at >=1440, 180px/40px
+   at 1024, in-flow labels below 1024) through its own view-scoped custom
+   properties, so each breakpoint block only swaps values. Content and
+   presence stay entirely canonical-data-driven (EvdDetail.tsx). */
+
+.evd-detail-view {
+  --evd-hero-pad-top: 96px;
+  --evd-hero-pad-bottom: 64px;
+  --evd-hero-title-size: 38px;
+  --evd-hero-title-width: 64rem;
+  --evd-meta-cell-pad-x: 20px;
+  --evd-meta-value-size: 18px;
+  --evd-section-pad-top: 96px;
+  --evd-section-col: 240px;
+  --evd-section-gap: 56px;
+  --evd-reading-size: 21px;
+  --evd-reading-width: 44rem;
+  --evd-body-pad-bottom: 112px;
+  --evd-audit-pad-top: 80px;
+  --evd-audit-pad-bottom: 88px;
+  --evd-audit-heading-size: 34px;
+  --evd-audit-row-gap: 48px;
+
+  /* Restrained effect tones — the same values as PRB Details' effect labels. */
+  --evd-effect-supports-ink: var(--color-accent-hover);
+  --evd-effect-supports-mark: var(--color-accent);
+  --evd-effect-refines-ink: #4a5c3e;
+  --evd-effect-refines-mark: #7d9170;
+  --evd-effect-bounds-ink: #5c5648;
+  --evd-effect-bounds-mark: #a39c88;
+  --evd-effect-neutral-ink: var(--color-ink-secondary);
+  --evd-effect-neutral-mark: var(--color-ink-muted);
+}
+
+/* ---- Full-width bands bleed through the shell gutter --------------------- */
+
+.evd-header-band,
+.evd-meta-band,
+.evd-audit {
+  margin-inline: calc(-1 * var(--explorer-shell-gutter, 0px));
+  padding-inline: var(--explorer-shell-gutter, 0px);
+}
+
+/* Terminal composition: the audit band's own bottom padding is the only
+   space before the footer (same scoping as PRB Details). */
+body:has(.evd-detail-view) main.explorer-shell {
+  padding-bottom: 0;
+}
+
+body:has(.evd-detail-view) .public-footer {
+  margin-top: 0;
+}
+
+/* ---- Local header: breadcrumb + Verificar / Partilhar -------------------- */
+
+.evd-header-band {
+  border-bottom: 1px solid var(--color-separator-standard);
+  background: var(--color-surface-subtle);
+}
+
+.evd-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 44px;
+  padding: 6px 0;
+}
+
+.evd-header .ui-breadcrumb {
+  min-width: 0;
+  gap: 0.45em;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.evd-breadcrumb-ancestor {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.evd-breadcrumb-ancestor:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.evd-header .ui-breadcrumb-current .rec-identifier {
+  color: var(--color-ink-primary);
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
+}
+
+.evd-header-utilities {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+}
+
+.evd-header-utility,
+.evd-header-utilities .problem-share-action button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent-hover);
+  font-family: var(--font-interface);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.evd-header-utility:hover,
+.evd-header-utilities .problem-share-action button:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}
+
+/* ---- Hero ------------------------------------------------------------------ */
+
+/* Grid so "Extraída em …" (DOM-ordered before the title) sits at the eyebrow
+   row's right edge at >=768 and on its own line at 360. */
+.evd-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 20px;
+  padding: var(--evd-hero-pad-top) 0 var(--evd-hero-pad-bottom);
+}
+
+.evd-hero-eyebrow-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 20px;
+  margin-bottom: 28px;
+}
+
+.evd-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-accent-hover);
+  font-family: var(--font-interface);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.evd-hero-eyebrow-mark {
+  width: 7px;
+  height: 7px;
+  background: var(--color-accent);
+}
+
+.evd-hero-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: var(--font-interface);
+  font-size: 15px;
+}
+
+.evd-hero-topic-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.evd-hero-topic-sep {
+  color: var(--color-ink-faint);
+}
+
+.evd-hero-topic {
+  color: var(--color-ink-secondary);
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.evd-hero-extracted {
+  align-self: baseline;
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.evd-hero-extracted time {
+  color: var(--color-ink-primary);
+}
+
+.evd-hero-title {
+  grid-column: 1 / -1;
+  max-width: var(--evd-hero-title-width);
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--evd-hero-title-size);
+  font-weight: 600;
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+
+/* ---- Metadata strip --------------------------------------------------------- */
+
+/* Presentation-only group row over the six-column strip (>=1024 only). */
+.evd-meta-groups {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  padding-bottom: 12px;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.evd-meta-group--classification {
+  grid-column: 1 / 3;
+}
+
+.evd-meta-group--scope {
+  grid-column: 3 / 6;
+  padding-left: var(--evd-meta-cell-pad-x);
+}
+
+.evd-meta-group--use {
+  grid-column: 6 / 7;
+  padding-left: var(--evd-meta-cell-pad-x);
+}
+
+.evd-meta-band {
+  border-top: 1px solid var(--color-separator-standard);
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.evd-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-areas: "nature authority where when topic problems";
+  margin-block: 0;
+}
+
+.evd-meta-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 20px var(--evd-meta-cell-pad-x) 24px;
+  border-left: 1px solid var(--color-separator-standard);
+}
+
+.evd-meta-cell--nature { grid-area: nature; padding-left: 0; border-left: 0; }
+.evd-meta-cell--authority { grid-area: authority; }
+.evd-meta-cell--where { grid-area: where; }
+.evd-meta-cell--when { grid-area: when; }
+.evd-meta-cell--topic { grid-area: topic; }
+.evd-meta-cell--problems { grid-area: problems; }
+
+.evd-meta-cell dt {
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+
+.evd-meta-cell dd {
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-interface);
+  font-size: var(--evd-meta-value-size);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+.evd-meta-empty {
+  color: var(--color-ink-muted);
+  font-weight: 400;
+}
+
+/* ---- Editorial sections (rail label + content) ------------------------------- */
+
+.evd-body {
+  padding-bottom: var(--evd-body-pad-bottom);
+}
+
+.evd-section {
+  display: grid;
+  grid-template-columns: var(--evd-section-col) minmax(0, 1fr);
+  gap: var(--evd-section-gap);
+  padding-top: var(--evd-section-pad-top);
+}
+
+.evd-section-intro {
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.evd-section-label {
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-technical);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.evd-section--accent .evd-section-label {
+  color: var(--color-accent-hover);
+}
+
+.evd-section-note {
+  margin: 4px 0 0;
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+.evd-section-body {
+  min-width: 0;
+}
+
+.evd-population-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: var(--evd-reading-width);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--evd-reading-size);
+  line-height: 1.6;
+}
+
+/* Presentation-only sentence case for the lower-case canonical phrase. */
+.evd-population-list li::first-letter {
+  text-transform: uppercase;
+}
+
+.evd-limit-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-accent-hover);
+}
+
+.evd-limit {
+  padding: 30px 0 30px;
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.evd-limit-index {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--color-accent-hover);
+  font-family: var(--font-technical);
+  font-size: 13px;
+}
+
+.evd-limit p {
+  max-width: var(--evd-reading-width);
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--evd-reading-size);
+  line-height: 1.6;
+}
+
+/* ---- Como é usada ------------------------------------------------------------ */
+
+.evd-use-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.evd-use {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "title title"
+    "facts id";
+  align-items: baseline;
+  gap: 14px 24px;
+  padding: 0 0 26px;
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.evd-use + .evd-use {
+  padding-top: 26px;
+}
+
+.evd-use > .rec-identifier {
+  grid-area: id;
+  justify-self: end;
+  color: var(--color-ink-muted);
+  font-size: 13px;
+  text-decoration-color: currentColor;
+}
+
+.evd-use > .rec-identifier:hover,
+.evd-use > .rec-identifier:focus-visible {
+  color: var(--color-accent-hover);
+}
+
+.evd-use-title {
+  grid-area: title;
+  justify-self: start;
+  max-width: var(--evd-reading-width);
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--evd-reading-size);
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--color-separator-standard);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+
+.evd-use-title:hover {
+  color: var(--color-accent-hover);
+  text-decoration-color: currentColor;
+}
+
+.evd-use-facts {
+  grid-area: facts;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 28px;
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: 15px;
+}
+
+.evd-use-facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.evd-use-facts dt {
+  color: var(--color-ink-muted);
+}
+
+.evd-use-facts dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  color: var(--color-ink-primary);
+}
+
+/* Effect / role values as plain inline text (no chip box), as in PRB Details. */
+.evd-use-facts .ui-inline-label {
+  display: inline;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  white-space: normal;
+}
+
+.evd-effect {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--evd-effect-ink);
+  font-weight: 600;
+}
+
+.evd-effect--supports { --evd-effect-ink: var(--evd-effect-supports-ink); --evd-effect-mark: var(--evd-effect-supports-mark); }
+.evd-effect--refines { --evd-effect-ink: var(--evd-effect-refines-ink); --evd-effect-mark: var(--evd-effect-refines-mark); }
+.evd-effect--bounds { --evd-effect-ink: var(--evd-effect-bounds-ink); --evd-effect-mark: var(--evd-effect-bounds-mark); }
+.evd-effect--neutral { --evd-effect-ink: var(--evd-effect-neutral-ink); --evd-effect-mark: var(--evd-effect-neutral-mark); }
+
+.evd-effect-marker {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  background: var(--evd-effect-mark);
+}
+
+@media (forced-colors: active) {
+  .evd-effect-marker,
+  .evd-hero-eyebrow-mark {
+    background: CanvasText;
+  }
+}
+
+/* ---- Origem e auditoria (terminal band) --------------------------------------- */
+
+.evd-audit {
+  border-top: 1px solid var(--color-ink-primary);
+  background: var(--color-surface-subtle);
+}
+
+/* The band itself carries `.evd-section` for the shared anchor scroll offset;
+   its inner frame owns the rail geometry. */
+.evd-audit.evd-section {
+  display: block;
+  padding-top: 0;
+}
+
+.evd-audit-frame {
+  display: grid;
+  grid-template-columns: var(--evd-section-col) minmax(0, 1fr);
+  gap: var(--evd-section-gap);
+  padding: var(--evd-audit-pad-top) 0 var(--evd-audit-pad-bottom);
+}
+
+.evd-audit-lede {
+  margin-bottom: 36px;
+}
+
+.evd-audit-heading {
+  margin: 0 0 10px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--evd-audit-heading-size);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.evd-audit-intro {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.evd-audit-sources {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.evd-audit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--evd-audit-row-gap);
+  padding: 30px 0;
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.evd-audit-sources > .evd-audit-row:first-child {
+  border-top-color: var(--color-ink-primary);
+}
+
+.evd-audit-row--canonical {
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.evd-audit-row h4 {
+  margin: 0 0 8px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.evd-audit-row > div > p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.evd-audit-row > div > p.evd-audit-source-id {
+  margin-bottom: 6px;
+}
+
+.evd-audit-source-id .rec-identifier {
+  color: var(--color-ink-muted);
+  font-size: 13px;
+}
+
+.evd-audit-term strong {
+  color: var(--color-ink-primary);
+  font-weight: 600;
+}
+
+.evd-audit-row > div > p.evd-audit-canonical-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 20px;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-technical);
+  font-size: 13px;
+}
+
+.evd-audit-canonical-meta code {
+  padding: 0;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  overflow-wrap: anywhere;
+}
+
+.evd-audit-secondary-cta,
+.evd-audit-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: var(--radius-control);
+  font-family: var(--font-interface);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.evd-audit-secondary-cta {
+  border: 1px solid var(--color-separator-standard);
+  background: var(--color-surface-raised);
+  color: var(--color-ink-primary);
+}
+
+.evd-audit-secondary-cta:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
+.evd-audit-primary-cta {
+  border: 1px solid var(--color-accent-hover);
+  background: var(--color-accent-hover);
+  color: var(--color-surface-reading);
+}
+
+.evd-audit-primary-cta:hover {
+  color: var(--color-surface-reading);
+  text-decoration: underline;
+}
+
+.evd-audit-method-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  color: var(--color-accent-hover);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.evd-audit-method-link:hover {
+  text-decoration: underline;
+}
+
+/* ---- Responsive: 1024 fit, 768 boundary, 360 compact ------------------------- */
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .evd-detail-view {
+    --evd-hero-pad-top: 80px;
+    --evd-hero-pad-bottom: 60px;
+    --evd-hero-title-size: 34px;
+    --evd-meta-cell-pad-x: 16px;
+    --evd-meta-value-size: 17px;
+    --evd-section-pad-top: 88px;
+    --evd-section-col: 180px;
+    --evd-section-gap: 40px;
+    --evd-reading-size: 20px;
+    --evd-body-pad-bottom: 96px;
+    --evd-audit-pad-top: 68px;
+    --evd-audit-heading-size: 30px;
+  }
+}
+
+/* Below 1024: no reading rail — section labels enter normal flow with their
+   note beside them; the strip becomes a 3 × 2 grid without group labels. */
+@media (max-width: 1023px) {
+  .evd-detail-view {
+    --evd-hero-pad-top: 56px;
+    --evd-hero-pad-bottom: 48px;
+    --evd-hero-title-size: 30px;
+    --evd-section-pad-top: 64px;
+    --evd-reading-size: 19px;
+    --evd-body-pad-bottom: 80px;
+    --evd-audit-pad-top: 56px;
+    --evd-audit-pad-bottom: 72px;
+    --evd-audit-heading-size: 28px;
+    --evd-audit-row-gap: 28px;
+  }
+
+  .evd-meta-groups {
+    display: none;
+  }
+
+  .evd-meta-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas:
+      "nature authority problems"
+      "where when topic";
+  }
+
+  .evd-meta-cell {
+    padding: 18px var(--evd-meta-cell-pad-x) 20px;
+  }
+
+  .evd-meta-cell--nature,
+  .evd-meta-cell--where {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .evd-meta-cell--where,
+  .evd-meta-cell--when,
+  .evd-meta-cell--topic {
+    border-top: 1px solid var(--color-separator-standard);
+  }
+
+  .evd-section,
+  .evd-audit-frame {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .evd-section-intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+    padding-top: 0;
+  }
+
+  .evd-section-note {
+    margin: 0;
+  }
+
+  #evd-population .evd-section-note {
+    display: none;
+  }
+
+  .evd-audit-frame {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .evd-detail-view {
+    --evd-hero-pad-top: 28px;
+    --evd-hero-pad-bottom: 30px;
+    --evd-hero-title-size: 23px;
+    --evd-meta-cell-pad-x: 14px;
+    --evd-meta-value-size: 16px;
+    --evd-section-pad-top: 44px;
+    --evd-reading-size: 18px;
+    --evd-body-pad-bottom: 56px;
+    --evd-audit-pad-top: 36px;
+    --evd-audit-pad-bottom: 40px;
+    --evd-audit-heading-size: 24px;
+  }
+
+  /* Breadcrumb and icon-only utilities share one row; each utility keeps
+     its full accessible name (EvdDetail.tsx). */
+  .evd-header {
+    gap: 8px;
+    padding: 0;
+  }
+
+  .evd-header-utilities {
+    gap: 0;
+  }
+
+  .evd-header-utility,
+  .evd-header-utilities .problem-share-action button {
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font-size: 17px;
+  }
+
+  .evd-header-utility-label,
+  .evd-header-utilities .problem-share-action-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .evd-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .evd-hero-eyebrow-row {
+    gap: 6px 14px;
+    margin-bottom: 6px;
+  }
+
+  .evd-hero-eyebrow,
+  .evd-hero-topics {
+    font-size: 14.5px;
+  }
+
+  .evd-hero-extracted {
+    margin-bottom: 18px;
+    font-size: 12.5px;
+    white-space: normal;
+  }
+
+  .evd-hero-title {
+    line-height: 1.3;
+  }
+
+  .evd-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "nature authority"
+      "where when"
+      "topic problems";
+  }
+
+  .evd-meta-cell {
+    padding: 14px var(--evd-meta-cell-pad-x) 16px;
+  }
+
+  .evd-meta-cell--authority,
+  .evd-meta-cell--when {
+    border-left: 1px solid var(--color-separator-standard);
+  }
+
+  .evd-meta-cell--nature,
+  .evd-meta-cell--where,
+  .evd-meta-cell--topic {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .evd-meta-cell--problems {
+    border-top: 1px solid var(--color-separator-standard);
+  }
+
+  .evd-meta-cell dt {
+    font-size: 13px;
+  }
+
+  .evd-section {
+    gap: 14px;
+  }
+
+  .evd-section-intro {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .evd-section-note {
+    font-size: 13.5px;
+  }
+
+  .evd-limit {
+    padding: 22px 0 24px;
+  }
+
+  .evd-limit-index {
+    margin-bottom: 8px;
+  }
+
+  .evd-use {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .evd-use > .rec-identifier {
+    align-self: flex-start;
+  }
+
+  .evd-use-facts {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 6px 16px;
+    margin-top: 4px;
+  }
+
+  .evd-use-facts > div {
+    display: contents;
+  }
+
+  .evd-audit-lede {
+    margin-bottom: 22px;
+  }
+
+  .evd-audit-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    padding: 24px 0;
+  }
+
+  .evd-audit-row h4 {
+    font-size: 20px;
+  }
+
+  .evd-audit-canonical-meta {
+    flex-direction: column;
+  }
+
+  .evd-audit-secondary-cta,
+  .evd-audit-primary-cta {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .evd-audit-method-link {
+    align-self: flex-start;
+    min-height: var(--target-min);
+  }
+}

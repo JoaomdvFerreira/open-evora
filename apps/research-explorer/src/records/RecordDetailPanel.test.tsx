@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { RecordDetailPanel } from "./RecordDetailPanel";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 
@@ -34,9 +34,11 @@ const renderDetail = (detail = evd, onSelect = vi.fn(), onViewAsProblem = vi.fn(
 };
 
 describe("RecordDetailPanel vNext", () => {
-  it("uses the approved neutral EVD description in the desktop rail", async () => {
+  it("renders EVD as its own public page, without the generic reading rail", async () => {
     renderDetail();
-    expect(await screen.findByText("Evidência é um registo com proveniência e limites explícitos.")).toBeTruthy();
+    expect(await screen.findByRole("heading", { level: 1, name: "Observação delimitada." })).toBeTruthy();
+    expect(screen.queryByRole("complementary", { name: "Mais ações" })).toBeNull();
+    expect(document.querySelector(".detail-rail-file")).toBeNull();
   });
 
   it("renders bounded observation, scope, inference limits and provenance", async () => {
@@ -45,15 +47,15 @@ describe("RecordDetailPanel vNext", () => {
     expect(screen.getAllByText("Évora").length).toBeGreaterThan(0);
     expect(screen.getAllByText("pessoas residentes").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Sem inferência adicional.").length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "Fonte" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Abrir fonte SRC-1" })).toBeTruthy();
   });
 
   it("navigates to the resolved Source, and routes 'Ver Problema' to the Problem experience, not technical Detail (ODM-019)", async () => {
     const { onSelect, onViewAsProblem } = renderDetail();
-    fireEvent.click(await screen.findByRole("button", { name: "Fonte" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Abrir fonte SRC-1" }));
     expect(onSelect).toHaveBeenCalledWith("SRC-1");
 
-    fireEvent.click(await screen.findByRole("button", { name: "Ver Problema →" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Ver problema PRB-1" }));
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-1");
     expect(onSelect).not.toHaveBeenCalledWith("PRB-1");
   });
@@ -147,7 +149,7 @@ describe("RecordDetailPanel DS-05I — EmptyState adoption", () => {
 
   it("does not offer 'Ver página do problema' for a non-PRB record", async () => {
     renderDetail();
-    await screen.findByText("Evidência é um registo com proveniência e limites explícitos.");
+    await screen.findByRole("heading", { level: 1, name: "Observação delimitada." });
     expect(screen.queryByRole("button", { name: "Ver página do problema" })).toBeNull();
   });
 
@@ -215,30 +217,19 @@ describe("RecordDetailPanel DS-05H — Source RailSectionIndex/CompactSectionInd
   });
 });
 
-describe("RecordDetailPanel DS-05H — EVD RailSectionIndex/CompactSectionIndex adoption", () => {
-  it("rail and compact expose identical entries", async () => {
+describe("RecordDetailPanel — EVD Problem-use relation authority", () => {
+  it("loads the EVD's Problem uses through the provider and shares them between the metadata count and Como é usada", async () => {
     renderDetail();
-    await screen.findByRole("navigation", { name: "Nesta evidência" });
-
-    const railNav = screen.getByRole("navigation", { name: "Nesta evidência" });
-    const compactNav = screen.getByRole("navigation", { name: "Nesta evidência (versão compacta)" });
-    const railLinks = Array.from(railNav.querySelectorAll("a"));
-    const compactLinks = Array.from(compactNav.querySelectorAll("a"));
-    expect(railLinks.length).toBeGreaterThan(0);
-    expect(railLinks.map((link) => link.textContent)).toEqual(compactLinks.map((link) => link.textContent));
-    expect(railLinks.map((link) => link.getAttribute("href"))).toEqual(compactLinks.map((link) => link.getAttribute("href")));
+    const uses = await screen.findByRole("region", { name: "Como é usada" });
+    expect(await within(uses).findByRole("button", { name: "Problema" })).toBeTruthy();
+    const problemsCell = document.querySelector(".evd-meta-cell--problems dd");
+    expect(problemsCell?.textContent).toBe("1");
   });
 
-  it("omits Limits when inference_limits is empty, in both rail and compact", async () => {
+  it("omits the limits section when inference_limits is empty", async () => {
     const noLimits: RecordDetail = { ...evd, record: { ...evd.record, inference_limits: [] } };
     renderDetail(noLimits);
-    await screen.findByRole("navigation", { name: "Nesta evidência" });
-    expect(screen.queryByRole("link", { name: "O que não permite concluir" })).toBeNull();
-  });
-
-  it("keeps detail-rail-file present alongside the EVD rail index", async () => {
-    renderDetail();
-    await screen.findByRole("navigation", { name: "Nesta evidência" });
-    expect(document.querySelector(".detail-rail-file")).not.toBeNull();
+    await screen.findByRole("region", { name: "Como é usada" });
+    expect(screen.queryByRole("region", { name: "O que não permite concluir" })).toBeNull();
   });
 });

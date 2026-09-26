@@ -22,7 +22,7 @@ import { SOURCE_SECTION_ANCHOR_IDS, sourceSectionIndex } from "./sourceSectionIn
 import { toSourceSectionRelationContext } from "./sourceEvidenceRelations";
 import { SourceCompactSectionIndex } from "./SourceCompactSectionIndex";
 import type { SourceSectionRelationContext } from "./sourceView";
-import { EvdDetail, EvdReadingRail } from "./EvdDetail";
+import { EvdDetail } from "./EvdDetail";
 import { useEvdProblemUses } from "./useEvdProblemUses";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
@@ -909,15 +909,20 @@ function RecordDetailContent({
   const roleFields = isSrc ? [] : Object.entries(lookup.get(detail.id)?.summaryFields ?? {});
   const relatedProblemId = findRelatedProblemId(detail, lookup);
 
+  // EVD owns its complete public page composition (local header, hero,
+  // editorial sections, terminal audit band) — no generic reading layout/rail.
+  if (isEvd) {
+    return (
+      <EvdDetail detail={detail} lookup={lookup} problemUses={evdProblemUses} onSelect={onSelect} onViewAsProblem={onViewAsProblem} onBackToRecords={onBackToRecords} />
+    );
+  }
+
   return (
     <div className="record-detail-layout shell-frame">
       <RecordDetailBreadcrumb detail={detail} onBackToRecords={onBackToRecords} />
 
       <div className="lyt-reading" data-rail="present">
         <div className="record-detail-main lyt-reading-main">
-          {isEvd ? (
-            <EvdDetail detail={detail} lookup={lookup} problemUses={evdProblemUses} onSelect={onSelect} onViewAsProblem={onViewAsProblem} />
-          ) : (
             <>
           <section aria-label="Significado" className="record-meaning-zone">
             <TypeBadge detail={detail} />
@@ -994,7 +999,6 @@ function RecordDetailContent({
             </>
           )}
             </>
-          )}
         </div>
 
         <aside className="lyt-reading-rail" aria-label="Mais ações">
@@ -1002,10 +1006,9 @@ function RecordDetailContent({
             <code>{detail.type}</code>
             <p>{typeInfo.description}</p>
           </div>
-          {isEvd && <EvdReadingRail detail={detail} />}
           {detail.type === "SRC-" && <SourceOriginalLinkAction detail={detail} variant="rail" />}
           {isSrc && <SourceReadingRailIndex record={detail.record} relationContext={sourceRelationContext} />}
-          {!isSrc && !isEvd && (
+          {!isSrc && (
             <div className="detail-rail-actions">
               {/* Technical inspection of a PRB leads back to its public
                   page through one ordinary action — not PRB-local

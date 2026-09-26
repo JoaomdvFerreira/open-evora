@@ -180,7 +180,7 @@ describe("Explorer — Records workflow (fake provider)", () => {
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
 
-    await user.click(await within(detailPanel).findByRole("button", { name: "Via Verde Estacionar" }));
+    await user.click(await within(detailPanel).findByRole("button", { name: "Abrir fonte SRC-0092" }));
 
     detailPanel = await getDetailPanel();
     expect(within(detailPanel).getAllByText("SRC-0092").length).toBeGreaterThan(0);
@@ -333,6 +333,18 @@ describe("Explorer — Overview view", () => {
     await user.click(await screen.findByRole("button", { name: "Registos", hidden: true }));
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
     expect(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }).getAttribute("aria-current")).toBe("page");
+  });
+});
+
+describe("Explorer — Registos stays current on EVD Record Detail", () => {
+  it("marks the global Registos item as the current page while an EVD is open", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /EVD-000105/ }));
+    await screen.findByRole("region", { name: "Origem e auditoria" });
+    expect(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }).getAttribute("aria-current")).toBe("page");
+    expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }).getAttribute("aria-current")).toBeNull();
   });
 });
 
@@ -934,14 +946,22 @@ describe("Explorer — global manifest summary placement", () => {
     expect(manifestSummary()).toBeNull();
   });
 
-  it("is absent on the Records landing, whose pagination row is the terminal content band, and present on Record Detail", async () => {
+  it("is absent on the Records landing, whose pagination row is the terminal content band, and present on generic Record Detail", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
     expect(manifestSummary()).toBeNull();
-    await user.click(screen.getByRole("button", { name: /EVD-000105/ }));
+    await user.click(screen.getByRole("button", { name: /SRC-0092/ }));
     await getDetailPanel();
     expect(manifestSummary()?.textContent).toContain("Corpus: 4 registos");
+  });
+
+  it("is absent on EVD Record Detail, whose Origem e auditoria band is the terminal content band", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
+    await user.click(await screen.findByRole("button", { name: /EVD-000105/ }));
+    await screen.findByRole("region", { name: "Origem e auditoria" });
+    expect(manifestSummary()).toBeNull();
   });
 
   it("is absent on PRB Histórico, whose material-history section is the terminal content band", async () => {

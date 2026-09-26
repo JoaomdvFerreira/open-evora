@@ -19,9 +19,12 @@ import { SKIP_TARGET_ID } from "./skipTarget";
 // into its own lazy chunk by this change alone (see RE-05 closure report).
 const GraphExplorer = lazy(() => import("../graph/GraphExplorer").then((m) => ({ default: m.GraphExplorer })));
 
-/** Views whose content has no terminal band of its own before the public footer. */
+/**
+ * Views whose content has no terminal band of its own before the public
+ * footer. EVD Record Detail ends on its own "Origem e auditoria" band.
+ */
 function showsManifestSummary(view: string, selectedId: string | null): boolean {
-  if (view === "records") return selectedId !== null;
+  if (view === "records") return selectedId !== null && !selectedId.startsWith("EVD-");
   return view === "graph";
 }
 
@@ -147,8 +150,9 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
       {/* Global manifest/build summary — Record Detail and Graph only.
           Overview replaced it with its own editorial metrics ruler, the
           Records landing ends on its own pagination row, and both public
-          PRB views end on their own terminal content band (Detalhes: the
-          audit band; Histórico: the material-history section). Kept here
+          PRB views and EVD Record Detail end on their own terminal content
+          band (Detalhes: the audit band; Histórico: the material-history
+          section; EVD: Origem e auditoria). Kept here
           rather than duplicated per view: still a single canonical rendering
           of manifest.totalRecords/generatedAt, not a competing corpus figure (AGENTS.md canonical-state integrity). */}
       {showsManifestSummary(url.state.view, url.state.selectedId) && totalRecords !== undefined && generatedAt !== undefined && (

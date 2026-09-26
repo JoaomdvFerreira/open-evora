@@ -2867,19 +2867,14 @@ body:has(.public-overview) .public-footer {
   display: none;
 }
 
-.evd-compact-section-index {
-  display: none;
-}
-
-/* DS-05H remediation F1: before DS-05H, Source/EVD compact indexes rendered
+/* DS-05H remediation F1: before DS-05H, Source compact indexes rendered
    the legacy records/CompactSectionIndex, whose root also carried
    `.problem-help`'s `margin: 0 0 var(--space-loose)` — the deliberate separation
-   from the following Source/EVD content. The canonical
+   from the following Source content. The canonical
    presentation/CompactSectionIndex deliberately owns `margin: 0` instead
    (generic recipe, no composition spacing), so that separation must be
    restored here at the domain-owned wrapper, not on the generic component. */
-.source-compact-section-index,
-.evd-compact-section-index {
+.source-compact-section-index {
   margin: 0 0 var(--space-loose);
 }
 
@@ -2913,10 +2908,6 @@ body:has(.public-overview) .public-footer {
   }
 
   .source-compact-section-index {
-    display: block;
-  }
-
-  .evd-compact-section-index {
     display: block;
   }
 
@@ -3663,6 +3654,7 @@ body:has(.public-overview) .public-footer {
   #overview-problemas,
   .problem-section,
   .record-editorial-section,
+  .evd-section,
   #relacoes {
     scroll-margin-top: 108px;
   }
@@ -3907,39 +3899,6 @@ body:has(.public-overview) .public-footer {
 .record-editorial-section .detail-panel-label {
   margin-bottom: var(--space-3);
 }
-
-/* EVD Detail vNext reuses the established reading column, fact grid,
-   disclosure and rail; these rules only supply EVD-owned composition. */
-.evd-identity {
-  margin: 0 0 var(--space-8);
-}
-
-.evd-type-row, .evd-identity-facts, .evd-problem-heading, .evd-source-list li, .evd-relation-values {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-tight);
-}
-.evd-type-row { margin-bottom: var(--space-standard); }
-.evd-secondary-id { color: var(--color-ink-faint); font-family: var(--recipe-technical-meta-family); font-size: 11px; }
-.evd-identity h1 { margin: 0; color: var(--color-ink-primary); font-family: var(--recipe-editorial-h1-family); font-size: var(--recipe-editorial-h1-size); font-weight: var(--recipe-editorial-h1-weight); line-height: var(--recipe-editorial-h1-line-height); }
-.evd-identity-facts { margin-top: var(--space-standard); color: var(--color-ink-secondary); font-size: 12px; }
-.evd-identity-fact { border: 1px solid var(--color-separator-standard); border-radius: var(--radius-sm); padding: var(--space-1) var(--space-tight); background: var(--color-surface-raised); font-family: var(--font-interface); }
-.evd-identity-facts b { color: var(--color-ink-primary); }
-.evd-scope-grid small { display: block; margin-top: 2px; color: var(--color-ink-faint); font-size: 12px; }
-.evd-limits { margin: 0; padding: 0; border-top: 1px solid var(--color-separator-standard); color: var(--color-ink-primary); list-style: none; }
-.evd-limits li { position: relative; padding: var(--space-3) 0 var(--space-3) var(--space-loose); border-bottom: 1px solid var(--color-separator-standard); line-height: 1.6; }
-.evd-limits li::before { position: absolute; left: 0; color: var(--color-ink-faint); content: "—"; }
-.evd-problem-list, .evd-source-list { list-style: none; margin: 0; padding: 0; }
-.evd-problem-list { display: grid; gap: var(--space-standard); }
-.evd-problem-card { border: 1px solid var(--color-separator-standard); border-radius: var(--radius-surface); padding: var(--space-standard); }
-.evd-problem-heading { margin-bottom: var(--space-tight); }
-.evd-problem-heading code, .evd-source-list code { color: var(--color-ink-faint); font-family: var(--recipe-technical-id-family); font-size: 12px; }
-.evd-problem-heading span { color: var(--color-ink-primary); font-size: 14px; font-weight: 600; }
-.evd-problem-action { margin-top: var(--space-tight); }
-.evd-problem-action, .evd-source-list button { padding: 0; border: 0; background: none; color: var(--link); font: inherit; cursor: pointer; text-align: left; }
-.evd-extracted-at { margin: 0 0 var(--space-3); color: var(--color-ink-muted); font-size: 13px; }
-.evd-source-list { display: grid; gap: var(--space-tight); }
 
 .problem-statement {
   max-width: none;
@@ -4218,10 +4177,6 @@ body:has(.public-overview) .public-footer {
     align-self: flex-start;
   }
 
-  .evd-identity h1 {
-    font-size: var(--recipe-editorial-intro-size);
-  }
-
   .problem-identity-title {
     font-size: var(--recipe-editorial-h1-size-compact);
   }
@@ -4231,10 +4186,6 @@ body:has(.public-overview) .public-footer {
   }
 
   .source-compact-section-index {
-    display: block;
-  }
-
-  .evd-compact-section-index {
     display: block;
   }
 

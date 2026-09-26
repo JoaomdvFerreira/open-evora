@@ -33,6 +33,15 @@ function assetUrl(relativePath: string): string {
   return `${import.meta.env.BASE_URL}${relativePath}`;
 }
 
+/**
+ * Same-origin URL of a record's canonical file as republished byte-for-byte
+ * by the data build (scripts/build-data.js, `canonical/<repo-relative file>`).
+ * `file` is the read model's repo-relative `RecordDetail.file`.
+ */
+export function canonicalFileUrl(file: string): string {
+  return assetUrl(`canonical/${file}`);
+}
+
 async function fetchJson<T>(relativePath: string, describe: string): Promise<T> {
   let response: Response;
   try {

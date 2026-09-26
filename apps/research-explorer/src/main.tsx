@@ -66,6 +66,9 @@ import "./styles/records.css";
 // The public Information area (TrustPage): shared shell for Sobre,
 // Metodologia, Correções, Contacto and Privacidade.
 import "./styles/information.css";
+// The public EVD Record Detail (EvdDetail): local header, hero, metadata
+// strip, editorial sections and the terminal Origem e auditoria band.
+import "./styles/evd-detail.css";
 
 const container = document.getElementById("root");
 if (!container) {

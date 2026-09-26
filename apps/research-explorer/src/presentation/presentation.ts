@@ -29,6 +29,33 @@ const LABELS: Record<string, Record<string, string>> = {
 };
 
 /**
+ * One-clause public explanations of what an EVD classification value means,
+ * keyed like LABELS. They describe the proposition's kind and who is making
+ * it; they never grade strength, reliability or truth (docs/datamodel.md §2:
+ * `evidence_nature` describes the proposition, it is not a verdict). A value
+ * without an entry has no public explanation rather than an improvised one.
+ */
+const EXPLANATIONS: Record<string, Record<string, string>> = {
+  evidence_nature: {
+    fact: "a fonte regista um dado ou acontecimento.",
+    "reported-experience": "a fonte relata uma experiência vivida.",
+    opinion: "a fonte exprime uma opinião ou avaliação.",
+    claim: "a fonte afirma, mas não mede.",
+    measurement: "a fonte mede ou contabiliza.",
+    recommendation: "a fonte recomenda uma ação.",
+  },
+  claim_authority: {
+    authoritative: "quem afirma tem competência institucional sobre o tema.",
+    non_authoritative: "quem afirma não tem competência institucional sobre o tema.",
+    unknown: "não foi possível determinar se quem afirma tem competência sobre o tema.",
+  },
+};
+
+export function publicEnumExplanation(field: string, value: string): string | null {
+  return EXPLANATIONS[field]?.[value] ?? null;
+}
+
+/**
  * UX-D §4 finding F01: compact labels agree grammatically with the dimension
  * noun they're displayed after ("Validação: <label>" / "Evidência: <label>"),
  * distinct from the full/non-compact LABELS mapping used elsewhere.
@@ -105,6 +132,18 @@ export function formatPublicDateTime(isoValue: string): string {
 export function formatPublicDate(isoValue: string): string {
   const date = new Date(isoValue);
   return Number.isNaN(date.valueOf()) ? isoValue : new Intl.DateTimeFormat("pt-PT", { dateStyle: "medium", timeZone: "UTC" }).format(date);
+}
+
+/**
+ * Compact civil date for editorial metadata lines, e.g. "10 ago 2026" — the
+ * same UTC civil-date handling as `formatPublicDate`, with the abbreviated
+ * PT-PT month name. Falls back to the original value when it cannot be parsed.
+ */
+export function formatPublicCompactDate(isoValue: string): string {
+  const date = new Date(isoValue);
+  if (Number.isNaN(date.valueOf())) return isoValue;
+  const month = new Intl.DateTimeFormat("pt-PT", { month: "short", timeZone: "UTC" }).format(date).replace(/\.$/, "");
+  return `${date.getUTCDate()} ${month} ${date.getUTCFullYear()}`;
 }
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;

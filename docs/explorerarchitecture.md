@@ -107,7 +107,8 @@ Explorer presentation invariants:
 - The `Detalhes` evidence/audit band is the final content band before the public footer.
 - The `Histórico` material-history section is likewise its final content band before the public footer.
 - The Records landing's pagination row is likewise its final content band before the public footer.
-- The global manifest/corpus-generation summary is not appended after `Detalhes`, `Histórico` or the Records landing. Record Detail and Graph may retain it.
+- EVD Record Detail's `Origem e auditoria` band is likewise its final content band before the public footer.
+- The global manifest/corpus-generation summary is not appended after `Detalhes`, `Histórico`, the Records landing or EVD Record Detail. Other Record Detail types and Graph may retain it.
 - Corpus-generation timestamps are never presented as investigation currentness.
 
 ## 4. Records presentation

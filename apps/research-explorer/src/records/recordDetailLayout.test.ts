@@ -196,17 +196,15 @@ describe("ReadingLayout production adoption", () => {
 
       const problemCompactBodies = bodiesInMediaBlock(indexCss, mediaSelector, ".problem-compact-section-index");
       const sourceCompactBodies = bodiesInMediaBlock(indexCss, mediaSelector, ".source-compact-section-index");
-      const evdCompactBodies = bodiesInMediaBlock(indexCss, mediaSelector, ".evd-compact-section-index");
       expect(problemCompactBodies.some((body) => /display\s*:\s*block/.test(body))).toBe(true);
       expect(sourceCompactBodies.some((body) => /display\s*:\s*block/.test(body))).toBe(true);
-      expect(evdCompactBodies.some((body) => /display\s*:\s*block/.test(body))).toBe(true);
     }
   });
 
   /**
    * ProblemReadingRail's own `<aside>` carries both `lyt-reading-rail` and
    * `problem-reading-rail` on the SAME element
-   * (unlike Source/EVD, where `.problem-reading-rail` wraps a nested child
+   * (unlike Source, where `.problem-reading-rail` wraps a nested child
    * inside the outer `.lyt-reading-rail` aside). At equal specificity
    * (single class each), CSS source order — not media-query nesting —
    * decides the cascade: reading-layout.css's unconditional
@@ -508,21 +506,21 @@ describe("shared nested-heading treatment (.record-editorial-subheading)", () =>
 /**
  * The canonical presentation/CompactSectionIndex deliberately owns `margin:
  * 0` (no composition spacing) — the previous `margin: 0 0 var(--space-6)`
- * separation from following Source/EVD content (formerly supplied by the
+ * separation from following Source content (formerly supplied by the
  * legacy records/CompactSectionIndex root, which also carried
  * `.problem-help`) must be restored at the domain-owned
- * `.source-compact-section-index`/`.evd-compact-section-index` wrappers
+ * `.source-compact-section-index` wrapper
  * instead, not on the generic component.
  */
-describe("Source/EVD compact-index composition spacing", () => {
+describe("Source compact-index composition spacing", () => {
   const css = readFileSync(CSS_PATH, "utf-8");
 
   function ruleBodiesForRawPattern(pattern: RegExp): string[] {
     return [...css.matchAll(pattern)].map((match) => match[1]);
   }
 
-  it("both .source-compact-section-index and .evd-compact-section-index carry margin: 0 0 var(--space-6)", () => {
-    const bodies = ruleBodiesForRawPattern(/\.source-compact-section-index,\s*\n?\s*\.evd-compact-section-index\s*\{([^}]*)\}/g);
+  it(".source-compact-section-index carries margin: 0 0 var(--space-loose)", () => {
+    const bodies = ruleBodiesForRawPattern(/\.source-compact-section-index\s*\{([^}]*margin[^}]*)\}/g);
     expect(bodies.length).toBeGreaterThan(0);
     expect(bodies[0]).toMatch(/margin\s*:\s*0\s+0\s+var\(--space-loose\)\s*;/);
   });

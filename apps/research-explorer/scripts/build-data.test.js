@@ -485,6 +485,10 @@ test("run() end-to-end: valid corpus publishes and reports ok", () => {
     assert.ok(fs.existsSync(path.join(targetDir, "index.json")));
     assert.ok(fs.existsSync(path.join(targetDir, "edges.json")));
     assert.ok(fs.existsSync(path.join(targetDir, "record-detail", "SRC-9001.json")));
+    assert.ok(
+      fs.readFileSync(path.join(targetDir, "canonical", "research", "sources", "SRC-9001.yaml")).equals(fs.readFileSync(path.join(root, "sources", "SRC-9001.yaml"))),
+      "each record's canonical YAML is republished byte-for-byte at canonical/<repo-relative file>"
+    );
   } finally {
     fs.rmSync(parent, { recursive: true, force: true });
   }
