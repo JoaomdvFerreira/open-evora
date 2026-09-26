@@ -28,11 +28,17 @@ import { IconMenu } from "../presentation/icons";
  * duplicated routing/business logic. At >=768px `.explorer-chrome-menu[hidden]`
  * is overridden back to visible in index.css — desktop ignores `menuOpen`
  * entirely and always shows nav+CTA, exactly as before this pass.
+ *
+ * Information pages (TrustPage.tsx) render this same header outside the live
+ * Explorer: they pass no SPA callbacks, so Problemas/Registos fall back to
+ * ordinary navigations to the same destinations (`/`, `/?view=records`), and
+ * `activeView` names the Information item they represent — `methodology`
+ * marks Método, `about` marks Sobre.
  */
 export function ExplorerHeader({ activeView, onProblemas, onRegistos }: {
   activeView: string;
-  onProblemas: () => void;
-  onRegistos: () => void;
+  onProblemas?: () => void;
+  onRegistos?: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
@@ -40,6 +46,8 @@ export function ExplorerHeader({ activeView, onProblemas, onRegistos }: {
   // Registos is the whole Records area — every type filter and Record
   // Detail alike — never one particular filter.
   const isRegistos = activeView === "records";
+  const isMetodo = activeView === "methodology";
+  const isSobre = activeView === "about";
   return (
     <header className="explorer-chrome">
       <div className="explorer-chrome-inner shell-frame shell-frame--wide">
@@ -61,10 +69,14 @@ export function ExplorerHeader({ activeView, onProblemas, onRegistos }: {
         </button>
         <div id={menuId} className="explorer-chrome-menu" hidden={!menuOpen}>
           <nav aria-label="Navegação principal" className="explorer-navigation">
-            <button type="button" className="explorer-navigation-action" aria-current={isProblemas ? "page" : undefined} onClick={onProblemas}>Problemas</button>
-            <a className="explorer-navigation-action" href="/methodology">Método</a>
-            <button type="button" className="explorer-navigation-action" aria-current={isRegistos ? "page" : undefined} onClick={onRegistos}>Registos</button>
-            <a className="explorer-navigation-action" href="/about">Sobre</a>
+            {onProblemas
+              ? <button type="button" className="explorer-navigation-action" aria-current={isProblemas ? "page" : undefined} onClick={onProblemas}>Problemas</button>
+              : <a className="explorer-navigation-action" href="/">Problemas</a>}
+            <a className="explorer-navigation-action" href="/methodology" aria-current={isMetodo ? "page" : undefined}>Método</a>
+            {onRegistos
+              ? <button type="button" className="explorer-navigation-action" aria-current={isRegistos ? "page" : undefined} onClick={onRegistos}>Registos</button>
+              : <a className="explorer-navigation-action" href="/?view=records">Registos</a>}
+            <a className="explorer-navigation-action" href="/about" aria-current={isSobre ? "page" : undefined}>Sobre</a>
           </nav>
           <a className="explorer-cta" href="/contact">Contribuir com evidência</a>
         </div>

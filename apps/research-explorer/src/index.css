@@ -19,44 +19,6 @@ main {
   font-size: 0.9rem;
 }
 
-.trust-page {
-  min-width: 0;
-  max-width: var(--measure-reading);
-  font-family: var(--font-reading);
-  font-size: var(--text-reading-body-size);
-  line-height: var(--text-reading-body-line-height);
-}
-
-.trust-page h1 {
-  margin: 0;
-  font-family: var(--font-reading);
-  font-size: var(--text-reading-h1-size);
-  font-weight: var(--text-reading-h1-weight);
-  line-height: var(--text-reading-h1-line-height);
-}
-
-.trust-experience { padding-top: var(--space-loose); }
-.trust-header { padding-bottom: var(--space-standard); border-bottom: 1px solid var(--color-separator-standard); }
-.trust-brand { display: inline-flex; align-items: center; gap: var(--space-standard); color: var(--color-ink-primary); font-family: var(--font-interface); font-size: var(--text-interface-label-size); font-weight: var(--text-interface-label-weight); text-decoration: none; }
-.trust-brand .oe-logo-full { height: 1.55rem; }
-.trust-brand:hover { color: var(--color-accent-hover); text-decoration: underline; }
-.trust-layout { display: grid; min-width: 0; grid-template-columns: 12rem minmax(0, 1fr); gap: 2.75rem; padding-top: var(--space-section); }
-.trust-navigation { min-width: 0; font-family: var(--font-interface); font-size: var(--text-interface-label-size); }
-.trust-navigation > p { margin: 0 0 var(--space-tight); color: var(--color-ink-muted); font-weight: var(--text-interface-label-weight); }
-.trust-navigation ul { display: grid; gap: 0.2rem; margin: 0; padding: 0; list-style: none; }
-.trust-navigation a { display: block; padding: 0.35rem 0.5rem; border-left: 2px solid transparent; color: var(--color-ink-secondary); }
-.trust-navigation a[aria-current="page"] { border-left-color: var(--color-feedback-affirmed); color: var(--color-ink-primary); font-weight: var(--text-interface-label-weight); text-decoration: none; }
-.trust-back { margin: 0 0 var(--space-loose); font-family: var(--font-interface); font-size: var(--text-interface-label-size); }
-.trust-summary { margin: var(--space-tight) 0 0; color: var(--color-ink-secondary); font-family: var(--font-interface); font-size: var(--text-interface-body-size); line-height: var(--text-interface-body-line-height); }
-.trust-content { margin-top: var(--space-loose); }
-.trust-content section + section { margin-top: var(--space-loose); }
-.trust-content h2 { margin: 0 0 var(--space-standard); font-family: var(--font-interface); font-size: var(--text-interface-heading-size); line-height: var(--text-interface-heading-line-height); }
-.trust-content p { margin: 0 0 var(--space-standard); }
-.trust-facts { margin: 0; border-top: 1px solid var(--color-separator-faint); }
-.trust-facts > div { display: grid; grid-template-columns: minmax(9rem, 0.7fr) minmax(0, 1.3fr); gap: var(--space-standard); padding: var(--space-standard) 0; border-bottom: 1px solid var(--color-separator-faint); }
-.trust-facts dt { color: var(--color-ink-muted); font-family: var(--font-interface); font-size: var(--text-interface-label-size); font-weight: var(--text-interface-label-weight); }
-.trust-facts dd { margin: 0; }
-
 /* Editorial footer (Overview final redesign, Phase 3B §6; converged to a
    full-width warm band + shared wide grid in the visual-convergence pass,
    task §12; PROJETO/DADOS grouped into one right-hand unit in the
@@ -3009,6 +2971,7 @@ body:has(.public-overview) .public-footer {
   .explorer-chrome-inner,
   .overview-hero > .shell-frame--wide,
   .records-page-frame,
+  .info-page,
   .overview-toolbar,
   .overview-category-drawer,
   .public-footer-inner {
@@ -3214,18 +3177,6 @@ body:has(.public-overview) .public-footer {
     --explorer-shell-gutter: 1rem;
     padding: 0 var(--explorer-shell-gutter) 2rem;
   }
-
-  .trust-experience { padding-top: var(--space-standard); }
-  .trust-layout { width: 100%; grid-template-columns: minmax(0, 1fr); gap: var(--space-loose); padding-top: var(--space-loose); }
-  .trust-navigation ul { display: flex; flex-wrap: wrap; max-width: 100%; gap: 0.15rem 0.25rem; }
-  .trust-navigation a { border-bottom: 2px solid transparent; border-left: 0; }
-  .trust-navigation a[aria-current="page"] { border-bottom-color: var(--color-feedback-affirmed); }
-  .trust-page h1 { font-size: var(--text-reading-h1-size-compact); }
-  .trust-page { box-sizing: border-box; width: 100%; max-width: 100%; }
-  .trust-content { margin-top: var(--space-loose); }
-  .trust-content section + section { margin-top: var(--space-loose); }
-  .trust-facts > div { grid-template-columns: 1fr; gap: 0.2rem; }
-  .trust-content { overflow-wrap: anywhere; }
 
   /* Footer density (task §17; tightened further in the final density pass,
      task §15): top/bottom padding and every internal gap reduced again from
