@@ -119,6 +119,7 @@ This is a bounded inventory of meaningful presentation boundaries, not a complet
 | `ProgressMessage` | Present in-progress loading/processing feedback with an explicit live status boundary | Uses the appropriate status/live-region semantics; it does not render errors or empty results. |
 | `ErrorNotice` | Present an error boundary with explicit alert semantics and an optional caller-owned retry action | Error title, copy, and retry action remain caller-owned; it does not render progress or empty results. |
 | `EmptyState` | Present an explicitly established empty result/collection as ordinary content | No automatic live region or alert. It must not reinterpret missing, `UNKNOWN`, unavailable, or not-authored values as empty. |
+| `Toast` | Present transient feedback caused by an action in one fixed application-level overlay | Caller supplies message and `affirmed`, `neutral`, or `error` tone. It is distinct from loading, page errors, and empty states; it owns no domain logic, history, queue, or persistent state. |
 | `UnavailableNote` | Explain a focusable `aria-disabled` control on hover and keyboard focus | Keep the current `useUnavailableNote` behaviour. It is not a general tooltip or status component. |
 | Native action recipes | Apply consistent text-action, outlined-action, and tab-action appearance to the correct native element | CSS recipes/classes, not a polymorphic link/button component. Disabled versus `aria-disabled` stays interaction-owned. |
 | Surface recipes | Provide border/background/padding anatomy without choosing HTML or meaning | At most plain outlined, muted inset, and interactive item recipes demonstrated by current surfaces. No default `Card` wrapper and no automatic cardification. |
@@ -303,7 +304,7 @@ Keep the global header and primary navigation composed in `Explorer`. Its one-us
 3. **Identifier and type are separate domain components.** `RecordIdentifier` and `RecordTypeLabel` are approved as distinct boundaries.
 4. **Inline-label anatomy is CSS-only and shared.** Dimension-specific domain components/wrappers own Problem state, Evidence effect, research role, and record type. A universal `Chip` component is rejected.
 5. **Source fact-section consolidation is approved.** The four fact-based Source sections may use `FactList`/shared internal rendering while preserving each section's extraction, formatting, labels, order, presence, and tests.
-6. **Public feedback boundaries are explicit.** Use `ProgressMessage`, `ErrorNotice`, and `EmptyState`, which may share internal CSS/frame anatomy. One public mode-driven `FeedbackMessage` component is rejected.
+6. **Public feedback boundaries are explicit.** Use `ProgressMessage`, `ErrorNotice`, and `EmptyState` for page content, and `Toast` for transient action feedback in a fixed overlay. They may share internal CSS/frame anatomy. One public mode-driven `FeedbackMessage` component is rejected.
 7. **Ordinary outer alignment uses `ShellFrame`.** Startup/view feedback, `ReadingGuide`, and `.manifest-summary` should use it for outer alignment while retaining content-owned local reading measures. Graph is excluded.
 8. **Automatic short-record rail behaviour is deferred.** Retain only the demonstrated rail/no-rail and current responsive fit recomposition until later evidence and approval justify content-dependent behaviour.
 

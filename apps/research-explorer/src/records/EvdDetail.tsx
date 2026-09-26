@@ -8,6 +8,7 @@ import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
 import { ShareAction } from "../problem/ShareAction";
+import { useToast } from "../presentation/Toast";
 import { RecordIdentifier } from "./RecordIdentifier";
 import { EvidenceEffectTag } from "./EvidenceEffectTag";
 import { ResearchRoleTag } from "./ResearchRoleTag";
@@ -253,6 +254,7 @@ function auditIntro(sourceIds: string[], lookup: Map<string, RecordSummary>): st
 }
 
 function EvdAudit({ detail, lookup, onSelect }: { detail: RecordDetail; lookup: Map<string, RecordSummary>; onSelect: (id: string) => void }) {
+  const { notify } = useToast();
   const record = detail.record;
   const provenance = objectValue(record.provenance);
   const sourceIds = strings(provenance?.sources);
@@ -310,7 +312,7 @@ function EvdAudit({ detail, lookup, onSelect }: { detail: RecordDetail; lookup: 
                 {lineageId && <span>linhagem <code>{lineageId}</code></span>}
               </p>
             </div>
-            <a href={canonicalFileUrl(detail.file)} download={fileName} className="evd-audit-primary-cta">
+            <a href={canonicalFileUrl(detail.file)} download={fileName} className="evd-audit-primary-cta" onClick={() => notify("Transferência iniciada.", "neutral")}>
               <span aria-hidden="true">↓</span>Descarregar YAML
             </a>
           </div>
