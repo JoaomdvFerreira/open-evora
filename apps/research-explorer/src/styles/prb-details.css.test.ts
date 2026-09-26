@@ -3,17 +3,20 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 /**
- * PRB Details layout — CSS contract. Structural only (selector presence,
- * declared values, scoping); never pixel/visual acceptance. Covers the
- * relationship between the terminal audit band, `main.explorer-shell` and
- * the global PublicFooter, the full-width band gutter bleed, and the
- * Estado da investigação / Âmbito six-column grid, and proves the
- * PRB-scoped treatment leaves the shared primitives (and Overview's own
- * terminal treatment) untouched for every other surface.
+ * Public PRB views layout — CSS contract. Structural only (selector
+ * presence, declared values, scoping); never pixel/visual acceptance. Covers
+ * PRB Details (the relationship between the terminal audit band,
+ * `main.explorer-shell` and the global PublicFooter, the full-width band
+ * gutter bleed, and the Estado da investigação / Âmbito six-column grid) and
+ * PRB Histórico (its shared header/hero token contract, material-history
+ * band and responsive rows), and proves the PRB-scoped treatment leaves the
+ * shared primitives (and Overview's own terminal treatment) untouched for
+ * every other surface.
  */
 const stripComments = (source: string) => source.replace(/\/\*[\s\S]*?\*\//g, "");
 const prbCss = stripComments(fs.readFileSync(path.resolve(__dirname, "prb-details.css"), "utf8"));
 const indexCss = stripComments(fs.readFileSync(path.resolve(__dirname, "..", "index.css"), "utf8"));
+const historyCss = stripComments(fs.readFileSync(path.resolve(__dirname, "prb-history.css"), "utf8"));
 
 /** Brace-balanced top-level blocks of `source` whose prelude is exactly `prelude`. */
 function mediaBlocks(source: string, prelude: string): string[] {
@@ -78,6 +81,10 @@ const indexBase = withoutMedia(indexCss);
 const indexCompact = mediaBlocks(indexCss, "@media (max-width: 767px)").join("\n");
 const prbCompact = mediaBlocks(prbCss, "@media (max-width: 767px)").join("\n");
 const prbTablet = mediaBlocks(prbCss, "@media (min-width: 768px) and (max-width: 1023px)").join("\n");
+const prbFit = mediaBlocks(prbCss, "@media (min-width: 1024px) and (max-width: 1439px)").join("\n");
+const historyBase = withoutMedia(historyCss);
+const historyCompact = mediaBlocks(historyCss, "@media (max-width: 767px)").join("\n");
+const historyTablet = mediaBlocks(historyCss, "@media (min-width: 768px) and (max-width: 1023px)").join("\n");
 
 /** The PRB Details bands whose surface/rules span the page and therefore bleed through the shell gutter. */
 const FULL_WIDTH_BANDS = [".prb-header-band", ".prb-state-scope-band", ".prb-path-section", ".prb-audit-section"];
@@ -154,8 +161,9 @@ describe("PRB Details full-width bands — gutter bleed", () => {
 
   it("keeps each band's inner shell-frame--wide as the content-alignment owner (no horizontal inset on the frame)", () => {
     const tsx = fs.readFileSync(path.resolve(__dirname, "..", "problem", "PrbDetailsPresentation.tsx"), "utf8");
+    const headerTsx = fs.readFileSync(path.resolve(__dirname, "..", "problem", "PrbPageHeader.tsx"), "utf8");
     expect(tsx).toMatch(/className="prb-section prb-audit-section">\s*<div className="shell-frame shell-frame--wide prb-section-frame">/);
-    expect(tsx).toMatch(/className="prb-header-band">\s*<div className="shell-frame shell-frame--wide">/);
+    expect(headerTsx).toMatch(/className="prb-header-band">\s*<div className="shell-frame shell-frame--wide">/);
     expect(tsx).toMatch(/className="prb-state-scope-band">\s*<div className="shell-frame shell-frame--wide prb-state-scope-row">/);
     expect(onlyRuleBody(prbBase, ".prb-audit-section .prb-section-frame")).not.toMatch(/padding-(left|right|inline)|margin/);
     expect(onlyRuleBody(prbBase, ".prb-state-scope-row")).not.toMatch(/padding|margin/);
@@ -195,15 +203,20 @@ describe("PRB Details Estado da investigação / Âmbito band — six-column gri
   });
 
   it("draws the heading/data separator across the band's full width from the band's own box", () => {
-    const band = ruleBodies(prbBase, ".prb-state-scope-band").find((rule) => /border-top:/.test(rule));
+    const band = ruleBodies(prbBase, ".prb-state-scope-band").find((rule) => /position:/.test(rule));
     expect(band).toMatch(/position:\s*relative;/);
-    expect(band).toMatch(/border-top:\s*1px solid var\(--color-separator-standard\);/);
     expect(band).not.toMatch(/background/);
     const separator = onlyRuleBody(prbBase, ".prb-state-grid::before");
     expect(separator).toMatch(/position:\s*absolute;/);
     expect(separator).toMatch(/left:\s*0;/);
     expect(separator).toMatch(/right:\s*0;/);
     expect(separator).not.toMatch(/(^|[\s;])(top|width):/);
+  });
+
+  it("closes the band with a bottom rule only — it declares no top border of its own", () => {
+    const bands = ruleBodies(prbCss, ".prb-state-scope-band");
+    expect(bands.some((rule) => /border-bottom:\s*1px solid var\(--color-separator-standard\);/.test(rule))).toBe(true);
+    for (const rule of bands) expect(rule).not.toMatch(/border-top/);
   });
 
   it("separates every data cell but the first with a vertical rule", () => {
@@ -224,5 +237,54 @@ describe("PRB Details Estado da investigação / Âmbito band — six-column gri
     expect(prbCompact).not.toMatch(/repeat\(6,/);
     expect(onlyRuleBody(prbCompact, ".prb-state-grid::before")).toMatch(/content:\s*none;/);
     expect(onlyRuleBody(prbCompact, ".prb-scope-block::before")).toMatch(/position:\s*absolute;/);
+  });
+});
+
+describe("PRB Histórico — shared header/hero contract and material-history layout", () => {
+  it("resolves the same header/hero/section token blocks as PRB Details at every breakpoint", () => {
+    for (const block of [prbBase, prbFit, prbTablet, prbCompact]) {
+      const tokens = onlyRuleBody(block, ".prb-details-view");
+      expect(ruleBodies(block, ".prb-history-view")).toEqual([tokens]);
+      expect(tokens).toMatch(/--prb-hero-title-size:/);
+    }
+  });
+
+  it("owns no competing copy of the shared header/hero rules", () => {
+    expect(historyCss).not.toMatch(/\.prb-(header|identity)/);
+  });
+
+  it("scopes its terminal zero-gap treatment to the Histórico root only", () => {
+    expect(onlyRuleBody(historyBase, "body:has(.prb-history-view) main.explorer-shell")).toMatch(/^\s*padding-bottom:\s*0;\s*$/);
+    expect(onlyRuleBody(historyBase, "body:has(.prb-history-view) .public-footer")).toMatch(/^\s*margin-top:\s*0;\s*$/);
+    expect(ruleBodies(historyCss, "main.explorer-shell")).toHaveLength(0);
+    expect(ruleBodies(historyCss, ".public-footer")).toHaveLength(0);
+    expect(onlyRuleBody(historyBase, ".prb-history-section .prb-section-frame")).toMatch(/padding-bottom:\s*var\(--prb-history-pad-bottom\);/);
+  });
+
+  it("bleeds the material-history band through the shell gutter token, never viewport-width geometry or overflow hiding", () => {
+    const band = onlyRuleBody(historyBase, ".prb-history-view .prb-history-section");
+    expect(band).toMatch(/margin-inline:\s*calc\(-1 \* var\(--explorer-shell-gutter, 0px\)\);/);
+    expect(band).toMatch(/padding-inline:\s*var\(--explorer-shell-gutter, 0px\);/);
+    expect(band).toMatch(/border-top:\s*1px solid/);
+    expect(historyCss).not.toMatch(/100vw/);
+    expect(historyCss).not.toMatch(/overflow-x:\s*hidden/);
+    expect(historyCss).not.toMatch(/(margin|padding)(-inline|-left|-right)?:\s*-\d/);
+  });
+
+  it("keeps a date column + content column per entry down to tablet width", () => {
+    expect(onlyRuleBody(historyBase, ".prb-history-entry")).toMatch(/grid-template-columns:\s*var\(--prb-history-date-col\) minmax\(0, 1fr\);/);
+    expect(ruleBodies(historyTablet, ".prb-history-entry")).toHaveLength(0);
+  });
+
+  it("stacks each entry at compact width, keeping exact date and relative age grouped on one line", () => {
+    expect(onlyRuleBody(historyCompact, ".prb-history-entry")).toMatch(/grid-template-columns:\s*minmax\(0, 1fr\);/);
+    expect(onlyRuleBody(historyCompact, ".prb-history-entry-date")).toMatch(/flex-direction:\s*row;/);
+    expect(onlyRuleBody(historyCompact, ".prb-history-entry-date")).toMatch(/flex-wrap:\s*wrap;/);
+  });
+
+  it("separates entries with restrained horizontal rules only — no cards or timeline markers", () => {
+    expect(onlyRuleBody(historyBase, ".prb-history-entry")).toMatch(/border-top:\s*1px solid var\(--color-separator-standard\);/);
+    expect(onlyRuleBody(historyBase, ".prb-history-entry:first-child")).toMatch(/border-top:\s*0;/);
+    expect(historyCss).not.toMatch(/border-radius|box-shadow|::before|::after/);
   });
 });

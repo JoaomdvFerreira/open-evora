@@ -2,12 +2,9 @@ import { useSyncExternalStore, type ReactNode, type RefObject } from "react";
 import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { RecordIdentifier } from "../records/RecordIdentifier";
-import { Breadcrumb } from "../presentation/Breadcrumb";
-import { ContextTabs } from "../navigation/ContextTabs";
-import { describeTopic } from "../presentation/topicMapping";
 import { validationVisual } from "./stateVisuals";
-import { ShareAction } from "./ShareAction";
-import { formatPublicCount, formatPublicDate, publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
+import { PrbHeader, PrbIdentityHeader } from "./PrbPageHeader";
+import { formatPublicCount, publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
 import type { PrbDetailsData, PrbOpenQuestion, PrbPathStage } from "./prbDetailsProjection";
 
 /**
@@ -25,7 +22,8 @@ import type { PrbDetailsData, PrbOpenQuestion, PrbPathStage } from "./prbDetails
  * presentation architecture (right-side reading rail/CompactSectionIndex
  * "Nesta página"). The approved reference is a wide editorial composition
  * with its own local header (breadcrumb + the shared Detalhes|Histórico
- * PRB navigation + Verificar/Partilhar utilities) and a
+ * PRB navigation + Verificar/Partilhar utilities — shared with Histórico,
+ * see PrbPageHeader.tsx) and a
  * left-label/broad-content section rhythm at desktop widths — see the
  * `.prb-*` classes in styles/prb-details.css, which own this view's own
  * geometry rather than `.lyt-reading`/`.context-tabs`.
@@ -48,99 +46,6 @@ export interface PrbDetailsPresentationProps {
   onViewHistory: (id: string) => void;
   /** Receives the focusable PRB title heading so the container can move focus to it once the async projection resolves. */
   titleRef?: RefObject<HTMLHeadingElement>;
-}
-
-/**
- * Local PRB header: breadcrumb (Visão geral › PRB-xxxx) + the shared
- * Detalhes|Histórico PRB navigation (ContextTabs) + Verificar/Partilhar
- * utilities. Detalhes is this view itself (current page), Histórico routes
- * to ProblemHistoryView via `onViewHistory`. "Verificar"
- * jumps to the audit section already on this page; "Partilhar" reuses the
- * existing ShareAction behaviour (Web Share API / copy-link fallback). Both
- * utilities carry a decorative aria-hidden glyph (↓/↗); their visible text
- * stays their accessible name. At 360 the breadcrumb takes its own line,
- * Partilhar collapses to its icon (label kept for assistive tech) and
- * Verificar is omitted from this row — the audit section itself remains in
- * normal page flow.
- */
-function PrbHeader({ data, onBackToOverview, onViewHistory }: { data: PrbDetailsData; onBackToOverview: () => void; onViewHistory: (id: string) => void }) {
-  return (
-    <div className="prb-header">
-      <Breadcrumb
-        label="Localização"
-        ancestors={[
-          {
-            key: "visao-geral",
-            action: (
-              <button type="button" className="prb-breadcrumb-ancestor" onClick={onBackToOverview}>
-                Visão geral
-              </button>
-            ),
-          },
-        ]}
-        current={<RecordIdentifier variant="text" density="compact" id={data.problemId} />}
-      />
-      <ContextTabs prbId={data.problemId} active="details" onViewDetails={() => undefined} onViewHistory={onViewHistory} />
-      <div className="prb-header-utilities">
-        <a href="#prb-auditoria" className="prb-header-utility prb-header-utility--verify">
-          <span aria-hidden="true" className="prb-header-utility-icon">
-            ↓
-          </span>
-          Verificar
-        </a>
-        <ShareAction title={data.title} icon="↗" />
-      </div>
-    </div>
-  );
-}
-
-/**
- * Editorial hero. The "Atualizado em …" line is canonical `updated_at` —
- * the date the PRB record was last edited. It is record metadata only, not
- * a currentness assessment: nothing here infers that the reading is still
- * current from it. It follows the statement in DOM order: at >=768 the hero
- * grid lifts it into the eyebrow row's right edge; at 360 it stays below the
- * statement as the compact "PRB-xxxx · Atualizado em …" line (the id prefix
- * is shown only there — the local header breadcrumb already carries it at
- * wider widths).
- */
-function PrbIdentityHeader({ data, titleRef }: { data: PrbDetailsData; titleRef?: RefObject<HTMLHeadingElement> }) {
-  return (
-    <header className="prb-identity">
-      <div className="prb-identity-eyebrow-row">
-        <span className="prb-identity-eyebrow">
-          <span className="prb-identity-eyebrow-dot" aria-hidden="true" />
-          Problema em investigação
-        </span>
-        {data.topics.length > 0 && (
-          <span className="prb-identity-topics" aria-label="Temas">
-            {data.topics.map((topic, index) => (
-              <span key={topic} className="prb-identity-topic-item">
-                {index > 0 && (
-                  <span aria-hidden="true" className="prb-identity-topic-sep">
-                    ·
-                  </span>
-                )}
-                <span className="prb-identity-topic-link">
-                  {describeTopic(topic).label}
-                </span>
-              </span>
-            ))}
-          </span>
-        )}
-      </div>
-      <h2 id="prb-identity-title" ref={titleRef} tabIndex={-1} className="prb-identity-title">
-        {data.title}
-      </h2>
-      {data.statement && <p className="prb-identity-statement">{data.statement}</p>}
-      {data.updatedAt && (
-        <p className="prb-identity-updated">
-          <span className="prb-identity-updated-id">{`${data.problemId} · `}</span>
-          Atualizado em <time dateTime={data.updatedAt}>{formatPublicDate(data.updatedAt)}</time>
-        </p>
-      )}
-    </header>
-  );
 }
 
 /**
@@ -607,14 +512,10 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
 export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, onViewHistory, titleRef }: PrbDetailsPresentationProps) {
   return (
     <article aria-labelledby="prb-identity-title" className="prb-details-view">
-      <div className="prb-header-band">
-        <div className="shell-frame shell-frame--wide">
-          <PrbHeader data={data} onBackToOverview={onBackToOverview} onViewHistory={onViewHistory} />
-        </div>
-      </div>
+      <PrbHeader identity={data} active="details" onBackToOverview={onBackToOverview} onViewDetails={() => undefined} onViewHistory={onViewHistory} />
 
       <div className="shell-frame shell-frame--wide prb-details-frame">
-        <PrbIdentityHeader data={data} titleRef={titleRef} />
+        <PrbIdentityHeader identity={data} titleRef={titleRef} />
       </div>
 
       <PrbInvestigationStateSection data={data} />

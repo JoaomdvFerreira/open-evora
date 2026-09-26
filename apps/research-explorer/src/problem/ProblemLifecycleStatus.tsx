@@ -34,12 +34,12 @@ import { lifecycleVisual } from "./stateVisuals";
  *   value.
  *
  * A `history` transition form is not implemented here: `ProblemHistoryView.tsx`'s
- * `StateChanges` already renders `status` transitions today, but as one of
+ * state-change rows already render `status` transitions today, but as one of
  * five fields sharing one generic `publicFieldCaption()`/`publicEnumLabel()`
  * row, not as a `status`-specific composition with its own coherent
  * component boundary — extracting one dimension out of that shared renderer
  * without touching the other four would not be a clean isolated boundary,
- * and this slice does not modify `ProblemHistoryView.tsx`.
+ * and this slice did not modify `ProblemHistoryView.tsx`.
  *
  * The dimension caption is always rendered — no form may drop it, per this
  * slice's scope boundary. `overview` uses the surface-specific "Estado do

@@ -54,10 +54,12 @@ import "./styles/section-index.css";
 import "./styles/logo.css";
 import "./styles/topic.css";
 // The public PRB Details composition (PrbDetailsPresentation, rendered by
-// ProblemView). prb-details.css itself imports prb-view-selector.css, so the
-// PRB-local Detalhes|Histórico navigation (ContextTabs) keeps its appearance
-// on ProblemHistoryView too without a second standalone import here.
+// ProblemView). prb-details.css itself imports prb-view-selector.css and
+// owns the PRB header/hero contract shared with Histórico.
 import "./styles/prb-details.css";
+// The public PRB Histórico composition (ProblemHistoryView) — only its own
+// material-history band on top of the shared PRB contract above.
+import "./styles/prb-history.css";
 
 const container = document.getElementById("root");
 if (!container) {

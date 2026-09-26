@@ -88,7 +88,12 @@ Canonical content that belongs only to the earlier Problem presentation (for exa
 
 Presents the optional authored material-change history of the selected Problem from canonical PRB `history[]`, newest first. It must not fabricate entries. Absence of history does not mean the Problem never changed. It is a read-only projection of PRB history, not a snapshot/version-control or audit-log system.
 
-Runtime integration adapts only its navigation/header to the two-view model; a full `Histórico` visual redesign is deferred.
+Explorer presentation invariants:
+
+- it shares the public PRB local header and identity hero with `Detalhes` (one implementation);
+- each entry renders only its authored fields (`date`, `summary`, `state_changes`, `evidence`); an exact date may carry a presentation-only relative age;
+- no entry type/category or current/in-force state is derived from summary text, entry order, or date;
+- `Verificar` navigates to the same Problem's `Detalhes` audit layer, since `Histórico` has none of its own.
 
 ### 3.4 Problem-local navigation
 
@@ -100,7 +105,8 @@ Runtime integration adapts only its navigation/header to the two-view model; a f
 ### 3.5 Terminal composition
 
 - The `Detalhes` evidence/audit band is the final content band before the public footer.
-- The global manifest/corpus-generation summary is not appended after `Detalhes`. Records, `Histórico`, and Graph may retain it.
+- The `Histórico` material-history section is likewise its final content band before the public footer.
+- The global manifest/corpus-generation summary is not appended after `Detalhes` or `Histórico`. Records and Graph may retain it.
 - Corpus-generation timestamps are never presented as investigation currentness.
 
 ## 4. Records presentation

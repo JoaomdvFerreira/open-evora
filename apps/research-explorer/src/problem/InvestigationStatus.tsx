@@ -48,10 +48,10 @@ import { evidenceVisual, validationVisual } from "./stateVisuals";
  *   token layer), gloss never substituted for the stored value.
  *
  * A `history` transition form is not implemented for the same reason given
- * in ProblemLifecycleStatus.tsx: `ProblemHistoryView.tsx`'s `StateChanges`
+ * in ProblemLifecycleStatus.tsx: `ProblemHistoryView.tsx`'s state-change rows
  * renders these fields' transitions today only as two of five fields inside
  * one generic renderer, not as a dimension-specific composition, and this
- * slice does not modify `ProblemHistoryView.tsx`.
+ * slice did not modify `ProblemHistoryView.tsx`.
  *
  * DS-04D Slice 3B F01: both `overview` and `reading` use the compact PT-PT
  * caption ("Validação" / "Evidência") and the compact label set
