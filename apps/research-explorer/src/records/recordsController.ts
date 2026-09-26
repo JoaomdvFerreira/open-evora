@@ -20,8 +20,9 @@ export type RecordsControllerAction =
   | { type: "SET_PAGE_INDEX"; pageIndex: number }
   | { type: "RESET_PAGE" };
 
+/** Records open sorted by canonical ID, ascending. */
 export const initialRecordsControllerState: RecordsControllerState = {
-  sorting: [],
+  sorting: [{ id: "id", desc: false }],
   pagination: { pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE },
 };
 

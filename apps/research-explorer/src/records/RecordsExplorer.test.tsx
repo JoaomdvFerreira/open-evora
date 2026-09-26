@@ -51,15 +51,15 @@ function Harness() {
   );
 }
 
-function pageIndicatorText(): string | null {
-  const nextButton = screen.getByRole("button", { name: "Seguinte" });
-  const indicator = nextButton.parentElement?.querySelector("span[aria-live='polite']");
-  return indicator ? indicator.textContent?.replace(/\s+/g, " ").trim() ?? null : null;
+function currentPageText(): string | null {
+  const nav = screen.getByRole("navigation", { name: "Paginação dos registos" });
+  return nav.querySelector('[aria-current="page"]')?.getAttribute("aria-label") ?? null;
 }
 
 async function expectPageTwoOfTwo() {
-  await screen.findByText(/Página/);
-  expect(pageIndicatorText()).toBe("Página 2 de 2");
+  await screen.findByRole("navigation", { name: "Paginação dos registos" });
+  expect(currentPageText()).toBe("Página 2");
+  expect(screen.getByText("Página 2 de 2 · 30 registos")).toBeTruthy();
 }
 
 describe("RecordsExplorer — sort/page persistence across select-then-return (ODM-015)", () => {
@@ -69,12 +69,11 @@ describe("RecordsExplorer — sort/page persistence across select-then-return (O
 
     await screen.findByText("Fixture evidence label 01");
 
-    // Sort by ID descending, then move to page 2.
+    // Sort by ID descending (Records open ID-ascending), then move to page 2.
     const sortButton = screen.getByRole("button", { name: /^ID/ });
     await user.click(sortButton);
-    await user.click(sortButton);
     expect(sortButton.getAttribute("aria-pressed")).toBe("true");
-    expect(sortButton.textContent).toContain("▼");
+    expect(sortButton.textContent).toContain("↓");
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
     await expectPageTwoOfTwo();
     const [firstRowOnPage2] = screen.getAllByText(/Fixture evidence label/);
@@ -90,7 +89,7 @@ describe("RecordsExplorer — sort/page persistence across select-then-return (O
     // Sort direction and page position must be exactly as left.
     const sortButtonAgain = await screen.findByRole("button", { name: /^ID/ });
     expect(sortButtonAgain.getAttribute("aria-pressed")).toBe("true");
-    expect(sortButtonAgain.textContent).toContain("▼");
+    expect(sortButtonAgain.textContent).toContain("↓");
     await expectPageTwoOfTwo();
     const [firstRowAfterReturn] = screen.getAllByText(/Fixture evidence label/);
     expect(firstRowAfterReturn.textContent).toBe(firstLabelOnPage2);

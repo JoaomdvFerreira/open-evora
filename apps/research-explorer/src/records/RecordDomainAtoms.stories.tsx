@@ -16,7 +16,7 @@ import { EvidenceEffectTag } from "./EvidenceEffectTag";
    Synthetic PT-PT content and synthetic IDs (SRC-XXXX/EVD-XXXXXX/PRB-XXXX
    style) only, per docs/design/foundations.md "Synthetic design content" —
    no real research findings or claims. No production call site
-   (RecordDetailPanel, RecordsTable, NarrowRecordsList, EvdDetail,
+   (RecordDetailPanel, RecordsTable, EvdDetail,
    ProblemView) is modified, migrated, or retired in this slice. */
 
 const meta = {

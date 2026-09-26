@@ -106,16 +106,19 @@ Explorer presentation invariants:
 
 - The `Detalhes` evidence/audit band is the final content band before the public footer.
 - The `Histórico` material-history section is likewise its final content band before the public footer.
-- The global manifest/corpus-generation summary is not appended after `Detalhes` or `Histórico`. Records and Graph may retain it.
+- The Records landing's pagination row is likewise its final content band before the public footer.
+- The global manifest/corpus-generation summary is not appended after `Detalhes`, `Histórico` or the Records landing. Record Detail and Graph may retain it.
 - Corpus-generation timestamps are never presented as investigation currentness.
 
 ## 4. Records presentation
 
+The public header entry `Registos` opens the complete, unfiltered Records area (`Todos`) and stays current throughout it — every type filter and Record Detail.
+
 Records should be compact and scannable:
-- human-readable meaning before technical identity;
-- technical ID retained as secondary identity;
-- useful Source/relationship context;
-- full technical inspection available without dominating first reading.
+- the canonical ID leads each row as the stable citation key, in restrained technical type;
+- the human-readable title is the visually primary text;
+- record type is carried by the type filters and the ID prefix, not a separate column;
+- full technical inspection available in Record Detail without dominating first reading.
 
 Generic Record Detail, reached through Records, is the technical/corpus inspection surface for every record type, including PRB.
 

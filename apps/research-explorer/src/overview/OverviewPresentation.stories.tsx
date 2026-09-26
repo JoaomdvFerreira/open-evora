@@ -168,10 +168,10 @@ function FullOverview({
  * hiding) — it only reuses the production `explorer-shell`/chrome classes so
  * `index.css`'s real rules apply exactly as they do outside Storybook.
  *
- * Header fixture state: `activeView="overview"` with no active Sources type
- * filter, matching the truthful Overview state Explorer.tsx itself passes
- * (Problemas reads as the active nav item; Fontes does not). The
- * onProblemas/onFontes callbacks are SPA URL-state navigation in production
+ * Header fixture state: `activeView="overview"`, matching the truthful
+ * Overview state Explorer.tsx itself passes
+ * (Problemas reads as the active nav item; Registos does not). The
+ * onProblemas/onRegistos callbacks are SPA URL-state navigation in production
  * (see Explorer.tsx) — here they are stable no-ops since this fixture has no
  * URL/routing machinery to navigate.
  */
@@ -181,7 +181,7 @@ function FullOverviewShell(props: Parameters<typeof FullOverview>[0]) {
   return (
     <>
       <main className="explorer-shell">
-        <ExplorerHeader activeView="overview" activeTypeFilter="" onProblemas={noop} onFontes={noop} />
+        <ExplorerHeader activeView="overview" onProblemas={noop} onRegistos={noop} />
         <FullOverview {...props} />
       </main>
       <PublicFooter />

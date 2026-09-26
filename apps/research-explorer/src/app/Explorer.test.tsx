@@ -64,6 +64,18 @@ function recordsHeading(): HTMLElement {
   return screen.getByRole("heading", { name: "Registos" });
 }
 
+/** The Records type-filter button whose visible label is `label` (its accessible name also carries the count). */
+function typeFilterButton(label: string): HTMLElement {
+  const group = screen.getByRole("group", { name: "Tipo de registo" });
+  return within(group).getByRole("button", { name: new RegExp(`^${label} `) });
+}
+
+function activeTypeFilterLabel(): string | undefined {
+  const group = screen.getByRole("group", { name: "Tipo de registo" });
+  const pressed = within(group).getAllByRole("button").find((button) => button.getAttribute("aria-pressed") === "true");
+  return pressed?.textContent?.replace(/\s*\d+$/, "");
+}
+
 /** PRB-0005 with an authored open question that references EVD-000105 — scoped to PRB Details tests so generic Record Detail fixtures stay unchanged. */
 function withOpenQuestionEvidence(): Partial<DataProvider> {
   const prb = DETAILS["PRB-0005"];
@@ -313,14 +325,14 @@ describe("Explorer — Overview view", () => {
     expect(window.location.search).toContain("id=PRB-0005");
   });
 
-  it("keeps explicit Records navigation available from the root Overview via the header's Fontes action", async () => {
+  it("keeps explicit Records navigation available from the root Overview via the header's Registos action", async () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    await user.click(await screen.findByRole("button", { name: "Fontes", hidden: true }));
+    await user.click(await screen.findByRole("button", { name: "Registos", hidden: true }));
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Fontes", hidden: true }).getAttribute("aria-current")).toBe("page");
+    expect(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }).getAttribute("aria-current")).toBe("page");
   });
 });
 
@@ -352,7 +364,7 @@ describe("Explorer — URL-addressable state", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
-    await user.selectOptions(screen.getByLabelText("Tipo"), "all");
+    await user.click(typeFilterButton("Todos"));
     expect(pushSpy).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole("button", { name: /PRB-0005/ }));
@@ -391,7 +403,7 @@ describe("Explorer — URL-addressable state", () => {
     await user.click(within(breadcrumb).getByRole("button", { name: "Registos" }));
 
     expect((await screen.findByLabelText("Pesquisar") as HTMLInputElement).value).toBe("PRB");
-    expect((screen.getByLabelText("Tipo") as HTMLSelectElement).value).toBe("PRB-");
+    expect(activeTypeFilterLabel()).toBe("Problemas");
   });
 
   it("browser back restores the previous selection after navigating to a related record", async () => {
@@ -442,30 +454,42 @@ describe("Explorer — URL-addressable state", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
 
     await screen.findByRole("button", { name: /PRB-0005/ });
-    expect((screen.getByLabelText("Tipo") as HTMLSelectElement).value).toBe("all");
+    expect(activeTypeFilterLabel()).toBe("Todos");
     expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
     expect(screen.getByRole("button", { name: /EVD-000105/ })).toBeTruthy();
   });
 
-  describe("Fontes — combined Records + canonical-Source URL-state navigation (Overview final redesign, Phase 3B §2)", () => {
-    it("is a single history entry that sets view=records, clears selection/query, and filters to SRC-", async () => {
+  describe("Registos — header entry into the complete, unfiltered Records area", () => {
+    it("is a single history entry that sets view=records and clears selection, query and type filter (Todos)", async () => {
       const user = userEvent.setup();
       window.history.replaceState(null, "", "/?view=problem&id=PRB-0005&q=stale-query&type=EVD-");
       const pushSpy = vi.spyOn(window.history, "pushState");
       render(<Explorer dataProvider={fakeProvider()} />);
       await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
-      await user.click(screen.getByRole("button", { name: "Fontes", hidden: true }));
+      await user.click(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }));
 
       expect(pushSpy).toHaveBeenCalledTimes(1);
-      expect(window.location.search).toContain("view=records");
-      expect(window.location.search).not.toContain("id=PRB-0005");
-      expect(window.location.search).not.toContain("q=stale-query");
-      expect(window.location.search).toContain("type=SRC-");
+      expect(window.location.search).toBe("?view=records");
       expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
       expect((await screen.findByLabelText("Pesquisar") as HTMLInputElement).value).toBe("");
-      expect((screen.getByLabelText("Tipo") as HTMLSelectElement).value).toBe("SRC-");
+      expect(activeTypeFilterLabel()).toBe("Todos");
+      for (const id of ["PRB-0005", "EVD-000105", "SRC-0092", "WID-0001"]) {
+        expect(screen.getByRole("button", { name: new RegExp(id) })).toBeTruthy();
+      }
       pushSpy.mockRestore();
+    });
+
+    it("from a filtered Records view, returns to Todos", async () => {
+      const user = userEvent.setup();
+      window.history.replaceState(null, "", "/?view=records&type=SRC-");
+      render(<Explorer dataProvider={fakeProvider()} />);
+      await screen.findByRole("button", { name: /SRC-0092/ });
+
+      await user.click(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }));
+
+      await waitFor(() => expect(activeTypeFilterLabel()).toBe("Todos"));
+      expect(window.location.search).not.toContain("type=");
     });
 
     it("leaves unrelated existing state (graph depth) untouched", async () => {
@@ -474,25 +498,52 @@ describe("Explorer — URL-addressable state", () => {
       render(<Explorer dataProvider={fakeProvider()} />);
       await screen.findByRole("button", { name: /PRB-0005/ });
 
-      await user.click(screen.getByRole("button", { name: "Fontes", hidden: true }));
+      await user.click(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }));
 
       await screen.findByRole("heading", { name: "Registos" });
       expect(window.location.search).toContain("d=2");
     });
 
-    it("is active only when Records is filtered to SRC-, not for other Records contexts", async () => {
-      window.history.replaceState(null, "", "/?view=records&type=PRB-");
-      const { unmount: unmountPrb } = render(<Explorer dataProvider={fakeProvider()} />);
-      await screen.findByRole("button", { name: /PRB-0005/ });
-
-      expect(within(globalNav()).getByRole("button", { name: "Fontes", hidden: true }).getAttribute("aria-current")).toBeNull();
-      unmountPrb();
-
-      window.history.replaceState(null, "", "/?view=records&type=SRC-");
+    it("stays active throughout the Records area — every type filter and Record Detail", async () => {
+      const user = userEvent.setup();
+      const registos = () => within(globalNav()).getByRole("button", { name: "Registos", hidden: true });
       render(<Explorer dataProvider={fakeProvider()} />);
-      await screen.findByRole("button", { name: /SRC-0092/ });
-      expect(within(globalNav()).getByRole("button", { name: "Fontes", hidden: true }).getAttribute("aria-current")).toBe("page");
+      await screen.findByRole("button", { name: /PRB-0005/ });
+      expect(registos().getAttribute("aria-current")).toBe("page");
+
+      for (const label of ["Problemas", "Fontes", "Evidências", "Todos"]) {
+        await user.click(typeFilterButton(label));
+        expect(activeTypeFilterLabel()).toBe(label);
+        expect(registos().getAttribute("aria-current")).toBe("page");
+      }
+
+      await user.click(screen.getByRole("button", { name: /SRC-0092/ }));
+      await getDetailPanel();
+      expect(registos().getAttribute("aria-current")).toBe("page");
+      expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }).getAttribute("aria-current")).toBeNull();
     });
+
+    it("is not active outside the Records area", async () => {
+      window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
+      render(<Explorer dataProvider={fakeProvider()} />);
+      await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+      expect(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }).getAttribute("aria-current")).toBeNull();
+    });
+  });
+
+  it("selecting a type filter is a URL-synced push navigation, restorable with browser back", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("button", { name: /PRB-0005/ });
+
+    await user.click(typeFilterButton("Fontes"));
+    expect(window.location.search).toContain("type=SRC-");
+    expect(screen.getByRole("button", { name: /SRC-0092/ })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /PRB-0005/ })).toBeNull();
+
+    window.history.back();
+    await waitFor(() => expect(activeTypeFilterLabel()).toBe("Todos"));
+    expect(window.location.search).not.toContain("type=");
   });
 });
 
@@ -517,10 +568,10 @@ describe("Explorer — chrome header identity", () => {
     expect(globalNav()).toBeTruthy();
     expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true })).toBeTruthy();
     expect(within(globalNav()).getByRole("link", { name: "Método", hidden: true })).toBeTruthy();
-    expect(within(globalNav()).getByRole("button", { name: "Fontes", hidden: true })).toBeTruthy();
+    expect(within(globalNav()).getByRole("button", { name: "Registos", hidden: true })).toBeTruthy();
     expect(within(globalNav()).getByRole("link", { name: "Sobre", hidden: true })).toBeTruthy();
     expect(within(globalNav()).queryByRole("button", { name: "Visão geral" })).toBeNull();
-    expect(within(globalNav()).queryByRole("button", { name: "Registos" })).toBeNull();
+    expect(within(globalNav()).queryByRole("button", { name: "Fontes", hidden: true })).toBeNull();
     expect(within(globalNav()).queryByRole("button", { name: "Grafo" })).toBeNull();
   });
 
@@ -554,28 +605,28 @@ describe("Explorer — chrome header identity", () => {
 });
 
 describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
-  it("navigating from a selected Problem to global Fontes clears selectedId (no hidden-context leak)", async () => {
+  it("navigating from a selected Problem to global Registos clears selectedId (no hidden-context leak)", async () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Fontes", hidden: true }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }));
 
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
     expect(window.location.search).toContain("view=records");
     expect(window.location.search).not.toContain("id=PRB-0005");
-    // Records renders its table, filtered to the canonical Source type.
+    // Records renders its unfiltered list, not Record Detail.
     expect(screen.getByRole("button", { name: /SRC-0092/ })).toBeTruthy();
-    expect(screen.queryByRole("button", { name: /PRB-0005/ })).toBeNull();
+    expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
   });
 
-  it("GlobalNav Problemas / Fontes remain fully navigable", async () => {
+  it("GlobalNav Problemas / Registos remain fully navigable", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
-    await user.click(within(globalNav()).getByRole("button", { name: "Fontes", hidden: true }));
+    await user.click(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }));
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
 
     await user.click(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }));
@@ -598,8 +649,8 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
 
   it("does not erase existing Records search/type-filter state when navigating away via GlobalNav Problemas and back via browser history", async () => {
     // GlobalNav has no plain "go back to Records as it was" destination —
-    // Fontes deliberately clears query/type to always open the complete
-    // Source set (task spec §2). This proves Problemas' own navigation
+    // Registos deliberately clears query/type to always open the complete
+    // Records area. This proves Problemas' own navigation
     // (clearSelectionAndSetView) doesn't mutate the Records state it left
     // behind; a browser Back still restores it unchanged.
     const user = userEvent.setup();
@@ -613,7 +664,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     window.history.back();
     await waitFor(() => expect(window.location.search).toContain("q=PRB"));
     expect((await screen.findByLabelText("Pesquisar") as HTMLInputElement).value).toBe("PRB");
-    expect((screen.getByLabelText("Tipo") as HTMLSelectElement).value).toBe("PRB-");
+    expect(activeTypeFilterLabel()).toBe("Problemas");
   });
 
   it("PRB-local Detalhes|Histórico navigation preserves PRB identity, unlike GlobalNav", async () => {
@@ -883,14 +934,14 @@ describe("Explorer — global manifest summary placement", () => {
     expect(manifestSummary()).toBeNull();
   });
 
-  it("remains on Records, including Record Detail", async () => {
+  it("is absent on the Records landing, whose pagination row is the terminal content band, and present on Record Detail", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
-    expect(manifestSummary()?.textContent).toContain("Corpus: 4 registos");
+    expect(manifestSummary()).toBeNull();
     await user.click(screen.getByRole("button", { name: /EVD-000105/ }));
     await getDetailPanel();
-    expect(manifestSummary()).toBeTruthy();
+    expect(manifestSummary()?.textContent).toContain("Corpus: 4 registos");
   });
 
   it("is absent on PRB Histórico, whose material-history section is the terminal content band", async () => {

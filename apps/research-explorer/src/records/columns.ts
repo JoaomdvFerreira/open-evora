@@ -7,16 +7,16 @@ import type { RecordSummary } from "../dataProvider/types";
  * the React table component and by plain-Node tests of the records view
  * logic, with no JSX/React dependency here.
  *
- * Deliberately generic: only universal fields (ID, Type, Label, provenance
- * file path). No SRC-/EVD-/PRB- specific columns — a future
- * schema-conforming record type renders through these same four columns
- * with no change here.
+ * Deliberately generic: only the universal sortable fields the public
+ * Records list presents (canonical ID and human-readable label). No
+ * SRC-/EVD-/PRB- specific columns — a future schema-conforming record type
+ * renders through these same columns with no change here. Record type is
+ * already carried by the active filter and the ID prefix; the provenance
+ * file path stays in Record Detail.
  */
 const columnHelper = createColumnHelper<RecordSummary>();
 
 export const recordColumns = [
   columnHelper.accessor("id", { id: "id", header: "ID" }),
-  columnHelper.accessor("type", { id: "type", header: "Tipo" }),
-  columnHelper.accessor("label", { id: "label", header: "Rótulo" }),
-  columnHelper.accessor("file", { id: "file", header: "Ficheiro" }),
+  columnHelper.accessor("label", { id: "label", header: "Título" }),
 ];

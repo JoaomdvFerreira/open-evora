@@ -17,10 +17,8 @@ import { describeType } from "../presentation/typeGlossary";
  * `RecordIdentifier`, so this component does not duplicate technical
  * identity into its own markup.
  *
- * - `compact` — the list/row marker beside a record row/identity line,
- *   current evidence `.desktop-record-type`/`.narrow-record-type`
- *   (RecordsTable.tsx/NarrowRecordsList.tsx) and the EVD identity row
- *   (EvdDetail.tsx).
+ * - `compact` — the row marker beside a record identity line, current
+ *   evidence the EVD identity row (EvdDetail.tsx).
  * - `detail` — the stronger-emphasis presentation shown once per Record
  *   Detail meaning zone, current evidence `.detail-type-badge` (`TypeBadge`
  *   in RecordDetailPanel.tsx). Per the approved catalogue, this is "the

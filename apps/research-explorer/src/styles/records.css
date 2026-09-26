@@ -1,0 +1,609 @@
+/* Public Records landing composition (RecordsTable.tsx).
+   Intro, type-filter strip + search, the ID/Título record list and
+   responsive pagination, on the shared `.shell-frame.shell-frame--wide`
+   grid (index.css) so the page shares the Header/Footer axes like the other
+   public surfaces. One DOM serves every width: the column header row, the
+   compact result toolbar and the three pagination summaries are switched
+   here at the 1024 and 768 boundaries.
+   Per-breakpoint rhythm/type values are view-scoped custom properties so
+   each breakpoint block only swaps values. Record Detail keeps its own
+   styling (index.css). */
+
+.records-page {
+  --records-pad-top: 80px;
+  --records-pad-bottom: 88px;
+  --records-title-size: 56px;
+  --records-lede-size: 21px;
+  --records-intro-gap: 44px;
+  --records-id-col: 162px;
+  --records-row-title-size: 16.5px;
+  --records-control-height: 42px;
+}
+
+/* Terminal composition: the page's own bottom padding is the sole breathing
+   room before the footer, so the shared shell bottom padding and footer top
+   margin are neutralized for this surface only (same body:has() scoping as
+   Overview and the PRB views). Record Detail does not render `.records-page`
+   and keeps both. */
+body:has(.records-page) main.explorer-shell {
+  padding-bottom: 0;
+}
+
+body:has(.records-page) .public-footer {
+  margin-top: 0;
+}
+
+.records-page-frame {
+  padding-block: var(--records-pad-top) var(--records-pad-bottom);
+}
+
+.records-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Intro ---------------------------------------------------------------- */
+
+.records-intro {
+  margin-bottom: var(--records-intro-gap);
+}
+
+.records-eyebrow {
+  margin: 0 0 20px;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.records-title {
+  margin: 0 0 24px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--records-title-size);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.records-lede {
+  max-width: 40rem;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-reading);
+  font-size: var(--records-lede-size);
+  line-height: 1.55;
+}
+
+/* ---- Filters + search ----------------------------------------------------- */
+
+/* >=1024: filters and search share one row over a single rule; the active
+   filter's underline sits on that rule. */
+.records-filter-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.records-type-filters {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 28px;
+  min-width: 0;
+}
+
+.records-type-filter {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 0;
+  margin: 0 0 -1px;
+  padding: 0 0 14px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.records-type-filter:hover {
+  color: var(--color-ink-primary);
+}
+
+.records-type-filter[aria-pressed="true"] {
+  color: var(--color-ink-primary);
+  border-bottom-color: var(--color-accent);
+}
+
+.records-type-filter-count {
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 12.5px;
+  font-weight: 400;
+}
+
+.records-type-filter[aria-pressed="true"] .records-type-filter-count {
+  color: var(--color-accent-hover);
+}
+
+.records-search {
+  flex: 0 1 26rem;
+  min-width: 0;
+  margin-bottom: 12px;
+}
+
+.records-search-field {
+  position: relative;
+  display: block;
+}
+
+.records-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: var(--color-ink-muted);
+  pointer-events: none;
+}
+
+.records-search-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--records-control-height);
+  padding: 8px 14px 8px 40px;
+  color: var(--color-ink-primary);
+  border: 1px solid var(--color-separator-standard);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--color-surface-raised) 55%, var(--color-surface-reading));
+  font-family: var(--font-interface);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.records-search-input::placeholder {
+  color: var(--color-ink-muted);
+}
+
+.records-search-input:focus {
+  border-color: var(--color-accent);
+}
+
+.records-empty {
+  padding-top: 32px;
+}
+
+/* ---- Column header row / compact toolbar ---------------------------------- */
+
+.records-list-head,
+.records-row {
+  display: grid;
+  grid-template-columns: var(--records-id-col) minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.records-list-head {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.records-sort {
+  justify-self: start;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.records-sort:hover,
+.records-sort[aria-pressed="true"] {
+  color: var(--color-ink-primary);
+}
+
+.records-sort-arrow {
+  letter-spacing: 0;
+}
+
+/* Compact only (see the <=767 block). */
+.records-compact-toolbar {
+  display: none;
+}
+
+/* ---- Record rows ------------------------------------------------------------ */
+
+.records-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.records-list > li {
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+/* The whole row is one native button (Record Detail navigation). */
+.records-row {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 60px;
+  padding: 16px 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.records-row:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.records-row-id {
+  color: var(--color-ink-primary);
+  font-family: var(--font-technical);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.records-row-title {
+  min-width: 0;
+  padding-right: 24px;
+  font-family: var(--font-interface);
+  font-size: var(--records-row-title-size);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.records-row-title-primary {
+  color: var(--color-ink-primary);
+  font-weight: 600;
+}
+
+.records-row-title-secondary {
+  color: var(--color-ink-muted);
+  font-weight: 400;
+}
+
+.records-row-arrow {
+  color: var(--color-accent);
+  font-size: 16px;
+  line-height: 1;
+  transition: transform 120ms ease;
+}
+
+.records-row:hover .records-row-title-primary {
+  color: var(--color-accent-hover);
+}
+
+.records-row:hover .records-row-arrow {
+  transform: translateX(3px);
+}
+
+/* ---- Pagination -------------------------------------------------------------
+   >=1024: range on the left; page numbers + steps on the right, with
+   Anterior hidden on the first page. 768–1023: Anterior | Página n de N ·
+   count | Seguinte. <=767: Anterior | n / N | Seguinte. */
+
+.records-pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 32px;
+}
+
+.records-pagination-range {
+  margin: 0 auto 0 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: 14px;
+}
+
+.records-pagination-status {
+  display: none;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: 14px;
+  text-align: center;
+}
+
+.records-pagination-status-short {
+  display: none;
+  font-family: var(--font-technical);
+}
+
+.records-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.records-pagination-page {
+  min-width: 40px;
+  min-height: 0;
+  height: 40px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--p-radius-sm);
+  background: none;
+  color: var(--color-ink-primary);
+  font-family: var(--font-interface);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.records-pagination-page:hover {
+  color: var(--color-accent-hover);
+}
+
+.records-pagination-page[aria-current="page"] {
+  background: var(--color-ink-primary);
+  color: var(--color-surface-reading);
+  font-weight: 700;
+  cursor: default;
+}
+
+.records-pagination-gap {
+  min-width: 24px;
+  color: var(--color-ink-muted);
+  text-align: center;
+}
+
+.records-pagination-step {
+  min-height: 0;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-radius: var(--p-radius-sm);
+  background: none;
+  color: var(--color-accent-hover);
+  font-family: var(--font-interface);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.records-pagination-step:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+
+.records-pagination-step:disabled {
+  border-color: var(--color-separator-standard);
+  color: var(--color-ink-muted);
+  cursor: not-allowed;
+}
+
+.records-pagination[data-first-page] .records-pagination-step--previous {
+  display: none;
+}
+
+/* ---- Responsive -------------------------------------------------------------- */
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .records-page {
+    --records-pad-top: 72px;
+    --records-pad-bottom: 80px;
+    --records-title-size: 52px;
+    --records-lede-size: 20px;
+    --records-id-col: 148px;
+  }
+
+  .records-type-filters {
+    gap: 24px;
+  }
+}
+
+/* <1024: search leaves the filter row; the column header row takes its own
+   top rule. Pagination switches to the centred status form. */
+@media (max-width: 1023px) {
+  .records-filter-bar {
+    display: block;
+    border-bottom: 0;
+  }
+
+  .records-type-filters {
+    border-bottom: 1px solid var(--color-separator-standard);
+  }
+
+  .records-search {
+    max-width: 26rem;
+    margin: 20px 0 0;
+  }
+
+  .records-list-head {
+    margin-top: 24px;
+    border-top: 1px solid var(--color-separator-standard);
+  }
+
+  .records-pagination {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .records-pagination-range,
+  .records-pagination-pages {
+    display: none;
+  }
+
+  .records-pagination-status {
+    display: block;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .records-pagination-step--previous,
+  .records-pagination[data-first-page] .records-pagination-step--previous {
+    display: inline-block;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+
+  .records-pagination-step--next {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .records-page {
+    --records-pad-top: 64px;
+    --records-pad-bottom: 72px;
+    --records-title-size: 48px;
+    --records-lede-size: 19px;
+    --records-intro-gap: 36px;
+    --records-id-col: 136px;
+    --records-row-title-size: 16px;
+  }
+}
+
+/* <=767: scrollable filter strip bleeding to the shell edges, full-width
+   search, compact toolbar in place of the column header row, stacked rows. */
+@media (max-width: 767px) {
+  .records-page {
+    --records-pad-top: 40px;
+    --records-pad-bottom: 48px;
+    --records-title-size: 40px;
+    --records-lede-size: 17px;
+    --records-intro-gap: 28px;
+    --records-row-title-size: 15.5px;
+    --records-control-height: 44px;
+  }
+
+  .records-eyebrow {
+    margin-bottom: 14px;
+  }
+
+  .records-title {
+    margin-bottom: 16px;
+  }
+
+  .records-type-filters {
+    gap: 22px;
+    margin-inline: calc(-1 * var(--explorer-shell-gutter, 0px));
+    padding-inline: var(--explorer-shell-gutter, 0px);
+    overflow-x: auto;
+    scroll-padding-inline: var(--explorer-shell-gutter, 0px);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-separator-standard) transparent;
+  }
+
+  .records-type-filter {
+    padding-bottom: 12px;
+    font-size: 15px;
+  }
+
+  .records-search {
+    max-width: none;
+    margin-top: 16px;
+  }
+
+  .records-list-head {
+    display: none;
+  }
+
+  .records-compact-toolbar {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-separator-standard);
+  }
+
+  .records-compact-count {
+    margin: 0;
+    color: var(--color-ink-secondary);
+    font-family: var(--font-technical);
+    font-size: 13px;
+  }
+
+  .records-compact-sort {
+    min-height: 32px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-ink-muted);
+    font-family: var(--font-technical);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .records-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "id ."
+      "title arrow";
+    row-gap: 6px;
+    column-gap: 16px;
+  }
+
+  .records-row-id {
+    grid-area: id;
+    font-size: 13px;
+  }
+
+  .records-row-title {
+    grid-area: title;
+    padding-right: 0;
+  }
+
+  .records-row-arrow {
+    grid-area: arrow;
+    align-self: end;
+    padding-bottom: 4px;
+  }
+
+  .records-pagination {
+    padding-top: 24px;
+  }
+
+  .records-pagination-status-full {
+    display: none;
+  }
+
+  .records-pagination-status-short {
+    display: inline;
+  }
+
+  .records-pagination-step {
+    height: var(--target-min);
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}

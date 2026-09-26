@@ -57,3 +57,29 @@ export function computeRecordsView(input: RecordsViewInput): RecordsViewResult {
     filteredCount: filtered.length,
   };
 }
+
+export type PaginationItem = { kind: "page"; pageIndex: number } | { kind: "gap"; afterPageIndex: number };
+
+/**
+ * The page-number sequence for the wide Records pagination: first and last
+ * page, the current page with its immediate neighbours (widened to three
+ * pages at either end), and a gap marker wherever pages are skipped — e.g.
+ * page 1 of 5 -> 1 2 3 … 5. Zero-based indices in, zero-based out.
+ */
+export function paginationItems(pageIndex: number, pageCount: number): PaginationItem[] {
+  if (pageCount <= 0) return [];
+  const last = pageCount - 1;
+  const current = Math.min(Math.max(pageIndex, 0), last);
+  const wanted = new Set([0, last, current - 1, current, current + 1]);
+  if (current <= 1) [1, 2].forEach((index) => wanted.add(index));
+  if (current >= last - 1) [last - 1, last - 2].forEach((index) => wanted.add(index));
+  const pages = [...wanted].filter((index) => index >= 0 && index <= last).sort((a, b) => a - b);
+
+  const items: PaginationItem[] = [];
+  pages.forEach((index, position) => {
+    const previous = pages[position - 1];
+    if (previous !== undefined && index - previous > 1) items.push({ kind: "gap", afterPageIndex: previous });
+    items.push({ kind: "page", pageIndex: index });
+  });
+  return items;
+}
