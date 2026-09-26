@@ -335,6 +335,9 @@ describe("publicEnumExplanation", () => {
       expect(publicEnumExplanation("claim_authority", value)).toBeTruthy();
     }
     expect(publicEnumExplanation("evidence_nature", "claim")).toBe("a fonte afirma, mas não mede.");
+    expect(publicEnumExplanation("claim_authority", "authoritative")).toBe("quem afirma tem competência institucional sobre o tema.");
+    expect(publicEnumExplanation("claim_authority", "non_authoritative")).toBe("quem afirma não tem competência institucional sobre a alegação.");
+    expect(publicEnumExplanation("claim_authority", "unknown")).toBe("não está estabelecido se quem afirma tem competência institucional sobre a alegação.");
   });
 
   it("has no improvised explanation for an unknown value or field", () => {

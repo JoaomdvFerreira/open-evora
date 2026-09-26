@@ -478,6 +478,7 @@ test("run() end-to-end: valid corpus publishes and reports ok", () => {
       fs.copyFileSync(path.join(REAL_SCHEMAS_DIR, f), path.join(root, "schemas", f));
     }
     write(root, "sources", "SRC-9001.yaml", minimalSrc());
+    write(root, "evidence", "EVD-900101.yaml", minimalEvd());
 
     const result = run({ researchRoot: root, repoRoot: parent, targetDir, now: () => "2026-01-01T00:00:00.000Z", sourceCommit: () => null });
     assert.strictEqual(result.ok, true);
@@ -486,8 +487,12 @@ test("run() end-to-end: valid corpus publishes and reports ok", () => {
     assert.ok(fs.existsSync(path.join(targetDir, "edges.json")));
     assert.ok(fs.existsSync(path.join(targetDir, "record-detail", "SRC-9001.json")));
     assert.ok(
-      fs.readFileSync(path.join(targetDir, "canonical", "research", "sources", "SRC-9001.yaml")).equals(fs.readFileSync(path.join(root, "sources", "SRC-9001.yaml"))),
-      "each record's canonical YAML is republished byte-for-byte at canonical/<repo-relative file>"
+      fs.readFileSync(path.join(targetDir, "canonical", "research", "evidence", "EVD-900101.yaml")).equals(fs.readFileSync(path.join(root, "evidence", "EVD-900101.yaml"))),
+      "an EVD record's canonical YAML is republished byte-for-byte at canonical/<repo-relative file>"
+    );
+    assert.ok(
+      !fs.existsSync(path.join(targetDir, "canonical", "research", "sources")),
+      "SRC canonical YAML is not published"
     );
   } finally {
     fs.rmSync(parent, { recursive: true, force: true });

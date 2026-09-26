@@ -46,8 +46,8 @@ const EXPLANATIONS: Record<string, Record<string, string>> = {
   },
   claim_authority: {
     authoritative: "quem afirma tem competência institucional sobre o tema.",
-    non_authoritative: "quem afirma não tem competência institucional sobre o tema.",
-    unknown: "não foi possível determinar se quem afirma tem competência sobre o tema.",
+    non_authoritative: "quem afirma não tem competência institucional sobre a alegação.",
+    unknown: "não está estabelecido se quem afirma tem competência institucional sobre a alegação.",
   },
 };
 

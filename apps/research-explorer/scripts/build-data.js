@@ -44,13 +44,18 @@ function getSourceCommit(repoRoot) {
 }
 
 /**
- * Canonical record files are republished byte-for-byte under
- * `canonical/<repo-relative file>` so the Explorer can offer the exact
- * canonical YAML behind each record as a same-origin download. They are
+ * Canonical EVD files are republished byte-for-byte under
+ * `canonical/<repo-relative file>` so EVD Detail can offer the exact
+ * canonical YAML behind the record as a same-origin download. Only EVD
+ * records are published; SRC/PRB have no download surface. They are
  * copies of the already-public canonical corpus, never re-serialized from the
  * read model, and they version together with the rest of generated/.
  */
 const CANONICAL_DIR = "canonical";
+
+function publishesCanonicalFile(detail) {
+  return detail.type === "EVD-";
+}
 
 function copyCanonicalFile(repoRoot, tmpDir, relFile) {
   const target = path.join(tmpDir, CANONICAL_DIR, ...relFile.split("/"));
@@ -99,7 +104,7 @@ function verifyGeneratedOutput(tmpDir, readModel, repoRoot) {
     }
   }
 
-  for (const detail of readModel.recordDetails) {
+  for (const detail of readModel.recordDetails.filter(publishesCanonicalFile)) {
     const copy = path.join(tmpDir, CANONICAL_DIR, ...detail.file.split("/"));
     if (!fs.existsSync(copy) || !fs.readFileSync(copy).equals(fs.readFileSync(path.join(repoRoot, ...detail.file.split("/"))))) {
       throw new Error(`Generated-data integrity check failed: canonical copy of "${detail.file}" is missing or differs from the canonical file.`);
@@ -156,7 +161,7 @@ function run({
       writeJson(path.join(tmpDir, "edges.json"), readModel.edges);
       for (const detail of readModel.recordDetails) {
         writeJson(path.join(tmpDir, "record-detail", `${detail.id}.json`), detail);
-        copyCanonicalFile(repoRoot, tmpDir, detail.file);
+        if (publishesCanonicalFile(detail)) copyCanonicalFile(repoRoot, tmpDir, detail.file);
       }
       verifyGeneratedOutput(tmpDir, readModel, repoRoot);
     });
