@@ -35,7 +35,7 @@ function PrbHistoryShell() {
   return (
     <>
       <main className="explorer-shell">
-        <ExplorerHeader activeView="history" activeTypeFilter="" onProblemas={noop} onFontes={noop} />
+        <ExplorerHeader activeView="history" onProblemas={noop} onRegistos={noop} />
         <ProblemHistoryView
           dataProvider={prb0005DataProvider}
           problemId="PRB-0005"

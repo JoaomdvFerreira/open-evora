@@ -19,11 +19,17 @@ import { SKIP_TARGET_ID } from "./skipTarget";
 // into its own lazy chunk by this change alone (see RE-05 closure report).
 const GraphExplorer = lazy(() => import("../graph/GraphExplorer").then((m) => ({ default: m.GraphExplorer })));
 
+/** Views whose content has no terminal band of its own before the public footer. */
+function showsManifestSummary(view: string, selectedId: string | null): boolean {
+  if (view === "records") return selectedId !== null;
+  return view === "graph";
+}
+
 interface ExplorerProps {
   dataProvider: DataProvider;
   /** manifest.schemaPrefixes — passed down so the reading guide's type list is data-driven, not hardcoded. */
   schemaPrefixes?: string[];
-  /** manifest.totalRecords — the same canonical corpus count shown in the "Corpus: X registos" summary below (every view except Overview, which has no total-records metric of its own, and PRB Details, whose audit band is its terminal content band). */
+  /** manifest.totalRecords — the same canonical corpus count shown in the "Corpus: X registos" summary below (Record Detail and Graph only — see showsManifestSummary). */
   totalRecords?: number;
   /** manifest.generatedAt — read-model build timestamp for the "Corpus: X registos" summary below (ODM-020: build/generation time, distinct from research currentness). */
   generatedAt?: string;
@@ -64,9 +70,8 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
     <>
       <ExplorerHeader
         activeView={url.state.view}
-        activeTypeFilter={url.state.typeFilter}
         onProblemas={() => url.clearSelectionAndSetView("overview")}
-        onFontes={url.goToSourcesInRecords}
+        onRegistos={url.goToRecords}
       />
 
       {/* F06: the skip link's real destination — after global navigation in
@@ -139,13 +144,14 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
         </Suspense>
       )}
 
-      {/* Global manifest/build summary — Records and Graph only. Overview
-          replaced it with its own editorial metrics ruler, and both public
+      {/* Global manifest/build summary — Record Detail and Graph only.
+          Overview replaced it with its own editorial metrics ruler, the
+          Records landing ends on its own pagination row, and both public
           PRB views end on their own terminal content band (Detalhes: the
           audit band; Histórico: the material-history section). Kept here
           rather than duplicated per view: still a single canonical rendering
           of manifest.totalRecords/generatedAt, not a competing corpus figure (AGENTS.md canonical-state integrity). */}
-      {url.state.view !== "overview" && url.state.view !== "problem" && url.state.view !== "history" && totalRecords !== undefined && generatedAt !== undefined && (
+      {showsManifestSummary(url.state.view, url.state.selectedId) && totalRecords !== undefined && generatedAt !== undefined && (
         <div className="shell-frame">
           <p className="manifest-summary">
             Corpus: {formatPublicCount(totalRecords)} registos · esta versão publicada dos dados foi gerada em{" "}

@@ -111,18 +111,15 @@ export function RecordsExplorer({
   }
 
   return (
-    <div className="records-explorer shell-frame">
-      <RecordsTable
-        records={indexState.records}
-        selectedId={selectedId}
-        onSelect={onSelect}
-        query={query}
-        onQueryChange={onQueryChange}
-        typeFilter={typeFilter}
-        onTypeFilterChange={onTypeFilterChange}
-        controllerState={recordsControllerState}
-        dispatchController={dispatchRecordsController}
-      />
-    </div>
+    <RecordsTable
+      records={indexState.records}
+      onSelect={onSelect}
+      query={query}
+      onQueryChange={onQueryChange}
+      typeFilter={typeFilter}
+      onTypeFilterChange={onTypeFilterChange}
+      controllerState={recordsControllerState}
+      dispatchController={dispatchRecordsController}
+    />
   );
 }

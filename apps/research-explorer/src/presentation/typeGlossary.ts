@@ -11,6 +11,8 @@
 export interface TypeDescriptor {
   /** Short Portuguese label shown inline, e.g. "[Evidência]". */
   label: string;
+  /** Plural form of `label`, e.g. "Evidências" (Records filters and counts). */
+  pluralLabel: string;
   /** One-sentence explanation, paraphrasing docs/datamodel.md's own record semantics. */
   description: string;
 }
@@ -18,14 +20,17 @@ export interface TypeDescriptor {
 const KNOWN_TYPES: Record<string, TypeDescriptor> = {
   "SRC-": {
     label: "Fonte",
+    pluralLabel: "Fontes",
     description: "Um documento, página ou conjunto de dados de origem — regista acesso público e direitos de reutilização separadamente.",
   },
   "EVD-": {
     label: "Evidência",
+    pluralLabel: "Evidências",
     description: "Evidência é um registo com proveniência e limites explícitos.",
   },
   "PRB-": {
     label: "Problema",
+    pluralLabel: "Problemas",
     description: "Consolida várias evidências que descrevem a mesma fricção cívica subjacente — sem incluir soluções na descrição do problema.",
   },
 };
@@ -33,12 +38,19 @@ const KNOWN_TYPES: Record<string, TypeDescriptor> = {
 const GENERIC_FALLBACK_DESCRIPTION = "Tipo de registo definido pelo esquema canónico (research/schemas/*.schema.json).";
 
 export function describeType(prefix: string): TypeDescriptor {
+  const fallbackLabel = prefix.endsWith("-") ? prefix.slice(0, -1) : prefix;
   return (
     KNOWN_TYPES[prefix] ?? {
-      label: prefix.endsWith("-") ? prefix.slice(0, -1) : prefix,
+      label: fallbackLabel,
+      pluralLabel: fallbackLabel,
       description: GENERIC_FALLBACK_DESCRIPTION,
     }
   );
+}
+
+/** Whether `prefix` has a glossary entry (vs. describeType's generic fallback). */
+export function isKnownTypePrefix(prefix: string): boolean {
+  return Object.prototype.hasOwnProperty.call(KNOWN_TYPES, prefix);
 }
 
 /** e.g. "[Evidência] EVD-000105" — inline orientation without requiring the user to memorise prefixes. */

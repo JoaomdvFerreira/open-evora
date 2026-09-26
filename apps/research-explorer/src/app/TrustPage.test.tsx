@@ -63,7 +63,8 @@ describe("PublicFooter — editorial identity/PROJETO/DADOS structure (Overview 
     expect(within(projeto).getByRole("link", { name: "Correções" }).getAttribute("href")).toBe("/corrections");
 
     const dados = within(footer).getByRole("navigation", { name: "Dados" });
-    expect(within(dados).getByRole("link", { name: "Fontes" }).getAttribute("href")).toBe("/?view=records&type=SRC-");
+    expect(within(dados).getByRole("link", { name: "Registos" }).getAttribute("href")).toBe("/?view=records");
+    expect(within(dados).queryByRole("link", { name: "Fontes" })).toBeNull();
     expect(within(dados).getByRole("link", { name: "Contactar" }).getAttribute("href")).toBe("/contact");
     expect(within(dados).getByRole("link", { name: "Privacidade" }).getAttribute("href")).toBe("/privacy");
   });

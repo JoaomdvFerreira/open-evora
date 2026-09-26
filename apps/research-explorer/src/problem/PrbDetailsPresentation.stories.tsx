@@ -73,7 +73,7 @@ function PrbDetailsShell() {
   return (
     <>
       <main className="explorer-shell">
-        <ExplorerHeader activeView="problem" activeTypeFilter="" onProblemas={noop} onFontes={noop} />
+        <ExplorerHeader activeView="problem" onProblemas={noop} onRegistos={noop} />
         <Prb0005Details />
       </main>
       <PublicFooter />

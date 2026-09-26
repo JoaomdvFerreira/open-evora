@@ -74,8 +74,8 @@ export function TrustPage({ page, skipTargetId }: { page: TrustPageContent; skip
  * — so it does not depend on `.public-overview` being present; the
  * Overview-specific zero-gap treatment lives entirely in index.css and stays
  * additive to this structure. Every link below is a real existing
- * destination: `Fontes` opens the same Records+SRC- filtered set as the
- * header's Fontes action, as an ordinary path/query navigation (this is a
+ * destination: `Registos` opens the same complete Records area as the
+ * header's Registos action, as an ordinary path/query navigation (this is a
  * cross-page footer, not the live Explorer's own SPA state).
  */
 export function PublicFooter() {
@@ -98,7 +98,7 @@ export function PublicFooter() {
           <nav className="public-footer-group" aria-label="Dados">
             <p>Dados</p>
             <ul>
-              <li><a href="/?view=records&type=SRC-">Fontes</a></li>
+              <li><a href="/?view=records">Registos</a></li>
               <li><a href="/contact">Contactar</a></li>
               <li><a href="/privacy">Privacidade</a></li>
             </ul>

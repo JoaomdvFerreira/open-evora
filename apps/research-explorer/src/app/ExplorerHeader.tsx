@@ -7,8 +7,8 @@ import { IconMenu } from "../presentation/icons";
  * added in the visual-completion pass, task §2). Replaces the earlier
  * three-item internal-navigation labelling (Visão geral / Registos / Grafo)
  * with the approved public-facing surface: Problemas (Overview + Problem
- * context), Método and Sobre (existing TrustPages), Fontes (Records filtered
- * to canonical Sources) and a Contribuir com evidência CTA — see
+ * context), Método and Sobre (existing TrustPages), Registos (the complete,
+ * unfiltered Records area) and a Contribuir com evidência CTA — see
  * docs/explorerarchitecture.md §3 for the Overview/Records/Problem-context
  * navigation model this maps onto. Records/Graph capabilities are unchanged
  * underneath; this is a navigation-surface relabelling only. Graph has no
@@ -29,16 +29,17 @@ import { IconMenu } from "../presentation/icons";
  * is overridden back to visible in index.css — desktop ignores `menuOpen`
  * entirely and always shows nav+CTA, exactly as before this pass.
  */
-export function ExplorerHeader({ activeView, activeTypeFilter, onProblemas, onFontes }: {
+export function ExplorerHeader({ activeView, onProblemas, onRegistos }: {
   activeView: string;
-  activeTypeFilter: string;
   onProblemas: () => void;
-  onFontes: () => void;
+  onRegistos: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
   const isProblemas = activeView === "overview" || activeView === "problem" || activeView === "history";
-  const isFontes = activeView === "records" && activeTypeFilter === "SRC-";
+  // Registos is the whole Records area — every type filter and Record
+  // Detail alike — never one particular filter.
+  const isRegistos = activeView === "records";
   return (
     <header className="explorer-chrome">
       <div className="explorer-chrome-inner shell-frame shell-frame--wide">
@@ -62,7 +63,7 @@ export function ExplorerHeader({ activeView, activeTypeFilter, onProblemas, onFo
           <nav aria-label="Navegação principal" className="explorer-navigation">
             <button type="button" className="explorer-navigation-action" aria-current={isProblemas ? "page" : undefined} onClick={onProblemas}>Problemas</button>
             <a className="explorer-navigation-action" href="/methodology">Método</a>
-            <button type="button" className="explorer-navigation-action" aria-current={isFontes ? "page" : undefined} onClick={onFontes}>Fontes</button>
+            <button type="button" className="explorer-navigation-action" aria-current={isRegistos ? "page" : undefined} onClick={onRegistos}>Registos</button>
             <a className="explorer-navigation-action" href="/about">Sobre</a>
           </nav>
           <a className="explorer-cta" href="/contact">Contribuir com evidência</a>

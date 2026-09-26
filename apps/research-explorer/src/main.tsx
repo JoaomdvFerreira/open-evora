@@ -60,6 +60,9 @@ import "./styles/prb-details.css";
 // The public PRB Histórico composition (ProblemHistoryView) — only its own
 // material-history band on top of the shared PRB contract above.
 import "./styles/prb-history.css";
+// The public Records landing (RecordsTable): intro, filters/search, record
+// list and responsive pagination.
+import "./styles/records.css";
 
 const container = document.getElementById("root");
 if (!container) {

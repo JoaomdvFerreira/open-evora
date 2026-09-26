@@ -16,9 +16,9 @@ import { ExplorerHeader } from "./ExplorerHeader";
  */
 function renderHeader() {
   const onProblemas = vi.fn();
-  const onFontes = vi.fn();
-  render(<ExplorerHeader activeView="overview" activeTypeFilter="" onProblemas={onProblemas} onFontes={onFontes} />);
-  return { onProblemas, onFontes };
+  const onRegistos = vi.fn();
+  render(<ExplorerHeader activeView="overview" onProblemas={onProblemas} onRegistos={onRegistos} />);
+  return { onProblemas, onRegistos };
 }
 
 describe("ExplorerHeader — compact menu disclosure", () => {
@@ -84,21 +84,21 @@ describe("ExplorerHeader — compact menu disclosure", () => {
     // are not evaluated by jsdom; see this file's own module doc).
     expect(screen.getAllByRole("button", { name: "Problemas", hidden: true })).toHaveLength(1);
     expect(screen.getAllByRole("link", { name: "Método", hidden: true })).toHaveLength(1);
-    expect(screen.getAllByRole("button", { name: "Fontes", hidden: true })).toHaveLength(1);
+    expect(screen.getAllByRole("button", { name: "Registos", hidden: true })).toHaveLength(1);
     expect(screen.getAllByRole("link", { name: "Sobre", hidden: true })).toHaveLength(1);
     expect(screen.getAllByRole("link", { name: "Contribuir com evidência", hidden: true })).toHaveLength(1);
   });
 
   it("nav actions still invoke the same callbacks/routing once the menu is open — no duplicated business logic", async () => {
     const user = userEvent.setup();
-    const { onProblemas, onFontes } = renderHeader();
+    const { onProblemas, onRegistos } = renderHeader();
     await user.click(screen.getByRole("button", { name: "Abrir menu" }));
 
     await user.click(screen.getByRole("button", { name: "Problemas" }));
     expect(onProblemas).toHaveBeenCalledTimes(1);
 
-    await user.click(screen.getByRole("button", { name: "Fontes" }));
-    expect(onFontes).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole("button", { name: "Registos" }));
+    expect(onRegistos).toHaveBeenCalledTimes(1);
   });
 
   it("marks Problemas as the active page via aria-current, matching activeView (desktop markup/state semantics unaffected)", () => {
@@ -107,9 +107,14 @@ describe("ExplorerHeader — compact menu disclosure", () => {
     expect(problemas.getAttribute("aria-current")).toBe("page");
   });
 
-  it("marks Fontes active instead when activeView/activeTypeFilter select it", () => {
-    render(<ExplorerHeader activeView="records" activeTypeFilter="SRC-" onProblemas={vi.fn()} onFontes={vi.fn()} />);
+  it("marks Registos active for the whole Records area, whatever its filter or selection", () => {
+    render(<ExplorerHeader activeView="records" onProblemas={vi.fn()} onRegistos={vi.fn()} />);
     expect(screen.getByRole("button", { name: "Problemas", hidden: true }).getAttribute("aria-current")).toBeNull();
-    expect(screen.getByRole("button", { name: "Fontes", hidden: true }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("button", { name: "Registos", hidden: true }).getAttribute("aria-current")).toBe("page");
+  });
+
+  it("does not offer a Fontes entry — Sources are a filter inside Registos", () => {
+    renderHeader();
+    expect(screen.queryByRole("button", { name: "Fontes", hidden: true })).toBeNull();
   });
 });

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
@@ -15,6 +15,10 @@ const manifest: ReadModelManifest = {
   schemaPrefixes: [],
 };
 
+afterEach(() => {
+  window.history.replaceState(null, "", "/");
+});
+
 it("retries a failed startup manifest load", async () => {
   let attempts = 0;
   const provider: DataProvider = {
@@ -24,19 +28,14 @@ it("retries a failed startup manifest load", async () => {
     getEdges: () => Promise.resolve([]),
   };
   const user = userEvent.setup();
+  window.history.replaceState(null, "", "/?view=records&id=SRC-0001");
   render(<App dataProvider={provider} />);
 
   const alert = await screen.findByRole("alert");
   expect(alert.textContent).toContain("temporary manifest failure");
   await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
-  // Manifest summary is omitted on Overview (Overview visual completion —
-  // it has its own metrics ruler); navigate to Records (via the header's
-  // Fontes action), where it still renders. `hidden: true` (visual-
-  // completion compact pass, task §2): the header nav now sits inside the
-  // collapsed-by-default `.explorer-chrome-menu`, shown at >=768px only via
-  // a CSS override jsdom does not evaluate — see ExplorerHeader.test.tsx's
-  // own module doc.
-  await user.click(await screen.findByRole("button", { name: "Fontes", hidden: true }));
+  // The manifest summary renders on Record Detail (Overview, the Records
+  // landing and the PRB views each end on their own terminal band).
   expect(await screen.findByText(/Corpus: 0/)).toBeTruthy();
   expect(attempts).toBe(2);
 });
@@ -135,14 +134,10 @@ it("qualifies the manifest timestamp as build/generation time, distinct from res
     getRecord: () => Promise.reject(new Error("not used")),
     getEdges: () => Promise.resolve([]),
   };
-  const user = userEvent.setup();
+  window.history.replaceState(null, "", "/?view=records&id=SRC-0001");
   render(<App dataProvider={provider} />);
 
-  // Manifest summary is omitted on Overview (Overview visual completion —
-  // it has its own metrics ruler); navigate to Records (via the header's
-  // Fontes action), where it still renders. `hidden: true` — see the
-  // preceding test's own comment.
-  await user.click(await screen.findByRole("button", { name: "Fontes", hidden: true }));
+  // Rendered on Record Detail — see the preceding test's own comment.
   const summary = await screen.findByText(/Corpus: 0/);
   expect(summary.textContent).toContain("não indica a atualidade da investigação");
   const time = summary.querySelector("time");
