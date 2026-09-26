@@ -68,10 +68,17 @@ export function useExplorerUrlState() {
   // fragment (if any) is scoped to content that may no longer exist/apply on
   // the new URL, so it is intentionally not carried over (existing semantics,
   // matching native same-document navigation to a fragment-less URL).
-  function push(next: ExplorerUrlState) {
+  //
+  // `fragment` is the one explicit exception: a navigation whose destination
+  // is a specific section of the new content (e.g. Histórico's "Verificar" →
+  // Detalhes#prb-auditoria) writes that fragment onto the new URL, and the
+  // destination view applies it once its content mounts (ProblemView via
+  // applyInitialFragment), exactly as for a direct deep link.
+  function push(next: ExplorerUrlState, fragment?: string) {
     const normalized = normalize(next);
     if (serializeUrlState(normalized) === serializeUrlState(state)) return;
-    window.history.pushState(null, "", serializeUrlState(normalized) || window.location.pathname);
+    const hash = fragment ? `#${encodeURIComponent(fragment)}` : "";
+    window.history.pushState(null, "", (serializeUrlState(normalized) || window.location.pathname) + hash);
     setState(normalized);
   }
 
@@ -101,6 +108,9 @@ export function useExplorerUrlState() {
     // EVD-/SRC- generically from the Problem view) — avoids two separate
     // back-stack entries for what the user experiences as one navigation.
     setViewAndSelection: (view: ExplorerView, selectedId: string) => push({ ...state, view, selectedId }),
+    // The same single navigation, landing on a named section of the
+    // destination (see `push`'s `fragment`).
+    setViewAndSelectionAtFragment: (view: ExplorerView, selectedId: string, fragment: string) => push({ ...state, view, selectedId }, fragment),
     // One combined history entry for "go to a different area, dropping any
     // contextual record identity" — used by GlobalNav (UX-D §1: switching
     // area must never leak a hidden selectedId into the destination area)

@@ -120,6 +120,7 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
           onBackToRecords={() => url.clearSelectionAndSetView("records")}
           onBackToOverview={() => url.clearSelectionAndSetView("overview")}
           onViewAsProblem={(id) => url.setViewAndSelection("problem", id)}
+          onVerifyInDetails={(id) => url.setViewAndSelectionAtFragment("problem", id, "prb-auditoria")}
         />
       )}
 
@@ -138,13 +139,13 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
         </Suspense>
       )}
 
-      {/* Global manifest/build summary — Records, History and Graph only.
-          Overview replaced it with its own editorial metrics ruler, and on
-          PRB Details (view=problem) the audit band is the terminal content
-          band. Kept here rather than duplicated per view: still a single
-          canonical rendering of manifest.totalRecords/generatedAt, not a
-          competing corpus figure (AGENTS.md canonical-state integrity). */}
-      {url.state.view !== "overview" && url.state.view !== "problem" && totalRecords !== undefined && generatedAt !== undefined && (
+      {/* Global manifest/build summary — Records and Graph only. Overview
+          replaced it with its own editorial metrics ruler, and both public
+          PRB views end on their own terminal content band (Detalhes: the
+          audit band; Histórico: the material-history section). Kept here
+          rather than duplicated per view: still a single canonical rendering
+          of manifest.totalRecords/generatedAt, not a competing corpus figure (AGENTS.md canonical-state integrity). */}
+      {url.state.view !== "overview" && url.state.view !== "problem" && url.state.view !== "history" && totalRecords !== undefined && generatedAt !== undefined && (
         <div className="shell-frame">
           <p className="manifest-summary">
             Corpus: {formatPublicCount(totalRecords)} registos · esta versão publicada dos dados foi gerada em{" "}

@@ -1,0 +1,240 @@
+/* Public PRB Histórico composition (ProblemHistoryView.tsx).
+   The local header, identity hero and the left-intro + broad-content
+   section frame are the shared PRB Details contract (PrbPageHeader.tsx and
+   the `.prb-header*`/`.prb-identity*`/`.prb-section-*` rules and tokens in
+   styles/prb-details.css, which declares its token blocks for
+   `.prb-history-view` too). This file owns only what is specific to
+   Histórico: the full-width material-history band, the per-entry
+   date + content rows, and the view's terminal spacing.
+
+   Rows are plain editorial rows split by restrained horizontal rules — no
+   cards, timeline rail/markers or entry-type labels: canonical `history[]`
+   carries no entry type or current/in-force state to show. */
+
+.prb-history-view {
+  --prb-history-pad-bottom: 104px;
+  --prb-history-date-col: 152px;
+  --prb-history-entry-gap: 32px;
+  --prb-history-entry-pad-top: 40px;
+  --prb-history-entry-pad-bottom: 44px;
+  --prb-history-summary-size: 21px;
+}
+
+/* Full-width band: its top rule separates the hero from the history and,
+   like the PRB Details bands, bleeds through `main.explorer-shell`'s inline
+   gutter via the shell's own `--explorer-shell-gutter` token so it meets
+   the Header/PublicFooter edges; the matching padding returns the content
+   box to the shell's content width, so the inner `shell-frame--wide` stays
+   the alignment owner. Scoped under the view root so it wins over the
+   shared `.prb-section` margin reset regardless of stylesheet order. */
+.prb-history-view .prb-history-section {
+  margin-inline: calc(-1 * var(--explorer-shell-gutter, 0px));
+  padding-inline: var(--explorer-shell-gutter, 0px);
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+/* The section's own bottom padding is its final breathing room before the
+   footer (see "Terminal composition" below). */
+.prb-history-section .prb-section-frame {
+  padding-bottom: var(--prb-history-pad-bottom);
+}
+
+.prb-history-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.prb-history-entry {
+  display: grid;
+  grid-template-columns: var(--prb-history-date-col) minmax(0, 1fr);
+  column-gap: var(--prb-history-entry-gap);
+  padding: var(--prb-history-entry-pad-top) 0 var(--prb-history-entry-pad-bottom);
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.prb-history-entry:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.prb-history-entry:last-child {
+  padding-bottom: 0;
+}
+
+/* Exact canonical date with its restrained relative age beneath — one group
+   at every width. */
+.prb-history-entry-date {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.prb-history-entry-exact {
+  color: var(--color-ink-primary);
+  font-family: var(--font-technical);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.prb-history-entry-age {
+  color: var(--color-ink-muted);
+  font-family: var(--font-interface);
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.prb-history-entry-body {
+  min-width: 0;
+}
+
+/* Canonical `summary`, verbatim — the row's primary content. */
+.prb-history-entry-summary {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--prb-history-summary-size);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+/* Authored `state_changes` / `evidence`: secondary caption + value lines,
+   visually subordinate to the summary. */
+.prb-history-entry-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 60ch;
+  margin: 20px 0 0;
+  font-family: var(--font-interface);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.prb-history-entry-meta + .prb-history-entry-meta {
+  margin-top: 10px;
+}
+
+.prb-history-entry-meta-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  min-width: 0;
+}
+
+.prb-history-entry-meta dt {
+  color: var(--color-ink-muted);
+}
+
+.prb-history-entry-meta dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  overflow-wrap: break-word;
+}
+
+.prb-history-entry-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Same technical-metadata treatment as PRB Details' EVD identifiers: muted
+   at rest, accent on hover/focus; still native buttons with the shared
+   focus ring. */
+.prb-history-view .rec-identifier--action {
+  color: var(--color-ink-muted);
+  text-decoration-color: currentColor;
+}
+
+.prb-history-view .rec-identifier--action:hover,
+.prb-history-view .rec-identifier--action:focus-visible {
+  color: var(--color-accent-hover);
+}
+
+/* Neutral empty state — canonical `history[]` absent or empty. */
+.prb-history-empty {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-reading);
+  font-size: 19px;
+  line-height: 1.6;
+}
+
+/* Terminal composition: the history section's own bottom padding is the
+   sole breathing room before the footer, so the shared layers that would
+   add a second gap — the shell's bottom padding and the footer's top
+   margin — are neutralized for this surface only (same body:has() scoping
+   as PRB Details and Overview; every other surface keeps both). */
+body:has(.prb-history-view) main.explorer-shell {
+  padding-bottom: 0;
+}
+
+body:has(.prb-history-view) .public-footer {
+  margin-top: 0;
+}
+
+/* ---- Responsive: 1024 fit, 768 boundary, 360 compact --------------------- */
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .prb-history-view {
+    --prb-history-pad-bottom: 88px;
+    --prb-history-date-col: 140px;
+    --prb-history-entry-gap: 28px;
+    --prb-history-summary-size: 20px;
+  }
+}
+
+/* 768–1023: the intro moves into normal flow with the shared section frame;
+   each entry keeps its date + content columns. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .prb-history-view {
+    --prb-history-pad-bottom: 80px;
+    --prb-history-date-col: 132px;
+    --prb-history-entry-gap: 24px;
+    --prb-history-entry-pad-top: 32px;
+    --prb-history-entry-pad-bottom: 36px;
+    --prb-history-summary-size: 19px;
+  }
+}
+
+/* Compact: each entry stacks — exact date + relative age together on one
+   line, then the summary, then state changes/evidence. */
+@media (max-width: 767px) {
+  .prb-history-view {
+    --prb-history-pad-bottom: 48px;
+    --prb-history-entry-pad-top: 24px;
+    --prb-history-entry-pad-bottom: 28px;
+    --prb-history-summary-size: 18px;
+  }
+
+  .prb-history-entry {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 10px;
+  }
+
+  .prb-history-entry-date {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 10px;
+    padding-top: 0;
+  }
+
+  .prb-history-entry-meta {
+    margin-top: 16px;
+  }
+
+  .prb-history-empty {
+    font-size: 17px;
+  }
+}

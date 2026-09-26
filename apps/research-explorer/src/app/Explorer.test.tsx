@@ -643,6 +643,24 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     expect(window.location.search).toContain("id=PRB-0005");
   });
 
+  it("Histórico's Verificar opens the same PRB's Detalhes at its audit section in one history entry", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=history&id=PRB-0005");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    const history = (await screen.findByRole("heading", { level: 2, name: /Pressão de estacionamento/ })).closest("article");
+    expect(history?.className).toBe("prb-history-view");
+
+    const pushSpy = vi.spyOn(window.history, "pushState");
+    await user.click(screen.getByRole("button", { name: "Verificar" }));
+    const audit = await screen.findByRole("region", { name: "Evidência e auditoria" });
+    expect(pushSpy).toHaveBeenCalledTimes(1);
+    expect(window.location.search).toContain("view=problem");
+    expect(window.location.search).toContain("id=PRB-0005");
+    expect(window.location.hash).toBe("#prb-auditoria");
+    await waitFor(() => expect(document.activeElement).toBe(audit));
+    expect(screen.getByRole("heading", { level: 2, name: /Pressão de estacionamento/ }).closest("article")?.className).toBe("prb-details-view");
+  });
+
   it("browser back after a GlobalNav area change restores the prior area and selection deterministically", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
@@ -875,7 +893,7 @@ describe("Explorer — global manifest summary placement", () => {
     expect(manifestSummary()).toBeTruthy();
   });
 
-  it("remains on PRB History, and returns when leaving PRB Details for it", async () => {
+  it("is absent on PRB Histórico, whose material-history section is the terminal content band", async () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
@@ -884,7 +902,8 @@ describe("Explorer — global manifest summary placement", () => {
     await user.click(within(nav).getByRole("button", { name: "Histórico" }));
     await screen.findByText("Não existe histórico material registado para este problema.");
     expect(window.location.search).toContain("view=history");
-    expect(manifestSummary()?.textContent).toContain("Corpus: 4 registos");
+    expect(manifestSummary()).toBeNull();
+    expect(screen.queryByText(/Corpus:/)).toBeNull();
   });
 });
 

@@ -22,7 +22,13 @@
    production PRB navigation can depend on it without this view's CSS. */
 @import "./prb-view-selector.css";
 
-.prb-details-view {
+/* The public PRB Histórico view (ProblemHistoryView.tsx) shares this view's
+   local header, identity hero and editorial-section geometry
+   (PrbPageHeader.tsx), so it resolves the same per-breakpoint tokens from
+   the same blocks rather than a drifting copy; its own layout lives in
+   styles/prb-history.css. */
+.prb-details-view,
+.prb-history-view {
   /* Hero */
   --prb-hero-pad-top: 88px;
   --prb-hero-pad-bottom: 63px;
@@ -271,7 +277,6 @@
    heading/data separator below. */
 .prb-state-scope-band {
   position: relative;
-  border-top: 1px solid var(--color-separator-standard);
   border-bottom: 1px solid var(--color-separator-standard);
 }
 
@@ -961,7 +966,8 @@ body:has(.prb-details-view) .public-footer {
 /* ---- Responsive: 1024 fit, 768 boundary, 360 compact --------------------- */
 
 @media (min-width: 1024px) and (max-width: 1439px) {
-  .prb-details-view {
+  .prb-details-view,
+  .prb-history-view {
     --prb-hero-pad-top: 72px;
     --prb-hero-pad-bottom: 51px;
     --prb-hero-title-size: 48px;
@@ -988,7 +994,8 @@ body:has(.prb-details-view) .public-footer {
    column); Estado da investigação / Âmbito keep the six-column grid with a
    tighter cell inset and type so the longest canonical value fits its cell. */
 @media (min-width: 768px) and (max-width: 1023px) {
-  .prb-details-view {
+  .prb-details-view,
+  .prb-history-view {
     --prb-hero-pad-top: 64px;
     --prb-hero-pad-bottom: 46px;
     --prb-hero-title-size: 40px;
@@ -1025,7 +1032,8 @@ body:has(.prb-details-view) .public-footer {
 }
 
 @media (max-width: 767px) {
-  .prb-details-view {
+  .prb-details-view,
+  .prb-history-view {
     --prb-hero-pad-top: 28px;
     --prb-hero-pad-bottom: 26px;
     --prb-hero-title-size: 29px;

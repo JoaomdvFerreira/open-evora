@@ -137,16 +137,35 @@ export function effectTally(evidence: EvidenceWithSources[]): PrbEffectTally[] {
   return [...counts.entries()].map(([value, count]) => ({ value, count }));
 }
 
-export interface PrbDetailsData {
+/**
+ * The shared public PRB identity (local header + editorial hero) rendered by
+ * both PRB views — Detalhes (PrbDetailsPresentation.tsx) and Histórico
+ * (ProblemHistoryView.tsx) — so both read the same canonical fields the same
+ * way rather than each re-deriving them.
+ */
+export interface PrbIdentityData {
   problemId: string;
   title: string;
   statement: string | null;
-  /** Canonical `causal_reading`, verbatim — authored text, never derived from evidence. */
-  causalReading: string | null;
   topics: string[];
-  geographyScope: PrbScope | null;
   /** Canonical `updated_at`: the date the PRB record was last edited — record metadata, not a currentness assessment. */
   updatedAt: string | null;
+}
+
+export function prbIdentity(problemId: string, record: Record<string, unknown>): PrbIdentityData {
+  return {
+    problemId,
+    title: fieldValue(record, "title") ?? problemId,
+    statement: fieldValue(record, "problem_statement"),
+    topics: stringValues(record.domain),
+    updatedAt: fieldValue(record, "updated_at"),
+  };
+}
+
+export interface PrbDetailsData extends PrbIdentityData {
+  /** Canonical `causal_reading`, verbatim — authored text, never derived from evidence. */
+  causalReading: string | null;
+  geographyScope: PrbScope | null;
   status: string | null;
   evidenceStatus: string | null;
   validationStatus: string | null;
@@ -169,13 +188,9 @@ export function buildPrbDetailsData(projection: ProblemProjection): PrbDetailsDa
   const evidenceEffectCount = projection.evidence.reduce((total, item) => total + (item.effects?.length ?? 0), 0);
 
   return {
-    problemId: projection.problem.id,
-    title: fieldValue(record, "title") ?? projection.problem.id,
-    statement: fieldValue(record, "problem_statement"),
+    ...prbIdentity(projection.problem.id, record),
     causalReading: fieldValue(record, "causal_reading"),
-    topics: stringValues(record.domain),
     geographyScope: scope(record),
-    updatedAt: fieldValue(record, "updated_at"),
     status: fieldValue(record, "status"),
     evidenceStatus: fieldValue(record, "evidence_status"),
     validationStatus: fieldValue(record, "validation_status"),
