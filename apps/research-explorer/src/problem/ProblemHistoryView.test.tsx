@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { ProblemHistoryView } from "./ProblemHistoryView";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 
@@ -60,6 +60,17 @@ describe("ProblemHistoryView", () => {
     expect(latest.compareDocumentPosition(older) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByText("Estado")).toBeTruthy();
     expect(screen.getByText("Aberto → Não digital")).toBeTruthy();
+  });
+
+  it("shares the Detalhes|Histórico PRB navigation with Histórico as the current page", async () => {
+    const onViewAsProblem = vi.fn();
+    render(<ProblemHistoryView {...props} problemId="PRB-0001" onViewAsProblem={onViewAsProblem} />);
+    const nav = await screen.findByRole("navigation", { name: "Vistas do problema" });
+    expect(nav.textContent).toBe("DetalhesHistórico");
+    expect(within(nav).getByText("Histórico").getAttribute("aria-current")).toBe("page");
+    expect(screen.queryByRole("tablist")).toBeNull();
+    fireEvent.click(within(nav).getByRole("button", { name: "Detalhes" }));
+    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0001");
   });
 
   it("uses a neutral empty state for a Problem with no authored history", async () => {

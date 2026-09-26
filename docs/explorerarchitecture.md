@@ -47,35 +47,61 @@ Problem context is the primary place for understanding a civic problem and the s
 
 Graph capability may remain implemented but is currently deferred as a primary public surface.
 
-### `Problema`
+All research semantics come from `docs/datamodel.md`; this section owns only their Explorer presentation.
 
-Answers:
+### 3.1 Problem context views
 
-> What is this problem and what do we know about it?
+The public Problem context has exactly two views:
 
-Foreground:
-- problem description;
-- manifestation, consequence, and scope;
-- affected populations/journeys where relevant;
-- supporting and contradictory Evidence;
-- substantive uncertainty and unresolved gaps.
+- `Detalhes`;
+- `Histórico`.
 
-### `Detalhe`
+### 3.2 `Detalhes`
 
-Answers:
+`Detalhes` is the primary public Problem reading and verification surface. It answers:
 
-> What is the current state of this investigation?
+- What is this problem?
+- What is the current canonical reading?
+- What remains unresolved?
+- How did the investigation reach this formulation?
+- How can the research be inspected and audited?
 
-Foreground:
-- current investigation state and decision posture;
-- provenance;
-- technical inspection where useful.
+Composition order:
 
-### `Histórico`
+`problem identity / statement → investigation state + scope → Leitura atual → open questions → investigation path → evidence/audit layer`
 
-Presents the optional authored material-change history of the selected Problem, newest first. It must not fabricate entries or imply that a Problem without entries never changed. It is a read-only projection of PRB history, not a snapshot/versioning or audit-log surface.
+The semantics of the PRB fields it presents (`problem_statement`, `causal_reading`, `investigation.open_questions[]` fields, `investigation.path`, `updated_at`, currentness) are owned by `docs/datamodel.md` §3 "Problem reading and investigation semantics". Explorer-specific presentation invariants:
 
-All research semantics come from `docs/datamodel.md`.
+- `Leitura atual` renders canonical `causal_reading`;
+- the view performs no arbitrary selected-evidence or "top evidence" synthesis;
+- open-question fields (`latest_result`, `why_open`, `resolution_condition`, `current_action`, `evidence[]`) remain distinct in presentation; per-question current knowledge comes from that question's `latest_result`;
+- `updated_at` is presented as edit metadata, never as investigation currentness;
+- free-text tokens such as `WATCH` are presented as text, not as structured posture;
+- the investigation path is presented as narrative, not as progress, completion, or current/pending state;
+- audit presentation does not invent Evidence ranking or strength.
+
+The page title uses the page-composition heading level consistent with the global Explorer heading hierarchy.
+
+Canonical content that belongs only to the earlier Problem presentation (for example the per-Evidence list, decision-basis prose, recent-history summary, and affected-populations blocks) is not foreground content in `Detalhes`. It remains in the corpus and inspectable through generic Record Detail in Records; it must not be re-added to `Detalhes` without an owner decision. A bulk "open the N records" action from the audit layer is not implemented.
+
+### 3.3 `Histórico`
+
+Presents the optional authored material-change history of the selected Problem from canonical PRB `history[]`, newest first. It must not fabricate entries. Absence of history does not mean the Problem never changed. It is a read-only projection of PRB history, not a snapshot/version-control or audit-log system.
+
+Runtime integration adapts only its navigation/header to the two-view model; a full `Histórico` visual redesign is deferred.
+
+### 3.4 Problem-local navigation
+
+- Public Problem-local navigation has exactly `Detalhes | Histórico`.
+- It is navigation (`<nav>` with current-page semantics), not an ARIA tabs widget.
+- Generic Record Detail is a technical/corpus inspection capability, not a third Problem-local view; generic PRB inspection remains available through Records.
+- Graph is not a Problem-local view.
+
+### 3.5 Terminal composition
+
+- The `Detalhes` evidence/audit band is the final content band before the public footer.
+- The global manifest/corpus-generation summary is not appended after `Detalhes`. Records, `Histórico`, and Graph may retain it.
+- Corpus-generation timestamps are never presented as investigation currentness.
 
 ## 4. Records presentation
 
@@ -84,6 +110,8 @@ Records should be compact and scannable:
 - technical ID retained as secondary identity;
 - useful Source/relationship context;
 - full technical inspection available without dominating first reading.
+
+Generic Record Detail, reached through Records, is the technical/corpus inspection surface for every record type, including PRB.
 
 ## 5. Responsive and accessibility invariants
 
@@ -94,6 +122,12 @@ Responsive boundary:
 `360px` is a compact QA viewport, not another breakpoint.
 
 Preserve essential content, keyboard/focus behaviour, and semantic HTML. Avoid unintended page-level horizontal overflow or sticky navigation obscuring target content.
+
+Problem `Detalhes` responsive invariants:
+- semantic content and order are preserved at every width;
+- wider layouts may use independent columns only where reading/DOM order remains correct;
+- narrower open-question layouts use one readable flow;
+- the investigation path remains vertical at all supported widths.
 
 Production code owns exact design-token and component values.
 
@@ -109,6 +143,8 @@ Material visual, responsive, layout, or navigation changes require rendered revi
 When an approved visual reference exists, rendered/browser comparison is the primary visual gate.
 
 Approved references own the intended rendered composition, hierarchy, typography, spacing, density, surfaces, and responsive treatment for the surfaces they cover. Deviate only for a concrete semantic, accessibility, or technical reason.
+
+For PRB `Detalhes`, the approved reference is the owner-approved Storybook composition; the static HTML references under `docs/design/reference/prb-details/` remain baseline artifacts where not superseded by its recorded deltas.
 
 Minor non-visual changes do not require a full visual-review cycle.
 

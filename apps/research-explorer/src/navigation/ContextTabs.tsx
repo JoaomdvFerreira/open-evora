@@ -1,30 +1,40 @@
-export type ContextTabsActive = "detail" | "problem" | "history" | "graph";
+export type ContextTabsActive = "details" | "history";
 
 interface ContextTabsProps {
   prbId: string;
   active: ContextTabsActive;
-  onOpenGeneric: (id: string) => void;
-  onViewAsProblem: (id: string) => void;
+  onViewDetails: (id: string) => void;
   onViewHistory: (id: string) => void;
 }
 
 /**
- * PRB-scoped orientation switcher. It keeps the same Problem identity while
- * moving between generic detail, the Problem reading, and its authored
- * material history. Non-PRB records never render this control.
+ * PRB-local navigation: exactly Detalhes | Histórico for the same Problem
+ * identity. Ordinary navigation (`<nav>` + `aria-current="page"`), not an
+ * ARIA tablist — each destination is its own view. The current destination
+ * renders as non-interactive text; the other is a button calling its view
+ * callback with the same PRB id. Generic Record Detail (technical inspection
+ * through Registos) and Grafo are not PRB-local destinations. Appearance is
+ * the approved `.prb-view-selector` recipe (styles/prb-view-selector.css).
  */
-export function ContextTabs({ prbId, active, onOpenGeneric, onViewAsProblem, onViewHistory }: ContextTabsProps) {
+export function ContextTabs({ prbId, active, onViewDetails, onViewHistory }: ContextTabsProps) {
+  const destinations = [
+    { key: "details", label: "Detalhes", onActivate: () => onViewDetails(prbId) },
+    { key: "history", label: "Histórico", onActivate: () => onViewHistory(prbId) },
+  ] as const;
+
   return (
-    <nav aria-label={`Navegação de ${prbId}`} className="context-tabs">
-      <button type="button" aria-current={active === "detail" ? "page" : undefined} onClick={active === "detail" ? undefined : () => onOpenGeneric(prbId)}>
-        Detalhe
-      </button>
-      <button type="button" aria-current={active === "problem" ? "page" : undefined} onClick={active === "problem" ? undefined : () => onViewAsProblem(prbId)}>
-        Problema
-      </button>
-      <button type="button" aria-current={active === "history" ? "page" : undefined} onClick={active === "history" ? undefined : () => onViewHistory(prbId)}>
-        Histórico
-      </button>
+    <nav aria-label="Vistas do problema" className="prb-view-selector">
+      {destinations.map(({ key, label, onActivate }) =>
+        key === active ? (
+          <span key={key} aria-current="page" className="prb-view-selector-item prb-view-selector-item--active">
+            {label}
+          </span>
+        ) : (
+          <button key={key} type="button" className="prb-view-selector-item" onClick={onActivate}>
+            {label}
+          </button>
+        )
+      )}
     </nav>
   );
 }

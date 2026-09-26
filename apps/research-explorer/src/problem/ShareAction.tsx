@@ -14,8 +14,13 @@ function copyCurrentLink(url: string): Promise<void> {
   return copied ? Promise.resolve() : Promise.reject(new Error("copy unavailable"));
 }
 
-/** Shares the current canonical Problem URL, falling back to an accessible copy-link action. */
-export function ShareAction({ title }: { title: string }) {
+/**
+ * Shares the current canonical Problem URL, falling back to an accessible copy-link action.
+ * `icon` is an optional decorative glyph rendered before the label and hidden from the
+ * accessibility tree; the visible "Partilhar" label always remains the accessible name,
+ * even where a caller's CSS visually reduces the control to its icon.
+ */
+export function ShareAction({ title, icon }: { title: string; icon?: string }) {
   const [message, setMessage] = useState("");
   async function share() {
     const url = window.location.href;
@@ -35,5 +40,5 @@ export function ShareAction({ title }: { title: string }) {
       setMessage("Não foi possível copiar a ligação.");
     }
   }
-  return <div className="problem-share-action"><button type="button" onClick={share} aria-describedby="problem-share-status">Partilhar</button><span id="problem-share-status" className="visually-hidden" aria-live="polite">{message}</span></div>;
+  return <div className="problem-share-action"><button type="button" onClick={share} aria-describedby="problem-share-status">{icon ? <><span aria-hidden="true" className="problem-share-action-icon">{icon}</span><span className="problem-share-action-label">Partilhar</span></> : "Partilhar"}</button><span id="problem-share-status" className="visually-hidden" aria-live="polite">{message}</span></div>;
 }

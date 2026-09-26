@@ -1,0 +1,1290 @@
+/* Generic public PRB Details composition (PrbDetailsPresentation.tsx).
+   Approved visual reference: docs/design/reference/prb-details/ (README is
+   the authority contract). This view owns its own wide editorial geometry —
+   it does not reuse the legacy `.lyt-reading`/`.lyt-reading-rail`/
+   `.context-tabs` composition (ProblemView.tsx). Section width comes from
+   the shared `.shell-frame.shell-frame--wide` primitive (index.css,
+   1216px), the same frame the public Header/Overview hero already use, so
+   this view's content visibly shares their left/right axes; the shell's own
+   side gutters stay the product source of truth at every width.
+
+   Content, counts, and field presence remain entirely canonical-data-driven
+   (prbDetailsProjection.ts); only layout/hierarchy/spacing/responsive
+   behaviour follow the approved 1440/1024/768/360 references.
+
+   Vertical rhythm, column gaps and the editorial type scale are the exact
+   per-breakpoint reference values, held as view-scoped custom properties
+   below so each breakpoint block only swaps values rather than restating
+   rules. Where a reference value has no equal on the shared spacing scale it
+   is written literally rather than approximated to the nearest token. */
+
+/* Detalhes|Histórico selector appearance (ContextTabs) — its own file so
+   production PRB navigation can depend on it without this view's CSS. */
+@import "./prb-view-selector.css";
+
+.prb-details-view {
+  /* Hero */
+  --prb-hero-pad-top: 88px;
+  --prb-hero-pad-bottom: 63px;
+  --prb-hero-title-size: 60px;
+  --prb-hero-statement-size: 23px;
+
+  /* Estado / Âmbito band (six-column grid at >=768) */
+  --prb-state-head-pad-top: 28px;
+  --prb-state-head-pad-bottom: 12px;
+  --prb-state-cell-pad-x: 20px;
+  --prb-state-cell-pad-top: 20px;
+  --prb-state-cell-pad-bottom: 24px;
+  --prb-state-label-size: 14px;
+  --prb-state-value-size: 20px;
+
+  /* Editorial sections (label column + broad content) */
+  --prb-section-pad-top: 96px;
+  --prb-section-col: 240px;
+  --prb-section-gap: 56px;
+  --prb-current-reading-size: 23px;
+  --prb-question-size: 30px;
+  --prb-question-grid-gap: 40px;
+
+  /* Percurso / Auditoria bands */
+  --prb-path-margin-top: 112px;
+  --prb-path-pad-top: 72px;
+  --prb-path-pad-bottom: 104px;
+  --prb-path-stage-gap: 48px;
+  --prb-path-stage-label-size: 24px;
+  --prb-path-rail-indent: 40px;
+  --prb-path-reading-width: 44rem;
+  --prb-band-heading-size: 34px;
+  --prb-audit-pad-top: 72px;
+  --prb-audit-pad-bottom: 88px;
+  --prb-audit-row-gap: 48px;
+
+  /* Restrained effect tones (see "Effect label" below). */
+  --prb-effect-supports-ink: var(--color-accent-hover);
+  --prb-effect-supports-mark: var(--color-accent);
+  --prb-effect-refines-ink: #4a5c3e;
+  --prb-effect-refines-mark: #7d9170;
+  --prb-effect-bounds-ink: #5c5648;
+  --prb-effect-bounds-mark: #a39c88;
+  --prb-effect-neutral-ink: var(--color-ink-secondary);
+  --prb-effect-neutral-mark: var(--color-ink-muted);
+}
+
+.prb-details-frame {
+  padding-top: 0;
+}
+
+/* ---- Local PRB header: breadcrumb + Detalhes|Histórico + utilities ------ */
+
+.prb-header-band {
+  border-bottom: 1px solid var(--color-separator-standard);
+  background: var(--color-surface-subtle);
+}
+
+.prb-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 10px 0;
+}
+
+/* Plain technical breadcrumb text — the ancestor is a native <button> for
+   its real behaviour, but carries no control chrome here. */
+.prb-header .ui-breadcrumb {
+  gap: 0.45em;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.prb-breadcrumb-ancestor {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.prb-breadcrumb-ancestor:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.prb-header .ui-breadcrumb-current .rec-identifier {
+  color: var(--color-ink-primary);
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
+}
+
+.prb-header-utilities {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+}
+
+.prb-header-utility,
+.prb-header-utilities .problem-share-action button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent-hover);
+  font-family: var(--font-interface);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.prb-header-utility:hover,
+.prb-header-utilities .problem-share-action button:hover {
+  text-decoration: underline;
+}
+
+/* ---- Identity header: wide editorial hero -------------------------------- */
+
+/* Grid so the "Atualizado em …" line (DOM-ordered after the statement) can
+   sit at the eyebrow row's right edge at >=768 and fall below the statement
+   at 360. */
+.prb-identity {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 20px;
+  padding: var(--prb-hero-pad-top) 0 var(--prb-hero-pad-bottom);
+}
+
+.prb-identity-eyebrow-row {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 20px;
+  margin-bottom: 30px;
+}
+
+.prb-identity-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-accent-hover);
+  font-family: var(--font-interface);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.prb-identity-eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+/* Approved restrained text topic treatment — plain underlined non-interactive
+   text separated by a middot, never TopicBadge pills. */
+.prb-identity-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.prb-identity-topic-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.prb-identity-topic-sep {
+  color: var(--color-ink-faint);
+}
+
+.prb-identity-topic-link {
+  color: var(--color-ink-secondary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.prb-identity-updated {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: baseline;
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+
+.prb-identity-updated time {
+  color: var(--color-ink-secondary);
+  border-bottom: 1px dashed var(--color-separator-standard);
+}
+
+/* The id prefix belongs to the compact 360 "Atualizado em …" line only; wider
+   widths already show the id in the local header breadcrumb. */
+.prb-identity-updated-id {
+  display: none;
+}
+
+.prb-identity-title {
+  grid-column: 1 / -1;
+  margin: 0 0 36px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--prb-hero-title-size);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.prb-identity-statement {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-reading);
+  font-size: var(--prb-hero-statement-size);
+  line-height: 1.6;
+}
+
+/* ---- Investigation state + scope full-width flat band -------------------- */
+
+/* One systematic six-column grid at >=768: a group-heading row (Estado da
+   investigação over columns 1–3, Âmbito over 4–6) and a data row of six
+   equal label-over-value cells. The two group wrappers are
+   `display: contents`, so the markup keeps its heading → values order per
+   group (PrbDetailsPresentation.tsx) while both groups share one grid; the
+   <dl> and the metrics group each span three columns and split them into
+   three equal cells. The band is the containing block for the full-width
+   heading/data separator below. */
+.prb-state-scope-band {
+  position: relative;
+  border-top: 1px solid var(--color-separator-standard);
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.prb-state-scope-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.prb-state-block,
+.prb-scope-block {
+  display: contents;
+}
+
+.prb-state-scope-band .detail-panel-label {
+  grid-row: 1;
+  margin: 0;
+  padding: var(--prb-state-head-pad-top) 0 var(--prb-state-head-pad-bottom);
+}
+
+.prb-state-block > .detail-panel-label {
+  grid-column: 1 / 4;
+}
+
+.prb-scope-block > .detail-panel-label {
+  grid-column: 4 / 7;
+  padding-left: var(--prb-state-cell-pad-x);
+}
+
+.prb-state-grid,
+.prb-scope-metrics {
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.prb-state-grid {
+  grid-column: 1 / 4;
+}
+
+.prb-scope-metrics {
+  grid-column: 4 / 7;
+}
+
+/* Full-width separator between the group-heading row and the data row. Its
+   vertical position is its static position (the top of the data row);
+   left/right resolve against the band's padding box, which the band's
+   gutter bleed ("Full-width band gutter bleed" below) extends to the
+   band's outer edges — so the rule spans the band while every cell stays on
+   the shell-frame axes. */
+.prb-state-grid::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.prb-state-item,
+.prb-scope-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: var(--prb-state-cell-pad-top) var(--prb-state-cell-pad-x) var(--prb-state-cell-pad-bottom);
+  border-left: 1px solid var(--color-separator-standard);
+}
+
+.prb-state-item:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.prb-state-item dt,
+.prb-scope-metric-label {
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-size: var(--prb-state-label-size);
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+.prb-state-value,
+.prb-scope-metric-value {
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-size: var(--prb-state-value-size);
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+}
+
+.prb-state-value--accent {
+  color: var(--color-accent-hover);
+}
+
+.prb-scope-metric {
+  color: inherit;
+  text-decoration: none;
+}
+
+.prb-scope-metric:hover {
+  text-decoration: underline;
+}
+
+/* ---- Shared "editorial left label + broad content" section frame -------- */
+
+.prb-section {
+  margin: 0;
+}
+
+.prb-section-frame {
+  display: grid;
+  grid-template-columns: var(--prb-section-col) minmax(0, 1fr);
+  gap: var(--prb-section-gap);
+  padding: var(--prb-section-pad-top) 0 0;
+}
+
+.prb-section-intro {
+  padding-top: 4px;
+}
+
+.prb-section-intro .detail-panel-label {
+  margin: 0;
+}
+
+.prb-section-intro-note {
+  margin: 6px 0 0;
+  color: var(--color-ink-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ---- Full-width band gutter bleed ----------------------------------------- */
+
+/* Every PRB Details band whose surface or rules span the page (local header,
+   Estado/Âmbito, Percurso, Evidência e auditoria) bleeds through
+   `main.explorer-shell`'s inline gutter via the shell's own
+   `--explorer-shell-gutter` (2rem, 1rem <=767px), so its background and
+   horizontal rules reach the same outer edges as the Header/PublicFooter.
+   The matching inline padding returns the content box to exactly the
+   shell's content width, so each band's inner `shell-frame shell-frame--wide`
+   stays the content-alignment owner on unchanged axes. The 0px fallback
+   keeps a band in-flow if rendered outside the shell. Declared after
+   `.prb-section` so its margin reset cannot cancel the bleed. */
+.prb-header-band,
+.prb-state-scope-band,
+.prb-path-section,
+.prb-audit-section {
+  margin-inline: calc(-1 * var(--explorer-shell-gutter, 0px));
+  padding-inline: var(--explorer-shell-gutter, 0px);
+}
+
+/* ---- Effect label: marker + restrained tone + explicit text -------------- */
+
+/* One treatment for every effect occurrence in this view (audit tally,
+   "Como verificamos" legend). The marker is aria-hidden and
+   colour is supplemental only: the explicit label text carries the meaning.
+   CONTRADICTS has no dedicated tone until an approved reference exercises
+   it — it takes .prb-effect--neutral like any unknown value. */
+.prb-effect {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--prb-effect-ink);
+}
+
+.prb-effect--supports {
+  --prb-effect-ink: var(--prb-effect-supports-ink);
+  --prb-effect-mark: var(--prb-effect-supports-mark);
+}
+
+.prb-effect--refines {
+  --prb-effect-ink: var(--prb-effect-refines-ink);
+  --prb-effect-mark: var(--prb-effect-refines-mark);
+}
+
+.prb-effect--bounds {
+  --prb-effect-ink: var(--prb-effect-bounds-ink);
+  --prb-effect-mark: var(--prb-effect-bounds-mark);
+}
+
+.prb-effect--neutral {
+  --prb-effect-ink: var(--prb-effect-neutral-ink);
+  --prb-effect-mark: var(--prb-effect-neutral-mark);
+}
+
+.prb-effect-marker {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  background: var(--prb-effect-mark);
+}
+
+@media (forced-colors: active) {
+  .prb-effect-marker {
+    background: CanvasText;
+  }
+}
+
+/* Approved restrained treatment: effect/research-role values render as
+   plain inline text here, not the generic pill/box anatomy
+   (EvidenceEffectTag/ResearchRoleTag's shared `.ui-inline-label` border +
+   fill). The components' own label/accessible-name semantics stay
+   untouched; this strips only the local box styling within this view. */
+.prb-effect .ui-inline-label,
+.prb-audit-dimension-grid .ui-inline-label {
+  display: inline;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  white-space: normal;
+}
+
+/* ---- "Leitura atual" (canonical causal_reading) ------------------------- */
+
+.prb-current-reading {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--prb-current-reading-size);
+  line-height: 1.5;
+}
+
+/* EVD identifiers in this view follow the approved technical-metadata
+   hierarchy: muted technical colour at rest, accent on hover/focus. Scoped
+   to this view's action identifiers only — RecordIdentifier elsewhere keeps
+   its default recipe (domain.css). Still a native button with the shared
+   focus ring. */
+.prb-details-view .rec-identifier--action {
+  color: var(--color-ink-muted);
+  text-decoration-color: currentColor;
+}
+
+.prb-details-view .rec-identifier--action:hover,
+.prb-details-view .rec-identifier--action:focus-visible {
+  color: var(--color-accent-hover);
+}
+
+/* ---- "O que ainda não sabemos" (open questions) -------------------------- */
+
+.prb-open-question-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prb-open-question-item {
+  padding: 30px 0 36px;
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.prb-open-question-item:first-child {
+  border-top: 2px solid var(--color-accent);
+}
+
+.prb-open-question-item:last-child {
+  border-bottom: 1px solid var(--color-separator-standard);
+}
+
+.prb-open-question-index {
+  margin-bottom: 12px;
+  color: var(--color-accent-hover);
+  font-family: var(--font-technical);
+  font-size: 13px;
+}
+
+.prb-open-question-text {
+  max-width: 40ch;
+  margin: 0 0 24px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--prb-question-size);
+  font-weight: 600;
+  line-height: 1.3;
+  text-wrap: pretty;
+}
+
+/* Up to five independently authored fields per question. Single column by
+   default (semantic order); at >=1024 the component renders the `--stacked`
+   form: latest result full-width, then two independently flowing stacks
+   (PrbDetailsPresentation.tsx, OPEN_QUESTION_STACKS_QUERY). */
+.prb-open-question-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prb-question-grid-gap);
+}
+
+.prb-open-question-grid--stacked {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.prb-open-question-grid--stacked > .prb-open-question-field {
+  grid-column: 1 / -1;
+}
+
+.prb-open-question-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prb-question-grid-gap);
+  min-width: 0;
+}
+
+.prb-open-question-stack--primary {
+  grid-column: 1;
+}
+
+.prb-open-question-stack--secondary {
+  grid-column: 2;
+}
+
+.prb-open-question-field h4 {
+  margin: 0 0 6px;
+  color: var(--color-ink-muted);
+  font-family: var(--font-reading);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: var(--text-reading-h3-line-height);
+}
+
+.prb-open-question-field p {
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.prb-open-question-evidence-refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight) var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prb-contribute-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 24px;
+  padding-top: 28px;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-reading);
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.prb-contribute-prompt a {
+  font-family: var(--font-interface);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ---- "Percurso da investigação" — vertical timeline at every width ------ */
+
+.prb-path-section {
+  margin-top: var(--prb-path-margin-top);
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.prb-path-section .prb-section-frame {
+  padding: var(--prb-path-pad-top) 0 var(--prb-path-pad-bottom);
+}
+
+.prb-path-heading {
+  margin: 0 0 48px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--prb-band-heading-size);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.prb-path-stage-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prb-path-stage-gap);
+  max-width: var(--prb-path-reading-width);
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--prb-path-rail-indent);
+}
+
+.prb-path-stage {
+  position: relative;
+}
+
+/* Neutral equal sequence markers on a left rail — one dot per stage plus a
+   connector down to the next stage's dot (drawn per stage, so it spans
+   exactly the stages that exist), never a completion/current/pending
+   progress indicator. */
+.prb-path-stage:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: calc(10px - var(--prb-path-rail-indent));
+  top: 21px;
+  bottom: calc(-4px - var(--prb-path-stage-gap));
+  width: 2px;
+  background: var(--color-separator-standard);
+}
+
+.prb-path-stage-marker {
+  position: absolute;
+  z-index: 1;
+  left: calc(5px - var(--prb-path-rail-indent));
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-ink-muted);
+}
+
+.prb-path-stage-index {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--color-ink-muted);
+  font-family: var(--font-technical);
+  font-size: 13.5px;
+}
+
+.prb-path-stage-label {
+  margin: 0 0 12px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--prb-path-stage-label-size);
+  font-weight: 600;
+}
+
+.prb-path-stage p {
+  margin: 0 0 var(--space-tight);
+  color: var(--color-ink-secondary);
+  font-size: 17px;
+  line-height: 1.62;
+}
+
+/* ---- "Evidência e auditoria" --------------------------------------------- */
+
+/* Terminal band (explorerarchitecture.md §3.5): its outer surface (background
+   + top rule) bleeds through the shell gutter with the other full-width
+   bands ("Full-width band gutter bleed" above), so it meets the full-width
+   PublicFooter edge to edge. */
+.prb-audit-section {
+  border-top: 1px solid var(--color-ink-primary);
+  background: var(--color-surface-subtle);
+}
+
+/* PRB Details terminal composition: the audit band's own
+   `--prb-audit-pad-bottom` is the sole breathing room before the footer, so
+   the shared layers that would otherwise add a second gap — the shell's
+   bottom padding and the footer's top margin — are neutralized for this
+   surface only (same body:has() scoping as the Overview treatment in
+   index.css; Records/History/Graph/Trust keep both). */
+body:has(.prb-details-view) main.explorer-shell {
+  padding-bottom: 0;
+}
+
+body:has(.prb-details-view) .public-footer {
+  margin-top: 0;
+}
+
+.prb-audit-section .prb-section-frame {
+  padding: var(--prb-audit-pad-top) 0 var(--prb-audit-pad-bottom);
+}
+
+.prb-audit-lede {
+  margin-bottom: 36px;
+}
+
+.prb-audit-heading {
+  margin: 0 0 10px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: var(--prb-band-heading-size);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.prb-audit-intro {
+  max-width: 64ch;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.prb-audit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--prb-audit-row-gap);
+  padding: 34px 0;
+  border-top: 1px solid var(--color-separator-standard);
+}
+
+.prb-audit-row > :last-child:not(:first-child) {
+  padding-top: 2px;
+}
+
+.prb-audit-row--first {
+  border-top: 1px solid var(--color-ink-primary);
+}
+
+/* Last audit row: the band's own --prb-audit-pad-bottom is the only space
+   below it. Compound selector so it also outranks the compact row padding. */
+.prb-audit-row.prb-audit-row--dossier {
+  padding-bottom: 0;
+}
+
+.prb-audit-row h5 {
+  margin: 0 0 10px;
+  color: var(--color-ink-primary);
+  font-family: var(--font-reading);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.prb-audit-row > div > p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--color-ink-secondary);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.prb-audit-evidence-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 22px;
+  color: var(--color-ink-secondary);
+  font-size: 16px;
+}
+
+.prb-audit-evidence-summary strong {
+  color: var(--color-ink-primary);
+  font-weight: 600;
+}
+
+.prb-audit-evidence-summary-sep {
+  align-self: center;
+  width: 1px;
+  height: 14px;
+  background: var(--color-separator-standard);
+}
+
+.prb-audit-effect-tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.prb-audit-effect-tally .prb-effect strong {
+  color: inherit;
+}
+
+.prb-audit-dimension-grid dt {
+  font-weight: 600;
+}
+
+.prb-audit-open-records,
+.prb-audit-dossier-cta {
+  flex: none;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: var(--radius-control);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.prb-audit-open-records {
+  color: var(--color-ink-primary);
+  border: 1px solid var(--color-separator-standard);
+  background: var(--color-surface-raised);
+}
+
+.prb-audit-open-records:hover:not([disabled]) {
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
+.prb-audit-dossier-cta {
+  color: var(--color-surface-reading);
+  border: 1px solid var(--color-accent-hover);
+  background: var(--color-accent-hover);
+}
+
+.prb-audit-open-records[disabled],
+.prb-audit-dossier-cta[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Disabled dossier placeholder: quiet outline treatment so it never reads
+   as an active primary CTA, while the label stays legible. */
+.prb-audit-dossier-cta[disabled] {
+  color: var(--color-ink-muted);
+  border-color: var(--color-separator-standard);
+  background: transparent;
+  font-weight: 500;
+  opacity: 1;
+}
+
+.prb-audit-dimension-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 40px;
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--color-separator-faint);
+}
+
+.prb-audit-dimension-grid h6 {
+  margin: 0 0 6px;
+  color: var(--color-ink-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.prb-audit-dimension-grid > div > p {
+  margin: 0 0 12px;
+  color: var(--color-ink-secondary);
+  font-size: 16.5px;
+  line-height: 1.55;
+}
+
+.prb-audit-dimension-grid dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.5;
+}
+
+.prb-audit-dimension-grid .prb-audit-effect-legend {
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px 18px;
+  align-items: baseline;
+}
+
+.prb-audit-dimension-grid dd {
+  margin: 0;
+  color: var(--color-ink-secondary);
+}
+
+.prb-audit-role-legend > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prb-audit-role-legend dt {
+  color: var(--color-ink-primary);
+}
+
+.prb-audit-role-legend dt .ui-inline-label {
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+.prb-audit-method-link {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  color: var(--color-accent-hover);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.prb-audit-method-link:hover {
+  text-decoration: underline;
+}
+
+/* ---- Responsive: 1024 fit, 768 boundary, 360 compact --------------------- */
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .prb-details-view {
+    --prb-hero-pad-top: 72px;
+    --prb-hero-pad-bottom: 51px;
+    --prb-hero-title-size: 48px;
+    --prb-hero-statement-size: 21px;
+    --prb-state-cell-pad-x: 16px;
+    --prb-state-value-size: 18px;
+    --prb-section-pad-top: 88px;
+    --prb-section-col: 180px;
+    --prb-section-gap: 40px;
+    --prb-current-reading-size: 21px;
+    --prb-question-size: 27px;
+    --prb-question-grid-gap: 28px;
+    --prb-path-margin-top: 104px;
+    --prb-path-pad-top: 60px;
+    --prb-path-pad-bottom: 80px;
+    --prb-path-stage-gap: 40px;
+    --prb-path-rail-indent: 36px;
+    --prb-band-heading-size: 30px;
+    --prb-audit-pad-top: 60px;
+  }
+}
+
+/* 768–1023: section labels move into normal content flow (no left-rail
+   column); Estado da investigação / Âmbito keep the six-column grid with a
+   tighter cell inset and type so the longest canonical value fits its cell. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .prb-details-view {
+    --prb-hero-pad-top: 64px;
+    --prb-hero-pad-bottom: 46px;
+    --prb-hero-title-size: 40px;
+    --prb-hero-statement-size: 20px;
+    --prb-state-head-pad-top: 24px;
+    --prb-state-cell-pad-x: 12px;
+    --prb-state-cell-pad-top: 18px;
+    --prb-state-cell-pad-bottom: 20px;
+    --prb-state-label-size: 13px;
+    --prb-state-value-size: 16px;
+    --prb-section-pad-top: 80px;
+    --prb-current-reading-size: 20px;
+    --prb-question-size: 25px;
+    --prb-path-margin-top: 96px;
+    --prb-path-pad-top: 60px;
+    --prb-path-pad-bottom: 80px;
+    --prb-path-stage-gap: 36px;
+    --prb-path-rail-indent: 36px;
+    --prb-path-stage-label-size: 22px;
+    --prb-band-heading-size: 28px;
+    --prb-audit-pad-top: 60px;
+    --prb-audit-row-gap: 28px;
+  }
+
+  .prb-section-frame {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .prb-open-question-grid {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .prb-details-view {
+    --prb-hero-pad-top: 28px;
+    --prb-hero-pad-bottom: 26px;
+    --prb-hero-title-size: 29px;
+    --prb-hero-statement-size: 18px;
+    --prb-section-pad-top: 56px;
+    --prb-current-reading-size: 19px;
+    --prb-question-size: 22px;
+    --prb-path-margin-top: 48px;
+    --prb-path-pad-top: 36px;
+    --prb-path-pad-bottom: 40px;
+    --prb-path-stage-gap: 28px;
+    --prb-path-rail-indent: 28px;
+    --prb-path-reading-width: none;
+    --prb-path-stage-label-size: 20px;
+    --prb-band-heading-size: 24px;
+    --prb-audit-pad-top: 36px;
+    --prb-audit-pad-bottom: 40px;
+  }
+
+  /* Local header: breadcrumb on its own line; Detalhes|Histórico plus an
+     icon-only Partilhar on the next row. Verificar is not part of this row
+     at 360 (the audit section stays in normal page flow). */
+  .prb-header {
+    gap: 8px;
+    padding: 10px 0 8px;
+  }
+
+  .prb-header .ui-breadcrumb {
+    flex-basis: 100%;
+  }
+
+  .prb-header-utility--verify {
+    display: none;
+  }
+
+  .prb-header-utilities .problem-share-action button {
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font-size: 17px;
+  }
+
+  .prb-header-utilities .problem-share-action-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Hero: eyebrow, topics, title, statement, then the compact
+     "PRB-xxxx · Atualizado em …" record-edit line. */
+  .prb-identity {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .prb-identity-eyebrow-row {
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .prb-identity-eyebrow,
+  .prb-identity-topics {
+    font-size: 15px;
+  }
+
+  .prb-identity-topics {
+    flex-basis: 100%;
+    gap: 8px;
+  }
+
+  .prb-identity-topic-item {
+    gap: 8px;
+  }
+
+  .prb-identity-title {
+    margin-bottom: 18px;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+
+  .prb-identity-updated {
+    grid-column: 1;
+    grid-row: auto;
+    margin-top: 16px;
+    font-size: 13px;
+    white-space: normal;
+  }
+
+  .prb-identity-updated-id {
+    display: inline;
+  }
+
+  /* Estado: stacked label/value rows. Âmbito: three equal label-over-value
+     cells with vertical dividers, all counts on one row. The two groups
+     stack, split by one full-width divider (the scope group's ::before —
+     the same static-position technique as the >=768 heading/data
+     separator, which this width does not draw). */
+  .prb-state-scope-row,
+  .prb-state-block,
+  .prb-scope-block {
+    display: block;
+  }
+
+  .prb-state-scope-band .detail-panel-label {
+    padding: 20px 0 12px;
+  }
+
+  .prb-scope-block > .detail-panel-label {
+    padding-left: 0;
+  }
+
+  .prb-state-grid::before {
+    content: none;
+  }
+
+  .prb-scope-block::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--color-separator-standard);
+  }
+
+  .prb-state-grid {
+    grid-template-columns: 104px minmax(0, 1fr);
+    row-gap: 10px;
+    align-items: baseline;
+    padding-bottom: 18px;
+  }
+
+  .prb-state-item {
+    display: contents;
+  }
+
+  .prb-state-item dt,
+  .prb-state-value {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .prb-scope-metrics {
+    padding-bottom: 18px;
+  }
+
+  .prb-scope-metric {
+    padding: 0 0 0 14px;
+  }
+
+  .prb-scope-metric:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .prb-section-frame {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .prb-section-intro-note {
+    font-size: 14.5px;
+  }
+
+  .prb-open-question-item {
+    padding: 22px 0 26px;
+  }
+
+  .prb-open-question-index {
+    margin-bottom: 8px;
+  }
+
+  .prb-open-question-text {
+    margin-bottom: 18px;
+  }
+
+  .prb-open-question-grid {
+    gap: 18px;
+  }
+
+  .prb-open-question-grid > .prb-open-question-field:not(:first-child) {
+    padding-top: 16px;
+    border-top: 1px solid var(--color-separator-faint);
+  }
+
+  .prb-contribute-prompt {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding-top: 22px;
+    font-size: 18px;
+  }
+
+  .prb-contribute-prompt a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target-min);
+  }
+
+  /* Vertical timeline: same model as wider widths, compact spacing via the
+     --prb-path-* custom properties above. */
+  .prb-path-heading {
+    margin-bottom: 26px;
+  }
+
+  .prb-path-stage-index {
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+
+  .prb-path-stage-label {
+    margin-bottom: 6px;
+  }
+
+  .prb-path-stage p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .prb-audit-lede {
+    margin-bottom: 22px;
+  }
+
+  .prb-audit-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    padding: 24px 0;
+  }
+
+  .prb-audit-row > :last-child:not(:first-child) {
+    padding-top: 0;
+  }
+
+  .prb-audit-row h5 {
+    font-size: 21px;
+  }
+
+  .prb-audit-evidence-summary-sep {
+    display: none;
+  }
+
+  .prb-audit-dimension-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .prb-audit-method-link {
+    min-height: var(--target-min);
+  }
+
+  .prb-audit-open-records,
+  .prb-audit-dossier-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+  }
+}

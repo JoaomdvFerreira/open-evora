@@ -31,6 +31,22 @@ one-to-one. Every candidateFiles[].path in the top-level array must exactly
 match one entry in manifest.candidateFiles.`;
 
 /**
+ * Bounded PRB semantic guardrails (docs/datamodel.md §3 "Problem reading and
+ * investigation semantics"). Existing corpus wording is not a sufficient
+ * template, so the distinctions are stated here rather than left implicit.
+ */
+const PRB_SEMANTIC_GUARDRAILS = `PRB semantic guardrails (existing corpus wording is not a template that licenses a claim):
+- Claim strength: problem_statement and causal_reading must not assert more causal strength than the linked Evidence and its inference_limits support. causal_reading is a bounded interpretation, not a proven cause; do not build it by selecting or ranking a convenient subset of Evidence.
+- investigation.open_questions[] fields are distinct: latest_result = current result/knowledge for that question; why_open = why it remains unresolved; resolution_condition = evidential/decision condition to resolve or reopen it; current_action = current investigation activity. Do not merge or substitute one for another.
+- current_action is free text: a token such as WATCH carries no structured posture meaning.
+- evidence[] on a question or relationship does not license stronger wording; never link Evidence merely to rescue unsupported wording.
+- Currentness: updated_at is edit metadata. Do not infer or assert currentness from updated_at, Source/Evidence dates, or absence of contradiction.
+- investigation.path is a narrative of how the formulation was reached, not a progress/completion/pending state.
+- PRB evidence[].effects and evidence[].research_roles are independent: choose each on its own terms.
+- Preserve unresolved or contradictory Evidence with its boundary stated; do not suppress it or resolve it by wording.
+- Optional fields stay optional: omit them when not explicitly supported; do not invent values to fill them.`;
+
+/**
  * Builds the complete bounded stdin payload for the primary invocation. The
  * trigger's `request` field frames the investigation; everything else in
  * this prompt is the fixed structural contract, not free-form guidance the
@@ -46,6 +62,8 @@ export function buildPrimaryAuthoringPrompt(trigger: ResearchTrigger): string {
     "canonical record shape already in use in this repository's research corpus.",
     "Do not invent fields. Do not modify canonical records; author new/updated",
     "candidates only.",
+    "",
+    PRB_SEMANTIC_GUARDRAILS,
     "",
     ENVELOPE_CONTRACT,
   ].filter((line): line is string => line !== undefined);

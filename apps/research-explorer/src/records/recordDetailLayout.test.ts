@@ -6,7 +6,7 @@ import path from "node:path";
  * Structural regression for the Record Detail desktop centering defect: the
  * top-level Record Detail composition owns the shared 980px outer frame
  * (`.record-detail-layout.shell-frame`),
- * so Breadcrumb, ContextTabs, and the two-column content share one frame
+ * so Breadcrumb and the two-column content share one frame
  * instead of each capping/centering itself independently (which is exactly
  * the drift this test previously caught). This test parses the actual rule
  * bodies out of the production stylesheet and asserts the ownership split
@@ -106,13 +106,9 @@ describe("ReadingLayout production adoption", () => {
     expect(recordDetailSource).not.toMatch(/className="record-detail-rail/);
   });
 
-  it("Problem View uses the same lyt-reading / data-rail=\"present\" / lyt-reading-main composition", () => {
-    expect(problemViewSource).toMatch(/className="lyt-reading" data-rail="present"/);
-    expect(problemViewSource).toMatch(/className="record-detail-main lyt-reading-main"/);
-  });
-
-  it("ProblemReadingRail's <aside> carries lyt-reading-rail problem-reading-rail", () => {
-    expect(problemViewSource).toMatch(/<aside className="lyt-reading-rail problem-reading-rail">/);
+  it("Problem View does not use the ReadingLayout 720+rail composition — PRB Details owns its own wide geometry", () => {
+    expect(problemViewSource).not.toMatch(/lyt-reading/);
+    expect(problemViewSource).not.toMatch(/problem-reading-rail/);
   });
 
   it("Problem View production JSX no longer uses problem-view-columns", () => {

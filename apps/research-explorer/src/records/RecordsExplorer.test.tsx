@@ -46,7 +46,6 @@ function Harness() {
       onTypeFilterChange={vi.fn()}
       onViewAsProblem={vi.fn()}
       onViewInGraph={vi.fn()}
-      onViewHistory={vi.fn()}
       onBackToRecords={() => setSelectedId(null)}
     />
   );

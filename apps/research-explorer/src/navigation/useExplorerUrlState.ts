@@ -59,7 +59,7 @@ export function useExplorerUrlState() {
   // Round-tripped through serialize->parse before every write (not just on
   // load/popstate) so UX-F's view=graph normalization (parseUrlState) governs
   // every path into state uniformly — including in-app calls like "Ver no
-  // Grafo" or a ContextTabs graph link — not just direct/bookmarked URLs.
+  // Grafo" — not just direct/bookmarked URLs.
   function normalize(next: ExplorerUrlState): ExplorerUrlState {
     return parseUrlState(serializeUrlState(next));
   }
