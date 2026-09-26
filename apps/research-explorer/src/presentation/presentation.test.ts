@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPublicCount, formatPublicDate, formatPublicDateTime, formatPublicPartialDate, formatPublicRelativeDays, publicCompactEnumLabel, publicEnumLabel, publicFieldCaption, publicTriStateLabel } from "./presentation";
+import { formatPublicCompactDate, formatPublicCount, formatPublicDate, formatPublicDateTime, formatPublicPartialDate, formatPublicRelativeDays, publicCompactEnumLabel, publicEnumExplanation, publicEnumLabel, publicFieldCaption, publicTriStateLabel } from "./presentation";
 
 describe("PT-PT public presentation terminology", () => {
   it("uses field-aware PRB validation labels", () => {
@@ -306,6 +306,43 @@ describe("formatPublicDate", () => {
   it("retains the documented fallback for malformed/unsupported input", () => {
     expect(formatPublicDate("not-a-date")).toBe("not-a-date");
     expect(formatPublicDate("")).toBe("");
+  });
+});
+
+describe("formatPublicCompactDate", () => {
+  it("renders the abbreviated PT-PT civil date without shifting the authored day", () => {
+    const original = process.env.TZ;
+    try {
+      process.env.TZ = "America/New_York";
+      expect(formatPublicCompactDate("2026-08-10")).toBe("10 ago 2026");
+    } finally {
+      if (original === undefined) delete process.env.TZ;
+      else process.env.TZ = original;
+    }
+  });
+
+  it("falls back to the original value when it cannot be parsed", () => {
+    expect(formatPublicCompactDate("not-a-date")).toBe("not-a-date");
+  });
+});
+
+describe("publicEnumExplanation", () => {
+  it("explains every canonical EVD classification value", () => {
+    for (const value of ["fact", "reported-experience", "opinion", "claim", "measurement", "recommendation"]) {
+      expect(publicEnumExplanation("evidence_nature", value)).toBeTruthy();
+    }
+    for (const value of ["authoritative", "non_authoritative", "unknown"]) {
+      expect(publicEnumExplanation("claim_authority", value)).toBeTruthy();
+    }
+    expect(publicEnumExplanation("evidence_nature", "claim")).toBe("a fonte afirma, mas não mede.");
+    expect(publicEnumExplanation("claim_authority", "authoritative")).toBe("quem afirma tem competência institucional sobre o tema.");
+    expect(publicEnumExplanation("claim_authority", "non_authoritative")).toBe("quem afirma não tem competência institucional sobre a alegação.");
+    expect(publicEnumExplanation("claim_authority", "unknown")).toBe("não está estabelecido se quem afirma tem competência institucional sobre a alegação.");
+  });
+
+  it("has no improvised explanation for an unknown value or field", () => {
+    expect(publicEnumExplanation("evidence_nature", "future_value")).toBeNull();
+    expect(publicEnumExplanation("status", "OPEN")).toBeNull();
   });
 });
 

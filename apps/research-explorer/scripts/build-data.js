@@ -43,6 +43,26 @@ function getSourceCommit(repoRoot) {
   }
 }
 
+/**
+ * Canonical EVD files are republished byte-for-byte under
+ * `canonical/<repo-relative file>` so EVD Detail can offer the exact
+ * canonical YAML behind the record as a same-origin download. Only EVD
+ * records are published; SRC/PRB have no download surface. They are
+ * copies of the already-public canonical corpus, never re-serialized from the
+ * read model, and they version together with the rest of generated/.
+ */
+const CANONICAL_DIR = "canonical";
+
+function publishesCanonicalFile(detail) {
+  return detail.type === "EVD-";
+}
+
+function copyCanonicalFile(repoRoot, tmpDir, relFile) {
+  const target = path.join(tmpDir, CANONICAL_DIR, ...relFile.split("/"));
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.copyFileSync(path.join(repoRoot, ...relFile.split("/")), target);
+}
+
 function writeJson(filePath, data) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n");
@@ -54,7 +74,7 @@ function writeJson(filePath, data) {
  * on disk. Throws (aborting the publish, per atomic-write.js) on any
  * mismatch.
  */
-function verifyGeneratedOutput(tmpDir, readModel) {
+function verifyGeneratedOutput(tmpDir, readModel, repoRoot) {
   const manifest = JSON.parse(fs.readFileSync(path.join(tmpDir, "manifest.json"), "utf8"));
   const index = JSON.parse(fs.readFileSync(path.join(tmpDir, "index.json"), "utf8"));
   const edges = JSON.parse(fs.readFileSync(path.join(tmpDir, "edges.json"), "utf8"));
@@ -81,6 +101,13 @@ function verifyGeneratedOutput(tmpDir, readModel) {
     const detailPath = path.join(tmpDir, "record-detail", `${node.id}.json`);
     if (!fs.existsSync(detailPath)) {
       throw new Error(`Generated-data integrity check failed: missing record-detail file for "${node.id}".`);
+    }
+  }
+
+  for (const detail of readModel.recordDetails.filter(publishesCanonicalFile)) {
+    const copy = path.join(tmpDir, CANONICAL_DIR, ...detail.file.split("/"));
+    if (!fs.existsSync(copy) || !fs.readFileSync(copy).equals(fs.readFileSync(path.join(repoRoot, ...detail.file.split("/"))))) {
+      throw new Error(`Generated-data integrity check failed: canonical copy of "${detail.file}" is missing or differs from the canonical file.`);
     }
   }
 
@@ -134,8 +161,9 @@ function run({
       writeJson(path.join(tmpDir, "edges.json"), readModel.edges);
       for (const detail of readModel.recordDetails) {
         writeJson(path.join(tmpDir, "record-detail", `${detail.id}.json`), detail);
+        if (publishesCanonicalFile(detail)) copyCanonicalFile(repoRoot, tmpDir, detail.file);
       }
-      verifyGeneratedOutput(tmpDir, readModel);
+      verifyGeneratedOutput(tmpDir, readModel, repoRoot);
     });
   } catch (e) {
     return { ok: false, stage: "publish", error: e };
