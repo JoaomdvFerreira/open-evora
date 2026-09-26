@@ -195,8 +195,10 @@ describe("PRB Details Estado da investigação / Âmbito band — six-column gri
   });
 
   it("draws the heading/data separator across the band's full width from the band's own box", () => {
-    const band = ruleBodies(prbBase, ".prb-state-scope-band").find((rule) => /background:/.test(rule));
+    const band = ruleBodies(prbBase, ".prb-state-scope-band").find((rule) => /border-top:/.test(rule));
     expect(band).toMatch(/position:\s*relative;/);
+    expect(band).toMatch(/border-top:\s*1px solid var\(--color-separator-standard\);/);
+    expect(band).not.toMatch(/background/);
     const separator = onlyRuleBody(prbBase, ".prb-state-grid::before");
     expect(separator).toMatch(/position:\s*absolute;/);
     expect(separator).toMatch(/left:\s*0;/);

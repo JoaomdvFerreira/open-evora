@@ -271,9 +271,8 @@
    heading/data separator below. */
 .prb-state-scope-band {
   position: relative;
-  border-top: 1px solid var(--color-ink-primary);
+  border-top: 1px solid var(--color-separator-standard);
   border-bottom: 1px solid var(--color-separator-standard);
-  background: var(--color-surface-subtle);
 }
 
 .prb-state-scope-row {
@@ -781,6 +780,12 @@ body:has(.prb-details-view) .public-footer {
 
 .prb-audit-row--first {
   border-top: 1px solid var(--color-ink-primary);
+}
+
+/* Last audit row: the band's own --prb-audit-pad-bottom is the only space
+   below it. Compound selector so it also outranks the compact row padding. */
+.prb-audit-row.prb-audit-row--dossier {
+  padding-bottom: 0;
 }
 
 .prb-audit-row h5 {
