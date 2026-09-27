@@ -69,3 +69,94 @@
 .ui-error-notice .ui-action-outlined {
   margin-top: var(--space-tight);
 }
+
+/* ---- Toast -------------------------------------------------------------
+   One fixed, replaceable action-feedback surface. The viewport stays out of
+   document flow; the message owns the live-region role and the adjacent
+   close action remains outside it so assistive technology announces the
+   feedback once. */
+.ui-toast-viewport {
+  position: fixed;
+  right: max(var(--space-standard), env(safe-area-inset-right));
+  bottom: max(var(--space-standard), env(safe-area-inset-bottom));
+  z-index: 100;
+  width: min(24rem, calc(100vw - (2 * var(--space-standard))));
+  max-width: calc(100vw - (2 * var(--space-standard)));
+  pointer-events: none;
+}
+
+.ui-toast {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-tight);
+  width: 100%;
+  border: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  border-radius: var(--radius-surface);
+  padding: var(--space-tight) var(--space-tight) var(--space-tight) var(--space-standard);
+  background: var(--color-surface-raised);
+  color: var(--color-ink-primary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+  pointer-events: auto;
+}
+
+.ui-toast--affirmed {
+  border-color: var(--color-feedback-affirmed);
+}
+
+.ui-toast--error {
+  border-color: var(--color-feedback-error-line);
+  background: var(--color-feedback-error-surface);
+  color: var(--color-feedback-error-ink);
+}
+
+.ui-toast-icon {
+  display: inline-flex;
+  color: var(--color-ink-secondary);
+  font-size: 1.25rem;
+}
+
+.ui-toast--affirmed .ui-toast-icon {
+  color: var(--color-feedback-affirmed);
+}
+
+.ui-toast--error .ui-toast-icon {
+  color: var(--color-feedback-error-ink);
+}
+
+.ui-toast-message {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ui-toast-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--target-min);
+  height: var(--target-min);
+  border: 0;
+  border-radius: var(--radius-control);
+  padding: 0;
+  background: transparent;
+  color: currentColor;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ui-toast-close:hover {
+  background: var(--color-surface-subtle);
+}
+
+.ui-toast-close:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.ui-toast-close svg {
+  font-size: 1.25rem;
+}

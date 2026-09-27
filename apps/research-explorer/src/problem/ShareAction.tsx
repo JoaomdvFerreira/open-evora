@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useToast } from "../presentation/Toast";
 
 function copyCurrentLink(url: string): Promise<void> {
   if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(url);
@@ -22,24 +22,24 @@ function copyCurrentLink(url: string): Promise<void> {
  * optionally extends that name (it must begin with the visible "Partilhar").
  */
 export function ShareAction({ title, icon, accessibleLabel }: { title: string; icon?: string; accessibleLabel?: string }) {
-  const [message, setMessage] = useState("");
+  const { notify } = useToast();
   async function share() {
     const url = window.location.href;
     if (navigator.share) {
       try {
         await navigator.share({ title, url });
-        setMessage("Ligação partilhada.");
+        notify("Ligação partilhada.", "affirmed");
       } catch (error) {
-        if ((error as DOMException).name !== "AbortError") setMessage("Não foi possível partilhar a ligação.");
+        if ((error as DOMException).name !== "AbortError") notify("Não foi possível partilhar a ligação.", "error");
       }
       return;
     }
     try {
       await copyCurrentLink(url);
-      setMessage("Ligação copiada.");
+      notify("Ligação copiada.", "affirmed");
     } catch {
-      setMessage("Não foi possível copiar a ligação.");
+      notify("Não foi possível copiar a ligação.", "error");
     }
   }
-  return <div className="problem-share-action"><button type="button" onClick={share} aria-label={accessibleLabel} aria-describedby="problem-share-status">{icon ? <><span aria-hidden="true" className="problem-share-action-icon">{icon}</span><span className="problem-share-action-label">Partilhar</span></> : "Partilhar"}</button><span id="problem-share-status" className="visually-hidden" aria-live="polite">{message}</span></div>;
+  return <div className="problem-share-action"><button type="button" onClick={share} aria-label={accessibleLabel}>{icon ? <><span aria-hidden="true" className="problem-share-action-icon">{icon}</span><span className="problem-share-action-label">Partilhar</span></> : "Partilhar"}</button></div>;
 }

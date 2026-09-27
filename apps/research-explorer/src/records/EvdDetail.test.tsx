@@ -3,6 +3,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { EVD_AUDIT_ANCHOR_ID, EvdDetail } from "./EvdDetail";
+import { ToastProvider } from "../presentation/Toast";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { DataLoadError } from "../dataProvider/types";
 import type { EVDProblemUsesState } from "./useEvdProblemUses";
@@ -22,7 +23,7 @@ const lookup = new Map<string, RecordSummary>([
 
 function renderEvd(item: RecordDetail, overrides: Partial<{ problemUses: UsesState; onSelect: (id: string) => void; onViewAsProblem: (id: string) => void; onBackToRecords: () => void }> = {}) {
   const props = { problemUses: ready([]), onSelect: vi.fn(), onViewAsProblem: vi.fn(), onBackToRecords: vi.fn(), ...overrides };
-  const view = render(<EvdDetail detail={item} lookup={lookup} {...props} />);
+  const view = render(<ToastProvider><EvdDetail detail={item} lookup={lookup} {...props} /></ToastProvider>);
   return { ...view, ...props };
 }
 
@@ -88,6 +89,8 @@ describe.skipIf(!hasGeneratedData)("EVD Detail — canonical regression cases", 
     const download = within(auditRegion()).getByRole("link", { name: /Descarregar YAML/ });
     expect(download.getAttribute("href")).toBe("/canonical/research/evidence/EVD-000001.yaml");
     expect(download.getAttribute("download")).toBe("EVD-000001.yaml");
+    fireEvent.click(download);
+    expect(screen.getByRole("status").textContent).toBe("Transferência iniciada.");
   });
 
   it("EVD-000114 derives a different classification explanation and multiple topics from its own data", () => {

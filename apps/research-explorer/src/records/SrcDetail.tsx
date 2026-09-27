@@ -7,6 +7,7 @@ import { Breadcrumb } from "../presentation/Breadcrumb";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
+import { useToast } from "../presentation/Toast";
 import { RecordIdentifier } from "./RecordIdentifier";
 import { extractSourceCaveats, extractSourceCoverage, extractSourceDatesAccess, extractSourceLicensing, extractSourceOverview, isHttpUrl, type SourceCoverage } from "./sourceView";
 import type { SourceEvidenceRelations } from "./sourceEvidenceRelations";
@@ -459,6 +460,7 @@ function SrcLicensing({ record, readable }: { record: Record<string, unknown>; r
 }
 
 function SrcAudit({ detail, originalUrl }: { detail: RecordDetail; originalUrl: string | null }) {
+  const { notify } = useToast();
   const record = detail.record;
   const facts = extractSourceDatesAccess(record);
   const resourceType = extractSourceOverview(record).resourceType;
@@ -485,7 +487,7 @@ function SrcAudit({ detail, originalUrl }: { detail: RecordDetail; originalUrl: 
               <h4>Registo canónico</h4>
               <p className="src-audit-canonical-meta"><code>{detail.file}</code></p>
             </div>
-            <a href={canonicalFileUrl(detail.file)} download={fileName} className="src-audit-primary-cta">
+            <a href={canonicalFileUrl(detail.file)} download={fileName} className="src-audit-primary-cta" onClick={() => notify("Transferência iniciada.", "neutral")}>
               <span aria-hidden="true">↓</span>Descarregar YAML
             </a>
           </div>

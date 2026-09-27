@@ -5,6 +5,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { SRC_AUDIT_ANCHOR_ID, SrcDetail } from "./SrcDetail";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { DataLoadError } from "../dataProvider/types";
+import { ToastProvider } from "../presentation/Toast";
 import type { SourceEvidenceRelations, SourceRelatedProblem } from "./sourceEvidenceRelations";
 import type { SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
 
@@ -43,7 +44,7 @@ function renderSrc(item: RecordDetail, overrides: Partial<{ relations: Relations
     onBackToRecords: vi.fn(),
     ...overrides,
   };
-  const view = render(<SrcDetail detail={item} {...props} />);
+  const view = render(<ToastProvider><SrcDetail detail={item} {...props} /></ToastProvider>);
   return { ...view, ...props };
 }
 
@@ -167,6 +168,8 @@ describe.skipIf(!hasGeneratedData)("SRC Detail — canonical regression cases", 
     const download = within(auditRegion()).getByRole("link", { name: /Descarregar YAML/ });
     expect(download.getAttribute("href")).toBe("/canonical/research/sources/SRC-0002.yaml");
     expect(download.getAttribute("download")).toBe("SRC-0002.yaml");
+    fireEvent.click(download);
+    expect(screen.getByRole("status").textContent).toBe("Transferência iniciada.");
     expect(within(auditRegion()).getByText("research/sources/SRC-0002.yaml")).toBeTruthy();
     expect(screen.queryByText(/linhagem/)).toBeNull();
   });

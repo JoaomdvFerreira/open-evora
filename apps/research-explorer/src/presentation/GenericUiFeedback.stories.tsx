@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import "../styles/layout.css";
 import "../styles/ui.css";
+import "../styles/feedback.css";
 import { ProgressMessage } from "./ProgressMessage";
 import { ErrorNotice } from "./ErrorNotice";
 import { EmptyState } from "./EmptyState";
 import { useUnavailableNote } from "./UnavailableNote";
+import { ToastProvider, useToast, type ToastTone } from "./Toast";
+import { useEffect } from "react";
 
 /* DS-04D Slice 2B — Generic UI feedback boundary stories (ProgressMessage,
    ErrorNotice, EmptyState) plus isolated UnavailableNote coverage. Ordinary
@@ -126,6 +129,24 @@ function UnavailableNoteDemo() {
   );
 }
 
+function ToastOnMount({ message, tone }: { message: string; tone: ToastTone }) {
+  const { notify } = useToast();
+  useEffect(() => notify(message, tone), [message, notify, tone]);
+  return <StandaloneDemo heading={`Toast — ${tone}`}>A notificação aparece como uma sobreposição fixa.</StandaloneDemo>;
+}
+
+function InteractiveToastDemo() {
+  const { notify } = useToast();
+  return (
+    <StandaloneDemo heading="Toast — interação">
+      <div className="lyt-cluster">
+        <button type="button" className="ui-action-outlined" onClick={() => notify("A mesma notificação reiniciou.", "neutral")}>Repetir notificação</button>
+        <button type="button" className="ui-action-outlined" onClick={() => notify("Ocorreu um erro sintético.", "error")}>Substituir por erro</button>
+      </div>
+    </StandaloneDemo>
+  );
+}
+
 export const ProgressMessageStory: Story = {
   name: "ProgressMessage — progress",
   render: () => (
@@ -188,6 +209,27 @@ export const UnavailableNoteStory: Story = {
       <UnavailableNoteDemo />
     </StandaloneDemo>
   ),
+};
+
+export const ToastAffirmed: Story = {
+  name: "Toast — affirmed",
+  render: () => <ToastProvider><ToastOnMount message="A ação sintética foi confirmada." tone="affirmed" /></ToastProvider>,
+};
+
+export const ToastError: Story = {
+  name: "Toast — error",
+  render: () => <ToastProvider><ToastOnMount message="Não foi possível concluir a ação sintética." tone="error" /></ToastProvider>,
+};
+
+export const ToastCompact: Story = {
+  name: "Toast — compact (360px)",
+  parameters: { viewport: { defaultViewport: "reviewCompact" } },
+  render: () => <ToastProvider><ToastOnMount message="Transferência iniciada." tone="neutral" /></ToastProvider>,
+};
+
+export const ToastInteractive: Story = {
+  name: "Toast — repeated notification and dismissal",
+  render: () => <ToastProvider><InteractiveToastDemo /></ToastProvider>,
 };
 
 /* Combined comparison: all three feedback boundaries plus UnavailableNote
