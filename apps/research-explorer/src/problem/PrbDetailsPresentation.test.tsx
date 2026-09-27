@@ -1,6 +1,7 @@
 import { createRef } from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
 import { buildPrbDetailsData } from "./prbDetailsProjection";
 import type { RecordDetail } from "../dataProvider/types";
@@ -528,5 +529,109 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(screen.getByText("Ação registada.")).toBeTruthy();
     expect(screen.getByText("Sinal inicial registado.")).toBeTruthy();
     expect(screen.getByText("Verificar esta investigação")).toBeTruthy();
+  });
+});
+
+describe("PrbDetailsPresentation — audit evidence drawer", () => {
+  // jsdom has no showModal(); stand in for the native modal API so the drawer's modal path is exercised and observable.
+  const showModal = vi.fn(function (this: HTMLDialogElement) {
+    this.setAttribute("open", "");
+  });
+  beforeEach(() => {
+    showModal.mockClear();
+    Object.defineProperty(HTMLDialogElement.prototype, "showModal", { configurable: true, value: showModal });
+  });
+  afterEach(() => {
+    Reflect.deleteProperty(HTMLDialogElement.prototype, "showModal");
+  });
+
+  const evidence = () => [
+    evd("EVD-2", "Segunda observação.", ["SUPPORTS", "REFINES"], ["LOCAL_OBSERVATION"], ["Editor A"]),
+    evd("EVD-1", "Primeira observação.", ["BOUNDS"], ["EXISTING_RESPONSE", "LOCAL_OBSERVATION"]),
+  ];
+
+  function renderWithEvidence(onOpenGeneric = vi.fn()) {
+    render(<PrbDetailsPresentation data={buildPrbDetailsData(baseProjection({ title: "T" }, evidence()))} {...handlers} onOpenGeneric={onOpenGeneric} />);
+    return { trigger: screen.getByRole("button", { name: "Abrir os 2 registos" }), onOpenGeneric };
+  }
+
+  it("opens one modal drawer from Abrir os N registos, named by its visible title and carrying the truthful count", async () => {
+    const { trigger } = renderWithEvidence();
+    expect(screen.queryByRole("dialog")).toBeNull();
+    await userEvent.click(trigger);
+
+    const dialog = screen.getByRole("dialog", { name: "Registos usados neste problema" });
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    expect(showModal).toHaveBeenCalledTimes(1);
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(within(dialog).getByRole("heading", { level: 2, name: "Registos usados neste problema" })).toBeTruthy();
+    expect(within(dialog).getByText("2 registos")).toBeTruthy();
+    expect(within(dialog).getByRole("button", { name: "Fechar" })).toBeTruthy();
+  });
+
+  it("renders every evidence record in projection order with its ID, summary, effects, research roles and source references as text", async () => {
+    const { trigger } = renderWithEvidence();
+    await userEvent.click(trigger);
+    const dialog = screen.getByRole("dialog");
+
+    const rows = within(dialog).getAllByRole("listitem").filter((item) => item.classList.contains("prb-evidence-item"));
+    expect(rows.map((row) => within(row).getByRole("heading", { level: 3 }).textContent)).toEqual(["EVD-2", "EVD-1"]);
+
+    const [first, second] = rows;
+    expect(within(first).getByText("Segunda observação.")).toBeTruthy();
+    expect(within(first).getByText("Efeitos").nextElementSibling?.textContent).toBe("SustentaRefina");
+    expect(within(first).getByLabelText("Papel: Observação local")).toBeTruthy();
+    expect(within(first).getByText("Fonte").nextElementSibling?.textContent).toBe("SRC-EVD-2-0");
+    expect(within(second).getByText("Efeito").nextElementSibling?.textContent).toBe("Delimita");
+    expect(within(second).getByText("Papéis")).toBeTruthy();
+    expect(within(second).queryByText(/^Fontes?$/)).toBeNull();
+    // No invented ranking, confidence or strength.
+    expect(dialog.textContent).not.toMatch(/confiança|importância|força|relevância/i);
+  });
+
+  it("dismisses with the close button and returns focus to the opener", async () => {
+    const { trigger } = renderWithEvidence();
+    await userEvent.click(trigger);
+    await userEvent.click(screen.getByRole("button", { name: "Fechar" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it("dismisses with Escape (and the native cancel event) and returns focus to the opener", async () => {
+    const { trigger } = renderWithEvidence();
+    await userEvent.click(trigger);
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+
+    await userEvent.click(trigger);
+    fireEvent(screen.getByRole("dialog"), new Event("cancel", { cancelable: true }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it("opens the canonical EVD Record Detail through onOpenGeneric, closing the drawer without returning focus to the opener", async () => {
+    const { trigger, onOpenGeneric } = renderWithEvidence();
+    await userEvent.click(trigger);
+    const dialog = screen.getByRole("dialog");
+    // Only a row summary lives in the drawer — never the full EVD Detail.
+    expect(dialog.querySelector(".evd-detail-view")).toBeNull();
+    expect(within(dialog).queryByText("Origem e auditoria")).toBeNull();
+
+    await userEvent.click(within(dialog).getByRole("button", { name: "Abrir registo EVD-1" }));
+    expect(onOpenGeneric).toHaveBeenCalledTimes(1);
+    expect(onOpenGeneric).toHaveBeenCalledWith("EVD-1");
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).not.toBe(trigger);
+  });
+
+  it("never opens an empty drawer when the Problem links no evidence", async () => {
+    renderPrb({ title: "T" }, []);
+    const trigger = screen.getByRole("button", { name: "Abrir os 0 registos" });
+    expect(trigger).toHaveProperty("disabled", true);
+    expect(trigger.getAttribute("aria-disabled")).toBe("true");
+    await userEvent.click(trigger);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(showModal).not.toHaveBeenCalled();
   });
 });

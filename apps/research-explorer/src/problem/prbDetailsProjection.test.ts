@@ -181,4 +181,32 @@ describe("prbDetailsProjection — canonical mapping for the generic PRB Details
     expect(data.openQuestionCount).toBe(0);
     expect(data.pathStages).toEqual([]);
   });
+  it("carries every linked evidence record from projection.evidence, in its order, with ID, summary, topics, effects, roles and sources as resolved", () => {
+    const withTopicsAndNamedSource: EvidenceWithSources = {
+      detail: { id: "EVD-B", type: "EVD-", file: "", outgoingEdges: [], incomingEdges: [], record: { observation: { summary: "Observação B." }, domains: ["MOB", "ACC"] } },
+      sources: [{ id: "SRC-0002", type: "SRC-", file: "", outgoingEdges: [], incomingEdges: [], record: { name: "Plano de Desenvolvimento Social" } }],
+      effects: ["REFINES", "SUPPORTS"],
+      researchRoles: ["EXISTING_RESPONSE"],
+    };
+    const evidence = [evd("EVD-Z", "Observação Z.", ["BOUNDS"]), withTopicsAndNamedSource, evd("EVD-A", "Observação A.", [], ["LOCAL_OBSERVATION"], ["Editor"])];
+    const data = buildPrbDetailsData(problem({ title: "T" }, evidence));
+
+    expect(data.evidence.map((item) => item.id)).toEqual(["EVD-Z", "EVD-B", "EVD-A"]);
+    expect(data.evidence[1]).toEqual({
+      id: "EVD-B",
+      summary: "Observação B.",
+      topics: ["MOB", "ACC"],
+      effects: ["REFINES", "SUPPORTS"],
+      researchRoles: ["EXISTING_RESPONSE"],
+      sources: [{ id: "SRC-0002", name: "Plano de Desenvolvimento Social" }],
+    });
+    // Unavailable fields stay empty/null — no fallback meaning is invented.
+    expect(data.evidence[2]).toEqual({ id: "EVD-A", summary: "Observação A.", topics: [], effects: [], researchRoles: ["LOCAL_OBSERVATION"], sources: [{ id: "SRC-0", name: null }] });
+    expect(data.evidence.length).toBe(data.evidenceRecordCount);
+  });
+
+  it("omits an unauthored observation summary rather than substituting other text", () => {
+    const bare: EvidenceWithSources = { detail: { id: "EVD-1", type: "EVD-", file: "", outgoingEdges: [], incomingEdges: [], record: {} }, sources: [] };
+    expect(buildPrbDetailsData(problem({ title: "T" }, [bare])).evidence).toEqual([{ id: "EVD-1", summary: null, topics: [], effects: [], researchRoles: [], sources: [] }]);
+  });
 });

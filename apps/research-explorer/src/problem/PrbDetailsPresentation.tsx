@@ -1,11 +1,13 @@
-import { useSyncExternalStore, type ReactNode, type RefObject } from "react";
+import { useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
 import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { RecordIdentifier } from "../records/RecordIdentifier";
 import { validationVisual } from "./stateVisuals";
 import { PrbHeader, PrbIdentityHeader } from "./PrbPageHeader";
 import { formatPublicCount, publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
-import type { PrbDetailsData, PrbOpenQuestion, PrbPathStage } from "./prbDetailsProjection";
+import { Drawer } from "../presentation/Drawer";
+import { describeTopic } from "../presentation/topicMapping";
+import type { PrbDetailsData, PrbEvidenceItem, PrbOpenQuestion, PrbPathStage } from "./prbDetailsProjection";
 
 /**
  * Generic public PRB Details full-page composition.
@@ -382,12 +384,15 @@ function PrbPathSection({ stages }: { stages: PrbPathStage[] }) {
  * illustrative examples of the approved copy, not the full vocabulary;
  * "Ler o método" routes to the fuller methodology), and Dossiê canónico (a
  * disabled placeholder CTA only — PDF generation itself is out of scope).
- * No per-evidence metadata is rendered here. "Abrir os N registos" is kept
- * non-destructive/explicit here: it does not route to the PRB generic-detail
- * record merely because that callback already exists, since the real
- * all-evidence interaction contract is not yet decided.
+ * No per-evidence metadata is rendered in the page itself: "Abrir os N
+ * registos" opens PrbEvidenceDrawer in place (no URL change, navigation or
+ * data load), and stays disabled when the PRB links no evidence so an empty
+ * drawer can never open.
  */
-function PrbAuditSection({ data }: { data: PrbDetailsData }) {
+function PrbAuditSection({ data, onOpenGeneric }: { data: PrbDetailsData; onOpenGeneric: (id: string) => void }) {
+  const [evidenceDrawerOpen, setEvidenceDrawerOpen] = useState(false);
+  const openRecordsRef = useRef<HTMLButtonElement>(null);
+  const hasEvidence = data.evidence.length > 0;
   return (
     <section id="prb-auditoria" aria-labelledby="prb-auditoria-heading" className="prb-section prb-audit-section">
       <div className="shell-frame shell-frame--wide prb-section-frame">
@@ -430,16 +435,29 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
                 )}
               </div>
             </div>
-            {/* The real all-evidence interaction (e.g. a filtered Records
-                view scoped to this PRB) is not yet decided — this must not
-                route to the PRB's own generic-detail record merely because
-                `onOpenGeneric` already exists for that unrelated purpose, so
-                the action stays explicitly disabled rather than wired to a
-                semantically wrong destination. */}
-            <button type="button" className="prb-audit-open-records" disabled aria-disabled="true">
+            <button
+              ref={openRecordsRef}
+              type="button"
+              className="prb-audit-open-records"
+              disabled={!hasEvidence}
+              aria-disabled={hasEvidence ? undefined : "true"}
+              aria-haspopup="dialog"
+              onClick={() => setEvidenceDrawerOpen(true)}
+            >
               Abrir os {formatPublicCount(data.evidenceRecordCount)} registos
             </button>
           </div>
+          {evidenceDrawerOpen && hasEvidence && (
+            <PrbEvidenceDrawer
+              evidence={data.evidence}
+              returnFocusRef={openRecordsRef}
+              onDismiss={() => setEvidenceDrawerOpen(false)}
+              onOpenRecord={(id) => {
+                setEvidenceDrawerOpen(false);
+                onOpenGeneric(id);
+              }}
+            />
+          )}
 
           <div className="prb-audit-row">
             <div>
@@ -509,6 +527,96 @@ function PrbAuditSection({ data }: { data: PrbDetailsData }) {
   );
 }
 
+/**
+ * One linked evidence record inside the audit drawer: canonical ID, topics,
+ * the PRB→EVD effects and research roles in authored order, the observation
+ * summary and resolved source references — each omitted when unavailable.
+ * The primary action opens the canonical EVD Record Detail; the full EVD
+ * Detail is never rendered here, and no confidence, importance or ranking
+ * is shown.
+ */
+function PrbEvidenceRow({ item, onOpenRecord }: { item: PrbEvidenceItem; onOpenRecord: (id: string) => void }) {
+  return (
+    <li className="prb-evidence-item">
+      <h3 className="prb-evidence-item-id">
+        <RecordIdentifier variant="text" density="compact" id={item.id} />
+      </h3>
+      {item.topics.length > 0 && <p className="prb-evidence-item-topics">{item.topics.map((code) => describeTopic(code).label).join(" · ")}</p>}
+      {item.summary && <p className="prb-evidence-item-summary">{item.summary}</p>}
+      {(item.effects.length > 0 || item.researchRoles.length > 0 || item.sources.length > 0) && (
+        <dl className="prb-evidence-item-facts">
+          {item.effects.length > 0 && (
+            <div>
+              <dt>{item.effects.length === 1 ? "Efeito" : "Efeitos"}</dt>
+              <dd>
+                {item.effects.map((effect, index) => (
+                  <PrbEffectLabel key={`${effect}-${index}`} effect={effect} />
+                ))}
+              </dd>
+            </div>
+          )}
+          {item.researchRoles.length > 0 && (
+            <div>
+              <dt>{item.researchRoles.length === 1 ? "Papel" : "Papéis"}</dt>
+              <dd>
+                {item.researchRoles.map((role, index) => (
+                  <ResearchRoleTag key={`${role}-${index}`} role={role} variant="compact" />
+                ))}
+              </dd>
+            </div>
+          )}
+          {item.sources.length > 0 && (
+            <div>
+              <dt>{item.sources.length === 1 ? "Fonte" : "Fontes"}</dt>
+              <dd>
+                <ul className="prb-evidence-item-sources">
+                  {item.sources.map((source) => (
+                    <li key={source.id}>
+                      <RecordIdentifier variant="text" density="compact" id={source.id} />
+                      {source.name && <span className="prb-evidence-item-source-name">{source.name}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          )}
+        </dl>
+      )}
+      <button type="button" className="prb-evidence-item-open" aria-label={`Abrir registo ${item.id}`} onClick={() => onOpenRecord(item.id)}>
+        Abrir registo →
+      </button>
+    </li>
+  );
+}
+
+/** "Registos usados neste problema" — every linked evidence record, in `projection.evidence` order, inside the generic modal Drawer. */
+function PrbEvidenceDrawer({
+  evidence,
+  returnFocusRef,
+  onDismiss,
+  onOpenRecord,
+}: {
+  evidence: PrbEvidenceItem[];
+  returnFocusRef: RefObject<HTMLButtonElement>;
+  onDismiss: () => void;
+  onOpenRecord: (id: string) => void;
+}) {
+  return (
+    <Drawer
+      title="Registos usados neste problema"
+      description={`${formatPublicCount(evidence.length)} ${evidence.length === 1 ? "registo" : "registos"}`}
+      returnFocusRef={returnFocusRef}
+      onDismiss={onDismiss}
+    >
+      <ul className="prb-evidence-list">
+        {evidence.map((item) => (
+          <PrbEvidenceRow key={item.id} item={item} onOpenRecord={onOpenRecord} />
+        ))}
+      </ul>
+    </Drawer>
+  );
+}
+
 export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, onViewHistory, titleRef }: PrbDetailsPresentationProps) {
   return (
     <article aria-labelledby="prb-identity-title" className="prb-details-view">
@@ -526,7 +634,7 @@ export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, 
       </div>
 
       <PrbPathSection stages={data.pathStages} />
-      <PrbAuditSection data={data} />
+      <PrbAuditSection data={data} onOpenGeneric={onOpenGeneric} />
     </article>
   );
 }

@@ -1,0 +1,139 @@
+/* Generic modal Drawer (presentation/Drawer.tsx) — a native <dialog> opened
+   with showModal(). Right-side, bounded-width, viewport-height panel at
+   >=768; full-screen at <=767. The header stays fixed while the body scrolls,
+   so the close control is always reachable. Callers own their content
+   styling. */
+
+.ui-drawer {
+  box-sizing: border-box;
+  width: min(34rem, 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0 0 0 auto;
+  border: 0;
+  border-left: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  padding: 0;
+  background: var(--color-surface-reading);
+  color: var(--color-ink-primary);
+  overflow: hidden;
+}
+
+/* --p-color-ink-90 at 32%, written out: ::backdrop does not inherit custom
+   properties in every supported browser. */
+.ui-drawer::backdrop {
+  background: oklch(22% 0.01 60 / 0.32);
+}
+
+/* The page behind a modal drawer does not scroll under it. */
+html:has(.ui-drawer[open]) {
+  overflow: hidden;
+}
+
+.ui-drawer-panel {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ui-drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-standard);
+  flex: none;
+  padding: var(--space-loose) var(--space-loose) var(--space-standard);
+  border-bottom: var(--p-border-width-hairline) solid var(--color-separator-standard);
+  background: var(--color-surface-subtle);
+}
+
+.ui-drawer-heading {
+  min-width: 0;
+}
+
+.ui-drawer-title {
+  margin: 0;
+  font-family: var(--font-reading);
+  font-size: var(--text-reading-h2-size);
+  font-weight: var(--text-reading-h2-weight);
+  line-height: var(--text-reading-h2-line-height);
+  overflow-wrap: anywhere;
+}
+
+.ui-drawer-description {
+  margin: var(--p-space-1) 0 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--text-interface-body-size);
+  line-height: var(--text-interface-body-line-height);
+}
+
+.ui-drawer-close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--target-min);
+  height: var(--target-min);
+  margin: calc(-1 * var(--space-tight)) calc(-1 * var(--space-tight)) 0 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  padding: 0;
+  background: transparent;
+  color: var(--color-ink-primary);
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
+.ui-drawer-close:hover {
+  background: var(--color-surface-raised);
+}
+
+.ui-drawer-close:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.ui-drawer-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-loose);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ui-drawer[open] {
+    animation: ui-drawer-enter 180ms ease-out;
+  }
+}
+
+@keyframes ui-drawer-enter {
+  from {
+    transform: translateX(1.5rem);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .ui-drawer {
+    width: 100vw;
+    border-left: 0;
+  }
+
+  .ui-drawer-header {
+    padding: var(--space-standard);
+  }
+
+  .ui-drawer-body {
+    padding: var(--space-standard);
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-drawer {
+    border: 1px solid CanvasText;
+  }
+}
