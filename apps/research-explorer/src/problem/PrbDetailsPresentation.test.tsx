@@ -237,6 +237,15 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     ]);
   });
 
+  it("links the open-question contribution prompt to an evidence contribution for the current Problem", () => {
+    renderPrb({ title: "T", investigation: { open_questions: [{ question: "Questão?" }] } });
+    const link = screen.getByRole("link", { name: "Contribuir para a investigação →" });
+    const href = new URL(link.getAttribute("href") ?? "", "https://example.test");
+    expect(href.pathname).toBe("/contact");
+    expect(href.searchParams.get("type")).toBe("evidence");
+    expect(href.searchParams.get("prb")).toBe("PRB-9999");
+  });
+
   it("omits each open-question block whose canonical field is absent, never a fallback", () => {
     const record = {
       title: "T",

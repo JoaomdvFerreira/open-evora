@@ -86,7 +86,9 @@ describe("ExplorerHeader — compact menu disclosure", () => {
     expect(screen.getAllByRole("link", { name: "Método", hidden: true })).toHaveLength(1);
     expect(screen.getAllByRole("button", { name: "Registos", hidden: true })).toHaveLength(1);
     expect(screen.getAllByRole("link", { name: "Sobre", hidden: true })).toHaveLength(1);
-    expect(screen.getAllByRole("link", { name: "Contribuir com evidência", hidden: true })).toHaveLength(1);
+    const contribute = screen.getAllByRole("link", { name: "Contribuir para a investigação", hidden: true });
+    expect(contribute).toHaveLength(1);
+    expect(contribute[0].getAttribute("href")).toBe("/contact");
   });
 
   it("nav actions still invoke the same callbacks/routing once the menu is open — no duplicated business logic", async () => {

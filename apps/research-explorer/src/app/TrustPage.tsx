@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import { ContributionForm } from "./ContributionForm";
 import { ExplorerHeader } from "./ExplorerHeader";
 
 const GITHUB_ISSUES_URL = "https://github.com/JoaomdvFerreira/open-evora/issues";
@@ -114,6 +115,17 @@ const TRUST_PAGES: Record<TrustPagePath, TrustPageContent> = {
       ]} />
       <p className="info-notice" role="note"><strong>Atenção:</strong> Evite publicar dados pessoais ou informação sensível num issue público.</p>
       <InfoAction href={GITHUB_ISSUES_URL}>Abrir issue no GitHub</InfoAction>
+      <InfoSection id="contact-contribute" title="Contribuir para a investigação">
+        <p>Pode sugerir um problema para investigação ou contribuir com informação ou evidência para um problema existente.</p>
+        <ul className="info-guidance">
+          <li>Seja factual e específico.</li>
+          <li>Indique o local e a data, quando aplicável.</li>
+          <li>Inclua uma fonte ou ligação, quando disponível.</li>
+          <li>Não inclua dados pessoais nem informação sensível.</li>
+        </ul>
+        <p>A contribuição é enviada através de um <strong>issue público no GitHub</strong>: o formulário prepara o issue e o envio é concluído no GitHub.</p>
+        <ContributionForm />
+      </InfoSection>
     </>,
   },
   "/privacy": {

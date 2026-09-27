@@ -322,7 +322,7 @@ function OpenQuestionItem({ index, item, stacked, onOpenGeneric }: { index: numb
   );
 }
 
-function PrbOpenQuestionsSection({ questions, onOpenGeneric }: { questions: PrbOpenQuestion[]; onOpenGeneric: (id: string) => void }) {
+function PrbOpenQuestionsSection({ problemId, questions, onOpenGeneric }: { problemId: string; questions: PrbOpenQuestion[]; onOpenGeneric: (id: string) => void }) {
   const stacked = useOpenQuestionStacks();
   if (questions.length === 0) return null;
   return (
@@ -337,7 +337,7 @@ function PrbOpenQuestionsSection({ questions, onOpenGeneric }: { questions: PrbO
         ))}
       </ul>
       <p className="prb-contribute-prompt">
-        Tem informação ou documentação sobre uma destas questões? <a href="/contact">Contribuir com evidência →</a>
+        Tem informação ou documentação sobre uma destas questões? <a href={`/contact?${new URLSearchParams({ type: "evidence", prb: problemId })}`}>Contribuir para a investigação →</a>
       </p>
     </PrbSection>
   );
@@ -522,7 +522,7 @@ export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, 
 
       <div className="shell-frame shell-frame--wide prb-details-frame">
         <PrbCurrentReadingSection causalReading={data.causalReading} />
-        <PrbOpenQuestionsSection questions={data.openQuestions} onOpenGeneric={onOpenGeneric} />
+        <PrbOpenQuestionsSection problemId={data.problemId} questions={data.openQuestions} onOpenGeneric={onOpenGeneric} />
       </div>
 
       <PrbPathSection stages={data.pathStages} />

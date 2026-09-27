@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import "../index.css";
 import "../styles/logo.css";
 import "../styles/information.css";
+import "../styles/feedback.css";
+import { ToastProvider } from "../presentation/Toast";
 import { PublicFooter, TrustPage, trustPageForPath } from "./TrustPage";
 
 const meta = { title: "Public/Informação" } satisfies Meta;
@@ -13,12 +15,14 @@ type InformationPath = "/about" | "/methodology" | "/corrections" | "/contact" |
 /**
  * Full-page review surface: the production TrustPage (global header, local
  * INFORMAÇÃO navigation, page content, previous/next) inside the same
- * `main.explorer-shell` App.tsx renders, followed by the shared PublicFooter.
+ * `main.explorer-shell` App.tsx renders, followed by the shared PublicFooter,
+ * inside the ToastProvider main.tsx supplies (Contacto's contribution form
+ * reports its GitHub handoff through it).
  */
 function InformationShell({ path }: { path: InformationPath }) {
   const page = trustPageForPath(path);
   if (!page) throw new Error(`Missing Information page for ${path}`);
-  return <><main className="explorer-shell"><TrustPage page={page} /></main><PublicFooter /></>;
+  return <ToastProvider><main className="explorer-shell"><TrustPage page={page} /></main><PublicFooter /></ToastProvider>;
 }
 
 const desktop = { viewport: { value: "reviewDesktop" } };
@@ -29,10 +33,12 @@ export const Correcoes1440: Story = { name: "Correções — 1440 desktop", glob
 export const Contacto1440: Story = { name: "Contacto — 1440 desktop", globals: desktop, render: () => <InformationShell path="/contact" /> };
 export const Privacidade1440: Story = { name: "Privacidade — 1440 desktop", globals: desktop, render: () => <InformationShell path="/privacy" /> };
 
-/* The shell is shared, so Sobre carries the responsive review; Privacidade at
-   360 additionally shows the strip scrolled to its last (current) item. */
+/* The shell is shared, so Sobre carries the responsive review; Contacto at 360
+   reviews the stacked contribution form; Privacidade at 360 additionally
+   shows the strip scrolled to its last (current) item. */
 
 export const Sobre1024: Story = { name: "Sobre — 1024 desktop-fit", globals: { viewport: { value: "reviewDesktopFit" } }, render: () => <InformationShell path="/about" /> };
 export const Sobre768: Story = { name: "Sobre — 768 boundary", globals: { viewport: { value: "reviewBoundary" } }, render: () => <InformationShell path="/about" /> };
 export const Sobre360: Story = { name: "Sobre — 360 compact", globals: { viewport: { value: "reviewCompact" } }, render: () => <InformationShell path="/about" /> };
+export const Contacto360: Story = { name: "Contacto — 360 compact", globals: { viewport: { value: "reviewCompact" } }, render: () => <InformationShell path="/contact" /> };
 export const Privacidade360: Story = { name: "Privacidade — 360 compact", globals: { viewport: { value: "reviewCompact" } }, render: () => <InformationShell path="/privacy" /> };

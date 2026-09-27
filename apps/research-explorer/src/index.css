@@ -1918,7 +1918,7 @@ main.explorer-shell {
    radius/shadow/border — never a card, only the explicit 67px minimum
    height below (owner request). Renders whenever there is at least one
    visible result (never only when paginated), so its status text and
-   `Propor um problema` CTA are always available together at the end of
+   `Contribuir para a investigação` CTA are always available together at the end of
    the list. */
 .overview-end-of-results {
   box-sizing: border-box;
@@ -1978,13 +1978,13 @@ main.explorer-shell {
   cursor: not-allowed;
 }
 
-/* `Propor um problema` (Overview final redesign, Phase 3A, §3) — matches
-   `.explorer-cta`'s (`Contribuir com evidência`) restrained clay/dark-clay
+/* Overview `Contribuir para a investigação` (Overview final redesign, Phase 3A, §3) — matches
+   the header `.explorer-cta`'s restrained clay/dark-clay
    treatment exactly (owner request): identical padding, border, colour,
    line-height, hover fill, and focus outline — no min-height, padding plus
    the shared line-height alone set the density, precisely as `.explorer-
-   cta` does. Still a normal navigation link to the existing `/contact`
-   route — no button semantics, no modal, no form. */
+   cta` does. Still a normal navigation link to the `/contact` contribution
+   form — no button semantics, no modal. */
 .overview-propose-problem {
   display: inline-flex;
   align-items: center;
@@ -3094,6 +3094,20 @@ body:has(.public-overview) .public-footer {
 
   .public-footer-group {
     min-width: 7rem;
+  }
+}
+
+/* Narrow desktop band: the wordmark, nav and the `Contribuir para a
+   investigação` CTA only fit one unwrapped row on the frame from ~880px, so
+   just above the compact boundary the nav/CTA spacing tightens instead of
+   the wordmark wrapping or the CTA crossing the frame edge. */
+@media (min-width: 768px) and (max-width: 879px) {
+  .explorer-chrome-menu {
+    gap: var(--space-standard);
+  }
+
+  .explorer-navigation .explorer-navigation-action {
+    padding-inline: 0.35rem;
   }
 }
 
