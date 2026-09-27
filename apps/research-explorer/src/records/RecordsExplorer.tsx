@@ -3,7 +3,7 @@ import type { DataProvider } from "../dataProvider/types";
 import { useRecordIndex } from "./useRecordIndex";
 import { RecordsTable } from "./RecordsTable";
 import { RecordDetailPanel } from "./RecordDetailPanel";
-import { ProgressMessage } from "../presentation/ProgressMessage";
+import { RecordsSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { initialRecordsControllerState, recordsControllerReducer } from "./recordsController";
 
@@ -76,7 +76,7 @@ export function RecordsExplorer({
   }, [query, typeFilter]);
 
   if (indexState.status === "loading") {
-    return <div className="shell-frame"><ProgressMessage message="A carregar registos…" /></div>;
+    return <RecordsSkeleton />;
   }
 
   if (indexState.status === "error") {

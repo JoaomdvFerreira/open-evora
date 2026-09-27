@@ -35,6 +35,18 @@ function makeProvider(index: RecordSummary[]): DataProvider {
 
 const props = { onExploreProblem: vi.fn() };
 
+it("uses the Overview macro-layout skeleton while the index loads", () => {
+  const pending: DataProvider = {
+    getManifest: async () => { throw new Error("unused"); },
+    listRecords: () => new Promise<RecordSummary[]>(() => {}),
+    getEdges: async () => [],
+    getRecord: async () => { throw new Error("unused"); },
+  };
+  render(<OverviewFixture dataProvider={pending} onExploreProblem={vi.fn()} />);
+  expect(screen.getByTestId("overview-skeleton")).toBeTruthy();
+  expect(screen.getAllByRole("status")).toHaveLength(1);
+});
+
 /**
  * F03: production lifts Overview's discovery state to Explorer
  * (`useOverviewDiscoveryState`) so it survives Overview's own unmount/remount

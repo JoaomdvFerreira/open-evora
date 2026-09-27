@@ -6,7 +6,7 @@ import { RecordsExplorer } from "../records/RecordsExplorer";
 import { ProblemView } from "../problem/ProblemView";
 import { ProblemHistoryView } from "../problem/ProblemHistoryView";
 import { ReadingGuide } from "../guide/ReadingGuide";
-import { ProgressMessage } from "../presentation/ProgressMessage";
+import { GraphSkeleton } from "../loading/LoadingSkeletons";
 import { ExplorerHeader } from "./ExplorerHeader";
 import { formatPublicCount, formatPublicDateTime } from "../presentation/presentation";
 import { SKIP_TARGET_ID } from "./skipTarget";
@@ -18,6 +18,11 @@ import { SKIP_TARGET_ID } from "./skipTarget";
 // Graph view is opened. Measured: ~17 KB gzip moved out of the initial chunk
 // into its own lazy chunk by this change alone (see RE-05 closure report).
 const GraphExplorer = lazy(() => import("../graph/GraphExplorer").then((m) => ({ default: m.GraphExplorer })));
+
+/** Shared Graph-shaped fallback used by the lazy module boundary. */
+export function GraphLoadingFallback() {
+  return <GraphSkeleton message="A carregar o grafo…" />;
+}
 
 /**
  * Views whose content has no terminal band of its own before the public
@@ -134,7 +139,7 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
       )}
 
       {url.state.view === "graph" && (
-        <Suspense fallback={<div className="shell-frame"><ProgressMessage message="A carregar o grafo…" /></div>}>
+        <Suspense fallback={<GraphLoadingFallback />}>
           <GraphExplorer
             dataProvider={dataProvider}
             focusId={url.state.selectedId}

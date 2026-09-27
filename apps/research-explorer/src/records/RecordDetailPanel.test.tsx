@@ -34,6 +34,17 @@ const renderDetail = (detail = evd, onSelect = vi.fn(), onViewAsProblem = vi.fn(
 };
 
 describe("RecordDetailPanel vNext", () => {
+  it.each([
+    ["EVD-1", "evd-detail-skeleton"],
+    ["SRC-1", "src-detail-skeleton"],
+    ["PRB-1", "generic-detail-skeleton"],
+  ])("uses the prefix-specific loading composition for %s", (selectedId, testId) => {
+    const pending: DataProvider = { ...provider, getRecord: () => new Promise<RecordDetail>(() => {}) };
+    render(<RecordDetailPanel dataProvider={pending} lookup={lookup} selectedId={selectedId} onBackToRecords={vi.fn()} onSelect={vi.fn()} onViewAsProblem={vi.fn()} onViewInGraph={vi.fn()} />);
+    expect(screen.getByTestId(testId)).toBeTruthy();
+    expect(screen.getAllByRole("status")).toHaveLength(1);
+  });
+
   it("renders EVD as its own public page, without the generic reading rail", async () => {
     renderDetail();
     expect(await screen.findByRole("heading", { level: 1, name: "Observação delimitada." })).toBeTruthy();

@@ -231,6 +231,7 @@ describe("SRC Detail — relation state", () => {
   it("shows loading in findings and the Observações cell, and no summary or investigation section yet", () => {
     const { container } = renderSrc(src, { lookup, relations: { status: "loading", id: "SRC-1", retry: vi.fn() } });
     expect(screen.getByText("A carregar observações da investigação…")).toBeTruthy();
+    expect(screen.getByTestId("relation-skeleton")).toBeTruthy();
     expect(container.querySelector(".src-meta-cell--usage dd [aria-label='A carregar']")).toBeTruthy();
     expect(container.querySelector(".src-hero-summary")).toBeNull();
     expect(screen.queryByRole("region", { name: "Na investigação" })).toBeNull();

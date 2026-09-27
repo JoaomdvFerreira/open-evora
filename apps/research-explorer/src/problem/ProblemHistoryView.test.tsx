@@ -67,6 +67,20 @@ const props = {
 /** Retired Problem View presentation classes Histórico must no longer render through. */
 const RETIRED_PROBLEM_VIEW = ".problem-view, .problem-section, .open-question-list, .open-question-item, .problem-current-state-list";
 
+it("uses the History skeleton for both index and record loading", async () => {
+  const pendingIndex = { ...provider(), listRecords: () => new Promise<RecordSummary[]>(() => {}) };
+  const first = render(<ProblemHistoryView {...props} dataProvider={pendingIndex} problemId="PRB-0003" />);
+  expect(screen.getByTestId("prb-history-skeleton")).toBeTruthy();
+  expect(screen.getAllByRole("status")).toHaveLength(1);
+  first.unmount();
+
+  const pendingDetail = { ...provider(), getRecord: () => new Promise<RecordDetail>(() => {}) };
+  render(<ProblemHistoryView {...props} dataProvider={pendingDetail} problemId="PRB-0003" />);
+  expect(await screen.findByText("A carregar histórico de PRB-0003…")).toBeTruthy();
+  expect(screen.getByTestId("prb-history-skeleton")).toBeTruthy();
+  expect(screen.getAllByRole("status")).toHaveLength(1);
+});
+
 describe("ProblemHistoryView — composition", () => {
   it("renders the dedicated PRB Histórico composition, not the retired Problem View presentation", async () => {
     render(<ProblemHistoryView {...props} problemId="PRB-0003" />);

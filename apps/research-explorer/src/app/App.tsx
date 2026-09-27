@@ -3,7 +3,7 @@ import type { DataProvider } from "../dataProvider/types";
 import { StaticDataProvider } from "../dataProvider/StaticDataProvider";
 import { loadExplorerStartupState, type ExplorerStartupState } from "./startup";
 import { Explorer } from "./Explorer";
-import { ProgressMessage } from "../presentation/ProgressMessage";
+import { AppSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { PublicFooter, TrustPage, trustPageForPath } from "./TrustPage";
 import { SKIP_TARGET_ID } from "./skipTarget";
@@ -47,11 +47,7 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
       </a>
       <main id="main-content" className="explorer-shell">
         {trustPage ? <TrustPage page={trustPage} skipTargetId={SKIP_TARGET_ID} /> : <>
-        {state.status === "loading" && (
-          <div id={SKIP_TARGET_ID} tabIndex={-1} className="shell-frame">
-            <ProgressMessage message="A carregar modelo de leitura gerado…" />
-          </div>
-        )}
+        {state.status === "loading" && <div id={SKIP_TARGET_ID} tabIndex={-1}><AppSkeleton /></div>}
 
         {state.status === "error" && (
           <div className="shell-frame">

@@ -17,7 +17,7 @@ import {
   type MaterialChangeEntry,
   type ProblemSortOrder,
 } from "./overviewStats";
-import { ProgressMessage } from "../presentation/ProgressMessage";
+import { OverviewSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { OverviewPresentation } from "./OverviewPresentation";
 
@@ -279,7 +279,7 @@ export function Overview({
   const paginatedProblems = visibleProblems === null ? null : paginateProblems(visibleProblems, currentPage);
 
   if (indexState.status === "loading") {
-    return <div className="shell-frame shell-frame--wide"><ProgressMessage message="A carregar visão geral…" /></div>;
+    return <OverviewSkeleton />;
   }
 
   if (indexState.status === "error") {

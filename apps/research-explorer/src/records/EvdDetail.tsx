@@ -4,7 +4,7 @@ import { canonicalFileUrl } from "../dataProvider/StaticDataProvider";
 import { formatPublicCompactDate, formatPublicCount, formatPublicDate, formatPublicPartialDate, publicEnumExplanation, publicEnumLabel } from "../presentation/presentation";
 import { describeTopic } from "../presentation/topicMapping";
 import { Breadcrumb } from "../presentation/Breadcrumb";
-import { ProgressMessage } from "../presentation/ProgressMessage";
+import { RelationSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
 import { ShareAction } from "../problem/ShareAction";
@@ -225,7 +225,7 @@ function EvdUses({ state, onViewAsProblem }: { state: ProblemUsesState; onViewAs
   return (
     <EvdSection id="evd-investigation" label="Como é usada" note={usesNote(state)}>
       {state.status === "loading" || state.status === "idle" ? (
-        <ProgressMessage message="A carregar usos nos Problemas…" />
+        <RelationSkeleton message="A carregar usos nos Problemas…" />
       ) : state.status === "error" ? (
         <ErrorNotice title="Não foi possível carregar os usos desta evidência nos Problemas." message="" action={<button type="button" onClick={state.retry}>Tentar novamente</button>} />
       ) : state.uses.length === 0 ? (

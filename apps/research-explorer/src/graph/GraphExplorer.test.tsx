@@ -40,6 +40,13 @@ function fakeProvider(): DataProvider {
 // information (RE-04 accessibility requirement).
 
 describe("GraphExplorer", () => {
+  it("uses the Graph skeleton while graph data loads", () => {
+    const pending = { ...fakeProvider(), listRecords: () => new Promise<RecordSummary[]>(() => {}) };
+    render(<GraphExplorer dataProvider={pending} focusId={null} depth={1} onFocusChange={vi.fn()} onClearFocus={vi.fn()} onDepthChange={vi.fn()} onOpenGeneric={vi.fn()} onViewAsProblem={vi.fn()} />);
+    expect(screen.getByTestId("graph-skeleton")).toBeTruthy();
+    expect(screen.getAllByRole("status")).toHaveLength(1);
+  });
+
   it("prompts for a record to focus before rendering any neighbourhood", async () => {
     render(
       <GraphExplorer

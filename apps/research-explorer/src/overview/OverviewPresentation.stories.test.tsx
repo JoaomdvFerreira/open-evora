@@ -36,3 +36,14 @@ describe("Overview/Full composition story shell", () => {
     expect(main?.contains(footer)).toBe(false);
   });
 });
+
+describe("Overview second-stage loading", () => {
+  it("keeps the ready Overview chrome and replaces only the Problem results", () => {
+    const Story = composed.ProblemsLoading;
+    render(<Story />);
+    expect(screen.getByRole("heading", { level: 2, name: "Visão geral" })).toBeTruthy();
+    expect(screen.getByTestId("overview-results-skeleton")).toBeTruthy();
+    expect(screen.queryByTestId("overview-skeleton")).toBeNull();
+    expect(screen.getAllByRole("status")).toHaveLength(1);
+  });
+});

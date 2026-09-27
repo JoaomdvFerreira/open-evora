@@ -70,6 +70,7 @@ import "./styles/information.css";
 // strip, editorial sections and the terminal Origem e auditoria band.
 import "./styles/evd-detail.css";
 import "./styles/src-detail.css";
+import "./styles/skeleton.css";
 import { ToastProvider } from "./presentation/Toast";
 
 const container = document.getElementById("root");
