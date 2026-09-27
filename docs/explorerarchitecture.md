@@ -82,7 +82,7 @@ The semantics of the PRB fields it presents (`problem_statement`, `causal_readin
 
 The page title uses the page-composition heading level consistent with the global Explorer heading hierarchy.
 
-Canonical content that belongs only to the earlier Problem presentation (for example the per-Evidence list, decision-basis prose, recent-history summary, and affected-populations blocks) is not foreground content in `Detalhes`. It remains in the corpus and inspectable through generic Record Detail in Records; it must not be re-added to `Detalhes` without an owner decision. A bulk "open the N records" action from the audit layer is not implemented.
+Canonical content that belongs only to the earlier Problem presentation (for example the per-Evidence list, decision-basis prose, recent-history summary, and affected-populations blocks) is not foreground content in `Detalhes`. It remains in the corpus and inspectable through generic Record Detail in Records; it must not be re-added to `Detalhes` without an owner decision. The audit layer's "open the N records" action opens an on-demand modal drawer listing every Evidence record linked by the resolved Problem projection, in projection order and without ranking; each entry opens generic EVD Record Detail. The drawer changes no URL, loads no data, and is not a Problem-local view.
 
 ### 3.3 `Histórico`
 

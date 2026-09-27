@@ -137,6 +137,43 @@ export function effectTally(evidence: EvidenceWithSources[]): PrbEffectTally[] {
   return [...counts.entries()].map(([value, count]) => ({ value, count }));
 }
 
+export interface PrbEvidenceSourceRef {
+  id: string;
+  /** Canonical SRC `name`, when authored. */
+  name: string | null;
+}
+
+/**
+ * One linked EVD as used by this PRB: the EVD's own canonical fields plus the
+ * PRB→EVD relationship's authored `effects`/`research_roles`. Carries only
+ * resolved canonical values — no confidence, importance or ranking.
+ */
+export interface PrbEvidenceItem {
+  id: string;
+  /** Canonical `observation.summary`, when authored. */
+  summary: string | null;
+  /** Canonical EVD `domains` codes, in authored order. */
+  topics: string[];
+  effects: string[];
+  researchRoles: string[];
+  sources: PrbEvidenceSourceRef[];
+}
+
+/** Maps `projection.evidence` one-to-one, preserving its order — the sole PRB→EVD authority; nothing is re-fetched, filtered or sorted here. */
+export function evidenceItems(evidence: EvidenceWithSources[]): PrbEvidenceItem[] {
+  return evidence.map((item) => {
+    const observation = recordValue(item.detail.record.observation);
+    return {
+      id: item.detail.id,
+      summary: observation ? fieldValue(observation, "summary") : null,
+      topics: stringValues(item.detail.record.domains),
+      effects: item.effects ?? [],
+      researchRoles: item.researchRoles ?? [],
+      sources: item.sources.map((source) => ({ id: source.id, name: fieldValue(source.record, "name") })),
+    };
+  });
+}
+
 /**
  * The shared public PRB identity (local header + editorial hero) rendered by
  * both PRB views — Detalhes (PrbDetailsPresentation.tsx) and Histórico
@@ -175,6 +212,8 @@ export interface PrbDetailsData extends PrbIdentityData {
   effectTally: PrbEffectTally[];
   openQuestions: PrbOpenQuestion[];
   pathStages: PrbPathStage[];
+  /** Every linked evidence record, in `projection.evidence` order — the audit drawer's content. */
+  evidence: PrbEvidenceItem[];
 }
 
 /**
@@ -200,5 +239,6 @@ export function buildPrbDetailsData(projection: ProblemProjection): PrbDetailsDa
     effectTally: effectTally(projection.evidence),
     openQuestions: openQuestions(record),
     pathStages: investigationPathStages(record),
+    evidence: evidenceItems(projection.evidence),
   };
 }

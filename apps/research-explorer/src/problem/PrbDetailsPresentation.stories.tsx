@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { userEvent, within } from "storybook/test";
 import "../index.css";
 import "../styles/reading-layout.css";
 import "../styles/inline-label.css";
@@ -11,6 +12,7 @@ import "../styles/surface-inset.css";
 import "../styles/section-index.css";
 import "../styles/topic.css";
 import "../styles/prb-details.css";
+import "../styles/drawer.css";
 import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
 import { buildPrbDetailsData } from "./prbDetailsProjection";
 import { useProblemProjection } from "./useProblemProjection";
@@ -103,4 +105,24 @@ export const Compact360: Story = {
   name: "360 compact",
   globals: { viewport: { value: "reviewCompact" } },
   render: () => <PrbDetailsShell />,
+};
+
+/** Opens the audit evidence drawer through its real trigger, as a reader would. */
+async function openEvidenceDrawer({ canvasElement }: { canvasElement: HTMLElement }) {
+  const trigger = await within(canvasElement).findByRole("button", { name: /^Abrir os \d+ registos$/ }, { timeout: 5000 });
+  await userEvent.click(trigger);
+}
+
+export const EvidenceDrawer1440: Story = {
+  name: "1440 evidence drawer open",
+  globals: { viewport: { value: "reviewDesktop" } },
+  render: () => <PrbDetailsShell />,
+  play: openEvidenceDrawer,
+};
+
+export const EvidenceDrawer360: Story = {
+  name: "360 evidence drawer open",
+  globals: { viewport: { value: "reviewCompact" } },
+  render: () => <PrbDetailsShell />,
+  play: openEvidenceDrawer,
 };

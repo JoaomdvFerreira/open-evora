@@ -37,6 +37,8 @@ import "./styles/breadcrumb.css";
 // only (not the rest of ui.css, which still carries other unrelated/
 // colliding selectors).
 import "./styles/feedback.css";
+// The generic modal Drawer primitive (presentation/Drawer.tsx).
+import "./styles/drawer.css";
 // DS-05I: the narrow canonical EmptyState visual recipe only (not the rest
 // of ui.css, which still carries unrelated selectors/collision risk).
 import "./styles/empty-state.css";
