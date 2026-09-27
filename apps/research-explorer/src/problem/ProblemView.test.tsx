@@ -58,6 +58,7 @@ describe("ProblemView — record index and selection guards", () => {
     };
     render(<ProblemView {...props} dataProvider={flakyProvider} problemId="PRB-1" />);
     expect(screen.getByText("A carregar…")).toBeTruthy();
+    expect(screen.getByTestId("prb-details-skeleton")).toBeTruthy();
     expect(await screen.findByText("Não foi possível carregar os registos")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Tentar novamente" }));
     expect(await prbTitle("Problema de teste")).toBeTruthy();
@@ -88,6 +89,8 @@ describe("ProblemView — projection loading and error", () => {
   it("shows projection loading while the PRB resolves", async () => {
     render(<ProblemView {...props} dataProvider={{ ...provider, getRecord: () => new Promise(() => {}) }} problemId="PRB-1" />);
     expect(await screen.findByText("A carregar Problema PRB-1…")).toBeTruthy();
+    expect(screen.getByTestId("prb-details-skeleton")).toBeTruthy();
+    expect(screen.getAllByRole("status")).toHaveLength(1);
     expect(document.getElementById("prb-identity-title")).toBeNull();
   });
 

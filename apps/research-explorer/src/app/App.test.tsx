@@ -93,6 +93,8 @@ describe("App — skip link bypasses global navigation (F06)", () => {
     render(<App dataProvider={pendingProvider} />);
 
     await screen.findByRole("status");
+    expect(screen.getByTestId("app-skeleton")).toBeTruthy();
+    expect(screen.getAllByRole("status")).toHaveLength(1);
     const skipTarget = document.getElementById("explorer-content-start");
     expect(skipTarget).not.toBeNull();
     expect(skipTarget?.getAttribute("tabindex")).toBe("-1");

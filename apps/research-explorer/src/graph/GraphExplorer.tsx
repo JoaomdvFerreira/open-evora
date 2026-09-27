@@ -18,7 +18,7 @@ import { buildRenderGraph } from "./renderGraph";
 import { GraphCanvas, type GraphCanvasHandle } from "./GraphCanvas";
 import { FOCUS_NODE_COLOR, typeVisual } from "./typeVisuals";
 import type { ResearchGraph } from "./buildGraphModel";
-import { ProgressMessage } from "../presentation/ProgressMessage";
+import { GraphSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
 
@@ -136,7 +136,7 @@ export function GraphExplorer({
   }, [invalidFocus, state.status]);
 
   if (state.status === "loading") {
-    return <div className="shell-frame"><ProgressMessage message="A carregar dados do grafo…" /></div>;
+    return <GraphSkeleton />;
   }
 
   if (state.status === "error") {

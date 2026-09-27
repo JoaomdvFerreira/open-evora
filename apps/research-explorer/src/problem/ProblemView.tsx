@@ -6,7 +6,7 @@ import { useProblemProjection } from "./useProblemProjection";
 import { buildPrbDetailsData } from "./prbDetailsProjection";
 import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
 import { formatTypedId } from "../presentation/typeGlossary";
-import { ProgressMessage } from "../presentation/ProgressMessage";
+import { PrbDetailsSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 
 const ERROR_TITLES: Record<string, string> = {
@@ -74,10 +74,8 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
     }
   }, [problemId, state.status]);
 
-  if (state.status === "idle") return null;
-
-  if (state.status === "loading") {
-    return <div className="shell-frame"><ProgressMessage message={`A carregar Problema ${state.id}…`} /></div>;
+  if (state.status === "idle" || state.status === "loading") {
+    return <PrbDetailsSkeleton message={`A carregar Problema ${problemId}…`} />;
   }
 
   if (state.status === "error") {
@@ -143,7 +141,7 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
   const initialFragmentConsideredRef = useRef(false);
 
   if (indexState.status === "loading") {
-    return <div className="shell-frame"><ProgressMessage message="A carregar…" /></div>;
+    return <PrbDetailsSkeleton message="A carregar…" />;
   }
 
   if (indexState.status === "error") {

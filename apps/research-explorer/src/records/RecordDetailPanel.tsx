@@ -12,7 +12,7 @@ import { useSourceEvidenceRelations } from "./useSourceEvidenceRelations";
 import { EvdDetail } from "./EvdDetail";
 import { SrcDetail } from "./SrcDetail";
 import { useEvdProblemUses } from "./useEvdProblemUses";
-import { ProgressMessage } from "../presentation/ProgressMessage";
+import { RecordDetailSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
 import { applyInitialFragment } from "../navigation/applyInitialFragment";
@@ -908,7 +908,7 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
 
       {selectedId === null && <p>Nenhum registo selecionado.</p>}
 
-      {state.status === "loading" && <ProgressMessage message={`A carregar detalhes de ${state.id}…`} />}
+      {selectedId !== null && (state.status === "idle" || state.status === "loading") && <RecordDetailSkeleton id={selectedId} />}
 
       {state.status === "error" && (
         <>

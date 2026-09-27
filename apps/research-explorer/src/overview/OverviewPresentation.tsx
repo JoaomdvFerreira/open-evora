@@ -10,7 +10,7 @@ import {
   type ProblemSortOrder,
 } from "./overviewStats";
 import { formatPublicCount } from "../presentation/presentation";
-import { ProgressMessage } from "../presentation/ProgressMessage";
+import { OverviewResultsSkeleton } from "../loading/LoadingSkeletons";
 import { CategoryDrawer, CitizenSearchControl, FiltrosToggle, ProblemRow, SortControl } from "./CitizenDiscovery";
 import { describeTopic } from "../presentation/topicMapping";
 
@@ -215,7 +215,7 @@ export function OverviewPresentation({
 
       <section id="overview-problemas" aria-label="Explorar problemas">
         {citizenProblems === null || visibleProblems === null ? (
-          <div className="shell-frame shell-frame--wide"><ProgressMessage message="A carregar problemas…" /></div>
+          <OverviewResultsSkeleton />
         ) : (
           <div className="overview-results">
             {visibleProblems.length === 0 ? (

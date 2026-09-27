@@ -1,9 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Explorer } from "./Explorer";
+import { Explorer, GraphLoadingFallback } from "./Explorer";
 import { StaticDataProvider } from "../dataProvider/StaticDataProvider";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
+
+it("uses the Graph skeleton for the lazy-module fallback", () => {
+  render(<GraphLoadingFallback />);
+  expect(screen.getByTestId("graph-skeleton")).toBeTruthy();
+  expect(screen.getByRole("status").textContent).toBe("A carregar o grafo…");
+});
 
 const INDEX: RecordSummary[] = [
   { id: "PRB-0005", type: "PRB-", label: "Pressão de estacionamento com uma descrição…", file: "research/problems/PRB-0005.yaml", summaryFields: { status: "OPEN" } },

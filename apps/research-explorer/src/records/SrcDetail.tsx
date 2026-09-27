@@ -4,7 +4,7 @@ import { canonicalFileUrl } from "../dataProvider/StaticDataProvider";
 import { formatPublicCompactDate, formatPublicCount, formatPublicPartialDate, publicEnumLabel } from "../presentation/presentation";
 import { describeTopic } from "../presentation/topicMapping";
 import { Breadcrumb } from "../presentation/Breadcrumb";
-import { ProgressMessage } from "../presentation/ProgressMessage";
+import { RelationSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
 import { useToast } from "../presentation/Toast";
@@ -280,7 +280,7 @@ function SrcFindings({ state, sourceId, onSelect, onViewAsProblem }: { state: Re
   return (
     <SrcSection id="src-findings" label="O que encontrámos" note={note}>
       {state.status === "loading" || state.status === "idle" ? (
-        <ProgressMessage message="A carregar observações da investigação…" />
+        <RelationSkeleton message="A carregar observações da investigação…" />
       ) : state.status === "error" ? (
         <ErrorNotice title="Não foi possível carregar as observações da investigação ligadas a esta fonte." message="" action={<button type="button" onClick={state.retry}>Tentar novamente</button>} />
       ) : ready!.evidence.length === 0 ? (

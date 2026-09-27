@@ -184,6 +184,7 @@ describe("EVD Detail — synthetic contract cases", () => {
   it("keeps loading as ProgressMessage with a pending Problemas value", () => {
     const { container } = renderEvd(base, { problemUses: { status: "loading", retry: vi.fn() } });
     expect(screen.getByRole("status").textContent).toBe("A carregar usos nos Problemas…");
+    expect(screen.getByTestId("relation-skeleton")).toBeTruthy();
     expect(metadata(container).Problemas).toBe("…");
     expect(screen.queryByText("Esta evidência ainda não está ligada explicitamente a um Problema.")).toBeNull();
   });

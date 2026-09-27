@@ -56,6 +56,13 @@ function currentPageText(): string | null {
   return nav.querySelector('[aria-current="page"]')?.getAttribute("aria-label") ?? null;
 }
 
+it("uses the Records page skeleton while the index loads", () => {
+  const pending = { ...makeProvider(), listRecords: () => new Promise<RecordSummary[]>(() => {}) };
+  render(<RecordsExplorer dataProvider={pending} selectedId={null} onSelect={vi.fn()} query="" onQueryChange={vi.fn()} typeFilter="all" onTypeFilterChange={vi.fn()} onViewAsProblem={vi.fn()} onViewInGraph={vi.fn()} onBackToRecords={vi.fn()} />);
+  expect(screen.getByTestId("records-skeleton")).toBeTruthy();
+  expect(screen.getAllByRole("status")).toHaveLength(1);
+});
+
 async function expectPageTwoOfTwo() {
   await screen.findByRole("navigation", { name: "Paginação dos registos" });
   expect(currentPageText()).toBe("Página 2");
