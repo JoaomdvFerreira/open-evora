@@ -599,7 +599,7 @@ describe("Explorer — chrome header identity", () => {
 
     expect(within(globalNav()).getByRole("link", { name: "Método", hidden: true }).getAttribute("href")).toBe("/methodology");
     expect(within(globalNav()).getByRole("link", { name: "Sobre", hidden: true }).getAttribute("href")).toBe("/about");
-    expect(screen.getByRole("link", { name: "Contribuir com evidência", hidden: true }).getAttribute("href")).toBe("/contact");
+    expect(screen.getByRole("link", { name: "Contribuir para a investigação", hidden: true }).getAttribute("href")).toBe("/contact");
   });
 
   it("Problemas' active state covers Overview, Problem detail, and Problem history alike", async () => {

@@ -122,6 +122,15 @@ it("renders the Contact channels, privacy notice and GitHub action with their ex
   expect(screen.getByRole("link", { name: "Abrir issue no GitHub" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
 });
 
+it("renders the Contact contribution section with its public-GitHub guidance and the production form", () => {
+  renderInformationPage("/contact");
+  const section = screen.getByRole("region", { name: "Contribuir para a investigação" });
+  expect(section.textContent).toContain("issue público no GitHub");
+  expect(section.textContent).toContain("Não inclua dados pessoais nem informação sensível.");
+  expect(within(section).getByRole("group", { name: /Tipo de contribuição/ })).toBeTruthy();
+  expect(within(section).getByRole("button", { name: "Preparar issue no GitHub" })).toBeTruthy();
+});
+
 describe("PublicFooter — editorial identity/PROJETO/DADOS structure (Overview final redesign, Phase 3B §6)", () => {
   it("renders the identity heading and supporting copy", () => {
     window.history.replaceState(null, "", "/about");

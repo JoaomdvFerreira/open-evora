@@ -8,7 +8,7 @@ import { IconMenu } from "../presentation/icons";
  * three-item internal-navigation labelling (Visão geral / Registos / Grafo)
  * with the approved public-facing surface: Problemas (Overview + Problem
  * context), Método and Sobre (existing TrustPages), Registos (the complete,
- * unfiltered Records area) and a Contribuir com evidência CTA — see
+ * unfiltered Records area) and a Contribuir para a investigação CTA — see
  * docs/explorerarchitecture.md §3 for the Overview/Records/Problem-context
  * navigation model this maps onto. Records/Graph capabilities are unchanged
  * underneath; this is a navigation-surface relabelling only. Graph has no
@@ -78,7 +78,7 @@ export function ExplorerHeader({ activeView, onProblemas, onRegistos }: {
               : <a className="explorer-navigation-action" href="/?view=records">Registos</a>}
             <a className="explorer-navigation-action" href="/about" aria-current={isSobre ? "page" : undefined}>Sobre</a>
           </nav>
-          <a className="explorer-cta" href="/contact">Contribuir com evidência</a>
+          <a className="explorer-cta" href="/contact">Contribuir para a investigação</a>
         </div>
       </div>
     </header>

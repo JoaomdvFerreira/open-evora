@@ -240,10 +240,9 @@ export function OverviewPresentation({
                 rendered" or "results loaded so far" (§2). This status is
                 informational only, not a second live region — the toolbar's
                 own `aria-live` count above already announces filter/search
-                changes (§8). `Propor um problema` (§3) is a normal outbound
-                link to the existing `/contact` route, not a new submission
-                workflow — the Contact page already owns public
-                questions/suggestions/problems. Full-width band (§11), same
+                changes (§8). `Contribuir para a investigação` (§3) is a normal
+                outbound link to the Contact page's contribution form,
+                preselecting a problem suggestion (`?type=problem`). Full-width band (§11), same
                 shared wide grid as every other band. */}
             {visibleProblems.length > 0 && (
               <div className="overview-end-of-results">
@@ -263,8 +262,8 @@ export function OverviewPresentation({
                       </button>
                     </div>
                   )}
-                  <a className="overview-propose-problem" href="/contact">
-                    Propor um problema
+                  <a className="overview-propose-problem" href="/contact?type=problem">
+                    Contribuir para a investigação
                   </a>
                 </div>
               </div>

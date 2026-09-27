@@ -770,19 +770,19 @@ describe("Overview — end-of-results row", () => {
     expect(document.querySelector(".overview-end-of-results")).toBeNull();
   });
 
-  it("links Propor um problema to /contact in the end-of-results row", async () => {
+  it("links Contribuir para a investigação to a Contact problem suggestion in the end-of-results row", async () => {
     render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(6))} {...props} />);
 
     await screen.findByText("6 problemas");
-    const link = screen.getByRole("link", { name: "Propor um problema" }) as HTMLAnchorElement;
-    expect(link.getAttribute("href")).toBe("/contact");
+    const link = screen.getByRole("link", { name: "Contribuir para a investigação" }) as HTMLAnchorElement;
+    expect(link.getAttribute("href")).toBe("/contact?type=problem");
   });
 
-  it("keeps Propor um problema available on a multi-page result set alongside the paginator", async () => {
+  it("keeps Contribuir para a investigação available on a multi-page result set alongside the paginator", async () => {
     render(<OverviewFixture dataProvider={makeProvider(makeManyProblems(21))} {...props} />);
 
     await screen.findByText("21 problemas");
-    expect(screen.getByRole("link", { name: "Propor um problema" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Contribuir para a investigação" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Anterior" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Seguinte" })).toBeTruthy();
   });
