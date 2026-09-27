@@ -61,5 +61,5 @@ contract, and these HTML files are not updated to track the deltas below.
 - No arbitrary EVD subset or ranking is presented.
 - The investigation path is vertical at every breakpoint.
 - The responsive open-question layout preserves reading order.
-- The dossier CTA remains visibly disabled until implemented.
+- The dossier CTA downloads the client-side PDF dossier (see `docs/explorerarchitecture.md` "Problem dossier projection"); it is disabled only when no dossier data is available.
 - The audit band is the terminal PRB Details content band before the footer.

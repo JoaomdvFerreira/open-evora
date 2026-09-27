@@ -4,6 +4,7 @@ import type { DataProvider, RecordSummary } from "../dataProvider/types";
 import { useRecordIndex } from "../records/useRecordIndex";
 import { useProblemProjection } from "./useProblemProjection";
 import { buildPrbDetailsData } from "./prbDetailsProjection";
+import { buildPrbDossierData } from "./prbDossierProjection";
 import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
 import { formatTypedId } from "../presentation/typeGlossary";
 import { PrbDetailsSkeleton } from "../loading/LoadingSkeletons";
@@ -97,11 +98,13 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
     );
   }
 
-  // The PRB Details composition's fields are derived only by the governed
-  // projection (prbDetailsProjection.ts) — never re-derived here.
+  // The PRB Details composition's fields and the downloadable dossier's data
+  // are derived only by their governed projections (prbDetailsProjection.ts,
+  // prbDossierProjection.ts) — never re-derived here.
   return (
     <PrbDetailsPresentation
       data={buildPrbDetailsData(state.projection)}
+      dossier={buildPrbDossierData(state.projection)}
       onOpenGeneric={onOpenGeneric}
       onBackToOverview={onBackToOverview}
       onViewHistory={onViewHistory}

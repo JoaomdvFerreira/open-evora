@@ -15,6 +15,8 @@ import "../styles/prb-details.css";
 import "../styles/drawer.css";
 import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
 import { buildPrbDetailsData } from "./prbDetailsProjection";
+import { buildPrbDossierData } from "./prbDossierProjection";
+import { ToastProvider } from "../presentation/Toast";
 import { useProblemProjection } from "./useProblemProjection";
 import { useRecordIndex } from "../records/useRecordIndex";
 import { prb0005DataProvider } from "./prb0005Fixture";
@@ -62,24 +64,27 @@ function Prb0005Details() {
   }
 
   const data = buildPrbDetailsData(projectionState.projection);
+  const dossier = buildPrbDossierData(projectionState.projection);
 
-  return <PrbDetailsPresentation data={data} onOpenGeneric={noop} onBackToOverview={noop} onViewHistory={noop} />;
+  return <PrbDetailsPresentation data={data} dossier={dossier} onOpenGeneric={noop} onBackToOverview={noop} onViewHistory={noop} />;
 }
 
 /**
  * Full-page shell (ExplorerHeader + PrbDetailsPresentation + PublicFooter),
  * matching OverviewPresentation.stories.tsx's FullOverviewShell precedent —
  * a truthful full-page review surface, not the composition's body alone.
+ * Wrapped in the ToastProvider main.tsx supplies, so the dossier download's
+ * feedback appears exactly as in production.
  */
 function PrbDetailsShell() {
   return (
-    <>
+    <ToastProvider>
       <main className="explorer-shell">
         <ExplorerHeader activeView="problem" onProblemas={noop} onRegistos={noop} />
         <Prb0005Details />
       </main>
       <PublicFooter />
-    </>
+    </ToastProvider>
   );
 }
 
@@ -125,4 +130,21 @@ export const EvidenceDrawer360: Story = {
   globals: { viewport: { value: "reviewCompact" } },
   render: () => <PrbDetailsShell />,
   play: openEvidenceDrawer,
+};
+
+/**
+ * Brings the enabled "Dossiê canónico" action into view and focus. Activating
+ * it generates the real PRB-0005 PDF dossier client-side and downloads it.
+ */
+async function focusDossierAction({ canvasElement }: { canvasElement: HTMLElement }) {
+  const action = await within(canvasElement).findByRole("button", { name: "↓ Descarregar dossiê (PDF)" }, { timeout: 5000 });
+  action.scrollIntoView({ block: "center" });
+  action.focus();
+}
+
+export const DossierAction1440: Story = {
+  name: "1440 dossier download",
+  globals: { viewport: { value: "reviewDesktop" } },
+  render: () => <PrbDetailsShell />,
+  play: focusDossierAction,
 };

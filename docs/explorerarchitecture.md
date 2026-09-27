@@ -88,11 +88,23 @@ Canonical content that belongs only to the earlier Problem presentation (for exa
 
 The downloadable Problem dossier has a dedicated data boundary:
 
-`ProblemProjection → PrbDossierData → dossier renderer`
+`ProblemProjection → PrbDossierData → React-PDF renderer → browser download`
 
 `PrbDossierData` is a pure, deterministic, JSON-serialisable projection of the already-resolved Problem projection (PRB, linked EVD in projection order, and their SRC de-duplicated by canonical ID). It fetches nothing, is independent of the `Detalhes` presentation data, carries canonical values and enum codes as authored (unauthored optional content stays absent rather than fabricated; explicit `false` is preserved), and produces no ranking, score or derived research state. It carries an explicit contract version and no generation timestamp: identical input yields identical output.
 
-It performs no document generation. The renderer layer owns presentation labels, formatting, layout and generation metadata such as the generation timestamp. The dossier renderer is not yet implemented; the `Detalhes` dossier action remains disabled until it is.
+It performs no document generation. The renderer layer owns presentation labels, formatting, layout and generation metadata such as the generation timestamp.
+
+#### Problem dossier PDF
+
+The `Detalhes` dossier action ("Descarregar dossiê (PDF)") generates an A4 PDF entirely in the browser from the current Problem's `PrbDossierData` and downloads it as `open-evora-<PRB-ID>-dossie.pdf`. Invariants:
+
+- the renderer consumes only `PrbDossierData` plus generation metadata (the generation timestamp, captured once per generation and used only as audit metadata); it never loads data, reads files, inspects the page DOM, or uses website CSS, and it never re-derives or extends the dossier projection;
+- labels, dates and topic names come from the shared PT-PT presentation authorities; canonical order is preserved; absent content omits its section or field rather than printing placeholders; explicit `false` renders as such; no ranking, score, strength or confidence is produced;
+- source access, availability, reuse permission and the Open Évora last-check date stay separate; the last-check date is never presented as validation, currentness or authority;
+- the document contains real selectable text, clickable canonical references and in-document links, and no prototype or development commentary;
+- the PDF engine is loaded on demand when the action is used, never as part of the initial Explorer bundle; success is reported only after a PDF Blob exists.
+
+`@react-pdf/renderer` is the chosen production dependency: it provides client-side, PDF-native document layout with pagination, selectable/searchable text and hyperlinks, with no DOM-print and no server dependency. The PDF uses the Explorer's own self-hosted typefaces (bundled @fontsource files, never fetched from a font service).
 
 ### 3.3 `Histórico`
 

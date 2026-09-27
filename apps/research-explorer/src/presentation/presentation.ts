@@ -26,6 +26,8 @@ const LABELS: Record<string, Record<string, string>> = {
   "licensing.status": { known: "Conhecido", unknown: "Desconhecido" },
   "licensing.reuse": { permitted: "Permitida", restricted: "Restrita", prohibited: "Proibida", unknown: "Desconhecida" },
   update_frequency: { one_off: "Pontual", daily: "Diária", weekly: "Semanal", monthly: "Mensal", quarterly: "Trimestral", annual: "Anual", irregular: "Irregular", unknown: "Desconhecida" },
+  "acquisition.method": { public_web: "Web pública", direct_contact: "Contacto direto", direct_submission: "Submissão direta", api: "API", archive: "Arquivo", other: "Outro", unknown: "Desconhecido" },
+  "scope.temporal.status": { unknown: "Desconhecida" },
 };
 
 /**
@@ -72,20 +74,14 @@ const FIELD_CAPTIONS: Record<string, string> = {
   "scope.temporal.as_of": "Data de referência", "scope.temporal.start": "Início", "scope.temporal.end": "Fim",
   "licensing.status": "Estado do licenciamento", "licensing.licence": "Licença", "licensing.reuse": "Reutilização", "licensing.attribution": "Atribuição",
   update_frequency: "Frequência de atualização", published_at: "Publicação", updated_at: "Última atualização da fonte", last_checked_at: "Última verificação pela Open Évora",
-  canonical_reference: "Referência original",
+  canonical_reference: "Referência original", "acquisition.method": "Forma de obtenção", "acquisition.obtained_at": "Data de obtenção",
 };
 
 export function publicEnumLabel(field: string, value: string): string {
   const terminalField = field.split(".").at(-1) ?? field;
-  const labelField = field === "scope.geography.level"
-    ? "scope.geography.level"
-    : field === "licensing.status"
-      ? "licensing.status"
-      : field === "licensing.reuse"
-        ? "licensing.reuse"
-        : field.startsWith("geography.")
-          ? "geography"
-          : terminalField;
+  // Dotted keys (e.g. "scope.geography.level", "acquisition.method") own their values outright, so
+  // a shared terminal name ("level", "method", "status") never borrows another field's labels.
+  const labelField = LABELS[field] ? field : field.startsWith("geography.") ? "geography" : terminalField;
   return LABELS[labelField]?.[value] ?? value;
 }
 
@@ -96,7 +92,7 @@ export function publicCompactEnumLabel(field: string, value: string): string {
 }
 
 export function publicFieldCaption(field: string): string {
-  if ((field.startsWith("access.") || field.startsWith("scope.") || field.startsWith("licensing.")) && FIELD_CAPTIONS[field]) return FIELD_CAPTIONS[field];
+  if ((field.startsWith("access.") || field.startsWith("scope.") || field.startsWith("licensing.") || field.startsWith("acquisition.")) && FIELD_CAPTIONS[field]) return FIELD_CAPTIONS[field];
   const terminalField = field.split(".").at(-1) ?? field;
   const captionField = field.startsWith("geography.") ? "geography" : terminalField;
   return FIELD_CAPTIONS[captionField] ?? field;

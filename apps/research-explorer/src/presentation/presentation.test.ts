@@ -199,6 +199,18 @@ describe("PT-PT public presentation terminology", () => {
     expect(publicEnumLabel("temporal.update_frequency", "future_frequency")).toBe("future_frequency");
   });
 
+  it("maps acquisition.method and EVD scope.temporal.status without borrowing access.method or lifecycle status labels", () => {
+    expect(["public_web", "direct_contact", "direct_submission", "api", "archive", "other", "unknown"].map((value) => publicEnumLabel("acquisition.method", value))).toEqual([
+      "Web pública", "Contacto direto", "Submissão direta", "API", "Arquivo", "Outro", "Desconhecido",
+    ]);
+    expect(publicEnumLabel("access.method", "direct")).toBe("Acesso direto");
+    expect(publicEnumLabel("acquisition.method", "direct")).toBe("direct");
+    expect(publicEnumLabel("scope.temporal.status", "unknown")).toBe("Desconhecida");
+    expect(publicEnumLabel("status", "OPEN")).toBe("Aberto");
+    expect(publicFieldCaption("acquisition.method")).toBe("Forma de obtenção");
+    expect(publicFieldCaption("acquisition.obtained_at")).toBe("Data de obtenção");
+  });
+
   it("maps the machine-readable tri-state, never treating unknown as false", () => {
     expect(publicTriStateLabel(true)).toBe("Sim");
     expect(publicTriStateLabel(false)).toBe("Não");
