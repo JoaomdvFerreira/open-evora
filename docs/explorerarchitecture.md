@@ -84,6 +84,16 @@ The page title uses the page-composition heading level consistent with the globa
 
 Canonical content that belongs only to the earlier Problem presentation (for example the per-Evidence list, decision-basis prose, recent-history summary, and affected-populations blocks) is not foreground content in `Detalhes`. It remains in the corpus and inspectable through generic Record Detail in Records; it must not be re-added to `Detalhes` without an owner decision. The audit layer's "open the N records" action opens an on-demand modal drawer listing every Evidence record linked by the resolved Problem projection, in projection order and without ranking; each entry opens generic EVD Record Detail. The drawer changes no URL, loads no data, and is not a Problem-local view.
 
+#### Problem dossier projection
+
+The downloadable Problem dossier has a dedicated data boundary:
+
+`ProblemProjection → PrbDossierData → dossier renderer`
+
+`PrbDossierData` is a pure, deterministic, JSON-serialisable projection of the already-resolved Problem projection (PRB, linked EVD in projection order, and their SRC de-duplicated by canonical ID). It fetches nothing, is independent of the `Detalhes` presentation data, carries canonical values and enum codes as authored (unauthored optional content stays absent rather than fabricated; explicit `false` is preserved), and produces no ranking, score or derived research state. It carries an explicit contract version and no generation timestamp: identical input yields identical output.
+
+It performs no document generation. The renderer layer owns presentation labels, formatting, layout and generation metadata such as the generation timestamp. The dossier renderer is not yet implemented; the `Detalhes` dossier action remains disabled until it is.
+
 ### 3.3 `Histórico`
 
 Presents the optional authored material-change history of the selected Problem from canonical PRB `history[]`, newest first. It must not fabricate entries. Absence of history does not mean the Problem never changed. It is a read-only projection of PRB history, not a snapshot/version-control or audit-log system.
