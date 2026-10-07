@@ -7,16 +7,13 @@ import {
   formatOverviewCompactDate,
   getLisbonCivilDate,
   isDateInCivilWeekOf,
-  isMaterialChangeInCivilWeek,
   latestMaterialChangeByProblem,
-  latestMaterialChangeInCivilWeekByProblem,
   latestMaterialChangeInCivilWeekOfByProblem,
   matchesCitizenSearch,
   matchesTopicFilter,
   overviewPageCount,
   paginateProblems,
   problemCountLabel,
-  problemIdsAlteredInCivilWeek,
   problemIdsAlteredInCivilWeekOf,
   projectMaterialChangeEntries,
   sortProblems,
@@ -317,6 +314,18 @@ describe("latestMaterialChangeInCivilWeekOfByProblem", () => {
     expect(latest.get("PRB-0001")?.summary).toBe("Mais recente desta semana.");
   });
 
+  it("never surfaces an out-of-week newest entry in place of an in-week older one", () => {
+    // The Problem's overall-newest entry (2026-04-01) is outside this civil
+    // week; only the older 2026-03-06 entry qualifies, so that is what must
+    // be reported here — never the out-of-week newest, and never nothing.
+    const entries = [
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-04-01", summary: "Mais recente no geral, fora da semana." }),
+      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-06", summary: "Mais recente qualificável esta semana." }),
+    ];
+    const latest = latestMaterialChangeInCivilWeekOfByProblem(entries, referenceCivilDate);
+    expect(latest.get("PRB-0001")?.summary).toBe("Mais recente qualificável esta semana.");
+  });
+
   it("agrees exactly with problemIdsAlteredInCivilWeekOf's membership for the same supplied civil date", () => {
     const entries = [
       materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-05" }),
@@ -342,123 +351,11 @@ describe("latestMaterialChangeInCivilWeekOfByProblem", () => {
   });
 });
 
-describe("latestMaterialChangeInCivilWeekByProblem", () => {
-  const wednesday = new Date(Date.UTC(2026, 2, 4)); // civil week 2026-03-02..2026-03-08 (Lisbon)
-
-  it("carries no entry for a Problem whose only history is outside the current civil week", () => {
-    const entries = [materialChangeEntry({ problemId: "PRB-0001", date: "2026-01-15" })];
-    expect(latestMaterialChangeInCivilWeekByProblem(entries, wednesday).has("PRB-0001")).toBe(false);
-  });
-
-  it("carries the qualifying entry for a Problem changed inside the current civil week", () => {
-    const entries = [materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-05", summary: "Alteração desta semana." })];
-    const latest = latestMaterialChangeInCivilWeekByProblem(entries, wednesday);
-    expect(latest.get("PRB-0001")?.summary).toBe("Alteração desta semana.");
-  });
-
-  it("uses the newest qualifying entry, never an older entry, when a Problem has several this week", () => {
-    const entries = [
-      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-06", summary: "Mais recente desta semana." }),
-      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-02", summary: "Mais antiga desta semana." }),
-    ];
-    const latest = latestMaterialChangeInCivilWeekByProblem(entries, wednesday);
-    expect(latest.get("PRB-0001")?.summary).toBe("Mais recente desta semana.");
-  });
-
-  it("never surfaces an out-of-week newest entry in place of an in-week older one", () => {
-    // The Problem's overall-newest entry (2026-04-01) is outside this civil
-    // week; only the older 2026-03-06 entry qualifies, so that is what must
-    // be reported here — never the out-of-week newest, and never nothing.
-    const entries = [
-      materialChangeEntry({ problemId: "PRB-0001", date: "2026-04-01", summary: "Mais recente no geral, fora da semana." }),
-      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-06", summary: "Mais recente qualificável esta semana." }),
-    ];
-    const latest = latestMaterialChangeInCivilWeekByProblem(entries, wednesday);
-    expect(latest.get("PRB-0001")?.summary).toBe("Mais recente qualificável esta semana.");
-  });
-
-  it("agrees exactly with problemIdsAlteredInCivilWeek's membership", () => {
-    const entries = [
-      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-05" }),
-      materialChangeEntry({ problemId: "PRB-0002", date: "2026-01-01" }),
-    ];
-    const latestKeys = new Set(latestMaterialChangeInCivilWeekByProblem(entries, wednesday).keys());
-    expect(latestKeys).toEqual(problemIdsAlteredInCivilWeek(entries, wednesday));
-  });
-
-  it("returns an empty map for an empty entry list", () => {
-    expect(latestMaterialChangeInCivilWeekByProblem([], wednesday).size).toBe(0);
-  });
-});
-
-describe("isMaterialChangeInCivilWeek", () => {
-  // Reference: Wednesday 2026-03-04. Its civil week is Monday 2026-03-02
-  // through Sunday 2026-03-08.
-  const wednesday = new Date(Date.UTC(2026, 2, 4));
-
-  it("includes the Monday boundary", () => {
-    expect(isMaterialChangeInCivilWeek("2026-03-02", wednesday)).toBe(true);
-  });
-
-  it("includes the Sunday boundary", () => {
-    expect(isMaterialChangeInCivilWeek("2026-03-08", wednesday)).toBe(true);
-  });
-
-  it("excludes the previous Sunday", () => {
-    expect(isMaterialChangeInCivilWeek("2026-03-01", wednesday)).toBe(false);
-  });
-
-  it("excludes the following Monday", () => {
-    expect(isMaterialChangeInCivilWeek("2026-03-09", wednesday)).toBe(false);
-  });
-
-  it("includes a mid-week date in the same civil week", () => {
-    expect(isMaterialChangeInCivilWeek("2026-03-04", wednesday)).toBe(true);
-  });
-
-  it("computes the correct civil week when the reference date is itself a Sunday", () => {
-    const sunday = new Date(Date.UTC(2026, 2, 8));
-    expect(isMaterialChangeInCivilWeek("2026-03-02", sunday)).toBe(true);
-    expect(isMaterialChangeInCivilWeek("2026-03-09", sunday)).toBe(false);
-  });
-
-  it("safely excludes a malformed or invalid date", () => {
-    expect(isMaterialChangeInCivilWeek("not-a-date", wednesday)).toBe(false);
-    expect(isMaterialChangeInCivilWeek("2026-13-01", wednesday)).toBe(false);
-    expect(isMaterialChangeInCivilWeek("2026-02-30", wednesday)).toBe(false);
-    expect(isMaterialChangeInCivilWeek("", wednesday)).toBe(false);
-  });
-
-  it("does not use a rolling seven days — a date 7 days before the reference but outside the civil week is excluded", () => {
-    // 2026-02-25 is exactly 7 days before 2026-03-04, but falls in the prior
-    // civil week (2026-02-23 to 2026-03-01), not the current one.
-    expect(isMaterialChangeInCivilWeek("2026-02-25", wednesday)).toBe(false);
-  });
-
-  it("resolves the civil week from the Europe/Lisbon calendar, not the system/browser timezone", () => {
-    // 2026-06-01T23:30:00Z is still Monday 2026-06-01 in UTC, but Portugal is
-    // on summer time (WEST, UTC+1) in June, so it is already Tuesday
-    // 2026-06-02 in Lisbon. A UTC-only implementation would anchor the civil
-    // week one day early; the Europe/Lisbon-aware implementation must not.
-    const lateMondayUtc = new Date(Date.UTC(2026, 5, 1, 23, 30));
-    expect(getLisbonCivilDate(lateMondayUtc)).toBe("2026-06-02");
-    // The Lisbon week is Monday 2026-06-01 through Sunday 2026-06-07: Monday
-    // itself must still qualify even though it is already "yesterday" in UTC
-    // terms relative to this reference instant.
-    expect(isMaterialChangeInCivilWeek("2026-06-01", lateMondayUtc)).toBe(true);
-    // The following Monday must not.
-    expect(isMaterialChangeInCivilWeek("2026-06-08", lateMondayUtc)).toBe(false);
-  });
-
-  it("places a late-Sunday-UTC instant that is already Monday in Lisbon into the new week, not the old one", () => {
-    // 2026-06-07T23:30:00Z is Sunday in UTC, but with Portugal on summer time
-    // it is already 2026-06-08T00:30 in Lisbon — Monday of the *next* civil
-    // week. The reference civil week must be 2026-06-08..2026-06-14, not
-    // 2026-06-01..2026-06-07.
-    const lateSundayUtc = new Date(Date.UTC(2026, 5, 7, 23, 30));
-    expect(getLisbonCivilDate(lateSundayUtc)).toBe("2026-06-08");
-    expect(isMaterialChangeInCivilWeek("2026-06-08", lateSundayUtc)).toBe(true);
-    expect(isMaterialChangeInCivilWeek("2026-06-07", lateSundayUtc)).toBe(false);
+describe("getLisbonCivilDate", () => {
+  it("defaults to resolving the current instant when called with no argument", () => {
+    // Only asserts the shape/determinism contract — this test intentionally
+    // avoids asserting a specific date against wall-clock time.
+    expect(getLisbonCivilDate()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
   it("stays correct immediately either side of the Portugal DST transitions", () => {
@@ -471,13 +368,31 @@ describe("isMaterialChangeInCivilWeek", () => {
     expect(getLisbonCivilDate(new Date(Date.UTC(2026, 9, 25, 0, 30)))).toBe("2026-10-25");
     expect(getLisbonCivilDate(new Date(Date.UTC(2026, 9, 25, 23, 30)))).toBe("2026-10-25");
   });
-});
 
-describe("getLisbonCivilDate", () => {
-  it("defaults to resolving the current instant when called with no argument", () => {
-    // Only asserts the shape/determinism contract — this test intentionally
-    // avoids asserting a specific date against wall-clock time.
-    expect(getLisbonCivilDate()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  it("anchors the civil week (via isDateInCivilWeekOf) to the Europe/Lisbon calendar, not the system/browser timezone", () => {
+    // 2026-06-01T23:30:00Z is still Monday 2026-06-01 in UTC, but Portugal is
+    // on summer time (WEST, UTC+1) in June, so it is already Tuesday
+    // 2026-06-02 in Lisbon. A UTC-only resolution would anchor the civil
+    // week one day early; the Europe/Lisbon-aware resolution must not.
+    const lateMondayUtc = getLisbonCivilDate(new Date(Date.UTC(2026, 5, 1, 23, 30)));
+    expect(lateMondayUtc).toBe("2026-06-02");
+    // The Lisbon week is Monday 2026-06-01 through Sunday 2026-06-07: Monday
+    // itself must still qualify even though it is already "yesterday" in UTC
+    // terms relative to this reference instant.
+    expect(isDateInCivilWeekOf("2026-06-01", lateMondayUtc)).toBe(true);
+    // The following Monday must not.
+    expect(isDateInCivilWeekOf("2026-06-08", lateMondayUtc)).toBe(false);
+  });
+
+  it("places a late-Sunday-UTC instant that is already Monday in Lisbon into the new week, not the old one", () => {
+    // 2026-06-07T23:30:00Z is Sunday in UTC, but with Portugal on summer time
+    // it is already 2026-06-08T00:30 in Lisbon — Monday of the *next* civil
+    // week. The reference civil week must be 2026-06-08..2026-06-14, not
+    // 2026-06-01..2026-06-07.
+    const lateSundayUtc = getLisbonCivilDate(new Date(Date.UTC(2026, 5, 7, 23, 30)));
+    expect(lateSundayUtc).toBe("2026-06-08");
+    expect(isDateInCivilWeekOf("2026-06-08", lateSundayUtc)).toBe(true);
+    expect(isDateInCivilWeekOf("2026-06-07", lateSundayUtc)).toBe(false);
   });
 });
 
@@ -494,8 +409,26 @@ describe("isDateInCivilWeekOf", () => {
     expect(isDateInCivilWeekOf("2026-03-09", "2026-03-04")).toBe(false);
   });
 
+  it("includes a mid-week date in the same civil week", () => {
+    expect(isDateInCivilWeekOf("2026-03-04", "2026-03-04")).toBe(true);
+  });
+
+  it("computes the correct civil week when the reference date is itself a Sunday", () => {
+    expect(isDateInCivilWeekOf("2026-03-02", "2026-03-08")).toBe(true);
+    expect(isDateInCivilWeekOf("2026-03-09", "2026-03-08")).toBe(false);
+  });
+
+  it("does not use a rolling seven days — a date 7 days before the reference but outside the civil week is excluded", () => {
+    // 2026-02-25 is exactly 7 days before 2026-03-04, but falls in the prior
+    // civil week (2026-02-23 to 2026-03-01), not the current one.
+    expect(isDateInCivilWeekOf("2026-02-25", "2026-03-04")).toBe(false);
+  });
+
   it("safely excludes a malformed candidate or reference civil date", () => {
     expect(isDateInCivilWeekOf("not-a-date", "2026-03-04")).toBe(false);
+    expect(isDateInCivilWeekOf("2026-13-01", "2026-03-04")).toBe(false);
+    expect(isDateInCivilWeekOf("2026-02-30", "2026-03-04")).toBe(false);
+    expect(isDateInCivilWeekOf("", "2026-03-04")).toBe(false);
     expect(isDateInCivilWeekOf("2026-03-04", "not-a-date")).toBe(false);
   });
 });
@@ -531,39 +464,16 @@ describe("problemIdsAlteredInCivilWeekOf", () => {
     expect(problemIdsAlteredInCivilWeekOf(entries, "2026-03-09").has("PRB-0001")).toBe(false);
   });
 
-  it("returns an empty set for no entries", () => {
-    expect(problemIdsAlteredInCivilWeekOf([], referenceCivilDate).size).toBe(0);
-  });
-});
-
-describe("problemIdsAlteredInCivilWeek", () => {
-  const wednesday = new Date(Date.UTC(2026, 2, 4)); // civil week 2026-03-02..2026-03-08
-
-  it("counts each qualifying Problem once, deduplicated by problemId", () => {
-    const entries = [
-      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-02" }),
-      materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-05" }),
-      materialChangeEntry({ problemId: "PRB-0002", date: "2026-03-08" }),
-    ];
-    const ids = problemIdsAlteredInCivilWeek(entries, wednesday);
-    expect(ids).toEqual(new Set(["PRB-0001", "PRB-0002"]));
-  });
-
-  it("excludes a Problem whose only entries fall outside the civil week", () => {
-    const entries = [materialChangeEntry({ problemId: "PRB-0001", date: "2026-02-20" })];
-    expect(problemIdsAlteredInCivilWeek(entries, wednesday).size).toBe(0);
-  });
-
   it("includes a Problem with at least one qualifying entry even if its newest entry is older", () => {
     const entries = [
       materialChangeEntry({ problemId: "PRB-0001", date: "2026-04-01" }), // newest, outside this week
       materialChangeEntry({ problemId: "PRB-0001", date: "2026-03-06" }), // older, but in this civil week
     ];
-    expect(problemIdsAlteredInCivilWeek(entries, wednesday).has("PRB-0001")).toBe(true);
+    expect(problemIdsAlteredInCivilWeekOf(entries, referenceCivilDate).has("PRB-0001")).toBe(true);
   });
 
   it("returns an empty set for no entries", () => {
-    expect(problemIdsAlteredInCivilWeek([], wednesday).size).toBe(0);
+    expect(problemIdsAlteredInCivilWeekOf([], referenceCivilDate).size).toBe(0);
   });
 });
 

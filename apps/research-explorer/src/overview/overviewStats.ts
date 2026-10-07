@@ -224,7 +224,7 @@ export function projectMaterialChangeEntries(sources: MaterialChangeSource[]): M
  * its own.
  *
  * Not the Overview row-level changed-treatment source (weekly-emphasis
- * correction) — that is `latestMaterialChangeInCivilWeekByProblem`, which
+ * correction) — that is `latestMaterialChangeInCivilWeekOfByProblem`, which
  * additionally requires the entry to fall in the current civil week. This
  * helper remains available for other, non-recency-scoped historical uses of
  * "this Problem's most recent authored change".
@@ -295,9 +295,9 @@ export function getLisbonCivilDate(referenceDate: Date = new Date()): string {
  * not "the 7 days up to and including `referenceCivilDate`".
  *
  * Pure whole-day date arithmetic only — no timezone resolution happens here.
- * Both dates are already civil dates by the time they reach this helper (see
- * `isMaterialChangeInCivilWeek`, which resolves an instant to its Lisbon
- * civil date before delegating here), so this stays trivially deterministic
+ * Both dates are already civil dates by the time they reach this helper
+ * (callers resolve an instant to its Lisbon civil date via
+ * `getLisbonCivilDate` first), so this stays trivially deterministic
  * and independently testable against fixed civil-date strings. A
  * malformed/invalid `date` (wrong shape, or a shape that does not round-trip
  * to a real calendar day) is safely excluded — never treated as a match.
@@ -317,26 +317,6 @@ export function isDateInCivilWeekOf(date: string, referenceCivilDate: string): b
   const sundayEnd = mondayStart + 7 * MS_PER_CIVIL_DAY - 1;
 
   return candidateDay >= mondayStart && candidateDay <= sundayEnd;
-}
-
-/**
- * True when a canonical, day-precision material-change `date`
- * (`YYYY-MM-DD`) falls within the `Europe/Lisbon` civil week containing
- * `referenceDate` (Overview final redesign, Phase 2, §5; §3 timezone
- * correction). `referenceDate` is an injectable parameter (defaulting to
- * `new Date()`) precisely so callers — and unit tests — never depend on
- * wall-clock time implicitly; it is resolved to its Lisbon civil date via
- * `getLisbonCivilDate` (correct across Portugal's DST transitions,
- * independent of the browser/system timezone), and the actual week-boundary
- * arithmetic is delegated to the pure `isDateInCivilWeekOf`.
- *
- * A `Date`-instant convenience wrapper only — callers that already hold a
- * resolved Lisbon civil date (e.g. Overview's own shared civil-date state,
- * see §1 hardening) should call `isDateInCivilWeekOf` directly instead of
- * reconstructing an instant merely to re-resolve it here.
- */
-export function isMaterialChangeInCivilWeek(date: string, referenceDate: Date = new Date()): boolean {
-  return isDateInCivilWeekOf(date, getLisbonCivilDate(referenceDate));
 }
 
 /**
@@ -360,17 +340,6 @@ export function problemIdsAlteredInCivilWeekOf(entries: MaterialChangeEntry[], r
     if (isDateInCivilWeekOf(entry.date, referenceCivilDate)) ids.add(entry.problemId);
   }
   return ids;
-}
-
-/**
- * `Date`-instant convenience wrapper over `problemIdsAlteredInCivilWeekOf`
- * (resolves `referenceDate` to its Lisbon civil date via `getLisbonCivilDate`
- * first). Callers that already hold a resolved Lisbon civil date should call
- * `problemIdsAlteredInCivilWeekOf` directly instead of reconstructing an
- * instant merely to re-resolve it here.
- */
-export function problemIdsAlteredInCivilWeek(entries: MaterialChangeEntry[], referenceDate: Date = new Date()): Set<string> {
-  return problemIdsAlteredInCivilWeekOf(entries, getLisbonCivilDate(referenceDate));
 }
 
 /**
@@ -402,21 +371,6 @@ export function latestMaterialChangeInCivilWeekOfByProblem(
   referenceCivilDate: string
 ): Map<string, MaterialChangeEntry> {
   return latestMaterialChangeByProblem(entries.filter((entry) => isDateInCivilWeekOf(entry.date, referenceCivilDate)));
-}
-
-/**
- * `Date`-instant convenience wrapper over
- * `latestMaterialChangeInCivilWeekOfByProblem` (resolves `referenceDate` to
- * its Lisbon civil date via `getLisbonCivilDate` first). Callers that already
- * hold a resolved Lisbon civil date should call
- * `latestMaterialChangeInCivilWeekOfByProblem` directly instead of
- * reconstructing an instant merely to re-resolve it here.
- */
-export function latestMaterialChangeInCivilWeekByProblem(
-  entries: MaterialChangeEntry[],
-  referenceDate: Date = new Date()
-): Map<string, MaterialChangeEntry> {
-  return latestMaterialChangeInCivilWeekOfByProblem(entries, getLisbonCivilDate(referenceDate));
 }
 
 /**
