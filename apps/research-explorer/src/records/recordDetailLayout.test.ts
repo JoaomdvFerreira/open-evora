@@ -170,149 +170,19 @@ describe("ReadingLayout production adoption", () => {
     expect(ruleBodiesFor(indexCss, ".problem-view-columns")).toEqual([]);
   });
 
-  function bodiesInMediaBlock(css: string, mediaSelector: string, ruleSelector: string): string[] {
-    const escapedMedia = mediaSelector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const mediaPattern = new RegExp(`@media\\s*${escapedMedia}\\s*\\{`, "g");
-    const bodies: string[] = [];
-    for (const match of css.matchAll(mediaPattern)) {
-      const start = match.index! + match[0].length;
-      let depth = 1;
-      let i = start;
-      while (i < css.length && depth > 0) {
-        if (css[i] === "{") depth++;
-        else if (css[i] === "}") depth--;
-        i++;
-      }
-      const blockBody = css.slice(start, i - 1);
-      bodies.push(...ruleBodiesFor(blockBody, ruleSelector));
-    }
-    return bodies;
-  }
-
-  it(".problem-reading-rail remains hidden in both the 768-1059px and <=767px bands, with compact indexes shown", () => {
-    for (const mediaSelector of ["(min-width: 768px) and (max-width: 1059px)", "(max-width: 767px)"]) {
-      const railBodies = bodiesInMediaBlock(indexCss, mediaSelector, ".problem-reading-rail");
-      expect(railBodies.some((body) => /display\s*:\s*none/.test(body))).toBe(true);
-
-      const problemCompactBodies = bodiesInMediaBlock(indexCss, mediaSelector, ".problem-compact-section-index");
-      expect(problemCompactBodies.some((body) => /display\s*:\s*block/.test(body))).toBe(true);
-    }
-  });
-
   /**
-   * ProblemReadingRail's own `<aside>` carries both `lyt-reading-rail` and
-   * `problem-reading-rail` on the SAME element
-   * (unlike Source, where `.problem-reading-rail` wraps a nested child
-   * inside the outer `.lyt-reading-rail` aside). At equal specificity
-   * (single class each), CSS source order — not media-query nesting —
-   * decides the cascade: reading-layout.css's unconditional
-   * `.lyt-reading-rail { display: flex }` base rule would otherwise beat
-   * index.css's media-scoped `.problem-reading-rail { display: none }`
-   * override if reading-layout.css were imported after index.css. main.tsx
-   * must import reading-layout.css BEFORE index.css so the domain-owned
-   * visibility rule always wins.
+   * At equal specificity, CSS source order — not media-query nesting —
+   * decides the cascade. main.tsx must import reading-layout.css BEFORE
+   * index.css so domain-owned index.css rules always win over ReadingLayout's
+   * generic geometry (component-model.md §2.2).
    */
-  it("main.tsx imports styles/reading-layout.css before index.css (cascade order for .problem-reading-rail vs .lyt-reading-rail)", () => {
+  it("main.tsx imports styles/reading-layout.css before index.css (domain rules win over generic reading geometry)", () => {
     const mainSource = readFileSync(path.join(__dirname, "..", "main.tsx"), "utf-8");
     const readingLayoutImportIndex = mainSource.indexOf('"./styles/reading-layout.css"');
     const indexCssImportIndex = mainSource.indexOf('"./index.css"');
     expect(readingLayoutImportIndex).toBeGreaterThan(-1);
     expect(indexCssImportIndex).toBeGreaterThan(-1);
     expect(readingLayoutImportIndex).toBeLessThan(indexCssImportIndex);
-  });
-});
-
-/**
- * Source View top-level sections reuse the exact PRB editorial section
- * rhythm (`.problem-section`, the confirmed root cause of the previously
- * compressed Source rhythm) via one neutral shared class,
- * `.record-editorial-section`, rather than a Source-specific spacing rule or
- * direct coupling to the PRB-branded `.problem-section` class name. Parses
- * the actual rule bodies out of the production stylesheet — no pixel
- * geometry assertions, matching this file's existing characterization style.
- */
-describe("shared editorial-section rhythm (.record-editorial-section)", () => {
-  const css = readFileSync(CSS_PATH, "utf-8");
-
-  function ruleBodiesForRawPattern(pattern: RegExp): string[] {
-    return [...css.matchAll(pattern)].map((match) => match[1]);
-  }
-
-  it(".record-editorial-section shares .problem-section's exact margin-bottom: var(--space-8) rule", () => {
-    const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
-    expect(bodies.length).toBeGreaterThan(0);
-    expect(bodies[0]).toMatch(/margin-bottom\s*:\s*var\(--space-8\)\s*;/);
-  });
-
-  it(".record-editorial-section .detail-panel-label shares .problem-section .detail-panel-label's exact margin-bottom: var(--space-3) rule", () => {
-    const bodies = ruleBodiesForRawPattern(/\.problem-section \.detail-panel-label,\s*\n?\s*\.record-editorial-section \.detail-panel-label\s*\{([^}]*)\}/g);
-    expect(bodies.length).toBeGreaterThan(0);
-    expect(bodies[0]).toMatch(/margin-bottom\s*:\s*var\(--space-3\)\s*;/);
-  });
-
-  it(".problem-section's own rule/value is unchanged (still exactly margin-bottom: var(--space-8))", () => {
-    const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
-    expect(bodies.length).toBeGreaterThan(0);
-    expect(bodies[0].trim()).toBe("margin-bottom: var(--space-8);");
-  });
-
-  it("no Source-specific margin value was introduced for these sections (no .source-*-section margin/margin-bottom rule outside .record-editorial-section)", () => {
-    const sourceSectionClasses = [
-      "source-overview-section",
-      "source-findings-section",
-      "source-coverage-section",
-      "source-dates-access-section",
-      "source-licensing-section",
-      "source-caveats-section",
-      "source-technical-section",
-    ];
-    for (const className of sourceSectionClasses) {
-      const bodies = ruleBodiesFor(css, `\\.${className}`);
-      for (const body of bodies) {
-        expect(body).not.toMatch(/margin(-bottom)?\s*:/);
-      }
-    }
-  });
-});
-
-/**
- * Nested `<h4>` editorial headings reuse the exact PRB nested-heading visual contract (`.problem-current-state-item
- * h4`) via one neutral shared class, `.record-editorial-subheading`, rather
- * than a Source-specific rule or direct coupling to the PRB-branded
- * `.problem-current-state-item` class. Parses the actual rule bodies out of
- * the production stylesheet — no pixel geometry assertions, matching this
- * file's existing characterization style.
- */
-describe("shared nested-heading treatment (.record-editorial-subheading)", () => {
-  const css = readFileSync(CSS_PATH, "utf-8");
-
-  function ruleBodiesForRawPattern(pattern: RegExp): string[] {
-    return [...css.matchAll(pattern)].map((match) => match[1]);
-  }
-
-  const SHARED_RULE_PATTERN = /\.problem-current-state-item h4,\s*\n?\s*\.record-editorial-subheading\s*\{([^}]*)\}/g;
-
-  it(".record-editorial-subheading shares .problem-current-state-item h4's exact typography values", () => {
-    const bodies = ruleBodiesForRawPattern(SHARED_RULE_PATTERN);
-    expect(bodies.length).toBeGreaterThan(0);
-    const body = bodies[0];
-    expect(body).toMatch(/margin\s*:\s*0 0 var\(--space-tight\)\s*;/);
-    expect(body).toMatch(/color\s*:\s*var\(--color-ink-muted\)\s*;/);
-    expect(body).toMatch(/font-family\s*:\s*var\(--font-interface\)\s*;/);
-    expect(body).toMatch(/font-size\s*:\s*12px\s*;/);
-    expect(body).toMatch(/font-weight\s*:\s*600\s*;/);
-    expect(body).toMatch(/text-transform\s*:\s*uppercase\s*;/);
-    expect(body).toMatch(/letter-spacing\s*:\s*0\.03em\s*;/);
-  });
-
-  it("no top-level h3 (.detail-panel-label) receives the nested-heading class", () => {
-    expect(css).not.toMatch(/\.detail-panel-label[^{]*\.record-editorial-subheading/);
-  });
-
-  it(".record-editorial-section spacing rule is unchanged (still exactly margin-bottom: var(--space-8))", () => {
-    const bodies = ruleBodiesForRawPattern(/\.problem-section,\s*\n?\s*\.record-editorial-section\s*\{([^}]*)\}/g);
-    expect(bodies.length).toBeGreaterThan(0);
-    expect(bodies[0].trim()).toBe("margin-bottom: var(--space-8);");
   });
 });
 

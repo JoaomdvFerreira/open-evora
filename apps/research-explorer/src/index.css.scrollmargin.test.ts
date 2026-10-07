@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
  * ODM-016B — CSS-contract regression: every real in-app fragment target must
  * carry the compact sticky-header scroll-margin-top offset, not just
  * Problem/Overview (the pre-existing F4 rule). Extends coverage to the EVD/SRC
- * `.record-editorial-section` ids and `#relacoes` (see EvdDetail.tsx,
+ * `.evd-section`/`.src-section` ids and `#relacoes` (see EvdDetail.tsx,
  * SrcDetail.tsx, RecordDetailPanel.tsx) without introducing a new
  * mechanism — one rule, the same scroll-margin-top declaration.
  */
@@ -22,11 +22,11 @@ function ruleFor(selectorFragment: string): string | null {
 }
 
 describe("index.css — compact sticky-header scroll-margin-top coverage (ODM-016B)", () => {
-  it("covers #relacoes and .record-editorial-section alongside the pre-existing .problem-section/#overview-problemas rule", () => {
+  it("covers #relacoes and the .evd-section/.src-section ids alongside the pre-existing #overview-problemas rule", () => {
     const block = ruleFor("#overview-problemas");
     expect(block).toBeTruthy();
-    expect(block).toContain(".problem-section");
-    expect(block).toContain(".record-editorial-section");
+    expect(block).toContain(".evd-section");
+    expect(block).toContain(".src-section");
     expect(block).toContain("#relacoes");
     expect(block).toContain("scroll-margin-top: 108px");
   });

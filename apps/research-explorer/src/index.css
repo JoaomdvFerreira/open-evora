@@ -706,9 +706,7 @@ main.explorer-shell {
    breakpoint, keeping the header from crowding the nav at narrow widths. */
 /* `.explorer-logo--compact` needs to win over logo.css's own `.oe-logo {
    display: inline-flex }` base rule despite loading before it (main.tsx
-   import order) — matched by pairing the class with itself for specificity,
-   the same technique this file already documents at main.tsx's DS-05J
-   note for `.problem-reading-rail`. */
+   import order) — matched by pairing the class with itself for specificity. */
 .explorer-logo--compact.explorer-logo--compact {
   display: none;
 }
@@ -2747,41 +2745,7 @@ body:has(.public-overview) .public-footer {
   color: var(--color-accent);
 }
 
-/* Compact-only substitute for the desktop reading rail's "Nesta página"
-   index (UX-B §4) — the rail already provides it on desktop, so this stays
-   hidden there to avoid a duplicate section index. Placed before the
-   responsive overrides below so their `display: block` wins by source
-   order in the bands where the section index should show.
-   DS-05H: renamed from `.problem-help-section-index` (the class formerly on
-   the compact nav embedded inside `ProblemHelpDisclosure`) to
-   `.problem-compact-section-index` (the wrapper around the now-independent
-   canonical CompactSectionIndex, rendered adjacent to ProblemHelpDisclosure
-   — see ProblemView.tsx's `ProblemCompactSectionIndex`). Same visibility
-   contract, unchanged breakpoints. */
-.problem-compact-section-index {
-  display: none;
-  margin: 0 0 var(--space-3);
-}
-
-/* F1 intermediate reading-layout recomposition (768px-1059px): the
-   canonical 720 main + 44 gap + 216 rail composition cannot fit in this
-   band without destructively compressing the 720px reading column.
-   DS-05J: the geometry recomposition itself (flex-direction/gap/max-width/
-   rail static+width) is now owned by the canonical `.lyt-reading`/`-main`/
-   `-rail` rules in styles/reading-layout.css (imported by main.tsx) for
-   both reading surfaces (Record Detail, Problem View) — this block keeps
-   only the domain-owned rail/index *visibility* rules, which stay
-   independent of ReadingLayout itself (component-model.md §2.2: layout
-   primitives do not decide content presence). At >=1060px the canonical
-   two-column geometry resumes unchanged. */
 @media (min-width: 768px) and (max-width: 1059px) {
-  .problem-reading-rail {
-    display: none;
-  }
-
-  .problem-compact-section-index {
-    display: block;
-  }
 
 
 
@@ -3529,12 +3493,10 @@ body:has(.public-overview) .public-footer {
   /* Sticky compact header (F4, extended by ODM-016B): anchor-target sections
      must not land underneath it — scroll-margin-top offsets by the header's
      own height. Extended to every real in-app fragment target (EVD/SRC
-     .record-editorial-section ids, #relacoes, and the section-index
+     .evd-section/.src-section ids, #relacoes, and the section-index
      targets), not just Problem/Overview, since the compact header is sticky
      across every view, not only these two. */
   #overview-problemas,
-  .problem-section,
-  .record-editorial-section,
   .evd-section,
   .src-section,
   #relacoes {
@@ -3656,16 +3618,6 @@ body:has(.public-overview) .public-footer {
   line-height: var(--recipe-editorial-h1-line-height);
 }
 
-.problem-section,
-.record-editorial-section {
-  margin-bottom: var(--space-8);
-}
-
-.problem-section .detail-panel-label,
-.record-editorial-section .detail-panel-label {
-  margin-bottom: var(--space-3);
-}
-
 .problem-statement {
   max-width: none;
   margin: 0;
@@ -3706,40 +3658,6 @@ body:has(.public-overview) .public-footer {
   line-height: 1.5;
 }
 
-/* PI-02B "Estado atual" items — one labelled block per authored
-   decision_basis field, no shared card chrome beyond the existing
-   .problem-section rhythm. */
-.problem-current-state-item {
-  margin-bottom: var(--space-loose);
-}
-
-.problem-current-state-item:last-child {
-  margin-bottom: 0;
-}
-
-.problem-current-state-item h4,
-.record-editorial-subheading {
-  margin: 0 0 var(--space-tight);
-  color: var(--color-ink-muted);
-  font-family: var(--font-interface);
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.problem-current-state-item h4.open-question-detail-label {
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.problem-current-state-item p {
-  margin: 0;
-  color: var(--color-ink-primary);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
 /* "Estado atual" status row (DS-05A): row layout only. Each chip's own
    visual anatomy now comes from ProblemLifecycleStatus/ValidationStatus/
    EvidenceStatus's `reading` form (styles/domain.css `.prb-status-chip`,
@@ -3753,14 +3671,6 @@ body:has(.public-overview) .public-footer {
 }
 
 @media (max-width: 767px) {
-  /* No persistent side rail on compact (UX-B §4) — the "Nesta página"
-     index is desktop-only; compact gets the equivalent essential help
-     in-flow via ProblemHelpDisclosure instead, not a restacked copy of
-     this rail. */
-  .problem-reading-rail {
-    display: none;
-  }
-
   .problem-identity {
     padding: var(--space-standard);
   }
@@ -3776,10 +3686,6 @@ body:has(.public-overview) .public-footer {
 
   .problem-identity-title {
     font-size: var(--recipe-editorial-h1-size-compact);
-  }
-
-  .problem-compact-section-index {
-    display: block;
   }
 
 
