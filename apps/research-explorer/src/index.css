@@ -1766,8 +1766,8 @@ main.explorer-shell {
 }
 
 /* Row-local visual simplification of the shared `reading` evidence chip
-   (EvidenceStatus, InvestigationStatus.tsx — unchanged, shared with the
-   Problem detail header): TARGET shows only the public evidence label
+   (EvidenceStatus, InvestigationStatus.tsx — unchanged): TARGET shows
+   only the public evidence label
    ("Corroborada"), not the inline "Evidência:" caption. The caption/value
    split, the `.prb-status-chip` DOM, and the chip's own
    `aria-label="Evidência: Corroborada"` are untouched — this scopes only to
@@ -1775,9 +1775,7 @@ main.explorer-shell {
    `.fnd-visually-hidden` (foundations.css), so the caption stays present for
    assistive tech (redundant with the chip's own explicit aria-label, never
    removed from the accessible name) while disappearing from the row's visual
-   line. The Problem detail header (ProblemIdentityHeader.tsx), which reuses
-   the same chip, is unaffected — this rule is scoped to
-   `.overview-problem-row-meta` only. */
+   line. This rule is scoped to `.overview-problem-row-meta` only. */
 .overview-problem-row-meta .prb-status-chip-caption {
   position: absolute;
   width: 1px;
@@ -3571,121 +3569,14 @@ body:has(.public-overview) .public-footer {
   visibility: visible;
 }
 
-.problem-identity {
-  border: 1px solid var(--color-separator-emphasis);
-  border-radius: var(--radius-surface);
-  padding: var(--space-loose) var(--space-loose);
-  margin: 0 0 var(--space-loose);
-}
-
-.problem-identity-heading-row {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: var(--space-standard);
-}
-
 .problem-share-action button {
   min-height: auto;
   white-space: nowrap;
 }
 
-.problem-topic-list,
-.problem-header-states {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-tight);
-  margin: var(--space-standard) 0;
-}
-
-.problem-header-states:empty {
-  display: none;
-}
-
-.problem-identity-id {
-  margin-bottom: var(--space-tight);
-  color: var(--color-ink-faint);
-  font-family: var(--recipe-technical-id-family);
-  font-size: var(--recipe-technical-id-size);
-}
-
-.problem-identity-title {
-  margin: 0;
-  color: var(--color-ink-primary);
-  font-family: var(--recipe-editorial-h1-family);
-  font-size: var(--recipe-editorial-h1-size);
-  font-weight: var(--recipe-editorial-h1-weight);
-  line-height: var(--recipe-editorial-h1-line-height);
-}
-
-.problem-statement {
-  max-width: none;
-  margin: 0;
-  color: var(--color-ink-primary);
-  font-family: var(--recipe-editorial-body-family);
-  font-size: var(--recipe-editorial-body-size);
-  font-weight: var(--recipe-editorial-body-weight);
-  line-height: var(--recipe-editorial-body-line-height);
-}
-
-.problem-header-statement {
-  margin-bottom: var(--space-loose);
-}
-
-/* PI-02B header facts (Onde / Quem é afetado / Atualidade / Âmbito) — compact
-   dt/dd pairs, same visual register as the technical provenance grid rather
-   than a new pattern. */
-.problem-header-facts {
-  display: grid;
-  gap: var(--space-3) var(--space-loose);
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  margin: 0 0 var(--space-loose);
-}
-
-.problem-header-fact dt {
-  margin-bottom: 2px;
-  color: var(--color-ink-faint);
-  font-family: var(--font-interface);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.problem-header-fact dd {
-  margin: 0;
-  color: var(--color-ink-primary);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* "Estado atual" status row (DS-05A): row layout only. Each chip's own
-   visual anatomy now comes from ProblemLifecycleStatus/ValidationStatus/
-   EvidenceStatus's `reading` form (styles/domain.css `.prb-status-chip`,
-   composing styles/inline-label.css `.ui-inline-label`), not a local class
-   here. */
-.status-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-tight);
-  margin: 0 0 var(--space-standard);
-}
-
 @media (max-width: 767px) {
-  .problem-identity {
-    padding: var(--space-standard);
-  }
-
-  .problem-identity-heading-row {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .problem-share-action {
     align-self: flex-start;
-  }
-
-  .problem-identity-title {
-    font-size: var(--recipe-editorial-h1-size-compact);
   }
 
 
