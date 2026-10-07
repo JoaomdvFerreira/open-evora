@@ -1089,92 +1089,6 @@ main.explorer-shell {
   background: var(--color-surface-subtle);
 }
 
-/* MaterialChangeTimeline's default variant (ProblemView's "Alterações
-   materiais recentes") — preserves the pre-existing date-column/content
-   presentation, independent of any caller's section/boundary styling
-   (AGENTS.md canonical-state integrity). Overview's vertical-timeline
-   treatment lives in `.material-change-list--overview` below and must not
-   leak into this default. */
-.material-change-list {
-  display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.material-change-item {
-  display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr);
-  gap: 1rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--color-separator-faint);
-}
-
-.material-change-date {
-  color: var(--color-ink-muted);
-  font-size: 0.78rem;
-  line-height: 1.5;
-}
-
-.material-change-content p {
-  margin: 0;
-}
-
-.material-change-problem {
-  color: var(--color-ink-primary);
-  font-family: var(--font-reading);
-  font-size: 0.93rem;
-  line-height: 1.45;
-}
-
-.material-change-problem-id.material-change-problem-id {
-  color: var(--color-ink-faint);
-}
-
-.material-change-problem-id::after {
-  content: " · ";
-}
-
-.material-change-summary {
-  margin-top: 0.35rem !important;
-  color: var(--color-ink-secondary);
-  font-size: 0.86rem;
-  line-height: 1.55;
-}
-
-.material-change-content button {
-  min-height: auto;
-  margin-top: 0.5rem;
-  padding: 0.25rem 0;
-  color: var(--color-accent-hover);
-  border: 0;
-  background: transparent;
-  font-size: 0.78rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.material-change-content button:hover {
-  color: var(--color-accent);
-  text-decoration: underline;
-  text-underline-offset: 0.16em;
-}
-
-.material-change-content button:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-.material-change-empty-state {
-  margin: 0;
-  padding: 1rem;
-  color: var(--color-ink-secondary);
-  border: 1px dashed var(--color-separator-standard);
-  border-radius: 0.3rem;
-  background: var(--color-surface-subtle);
-}
-
 .overview-problem-list code,
 .technical-id {
   padding: 0;
@@ -1970,131 +1884,13 @@ body:has(.public-overview) .public-footer {
   margin-top: 0;
 }
 
-/* Overview's own separation from MaterialChangeTimeline — spacing/rhythm
-   only, no separator rule (see the compact-viewport rhythm reduction below).
-   MaterialChangeTimeline itself owns only its internal presentation, not
-   this section's separation, so ProblemView's reuse of the component is
-   unaffected. */
-.overview-material-change-section {
-  max-width: none;
-  margin-top: var(--space-section);
-  padding-top: var(--space-loose);
-}
-
-/* Delta §5 — Overview's own horizontal scroll-snap rail for
-   MaterialChangeTimeline, scoped to `.material-change-list--overview` (set
-   only by `variant="overview"`) so ProblemView's default "Alterações
-   materiais recentes" presentation above is unaffected. Plain CSS overflow
-   and scroll-snap only — no JS carousel, autoplay, pagination dots, or
-   Previous/Next controls; the semantic `<ol>/<li>` list is unchanged.
-   `grid-auto-columns` targets ~2.5–3 visible cards on desktop. The bleed
-   margin matches `main.explorer-shell`'s own horizontal padding (2rem
-   desktop, reset to 1rem below the 767px breakpoint) — the same technique
-   `.explorer-chrome` already uses — so the rail can scroll to the shell's
-   true edge without creating page-level horizontal overflow. */
-.material-change-list--overview {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(15rem, calc((100% - 2 * var(--space-loose)) / 2.6));
-  gap: var(--space-loose);
-  margin: 0 -2rem;
-  padding: 0.15rem 2rem 0.85rem;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
-  scrollbar-width: thin;
-}
-
-.material-change-list--overview .material-change-item {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-content: start;
-  gap: 0.3rem;
-  padding: 1rem 1.1rem 1.2rem;
-  border: 1px solid var(--color-separator-faint);
-  border-radius: var(--radius-surface);
-  background: var(--color-surface-raised);
-  scroll-snap-align: start;
-}
-
-.material-change-list--overview .material-change-date {
-  font-family: var(--font-interface);
-  font-size: 0.72rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.material-change-list--overview .material-change-problem {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-}
-
-.material-change-list--overview .material-change-problem-title {
-  color: var(--color-ink-primary);
-  font-family: var(--font-reading);
-  font-size: 1.02rem;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.material-change-list--overview .material-change-problem-id::after {
-  content: none;
-}
-
-/* Presentation-only visual clamp (~3 lines) so rail cards stay compact — the
-   full canonical summary remains in the DOM, unchanged and unclamped. */
-.material-change-list--overview .material-change-summary {
-  margin-top: 0.3rem !important;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.material-change-list--overview .material-change-content .material-change-action {
-  min-height: var(--target-min);
-  padding: 0.25rem 0;
-  color: var(--color-accent-hover);
-  font-size: var(--text-interface-label-size);
-  font-weight: var(--text-interface-label-weight);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.16em;
-}
-
-.material-change-list--overview .material-change-content .material-change-action:hover {
-  color: var(--color-accent);
-  text-decoration-thickness: 2px;
-}
-
-.overview-material-change-section > h3 {
-  margin: 0 0 var(--space-standard);
-  color: var(--color-ink-secondary);
-  font-size: 0.77rem;
-  font-weight: 700;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-}
-
-/* The rail itself intentionally spans the available width (more than the
-   reading measure) so ~2.5–3 cards are visible; only the empty state keeps
-   the reading-measure cap. */
-.overview-material-change-section .material-change-empty-state {
-  max-width: var(--measure-reading);
-}
-
 @media (max-width: 767px) {
   .explorer-chrome {
     min-height: 0;
   }
 
   /* `.overview-discovery`'s bleed matches `main.explorer-shell`'s compact
-     1rem horizontal padding, the same technique `.material-change-list
-     --overview` already uses below. */
+     1rem horizontal padding. */
   .overview-discovery {
     margin: 0 -1rem;
     padding: 0 1rem;
@@ -2252,22 +2048,6 @@ body:has(.public-overview) .public-footer {
     width: 100%;
     justify-content: center;
     padding: 0.5rem 0.85rem;
-  }
-
-  .overview-material-change-section {
-    margin-top: var(--space-loose);
-    padding-top: var(--space-standard);
-  }
-
-  /* Compact rail: ~one card plus a peek of the next, natural touch
-     scrolling, no forced snap/interaction trap. Bleed matches
-     main.explorer-shell's compact 1rem horizontal padding above. */
-  .material-change-list--overview {
-    grid-auto-columns: 84%;
-    gap: var(--space-standard);
-    margin: 0 -1rem;
-    padding: 0.15rem 1rem 0.85rem;
-    scroll-snap-type: x proximity;
   }
 
   /* Headline measure (task §4 — vertical density lives in the later,
