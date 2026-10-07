@@ -377,21 +377,6 @@ code {
   overflow-x: auto;
 }
 
-.evidence-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: var(--space-tight);
-  margin-bottom: var(--space-tight);
-}
-
-.evidence-item-effects {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-}
-
 /* V1 visual foundation ----------------------------------------------------
    The Explorer remains a text-first research surface: warm paper, restrained
    borders, a readable editorial measure, and deliberately quieter technical
@@ -2355,8 +2340,7 @@ body:has(.public-overview) .public-footer {
    those migrated page compositions, unchanged in value, rather than
    widening the style boundary to ui-action-text/ui.css. */
 .detail-breadcrumb button,
-.record-detail-layout > .ui-breadcrumb > button,
-.problem-view > .ui-breadcrumb > button {
+.record-detail-layout > .ui-breadcrumb > button {
   padding: 0;
   color: var(--color-ink-muted);
   border: 0;
@@ -2366,8 +2350,7 @@ body:has(.public-overview) .public-footer {
 }
 
 .detail-breadcrumb button:hover,
-.record-detail-layout > .ui-breadcrumb > button:hover,
-.problem-view > .ui-breadcrumb > button:hover {
+.record-detail-layout > .ui-breadcrumb > button:hover {
   color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 0.16em;
@@ -2381,14 +2364,12 @@ body:has(.public-overview) .public-footer {
    at the page-composition level, scoped to the narrowest existing Record
    Detail / Problem View / Problem History root selectors that now render the
    shared `Breadcrumb` component as their first child. */
-.record-detail-layout > .ui-breadcrumb,
-.problem-view > .ui-breadcrumb {
+.record-detail-layout > .ui-breadcrumb {
   margin: var(--space-loose) 0;
 }
 
 @media (max-width: 767px) {
-  .record-detail-layout > .ui-breadcrumb,
-  .problem-view > .ui-breadcrumb {
+  .record-detail-layout > .ui-breadcrumb {
     margin-bottom: var(--space-standard);
   }
 }
@@ -3600,78 +3581,6 @@ body:has(.public-overview) .public-footer {
   }
 }
 
-/* V3/UX-B: Problem View (design-system.md §1/§2/§3, Prototype B) — an
-   editorial reading composition sharing the Breadcrumb pattern with Record
-   Detail and the PRB-local Detalhes|Histórico navigation (ContextTabs).
-   UX-B adds a desktop reading rail reusing the same canonical ReadingLayout geometry as Record Detail (DS-05J: `.lyt-reading`/
-   `-main`/`-rail`, styles/reading-layout.css — 720px main + 44px gap +
-   216px rail = 980px), rather than a second bespoke rail width —
-   `.problem-view`'s own frame widens from the original 800px main-only
-   reading width to that same 980px total to house it. `.problem-view-columns`
-   is retired: it carried only `align-items: flex-start`, already the
-   canonical `.lyt-reading` base rule, and JSX no longer uses it. Desktop
-   sizing lives here; compact overrides are in the 767px media query below.
-   No shadows — separation comes from 1px borders and surface steps only. */
-.problem-view {
-  padding-bottom: var(--space-section);
-}
-
-.context-tabs {
-  box-sizing: border-box;
-  display: inline-flex;
-  gap: 0;
-  margin: var(--space-3) 0 var(--space-loose);
-  border: 1px solid var(--color-separator-standard);
-  border-radius: var(--radius-surface);
-  overflow: hidden;
-}
-
-.context-tabs button {
-  padding: 7px 14px;
-  color: var(--color-ink-muted);
-  border: 0;
-  border-right: 1px solid var(--color-separator-standard);
-  background: none;
-  font-family: var(--font-interface);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.context-tabs button:last-child,
-.context-tabs .unavailable-control:last-child button {
-  border-right: 0;
-}
-
-.context-tabs button:hover {
-  color: var(--color-ink-primary);
-  background: var(--color-surface-subtle);
-}
-
-.context-tabs button[aria-disabled="true"] {
-  color: var(--color-ink-faint);
-  cursor: not-allowed;
-  opacity: 0.72;
-}
-
-.context-tabs button[aria-disabled="true"]:hover {
-  background: none;
-}
-
-.context-tabs button[aria-current="page"] {
-  color: var(--color-surface-reading);
-  background: var(--color-ink-primary);
-  font-weight: 600;
-  cursor: default;
-}
-
-/* PRB-local navigation (ContextTabs: Detalhes|Histórico) placement inside
-   the Problem/History article frame — the same vertical spacing the legacy
-   `.context-tabs` row carried. Its appearance is owned by
-   styles/prb-view-selector.css; only placement lives here. */
-.problem-view > .prb-view-selector {
-  margin: var(--space-3) 0 var(--space-loose);
-}
-
 /* UX-F: shared unavailable-control pattern (GlobalNav Grafo, ContextTabs Grafo) —
    exposes the aria-disabled button's explanation as visible text on pointer hover
    and keyboard focus, not just `title`, which screen magnifier / low-vision keyboard
@@ -3706,37 +3615,6 @@ body:has(.public-overview) .public-footer {
 .unavailable-control button:focus-visible ~ .unavailable-note {
   opacity: 1;
   visibility: visible;
-}
-
-/* Point-of-use Problem help (REDUX-007) — collapsed by default, native
-   disclosure; distinguished from the technical-disclosure/reading-guide
-   treatment only by placement (top of Problem View), not by a different
-   interaction model. */
-.problem-help {
-  margin: 0 0 var(--space-loose);
-  border: 1px solid var(--color-separator-standard);
-  border-radius: var(--radius-surface);
-  background: var(--color-surface-subtle);
-  padding: var(--space-3) var(--space-standard);
-}
-
-.problem-help summary {
-  color: var(--color-ink-secondary);
-  font-family: var(--font-interface);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.problem-help-content {
-  margin-top: var(--space-3);
-  color: var(--color-ink-secondary);
-  font-size: 13px;
-  line-height: 1.65;
-}
-
-.problem-help-content p {
-  margin: 0 0 var(--space-tight);
 }
 
 .problem-identity {
@@ -3784,19 +3662,6 @@ body:has(.public-overview) .public-footer {
   font-size: var(--recipe-editorial-h1-size);
   font-weight: var(--recipe-editorial-h1-weight);
   line-height: var(--recipe-editorial-h1-line-height);
-}
-
-.problem-file-path {
-  margin: 0 0 var(--space-8);
-  color: var(--color-ink-faint);
-  font-family: var(--recipe-technical-meta-family);
-  font-size: 11px;
-}
-
-.problem-file-path code {
-  background: none;
-  padding: 0;
-  font-family: inherit;
 }
 
 .problem-section,
@@ -3883,153 +3748,6 @@ body:has(.public-overview) .public-footer {
   line-height: 1.6;
 }
 
-.problem-scope-grid {
-  display: grid;
-  gap: var(--space-3) var(--space-loose);
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  margin: 0;
-}
-
-.problem-scope-item dt {
-  margin-bottom: 2px;
-  color: var(--color-ink-faint);
-  font-family: var(--font-interface);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.problem-scope-item dd {
-  margin: 0;
-  color: var(--color-ink-primary);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* PI-02C §3 evidence groups (Evidência que suporta / que limita a conclusão /
-   Outra evidência relacionada) — a labelled heading above the existing
-   .evidence-list, no per-group visual ranking beyond the heading text
-   itself. */
-.evidence-group {
-  margin-bottom: var(--space-loose);
-}
-
-.evidence-group:last-child {
-  margin-bottom: 0;
-}
-
-.evidence-group h4 {
-  margin: 0 0 var(--space-3);
-  color: var(--color-ink-muted);
-  font-family: var(--font-interface);
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.evidence-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-standard);
-}
-
-.evidence-card {
-  border: 1px solid var(--color-separator-standard);
-  border-radius: var(--radius-surface);
-  padding: var(--space-standard);
-}
-
-.evidence-item-header > a,
-.evidence-item-header > button {
-  font-family: var(--recipe-technical-id-family);
-  font-size: 12px;
-}
-
-.evidence-observation,
-.evidence-provenance {
-  margin: 0 0 var(--space-tight);
-  color: var(--color-ink-primary);
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.evidence-provenance {
-  color: var(--color-ink-muted);
-  font-size: 12px;
-}
-
-.evidence-sources {
-  margin: var(--space-tight) 0 0;
-  padding-left: var(--space-loose);
-  font-size: 13px;
-}
-
-/* PI-02D "O que ainda não sabemos — e o que estamos a fazer" — each
-   open_questions[] item (plus contradiction_search) reuses the existing
-   .problem-current-state-item labelled-block pattern for its sub-fields;
-   only the item wrapper, question heading, and compact evidence-reference
-   row are new. */
-.open-question-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-loose);
-}
-
-.open-question-item {
-  border: 1px solid var(--color-separator-standard);
-  border-radius: var(--radius-surface);
-  padding: var(--space-standard);
-}
-
-.open-question-question {
-  margin: 0 0 var(--space-standard);
-  color: var(--color-ink-primary);
-  font-family: var(--recipe-editorial-body-family);
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.5;
-}
-
-.open-question-evidence-refs {
-  margin-top: var(--space-standard);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--color-separator-standard);
-}
-
-.open-question-evidence-refs-label {
-  margin-right: var(--space-tight);
-  color: var(--color-ink-faint);
-  font-family: var(--font-interface);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.open-question-evidence-refs-list {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: var(--space-tight);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.open-question-evidence-refs-list li {
-  display: inline-flex;
-}
-
-.open-question-evidence-refs-list button {
-  font-family: var(--recipe-technical-id-family);
-  font-size: 12px;
-}
-
 /* "Estado atual" status row (DS-05A): row layout only. Each chip's own
    visual anatomy now comes from ProblemLifecycleStatus/ValidationStatus/
    EvidenceStatus's `reading` form (styles/domain.css `.prb-status-chip`,
@@ -4043,34 +3761,12 @@ body:has(.public-overview) .public-footer {
 }
 
 @media (max-width: 767px) {
-  .problem-view {
-    max-width: 100%;
-  }
-
   /* No persistent side rail on compact (UX-B §4) — the "Nesta página"
      index is desktop-only; compact gets the equivalent essential help
      in-flow via ProblemHelpDisclosure instead, not a restacked copy of
      this rail. */
   .problem-reading-rail {
     display: none;
-  }
-
-  .context-tabs {
-    display: flex;
-    width: 100%;
-  }
-
-  .context-tabs button,
-  .context-tabs .unavailable-control {
-    flex: 1 1 0;
-  }
-
-  .context-tabs button {
-    text-align: center;
-  }
-
-  .context-tabs .unavailable-control button {
-    width: 100%;
   }
 
   .problem-identity {
