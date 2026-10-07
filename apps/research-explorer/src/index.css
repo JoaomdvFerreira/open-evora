@@ -392,46 +392,6 @@ code {
   gap: var(--space-1);
 }
 
-/* Contribution occurrence summary (REDUX-002) — a tally of already-explicit
-   canonical values, explicitly labelled as occurrences, never a score. */
-.effect-summary {
-  border: 1px solid var(--color-separator-standard);
-  border-radius: var(--radius-surface);
-  background: var(--color-surface-subtle);
-  padding: var(--space-3) var(--space-standard);
-  margin: 0 0 var(--space-standard);
-}
-
-.effect-summary-caption {
-  color: var(--color-ink-muted);
-  font-weight: 600;
-  font-size: 11px;
-  margin: 0 0 2px;
-}
-
-.effect-summary-counts {
-  color: var(--color-ink-faint);
-  font-size: 11px;
-  margin: 0 0 var(--space-tight);
-}
-
-.effect-summary-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-tight);
-}
-
-.effect-summary-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.effect-count {
-  color: var(--color-ink-faint);
-  font-size: 11px;
-}
-
 /* V1 visual foundation ----------------------------------------------------
    The Explorer remains a text-first research surface: warm paper, restrained
    borders, a readable editorial measure, and deliberately quieter technical
