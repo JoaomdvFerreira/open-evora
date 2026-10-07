@@ -8,6 +8,8 @@ import { formatPublicCount, publicCompactEnumLabel, publicEnumLabel } from "../p
 import { Drawer } from "../presentation/Drawer";
 import { describeTopic } from "../presentation/topicMapping";
 import type { PrbDetailsData, PrbEvidenceItem, PrbOpenQuestion, PrbPathStage } from "./prbDetailsProjection";
+import type { PrbDossierData } from "./prbDossierProjection";
+import { PrbDossierAction } from "./PrbDossierAction";
 
 /**
  * Generic public PRB Details full-page composition.
@@ -48,6 +50,8 @@ export interface PrbDetailsPresentationProps {
   onViewHistory: (id: string) => void;
   /** Receives the focusable PRB title heading so the container can move focus to it once the async projection resolves. */
   titleRef?: RefObject<HTMLHeadingElement>;
+  /** The same PRB's dossier projection (prbDossierProjection.ts); the dossier download stays disabled without it. */
+  dossier?: PrbDossierData | null;
 }
 
 /**
@@ -382,14 +386,14 @@ function PrbPathSection({ stages }: { stages: PrbPathStage[] }) {
  * score), Como verificamos (a concise methodology explainer:
  * Sustenta/Refina/Delimita and Observação local/Resposta existente are
  * illustrative examples of the approved copy, not the full vocabulary;
- * "Ler o método" routes to the fuller methodology), and Dossiê canónico (a
- * disabled placeholder CTA only — PDF generation itself is out of scope).
+ * "Ler o método" routes to the fuller methodology), and Dossiê canónico (the
+ * client-side PDF dossier download, PrbDossierAction.tsx).
  * No per-evidence metadata is rendered in the page itself: "Abrir os N
  * registos" opens PrbEvidenceDrawer in place (no URL change, navigation or
  * data load), and stays disabled when the PRB links no evidence so an empty
  * drawer can never open.
  */
-function PrbAuditSection({ data, onOpenGeneric }: { data: PrbDetailsData; onOpenGeneric: (id: string) => void }) {
+function PrbAuditSection({ data, dossier, onOpenGeneric }: { data: PrbDetailsData; dossier: PrbDossierData | null; onOpenGeneric: (id: string) => void }) {
   const [evidenceDrawerOpen, setEvidenceDrawerOpen] = useState(false);
   const openRecordsRef = useRef<HTMLButtonElement>(null);
   const hasEvidence = data.evidence.length > 0;
@@ -517,9 +521,7 @@ function PrbAuditSection({ data, onOpenGeneric }: { data: PrbDetailsData; onOpen
                 Representação de auditoria de {data.problemId}: problema, questões, evidência, fontes e percurso num único documento.
               </p>
             </div>
-            <button type="button" className="prb-audit-dossier-cta" disabled aria-disabled="true">
-              ↓ Descarregar dossiê (PDF)
-            </button>
+            <PrbDossierAction dossier={dossier} />
           </div>
         </div>
       </div>
@@ -617,7 +619,7 @@ function PrbEvidenceDrawer({
   );
 }
 
-export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, onViewHistory, titleRef }: PrbDetailsPresentationProps) {
+export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, onViewHistory, titleRef, dossier = null }: PrbDetailsPresentationProps) {
   return (
     <article aria-labelledby="prb-identity-title" className="prb-details-view">
       <PrbHeader identity={data} active="details" onBackToOverview={onBackToOverview} onViewDetails={() => undefined} onViewHistory={onViewHistory} />
@@ -634,7 +636,7 @@ export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, 
       </div>
 
       <PrbPathSection stages={data.pathStages} />
-      <PrbAuditSection data={data} onOpenGeneric={onOpenGeneric} />
+      <PrbAuditSection data={data} dossier={dossier} onOpenGeneric={onOpenGeneric} />
     </article>
   );
 }

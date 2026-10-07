@@ -4,6 +4,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
 import { buildPrbDetailsData } from "./prbDetailsProjection";
+import { buildPrbDossierData } from "./prbDossierProjection";
 import type { RecordDetail } from "../dataProvider/types";
 import type { EvidenceWithSources, ProblemProjection } from "./problemProjection";
 
@@ -379,11 +380,19 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     ]);
   });
 
-  it("keeps the dossier download control present but disabled", () => {
+  it("keeps the dossier download control present but disabled when no dossier data is supplied", () => {
     renderPrb({ title: "T" }, []);
     const dossier = screen.getByRole("button", { name: "↓ Descarregar dossiê (PDF)" });
     expect(dossier).toHaveProperty("disabled", true);
     expect(dossier.getAttribute("aria-disabled")).toBe("true");
+  });
+
+  it("enables the dossier download control when the same PRB's dossier data is supplied", () => {
+    const projection = baseProjection({ title: "T" }, []);
+    render(<PrbDetailsPresentation data={buildPrbDetailsData(projection)} dossier={buildPrbDossierData(projection)} {...handlers} />);
+    const dossier = screen.getByRole("button", { name: "↓ Descarregar dossiê (PDF)" });
+    expect(dossier).toHaveProperty("disabled", false);
+    expect(dossier.getAttribute("aria-disabled")).toBeNull();
   });
 
   it("renders path stages as sequence number, label and summary only — stage evidence IDs stay on the projection, not in the UI", () => {

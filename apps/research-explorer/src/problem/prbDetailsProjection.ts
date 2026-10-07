@@ -93,7 +93,8 @@ export interface PrbPathStage {
 
 const PATH_STAGE_KEYS = ["initial_signal", "development", "delimitation"] as const;
 
-const PATH_STAGE_LABELS: Record<(typeof PATH_STAGE_KEYS)[number], string> = {
+/** PT-PT public stage labels — the single authority, also used by the PDF dossier renderer. */
+export const PATH_STAGE_LABELS: Record<(typeof PATH_STAGE_KEYS)[number], string> = {
   initial_signal: "Sinal inicial",
   development: "Desenvolvimento",
   delimitation: "Delimitação",
