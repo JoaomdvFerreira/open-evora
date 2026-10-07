@@ -706,9 +706,7 @@ main.explorer-shell {
    breakpoint, keeping the header from crowding the nav at narrow widths. */
 /* `.explorer-logo--compact` needs to win over logo.css's own `.oe-logo {
    display: inline-flex }` base rule despite loading before it (main.tsx
-   import order) — matched by pairing the class with itself for specificity,
-   the same technique this file already documents at main.tsx's DS-05J
-   note for `.problem-reading-rail`. */
+   import order) — matched by pairing the class with itself for specificity. */
 .explorer-logo--compact.explorer-logo--compact {
   display: none;
 }
@@ -1084,92 +1082,6 @@ main.explorer-shell {
 .overview-empty-state {
   margin-top: 1rem;
   margin-bottom: 1rem;
-  padding: 1rem;
-  color: var(--color-ink-secondary);
-  border: 1px dashed var(--color-separator-standard);
-  border-radius: 0.3rem;
-  background: var(--color-surface-subtle);
-}
-
-/* MaterialChangeTimeline's default variant (ProblemView's "Alterações
-   materiais recentes") — preserves the pre-existing date-column/content
-   presentation, independent of any caller's section/boundary styling
-   (AGENTS.md canonical-state integrity). Overview's vertical-timeline
-   treatment lives in `.material-change-list--overview` below and must not
-   leak into this default. */
-.material-change-list {
-  display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.material-change-item {
-  display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr);
-  gap: 1rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--color-separator-faint);
-}
-
-.material-change-date {
-  color: var(--color-ink-muted);
-  font-size: 0.78rem;
-  line-height: 1.5;
-}
-
-.material-change-content p {
-  margin: 0;
-}
-
-.material-change-problem {
-  color: var(--color-ink-primary);
-  font-family: var(--font-reading);
-  font-size: 0.93rem;
-  line-height: 1.45;
-}
-
-.material-change-problem-id.material-change-problem-id {
-  color: var(--color-ink-faint);
-}
-
-.material-change-problem-id::after {
-  content: " · ";
-}
-
-.material-change-summary {
-  margin-top: 0.35rem !important;
-  color: var(--color-ink-secondary);
-  font-size: 0.86rem;
-  line-height: 1.55;
-}
-
-.material-change-content button {
-  min-height: auto;
-  margin-top: 0.5rem;
-  padding: 0.25rem 0;
-  color: var(--color-accent-hover);
-  border: 0;
-  background: transparent;
-  font-size: 0.78rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.material-change-content button:hover {
-  color: var(--color-accent);
-  text-decoration: underline;
-  text-underline-offset: 0.16em;
-}
-
-.material-change-content button:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-.material-change-empty-state {
-  margin: 0;
   padding: 1rem;
   color: var(--color-ink-secondary);
   border: 1px dashed var(--color-separator-standard);
@@ -1768,8 +1680,8 @@ main.explorer-shell {
 }
 
 /* Row-local visual simplification of the shared `reading` evidence chip
-   (EvidenceStatus, InvestigationStatus.tsx — unchanged, shared with the
-   Problem detail header): TARGET shows only the public evidence label
+   (EvidenceStatus, InvestigationStatus.tsx — unchanged): TARGET shows
+   only the public evidence label
    ("Corroborada"), not the inline "Evidência:" caption. The caption/value
    split, the `.prb-status-chip` DOM, and the chip's own
    `aria-label="Evidência: Corroborada"` are untouched — this scopes only to
@@ -1777,9 +1689,7 @@ main.explorer-shell {
    `.fnd-visually-hidden` (foundations.css), so the caption stays present for
    assistive tech (redundant with the chip's own explicit aria-label, never
    removed from the accessible name) while disappearing from the row's visual
-   line. The Problem detail header (ProblemIdentityHeader.tsx), which reuses
-   the same chip, is unaffected — this rule is scoped to
-   `.overview-problem-row-meta` only. */
+   line. This rule is scoped to `.overview-problem-row-meta` only. */
 .overview-problem-row-meta .prb-status-chip-caption {
   position: absolute;
   width: 1px;
@@ -1974,131 +1884,13 @@ body:has(.public-overview) .public-footer {
   margin-top: 0;
 }
 
-/* Overview's own separation from MaterialChangeTimeline — spacing/rhythm
-   only, no separator rule (see the compact-viewport rhythm reduction below).
-   MaterialChangeTimeline itself owns only its internal presentation, not
-   this section's separation, so ProblemView's reuse of the component is
-   unaffected. */
-.overview-material-change-section {
-  max-width: none;
-  margin-top: var(--space-section);
-  padding-top: var(--space-loose);
-}
-
-/* Delta §5 — Overview's own horizontal scroll-snap rail for
-   MaterialChangeTimeline, scoped to `.material-change-list--overview` (set
-   only by `variant="overview"`) so ProblemView's default "Alterações
-   materiais recentes" presentation above is unaffected. Plain CSS overflow
-   and scroll-snap only — no JS carousel, autoplay, pagination dots, or
-   Previous/Next controls; the semantic `<ol>/<li>` list is unchanged.
-   `grid-auto-columns` targets ~2.5–3 visible cards on desktop. The bleed
-   margin matches `main.explorer-shell`'s own horizontal padding (2rem
-   desktop, reset to 1rem below the 767px breakpoint) — the same technique
-   `.explorer-chrome` already uses — so the rail can scroll to the shell's
-   true edge without creating page-level horizontal overflow. */
-.material-change-list--overview {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(15rem, calc((100% - 2 * var(--space-loose)) / 2.6));
-  gap: var(--space-loose);
-  margin: 0 -2rem;
-  padding: 0.15rem 2rem 0.85rem;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
-  scrollbar-width: thin;
-}
-
-.material-change-list--overview .material-change-item {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-content: start;
-  gap: 0.3rem;
-  padding: 1rem 1.1rem 1.2rem;
-  border: 1px solid var(--color-separator-faint);
-  border-radius: var(--radius-surface);
-  background: var(--color-surface-raised);
-  scroll-snap-align: start;
-}
-
-.material-change-list--overview .material-change-date {
-  font-family: var(--font-interface);
-  font-size: 0.72rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.material-change-list--overview .material-change-problem {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-}
-
-.material-change-list--overview .material-change-problem-title {
-  color: var(--color-ink-primary);
-  font-family: var(--font-reading);
-  font-size: 1.02rem;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.material-change-list--overview .material-change-problem-id::after {
-  content: none;
-}
-
-/* Presentation-only visual clamp (~3 lines) so rail cards stay compact — the
-   full canonical summary remains in the DOM, unchanged and unclamped. */
-.material-change-list--overview .material-change-summary {
-  margin-top: 0.3rem !important;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.material-change-list--overview .material-change-content .material-change-action {
-  min-height: var(--target-min);
-  padding: 0.25rem 0;
-  color: var(--color-accent-hover);
-  font-size: var(--text-interface-label-size);
-  font-weight: var(--text-interface-label-weight);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.16em;
-}
-
-.material-change-list--overview .material-change-content .material-change-action:hover {
-  color: var(--color-accent);
-  text-decoration-thickness: 2px;
-}
-
-.overview-material-change-section > h3 {
-  margin: 0 0 var(--space-standard);
-  color: var(--color-ink-secondary);
-  font-size: 0.77rem;
-  font-weight: 700;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-}
-
-/* The rail itself intentionally spans the available width (more than the
-   reading measure) so ~2.5–3 cards are visible; only the empty state keeps
-   the reading-measure cap. */
-.overview-material-change-section .material-change-empty-state {
-  max-width: var(--measure-reading);
-}
-
 @media (max-width: 767px) {
   .explorer-chrome {
     min-height: 0;
   }
 
   /* `.overview-discovery`'s bleed matches `main.explorer-shell`'s compact
-     1rem horizontal padding, the same technique `.material-change-list
-     --overview` already uses below. */
+     1rem horizontal padding. */
   .overview-discovery {
     margin: 0 -1rem;
     padding: 0 1rem;
@@ -2256,22 +2048,6 @@ body:has(.public-overview) .public-footer {
     width: 100%;
     justify-content: center;
     padding: 0.5rem 0.85rem;
-  }
-
-  .overview-material-change-section {
-    margin-top: var(--space-loose);
-    padding-top: var(--space-standard);
-  }
-
-  /* Compact rail: ~one card plus a peek of the next, natural touch
-     scrolling, no forced snap/interaction trap. Bleed matches
-     main.explorer-shell's compact 1rem horizontal padding above. */
-  .material-change-list--overview {
-    grid-auto-columns: 84%;
-    gap: var(--space-standard);
-    margin: 0 -1rem;
-    padding: 0.15rem 1rem 0.85rem;
-    scroll-snap-type: x proximity;
   }
 
   /* Headline measure (task §4 — vertical density lives in the later,
@@ -2747,41 +2523,7 @@ body:has(.public-overview) .public-footer {
   color: var(--color-accent);
 }
 
-/* Compact-only substitute for the desktop reading rail's "Nesta página"
-   index (UX-B §4) — the rail already provides it on desktop, so this stays
-   hidden there to avoid a duplicate section index. Placed before the
-   responsive overrides below so their `display: block` wins by source
-   order in the bands where the section index should show.
-   DS-05H: renamed from `.problem-help-section-index` (the class formerly on
-   the compact nav embedded inside `ProblemHelpDisclosure`) to
-   `.problem-compact-section-index` (the wrapper around the now-independent
-   canonical CompactSectionIndex, rendered adjacent to ProblemHelpDisclosure
-   — see ProblemView.tsx's `ProblemCompactSectionIndex`). Same visibility
-   contract, unchanged breakpoints. */
-.problem-compact-section-index {
-  display: none;
-  margin: 0 0 var(--space-3);
-}
-
-/* F1 intermediate reading-layout recomposition (768px-1059px): the
-   canonical 720 main + 44 gap + 216 rail composition cannot fit in this
-   band without destructively compressing the 720px reading column.
-   DS-05J: the geometry recomposition itself (flex-direction/gap/max-width/
-   rail static+width) is now owned by the canonical `.lyt-reading`/`-main`/
-   `-rail` rules in styles/reading-layout.css (imported by main.tsx) for
-   both reading surfaces (Record Detail, Problem View) — this block keeps
-   only the domain-owned rail/index *visibility* rules, which stay
-   independent of ReadingLayout itself (component-model.md §2.2: layout
-   primitives do not decide content presence). At >=1060px the canonical
-   two-column geometry resumes unchanged. */
 @media (min-width: 768px) and (max-width: 1059px) {
-  .problem-reading-rail {
-    display: none;
-  }
-
-  .problem-compact-section-index {
-    display: block;
-  }
 
 
 
@@ -3529,12 +3271,10 @@ body:has(.public-overview) .public-footer {
   /* Sticky compact header (F4, extended by ODM-016B): anchor-target sections
      must not land underneath it — scroll-margin-top offsets by the header's
      own height. Extended to every real in-app fragment target (EVD/SRC
-     .record-editorial-section ids, #relacoes, and the section-index
+     .evd-section/.src-section ids, #relacoes, and the section-index
      targets), not just Problem/Overview, since the compact header is sticky
      across every view, not only these two. */
   #overview-problemas,
-  .problem-section,
-  .record-editorial-section,
   .evd-section,
   .src-section,
   #relacoes {
@@ -3609,177 +3349,14 @@ body:has(.public-overview) .public-footer {
   visibility: visible;
 }
 
-.problem-identity {
-  border: 1px solid var(--color-separator-emphasis);
-  border-radius: var(--radius-surface);
-  padding: var(--space-loose) var(--space-loose);
-  margin: 0 0 var(--space-loose);
-}
-
-.problem-identity-heading-row {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: var(--space-standard);
-}
-
 .problem-share-action button {
   min-height: auto;
   white-space: nowrap;
 }
 
-.problem-topic-list,
-.problem-header-states {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-tight);
-  margin: var(--space-standard) 0;
-}
-
-.problem-header-states:empty {
-  display: none;
-}
-
-.problem-identity-id {
-  margin-bottom: var(--space-tight);
-  color: var(--color-ink-faint);
-  font-family: var(--recipe-technical-id-family);
-  font-size: var(--recipe-technical-id-size);
-}
-
-.problem-identity-title {
-  margin: 0;
-  color: var(--color-ink-primary);
-  font-family: var(--recipe-editorial-h1-family);
-  font-size: var(--recipe-editorial-h1-size);
-  font-weight: var(--recipe-editorial-h1-weight);
-  line-height: var(--recipe-editorial-h1-line-height);
-}
-
-.problem-section,
-.record-editorial-section {
-  margin-bottom: var(--space-8);
-}
-
-.problem-section .detail-panel-label,
-.record-editorial-section .detail-panel-label {
-  margin-bottom: var(--space-3);
-}
-
-.problem-statement {
-  max-width: none;
-  margin: 0;
-  color: var(--color-ink-primary);
-  font-family: var(--recipe-editorial-body-family);
-  font-size: var(--recipe-editorial-body-size);
-  font-weight: var(--recipe-editorial-body-weight);
-  line-height: var(--recipe-editorial-body-line-height);
-}
-
-.problem-header-statement {
-  margin-bottom: var(--space-loose);
-}
-
-/* PI-02B header facts (Onde / Quem é afetado / Atualidade / Âmbito) — compact
-   dt/dd pairs, same visual register as the technical provenance grid rather
-   than a new pattern. */
-.problem-header-facts {
-  display: grid;
-  gap: var(--space-3) var(--space-loose);
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  margin: 0 0 var(--space-loose);
-}
-
-.problem-header-fact dt {
-  margin-bottom: 2px;
-  color: var(--color-ink-faint);
-  font-family: var(--font-interface);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.problem-header-fact dd {
-  margin: 0;
-  color: var(--color-ink-primary);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* PI-02B "Estado atual" items — one labelled block per authored
-   decision_basis field, no shared card chrome beyond the existing
-   .problem-section rhythm. */
-.problem-current-state-item {
-  margin-bottom: var(--space-loose);
-}
-
-.problem-current-state-item:last-child {
-  margin-bottom: 0;
-}
-
-.problem-current-state-item h4,
-.record-editorial-subheading {
-  margin: 0 0 var(--space-tight);
-  color: var(--color-ink-muted);
-  font-family: var(--font-interface);
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.problem-current-state-item h4.open-question-detail-label {
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.problem-current-state-item p {
-  margin: 0;
-  color: var(--color-ink-primary);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* "Estado atual" status row (DS-05A): row layout only. Each chip's own
-   visual anatomy now comes from ProblemLifecycleStatus/ValidationStatus/
-   EvidenceStatus's `reading` form (styles/domain.css `.prb-status-chip`,
-   composing styles/inline-label.css `.ui-inline-label`), not a local class
-   here. */
-.status-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-tight);
-  margin: 0 0 var(--space-standard);
-}
-
 @media (max-width: 767px) {
-  /* No persistent side rail on compact (UX-B §4) — the "Nesta página"
-     index is desktop-only; compact gets the equivalent essential help
-     in-flow via ProblemHelpDisclosure instead, not a restacked copy of
-     this rail. */
-  .problem-reading-rail {
-    display: none;
-  }
-
-  .problem-identity {
-    padding: var(--space-standard);
-  }
-
-  .problem-identity-heading-row {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .problem-share-action {
     align-self: flex-start;
-  }
-
-  .problem-identity-title {
-    font-size: var(--recipe-editorial-h1-size-compact);
-  }
-
-  .problem-compact-section-index {
-    display: block;
   }
 
 
