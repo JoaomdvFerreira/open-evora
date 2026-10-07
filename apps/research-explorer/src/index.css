@@ -1248,14 +1248,6 @@ main.explorer-shell {
   margin-bottom: 0;
 }
 
-/* Site identity given substantially more presence than the earlier compact
-   treatment (task §5 — "~20px visual scale, existing reading/serif
-   character"): the full lockup's rendered mark+wordmark height grows from
-   1.4rem to keep the identity legible as the header's own leading element. */
-.explorer-logo--full .oe-logo-full {
-  height: 1.75rem;
-}
-
 /* Desktop textual wordmark (Overview visual-completion, task §3): replaces
    the compact graphic mark as the desktop Header identity — TARGET's
    substantially greater visual presence, using the existing reading/serif
