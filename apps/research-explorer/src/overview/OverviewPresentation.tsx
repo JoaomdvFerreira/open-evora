@@ -112,7 +112,7 @@ export function OverviewPresentation({
 
   return (
     <section aria-labelledby="overview-heading" className="public-overview">
-      <h2 id="overview-heading">Visão geral</h2>
+      <h2 id="overview-heading" tabIndex={-1}>Visão geral</h2>
 
       <div className="overview-hero">
         <div className="shell-frame shell-frame--wide">

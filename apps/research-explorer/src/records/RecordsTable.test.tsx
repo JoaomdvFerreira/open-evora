@@ -264,6 +264,9 @@ describe("RecordsTable — pagination", () => {
     expect((within(nav).getByRole("button", { name: "Seguinte" }) as HTMLButtonElement).disabled).toBe(true);
     expect(nav.hasAttribute("data-first-page")).toBe(false);
     expect(nav.querySelector(".records-pagination-range")?.textContent).toBe("26–35 de 35 registos");
+    expect(document.activeElement).toBe(nav.querySelector(".records-pagination-status"));
+    expect(nav.querySelector(".records-pagination-status")?.getAttribute("aria-live")).toBe("polite");
+    expect(nav.querySelector(".records-pagination-status")?.textContent).toContain("Página 2 de 2");
 
     await user.click(within(nav).getByRole("button", { name: "Página 1" }));
     expect(rowIds()[0]).toBe("EVD-000001");

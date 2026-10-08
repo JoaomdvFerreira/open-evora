@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 import type { DataProvider } from "../dataProvider/types";
 import { useExplorerUrlState } from "../navigation/useExplorerUrlState";
 import { Overview, useOverviewDiscoveryState } from "../overview/Overview";
@@ -59,6 +59,35 @@ interface ExplorerProps {
 export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generatedAt }: ExplorerProps) {
   const url = useExplorerUrlState();
   const overviewDiscovery = useOverviewDiscoveryState();
+  const previousLocation = useRef({ view: url.state.view, selectedId: url.state.selectedId });
+
+  useEffect(() => {
+    const previous = previousLocation.current;
+    const arrivedAtOverview = url.state.view === "overview" && previous.view !== "overview";
+    const arrivedAtRecords = url.state.view === "records" && url.state.selectedId === null &&
+      (previous.view !== "records" || previous.selectedId !== null);
+    previousLocation.current = { view: url.state.view, selectedId: url.state.selectedId };
+    if (!arrivedAtOverview && !arrivedAtRecords) return;
+
+    const headingId = arrivedAtOverview ? "overview-heading" : "records-heading";
+    const focusHeading = () => {
+      const heading = document.getElementById(headingId);
+      if (!heading) return false;
+      heading.focus();
+      return true;
+    };
+    if (window.location.hash || focusHeading()) return;
+
+    // Overview/Records data can still be loading when the URL transition
+    // commits. Watch the existing main landmark until its content heading is
+    // mounted, then focus it once.
+    const main = document.getElementById("main-content") ?? document.body;
+    const observer = new MutationObserver(() => {
+      if (focusHeading()) observer.disconnect();
+    });
+    observer.observe(main, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [url.state.selectedId, url.state.view]);
 
   useEffect(() => {
     const selected = url.state.selectedId ? ` ${url.state.selectedId}` : "";

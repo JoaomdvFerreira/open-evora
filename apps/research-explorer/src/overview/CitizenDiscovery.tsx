@@ -372,7 +372,8 @@ export function ProblemRow({ problem, onExplore, latestChange }: { problem: Citi
   const rowClassName = latestChange !== undefined ? "overview-problem-row overview-problem-row--changed" : "overview-problem-row";
   return (
     <li className={rowClassName}>
-      <button type="button" className="overview-problem-row-link shell-frame shell-frame--wide" aria-label={`Explorar ${problem.title}`} onClick={() => onExplore(problem.id)}>
+      <div className="overview-problem-row-link shell-frame shell-frame--wide">
+        <button type="button" className="overview-problem-row-action" aria-label={`Explorar ${problem.title}`} onClick={() => onExplore(problem.id)} />
         {latestChange !== undefined && (
           <p className="overview-problem-row-change-marker">
             <IconTrendUp />
@@ -396,7 +397,7 @@ export function ProblemRow({ problem, onExplore, latestChange }: { problem: Citi
             {problem.domainCodes.map((code) => describeTopic(code).label).join(", ")}
           </p>
         )}
-      </button>
+      </div>
     </li>
   );
 }

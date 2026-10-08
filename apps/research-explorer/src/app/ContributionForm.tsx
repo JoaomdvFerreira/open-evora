@@ -1,4 +1,4 @@
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { useToast } from "../presentation/Toast";
 
 const GITHUB_NEW_ISSUE_URL = "https://github.com/JoaomdvFerreira/open-evora/issues/new";
@@ -101,6 +101,8 @@ export function ContributionForm({ initialSearch }: { initialSearch?: string }) 
   const [fields, setFields] = useState<ContributionFields>(() => contributionPrefill(initialSearch ?? window.location.search));
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [invalidSubmitCount, setInvalidSubmitCount] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const id = (name: string) => `${baseId}-${name}`;
   const errorId = (name: FieldName) => (errors[name] ? id(`${name}-error`) : undefined);
@@ -116,21 +118,29 @@ export function ContributionForm({ initialSearch }: { initialSearch?: string }) 
     setSubmitted(true);
     const nextErrors = validate(fields);
     setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
+    if (Object.keys(nextErrors).length > 0) {
+      setInvalidSubmitCount((count) => count + 1);
+      return;
+    }
     if (openInNewTab(contributionIssueUrl(fields))) notify("Contribuição preparada. Complete o envio no GitHub.", "affirmed");
     else notify("Não foi possível abrir o GitHub.", "error");
   }
 
+  useEffect(() => {
+    if (!submitted || Object.keys(errors).length === 0) return;
+    formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  }, [invalidSubmitCount]);
+
   const isEvidence = fields.type === "evidence";
 
   return (
-    <form className="info-form" noValidate onSubmit={handleSubmit}>
+    <form ref={formRef} className="info-form" noValidate onSubmit={handleSubmit}>
       <fieldset className="info-form-field" aria-describedby={errorId("type")}>
         <legend className="info-form-label">Tipo de contribuição <span className="info-form-required">(obrigatório)</span></legend>
         <div className="info-form-options">
           {(Object.keys(CONTRIBUTION_TYPE_LABELS) as ContributionType[]).map((type) => (
             <label key={type} className="info-form-option">
-              <input type="radio" name={id("type")} value={type} required checked={fields.type === type} onChange={() => update("type", type)} aria-describedby={errorId("type")} />
+              <input type="radio" name={id("type")} value={type} required checked={fields.type === type} onChange={() => update("type", type)} aria-invalid={errors.type ? true : undefined} aria-describedby={errorId("type")} />
               <span>{CONTRIBUTION_TYPE_LABELS[type]}</span>
             </label>
           ))}

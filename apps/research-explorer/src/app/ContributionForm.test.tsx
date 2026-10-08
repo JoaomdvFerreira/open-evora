@@ -105,11 +105,24 @@ describe("ContributionForm — validation", () => {
     }
   });
 
-  it("does not move focus when validation fails", async () => {
+  it("focuses the first invalid control and exposes invalid radio state after submission", async () => {
     const user = userEvent.setup();
     renderForm();
     await user.click(submit());
-    expect(document.activeElement).toBe(submit());
+    expect(document.activeElement).toBe(problemOption());
+    expect(problemOption().getAttribute("aria-invalid")).toBe("true");
+    expect(evidenceOption().getAttribute("aria-invalid")).toBe("true");
+  });
+
+  it("keeps entered values when validation fails and focuses the remaining problem", async () => {
+    const user = userEvent.setup();
+    renderForm("?type=problem");
+    const summary = screen.getByRole("textbox", { name: /Resumo/ }) as HTMLInputElement;
+    await user.type(summary, "Passeio sem rampa");
+    await user.click(submit());
+
+    expect(summary.value).toBe("Passeio sem rampa");
+    expect(document.activeElement).toBe(screen.getByRole("textbox", { name: /Descrição/ }));
   });
 
   it("requires a canonical related PRB for an existing-problem contribution", async () => {

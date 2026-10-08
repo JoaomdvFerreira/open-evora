@@ -340,6 +340,11 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
     const firstAction = await screen.findByRole("button", { name: "Explorar Problema de mobilidade" });
     expect(screen.getByRole("button", { name: "Explorar Problema digital" })).toBeTruthy();
     expect(firstAction.closest('[aria-live="polite"]')).toBeNull();
+    const row = firstAction.closest(".overview-problem-row")!;
+    expect(row.querySelector("h4")?.contains(firstAction)).toBe(false);
+    expect(row.querySelector(".overview-problem-row-meta")?.contains(firstAction)).toBe(false);
+    expect(row.querySelector(".overview-problem-statement")?.contains(firstAction) ?? false).toBe(false);
+    expect(row.querySelector(".overview-problem-topics")?.contains(firstAction) ?? false).toBe(false);
   });
 });
 

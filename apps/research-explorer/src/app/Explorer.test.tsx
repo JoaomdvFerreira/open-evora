@@ -134,6 +134,20 @@ describe("Explorer — Records workflow (fake provider)", () => {
     expect(getRecord).not.toHaveBeenCalled();
   });
 
+  it("moves focus to Overview and Records content after SPA navigation and browser Back", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("heading", { name: "Registos" });
+    await user.click(screen.getByRole("button", { name: "Abrir menu" }));
+    await user.click(screen.getByRole("button", { name: "Problemas" }));
+    const overviewHeading = await screen.findByRole("heading", { name: "Visão geral" });
+    await waitFor(() => expect(document.activeElement).toBe(overviewHeading));
+
+    window.history.back();
+    const recordsHeadingElement = await screen.findByRole("heading", { name: "Registos" });
+    await waitFor(() => expect(document.activeElement).toBe(recordsHeadingElement));
+  });
+
   it("selecting a record triggers exactly one lazy getRecord() call, not one per row", async () => {
     const user = userEvent.setup();
     const getRecord = vi.fn(fakeProvider().getRecord);

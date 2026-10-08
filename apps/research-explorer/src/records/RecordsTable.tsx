@@ -105,6 +105,8 @@ export function RecordsTable({
 }: RecordsTableProps) {
   const isNarrow = useNarrowViewport();
   const filterStripRef = useRef<HTMLDivElement>(null);
+  const paginationStatusRef = useRef<HTMLParagraphElement>(null);
+  const paginationFocusPending = useRef(false);
 
   const types = useMemo(() => orderedTypes(availableRecordTypes(records)), [records]);
   // A type filter value that no longer exists in the loaded data (e.g. a
@@ -136,6 +138,7 @@ export function RecordsTable({
     },
     onPaginationChange: (updater) => {
       const next = typeof updater === "function" ? updater(state.pagination) : updater;
+      paginationFocusPending.current = next.pageIndex !== state.pagination.pageIndex;
       dispatch({ type: "SET_PAGE_INDEX", pageIndex: next.pageIndex });
     },
     getCoreRowModel: getCoreRowModel(),
@@ -155,6 +158,13 @@ export function RecordsTable({
       strip.scrollLeft = Math.max(0, start - (strip.clientWidth - active.offsetWidth) / 2);
     }
   }, [effectiveTypeFilter]);
+
+  useEffect(() => {
+    if (paginationFocusPending.current) {
+      paginationStatusRef.current?.focus();
+      paginationFocusPending.current = false;
+    }
+  }, [state.pagination.pageIndex]);
 
   const count = filtered.length;
   const noun = resultNoun(effectiveTypeFilter, count);
@@ -176,7 +186,7 @@ export function RecordsTable({
       <div className="records-page-frame shell-frame shell-frame--wide">
         <header className="records-intro">
           <p className="records-eyebrow">Corpus de investigação</p>
-          <h2 id="records-heading" className="records-title">Registos</h2>
+          <h2 id="records-heading" className="records-title" tabIndex={-1}>Registos</h2>
           <p className="records-lede">
             Problemas, fontes e evidências que compõem a investigação. Cada registo tem um identificador estável para citação.
           </p>
@@ -272,7 +282,7 @@ export function RecordsTable({
                   <span aria-hidden="true">← </span>Anterior
                 </button>
               )}
-              <p className="records-pagination-status">
+              <p ref={paginationStatusRef} className="records-pagination-status" tabIndex={-1} role="status" aria-live="polite" aria-atomic="true">
                 <span className="records-pagination-status-full">
                   Página {pageIndex + 1} de {pageCount} · {countText}
                 </span>

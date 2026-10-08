@@ -1599,14 +1599,22 @@ main.explorer-shell {
    `shell-frame--wide` grid already provides — the row's content shares the
    same primary axis as the Hero, discovery band, and end-of-results. */
 .overview-problem-row-link {
+  position: relative;
   display: block;
   width: 100%;
   padding: 26px 0;
   color: inherit;
-  border: 0;
-  background: none;
-  font: inherit;
   text-align: left;
+}
+
+.overview-problem-row-action {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
   cursor: pointer;
 }
 
@@ -1619,7 +1627,7 @@ main.explorer-shell {
    own clay surface (`.overview-problem-row--changed`, below) regardless of
    hover. Keyboard focus keeps its own separate visible outline
    (`:focus-visible`, unchanged) regardless of hover. */
-.overview-problem-row-link:focus-visible {
+.overview-problem-row-action:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
 }
