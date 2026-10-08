@@ -408,6 +408,8 @@ These couple a record to internal research state of another layer; Problem relat
 
 Every other CLEC signal remains advisory: lexical wording is never automatically a violation, and a change that passes the precheck still requires the mandatory independent semantic review. No automatic semantic judgement has been introduced. The block applies only to the records in the current change unit; legacy corpus signals, including these two classes in unchanged records, are not turned into corpus-wide validation or CI failures.
 
+The enforcement chain as a whole has hermetic end-to-end regression coverage: Lane A from candidate through the precheck, independent review, Human Gate decision binding and post-approval promotion to the owner-merge boundary, and Lane B from Git-derived change through receipt and pull-request check. This coverage verifies that the gates hold; it does not judge wording.
+
 Not yet implemented:
 - automatic semantic decisions from lexical signals.
 
