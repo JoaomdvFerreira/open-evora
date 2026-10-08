@@ -9,22 +9,14 @@ import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
 import { formatTypedId } from "../presentation/typeGlossary";
 import { PrbDetailsSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
-import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
-
-const ERROR_TITLES: Record<string, string> = {
-  missing: "Modelo de leitura gerado não encontrado",
-  malformed: "Registo mal formado",
-  incompatible: "Versão do modelo de leitura incompatível",
-  network: "Falha ao carregar o Problema",
-  not_found: "Problema não encontrado",
-  invalid_id: "Identificador de Problema inválido",
-};
+import { problemLoadRecovery } from "./problemLoadRecovery";
 
 interface ProblemContentProps {
   dataProvider: DataProvider;
   lookup: Map<string, RecordSummary>;
   problemId: string;
   onOpenGeneric: (id: string) => void;
+  onBackToRecords: () => void;
   onBackToOverview: () => void;
   onViewHistory: (id: string) => void;
   initialFragmentConsideredRef: MutableRefObject<boolean>;
@@ -42,7 +34,7 @@ interface ProblemContentProps {
  * `loading`) is what the newly selected PRB shows while resolving — never the
  * previous PRB's stale `ready` projection.
  */
-function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToOverview, onViewHistory, initialFragmentConsideredRef, dossierIdentity }: ProblemContentProps) {
+function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewHistory, initialFragmentConsideredRef, dossierIdentity }: ProblemContentProps) {
   const state = useProblemProjection(dataProvider, lookup, problemId);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -82,14 +74,14 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
   }
 
   if (state.status === "error") {
-    const recovery = dataLoadRecovery(state.error, state.retry);
+    const recovery = problemLoadRecovery(state.error, "detail", state.retry, onBackToRecords, onBackToOverview);
     return (
       <div className="shell-frame">
         <ErrorNotice
           ref={errorRef}
           tabIndex={-1}
           titleAs="h2"
-          title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Problema"}
+          title={recovery.title}
           message={recovery.message}
           action={recovery.action}
         />
@@ -150,12 +142,12 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
   }
 
   if (indexState.status === "error") {
-    const recovery = dataLoadRecovery(indexState.error, indexState.retry);
+    const recovery = problemLoadRecovery(indexState.error, "index", indexState.retry, onBackToRecords, onBackToOverview);
     return (
       <div className="shell-frame">
         <ErrorNotice
           titleAs="h2"
-          title="Não foi possível carregar os registos"
+          title={recovery.title}
           message={recovery.message}
           action={recovery.action}
         />
@@ -202,6 +194,7 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
       lookup={indexState.lookup}
       problemId={problemId}
       onOpenGeneric={onOpenGeneric}
+      onBackToRecords={onBackToRecords}
       onBackToOverview={onBackToOverview}
       onViewHistory={onViewHistory}
       initialFragmentConsideredRef={initialFragmentConsideredRef}
