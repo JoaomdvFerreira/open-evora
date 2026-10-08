@@ -50,6 +50,8 @@ export function OverviewPresentation({
   sortOrder,
   onSortOrderChange,
   onExploreProblem,
+  partialState,
+  initialDrawerOpen = false,
 }: {
   problemCount: number;
   evidenceCount: number;
@@ -80,8 +82,10 @@ export function OverviewPresentation({
   sortOrder: ProblemSortOrder;
   onSortOrderChange: (order: ProblemSortOrder) => void;
   onExploreProblem: (id: string) => void;
+  partialState: { failedIds: string[]; total: number; retrying: boolean; onRetry: () => void } | null;
+  initialDrawerOpen?: boolean;
 }) {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(initialDrawerOpen);
   const drawerId = useId();
 
   // Category drawer vocabulary (Overview final redesign, Phase 1 — delta
@@ -109,6 +113,7 @@ export function OverviewPresentation({
     : topicFilter === null
       ? null
       : describeTopic(topicFilter).label;
+  const resultCountPartial = partialState !== null && (searchQuery.trim() !== "" || topicFilter !== null || alteredThisWeekSelected);
 
   return (
     <section aria-labelledby="overview-heading" className="public-overview">
@@ -189,8 +194,8 @@ export function OverviewPresentation({
                       screen readers) — `aria-hidden` on the compact span
                       stops the visible short text from being announced a
                       second time alongside it. */}
-                  <span className="overview-results-count-full">{formatPublicCount(visibleProblems.length)} problemas</span>
-                  <span className="overview-results-count-compact" aria-hidden="true">{formatPublicCount(visibleProblems.length)}</span>
+                  <span className="overview-results-count-full">{formatPublicCount(visibleProblems.length)} problemas{resultCountPartial ? " (parcial)" : ""}</span>
+                  <span className="overview-results-count-compact" aria-hidden="true">{formatPublicCount(visibleProblems.length)}{resultCountPartial ? " parcial" : ""}</span>
                 </p>
               )}
             </div>
@@ -210,8 +215,22 @@ export function OverviewPresentation({
           alteredThisWeekSelected={alteredThisWeekSelected}
           alteredThisWeekCount={alteredThisWeekCount}
           onAlteredThisWeekChange={onAlteredThisWeekChange}
+          partial={partialState !== null}
         />
       </div>
+
+      {partialState !== null && partialState.failedIds.length > 0 && (
+        <div className="overview-partial-notice shell-frame shell-frame--wide" role="status" aria-live="polite">
+          <div>
+            <strong>Dados parciais</strong>
+            <p>Não foi possível carregar os detalhes de {partialState.failedIds.length} de {partialState.total} problemas. Todos os problemas continuam na lista; a pesquisa, os filtros, a ordenação por atualização e algumas contagens podem estar incompletos.</p>
+          </div>
+          <button type="button" onClick={partialState.onRetry} disabled={partialState.retrying}>
+            {partialState.retrying ? "A tentar novamente…" : "Tentar novamente"}
+          </button>
+          {partialState.retrying && <span className="visually-hidden" role="status">A carregar novamente os detalhes em falta.</span>}
+        </div>
+      )}
 
       <section id="overview-problemas" aria-label="Explorar problemas">
         {citizenProblems === null || visibleProblems === null ? (
@@ -249,8 +268,8 @@ export function OverviewPresentation({
                 <div className="overview-end-of-results-inner shell-frame shell-frame--wide">
                   <p className="overview-end-of-results-status">
                     {pageCount > 1
-                      ? `Página ${currentPage} de ${pageCount} · ${formatPublicCount(visibleProblems.length)} problemas`
-                      : `${formatPublicCount(visibleProblems.length)} de ${formatPublicCount(visibleProblems.length)} problemas`}
+                      ? `Página ${currentPage} de ${pageCount} · ${formatPublicCount(visibleProblems.length)} problemas${resultCountPartial ? " (parcial)" : ""}`
+                      : `${formatPublicCount(visibleProblems.length)} de ${formatPublicCount(visibleProblems.length)} problemas${resultCountPartial ? " (parcial)" : ""}`}
                   </p>
                   {pageCount > 1 && (
                     <div className="overview-pagination-actions">

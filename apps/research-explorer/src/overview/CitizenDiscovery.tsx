@@ -160,7 +160,7 @@ export function FiltrosToggle({ expanded, onToggle, controlsId, activeTopicLabel
  * separate `onChange`/`onAlteredThisWeekChange` callbacks, this component
  * only reflects whichever is currently active.
  */
-export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, totalCount, alteredThisWeekSelected, alteredThisWeekCount, onAlteredThisWeekChange }: {
+export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, totalCount, alteredThisWeekSelected, alteredThisWeekCount, onAlteredThisWeekChange, partial = false }: {
   id: string;
   /** True while the disclosure is collapsed — applies the native `hidden` attribute instead of unmounting. */
   hidden: boolean;
@@ -174,6 +174,7 @@ export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, 
   /** Distinct-Problem count for the shortcut — rendered even when `0`. */
   alteredThisWeekCount: number;
   onAlteredThisWeekChange: (selected: boolean) => void;
+  partial?: boolean;
 }) {
   return (
     <div id={id} hidden={hidden} className="overview-category-drawer shell-frame shell-frame--wide" role="group" aria-label="Filtrar por tema">
@@ -182,7 +183,7 @@ export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, 
       </button>
       {categories.map(({ code, count }) => (
         <button key={code} type="button" className="overview-category-drawer-option" aria-pressed={activeTopic === code} onClick={() => onChange(activeTopic === code ? null : code)}>
-          <span>{describeTopic(code).label}</span> <span className="overview-category-drawer-count">{count}</span>
+        <span>{describeTopic(code).label}{partial ? " (parcial)" : ""}</span> <span className="overview-category-drawer-count">{count}</span>
         </button>
       ))}
       <button
@@ -191,7 +192,7 @@ export function CategoryDrawer({ id, hidden, categories, activeTopic, onChange, 
         aria-pressed={alteredThisWeekSelected}
         onClick={() => onAlteredThisWeekChange(!alteredThisWeekSelected)}
       >
-        <span>Alterados esta semana</span> <span className="overview-category-drawer-count">{alteredThisWeekCount}</span>
+        <span>Alterados esta semana{partial ? " (parcial)" : ""}</span> <span className="overview-category-drawer-count">{alteredThisWeekCount}</span>
       </button>
     </div>
   );

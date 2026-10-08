@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import { useRecordIndex } from "../records/useRecordIndex";
 import {
@@ -13,8 +13,6 @@ import {
   projectMaterialChangeEntries,
   sortProblems,
   toCitizenProblem,
-  type CitizenProblem,
-  type MaterialChangeEntry,
   type ProblemSortOrder,
 } from "./overviewStats";
 import { OverviewSkeleton } from "../loading/LoadingSkeletons";
@@ -186,8 +184,18 @@ export function Overview({
   discovery: OverviewDiscoveryState;
 }) {
   const indexState = useRecordIndex(dataProvider);
-  const [citizenProblems, setCitizenProblems] = useState<CitizenProblem[] | null>(null);
-  const [materialChangeEntries, setMaterialChangeEntries] = useState<MaterialChangeEntry[]>([]);
+  const [detailState, setDetailState] = useState<{
+    key: string;
+    details: Map<string, { summary: RecordSummary; detail: RecordDetail }>;
+    failedIds: string[];
+    retrying: boolean;
+  } | null>(null);
+  const generation = useRef(0);
+  const retryLock = useRef(false);
+  const providerIdentity = useRef({ provider: dataProvider, version: 0 });
+  if (providerIdentity.current.provider !== dataProvider) {
+    providerIdentity.current = { provider: dataProvider, version: providerIdentity.current.version + 1 };
+  }
   // The one current Europe/Lisbon civil date Overview evaluates every
   // "esta semana" judgement against (Lisbon date-boundary hardening) — see
   // `useLisbonCivilDate`'s own doc comment.
@@ -206,44 +214,73 @@ export function Overview({
   } = discovery;
   const overview = indexState.status === "ready" ? computePublicOverviewData(indexState.records) : null;
   const problemIds = overview?.problems.map((problem) => problem.id).join("|") ?? "";
+  const datasetKey = `${providerIdentity.current.version}:${problemIds}`;
 
   useEffect(() => {
+    const currentGeneration = ++generation.current;
     if (indexState.status !== "ready") {
-      setCitizenProblems(null);
-      setMaterialChangeEntries([]);
+      setDetailState(null);
       return;
     }
     let cancelled = false;
-    setCitizenProblems(null);
-    setMaterialChangeEntries([]);
-    const summaries = indexState.records.filter((record) => record.type === "PRB-");
+    retryLock.current = false;
+    const summaries = indexState.records.filter((record) => record.type === "PRB-").sort((a, b) => a.id.localeCompare(b.id));
+    const key = `${providerIdentity.current.version}:${summaries.map((s) => s.id).join("|")}`;
+    setDetailState({ key, details: new Map(), failedIds: [], retrying: false });
     Promise.all(
       summaries.map(async (summary) => {
         try {
           const detail = await dataProvider.getRecord(summary.id);
-          return { summary, detail };
+          return { summary, detail, failed: false };
         } catch {
           const detail: RecordDetail = { id: summary.id, type: summary.type, file: summary.file, record: {}, outgoingEdges: [], incomingEdges: [] };
-          return { summary, detail };
+          return { summary, detail, failed: true };
         }
       })
-    ).then((resolved: { summary: RecordSummary; detail: RecordDetail }[]) => {
-      if (cancelled) return;
-      setCitizenProblems(
-        resolved.map(({ summary, detail }) => toCitizenProblem(summary, detail)).sort((a, b) => a.id.localeCompare(b.id))
-      );
-      // Same resolved detail reads, reused rather than re-fetched (§1/§9) —
-      // a Problem whose read failed above contributes an empty `record: {}`
-      // here too, which `projectMaterialChangeEntries` already treats as "no
-      // authored history" (see its own doc comment), never as a fallback
-      // material-change signal.
-      setMaterialChangeEntries(projectMaterialChangeEntries(resolved));
+    ).then((results: ({ summary: RecordSummary; detail: RecordDetail; failed: boolean })[]) => {
+      if (cancelled || generation.current !== currentGeneration) return;
+      setDetailState({
+        key,
+        details: new Map(results.map(({ summary, detail }) => [summary.id, { summary, detail }])),
+        failedIds: results.filter((result) => result.failed).map((result) => result.summary.id),
+        retrying: false,
+      });
     });
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- problemIds is a stable content-based key for the summaries above
   }, [dataProvider, indexState.status, problemIds]);
+
+  const retryFailedDetails = useCallback(async () => {
+    if (!detailState || detailState.key !== datasetKey || detailState.failedIds.length === 0 || retryLock.current) return;
+    retryLock.current = true;
+    const currentGeneration = generation.current;
+    const ids = [...detailState.failedIds];
+    setDetailState((current) => current?.key === datasetKey ? { ...current, retrying: true } : current);
+    const summaries = indexState.status === "ready" ? indexState.records.filter((record) => ids.includes(record.id)) : [];
+    const results = await Promise.all(summaries.map(async (summary) => {
+      try { return { summary, detail: await dataProvider.getRecord(summary.id), failed: false }; }
+      catch { return { summary, detail: { id: summary.id, type: summary.type, file: summary.file, record: {}, outgoingEdges: [], incomingEdges: [] } as RecordDetail, failed: true }; }
+    }));
+    if (generation.current === currentGeneration) {
+      setDetailState((current) => {
+        if (!current || current.key !== datasetKey) return current;
+        const details = new Map(current.details);
+        for (const result of results) details.set(result.summary.id, { summary: result.summary, detail: result.detail });
+        const failed = new Set(current.failedIds);
+        for (const result of results) result.failed ? failed.add(result.summary.id) : failed.delete(result.summary.id);
+        return { key: current.key, details, failedIds: [...failed], retrying: false };
+      });
+    }
+    retryLock.current = false;
+  }, [dataProvider, datasetKey, detailState, indexState]);
+
+  const currentDetailState = detailState?.key === datasetKey ? detailState : null;
+  const resolved = currentDetailState ? [...currentDetailState.details.values()] : [];
+  const citizenProblems = currentDetailState && resolved.length === (overview?.problemCount ?? -1)
+    ? resolved.map(({ summary, detail }) => toCitizenProblem(summary, detail)).sort((a, b) => a.id.localeCompare(b.id)) : null;
+  const materialChangeEntries = useMemo(() => projectMaterialChangeEntries(resolved), [currentDetailState]);
 
   // This-civil-week latest material change per Problem (row-level changed
   // treatment) and the distinct set of Problems qualifying for `Alterados
@@ -324,6 +361,7 @@ export function Overview({
       sortOrder={sortOrder}
       onSortOrderChange={setSortOrder}
       onExploreProblem={onExploreProblem}
+      partialState={currentDetailState && currentDetailState.failedIds.length > 0 ? { failedIds: currentDetailState.failedIds, total: overview.problemCount, retrying: currentDetailState.retrying, onRetry: retryFailedDetails } : null}
     />
   );
 }

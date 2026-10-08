@@ -1,5 +1,5 @@
 ﻿import { describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Overview, useOverviewDiscoveryState } from "./Overview";
 import { DataLoadError, type DataProvider, type RecordDetail, type RecordSummary } from "../dataProvider/types";
@@ -875,10 +875,12 @@ describe("Overview — material-change row treatment", () => {
 
   it("does not block or drop a Problem from the normal list when its detail read fails", async () => {
     const provider = providerWithHistory([{ id: "PRB-1", label: "Problema saudável" }]);
-    provider.getRecord = async (id) => {
-      if (id === "PRB-2") throw new Error("falha ao ler PRB-2");
-      return { id, type: "PRB-", file: "", record: { title: "Problema saudável" }, outgoingEdges: [], incomingEdges: [] };
-    };
+    let prb2Attempts = 0;
+    const getRecord = vi.fn(async (id: string) => {
+      if (id === "PRB-2" && ++prb2Attempts <= 2) throw new Error("falha ao ler PRB-2");
+      return { id, type: "PRB-", file: "", record: { title: "Problema saudável", domain: ["MOB"], history: [{ date: getLisbonCivilDate(), summary: "Alteração registada." }] }, outgoingEdges: [], incomingEdges: [] };
+    });
+    provider.getRecord = getRecord;
     provider.listRecords = async () => [
       { id: "PRB-1", type: "PRB-", label: "Problema saudável", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema com falha de leitura", file: "", summaryFields: {} },
@@ -888,9 +890,69 @@ describe("Overview — material-change row treatment", () => {
     // Both Problems remain in the list; the failed one just never gets the
     // changed-row treatment (its fallback empty record carries no history).
     await screen.findByText("Problema saudável");
+    expect(await screen.findByText("Dados parciais")).toBeTruthy();
     expect(screen.getByText("2 problemas")).toBeTruthy();
+    expect([...document.querySelectorAll(".overview-metric")].every((metric) => !metric.textContent?.includes("parcial"))).toBe(true);
     const failedRow = screen.getByText("Problema com falha de leitura").closest(".overview-problem-row");
     expect(failedRow?.classList.contains("overview-problem-row--changed")).toBe(false);
+    expect(screen.getByText(/detalhes de 1 de 2 problemas/)).toBeTruthy();
+    expect(getRecord.mock.calls.map(([id]) => id).sort()).toEqual(["PRB-1", "PRB-2"]);
+    const user = userEvent.setup();
+    await user.click(openDrawer());
+    expect(screen.getByRole("button", { name: "Todos 2" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Mobilidade \(parcial\) 1/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Alterados esta semana \(parcial\) 1/ })).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: /Mobilidade \(parcial\)/ }));
+    expect(document.querySelector(".overview-results-count-full")?.textContent).toBe("1 problemas (parcial)");
+    await user.click(screen.getByRole("button", { name: /Filtros/ }));
+    await user.clear(screen.getByLabelText("Pesquisar problemas"));
+    await user.type(screen.getByLabelText("Pesquisar problemas"), "saudável");
+    expect(document.querySelector(".overview-results-count-full")?.textContent).toBe("1 problemas (parcial)");
+    await user.clear(screen.getByLabelText("Pesquisar problemas"));
+    await user.click(screen.getByRole("button", { name: /^Filtros/ }));
+    await user.click(screen.getByRole("button", { name: /Alterados esta semana \(parcial\)/ }));
+    expect(document.querySelector(".overview-results-count-full")?.textContent).toBe("1 problemas (parcial)");
+    await user.click(screen.getByRole("button", { name: /^Filtros/ }));
+    await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
+    expect(await screen.findByText("Dados parciais")).toBeTruthy();
+    expect(getRecord).toHaveBeenCalledTimes(3);
+    await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
+    await waitFor(() => expect(screen.queryByText("Dados parciais")).toBeNull());
+    expect(getRecord).toHaveBeenCalledTimes(4);
+    expect(getRecord.mock.calls.slice(2).map(([id]) => id)).toEqual(["PRB-2", "PRB-2"]);
+  });
+
+  it("prevents overlapping retries while a failed detail read is still pending", async () => {
+    const index: RecordSummary[] = [
+      { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
+      { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
+    ];
+    let resolveRetry!: (detail: RecordDetail) => void;
+    const pendingRetry = new Promise<RecordDetail>((resolve) => { resolveRetry = resolve; });
+    let prb2Calls = 0;
+    const getRecord = vi.fn(async (id: string): Promise<RecordDetail> => {
+      if (id === "PRB-2" && prb2Calls++ === 0) throw new Error("falha inicial");
+      if (id === "PRB-2") return pendingRetry;
+      return { id, type: "PRB-", file: "", record: { title: "Problema um" }, outgoingEdges: [], incomingEdges: [] };
+    });
+    const provider: DataProvider = {
+      getManifest: async () => { throw new Error("unused"); },
+      listRecords: async () => index,
+      getEdges: async () => [],
+      getRecord,
+    };
+    render(<OverviewFixture dataProvider={provider} {...props} />);
+    await screen.findByText("Dados parciais");
+    const retry = screen.getByRole("button", { name: "Tentar novamente" });
+    fireEvent.click(retry);
+    fireEvent.click(retry);
+    expect(screen.getByRole("button", { name: "A tentar novamente…" }).hasAttribute("disabled")).toBe(true);
+    expect(getRecord.mock.calls.filter(([id]) => id === "PRB-2")).toHaveLength(2);
+    await act(async () => {
+      resolveRetry({ id: "PRB-2", type: "PRB-", file: "", record: { title: "Problema dois" }, outgoingEdges: [], incomingEdges: [] });
+      await pendingRetry;
+    });
+    await waitFor(() => expect(screen.queryByText("Dados parciais")).toBeNull());
   });
 });
 

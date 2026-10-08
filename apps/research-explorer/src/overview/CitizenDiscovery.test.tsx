@@ -202,6 +202,12 @@ describe("FiltrosToggle", () => {
 const drawerShortcutDefaults = { alteredThisWeekSelected: false, alteredThisWeekCount: 0, onAlteredThisWeekChange: vi.fn() };
 
 describe("CategoryDrawer", () => {
+  it("qualifies only detail-derived counts while keeping Todos exact", () => {
+    render(<CategoryDrawer id="drawer-1" hidden={false} categories={[{ code: "MOB", count: 3 }]} activeTopic={null} onChange={vi.fn()} totalCount={5} {...drawerShortcutDefaults} alteredThisWeekCount={2} partial />);
+    expect(screen.getByRole("button", { name: "Todos 5" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Mobilidade \(parcial\) 3/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Alterados esta semana \(parcial\) 2/ })).toBeTruthy();
+  });
   it("renders Todos with the given total count, then each category with its own real count, then the Alterados esta semana shortcut, in that order", () => {
     render(
       <CategoryDrawer

@@ -1270,6 +1270,27 @@ main.explorer-shell {
   border-bottom: 1px solid var(--color-separator-standard);
 }
 
+.overview-partial-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-standard);
+  margin-top: var(--space-standard);
+  margin-bottom: var(--space-standard);
+  padding: var(--space-standard);
+  border: 1px solid var(--color-separator-standard);
+  background: var(--color-surface-subtle);
+  color: var(--color-text-primary);
+}
+
+.overview-partial-notice p {
+  margin: var(--space-micro) 0 0;
+}
+
+.overview-partial-notice button {
+  flex: 0 0 auto;
+}
+
 /* Toolbar (Overview final redesign, Phase 1 — delta §3; final alignment
    pass, Phase 3A §6; visual-convergence pass §8): Filtros, search, and the
    result count read as one left-hand group — the count visually follows the
@@ -1902,6 +1923,13 @@ body:has(.public-overview) .public-footer {
   .overview-discovery {
     margin: 0 -1rem;
     padding: 0 1rem;
+  }
+
+  .overview-partial-notice {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-right: auto;
+    margin-left: auto;
   }
 
   /* Compact discovery composition (visual-completion compact pass, task §7;
