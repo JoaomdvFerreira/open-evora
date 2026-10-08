@@ -96,6 +96,8 @@ It performs no document generation. The renderer layer owns presentation labels,
 
 #### Problem dossier PDF
 
+Expensive React-PDF generation runs in a dedicated browser module Worker; main-thread interaction, busy state, download and notifications remain separate. Rendering stays client-side and lazy-loaded, with no server dependency.
+
 The `Detalhes` dossier action ("Descarregar dossiê (PDF)") generates an A4 PDF entirely in the browser from the current Problem's `PrbDossierData` and downloads it as `open-evora-<PRB-ID>-dossie.pdf`. Invariants:
 
 - the renderer consumes only `PrbDossierData` plus generation metadata (the generation timestamp, captured once per generation and used only as audit metadata); it never loads data, reads files, inspects the page DOM, or uses website CSS, and it never re-derives or extends the dossier projection;

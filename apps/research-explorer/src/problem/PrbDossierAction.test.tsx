@@ -4,8 +4,13 @@ import { ToastProvider } from "../presentation/Toast";
 import { PrbDossierAction, prbDossierFileName } from "./PrbDossierAction";
 import { buildPrbDossierData, type PrbDossierData } from "./prbDossierProjection";
 
-const generate = vi.hoisted(() => vi.fn<(dossier: PrbDossierData, generatedAt?: Date) => Promise<Blob>>());
-vi.mock("./pdf/generatePrbDossierPdf", () => ({ generatePrbDossierPdf: generate }));
+const generate = vi.hoisted(() => vi.fn<(dossier: PrbDossierData, generatedAt: string) => Promise<Blob>>());
+const rendererImported = vi.hoisted(() => vi.fn());
+vi.mock("./pdf/prbDossierWorkerClient", () => ({ generateDossierInWorker: generate }));
+vi.mock("./pdf/generatePrbDossierPdf", () => {
+  rendererImported();
+  return { generatePrbDossierPdf: vi.fn() };
+});
 
 const dossier = buildPrbDossierData({
   problem: { id: "PRB-9999", type: "PRB-", file: "", record: { title: "Problema sintético" }, outgoingEdges: [], incomingEdges: [] },
@@ -39,6 +44,8 @@ describe("PRB dossier PDF download action", () => {
 
   beforeEach(() => {
     generate.mockReset();
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-08T10:11:12.000Z"));
     clicked = [];
     createObjectURL = vi.fn(() => "blob:dossie");
     URL.createObjectURL = createObjectURL as unknown as typeof URL.createObjectURL;
@@ -50,6 +57,7 @@ describe("PRB dossier PDF download action", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it("names the file after the PRB identifier", () => {
@@ -63,7 +71,7 @@ describe("PRB dossier PDF download action", () => {
     expect(screen.getAllByRole("button", { name: /dossiê \(PDF\)/ })[1]).toHaveProperty("disabled", true);
   });
 
-  it("generates from the current PRB dossier, downloads the real Blob under the expected name and confirms only afterwards", async () => {
+  it("delegates the current dossier and one captured timestamp, downloads the returned Blob and confirms only afterwards", async () => {
     const pending = deferred<Blob>();
     generate.mockReturnValue(pending.promise);
     renderAction();
@@ -71,6 +79,7 @@ describe("PRB dossier PDF download action", () => {
     fireEvent.click(button());
     await vi.waitFor(() => expect(generate).toHaveBeenCalledTimes(1));
     expect(generate.mock.calls[0][0]).toBe(dossier);
+    expect(generate.mock.calls[0][1]).toBe("2026-10-08T10:11:12.000Z");
     expect(screen.queryByText("Dossiê PDF preparado.")).toBeNull();
 
     const blob = new Blob(["%PDF-1.3"], { type: "application/pdf" });
@@ -117,5 +126,9 @@ describe("PRB dossier PDF download action", () => {
     expect(screen.queryByText("Dossiê PDF preparado.")).toBeNull();
     expect(button().getAttribute("aria-busy")).toBeNull();
     expect(window.location.href).toBe(startUrl);
+  });
+
+  it("does not eagerly import the PDF renderer from the action module", async () => {
+    expect(rendererImported).not.toHaveBeenCalled();
   });
 });

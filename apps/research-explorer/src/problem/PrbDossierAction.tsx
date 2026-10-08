@@ -23,8 +23,9 @@ function saveBlob(blob: Blob, fileName: string): void {
 /**
  * "Descarregar dossiê (PDF)": generates the PRB dossier client-side from the
  * current PRB's `PrbDossierData` and hands the browser a real PDF Blob. The
- * PDF engine (React-PDF + dossier layout) is loaded only on click, via
- * dynamic import, so it never weighs on the initial Explorer bundle.
+ * React-PDF and dossier layout run in a dedicated module
+ * Worker created only on click, so it never blocks the Explorer UI or weighs
+ * on the initial Explorer execution path.
  *
  * While generating, the button stays focusable but inert (`aria-disabled`,
  * `aria-busy`, busy label) so a second click cannot start a duplicate run;
@@ -42,8 +43,9 @@ export function PrbDossierAction({ dossier }: { dossier: PrbDossierData | null }
     running.current = true;
     setBusy(true);
     try {
-      const { generatePrbDossierPdf } = await import("./pdf/generatePrbDossierPdf");
-      const blob = await generatePrbDossierPdf(dossier);
+      const generatedAt = new Date().toISOString();
+      const { generateDossierInWorker } = await import("./pdf/prbDossierWorkerClient");
+      const blob = await generateDossierInWorker(dossier, generatedAt);
       saveBlob(blob, prbDossierFileName(dossier.problem.id));
       notify("Dossiê PDF preparado.", "affirmed");
     } catch {
