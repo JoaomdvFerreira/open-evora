@@ -70,11 +70,11 @@ export function ExplorerHeader({ activeView, onProblemas, onRegistos }: {
         <div id={menuId} className="explorer-chrome-menu" hidden={!menuOpen}>
           <nav aria-label="Navegação principal" className="explorer-navigation">
             {onProblemas
-              ? <button type="button" className="explorer-navigation-action" aria-current={isProblemas ? "page" : undefined} onClick={onProblemas}>Problemas</button>
+              ? <button type="button" className="explorer-navigation-action" aria-current={isProblemas ? "page" : undefined} onClick={() => { setMenuOpen(false); onProblemas(); }}>Problemas</button>
               : <a className="explorer-navigation-action" href="/">Problemas</a>}
             <a className="explorer-navigation-action" href="/methodology" aria-current={isMetodo ? "page" : undefined}>Método</a>
             {onRegistos
-              ? <button type="button" className="explorer-navigation-action" aria-current={isRegistos ? "page" : undefined} onClick={onRegistos}>Registos</button>
+              ? <button type="button" className="explorer-navigation-action" aria-current={isRegistos ? "page" : undefined} onClick={() => { setMenuOpen(false); onRegistos(); }}>Registos</button>
               : <a className="explorer-navigation-action" href="/?view=records">Registos</a>}
             <a className="explorer-navigation-action" href="/about" aria-current={isSobre ? "page" : undefined}>Sobre</a>
           </nav>

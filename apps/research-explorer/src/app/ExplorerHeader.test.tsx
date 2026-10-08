@@ -98,9 +98,12 @@ describe("ExplorerHeader — compact menu disclosure", () => {
 
     await user.click(screen.getByRole("button", { name: "Problemas" }));
     expect(onProblemas).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Abrir menu" }).getAttribute("aria-expanded")).toBe("false");
 
+    await user.click(screen.getByRole("button", { name: "Abrir menu" }));
     await user.click(screen.getByRole("button", { name: "Registos" }));
     expect(onRegistos).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Abrir menu" }).getAttribute("aria-expanded")).toBe("false");
   });
 
   it("marks Problemas as the active page via aria-current, matching activeView (desktop markup/state semantics unaffected)", () => {
