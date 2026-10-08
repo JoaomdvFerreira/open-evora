@@ -1328,3 +1328,88 @@ describe("Explorer workflow — never loads edges.json or canonical YAML (real S
     expect(requestedUrls.some((u) => u.includes("research/"))).toBe(false);
   });
 });
+
+/**
+ * D01-019: document titles identify the destination from URL state alone —
+ * a selected EVD/SRC by type and canonical ID (never waiting on, or changing
+ * after, the detail request) — while every pre-existing view title holds.
+ */
+describe("Explorer — document titles (D01-019)", () => {
+  const titleOf = (label: string) => `${label} — Explorador de Investigação Open Évora`;
+  const pending: Partial<DataProvider> = { getRecord: () => new Promise<RecordDetail>(() => {}) };
+
+  it("direct EVD URL titles the record by type and ID while its detail is still loading", () => {
+    window.history.replaceState(null, "", "/?view=records&id=EVD-000105");
+    render(<Explorer dataProvider={fakeProvider(pending)} />);
+    expect(document.title).toBe("Evidência EVD-000105 — Explorador de Investigação Open Évora");
+  });
+
+  it("direct SRC URL titles the record by type and ID while its detail is still loading", () => {
+    window.history.replaceState(null, "", "/?view=records&id=SRC-0092");
+    render(<Explorer dataProvider={fakeProvider(pending)} />);
+    expect(document.title).toBe("Fonte SRC-0092 — Explorador de Investigação Open Évora");
+  });
+
+  it("keeps the type/ID title when the selected record's detail fails to load", async () => {
+    window.history.replaceState(null, "", "/?view=records&id=EVD-000105");
+    render(<Explorer dataProvider={fakeProvider({ getRecord: () => Promise.reject(new Error("detail failure")) })} />);
+    await screen.findByRole("alert");
+    expect(document.title).toBe(titleOf("Evidência EVD-000105"));
+  });
+
+  it("follows in-app EVD -> SRC navigation and restores titles on Back/Forward", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await screen.findByRole("heading", { name: "Registos" });
+    expect(document.title).toBe(titleOf("Registos"));
+
+    await user.click(await screen.findByRole("button", { name: /EVD-000105/ }));
+    expect(document.title).toBe(titleOf("Evidência EVD-000105"));
+
+    const detailPanel = await getDetailPanel();
+    await user.click(await within(detailPanel).findByRole("button", { name: "Abrir fonte SRC-0092" }));
+    expect(window.location.search).toContain("id=SRC-0092");
+    expect(document.title).toBe(titleOf("Fonte SRC-0092"));
+
+    window.history.back();
+    await waitFor(() => expect(document.title).toBe(titleOf("Evidência EVD-000105")));
+    expect(window.location.search).toContain("id=EVD-000105");
+
+    window.history.back();
+    await waitFor(() => expect(document.title).toBe(titleOf("Registos")));
+    expect(window.location.search).not.toContain("id=");
+
+    window.history.forward();
+    await waitFor(() => expect(document.title).toBe(titleOf("Evidência EVD-000105")));
+
+    window.history.forward();
+    await waitFor(() => expect(document.title).toBe(titleOf("Fonte SRC-0092")));
+  });
+
+  it("follows in-app SRC -> EVD navigation from a direct SRC load", async () => {
+    window.history.replaceState(null, "", "/?view=records&id=SRC-0092");
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    expect(document.title).toBe(titleOf("Fonte SRC-0092"));
+
+    const detailPanel = await getDetailPanel();
+    await user.click(await within(detailPanel).findByRole("button", { name: /EVD-000105/ }));
+    expect(window.location.search).toContain("id=EVD-000105");
+    expect(document.title).toBe(titleOf("Evidência EVD-000105"));
+  });
+
+  it.each([
+    ["/?view=records", "Registos"],
+    ["/?view=records&id=PRB-0005", "Registos"],
+    ["/?view=records&id=WID-0001", "Registos"],
+    ["/?view=problem&id=PRB-0005", "Problema PRB-0005"],
+    ["/?view=history&id=PRB-0005", "Histórico PRB-0005"],
+    ["/", "Visão geral"],
+    ["/?view=graph&id=PRB-0005", "Problema PRB-0005"],
+    ["/?view=graph", "Visão geral"],
+  ])("preserves the existing title for %s", (url, label) => {
+    window.history.replaceState(null, "", url);
+    render(<Explorer dataProvider={fakeProvider(pending)} />);
+    expect(document.title).toBe(titleOf(label));
+  });
+});

@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { ContributionForm } from "./ContributionForm";
 import { ExplorerHeader } from "./ExplorerHeader";
+import { documentTitle } from "./documentTitle";
 
 const GITHUB_ISSUES_URL = "https://github.com/JoaomdvFerreira/open-evora/issues";
 
@@ -25,6 +26,13 @@ const TRUST_NAVIGATION: Array<{ path: TrustPagePath; label: string }> = [
   { path: "/contact", label: "Contacto" },
   { path: "/privacy", label: "Privacidade" },
 ];
+
+/** Document title for an Information page: its navigation label (not the
+ * longer H1) plus the shared site suffix. Each page's static
+ * `<path>/index.html` carries this exact string as its `<title>`. */
+function trustPageTitle(path: TrustPagePath): string {
+  return documentTitle(TRUST_NAVIGATION.find((item) => item.path === path)!.label);
+}
 
 /** Global-header item each Information page represents: Metodologia is the
  * destination behind the header's Método; every other page sits under Sobre. */
@@ -194,6 +202,9 @@ function InformationSequence({ currentPath }: { currentPath: TrustPagePath }) {
  * main landmark.
  */
 export function TrustPage({ page, skipTargetId }: { page: TrustPageEntry; skipTargetId?: string }) {
+  useEffect(() => {
+    document.title = trustPageTitle(page.path);
+  }, [page.path]);
   return <>
     <ExplorerHeader activeView={trustHeaderView(page.path)} />
     <div className="info-page shell-frame shell-frame--wide">

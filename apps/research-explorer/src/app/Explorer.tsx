@@ -8,6 +8,7 @@ import { ProblemHistoryView } from "../problem/ProblemHistoryView";
 import { ReadingGuide } from "../guide/ReadingGuide";
 import { GraphSkeleton } from "../loading/LoadingSkeletons";
 import { ExplorerHeader } from "./ExplorerHeader";
+import { documentTitle, recordsTitleLabel } from "./documentTitle";
 import { formatPublicCount, formatPublicDateTime } from "../presentation/presentation";
 import { SKIP_TARGET_ID } from "./skipTarget";
 
@@ -103,8 +104,8 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
           ? `Grafo${selected}`
           : url.state.view === "overview"
             ? "Visão geral"
-            : "Registos";
-    document.title = `${viewTitle} — Explorador de Investigação Open Évora`;
+            : recordsTitleLabel(url.state.selectedId);
+    document.title = documentTitle(viewTitle);
   }, [url.state.selectedId, url.state.view]);
 
   return (
