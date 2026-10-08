@@ -2,6 +2,9 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { useToast } from "../presentation/Toast";
 
 const GITHUB_NEW_ISSUE_URL = "https://github.com/JoaomdvFerreira/open-evora/issues/new";
+const GITHUB_ISSUES_URL = GITHUB_NEW_ISSUE_URL;
+export const MAX_PREFILLED_ISSUE_URL_LENGTH = 7000;
+export const isPrefilledIssueUrlEligible = (url: string): boolean => url.length <= MAX_PREFILLED_ISSUE_URL_LENGTH;
 
 export type ContributionType = "problem" | "evidence";
 
@@ -56,8 +59,8 @@ function validate(fields: ContributionFields): FieldErrors {
   return errors;
 }
 
-/** GitHub new-issue URL carrying the contribution as a prefilled title and body. */
-export function contributionIssueUrl(fields: ContributionFields): string {
+/** The exact title and body prepared for GitHub, independent of transport. */
+export function contributionIssueContent(fields: ContributionFields): { title: string; body: string } {
   const type = fields.type || "problem";
   const summary = fields.summary.trim();
   const problemId = type === "evidence" ? normalizeProblemId(fields.problemId) : "";
@@ -74,8 +77,40 @@ export function contributionIssueUrl(fields: ContributionFields): string {
     fields.description.trim(),
     ...(source ? ["", "### Fonte ou ligação", source] : []),
   ].join("\n");
-  const params = new URLSearchParams({ title, body });
+  return { title, body };
+}
+
+/** GitHub new-issue URL carrying the contribution as a prefilled title and body. */
+export function contributionIssueUrl(fields: ContributionFields): string {
+  return prefilledIssueUrl(contributionIssueContent(fields));
+}
+
+export function prefilledIssueUrl(content: { title: string; body: string }): string {
+  const params = new URLSearchParams(content);
   return `${GITHUB_NEW_ISSUE_URL}?${params.toString()}`;
+}
+
+async function copyText(value: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch { /* Try the DOM fallback. */ }
+  const activeElement = document.activeElement;
+  const temporary = document.createElement("textarea");
+  temporary.value = value;
+  temporary.setAttribute("readonly", "");
+  temporary.style.position = "fixed";
+  temporary.style.opacity = "0";
+  document.body.appendChild(temporary);
+  temporary.select();
+  try { return document.execCommand("copy"); }
+  catch { return false; }
+  finally {
+    temporary.remove();
+    if (activeElement instanceof HTMLElement) activeElement.focus({ preventScroll: true });
+  }
 }
 
 function openInNewTab(url: string): boolean {
@@ -93,7 +128,7 @@ function openInNewTab(url: string): boolean {
  * Contact-page contribution form. It collects no personal/contact data and
  * submits nothing itself: a valid form opens a prefilled public GitHub issue
  * in a new tab, where the citizen completes submission. Validation feedback
- * is inline; only the GitHub handoff outcome uses a toast.
+ * is inline; successful handoff and copy outcomes use the toast system.
  */
 export function ContributionForm({ initialSearch }: { initialSearch?: string }) {
   const { notify } = useToast();
@@ -102,6 +137,7 @@ export function ContributionForm({ initialSearch }: { initialSearch?: string }) 
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitted, setSubmitted] = useState(false);
   const [invalidSubmitCount, setInvalidSubmitCount] = useState(0);
+  const [prepared, setPrepared] = useState<{ title: string; body: string; reason: "long" | "open-failed" } | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const id = (name: string) => `${baseId}-${name}`;
@@ -122,8 +158,14 @@ export function ContributionForm({ initialSearch }: { initialSearch?: string }) 
       setInvalidSubmitCount((count) => count + 1);
       return;
     }
-    if (openInNewTab(contributionIssueUrl(fields))) notify("Contribuição preparada. Complete o envio no GitHub.", "affirmed");
-    else notify("Não foi possível abrir o GitHub.", "error");
+    const content = contributionIssueContent(fields);
+    const url = prefilledIssueUrl(content);
+    if (isPrefilledIssueUrlEligible(url) && openInNewTab(url)) {
+      setPrepared(null);
+      notify("Contribuição preparada. Complete o envio no GitHub.", "affirmed");
+    } else {
+      setPrepared({ ...content, reason: url.length > MAX_PREFILLED_ISSUE_URL_LENGTH ? "long" : "open-failed" });
+    }
   }
 
   useEffect(() => {
@@ -216,6 +258,31 @@ export function ContributionForm({ initialSearch }: { initialSearch?: string }) 
         <button type="submit" className="info-action-link info-form-submit">Preparar issue no GitHub<span aria-hidden="true"> ↗</span></button>
         <p className="info-form-hint">Abre um issue público pré-preenchido num novo separador. O envio só fica concluído no GitHub.</p>
       </div>
+      {prepared && (
+        <section className="info-contribution-recovery" aria-labelledby={id("recovery-heading")}>
+          <h3 id={id("recovery-heading")}>Contribuição preparada manualmente</h3>
+          <p>{prepared.reason === "long"
+            ? "O conteúdo é demasiado extenso para abrir de forma fiável num issue pré-preenchido. Nada foi perdido: copie o título e o conteúdo abaixo e conclua o envio no GitHub."
+            : "Não foi possível abrir o issue pré-preenchido. Nada foi perdido: copie o título e o conteúdo abaixo e conclua o envio no GitHub."}</p>
+          <div className="info-form-field">
+            <label className="info-form-label" htmlFor={id("prepared-title")}>Título preparado</label>
+            <input id={id("prepared-title")} className="info-form-control" readOnly value={prepared.title} />
+            <button type="button" className="info-action-link" onClick={async () => {
+              const copied = await copyText(prepared.title);
+              notify(copied ? "Título copiado." : "Não foi possível copiar o título. Selecione-o manualmente.", copied ? "affirmed" : "error");
+            }}>Copiar título</button>
+          </div>
+          <div className="info-form-field">
+            <label className="info-form-label" htmlFor={id("prepared-body")}>Conteúdo preparado</label>
+            <textarea id={id("prepared-body")} className="info-form-control info-form-control--multiline" rows={10} readOnly value={prepared.body} />
+            <button type="button" className="info-action-link" onClick={async () => {
+              const copied = await copyText(prepared.body);
+              notify(copied ? "Conteúdo copiado." : "Não foi possível copiar o conteúdo. Selecione-o manualmente.", copied ? "affirmed" : "error");
+            }}>Copiar conteúdo</button>
+          </div>
+          <a className="info-action-link" href={GITHUB_ISSUES_URL} target="_blank" rel="noopener noreferrer">Abrir novo issue no GitHub <span aria-hidden="true">↗</span></a>
+        </section>
+      )}
     </form>
   );
 }
