@@ -7,9 +7,11 @@
   "scripts": {
     "build-data": "node scripts/build-data.js",
     "build-data:test": "node scripts/build-data.test.js",
+    "check-generated-data": "node scripts/check-generated-data.js",
+    "check-generated-data:test": "node scripts/check-generated-data.test.js",
     "dev": "vite",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "typecheck": "npm run check-generated-data && tsc --noEmit",
+    "test": "npm run check-generated-data && vitest run",
     "build": "vite build",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",

@@ -12,7 +12,6 @@ import type { SourceEvidenceRelations, SourceRelatedProblem } from "./sourceEvid
 import type { SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
 
 const GENERATED = path.resolve(__dirname, "..", "..", "generated");
-const hasGeneratedData = fs.existsSync(path.join(GENERATED, "record-detail"));
 const detail = (id: string): RecordDetail => JSON.parse(fs.readFileSync(path.join(GENERATED, "record-detail", `${id}.json`), "utf8"));
 const corpusLookup = (): Map<string, RecordSummary> =>
   new Map((JSON.parse(fs.readFileSync(path.join(GENERATED, "index.json"), "utf8")) as RecordSummary[]).map((summary) => [summary.id, summary]));
@@ -57,7 +56,7 @@ function metadata(container: HTMLElement): Record<string, string> {
 
 const auditRegion = () => screen.getByRole("region", { name: "Acesso e auditoria" });
 
-describe.skipIf(!hasGeneratedData)("SRC Detail — canonical regression cases", () => {
+describe("SRC Detail — canonical regression cases", () => {
   it("SRC-0002 renders its identity hero from canonical fields and a relation-derived summary", () => {
     renderSrc(detail("SRC-0002"));
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Plano de Desenvolvimento Social de Évora 2024-2027");
@@ -298,7 +297,7 @@ describe("SRC Detail — relation state", () => {
   });
 });
 
-describe.skipIf(!hasGeneratedData)("Public/SRC Detail review stories", () => {
+describe("Public/SRC Detail review stories", () => {
   const composed = composeStories(stories);
 
   it("ordinary 1440 story retains the approved SRC composition and audit band", async () => {
