@@ -9,6 +9,7 @@ import { PrbDetailsPresentation } from "./PrbDetailsPresentation";
 import { formatTypedId } from "../presentation/typeGlossary";
 import { PrbDetailsSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -81,6 +82,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
   }
 
   if (state.status === "error") {
+    const recovery = dataLoadRecovery(state.error, state.retry);
     return (
       <div className="shell-frame">
         <ErrorNotice
@@ -88,12 +90,8 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
           tabIndex={-1}
           titleAs="h2"
           title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o Problema"}
-          message={state.error.message}
-          action={
-            <button type="button" onClick={state.retry}>
-              Tentar novamente
-            </button>
-          }
+          message={recovery.message}
+          action={recovery.action}
         />
       </div>
     );
@@ -152,17 +150,14 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
   }
 
   if (indexState.status === "error") {
+    const recovery = dataLoadRecovery(indexState.error, indexState.retry);
     return (
       <div className="shell-frame">
         <ErrorNotice
           titleAs="h2"
           title="Não foi possível carregar os registos"
-          message={indexState.error.message}
-          action={
-            <button type="button" onClick={indexState.retry}>
-              Tentar novamente
-            </button>
-          }
+          message={recovery.message}
+          action={recovery.action}
         />
       </div>
     );

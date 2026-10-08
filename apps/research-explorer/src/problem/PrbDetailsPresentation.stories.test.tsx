@@ -16,7 +16,8 @@ import prb0005 from "../../generated/record-detail/PRB-0005.json";
 const composed = composeStories(stories);
 
 describe("Public/PRB Details / PRB0005 story shell", () => {
-  it.each(Object.entries(composed))("%s includes real Header/Footer chrome and resolves real PRB-0005 content", async (_name, Story) => {
+  const contentStories = Object.entries(composed).filter(([name]) => !name.startsWith("VersionMismatchRecovery") && !name.startsWith("DossierChunkRecovery"));
+  it.each(contentStories)("%s includes real Header/Footer chrome and resolves real PRB-0005 content", async (_name, Story) => {
     const { container } = render(<Story />);
 
     const main = container.querySelector("main.explorer-shell");
@@ -29,6 +30,17 @@ describe("Public/PRB Details / PRB0005 story shell", () => {
 
     expect(await screen.findByText(/tráfego automóvel e a pressão de estacionamento/)).toBeTruthy();
     expect(screen.getByText("PRB-0005")).toBeTruthy();
+  });
+
+  it("renders both deployment-version and PDF stale-chunk recovery stories", () => {
+    const { unmount: unmountMismatch } = render(<composed.VersionMismatchRecovery1440 />);
+    expect(screen.getByText("Os dados publicados foram atualizados. Recarregue a página antes de continuar.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Recarregar página" })).toBeTruthy();
+    unmountMismatch();
+
+    render(<composed.DossierChunkRecovery1440 />);
+    expect(screen.getByText("Esta página publicada pode estar desatualizada")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Recarregar página" })).toBeTruthy();
   });
 
   it("renders the canonical PRB-0005 causal reading and open-question fields verbatim, with no manually selected evidence subset", async () => {

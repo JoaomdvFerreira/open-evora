@@ -247,13 +247,15 @@ function buildReadModel({ researchRoot, repoRoot, validation, generatedAt, sourc
   }
 
   const recordDetails = [...detailById.values()].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const corpusFingerprint = fingerprintHash.digest("hex");
+  for (const detail of recordDetails) detail.corpusFingerprint = corpusFingerprint;
 
   const manifest = {
     readModelVersion: READ_MODEL_VERSION,
     generatedAt,
     generator: "apps/research-explorer/scripts/build-data.js",
     sourceCommit: sourceCommit || null,
-    corpusFingerprint: fingerprintHash.digest("hex"),
+    corpusFingerprint,
     totalRecords: validation.totalRecords,
     counts,
     schemaPrefixes: prefixes,

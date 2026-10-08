@@ -3,6 +3,16 @@ import { useToast } from "../presentation/Toast";
 import type { PrbDossierData } from "./prbDossierProjection";
 import type { DossierPublicationIdentity } from "./PrbDetailsPresentation";
 import type { DossierGenerationMetadata } from "./pdf/dossierPresentation";
+import { ErrorNotice } from "../presentation/ErrorNotice";
+
+export function isDeploymentChunkLoadError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  return /(?:failed to fetch dynamically imported module|error loading dynamically imported module|importing a module script failed|unable to preload css for)/i.test(error.message);
+}
+
+export function PrbDossierChunkRecovery() {
+  return <ErrorNotice title="Esta página publicada pode estar desatualizada" message="O recurso do dossiê já não está disponível nesta versão. Recarregue a página antes de continuar." action={<button className="ui-action-outlined" type="button" onClick={() => window.location.reload()}>Recarregar página</button>} />;
+}
 
 export function prbDossierFileName(problemId: string): string {
   return `open-evora-${problemId}-dossie.pdf`;
@@ -37,6 +47,7 @@ function saveBlob(blob: Blob, fileName: string): void {
 export function PrbDossierAction({ dossier, identity }: { dossier: PrbDossierData | null; identity: DossierPublicationIdentity | null }) {
   const { notify } = useToast();
   const [busy, setBusy] = useState(false);
+  const [chunkFailure, setChunkFailure] = useState(false);
   const running = useRef(false);
   const available = dossier !== null && identity !== null && identity.corpusFingerprint.length > 0;
 
@@ -54,7 +65,11 @@ export function PrbDossierAction({ dossier, identity }: { dossier: PrbDossierDat
       const blob = await generateDossierInWorker(dossier, generation);
       saveBlob(blob, prbDossierFileName(dossier.problem.id));
       notify("Dossiê PDF preparado.", "affirmed");
-    } catch {
+    } catch (error) {
+      if (isDeploymentChunkLoadError(error)) {
+        setChunkFailure(true);
+        return;
+      }
       notify("Não foi possível gerar o dossiê PDF.", "error");
     } finally {
       running.current = false;
@@ -63,15 +78,18 @@ export function PrbDossierAction({ dossier, identity }: { dossier: PrbDossierDat
   }
 
   return (
+    <div className="prb-dossier-action">
     <button
       type="button"
       className="prb-audit-dossier-cta"
-      disabled={!available}
-      aria-disabled={!available || busy ? "true" : undefined}
+      disabled={!available || chunkFailure}
+      aria-disabled={!available || busy || chunkFailure ? "true" : undefined}
       aria-busy={busy ? "true" : undefined}
       onClick={download}
     >
       {busy ? "A preparar dossiê (PDF)…" : "↓ Descarregar dossiê (PDF)"}
     </button>
+    {chunkFailure && <PrbDossierChunkRecovery />}
+    </div>
   );
 }

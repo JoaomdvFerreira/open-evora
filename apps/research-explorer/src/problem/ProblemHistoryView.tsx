@@ -6,6 +6,8 @@ import { formatTypedId } from "../presentation/typeGlossary";
 import { RecordIdentifier } from "../records/RecordIdentifier";
 import { PrbHistorySkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { DataLoadError } from "../dataProvider/types";
+import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
 import { PrbHeader, PrbIdentityHeader } from "./PrbPageHeader";
 import { prbIdentity, type PrbIdentityData } from "./prbDetailsProjection";
 
@@ -201,6 +203,7 @@ interface ProblemHistoryViewProps {
 function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackToOverview, onViewAsProblem, onVerifyInDetails }: Omit<ProblemHistoryViewProps, "problemId" | "onBackToRecords"> & { problemId: string }) {
   const [detail, setDetail] = useState<RecordDetail | null>(null);
   const [error, setError] = useState<unknown>(null);
+  const [attempt, setAttempt] = useState(0);
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -212,14 +215,16 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
       (nextError) => { if (!cancelled) setError(nextError); }
     );
     return () => { cancelled = true; };
-  }, [dataProvider, problemId]);
+  }, [dataProvider, problemId, attempt]);
 
   useEffect(() => {
     if (detail) headingRef.current?.focus();
   }, [detail]);
 
   if (error) {
-    return <div className="shell-frame"><ErrorNotice titleAs="h2" title="Não foi possível carregar o histórico" message={error instanceof Error ? error.message : String(error)} /></div>;
+    const loadError = error instanceof DataLoadError ? error : new DataLoadError("Falha ao carregar o histórico.", "network");
+    const recovery = dataLoadRecovery(loadError, () => setAttempt((value) => value + 1));
+    return <div className="shell-frame"><ErrorNotice titleAs="h2" title="Não foi possível carregar o histórico" message={recovery.message} action={recovery.action} /></div>;
   }
   if (!detail) return <PrbHistorySkeleton message={`A carregar histórico de ${problemId}…`} />;
 

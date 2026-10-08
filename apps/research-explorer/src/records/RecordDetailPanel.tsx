@@ -16,6 +16,7 @@ import { RecordDetailSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
 import { applyInitialFragment } from "../navigation/applyInitialFragment";
+import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -900,6 +901,8 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readyId === null]);
 
+  const recovery = state.status === "error" ? dataLoadRecovery(state.error, state.retry) : null;
+
   return (
     <section aria-labelledby="detail-heading" className="record-detail-panel">
       <h2 id="detail-heading" className="record-detail-heading">
@@ -924,12 +927,8 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
           <ErrorNotice
             titleAs="h3"
             title={ERROR_TITLES[state.error.kind] ?? "Não foi possível carregar o registo"}
-            message={state.error.message}
-            action={
-              <button type="button" onClick={state.retry}>
-                Tentar novamente
-              </button>
-            }
+            message={recovery!.message}
+            action={recovery!.action}
           />
         </>
       )}

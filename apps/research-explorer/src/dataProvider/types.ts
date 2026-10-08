@@ -54,6 +54,8 @@ export interface RecordEdge {
 }
 
 export interface RecordDetail {
+  /** Operational identity of the generated corpus that published this detail. */
+  corpusFingerprint?: string;
   id: string;
   type: string;
   file: string;
@@ -85,7 +87,7 @@ export interface DataProvider {
   getEdges(): Promise<RecordEdge[]>;
 }
 
-export type DataLoadErrorKind = "missing" | "malformed" | "incompatible" | "network" | "not_found" | "invalid_id";
+export type DataLoadErrorKind = "missing" | "malformed" | "incompatible" | "network" | "not_found" | "invalid_id" | "version_mismatch";
 
 export class DataLoadError extends Error {
   readonly kind: DataLoadErrorKind;

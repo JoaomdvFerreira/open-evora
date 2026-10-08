@@ -6,6 +6,7 @@ import { describeTopic } from "../presentation/topicMapping";
 import { Breadcrumb } from "../presentation/Breadcrumb";
 import { RelationSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
 import { EmptyState } from "../presentation/EmptyState";
 import { useToast } from "../presentation/Toast";
 import { RecordIdentifier } from "./RecordIdentifier";
@@ -274,6 +275,7 @@ function SrcFinding({ evidence, sourceId, problemIds, onSelect, onViewAsProblem 
 }
 
 function SrcFindings({ state, sourceId, onSelect, onViewAsProblem }: { state: RelationsState; sourceId: string; onSelect: (id: string) => void; onViewAsProblem: (id: string) => void }) {
+  const recovery = state.status === "error" ? dataLoadRecovery(state.error, state.retry) : null;
   const ready = state.status === "ready" ? state.relations : null;
   const note = ready && ready.uniqueEvidenceCount > 0 ? plural(ready.uniqueEvidenceCount, "observação", "observações") : null;
   const byEvidence = ready ? problemsByEvidence(ready) : null;
@@ -282,7 +284,7 @@ function SrcFindings({ state, sourceId, onSelect, onViewAsProblem }: { state: Re
       {state.status === "loading" || state.status === "idle" ? (
         <RelationSkeleton message="A carregar observações da investigação…" />
       ) : state.status === "error" ? (
-        <ErrorNotice title="Não foi possível carregar as observações da investigação ligadas a esta fonte." message="" action={<button type="button" onClick={state.retry}>Tentar novamente</button>} />
+        <ErrorNotice title="Não foi possível carregar as observações da investigação ligadas a esta fonte." message={state.error.kind === "version_mismatch" ? recovery!.message : ""} action={recovery!.action} />
       ) : ready!.evidence.length === 0 ? (
         <EmptyState message="Ainda não existem observações da investigação ligadas explicitamente a esta fonte." />
       ) : (

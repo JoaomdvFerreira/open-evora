@@ -26,6 +26,7 @@ const INDEX: RecordSummary[] = [
 
 const DETAILS: Record<string, RecordDetail> = {
   "PRB-0005": {
+    corpusFingerprint: "fixture-corpus",
     id: "PRB-0005",
     type: "PRB-",
     file: "research/problems/PRB-0005.yaml",
@@ -34,6 +35,7 @@ const DETAILS: Record<string, RecordDetail> = {
     incomingEdges: [],
   },
   "EVD-000105": {
+    corpusFingerprint: "fixture-corpus",
     id: "EVD-000105",
     type: "EVD-",
     file: "research/evidence/EVD-000105.yaml",
@@ -42,6 +44,7 @@ const DETAILS: Record<string, RecordDetail> = {
     incomingEdges: [{ field: "evidence", ordinal: 0, from: "PRB-0005" }],
   },
   "SRC-0092": {
+    corpusFingerprint: "fixture-corpus",
     id: "SRC-0092",
     type: "SRC-",
     file: "research/sources/SRC-0092.yaml",
@@ -50,6 +53,7 @@ const DETAILS: Record<string, RecordDetail> = {
     incomingEdges: [{ field: "provenance.sources", ordinal: 0, from: "EVD-000105" }],
   },
   "WID-0001": {
+    corpusFingerprint: "fixture-corpus",
     id: "WID-0001",
     type: "WID-",
     file: "research/widgets/WID-0001.yaml",
@@ -1283,6 +1287,9 @@ describe("Explorer workflow — never loads edges.json or canonical YAML (real S
   beforeEach(() => {
     fetchMock = vi.fn((input: RequestInfo | URL) => {
       const url = String(input);
+      if (url.endsWith("manifest.json")) {
+        return Promise.resolve(new Response(JSON.stringify({ readModelVersion: "1.0.0", generatedAt: "2026-01-01T00:00:00.000Z", generator: "fixture", sourceCommit: null, corpusFingerprint: "fixture-corpus", totalRecords: INDEX.length, counts: { "PRB-": 1, "EVD-": 1, "SRC-": 1, "WID-": 1 }, schemaPrefixes: ["EVD-", "PRB-", "SRC-", "WID-"] }), { status: 200 }));
+      }
       if (url.endsWith("index.json")) {
         return Promise.resolve(new Response(JSON.stringify(INDEX), { status: 200 }));
       }
