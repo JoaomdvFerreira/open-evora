@@ -27,7 +27,7 @@ export interface ProblemProjection {
   evidence: EvidenceWithSources[];
 }
 
-function uniqueIds(ids: (string | undefined)[]): string[] {
+function uniqueIds(ids: unknown[]): string[] {
   return [...new Set(ids.filter((id): id is string => typeof id === "string"))];
 }
 
@@ -37,8 +37,7 @@ function outgoingIdsByType(detail: RecordDetail, type: string, lookup: Map<strin
 
 /**
  * Loads and assembles the full Problem projection for one PRB-* ID.
- * Fetches: the problem itself, its linked evidence (both the problem's own
- * outgoing `evidence` list, and each evidence
+ * Fetches: the problem itself, its authored `evidence` list, and each evidence
  * item's own linked sources (SRC-). All independent fetches run in parallel.
  */
 export async function loadProblemProjection(
@@ -48,14 +47,13 @@ export async function loadProblemProjection(
 ): Promise<ProblemProjection> {
   const problem = await provider.getRecord(problemId);
 
-  const evidenceIds = outgoingIdsByType(problem, "EVD-", lookup);
-
+  const authoredEvidence = (Array.isArray(problem.record.evidence) ? problem.record.evidence : [])
+    .filter((entry): entry is Record<string, unknown> => !!entry && typeof entry === "object" && !Array.isArray(entry));
+  const evidenceIds = uniqueIds(authoredEvidence.map((entry) => entry.evidence_id));
   const evidenceDetails = await Promise.all(evidenceIds.map((id) => provider.getRecord(id)));
 
   const relationships = new Map(
-    (Array.isArray(problem.record.evidence) ? problem.record.evidence : [])
-      .filter((entry): entry is Record<string, unknown> => !!entry && typeof entry === "object" && !Array.isArray(entry))
-      .map((entry) => [entry.evidence_id, { effects: Array.isArray(entry.effects) ? entry.effects.filter((v): v is string => typeof v === "string") : [], researchRoles: Array.isArray(entry.research_roles) ? entry.research_roles.filter((v): v is string => typeof v === "string") : [] }])
+    authoredEvidence.map((entry) => [entry.evidence_id, { effects: Array.isArray(entry.effects) ? entry.effects.filter((v): v is string => typeof v === "string") : [], researchRoles: Array.isArray(entry.research_roles) ? entry.research_roles.filter((v): v is string => typeof v === "string") : [] }])
   );
   const evidence = await Promise.all(
     evidenceDetails.map(async (evidenceDetail): Promise<EvidenceWithSources> => {
