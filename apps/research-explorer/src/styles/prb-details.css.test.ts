@@ -14,6 +14,11 @@ import { describe, expect, it } from "vitest";
  * every other surface.
  */
 const stripComments = (source: string) => source.replace(/\/\*[\s\S]*?\*\//g, "");
+const normalizeSelector = (selector: string) => selector.split(",").map((part) => part.trim().replace(/\s+/g, " ")).join(",");
+const normalizeDeclarations = (body: string) => {
+  const declarations = body.split(";").map((declaration) => declaration.trim().replace(/\s+/g, " ")).filter(Boolean);
+  return declarations.length ? `${declarations.join(";")};` : "";
+};
 const prbCss = stripComments(fs.readFileSync(path.resolve(__dirname, "prb-details.css"), "utf8"));
 const indexCss = stripComments(fs.readFileSync(path.resolve(__dirname, "..", "index.css"), "utf8"));
 const historyCss = stripComments(fs.readFileSync(path.resolve(__dirname, "prb-history.css"), "utf8"));
@@ -30,7 +35,7 @@ function mediaBlocks(source: string, prelude: string): string[] {
     for (let i = open; i < source.length; i += 1) {
       if (source[i] === "{") depth += 1;
       if (source[i] === "}" && --depth === 0) {
-        blocks.push(source.slice(open + 1, i));
+        blocks.push(source.slice(open + 1, i).replace(/\r\n?/g, "\n"));
         from = i + 1;
         break;
       }
@@ -64,9 +69,16 @@ function ruleBodies(source: string, selector: string): string[] {
   while ((match = rulePattern.exec(source)) !== null) {
     // A preceding `@import …;` statement has no braces of its own; keep only the selector list.
     const prelude = match[1].split(";").pop() ?? "";
-    if (prelude.split(",").map((s) => s.trim()).includes(selector)) bodies.push(match[2]);
+    if (normalizeSelector(prelude).split(",").includes(normalizeSelector(selector))) bodies.push(normalizeDeclarations(match[2]));
   }
   return bodies;
+}
+
+function structuralRules(source: string): Array<{ selector: string; declarations: string }> {
+  return [...source.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((match) => ({
+    selector: normalizeSelector(match[1].split(";").pop() ?? ""),
+    declarations: normalizeDeclarations(match[2]),
+  }));
 }
 
 function onlyRuleBody(source: string, selector: string): string {
@@ -91,6 +103,13 @@ const FULL_WIDTH_BANDS = [".prb-header-band", ".prb-state-scope-band", ".prb-pat
 const BAND_BLEED_SELECTOR = FULL_WIDTH_BANDS.join(",\n");
 
 describe("PRB Details terminal composition — vertical spacing ownership", () => {
+  it("parses equivalent selector/rule structure from LF and CRLF source", () => {
+    const crlf = prbCss.replace(/\n/g, "\r\n");
+    for (const selector of ["body:has(.prb-details-view) main.explorer-shell", BAND_BLEED_SELECTOR, ".prb-details-view"]) {
+      expect(ruleBodies(crlf, selector)).toEqual(ruleBodies(prbCss, selector));
+    }
+    expect(structuralRules(mediaBlocks(crlf, "@media (max-width: 767px)").join("\n"))).toEqual(structuralRules(mediaBlocks(prbCss, "@media (max-width: 767px)").join("\n")));
+  });
   it("suppresses the Explorer shell's bottom padding only while PRB Details is rendered", () => {
     expect(onlyRuleBody(prbBase, "body:has(.prb-details-view) main.explorer-shell")).toMatch(/^\s*padding-bottom:\s*0;\s*$/);
   });
@@ -133,16 +152,18 @@ describe("PRB Details full-width bands — gutter bleed", () => {
 
   it("bleeds every full-width band through the shell gutter with one shared rule and restores its content box with matching padding", () => {
     const rules = prbBase.match(/[^{}]+\{[^{}]*\}/g) ?? [];
-    const shared = rules.filter((rule) => rule.split("{")[0].trim() === BAND_BLEED_SELECTOR);
+    const shared = rules.filter((rule) => normalizeSelector(rule.split("{")[0]) === normalizeSelector(BAND_BLEED_SELECTOR));
     expect(shared).toHaveLength(1);
     expect(shared[0]).toMatch(/margin-inline:\s*calc\(-1 \* var\(--explorer-shell-gutter, 0px\)\);/);
     expect(shared[0]).toMatch(/padding-inline:\s*var\(--explorer-shell-gutter, 0px\);/);
   });
 
   it("declares the bleed after the generic .prb-section margin reset, so the reset cannot cancel it", () => {
-    const reset = prbBase.search(/(^|\n)\.prb-section\s*\{/);
+    const reset = prbBase.search(/\.prb-section\s*\{/);
     expect(reset).toBeGreaterThan(-1);
-    expect(prbBase.indexOf(BAND_BLEED_SELECTOR)).toBeGreaterThan(reset);
+    const rules = prbBase.match(/[^{}]+\{[^{}]*\}/g) ?? [];
+    const bleedRule = rules.find((rule) => normalizeSelector(rule.split("{")[0]) === normalizeSelector(BAND_BLEED_SELECTOR));
+    expect(prbBase.indexOf(bleedRule ?? "")).toBeGreaterThan(reset);
   });
 
   it("keeps the audit band's own terminal surface (top rule + background)", () => {
@@ -171,7 +192,7 @@ describe("PRB Details full-width bands — gutter bleed", () => {
 
   it("bleeds only the PRB full-width bands — no other PRB rule or shell/footer primitive consumes the gutter token", () => {
     const consumers = prbCss.match(/[^{}]+\{[^{}]*var\(--explorer-shell-gutter[^{}]*\}/g) ?? [];
-    expect(consumers.map((rule) => rule.split("{")[0].trim())).toEqual([BAND_BLEED_SELECTOR]);
+    expect(consumers.map((rule) => normalizeSelector(rule.split("{")[0]))).toEqual([normalizeSelector(BAND_BLEED_SELECTOR)]);
   });
 
   it("never uses viewport-width geometry for the bleed", () => {

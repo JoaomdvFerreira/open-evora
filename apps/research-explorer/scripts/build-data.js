@@ -23,19 +23,26 @@ const { execFileSync } = require("child_process");
 
 const { validateResearchTree } = require("./validate-research-bridge.js");
 const { buildReadModel } = require("./read-model.js");
+const { canonicalYamlBytes } = require("./canonical-bytes.js");
 const { publishDirectoryAtomically } = require("./atomic-write.js");
 
 const DEFAULT_REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const DEFAULT_RESEARCH_ROOT = path.join(DEFAULT_REPO_ROOT, "research");
 const DEFAULT_TARGET_DIR = path.join(__dirname, "..", "generated");
 
-function getSourceCommit(repoRoot) {
+function getSourceCommit(repoRoot, gitCommand = "git") {
   try {
-    return execFileSync("git", ["rev-parse", "HEAD"], {
+    const head = execFileSync(gitCommand, ["rev-parse", "HEAD"], {
       cwd: repoRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
     }).trim();
+    const researchStatus = execFileSync(gitCommand, ["status", "--porcelain", "--untracked-files=all", "--", "research/"], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    return researchStatus.trim() === "" ? head : null;
   } catch {
     // Git unavailable, or repoRoot is not a git checkout: operational
     // metadata only, must never fail an otherwise-valid build.
@@ -44,12 +51,13 @@ function getSourceCommit(repoRoot) {
 }
 
 /**
- * Canonical EVD and SRC files are republished byte-for-byte under
+ * Canonical EVD and SRC files are republished with LF line endings under
  * `canonical/<repo-relative file>` so EVD and SRC Detail can offer the exact
  * canonical YAML behind the record as a same-origin download. Only records
  * with a download surface are published; PRB has none. They are
  * copies of the already-public canonical corpus, never re-serialized from the
- * read model, and they version together with the rest of generated/.
+ * read model; only CRLF/CR line endings are normalized to LF. They version
+ * together with the rest of generated/.
  */
 const CANONICAL_DIR = "canonical";
 
@@ -60,7 +68,7 @@ function publishesCanonicalFile(detail) {
 function copyCanonicalFile(repoRoot, tmpDir, relFile) {
   const target = path.join(tmpDir, CANONICAL_DIR, ...relFile.split("/"));
   fs.mkdirSync(path.dirname(target), { recursive: true });
-  fs.copyFileSync(path.join(repoRoot, ...relFile.split("/")), target);
+  fs.writeFileSync(target, canonicalYamlBytes(fs.readFileSync(path.join(repoRoot, ...relFile.split("/")))));
 }
 
 function writeJson(filePath, data) {
@@ -110,7 +118,8 @@ function verifyGeneratedOutput(tmpDir, readModel, repoRoot) {
 
   for (const detail of readModel.recordDetails.filter(publishesCanonicalFile)) {
     const copy = path.join(tmpDir, CANONICAL_DIR, ...detail.file.split("/"));
-    if (!fs.existsSync(copy) || !fs.readFileSync(copy).equals(fs.readFileSync(path.join(repoRoot, ...detail.file.split("/"))))) {
+    const canonical = canonicalYamlBytes(fs.readFileSync(path.join(repoRoot, ...detail.file.split("/"))));
+    if (!fs.existsSync(copy) || !fs.readFileSync(copy).equals(canonical)) {
       throw new Error(`Generated-data integrity check failed: canonical copy of "${detail.file}" is missing or differs from the canonical file.`);
     }
   }
@@ -212,4 +221,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { main, run, verifyGeneratedOutput };
+module.exports = { main, run, verifyGeneratedOutput, getSourceCommit };
