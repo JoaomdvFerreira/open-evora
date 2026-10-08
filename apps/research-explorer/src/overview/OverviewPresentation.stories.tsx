@@ -109,12 +109,14 @@ function FullOverview({
   citizenProblemsOverride,
   visibleProblemsOverride,
   withMaterialChanges = false,
+  partial = false,
 }: {
   source?: CitizenProblem[];
   search?: string;
   citizenProblemsOverride?: CitizenProblem[] | null;
   visibleProblemsOverride?: CitizenProblem[] | null;
   withMaterialChanges?: boolean;
+  partial?: boolean;
 }) {
   const state = useOverviewState({ search, source });
   const citizenProblems = citizenProblemsOverride !== undefined ? citizenProblemsOverride : state.source;
@@ -143,6 +145,8 @@ function FullOverview({
       sortOrder={state.sortOrder}
       onSortOrderChange={state.setSortOrder}
       onExploreProblem={() => {}}
+      partialState={partial ? { failedIds: ["PRB-XXXX-6"], total: state.source.length, retrying: false, onRetry: () => {} } : null}
+      initialDrawerOpen={partial}
     />
   );
 }
@@ -211,6 +215,12 @@ export const Compact360: Story = {
   name: "360 compact",
   globals: { viewport: { value: "reviewCompact" } },
   render: () => <FullOverviewShell />,
+};
+
+export const PartialData: Story = {
+  name: "partial data",
+  globals: { viewport: { value: "reviewDesktop" } },
+  render: () => <FullOverviewShell partial withMaterialChanges />,
 };
 
 export const ActiveSearch: Story = {
