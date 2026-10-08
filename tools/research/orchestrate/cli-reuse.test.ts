@@ -63,7 +63,7 @@ const VALID_ENVELOPE = {
   candidateFiles: [{ path: "SRC-NEW.yaml", yaml: "source_id: SRC-NEW\nname: Synthetic source\n" }],
 };
 
-const VALID_REVIEW = { schemaVersion: "1", outcome: "CONCUR", rationale: "No disagreement found." };
+const VALID_REVIEW = { schemaVersion: "2", outcome: "CONCUR", rationale: "No disagreement found.", findings: [], signalDispositions: [] };
 
 class FixedInvoker implements AiInvoker {
   private readonly stdout: unknown;

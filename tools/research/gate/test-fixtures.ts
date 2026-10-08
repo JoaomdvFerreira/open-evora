@@ -184,9 +184,11 @@ function manifest(overrides: Partial<GenerationManifest> = {}): GenerationManife
 
 function independentReview(overrides: Partial<IndependentReviewResult> = {}): IndependentReviewResult {
   return {
-    schemaVersion: "1",
+    schemaVersion: "2",
     outcome: "CONCUR",
     rationale: "Independent reviewer found no disagreement.",
+    findings: [],
+    signalDispositions: [],
     ...overrides,
   };
 }

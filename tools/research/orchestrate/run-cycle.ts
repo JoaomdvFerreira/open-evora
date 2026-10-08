@@ -38,7 +38,7 @@ import { asValidatedManifest, validateManifest } from "./manifest.ts";
 import { resolveContainedPath } from "./path-containment.ts";
 import { buildPrimaryAuthoringPrompt } from "./primary-prompt.ts";
 import { assembleResearchChangeSet } from "./research-change-set.ts";
-import { buildReviewerInput } from "./reviewer-input.ts";
+import { buildReviewerInputPackage, serializeReviewerInput } from "./reviewer-input.ts";
 import { buildReviewerPrompt } from "./reviewer-prompt.ts";
 import type { GenerationManifest, PreparationOutcome, ResearchTrigger } from "./types.ts";
 import { deriveMaterialNonPrivateSources, evaluateSafetyAdmission, type InferenceLimitResolutionChecker, type SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
@@ -228,20 +228,28 @@ export async function continueFromFrozenCandidates(
   }
 
   // --- FREEZE THE IMMUTABLE REVIEWER INPUT -----------------------------------
-  const reviewerInputJson = buildReviewerInput({
-    baseGitSha,
-    manifest,
-    candidates: review.candidates,
-    deltas: review.deltas,
-    validation: review.validation,
-    readiness: review.readiness,
-  });
+  // The one frozen package both builds the prompt and validates the result:
+  // the review is never checked against a snapshot reconstructed afterward.
+  let reviewerInput;
+  try {
+    reviewerInput = buildReviewerInputPackage({
+      baseGitSha,
+      manifest,
+      index,
+      candidates: review.candidates,
+      deltas: review.deltas,
+      validation: review.validation,
+      readiness: review.readiness,
+    });
+  } catch (error) {
+    return failed("PROSPECTIVE_VALIDATION", (error as Error).message);
+  }
 
   // --- FRESH INDEPENDENT REVIEW AI INVOCATION --------------------------------
   // Invoked only now that admission is provably ELIGIBLE (never on a
   // resume that is still HOLD), and always a brand-new invocation — never
   // the same invoker/process used for PRIMARY_AUTHOR.
-  const reviewerPrompt = buildReviewerPrompt(reviewerInputJson);
+  const reviewerPrompt = buildReviewerPrompt(serializeReviewerInput(reviewerInput));
   const reviewerResult = reviewerInvoker.invoke({ role: "INDEPENDENT_REVIEWER", input: reviewerPrompt });
 
   if (reviewerResult.status === "TIMEOUT") {
@@ -254,7 +262,7 @@ export async function continueFromFrozenCandidates(
   const reviewerParsed = parseJsonStdout(reviewerResult.stdout, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
   if ("failure" in reviewerParsed) return reviewerParsed.failure;
 
-  const reviewValidation = validateIndependentReview(reviewerParsed.value);
+  const reviewValidation = validateIndependentReview(reviewerParsed.value, reviewerInput);
   if (reviewValidation.errors.length > 0) {
     return failed("INDEPENDENT_REVIEW_OUTPUT_INVALID", reviewValidation.errors.join("; "));
   }
@@ -266,7 +274,7 @@ export async function continueFromFrozenCandidates(
 
   // --- ASSEMBLE THE FINAL RESEARCH CHANGE SET --------------------------------
   // Assembles directly from the exact `review` object computed above (the
-  // same one buildReviewerInput() used to freeze the reviewer's input) and
+  // same one buildReviewerInputPackage() used to freeze the reviewer's input) and
   // the real, freshly-invoked independent-review result — never by
   // re-reading candidate files from disk and re-deriving a second,
   // potentially-divergent snapshot (WU045-B01 independent-review

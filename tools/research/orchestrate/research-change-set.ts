@@ -20,6 +20,7 @@ import { sha256Hex } from "./fingerprint.ts";
 import { loadCandidates } from "./candidate-loader.ts";
 import { validateManifest, asValidatedManifest } from "./manifest.ts";
 import { validateIndependentReview, asValidatedIndependentReview } from "./independent-review.ts";
+import { buildReviewerInputPackage } from "./reviewer-input.ts";
 import type { GenerationManifest, IndependentReviewResult, PreparationOutcome, ResearchChangeSet } from "./types.ts";
 import { evaluateSafetyAdmission, type SafetyAdmission } from "../admission/safety-admission.ts";
 
@@ -158,12 +159,6 @@ export function prepareResearchChangeSet(input: PrepareResearchChangeSetInput): 
   }
   const manifest = asValidatedManifest(input.rawManifest);
 
-  const reviewValidation = validateIndependentReview(input.rawIndependentReview);
-  if (reviewValidation.errors.length > 0) {
-    return failed("INDEPENDENT_REVIEW_VALIDATION", reviewValidation.errors.join("; "));
-  }
-  const independentReview = asValidatedIndependentReview(input.rawIndependentReview);
-
   const loadResult = loadCandidates(input.index, input.candidatesDir, manifest.candidateFiles);
   if (loadResult.failures.length > 0) {
     return failed(
@@ -187,6 +182,20 @@ export function prepareResearchChangeSet(input: PrepareResearchChangeSetInput): 
   } catch (error) {
     return failed("PROSPECTIVE_VALIDATION", (error as Error).message);
   }
+
+  // The supplied review is validated against the reviewer package this exact
+  // `review` produces — the same context-aware check the AI-driven path runs.
+  let reviewerInput;
+  try {
+    reviewerInput = buildReviewerInputPackage({ ...review, manifest, index: input.index });
+  } catch (error) {
+    return failed("PROSPECTIVE_VALIDATION", (error as Error).message);
+  }
+  const reviewValidation = validateIndependentReview(input.rawIndependentReview, reviewerInput);
+  if (reviewValidation.errors.length > 0) {
+    return failed("INDEPENDENT_REVIEW_VALIDATION", reviewValidation.errors.join("; "));
+  }
+  const independentReview = asValidatedIndependentReview(input.rawIndependentReview);
 
   // The manifest/claimed-ID cross-check now lives in assembleResearchChangeSet()
   // (shared with run-cycle.ts's AI-driven path) so both callers enforce it

@@ -81,7 +81,23 @@ test("independent-review DISAGREEMENT_FOUND is surfaced as a risk rather than si
   try {
     const index = loadIndexFor(fixture.research);
     const changeSet = syntheticResearchChangeSet(index, fixture.head(), "SRC-NEW", {
-      independentReview: { outcome: "DISAGREEMENT_FOUND", rationale: "Synthetic disagreement for test coverage." },
+      independentReview: {
+        outcome: "DISAGREEMENT_FOUND",
+        rationale: "Synthetic disagreement for test coverage.",
+        findings: [{
+          findingId: "CLEC-FND-0001",
+          recordId: "SRC-NEW",
+          field: "name",
+          claim: "Created",
+          dimension: "evidence_fidelity",
+          kind: "CLEC_VIOLATION",
+          severity: "BLOCKING",
+          reason: "Synthetic disagreement for test coverage.",
+          evidenceReferences: ["SRC-NEW"],
+          correctionDirection: "Record the Source name as published.",
+          relatedSignalIds: [],
+        }],
+      },
     });
     const built = buildHumanGatePackage(index, changeSet);
     assert.deepEqual(built.errors, []);

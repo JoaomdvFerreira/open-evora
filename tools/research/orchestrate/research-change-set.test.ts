@@ -71,10 +71,29 @@ function validManifest(overrides: Partial<GenerationManifest> = {}): GenerationM
 
 function validIndependentReview(overrides: Partial<IndependentReviewResult> = {}): IndependentReviewResult {
   return {
-    schemaVersion: "1",
+    schemaVersion: "2",
     outcome: "CONCUR",
     rationale: "Independent reviewer found no disagreement.",
+    findings: [],
+    signalDispositions: [],
     ...overrides,
+  };
+}
+
+/** A blocking finding quoting the SRC-NEW candidate fixture verbatim. */
+function blockingFinding(): IndependentReviewResult["findings"][number] {
+  return {
+    findingId: "CLEC-FND-0001",
+    recordId: "SRC-NEW",
+    field: "name",
+    claim: "Synthetic source",
+    dimension: "explicit_scope",
+    kind: "CLEC_VIOLATION",
+    severity: "BLOCKING",
+    reason: "Found a scope mismatch.",
+    evidenceReferences: ["SRC-NEW"],
+    correctionDirection: "State the scope the Source covers.",
+    relatedSignalIds: [],
   };
 }
 
@@ -130,7 +149,7 @@ test("malformed manifest fails closed before reaching candidate delta/promotion"
   });
 });
 
-test("missing independent review fails closed before reaching candidate delta/promotion", () => {
+test("missing independent review fails closed before integration planning", () => {
   withTempDir((candidatesDir) => {
     writeCandidate(candidatesDir, "SRC-NEW.yaml", "source_id: SRC-NEW\nname: Synthetic source\n");
     const outcome = prepareResearchChangeSet({
@@ -333,7 +352,7 @@ test("independent review disagreement is preserved and surfaced, not auto-resolv
       baseGitSha: SHA,
       candidatesDir,
       rawManifest: validManifest(),
-      rawIndependentReview: validIndependentReview({ outcome: "DISAGREEMENT_FOUND", rationale: "Found a scope mismatch." }),
+      rawIndependentReview: validIndependentReview({ outcome: "DISAGREEMENT_FOUND", rationale: "Found a scope mismatch.", findings: [blockingFinding()] }),
     });
     assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW");
     if (outcome.status !== "READY_FOR_HUMAN_REVIEW") return;

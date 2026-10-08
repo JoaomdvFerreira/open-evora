@@ -4,17 +4,26 @@
  * §6 "Independent review contract"). This module is the sole place the
  * reviewer's input is assembled — it is constructed exclusively from
  * already-validated, already-written artifacts (the manifest, the
- * materialized candidate YAML, and the deterministic
- * validation/readiness/delta results), never from the primary invocation's
+ * materialized candidate YAML, the deterministic
+ * validation/readiness/delta results, and the canonical corpus index the
+ * candidates are overlaid onto), never from the primary invocation's
  * process object, stdout transcript, or any other live reference to that
  * invocation. Because the reviewer invocation is a brand-new child process
  * (ai-invoker.ts) that only ever receives the string this module returns,
  * there is no code path by which generator conversational history, scratch
  * reasoning, or free-form rationale beyond `manifest.rationale` itself can
  * reach the reviewer.
+ *
+ * The same frozen package object is used both to build the reviewer prompt
+ * and to validate the reviewer's structured result (independent-review.ts),
+ * so the review is always judged against exactly the context it was given.
  */
+import { getRecordField } from "../core/record-fields.ts";
+import type { CorpusIndex, RecordFields, RecordIndex } from "../core/types.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CanonicalIntegrationReadiness } from "../integration/canonical-integration-review.ts";
+import { buildProspectiveCorpusIndex } from "../integration/prospective-validation.ts";
+import { detectLanguageSignals, type LanguageSignal } from "../language/signals.ts";
 import type { ValidationResult } from "../validation/validate.ts";
 import { canonicalJsonStringify } from "./fingerprint.ts";
 import type { GenerationManifest } from "./types.ts";
@@ -22,10 +31,26 @@ import type { GenerationManifest } from "./types.ts";
 export interface ReviewerInputSource {
   baseGitSha: string;
   manifest: GenerationManifest;
-  candidates: CandidateRecord[];
-  deltas: CandidateDelta[];
+  /** The canonical index the candidates are overlaid onto. */
+  index: CorpusIndex;
+  /** Candidate records in the same order as `deltas` (CanonicalIntegrationReview order). */
+  candidates: readonly CandidateRecord[];
+  deltas: readonly CandidateDelta[];
   validation: ValidationResult;
   readiness: CanonicalIntegrationReadiness;
+}
+
+/** One non-candidate record from the prospective corpus that a candidate's evidence chain requires. */
+export interface ReviewContextRecord {
+  recordFamily: string;
+  id: string;
+  fields: RecordFields;
+}
+
+/** One deterministic CLEC signal (unchanged signal-engine data) under a package-local stable ID. */
+export interface ReviewSignal {
+  signalId: string;
+  signal: LanguageSignal;
 }
 
 /**
@@ -38,7 +63,7 @@ export interface ReviewerInputSource {
  * generator-only context into the reviewer's input.
  */
 export interface ReviewerInputPackage {
-  schemaVersion: "1";
+  schemaVersion: "2";
   baseGitSha: string;
   investigationQuestion: string;
   mode: string;
@@ -47,29 +72,119 @@ export interface ReviewerInputPackage {
   deltas: CandidateDelta[];
   validation: ValidationResult;
   readiness: CanonicalIntegrationReadiness;
+  /** Existing records the candidates' evidence chains reference, prospective version, sorted by family then ID. */
+  evidenceContext: ReviewContextRecord[];
+  /** Candidate-scoped deterministic CLEC signals, in signal-engine order. */
+  signals: ReviewSignal[];
+}
+
+/** Record families a candidate's evidence chain follows: PRB -> EVD -> SRC, never to other problems. */
+const EVIDENCE_CHAIN_PREFIXES: ReadonlySet<string> = new Set(["EVD-", "SRC-"]);
+
+/** Package-local stable signal ID, assigned in signal-engine order. */
+export function reviewSignalId(position: number): string {
+  return `CLEC-SIG-${String(position + 1).padStart(4, "0")}`;
+}
+
+function evidenceChainReferences(recordIndex: RecordIndex, fields: RecordFields): { prefix: string; id: string }[] {
+  const out: { prefix: string; id: string }[] = [];
+  for (const ref of recordIndex.schema.references ?? []) {
+    if (!EVIDENCE_CHAIN_PREFIXES.has(ref.targetPrefix)) continue;
+    const value = getRecordField(fields, ref.field);
+    const items = ref.isList && Array.isArray(value) ? value : [value];
+    for (const item of items) {
+      const target = ref.itemField && item !== null && typeof item === "object" && !Array.isArray(item)
+        ? getRecordField(item as RecordFields, ref.itemField)
+        : item;
+      if (typeof target === "string" && target.trim() !== "") out.push({ prefix: ref.targetPrefix, id: target });
+    }
+  }
+  return out;
+}
+
+function compareContextRecords(a: ReviewContextRecord, b: ReviewContextRecord): number {
+  const left = `${a.recordFamily}\u0000${a.id}`;
+  const right = `${b.recordFamily}\u0000${b.id}`;
+  return left < right ? -1 : left > right ? 1 : 0;
 }
 
 /**
- * Freezes the reviewer input as a canonical JSON string (stable key
- * ordering, no insignificant whitespace — same serialization discipline as
- * fingerprint.ts) ready to deliver over stdin. Deliberately omits
- * `manifest.rationale`: the primary author's free-form justification is not
- * on the allow-list (contract §6 "must NOT receive... primary free-form
- * rationale outside the immutable package") — the reviewer evaluates the
- * candidates and deterministic results directly, not the author's stated
- * reasoning for them.
+ * Walks each candidate's evidence chain through the prospective index and
+ * returns the referenced records that are not themselves candidates. A
+ * referenced record that is also a candidate is already present (in its
+ * candidate version) under `candidates`; unrelated corpus records are never
+ * reached.
  */
-export function buildReviewerInput(source: ReviewerInputSource): string {
+function evidenceContextOf(prospective: CorpusIndex, deltas: readonly CandidateDelta[]): ReviewContextRecord[] {
+  const key = (prefix: string, id: string): string => `${prefix}\u0000${id}`;
+  const candidateKeys = new Set(deltas.map((delta) => key(delta.recordFamily, delta.id)));
+  const visited = new Set<string>();
+  const queue = deltas.map((delta) => ({ prefix: delta.recordFamily, id: delta.id }));
+  const context: ReviewContextRecord[] = [];
+
+  while (queue.length > 0) {
+    const { prefix, id } = queue.shift()!;
+    if (visited.has(key(prefix, id))) continue;
+    visited.add(key(prefix, id));
+    const recordIndex = prospective.byPrefix.get(prefix);
+    const record = recordIndex?.byId.get(id);
+    if (!recordIndex || !record) continue;
+    if (!candidateKeys.has(key(prefix, id))) context.push({ recordFamily: prefix, id, fields: structuredClone(record.fields) });
+    queue.push(...evidenceChainReferences(recordIndex, record.fields));
+  }
+
+  return context.sort(compareContextRecords);
+}
+
+function deepFreeze<T>(value: T): T {
+  if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
+    Object.freeze(value);
+    for (const child of Object.values(value as Record<string, unknown>)) deepFreeze(child);
+  }
+  return value;
+}
+
+/**
+ * Builds the frozen reviewer package. The evidence context and the CLEC
+ * signals both come from the one prospective corpus produced by overlaying
+ * the candidates onto `index` (buildProspectiveCorpusIndex()), so candidate
+ * replacements win over canonical versions. Signal subjects are limited to
+ * the candidate records; cross-record signal context still reads the whole
+ * prospective index. Deliberately omits `manifest.rationale`: the primary
+ * author's free-form justification is not on the allow-list (contract §6
+ * "must NOT receive... primary free-form rationale outside the immutable
+ * package"). Canonical SRC records carry provenance and metadata, not the
+ * Source body; no Source content is fetched or synthesized here.
+ */
+export function buildReviewerInputPackage(source: ReviewerInputSource): ReviewerInputPackage {
+  const prospective = buildProspectiveCorpusIndex(source.index, source.candidates);
+  const candidateIds = new Set(source.deltas.map((delta) => delta.id));
+  const signals = detectLanguageSignals(prospective, { subjectIds: candidateIds }).map((signal, position) => ({
+    signalId: reviewSignalId(position),
+    signal,
+  }));
+
   const pkg: ReviewerInputPackage = {
-    schemaVersion: "1",
+    schemaVersion: "2",
     baseGitSha: source.baseGitSha,
     investigationQuestion: source.manifest.investigationQuestion,
     mode: source.manifest.mode,
     ...(source.manifest.targetProblemId !== undefined ? { targetProblemId: source.manifest.targetProblemId } : {}),
-    candidates: source.candidates,
-    deltas: source.deltas,
-    validation: source.validation,
+    candidates: structuredClone([...source.candidates]),
+    deltas: structuredClone([...source.deltas]),
+    validation: structuredClone(source.validation),
     readiness: source.readiness,
+    evidenceContext: evidenceContextOf(prospective, source.deltas),
+    signals,
   };
+  return deepFreeze(pkg);
+}
+
+/**
+ * Serializes the frozen package as canonical JSON (stable key ordering, no
+ * insignificant whitespace — same serialization discipline as
+ * fingerprint.ts) ready to deliver over stdin.
+ */
+export function serializeReviewerInput(pkg: ReviewerInputPackage): string {
   return canonicalJsonStringify(pkg);
 }

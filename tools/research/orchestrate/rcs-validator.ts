@@ -18,7 +18,7 @@
  * produced — it fails closed exactly like a schema-invalid manifest does.
  */
 import { validateManifest, asValidatedManifest } from "./manifest.ts";
-import { validateIndependentReview, asValidatedIndependentReview } from "./independent-review.ts";
+import { asValidatedIndependentReview, candidateFieldsById, validateIndependentReviewStructure } from "./independent-review.ts";
 import { sha256Hex } from "./fingerprint.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
@@ -211,7 +211,14 @@ export function validateResearchChangeSet(value: unknown): RcsValidationResult {
     );
   }
 
-  const reviewValidation = validateIndependentReview(rcs.independentReview);
+  // Corpus-independent: the stored structured review is checked against the
+  // RCS's own candidates. The context-aware checks ran against the frozen
+  // reviewer package before assembly, and the fingerprint below binds the
+  // validated review into the package.
+  const reviewCandidates = Array.isArray(rcs.candidates) && Array.isArray(rcs.deltas)
+    ? candidateFieldsById(rcs.candidates as CandidateRecord[], rcs.deltas as CandidateDelta[])
+    : new Map();
+  const reviewValidation = validateIndependentReviewStructure(rcs.independentReview, reviewCandidates);
   errors.push(...reviewValidation.errors.map((message) => `independentReview.${message}`));
   if (!rcs.safetyAdmission || typeof rcs.safetyAdmission !== "object" || (rcs.safetyAdmission as Record<string, unknown>).disposition !== "ELIGIBLE" || !Array.isArray((rcs.safetyAdmission as Record<string, unknown>).findings)) {
     errors.push("rcs.safetyAdmission must be an eligible structured admission result");
