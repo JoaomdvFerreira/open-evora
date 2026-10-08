@@ -2,7 +2,7 @@
 
 Operational strategy for investigating civic problems and integrating new research into Open Évora.
 
-This document owns **research method, integration decisions, challenge/validation method, material-review rules, and stopping rules**.
+This document owns **research method, integration decisions, challenge/validation method, material-review rules, stopping rules, and the Citizen Language & Evidence Contract for canonical research text**.
 
 It does not define what Source, Evidence, or Problem records mean; those semantics belong to `docs/datamodel.md`. Repository-wide safety and publication rules belong to `AGENTS.md`.
 
@@ -139,7 +139,7 @@ Existing does not prove effective. Planned does not mean implemented. Understand
 
 ### Authoring Problem wording
 
-Field meanings are owned by `docs/datamodel.md` §3. When authoring or revising a Problem:
+Field meanings are owned by `docs/datamodel.md` §3. Problem wording is governed by the Citizen Language & Evidence Contract (§12). When authoring or revising a Problem:
 - fit the wording to the Evidence and its inference limits; when wording is unsupported, weaken or remove it — do not link Evidence merely to rescue it;
 - do not treat existing corpus wording as a template that licenses equivalent claims elsewhere;
 - do not assert or refresh currentness from edit dates, Source/Evidence dates, or absence of contradiction;
@@ -305,3 +305,78 @@ Before completing an integration:
 The programme is currently in stakeholder challenge and validation.
 
 Do not begin the next investigation phase solely because individual Problems appear ready. Programme progression requires explicit authorization.
+
+## 12. Citizen Language & Evidence Contract (CLEC)
+
+This section is the canonical research-text contract. It applies the evidence-integrity safeguard in `AGENTS.md` to authored text in canonical SRC, EVD and PRB records whenever that text is created, revised, simplified, paraphrased or translated. Field meanings remain owned by `docs/datamodel.md`.
+
+Governing principle (the global safeguard in `AGENTS.md`):
+
+> Never make a statement stronger, broader, more certain or more causal in order to make it simpler.
+
+Canonical research text should be understandable by a non-specialist citizen. Where plain wording and evidential accuracy conflict, accuracy wins: keep the longer faithful wording rather than a simpler, stronger one.
+
+### Dimensions
+
+| # | Dimension | Requirement |
+| --- | --- | --- |
+| 1 | Clarity | Plain, direct wording a non-specialist can follow, achieved without weakening any other dimension. |
+| 2 | Specificity | Name the concrete service, place, population, condition or mechanism the evidence concerns; do not replace it with a vaguer or more general category. |
+| 3 | Explicit scope | State the place, population, period and conditions a statement applies to; silence must not imply wider scope. |
+| 4 | Supported quantity | Quantities, frequencies and prevalence words (all, most, many, often, always, increasing) go no further than the evidence; prefer the evidence's own figures or ranges. Discussion volume is not prevalence. |
+| 5 | Attribution | Reported experiences, claims, opinions, measurements and recommendations remain attributed to who reports, claims, measures or recommends them; attributed statements must not become unattributed fact. |
+| 6 | Supported causality | Causal wording (causes, leads to, because of, results in) only to the extent the evidence supports it; sequence, association or a reported cause stays expressed as such. |
+| 7 | Temporal precision | State when a statement applies; historical is not presented as current, and planned or announced is not presented as implemented. |
+| 8 | Visible uncertainty | Keep qualifiers, unknowns, contradictions and limits visible; `UNKNOWN` is not `NO`. |
+| 9 | Neutral wording | Descriptive, non-evaluative and non-emotive; no advocacy, blame, intensifiers or rhetorical framing. |
+| 10 | Evidence fidelity | Every statement is traceable to, and no stronger than, its supporting evidence: PRB text to its linked EVD, EVD text to its Source. |
+
+### Simplification, paraphrase and translation
+
+- Simplification must never change evidential meaning.
+- Paraphrase and translation must preserve qualifiers, attribution, scope, temporal markers and uncertainty.
+- Translation, including into PT-PT for public presentation, is not a licence to strengthen, broaden or resolve what the original leaves qualified or uncertain.
+
+### Record-specific requirements
+
+The dimensions apply to all three record types; each type carries a strictest emphasis matching its role (`docs/datamodel.md` §1–§3).
+
+- **PRB** — strictest neutrality, scope and causality requirements. Problem-level synthesis must not exceed its supporting EVD and their inference limits.
+- **EVD** — strictest fidelity to the Source. Preserve the Source's qualification, attribution and the inference limits of the observation.
+- **SRC** — strictest preservation and provenance requirement. Record the Source as published; no evaluative language about what the Source proves or how strong it is.
+
+### Signals and human judgement
+
+- Lexical or other deterministic signals (for example a quantifier, an absolute, or causal wording) are review prompts, not automatic wording violations. No word is banned as such; the same wording may be supported in one context and unsupported in another.
+- Where deterministic signals are produced, each requires an explicit semantic disposition in review; a signal is neither a finding nor a pass by itself.
+- Semantic review must compare each changed claim with its supporting evidence — PRB text with its linked EVD, EVD text with its Source. Reading the text in isolation is not semantic review.
+- Human judgement remains final. Deterministic tooling may flag wording; it does not decide whether wording complies.
+
+### Mandatory independent semantic review
+
+Every canonical research text change requires independent semantic review before human approval, without exception.
+
+This applies to both research lanes:
+- orchestrated research changes;
+- direct pull-request changes to canonical research.
+
+The orchestration may differ between the lanes; the quality gate must not.
+
+Self-review by the author of the change — human or agent — does not satisfy this requirement.
+
+A semantic blocking finding cannot be approved while unresolved. No separate per-finding human disposition mechanism is currently required.
+
+### Current policy and future enforcement
+
+Current policy: this contract and the mandatory independent semantic review apply now, through review.
+
+Not yet implemented:
+- a deterministic signal lexicon — when introduced it is code-owned and is not duplicated in this document;
+- tooling that surfaces deterministic signals for semantic disposition;
+- CI enforcement on changed records.
+
+Until such tooling exists, nothing in this section should be read as describing an implemented validator or CI check.
+
+Boundaries of initial enforcement:
+- Explorer-generated copy is outside initial CLEC enforcement; the global evidence-integrity safeguard in `AGENTS.md` still applies to it.
+- Adopting this contract does not require rewriting the existing corpus.
