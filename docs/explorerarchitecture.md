@@ -191,3 +191,7 @@ For SRC Record Detail, the approved references are the owner-approved 1440/1024/
 The static client-side architecture has been validated at corpus sizes materially above the current dataset without a demonstrated architectural cliff in supported workflows.
 
 Treat performance measurements as evidence. Do not introduce architectural complexity pre-emptively.
+
+## 8. Contribution handoff
+
+The public contribution form remains client-only and hands prepared content to GitHub; prefilled navigation is used only within the Explorer's bounded URL safety policy, while long or failed handoffs retain the exact prepared title and body in a recoverable inline fallback. The Explorer never reports a contribution as submitted.
