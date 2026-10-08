@@ -5,6 +5,8 @@
  */
 export { analyzeCorpus, computeProblemAnalysis, computeGaps } from "./analysis/analyze.ts";
 export type { AnalysisResult, CorpusSummary, ProblemAnalysis } from "./analysis/analyze.ts";
+export { ADVISORY, CLEC_DIMENSION, detectLanguageSignals, SIGNAL_CODE, SIGNAL_DIMENSION, subjectIdsForFiles } from "./language/signals.ts";
+export type { ClecDimension, DetectOptions, LanguageSignal, SignalCode } from "./language/signals.ts";
 export { loadCorpusIndex, loadCorpusIndexTolerant } from "./core/corpus.ts";
 export type { CorpusLoadResult, MalformedRecordFile } from "./core/corpus.ts";
 export { loadSchemas } from "./core/schemas.ts";

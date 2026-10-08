@@ -370,12 +370,20 @@ A semantic blocking finding cannot be approved while unresolved. No separate per
 
 Current policy: this contract and the mandatory independent semantic review apply now, through review.
 
-Not yet implemented:
-- a deterministic signal lexicon — when introduced it is code-owned and is not duplicated in this document;
-- tooling that surfaces deterministic signals for semantic disposition;
-- CI enforcement on changed records.
+Implemented in advisory/report mode:
+- a deterministic signal lexicon, code-owned and not duplicated in this document;
+- tooling that surfaces advisory CLEC signals for the corpus or for changed records.
 
-Until such tooling exists, nothing in this section should be read as describing an implemented validator or CI check.
+These signals are review prompts, not automatic violations; each still requires semantic disposition in review (see *Signals and human judgement*). The tooling does not rewrite canonical text, and signal presence does not fail validation or CI.
+
+Not yet implemented:
+- structured semantic dispositions (`SUPPORTED` / `VIOLATION` / `NOT_APPLICABLE`);
+- structured reviewer findings and signal dispositions;
+- Gate integration for those dispositions;
+- technical enforcement for direct pull-request changes (Lane B);
+- CI or blocking validation based on CLEC signals.
+
+Nothing in this section should be read as describing an implemented blocking CLEC validator or CI check.
 
 Boundaries of initial enforcement:
 - Explorer-generated copy is outside initial CLEC enforcement; the global evidence-integrity safeguard in `AGENTS.md` still applies to it.
