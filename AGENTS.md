@@ -60,6 +60,14 @@ If potentially non-public material is encountered, stop the affected work. Do no
 
 Never strengthen a claim beyond what canonical evidence supports.
 
+Never make a statement stronger, broader, more certain or more causal in order to make it simpler.
+
+This applies equally when authoring, simplifying, summarising, paraphrasing or translating. Wording must not:
+- make a claim stronger than its evidence;
+- broaden its scope (place, population, period, quantity);
+- increase its certainty or remove qualifiers and visible uncertainty;
+- introduce or strengthen causality the evidence does not support.
+
 In particular:
 - `UNKNOWN` is not `NO`;
 - reported is not verified;
@@ -69,6 +77,8 @@ In particular:
 - absence of evidence does not establish absence of a problem.
 
 Do not invent, silently normalize, or fill factual gaps.
+
+For canonical research text, this safeguard is applied through the Citizen Language & Evidence Contract and its mandatory independent semantic review, owned by `docs/investigationstrategy.md` §12.
 
 ### Canonical-state integrity
 
