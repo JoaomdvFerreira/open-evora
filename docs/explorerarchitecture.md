@@ -133,6 +133,7 @@ Explorer presentation invariants:
 - The Records landing's pagination row is likewise its final content band before the public footer.
 - EVD Record Detail's `Origem e auditoria` band is likewise its final content band before the public footer.
 - SRC Record Detail's `Acesso e auditoria` band is likewise its final content band before the public footer.
+- SRC Record Detail's terminal `Acesso e auditoria` band exposes canonical access/licensing plus Source acquisition and persistent identity where authored.
 - The global manifest/corpus-generation summary is not appended after `Detalhes`, `Histórico`, the Records landing, EVD or SRC Record Detail. Other Record Detail types and Graph may retain it.
 - Corpus-generation timestamps are never presented as investigation currentness.
 

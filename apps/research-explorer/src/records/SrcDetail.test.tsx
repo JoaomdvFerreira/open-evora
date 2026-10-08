@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import { composeStories } from "@storybook/react-vite";
+import * as stories from "./SrcDetail.stories";
 import { SRC_AUDIT_ANCHOR_ID, SrcDetail } from "./SrcDetail";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { DataLoadError } from "../dataProvider/types";
@@ -153,6 +155,7 @@ describe.skipIf(!hasGeneratedData)("SRC Detail — canonical regression cases", 
       Disponibilidade: "Disponível · Público",
       Consulta: "Transferência · PDF · sem leitura automática",
       Endereço: "cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf",
+      "Forma de obtenção": "Web pública",
     });
     expect(within(audit).getByRole("link", { name: "cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf" }).getAttribute("href")).toBe("https://www.cm-evora.pt/wp-content/uploads/2024/01/PDS-Evora_FINAL_VF.pdf");
     expect(within(audit).getByText("Estado desconhecido.").closest("p")!.textContent).toBe("Estado desconhecido. Pode ser lida e citada; a reutilização do conteúdo requer confirmação junto do editor.");
@@ -182,6 +185,18 @@ describe.skipIf(!hasGeneratedData)("SRC Detail — canonical regression cases", 
     expect(licensing.textContent).toBe("CC BY 4.0. A reutilização do conteúdo é permitida. Atribuição: Giacomo Dalla Chiara, Klaas Fiete Krutein, Andisheh Ranjbari e Anne Goodchild");
   });
 
+  it("SRC-0093 exposes acquisition method and its full DOI without inventing an acquisition date or link", () => {
+    renderSrc(detail("SRC-0093"));
+    const audit = auditRegion();
+    const provenance = within(audit).getByRole("heading", { name: "Proveniência" }).parentElement!;
+    const facts = Object.fromEntries(Array.from(provenance.querySelectorAll(".src-audit-facts > div")).map((row) => [row.querySelector("dt")!.textContent, row.querySelector("dd")!.textContent]));
+    expect(facts).toEqual({ "Forma de obtenção": "Web pública", "Identificador persistente": "doi: 10.1038/s41598-022-23987-z" });
+    expect(within(provenance).queryByText("Data de obtenção")).toBeNull();
+    expect(within(provenance).queryByRole("link")).toBeNull();
+    expect(within(audit).getByText("Última verificação").nextElementSibling?.textContent).toBe("25 de agosto de 2026");
+    expect(within(audit).getByText("Endereço").nextElementSibling?.textContent).toBe("doi.org/10.1038/s41598-022-23987-z");
+  });
+
   it("SRC-0120 reads its as_of coverage as a single date", () => {
     const { container } = renderSrc(detail("SRC-0120"));
     expect(metadata(container)).toMatchObject({ Onde: "Município de Évora", Data: "19 de fevereiro de 2026" });
@@ -195,6 +210,12 @@ describe.skipIf(!hasGeneratedData)("SRC Detail — canonical regression cases", 
     expect(within(audit).getByRole("heading", { name: "Consultar a fonte" })).toBeTruthy();
     expect(within(audit).getByText(/^A fonte é privada/)).toBeTruthy();
     expect(within(audit).getByText("Estado desconhecido.").closest("p")!.textContent).toBe("Estado desconhecido. A reutilização do conteúdo requer confirmação junto do editor.");
+    const provenance = within(audit).getByRole("heading", { name: "Proveniência" }).parentElement!;
+    expect(provenance.textContent).toContain("Contacto direto");
+    expect(provenance.textContent).toContain("3 de setembro de 2026");
+    expect(provenance.textContent).not.toContain("Identificador persistente");
+    expect(within(audit).getByText("Última verificação").nextElementSibling?.textContent).toBe("3 de setembro de 2026");
+    expect(within(audit).getByText("Data de obtenção").nextElementSibling?.textContent).toBe("3 de setembro de 2026");
     expect(screen.queryByRole("region", { name: "Limitações" })).toBeNull();
   });
 
@@ -253,6 +274,14 @@ describe("SRC Detail — relation state", () => {
     expect(within(auditRegion()).getByText(/^A fonte é pública/).textContent).toBe("A fonte é pública e está disponível para consulta por API. Os direitos de reutilização não são conhecidos.");
   });
 
+  it("keeps acquisition date distinct from the last-checked date", () => {
+    const record = { ...src.record, acquisition: { method: "direct_contact", obtained_at: "2026-09-03" }, temporal: { last_checked_at: "2026-08-25" } };
+    renderSrc({ ...src, record }, { lookup, relations: ready({ evidence: [], uniqueEvidenceCount: 0, relatedProblems: [], problemDomainCodes: {} }) });
+    const audit = auditRegion();
+    expect(within(audit).getByText("Última verificação").nextElementSibling?.textContent).toBe("25 de agosto de 2026");
+    expect(within(audit).getByText("Data de obtenção").nextElementSibling?.textContent).toBe("3 de setembro de 2026");
+  });
+
   it("says 'em investigação' only when every related Problem is canonically OPEN", () => {
     const evidence: RecordDetail = { id: "EVD-1", type: "EVD-", file: "", outgoingEdges: [], incomingEdges: [], record: { observation: { summary: "Obs." } } };
     const relations = ready({ evidence: [evidence], uniqueEvidenceCount: 1, relatedProblems: [{ problemId: "PRB-1", viaEvidenceIds: ["EVD-1"] }, { problemId: "PRB-2", viaEvidenceIds: ["EVD-1"] }], problemDomainCodes: {} });
@@ -266,5 +295,31 @@ describe("SRC Detail — relation state", () => {
     mixed.set("PRB-2", { ...mixed.get("PRB-2")!, summaryFields: { status: "OPEN" } });
     renderSrc(src, { lookup: mixed, relations });
     expect(screen.getByText("A Open Évora extraiu desta fonte 1 observação, usada em 2 problemas em investigação.")).toBeTruthy();
+  });
+});
+
+describe.skipIf(!hasGeneratedData)("Public/SRC Detail review stories", () => {
+  const composed = composeStories(stories);
+
+  it("ordinary 1440 story retains the approved SRC composition and audit band", async () => {
+    const { container } = render(<composed.SrcDetail1440 />);
+    expect(await screen.findByRole("heading", { level: 1 })).toBeTruthy();
+    expect(await screen.findByRole("region", { name: "Acesso e auditoria" })).toBeTruthy();
+    expect(container.querySelector(".src-meta-grid .src-meta-cell")).not.toBeNull();
+    expect(container.querySelector("footer.public-footer")).not.toBeNull();
+  });
+
+  it("known-licence 1440 story shows SRC-0093 persistent identity", async () => {
+    render(<composed.KnownLicence1440 />);
+    const audit = await screen.findByRole("region", { name: "Acesso e auditoria" });
+    expect(within(audit).getByText("doi: 10.1038/s41598-022-23987-z")).toBeTruthy();
+  });
+
+  it("private-correspondence 360 story shows SRC-0130 acquisition method and date", async () => {
+    render(<composed.PrivateCorrespondence360 />);
+    const audit = await screen.findByRole("region", { name: "Acesso e auditoria" });
+    expect(within(audit).getByText("Contacto direto")).toBeTruthy();
+    const provenance = within(audit).getByRole("heading", { name: "Proveniência" }).parentElement!;
+    expect(within(provenance).getByText("3 de setembro de 2026")).toBeTruthy();
   });
 });
