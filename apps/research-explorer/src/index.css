@@ -3,7 +3,7 @@
    always conveyed through text/markers/outlines, never colour alone. */
 
 body {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-interface);
   margin: 1rem;
   color: #111;
   background: #fff;

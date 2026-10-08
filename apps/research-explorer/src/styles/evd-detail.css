@@ -636,6 +636,7 @@ body:has(.evd-detail-view) .public-footer {
 
 .evd-audit-secondary-cta,
 .evd-audit-primary-cta {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
