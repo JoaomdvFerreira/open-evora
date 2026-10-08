@@ -72,6 +72,34 @@ test("the reviewer prompt assesses support, inference limits, faithful contradic
   assert.match(REVIEWER_PROMPT, /no unsupported certainty/);
 });
 
+test("the reviewer prompt assesses the CLEC core rule and all ten dimensions against the evidence", () => {
+  assert.ok(REVIEWER_PROMPT.includes("Never make a statement stronger, broader, more certain or more causal in order to make it simpler."));
+  const dimensions = ["Clarity", "Specificity", "Explicit scope", "Supported quantity", "Attribution", "Supported causality", "Temporal precision", "Visible uncertainty", "Neutral wording", "Evidence fidelity"];
+  dimensions.forEach((dimension, index) => {
+    assert.ok(REVIEWER_PROMPT.includes(`${index + 1}. ${dimension} —`), `reviewer must assess CLEC dimension ${dimension}`);
+  });
+  assert.match(REVIEWER_PROMPT, /Reading the text in isolation is not semantic review/);
+});
+
+test("the reviewer prompt makes Source→EVD fidelity and translation/paraphrase strengthening explicit", () => {
+  assert.match(REVIEWER_PROMPT, /Source→EVD fidelity/);
+  assert.match(REVIEWER_PROMPT, /no translation or paraphrase strengthens, broadens or resolves the Source/);
+  assert.match(REVIEWER_PROMPT, /no simplification changes evidential meaning/);
+});
+
+test("the reviewer prompt treats lexical terms as contextual signals, not banned words", () => {
+  assert.match(REVIEWER_PROMPT, /"vários", "zonas-chave", "significativo"/);
+  assert.match(REVIEWER_PROMPT, /signals to examine, not banned words and not automatic violations/);
+  assert.match(REVIEWER_PROMPT, /evidence and its context decide/);
+});
+
+test("the reviewer prompt routes CLEC findings through the unchanged result shape", () => {
+  const resultContract = REVIEWER_PROMPT.slice(REVIEWER_PROMPT.indexOf("Respond with a single JSON object"));
+  const keys = [...resultContract.matchAll(/^\s*"(\w+)":/gm)].map((match) => match[1]);
+  assert.deepEqual(keys, ["schemaVersion", "outcome", "rationale"]);
+  assert.doesNotMatch(REVIEWER_PROMPT, /findings\[\]|signalDispositions/);
+});
+
 test("the reviewer prompt embeds the frozen input verbatim and states exactly the outcomes the validator accepts", () => {
   assert.ok(REVIEWER_PROMPT.includes(`REVIEW INPUT (immutable, JSON):\n${FROZEN_INPUT}\n`));
   assert.match(REVIEWER_PROMPT, /"outcome": "CONCUR" \| "DISAGREEMENT_FOUND" \| "INSUFFICIENT_EVIDENCE"/);
