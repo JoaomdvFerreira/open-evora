@@ -16,6 +16,19 @@
 - [ ] `git diff --check` passes.
 - [ ] Required repository checks pass.
 
+## Research semantic review
+
+<!--
+Keep N/A when this PR creates, updates or deletes no canonical PRB/EVD/SRC record file.
+Otherwise replace N/A with the exact block printed by `npm run research:lane-b:prepare -- --base <base>`, run before the research change is committed. Never write or edit the receipt by hand.
+- A self-review is not sufficient; the receipt carries a separate independent reviewer's result.
+- Lexical CLEC signals are not violations by themselves; each carries the reviewer's disposition.
+- The receipt must correspond to this PR's exact base and canonical record content; altering reviewed record content requires a new review receipt.
+- Only a CONCUR review is eligible for human approval; it is not an approval.
+-->
+
+N/A
+
 ## Source / provenance
 
 - Branch: `...`
