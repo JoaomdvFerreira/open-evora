@@ -7,6 +7,12 @@
  * banned: the same wording may be supported in one context and unsupported
  * in another, and only review against the linked evidence decides that.
  *
+ * Separately, this module owns the context-free blocking policy: a closed set
+ * of signal codes for cross-layer internal-ID coupling that no evidence
+ * interpretation can make valid. A change unit carrying one of them is
+ * rejected before semantic review; that is a layer-integrity rule, not a
+ * semantic judgement, and it never applies to lexical wording.
+ *
  * This module is the code-owned home of the signal lexicon (CLEC: "a
  * deterministic signal lexicon ... is code-owned"). It is pure: it reads an
  * already-loaded corpus index, never mutates or rewrites record text, never
@@ -69,7 +75,11 @@ export const SIGNAL_DIMENSION: Readonly<Record<SignalCode, ClecDimension>> = {
   PRB_ID_IN_EVD_TEXT: CLEC_DIMENSION.EVIDENCE_FIDELITY,
 };
 
-/** Every signal in this module is advisory; there is no blocking severity. */
+/**
+ * Every signal is an advisory semantic-review prompt; there is no blocking
+ * signal severity. Context-free blocking is a separate enforcement policy over
+ * signal codes (CONTEXT_FREE_BLOCKING_CODES), not a property of a signal.
+ */
 export const ADVISORY = "advisory" as const;
 
 /**
@@ -707,6 +717,41 @@ export function detectLanguageSignals(index: CorpusIndex, options: DetectOptions
     ...records("EVD-").flatMap((r) => evidenceSignals(r)),
     ...records("SRC-").flatMap((r) => sourceSignals(r)),
   ];
+}
+
+// ---------------------------------------------------------------------------
+// Context-free blocking policy (docs/investigationstrategy.md §12).
+// ---------------------------------------------------------------------------
+
+/** The one failure identity for a context-free blocker, in every enforcement path. */
+export const CONTEXT_FREE_BLOCK = "CLEC_CONTEXT_FREE_BLOCK" as const;
+
+/**
+ * Signal codes rejected deterministically before semantic review. Canonical
+ * record IDs in authored SRC text, and PRB IDs in authored EVD text, couple a
+ * record to internal research state of another layer; the code alone decides
+ * this, with no evidence or context lookup. Every other code stays advisory.
+ */
+export const CONTEXT_FREE_BLOCKING_CODES: ReadonlySet<SignalCode> = new Set([SIGNAL_CODE.SRC_RECORD_ID_IN_TEXT, SIGNAL_CODE.PRB_ID_IN_EVD_TEXT]);
+
+/**
+ * The context-free blockers among a review unit's signals (for example a
+ * reviewer package's `{ signalId, signal }` entries), unchanged and in their
+ * given order. Empty means the unit proceeds to semantic review.
+ */
+export function contextFreeBlockers<T extends { signal: LanguageSignal }>(signals: readonly T[]): T[] {
+  return signals.filter((entry) => CONTEXT_FREE_BLOCKING_CODES.has(entry.signal.code));
+}
+
+/** A deterministic report of context-free blockers: one line per signal, quoting the authored location. */
+export function describeContextFreeBlockers(blockers: readonly { signalId: string; signal: LanguageSignal }[]): string {
+  const lines = blockers.map(({ signalId, signal: s }) =>
+    `${signalId} ${s.code} ${s.subjectId} ${s.field}: ${JSON.stringify(s.match ?? s.excerpt)} in ${JSON.stringify(s.excerpt)}`
+  );
+  return [
+    "canonical record text embeds internal record IDs across research layers; correct the text before independent semantic review (a review cannot waive this):",
+    ...lines,
+  ].join("\n  ");
 }
 
 /**

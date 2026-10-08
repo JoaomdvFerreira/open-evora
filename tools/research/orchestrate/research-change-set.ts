@@ -16,6 +16,7 @@ import { classifyCandidateDelta } from "../integration/candidate-delta.ts";
 import { prepareCanonicalIntegrationReview, type CanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
 import { prepareCanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
 import type { CorpusIndex } from "../core/types.ts";
+import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
 import { sha256Hex } from "./fingerprint.ts";
 import { loadCandidates } from "./candidate-loader.ts";
 import { validateManifest, asValidatedManifest } from "./manifest.ts";
@@ -191,6 +192,9 @@ export function prepareResearchChangeSet(input: PrepareResearchChangeSetInput): 
   } catch (error) {
     return failed("PROSPECTIVE_VALIDATION", (error as Error).message);
   }
+  // Same context-free precheck as the AI-driven path: supplied review material never waives it.
+  const blockers = contextFreeBlockers(reviewerInput.signals);
+  if (blockers.length > 0) return failed(CONTEXT_FREE_BLOCK, describeContextFreeBlockers(blockers));
   const reviewValidation = validateIndependentReview(input.rawIndependentReview, reviewerInput);
   if (reviewValidation.errors.length > 0) {
     return failed("INDEPENDENT_REVIEW_VALIDATION", reviewValidation.errors.join("; "));

@@ -27,7 +27,7 @@ import { fileURLToPath } from "node:url";
 
 import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "../orchestrate/ai-invoker.ts";
 import { assertWorkbenchBoundary } from "../orchestrate/workbench-boundary.ts";
-import { prepareLaneBReview, verifyLaneBPullRequest } from "./receipt.ts";
+import { laneBContextFreeBlock, prepareLaneBReview, verifyLaneBPullRequest } from "./receipt.ts";
 import { pullRequestBase, resolveCommit, resolveLaneBReviewUnit, type LaneBReviewUnit } from "./review-unit.ts";
 
 const USAGE = [
@@ -59,6 +59,9 @@ function prepare(repoRoot: string, flag: (name: string) => string | undefined): 
   if (unit.status === "UNSUPPORTED_DELETION") {
     return failed("UNSUPPORTED_CANONICAL_DELETION", `Lane B direct review does not support deleting or renaming canonical records: ${unit.paths.join(", ")}`);
   }
+  // Deterministic, so reported even before the reviewer runtime is configured.
+  const blocked = laneBContextFreeBlock(unit);
+  if (blocked) return failed(blocked.failedCheck, blocked.message);
 
   const aiConfig = loadLocalCommandAiInvokerConfigFromEnv();
   if (!aiConfig) {

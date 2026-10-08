@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import type { RecordFields, RecordSchema } from "../core/types.ts";
 import { stringifyRecordYaml } from "../core/yaml.ts";
 import type { AiInvocationRequest, AiInvoker } from "../orchestrate/ai-invoker.ts";
+import { validateIndependentReview } from "../orchestrate/independent-review.ts";
 import { serializeReviewerInput, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
 import { buildReviewerPrompt } from "../orchestrate/reviewer-prompt.ts";
 import { assertWorkbenchBoundary } from "../orchestrate/workbench-boundary.ts";
@@ -590,6 +591,73 @@ test("preparation yields no receipt for a non-CONCUR, malformed or self-asserted
   });
 });
 
+// ---------------------------------------------------------------------------
+// Context-free CLEC precheck: cross-layer internal IDs fail before any review.
+
+/** A CONCUR review that validates against the package, dispositioning every signal (blockers included) as `disposition`. */
+function waiverAttempt(pkg: ReviewerInputPackage, disposition: "SUPPORTED" | "NOT_APPLICABLE"): Review {
+  const review = concur(pkg);
+  review.signalDispositions.forEach((entry, i) => {
+    Object.assign(entry, { disposition, evidenceReferences: disposition === "SUPPORTED" ? [pkg.signals[i].signal.subjectId] : [] });
+  });
+  return review;
+}
+
+/** The changed records carry `blocker`: preparation never invokes the reviewer, and no receipt or N/A passes the check. */
+function assertContextFreeBlocked(fixture: Fixture, base: string, blocker: RegExp): void {
+  const prepared = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
+  const workbench = mkdtempSync(join(tmpdir(), "open-evora-lane-b-workbench-"));
+  try {
+    const invoker = new RecordingInvoker(() => JSON.stringify(waiverAttempt(prepared.reviewerInput, "SUPPORTED")));
+    const outcome = prepareLaneBReview(prepared, invoker, workbench);
+    assert.equal(outcome.status, "REVIEW_FAILED");
+    if (outcome.status === "REVIEW_FAILED") {
+      assert.equal(outcome.failedCheck, "CLEC_CONTEXT_FREE_BLOCK");
+      assert.match(outcome.message, blocker);
+    }
+    assert.equal(invoker.requests.length, 0);
+    assert.deepEqual(readdirSync(workbench), [], "no reviewer input, review or receipt is written");
+  } finally {
+    rmSync(workbench, { recursive: true, force: true });
+  }
+
+  const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
+  for (const review of [waiverAttempt(unit.reviewerInput, "SUPPORTED"), waiverAttempt(unit.reviewerInput, "NOT_APPLICABLE")]) {
+    // The receipt is otherwise exact and its review validates: only the precheck rejects it.
+    assert.deepEqual(validateIndependentReview(review, unit.reviewerInput).errors, []);
+    assert.equal(review.outcome, "CONCUR");
+    assertFails(unit, bodyWith(receiptFor(unit, review)), "CLEC_CONTEXT_FREE_BLOCK", blocker);
+  }
+  for (const body of [prBody("N/A"), "## Summary\n\nNo section.", ""]) assertFails(unit, body, "CLEC_CONTEXT_FREE_BLOCK", blocker);
+}
+
+test("a direct EVD update embedding a PRB ID is blocked before review, and no receipt waives it", () => {
+  withFixture((fixture, base) => {
+    fixture.record(evidence("EVD-B", ["SRC-B"], "Versão candidata, ligada a PRB-0001."));
+    assertContextFreeBlocked(fixture, base, /CLEC-SIG-\d{4} PRB_ID_IN_EVD_TEXT EVD-B observation\.summary: "PRB-0001"/);
+  });
+});
+
+test("a direct SRC update embedding a canonical record ID is blocked before review, and no receipt waives it", () => {
+  withFixture((fixture, base) => {
+    fixture.record(source("SRC-B", "Fonte B, ver EVD-000001"));
+    assertContextFreeBlocked(fixture, base, /CLEC-SIG-\d{4} SRC_RECORD_ID_IN_TEXT SRC-B name: "EVD-000001"/);
+  });
+});
+
+test("a historical blocker outside the changed records never blocks the change, even within its evidence context", () => {
+  withFixture((fixture) => {
+    fixture.record(evidence("EVD-A", ["SRC-A"], "Muitas reclamações registadas em 2025, ver PRB-0001."));
+    const base = fixture.commit("historical coupling already on main");
+    addProblemWithSignal(fixture);
+    const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
+    assert.ok(unit.reviewerInput.evidenceContext.some((record) => record.id === "EVD-A"));
+    assert.ok(unit.reviewerInput.signals.every(({ signal }) => signal.subjectId === "PRB-NEW"));
+    const result = verifyLaneBPullRequest(unit, bodyWith(receiptFor(unit, concur(unit.reviewerInput))));
+    assert.equal(result.ok, true, result.ok ? "" : result.errors.join("; "));
+  });
+});
+
 test("the default Lane B workbench location is inside the gitignored research workbench", () => {
   const unit = { status: "REVIEW_REQUIRED", baseGitSha: "a".repeat(40), reviewerInputFingerprint: "b".repeat(64) } as ReviewRequired;
   const dir = defaultLaneBWorkbenchDir(realRepoRoot, unit);
@@ -631,6 +699,37 @@ test("the check CLI reads the PR body from the GitHub event file and measures fr
       assert.match(passed.output, /^PASS: independent review CONCUR/m);
     } finally {
       rmSync(eventDir, { recursive: true, force: true });
+    }
+  });
+});
+
+test("the prepare and check CLIs fail a context-free blocker before any reviewer process runs, whatever the receipt", () => {
+  withFixture((fixture, base) => {
+    fixture.record(evidence("EVD-B", ["SRC-B"], "Versão candidata, ligada a PRB-0001."));
+    const stubDir = mkdtempSync(join(tmpdir(), "open-evora-lane-b-stub-"));
+    const stub = join(stubDir, "reviewer.cjs");
+    const marker = join(stubDir, "invoked");
+    writeFileSync(stub, `require("node:fs").writeFileSync(${JSON.stringify(marker)}, "");\nprocess.stdout.write("{}");\n`);
+    try {
+      const prepared = spawnSync(process.execPath, ["--experimental-strip-types", cliPath, "prepare", "--base", base], {
+        cwd: fixture.root,
+        encoding: "utf8",
+        env: { ...process.env, RESEARCH_AI_COMMAND: process.execPath, RESEARCH_AI_ARGS: stub },
+      });
+      assert.equal(prepared.status, 1, prepared.stdout);
+      assert.match(prepared.stderr, /^FAILED \[CLEC_CONTEXT_FREE_BLOCK\]: .*\n  CLEC-SIG-\d{4} PRB_ID_IN_EVD_TEXT EVD-B observation\.summary: "PRB-0001"/m);
+      assert.equal(readdirSync(stubDir).includes("invoked"), false, "the reviewer command never ran");
+      assert.equal(prepared.stdout.includes(RECEIPT_BEGIN), false);
+
+      const head = fixture.commit();
+      const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: head }));
+      const bodyFile = join(stubDir, "body.md");
+      writeFileSync(bodyFile, bodyWith(receiptFor(unit, waiverAttempt(unit.reviewerInput, "SUPPORTED"))));
+      const checked = runCheck(fixture, ["--base", base, "--head", head, "--body-file", bodyFile]);
+      assert.equal(checked.status, 1);
+      assert.match(checked.output, /FAILED \[CLEC_CONTEXT_FREE_BLOCK\]/);
+    } finally {
+      rmSync(stubDir, { recursive: true, force: true });
     }
   });
 });

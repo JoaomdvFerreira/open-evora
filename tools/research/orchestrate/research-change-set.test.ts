@@ -360,3 +360,21 @@ test("independent review disagreement is preserved and surfaced, not auto-resolv
     assert.equal(outcome.changeSet.readiness, "READY_FOR_INTEGRATION_GATE");
   });
 });
+
+test("supplied review material cannot bypass the context-free precheck: a candidate SRC embedding a record ID fails even with CONCUR", () => {
+  withTempDir((candidatesDir) => {
+    writeCandidate(candidatesDir, "SRC-NEW.yaml", "source_id: SRC-NEW\nname: Anexo do PRB-0001\n");
+    const signalDispositions = [{ signalId: "CLEC-SIG-0001", disposition: "NOT_APPLICABLE" as const, reason: "Supplied waiver attempt.", evidenceReferences: ["SRC-NEW"], relatedFindingIds: [] }];
+    const outcome = prepareResearchChangeSet({
+      index: emptyIndex(),
+      baseGitSha: SHA,
+      candidatesDir,
+      rawManifest: validManifest(),
+      rawIndependentReview: validIndependentReview({ signalDispositions }),
+    });
+    assert.equal(outcome.status, "FAILED");
+    if (outcome.status !== "FAILED") return;
+    assert.equal(outcome.failedCheck, "CLEC_CONTEXT_FREE_BLOCK");
+    assert.match(outcome.message, /CLEC-SIG-0001 SRC_RECORD_ID_IN_TEXT SRC-NEW name: "PRB-0001"/);
+  });
+});

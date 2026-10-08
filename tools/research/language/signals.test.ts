@@ -17,7 +17,18 @@ import { fileURLToPath } from "node:url";
 import { loadSchemas } from "../core/schemas.ts";
 import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex } from "../core/types.ts";
 import { stringifyRecordYaml } from "../core/yaml.ts";
-import { ADVISORY, CLEC_DIMENSION, detectLanguageSignals, SIGNAL_CODE, SIGNAL_DIMENSION, subjectIdsForFiles } from "./signals.ts";
+import {
+  ADVISORY,
+  CLEC_DIMENSION,
+  CONTEXT_FREE_BLOCK,
+  CONTEXT_FREE_BLOCKING_CODES,
+  contextFreeBlockers,
+  describeContextFreeBlockers,
+  detectLanguageSignals,
+  SIGNAL_CODE,
+  SIGNAL_DIMENSION,
+  subjectIdsForFiles,
+} from "./signals.ts";
 import type { LanguageSignal, SignalCode } from "./signals.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
@@ -384,6 +395,73 @@ describe("advisory-only, read-only contract", () => {
   });
 });
 
+describe("context-free blocking policy", () => {
+  /** Signals in the reviewer-package shape: a package-local ID over unchanged signal data. */
+  function identified(signals: LanguageSignal[]): { signalId: string; signal: LanguageSignal }[] {
+    return signals.map((signal, i) => ({ signalId: `CLEC-SIG-${String(i + 1).padStart(4, "0")}`, signal }));
+  }
+
+  /** One signal of `code`, with no record, index or evidence context behind it. */
+  function bare(code: SignalCode): LanguageSignal {
+    return { code, dimension: SIGNAL_DIMENSION[code], subjectId: "X", field: "f", excerpt: "e", severity: ADVISORY };
+  }
+
+  test("the blocking set is exactly the two cross-layer internal-ID codes", () => {
+    assert.deepEqual([...CONTEXT_FREE_BLOCKING_CODES].sort(), [SIGNAL_CODE.PRB_ID_IN_EVD_TEXT, SIGNAL_CODE.SRC_RECORD_ID_IN_TEXT]);
+    assert.equal(CONTEXT_FREE_BLOCK, "CLEC_CONTEXT_FREE_BLOCK");
+  });
+
+  test("classification reads the code alone: every other code, lexical or contextual, stays advisory", () => {
+    const all = identified(Object.values(SIGNAL_CODE).map(bare));
+    assert.deepEqual(
+      contextFreeBlockers(all).map((entry) => entry.signal.code),
+      [SIGNAL_CODE.SRC_RECORD_ID_IN_TEXT, SIGNAL_CODE.PRB_ID_IN_EVD_TEXT]
+    );
+    for (const code of [
+      SIGNAL_CODE.EVD_INFERENCE_LIMITS_EMPTY,
+      SIGNAL_CODE.EVD_ATTRIBUTION_ABSENT,
+      SIGNAL_CODE.CAUSAL_MARKER,
+      SIGNAL_CODE.SRC_EVALUATIVE_WORDING,
+    ]) {
+      assert.deepEqual(contextFreeBlockers(identified([bare(code)])), [], `${code} is not blocking`);
+    }
+  });
+
+  test("blockers keep their signal identity and authored location, in signal order", () => {
+    const signals = identified(
+      detectLanguageSignals(
+        corpus({
+          src: [src({ caveats: ["Fonte fiável; ver EVD-000001."] })],
+          evd: [evd({ evidence_nature: "claim", inference_limits: [], observation: { summary: "Muitos atrasos causam queixas em PRB-0003." } })],
+        })
+      )
+    );
+    const blockers = contextFreeBlockers(signals);
+    assert.deepEqual(
+      blockers.map(({ signalId, signal }) => [signalId, signal.code, signal.subjectId, signal.field, signal.match]),
+      signals
+        .filter(({ signal }) => signal.code === SIGNAL_CODE.PRB_ID_IN_EVD_TEXT || signal.code === SIGNAL_CODE.SRC_RECORD_ID_IN_TEXT)
+        .map(({ signalId, signal }) => [signalId, signal.code, signal.subjectId, signal.field, signal.match])
+    );
+    assert.deepEqual(
+      blockers.map(({ signal }) => [signal.code, signal.subjectId, signal.field, signal.match]),
+      [
+        [SIGNAL_CODE.PRB_ID_IN_EVD_TEXT, "EVD-900001", "observation.summary", "PRB-0003"],
+        [SIGNAL_CODE.SRC_RECORD_ID_IN_TEXT, "SRC-9001", "caveats[0]", "EVD-000001"],
+      ]
+    );
+    for (const blocker of blockers) assert.equal(blocker, signals.find((entry) => entry.signalId === blocker.signalId), "the entry is returned unchanged");
+    // Advisory prompts in the same records are untouched by the policy.
+    assert.ok(signals.length > blockers.length);
+    assert.deepEqual(contextFreeBlockers(signals), blockers, "evaluation is deterministic");
+
+    const report = describeContextFreeBlockers(blockers);
+    assert.match(report, /CLEC-SIG-\d{4} PRB_ID_IN_EVD_TEXT EVD-900001 observation\.summary: "PRB-0003" in "Muitos atrasos causam queixas em PRB-0003\."/);
+    assert.match(report, /SRC_RECORD_ID_IN_TEXT SRC-9001 caveats\[0\]: "EVD-000001"/);
+    assert.equal(report, describeContextFreeBlockers(blockers));
+  });
+});
+
 describe("language signal CLI", () => {
   function fixtureRepo(): { root: string; research: string; cleanup: () => void } {
     const root = mkdtempSync(join(tmpdir(), "open-evora-language-signals-"));
@@ -411,6 +489,20 @@ describe("language signal CLI", () => {
       assert.equal(result.status, 0, result.stderr);
       assert.match(result.stdout, /PRB-9001 problem_statement VAGUE_QUANTITY \[supported_quantity\] advisory/);
       assert.match(result.stdout, /1 advisory signal\(s\) across 1 record\(s\)\./);
+    } finally {
+      repo.cleanup();
+    }
+  });
+
+  test("corpus mode stays advisory when context-free blocker codes are present", () => {
+    const repo = fixtureRepo();
+    try {
+      writeFileSync(join(repo.research, "evidence", "EVD-900002.yaml"), stringifyRecordYaml(evd({ evidence_id: "EVD-900002", inference_limits: ["Não é impacto em PRB-0005."] })));
+      writeFileSync(join(repo.research, "sources", "SRC-9001.yaml"), stringifyRecordYaml(src({ caveats: ["Ver EVD-900001."] })));
+      const result = run(["--all", "--dir", repo.research]);
+      assert.equal(result.status, 0, result.stderr);
+      assert.match(result.stdout, /EVD-900002 inference_limits\[0\] PRB_ID_IN_EVD_TEXT \[evidence_fidelity\] advisory/);
+      assert.match(result.stdout, /SRC-9001 caveats\[0\] SRC_RECORD_ID_IN_TEXT \[evidence_fidelity\] advisory/);
     } finally {
       repo.cleanup();
     }

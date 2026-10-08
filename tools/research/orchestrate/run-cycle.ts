@@ -12,6 +12,7 @@
  *   -> deterministic candidate/delta/validation/readiness/review-plan
  *      preparation (research-change-set.ts, reusing existing primitives)
  *   -> freeze the immutable reviewer input (reviewer-input.ts)
+ *   -> context-free CLEC precheck over that frozen input (fails closed)
  *   -> FRESH INDEPENDENT REVIEW AI INVOCATION (role INDEPENDENT_REVIEWER,
  *      a brand-new process — see ai-invoker.ts)
  *   -> validate the independent-review result
@@ -29,6 +30,7 @@ import { dirname, join } from "node:path";
 import type { CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CorpusIndex } from "../core/types.ts";
 import { prepareCanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
+import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
 import type { AiInvoker } from "./ai-invoker.ts";
 import { asValidatedAuthoringEnvelope, validateAuthoringEnvelope } from "./authoring-envelope.ts";
 import { loadCandidates } from "./candidate-loader.ts";
@@ -244,6 +246,13 @@ export async function continueFromFrozenCandidates(
   } catch (error) {
     return failed("PROSPECTIVE_VALIDATION", (error as Error).message);
   }
+
+  // --- CONTEXT-FREE CLEC PRECHECK --------------------------------------------
+  // A candidate embedding internal record IDs across layers is invalid in
+  // any evidence context: fail before the reviewer is ever invoked. This is
+  // deterministic invalidity, not a resumable safety HOLD.
+  const blockers = contextFreeBlockers(reviewerInput.signals);
+  if (blockers.length > 0) return failed(CONTEXT_FREE_BLOCK, describeContextFreeBlockers(blockers));
 
   // --- FRESH INDEPENDENT REVIEW AI INVOCATION --------------------------------
   // Invoked only now that admission is provably ELIGIBLE (never on a
