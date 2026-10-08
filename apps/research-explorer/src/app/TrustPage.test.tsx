@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { App } from "./App";
 import type { DataProvider } from "../dataProvider/types";
 
@@ -101,6 +103,53 @@ describe("Information area — shared shell navigation contract", () => {
       );
     },
   );
+});
+
+/**
+ * D01-019: each Information page has its own document title — its short
+ * navigation label, not the longer H1 — set at runtime by TrustPage and
+ * carried verbatim by its static Vite HTML entry, so the pre-hydration tab
+ * title and the runtime title never disagree. Information pages are ordinary
+ * HTML documents, so a browser Back onto one is a fresh document load.
+ */
+describe("Information area — document titles (D01-019)", () => {
+  const ROOT_TITLE = "Open Évora — Explorador de Investigação";
+  const INFORMATION_TITLES = [
+    { path: "/about", title: "Sobre — Explorador de Investigação Open Évora" },
+    { path: "/methodology", title: "Metodologia — Explorador de Investigação Open Évora" },
+    { path: "/corrections", title: "Correções — Explorador de Investigação Open Évora" },
+    { path: "/contact", title: "Contacto — Explorador de Investigação Open Évora" },
+    { path: "/privacy", title: "Privacidade — Explorador de Investigação Open Évora" },
+  ];
+
+  function staticTitle(entryPath: string): string | undefined {
+    const html = readFileSync(path.join(__dirname, "..", "..", entryPath, "index.html"), "utf-8");
+    return /<title>([^<]*)<\/title>/.exec(html)?.[1];
+  }
+
+  it.each(INFORMATION_TITLES)("$path sets its own runtime title on direct load", ({ path: pagePath, title }) => {
+    document.title = ROOT_TITLE;
+    renderInformationPage(pagePath);
+    expect(document.title).toBe(title);
+    expect(document.title).not.toBe(ROOT_TITLE);
+  });
+
+  it.each(INFORMATION_TITLES)("$path static HTML entry carries the same pre-hydration <title>", ({ path: pagePath, title }) => {
+    expect(staticTitle(pagePath)).toBe(title);
+  });
+
+  it("gives all five Information pages distinct titles and leaves the root entry's generic title unchanged", () => {
+    expect(new Set(INFORMATION_TITLES.map(({ title }) => title)).size).toBe(5);
+    expect(staticTitle("")).toBe(ROOT_TITLE);
+  });
+
+  it("a later page load (e.g. browser Back onto a previous page) never keeps the prior page's title", () => {
+    for (const { path: pagePath, title } of [INFORMATION_TITLES[0], INFORMATION_TITLES[4], INFORMATION_TITLES[0]]) {
+      const { unmount } = renderInformationPage(pagePath);
+      expect(document.title).toBe(title);
+      unmount();
+    }
+  });
 });
 
 it("renders the About publication sequence as three ordered steps", () => {
