@@ -5,8 +5,9 @@
  * gate/approval/promotion sequence:
  *
  *   render   — assembles + validates a Human Gate package from a WU045
- *              Research Change Set, writes the package JSON (source of
- *              truth) and its generated Markdown view into the same
+ *              Research Change Set — only against a clean canonical
+ *              checkout at exactly the RCS baseGitSha — writes the package
+ *              JSON (source of truth) and its generated Markdown view into the same
  *              gitignored cycle directory, and prints the packageId +
  *              contentHash the owner must review against.
  *   decide   — submits a human decision against the package JSON currently
@@ -48,6 +49,7 @@ import { renderHumanGateMarkdown } from "./markdown-view.ts";
 import { submitHumanGateDecision } from "./decision.ts";
 import { writeDecisionRecord } from "./decision-record.ts";
 import { runPostApprovalPath } from "./promote.ts";
+import { precheckRepositoryState } from "./repository-state.ts";
 import type { CanonicalAcceptanceDecision, PublicExplorerPublicationDecision } from "./types.ts";
 
 export const PACKAGE_FILENAME = "human-gate-package.json";
@@ -91,6 +93,16 @@ function runRender(flag: (name: string) => string | undefined): number {
     return 1;
   }
   const changeSet = asValidatedResearchChangeSet(rawRcs);
+
+  // The package is presented as bound to changeSet.baseGitSha, so the corpus
+  // its reviewer context is rebuilt from must be exactly that clean Git
+  // state. Moving a cycle to a new base is frozen-cycle revalidation's job,
+  // never render's.
+  const repositoryState = precheckRepositoryState(researchRoot, changeSet.baseGitSha);
+  if (!repositoryState.ok) {
+    console.error(`FAILED [RCS_BASE_STATE_MISMATCH]: ${repositoryState.reason}`);
+    return 1;
+  }
 
   const index = loadCorpusIndex(researchRoot);
   const { errors } = validateCorpusIndex(index);

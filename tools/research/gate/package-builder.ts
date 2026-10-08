@@ -11,6 +11,11 @@
  *    reimplementation of eligibility/corroboration logic and no change to
  *    ReasonCodes or readiness rules.
  *
+ * The independent semantic review is re-checked here against the reviewer
+ * context reconstructed by the one F00-F authority, buildReviewerInputPackage()
+ * (never a second signal/context derivation), and that bounded context is
+ * stored in the package so decision-time revalidation needs no corpus.
+ *
  * The returned HumanGatePackage is the exact validated in-memory object
  * both the Markdown view (markdown-view.ts) and the contentHash
  * (content-hash.ts) are derived from — this module is the single assembly
@@ -20,6 +25,8 @@ import { evaluateProblem } from "../readiness/readiness.ts";
 import type { ReadinessReport } from "../readiness/readiness.ts";
 import type { CorpusIndex } from "../core/types.ts";
 import type { ResearchChangeSet } from "../orchestrate/types.ts";
+import { validateIndependentReview } from "../orchestrate/independent-review.ts";
+import { buildReviewerInputPackage, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
 import { validateHumanGatePackage } from "./package-validator.ts";
 import type { HumanGatePackage } from "./types.ts";
 
@@ -108,10 +115,43 @@ function deriveRisksAndUncertainties(changeSet: ResearchChangeSet, affectedProbl
 }
 
 function deriveNonAuthoritativeRecommendation(changeSet: ResearchChangeSet, risksAndUncertainties: readonly string[]): string {
-  const base = changeSet.readiness === "READY_FOR_INTEGRATION_GATE" && changeSet.independentReview.outcome === "CONCUR" && risksAndUncertainties.length === 0
-    ? "Structural checks and independent review raise no flags; this is a non-authoritative observation only, not an approval."
-    : "One or more structural/readiness/independent-review flags were raised; review the details below before deciding. This is a non-authoritative observation only, not an approval.";
+  const outcome = changeSet.independentReview.outcome;
+  const base = outcome !== "CONCUR"
+    ? `The independent semantic review outcome is ${outcome}, so canonical APPROVE is unavailable for this package until a new compliant candidate/review/package cycle reaches CONCUR; review the structured findings below before deciding. This is a non-authoritative observation only, not an approval.`
+    : changeSet.readiness === "READY_FOR_INTEGRATION_GATE" && risksAndUncertainties.length === 0
+      ? "Structural checks and independent review raise no flags; this is a non-authoritative observation only, not an approval."
+      : "One or more structural/readiness/independent-review flags were raised; review the details below before deciding. This is a non-authoritative observation only, not an approval.";
   return `[NON-AUTHORITATIVE — DOES NOT CONSTITUTE APPROVAL] ${base}`;
+}
+
+/**
+ * Reconstructs the exact reviewer package F00-F froze for this change set
+ * (same base SHA, manifest, candidates, deltas, validation and readiness,
+ * overlaid onto `index`) and re-runs the context-aware review validation
+ * against it. Fails closed: a review that is no longer coherent with its
+ * reconstructed context is never presented, and never downgraded to the
+ * RCS-only structural check.
+ */
+function reconstructReviewerInput(index: CorpusIndex, changeSet: ResearchChangeSet): { errors: string[]; reviewerInput?: ReviewerInputPackage } {
+  let reviewerInput: ReviewerInputPackage;
+  try {
+    reviewerInput = buildReviewerInputPackage({
+      baseGitSha: changeSet.baseGitSha,
+      manifest: changeSet.manifest,
+      index,
+      candidates: changeSet.candidates,
+      deltas: changeSet.deltas,
+      validation: changeSet.validation,
+      readiness: changeSet.readiness,
+    });
+  } catch (error) {
+    return { errors: [`reviewer context reconstruction failed: ${(error as Error).message}`] };
+  }
+  const review = validateIndependentReview(changeSet.independentReview, reviewerInput);
+  if (review.errors.length > 0) {
+    return { errors: review.errors.map((message) => `independent review does not validate against the reconstructed reviewer context: ${message}`) };
+  }
+  return { errors: [], reviewerInput };
 }
 
 /**
@@ -121,12 +161,16 @@ function deriveNonAuthoritativeRecommendation(changeSet: ResearchChangeSet, risk
  * assumes an already-validated index — see its own module doc).
  */
 export function buildHumanGatePackage(index: CorpusIndex, changeSet: ResearchChangeSet): BuildHumanGatePackageResult {
+  const reconstructed = reconstructReviewerInput(index, changeSet);
+  if (!reconstructed.reviewerInput) return { errors: reconstructed.errors };
+  const { reviewerInput } = reconstructed;
+
   const affectedProblemIds = deriveAffectedProblemIds(changeSet);
   const affectedProblemReadiness = evaluateAffectedProblems(index, affectedProblemIds);
   const risksAndUncertainties = deriveRisksAndUncertainties(changeSet, affectedProblemReadiness);
 
   const pkg: HumanGatePackage = {
-    schemaVersion: "1",
+    schemaVersion: "2",
     packageId: changeSet.packageId,
     baseGitSha: changeSet.baseGitSha,
     researchChangeSet: changeSet,
@@ -135,6 +179,9 @@ export function buildHumanGatePackage(index: CorpusIndex, changeSet: ResearchCha
     deltas: changeSet.deltas,
     prospectiveValidation: changeSet.validation,
     independentReview: changeSet.independentReview,
+    // Detached from the frozen reviewer package so the Gate object stays a plain JSON value.
+    reviewEvidenceContext: structuredClone([...reviewerInput.evidenceContext]),
+    reviewSignals: structuredClone([...reviewerInput.signals]),
     integrationPlan: changeSet.integrationPlan,
     manifest: changeSet.manifest,
     safetyAdmission: changeSet.safetyAdmission,

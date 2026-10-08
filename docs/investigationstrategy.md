@@ -386,12 +386,19 @@ Implemented for the orchestrated independent reviewer only:
 
 The orchestration rejects a structurally incomplete or inconsistent review result; it does not decide whether wording is supported.
 
-Not yet implemented:
-- Human Gate presentation and integration of structured findings and dispositions;
-- technical enforcement for direct pull-request changes (Lane B);
-- CI or blocking validation based on CLEC signals.
+Implemented at Human Gate 1 for orchestrated changes:
+- the Gate presents the structured CLEC findings and every signal with its disposition;
+- that review material, with its bounded evidence context, is part of the hash-bound Gate package;
+- canonical APPROVE is unavailable while the independent semantic review outcome is not `CONCUR`; correction requires a new candidate, review and package.
 
-Nothing in this section should be read as describing an implemented blocking CLEC validator or CI check.
+Once a package is eligible for approval, the canonical and publication decisions remain human judgement.
+
+Not yet implemented:
+- technical enforcement for direct pull-request changes (Lane B);
+- CI or blocking validation based on CLEC signals;
+- automatic semantic decisions from lexical signals.
+
+The no-exception review requirement is therefore not yet technically enforced for every lane. Nothing in this section should be read as describing an implemented blocking CLEC validator or CI check.
 
 Boundaries of initial enforcement:
 - Explorer-generated copy is outside initial CLEC enforcement; the global evidence-integrity safeguard in `AGENTS.md` still applies to it.

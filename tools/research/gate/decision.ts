@@ -18,6 +18,7 @@ import { readFileSync } from "node:fs";
 
 import { computeContentHash } from "./content-hash.ts";
 import { validateHumanGatePackage, asValidatedHumanGatePackage } from "./package-validator.ts";
+import type { IndependentReviewOutcome } from "../orchestrate/types.ts";
 import type {
   CanonicalAcceptanceDecision,
   DecisionSubmissionOutcome,
@@ -50,6 +51,23 @@ export function describeInvalidCombination(
 }
 
 /**
+ * Canonical APPROVE is available only when the package's independent
+ * semantic review outcome is CONCUR (docs/investigationstrategy.md §12),
+ * whatever the publication decision. There is no per-finding override.
+ */
+export function isCanonicalApprovalAvailable(outcome: IndependentReviewOutcome): boolean {
+  return outcome === "CONCUR";
+}
+
+export function describeSemanticReviewBlocker(outcome: IndependentReviewOutcome): string {
+  return (
+    `canonicalAcceptance=APPROVE is unavailable: the independent semantic review outcome is ${outcome}, not CONCUR. ` +
+    "Canonical APPROVE stays unavailable until a new compliant candidate/review/package cycle reaches CONCUR; " +
+    "REJECT or HOLD_MORE_RESEARCH may still be recorded for this package."
+  );
+}
+
+/**
  * Submits a human decision against the package JSON currently on disk at
  * `packagePath`. Implements HIGH-2 steps 7-12 exactly:
  *   7. re-read the JSON source of truth from disk;
@@ -63,7 +81,9 @@ export function describeInvalidCombination(
  *       review package and require a new decision;
  *   12. on match: persist a decision record.
  *
- * Also enforces OD-D's invalid-combination table before persisting. This
+ * Also enforces OD-D's invalid-combination table before persisting, and,
+ * after step 10 matches, refuses canonical APPROVE for a package whose
+ * independent semantic review outcome is not CONCUR. This
  * function never writes the decision record itself — see decision-record.ts
  * — it only validates and, on success, returns the exact record to persist.
  */
@@ -122,6 +142,14 @@ export function submitHumanGateDecision(packagePath: string, input: HumanGateDec
         `(shown: ${input.contentHash}, recomputed: ${recomputedContentHash}). The review session is invalidated; ` +
         "a regenerated review package and a new human decision are required.",
     };
+  }
+
+  // Evaluated only on the exact validated, hash-bound package being decided.
+  // A blocking semantic finding or evidence gap cannot be approved by human
+  // acknowledgement within this package; REJECT/HOLD_MORE_RESEARCH remain
+  // the owner's to record.
+  if (input.canonicalAcceptance === "APPROVE" && !isCanonicalApprovalAvailable(pkg.independentReview.outcome)) {
+    return { status: "REJECTED_SEMANTIC_REVIEW_BLOCKER", message: describeSemanticReviewBlocker(pkg.independentReview.outcome) };
   }
 
   const record: HumanGateDecisionRecord = {

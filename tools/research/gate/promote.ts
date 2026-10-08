@@ -26,6 +26,7 @@ import { applyCanonicalIntegrationPlan, CanonicalIntegrationPromotionError } fro
 import type { CanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
 import { computeContentHash } from "./content-hash.ts";
 import { assertDecisionRecordBinding, loadDecisionRecord } from "./decision-record.ts";
+import { describeSemanticReviewBlocker, isCanonicalApprovalAvailable } from "./decision.ts";
 import { checkPublicationGuard } from "./publication-guard.ts";
 import { precheckRepositoryState } from "./repository-state.ts";
 import { runPostApprovalGitSequence } from "./git-orchestrator.ts";
@@ -156,6 +157,10 @@ export function runPostApprovalPath(input: RunPostApprovalPathInput): PostApprov
   // --- OD-D: REJECT / HOLD_MORE_RESEARCH must never promote ---------------
   if (record.canonicalAcceptance !== "APPROVE") {
     return failed("NOT_APPROVED", `canonicalAcceptance=${record.canonicalAcceptance}; no canonical write, no Git publication.`);
+  }
+  // decision.ts never records this; a record that claims it anyway is not honoured.
+  if (!isCanonicalApprovalAvailable(pkg.independentReview.outcome)) {
+    return failed("SEMANTIC_REVIEW_BLOCKER", describeSemanticReviewBlocker(pkg.independentReview.outcome));
   }
 
   // --- OD-D: APPROVE canonical + HOLD/REJECT publication => private hold --

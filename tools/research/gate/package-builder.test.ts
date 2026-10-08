@@ -1,9 +1,87 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { gitFixture, loadIndexFor, syntheticHumanGatePackage, syntheticResearchChangeSet } from "./test-fixtures.ts";
+import {
+  gitFixture,
+  loadIndexFor,
+  SHA_A,
+  semanticHumanGatePackage,
+  semanticResearchChangeSet,
+  semanticReview,
+  semanticReviewCorpus,
+  semanticReviewerInput,
+  syntheticHumanGatePackage,
+  syntheticResearchChangeSet,
+} from "./test-fixtures.ts";
 import { buildHumanGatePackage } from "./package-builder.ts";
 import { validateHumanGatePackage } from "./package-validator.ts";
+import { canonicalJsonStringify } from "../orchestrate/fingerprint.ts";
+
+test("the Gate stores exactly the reviewer signals and bounded evidence context buildReviewerInputPackage() reconstructs", () => {
+  const index = semanticReviewCorpus();
+  const reviewerInput = semanticReviewerInput(index, SHA_A);
+  const pkg = semanticHumanGatePackage("CONCUR");
+
+  assert.deepEqual(pkg.reviewSignals, reviewerInput.signals);
+  assert.deepEqual(pkg.reviewEvidenceContext, reviewerInput.evidenceContext);
+  // Candidate-scoped signals under stable IDs; the canonical EVD-A also says "Muitas" but is context only.
+  assert.deepEqual(pkg.reviewSignals.map((s) => [s.signalId, s.signal.subjectId]), [["CLEC-SIG-0001", "PRB-NEW"], ["CLEC-SIG-0002", "PRB-NEW"], ["CLEC-SIG-0003", "EVD-B"]]);
+  // PRB -> EVD -> SRC chain through the prospective corpus; the candidate EVD-B (now citing SRC-C) wins.
+  assert.deepEqual(pkg.reviewEvidenceContext.map((r) => r.id), ["EVD-A", "SRC-A", "SRC-C"]);
+  const json = canonicalJsonStringify(pkg);
+  for (const excluded of ["SRC-UNRELATED", "EVD-UNRELATED", "SRC-B", "Outro problema.", "Versão canónica."]) {
+    assert.equal(json.includes(excluded), false, `${excluded} must not enter the Gate package`);
+  }
+  assert.deepEqual(validateHumanGatePackage(JSON.parse(JSON.stringify(pkg))).errors, []);
+});
+
+test("the Gate review projection equals the Research Change Set's review exactly", () => {
+  for (const scenario of ["CONCUR", "DISAGREEMENT_FOUND", "INSUFFICIENT_EVIDENCE"] as const) {
+    const pkg = semanticHumanGatePackage(scenario);
+    assert.deepEqual(pkg.independentReview, pkg.researchChangeSet.independentReview);
+    assert.equal(pkg.independentReview.outcome, scenario);
+  }
+});
+
+test("package assembly fails closed when the review no longer validates against the reconstructed reviewer context", () => {
+  const index = semanticReviewCorpus();
+  const review = semanticReview(semanticReviewerInput(index, SHA_A), "CONCUR");
+  const cases = {
+    "missing disposition": { ...review, signalDispositions: review.signalDispositions.slice(0, -1) },
+    "evidence outside the context": {
+      ...review,
+      signalDispositions: review.signalDispositions.map((d, i) => (i === 0 ? { ...d, evidenceReferences: ["EVD-UNRELATED"] } : d)),
+    },
+  };
+  for (const [name, stale] of Object.entries(cases)) {
+    const built = buildHumanGatePackage(index, semanticResearchChangeSet(index, SHA_A, stale));
+    assert.equal(built.pkg, undefined, name);
+    assert.ok(built.errors.some((e) => e.startsWith("independent review does not validate against the reconstructed reviewer context")), name);
+  }
+});
+
+test("the package validator rejects semantic-review material that diverges from its RCS authority or stored context", () => {
+  const pkg = semanticHumanGatePackage("DISAGREEMENT_FOUND");
+  const concur = semanticHumanGatePackage("CONCUR");
+  const errorsOf = (value: unknown) => validateHumanGatePackage(JSON.parse(JSON.stringify(value))).errors;
+
+  assert.ok(errorsOf({ ...pkg, independentReview: concur.independentReview }).includes("package.independentReview must equal package.researchChangeSet.independentReview exactly"));
+  assert.ok(errorsOf({ ...pkg, candidates: [...pkg.candidates].reverse() }).includes("package.candidates must equal package.researchChangeSet.candidates exactly"));
+  assert.ok(errorsOf({ ...pkg, reviewSignals: pkg.reviewSignals.slice(0, -1) }).some((e) => e.includes("is not a signal in the review input")));
+  assert.ok(errorsOf({ ...pkg, reviewEvidenceContext: pkg.reviewEvidenceContext.filter((r) => r.id !== "EVD-A") }).some((e) => e.includes("\"EVD-A\", which is not a record in the review input")));
+  assert.ok(errorsOf({ ...pkg, reviewEvidenceContext: [...pkg.reviewEvidenceContext, { recordFamily: "PRB-", id: "PRB-OTHER", fields: {} }] }).some((e) => e.includes("recordFamily must be one of EVD-, SRC-")));
+  assert.ok(errorsOf({ ...pkg, reviewSignals: pkg.reviewSignals.map((s, i) => (i === 0 ? { ...s, signal: { ...s.signal, dimension: "clarity" } } : s)) }).some((e) => e.includes("signal.dimension must be supported_quantity")));
+});
+
+test("a Human Gate package v1 no longer validates", () => {
+  const pkg = semanticHumanGatePackage("CONCUR");
+  const { reviewEvidenceContext: _context, reviewSignals: _signals, ...v1Shape } = pkg;
+  for (const v1 of [{ ...pkg, schemaVersion: "1" }, { ...v1Shape, schemaVersion: "1" }]) {
+    const { errors } = validateHumanGatePackage(v1);
+    assert.ok(errors.includes('package.schemaVersion must be exactly "2", got "1"'));
+  }
+  assert.ok(validateHumanGatePackage({ ...v1Shape }).errors.includes("package.reviewSignals must be an array"));
+});
 
 test("a valid RCS assembles into a Human Gate package exposing every contractually required element", () => {
   const fixture = gitFixture();
@@ -11,7 +89,7 @@ test("a valid RCS assembles into a Human Gate package exposing every contractual
     const index = loadIndexFor(fixture.research);
     const pkg = syntheticHumanGatePackage(index, fixture.head());
 
-    assert.equal(pkg.schemaVersion, "1");
+    assert.equal(pkg.schemaVersion, "2");
     assert.ok(pkg.packageId.startsWith("RCS-"));
     assert.equal(pkg.baseGitSha, fixture.head());
     assert.ok(pkg.investigationQuestion.length > 0);

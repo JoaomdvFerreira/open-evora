@@ -16,6 +16,7 @@ import {
   gitFixture,
   loadIndexFor,
   remoteGitFixture,
+  semanticHumanGatePackage,
   syntheticHumanGatePackage,
   withTempDir,
 } from "./test-fixtures.ts";
@@ -213,6 +214,47 @@ test("ADVERSARIAL: promotion is unreachable without a decision record on disk (n
       assert.equal(outcome.status, "FAILED");
       if (outcome.status !== "FAILED") return;
       assert.equal(outcome.failedStage, "HIGH2_REVALIDATION");
+    });
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test("ADVERSARIAL: a hand-written APPROVE record never promotes a package whose semantic review is not CONCUR", () => {
+  const fixture = remoteGitFixture();
+  try {
+    withTempDir((cycleDir) => {
+      const pkg = semanticHumanGatePackage("DISAGREEMENT_FOUND", fixture.head());
+      writeFileSync(join(cycleDir, PACKAGE_FILENAME), JSON.stringify(pkg, null, 2), "utf8");
+      // decision.ts refuses this decision; simulate a record written around it.
+      writeDecisionRecord(cycleDir, {
+        schemaVersion: "1",
+        packageId: pkg.packageId,
+        contentHash: computeContentHash(pkg),
+        baseGitSha: pkg.baseGitSha,
+        actor: "owner@example.invalid",
+        timestamp: "2026-10-08T12:00:00.000Z",
+        canonicalAcceptance: "APPROVE",
+        publicExplorerPublication: "APPROVE",
+      });
+      const headBefore = fixture.head();
+
+      const outcome = runPostApprovalPath({
+        repoRoot: fixture.root,
+        researchRoot: fixture.research,
+        cycleDir,
+        packagePath: join(cycleDir, PACKAGE_FILENAME),
+        baseBranch: "master",
+        env: fixture.env,
+        postPromotionCommandsForTestingOnly: NOOP_COMMANDS,
+      });
+
+      assert.equal(outcome.status, "FAILED");
+      if (outcome.status !== "FAILED") return;
+      assert.equal(outcome.failedStage, "SEMANTIC_REVIEW_BLOCKER");
+      assert.match(outcome.message, /DISAGREEMENT_FOUND/);
+      assert.equal(fixture.head(), headBefore);
+      assert.deepEqual(fixture.readFakeGhState().prs, []);
     });
   } finally {
     fixture.cleanup();

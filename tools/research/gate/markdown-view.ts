@@ -53,6 +53,125 @@ function renderContradictionAndOverlapAnalysis(pkg: HumanGatePackage): string {
   return bulletList([...findings.map((f) => `${f.code}${f.field ? ` (${f.field})` : ""}${f.detail ? `: ${f.detail}` : ""}`), ...admission.map((f) => `${f.code} (${f.subjectId}): ${f.summary}${f.evidenceReferences?.length ? ` [${f.evidenceReferences.join(", ")}]` : ""}`)]);
 }
 
+function code(value: string): string {
+  return `\`${value}\``;
+}
+
+function idList(ids: readonly string[] | undefined): string {
+  return ids && ids.length > 0 ? ids.map(code).join(", ") : "_none_";
+}
+
+/** Verbatim authored text as a blockquote; every line is kept, nothing is rewritten. */
+function quote(text: string): string {
+  return text.split("\n").map((line) => `  > ${line}`).join("\n");
+}
+
+const DISPOSITION_ORDER = ["SUPPORTED", "VIOLATION", "NOT_APPLICABLE", "INSUFFICIENT_EVIDENCE"] as const;
+
+function renderReviewSummary(pkg: HumanGatePackage): string {
+  const review = pkg.independentReview;
+  const counts = DISPOSITION_ORDER.map((value) => `${value} ${review.signalDispositions.filter((d) => d.disposition === value).length}`);
+  const lines = [
+    `Outcome: ${code(review.outcome)}  `,
+    `Rationale: ${review.rationale}  `,
+    `Findings: ${review.findings.length}  `,
+    `Reviewed signals: ${pkg.reviewSignals.length}  `,
+    `Signal dispositions: ${counts.join(" · ")}`,
+    "",
+  ];
+  if (review.outcome !== "CONCUR") {
+    lines.push(
+      `**Canonical APPROVE is unavailable for this package:** the independent semantic review outcome is ${code(review.outcome)}, not ${code("CONCUR")}. ` +
+      "A blocking finding or evidence gap cannot be approved by acknowledgement; it requires a new compliant candidate/review/package cycle that reaches CONCUR. " +
+      "REJECT or HOLD_MORE_RESEARCH remain the reviewing human's own decision.",
+      ""
+    );
+  }
+  lines.push("Deterministic CLEC signals are review prompts, not violations; only the reviewer's dispositions and findings below judge the wording against the supplied evidence. `UNKNOWN` is not `NO`.");
+  return lines.join("\n");
+}
+
+function renderFindings(pkg: HumanGatePackage): string {
+  const findings = pkg.independentReview.findings;
+  if (findings.length === 0) return "_No findings: the independent review recorded 0 findings._";
+  return findings
+    .map((finding) => [
+      heading(4, `${finding.findingId} — ${finding.kind} (${finding.severity})`),
+      ...(finding.kind === "INSUFFICIENT_EVIDENCE"
+        ? ["_Evidence gap: the supplied evidence context cannot decide whether this wording is supported._", ""]
+        : []),
+      `- Record: ${code(finding.recordId)}`,
+      `- Field: ${code(finding.field)}`,
+      `- CLEC dimension: ${code(finding.dimension)}`,
+      `- Kind: ${code(finding.kind)}`,
+      `- Severity: ${code(finding.severity)}`,
+      "- Claim (verbatim):",
+      quote(finding.claim),
+      `- Reason: ${finding.reason}`,
+      `- Evidence references: ${idList(finding.evidenceReferences)}`,
+      `- Correction direction: ${finding.correctionDirection}`,
+      `- Related signals: ${idList(finding.relatedSignalIds)}`,
+    ].join("\n"))
+    .join("\n\n");
+}
+
+function renderSignalDispositions(pkg: HumanGatePackage): string {
+  if (pkg.reviewSignals.length === 0) return "_No deterministic CLEC signals were supplied to the independent reviewer for these candidates._";
+  const dispositions = new Map(pkg.independentReview.signalDispositions.map((d) => [d.signalId, d]));
+  return pkg.reviewSignals
+    .map(({ signalId, signal }) => {
+      const disposition = dispositions.get(signalId);
+      return [
+        heading(4, `${signalId} — ${signal.code} → ${disposition ? disposition.disposition : "NO DISPOSITION"}`),
+        `- Signal code: ${code(signal.code)}`,
+        `- CLEC dimension: ${code(signal.dimension)}`,
+        `- Subject record: ${code(signal.subjectId)}`,
+        `- Field: ${code(signal.field)}`,
+        ...(signal.match !== undefined ? [`- Matched text: ${code(signal.match)}`] : []),
+        ...(signal.evidenceReferences !== undefined ? [`- Signal evidence references: ${idList(signal.evidenceReferences)}`] : []),
+        "- Excerpt (verbatim):",
+        quote(signal.excerpt),
+        ...(disposition
+          ? [
+            `- Disposition: ${code(disposition.disposition)}`,
+            `- Disposition reason: ${disposition.reason}`,
+            `- Disposition evidence references: ${idList(disposition.evidenceReferences)}`,
+            `- Related findings: ${idList(disposition.relatedFindingIds)}`,
+          ]
+          : ["- Disposition: _none recorded_"]),
+      ].join("\n");
+    })
+    .join("\n\n");
+}
+
+function renderEvidenceContext(pkg: HumanGatePackage): string {
+  const records = pkg.reviewEvidenceContext.length === 0
+    ? "_No non-candidate records were in the reviewer's evidence context._"
+    : bulletList(pkg.reviewEvidenceContext.map((record) => `${code(record.id)} (${record.recordFamily})`));
+  return [
+    "The Human Gate package JSON is the source of truth and carries these bounded review-context records in full (`reviewEvidenceContext`). " +
+    "Canonical SRC- records carry provenance and metadata, not the Source body; no Source content was fetched or reproduced.",
+    "",
+    records,
+  ].join("\n");
+}
+
+function renderSemanticReview(pkg: HumanGatePackage): string {
+  return [
+    heading(2, "Independent semantic review (CLEC)"),
+    renderReviewSummary(pkg),
+    "",
+    heading(3, "Findings"),
+    renderFindings(pkg),
+    "",
+    heading(3, "Signal dispositions"),
+    renderSignalDispositions(pkg),
+    "",
+    heading(3, "Review evidence context"),
+    renderEvidenceContext(pkg),
+  ].join("\n");
+}
+
 function renderCandidateScope(pkg: HumanGatePackage): string {
   return bulletList(pkg.candidates.map((candidate) => `${candidate.recordFamily} record (fields: ${Object.keys(candidate.fields).join(", ")})`));
 }
@@ -100,9 +219,7 @@ export function renderHumanGateMarkdown(pkg: HumanGatePackage): string {
     heading(2, "Structured readiness result (readiness.ts)"),
     renderReadiness(pkg),
     "",
-    heading(2, "Independent AI review"),
-    `Outcome: \`${pkg.independentReview.outcome}\`  `,
-    `Rationale: ${pkg.independentReview.rationale}`,
+    renderSemanticReview(pkg),
     "",
     heading(2, "Canonical integration plan"),
     pkg.integrationPlan === null
