@@ -26,6 +26,10 @@ The current static client-side architecture remains the default. Add backend per
 
 The read model is a deterministic derived representation of canonical research data.
 
+Canonical research YAML uses LF line endings as its repository byte contract. The Explorer build also normalizes only line endings at its byte boundary, so logically identical LF and CRLF checkouts produce the same `corpusFingerprint` and LF canonical EVD/SRC download bytes. This operational normalization does not alter parsed record values or research semantics, and it never writes back into `research/`.
+
+`manifest.sourceCommit` is present only when the canonical `research/` corpus represented by the build is clean against that Git `HEAD`. A `null` value means commit provenance is unavailable or not exact; it does not mean the research is invalid. `corpusFingerprint` remains the concrete identity of the generated corpus.
+
 Keep it generic and schema-driven where practical. Canonical references may be projected into navigation/graph relationships without creating new semantic truth.
 
 Runtime types, builders, and tests own the exact read-model shape.

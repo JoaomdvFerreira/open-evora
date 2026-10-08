@@ -18,11 +18,12 @@ const crypto = require("crypto");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const { execFileSync } = require("child_process");
 
 const { validateResearchTree } = require("./validate-research-bridge.js");
 const { buildReadModel } = require("./read-model.js");
 const { publishDirectoryAtomically } = require("./atomic-write.js");
-const { run } = require("./build-data.js");
+const { run, getSourceCommit } = require("./build-data.js");
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const REAL_SCHEMAS_DIR = path.join(REPO_ROOT, "research", "schemas");
@@ -443,7 +444,7 @@ test("corpusFingerprint is stable for identical input and changes when canonical
   }
 });
 
-test("corpusFingerprint preserves NUL-delimited raw-byte hashing without embedding NUL bytes in source", () => {
+test("corpusFingerprint preserves NUL-delimited canonical-byte hashing without embedding NUL bytes in source", () => {
   const source = fs.readFileSync(path.join(__dirname, "read-model.js"));
   assert.strictEqual(source.includes(0), false, "read-model.js source must not contain literal NUL bytes");
 
@@ -458,13 +459,13 @@ test("corpusFingerprint preserves NUL-delimited raw-byte hashing without embeddi
       generatedAt: "2026-01-01T00:00:00.000Z",
       sourceCommit: null,
     });
-    const raw = fs.readFileSync(path.join(root, "sources", "SRC-9001.yaml"));
+    const raw = fs.readFileSync(path.join(root, "sources", "SRC-9001.yaml"), "utf8").replace(/\r\n?/g, "\n");
     const expected = crypto.createHash("sha256")
       .update("SRC-", "utf8")
       .update(Buffer.from([0]))
       .update("SRC-9001", "utf8")
       .update(Buffer.from([0]))
-      .update(raw)
+      .update(raw, "utf8")
       .update(Buffer.from([0]))
       .digest("hex");
 
@@ -473,6 +474,93 @@ test("corpusFingerprint preserves NUL-delimited raw-byte hashing without embeddi
   } finally {
     cleanup(root);
   }
+});
+
+test("LF and CRLF canonical YAML produce identical fingerprints, projections and LF downloads", () => {
+  const buildVariant = (eol) => {
+    const parent = fs.mkdtempSync(path.join(os.tmpdir(), "evora-eol-"));
+    const root = path.join(parent, "research");
+    const targetDir = path.join(parent, "generated");
+    for (const d of STANDARD_DIRS) fs.mkdirSync(path.join(root, d), { recursive: true });
+    for (const f of fs.readdirSync(REAL_SCHEMAS_DIR)) fs.copyFileSync(path.join(REAL_SCHEMAS_DIR, f), path.join(root, "schemas", f));
+    try {
+      for (const [dir, name, value] of [
+        ["sources", "SRC-9001.yaml", minimalSrc()],
+        ["evidence", "EVD-900101.yaml", minimalEvd()],
+        ["problems", "PRB-9001.yaml", minimalPrb({ evidence: ["EVD-900101"] })],
+      ]) fs.writeFileSync(path.join(root, dir, name), value.replace(/\n/g, eol), "utf8");
+      const result = run({ researchRoot: root, repoRoot: parent, targetDir, now: () => "2026-01-01T00:00:00.000Z", sourceCommit: () => null });
+      assert.strictEqual(result.ok, true, result.error?.message);
+      const downloads = {};
+      for (const id of ["EVD-900101", "SRC-9001"]) {
+        const detail = result.readModel.recordDetails.find((item) => item.id === id);
+        downloads[id] = fs.readFileSync(path.join(targetDir, "canonical", ...detail.file.split("/")));
+      }
+      return { parent, result, downloads };
+    } catch (error) {
+      fs.rmSync(parent, { recursive: true, force: true });
+      throw error;
+    }
+  };
+  let lf;
+  let crlf;
+  try {
+    lf = buildVariant("\n");
+    crlf = buildVariant("\r\n");
+    assert.strictEqual(lf.result.readModel.manifest.corpusFingerprint, crlf.result.readModel.manifest.corpusFingerprint);
+    assert.deepStrictEqual(lf.result.readModel.index, crlf.result.readModel.index);
+    assert.deepStrictEqual(lf.result.readModel.edges, crlf.result.readModel.edges);
+    assert.deepStrictEqual(lf.result.readModel.recordDetails.map(({ corpusFingerprint, ...detail }) => detail), crlf.result.readModel.recordDetails.map(({ corpusFingerprint, ...detail }) => detail));
+    for (const id of ["EVD-900101", "SRC-9001"]) {
+      assert.deepStrictEqual(lf.downloads[id], crlf.downloads[id]);
+      assert.ok(!crlf.downloads[id].includes(Buffer.from("\r\n")), `${id} download contains CRLF`);
+      assert.ok(crlf.downloads[id].includes(Buffer.from("\n")), `${id} download should contain LF`);
+    }
+  } finally {
+    if (lf) fs.rmSync(lf.parent, { recursive: true, force: true });
+    if (crlf) fs.rmSync(crlf.parent, { recursive: true, force: true });
+  }
+});
+
+test("repository attributes declare LF for canonical research YAML", () => {
+  const output = execFileSync("git", ["check-attr", "text", "eol", "--", "research/evidence/EVD-000001.yaml"], { cwd: REPO_ROOT, encoding: "utf8" });
+  assert.match(output, /research\/evidence\/EVD-000001\.yaml: text: set/);
+  assert.match(output, /research\/evidence\/EVD-000001\.yaml: eol: lf/);
+});
+
+test("sourceCommit is HEAD only when the canonical research tree is clean", () => {
+  const initRepo = () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "evora-provenance-"));
+    fs.mkdirSync(path.join(root, "research"), { recursive: true });
+    fs.writeFileSync(path.join(root, "research", "record.yaml"), "value: one\n");
+    fs.writeFileSync(path.join(root, "docs.md"), "clean\n");
+    const git = (...args) => execFileSync("git", args, { cwd: root, stdio: "ignore" });
+    git("init", "-q");
+    git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "add", ".");
+    git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "-q", "-m", "fixture");
+    const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
+    return { root, head, git };
+  };
+  const cases = [
+    ["clean corpus", (repo) => {}, (repo) => repo.head],
+    ["unrelated dirty file", (repo) => fs.writeFileSync(path.join(repo.root, "docs.md"), "changed\n"), (repo) => repo.head],
+    ["modified research file", (repo) => fs.writeFileSync(path.join(repo.root, "research", "record.yaml"), "value: modified\n"), () => null],
+    ["staged research change", (repo) => { fs.writeFileSync(path.join(repo.root, "research", "record.yaml"), "value: staged\n"); repo.git("add", "research/record.yaml"); }, () => null],
+    ["untracked research file", (repo) => fs.writeFileSync(path.join(repo.root, "research", "new.yaml"), "value: new\n"), () => null],
+    ["deleted research file", (repo) => fs.rmSync(path.join(repo.root, "research", "record.yaml")), () => null],
+  ];
+  for (const [name, mutate, expected] of cases) {
+    const repo = initRepo();
+    try { mutate(repo); assert.strictEqual(getSourceCommit(repo.root), expected(repo), name); }
+    finally { fs.rmSync(repo.root, { recursive: true, force: true }); }
+  }
+  const outside = fs.mkdtempSync(path.join(os.tmpdir(), "evora-nogit-"));
+  try {
+    assert.strictEqual(getSourceCommit(outside), null, "non-repository build should have null provenance");
+    const repo = initRepo();
+    try { assert.strictEqual(getSourceCommit(repo.root, "missing-git-executable-for-test"), null, "unavailable Git should have null provenance"); }
+    finally { fs.rmSync(repo.root, { recursive: true, force: true }); }
+  } finally { fs.rmSync(outside, { recursive: true, force: true }); }
 });
 
 test("corpusFingerprint does not depend on generatedAt or sourceCommit", () => {

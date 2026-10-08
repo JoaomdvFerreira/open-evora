@@ -20,6 +20,7 @@ const path = require("path");
 const crypto = require("crypto");
 
 const { getPath } = require("./validate-research-bridge.js");
+const { canonicalYamlBytes } = require("./canonical-bytes.js");
 
 const READ_MODEL_VERSION = "1.0.0";
 const FINGERPRINT_SEPARATOR = "\0";
@@ -167,12 +168,12 @@ function buildReadModel({ researchRoot, repoRoot, validation, generatedAt, sourc
       const absFile = path.join(researchRoot, file);
       const relFile = toRepoRelativePosix(repoRoot, absFile);
 
-      const raw = fs.readFileSync(absFile);
+      const canonicalBytes = canonicalYamlBytes(fs.readFileSync(absFile));
       fingerprintHash.update(prefix, "utf8");
       fingerprintHash.update(FINGERPRINT_SEPARATOR, "utf8");
       fingerprintHash.update(id, "utf8");
       fingerprintHash.update(FINGERPRINT_SEPARATOR, "utf8");
-      fingerprintHash.update(raw);
+      fingerprintHash.update(canonicalBytes);
       fingerprintHash.update(FINGERPRINT_SEPARATOR, "utf8");
 
       index.push({
