@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { ProblemView } from "./ProblemView";
-import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
+import { DataLoadError, type DataLoadErrorKind, type DataProvider, type RecordDetail, type RecordSummary } from "../dataProvider/types";
 
 const index: RecordSummary[] = [
   { id: "PRB-1", type: "PRB-", label: "Problema", file: "", summaryFields: {} },
@@ -65,6 +65,17 @@ describe("ProblemView — record index and selection guards", () => {
     expect(attempts).toBe(2);
   });
 
+  it.each(["missing", "malformed", "incompatible"] as const)("routes %s index failures to Overview without retry", async (kind) => {
+    const listRecords = vi.fn(async () => { throw new DataLoadError("Index failure", kind); });
+    const onBackToOverview = vi.fn();
+    render(<ProblemView {...props} dataProvider={{ ...provider, listRecords }} problemId="PRB-1" onBackToOverview={onBackToOverview} />);
+    expect(await screen.findByRole("button", { name: "Voltar à visão geral" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Tentar novamente" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Voltar à visão geral" }));
+    expect(onBackToOverview).toHaveBeenCalledTimes(1);
+    expect(listRecords).toHaveBeenCalledTimes(1);
+  });
+
   it("keeps an empty selection explicit and routes back to Records", async () => {
     const onBackToRecords = vi.fn();
     render(<ProblemView {...props} problemId={null} onBackToRecords={onBackToRecords} />);
@@ -112,6 +123,43 @@ describe("ProblemView — projection loading and error", () => {
     fireEvent.click(screen.getByRole("button", { name: "Tentar novamente" }));
     expect(await prbTitle("Problema de teste")).toBeTruthy();
     expect(attempts).toBe(2);
+  });
+
+  it.each([
+    ["not_found", "Problema não encontrado", "Voltar aos registos", "records"],
+    ["invalid_id", "Identificador de Problema inválido", "Voltar aos registos", "records"],
+    ["missing", "Modelo de leitura gerado não encontrado", "Voltar à visão geral", "overview"],
+    ["malformed", "Registo mal formado", "Voltar à visão geral", "overview"],
+    ["incompatible", "Versão do modelo de leitura incompatível", "Voltar à visão geral", "overview"],
+  ] as const)("routes %s detail failures without retry", async (kind, title, action, destination) => {
+    const getRecord = vi.fn(async () => { throw new DataLoadError("Detail failure", kind as DataLoadErrorKind); });
+    const onBackToRecords = vi.fn();
+    const onBackToOverview = vi.fn();
+    render(<ProblemView {...props} dataProvider={{ ...provider, getRecord }} problemId="PRB-1" onBackToRecords={onBackToRecords} onBackToOverview={onBackToOverview} />);
+    expect(await screen.findByRole("heading", { name: title })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Tentar novamente" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: action }));
+    expect(destination === "records" ? onBackToRecords : onBackToOverview).toHaveBeenCalledTimes(1);
+    expect(destination === "records" ? onBackToOverview : onBackToRecords).not.toHaveBeenCalled();
+    expect(getRecord).toHaveBeenCalledTimes(1);
+  });
+
+  it("reloads only when the version-mismatch action is activated", async () => {
+    const originalLocation = window.location;
+    const reload = vi.fn();
+    Object.defineProperty(window, "location", { configurable: true, value: { ...originalLocation, reload } });
+    try {
+      const getRecord = vi.fn(async () => { throw new DataLoadError("Mismatch", "version_mismatch"); });
+      render(<ProblemView {...props} dataProvider={{ ...provider, getRecord }} problemId="PRB-1" />);
+      const action = await screen.findByRole("button", { name: "Recarregar página" });
+      expect(reload).not.toHaveBeenCalled();
+      expect(screen.queryByRole("button", { name: "Tentar novamente" })).toBeNull();
+      fireEvent.click(action);
+      expect(reload).toHaveBeenCalledTimes(1);
+      expect(getRecord).toHaveBeenCalledTimes(1);
+    } finally {
+      Object.defineProperty(window, "location", { configurable: true, value: originalLocation });
+    }
   });
 });
 

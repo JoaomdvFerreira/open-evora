@@ -7,7 +7,7 @@ import { RecordIdentifier } from "../records/RecordIdentifier";
 import { PrbHistorySkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { DataLoadError } from "../dataProvider/types";
-import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
+import { problemLoadRecovery } from "./problemLoadRecovery";
 import { PrbHeader, PrbIdentityHeader } from "./PrbPageHeader";
 import { prbIdentity, type PrbIdentityData } from "./prbDetailsProjection";
 
@@ -200,11 +200,12 @@ interface ProblemHistoryViewProps {
   onVerifyInDetails: (id: string) => void;
 }
 
-function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackToOverview, onViewAsProblem, onVerifyInDetails }: Omit<ProblemHistoryViewProps, "problemId" | "onBackToRecords"> & { problemId: string }) {
+function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewAsProblem, onVerifyInDetails }: Omit<ProblemHistoryViewProps, "problemId"> & { problemId: string }) {
   const [detail, setDetail] = useState<RecordDetail | null>(null);
-  const [error, setError] = useState<unknown>(null);
+  const [error, setError] = useState<DataLoadError | null>(null);
   const [attempt, setAttempt] = useState(0);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -212,7 +213,7 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
     setError(null);
     dataProvider.getRecord(problemId).then(
       (next) => { if (!cancelled) setDetail(next); },
-      (nextError) => { if (!cancelled) setError(nextError); }
+      (nextError) => { if (!cancelled) setError(nextError instanceof DataLoadError ? nextError : new DataLoadError("Falha ao carregar o Problema.", "network")); }
     );
     return () => { cancelled = true; };
   }, [dataProvider, problemId, attempt]);
@@ -221,10 +222,13 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
     if (detail) headingRef.current?.focus();
   }, [detail]);
 
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
+
   if (error) {
-    const loadError = error instanceof DataLoadError ? error : new DataLoadError("Falha ao carregar o histórico.", "network");
-    const recovery = dataLoadRecovery(loadError, () => setAttempt((value) => value + 1));
-    return <div className="shell-frame"><ErrorNotice titleAs="h2" title="Não foi possível carregar o histórico" message={recovery.message} action={recovery.action} /></div>;
+    const recovery = problemLoadRecovery(error, "detail", () => setAttempt((value) => value + 1), onBackToRecords, onBackToOverview);
+    return <div className="shell-frame"><ErrorNotice ref={errorRef} tabIndex={-1} titleAs="h2" title={recovery.title} message={recovery.message} action={recovery.action} /></div>;
   }
   if (!detail) return <PrbHistorySkeleton message={`A carregar histórico de ${problemId}…`} />;
 
@@ -246,12 +250,15 @@ function ProblemHistoryContent({ dataProvider, problemId, onOpenGeneric, onBackT
 export function ProblemHistoryView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewAsProblem, onVerifyInDetails }: ProblemHistoryViewProps) {
   const indexState = useRecordIndex(dataProvider);
   if (indexState.status === "loading") return <PrbHistorySkeleton message="A carregar…" />;
-  if (indexState.status === "error") return <div className="shell-frame"><ErrorNotice titleAs="h2" title="Não foi possível carregar os registos" message={indexState.error.message} action={<button type="button" onClick={indexState.retry}>Tentar novamente</button>} /></div>;
+  if (indexState.status === "error") {
+    const recovery = problemLoadRecovery(indexState.error, "index", indexState.retry, onBackToRecords, onBackToOverview);
+    return <div className="shell-frame"><ErrorNotice titleAs="h2" title={recovery.title} message={recovery.message} action={recovery.action} /></div>;
+  }
   if (problemId === null) return <div><p>Nenhum Problema selecionado.</p><button type="button" onClick={onBackToRecords}>Procurar um Problema em Registos</button></div>;
 
   const summary = indexState.lookup.get(problemId);
   if (summary && summary.type !== "PRB-") {
     return <ErrorNotice titleAs="h2" title="Este registo não é um Problema" message={`${formatTypedId(summary.type, problemId)} não pode ser aberto como histórico.`} action={<button type="button" onClick={() => onOpenGeneric(problemId)}>Ver detalhe genérico</button>} />;
   }
-  return <ProblemHistoryContent dataProvider={dataProvider} problemId={problemId} onOpenGeneric={onOpenGeneric} onBackToOverview={onBackToOverview} onViewAsProblem={onViewAsProblem} onVerifyInDetails={onVerifyInDetails} />;
+  return <ProblemHistoryContent dataProvider={dataProvider} problemId={problemId} onOpenGeneric={onOpenGeneric} onBackToRecords={onBackToRecords} onBackToOverview={onBackToOverview} onViewAsProblem={onViewAsProblem} onVerifyInDetails={onVerifyInDetails} />;
 }

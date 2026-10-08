@@ -36,6 +36,8 @@ Runtime types, builders, and tests own the exact read-model shape.
 
 A rendered Explorer projection must use one generated read-model corpus identity. Record details carry the manifest's `corpusFingerprint`; if a fetched detail belongs to another identity, the provider fails closed and requires an explicit page reload. This generated publication identity is operational provenance, not research currentness. When deployment skew removes a lazy-loaded asset, the Explorer offers the same explicit reload recovery.
 
+In public Problem `Detalhes` and `Histórico`, transient network load failures retry in place; deployment-version skew requires an explicit page reload. Terminal record-selection failures return to Records, while terminal generated read-model failures return to Overview. Recovery never navigates or reloads automatically.
+
 The Explorer must expose canonical research record types from `docs/datamodel.md`; it must not preserve or invent deprecated record types independently.
 
 Prefer adapting the projection over changing the architecture when the existing architecture remains sufficient.

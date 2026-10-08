@@ -4,7 +4,7 @@ import { composeStories } from "@storybook/react-vite";
 import { ProblemHistoryView } from "./ProblemHistoryView";
 import * as stories from "./ProblemHistoryView.stories";
 import prb0005 from "../../generated/record-detail/PRB-0005.json";
-import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
+import { DataLoadError, type DataProvider, type RecordDetail, type RecordSummary } from "../dataProvider/types";
 
 const summaries: RecordSummary[] = [
   { id: "PRB-0010", type: "PRB-", label: "Pavimento", file: "research/problems/PRB-0010.yaml", summaryFields: {} },
@@ -79,6 +79,80 @@ it("uses the History skeleton for both index and record loading", async () => {
   expect(await screen.findByText("A carregar histórico de PRB-0003…")).toBeTruthy();
   expect(screen.getByTestId("prb-history-skeleton")).toBeTruthy();
   expect(screen.getAllByRole("status")).toHaveLength(1);
+});
+
+describe("ProblemHistoryView — typed load recovery", () => {
+  it("retries one transient detail failure and focuses the recovered title", async () => {
+    const getRecord = vi.fn()
+      .mockRejectedValueOnce(new DataLoadError("Falha temporária.", "network"))
+      .mockResolvedValue(details["PRB-0003"]);
+    render(<ProblemHistoryView {...props} dataProvider={{ ...provider(), getRecord }} problemId="PRB-0003" />);
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("heading", { name: "Falha ao carregar o Problema" })).toBeTruthy();
+    expect(within(alert).getByText("Falha temporária.")).toBeTruthy();
+    await waitFor(() => expect(document.activeElement).toBe(alert));
+    fireEvent.click(within(alert).getByRole("button", { name: "Tentar novamente" }));
+    const title = await screen.findByRole("heading", { name: "Tráfego e estacionamento" });
+    await waitFor(() => expect(document.activeElement).toBe(title));
+    expect(getRecord).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    ["not_found", "Problema não encontrado", "Voltar aos registos", "records"],
+    ["invalid_id", "Identificador de Problema inválido", "Voltar aos registos", "records"],
+    ["missing", "Modelo de leitura gerado não encontrado", "Voltar à visão geral", "overview"],
+    ["malformed", "Registo mal formado", "Voltar à visão geral", "overview"],
+    ["incompatible", "Versão do modelo de leitura incompatível", "Voltar à visão geral", "overview"],
+  ] as const)("routes %s detail failures without another load", async (kind, title, action, destination) => {
+    const getRecord = vi.fn(async () => { throw new DataLoadError("Typed failure", kind); });
+    const onBackToRecords = vi.fn();
+    const onBackToOverview = vi.fn();
+    render(<ProblemHistoryView {...props} dataProvider={{ ...provider(), getRecord }} problemId="PRB-0003" onBackToRecords={onBackToRecords} onBackToOverview={onBackToOverview} />);
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("heading", { name: title })).toBeTruthy();
+    await waitFor(() => expect(document.activeElement).toBe(alert));
+    expect(screen.queryByRole("button", { name: "Tentar novamente" })).toBeNull();
+    fireEvent.click(within(alert).getByRole("button", { name: action }));
+    expect(destination === "records" ? onBackToRecords : onBackToOverview).toHaveBeenCalledTimes(1);
+    expect(destination === "records" ? onBackToOverview : onBackToRecords).not.toHaveBeenCalled();
+    expect(getRecord).toHaveBeenCalledTimes(1);
+  });
+
+  it("requires activation to reload for a detail version mismatch", async () => {
+    const originalLocation = window.location;
+    const reload = vi.fn();
+    Object.defineProperty(window, "location", { configurable: true, value: { ...originalLocation, reload } });
+    try {
+      const getRecord = vi.fn(async () => { throw new DataLoadError("Mismatch", "version_mismatch"); });
+      render(<ProblemHistoryView {...props} dataProvider={{ ...provider(), getRecord }} problemId="PRB-0003" />);
+      const action = await screen.findByRole("button", { name: "Recarregar página" });
+      expect(reload).not.toHaveBeenCalled();
+      expect(screen.queryByRole("button", { name: "Tentar novamente" })).toBeNull();
+      fireEvent.click(action);
+      expect(reload).toHaveBeenCalledTimes(1);
+      expect(getRecord).toHaveBeenCalledTimes(1);
+    } finally {
+      Object.defineProperty(window, "location", { configurable: true, value: originalLocation });
+    }
+  });
+
+  it("retries a transient record-index failure", async () => {
+    const listRecords = vi.fn().mockRejectedValueOnce(new DataLoadError("Index failure", "network")).mockResolvedValue(summaries);
+    render(<ProblemHistoryView {...props} dataProvider={{ ...provider(), listRecords }} problemId="PRB-0003" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Tentar novamente" }));
+    expect(await screen.findByRole("heading", { name: "Tráfego e estacionamento" })).toBeTruthy();
+    expect(listRecords).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(["missing", "malformed", "incompatible"] as const)("routes %s index failures to Overview without retry", async (kind) => {
+    const listRecords = vi.fn(async () => { throw new DataLoadError("Index failure", kind); });
+    const onBackToOverview = vi.fn();
+    render(<ProblemHistoryView {...props} dataProvider={{ ...provider(), listRecords }} problemId="PRB-0003" onBackToOverview={onBackToOverview} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Voltar à visão geral" }));
+    expect(screen.queryByRole("button", { name: "Tentar novamente" })).toBeNull();
+    expect(onBackToOverview).toHaveBeenCalledTimes(1);
+    expect(listRecords).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("ProblemHistoryView — composition", () => {
