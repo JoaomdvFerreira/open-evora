@@ -5,6 +5,7 @@ import {
   extractSourceDatesAccess,
   extractSourceLicensing,
   extractSourceOverview,
+  extractSourceProvenance,
 } from "./sourceView";
 
 /** Mirrors research/sources/SRC-0093.yaml exactly. */
@@ -130,6 +131,20 @@ describe("extractSourceDatesAccess", () => {
   it("extracts the literal 'unknown' machine_readable value verbatim, distinct from boolean false", () => {
     const datesAccess = extractSourceDatesAccess(MINIMAL_SRC);
     expect(datesAccess.accessMachineReadable).toBe("unknown");
+  });
+});
+
+describe("extractSourceProvenance", () => {
+  it("extracts the SRC-0093 acquisition method and persistent identifier exactly", () => {
+    expect(extractSourceProvenance(SRC_0093)).toEqual({ acquisitionMethod: "public_web", acquisitionObtainedAt: null, persistentIdentifierScheme: "doi", persistentIdentifierValue: "10.1038/s41598-022-23987-z" });
+  });
+
+  it("extracts an authored acquisition date and leaves absent identity fields null", () => {
+    expect(extractSourceProvenance({ acquisition: { method: "direct_contact", obtained_at: "2026-09-03" } })).toEqual({ acquisitionMethod: "direct_contact", acquisitionObtainedAt: "2026-09-03", persistentIdentifierScheme: null, persistentIdentifierValue: null });
+  });
+
+  it("keeps optional provenance fields null when absent", () => {
+    expect(extractSourceProvenance(MINIMAL_SRC)).toEqual({ acquisitionMethod: "unknown", acquisitionObtainedAt: null, persistentIdentifierScheme: null, persistentIdentifierValue: null });
   });
 });
 

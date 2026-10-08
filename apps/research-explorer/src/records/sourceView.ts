@@ -145,6 +145,26 @@ export function extractSourceDatesAccess(record: Record<string, unknown>): Sourc
   };
 }
 
+export interface SourceProvenance {
+  acquisitionMethod: string | null;
+  acquisitionObtainedAt: string | null;
+  persistentIdentifierScheme: string | null;
+  persistentIdentifierValue: string | null;
+}
+
+/** Extracts only authored Source acquisition and persistent-identity fields. */
+export function extractSourceProvenance(record: Record<string, unknown>): SourceProvenance {
+  const acquisition = getObject(record, "acquisition");
+  const identity = getObject(record, "identity");
+  const persistentIdentifier = identity ? getObject(identity, "persistent_identifier") : null;
+  return {
+    acquisitionMethod: acquisition ? getString(acquisition, "method") : null,
+    acquisitionObtainedAt: acquisition ? getString(acquisition, "obtained_at") : null,
+    persistentIdentifierScheme: persistentIdentifier ? getString(persistentIdentifier, "scheme") : null,
+    persistentIdentifierValue: persistentIdentifier ? getString(persistentIdentifier, "value") : null,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Licenciamento
 // ---------------------------------------------------------------------------

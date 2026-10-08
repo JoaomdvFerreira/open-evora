@@ -683,6 +683,10 @@ body:has(.src-detail-view) .public-footer {
   overflow-wrap: anywhere;
 }
 
+.src-audit-identifier {
+  overflow-wrap: anywhere;
+}
+
 a.src-audit-address {
   color: var(--color-accent-hover);
   text-underline-offset: 0.2em;

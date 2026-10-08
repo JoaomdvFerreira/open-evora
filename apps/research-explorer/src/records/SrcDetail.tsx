@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { canonicalFileUrl } from "../dataProvider/StaticDataProvider";
-import { formatPublicCompactDate, formatPublicCount, formatPublicPartialDate, publicEnumLabel } from "../presentation/presentation";
+import { formatPublicCompactDate, formatPublicCount, formatPublicPartialDate, publicEnumLabel, publicFieldCaption } from "../presentation/presentation";
 import { describeTopic } from "../presentation/topicMapping";
 import { Breadcrumb } from "../presentation/Breadcrumb";
 import { RelationSkeleton } from "../loading/LoadingSkeletons";
@@ -9,7 +9,7 @@ import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
 import { useToast } from "../presentation/Toast";
 import { RecordIdentifier } from "./RecordIdentifier";
-import { extractSourceCaveats, extractSourceCoverage, extractSourceDatesAccess, extractSourceLicensing, extractSourceOverview, isHttpUrl, type SourceCoverage } from "./sourceView";
+import { extractSourceCaveats, extractSourceCoverage, extractSourceDatesAccess, extractSourceLicensing, extractSourceOverview, extractSourceProvenance, isHttpUrl, type SourceCoverage } from "./sourceView";
 import type { SourceEvidenceRelations } from "./sourceEvidenceRelations";
 import type { SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
 
@@ -440,6 +440,29 @@ function SrcDatesAccess({ record, originalUrl }: { record: Record<string, unknow
   );
 }
 
+function SrcProvenance({ record }: { record: Record<string, unknown> }) {
+  const provenance = extractSourceProvenance(record);
+  const identifier = provenance.persistentIdentifierValue
+    ? `${provenance.persistentIdentifierScheme ? `${provenance.persistentIdentifierScheme}: ` : ""}${provenance.persistentIdentifierValue}`
+    : null;
+  const rows = [
+    { key: "method", label: publicFieldCaption("acquisition.method"), value: provenance.acquisitionMethod && publicEnumLabel("acquisition.method", provenance.acquisitionMethod) },
+    { key: "obtained", label: publicFieldCaption("acquisition.obtained_at"), value: provenance.acquisitionObtainedAt && formatPublicPartialDate(provenance.acquisitionObtainedAt) },
+    { key: "identifier", label: "Identificador persistente", value: identifier && <span className="src-audit-identifier">{identifier}</span> },
+  ].filter((row) => row.value);
+  if (rows.length === 0) return null;
+  return (
+    <div className="src-audit-row src-audit-row--provenance">
+      <div>
+        <h4>Proveniência</h4>
+        <dl className="src-audit-facts">
+          {rows.map((row) => <div key={row.key}><dt>{row.label}</dt><dd>{row.value}</dd></div>)}
+        </dl>
+      </div>
+    </div>
+  );
+}
+
 function SrcLicensing({ record, readable }: { record: Record<string, unknown>; readable: boolean }) {
   const licensing = extractSourceLicensing(record);
   const lead = licensing.status === "known" ? (licensing.licence ? `${licensing.licence}.` : "Licença conhecida.") : "Estado desconhecido.";
@@ -480,6 +503,7 @@ function SrcAudit({ detail, originalUrl }: { detail: RecordDetail; originalUrl: 
           </div>
 
           <SrcDatesAccess record={record} originalUrl={originalUrl} />
+          <SrcProvenance record={record} />
           <SrcLicensing record={record} readable={facts.accessLevel === "public" && facts.accessAvailability === "available"} />
 
           <div className="src-audit-row src-audit-row--canonical">
