@@ -31,6 +31,32 @@ one-to-one. Every candidateFiles[].path in the top-level array must exactly
 match one entry in manifest.candidateFiles.`;
 
 /**
+ * Citizen Language & Evidence Contract applied to authoring (canonical
+ * policy: docs/investigationstrategy.md §12; EVD wording: docs/datamodel.md
+ * "Observation wording and inference limits"). This operationalizes the
+ * contract for the author; it is not a second version of it.
+ */
+const CLEC_AUTHORING_CONTRACT = `Citizen Language & Evidence Contract (CLEC) — applies to all authored text in PRB, EVD and SRC candidates, including simplified, paraphrased or translated text:
+Core rule: Never make a statement stronger, broader, more certain or more causal in order to make it simpler.
+Write so a non-specialist citizen can follow; where plain wording and evidential accuracy conflict, accuracy wins — keep the longer faithful wording.
+1. Clarity: plain, direct wording, never achieved by weakening any other dimension.
+2. Specificity: name the concrete service, place, population, condition or mechanism the evidence concerns; do not replace it with a vaguer or more general category.
+3. Explicit scope: state the place, population, period and conditions a statement applies to; silence must not imply wider scope.
+4. Supported quantity: quantity, frequency and prevalence words (all, most, many, often, always, increasing) go no further than the evidence; prefer the evidence's own figures or ranges. Discussion volume is not prevalence.
+5. Attribution: reported experiences, claims, opinions, measurements and recommendations stay attributed to who reports, claims, measures or recommends them; never turn them into unattributed fact.
+6. Supported causality: causal wording (causes, leads to, because of, results in) only as far as the evidence supports; sequence, association or a reported cause stays expressed as such.
+7. Temporal precision: state when a statement applies; historical is not current, planned or announced is not implemented.
+8. Visible uncertainty: keep qualifiers, unknowns, contradictions and limits visible; UNKNOWN is not NO.
+9. Neutral wording: descriptive, non-evaluative, non-emotive; no advocacy, blame, intensifiers or rhetorical framing.
+10. Evidence fidelity: every statement is traceable to, and no stronger than, its supporting evidence — PRB text to its linked EVD, EVD text to its Source.
+Simplification must never change evidential meaning. Paraphrase and translation (including into PT-PT) must preserve qualifiers, attribution, scope, temporal markers and uncertainty, and must not strengthen, broaden or resolve what the original leaves qualified or uncertain.
+Record-specific emphasis:
+- PRB: strictest neutrality, scope and causality. Problem-level synthesis is neutral and scoped, and never broader, stronger or more causal than its supporting EVD and their inference_limits.
+- EVD: strictest fidelity to the Source. observation.summary preserves the Source's meaning, attribution, qualifications and the observation's inference limits; a translation or paraphrase must not strengthen the Source. Non-factual observations (reported experience, claim, opinion, recommendation) are attributed, not stated as fact.
+- SRC: strictest preservation and provenance. Record the Source's provenance and published identity as published; add no evaluative statement about what the Source proves or how strong it is.
+Checking your own wording against these dimensions is expected, but author self-review does not substitute for the independent semantic review every canonical research text change requires.`;
+
+/**
  * Bounded PRB semantic guardrails (docs/datamodel.md §3 "Problem reading and
  * investigation semantics"). Existing corpus wording is not a sufficient
  * template, so the distinctions are stated here rather than left implicit.
@@ -62,6 +88,8 @@ export function buildPrimaryAuthoringPrompt(trigger: ResearchTrigger): string {
     "canonical record shape already in use in this repository's research corpus.",
     "Do not invent fields. Do not modify canonical records; author new/updated",
     "candidates only.",
+    "",
+    CLEC_AUTHORING_CONTRACT,
     "",
     PRB_SEMANTIC_GUARDRAILS,
     "",

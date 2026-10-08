@@ -180,6 +180,38 @@ test("the primary prompt keeps optional fields optional and forbids invented fie
   assert.match(PRIMARY_PROMPT, /omit them when not explicitly supported; do not invent values/);
 });
 
+const CLEC_DIMENSIONS = [
+  "Clarity",
+  "Specificity",
+  "Explicit scope",
+  "Supported quantity",
+  "Attribution",
+  "Supported causality",
+  "Temporal precision",
+  "Visible uncertainty",
+  "Neutral wording",
+  "Evidence fidelity",
+];
+
+test("the primary prompt applies the CLEC core rule and all ten dimensions", () => {
+  assert.ok(PRIMARY_PROMPT.includes("Never make a statement stronger, broader, more certain or more causal in order to make it simpler."));
+  CLEC_DIMENSIONS.forEach((dimension, index) => {
+    assert.ok(PRIMARY_PROMPT.includes(`${index + 1}. ${dimension}:`), `prompt must state CLEC dimension ${dimension}`);
+  });
+});
+
+test("the primary prompt gives PRB, EVD and SRC their CLEC emphasis", () => {
+  assert.match(PRIMARY_PROMPT, /applies to all authored text in PRB, EVD and SRC candidates/);
+  assert.match(PRIMARY_PROMPT, /- PRB: .*never broader, stronger or more causal than its supporting EVD/);
+  assert.match(PRIMARY_PROMPT, /- EVD: .*translation or paraphrase must not strengthen the Source/);
+  assert.match(PRIMARY_PROMPT, /- SRC: .*provenance and published identity as published; add no evaluative statement/);
+});
+
+test("the primary prompt keeps translation faithful and does not treat self-review as independent review", () => {
+  assert.match(PRIMARY_PROMPT, /Paraphrase and translation .* must not strengthen, broaden or resolve/);
+  assert.match(PRIMARY_PROMPT, /author self-review does not substitute for the independent semantic review/);
+});
+
 test("the primary prompt still states the structured envelope contract the validator enforces", () => {
   for (const key of ["schemaVersion", "manifest", "mode", "targetProblemId", "investigationQuestion", "candidateFiles", "claimedRecordIds", "rationale", "path", "yaml"]) {
     assert.ok(PRIMARY_PROMPT.includes(`"${key}"`), `prompt must describe envelope key ${key}`);
