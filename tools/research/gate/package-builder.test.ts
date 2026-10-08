@@ -6,6 +6,7 @@ import {
   loadIndexFor,
   SHA_A,
   semanticHumanGatePackage,
+  semanticCandidates,
   semanticResearchChangeSet,
   semanticReview,
   semanticReviewCorpus,
@@ -16,6 +17,8 @@ import {
 import { buildHumanGatePackage } from "./package-builder.ts";
 import { validateHumanGatePackage } from "./package-validator.ts";
 import { canonicalJsonStringify } from "../orchestrate/fingerprint.ts";
+import { validateIndependentReview } from "../orchestrate/independent-review.ts";
+import { buildReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
 
 test("the Gate stores exactly the reviewer signals and bounded evidence context buildReviewerInputPackage() reconstructs", () => {
   const index = semanticReviewCorpus();
@@ -58,6 +61,24 @@ test("package assembly fails closed when the review no longer validates against 
     assert.equal(built.pkg, undefined, name);
     assert.ok(built.errors.some((e) => e.startsWith("independent review does not validate against the reconstructed reviewer context")), name);
   }
+});
+
+test("package assembly rejects a change set carrying a context-free CLEC blocker even when its review is a valid CONCUR", () => {
+  const index = semanticReviewCorpus();
+  const records = semanticCandidates();
+  records.candidates[0].fields = { ...records.candidates[0].fields, inference_limits: ["Não é impacto em PRB-0005."] };
+  const draft = syntheticResearchChangeSet(index, SHA_A, "PRB-NEW", { records });
+  const reviewerInput = buildReviewerInputPackage({ ...draft, index });
+  assert.ok(reviewerInput.signals.some((s) => s.signal.code === "PRB_ID_IN_EVD_TEXT"));
+
+  // A hand-built review dispositioning every signal, the blocker included, as SUPPORTED or NOT_APPLICABLE.
+  const review = semanticReview(reviewerInput, "CONCUR");
+  assert.deepEqual(validateIndependentReview(review, reviewerInput).errors, []);
+  const built = buildHumanGatePackage(index, syntheticResearchChangeSet(index, SHA_A, "PRB-NEW", { records, independentReview: review }));
+  assert.equal(built.pkg, undefined);
+  assert.equal(built.errors.length, 1);
+  assert.match(built.errors[0], /^CLEC_CONTEXT_FREE_BLOCK: /);
+  assert.match(built.errors[0], /CLEC-SIG-\d{4} PRB_ID_IN_EVD_TEXT EVD-B inference_limits\[0\]: "PRB-0005"/);
 });
 
 test("the package validator rejects semantic-review material that diverges from its RCS authority or stored context", () => {

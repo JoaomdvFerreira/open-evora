@@ -378,7 +378,7 @@ Implemented in advisory/report mode:
 - a deterministic signal lexicon, code-owned and not duplicated in this document;
 - tooling that surfaces advisory CLEC signals for the corpus or for changed records.
 
-These signals are review prompts, not automatic violations; each still requires semantic disposition in review (see *Signals and human judgement*). The tooling does not rewrite canonical text, and signal presence does not fail validation or CI.
+These signals are review prompts, not automatic violations; each still requires semantic disposition in review (see *Signals and human judgement*). The tooling does not rewrite canonical text, and advisory signal presence does not fail validation or CI.
 
 Implemented for the independent reviewer in both lanes:
 - structured semantic findings (CLEC violations and evidence gaps) quoting the authored text;
@@ -400,11 +400,18 @@ Implemented for direct pull-request changes (Lane B):
 
 The no-exception independent semantic-review rule is therefore technically enforced for both lanes. A `CONCUR` review makes a change eligible for human review; it is not an approval. Once a change is eligible, the canonical and publication decisions remain human judgement.
 
+Implemented as a deterministic pre-review block, in both lanes and again at Human Gate package assembly, for exactly two context-free layer-integrity signal classes:
+- canonical record IDs (`SRC-`, `EVD-`, `PRB-`) embedded in authored SRC text;
+- PRB IDs embedded in authored EVD text.
+
+These couple a record to internal research state of another layer; Problem relationships belong in Problem structures. No evidence interpretation can make that coupling valid, so a change whose own changed or candidate records carry either class fails before the independent reviewer is invoked, and no review, disposition or receipt can waive it. This is a structural rule, not a semantic judgement.
+
+Every other CLEC signal remains advisory: lexical wording is never automatically a violation, and a change that passes the precheck still requires the mandatory independent semantic review. No automatic semantic judgement has been introduced. The block applies only to the records in the current change unit; legacy corpus signals, including these two classes in unchanged records, are not turned into corpus-wide validation or CI failures.
+
 Not yet implemented:
-- deterministic or blocking policy based directly on approved context-free signal classes;
 - automatic semantic decisions from lexical signals.
 
-Advisory signal presence does not itself fail validation or CI; only a missing, invalid or non-`CONCUR` independent review does.
+Advisory signal presence does not itself fail validation or CI; only a context-free block, or a missing, invalid or non-`CONCUR` independent review, does.
 
 Boundaries of initial enforcement:
 - Explorer-generated copy is outside initial CLEC enforcement; the global evidence-integrity safeguard in `AGENTS.md` still applies to it.

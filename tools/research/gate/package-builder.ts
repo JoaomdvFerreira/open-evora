@@ -27,6 +27,7 @@ import type { CorpusIndex } from "../core/types.ts";
 import type { ResearchChangeSet } from "../orchestrate/types.ts";
 import { validateIndependentReview } from "../orchestrate/independent-review.ts";
 import { buildReviewerInputPackage, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
+import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
 import { validateHumanGatePackage } from "./package-validator.ts";
 import type { HumanGatePackage } from "./types.ts";
 
@@ -130,7 +131,8 @@ function deriveNonAuthoritativeRecommendation(changeSet: ResearchChangeSet, risk
  * overlaid onto `index`) and re-runs the context-aware review validation
  * against it. Fails closed: a review that is no longer coherent with its
  * reconstructed context is never presented, and never downgraded to the
- * RCS-only structural check.
+ * RCS-only structural check. A reconstructed context carrying a context-free
+ * CLEC blocker fails before the review is considered at all.
  */
 function reconstructReviewerInput(index: CorpusIndex, changeSet: ResearchChangeSet): { errors: string[]; reviewerInput?: ReviewerInputPackage } {
   let reviewerInput: ReviewerInputPackage;
@@ -147,6 +149,9 @@ function reconstructReviewerInput(index: CorpusIndex, changeSet: ResearchChangeS
   } catch (error) {
     return { errors: [`reviewer context reconstruction failed: ${(error as Error).message}`] };
   }
+  // Defense in depth for a hand-built or stale change set: whatever its embedded review says.
+  const blockers = contextFreeBlockers(reviewerInput.signals);
+  if (blockers.length > 0) return { errors: [`${CONTEXT_FREE_BLOCK}: ${describeContextFreeBlockers(blockers)}`] };
   const review = validateIndependentReview(changeSet.independentReview, reviewerInput);
   if (review.errors.length > 0) {
     return { errors: review.errors.map((message) => `independent review does not validate against the reconstructed reviewer context: ${message}`) };

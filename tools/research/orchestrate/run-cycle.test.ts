@@ -199,6 +199,64 @@ test("a valid claim reaches the independent reviewer through real orchestration"
   });
 });
 
+/** A single-candidate envelope for `id`, whose YAML is supplied verbatim. */
+function singleCandidateEnvelope(id: string, yaml: string): unknown {
+  return { schemaVersion: "1", manifest: { schemaVersion: "1", mode: "daily-discovery", investigationQuestion: "q", candidateFiles: [`${id}.yaml`], claimedRecordIds: [id], rationale: "r" }, candidateFiles: [{ path: `${id}.yaml`, yaml }] };
+}
+
+const AVAILABLE = { check: () => ({ sourceId: "SRC-MATERIAL", status: "available" as const, checkedAt: "2026-09-15T12:00:00.000Z" }) };
+
+/** Asserts a deterministic context-free FAILED with no reviewer call and no review, RCS, Gate or HOLD artifact. */
+function assertContextFreeBlocked(outcome: Awaited<ReturnType<typeof runResearchCycle>>, reviewer: RecordingInvoker, cycleDir: string, blocker: RegExp): void {
+  assert.equal(outcome.status, "FAILED", outcome.status);
+  if (outcome.status !== "FAILED") return;
+  assert.equal(outcome.failedCheck, "CLEC_CONTEXT_FREE_BLOCK");
+  assert.match(outcome.message, blocker);
+  assert.equal(reviewer.calls.length, 0);
+  for (const artifact of ["independent-review.json", "research-change-set.json", "human-gate-package.json", "hold-freeze.json"]) {
+    assert.equal(existsSync(join(cycleDir, artifact)), false, artifact);
+  }
+}
+
+test("a candidate EVD embedding a PRB ID fails the context-free precheck before the reviewer is invoked", async () => {
+  await withTempDir(async (cycleDir) => {
+    const envelope = singleCandidateEnvelope("EVD-NEW", "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: fact\nclaim_authority: authoritative\ninference_limits:\n  - Não é impacto em PRB-0005.\n");
+    const primary = new RecordingInvoker(fixedResponder(envelope));
+    const reviewer = new RecordingInvoker(concurringResponder);
+    const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: AVAILABLE, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    assertContextFreeBlocked(outcome, reviewer, cycleDir, /CLEC-SIG-\d{4} PRB_ID_IN_EVD_TEXT EVD-NEW inference_limits\[0\]: "PRB-0005"/);
+  });
+});
+
+test("a candidate SRC embedding a canonical record ID fails the context-free precheck before the reviewer is invoked", async () => {
+  await withTempDir(async (cycleDir) => {
+    const envelope = singleCandidateEnvelope("SRC-NEW", "source_id: SRC-NEW\nname: Synthetic source\ncaveats:\n  - Ver EVD-000001.\n");
+    const primary = new RecordingInvoker(fixedResponder(envelope));
+    const reviewer = new RecordingInvoker(concurringResponder);
+    const outcome = await runResearchCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer });
+    assertContextFreeBlocked(outcome, reviewer, cycleDir, /CLEC-SIG-\d{4} SRC_RECORD_ID_IN_TEXT SRC-NEW caveats\[0\]: "EVD-000001"/);
+  });
+});
+
+test("an advisory-only lexical signal still reaches the independent reviewer and is processed by its dispositions", async () => {
+  await withTempDir(async (cycleDir) => {
+    const envelope = singleCandidateEnvelope("SRC-NEW", "source_id: SRC-NEW\nname: Synthetic source\ncaveats:\n  - Fonte fiável.\n");
+    const primary = new RecordingInvoker(fixedResponder(envelope));
+
+    const undispositioned = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const failed = await runResearchCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: undispositioned });
+    assert.equal(undispositioned.calls.length, 1);
+    assert.deepEqual(frozenReviewerInput(undispositioned.calls[0]).signals.map((s) => s.signal.code), ["SRC_EVALUATIVE_WORDING"]);
+    assert.equal(failed.status === "FAILED" && failed.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
+
+    const reviewer = new RecordingInvoker(concurringResponder);
+    const outcome = await runResearchCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer });
+    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
+    if (outcome.status !== "READY_FOR_HUMAN_REVIEW") return;
+    assert.deepEqual(outcome.changeSet.independentReview.signalDispositions.map((d) => d.disposition), ["SUPPORTED"]);
+  });
+});
+
 test("the reviewer receives the candidate's evidence context and signals, and a result that leaves a signal undispositioned fails closed", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));

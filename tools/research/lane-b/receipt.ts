@@ -12,12 +12,14 @@
  * context-aware validateIndependentReview().
  *
  * A verified CONCUR receipt makes a change eligible for human review only.
- * It is not an approval, and signal presence alone never fails it.
+ * It is not an approval. Advisory signal presence alone never fails it; a
+ * context-free CLEC blocker in the review unit always does, receipt or not.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import type { AiInvoker } from "../orchestrate/ai-invoker.ts";
+import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
 import { canonicalJsonStringify } from "../orchestrate/fingerprint.ts";
 import { asValidatedIndependentReview, validateIndependentReview } from "../orchestrate/independent-review.ts";
 import { serializeReviewerInput } from "../orchestrate/reviewer-input.ts";
@@ -161,10 +163,20 @@ function recordList(records: readonly LaneBChangedRecord[]): string {
 }
 
 /**
+ * The context-free CLEC precheck over the unit's exact reviewer input:
+ * a failure message when the changed records carry a blocker, else null.
+ */
+export function laneBContextFreeBlock(unit: ReviewRequiredUnit): { failedCheck: typeof CONTEXT_FREE_BLOCK; message: string } | null {
+  const blockers = contextFreeBlockers(unit.reviewerInput.signals);
+  return blockers.length > 0 ? { failedCheck: CONTEXT_FREE_BLOCK, message: describeContextFreeBlockers(blockers) } : null;
+}
+
+/**
  * Verifies a pull request's Lane B receipt against the review unit rebuilt
  * from Git. Fails closed on every missing, ambiguous, stale or invalid
  * receipt and on any outcome other than CONCUR. Advisory signals are never
  * failures by themselves: only a missing or inconsistent disposition is.
+ * A context-free blocker fails first, before the receipt is even read.
  */
 export function verifyLaneBPullRequest(unit: LaneBReviewUnit, body: string | null | undefined): LaneBVerification {
   if (unit.status === "NO_CANONICAL_CHANGE") {
@@ -176,6 +188,8 @@ export function verifyLaneBPullRequest(unit: LaneBReviewUnit, body: string | nul
       `deleting or renaming canonical records is not supported by Lane B direct review: ${unit.paths.join(", ")}`
     );
   }
+  const blocked = laneBContextFreeBlock(unit);
+  if (blocked) return fail(blocked.failedCheck, blocked.message);
 
   const extracted = extractPullRequestReceipt(body);
   if (extracted.status === "ABSENT") {
@@ -225,9 +239,12 @@ export type LaneBPreparation =
  * prompt built from the frozen reviewer package, validated against that
  * same package. `workbenchDir` must already be boundary-checked as
  * gitignored; the reviewer input, its result and any receipt are written
- * only there.
+ * only there. A context-free blocker fails before anything is written or
+ * the reviewer is invoked.
  */
 export function prepareLaneBReview(unit: ReviewRequiredUnit, reviewerInvoker: AiInvoker, workbenchDir: string): LaneBPreparation {
+  const blocked = laneBContextFreeBlock(unit);
+  if (blocked) return { status: "REVIEW_FAILED", ...blocked };
   mkdirSync(workbenchDir, { recursive: true });
   const reviewerInputJson = serializeReviewerInput(unit.reviewerInput);
   writeFileSync(join(workbenchDir, "reviewer-input.json"), `${reviewerInputJson}\n`, "utf8");
