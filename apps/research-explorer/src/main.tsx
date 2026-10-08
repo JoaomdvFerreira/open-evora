@@ -1,12 +1,19 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "@fontsource/source-serif-4/latin-ext-400.css";
+import "@fontsource/source-serif-4/latin-400.css";
 import "@fontsource/source-serif-4/latin-ext-600.css";
+import "@fontsource/source-serif-4/latin-600.css";
 import "@fontsource/source-serif-4/latin-ext-700.css";
+import "@fontsource/source-serif-4/latin-700.css";
 import "@fontsource/ibm-plex-mono/latin-ext-400.css";
+import "@fontsource/ibm-plex-mono/latin-400.css";
 import "@fontsource/ibm-plex-mono/latin-ext-500.css";
+import "@fontsource/ibm-plex-mono/latin-500.css";
 import "@fontsource/public-sans/latin-ext-400.css";
+import "@fontsource/public-sans/latin-400.css";
 import "@fontsource/public-sans/latin-ext-600.css";
+import "@fontsource/public-sans/latin-600.css";
 import { App } from "./app/App";
 // DS-05J: reading-layout.css is imported before index.css so that
 // domain-owned rules in index.css win the cascade over ReadingLayout's
