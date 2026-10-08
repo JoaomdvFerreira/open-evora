@@ -433,6 +433,7 @@ test("corpusFingerprint is stable for identical input and changes when canonical
     const modelA = buildFor(root);
     const modelB = buildFor(root);
     assert.strictEqual(modelA.manifest.corpusFingerprint, modelB.manifest.corpusFingerprint);
+    assert.ok(modelA.recordDetails.every((detail) => detail.corpusFingerprint === modelA.manifest.corpusFingerprint));
 
     write(root, "sources", "SRC-9001.yaml", minimalSrc().replace("Fixture Source", "Changed Fixture Source"));
     const modelC = buildFor(root);

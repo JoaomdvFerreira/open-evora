@@ -128,7 +128,7 @@ function assertEdgeRefShape(value: unknown, direction: "incoming" | "outgoing"):
 }
 
 function assertRecordDetailShape(data: unknown): asserts data is RecordDetail {
-  if (!isObject(data) || !isNonEmptyString(data.id) || !isNonEmptyString(data.type) || !isNonEmptyString(data.file) || !isObject(data.record) || !Array.isArray(data.outgoingEdges) || !Array.isArray(data.incomingEdges)) {
+  if (!isObject(data) || !isNonEmptyString(data.corpusFingerprint) || !isNonEmptyString(data.id) || !isNonEmptyString(data.type) || !isNonEmptyString(data.file) || !isObject(data.record) || !Array.isArray(data.outgoingEdges) || !Array.isArray(data.incomingEdges)) {
     throw new DataLoadError("O detalhe do registo tem um formato inválido.", "malformed");
   }
   data.outgoingEdges.forEach((edge) => assertEdgeRefShape(edge, "outgoing"));
@@ -209,6 +209,7 @@ export class StaticDataProvider implements DataProvider {
     // Never fetch a record-detail path for an ID that isn't part of the
     // generated index, even if it is syntactically well-formed — this is the
     // "part of the known record set" check, not just a shape check.
+    const manifest = await this.getManifest();
     const index = await this.listRecords();
     const known = index.some((r) => r.id === id);
     if (!known) {
@@ -217,6 +218,9 @@ export class StaticDataProvider implements DataProvider {
 
     const detail = await fetchJson<unknown>(`record-detail/${encodeURIComponent(id)}.json`, `o detalhe do registo «${id}»`);
     assertRecordDetailShape(detail);
+    if (detail.corpusFingerprint !== manifest.corpusFingerprint) {
+      throw new DataLoadError("Os dados publicados foram atualizados. Recarregue a página antes de continuar.", "version_mismatch");
+    }
     return detail;
   }
 

@@ -17,6 +17,8 @@ import {
 } from "./overviewStats";
 import { OverviewSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { DataLoadError } from "../dataProvider/types";
+import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
 import { OverviewPresentation } from "./OverviewPresentation";
 
 const ERROR_TITLES: Record<string, string> = {
@@ -189,6 +191,7 @@ export function Overview({
     details: Map<string, { summary: RecordSummary; detail: RecordDetail }>;
     failedIds: string[];
     retrying: boolean;
+    error: DataLoadError | null;
   } | null>(null);
   const generation = useRef(0);
   const retryLock = useRef(false);
@@ -226,24 +229,30 @@ export function Overview({
     retryLock.current = false;
     const summaries = indexState.records.filter((record) => record.type === "PRB-").sort((a, b) => a.id.localeCompare(b.id));
     const key = `${providerIdentity.current.version}:${summaries.map((s) => s.id).join("|")}`;
-    setDetailState({ key, details: new Map(), failedIds: [], retrying: false });
+    setDetailState({ key, details: new Map(), failedIds: [], retrying: false, error: null });
     Promise.all(
       summaries.map(async (summary) => {
         try {
           const detail = await dataProvider.getRecord(summary.id);
-          return { summary, detail, failed: false };
-        } catch {
+          return { summary, detail, failed: false, error: null };
+        } catch (error) {
           const detail: RecordDetail = { id: summary.id, type: summary.type, file: summary.file, record: {}, outgoingEdges: [], incomingEdges: [] };
-          return { summary, detail, failed: true };
+          return { summary, detail, failed: true, error: error instanceof DataLoadError ? error : null };
         }
       })
-    ).then((results: ({ summary: RecordSummary; detail: RecordDetail; failed: boolean })[]) => {
+    ).then((results) => {
       if (cancelled || generation.current !== currentGeneration) return;
+      const mismatch = results.find((result) => result.error?.kind === "version_mismatch");
+      if (mismatch?.error) {
+        setDetailState({ key, details: new Map(), failedIds: [], retrying: false, error: mismatch.error });
+        return;
+      }
       setDetailState({
         key,
         details: new Map(results.map(({ summary, detail }) => [summary.id, { summary, detail }])),
         failedIds: results.filter((result) => result.failed).map((result) => result.summary.id),
         retrying: false,
+        error: null,
       });
     });
     return () => {
@@ -260,17 +269,23 @@ export function Overview({
     setDetailState((current) => current?.key === datasetKey ? { ...current, retrying: true } : current);
     const summaries = indexState.status === "ready" ? indexState.records.filter((record) => ids.includes(record.id)) : [];
     const results = await Promise.all(summaries.map(async (summary) => {
-      try { return { summary, detail: await dataProvider.getRecord(summary.id), failed: false }; }
-      catch { return { summary, detail: { id: summary.id, type: summary.type, file: summary.file, record: {}, outgoingEdges: [], incomingEdges: [] } as RecordDetail, failed: true }; }
+      try { return { summary, detail: await dataProvider.getRecord(summary.id), failed: false, error: null }; }
+      catch (error) { return { summary, detail: { id: summary.id, type: summary.type, file: summary.file, record: {}, outgoingEdges: [], incomingEdges: [] } as RecordDetail, failed: true, error: error instanceof DataLoadError ? error : null }; }
     }));
     if (generation.current === currentGeneration) {
+      const mismatch = results.find((result) => result.error?.kind === "version_mismatch");
+      if (mismatch?.error) {
+        setDetailState({ key: datasetKey, details: new Map(), failedIds: [], retrying: false, error: mismatch.error });
+        retryLock.current = false;
+        return;
+      }
       setDetailState((current) => {
         if (!current || current.key !== datasetKey) return current;
         const details = new Map(current.details);
         for (const result of results) details.set(result.summary.id, { summary: result.summary, detail: result.detail });
         const failed = new Set(current.failedIds);
         for (const result of results) result.failed ? failed.add(result.summary.id) : failed.delete(result.summary.id);
-        return { key: current.key, details, failedIds: [...failed], retrying: false };
+        return { key: current.key, details, failedIds: [...failed], retrying: false, error: null };
       });
     }
     retryLock.current = false;
@@ -337,6 +352,11 @@ export function Overview({
   }
 
   if (overview === null) return null;
+
+  if (currentDetailState?.error) {
+    const recovery = dataLoadRecovery(currentDetailState.error, retryFailedDetails);
+    return <div className="shell-frame shell-frame--wide"><ErrorNotice titleAs="h2" title="A versão publicada mudou" message={recovery.message} action={recovery.action} /></div>;
+  }
 
   return (
     <OverviewPresentation

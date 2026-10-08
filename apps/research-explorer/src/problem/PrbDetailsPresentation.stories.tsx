@@ -26,6 +26,9 @@ import { PublicFooter } from "../app/TrustPage";
 import { ProgressMessage } from "../presentation/ProgressMessage";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import type { RecordSummary } from "../dataProvider/types";
+import { DataLoadError } from "../dataProvider/types";
+import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
+import { PrbDossierChunkRecovery } from "./PrbDossierAction";
 
 const meta = { title: "Public/PRB Details / PRB0005" } satisfies Meta;
 export default meta;
@@ -111,6 +114,39 @@ export const Compact360: Story = {
   name: "360 compact",
   globals: { viewport: { value: "reviewCompact" } },
   render: () => <PrbDetailsShell />,
+};
+
+function VersionMismatchReview() {
+  const recovery = dataLoadRecovery(new DataLoadError("", "version_mismatch"), noop);
+  return <><main className="explorer-shell"><ExplorerHeader activeView="problem" onProblemas={noop} onRegistos={noop} /><div className="shell-frame"><ErrorNotice titleAs="h2" title="Não foi possível carregar o Problema" message={recovery.message} action={recovery.action} /></div></main><PublicFooter /></>;
+}
+
+function DossierChunkRecoveryReview() {
+  return <><main className="explorer-shell"><ExplorerHeader activeView="problem" onProblemas={noop} onRegistos={noop} /><section className="prb-audit-section"><div className="prb-section-frame"><div className="prb-audit-row prb-audit-row--dossier"><div><h5>Dossiê canónico</h5><p>Representação de auditoria de PRB-0005: problema, questões, evidência, fontes e percurso num único documento.</p></div><div className="prb-dossier-action"><PrbDossierChunkRecovery /></div></div></div></section></main><PublicFooter /></>;
+}
+
+export const VersionMismatchRecovery1440: Story = {
+  name: "1440 deployment version mismatch recovery",
+  globals: { viewport: { value: "reviewDesktop" } },
+  render: () => <VersionMismatchReview />,
+};
+
+export const VersionMismatchRecovery360: Story = {
+  name: "360 deployment version mismatch recovery",
+  globals: { viewport: { value: "reviewCompact" } },
+  render: () => <VersionMismatchReview />,
+};
+
+export const DossierChunkRecovery1440: Story = {
+  name: "1440 PDF stale chunk recovery",
+  globals: { viewport: { value: "reviewDesktop" } },
+  render: () => <DossierChunkRecoveryReview />,
+};
+
+export const DossierChunkRecovery360: Story = {
+  name: "360 PDF stale chunk recovery",
+  globals: { viewport: { value: "reviewCompact" } },
+  render: () => <DossierChunkRecoveryReview />,
 };
 
 /** Opens the audit evidence drawer through its real trigger, as a reader would. */

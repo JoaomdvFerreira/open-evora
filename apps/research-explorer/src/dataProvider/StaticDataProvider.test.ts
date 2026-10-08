@@ -17,6 +17,16 @@ const VALID_INDEX = [
   { id: "WID-0001", type: "WID-", label: "WID-0001", file: "research/widgets/WID-0001.yaml", summaryFields: {} },
 ];
 
+const VALID_DETAIL = {
+  corpusFingerprint: VALID_MANIFEST.corpusFingerprint,
+  id: "WID-0001",
+  type: "WID-",
+  file: "research/widgets/WID-0001.yaml",
+  record: { widget_id: "WID-0001", problem: "PRB-0005" },
+  outgoingEdges: [{ field: "problem", ordinal: null, to: "PRB-0005" }],
+  incomingEdges: [],
+};
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 }
@@ -138,6 +148,7 @@ describe("StaticDataProvider.getRecord — record-ID safety", () => {
   });
 
   it("rejects a well-formed but unknown ID without fetching its record-detail asset", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_MANIFEST));
     fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX));
     const provider = new StaticDataProvider();
     await expect(provider.getRecord("PRB-9999")).rejects.toMatchObject({ kind: "not_found" });
@@ -146,28 +157,45 @@ describe("StaticDataProvider.getRecord — record-ID safety", () => {
   });
 
   it("resolves a future generic record type (WID-) present in the index", async () => {
-    const detail = {
-      id: "WID-0001",
-      type: "WID-",
-      file: "research/widgets/WID-0001.yaml",
-      record: { widget_id: "WID-0001", problem: "PRB-0005" },
-      outgoingEdges: [{ field: "problem", ordinal: null, to: "PRB-0005" }],
-      incomingEdges: [],
-    };
-    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX)); // listRecords()
-    fetchMock.mockResolvedValueOnce(jsonResponse(detail)); // record-detail
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_MANIFEST));
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX));
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_DETAIL));
 
     const provider = new StaticDataProvider();
     const result = await provider.getRecord("WID-0001");
     expect(result.id).toBe("WID-0001");
     expect(result.outgoingEdges[0].to).toBe("PRB-0005");
 
-    const lastUrl = String(fetchMock.mock.calls[1][0]);
+    const lastUrl = String(fetchMock.mock.calls[2][0]);
     expect(lastUrl.endsWith("record-detail/WID-0001.json")).toBe(true);
   });
 
+  it("returns a detail only when its generated corpus identity matches the session manifest", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_MANIFEST));
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX));
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_DETAIL));
+    await expect(new StaticDataProvider().getRecord("WID-0001")).resolves.toMatchObject({ corpusFingerprint: "abc123" });
+
+    fetchMock.mockReset();
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_MANIFEST));
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX));
+    fetchMock.mockResolvedValueOnce(jsonResponse({ ...VALID_DETAIL, corpusFingerprint: "new-corpus" }));
+    await expect(new StaticDataProvider().getRecord("WID-0001")).rejects.toMatchObject({ kind: "version_mismatch" });
+  });
+
+  it("allows a transient detail fetch failure to be retried", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_MANIFEST));
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX));
+    fetchMock.mockRejectedValueOnce(new TypeError("offline"));
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_DETAIL));
+    const provider = new StaticDataProvider();
+    await expect(provider.getRecord("WID-0001")).rejects.toMatchObject({ kind: "network" });
+    await expect(provider.getRecord("WID-0001")).resolves.toMatchObject({ id: "WID-0001" });
+  });
+
   it("rejects a malformed (invalid JSON) record-detail response with an actionable error", async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX)); // listRecords()
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_MANIFEST));
+    fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX));
     fetchMock.mockResolvedValueOnce(new Response("not valid json {{{", { status: 200 })); // record-detail
 
     const provider = new StaticDataProvider();
@@ -179,9 +207,18 @@ it("rejects fetchable index and detail entries that lack the fields consumers de
   fetchMock.mockResolvedValueOnce(jsonResponse([{ id: "PRB-0005" }]));
   await expect(new StaticDataProvider().listRecords()).rejects.toMatchObject({ kind: "malformed" });
 
+  fetchMock.mockResolvedValueOnce(jsonResponse(VALID_MANIFEST));
   fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX));
-  fetchMock.mockResolvedValueOnce(jsonResponse({ id: "PRB-0005", type: "PRB-", file: "research/problems/PRB-0005.yaml", record: {}, outgoingEdges: [], incomingEdges: [{}] }));
+  fetchMock.mockResolvedValueOnce(jsonResponse({ id: "PRB-0005", corpusFingerprint: "abc123", type: "PRB-", file: "research/problems/PRB-0005.yaml", record: {}, outgoingEdges: [], incomingEdges: [{}] }));
   await expect(new StaticDataProvider().getRecord("PRB-0005")).rejects.toMatchObject({ kind: "malformed" });
+
+  fetchMock.mockReset();
+  fetchMock.mockResolvedValueOnce(jsonResponse(VALID_MANIFEST));
+  fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX));
+  const { corpusFingerprint: omittedFingerprint, ...detailWithoutFingerprint } = VALID_DETAIL;
+  void omittedFingerprint;
+  fetchMock.mockResolvedValueOnce(jsonResponse(detailWithoutFingerprint));
+  await expect(new StaticDataProvider().getRecord("WID-0001")).rejects.toMatchObject({ kind: "malformed" });
 });
 
 const VALID_EDGES = [

@@ -6,6 +6,7 @@ import { describeTopic } from "../presentation/topicMapping";
 import { Breadcrumb } from "../presentation/Breadcrumb";
 import { RelationSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
+import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
 import { EmptyState } from "../presentation/EmptyState";
 import { ShareAction } from "../problem/ShareAction";
 import { useToast } from "../presentation/Toast";
@@ -222,12 +223,13 @@ function usesNote(state: ProblemUsesState): string | null {
 }
 
 function EvdUses({ state, onViewAsProblem }: { state: ProblemUsesState; onViewAsProblem: (id: string) => void }) {
+  const recovery = state.status === "error" ? dataLoadRecovery(state.error, state.retry) : null;
   return (
     <EvdSection id="evd-investigation" label="Como é usada" note={usesNote(state)}>
       {state.status === "loading" || state.status === "idle" ? (
         <RelationSkeleton message="A carregar usos nos Problemas…" />
       ) : state.status === "error" ? (
-        <ErrorNotice title="Não foi possível carregar os usos desta evidência nos Problemas." message="" action={<button type="button" onClick={state.retry}>Tentar novamente</button>} />
+        <ErrorNotice title="Não foi possível carregar os usos desta evidência nos Problemas." message={state.error.kind === "version_mismatch" ? recovery!.message : ""} action={recovery!.action} />
       ) : state.uses.length === 0 ? (
         <EmptyState message="Esta evidência ainda não está ligada explicitamente a um Problema." />
       ) : (

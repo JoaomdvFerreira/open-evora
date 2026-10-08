@@ -102,6 +102,10 @@ function verifyGeneratedOutput(tmpDir, readModel, repoRoot) {
     if (!fs.existsSync(detailPath)) {
       throw new Error(`Generated-data integrity check failed: missing record-detail file for "${node.id}".`);
     }
+    const detail = JSON.parse(fs.readFileSync(detailPath, "utf8"));
+    if (detail.corpusFingerprint !== manifest.corpusFingerprint) {
+      throw new Error(`Generated-data integrity check failed: record-detail file for "${node.id}" has a different corpus fingerprint.`);
+    }
   }
 
   for (const detail of readModel.recordDetails.filter(publishesCanonicalFile)) {

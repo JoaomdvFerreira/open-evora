@@ -1287,6 +1287,30 @@ describe("Overview — Lisbon civil-date-boundary hardening", () => {
 });
 
 describe("Overview — error state retry (ODM-021)", () => {
+  it("fails closed and offers reload when a PRB detail belongs to a newer published corpus", async () => {
+    const originalLocation = window.location;
+    const reload = vi.fn();
+    Object.defineProperty(window, "location", { configurable: true, value: { ...window.location, reload } });
+    try {
+      const provider: DataProvider = {
+        getManifest: async () => { throw new Error("unused"); },
+        listRecords: async () => [{ id: "PRB-9", type: "PRB-", label: "Problema versionado", file: "", summaryFields: {} }],
+        getEdges: async () => [],
+        getRecord: async () => { throw new DataLoadError("Os dados publicados foram atualizados.", "version_mismatch"); },
+      };
+      render(<OverviewFixture dataProvider={provider} {...props} />);
+
+      const alert = await screen.findByRole("alert");
+      expect(alert.textContent).toContain("Recarregue a página antes de continuar.");
+      expect(screen.queryByText("Dados parciais")).toBeNull();
+      expect(screen.queryByText("Problema versionado")).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "Recarregar página" }));
+      expect(reload).toHaveBeenCalledTimes(1);
+    } finally {
+      Object.defineProperty(window, "location", { configurable: true, value: originalLocation });
+    }
+  });
+
   it("retries a failed listRecords load and recovers", async () => {
     let attempts = 0;
     const provider: DataProvider = {

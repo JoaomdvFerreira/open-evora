@@ -783,6 +783,13 @@ body:has(.prb-details-view) .public-footer {
   padding-top: 2px;
 }
 
+.prb-dossier-action {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-standard);
+  min-width: 0;
+}
+
 .prb-audit-row--first {
   border-top: 1px solid var(--color-ink-primary);
 }

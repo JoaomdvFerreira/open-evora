@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { ToastProvider } from "../presentation/Toast";
-import { PrbDossierAction, prbDossierFileName } from "./PrbDossierAction";
+import { isDeploymentChunkLoadError, PrbDossierAction, prbDossierFileName } from "./PrbDossierAction";
 import { buildPrbDossierData, type PrbDossierData } from "./prbDossierProjection";
 
 const generate = vi.hoisted(() => vi.fn<(dossier: PrbDossierData, generation: { generatedAt: string; sourceCommit: string | null; corpusFingerprint: string }) => Promise<Blob>>());
@@ -42,6 +42,7 @@ describe("PRB dossier PDF download action", () => {
   let createObjectURL: ReturnType<typeof vi.fn>;
   let clicked: { href: string; download: string }[];
   const startUrl = window.location.href;
+  const originalLocation = window.location;
 
   beforeEach(() => {
     generate.mockReset();
@@ -58,6 +59,7 @@ describe("PRB dossier PDF download action", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    Object.defineProperty(window, "location", { configurable: true, value: originalLocation });
     vi.useRealTimers();
   });
 
@@ -127,6 +129,39 @@ describe("PRB dossier PDF download action", () => {
     expect(screen.queryByText("Dossiê PDF preparado.")).toBeNull();
     expect(button().getAttribute("aria-busy")).toBeNull();
     expect(window.location.href).toBe(startUrl);
+  });
+
+  it.each([
+    "Failed to fetch dynamically imported module: https://example.test/assets/prbDossierWorkerClient-a1b2.js",
+    "error loading dynamically imported module: https://example.test/assets/prbDossierWorkerClient-a1b2.js",
+    "Importing a module script failed.",
+    "Unable to preload CSS for /assets/prbDossierWorkerClient-a1b2.css",
+  ])("shows explicit reload recovery for a supported Vite module-load failure: %s", async (message) => {
+    expect(isDeploymentChunkLoadError(new TypeError(message))).toBe(true);
+    generate.mockRejectedValue(new TypeError(message));
+    renderAction();
+
+    fireEvent.click(button());
+    expect(await screen.findByText("Esta página publicada pode estar desatualizada")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Recarregar página" })).toBeTruthy();
+    expect(button()).toHaveProperty("disabled", true);
+    expect(screen.queryByText("Não foi possível gerar o dossiê PDF.")).toBeNull();
+    expect(screen.queryByText("Dossiê PDF preparado.")).toBeNull();
+  });
+
+  it("reloads only after explicit activation of the stale chunk recovery action", async () => {
+    const reload = vi.fn();
+    Object.defineProperty(window, "location", { configurable: true, value: { ...window.location, reload } });
+    generate.mockRejectedValue(new TypeError("Failed to fetch dynamically imported module: /assets/pdf-old.js"));
+    renderAction();
+    fireEvent.click(button());
+    fireEvent.click(await screen.findByRole("button", { name: "Recarregar página" }));
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not classify unrelated renderer failures as deployment chunk loss", () => {
+    expect(isDeploymentChunkLoadError(new Error("PDF worker failed"))).toBe(false);
+    expect(isDeploymentChunkLoadError("Failed to fetch dynamically imported module")).toBe(false);
   });
 
   it("does not eagerly import the PDF renderer from the action module", async () => {
