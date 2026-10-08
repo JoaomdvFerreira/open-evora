@@ -183,3 +183,7 @@ Before handing work back:
 - report failures and blockers accurately.
 
 Do not claim validation that was not performed.
+
+### Direct canonical research changes
+
+An agent directly modifying canonical PRB/EVD/SRC record files (outside an orchestrated research cycle) must run the Lane B independent semantic review (`npm run research:lane-b:prepare -- --base <base>`) before committing or pushing that material, and must use the generated receipt in the PR's `Research semantic review` section. The policy is owned by `docs/investigationstrategy.md` §12.

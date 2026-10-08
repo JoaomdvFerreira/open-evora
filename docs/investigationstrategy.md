@@ -361,8 +361,8 @@ The dimensions apply to all three record types; each type carries a strictest em
 Every canonical research text change requires independent semantic review before human approval, without exception.
 
 This applies to both research lanes:
-- orchestrated research changes;
-- direct pull-request changes to canonical research.
+- orchestrated research changes (Lane A);
+- direct pull-request changes to canonical research (Lane B).
 
 The orchestration may differ between the lanes; the quality gate must not.
 
@@ -380,25 +380,31 @@ Implemented in advisory/report mode:
 
 These signals are review prompts, not automatic violations; each still requires semantic disposition in review (see *Signals and human judgement*). The tooling does not rewrite canonical text, and signal presence does not fail validation or CI.
 
-Implemented for the orchestrated independent reviewer only:
+Implemented for the independent reviewer in both lanes:
 - structured semantic findings (CLEC violations and evidence gaps) quoting the authored text;
-- a structured disposition for every deterministic signal affecting the candidate records.
+- a structured disposition for every deterministic signal affecting the changed records.
 
-The orchestration rejects a structurally incomplete or inconsistent review result; it does not decide whether wording is supported.
+The tooling rejects a structurally incomplete or inconsistent review result; it does not decide whether wording is supported.
 
-Implemented at Human Gate 1 for orchestrated changes:
+Implemented at Human Gate 1 for orchestrated changes (Lane A):
 - the Gate presents the structured CLEC findings and every signal with its disposition;
 - that review material, with its bounded evidence context, is part of the hash-bound Gate package;
 - canonical APPROVE is unavailable while the independent semantic review outcome is not `CONCUR`; correction requires a new candidate, review and package.
 
-Once a package is eligible for approval, the canonical and publication decisions remain human judgement.
+Implemented for direct pull-request changes (Lane B):
+- canonical changed-record detection from Git: every created or updated canonical SRC, EVD or PRB record file enters the review unit, whichever of its fields changed; deleting or renaming a canonical record is not supported on this path and fails;
+- independent semantic review of the changed records by a separate reviewer invocation, against the same bounded evidence context and structured result contract as Lane A;
+- binding of that review to the exact base commit, the exact changed record content and the exact reviewer input;
+- a machine-generated receipt carrying the review in the pull-request body;
+- CI rebuilds the review input from Git and fails the pull request when the receipt is missing, stale or structurally or contextually invalid, or the review outcome is not `CONCUR`.
+
+The no-exception independent semantic-review rule is therefore technically enforced for both lanes. A `CONCUR` review makes a change eligible for human review; it is not an approval. Once a change is eligible, the canonical and publication decisions remain human judgement.
 
 Not yet implemented:
-- technical enforcement for direct pull-request changes (Lane B);
-- CI or blocking validation based on CLEC signals;
+- deterministic or blocking policy based directly on approved context-free signal classes;
 - automatic semantic decisions from lexical signals.
 
-The no-exception review requirement is therefore not yet technically enforced for every lane. Nothing in this section should be read as describing an implemented blocking CLEC validator or CI check.
+Advisory signal presence does not itself fail validation or CI; only a missing, invalid or non-`CONCUR` independent review does.
 
 Boundaries of initial enforcement:
 - Explorer-generated copy is outside initial CLEC enforcement; the global evidence-integrity safeguard in `AGENTS.md` still applies to it.

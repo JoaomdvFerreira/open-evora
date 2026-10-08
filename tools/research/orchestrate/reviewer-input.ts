@@ -28,9 +28,16 @@ import type { ValidationResult } from "../validation/validate.ts";
 import { canonicalJsonStringify } from "./fingerprint.ts";
 import type { GenerationManifest } from "./types.ts";
 
+/**
+ * The review framing a package carries: an orchestrated cycle's manifest
+ * (Lane A), or a fixed, author-independent framing for a direct
+ * pull-request change (Lane B). Only these fields are ever read.
+ */
+export type ReviewFraming = Pick<GenerationManifest, "investigationQuestion" | "targetProblemId"> & { mode: string };
+
 export interface ReviewerInputSource {
   baseGitSha: string;
-  manifest: GenerationManifest;
+  manifest: GenerationManifest | ReviewFraming;
   /** The canonical index the candidates are overlaid onto. */
   index: CorpusIndex;
   /** Candidate records in the same order as `deltas` (CanonicalIntegrationReview order). */
