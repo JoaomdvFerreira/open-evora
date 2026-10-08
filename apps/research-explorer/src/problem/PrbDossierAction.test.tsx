@@ -4,7 +4,7 @@ import { ToastProvider } from "../presentation/Toast";
 import { PrbDossierAction, prbDossierFileName } from "./PrbDossierAction";
 import { buildPrbDossierData, type PrbDossierData } from "./prbDossierProjection";
 
-const generate = vi.hoisted(() => vi.fn<(dossier: PrbDossierData, generatedAt: string) => Promise<Blob>>());
+const generate = vi.hoisted(() => vi.fn<(dossier: PrbDossierData, generation: { generatedAt: string; sourceCommit: string | null; corpusFingerprint: string }) => Promise<Blob>>());
 const rendererImported = vi.hoisted(() => vi.fn());
 vi.mock("./pdf/prbDossierWorkerClient", () => ({ generateDossierInWorker: generate }));
 vi.mock("./pdf/generatePrbDossierPdf", () => {
@@ -16,6 +16,7 @@ const dossier = buildPrbDossierData({
   problem: { id: "PRB-9999", type: "PRB-", file: "", record: { title: "Problema sintético" }, outgoingEdges: [], incomingEdges: [] },
   evidence: [],
 });
+const identity = { sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" };
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -30,7 +31,7 @@ function deferred<T>() {
 function renderAction(data: PrbDossierData | null = dossier) {
   return render(
     <ToastProvider>
-      <PrbDossierAction dossier={data} />
+      <PrbDossierAction dossier={data} identity={data ? identity : null} />
     </ToastProvider>,
   );
 }
@@ -79,7 +80,7 @@ describe("PRB dossier PDF download action", () => {
     fireEvent.click(button());
     await vi.waitFor(() => expect(generate).toHaveBeenCalledTimes(1));
     expect(generate.mock.calls[0][0]).toBe(dossier);
-    expect(generate.mock.calls[0][1]).toBe("2026-10-08T10:11:12.000Z");
+    expect(generate.mock.calls[0][1]).toEqual({ generatedAt: "2026-10-08T10:11:12.000Z", ...identity });
     expect(screen.queryByText("Dossiê PDF preparado.")).toBeNull();
 
     const blob = new Blob(["%PDF-1.3"], { type: "application/pdf" });

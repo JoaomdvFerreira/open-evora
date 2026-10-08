@@ -192,6 +192,7 @@ describe("buildPrbDossierData — determinism and serialisation", () => {
     expect(first.projectionVersion).toBe(PRB_DOSSIER_PROJECTION_VERSION);
     expect(first.projectionVersion).toBe(1);
     expect(JSON.stringify(first)).not.toMatch(/generat/i);
+    expect(JSON.stringify(first)).not.toMatch(/sourceCommit|corpusFingerprint/);
   });
 
   it("survives a JSON round trip unchanged and contains only plain JSON values, never undefined", () => {

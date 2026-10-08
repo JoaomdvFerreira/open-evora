@@ -27,6 +27,7 @@ interface ProblemContentProps {
   onBackToOverview: () => void;
   onViewHistory: (id: string) => void;
   initialFragmentConsideredRef: MutableRefObject<boolean>;
+  dossierIdentity: { sourceCommit: string | null; corpusFingerprint: string };
 }
 
 /**
@@ -40,7 +41,7 @@ interface ProblemContentProps {
  * `loading`) is what the newly selected PRB shows while resolving — never the
  * previous PRB's stale `ready` projection.
  */
-function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToOverview, onViewHistory, initialFragmentConsideredRef }: ProblemContentProps) {
+function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBackToOverview, onViewHistory, initialFragmentConsideredRef, dossierIdentity }: ProblemContentProps) {
   const state = useProblemProjection(dataProvider, lookup, problemId);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -105,6 +106,7 @@ function ProblemContent({ dataProvider, lookup, problemId, onOpenGeneric, onBack
     <PrbDetailsPresentation
       data={buildPrbDetailsData(state.projection)}
       dossier={buildPrbDossierData(state.projection)}
+      dossierIdentity={dossierIdentity}
       onOpenGeneric={onOpenGeneric}
       onBackToOverview={onBackToOverview}
       onViewHistory={onViewHistory}
@@ -121,6 +123,8 @@ interface ProblemViewProps {
   /** UX-D §2: the Problem breadcrumb's own first action — Problem View reads as "Visão geral › PRB-*", not a child of Records. */
   onBackToOverview: () => void;
   onViewHistory: (id: string) => void;
+  sourceCommit?: string | null;
+  corpusFingerprint?: string;
 }
 
 /**
@@ -133,7 +137,7 @@ interface ProblemViewProps {
  * record reached from here (evidence, source) still opens through the same
  * generic detail renderer via onOpenGeneric.
  */
-export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewHistory }: ProblemViewProps) {
+export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRecords, onBackToOverview, onViewHistory, sourceCommit = null, corpusFingerprint = "" }: ProblemViewProps) {
   const indexState = useRecordIndex(dataProvider);
   // F07/F16: owned here, not inside `ProblemContent`, because that component
   // is now keyed by `problemId` (F16) and remounts fresh on every PRB
@@ -206,6 +210,7 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
       onBackToOverview={onBackToOverview}
       onViewHistory={onViewHistory}
       initialFragmentConsideredRef={initialFragmentConsideredRef}
+      dossierIdentity={{ sourceCommit, corpusFingerprint }}
     />
   );
 }

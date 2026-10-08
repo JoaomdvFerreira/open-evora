@@ -181,7 +181,7 @@ function field(fields: DossierField[], label: string): DossierField | undefined 
   return fields.find((entry) => entry.label === label);
 }
 
-const rich = () => buildDossierDocumentModel(richDossier(), { generatedAt: GENERATED_AT });
+const rich = () => buildDossierDocumentModel(richDossier(), { generatedAt: GENERATED_AT, sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" });
 
 describe("PDF dossier document model", () => {
   it("presents PRB identity on the cover and in the PDF metadata", () => {
@@ -313,12 +313,12 @@ describe("PDF dossier document model", () => {
 
   it("presents a canonical URL as a concise external action that links to the exact reference, without printing the URL", () => {
     const dossier = richDossier();
-    const { sources } = buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT });
+    const { sources } = buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT, sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" });
     for (const item of sources!.items) {
       const canonical = dossier.sources.find((entry) => entry.id === item.id)!.canonicalReference;
       expect(field(item.facts, "Referência original")).toEqual({ label: "Referência original", href: canonical, linkText: "Abrir fonte original ↗" });
     }
-    const visible = JSON.stringify(buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT }), (key, value: unknown) => (key === "href" ? undefined : value));
+    const visible = JSON.stringify(buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT, sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" }), (key, value: unknown) => (key === "href" ? undefined : value));
     expect(visible).not.toMatch(/https?:\/\//);
   });
 
@@ -326,7 +326,7 @@ describe("PDF dossier document model", () => {
     const dossier = richDossier();
     dossier.sources[0] = { ...dossier.sources[0], canonicalReference: "Arquivo municipal, caixa 12" };
     dossier.sources[1] = { ...dossier.sources[1], canonicalReference: null };
-    const [nonUrl, absent] = buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT }).sources!.items;
+    const [nonUrl, absent] = buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT, sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" }).sources!.items;
     expect(field(nonUrl.facts, "Referência original")).toEqual({ label: "Referência original", text: "Arquivo municipal, caixa 12" });
     expect(field(absent.facts, "Referência original")).toBeUndefined();
     expect([...nonUrl.facts, ...absent.facts].some((entry) => entry.href || entry.linkText)).toBe(false);
@@ -377,10 +377,18 @@ describe("PDF dossier document model", () => {
       "Questões em aberto": "2",
     });
     expect(field(audit.fields, "Documento gerado em")?.text).toContain("2026");
+    expect(field(audit.fields, "Commit de origem")).toMatchObject({ text: "full-source-commit", mono: true });
+    expect(field(audit.fields, "Impressão digital do corpus")).toMatchObject({ text: "full-corpus-fingerprint", mono: true });
+  });
+
+  it("omits a missing source commit while preserving the complete corpus fingerprint", () => {
+    const { audit } = buildDossierDocumentModel(richDossier(), { generatedAt: GENERATED_AT, sourceCommit: null, corpusFingerprint: "fingerprint-without-truncation" });
+    expect(field(audit.fields, "Commit de origem")).toBeUndefined();
+    expect(field(audit.fields, "Impressão digital do corpus")).toMatchObject({ text: "fingerprint-without-truncation", mono: true });
   });
 
   it("omits unavailable sections and fields cleanly for a sparse dossier, with no placeholder research content", () => {
-    const model = buildDossierDocumentModel(sparseDossier(), { generatedAt: GENERATED_AT });
+    const model = buildDossierDocumentModel(sparseDossier(), { generatedAt: GENERATED_AT, sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" });
     expect(model.contents.map((entry) => entry.title)).toEqual(["Síntese", "Auditoria"]);
     expect([model.openQuestions, model.path, model.evidence, model.sources, model.decisionBasis, model.history]).toEqual([null, null, null, null, null, null]);
     expect(model.summary.states).toEqual([{ label: "Estado", value: "Aberto" }]);
@@ -392,12 +400,12 @@ describe("PDF dossier document model", () => {
   });
 
   it("is a pure function of the dossier and generation time — the timestamp never reorders or alters research content", () => {
-    const later = buildDossierDocumentModel(richDossier(), { generatedAt: new Date("2027-01-01T00:00:00Z") });
-    const strip = (model: DossierDocumentModel) => ({ ...model, metadata: { ...model.metadata, creationDate: null }, audit: { ...model.audit, fields: model.audit.fields.filter((entry) => entry.label !== "Documento gerado em") } });
+    const later = buildDossierDocumentModel(richDossier(), { generatedAt: new Date("2027-01-01T00:00:00Z"), sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" });
+    const strip = (model: DossierDocumentModel) => ({ ...model, metadata: { ...model.metadata, creationDate: null }, audit: { ...model.audit, fields: model.audit.fields.filter((entry) => !["Documento gerado em", "Commit de origem", "Impressão digital do corpus"].includes(entry.label)) } });
     expect(strip(later)).toEqual(strip(rich()));
     const dossier = richDossier();
     const before = structuredClone(dossier);
-    buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT });
+    buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT, sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" });
     expect(dossier).toEqual(before);
   });
 
@@ -431,7 +439,7 @@ describe("PDF dossier production copy", () => {
   it("leaves canonical research content untouched even when it contains a guarded word", () => {
     const dossier = richDossier();
     dossier.problem.causalReading = "O protótipo municipal de 2025 foi descontinuado.";
-    expect(buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT }).summary.causalReading?.paragraphs).toEqual(["O protótipo municipal de 2025 foi descontinuado."]);
+    expect(buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT, sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" }).summary.causalReading?.paragraphs).toEqual(["O protótipo municipal de 2025 foi descontinuado."]);
   });
 });
 
@@ -450,7 +458,7 @@ describe("PDF dossier data boundary", () => {
   it("renders the complete real PRB-0005 dossier projection", async () => {
     const lookup = new Map((await prb0005DataProvider.listRecords()).map((summary) => [summary.id, summary]));
     const dossier = buildPrbDossierData(await loadProblemProjection(prb0005DataProvider, lookup, "PRB-0005"));
-    const model = buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT });
+    const model = buildDossierDocumentModel(dossier, { generatedAt: GENERATED_AT, sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" });
     expect(model.evidence?.items).toHaveLength(dossier.counts.evidenceRecordCount);
     expect(model.sources?.items).toHaveLength(dossier.counts.distinctSourceCount);
     expect(model.evidence?.items.map((item) => item.id)).toEqual(dossier.evidence.map((item) => item.id));

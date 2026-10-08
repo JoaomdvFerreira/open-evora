@@ -1,8 +1,12 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
 import { DataLoadError, type DataProvider, type ReadModelManifest } from "../dataProvider/types";
+import { prb0005DataProvider } from "../problem/prb0005Fixture";
+
+const generateDossierInWorker = vi.hoisted(() => vi.fn());
+vi.mock("../problem/pdf/prbDossierWorkerClient", () => ({ generateDossierInWorker }));
 
 const manifest: ReadModelManifest = {
   readModelVersion: "1.0.0",
@@ -38,6 +42,22 @@ it("retries a failed startup manifest load", async () => {
   // landing, the PRB views and EVD/SRC Record Detail each end on their own terminal band).
   expect(await screen.findByText(/Corpus: 0/)).toBeTruthy();
   expect(attempts).toBe(2);
+});
+
+it("uses the startup manifest identity for the PRB dossier without fetching it again", async () => {
+  generateDossierInWorker.mockRejectedValue(new Error("worker unavailable in test"));
+  const getManifest = vi.fn(async () => ({ ...manifest, sourceCommit: "full-startup-commit", corpusFingerprint: "full-startup-fingerprint" }));
+  const provider: DataProvider = { ...prb0005DataProvider, getManifest };
+  window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
+  render(<App dataProvider={provider} />);
+
+  const button = await screen.findByRole("button", { name: /Descarregar dossiê \(PDF\)/ });
+  expect(button).toHaveProperty("disabled", false);
+  expect(getManifest).toHaveBeenCalledTimes(1);
+  await userEvent.click(button);
+  await vi.waitFor(() => expect(generateDossierInWorker).toHaveBeenCalledTimes(1));
+  expect(generateDossierInWorker.mock.calls[0][1]).toMatchObject({ sourceCommit: "full-startup-commit", corpusFingerprint: "full-startup-fingerprint" });
+  expect(getManifest).toHaveBeenCalledTimes(1);
 });
 
 // F06 regression: the skip link must bypass ExplorerHeader's global

@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { useToast } from "../presentation/Toast";
 import type { PrbDossierData } from "./prbDossierProjection";
+import type { DossierPublicationIdentity } from "./PrbDetailsPresentation";
+import type { DossierGenerationMetadata } from "./pdf/dossierPresentation";
 
 export function prbDossierFileName(problemId: string): string {
   return `open-evora-${problemId}-dossie.pdf`;
@@ -32,20 +34,24 @@ function saveBlob(blob: Blob, fileName: string): void {
  * the rest of the page stays usable and nothing navigates. Success is only
  * announced after a Blob exists and its download has been triggered.
  */
-export function PrbDossierAction({ dossier }: { dossier: PrbDossierData | null }) {
+export function PrbDossierAction({ dossier, identity }: { dossier: PrbDossierData | null; identity: DossierPublicationIdentity | null }) {
   const { notify } = useToast();
   const [busy, setBusy] = useState(false);
   const running = useRef(false);
-  const available = dossier !== null;
+  const available = dossier !== null && identity !== null && identity.corpusFingerprint.length > 0;
 
   async function download() {
-    if (!dossier || running.current) return;
+    if (!dossier || !identity || !identity.corpusFingerprint || running.current) return;
     running.current = true;
     setBusy(true);
     try {
-      const generatedAt = new Date().toISOString();
+      const generation: Omit<DossierGenerationMetadata, "generatedAt"> & { generatedAt: string } = {
+        generatedAt: new Date().toISOString(),
+        sourceCommit: identity.sourceCommit,
+        corpusFingerprint: identity.corpusFingerprint,
+      };
       const { generateDossierInWorker } = await import("./pdf/prbDossierWorkerClient");
-      const blob = await generateDossierInWorker(dossier, generatedAt);
+      const blob = await generateDossierInWorker(dossier, generation);
       saveBlob(blob, prbDossierFileName(dossier.problem.id));
       notify("Dossiê PDF preparado.", "affirmed");
     } catch {
