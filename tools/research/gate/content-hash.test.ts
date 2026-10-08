@@ -50,7 +50,7 @@ test("derivePackageIdentity exposes packageId/schemaVersion/baseGitSha/contentHa
     const pkg = syntheticHumanGatePackage(index, fixture.head());
     const identity = derivePackageIdentity(pkg);
     assert.equal(identity.packageId, pkg.packageId);
-    assert.equal(identity.schemaVersion, "1");
+    assert.equal(identity.schemaVersion, "2");
     assert.equal(identity.baseGitSha, pkg.baseGitSha);
     assert.equal(identity.contentHash, computeContentHash(pkg));
   } finally {

@@ -12,10 +12,12 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { loadCorpusIndex } from "../core/corpus.ts";
-import type { CorpusIndex } from "../core/types.ts";
+import type { CorpusIndex, ParsedRecord, RecordFields, RecordSchema } from "../core/types.ts";
+import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
-import type { GenerationManifest, IndependentReviewResult, ResearchChangeSet } from "../orchestrate/types.ts";
+import type { GenerationManifest, IndependentReviewResult, ResearchChangeSet, ReviewFinding, SignalDisposition } from "../orchestrate/types.ts";
 import { sha256Hex } from "../orchestrate/fingerprint.ts";
+import { buildReviewerInputPackage, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
 import { buildHumanGatePackage } from "./package-builder.ts";
 import type { HumanGatePackage } from "./types.ts";
 
@@ -204,6 +206,8 @@ export interface SyntheticRcsOverrides {
   manifest?: Partial<GenerationManifest>;
   independentReview?: Partial<IndependentReviewResult>;
   validation?: ResearchChangeSet["validation"];
+  /** Replaces the single SRC- CREATE candidate/delta; the integration plan is then null. */
+  records?: { candidates: CandidateRecord[]; deltas: CandidateDelta[] };
 }
 
 export function syntheticResearchChangeSet(
@@ -219,19 +223,21 @@ export function syntheticResearchChangeSet(
     deltas: [delta],
     operations: [{ recordFamily: "SRC-", id, action: "CREATE", targetFile: `sources/${id}.yaml`, yaml: sourceYaml(id, "Created") }],
   };
-  const m = manifest({ claimedRecordIds: [id], candidateFiles: [`${id}.yaml`], ...overrides.manifest });
+  const records = overrides.records ?? { candidates: [candidate], deltas: [delta] };
+  const ids = records.deltas.map((d) => d.id);
+  const m = manifest({ claimedRecordIds: ids, candidateFiles: ids.map((i) => `${i}.yaml`), ...overrides.manifest });
   const ir = independentReview(overrides.independentReview);
 
   const core = {
     schemaVersion: "1" as const,
     baseGitSha,
     manifest: m,
-    candidates: [candidate],
-    deltas: [delta],
+    candidates: records.candidates,
+    deltas: records.deltas,
     validation: overrides.validation ?? { errors: [], totalRecords: index.totalRecords },
     readiness: "READY_FOR_INTEGRATION_GATE" as const,
     independentReview: ir,
-    integrationPlan: plan,
+    integrationPlan: overrides.records ? null : plan,
     safetyAdmission: { disposition: "ELIGIBLE" as const, findings: [], evaluatedAt: "2026-09-15T12:00:00.000Z" },
   };
   const fingerprint = sha256Hex({
@@ -260,4 +266,152 @@ export function syntheticHumanGatePackage(index: CorpusIndex, baseGitSha: string
 
 export function loadIndexFor(researchRoot: string): CorpusIndex {
   return loadCorpusIndex(resolve(researchRoot));
+}
+
+// ---------------------------------------------------------------------------
+// Semantic-review scenario: an in-memory canonical corpus with a PRB -> EVD ->
+// SRC evidence chain, unrelated records, and candidates (an EVD- replacement
+// and a new PRB-) whose wording produces deterministic CLEC signals.
+// ---------------------------------------------------------------------------
+
+const SEMANTIC_SCHEMAS: Record<string, RecordSchema> = {
+  "SRC-": { prefix: "SRC-", directory: "sources", idField: "source_id" },
+  "EVD-": {
+    prefix: "EVD-",
+    directory: "evidence",
+    idField: "evidence_id",
+    references: [{ field: "provenance.sources", isList: true, targetPrefix: "SRC-", targetDirectory: "sources", required: true }],
+  },
+  "PRB-": {
+    prefix: "PRB-",
+    directory: "problems",
+    idField: "problem_id",
+    references: [
+      { field: "evidence", isList: true, itemField: "evidence_id", targetPrefix: "EVD-", targetDirectory: "evidence" },
+      { field: "decision_basis.overlap_check.related_problems", isList: true, targetPrefix: "PRB-", targetDirectory: "problems" },
+    ],
+  },
+};
+
+function semanticFamily(prefix: string, records: RecordFields[]) {
+  const schema = SEMANTIC_SCHEMAS[prefix];
+  const parsed: ParsedRecord[] = records.map((fields) => ({ file: `${schema.directory}/${fields[schema.idField]}.yaml`, fields }));
+  return { schema, records: parsed, byId: new Map(parsed.map((r) => [r.fields[schema.idField] as string, r])) };
+}
+
+function semanticEvidence(id: string, sources: string[], summary: string): RecordFields {
+  return { evidence_id: id, provenance: { sources }, observation: { summary }, evidence_nature: "measurement", inference_limits: [] };
+}
+
+export function semanticReviewCorpus(): CorpusIndex {
+  const byPrefix = new Map([
+    ["SRC-", semanticFamily("SRC-", ["SRC-A", "SRC-B", "SRC-C", "SRC-UNRELATED"].map((id) => ({ source_id: id, name: `Fonte ${id}` })))],
+    ["EVD-", semanticFamily("EVD-", [
+      semanticEvidence("EVD-A", ["SRC-A"], "Muitas reclamações registadas."),
+      semanticEvidence("EVD-B", ["SRC-B"], "Versão canónica."),
+      semanticEvidence("EVD-UNRELATED", ["SRC-UNRELATED"], "Sem relação."),
+    ])],
+    ["PRB-", semanticFamily("PRB-", [{ problem_id: "PRB-OTHER", problem_statement: "Outro problema." }])],
+  ]);
+  return { researchRoot: "/synthetic", byPrefix, totalRecords: 8 };
+}
+
+export function semanticCandidates(): { candidates: CandidateRecord[]; deltas: CandidateDelta[] } {
+  return {
+    candidates: [
+      { recordFamily: "EVD-", fields: semanticEvidence("EVD-B", ["SRC-C"], "Versão candidata: atrasos frequentes.") },
+      {
+        recordFamily: "PRB-",
+        fields: {
+          problem_id: "PRB-NEW",
+          problem_statement: "Muitos moradores relatam atrasos frequentes.",
+          evidence: [{ evidence_id: "EVD-A" }, { evidence_id: "EVD-B" }],
+          decision_basis: { overlap_check: { related_problems: ["PRB-OTHER"] } },
+        },
+      },
+    ],
+    deltas: [
+      { recordFamily: "EVD-", id: "EVD-B", action: "UPDATE" },
+      { recordFamily: "PRB-", id: "PRB-NEW", action: "CREATE" },
+    ],
+  };
+}
+
+export type SemanticReviewScenario = IndependentReviewResult["outcome"];
+
+/** The reviewer package the F00-F authority freezes for the semantic scenario. */
+export function semanticReviewerInput(index: CorpusIndex, baseGitSha: string): ReviewerInputPackage {
+  const { candidates, deltas } = semanticCandidates();
+  return buildReviewerInputPackage({
+    baseGitSha,
+    manifest: manifest({ claimedRecordIds: deltas.map((d) => d.id), candidateFiles: deltas.map((d) => `${d.id}.yaml`) }),
+    index,
+    candidates,
+    deltas,
+    validation: { errors: [], totalRecords: index.totalRecords },
+    readiness: "READY_FOR_INTEGRATION_GATE",
+  });
+}
+
+/**
+ * A valid structured review of the semantic scenario. The first signal is
+ * dispositioned per `scenario` (SUPPORTED for CONCUR, otherwise VIOLATION or
+ * INSUFFICIENT_EVIDENCE with a linked finding); the last is NOT_APPLICABLE;
+ * the rest are SUPPORTED.
+ */
+export function semanticReview(input: ReviewerInputPackage, scenario: SemanticReviewScenario): IndependentReviewResult {
+  const [first] = input.signals;
+  const findings: ReviewFinding[] = [];
+  if (scenario !== "CONCUR") {
+    findings.push({
+      findingId: "CLEC-FND-0001",
+      recordId: first.signal.subjectId,
+      field: first.signal.field,
+      claim: first.signal.excerpt,
+      dimension: first.signal.dimension,
+      kind: scenario === "DISAGREEMENT_FOUND" ? "CLEC_VIOLATION" : "INSUFFICIENT_EVIDENCE",
+      severity: "BLOCKING",
+      reason: scenario === "DISAGREEMENT_FOUND" ? "The quantity is broader than EVD-A records." : "No supplied record states how many residents reported delays.",
+      evidenceReferences: ["EVD-A", "SRC-A"],
+      correctionDirection: "State only the quantity the linked evidence records, or remove the quantifier.",
+      relatedSignalIds: [first.signalId],
+    });
+  }
+  const signalDispositions: SignalDisposition[] = input.signals.map(({ signalId }, i) => {
+    if (i === 0 && scenario !== "CONCUR") {
+      return {
+        signalId,
+        disposition: scenario === "DISAGREEMENT_FOUND" ? "VIOLATION" : "INSUFFICIENT_EVIDENCE",
+        reason: "See the linked finding.",
+        evidenceReferences: ["EVD-A"],
+        relatedFindingIds: ["CLEC-FND-0001"],
+      };
+    }
+    if (i === input.signals.length - 1 && i > 0) {
+      return { signalId, disposition: "NOT_APPLICABLE", reason: "The wording is a direct attribution, not a generalisation.", evidenceReferences: [], relatedFindingIds: [] };
+    }
+    return { signalId, disposition: "SUPPORTED", reason: "EVD-A records the stated scope.", evidenceReferences: ["EVD-A"], relatedFindingIds: [] };
+  });
+  return {
+    schemaVersion: "2",
+    outcome: scenario,
+    rationale: `Synthetic ${scenario} review of the semantic scenario.`,
+    findings,
+    signalDispositions,
+  };
+}
+
+export function semanticResearchChangeSet(index: CorpusIndex, baseGitSha: string, review: IndependentReviewResult): ResearchChangeSet {
+  return syntheticResearchChangeSet(index, baseGitSha, "PRB-NEW", { records: semanticCandidates(), independentReview: review });
+}
+
+/** A valid Human Gate package for the semantic scenario with the given review outcome. */
+export function semanticHumanGatePackage(scenario: SemanticReviewScenario, baseGitSha = SHA_A): HumanGatePackage {
+  const index = semanticReviewCorpus();
+  const review = semanticReview(semanticReviewerInput(index, baseGitSha), scenario);
+  const built = buildHumanGatePackage(index, semanticResearchChangeSet(index, baseGitSha, review));
+  if (built.errors.length > 0 || !built.pkg) {
+    throw new Error(`semanticHumanGatePackage fixture failed to assemble: ${built.errors.join("; ")}`);
+  }
+  return built.pkg;
 }

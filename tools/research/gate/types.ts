@@ -12,6 +12,7 @@ import type { CanonicalIntegrationPlan } from "../integration/canonical-integrat
 import type { ReadinessReport } from "../readiness/readiness.ts";
 import type { ValidationResult } from "../validation/validate.ts";
 import type { GenerationManifest, IndependentReviewResult, ResearchChangeSet } from "../orchestrate/types.ts";
+import type { ReviewContextRecord, ReviewSignal } from "../orchestrate/reviewer-input.ts";
 import type { SafetyAdmission } from "../admission/safety-admission.ts";
 
 /**
@@ -22,7 +23,7 @@ import type { SafetyAdmission } from "../admission/safety-admission.ts";
  * of either.
  */
 export interface HumanGatePackage {
-  schemaVersion: "1";
+  schemaVersion: "2";
   /** Stable identity for this Human Gate package, derived from the underlying RCS packageId. */
   packageId: string;
   /** Exact canonical Git base SHA this package is bound to (copied from the RCS). */
@@ -37,8 +38,18 @@ export interface HumanGatePackage {
   deltas: CandidateDelta[];
   /** Convenience projection of researchChangeSet.validation (prospective validation result). */
   prospectiveValidation: ValidationResult;
-  /** Convenience projection of researchChangeSet.independentReview. */
+  /** Convenience projection of researchChangeSet.independentReview; must equal it exactly. */
   independentReview: IndependentReviewResult;
+  /**
+   * The bounded evidence context the independent reviewer was given,
+   * reconstructed with buildReviewerInputPackage() at package assembly: the
+   * non-candidate EVD-/SRC- records the candidates' evidence chains reach in
+   * the prospective corpus. Never the whole corpus, unrelated records, or
+   * Source body content (canonical SRC records carry provenance/metadata).
+   */
+  reviewEvidenceContext: ReviewContextRecord[];
+  /** The candidate-scoped deterministic CLEC signals the reviewer dispositioned, in reviewer-package order. */
+  reviewSignals: ReviewSignal[];
   /** Convenience projection of researchChangeSet.integrationPlan. */
   integrationPlan: CanonicalIntegrationPlan | null;
   /** Convenience projection of researchChangeSet.manifest. */
@@ -73,7 +84,7 @@ export interface HumanGatePackage {
 /** Deterministic content-hash identity for a Human Gate package (HIGH-2). */
 export interface HumanGatePackageIdentity {
   packageId: string;
-  schemaVersion: "1";
+  schemaVersion: HumanGatePackage["schemaVersion"];
   baseGitSha: string;
   contentHash: string;
 }
@@ -119,6 +130,8 @@ export interface HumanGateDecisionRecord {
 export type DecisionSubmissionOutcome =
   | { status: "RECORDED"; record: HumanGateDecisionRecord }
   | { status: "REJECTED_INVALID_COMBINATION"; message: string }
+  /** Canonical APPROVE requested for a package whose independent semantic review outcome is not CONCUR. */
+  | { status: "REJECTED_SEMANTIC_REVIEW_BLOCKER"; message: string }
   | { status: "ABORTED_CONTENT_MISMATCH"; message: string }
   | { status: "ABORTED_INVALID_PACKAGE"; message: string };
 
