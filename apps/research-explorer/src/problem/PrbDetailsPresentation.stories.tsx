@@ -20,6 +20,7 @@ import { ToastProvider } from "../presentation/Toast";
 import { useProblemProjection } from "./useProblemProjection";
 import { useRecordIndex } from "../records/useRecordIndex";
 import { prb0005DataProvider } from "./prb0005Fixture";
+import manifest from "../../generated/manifest.json";
 import { ExplorerHeader } from "../app/ExplorerHeader";
 import { PublicFooter } from "../app/TrustPage";
 import { ProgressMessage } from "../presentation/ProgressMessage";
@@ -66,7 +67,7 @@ function Prb0005Details() {
   const data = buildPrbDetailsData(projectionState.projection);
   const dossier = buildPrbDossierData(projectionState.projection);
 
-  return <PrbDetailsPresentation data={data} dossier={dossier} onOpenGeneric={noop} onBackToOverview={noop} onViewHistory={noop} />;
+  return <PrbDetailsPresentation data={data} dossier={dossier} dossierIdentity={{ sourceCommit: manifest.sourceCommit, corpusFingerprint: manifest.corpusFingerprint }} onOpenGeneric={noop} onBackToOverview={noop} onViewHistory={noop} />;
 }
 
 /**

@@ -42,6 +42,9 @@ interface ExplorerProps {
   totalRecords?: number;
   /** manifest.generatedAt — read-model build timestamp for the "Corpus: X registos" summary below (ODM-020: build/generation time, distinct from research currentness). */
   generatedAt?: string;
+  /** Publication identity from the startup manifest, carried to portable PRB dossiers. */
+  sourceCommit?: string | null;
+  corpusFingerprint?: string;
 }
 
 /**
@@ -56,7 +59,7 @@ interface ExplorerProps {
  * itself unmounts/remounts on every such switch, so Explorer is the one
  * stable owner that can survive that and hand the same state back.
  */
-export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generatedAt }: ExplorerProps) {
+export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generatedAt, sourceCommit = null, corpusFingerprint = "" }: ExplorerProps) {
   const url = useExplorerUrlState();
   const overviewDiscovery = useOverviewDiscoveryState();
   const previousLocation = useRef({ view: url.state.view, selectedId: url.state.selectedId });
@@ -147,6 +150,8 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
       {url.state.view === "problem" && (
         <ProblemView
           dataProvider={dataProvider}
+          sourceCommit={sourceCommit}
+          corpusFingerprint={corpusFingerprint}
           problemId={url.state.selectedId}
           onOpenGeneric={(id) => url.setViewAndSelection("records", id)}
           onBackToRecords={() => url.clearSelectionAndSetView("records")}

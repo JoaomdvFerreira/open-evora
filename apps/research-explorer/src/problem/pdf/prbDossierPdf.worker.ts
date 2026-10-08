@@ -1,5 +1,5 @@
 import { generatePrbDossierPdf } from "./generatePrbDossierPdf";
-import { isPrbDossierWorkerResponse, type PrbDossierWorkerRequest } from "./prbDossierWorkerProtocol";
+import { isPrbDossierWorkerRequest, isPrbDossierWorkerResponse, type PrbDossierWorkerRequest } from "./prbDossierWorkerProtocol";
 
 const workerScope = self as unknown as {
   onmessage: ((event: MessageEvent<PrbDossierWorkerRequest>) => void) | null;
@@ -8,12 +8,12 @@ const workerScope = self as unknown as {
 
 workerScope.onmessage = async (event) => {
   const request = event.data;
-  if (!request || request.type !== "generate" || typeof request.generatedAt !== "string" || !request.dossier) {
+  if (!isPrbDossierWorkerRequest(request)) {
     workerScope.postMessage({ type: "failure", error: { message: "Invalid PDF request" } });
     return;
   }
   try {
-    const blob = await generatePrbDossierPdf(request.dossier, new Date(request.generatedAt));
+    const blob = await generatePrbDossierPdf(request.dossier, { ...request.generation, generatedAt: new Date(request.generation.generatedAt) });
     const response = { type: "success", blob } as const;
     if (isPrbDossierWorkerResponse(response)) workerScope.postMessage(response);
     else workerScope.postMessage({ type: "failure", error: { message: "Invalid PDF output" } });

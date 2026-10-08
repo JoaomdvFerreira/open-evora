@@ -22,6 +22,8 @@ import type { PrbDossierData, PrbDossierDecisionBasis, PrbDossierEvidence, PrbDo
 /** Generation-layer metadata, captured once per generated PDF and never fed back into research ordering or semantics. */
 export interface DossierGenerationMetadata {
   generatedAt: Date;
+  corpusFingerprint: string;
+  sourceCommit: string | null;
 }
 
 export type DossierSectionId = "sintese" | "questoes" | "percurso" | "evidencia" | "fontes" | "base" | "historico" | "auditoria";
@@ -491,6 +493,8 @@ export function buildDossierDocumentModel(dossier: PrbDossierData, generation: D
         ...textField("Registo atualizado em", date(problem.updatedAt)),
         { label: "Versão da projeção do dossiê", text: String(dossier.projectionVersion) },
         { label: "Documento gerado em", text: formatDossierGeneratedAt(generation.generatedAt) },
+        ...(generation.sourceCommit ? [{ label: "Commit de origem", text: generation.sourceCommit, mono: true }] : []),
+        { label: "Impressão digital do corpus", text: generation.corpusFingerprint, mono: true },
         { label: "Registos de evidência", text: formatPublicCount(counts.evidenceRecordCount) },
         { label: "Fontes distintas", text: formatPublicCount(counts.distinctSourceCount) },
         { label: "Efeitos PRB–EVD", text: formatPublicCount(counts.effectCount) },

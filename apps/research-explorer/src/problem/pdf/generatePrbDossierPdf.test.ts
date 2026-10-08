@@ -24,7 +24,7 @@ let pdf: string;
 beforeAll(async () => {
   const lookup = new Map((await prb0005DataProvider.listRecords()).map((summary) => [summary.id, summary]));
   dossier = buildPrbDossierData(await loadProblemProjection(prb0005DataProvider, lookup, "PRB-0005"));
-  const blob = await generatePrbDossierPdf(dossier, new Date("2026-09-27T10:30:00Z"));
+  const blob = await generatePrbDossierPdf(dossier, { generatedAt: new Date("2026-09-27T10:30:00Z"), sourceCommit: "full-source-commit", corpusFingerprint: "full-corpus-fingerprint" });
   expect(blob.type).toBe("application/pdf");
   pdf = new TextDecoder("latin1").decode(await blob.arrayBuffer());
 }, 60_000);

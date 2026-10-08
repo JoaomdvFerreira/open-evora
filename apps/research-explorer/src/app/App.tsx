@@ -72,6 +72,8 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
             schemaPrefixes={state.manifest.schemaPrefixes}
             totalRecords={state.manifest.totalRecords}
             generatedAt={state.manifest.generatedAt}
+            sourceCommit={state.manifest.sourceCommit}
+            corpusFingerprint={state.manifest.corpusFingerprint}
           />
         )}</>}
       </main>

@@ -389,7 +389,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
 
   it("enables the dossier download control when the same PRB's dossier data is supplied", () => {
     const projection = baseProjection({ title: "T" }, []);
-    render(<PrbDetailsPresentation data={buildPrbDetailsData(projection)} dossier={buildPrbDossierData(projection)} {...handlers} />);
+    render(<PrbDetailsPresentation data={buildPrbDetailsData(projection)} dossier={buildPrbDossierData(projection)} dossierIdentity={{ sourceCommit: "story-test-commit", corpusFingerprint: "story-test-fingerprint" }} {...handlers} />);
     const dossier = screen.getByRole("button", { name: "↓ Descarregar dossiê (PDF)" });
     expect(dossier).toHaveProperty("disabled", false);
     expect(dossier.getAttribute("aria-disabled")).toBeNull();

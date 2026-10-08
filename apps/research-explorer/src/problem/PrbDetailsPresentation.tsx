@@ -11,6 +11,8 @@ import type { PrbDetailsData, PrbEvidenceItem, PrbOpenQuestion, PrbPathStage } f
 import type { PrbDossierData } from "./prbDossierProjection";
 import { PrbDossierAction } from "./PrbDossierAction";
 
+export interface DossierPublicationIdentity { sourceCommit: string | null; corpusFingerprint: string }
+
 /**
  * Generic public PRB Details full-page composition.
  *
@@ -52,6 +54,7 @@ export interface PrbDetailsPresentationProps {
   titleRef?: RefObject<HTMLHeadingElement>;
   /** The same PRB's dossier projection (prbDossierProjection.ts); the dossier download stays disabled without it. */
   dossier?: PrbDossierData | null;
+  dossierIdentity?: DossierPublicationIdentity;
 }
 
 /**
@@ -393,7 +396,7 @@ function PrbPathSection({ stages }: { stages: PrbPathStage[] }) {
  * data load), and stays disabled when the PRB links no evidence so an empty
  * drawer can never open.
  */
-function PrbAuditSection({ data, dossier, onOpenGeneric }: { data: PrbDetailsData; dossier: PrbDossierData | null; onOpenGeneric: (id: string) => void }) {
+function PrbAuditSection({ data, dossier, dossierIdentity, onOpenGeneric }: { data: PrbDetailsData; dossier: PrbDossierData | null; dossierIdentity: DossierPublicationIdentity | undefined; onOpenGeneric: (id: string) => void }) {
   const [evidenceDrawerOpen, setEvidenceDrawerOpen] = useState(false);
   const openRecordsRef = useRef<HTMLButtonElement>(null);
   const hasEvidence = data.evidence.length > 0;
@@ -521,7 +524,7 @@ function PrbAuditSection({ data, dossier, onOpenGeneric }: { data: PrbDetailsDat
                 Representação de auditoria de {data.problemId}: problema, questões, evidência, fontes e percurso num único documento.
               </p>
             </div>
-            <PrbDossierAction dossier={dossier} />
+            <PrbDossierAction dossier={dossier} identity={dossierIdentity ?? null} />
           </div>
         </div>
       </div>
@@ -619,7 +622,7 @@ function PrbEvidenceDrawer({
   );
 }
 
-export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, onViewHistory, titleRef, dossier = null }: PrbDetailsPresentationProps) {
+export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, onViewHistory, titleRef, dossier = null, dossierIdentity }: PrbDetailsPresentationProps) {
   return (
     <article aria-labelledby="prb-identity-title" className="prb-details-view">
       <PrbHeader identity={data} active="details" onBackToOverview={onBackToOverview} onViewDetails={() => undefined} onViewHistory={onViewHistory} />
@@ -636,7 +639,7 @@ export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, 
       </div>
 
       <PrbPathSection stages={data.pathStages} />
-      <PrbAuditSection data={data} dossier={dossier} onOpenGeneric={onOpenGeneric} />
+      <PrbAuditSection data={data} dossier={dossier} dossierIdentity={dossierIdentity} onOpenGeneric={onOpenGeneric} />
     </article>
   );
 }
