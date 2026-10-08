@@ -14,6 +14,7 @@
  */
 
 const assert = require("assert");
+const crypto = require("crypto");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -436,6 +437,38 @@ test("corpusFingerprint is stable for identical input and changes when canonical
     write(root, "sources", "SRC-9001.yaml", minimalSrc().replace("Fixture Source", "Changed Fixture Source"));
     const modelC = buildFor(root);
     assert.notStrictEqual(modelC.manifest.corpusFingerprint, modelA.manifest.corpusFingerprint);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("corpusFingerprint preserves NUL-delimited raw-byte hashing without embedding NUL bytes in source", () => {
+  const source = fs.readFileSync(path.join(__dirname, "read-model.js"));
+  assert.strictEqual(source.includes(0), false, "read-model.js source must not contain literal NUL bytes");
+
+  const root = makeFixtureRoot();
+  try {
+    write(root, "sources", "SRC-9001.yaml", minimalSrc());
+    const validation = validateResearchTree(root);
+    const model = buildReadModel({
+      researchRoot: root,
+      repoRoot: REPO_ROOT,
+      validation,
+      generatedAt: "2026-01-01T00:00:00.000Z",
+      sourceCommit: null,
+    });
+    const raw = fs.readFileSync(path.join(root, "sources", "SRC-9001.yaml"));
+    const expected = crypto.createHash("sha256")
+      .update("SRC-", "utf8")
+      .update(Buffer.from([0]))
+      .update("SRC-9001", "utf8")
+      .update(Buffer.from([0]))
+      .update(raw)
+      .update(Buffer.from([0]))
+      .digest("hex");
+
+    assert.strictEqual(model.manifest.corpusFingerprint, expected);
+    assert.strictEqual(buildFor(root).manifest.corpusFingerprint, expected);
   } finally {
     cleanup(root);
   }

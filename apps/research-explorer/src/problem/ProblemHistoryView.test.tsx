@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { composeStories } from "@storybook/react-vite";
 import { ProblemHistoryView } from "./ProblemHistoryView";
 import * as stories from "./ProblemHistoryView.stories";
@@ -98,7 +98,7 @@ describe("ProblemHistoryView — composition", () => {
   it("focuses the PRB title heading once the record has loaded", async () => {
     render(<ProblemHistoryView {...props} problemId="PRB-0003" />);
     const title = await screen.findByRole("heading", { level: 2, name: "Tráfego e estacionamento" });
-    expect(document.activeElement).toBe(title);
+    await waitFor(() => expect(document.activeElement).toBe(title));
   });
 
   it("renders the shared identity hero from canonical title, problem_statement, topics and updated_at", async () => {
