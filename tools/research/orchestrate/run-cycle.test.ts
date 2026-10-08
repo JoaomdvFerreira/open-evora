@@ -75,7 +75,7 @@ const VALID_ENVELOPE = {
   candidateFiles: [{ path: "SRC-NEW.yaml", yaml: "source_id: SRC-NEW\nname: Synthetic source\n" }],
 };
 
-const VALID_REVIEW = { schemaVersion: "1", outcome: "CONCUR", rationale: "No disagreement found." };
+const VALID_REVIEW = { schemaVersion: "2", outcome: "CONCUR", rationale: "No disagreement found.", findings: [], signalDispositions: [] };
 
 /** Records every invocation (role, input, order) for structural assertions. */
 class RecordingInvoker implements AiInvoker {
@@ -94,6 +94,23 @@ class RecordingInvoker implements AiInvoker {
 
 function fixedResponder(stdout: unknown): (request: AiInvocationRequest) => AiInvocationResult {
   return () => ({ status: "OK", stdout: JSON.stringify(stdout) });
+}
+
+/** The frozen reviewer package exactly as the reviewer prompt embeds it. */
+function frozenReviewerInput(request: AiInvocationRequest): { signals: { signalId: string; signal: { subjectId: string; code: string } }[]; evidenceContext: { id: string }[] } {
+  return JSON.parse(request.input.split("REVIEW INPUT (immutable, JSON):\n")[1].split("\n")[0]);
+}
+
+/** A structurally valid CONCUR that dispositions every supplied signal against the signal's own subject record. */
+function concurringResponder(request: AiInvocationRequest): AiInvocationResult {
+  const signalDispositions = frozenReviewerInput(request).signals.map(({ signalId, signal }) => ({
+    signalId,
+    disposition: "SUPPORTED",
+    reason: "Synthetic disposition for orchestration coverage.",
+    evidenceReferences: [signal.subjectId],
+    relatedFindingIds: [],
+  }));
+  return { status: "OK", stdout: JSON.stringify({ ...VALID_REVIEW, signalDispositions }) };
 }
 
 /** A single shared invoker used for both roles, exactly as the CLI's single-executable configuration does. */
@@ -175,10 +192,42 @@ test("a private-Source HOLD through real orchestration prevents reviewer/RCS and
 test("a valid claim reaches the independent reviewer through real orchestration", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
-    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const reviewer = new RecordingInvoker(concurringResponder);
     const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
     assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
     assert.equal(reviewer.calls.length, 1);
+  });
+});
+
+test("the reviewer receives the candidate's evidence context and signals, and a result that leaves a signal undispositioned fails closed", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
+    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+
+    const input = frozenReviewerInput(reviewer.calls[0]);
+    assert.deepEqual(input.evidenceContext.map((record) => record.id), ["SRC-MATERIAL"]);
+    assert.deepEqual(input.signals.map((s) => [s.signalId, s.signal.subjectId, s.signal.code]), [["CLEC-SIG-0001", "EVD-NEW", "EVD_INFERENCE_LIMITS_EMPTY"]]);
+
+    assert.equal(outcome.status, "FAILED");
+    if (outcome.status !== "FAILED") return;
+    assert.equal(outcome.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
+    assert.match(outcome.message, /signal CLEC-SIG-0001 has no disposition/);
+    assert.equal(existsSync(join(cycleDir, "independent-review.json")), false);
+  });
+});
+
+test("the validated v2 review is persisted and carried unchanged by the Research Change Set", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
+    const reviewer = new RecordingInvoker(concurringResponder);
+    const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
+    if (outcome.status !== "READY_FOR_HUMAN_REVIEW") return;
+    const persisted = JSON.parse(readFileSync(join(cycleDir, "independent-review.json"), "utf8"));
+    assert.equal(persisted.schemaVersion, "2");
+    assert.deepEqual(persisted.signalDispositions.map((d: { signalId: string }) => d.signalId), ["CLEC-SIG-0001"]);
+    assert.deepEqual(outcome.changeSet.independentReview, persisted);
   });
 });
 
@@ -373,7 +422,24 @@ test("disagreement is surfaced in the final package, never auto-resolved", async
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer = new RecordingInvoker(
-      fixedResponder({ schemaVersion: "1", outcome: "DISAGREEMENT_FOUND", rationale: "Scope mismatch found." })
+      fixedResponder({
+        ...VALID_REVIEW,
+        outcome: "DISAGREEMENT_FOUND",
+        rationale: "Scope mismatch found.",
+        findings: [{
+          findingId: "CLEC-FND-0001",
+          recordId: "SRC-NEW",
+          field: "name",
+          claim: "Synthetic source",
+          dimension: "evidence_fidelity",
+          kind: "CLEC_VIOLATION",
+          severity: "BLOCKING",
+          reason: "Scope mismatch found.",
+          evidenceReferences: ["SRC-NEW"],
+          correctionDirection: "Record the Source name as published.",
+          relatedSignalIds: [],
+        }],
+      })
     );
     const outcome = await runResearchCycle({
       trigger: TRIGGER,
@@ -611,7 +677,7 @@ test("the final package reflects the exact snapshot frozen for the reviewer, eve
 test("resolveAvailabilityAdapter is invoked with exactly the material non-private Source set, and never when availabilityAdapter is supplied directly", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
-    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const reviewer = new RecordingInvoker(concurringResponder);
     let resolveCalls = 0;
     let seenSourceIds: string[] = [];
     const outcome = await runResearchCycle({
@@ -640,7 +706,7 @@ test("resolveAvailabilityAdapter is invoked with exactly the material non-privat
 test("resolveAvailabilityAdapter is never called when a synchronous availabilityAdapter is supplied directly", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
-    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const reviewer = new RecordingInvoker(concurringResponder);
     let resolveCalls = 0;
     const outcome = await runResearchCycle({
       trigger: TRIGGER,

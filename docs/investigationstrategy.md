@@ -348,7 +348,11 @@ The dimensions apply to all three record types; each type carries a strictest em
 ### Signals and human judgement
 
 - Lexical or other deterministic signals (for example a quantifier, an absolute, or causal wording) are review prompts, not automatic wording violations. No word is banned as such; the same wording may be supported in one context and unsupported in another.
-- Where deterministic signals are produced, each requires an explicit semantic disposition in review; a signal is neither a finding nor a pass by itself.
+- Where deterministic signals are produced, each requires an explicit semantic disposition in review; a signal is neither a finding nor a pass by itself. The dispositions are:
+  - `SUPPORTED` — the flagged wording is relevant and the supplied evidence supports it;
+  - `VIOLATION` — the flagged wording is relevant and semantic review confirms a CLEC defect;
+  - `NOT_APPLICABLE` — the signal is contextually irrelevant or a false positive for its dimension;
+  - `INSUFFICIENT_EVIDENCE` — the signal is semantically relevant, but the supplied evidence/context is insufficient to decide support versus violation (for example, EVD wording whose fidelity depends on Source content that the canonical SRC record does not hold). It is an evidence gap, never a violation or a non-applicable signal by default; `UNKNOWN` is not `NO`.
 - Semantic review must compare each changed claim with its supporting evidence — PRB text with its linked EVD, EVD text with its Source. Reading the text in isolation is not semantic review.
 - Human judgement remains final. Deterministic tooling may flag wording; it does not decide whether wording complies.
 
@@ -376,10 +380,14 @@ Implemented in advisory/report mode:
 
 These signals are review prompts, not automatic violations; each still requires semantic disposition in review (see *Signals and human judgement*). The tooling does not rewrite canonical text, and signal presence does not fail validation or CI.
 
+Implemented for the orchestrated independent reviewer only:
+- structured semantic findings (CLEC violations and evidence gaps) quoting the authored text;
+- a structured disposition for every deterministic signal affecting the candidate records.
+
+The orchestration rejects a structurally incomplete or inconsistent review result; it does not decide whether wording is supported.
+
 Not yet implemented:
-- structured semantic dispositions (`SUPPORTED` / `VIOLATION` / `NOT_APPLICABLE`);
-- structured reviewer findings and signal dispositions;
-- Gate integration for those dispositions;
+- Human Gate presentation and integration of structured findings and dispositions;
 - technical enforcement for direct pull-request changes (Lane B);
 - CI or blocking validation based on CLEC signals.
 

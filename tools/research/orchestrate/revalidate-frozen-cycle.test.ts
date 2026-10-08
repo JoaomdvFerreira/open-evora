@@ -93,7 +93,7 @@ class SharedInvoker implements AiInvoker {
   }
   invoke(request: AiInvocationRequest): AiInvocationResult {
     this.calls.push(request);
-    return { status: "OK", stdout: JSON.stringify(request.role === "PRIMARY_AUTHOR" ? this.primaryStdout : this.reviewerStdout) };
+    return { status: "OK", stdout: JSON.stringify(request.role === "PRIMARY_AUTHOR" ? this.primaryStdout : reviewerOutput(this.reviewerStdout, request)) };
   }
 }
 
@@ -115,7 +115,7 @@ class RoleCountingInvoker implements AiInvoker {
   invoke(request: AiInvocationRequest): AiInvocationResult {
     if (request.role === "PRIMARY_AUTHOR") this.primaryCalls += 1;
     else this.reviewerCalls += 1;
-    return { status: "OK", stdout: JSON.stringify(this.stdout) };
+    return { status: "OK", stdout: JSON.stringify(reviewerOutput(this.stdout, request)) };
   }
 }
 
@@ -125,7 +125,18 @@ const VALID_ENVELOPE = {
   manifest: { schemaVersion: "1", mode: "daily-discovery", investigationQuestion: TRIGGER.request, candidateFiles: ["SRC-NEW.yaml"], claimedRecordIds: ["SRC-NEW"], rationale: "r" },
   candidateFiles: [{ path: "SRC-NEW.yaml", yaml: "source_id: SRC-NEW\nname: Synthetic source\n" }],
 };
-const VALID_REVIEW = { schemaVersion: "1", outcome: "CONCUR", rationale: "No disagreement found." };
+const VALID_REVIEW = { schemaVersion: "2", outcome: "CONCUR", rationale: "No disagreement found.", findings: [], signalDispositions: [] };
+
+/** A structurally valid CONCUR that dispositions every signal in the frozen reviewer input it receives. */
+function concurringReview(request: AiInvocationRequest): unknown {
+  const input = JSON.parse(request.input.split("REVIEW INPUT (immutable, JSON):\n")[1].split("\n")[0]) as { signals: { signalId: string; signal: { subjectId: string } }[] };
+  const signalDispositions = input.signals.map(({ signalId, signal }) => ({ signalId, disposition: "SUPPORTED", reason: "Synthetic disposition.", evidenceReferences: [signal.subjectId], relatedFindingIds: [] }));
+  return { ...VALID_REVIEW, signalDispositions };
+}
+
+function reviewerOutput(stdout: unknown, request: AiInvocationRequest): unknown {
+  return typeof stdout === "function" ? stdout(request) : stdout;
+}
 
 /**
  * Builds a genuinely-assembled, internally-consistent source cycle at
@@ -603,7 +614,7 @@ test("fresh reviewer occurs only after admission becomes ELIGIBLE at the new bas
         manifest: { schemaVersion: "1", mode: "daily-discovery", investigationQuestion: TRIGGER.request, candidateFiles: ["EVD-NEW.yaml"], claimedRecordIds: ["EVD-NEW"], rationale: "r" },
         candidateFiles: [{ path: "EVD-NEW.yaml", yaml: "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: claim\nclaim_authority: authoritative\ninference_limits: []\n" }],
       };
-      const buildShared = new SharedInvoker(claimEnvelope, VALID_REVIEW);
+      const buildShared = new SharedInvoker(claimEnvelope, concurringReview);
       const buildOutcome = await runResearchCycle({
         trigger: TRIGGER,
         index: privateCorpus,
@@ -621,7 +632,7 @@ test("fresh reviewer occurs only after admission becomes ELIGIBLE at the new bas
       // so the revalidation path's own structural-source check must itself
       // fail closed (SOURCE_CYCLE_INVALID) rather than ever reaching the
       // reviewer — proving no reviewer call happens on a non-ELIGIBLE source.
-      const holdReviewer = new RoleCountingInvoker(VALID_REVIEW);
+      const holdReviewer = new RoleCountingInvoker(concurringReview);
       const holdOutcome = await revalidateFrozenCycleAtNewBase({
         sourceCycleDir,
         targetCycleDir,
@@ -639,7 +650,7 @@ test("fresh reviewer occurs only after admission becomes ELIGIBLE at the new bas
       // Now freeze a genuinely ELIGIBLE source cycle (public source) and confirm the reviewer IS invoked once at the new base.
       cleanupCycleDir(sourceCycleDir);
       const publicCorpus = admissionIndex("public");
-      const eligibleShared = new SharedInvoker(claimEnvelope, VALID_REVIEW);
+      const eligibleShared = new SharedInvoker(claimEnvelope, concurringReview);
       const eligibleBuild = await runResearchCycle({
         trigger: TRIGGER,
         index: publicCorpus,
@@ -653,7 +664,7 @@ test("fresh reviewer occurs only after admission becomes ELIGIBLE at the new bas
       assert.equal(eligibleBuild.status, "READY_FOR_HUMAN_REVIEW", eligibleBuild.status === "FAILED" ? eligibleBuild.message : "");
       writeFileSync(join(sourceCycleDir, "research-change-set.json"), `${JSON.stringify((eligibleBuild as { changeSet: unknown }).changeSet, null, 2)}\n`, "utf8");
 
-      const eligibleReviewer = new RoleCountingInvoker(VALID_REVIEW);
+      const eligibleReviewer = new RoleCountingInvoker(concurringReview);
       const eligibleOutcome = await revalidateFrozenCycleAtNewBase({
         sourceCycleDir,
         targetCycleDir,

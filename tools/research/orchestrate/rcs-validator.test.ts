@@ -18,17 +18,16 @@ function genuineManifest() {
 }
 
 function genuineIndependentReview() {
-  return { schemaVersion: "1" as const, outcome: "CONCUR" as const, rationale: "No disagreement found." };
+  return { schemaVersion: "2", outcome: "CONCUR", rationale: "No disagreement found.", findings: [], signalDispositions: [] } as Record<string, unknown>;
 }
 
 /** Builds a genuinely valid RCS whose preparationFingerprint/packageId are actually correct. */
-function genuineRcs() {
+function genuineRcs(independentReview: unknown = genuineIndependentReview()) {
   const manifest = genuineManifest();
   const candidates = [{ recordFamily: "SRC-", fields: { source_id: "SRC-NEW", name: "Synthetic source" } }];
   const deltas = [{ recordFamily: "SRC-", id: "SRC-NEW", action: "CREATE" as const }];
   const validation = { errors: [] as string[], totalRecords: 1 };
   const readiness = "READY_FOR_INTEGRATION_GATE" as const;
-  const independentReview = genuineIndependentReview();
   const safetyAdmission = { disposition: "ELIGIBLE" as const, findings: [], evaluatedAt: "" };
   const integrationPlan = {
     baseGitSha: SHA,
@@ -86,6 +85,47 @@ test("a missing independentReview fails closed", () => {
   delete rcs.independentReview;
   const { errors } = validateResearchChangeSet(rcs);
   assert.ok(errors.some((e) => e.includes("independentReview.") && e.includes("is required")));
+});
+
+test("an RCS carrying a v1 independent review is rejected even when its fingerprint is genuine", () => {
+  const rcs = genuineRcs({ schemaVersion: "1", outcome: "CONCUR", rationale: "No disagreement found." });
+  const errors = validateResearchChangeSet(rcs).errors.join("\n");
+  assert.match(errors, /schemaVersion must be exactly "2"/);
+  assert.doesNotMatch(errors, /fingerprint/);
+});
+
+function blockingFinding(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    findingId: "CLEC-FND-0001",
+    recordId: "SRC-NEW",
+    field: "name",
+    claim: "Synthetic source",
+    dimension: "evidence_fidelity",
+    kind: "CLEC_VIOLATION",
+    severity: "BLOCKING",
+    reason: "Name differs from the published Source identity.",
+    evidenceReferences: ["SRC-NEW"],
+    correctionDirection: "Record the name exactly as published.",
+    relatedSignalIds: [],
+    ...overrides,
+  };
+}
+
+test("a structured v2 review is checked against the RCS's own candidates without a corpus index", () => {
+  const disagreement = { ...genuineIndependentReview(), outcome: "DISAGREEMENT_FOUND", findings: [blockingFinding()] };
+  assert.deepEqual(validateResearchChangeSet(genuineRcs(disagreement)).errors, []);
+
+  const paraphrased = { ...disagreement, findings: [blockingFinding({ claim: "A synthetic source" })] };
+  assert.match(validateResearchChangeSet(genuineRcs(paraphrased)).errors.join("\n"), /claim does not occur verbatim in SRC-NEW name/);
+
+  const notCandidate = { ...disagreement, findings: [blockingFinding({ recordId: "SRC-OTHER" })] };
+  assert.match(validateResearchChangeSet(genuineRcs(notCandidate)).errors.join("\n"), /recordId must name a candidate record/);
+
+  const inconsistent = { ...disagreement, outcome: "CONCUR" };
+  assert.match(validateResearchChangeSet(genuineRcs(inconsistent)).errors.join("\n"), /require DISAGREEMENT_FOUND/);
+
+  const danglingLink = { ...disagreement, findings: [blockingFinding({ relatedSignalIds: ["CLEC-SIG-0001"] })] };
+  assert.match(validateResearchChangeSet(genuineRcs(danglingLink)).errors.join("\n"), /references signal CLEC-SIG-0001, which has no disposition/);
 });
 
 test("empty candidates fails closed", () => {
