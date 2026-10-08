@@ -3309,11 +3309,14 @@ body:has(.public-overview) .public-footer {
      own height. Extended to every real in-app fragment target (EVD/SRC
      .evd-section/.src-section ids, #relacoes, and the section-index
      targets), not just Problem/Overview, since the compact header is sticky
-     across every view, not only these two. */
+     across every view, not only these two. D01-020: also the real PRB
+     fragment destinations (#prb-auditoria, #prb-questoes). */
   #overview-problemas,
   .evd-section,
   .src-section,
-  #relacoes {
+  #relacoes,
+  #prb-auditoria,
+  #prb-questoes {
     scroll-margin-top: 108px;
   }
 
