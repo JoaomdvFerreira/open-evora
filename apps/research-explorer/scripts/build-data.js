@@ -71,9 +71,14 @@ function copyCanonicalFile(repoRoot, tmpDir, relFile) {
   fs.writeFileSync(target, canonicalYamlBytes(fs.readFileSync(path.join(repoRoot, ...relFile.split("/")))));
 }
 
+/** The exact text every generated JSON file is published with. */
+function jsonText(data) {
+  return JSON.stringify(data, null, 2) + "\n";
+}
+
 function writeJson(filePath, data) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n");
+  fs.writeFileSync(filePath, jsonText(data));
 }
 
 /**
@@ -221,4 +226,15 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { main, run, verifyGeneratedOutput, getSourceCommit };
+module.exports = {
+  main,
+  run,
+  verifyGeneratedOutput,
+  getSourceCommit,
+  jsonText,
+  publishesCanonicalFile,
+  CANONICAL_DIR,
+  DEFAULT_REPO_ROOT,
+  DEFAULT_RESEARCH_ROOT,
+  DEFAULT_TARGET_DIR,
+};

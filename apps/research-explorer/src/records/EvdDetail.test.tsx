@@ -12,7 +12,6 @@ import { composeStories } from "@storybook/react-vite";
 import * as stories from "./EvdDetail.stories";
 
 const GENERATED = path.resolve(__dirname, "..", "..", "generated", "record-detail");
-const hasGeneratedData = fs.existsSync(GENERATED);
 const detail = (id: string): RecordDetail => JSON.parse(fs.readFileSync(path.join(GENERATED, `${id}.json`), "utf8"));
 type UsesState = EVDProblemUsesState & { retry: () => void };
 const ready = (uses: EVDProblemUse[]): UsesState => ({ status: "ready", uses, retry: vi.fn() });
@@ -34,7 +33,7 @@ function metadata(container: HTMLElement): Record<string, string> {
 
 const auditRegion = () => screen.getByRole("region", { name: "Origem e auditoria" });
 
-describe.skipIf(!hasGeneratedData)("EVD Detail — canonical regression cases", () => {
+describe("EVD Detail — canonical regression cases", () => {
   it("EVD-000001 renders the full observation as the H1 with its type eyebrow, topic and extraction date", () => {
     const item = detail("EVD-000001");
     renderEvd(item);
@@ -284,7 +283,7 @@ describe("EVD Detail — synthetic contract cases", () => {
  * RecordDetailPanel, PublicFooter) over the generated read model — not a
  * mock composition. Not a visual-acceptance test.
  */
-describe.skipIf(!hasGeneratedData)("Public/EVD Detail stories", () => {
+describe("Public/EVD Detail stories", () => {
   const composed = composeStories(stories);
 
   it.each(Object.entries(composed))("%s renders the production EVD page inside the real Explorer chrome", async (_name, Story) => {

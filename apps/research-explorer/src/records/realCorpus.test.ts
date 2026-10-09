@@ -7,16 +7,13 @@ import type { RecordSummary } from "../dataProvider/types";
 /**
  * Exercises the Records model against the real RE-01 generated index.json —
  * not a fixture — to prove the actual current corpus (not just synthetic
- * data) populates correctly. Requires `node scripts/build-data.js` to have
- * already run (the root `npm run explorer:build`/`explorer` commands always
- * do this first); skips gracefully rather than failing if generated data
- * isn't present, e.g. a fresh checkout where the read model hasn't been
- * built yet.
+ * data) populates correctly. Package `npm run test` checks generated data
+ * is present and fresh first (scripts/check-generated-data.js); this suite
+ * never skips, so a missing read model fails rather than passing silently.
  */
 const INDEX_PATH = path.resolve(__dirname, "..", "..", "generated", "index.json");
-const hasGeneratedData = fs.existsSync(INDEX_PATH);
 
-describe.skipIf(!hasGeneratedData)("Records model — real generated corpus", () => {
+describe("Records model — real generated corpus", () => {
   const records: RecordSummary[] = JSON.parse(fs.readFileSync(INDEX_PATH, "utf8"));
 
   it("populates from the real generated index.json with a non-trivial record count", () => {
