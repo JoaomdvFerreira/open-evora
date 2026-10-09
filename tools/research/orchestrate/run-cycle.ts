@@ -28,6 +28,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import type { CandidateRecord } from "../integration/candidate-delta.ts";
+import { loadSourceVerifications, SOURCE_VERIFICATION_SUPPORT, SourceVerificationError } from "../core/source-verifications.ts";
 import type { CorpusIndex } from "../core/types.ts";
 import { prepareCanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
 import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
@@ -241,9 +242,11 @@ export async function continueFromFrozenCandidates(
       deltas: review.deltas,
       validation: review.validation,
       readiness: review.readiness,
+      // Lane A's review base is the canonical root `index` was loaded from; candidates live in the workbench.
+      sourceVerifications: loadSourceVerifications(index),
     });
   } catch (error) {
-    return failed("PROSPECTIVE_VALIDATION", (error as Error).message);
+    return failed(error instanceof SourceVerificationError ? SOURCE_VERIFICATION_SUPPORT : "PROSPECTIVE_VALIDATION", (error as Error).message);
   }
 
   // --- CONTEXT-FREE CLEC PRECHECK --------------------------------------------

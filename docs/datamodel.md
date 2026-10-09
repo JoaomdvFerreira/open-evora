@@ -15,6 +15,8 @@ No Hypothesis (`HYP-*`) record type is part of the current process or target mod
 
 Assessment (`ASM-*`) is not part of the current canonical model. Problem history is an optional authored lightweight changelog on a PRB, not another record type; full historical snapshots remain deferred (see §4).
 
+Source Verification Support is a non-record review-support layer, not canonical research state (see §8).
+
 ## 0. Local research workbench boundary
 
 `.research-workbench/` is a local, non-canonical, non-public workspace. It may contain raw source material, private notes, AI intermediate outputs, candidate drafts, rejected/no-delta work, and similar research working material. Nothing acquires canonical status merely by existing there, and workbench material must not be committed as such.
@@ -366,3 +368,16 @@ They must not silently create authored decisions such as corroboration, validati
 This document defines semantic meaning and ownership only.
 
 No application, generated projection, or document may create a competing semantic definition of canonical research state.
+
+## 8. Source Verification Support (non-record review support)
+
+`research/source-verifications/SRC-*.yaml` holds Source Verification Support: for one Source, a small bounded set of factual paraphrases that a human verified against captured bytes of that Source, together with the identity of those bytes (retrieval date, content digest, media type, optional archive reference). Its executable shape and bounds are owned by `tools/research/core/source-verifications.ts`.
+
+It is review context for independent semantic review, not canonical research state and not a fourth record type:
+- No research schema declares it. The canonical corpus loader does not read it, it is not counted as a record, and the Explorer neither loads nor publishes it.
+- It leaves the record roles unchanged: SRC remains provenance only, EVD remains the extracted observation, PRB remains synthesis. Support is not Evidence, is never Evidence provenance, and never establishes or implies a PRB→EVD relationship or research role.
+- It carries no author rationale, no statement of what the Source proves or how strong it is, and never a verbatim Source quotation or Source bytes.
+- It is incomplete by design: a Source without support, or a fact its support does not state, is `UNKNOWN`, never `NO`.
+- Only a canonical SRC that is public, not correspondence, and not `reuse: prohibited` may carry support. `reuse: unknown` is allowed only because support contains no Source wording or bytes; it does not authorize republishing Source wording.
+
+Deterministic validation checks structure, bounds and eligibility only; it cannot prove that a statement is a faithful paraphrase rather than Source wording. That remains part of owner review and publication safety (`AGENTS.md`). How independent review uses support is owned by `docs/investigationstrategy.md` §12.

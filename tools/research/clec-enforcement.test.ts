@@ -31,7 +31,9 @@ import { gitFixture, loadIndexFor, remoteGitFixture, sourceYaml, type GitFixture
 import { MARKDOWN_FILENAME, PACKAGE_FILENAME } from "./gate/cli.ts";
 import { computeContentHash } from "./gate/content-hash.ts";
 import { DECISION_RECORD_FILENAME, writeDecisionRecord } from "./gate/decision-record.ts";
-import { validateHumanGatePackage } from "./gate/package-validator.ts";
+import { reviewerInputFromGatePackage, validateHumanGatePackage } from "./gate/package-validator.ts";
+import { stringifyRecordYaml } from "./core/yaml.ts";
+import { sha256Hex } from "./orchestrate/fingerprint.ts";
 import { runPostApprovalPath } from "./gate/promote.ts";
 import type { HumanGatePackage } from "./gate/types.ts";
 import { ADVISORY, CONTEXT_FREE_BLOCK, contextFreeBlockers, SIGNAL_CODE } from "./language/signals.ts";
@@ -184,10 +186,12 @@ interface LaneACycle {
   cycleArtifacts(): string[];
 }
 
-async function withLaneACycle(fn: (cycle: LaneACycle) => Promise<void>): Promise<void> {
+/** `setup` shapes the fixture's main before its head becomes the cycle's base. */
+async function withLaneACycle(fn: (cycle: LaneACycle) => Promise<void>, setup?: (fixture: RemoteGitFixture) => void): Promise<void> {
   const fixture = remoteGitFixture();
   const cycleDir = mkdtempSync(join(tmpdir(), "open-evora-clec-cycle-"));
   try {
+    setup?.(fixture);
     const git = (...args: string[]): string => execFileSync("git", ["-C", fixture.root, ...args], { encoding: "utf8" }).trim();
     const baseBranch = git("rev-parse", "--abbrev-ref", "HEAD");
     await fn({
@@ -423,8 +427,8 @@ interface LaneBRepo {
   commit(message: string): string;
   /** The review unit `research:lane-b:prepare` computes from the uncommitted working tree. */
   workingTreeUnit(): LaneBReviewUnit;
-  /** `research:lane-b:check` against a pull-request body in the repository's own template. */
-  check(head: string, reviewSection: string): { status: number | null; output: string };
+  /** `research:lane-b:check` against a pull-request body in the repository's own template; `base` defaults to the fixture base. */
+  check(head: string, reviewSection: string, base?: string): { status: number | null; output: string };
 }
 
 const PR_TEMPLATE = readFileSync(join(REPO_ROOT, ".github", "PULL_REQUEST_TEMPLATE.md"), "utf8");
@@ -458,10 +462,10 @@ function withLaneBRepo(fn: (repo: LaneBRepo) => void): void {
         baseGitSha: pullRequestBase(fixture.root, base, resolveCommit(fixture.root, "HEAD")),
         head: { kind: "working-tree" },
       }),
-      check: (head, reviewSection) => {
+      check: (head, reviewSection, prBase = base) => {
         const bodyFile = join(scratch, "pr-body.md");
         writeFileSync(bodyFile, pullRequestBody(reviewSection), "utf8");
-        const result = spawnSync(process.execPath, ["--experimental-strip-types", LANE_B_CLI, "check", "--base", base, "--head", head, "--body-file", bodyFile], {
+        const result = spawnSync(process.execPath, ["--experimental-strip-types", LANE_B_CLI, "check", "--base", prBase, "--head", head, "--body-file", bodyFile], {
           cwd: fixture.root,
           encoding: "utf8",
         });
@@ -590,5 +594,151 @@ test("Lane B: a change touching no canonical PRB/EVD/SRC record needs no receipt
     const checked = repo.check(repo.commit("tooling and docs change"), "N/A");
     assert.equal(checked.status, 0, checked.output);
     assert.match(checked.output, /^PASS: no canonical PRB\/EVD\/SRC record changed; no Lane B receipt is required/m);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Source Verification Support: bounded, base-bound review context for Source fidelity.
+
+const COUNT_FACT = "312 reclamações";
+const TREND_FACT = "duplicaram";
+const FIDELITY_SUMMARY = `A fonte regista ${COUNT_FACT} sobre a recolha de resíduos no primeiro semestre de 2026.`;
+const FIDELITY_EVD = evidenceYaml(FIDELITY_SUMMARY, "A contagem de reclamações não mede a frequência dos atrasos.");
+const BEYOND_SUPPORT_EVD = evidenceYaml(`${FIDELITY_SUMMARY.slice(0, -1)}, que ${TREND_FACT} face a 2025.`, "A contagem de reclamações não mede a frequência dos atrasos.");
+const VERIFIED_STATEMENTS = [
+  `O relatório indica ${COUNT_FACT} sobre a recolha de resíduos entre janeiro e junho de 2026.`,
+  "O relatório não distingue reclamações por freguesia.",
+];
+
+function writeSupport(researchRoot: string, statements: readonly string[]): void {
+  mkdirSync(join(researchRoot, "source-verifications"), { recursive: true });
+  writeFileSync(join(researchRoot, "source-verifications", "SRC-BASE.yaml"), stringifyRecordYaml({
+    source_id: "SRC-BASE",
+    retrieval: { retrieved_at: "2026-08-27", content_sha256: "9f".repeat(32), media_type: "application/pdf" },
+    verified_claims: statements.map((statement, i) => ({ locator: `p. ${i + 3}`, statement })),
+  }), "utf8");
+}
+
+/**
+ * Deterministic stand-in for the reviewer's Source-fidelity judgement: each
+ * Source-derived fact the EVD states must be stated by a verified claim
+ * supplied for its cited Source; otherwise that wording stays
+ * INSUFFICIENT_EVIDENCE (silence is not absence, and nothing is inferred).
+ */
+function sourceFidelityReviewer(statedFacts: readonly string[]): RecordingInvoker {
+  return new RecordingInvoker((request) => {
+    const input = reviewerInputOf(request);
+    const verified = (input.sourceVerificationContext ?? [])
+      .filter((entry) => entry.source_id === "SRC-BASE")
+      .flatMap((entry) => entry.verified_claims.map((claim) => claim.statement));
+    const unsupported = statedFacts.filter((fact) => !verified.some((statement) => statement.includes(fact)));
+    const review = concur(input);
+    if (unsupported.length === 0) return review;
+    review.outcome = "INSUFFICIENT_EVIDENCE";
+    review.rationale = "A metadata canónica da fonte não permite verificar a afirmação derivada da fonte.";
+    review.findings = unsupported.map((fact, i) => ({
+      findingId: `CLEC-FND-${String(i + 1).padStart(4, "0")}`,
+      recordId: EVD_ID,
+      field: "observation.summary",
+      claim: fact,
+      dimension: "evidence_fidelity",
+      kind: "INSUFFICIENT_EVIDENCE",
+      severity: "BLOCKING",
+      reason: "Nem a metadata de SRC-BASE nem as afirmações verificadas fornecidas indicam este facto.",
+      evidenceReferences: ["SRC-BASE"],
+      correctionDirection: "Limitar a observação ao que a fonte verificada indica, ou obter verificação da fonte para este facto.",
+      relatedSignalIds: [],
+    }));
+    return review;
+  });
+}
+
+function assertInsufficient(prepared: ReturnType<typeof prepareLaneBReview>, claims: string[]): void {
+  assert.equal(prepared.status, "NOT_CONCUR", prepared.status === "REVIEW_FAILED" ? `${prepared.failedCheck}: ${prepared.message}` : prepared.status);
+  if (prepared.status !== "NOT_CONCUR") return;
+  assert.equal(prepared.independentReview.outcome, "INSUFFICIENT_EVIDENCE");
+  assert.deepEqual(
+    prepared.independentReview.findings.map((finding) => [finding.kind, finding.claim, finding.evidenceReferences]),
+    claims.map((claim) => ["INSUFFICIENT_EVIDENCE", claim, ["SRC-BASE"]])
+  );
+}
+
+test("Lane A: base Source Verification Support reaches the reviewer and the Gate identically, presented as review context", async () => {
+  await withLaneACycle(async (cycle) => {
+    const reviewer = sourceFidelityReviewer([COUNT_FACT]);
+    const outcome = await prepareCycle(cycle, primaryAuthor(FIDELITY_EVD), reviewer);
+    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? `${outcome.failedCheck}: ${outcome.message}` : outcome.status);
+    if (outcome.status !== "READY_FOR_HUMAN_REVIEW") return;
+
+    const reviewerInput = reviewerInputOf(reviewer.calls[0]);
+    assert.deepEqual(
+      reviewerInput.sourceVerificationContext?.map((entry) => [entry.source_id, entry.verified_claims.map((claim) => claim.statement)]),
+      [["SRC-BASE", VERIFIED_STATEMENTS]]
+    );
+    assert.deepEqual(reviewerInput.evidenceContext.map((record) => record.id), ["SRC-BASE"]);
+    assert.equal(outcome.changeSet.independentReview.outcome, "CONCUR");
+
+    // The Gate exposes exactly what the reviewer received and rebuilds the identical reviewer input.
+    const { pkg, markdown } = render(cycle);
+    assert.deepEqual(validateHumanGatePackage(pkg).errors, []);
+    assert.deepEqual(pkg.reviewSourceVerificationContext, reviewerInput.sourceVerificationContext);
+    assert.equal(sha256Hex(reviewerInputFromGatePackage(pkg)), sha256Hex(reviewerInput));
+    assert.match(markdown, /### Source Verification Support \(review context, not Evidence\)\nReview support, not canonical Evidence and not Source text/);
+    assert.ok(markdown.includes(`  - \`p. 3\`: ${VERIFIED_STATEMENTS[0]}`));
+    assertNothingPublished(cycle);
+  }, (fixture) => {
+    writeSupport(fixture.research, VERIFIED_STATEMENTS);
+    fixture.commit("source verification support");
+  });
+});
+
+test("Lane B: a Source-fidelity claim is INSUFFICIENT_EVIDENCE without support and becomes reviewable once bounded support is merged first", () => {
+  withLaneBRepo((repo) => {
+    // Without support, the canonical SRC metadata cannot decide the Source-derived count.
+    repo.writeEvidence(FIDELITY_EVD);
+    const before = reviewRequired(repo.workingTreeUnit());
+    assert.equal(before.reviewerInput.sourceVerificationContext, undefined);
+    assertInsufficient(prepareLaneBReview(before, sourceFidelityReviewer([COUNT_FACT]), join(repo.scratch, "without-support")), [COUNT_FACT]);
+
+    // Support introduced in the same change is refused, whatever the review section says.
+    writeSupport(repo.fixture.research, VERIFIED_STATEMENTS);
+    assert.equal(repo.workingTreeUnit().status, "SOURCE_VERIFICATION_NOT_SEPARATE");
+    const mixed = repo.check(repo.commit("canonical change with its own support"), "N/A");
+    assert.equal(mixed.status, 1);
+    assert.match(mixed.output, /FAILED \[SOURCE_VERIFICATION_NOT_SEPARATE\]: .*Source Verification Support must be merged first in a separate pull request/);
+
+    // The support-only pull request needs no receipt; once merged it is the next change's base.
+    execFileSync("git", ["-C", repo.fixture.root, "reset", "-q", "--hard", repo.base]);
+    writeSupport(repo.fixture.research, VERIFIED_STATEMENTS);
+    const supportHead = repo.commit("source verification support");
+    const supportOnly = repo.check(supportHead, "N/A");
+    assert.equal(supportOnly.status, 0, supportOnly.output);
+    assert.match(supportOnly.output, /^PASS: no canonical PRB\/EVD\/SRC record changed/m);
+
+    mkdirSync(join(repo.fixture.research, "evidence"), { recursive: true }); // Git dropped the emptied directory
+    repo.writeEvidence(FIDELITY_EVD);
+    const reviewer = sourceFidelityReviewer([COUNT_FACT]);
+    const unit = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: supportHead, head: { kind: "working-tree" } }));
+    assert.deepEqual(unit.reviewerInput.sourceVerificationContext?.map((entry) => entry.source_id), ["SRC-BASE"]);
+    const prepared = prepareLaneBReview(unit, reviewer, join(repo.scratch, "with-support"));
+    assert.equal(prepared.status, "READY", prepared.status === "REVIEW_FAILED" ? `${prepared.failedCheck}: ${prepared.message}` : prepared.status);
+    if (prepared.status !== "READY") return;
+    assert.ok(reviewer.calls[0].input.includes(serializeReviewerInput(unit.reviewerInput)));
+    const checked = repo.check(repo.commit("direct research change"), prepared.receiptBlock, supportHead);
+    assert.equal(checked.status, 0, checked.output);
+    assert.match(checked.output, /^PASS: independent review CONCUR /m);
+  });
+});
+
+test("Lane B: Source-derived wording beyond the verified claims stays INSUFFICIENT_EVIDENCE even with support", () => {
+  withLaneBRepo((repo) => {
+    writeSupport(repo.fixture.research, VERIFIED_STATEMENTS);
+    const supportHead = repo.commit("source verification support");
+    repo.writeEvidence(BEYOND_SUPPORT_EVD);
+    const unit = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: supportHead, head: { kind: "working-tree" } }));
+    assert.deepEqual(unit.reviewerInput.sourceVerificationContext?.[0].verified_claims.map((claim) => claim.statement), VERIFIED_STATEMENTS);
+    const workbench = join(repo.scratch, "workbench");
+    assertInsufficient(prepareLaneBReview(unit, sourceFidelityReviewer([COUNT_FACT, TREND_FACT]), workbench), [TREND_FACT]);
+    assert.equal(existsSync(join(workbench, "pr-receipt.md")), false, "no receipt exists for a non-CONCUR review");
   });
 });

@@ -156,6 +156,26 @@ function renderEvidenceContext(pkg: HumanGatePackage): string {
   ].join("\n");
 }
 
+function renderSourceVerificationSupport(pkg: HumanGatePackage): string {
+  const support = pkg.reviewSourceVerificationContext ?? [];
+  const entries = support.length === 0
+    ? "_No Source Verification Support was supplied to the independent reviewer._"
+    : support
+      .map((entry) => [
+        `- ${code(entry.source_id)} — retrieved ${entry.retrieval.retrieved_at}, ${code(entry.retrieval.media_type)}, sha256 ${code(entry.retrieval.content_sha256)}` +
+          (entry.retrieval.archive_reference !== undefined ? `, archive: ${entry.retrieval.archive_reference}` : ""),
+        ...entry.verified_claims.map((claim) => `  - ${code(claim.locator)}: ${claim.statement}`),
+      ].join("\n"))
+      .join("\n");
+  return [
+    "Review support, not canonical Evidence and not Source text: bounded factual paraphrases verified upstream against captured Source bytes, read from the review base. " +
+    "It does not establish completeness — a Source or claim without support is `UNKNOWN`, never `NO`. " +
+    "The Human Gate package JSON carries it in full (`reviewSourceVerificationContext`).",
+    "",
+    entries,
+  ].join("\n");
+}
+
 function renderSemanticReview(pkg: HumanGatePackage): string {
   return [
     heading(2, "Independent semantic review (CLEC)"),
@@ -169,6 +189,9 @@ function renderSemanticReview(pkg: HumanGatePackage): string {
     "",
     heading(3, "Review evidence context"),
     renderEvidenceContext(pkg),
+    "",
+    heading(3, "Source Verification Support (review context, not Evidence)"),
+    renderSourceVerificationSupport(pkg),
   ].join("\n");
 }
 

@@ -1,7 +1,19 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { gitFixture, loadIndexFor, semanticHumanGatePackage, syntheticHumanGatePackage } from "./test-fixtures.ts";
+import {
+  gitFixture,
+  loadIndexFor,
+  SHA_A,
+  semanticHumanGatePackage,
+  semanticResearchChangeSet,
+  semanticReview,
+  semanticReviewerInput,
+  semanticSupportedCorpus,
+  syntheticHumanGatePackage,
+  withTempDir,
+} from "./test-fixtures.ts";
+import { buildHumanGatePackage } from "./package-builder.ts";
 import { computeContentHash, shortFingerprint } from "./content-hash.ts";
 import { renderHumanGateMarkdown } from "./markdown-view.ts";
 
@@ -178,4 +190,28 @@ test("markdown-view.ts never imports decision.ts or decision-record.ts (renderin
   const source = readFileSync(fileURLToPath(new URL("./markdown-view.ts", import.meta.url)), "utf8");
   assert.ok(!source.includes("decision.ts"));
   assert.ok(!source.includes("decision-record.ts"));
+});
+
+test("Source Verification Support is shown as review context the reviewer received, never as canonical Evidence", () => {
+  const without = renderHumanGateMarkdown(semanticHumanGatePackage("CONCUR"));
+  assert.ok(without.includes("### Source Verification Support (review context, not Evidence)"));
+  assert.ok(without.includes("_No Source Verification Support was supplied to the independent reviewer._"));
+
+  withTempDir((root) => {
+    const index = semanticSupportedCorpus(root, { "SRC-C": ["A fonte regista atrasos na recolha em 2026.", "A fonte não indica a frequência dos atrasos."] });
+    const reviewerInput = semanticReviewerInput(index, SHA_A);
+    const { pkg } = buildHumanGatePackage(index, semanticResearchChangeSet(index, SHA_A, semanticReview(reviewerInput, "CONCUR")));
+    assert.ok(pkg);
+    const markdown = renderHumanGateMarkdown(pkg);
+    const start = markdown.indexOf("### Source Verification Support (review context, not Evidence)");
+    const block = markdown.slice(start, markdown.indexOf("\n## ", start));
+    assert.ok(block.includes("Review support, not canonical Evidence and not Source text"));
+    assert.ok(block.includes("`UNKNOWN`, never `NO`"));
+    assert.ok(block.includes(`- \`SRC-C\` — retrieved 2026-08-25, \`text/html\`, sha256 \`${"cd".repeat(32)}\`, archive: Captura local do projeto`));
+    assert.ok(block.includes("  - `secção 1`: A fonte regista atrasos na recolha em 2026.\n  - `secção 2`: A fonte não indica a frequência dos atrasos."));
+    // The evidence-context listing is unchanged: support adds no record to it.
+    const evidence = markdown.slice(markdown.indexOf("### Review evidence context"), start);
+    assert.equal(evidence.includes("verificad"), false);
+    assert.equal(evidence.includes("A fonte regista atrasos"), false);
+  });
 });

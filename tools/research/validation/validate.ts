@@ -13,6 +13,7 @@
  * "Human-owned decisions").
  */
 import { loadCorpusIndexTolerant } from "../core/corpus.ts";
+import { validateSourceVerifications } from "../core/source-verifications.ts";
 import { getRecordField } from "../core/record-fields.ts";
 import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex, RecordSchema, SchemaFieldType } from "../core/types.ts";
 
@@ -653,11 +654,13 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
 /**
  * Loads the corpus at researchRoot (tolerating malformed YAML files, which
  * are reported as validation errors rather than aborting the load — this
- * matches the legacy validator's per-file try/catch) and validates it.
+ * matches the legacy validator's per-file try/catch) and validates it, then
+ * validates every Source Verification Support file against that corpus.
+ * Support files are not records and are not counted in totalRecords.
  */
 export function validateResearchRoot(researchRoot: string): ValidationResult {
   const { index, issues } = loadCorpusIndexTolerant(researchRoot);
   const errors = issues.map((failure) => `[${failure.file}] malformed YAML: ${failure.message}`);
   const result = validateCorpusIndex(index);
-  return { errors: [...errors, ...result.errors], totalRecords: result.totalRecords };
+  return { errors: [...errors, ...result.errors, ...validateSourceVerifications(index)], totalRecords: result.totalRecords };
 }

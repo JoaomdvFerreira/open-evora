@@ -57,6 +57,7 @@ function sourceDependentPackage(): ReviewerInputPackage {
     deltas: [{ recordFamily: "EVD-", id: "EVD-NEW", action: "CREATE" }],
     validation: { errors: [], totalRecords: 2 },
     readiness: "READY_FOR_INTEGRATION_GATE",
+    sourceVerifications: { bySourceId: new Map(), issues: [] },
   });
 }
 
@@ -479,4 +480,20 @@ test("the reviewer prompt makes signal dispositions, evidence gaps and unsignall
   assert.match(REVIEWER_PROMPT, /never guess, and never fill the gap from outside the package/);
   assert.match(REVIEWER_PROMPT, /Judge from the supplied evidence and context, not from wording alone/);
   assert.match(REVIEWER_PROMPT, /Do not rewrite canonical records/);
+});
+
+test("the reviewer prompt bounds Source Verification Support to its explicit verified claims, never treating silence as absence", () => {
+  for (const rule of [
+    "\"sourceVerificationContext\"",
+    "It is not Source text, not a quotation and not an EVD.",
+    "Use it only for the bounded factual claims it explicitly contains.",
+    "It does not establish completeness: silence is not absence, and a fact it does not state stays UNKNOWN, never NO.",
+    "Never infer beyond it.",
+    "When candidate Source-derived wording exceeds both the canonical SRC metadata and the supplied verified claims, report INSUFFICIENT_EVIDENCE.",
+    "Do not judge the authenticity of the support",
+    "do not CLEC-review its statements",
+    "cite the associated SRC-* ID in evidenceReferences",
+  ]) {
+    assert.ok(REVIEWER_PROMPT.includes(rule), rule);
+  }
 });

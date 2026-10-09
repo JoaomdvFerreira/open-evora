@@ -19,6 +19,7 @@
  * so the review is always judged against exactly the context it was given.
  */
 import { getRecordField } from "../core/record-fields.ts";
+import { selectSourceVerificationContext, type SourceVerification, type SourceVerificationSet } from "../core/source-verifications.ts";
 import type { CorpusIndex, RecordFields, RecordIndex } from "../core/types.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CanonicalIntegrationReadiness } from "../integration/canonical-integration-review.ts";
@@ -45,6 +46,12 @@ export interface ReviewerInputSource {
   deltas: readonly CandidateDelta[];
   validation: ValidationResult;
   readiness: CanonicalIntegrationReadiness;
+  /**
+   * Source Verification Support loaded from the review base — the research
+   * root `index` was loaded from (loadSourceVerifications(index)), never from
+   * the candidates or a prospective head.
+   */
+  sourceVerifications: SourceVerificationSet;
 }
 
 /** One non-candidate record from the prospective corpus that a candidate's evidence chain requires. */
@@ -83,6 +90,14 @@ export interface ReviewerInputPackage {
   evidenceContext: ReviewContextRecord[];
   /** Candidate-scoped deterministic CLEC signals, in signal-engine order. */
   signals: ReviewSignal[];
+  /**
+   * Base-bound Source Verification Support for SRC records the package
+   * already carries (as candidates or in `evidenceContext`), sorted by SRC
+   * ID, claims in file order. Review context only — never Source text and
+   * never an EVD. Omitted entirely when no applicable support exists, so such
+   * packages serialize exactly as they did before this field existed.
+   */
+  sourceVerificationContext?: SourceVerification[];
 }
 
 /** Record families a candidate's evidence chain follows: PRB -> EVD -> SRC, never to other problems. */
@@ -161,7 +176,10 @@ function deepFreeze<T>(value: T): T {
  * author's free-form justification is not on the allow-list (contract §6
  * "must NOT receive... primary free-form rationale outside the immutable
  * package"). Canonical SRC records carry provenance and metadata, not the
- * Source body; no Source content is fetched or synthesized here.
+ * Source body; no Source content is fetched or synthesized here. Applicable
+ * base Source Verification Support is attached as bounded review context;
+ * invalid or no-longer-eligible applicable support throws
+ * SourceVerificationError, on which every caller fails closed.
  */
 export function buildReviewerInputPackage(source: ReviewerInputSource): ReviewerInputPackage {
   const prospective = buildProspectiveCorpusIndex(source.index, source.candidates);
@@ -170,6 +188,14 @@ export function buildReviewerInputPackage(source: ReviewerInputSource): Reviewer
     signalId: reviewSignalId(position),
     signal,
   }));
+
+  const evidenceContext = evidenceContextOf(prospective, source.deltas);
+  // Only SRC records the package already carries: support never widens the evidence graph.
+  const reachableSourceIds = [
+    ...source.deltas.filter((delta) => delta.recordFamily === "SRC-").map((delta) => delta.id),
+    ...evidenceContext.filter((record) => record.recordFamily === "SRC-").map((record) => record.id),
+  ];
+  const sourceVerificationContext = selectSourceVerificationContext(source.sourceVerifications, reachableSourceIds, prospective);
 
   const pkg: ReviewerInputPackage = {
     schemaVersion: "2",
@@ -181,8 +207,9 @@ export function buildReviewerInputPackage(source: ReviewerInputSource): Reviewer
     deltas: structuredClone([...source.deltas]),
     validation: structuredClone(source.validation),
     readiness: source.readiness,
-    evidenceContext: evidenceContextOf(prospective, source.deltas),
+    evidenceContext,
     signals,
+    ...(sourceVerificationContext.length > 0 ? { sourceVerificationContext } : {}),
   };
   return deepFreeze(pkg);
 }

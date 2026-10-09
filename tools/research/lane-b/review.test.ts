@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import type { RecordFields, RecordSchema } from "../core/types.ts";
 import { stringifyRecordYaml } from "../core/yaml.ts";
 import type { AiInvocationRequest, AiInvoker } from "../orchestrate/ai-invoker.ts";
+import { sha256Hex } from "../orchestrate/fingerprint.ts";
 import { validateIndependentReview } from "../orchestrate/independent-review.ts";
 import { serializeReviewerInput, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
 import { buildReviewerPrompt } from "../orchestrate/reviewer-prompt.ts";
@@ -381,6 +382,115 @@ test("an uncommitted working-tree change yields the same review unit as its late
     const committed = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
     assert.deepEqual(committed.changedRecords, prepared.changedRecords);
     assert.equal(committed.reviewerInputFingerprint, prepared.reviewerInputFingerprint);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Source Verification Support: read from the review base only.
+
+const SUPPORT_PATH = "research/source-verifications/SRC-A.yaml";
+const ELIGIBLE_SOURCE: RecordFields = { resource_type: "document", access: { level: "public" }, licensing: { reuse: "unknown" } };
+
+function writeSupport(fixture: Fixture, sourceId: string, statements: string[]): void {
+  fixture.write(`research/source-verifications/${sourceId}.yaml`, stringifyRecordYaml({
+    source_id: sourceId,
+    retrieval: { retrieved_at: "2026-08-25", content_sha256: "ab".repeat(32), media_type: "application/pdf" },
+    verified_claims: statements.map((statement, i) => ({ locator: `p. ${i + 1}`, statement })),
+  }));
+}
+
+/** A base where SRC-A is an eligible public Source carrying support with `statements`. */
+function withSupportedBase(statements: string[], fn: (fixture: Fixture, base: string) => void): void {
+  withFixture((fixture) => {
+    fixture.record({ ...source("SRC-A", "Fonte A"), ...ELIGIBLE_SOURCE });
+    writeSupport(fixture, "SRC-A", statements);
+    fn(fixture, fixture.commit("support merged on main"));
+  });
+}
+
+test("support for a Source the changed records reach is read from the base commit, not from the head or checkout", () => {
+  withSupportedBase(["A fonte regista reclamações sobre atrasos em 2025."], (fixture, base) => {
+    addProblemWithSignal(fixture);
+    const head = fixture.commit("direct change");
+    writeSupport(fixture, "SRC-A", ["Afirmação não revista no checkout."]);
+
+    const pkg = reviewRequired(fixture.unit(base, { kind: "commit", sha: head })).reviewerInput;
+    assert.deepEqual(pkg.sourceVerificationContext?.map((entry) => [entry.source_id, entry.verified_claims.map((claim) => claim.statement)]), [
+      ["SRC-A", ["A fonte regista reclamações sobre atrasos em 2025."]],
+    ]);
+    assert.equal(serializeReviewerInput(pkg).includes("Afirmação não revista no checkout."), false);
+    // The edited checkout is itself a change carrying both canonical records and support.
+    assert.equal(fixture.unit(base, { kind: "working-tree" }).status, "SOURCE_VERIFICATION_NOT_SEPARATE");
+  });
+});
+
+test("support introduced together with a canonical change cannot influence its review and fails closed", () => {
+  withFixture((fixture, first) => {
+    fixture.record({ ...source("SRC-A", "Fonte A"), ...ELIGIBLE_SOURCE });
+    const base = fixture.commit("eligible source on main");
+    addProblemWithSignal(fixture);
+    writeSupport(fixture, "SRC-A", ["Afirmação trazida pela própria alteração."]);
+
+    for (const unit of [fixture.unit(base, { kind: "working-tree" }), fixture.unit(base, { kind: "commit", sha: fixture.commit("mixed change") })]) {
+      assert.deepEqual(unit, { status: "SOURCE_VERIFICATION_NOT_SEPARATE", baseGitSha: base, recordPaths: [recordPath("PRB-NEW")], supportPaths: [SUPPORT_PATH] });
+      assertFails(unit, prBody("N/A"), "SOURCE_VERIFICATION_NOT_SEPARATE", /Source Verification Support must be merged first in a separate pull request/);
+    }
+    // Measured from an older base the SRC-A update joins the canonical side; the refusal is the same.
+    assert.equal(fixture.unit(first, { kind: "working-tree" }).status, "SOURCE_VERIFICATION_NOT_SEPARATE");
+  });
+});
+
+test("a support-only change has no canonical change and needs no Lane B receipt", () => {
+  withSupportedBase(["A fonte regista reclamações sobre atrasos em 2025."], (fixture, base) => {
+    writeSupport(fixture, "SRC-A", ["A fonte regista reclamações sobre atrasos no segundo trimestre de 2025."]);
+    writeSupport(fixture, "SRC-B", ["Outra afirmação verificada."]);
+    const unit = fixture.unit(base, { kind: "commit", sha: fixture.commit("support-only change") });
+    assert.deepEqual(unit, { status: "NO_CANONICAL_CHANGE", baseGitSha: base });
+    assert.equal(verifyLaneBPullRequest(unit, prBody("N/A")).ok, true);
+  });
+});
+
+test("invalid applicable support in the base fails closed; invalid support for an unreached Source does not", () => {
+  withFixture((fixture) => {
+    fixture.record({ ...source("SRC-A", "Fonte A"), ...ELIGIBLE_SOURCE, licensing: { reuse: "prohibited" } });
+    writeSupport(fixture, "SRC-A", ["A fonte regista reclamações."]);
+    writeSupport(fixture, "SRC-UNRELATED", []);
+    const base = fixture.commit("invalid support on main");
+
+    addProblemWithSignal(fixture);
+    assert.throws(
+      () => fixture.unit(base, { kind: "working-tree" }),
+      /SOURCE_VERIFICATION_SUPPORT: applicable Source Verification Support is invalid: source-verifications\/SRC-A\.yaml: SRC-A has licensing\.reuse "prohibited"/
+    );
+
+    fixture.remove(recordPath("PRB-NEW"));
+    fixture.record(evidence("EVD-B", ["SRC-B"], "Versão candidata."));
+    assert.equal(reviewRequired(fixture.unit(base, { kind: "working-tree" })).reviewerInput.sourceVerificationContext, undefined);
+  });
+});
+
+test("the fingerprinted reviewer input changes with applicable base support and not with support for unreached Sources", () => {
+  withSupportedBase(["A fonte regista reclamações sobre atrasos em 2025."], (fixture, base) => {
+    // The same direct change reviewed on another base; only the base SHA itself is neutralised for comparison.
+    const reviewOn = (onBase: string): string => {
+      fixture.git("checkout", "-q", "--detach", onBase);
+      addProblemWithSignal(fixture);
+      const unit = reviewRequired(fixture.unit(onBase, { kind: "commit", sha: fixture.commit("direct change") }));
+      assert.equal(unit.reviewerInputFingerprint, sha256Hex(unit.reviewerInput));
+      return sha256Hex({ ...unit.reviewerInput, baseGitSha: "" });
+    };
+    const original = reviewOn(base);
+
+    fixture.git("checkout", "-q", "--detach", base);
+    writeSupport(fixture, "SRC-A", ["A fonte regista reclamações sobre atrasos no segundo trimestre de 2025."]);
+    const revisedBase = fixture.commit("support revised on main");
+    fixture.git("checkout", "-q", "--detach", base);
+    fixture.record({ ...source("SRC-UNRELATED", "Fonte sem relação"), ...ELIGIBLE_SOURCE });
+    writeSupport(fixture, "SRC-UNRELATED", ["Afirmação sobre outra fonte."]);
+    const unrelatedBase = fixture.commit("unrelated support on main");
+
+    assert.notEqual(reviewOn(revisedBase), original);
+    assert.equal(reviewOn(unrelatedBase), original);
   });
 });
 

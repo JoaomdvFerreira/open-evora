@@ -25,7 +25,7 @@ import { validateIndependentReview } from "../orchestrate/independent-review.ts"
 import { invokeIndependentReview } from "../orchestrate/independent-review-invocation.ts";
 import { serializeReviewerInput } from "../orchestrate/reviewer-input.ts";
 import type { IndependentReviewResult } from "../orchestrate/types.ts";
-import type { LaneBChangedRecord, LaneBReviewUnit } from "./review-unit.ts";
+import { describeSourceVerificationNotSeparate, type LaneBChangedRecord, type LaneBReviewUnit } from "./review-unit.ts";
 
 type ReviewRequiredUnit = Extract<LaneBReviewUnit, { status: "REVIEW_REQUIRED" }>;
 
@@ -188,6 +188,7 @@ export function verifyLaneBPullRequest(unit: LaneBReviewUnit, body: string | nul
       `deleting or renaming canonical records is not supported by Lane B direct review: ${unit.paths.join(", ")}`
     );
   }
+  if (unit.status === "SOURCE_VERIFICATION_NOT_SEPARATE") return fail("SOURCE_VERIFICATION_NOT_SEPARATE", describeSourceVerificationNotSeparate(unit));
   const blocked = laneBContextFreeBlock(unit);
   if (blocked) return fail(blocked.failedCheck, blocked.message);
 

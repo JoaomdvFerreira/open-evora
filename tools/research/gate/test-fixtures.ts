@@ -13,11 +13,13 @@ import { fileURLToPath } from "node:url";
 
 import { loadCorpusIndex } from "../core/corpus.ts";
 import type { CorpusIndex, ParsedRecord, RecordFields, RecordSchema } from "../core/types.ts";
+import { stringifyRecordYaml } from "../core/yaml.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
 import type { GenerationManifest, IndependentReviewResult, ResearchChangeSet, ReviewFinding, SignalDisposition } from "../orchestrate/types.ts";
 import { sha256Hex } from "../orchestrate/fingerprint.ts";
 import { buildReviewerInputPackage, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
+import { loadSourceVerifications } from "../core/source-verifications.ts";
 import { buildHumanGatePackage } from "./package-builder.ts";
 import type { HumanGatePackage } from "./types.ts";
 
@@ -316,6 +318,27 @@ export function semanticReviewCorpus(): CorpusIndex {
   return { researchRoot: "/synthetic", byPrefix, totalRecords: 8 };
 }
 
+/**
+ * semanticReviewCorpus() bound to a temporary `researchRoot` whose
+ * `source-verifications/` holds support with `statements` for each listed
+ * Source; every SRC is made eligible (public document, reuse unknown).
+ */
+export function semanticSupportedCorpus(researchRoot: string, support: Record<string, string[]>): CorpusIndex {
+  const index = semanticReviewCorpus();
+  for (const record of index.byPrefix.get("SRC-")!.records) {
+    Object.assign(record.fields, { resource_type: "document", access: { level: "public" }, licensing: { reuse: "unknown" } });
+  }
+  mkdirSync(join(researchRoot, "source-verifications"), { recursive: true });
+  for (const [sourceId, statements] of Object.entries(support)) {
+    writeFileSync(join(researchRoot, "source-verifications", `${sourceId}.yaml`), stringifyRecordYaml({
+      source_id: sourceId,
+      retrieval: { retrieved_at: "2026-08-25", content_sha256: "cd".repeat(32), media_type: "text/html", archive_reference: "Captura local do projeto" },
+      verified_claims: statements.map((statement, i) => ({ locator: `secção ${i + 1}`, statement })),
+    }), "utf8");
+  }
+  return { ...index, researchRoot };
+}
+
 export function semanticCandidates(): { candidates: CandidateRecord[]; deltas: CandidateDelta[] } {
   return {
     candidates: [
@@ -350,6 +373,8 @@ export function semanticReviewerInput(index: CorpusIndex, baseGitSha: string): R
     deltas,
     validation: { errors: [], totalRecords: index.totalRecords },
     readiness: "READY_FOR_INTEGRATION_GATE",
+    // Loaded exactly as the Gate builder loads it: from the base root `index` was loaded from.
+    sourceVerifications: loadSourceVerifications(index),
   });
 }
 

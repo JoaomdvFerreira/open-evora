@@ -11,14 +11,18 @@ import {
   semanticReview,
   semanticReviewCorpus,
   semanticReviewerInput,
+  semanticSupportedCorpus,
   syntheticHumanGatePackage,
   syntheticResearchChangeSet,
+  withTempDir,
 } from "./test-fixtures.ts";
+import { computeContentHash } from "./content-hash.ts";
 import { buildHumanGatePackage } from "./package-builder.ts";
-import { validateHumanGatePackage } from "./package-validator.ts";
-import { canonicalJsonStringify } from "../orchestrate/fingerprint.ts";
+import { reviewerInputFromGatePackage, validateHumanGatePackage } from "./package-validator.ts";
+import { canonicalJsonStringify, sha256Hex } from "../orchestrate/fingerprint.ts";
 import { validateIndependentReview } from "../orchestrate/independent-review.ts";
 import { buildReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
+import { loadSourceVerifications } from "../core/source-verifications.ts";
 
 test("the Gate stores exactly the reviewer signals and bounded evidence context buildReviewerInputPackage() reconstructs", () => {
   const index = semanticReviewCorpus();
@@ -68,7 +72,7 @@ test("package assembly rejects a change set carrying a context-free CLEC blocker
   const records = semanticCandidates();
   records.candidates[0].fields = { ...records.candidates[0].fields, inference_limits: ["Não é impacto em PRB-0005."] };
   const draft = syntheticResearchChangeSet(index, SHA_A, "PRB-NEW", { records });
-  const reviewerInput = buildReviewerInputPackage({ ...draft, index });
+  const reviewerInput = buildReviewerInputPackage({ ...draft, index, sourceVerifications: loadSourceVerifications(index) });
   assert.ok(reviewerInput.signals.some((s) => s.signal.code === "PRB_ID_IN_EVD_TEXT"));
 
   // A hand-built review dispositioning every signal, the blocker included, as SUPPORTED or NOT_APPLICABLE.
@@ -205,4 +209,63 @@ test("independent-review DISAGREEMENT_FOUND is surfaced as a risk rather than si
   } finally {
     fixture.cleanup();
   }
+});
+
+test("a package whose reviewer received no Source Verification Support keeps its exact shape and content hash", () => {
+  const pkg = semanticHumanGatePackage("CONCUR");
+  assert.equal("reviewSourceVerificationContext" in pkg, false);
+  // Golden content hash of this fixture package, recorded before Source Verification Support existed.
+  assert.equal(computeContentHash(pkg), "7a076fcbf1b8c372532d36fa5dca968972cfce728962bb0eb9d14bb09bd7d174");
+  assert.equal(sha256Hex(reviewerInputFromGatePackage(pkg)), sha256Hex(semanticReviewerInput(semanticReviewCorpus(), SHA_A)));
+});
+
+test("the Gate stores exactly the base Source Verification Support the reviewer received and rebuilds the identical reviewer input", () => {
+  withTempDir((root) => {
+    const index = semanticSupportedCorpus(root, {
+      "SRC-C": ["A fonte regista atrasos na recolha em 2026.", "A fonte não indica a frequência dos atrasos."],
+      "SRC-UNRELATED": ["Afirmação sobre uma fonte que o pacote não alcança."],
+    });
+    const reviewerInput = semanticReviewerInput(index, SHA_A);
+    assert.deepEqual(reviewerInput.sourceVerificationContext?.map((entry) => entry.source_id), ["SRC-C"]);
+
+    const built = buildHumanGatePackage(index, semanticResearchChangeSet(index, SHA_A, semanticReview(reviewerInput, "CONCUR")));
+    assert.deepEqual(built.errors, []);
+    const pkg = JSON.parse(JSON.stringify(built.pkg));
+    assert.deepEqual(pkg.reviewSourceVerificationContext, reviewerInput.sourceVerificationContext);
+    // Support is review context, never canonical Evidence: no record is added to the evidence context.
+    assert.deepEqual(pkg.reviewEvidenceContext.map((r: { id: string }) => r.id), ["EVD-A", "SRC-A", "SRC-C"]);
+    assert.deepEqual(validateHumanGatePackage(pkg).errors, []);
+    assert.equal(sha256Hex(reviewerInputFromGatePackage(pkg)), sha256Hex(reviewerInput));
+    assert.equal(canonicalJsonStringify(pkg).includes("Afirmação sobre uma fonte que o pacote não alcança."), false);
+  });
+});
+
+test("package assembly fails closed on invalid applicable Source Verification Support", () => {
+  withTempDir((root) => {
+    const index = semanticSupportedCorpus(root, { "SRC-C": [] });
+    const review = semanticReview(semanticReviewerInput(semanticReviewCorpus(), SHA_A), "CONCUR");
+    const built = buildHumanGatePackage(index, semanticResearchChangeSet(index, SHA_A, review));
+    assert.equal(built.pkg, undefined);
+    assert.ok(built.errors.some((e) => /reviewer context reconstruction failed: applicable Source Verification Support is invalid: source-verifications\/SRC-C\.yaml/.test(e)), built.errors.join("; "));
+  });
+});
+
+test("stored Source Verification Support is validated structurally against the SRC records the reviewer received", () => {
+  withTempDir((root) => {
+    const index = semanticSupportedCorpus(root, { "SRC-A": ["A fonte regista reclamações."], "SRC-C": ["A fonte regista atrasos na recolha em 2026."] });
+    const reviewerInput = semanticReviewerInput(index, SHA_A);
+    const built = buildHumanGatePackage(index, semanticResearchChangeSet(index, SHA_A, semanticReview(reviewerInput, "CONCUR")));
+    const pkg = JSON.parse(JSON.stringify(built.pkg));
+    const [a, c] = pkg.reviewSourceVerificationContext;
+    const errorsOf = (support: unknown) => validateHumanGatePackage({ ...pkg, reviewSourceVerificationContext: support }).errors;
+
+    assert.ok(errorsOf([]).some((e) => e.includes("must be a non-empty array when present")));
+    assert.ok(errorsOf([c, a]).some((e) => e.includes("is out of order or duplicated")));
+    assert.ok(errorsOf([a, a]).some((e) => e.includes("is out of order or duplicated")));
+    assert.ok(errorsOf([a, { ...c, source_id: "SRC-UNRELATED" }]).some((e) => e.includes("must name an SRC record the reviewer received")));
+    assert.ok(errorsOf([a, { ...c, rationale: "Justificação do autor." }]).some((e) => e.includes('has unexpected field "rationale"')));
+    assert.ok(errorsOf([a, { ...c, verified_claims: [{ locator: "p. 1", statement: "x".repeat(501) }] }]).some((e) => e.includes("at most 500 characters")));
+    const restricted = pkg.reviewEvidenceContext.map((r: { id: string; fields: object }) => (r.id === "SRC-A" ? { ...r, fields: { ...r.fields, access: { level: "restricted" } } } : r));
+    assert.ok(validateHumanGatePackage({ ...pkg, reviewEvidenceContext: restricted }).errors.some((e) => e.includes('SRC-A has access.level "restricted"')));
+  });
 });

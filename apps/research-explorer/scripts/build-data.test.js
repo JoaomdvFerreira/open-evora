@@ -656,6 +656,64 @@ test("run() end-to-end: canonical validation failure aborts without publishing, 
   }
 });
 
+test("run() never publishes Source Verification Support: generated output is identical with or without it", () => {
+  const MARKER = "MARCADOR-DE-APOIO-DE-VERIFICACAO-NAO-PUBLICAVEL";
+  const parent = fs.mkdtempSync(path.join(os.tmpdir(), "evora-re01-e2e-"));
+  const readTree = (dir) => {
+    const files = new Map();
+    const walk = (current) => {
+      for (const entry of fs.readdirSync(current, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+        const full = path.join(current, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else files.set(path.relative(dir, full).split(path.sep).join("/"), fs.readFileSync(full));
+      }
+    };
+    walk(dir);
+    return files;
+  };
+  try {
+    const roots = ["without", "with"].map((name) => {
+      const root = path.join(parent, name, "research");
+      for (const d of STANDARD_DIRS) fs.mkdirSync(path.join(root, d), { recursive: true });
+      for (const f of fs.readdirSync(REAL_SCHEMAS_DIR)) fs.copyFileSync(path.join(REAL_SCHEMAS_DIR, f), path.join(root, "schemas", f));
+      write(root, "sources", "SRC-9001.yaml", minimalSrc());
+      write(root, "evidence", "EVD-900101.yaml", minimalEvd());
+      write(root, "problems", "PRB-9001.yaml", minimalPrb({ evidence: ["EVD-900101"] }));
+      return root;
+    });
+    fs.mkdirSync(path.join(roots[1], "source-verifications"));
+    write(roots[1], "source-verifications", "SRC-9001.yaml", [
+      "source_id: SRC-9001",
+      "retrieval:",
+      "  retrieved_at: 2026-01-02",
+      `  content_sha256: ${"a".repeat(64)}`,
+      "  media_type: text/html",
+      "verified_claims:",
+      "  - locator: secção 1",
+      `    statement: ${MARKER} afirmação verificada.`,
+      "",
+    ].join("\n"));
+    assert.deepStrictEqual(validateResearchTree(roots[1]).errors, []);
+
+    const outputs = roots.map((root) => {
+      const targetDir = path.join(path.dirname(root), "generated");
+      const result = run({ researchRoot: root, repoRoot: path.dirname(root), targetDir, now: () => "2026-01-01T00:00:00.000Z", sourceCommit: () => null });
+      assert.strictEqual(result.ok, true);
+      return readTree(targetDir);
+    });
+    assert.deepStrictEqual([...outputs[1].keys()], [...outputs[0].keys()], "no generated file is added for support");
+    for (const [file, bytes] of outputs[1]) {
+      assert.ok(bytes.equals(outputs[0].get(file)), `${file} is byte-identical with or without support`);
+      const text = bytes.toString("utf8");
+      for (const leak of [MARKER, "source-verifications", "verified_claims", "content_sha256"]) {
+        assert.ok(!text.includes(leak), `${file} must not carry ${leak}`);
+      }
+    }
+  } finally {
+    fs.rmSync(parent, { recursive: true, force: true });
+  }
+});
+
 // ---- run -----------------------------------------------------------------------
 
 function main() {

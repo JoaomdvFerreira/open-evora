@@ -401,6 +401,16 @@ Implemented for direct pull-request changes (Lane B):
 
 The no-exception independent semantic-review rule is therefore technically enforced for both lanes. A `CONCUR` review makes a change eligible for human review; it is not an approval. Once a change is eligible, the canonical and publication decisions remain human judgement.
 
+### Source Verification Support in semantic review
+
+Canonical SRC records hold provenance and metadata, not Source content. Where judging a change requires Source content — typically EVD fidelity to its Source — the independent reviewer returns `INSUFFICIENT_EVIDENCE`. To make such wording reviewable, the bounded facts it relies on may first be recorded as Source Verification Support (`docs/datamodel.md` §8): factual paraphrases a human verified against captured bytes of the public Source.
+
+- **Separate prior pull request.** Support is added or changed only in a pull request that changes no canonical PRB/EVD/SRC record; such a pull request needs no Lane B receipt. A change carrying both canonical records and support fails Lane B and must be split: the support merges first. Authenticity and publication safety of support are decided by the owner when that pull request is reviewed.
+- **Base-only.** Both lanes read support from the review base, never from candidates or the prospective head: Lane B reconstructs it from the base commit; Lane A reads it from the canonical research root its base corpus is loaded from, which Gate rendering requires to be exactly the clean base commit. A change can therefore never supply the support its own review relies on.
+- **Bounded input.** The reviewer receives support only for SRC records already in the review package (as candidates or in the evidence context); support never widens the evidence graph. It is deterministically ordered, part of the fingerprinted reviewer input and of the hash-bound Gate package, and presented at the Gate as review support, not Evidence. Without applicable support the reviewer input is unchanged.
+- **Use by the reviewer.** Support counts only for the bounded claims it explicitly states. It does not establish completeness: silence is not absence, and nothing is inferred beyond it. Source-derived wording that exceeds both the canonical SRC metadata and the supplied verified claims remains `INSUFFICIENT_EVIDENCE`. Findings cite the associated `SRC-*` record. The reviewer does not judge the authenticity of support and does not CLEC-review its statements.
+- **Fail closed.** Invalid applicable support, or support whose Source is no longer eligible in the reviewed state, stops review preparation in both lanes. `npm run research:check` validates every support file.
+
 Implemented as a deterministic pre-review block, in both lanes and again at Human Gate package assembly, for exactly two context-free layer-integrity signal classes:
 - canonical record IDs (`SRC-`, `EVD-`, `PRB-`) embedded in authored SRC text;
 - PRB IDs embedded in authored EVD text.

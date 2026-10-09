@@ -187,6 +187,22 @@ describe("loadCorpusIndex (fixture corpus)", () => {
     assert.deepEqual(firstIds, secondIds);
   });
 
+  test("Source Verification Support files are never loaded or counted as canonical records", () => {
+    const supportRoot = makeFixtureRoot();
+    try {
+      write(supportRoot, "sources", "SRC-9001.yaml", MINIMAL_SRC);
+      mkdirSync(join(supportRoot, "source-verifications"));
+      write(supportRoot, "source-verifications", "SRC-9001.yaml", "source_id: SRC-9001\nverified_claims:\n  - locator: p. 1\n    statement: Uma afirmação verificada.\n");
+      const index = loadCorpusIndex(supportRoot);
+      assert.deepEqual([...index.byPrefix.keys()].sort(), ["EVD-", "PRB-", "SRC-"]);
+      assert.equal(index.totalRecords, 1);
+      assert.deepEqual(index.byPrefix.get("SRC-")?.records.map((r) => r.file), ["sources/SRC-9001.yaml"]);
+      assert.equal(index.byPrefix.get("SRC-")?.byId.get("SRC-9001")?.fields.verified_claims, undefined);
+    } finally {
+      rmSync(supportRoot, { recursive: true, force: true });
+    }
+  });
+
   test("multiple records of one type are read in sorted filename order", () => {
     const multiRoot = makeFixtureRoot();
     try {
