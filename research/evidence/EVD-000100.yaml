@@ -4,7 +4,7 @@ provenance:
     - SRC-0086
   extracted_at: 2026-08-11
 observation:
-  summary: Em 6 de maio de 2026, a Universidade de Évora comunicou a conclusão da
+  summary: Em maio de 2026, a Universidade de Évora publicou informação sobre a
     reabilitação da Residência Universitária Manuel Álvares.
 scope:
   geography:
@@ -13,13 +13,13 @@ scope:
   populations:
     - estudantes da Universidade de Évora
   temporal:
-    as_of: 2026-05-06
+    as_of: 2026-05
 domains:
   - HOU
   - EDU
 evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
-  - A conclusão da obra numa residência não estabelece a capacidade total
-    disponível, a procura não satisfeita nem a resolução das pressões de
-    alojamento estudantil.
+  - Esta observação limita-se à existência da publicação; não quantifica a
+    capacidade total disponível ou a procura não satisfeita nem demonstra a
+    resolução das pressões de alojamento estudantil.

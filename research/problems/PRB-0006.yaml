@@ -16,15 +16,18 @@ affected_populations:
 problem_statement: Os documentos de planeamento institucional identificam preços
   elevados de compra e arrendamento, uma oferta insuficiente de habitação a
   preços comportáveis, social e a custos controlados, degradação habitacional e
-  uma escassez específica de alojamento estudantil, reconhecendo simultaneamente
-  que já estão em curso ações de reabilitação habitacional, construção a custos
-  controlados, reabilitação destinada ao arrendamento apoiado e medidas de
-  alojamento estudantil.
-causal_reading: A causa dominante é sobretudo de natureza física e económica,
-  relacionada com a oferta e a acessibilidade dos preços — preços elevados,
-  oferta insuficiente de habitação a preços comportáveis e degradação
-  habitacional —, pelo que o potencial de uma intervenção digital sobre esta
-  causa dominante é provavelmente secundário. Esta leitura não está validada.
+  uma escassez específica de alojamento estudantil. O plano de ação de 2025
+  prevê reabilitação habitacional, metas de construção a custos controlados,
+  reabilitação para arrendamento apoiado, alojamento temporário ou partilhado
+  para populações vulneráveis, avaliação das necessidades de alojamento
+  estudantil e candidatura a financiamento, sem estabelecer execução ou entrega
+  dessas ações e metas; em janeiro de 2026 foram entregues 12
+  habitações para arrendamento apoiado na Malagueira. Em maio de 2026, a Universidade de Évora publicou informação sobre a reabilitação da
+  Residência Universitária Manuel Álvares.
+causal_reading: Os documentos de planeamento identificam preocupações com os
+  preços, a oferta e a degradação habitacional. A contribuição relativa de cada
+  fator e o papel de eventuais barreiras no processo de candidatura a
+  residência não estão estabelecidos.
 investigation:
   open_questions:
     - question: O processo de informação e candidatura a alojamento/residências da UÉ
@@ -32,19 +35,17 @@ investigation:
         elegibilidade, duplicação documental ou acompanhamento do estado — que
         pudesse ser significativamente reduzida por uma ferramenta digital de
         orientação habitacional?
-      why_open: A existência de vários programas e canais de informação não constitui,
-        por si só, evidência de uma falha de navegação. A resposta institucional
-        direta da SASUE descreve um processo de candidatura online estruturado e
-        totalmente operacional, o que contraria materialmente um enquadramento
-        de falha sistémica de informação ou processo do lado institucional. No
-        entanto, essa resposta não estabelece a usabilidade, clareza,
-        acessibilidade nem a experiência de espera do lado dos estudantes
-        afetados.
-      latest_result: O desafio institucional descreveu um processo online estruturado,
-        com consulta de estado, notificação de resultado e apoio, contrariando
-        materialmente uma falha sistémica institucional de candidatura ou
-        informação. Não estabelece a usabilidade, clareza, acessibilidade ou
-        experiência de espera dos estudantes.
+      why_open: Os SASUÉ descrevem um processo de candidatura em linha
+        estruturado e canais de informação e apoio. Esta descrição restringe
+        a hipótese de falha no processo institucional, mas não estabelece a
+        usabilidade, clareza, acessibilidade nem a experiência de espera dos
+        estudantes afetados.
+      latest_result: Os SASUÉ descreveram um processo de candidatura em linha
+        estruturado, com consulta do estado, notificação do resultado e apoio,
+        que consideram plenamente operacional. Esta descrição restringe a
+        hipótese de falha no processo institucional; não estabelece a
+        usabilidade, clareza, acessibilidade nem a experiência de espera dos
+        estudantes.
       current_action: Não é proporcional prosseguir desafio direto; qualquer reabertura
         da questão de navegação deve incidir na experiência efetiva dos estudantes.
       resolution_condition: Evidência direta da experiência dos estudantes —
@@ -66,13 +67,14 @@ investigation:
         - EVD-000033
     development:
       summary: >-
-        Foi confirmado que já estão em curso intervenções habitacionais
-        substanciais e financiadas — reabilitação, construção a custos
-        controlados, arrendamento apoiado, alojamento temporário ou partilhado e
-        avaliação das necessidades de alojamento estudantil —, pelo que este não
-        é um problema de ausência de resposta institucional. A existência dessas
-        respostas do lado da oferta não demonstra, por si só, que a necessidade
-        habitacional não satisfeita esteja resolvida.
+        O plano de ação de 2025 documenta ações e metas para reabilitação,
+        construção a custos controlados, arrendamento apoiado, alojamento
+        temporário ou partilhado e avaliação das necessidades de alojamento
+        estudantil, sem estabelecer a sua execução. A intervenção municipal de
+        2026 documenta financiamento e metas, bem como a entrega de 12
+        habitações para arrendamento apoiado na Malagueira em janeiro. Estas
+        respostas não demonstram, por si só, que a necessidade habitacional não
+        satisfeita esteja resolvida.
 
 
         A pressão específica sobre o alojamento estudantil foi mantida como uma
@@ -87,11 +89,11 @@ investigation:
       summary: >-
         Valores divulgados através da imprensa — quartos por cerca de 500 euros
         por mês, T2 por cerca de 1.000 euros por mês e cerca de 70% dos
-        estudantes da UÉ deslocados para o mercado de arrendamento — reforçaram
-        a evidência atual relativa à exposição dos estudantes aos custos e à
-        disponibilidade de alojamento. Estes valores são mantidos como
-        informação reportada e não verificada através de um conjunto de dados
-        primário.
+        estudantes da UÉ a viver fora de casa e dependentes de alojamento
+        arrendado — reforçaram os sinais relativos à exposição dos
+        estudantes aos custos e à disponibilidade de alojamento. Estes valores
+        são mantidos como informação reportada e não verificada através de um
+        conjunto de dados primário.
 
 
         O processo de informação e candidatura orientado ao candidato foi
@@ -152,7 +154,6 @@ evidence:
       - REFINES
     research_roles:
       - LOCAL_OBSERVATION
-      - EXISTING_RESPONSE
   - evidence_id: EVD-000125
     effects:
       - BOUNDS
@@ -177,7 +178,7 @@ solution_landscape_status: not_assessed
 status: OPEN
 history:
   - date: 2026-08-31
-    summary: O desafio institucional descreveu um processo online estruturado com consulta de estado, notificação e apoio, contrariando materialmente uma falha sistémica institucional de candidatura ou informação; a usabilidade e experiência dos estudantes mantêm-se por estabelecer.
+    summary: O desafio institucional documentou a descrição dos SASUÉ de um processo de candidatura em linha estruturado, que consideram plenamente operacional, e restringiu a hipótese de falha no processo institucional; a usabilidade, clareza, acessibilidade e experiência de espera dos estudantes mantêm-se por estabelecer.
     state_changes:
       validation_status:
         from: unvalidated
@@ -201,15 +202,19 @@ decision_basis:
     reconhecidas e recorrentes de planeamento, e não como uma suposição.
 
 
-    Existe evidência concreta de consequências para residentes/estudantes
-    especificamente na subpopulação estudantil (EVD-000099, EVD-000043),
-    permitindo fundamentar essa parte da afirmação em efeitos efetivamente
-    documentados e não apenas em preocupações institucionais.
+    Para estudantes, EVD-000043 documenta capacidade limitada ou
+    temporariamente afetada nas residências e encaminhamento institucional
+    para alojamento privado ou alternativo. EVD-000099 reporta preços e
+    dependência de alojamento arrendado, com período e representatividade
+    desconhecidos. Estes registos documentam constrangimentos e informação
+    reportada, mas não demonstram consequências individuais causadas por esses
+    constrangimentos. O registo não documenta de forma independente
+    consequências vividas por residentes não estudantes.
 
 
-    As intervenções existentes (EVD-000032, EVD-000042, EVD-000100, EVD-000125)
-    são documentadas como soluções existentes, respostas institucionais ou
-    evidência que delimita o estado atual. Não são tratadas como manifestação,
+    Os registos de medidas habitacionais (EVD-000032, EVD-000042), da publicação
+    sobre reabilitação (EVD-000100) e do processo de candidatura (EVD-000125)
+    delimitam a leitura do problema. Não são tratados como manifestação,
     consequência nem prova de prevalência ou severidade atual e, por si só, não
     estabelecem nem negam a existência do problema.
 
@@ -256,7 +261,7 @@ decision_basis:
 
 
     EVD-000099 (reportagem de imprensa, SRC-0085) acrescenta uma classe de
-    evidência secundária distinta, com valores atuais sobre preços e deslocação
+    evidência secundária distinta, com valores reportados sobre preços e deslocação
     dos estudantes para o mercado de arrendamento. Esses valores são tratados
     como REPORTADOS, com representatividade DESCONHECIDA, e não foram
     verificados através de um conjunto de dados primário.
@@ -268,12 +273,11 @@ decision_basis:
     da população estudantil.
 
 
-    A evidência sobre intervenções institucionais (EVD-000032, EVD-000042,
-    EVD-000100, EVD-000125 e EVD-000126) documenta soluções existentes, estado
-    atual e limites da afirmação. Mostra que existe resposta institucional ativa
-    e impede qualquer afirmação de que nada está a ser feito, mas não estabelece
-    de forma independente a manifestação, as consequências, a prevalência ou a
-    severidade atual, nem demonstra que a necessidade habitacional não
+    Os registos sobre medidas habitacionais (EVD-000032, EVD-000042), a
+    publicação sobre reabilitação (EVD-000100) e o processo de candidatura
+    (EVD-000125, EVD-000126) documentam respostas institucionais e limites da
+    afirmação. Não estabelecem, de forma independente, a manifestação, as
+    consequências, a prevalência ou a severidade atual, nem demonstram que a necessidade habitacional não
     satisfeita esteja resolvida.
 
 
@@ -293,11 +297,11 @@ decision_basis:
       documentada de alojamento estudantil (EVD-000033, EVD-000043).
 
 
-      EVD-000032 documenta o programa de resposta institucional — reabilitação,
-      metas de construção a custos controlados, reabilitação para arrendamento
-      apoiado, alojamento temporário ou partilhado e avaliação das necessidades
-      de alojamento estudantil — e é tratado como evidência de solução existente
-      e de estado atual, e não como evidência da manifestação da pressão
+      EVD-000032 documenta ações e metas do plano de resposta institucional de
+      2025 — reabilitação, construção a custos controlados, arrendamento apoiado,
+      alojamento temporário ou partilhado e avaliação das necessidades de
+      alojamento estudantil. É tratado como resposta planeada, sem estabelecer
+      execução ou entrega e sem constituir evidência da manifestação da pressão
       habitacional.
     evidence:
       - EVD-000031
@@ -305,50 +309,53 @@ decision_basis:
       - EVD-000043
   consequence:
     summary: >-
-      A evidência concreta de consequências para residentes/estudantes é mais
-      forte no caso dos estudantes.
+      A evidência é mais específica sobre constrangimentos no alojamento
+      estudantil e condições reportadas de arrendamento do que sobre
+      consequências individuais vividas por estudantes ou outros residentes.
 
 
-      EVD-000043 documenta que três residências da Universidade de Évora
-      estiveram encerradas para obras durante 2025/2026, provocando uma redução
-      temporária da capacidade, e que a Universidade encaminha explicitamente
-      estudantes para alojamento privado ou alternativo devido ao número
-      limitado de lugares.
+      EVD-000043 documenta encerramentos temporários de residências da
+      Universidade de Évora para obras durante 2025/2026 e que a Universidade
+      encaminha explicitamente estudantes para alojamento privado ou
+      alternativo devido ao número limitado de lugares.
 
 
-      EVD-000099 reporta valores atuais divulgados através da imprensa — quartos
+      EVD-000099 reporta valores divulgados através da imprensa — quartos
       por cerca de 500 euros por mês, T2 por cerca de 1.000 euros por mês e
-      aproximadamente 70% dos estudantes da UÉ deslocados para o mercado de
-      arrendamento.
+      aproximadamente 70% dos estudantes da UÉ a viver fora de casa e
+      dependentes de alojamento arrendado.
 
 
-      Em conjunto, estes elementos estabelecem efeitos concretos para estudantes
-      — deslocação para um mercado de arrendamento privado pressionado e perda
-      temporária de capacidade nas residências — e não apenas preocupação
-      institucional ou a existência de intervenções.
+      Os encerramentos temporários e o encaminhamento para alojamento
+      alternativo documentam constrangimentos nas residências. Os valores
+      divulgados através da imprensa contextualizam os custos e a dependência
+      de alojamento arrendado, sem estabelecer que a pressão habitacional causou
+      a situação de viver fora de casa.
 
 
-      Não existe no registo evidência concreta equivalente de consequências ao
-      nível da população geral de residentes. A afirmação relativa à população
-      geral assenta na caracterização dos documentos de planeamento
-      institucional (EVD-000031, EVD-000033), e não em casos documentados ao
-      nível individual ou dos agregados familiares.
+      A afirmação relativa à população geral assenta na caracterização dos
+      documentos de planeamento institucional (EVD-000031, EVD-000033). O
+      registo não documenta de forma independente consequências vividas por
+      residentes não estudantes ao nível individual ou dos agregados familiares.
     evidence:
       - EVD-000043
       - EVD-000099
   currentness:
     assessment: >-
-      ALTA para a pressão específica sobre o alojamento estudantil e para a
-      respetiva caracterização institucional; MÉDIA para a afirmação de pressão
-      habitacional relativa à população geral.
-
-
-      EVD-000099 fornece evidência atual de 2026 especificamente sobre a pressão
-      de preços e alojamento dos estudantes, sujeita às limitações de ser
-      informação REPORTADA e de representatividade DESCONHECIDA. EVD-000100,
-      relativo à conclusão de obras de renovação numa residência em maio de
-      2026, constitui também evidência atual sobre o estado do alojamento
+      A evidência sobre a pressão específica do alojamento estudantil inclui
+      encerramentos temporários de residências em 2025/2026 (EVD-000043) e
+      valores divulgados pela imprensa com período DESCONHECIDO (EVD-000099).
+      Não estabelece a magnitude ou a persistência atual dessa pressão. A
+      informação institucional de 2026 descreve intervenções e o processo de
+      candidatura nessa data, sem quantificar a pressão sobre o alojamento
       estudantil.
+
+
+      EVD-000099 reporta valores sobre preços e alojamento dos estudantes, mas
+      o período a que se referem é DESCONHECIDO. São informação REPORTADA e de
+      representatividade DESCONHECIDA. EVD-000100 documenta que, em maio de
+      2026, a Universidade de Évora publicou informação sobre a reabilitação da
+      Residência Universitária Manuel Álvares.
 
 
       EVD-000042, de 2026 — acordo de 67,1 milhões de euros para 459 habitações
@@ -358,11 +365,14 @@ decision_basis:
       satisfeita esteja resolvida.
 
 
-      EVD-000125, EVD-000126 e EVD-000127, resultantes da resposta institucional
-      dos SASUE de 13 de agosto de 2026, estabelecem o estado atual do processo
-      de candidatura e gestão das residências nessa data e fornecem evidência
-      atual que delimita ou contradiz apenas a questão específica do processo de
-      candidatura.
+      Em 13 de agosto de 2026, os SASUÉ descreveram o processo de candidatura
+      a residência (EVD-000125), referiram dispor de informação operacional
+      agregada (EVD-000126) e consideraram o processo plenamente operacional
+      (EVD-000127). Estes registos documentam a descrição e avaliação
+      institucionais disponíveis nessa data e delimitam a questão específica
+      da candidatura; não verificam de forma independente a usabilidade,
+      clareza, acessibilidade, ausência de fricção, experiência dos candidatos
+      ou o estado operacional completo da gestão das residências.
 
 
       Estes registos não são utilizados, nem devem ser interpretados, como
@@ -372,24 +382,23 @@ decision_basis:
       demonstram, por si só, a existência ou dimensão dessa escassez.
 
 
-      EVD-000126 confirma especificamente apenas que existem internamente
-      indicadores agregados de candidaturas, capacidade, lista de espera e
-      tempos de decisão. Não fornece valores desses indicadores, pelo que a
-      simples existência de indicadores não é tratada como evidência da
-      severidade atual.
+      Em EVD-000126, os SASUÉ referem dispor de informação operacional agregada
+      sobre candidaturas, vagas, candidatos não colocados, listas de espera e
+      tempos de decisão. Não foram fornecidos valores, pelo que esta declaração
+      não é tratada como evidência da magnitude da escassez.
 
 
       EVD-000031, EVD-000032 e EVD-000033 são documentos de planeamento de
       2024-2025.
 
 
-      A atualidade da afirmação relativa à população geral permanece MÉDIA:
-      assenta principalmente nessa caracterização institucional de 2024-2025 e
-      na ausência de evidência suficiente para estabelecer uma severidade atual
-      quantificada ou a resolução da necessidade subjacente. A evidência atual
-      de intervenção de EVD-000042 e a evidência atual específica dos estudantes
-      em EVD-000099 não constituem, pela simples ausência de contradição,
-      corroboração afirmativa da severidade atual para a população geral.
+      A caracterização da pressão habitacional relativa à população geral
+      assenta principalmente no planeamento institucional de 2024-2025.
+      EVD-000042 documenta intervenções posteriores, mas não estabelece a
+      magnitude atual da necessidade residual. A ausência de evidência de
+      resolução não demonstra persistência com uma severidade determinada.
+      O estado e a severidade atuais para a população geral permanecem por
+      estabelecer com a evidência disponível.
 
 
       Não foi localizado um conjunto de dados de 2026 que quantifique a
@@ -412,13 +421,12 @@ decision_basis:
       EVD-000127).
 
 
-      A resposta dos SASUE (EVD-000127) constitui um resultado genuíno de
-      contradição e delimitação: contraria a hipótese específica de que um
-      processo digital problemático de candidatura às residências seja uma
-      barreira material de acesso. A instituição descreve um processo online
-      estruturado e totalmente operacional, com candidatura, notificação e
-      consulta do estado (EVD-000125), e encaminha eventuais alterações técnicas
-      necessárias para os serviços de informática da Universidade (EVD-000127).
+      A resposta dos SASUÉ (EVD-000125 e EVD-000127) descreve um processo de
+      candidatura em linha estruturado, com notificação e consulta do estado,
+      que a instituição considera plenamente operacional. Esta descrição
+      restringe a hipótese de falha no processo institucional, mas não
+      estabelece a usabilidade, clareza, acessibilidade nem a experiência dos
+      candidatos.
 
 
       Este resultado restringe apenas a caracterização do problema na dimensão
@@ -431,10 +439,12 @@ decision_basis:
       respeito à oferta e aos custos, e não ao mecanismo digital de candidatura.
 
 
-      A evidência de intervenções institucionais ativas e de grande escala em
-      EVD-000042 foi igualmente considerada e preservada como evidência que
-      delimita a conclusão, e não como prova de que a necessidade habitacional
-      subjacente esteja resolvida.
+      EVD-000042 documenta financiamento de 67,1 milhões de euros, metas e
+      projetos relativos a 459 habitações e outras respostas planeadas, além de
+      12 habitações para arrendamento apoiado entregues na Malagueira em
+      janeiro de 2026. O financiamento, as metas e os projetos não equivalem a
+      habitações entregues; nem estes nem as 12 entregas demonstram, por si só,
+      que a necessidade habitacional residual esteja resolvida.
     evidence:
       - EVD-000125
       - EVD-000127
@@ -453,10 +463,16 @@ decision_basis:
   corroboration_statement: Os documentos de planeamento institucional identificam
     preços elevados de compra e arrendamento, uma oferta insuficiente de
     habitação a preços comportáveis, social e a custos controlados, degradação
-    habitacional e uma escassez específica de alojamento estudantil,
-    reconhecendo simultaneamente que já estão em curso ações de reabilitação
-    habitacional, construção a custos controlados, reabilitação destinada ao
-    arrendamento apoiado e medidas de alojamento estudantil.
+    habitacional e uma escassez específica de alojamento estudantil. O plano de
+    ação de 2025 prevê reabilitação habitacional, metas de construção a custos
+    controlados, reabilitação para arrendamento apoiado, alojamento temporário
+    ou partilhado para populações vulneráveis, avaliação das necessidades de
+    alojamento estudantil e candidatura a financiamento, sem estabelecer
+    execução ou entrega dessas ações e metas; a intervenção
+    municipal de 2026 documenta financiamento e metas, além da entrega de 12
+    habitações para arrendamento apoiado na Malagueira em janeiro. Em maio de
+    2026, a Universidade de Évora publicou informação sobre a reabilitação da
+    Residência Universitária Manuel Álvares.
   supporting_evidence:
     - EVD-000031
     - EVD-000033
@@ -492,11 +508,11 @@ decision_basis:
 
 
     A distinção entre documentos ou fontes não é, por isso, transformada
-    automaticamente em independência institucional. EVD-000033 está ainda
-    classificado no próprio registo como REFINA, e não como uma fonte primária
-    autónoma de peso equivalente, pelo que não é contabilizado como
-    acrescentando, por si só, detalhe independente sobre prevalência ou
-    severidade para além da caracterização geral da família PDS.
+    automaticamente em independência institucional. A contribuição de
+    EVD-000033 é avaliada à luz da proveniência institucional partilhada e do
+    seu limite de inferência, sem o contar automaticamente como uma voz
+    institucional adicional independente por apoiar ou refinar a
+    caracterização do PRB.
 
 
     Para a população estudantil, EVD-000043 (SRC-0037, página de alojamento dos
@@ -515,9 +531,9 @@ decision_basis:
     corroboração independente uns dos outros.
 
 
-    EVD-000042 e EVD-000100 são evidência de intervenção e estado atual, e não
-    linhas de corroboração da afirmação sobre a pressão habitacional, pelo que
-    são excluídos da avaliação de independência dessa afirmação.
+    EVD-000042 documenta intervenção municipal e EVD-000100 uma publicação
+    sobre reabilitação; não são linhas de corroboração da afirmação sobre a
+    pressão habitacional, pelo que são excluídos da avaliação de independência dessa afirmação.
 
 
     Em síntese, a afirmação relativa à população geral assenta em linhas
@@ -551,19 +567,23 @@ decision_basis:
       consequências ao nível individual ou dos agregados familiares no registo.
 
 
-      (2) Estudantes: suportados tanto por caracterização institucional como por
-      evidência concreta e atual de consequências (EVD-000043, EVD-000099).
+      (2) Estudantes: a caracterização institucional documenta capacidade
+      limitada ou temporariamente afetada nas residências e encaminhamento
+      para alternativas (EVD-000043); a imprensa reporta preços e dependência
+      de alojamento arrendado, com período e representatividade desconhecidos
+      (EVD-000099). Estes registos não demonstram consequências individuais
+      causadas pela pressão habitacional.
 
 
-      A evidência específica dos estudantes não é generalizada para a população
-      geral de residentes, e a evidência da população geral não é
-      artificialmente reforçada pelas consequências documentadas especificamente
-      para estudantes.
+      As condições documentadas ou reportadas para estudantes não são
+      generalizadas para os restantes residentes, cuja experiência individual
+      não está estabelecida de forma independente neste registo.
     temporal: >-
       Delimitado ao período documentado no registo. A caracterização
       institucional de planeamento abrange 2024-2025 (EVD-000031, EVD-000032,
-      EVD-000033); a evidência de estado atual abrange janeiro a agosto de 2026
-      (EVD-000042, EVD-000099, EVD-000100, EVD-000125 a EVD-000127).
+      EVD-000033); a intervenção e a informação institucional documentadas
+      abrangem janeiro a agosto de 2026 (EVD-000042, EVD-000100, EVD-000125 a EVD-000127). O
+      período dos valores reportados em EVD-000099 é desconhecido.
 
 
       A afirmação não se estende a uma magnitude quantificada da escassez em
@@ -576,32 +596,34 @@ decision_basis:
     preços elevados da habitação, oferta insuficiente de habitação a preços
     comportáveis, social e a custos controlados e degradação habitacional como
     preocupações reconhecidas, existindo uma componente específica de alojamento
-    estudantil mais bem evidenciada, incluindo deslocação para um mercado de
-    arrendamento privado pressionado.
+    estudantil mais bem evidenciada; a imprensa reporta que cerca de 70% dos
+    estudantes da UÉ viviam fora de casa e dependiam de alojamento arrendado;
+    trata-se de um valor mediado pela imprensa, sem metodologia primária
+    verificada, que não estabelece que a pressão habitacional causou essa
+    situação.
 
 
     NÃO É SUPORTADA como: uma afirmação de prevalência quantificada entre todos
     os residentes; um nível de severidade à escala de todo o município; uma
     atribuição causal a um único mecanismo; ou uma afirmação de que o processo
     digital de candidatura às residências constitui, por si só, uma barreira
-    significativa de acesso. A resposta dos SASUE (EVD-000127) contraria
-    especificamente esta última hipótese mais estreita, sem contradizer a
-    pressão habitacional mais ampla nem a componente de capacidade e
-    acessibilidade económica do alojamento estudantil.
+    significativa de acesso. A descrição e avaliação institucionais dos SASUÉ
+    (EVD-000125 e EVD-000127) restringem a hipótese de falha no processo
+    institucional, mas não estabelecem a experiência dos candidatos nem
+    contradizem a pressão habitacional mais ampla.
 
 
-    As intervenções institucionais existentes (EVD-000032, EVD-000042,
-    EVD-000100, EVD-000125, EVD-000126) estão documentadas como ativas e
-    substanciais, mas constituem evidência de limite e de estado atual, e não
-    evidência de consequências. Por si só, não estabelecem que a necessidade
-    habitacional não satisfeita esteja resolvida.
+    Os registos sobre medidas habitacionais (EVD-000032, EVD-000042), a
+    publicação sobre reabilitação (EVD-000100) e o processo de candidatura
+    (EVD-000125, EVD-000126) delimitam a leitura do problema. Por si só, não
+    estabelecem que a necessidade habitacional não satisfeita esteja resolvida.
 
 
     A evidência recente sobre intervenções — por exemplo, as entregas de janeiro
-    de 2026 em EVD-000042 e a conclusão de obras de renovação em maio de 2026 em
-    EVD-000100 — não demonstra automaticamente a severidade atual do problema, e
-    a ausência dessa evidência também não constituiria prova de que o problema
-    não existe.
+    de 2026 em EVD-000042 e a publicação sobre reabilitação de maio de 2026
+    em EVD-000100 — não demonstra automaticamente a severidade atual do
+    problema, e a ausência dessa evidência também não constituiria prova de que
+    o problema não existe.
 
 
     A evidência de consequências para a população geral é mais fraca do que para
@@ -616,15 +638,18 @@ decision_basis:
 
 
     Não foi localizado um conjunto de dados de 2026 que quantifique a magnitude
-    da escassez ou uma lista de espera. Os SASUE confirmaram que existem
-    internamente indicadores agregados desse tipo (EVD-000126), mas não
-    forneceram valores, definições nem condições de reutilização. A simples
-    existência dos indicadores não é interpretada como evidência da magnitude da
-    escassez.
+    da escassez ou uma lista de espera. Os SASUÉ referiram dispor de informação
+    operacional agregada desse tipo (EVD-000126), mas não forneceram valores,
+    definições nem condições de reutilização. A declaração de que esses indicadores existem não é interpretada como
+    evidência da magnitude da escassez.
 
 
-    EVD-000125, EVD-000126 e EVD-000127 estabelecem apenas o estado atual do
-    processo de candidatura e gestão das residências. Não são utilizados como
-    evidência de que a pressão habitacional mais ampla seja atualmente severa
-    nem de que a escassez de alojamento estudantil tenha uma magnitude atual
-    quantificada.
+    EVD-000125 regista a descrição dos SASUÉ do processo de candidatura em
+    13 de agosto de 2026; EVD-000126 regista que referem dispor de informação
+    operacional agregada; EVD-000127 regista a sua avaliação de que o processo
+    é plenamente operacional. Este relato institucional não verifica de forma
+    independente a usabilidade, clareza, acessibilidade, ausência de fricção,
+    experiência dos candidatos ou o estado operacional completo da gestão das
+    residências. Não é utilizado como evidência de que a pressão habitacional
+    mais ampla seja atualmente severa nem de que a escassez de alojamento
+    estudantil tenha uma magnitude atual quantificada.
