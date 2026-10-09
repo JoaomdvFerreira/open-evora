@@ -34,14 +34,13 @@ import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } 
 import type { AiInvoker } from "./ai-invoker.ts";
 import { asValidatedAuthoringEnvelope, validateAuthoringEnvelope } from "./authoring-envelope.ts";
 import { loadCandidates } from "./candidate-loader.ts";
-import { asValidatedIndependentReview, validateIndependentReview } from "./independent-review.ts";
+import { invokeIndependentReview } from "./independent-review-invocation.ts";
 import { sha256Hex } from "./fingerprint.ts";
 import { asValidatedManifest, validateManifest } from "./manifest.ts";
 import { resolveContainedPath } from "./path-containment.ts";
 import { buildPrimaryAuthoringPrompt } from "./primary-prompt.ts";
 import { assembleResearchChangeSet } from "./research-change-set.ts";
-import { buildReviewerInputPackage, serializeReviewerInput } from "./reviewer-input.ts";
-import { buildReviewerPrompt } from "./reviewer-prompt.ts";
+import { buildReviewerInputPackage } from "./reviewer-input.ts";
 import type { GenerationManifest, PreparationOutcome, ResearchTrigger } from "./types.ts";
 import { deriveMaterialNonPrivateSources, evaluateSafetyAdmission, type InferenceLimitResolutionChecker, type SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
 import { writeSafetyHoldReport } from "../admission/hold-report.ts";
@@ -258,24 +257,9 @@ export async function continueFromFrozenCandidates(
   // Invoked only now that admission is provably ELIGIBLE (never on a
   // resume that is still HOLD), and always a brand-new invocation — never
   // the same invoker/process used for PRIMARY_AUTHOR.
-  const reviewerPrompt = buildReviewerPrompt(serializeReviewerInput(reviewerInput));
-  const reviewerResult = reviewerInvoker.invoke({ role: "INDEPENDENT_REVIEWER", input: reviewerPrompt });
-
-  if (reviewerResult.status === "TIMEOUT") {
-    return failed("INDEPENDENT_REVIEW_TIMEOUT", reviewerResult.message);
-  }
-  if (reviewerResult.status === "INVOCATION_FAILED") {
-    return failed("INDEPENDENT_REVIEW_INVOCATION_FAILED", reviewerResult.message);
-  }
-
-  const reviewerParsed = parseJsonStdout(reviewerResult.stdout, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
-  if ("failure" in reviewerParsed) return reviewerParsed.failure;
-
-  const reviewValidation = validateIndependentReview(reviewerParsed.value, reviewerInput);
-  if (reviewValidation.errors.length > 0) {
-    return failed("INDEPENDENT_REVIEW_OUTPUT_INVALID", reviewValidation.errors.join("; "));
-  }
-  const independentReview = asValidatedIndependentReview(reviewerParsed.value);
+  const reviewerResult = invokeIndependentReview(reviewerInvoker, reviewerInput, cycleDir);
+  if (reviewerResult.status === "FAILED") return failed(reviewerResult.failedCheck, reviewerResult.message);
+  const independentReview = reviewerResult.review;
 
   // Persist the real independent-review result so a rerun (WU048 case 20)
   // observes the same on-disk artifact this run actually produced.

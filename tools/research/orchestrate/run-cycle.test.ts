@@ -245,7 +245,7 @@ test("an advisory-only lexical signal still reaches the independent reviewer and
 
     const undispositioned = new RecordingInvoker(fixedResponder(VALID_REVIEW));
     const failed = await runResearchCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: undispositioned });
-    assert.equal(undispositioned.calls.length, 1);
+    assert.equal(undispositioned.calls.length, 2);
     assert.deepEqual(frozenReviewerInput(undispositioned.calls[0]).signals.map((s) => s.signal.code), ["SRC_EVALUATIVE_WORDING"]);
     assert.equal(failed.status === "FAILED" && failed.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
 
@@ -286,6 +286,25 @@ test("the validated v2 review is persisted and carried unchanged by the Research
     assert.equal(persisted.schemaVersion, "2");
     assert.deepEqual(persisted.signalDispositions.map((d: { signalId: string }) => d.signalId), ["CLEC-SIG-0001"]);
     assert.deepEqual(outcome.changeSet.independentReview, persisted);
+  });
+});
+
+test("Lane A accepts a valid replacement after one structurally invalid independent review", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
+    const reviewer = new RecordingInvoker((request, callIndex) => {
+      const valid = concurringResponder(request);
+      if (callIndex !== 0 || valid.status !== "OK") return valid;
+      const invalid = JSON.parse(valid.stdout);
+      invalid.signalDispositions[0].evidenceReferences = [];
+      return { status: "OK", stdout: JSON.stringify(invalid) };
+    });
+    const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
+    assert.equal(reviewer.calls.length, 2);
+    assert.ok(reviewer.calls[1].input.startsWith(`${reviewer.calls[0].input}\n`));
+    assert.match(readFileSync(join(cycleDir, "independent-review-attempt-1.errors.txt"), "utf8"), /SUPPORTED but names no evidence/);
+    assert.equal(JSON.parse(readFileSync(join(cycleDir, "independent-review.json"), "utf8")).outcome, "CONCUR");
   });
 });
 

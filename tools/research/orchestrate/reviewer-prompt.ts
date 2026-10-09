@@ -52,9 +52,12 @@ Structured result rules:
 - INSUFFICIENT_EVIDENCE: the signal is relevant but the supplied review input lacks the evidence to decide support versus violation; link at least one INSUFFICIENT_EVIDENCE finding. Never call it a VIOLATION merely because evidence is unavailable.
 - SUPPORTED and NOT_APPLICABLE dispositions link no findings. Every link is mutual: a finding lists the signal in relatedSignalIds exactly when that signal's disposition lists the finding in relatedFindingIds, and the finding's recordId is the signal's subjectId.
 - Report semantic defects as findings even where no signal flagged them (relatedSignalIds []). A finding quotes the authored candidate text verbatim in claim and cites the review-input records it was judged against in evidenceReferences.
+- Every finding must have at least one evidenceReferences entry; evidenceReferences: [] is invalid. Every cited record ID must exist in the immutable review input (as a candidate or in evidenceContext).
+- When judging a finding against another EVD or SRC, cite the relevant EVD or SRC record. For an intrinsic inconsistency in a candidate record where no separate evidence record applies, the candidate recordId itself may be cited. For an evidence-gap finding, cite the record whose supplied context is insufficient.
 - An INSUFFICIENT_EVIDENCE finding is always BLOCKING. A CLEC_VIOLATION finding is BLOCKING when it makes a statement stronger, broader, more certain or more causal than its evidence or changes evidential meaning; otherwise ADVISORY.
 - Outcome: DISAGREEMENT_FOUND if any BLOCKING CLEC_VIOLATION finding or VIOLATION disposition exists; otherwise INSUFFICIENT_EVIDENCE if any INSUFFICIENT_EVIDENCE finding or disposition exists; otherwise CONCUR. Keep every evidence-gap finding even when the outcome is DISAGREEMENT_FOUND.
 - Do not rewrite canonical records: correctionDirection says what must change, not the replacement wording.
+- Before emitting stdout, self-check the complete JSON against this result contract, including every finding, evidenceReferences entry, signal disposition, and cross-link.
 Do not emit anything on stdout other than this JSON object.`;
 
 /**
@@ -109,5 +112,18 @@ export function buildReviewerPrompt(frozenReviewerInputJson: string): string {
     frozenReviewerInputJson,
     "",
     RESULT_CONTRACT,
+  ].join("\n");
+}
+
+/** Procedural feedback only: the original prompt, including its frozen input, is unchanged. */
+export function buildReviewerStructuralRetryPrompt(originalPrompt: string, validationErrors: readonly string[]): string {
+  return [
+    originalPrompt,
+    "",
+    "STRUCTURAL RETRY: Your previous JSON parsed but failed deterministic result validation:",
+    ...validationErrors.map((error) => `- ${error}`),
+    "Return a complete replacement JSON review object under the original result contract.",
+    "Use the same immutable REVIEW INPUT above. Do not add research facts, evidence, or interpretation from this feedback.",
+    "Self-check the entire replacement object before emitting stdout. Output only that JSON object.",
   ].join("\n");
 }

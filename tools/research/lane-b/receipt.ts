@@ -21,9 +21,9 @@ import { join } from "node:path";
 import type { AiInvoker } from "../orchestrate/ai-invoker.ts";
 import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
 import { canonicalJsonStringify } from "../orchestrate/fingerprint.ts";
-import { asValidatedIndependentReview, validateIndependentReview } from "../orchestrate/independent-review.ts";
+import { validateIndependentReview } from "../orchestrate/independent-review.ts";
+import { invokeIndependentReview } from "../orchestrate/independent-review-invocation.ts";
 import { serializeReviewerInput } from "../orchestrate/reviewer-input.ts";
-import { buildReviewerPrompt } from "../orchestrate/reviewer-prompt.ts";
 import type { IndependentReviewResult } from "../orchestrate/types.ts";
 import type { LaneBChangedRecord, LaneBReviewUnit } from "./review-unit.ts";
 
@@ -234,10 +234,8 @@ export type LaneBPreparation =
   | { status: "READY"; receipt: LaneBReviewReceipt; receiptBlock: string };
 
 /**
- * Runs the independent review for a Lane B unit: one fresh
- * INDEPENDENT_REVIEWER invocation that receives only the bounded F00-F
- * prompt built from the frozen reviewer package, validated against that
- * same package. `workbenchDir` must already be boundary-checked as
+ * Runs the independent review for a Lane B unit through the shared bounded
+ * invocation helper. `workbenchDir` must already be boundary-checked as
  * gitignored; the reviewer input, its result and any receipt are written
  * only there. A context-free blocker fails before anything is written or
  * the reviewer is invoked.
@@ -249,21 +247,9 @@ export function prepareLaneBReview(unit: ReviewRequiredUnit, reviewerInvoker: Ai
   const reviewerInputJson = serializeReviewerInput(unit.reviewerInput);
   writeFileSync(join(workbenchDir, "reviewer-input.json"), `${reviewerInputJson}\n`, "utf8");
 
-  const result = reviewerInvoker.invoke({ role: "INDEPENDENT_REVIEWER", input: buildReviewerPrompt(reviewerInputJson) });
-  if (result.status === "TIMEOUT") return { status: "REVIEW_FAILED", failedCheck: "INDEPENDENT_REVIEW_TIMEOUT", message: result.message };
-  if (result.status === "INVOCATION_FAILED") return { status: "REVIEW_FAILED", failedCheck: "INDEPENDENT_REVIEW_INVOCATION_FAILED", message: result.message };
-
-  let value: unknown;
-  try {
-    value = JSON.parse(result.stdout);
-  } catch (error) {
-    return { status: "REVIEW_FAILED", failedCheck: "INDEPENDENT_REVIEW_OUTPUT_INVALID", message: `stdout was not valid JSON: ${(error as Error).message}` };
-  }
-  const validation = validateIndependentReview(value, unit.reviewerInput);
-  if (validation.errors.length > 0) {
-    return { status: "REVIEW_FAILED", failedCheck: "INDEPENDENT_REVIEW_OUTPUT_INVALID", message: validation.errors.join("; ") };
-  }
-  const independentReview = asValidatedIndependentReview(value);
+  const result = invokeIndependentReview(reviewerInvoker, unit.reviewerInput, workbenchDir);
+  if (result.status === "FAILED") return { status: "REVIEW_FAILED", failedCheck: result.failedCheck, message: result.message };
+  const independentReview = result.review;
   writeFileSync(join(workbenchDir, "independent-review.json"), `${JSON.stringify(independentReview, null, 2)}\n`, "utf8");
   if (independentReview.outcome !== "CONCUR") return { status: "NOT_CONCUR", independentReview };
 

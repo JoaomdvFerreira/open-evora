@@ -560,7 +560,7 @@ test("preparation invokes one INDEPENDENT_REVIEWER with only the bounded package
       for (const excluded of ["Outro problema.", "Sem relação.", "Fonte sem relação", "Atrasos relatados."]) assert.equal(invoker.requests[0].input.includes(excluded), false);
       // Source records reach the reviewer exactly as canonical metadata; nothing is fetched.
       assert.deepEqual(unit.reviewerInput.evidenceContext.find((record) => record.id === "SRC-A")?.fields, source("SRC-A", "Fonte A"));
-      assert.deepEqual(readdirSync(workbench).sort(), ["independent-review.json", "pr-receipt.md", "reviewer-input.json"]);
+      assert.deepEqual(readdirSync(workbench).sort(), ["independent-review-attempt-1.stdout.txt", "independent-review.json", "pr-receipt.md", "reviewer-input.json"]);
 
       if (outcome.status !== "READY") return;
       const committed = fixture.unit(base, { kind: "commit", sha: fixture.commit() });
@@ -572,14 +572,62 @@ test("preparation invokes one INDEPENDENT_REVIEWER with only the bounded package
   });
 });
 
+test("Lane B retries an invalid finding once and creates a receipt only from the valid replacement", () => {
+  withFixture((fixture, base) => {
+    addProblemWithSignal(fixture);
+    const unit = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
+    const workbench = mkdtempSync(join(tmpdir(), "open-evora-lane-b-workbench-"));
+    try {
+      const invalid = withFinding(unit.reviewerInput, "CLEC_VIOLATION");
+      invalid.findings[0].evidenceReferences = [];
+      let calls = 0;
+      const invoker = new RecordingInvoker(() => JSON.stringify(++calls === 1 ? invalid : concur(unit.reviewerInput)));
+      const outcome = prepareLaneBReview(unit, invoker, workbench);
+      assert.equal(outcome.status, "READY");
+      assert.equal(invoker.requests.length, 2);
+      assert.ok(invoker.requests[1].input.startsWith(`${invoker.requests[0].input}\n`));
+      assert.match(readFileSync(join(workbench, "independent-review-attempt-1.errors.txt"), "utf8"), /evidenceReferences must name at least one record/);
+      assert.equal(JSON.parse(readFileSync(join(workbench, "independent-review.json"), "utf8")).outcome, "CONCUR");
+      if (outcome.status === "READY") assert.deepEqual(verifyLaneBPullRequest(reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() })), prBody(outcome.receiptBlock)).ok, true);
+    } finally {
+      rmSync(workbench, { recursive: true, force: true });
+    }
+  });
+});
+
+test("Lane B retains both invalid outputs and fails without a review or receipt", () => {
+  withFixture((fixture, base) => {
+    addProblemWithSignal(fixture);
+    const unit = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
+    const workbench = mkdtempSync(join(tmpdir(), "open-evora-lane-b-workbench-"));
+    try {
+      const invalid = withFinding(unit.reviewerInput, "CLEC_VIOLATION");
+      invalid.findings[0].evidenceReferences = [];
+      const invoker = new RecordingInvoker(() => JSON.stringify(invalid));
+      const outcome = prepareLaneBReview(unit, invoker, workbench);
+      assert.equal(outcome.status, "REVIEW_FAILED");
+      if (outcome.status === "REVIEW_FAILED") assert.equal(outcome.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
+      assert.equal(invoker.requests.length, 2);
+      assert.deepEqual(readdirSync(workbench).sort(), [
+        "independent-review-attempt-1.errors.txt", "independent-review-attempt-1.stdout.txt",
+        "independent-review-attempt-2.errors.txt", "independent-review-attempt-2.stdout.txt", "reviewer-input.json",
+      ]);
+    } finally {
+      rmSync(workbench, { recursive: true, force: true });
+    }
+  });
+});
+
 test("preparation yields no receipt for a non-CONCUR, malformed or self-asserted review", () => {
   withFixture((fixture, base) => {
     addProblemWithSignal(fixture);
     const unit = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
     const workbench = mkdtempSync(join(tmpdir(), "open-evora-lane-b-workbench-"));
     try {
-      const notConcur = prepareLaneBReview(unit, new RecordingInvoker(() => JSON.stringify(withFinding(unit.reviewerInput, "CLEC_VIOLATION"))), workbench);
+      const nonConcurInvoker = new RecordingInvoker(() => JSON.stringify(withFinding(unit.reviewerInput, "CLEC_VIOLATION")));
+      const notConcur = prepareLaneBReview(unit, nonConcurInvoker, workbench);
       assert.equal(notConcur.status, "NOT_CONCUR");
+      assert.equal(nonConcurInvoker.requests.length, 1);
       for (const stdout of ['{"reviewed": true}', "Reviewed: true", JSON.stringify({ ...concur(unit.reviewerInput), signalDispositions: [] })]) {
         const outcome = prepareLaneBReview(unit, new RecordingInvoker(() => stdout), workbench);
         assert.equal(outcome.status, "REVIEW_FAILED", stdout);

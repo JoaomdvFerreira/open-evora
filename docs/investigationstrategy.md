@@ -385,6 +385,7 @@ Implemented for the independent reviewer in both lanes:
 - a structured disposition for every deterministic signal affecting the changed records.
 
 The tooling rejects a structurally incomplete or inconsistent review result; it does not decide whether wording is supported.
+Malformed or invalid reviewer output is never accepted. If the first output is valid JSON but fails deterministic review validation, the shared runtime allows one fresh structural retry against the same immutable semantic input, with validation errors as procedural feedback only. A valid non-`CONCUR` review is never retried; a second invalid output fails closed.
 
 Implemented at Human Gate 1 for orchestrated changes (Lane A):
 - the Gate presents the structured CLEC findings and every signal with its disposition;
