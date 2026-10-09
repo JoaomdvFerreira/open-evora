@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { Explorer, GraphLoadingFallback } from "./Explorer";
 import { StaticDataProvider } from "../dataProvider/StaticDataProvider";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
+import { getLisbonCivilDate } from "../overview/overviewStats";
 
 it("uses the Graph skeleton for the lazy-module fallback", () => {
   render(<GraphLoadingFallback />);
@@ -1023,7 +1024,7 @@ describe("Explorer — Overview discovery-context preservation across Problem na
   function makeDiscoveryProblems(count: number): { index: RecordSummary[]; details: Record<string, RecordDetail> } {
     const index: RecordSummary[] = [];
     const details: Record<string, RecordDetail> = {};
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getLisbonCivilDate();
     for (let i = 1; i <= count; i += 1) {
       const id = `PRB-${String(i).padStart(4, "0")}`;
       const domain = i % 2 === 0 ? "PUB" : "MOB";
