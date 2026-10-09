@@ -1,8 +1,10 @@
 problem_id: PRB-0005
 created_at: 2026-08-28
-updated_at: 2026-09-25
-title: O tráfego automóvel e a pressão de estacionamento entram em conflito com
-  a qualidade e a segurança do espaço pedonal em zonas urbanas-chave
+updated_at: 2026-10-09
+title: A evidência institucional documenta, em diferentes locais de Évora,
+  questões distintas de tráfego e congestionamento, de pressão de
+  estacionamento e estacionamento abusivo ou ilegal e de condições de
+  segurança pedonal
 domain:
   - MOB
   - URB
@@ -14,25 +16,37 @@ affected_populations:
   - residentes
   - condutores
   - peões
-problem_statement: Em zonas-chave de Évora, o volume de tráfego, a velocidade
-  dos veículos, a pressão de estacionamento e o estacionamento ilegal estão
-  documentados em conjunto com congestionamento, conflitos de segurança e uma
-  redução da qualidade do espaço pedonal, sem que a contribuição relativa de
-  cada fator esteja quantificada; paralelamente, o PUE recomenda que a
-  distribuição da oferta de estacionamento, as condições de acesso e as tarifas
-  sejam imediatamente compreensíveis para os utilizadores.
-causal_reading: "Esta é uma leitura deliberadamente delimitada: os mecanismos
-  físicos e operacionais — tráfego, pressão de estacionamento e estacionamento
-  ilegal — permanecem distintos de possíveis lacunas de informação. A evidência
-  atual não estabelece que a falta ou inadequação de informação sobre a ocupação
-  e disponibilidade de estacionamento seja uma causa material dos resultados
-  observados."
+problem_statement: A evidência institucional documenta em Évora fenómenos
+  distintos, que variam de local para local e não estão estabelecidos como uma
+  cadeia causal conjunta. O diagnóstico de mobilidade do PUE, cujo período de
+  referência não está determinado e que não estabelece que a situação se
+  mantenha inalterada, regista congestionamento no sistema viário em torno das
+  muralhas e da circular sul, velocidades excessivas de veículos em corredores
+  com forte presença pedonal e um problema significativo de sinistralidade,
+  incluindo no Centro Histórico; o mesmo diagnóstico identifica pressão de
+  estacionamento em partes da cidade e estacionamento abusivo ou ilegal, sem
+  quantificar a sua prevalência ou severidade. O relatório anual municipal de
+  2026 atribui atrasos recorrentes do serviço urbano a tráfego lento nas
+  principais vias, em especial nos acessos ao Centro Histórico e na circular
+  que serve o Parque Industrial durante os períodos de ponta, sem isolar o
+  peso do tráfego face a outros fatores operacionais. Paralelamente, o PUE
+  recomenda que a distribuição da oferta de estacionamento, as condições de
+  acesso e as tarifas sejam imediatamente compreensíveis para os utilizadores;
+  trata-se de uma recomendação, que não estabelece uma falha atual nem a
+  necessidade de uma aplicação.
+causal_reading: "Esta é uma leitura deliberadamente delimitada: os fenómenos
+  documentados de tráfego e estacionamento — congestionamento, tráfego lento,
+  pressão de estacionamento e estacionamento abusivo ou ilegal — permanecem
+  distintos da hipótese informacional, que é tratada separadamente. A evidência
+  disponível não estabelece que a falta ou inadequação de informação sobre a
+  ocupação e a disponibilidade de estacionamento seja uma causa material dos
+  fenómenos de tráfego, estacionamento ou segurança documentados."
 investigation:
   open_questions:
     - question: A falta ou inadequação de informação sobre a ocupação e a
-        disponibilidade de estacionamento é uma causa material do
-        congestionamento, dos conflitos de segurança e da redução da qualidade
-        do espaço pedonal descritos neste problema?
+        disponibilidade de estacionamento é uma causa material de algum dos
+        fenómenos de tráfego, estacionamento ou segurança documentados neste
+        problema?
       why_open: As páginas de serviço da Via Verde Estacionar incluem Évora entre os
         municípios onde o pagamento do estacionamento na via pública está
         disponível, e a funcionalidade Parking Buddy do mesmo serviço oferece
@@ -40,42 +54,44 @@ investigation:
         estabelecido que essas previsões estejam operacionais nas zonas
         relevantes de Évora, nem com que cobertura, precisão ou adoção. A
         evidência atual não estabelece que a falta de informação sobre a
-        ocupação do estacionamento seja uma causa material dos resultados
-        observados.
+        ocupação do estacionamento seja uma causa material dos fenómenos de
+        tráfego, estacionamento ou segurança documentados.
       latest_result: A investigação realizada não estabeleceu se a disponibilidade de
         informação sobre estacionamento contribui materialmente para os
-        resultados descritos neste problema, e a evidência comparativa de outras
+        fenómenos de tráfego, estacionamento ou segurança documentados neste
+        problema, e a evidência comparativa de outras
         cidades não estabelece essa relação causal em Évora.
       current_action: O projeto não prossegue, no âmbito atual, a validação desta
         hipótese ao nível da deslocação, por não ser proporcional.
       resolution_condition: A questão só é retomada perante evidência local direta
         capaz de estabelecer contribuição causal material da falta ou
         inadequação de informação sobre a ocupação e a disponibilidade de
-        estacionamento para os resultados descritos neste problema.
+        estacionamento para os fenómenos de tráfego, estacionamento ou
+        segurança documentados neste problema.
       evidence:
         - EVD-000105
         - EVD-000106
         - EVD-000107
     - question: Que efeito observável tem a Variante Nascente de Évora (IP2) no volume
         e na composição do tráfego de atravessamento na rede viária urbana de
-        Évora, e existe um impacto mensurável no congestionamento, nos conflitos
-        de segurança e na qualidade do espaço pedonal descritos neste problema?
-      why_open: A Variante Nascente de Évora entrou em circulação a 3 de setembro de
-        2026 (cerca de 12,8 km, investimento de 54,9 milhões de euros financiado
-        ao abrigo do PRR), ligando o nó de Évora Nascente (A6/IP7) ao IP2/EN18
-        junto a São Manços, e cria um mecanismo físico para desviar da rede
-        viária urbana o tráfego de atravessamento sem destino em Évora. O
-        Município de Évora estima uma redução de cerca de 30-40% no volume de
-        tráfego na envolvente urbana, sobretudo de veículos pesados, mas esta
+        Évora, e existe um impacto mensurável no congestionamento ou nas
+        condições de segurança documentados neste problema?
+      why_open: A Infraestruturas de Portugal identifica a Variante Nascente de
+        Évora (IP2) como aberta à circulação; a evidência disponível não
+        estabelece a data exata de abertura, as características da via nem um
+        mecanismo físico de desvio do tráfego de atravessamento. O Município de
+        Évora estima uma redução de cerca de 30-40% no volume de tráfego na
+        envolvente urbana, sobretudo de veículos pesados, mas esta
         estimativa é atribuída ao vice-presidente da Câmara e não corresponde a
         uma medição observada antes/depois; a fonte que a reproduz regista
         também que a magnitude real só poderia ser avaliada após a entrada em
         funcionamento da via.
       latest_result: A pesquisa delimitada realizada não identificou, até 16 de
         setembro de 2026, um conjunto de dados de contagem de tráfego
-        pós-abertura, comparável e quantitativo, que estabeleça a redução
-        efetivamente registada. A redução de 30-40% mantém-se uma estimativa
-        municipal atribuída, e não uma medição antes/depois.
+        pós-abertura, comparável e quantitativo, que estabeleça a variação de
+        tráfego efetivamente registada. A estimativa de redução de 30-40%
+        mantém-se atribuída ao Município e não constitui uma medição
+        antes/depois.
       current_action: WATCH — monitorizar a disponibilidade de medições de tráfego
         pós-abertura adequadas; a abertura da via, por si só, não deve ser
         tratada como impacto realizado, e a estimativa de 30-40% mantém-se
@@ -116,8 +132,8 @@ investigation:
         - EVD-000012
     delimitation:
       summary: A degradação e a manutenção do pavimento rodoviário foram separadas
-        deste problema e são tratadas em PRB-0010, para manter aqui o foco no
-        conflito entre tráfego, pressão de estacionamento e espaço pedonal. As
+        deste problema e são tratadas em PRB-0010, para manter aqui o foco nos
+        fenómenos documentados de tráfego, estacionamento e segurança. As
         previsões de disponibilidade do Parking Buddy e a evidência comparativa
         de outras cidades foram analisadas, mas não estabelecem causalidade
         material para Évora.
@@ -157,7 +173,6 @@ evidence:
       - REFINES
     research_roles:
       - LOCAL_OBSERVATION
-      - EXISTING_RESPONSE
   - evidence_id: EVD-000105
     effects:
       - BOUNDS
@@ -203,17 +218,16 @@ history:
       que reabre apenas com evidência local direta de contribuição causal
       material.
   - date: 2026-09-16
-    summary: A Variante Nascente de Évora (IP2) entrou em funcionamento a 3 de
-      setembro de 2026, criando um desvio físico para o tráfego de
-      atravessamento sem destino em Évora; o Município estima uma redução de
-      30-40% no tráfego urbano envolvente, sobretudo de pesados, mas trata-se de
-      uma estimativa atribuída, não de uma medição, e os efeitos reais
-      pós-abertura permanecem por estabelecer na evidência revista nesta
+    summary: A Variante Nascente de Évora (IP2) foi identificada pela
+      Infraestruturas de Portugal como aberta à circulação; o Município estima
+      uma redução de 30-40% no tráfego urbano envolvente, sobretudo de pesados,
+      mas trata-se de uma estimativa atribuída, não de uma medição, e os efeitos
+      reais pós-abertura permanecem por estabelecer na evidência revista nesta
       pesquisa delimitada.
   - date: 2026-09-25
     summary: A formulação do problema foi delimitada para deixar de atribuir
-      causalidade conjunta aos fatores de tráfego e estacionamento onde a
-      evidência disponível apenas documenta a sua ocorrência em conjunto.
-      Mantém-se documentada a associação com congestionamento, segurança e
-      qualidade do espaço pedonal, mas a contribuição relativa de cada fator não
-      está quantificada.
+      causalidade conjunta aos fatores de tráfego e estacionamento. A evidência
+      disponível documenta congestionamento, tráfego lento, velocidades
+      excessivas, sinistralidade, pressão de estacionamento e estacionamento
+      abusivo ou ilegal, mas não quantifica a contribuição relativa de cada
+      fator nem estabelece relações causais entre eles.

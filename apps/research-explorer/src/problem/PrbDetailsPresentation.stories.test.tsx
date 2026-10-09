@@ -28,7 +28,8 @@ describe("Public/PRB Details / PRB0005 story shell", () => {
     expect(footer).not.toBeNull();
     expect(main?.contains(footer)).toBe(false);
 
-    expect(await screen.findByText(/tráfego automóvel e a pressão de estacionamento/)).toBeTruthy();
+    const record = prb0005.record as { title: string };
+    expect(await screen.findByRole("heading", { level: 2, name: record.title })).toBeTruthy();
     expect(screen.getByText("PRB-0005")).toBeTruthy();
   });
 
