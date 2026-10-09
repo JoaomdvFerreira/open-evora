@@ -39,6 +39,8 @@ function outgoingIdsByType(detail: RecordDetail, type: string, lookup: Map<strin
  * Loads and assembles the full Problem projection for one PRB-* ID.
  * Fetches: the problem itself, its authored `evidence` list, and each evidence
  * item's own linked sources (SRC-). All independent fetches run in parallel.
+ * A Source cited by several Evidence records is requested once per projection
+ * and then shared by each citing Evidence, in that Evidence's own edge order.
  */
 export async function loadProblemProjection(
   provider: DataProvider,
@@ -55,14 +57,15 @@ export async function loadProblemProjection(
   const relationships = new Map(
     authoredEvidence.map((entry) => [entry.evidence_id, { effects: Array.isArray(entry.effects) ? entry.effects.filter((v): v is string => typeof v === "string") : [], researchRoles: Array.isArray(entry.research_roles) ? entry.research_roles.filter((v): v is string => typeof v === "string") : [] }])
   );
-  const evidence = await Promise.all(
-    evidenceDetails.map(async (evidenceDetail): Promise<EvidenceWithSources> => {
-      const sourceIds = outgoingIdsByType(evidenceDetail, "SRC-", lookup);
-      const sources = await Promise.all(sourceIds.map((id) => provider.getRecord(id)));
-      const relationship = relationships.get(evidenceDetail.id) ?? { effects: [], researchRoles: [] };
-      return { detail: evidenceDetail, sources, ...relationship };
-    })
-  );
+  const sourceIdsByEvidence = evidenceDetails.map((evidenceDetail) => outgoingIdsByType(evidenceDetail, "SRC-", lookup));
+  const sourceIds = uniqueIds(sourceIdsByEvidence.flat());
+  const sourceDetails = await Promise.all(sourceIds.map((id) => provider.getRecord(id)));
+  const sourcesById = new Map(sourceIds.map((id, i) => [id, sourceDetails[i]]));
+  const evidence = evidenceDetails.map((evidenceDetail, i): EvidenceWithSources => {
+    const sources = sourceIdsByEvidence[i].map((id) => sourcesById.get(id)!);
+    const relationship = relationships.get(evidenceDetail.id) ?? { effects: [], researchRoles: [] };
+    return { detail: evidenceDetail, sources, ...relationship };
+  });
 
   return { problem, evidence };
 }

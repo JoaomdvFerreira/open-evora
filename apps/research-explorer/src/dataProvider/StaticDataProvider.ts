@@ -159,6 +159,15 @@ export class StaticDataProvider implements DataProvider {
   private manifestPromise: Promise<ReadModelManifest> | null = null;
   private indexPromise: Promise<RecordSummary[]> | null = null;
   private edgesPromise: Promise<RecordEdge[]> | null = null;
+  /**
+   * Record-detail reads for this provider's lifetime, keyed by the session
+   * manifest's corpusFingerprint plus record ID. The promise is stored before
+   * it settles so concurrent reads of one record share a single request. Only
+   * details that passed the corpusFingerprint check stay cached; every
+   * rejection (network, missing, malformed, version_mismatch) evicts its own
+   * entry so the next read refetches.
+   */
+  private readonly recordDetailPromises = new Map<string, Promise<RecordDetail>>();
 
   async getManifest(): Promise<ReadModelManifest> {
     if (!this.manifestPromise) {
@@ -216,6 +225,20 @@ export class StaticDataProvider implements DataProvider {
       throw new DataLoadError(`O registo "${id}" não foi encontrado.`, "not_found");
     }
 
+    // IDs never contain "/", so the key is unambiguous.
+    const key = `${manifest.corpusFingerprint}/${id}`;
+    const cached = this.recordDetailPromises.get(key);
+    if (cached) return cached;
+    const load: Promise<RecordDetail> = this.loadRecordDetail(id, manifest).catch((error: unknown) => {
+      // Evict only while the key still holds this load, never another entry.
+      if (this.recordDetailPromises.get(key) === load) this.recordDetailPromises.delete(key);
+      throw error;
+    });
+    this.recordDetailPromises.set(key, load);
+    return load;
+  }
+
+  private async loadRecordDetail(id: string, manifest: ReadModelManifest): Promise<RecordDetail> {
     const detail = await fetchJson<unknown>(`record-detail/${encodeURIComponent(id)}.json`, `o detalhe do registo «${id}»`);
     assertRecordDetailShape(detail);
     if (detail.corpusFingerprint !== manifest.corpusFingerprint) {
