@@ -1,8 +1,9 @@
 problem_id: PRB-0007
 created_at: 2026-08-28
 updated_at: 2026-10-09
-title: Os cuidadores informais em Évora enfrentam dificuldades no acesso a
-  apoios, incluindo necessidades de informação e orientação
+title: O Plano Concelhio dos Cuidadores Informais documenta, entre cuidadores
+  consultados em Évora, necessidades de informação e dificuldades relacionadas
+  com apoios
 domain:
   - SOC
   - HEA
@@ -41,11 +42,9 @@ investigation:
         existentes, e as medidas de criação de um manual e de sistematização das
         respostas previstas no plano 2026-2027 estão a ser executadas e são
         eficazes?
-      why_open: O plano municipal 2026-2027 — que prevê um manual, a sistematização
-        das respostas, procedimentos simplificados e publicação digital —
-        procura responder explicitamente às dificuldades de informação e
-        orientação descritas neste problema, mas a execução específica dessas
-        medidas e a sua eficácia ainda não foram verificadas.
+      why_open: O plano municipal 2026-2027 prevê um manual, a sistematização das
+        respostas, procedimentos simplificados e publicação digital; a execução
+        específica dessas medidas e a sua eficácia ainda não foram verificadas.
       latest_result: A DEIS reportou que as ações do Plano Concelhio dos Cuidadores
         Informais se encontram operacionalizadas. A implementação é recente e
         ainda não estão disponíveis resultados consistentes nem avaliação de
@@ -116,8 +115,9 @@ investigation:
         recente e os resultados e a eficácia ainda não estão estabelecidos.
 
 
-        Já existem também serviços dirigidos aos cuidadores — UCC, Cantinho do
-        Cuidador e VIVAMENTE. A evidência disponível afasta, por isso, uma
+        Já existem também iniciativas locais dirigidas a cuidadores, à comunidade e
+        à demência, incluindo a Unidade de Cuidados na Comunidade, o Cantinho do
+        Cuidador e o VIVAMENTE. A evidência disponível afasta, por isso, uma
         leitura de ausência de serviços e mantém em aberto questões relacionadas
         com o conhecimento das respostas existentes, a orientação e a
         coordenação entre apoios.
