@@ -1,6 +1,6 @@
 problem_id: PRB-0007
 created_at: 2026-08-28
-updated_at: 2026-09-09
+updated_at: 2026-10-09
 title: Os cuidadores informais em Évora enfrentam dificuldades no acesso a
   apoios, incluindo necessidades de informação e orientação
 domain:
@@ -15,28 +15,26 @@ affected_populations:
 problem_statement: >-
   Os cuidadores informais em Évora têm necessidades documentadas de informação
   que abrangem saúde, mobilidade, estruturas de apoio e apoio financeiro e
-  social. Um estudo com 68 cuidadores e 89 pessoas cuidadas, integrado no Plano
-  Concelhio dos Cuidadores Informais, apurou que 35% dos inquiridos indicaram
-  que a pessoa de quem cuidavam não utilizava qualquer serviço formal de apoio —
-  um resultado específico dessa amostra, que não pode ser generalizado ao
-  conjunto dos cuidadores de Évora.
+  social. Num questionário a 133 cuidadores incluído no Plano Concelhio dos
+  Cuidadores Informais, 35% dos respondentes indicaram que a pessoa de quem
+  cuidavam não utilizava qualquer serviço formal de apoio — um resultado
+  específico dessa amostra, que não pode ser generalizado ao conjunto dos
+  cuidadores de Évora.
 
 
-  Material de grupos focais do mesmo plano identifica, numa amostra distinta, a
-  burocracia e a dificuldade em compreender os direitos dos cuidadores como uma
-  fonte de sobrecarga separada da sobrecarga geral associada ao ato de cuidar. A
-  evidência atual não estabelece uma relação causal entre estas dificuldades de
-  informação e orientação e a não utilização de apoio formal reportada no estudo
-  com 68 cuidadores e 89 pessoas cuidadas.
+  Material de grupos focais do mesmo plano regista, entre as dificuldades
+  relativas aos apoios sociais, a burocracia e a dificuldade em conhecer os
+  direitos dos cuidadores, e identifica o acesso a informação e direitos como
+  necessidade. A evidência atual não estabelece uma relação causal entre estas
+  dificuldades e a não utilização de apoio formal indicada no questionário a
+  133 cuidadores.
 
 
-  Um terceiro inquérito, realizado junto de 133 cuidadores, indica que as
-  necessidades de apoio direto no cuidar, descanso, apoio financeiro e apoio
-  psicológico são reportadas com maior frequência do que as necessidades
-  relacionadas com orientação. Estas permanecem, por isso, explicações
-  alternativas e possivelmente mais prevalentes para as dificuldades de acesso a
-  apoios, apesar de Évora dispor de uma densa rede interinstitucional de apoio
-  social (CLASE/Rede Social).
+  O mesmo questionário regista também necessidades de apoio direto no cuidar,
+  descanso, apoio financeiro e apoio psicológico. A importância relativa da
+  orientação e destas necessidades para o acesso a apoios permanece por
+  estabelecer, apesar de Évora dispor de uma densa rede interinstitucional de
+  apoio social (CLASE/Rede Social).
 investigation:
   open_questions:
     - question: Os cuidadores conhecem o Cantinho do Cuidador e outros serviços já
@@ -68,22 +66,22 @@ investigation:
         - EVD-000045
         - EVD-000164
         - EVD-000165
-    - question: A burocracia e a dificuldade em compreender os direitos dos
-        cuidadores, identificadas em grupos focais, explicam a não utilização de
-        apoio formal reportada no estudo com 68 cuidadores e 89 pessoas
-        cuidadas?
+    - question: A burocracia e a dificuldade em conhecer os direitos dos
+        cuidadores, identificadas em grupos focais, têm alguma relação com a
+        não utilização de apoio formal indicada pelos respondentes do
+        questionário a 133 cuidadores?
       why_open: >-
-        Os dois resultados provêm de amostras distintas dentro do mesmo Plano
-        Concelhio dos Cuidadores Informais e da mesma fonte (SRC-0030). A
-        evidência atual não estabelece uma relação causal entre as dificuldades
-        de informação e orientação e a não utilização de apoio formal.
+        Os resultados dos grupos focais e do questionário a 133 cuidadores
+        provêm de amostras distintas dentro do mesmo Plano Concelhio dos
+        Cuidadores Informais e da mesma fonte (SRC-0030). A evidência atual não
+        estabelece uma relação causal entre as dificuldades de informação e
+        direitos e a não utilização de apoio formal.
 
 
-        Além disso, um terceiro inquérito realizado junto de 133 cuidadores
-        indica que as necessidades de apoio direto no cuidar, descanso, apoio
-        financeiro e apoio psicológico são reportadas com maior frequência do
-        que as necessidades de orientação, pelo que permanecem explicações
-        alternativas e possivelmente mais prevalentes.
+        O questionário regista também necessidades de apoio direto no cuidar,
+        descanso, apoio financeiro e apoio psicológico, mas não estabelece a
+        importância relativa destas necessidades e das dificuldades de
+        informação e direitos para a não utilização de apoio formal.
       latest_result: Não estava disponível um episódio concreto de procura de apoio
         que permitisse testar esta relação; a recolha não foi alargada apenas
         para obter evidência de validação.
@@ -110,8 +108,8 @@ investigation:
         - EVD-000036
     development:
       summary: >-
-        Foi confirmado que a Câmara Municipal reconhece oficialmente 262 pessoas
-        com estatuto de cuidador informal, em janeiro de 2026. A DEIS reportou
+        Informação municipal/CLASE referiu 262 pessoas com estatuto oficial de
+        cuidador informal em janeiro de 2026. A DEIS reportou
         que as ações do Plano Concelhio dos Cuidadores Informais para 2026-2027
         se encontram operacionalizadas, num modelo que inclui coordenação
         interinstitucional e facilitação de procedimentos; a implementação é
@@ -131,19 +129,19 @@ investigation:
         - EVD-000165
     delimitation:
       summary: >-
-        Um estudo com 68 cuidadores e 89 pessoas cuidadas apurou que 35% dos
-        inquiridos indicaram que a pessoa de quem cuidavam não utilizava
-        qualquer serviço formal de apoio. Material de grupos focais, relativo a
-        uma amostra distinta, identificou a burocracia e a dificuldade em
-        compreender os direitos como dificuldades separadas da sobrecarga geral
-        associada ao ato de cuidar.
+        No questionário a 133 cuidadores, 35% dos respondentes indicaram que a
+        pessoa de quem cuidavam não utilizava qualquer serviço formal de apoio.
+        Material de grupos focais, relativo a uma amostra distinta, registou a
+        burocracia e a dificuldade em conhecer os direitos entre as dificuldades
+        relativas aos apoios sociais e identificou o acesso a informação e
+        direitos como necessidade.
 
 
-        Um terceiro inquérito realizado junto de 133 cuidadores delimitou
-        adicionalmente o problema: as necessidades de apoio direto no cuidar,
-        descanso, apoio financeiro e apoio psicológico são reportadas com maior
-        frequência do que as necessidades de orientação. O problema não deve,
-        por isso, ser reduzido a uma questão de descoberta de informação.
+        O mesmo questionário registou necessidades de apoio direto no cuidar,
+        descanso, apoio financeiro e apoio psicológico. O problema não deve,
+        por isso, ser reduzido a uma questão de descoberta de informação; a
+        importância relativa das diferentes necessidades para o acesso a apoios
+        permanece por estabelecer.
 
 
         As preocupações relativas à saúde mental e à capacidade de resposta
@@ -254,8 +252,8 @@ history:
       avaliados; permanece também por estabelecer a importância causal das
       dificuldades de orientação face às restantes necessidades dos cuidadores.
   - date: 2026-09-09
-    summary: "Corrigida a formulação do resultado de 35% para refletir a unidade de
-      análise suportada pela evidência: 35% dos inquiridos indicaram que a
-      pessoa de quem cuidavam não utilizava qualquer serviço formal de apoio; o
-      resultado não estabelece que 35% do conjunto das pessoas cuidadas não
-      utilizava apoio formal."
+    summary: "Corrigida a formulação do resultado do questionário a 133
+      cuidadores para refletir a unidade de análise suportada pela evidência:
+      35% dos respondentes indicaram que a pessoa de quem cuidavam não utilizava
+      qualquer serviço formal de apoio; o resultado não estabelece que 35% do
+      conjunto das pessoas cuidadas não utilizava apoio formal."
