@@ -5,15 +5,14 @@ provenance:
     - SRC-0019
   extracted_at: 2026-08-10
 observation:
-  summary: Dos 844 173 passageiros da ATAC em 2025, 63,29% foram registados no
-    segmento de estudantes/jovens.
+  summary: O relatório anual da CIMAC/ATAC apresenta uma média mensal de 68 427
+    passageiros nos lotes 1 e 2 em 2025.
 scope:
   geography:
     level: intermunicipal
     area: Alentejo Central
   populations:
-    - students
-    - pessoas jovens
+    - passageiros dos lotes 1 e 2 do serviço intermunicipal
   temporal:
     as_of: "2025"
 domains:
@@ -22,5 +21,6 @@ domains:
 evidence_nature: measurement
 claim_authority: authoritative
 inference_limits:
-  - O resultado é relativo ao serviço regional/intermunicipal da ATAC e não
-    representa a composição demográfica dos passageiros da rede urbana TREVO.
+  - A média mensal dos lotes 1 e 2 não estabelece a proporção de estudantes
+    ou jovens entre os passageiros, nem descreve a composição demográfica
+    da rede urbana TREVO.
