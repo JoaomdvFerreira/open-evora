@@ -6,16 +6,15 @@
  * PNG directly as a temporary production asset. Faithful SVG vectorisation
  * is deferred visual-polish work, not part of this slice.
  *
- * `LogoMark` is the compact, roughly-square mark-only crop (favicon-style /
- * narrow header / footer use); `Logo` is the full wide lockup (mark +
- * wordmark) for ordinary header/About usage. Both are transparent-background
- * PNGs with explicit intrinsic dimensions so layout doesn't shift while the
- * asset loads.
+ * `LogoMark` is the compact, roughly-square mark-only crop (favicon-style
+ * use); `Logo` is the full wide lockup (mark + wordmark). Both are
+ * transparent-background PNGs with explicit intrinsic dimensions so layout
+ * doesn't shift while the asset loads.
  *
- * This component is not wired into any production header/page in this work
- * unit — WU053's constraint scope is the visual foundation itself, gated by
- * owner visual-review, not adoption into Overview/Problem View/Trust
- * surfaces (owned by a later Work Unit in this milestone).
+ * Production renders only the textual `wordmark` form (ExplorerHeader). The
+ * raster `full`/`compact` forms and `LogoMark` are currently visual-foundation
+ * (Storybook) review surfaces only — the Header no longer mounts the compact
+ * mark, since a CSS-hidden `<img>` is still fetched (D01-025).
  */
 
 import logoFullSrc from "../assets/logo-full.png";
@@ -29,12 +28,12 @@ export function LogoMark({ title = "Open Évora", ...props }: MarkProps & { titl
 }
 
 export interface LogoProps {
-  /** `full` — mark + wordmark raster lockup (About/TrustPage usage). `compact` — mark only, wrapped with the same accessible name (narrow header/footer usage). `wordmark` — a textual "Open Évora" lockup (Overview visual-completion, task §3): the desktop Header identity, converged toward TARGET's textual presence using the existing reading/serif typography rather than the compact raster mark, which reads with substantially less visual weight at header scale. */
+  /** `full` — mark + wordmark raster lockup. `compact` — mark only, wrapped with the same accessible name. `wordmark` — a textual "Open Évora" lockup (Overview visual-completion, task §3): the Header identity, converged toward TARGET's textual presence using the existing reading/serif typography rather than the compact raster mark, which reads with substantially less visual weight at header scale. */
   form?: "full" | "compact" | "wordmark";
   className?: string;
 }
 
-/** Full lockup for ordinary application use; `compact` reuses the cropped mark asset for narrow/footer placements; `wordmark` is the text-based desktop Header identity. */
+/** Full raster lockup by default; `compact` reuses the cropped mark asset; `wordmark` is the text-based Header identity at every width. */
 export function Logo({ form = "full", className }: LogoProps) {
   if (form === "compact") {
     return (

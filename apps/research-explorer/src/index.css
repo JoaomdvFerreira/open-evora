@@ -700,17 +700,6 @@ main.explorer-shell {
   letter-spacing: -0.01em;
 }
 
-/* WU054 delta — owner-approved logo (presentation/Logo.tsx) adopted into the
-   chrome header in place of the earlier text-only wordmark. `--full` is the
-   default responsive form; `--compact` (mark-only) takes over at the compact
-   breakpoint, keeping the header from crowding the nav at narrow widths. */
-/* `.explorer-logo--compact` needs to win over logo.css's own `.oe-logo {
-   display: inline-flex }` base rule despite loading before it (main.tsx
-   import order) — matched by pairing the class with itself for specificity. */
-.explorer-logo--compact.explorer-logo--compact {
-  display: none;
-}
-
 .manifest-summary {
   margin: 1.5rem 0 0;
   padding-top: 0.85rem;
@@ -2917,10 +2906,6 @@ body:has(.public-overview) .public-footer {
      compact-only text/markup duplicated. */
   .explorer-logo--full.explorer-logo--full {
     display: inline-flex;
-  }
-
-  .explorer-logo--compact.explorer-logo--compact {
-    display: none;
   }
 
   /* Wordmark size (task §3; nudged again in the final density pass, task

@@ -123,3 +123,19 @@ describe("ExplorerHeader — compact menu disclosure", () => {
     expect(screen.queryByRole("button", { name: "Fontes", hidden: true })).toBeNull();
   });
 });
+
+/**
+ * D01-025: a mounted `<img>` is fetched even when CSS hides it, so the
+ * Header identity is the textual wordmark only — no compact raster mark in
+ * the production Header DOM at all.
+ */
+describe("ExplorerHeader — identity loads no raster", () => {
+  it("exposes the textual Open Évora wordmark and renders no image or compact logo", () => {
+    renderHeader();
+    const identity = screen.getByRole("heading", { level: 1, name: "Open Évora" });
+    expect(identity.textContent).toBe("Open Évora");
+    const header = screen.getByRole("banner");
+    expect(header.querySelector(".oe-logo--compact, .explorer-logo--compact")).toBeNull();
+    expect(header.querySelector("img")).toBeNull();
+  });
+});

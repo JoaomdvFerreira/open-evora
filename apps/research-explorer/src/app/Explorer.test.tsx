@@ -597,7 +597,7 @@ describe("Explorer — chrome header identity", () => {
     render(<Explorer dataProvider={fakeProvider()} />);
     await screen.findByRole("button", { name: /PRB-0005/ });
 
-    expect(screen.getAllByAltText("Open Évora").length).toBeGreaterThan(0);
+    expect(screen.getByRole("heading", { level: 1, name: "Open Évora" })).toBeTruthy();
     expect(globalNav()).toBeTruthy();
     expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true })).toBeTruthy();
     expect(within(globalNav()).getByRole("link", { name: "Método", hidden: true })).toBeTruthy();

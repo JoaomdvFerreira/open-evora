@@ -83,13 +83,10 @@ function bodyFromAnyBlock(blocks: string[], selector: string): string {
 describe("index.css — compact Header disclosure (<=767px, task §2)", () => {
   const blocks = compactBlocks();
 
-  it("hides the graphic compact mark and shows the textual wordmark identity", () => {
-    expect(anyBlockHasRuleFor(blocks, ".explorer-logo--compact.explorer-logo--compact")).toBe(true);
-    const compactMarkBody = bodyFromAnyBlock(blocks, ".explorer-logo--compact.explorer-logo--compact");
-    expect(compactMarkBody).toMatch(/display:\s*none/);
-
+  it("shows the textual wordmark identity, with no Header compact-mark rule left to hide an unrendered raster (D01-025)", () => {
     const wordmarkBody = bodyFromAnyBlock(blocks, ".explorer-logo--full.explorer-logo--full");
     expect(wordmarkBody).toMatch(/display:\s*inline-flex/);
+    expect(css).not.toContain(".explorer-logo--compact");
   });
 
   it("the menu toggle is a hidden-at-rest disclosure target with a real hover/focus-visible treatment", () => {
