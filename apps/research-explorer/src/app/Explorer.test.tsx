@@ -391,7 +391,6 @@ describe("Explorer — URL-addressable state", () => {
 
     expect(window.location.search).toContain("q=PRB");
     expect(pushSpy).not.toHaveBeenCalled();
-    pushSpy.mockRestore();
   });
 
   it("does not add history entries for semantically unchanged view or type filter actions", async () => {
@@ -405,7 +404,6 @@ describe("Explorer — URL-addressable state", () => {
 
     await user.click(screen.getByRole("button", { name: /PRB-0005/ }));
     expect(pushSpy).toHaveBeenCalledTimes(1);
-    pushSpy.mockRestore();
   });
 
   it("selecting the same already-selected record again (via breadcrumb back, then reselect) adds exactly one further history entry", async () => {
@@ -419,7 +417,6 @@ describe("Explorer — URL-addressable state", () => {
     await user.click(within(breadcrumb).getByRole("button", { name: "Registos" }));
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     expect(pushSpy).toHaveBeenCalledTimes(2);
-    pushSpy.mockRestore();
   });
 
   it("a URL with view/id/query/type on initial load restores that state (bookmark/reload)", async () => {
@@ -513,7 +510,6 @@ describe("Explorer — URL-addressable state", () => {
       for (const id of ["PRB-0005", "EVD-000105", "SRC-0092", "WID-0001"]) {
         expect(screen.getByRole("button", { name: new RegExp(id) })).toBeTruthy();
       }
-      pushSpy.mockRestore();
     });
 
     it("from a filtered Records view, returns to Todos", async () => {
