@@ -5,16 +5,14 @@ provenance:
     - SRC-0019
   extracted_at: 2026-08-10
 observation:
-  summary: A ATAC refere que os serviços TPAC/TPF cobrem 94% da população do
-    município de Évora, tanto em períodos escolares como não escolares. O
-    cálculo exclui explicitamente o serviço distinto de transportes urbanos de
-    Évora.
+  summary: O relatório anual da CIMAC/ATAC regista 806 034 passageiros no
+    lote 1 e 15 084 no lote 2 em 2025.
 scope:
   geography:
     level: intermunicipal
-    area: Município de Évora (TPAC/TPF valor de cobertura)
+    area: Alentejo Central
   populations:
-    - population served by TPAC/TPF
+    - passageiros dos lotes 1 e 2 do serviço intermunicipal
   temporal:
     as_of: "2025"
 domains:
@@ -22,5 +20,6 @@ domains:
 evidence_nature: measurement
 claim_authority: authoritative
 inference_limits:
-  - O cálculo exclui o serviço urbano TREVO e a cobertura populacional não
-    estabelece frequência, qualidade ou utilidade prática das ligações.
+  - Os números de passageiros dos lotes 1 e 2 não estabelecem uma percentagem
+    de cobertura da população do Município de Évora, nem a frequência, a
+    qualidade ou a utilidade prática das ligações.
