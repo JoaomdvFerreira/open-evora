@@ -5,14 +5,17 @@ provenance:
     - SRC-0094
   extracted_at: 2026-08-11
 observation:
-  summary: A avaliação oficial do piloto SFpark da SFMTA indicou uma redução de 43
-    % no tempo de procura de estacionamento nas zonas-piloto, face a 13 % nas
-    zonas de controlo; os quarteirões foram classificados como «too full» com
-    uma frequência 16 % inferior nas zonas-piloto, enquanto nas zonas de
-    controlo essa frequência aumentou 51 %; e as milhas percorridas por veículos
-    à procura de estacionamento e as emissões de gases com efeito de estufa
-    associadas a essa procura diminuíram 30 % nas zonas-piloto, face a 6 % nas
-    zonas de controlo.
+  summary: A avaliação oficial do piloto SFpark da SFMTA indicou que o tempo que
+    a maioria dos inquiridos declarou ter demorado a encontrar estacionamento
+    diminuiu 43 % nas zonas-piloto, face a 13 % nas zonas de controlo, onde a
+    avaliação não identificou uma variação estatisticamente significativa; os
+    quarteirões foram classificados como «too full» com uma frequência 16 %
+    inferior nas zonas-piloto, enquanto nas zonas de controlo essa frequência
+    aumentou 51 %; e, segundo estimativas do relatório, as milhas diárias
+    percorridas em circulação à procura de estacionamento com parquímetro e as
+    emissões de gases com efeito de estufa associadas, expressas em CO2,
+    diminuíram 30 % nas zonas-piloto, face a 6 % nas zonas de controlo, em dias
+    úteis, das 9h às 18h.
 scope:
   geography:
     level: local_area
