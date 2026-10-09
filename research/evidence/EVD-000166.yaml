@@ -5,28 +5,27 @@ provenance:
     - SRC-0132
   extracted_at: 2026-09-16
 observation:
-  summary: A Variante Nascente de Évora (IP2) entrou em circulação a 3 de setembro
-    de 2026, com cerca de 12,8 km e um investimento de 54,9 milhões de euros
-    financiado ao abrigo do PRR, ligando o nó de Évora Nascente (A6/IP7) ao
-    IP2/EN18 junto a São Manços. A via cria um itinerário alternativo que
-    permite ao tráfego de atravessamento sem destino em Évora evitar a rede
-    viária urbana.
+  summary: A Infraestruturas de Portugal identifica a Variante Nascente de Évora
+    (IP2) como aberta à circulação.
 scope:
   geography:
     level: municipality
-    area: Évora, corredor Évora Nascente – São Manços (IP2)
+    area: Évora, Variante Nascente (IP2)
   populations:
-    - condutores em trânsito de atravessamento
+    - condutores
   temporal:
-    as_of: 2026-09-03
+    status: unknown
 domains:
   - MOB
 evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
-  - A fonte estabelece a abertura à circulação e o mecanismo físico de desvio do
-    tráfego de atravessamento, não quaisquer efeitos observados de fluxo de
-    tráfego, segurança, ruído, poluição, emissões ou redução de tráfego na
-    envolvente urbana.
+  - A Observação estabelece apenas que a Infraestruturas de Portugal identifica
+    a via como aberta à circulação; não estabelece a data exata de abertura, a
+    extensão, o investimento ou o seu financiamento, os pontos de ligação ou um
+    mecanismo físico de desvio do tráfego de atravessamento, nem quaisquer
+    efeitos observados de fluxo de tráfego, segurança, ruído, poluição,
+    emissões ou redução de tráfego na envolvente urbana.
   - A entrada em funcionamento da via não deve, por si só, ser tratada como
-    impacto realizado nos resultados representados por PRB-0005.
+    efeito realizado no tráfego, na segurança, no ruído, na poluição, nas
+    emissões ou noutros resultados daí decorrentes.
