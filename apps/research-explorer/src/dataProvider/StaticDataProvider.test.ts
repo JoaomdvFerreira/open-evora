@@ -39,7 +39,29 @@ function invalidJsonResponse(): Response {
   return new Response("not valid json {{{", { status: 200 });
 }
 
+const PRB_DETAIL = {
+  corpusFingerprint: VALID_MANIFEST.corpusFingerprint,
+  id: "PRB-0005",
+  type: "PRB-",
+  file: "research/problems/PRB-0005.yaml",
+  record: { problem_id: "PRB-0005" },
+  outgoingEdges: [],
+  incomingEdges: [{ field: "problem", ordinal: null, from: "WID-0001" }],
+};
+
 let fetchMock: ReturnType<typeof vi.fn>;
+
+/** Serves each generated-data path from its own route; unknown paths are 404. */
+function serve(routes: Record<string, () => Response | Promise<Response>>): void {
+  fetchMock.mockImplementation(async (url: string) => {
+    const route = routes[String(url).slice(import.meta.env.BASE_URL.length)];
+    return route ? route() : notFoundResponse();
+  });
+}
+
+function detailRequests(id: string): number {
+  return fetchMock.mock.calls.filter(([url]) => String(url).endsWith(`record-detail/${id}.json`)).length;
+}
 
 beforeEach(() => {
   fetchMock = vi.fn();
@@ -191,15 +213,114 @@ describe("StaticDataProvider.getRecord — record-ID safety", () => {
     const provider = new StaticDataProvider();
     await expect(provider.getRecord("WID-0001")).rejects.toMatchObject({ kind: "network" });
     await expect(provider.getRecord("WID-0001")).resolves.toMatchObject({ id: "WID-0001" });
+    expect(detailRequests("WID-0001")).toBe(2);
   });
 
   it("rejects a malformed (invalid JSON) record-detail response with an actionable error", async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse(VALID_MANIFEST));
     fetchMock.mockResolvedValueOnce(jsonResponse(VALID_INDEX));
     fetchMock.mockResolvedValueOnce(new Response("not valid json {{{", { status: 200 })); // record-detail
+    fetchMock.mockResolvedValueOnce(jsonResponse(PRB_DETAIL));
 
     const provider = new StaticDataProvider();
     await expect(provider.getRecord("PRB-0005")).rejects.toMatchObject({ kind: "malformed" });
+    // The malformed body is not retained: the next read refetches.
+    await expect(provider.getRecord("PRB-0005")).resolves.toMatchObject({ id: "PRB-0005" });
+    expect(detailRequests("PRB-0005")).toBe(2);
+  });
+});
+
+describe("StaticDataProvider.getRecord — session detail cache", () => {
+  const routes = (detail: Record<string, unknown> = VALID_DETAIL) => ({
+    "manifest.json": () => jsonResponse(VALID_MANIFEST),
+    "index.json": () => jsonResponse(VALID_INDEX),
+    "record-detail/WID-0001.json": () => jsonResponse(detail),
+    "record-detail/PRB-0005.json": () => jsonResponse(PRB_DETAIL),
+  });
+
+  it("reuses a successful detail read for the same record without refetching it", async () => {
+    serve(routes());
+    const provider = new StaticDataProvider();
+    const first = await provider.getRecord("WID-0001");
+    const second = await provider.getRecord("WID-0001");
+    expect(second).toBe(first);
+    expect(second).toMatchObject({ id: "WID-0001", corpusFingerprint: "abc123" });
+    expect(detailRequests("WID-0001")).toBe(1);
+  });
+
+  it("shares one in-flight detail request between concurrent reads of the same record", async () => {
+    let respond!: (response: Response) => void;
+    serve({ ...routes(), "record-detail/WID-0001.json": () => new Promise<Response>((resolve) => { respond = resolve; }) });
+    const provider = new StaticDataProvider();
+    await provider.getManifest();
+    await provider.listRecords();
+
+    const first = provider.getRecord("WID-0001");
+    const second = provider.getRecord("WID-0001");
+    // Drain queued microtasks so both reads pass their manifest/index awaits
+    // while the detail response is still unresolved.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(detailRequests("WID-0001")).toBe(1);
+
+    respond(jsonResponse(VALID_DETAIL));
+    const [a, b] = await Promise.all([first, second]);
+    expect(a).toMatchObject({ id: "WID-0001" });
+    expect(b).toBe(a);
+    expect(detailRequests("WID-0001")).toBe(1);
+  });
+
+  it("never lets one record's cached detail satisfy a different record ID", async () => {
+    serve(routes());
+    const provider = new StaticDataProvider();
+    await expect(provider.getRecord("WID-0001")).resolves.toMatchObject({ id: "WID-0001" });
+    await expect(provider.getRecord("PRB-0005")).resolves.toMatchObject({ id: "PRB-0005" });
+    await expect(provider.getRecord("WID-0001")).resolves.toMatchObject({ id: "WID-0001" });
+    expect(detailRequests("WID-0001")).toBe(1);
+    expect(detailRequests("PRB-0005")).toBe(1);
+  });
+
+  it("does not retain a version_mismatch rejection, and a refetched skewed detail still fails closed", async () => {
+    let fingerprint = "new-corpus";
+    serve({ ...routes(), "record-detail/WID-0001.json": () => jsonResponse({ ...VALID_DETAIL, corpusFingerprint: fingerprint }) });
+    const provider = new StaticDataProvider();
+    await expect(provider.getRecord("WID-0001")).rejects.toMatchObject({ kind: "version_mismatch" });
+    await expect(provider.getRecord("WID-0001")).rejects.toMatchObject({ kind: "version_mismatch" });
+    expect(detailRequests("WID-0001")).toBe(2);
+
+    fingerprint = VALID_MANIFEST.corpusFingerprint;
+    await expect(provider.getRecord("WID-0001")).resolves.toMatchObject({ corpusFingerprint: "abc123" });
+    expect(detailRequests("WID-0001")).toBe(3);
+  });
+
+  it("never caches an unknown ID: each read fails not_found without a detail fetch", async () => {
+    serve(routes());
+    const provider = new StaticDataProvider();
+    await expect(provider.getRecord("PRB-9999")).rejects.toMatchObject({ kind: "not_found" });
+    await expect(provider.getRecord("PRB-9999")).rejects.toMatchObject({ kind: "not_found" });
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes("record-detail"))).toBe(false);
+  });
+
+  it("binds cached details to the session corpus: an old session keeps its details, a new detail fails closed, a new session loads its own", async () => {
+    serve(routes());
+    const oldSession = new StaticDataProvider();
+    const oldDetail = await oldSession.getRecord("WID-0001");
+
+    // The deployment changes underneath the open session.
+    serve({
+      "manifest.json": () => jsonResponse({ ...VALID_MANIFEST, corpusFingerprint: "next-corpus" }),
+      "index.json": () => jsonResponse(VALID_INDEX),
+      "record-detail/WID-0001.json": () => jsonResponse({ ...VALID_DETAIL, corpusFingerprint: "next-corpus" }),
+      "record-detail/PRB-0005.json": () => jsonResponse({ ...PRB_DETAIL, corpusFingerprint: "next-corpus" }),
+    });
+    fetchMock.mockClear();
+
+    await expect(oldSession.getRecord("WID-0001")).resolves.toBe(oldDetail);
+    expect(detailRequests("WID-0001")).toBe(0);
+    await expect(oldSession.getRecord("PRB-0005")).rejects.toMatchObject({ kind: "version_mismatch" });
+
+    const newSession = new StaticDataProvider();
+    await expect(newSession.getRecord("WID-0001")).resolves.toMatchObject({ corpusFingerprint: "next-corpus" });
+    expect(detailRequests("WID-0001")).toBe(1);
   });
 });
 

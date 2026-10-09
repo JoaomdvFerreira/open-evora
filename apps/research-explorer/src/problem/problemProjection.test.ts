@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { loadProblemProjection } from "./problemProjection";
+import { StaticDataProvider } from "../dataProvider/StaticDataProvider";
 import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 import generatedIndex from "../../generated/index.json";
 const index:RecordSummary[]=[{id:"PRB-1",type:"PRB-",label:"P",file:"",summaryFields:{}},{id:"EVD-1",type:"EVD-",label:"E",file:"",summaryFields:{}},{id:"SRC-1",type:"SRC-",label:"S",file:"",summaryFields:{}}];
@@ -74,5 +75,76 @@ it("projects every canonical PRB Evidence ID exactly once in authored order", as
     const projectedIds = projection.evidence.map(({ detail }) => detail.id);
     expect(projectedIds, problemId).toEqual(authoredIds);
     expect(new Set(projectedIds).size, problemId).toBe(authoredIds.length);
+  }
+});
+
+const sharedSourceIndex: RecordSummary[] = ["PRB-2", "EVD-A", "EVD-B", "SRC-SHARED", "SRC-ONLY"].map((id) => ({ id, type: `${id.split("-")[0]}-`, label: id, file: `research/${id}.yaml`, summaryFields: {} }));
+const sharedSourceLookup = new Map(sharedSourceIndex.map((item) => [item.id, item]));
+const linkedDetail = (id: string, record: Record<string, unknown>, field: string, targets: string[]): RecordDetail => ({
+  corpusFingerprint: "same",
+  id,
+  type: `${id.split("-")[0]}-`,
+  file: `research/${id}.yaml`,
+  record,
+  outgoingEdges: targets.map((to, ordinal) => ({ field, ordinal, to })),
+  incomingEdges: [],
+});
+// EVD-B is authored first and is the first to cite SRC-SHARED, so the
+// projection-wide Source order differs from EVD-A's own Source order.
+const sharedSourceRecords: Record<string, RecordDetail> = {
+  "PRB-2": linkedDetail("PRB-2", {
+    evidence: [
+      { evidence_id: "EVD-B", effects: ["REFINES"], research_roles: ["CONTEXTUAL"] },
+      { evidence_id: "EVD-A", effects: ["SUPPORTS"], research_roles: ["LOCAL_OBSERVATION"] },
+    ],
+  }, "evidence", ["EVD-B", "EVD-A"]),
+  "EVD-A": linkedDetail("EVD-A", {}, "provenance.sources", ["SRC-ONLY", "SRC-SHARED"]),
+  "EVD-B": linkedDetail("EVD-B", {}, "provenance.sources", ["SRC-SHARED"]),
+  "SRC-SHARED": linkedDetail("SRC-SHARED", {}, "provenance.sources", []),
+  "SRC-ONLY": linkedDetail("SRC-ONLY", {}, "provenance.sources", []),
+};
+const sharedSourceShape = [
+  { id: "EVD-B", sources: ["SRC-SHARED"], effects: ["REFINES"], researchRoles: ["CONTEXTUAL"] },
+  { id: "EVD-A", sources: ["SRC-ONLY", "SRC-SHARED"], effects: ["SUPPORTS"], researchRoles: ["LOCAL_OBSERVATION"] },
+];
+const shapeOf = (evidence: Awaited<ReturnType<typeof loadProblemProjection>>["evidence"]) =>
+  evidence.map(({ detail, sources, effects, researchRoles }) => ({ id: detail.id, sources: sources.map((source) => source.id), effects, researchRoles }));
+
+it("requests a Source shared by several Evidence records once per projection, keeping it under each citing Evidence in that Evidence's order", async () => {
+  const requested: string[] = [];
+  const nonCachingProvider: DataProvider = { ...provider, getRecord: async (id) => { requested.push(id); return sharedSourceRecords[id]; } };
+  const projection = await loadProblemProjection(nonCachingProvider, sharedSourceLookup, "PRB-2");
+
+  expect(requested.filter((id) => id === "SRC-SHARED")).toHaveLength(1);
+  expect([...requested].sort()).toEqual(["EVD-A", "EVD-B", "PRB-2", "SRC-ONLY", "SRC-SHARED"]);
+  expect(shapeOf(projection.evidence)).toEqual(sharedSourceShape);
+  expect(projection.evidence[0].sources[0]).toBe(projection.evidence[1].sources[1]);
+});
+
+it("revisits a PRB through the same StaticDataProvider without issuing any further record-detail request", async () => {
+  const json = (body: unknown) => new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+  const manifest = { readModelVersion: "1.0.0", generatedAt: "2026-01-01T00:00:00.000Z", generator: "test", sourceCommit: null, corpusFingerprint: "same", totalRecords: sharedSourceIndex.length, counts: {}, schemaPrefixes: [] };
+  const fetchMock = vi.fn(async (url: string) => {
+    const path = String(url).slice(import.meta.env.BASE_URL.length);
+    if (path === "manifest.json") return json(manifest);
+    if (path === "index.json") return json(sharedSourceIndex);
+    const id = /^record-detail\/(.+)\.json$/.exec(path)?.[1];
+    return id && sharedSourceRecords[id] ? json(sharedSourceRecords[id]) : new Response(null, { status: 404 });
+  });
+  const detailRequests = () => fetchMock.mock.calls.map(([url]) => String(url)).filter((url) => url.includes("record-detail/")).map((url) => url.slice(url.lastIndexOf("/") + 1)).sort();
+  vi.stubGlobal("fetch", fetchMock);
+  try {
+    const sessionProvider = new StaticDataProvider();
+    const cold = await loadProblemProjection(sessionProvider, sharedSourceLookup, "PRB-2");
+    expect(detailRequests()).toEqual(["EVD-A.json", "EVD-B.json", "PRB-2.json", "SRC-ONLY.json", "SRC-SHARED.json"]);
+    expect(shapeOf(cold.evidence)).toEqual(sharedSourceShape);
+    const coldFetches = fetchMock.mock.calls.length;
+
+    const revisit = await loadProblemProjection(sessionProvider, sharedSourceLookup, "PRB-2");
+    expect(fetchMock.mock.calls.length).toBe(coldFetches);
+    expect(detailRequests()).toHaveLength(5);
+    expect(revisit).toEqual(cold);
+  } finally {
+    vi.unstubAllGlobals();
   }
 });
