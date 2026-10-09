@@ -54,7 +54,6 @@ export function ExplorerHeader({ activeView, onProblemas, onRegistos }: {
         <div className="explorer-chrome-group">
           <h1 className="explorer-identity">
             <Logo form="wordmark" className="explorer-logo explorer-logo--full" />
-            <Logo form="compact" className="explorer-logo explorer-logo--compact" />
           </h1>
         </div>
         <button
