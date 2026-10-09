@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 
 import type { CorpusIndex, RecordSchema } from "../core/types.ts";
+import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "./ai-invoker.ts";
+import { invokeIndependentReview } from "./independent-review-invocation.ts";
 import { candidateFieldsById, validateIndependentReview, validateIndependentReviewStructure } from "./independent-review.ts";
 import { buildReviewerInputPackage, type ReviewerInputPackage } from "./reviewer-input.ts";
 import { buildReviewerPrompt } from "./reviewer-prompt.ts";
@@ -116,6 +121,99 @@ function insufficientReview(): Review {
 function errorsOf(review: unknown): string {
   return validateIndependentReview(review, PKG).errors.join("\n");
 }
+
+class RecordingReviewer implements AiInvoker {
+  readonly calls: AiInvocationRequest[] = [];
+  private readonly responses: AiInvocationResult[];
+  constructor(responses: AiInvocationResult[]) { this.responses = responses; }
+  invoke(request: AiInvocationRequest): AiInvocationResult {
+    this.calls.push(request);
+    const response = this.responses.shift();
+    assert.ok(response, "unexpected reviewer invocation");
+    return response;
+  }
+}
+
+function withReviewWorkbench(run: (dir: string) => void): void {
+  const dir = mkdtempSync(join(tmpdir(), "open-evora-independent-review-test-"));
+  try { run(dir); } finally { rmSync(dir, { recursive: true, force: true }); }
+}
+
+const output = (value: unknown): AiInvocationResult => ({ status: "OK", stdout: JSON.stringify(value) });
+const validConcur = (): Review => ({ ...insufficientReview(), outcome: "CONCUR", findings: [], signalDispositions: [disposition("SUPPORTED")] });
+const emptyFindingReferences = (): Review => ({ ...insufficientReview(), findings: [gapFinding({ evidenceReferences: [] })] });
+
+test("a valid review of any outcome is accepted after one invocation", () => {
+  const disagreement: Review = {
+    ...insufficientReview(), outcome: "DISAGREEMENT_FOUND",
+    findings: [violationFinding({ relatedSignalIds: [SIGNAL_ID] })],
+    signalDispositions: [disposition("VIOLATION", { relatedFindingIds: ["CLEC-FND-0002"] })],
+  };
+  for (const review of [validConcur(), disagreement, insufficientReview()]) {
+    withReviewWorkbench((dir) => {
+      const invoker = new RecordingReviewer([output(review)]);
+      const result = invokeIndependentReview(invoker, PKG, dir);
+      assert.equal(result.status, "VALID");
+      if (result.status === "VALID") assert.deepEqual(result.review, review);
+      assert.equal(invoker.calls.length, 1);
+      assert.equal(invoker.calls[0].role, "INDEPENDENT_REVIEWER");
+      assert.equal(existsSync(join(dir, "independent-review-attempt-2.stdout.txt")), false);
+    });
+  }
+});
+
+test("a finding with no evidence reference gets one fresh structural retry over unchanged input", () => {
+  withReviewWorkbench((dir) => {
+    const first = emptyFindingReferences();
+    const invoker = new RecordingReviewer([output(first), output(validConcur())]);
+    const result = invokeIndependentReview(invoker, PKG, dir);
+    assert.equal(result.status, "VALID");
+    if (result.status === "VALID") assert.equal(result.review.outcome, "CONCUR");
+    assert.equal(invoker.calls.length, 2);
+    const original = invoker.calls[0].input;
+    const retry = invoker.calls[1].input;
+    assert.ok(retry.startsWith(`${original}\n`), "the original contract and immutable reviewer input remain byte-identical");
+    const feedback = retry.slice(original.length);
+    assert.match(feedback, /findings\[0\]\.evidenceReferences must name at least one record/);
+    assert.match(feedback, /complete replacement JSON review object/);
+    assert.equal(feedback.includes(JSON.stringify(first)), false, "the first review is not returned as new semantic context");
+    assert.equal(readFileSync(join(dir, "independent-review-attempt-1.stdout.txt"), "utf8"), JSON.stringify(first));
+    assert.match(readFileSync(join(dir, "independent-review-attempt-1.errors.txt"), "utf8"), /evidenceReferences must name at least one record/);
+    assert.deepEqual(JSON.parse(readFileSync(join(dir, "independent-review-attempt-2.stdout.txt"), "utf8")), validConcur());
+    assert.equal(existsSync(join(dir, "independent-review-attempt-2.errors.txt")), false);
+  });
+});
+
+test("two structurally invalid reviews fail closed after exactly two invocations", () => {
+  withReviewWorkbench((dir) => {
+    const invoker = new RecordingReviewer([output(emptyFindingReferences()), output(emptyFindingReferences())]);
+    const result = invokeIndependentReview(invoker, PKG, dir);
+    assert.equal(result.status, "FAILED");
+    if (result.status === "FAILED") {
+      assert.equal(result.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
+      assert.match(result.message, /evidenceReferences must name at least one record/);
+    }
+    assert.equal(invoker.calls.length, 2);
+    assert.match(readFileSync(join(dir, "independent-review-attempt-2.errors.txt"), "utf8"), /evidenceReferences must name at least one record/);
+    assert.equal(existsSync(join(dir, "independent-review.json")), false);
+  });
+});
+
+test("timeout, invocation failure, and non-JSON stdout do not trigger a structural retry", () => {
+  const failures: AiInvocationResult[] = [
+    { status: "TIMEOUT", message: "timed out" },
+    { status: "INVOCATION_FAILED", message: "process failed" },
+    { status: "OK", stdout: "not JSON" },
+  ];
+  for (const failure of failures) withReviewWorkbench((dir) => {
+    const invoker = new RecordingReviewer([failure]);
+    const result = invokeIndependentReview(invoker, PKG, dir);
+    assert.equal(result.status, "FAILED");
+    assert.equal(invoker.calls.length, 1);
+    assert.equal(existsSync(join(dir, "independent-review.json")), false);
+    assert.equal(existsSync(join(dir, "independent-review-attempt-2.stdout.txt")), false);
+  });
+});
 
 test("the Source-dependent EVD fixture yields one quantity signal referencing only the metadata SRC", () => {
   assert.equal(PKG.signals.length, 1);
@@ -359,6 +457,15 @@ test("the reviewer prompt requires the structured v2 result with exactly the val
   assert.match(REVIEWER_PROMPT, /"disposition": "SUPPORTED" \| "VIOLATION" \| "NOT_APPLICABLE" \| "INSUFFICIENT_EVIDENCE"/);
   assert.ok(REVIEWER_PROMPT.includes(`REVIEW INPUT (immutable, JSON):\n${FROZEN_INPUT}\n`));
   assert.ok(REVIEWER_PROMPT.endsWith("Do not emit anything on stdout other than this JSON object."));
+});
+
+test("the reviewer prompt requires nonempty finding references and a complete output self-check", () => {
+  assert.match(REVIEWER_PROMPT, /Every finding must have at least one evidenceReferences entry; evidenceReferences: \[\] is invalid/);
+  assert.match(REVIEWER_PROMPT, /Every cited record ID must exist in the immutable review input/);
+  assert.match(REVIEWER_PROMPT, /another EVD or SRC, cite the relevant EVD or SRC record/);
+  assert.match(REVIEWER_PROMPT, /candidate recordId itself may be cited/);
+  assert.match(REVIEWER_PROMPT, /For an evidence-gap finding, cite the record whose supplied context is insufficient/);
+  assert.match(REVIEWER_PROMPT, /Before emitting stdout, self-check the complete JSON/);
 });
 
 test("the reviewer prompt makes signal dispositions, evidence gaps and unsignalled findings explicit without rewriting records", () => {
