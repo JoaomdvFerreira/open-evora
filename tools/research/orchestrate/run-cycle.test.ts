@@ -1334,3 +1334,46 @@ test("no other blocker becomes overridable through resume — a HOLD caused by a
     assert.equal(reviewerResume.calls.length, 0);
   });
 });
+
+/** Writes Source Verification Support for SRC-MATERIAL under `researchRoot`; an empty claim list is invalid. */
+function writeMaterialSupport(researchRoot: string, statements: string[]): void {
+  mkdirSync(join(researchRoot, "source-verifications"), { recursive: true });
+  const claims = statements.map((statement, i) => `  - locator: p. ${i + 1}\n    statement: ${statement}\n`).join("");
+  writeFileSync(
+    join(researchRoot, "source-verifications", "SRC-MATERIAL.yaml"),
+    `source_id: SRC-MATERIAL\nretrieval:\n  retrieved_at: 2026-09-01\n  content_sha256: ${"e".repeat(64)}\n  media_type: text/html\nverified_claims:${claims ? `\n${claims}` : " []\n"}`,
+    "utf8"
+  );
+}
+
+test("orchestration hands the reviewer the Source Verification Support of the base it reviews against, and fails closed on invalid support", async () => {
+  await withTempDir(async (researchRoot) => {
+    const index = { ...admissionIndex("public"), researchRoot };
+    const run = (cycleDir: string, reviewer: RecordingInvoker) => runResearchCycle({ trigger: TRIGGER, index, baseGitSha: SHA, cycleDir, primaryInvoker: new RecordingInvoker(fixedResponder(claimEnvelope())), reviewerInvoker: reviewer, availabilityAdapter: AVAILABLE, now: () => new Date("2026-09-15T12:00:00.000Z") });
+
+    writeMaterialSupport(researchRoot, ["A fonte publica a afirmação reivindicada."]);
+    await withTempDir(async (cycleDir) => {
+      const reviewer = new RecordingInvoker(concurringResponder);
+      const outcome = await run(cycleDir, reviewer);
+      assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
+      const input = JSON.parse(reviewer.calls[0].input.split("REVIEW INPUT (immutable, JSON):\n")[1].split("\n")[0]);
+      assert.deepEqual(input.sourceVerificationContext, [{
+        source_id: "SRC-MATERIAL",
+        retrieval: { retrieved_at: "2026-09-01", content_sha256: "e".repeat(64), media_type: "text/html" },
+        verified_claims: [{ locator: "p. 1", statement: "A fonte publica a afirmação reivindicada." }],
+      }]);
+    });
+
+    writeMaterialSupport(researchRoot, []);
+    await withTempDir(async (cycleDir) => {
+      const reviewer = new RecordingInvoker(concurringResponder);
+      const outcome = await run(cycleDir, reviewer);
+      assert.equal(outcome.status, "FAILED");
+      if (outcome.status !== "FAILED") return;
+      assert.equal(outcome.failedCheck, "SOURCE_VERIFICATION_SUPPORT");
+      assert.match(outcome.message, /source-verifications\/SRC-MATERIAL\.yaml: verified_claims must be a list of 1-8 claims/);
+      assert.equal(reviewer.calls.length, 0);
+      assert.equal(existsSync(join(cycleDir, "research-change-set.json")), false);
+    });
+  });
+});

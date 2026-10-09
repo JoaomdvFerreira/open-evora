@@ -52,6 +52,8 @@ Do not publish:
 
 Public accessibility, machine readability, permission to reuse, and permission to republish are separate properties. Do not infer one from another.
 
+Source Verification Support (`research/source-verifications/`) may contain only bounded factual paraphrases about public Sources. It must never contain verbatim Source text or raw Source bytes, and it does not authorize republishing Source wording. Private, restricted or correspondence material remains prohibited there without separate explicit owner authorization. Its semantics are owned by `docs/datamodel.md` §8 and its review use by `docs/investigationstrategy.md` §12.
+
 When publication safety is genuinely uncertain, stop and report the uncertainty.
 
 If potentially non-public material is encountered, stop the affected work. Do not reproduce that material in reports; report only relevant IDs/paths/categories. Seek authorization before remediation.

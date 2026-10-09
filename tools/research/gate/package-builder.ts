@@ -23,6 +23,7 @@
  */
 import { evaluateProblem } from "../readiness/readiness.ts";
 import type { ReadinessReport } from "../readiness/readiness.ts";
+import { loadSourceVerifications } from "../core/source-verifications.ts";
 import type { CorpusIndex } from "../core/types.ts";
 import type { ResearchChangeSet } from "../orchestrate/types.ts";
 import { validateIndependentReview } from "../orchestrate/independent-review.ts";
@@ -145,6 +146,7 @@ function reconstructReviewerInput(index: CorpusIndex, changeSet: ResearchChangeS
       deltas: changeSet.deltas,
       validation: changeSet.validation,
       readiness: changeSet.readiness,
+      sourceVerifications: loadSourceVerifications(index),
     });
   } catch (error) {
     return { errors: [`reviewer context reconstruction failed: ${(error as Error).message}`] };
@@ -187,6 +189,10 @@ export function buildHumanGatePackage(index: CorpusIndex, changeSet: ResearchCha
     // Detached from the frozen reviewer package so the Gate object stays a plain JSON value.
     reviewEvidenceContext: structuredClone([...reviewerInput.evidenceContext]),
     reviewSignals: structuredClone([...reviewerInput.signals]),
+    // Present only when the reviewer received support, so packages without it keep their exact shape and content hash.
+    ...(reviewerInput.sourceVerificationContext
+      ? { reviewSourceVerificationContext: structuredClone([...reviewerInput.sourceVerificationContext]) }
+      : {}),
     integrationPlan: changeSet.integrationPlan,
     manifest: changeSet.manifest,
     safetyAdmission: changeSet.safetyAdmission,

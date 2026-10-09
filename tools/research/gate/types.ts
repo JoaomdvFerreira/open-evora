@@ -14,6 +14,7 @@ import type { ValidationResult } from "../validation/validate.ts";
 import type { GenerationManifest, IndependentReviewResult, ResearchChangeSet } from "../orchestrate/types.ts";
 import type { ReviewContextRecord, ReviewSignal } from "../orchestrate/reviewer-input.ts";
 import type { SafetyAdmission } from "../admission/safety-admission.ts";
+import type { SourceVerification } from "../core/source-verifications.ts";
 
 /**
  * The Human Gate package (OD-C Option 3): one coherent, inspectable JSON
@@ -50,6 +51,14 @@ export interface HumanGatePackage {
   reviewEvidenceContext: ReviewContextRecord[];
   /** The candidate-scoped deterministic CLEC signals the reviewer dispositioned, in reviewer-package order. */
   reviewSignals: ReviewSignal[];
+  /**
+   * The base-bound Source Verification Support the reviewer received
+   * (reviewer input `sourceVerificationContext`), sorted by SRC ID. Review
+   * support, not canonical Evidence: bounded paraphrases verified upstream
+   * against captured Source bytes, never Source text. Absent when the
+   * reviewer received none, so such packages keep their exact shape.
+   */
+  reviewSourceVerificationContext?: SourceVerification[];
   /** Convenience projection of researchChangeSet.integrationPlan. */
   integrationPlan: CanonicalIntegrationPlan | null;
   /** Convenience projection of researchChangeSet.manifest. */

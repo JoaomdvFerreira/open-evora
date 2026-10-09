@@ -15,6 +15,7 @@
 import { classifyCandidateDelta } from "../integration/candidate-delta.ts";
 import { prepareCanonicalIntegrationReview, type CanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
 import { prepareCanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
+import { loadSourceVerifications, SOURCE_VERIFICATION_SUPPORT, SourceVerificationError } from "../core/source-verifications.ts";
 import type { CorpusIndex } from "../core/types.ts";
 import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
 import { sha256Hex } from "./fingerprint.ts";
@@ -188,9 +189,9 @@ export function prepareResearchChangeSet(input: PrepareResearchChangeSetInput): 
   // `review` produces — the same context-aware check the AI-driven path runs.
   let reviewerInput;
   try {
-    reviewerInput = buildReviewerInputPackage({ ...review, manifest, index: input.index });
+    reviewerInput = buildReviewerInputPackage({ ...review, manifest, index: input.index, sourceVerifications: loadSourceVerifications(input.index) });
   } catch (error) {
-    return failed("PROSPECTIVE_VALIDATION", (error as Error).message);
+    return failed(error instanceof SourceVerificationError ? SOURCE_VERIFICATION_SUPPORT : "PROSPECTIVE_VALIDATION", (error as Error).message);
   }
   // Same context-free precheck as the AI-driven path: supplied review material never waives it.
   const blockers = contextFreeBlockers(reviewerInput.signals);

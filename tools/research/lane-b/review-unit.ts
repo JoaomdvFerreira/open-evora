@@ -10,6 +10,11 @@
  * Deletions and renames are not reviewable on this path and are reported as
  * unsupported rather than authorized.
  *
+ * Source Verification Support is read only from the base commit, never from
+ * the head: a change cannot supply the support its own review relies on, and
+ * a change touching both canonical records and support is refused outright
+ * (the support must be merged first, in its own pull request).
+ *
  * Every comparison step reuses the existing primitives — the corpus loader,
  * candidate loader, canonical-integration review and F00-F reviewer input
  * package — so Lane B is judged by exactly the Lane A review contract.
@@ -21,6 +26,7 @@ import { dirname, join } from "node:path";
 
 import { loadCorpusIndex } from "../core/corpus.ts";
 import { getRecordField } from "../core/record-fields.ts";
+import { loadSourceVerifications, SOURCE_VERIFICATION_SUPPORT, SOURCE_VERIFICATIONS_DIRECTORY, SourceVerificationError } from "../core/source-verifications.ts";
 import { loadSchemas } from "../core/schemas.ts";
 import type { RecordSchema } from "../core/types.ts";
 import type { CandidateDeltaAction } from "../integration/candidate-delta.ts";
@@ -46,6 +52,8 @@ export interface LaneBChangedRecord {
 export type LaneBReviewUnit =
   | { status: "NO_CANONICAL_CHANGE"; baseGitSha: string }
   | { status: "UNSUPPORTED_DELETION"; baseGitSha: string; paths: string[] }
+  /** Canonical records and Source Verification Support changed together; never reviewable. */
+  | { status: "SOURCE_VERIFICATION_NOT_SEPARATE"; baseGitSha: string; recordPaths: string[]; supportPaths: string[] }
   | {
       status: "REVIEW_REQUIRED";
       baseGitSha: string;
@@ -70,6 +78,7 @@ export const LANE_B_REVIEW_FRAMING: ReviewFraming = {
 
 const RESEARCH_ROOT = "research";
 const SCHEMAS_DIR = `${RESEARCH_ROOT}/schemas`;
+const SOURCE_VERIFICATIONS_DIR = `${RESEARCH_ROOT}/${SOURCE_VERIFICATIONS_DIRECTORY}`;
 const FULL_GIT_SHA = /^[0-9a-f]{40}$/;
 
 function git(repoRoot: string, args: string[], input?: string): Buffer {
@@ -153,6 +162,14 @@ function isCanonicalRecordPath(path: string, recordDirs: ReadonlySet<string>): b
   return slash > 0 && recordDirs.has(path.slice(0, slash)) && /\.ya?ml$/.test(path);
 }
 
+/** The deterministic refusal for a change that carries both canonical records and Source Verification Support. */
+export function describeSourceVerificationNotSeparate(unit: Extract<LaneBReviewUnit, { status: "SOURCE_VERIFICATION_NOT_SEPARATE" }>): string {
+  return (
+    `this change modifies canonical records (${unit.recordPaths.join(", ")}) and Source Verification Support (${unit.supportPaths.join(", ")}) together. ` +
+    "Source Verification Support must be merged first in a separate pull request; the canonical change is then reviewed against a base that already contains it."
+  );
+}
+
 interface PathChange {
   status: string;
   path: string;
@@ -211,7 +228,12 @@ export function resolveLaneBReviewUnit({ repoRoot, baseGitSha, head }: ResolveLa
   // same change cannot take records out of the review boundary.
   const recordDirs = new Set([...baseSchemas, ...headSchemas].map((schema) => `${RESEARCH_ROOT}/${schema.directory}`));
 
-  const changes = changedPaths(repoRoot, baseGitSha, head).filter((change) => isCanonicalRecordPath(change.path, recordDirs));
+  const allChanges = changedPaths(repoRoot, baseGitSha, head);
+  const changes = allChanges.filter((change) => isCanonicalRecordPath(change.path, recordDirs));
+  const supportPaths = [...new Set(allChanges.filter((change) => change.path.startsWith(`${SOURCE_VERIFICATIONS_DIR}/`)).map((change) => change.path))].sort();
+  if (changes.length > 0 && supportPaths.length > 0) {
+    return { status: "SOURCE_VERIFICATION_NOT_SEPARATE", baseGitSha, recordPaths: [...new Set(changes.map((change) => change.path))].sort(), supportPaths };
+  }
   const deleted = changes.filter((change) => change.status === "D").map((change) => change.path).sort();
   if (deleted.length > 0) return { status: "UNSUPPORTED_DELETION", baseGitSha, paths: deleted };
   const unexpected = changes.filter((change) => !["A", "M", "T"].includes(change.status));
@@ -224,7 +246,8 @@ export function resolveLaneBReviewUnit({ repoRoot, baseGitSha, head }: ResolveLa
   const staging = mkdtempSync(join(tmpdir(), "open-evora-lane-b-"));
   try {
     const baseDirs = baseSchemas.map((schema) => `${RESEARCH_ROOT}/${schema.directory}`);
-    const basePaths = nulSeparated(git(repoRoot, ["ls-tree", "-r", "-z", "--name-only", baseGitSha, "--", SCHEMAS_DIR, ...baseDirs]));
+    // Source Verification Support is staged from the base alongside the corpus, so it is loaded from the same base root.
+    const basePaths = nulSeparated(git(repoRoot, ["ls-tree", "-r", "-z", "--name-only", baseGitSha, "--", SCHEMAS_DIR, SOURCE_VERIFICATIONS_DIR, ...baseDirs]));
     const baseBlobs = readBlobs(repoRoot, baseGitSha, basePaths);
     const baseRoot = join(staging, "base");
     stage(baseRoot, new Map([...baseBlobs].map(([path, blob]) => [path, blob.content])));
@@ -272,15 +295,22 @@ export function resolveLaneBReviewUnit({ repoRoot, baseGitSha, head }: ResolveLa
     } catch (error) {
       throw new LaneBReviewUnitError((error as Error).message);
     }
-    const reviewerInput = buildReviewerInputPackage({
-      baseGitSha,
-      manifest: LANE_B_REVIEW_FRAMING,
-      index,
-      candidates: review.candidates,
-      deltas: review.deltas,
-      validation: review.validation,
-      readiness: review.readiness,
-    });
+    let reviewerInput;
+    try {
+      reviewerInput = buildReviewerInputPackage({
+        baseGitSha,
+        manifest: LANE_B_REVIEW_FRAMING,
+        index,
+        candidates: review.candidates,
+        deltas: review.deltas,
+        validation: review.validation,
+        readiness: review.readiness,
+        sourceVerifications: loadSourceVerifications(index),
+      });
+    } catch (error) {
+      if (error instanceof SourceVerificationError) throw new LaneBReviewUnitError(`${SOURCE_VERIFICATION_SUPPORT}: ${error.message}`);
+      throw error;
+    }
 
     const changedRecords = review.deltas.map((delta) => {
       const path = pathByTarget.get(`${delta.recordFamily}\u0000${delta.id}`)!;

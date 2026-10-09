@@ -14,8 +14,12 @@
  * The package is self-contained for semantic-review revalidation: the stored
  * reviewer evidence context and signals are checked structurally, then the
  * existing context-aware validateIndependentReview() is re-run against them,
- * so no live CorpusIndex is needed at decision time.
+ * so no live CorpusIndex is needed at decision time. Stored Source
+ * Verification Support is checked the same way: shape, caps and eligibility
+ * against the SRC records the package itself carries, never a corpus.
  */
+import { validateSourceVerification } from "../core/source-verifications.ts";
+import type { RecordFields } from "../core/types.ts";
 import { canonicalJsonStringify } from "../orchestrate/fingerprint.ts";
 import { validateIndependentReview } from "../orchestrate/independent-review.ts";
 import { asValidatedResearchChangeSet, validateResearchChangeSet } from "../orchestrate/rcs-validator.ts";
@@ -163,13 +167,51 @@ function validateReviewSignals(value: unknown, candidateIds: ReadonlySet<string>
 }
 
 /**
- * Re-runs the context-aware F00-F review validation against a
- * ReviewerInputPackage-equivalent rebuilt purely from the package's own
- * hash-bound content. Call only once every input has passed structure checks.
+ * The SRC records the reviewer received, by ID: SRC candidates and SRC
+ * evidence-context records. Stored support may only ever describe these.
  */
-function revalidateSemanticReview(pkg: HumanGatePackage): string[] {
+function reviewedSources(pkg: Record<string, unknown>, candidates: readonly { recordFamily: string; fields: RecordFields }[], deltas: readonly { recordFamily: string; id: string }[]): Map<string, RecordFields> {
+  const sources = new Map<string, RecordFields>();
+  deltas.forEach((delta, i) => {
+    if (delta.recordFamily === "SRC-" && candidates[i]) sources.set(delta.id, candidates[i].fields);
+  });
+  for (const record of Array.isArray(pkg.reviewEvidenceContext) ? pkg.reviewEvidenceContext : []) {
+    if (isObject(record) && record.recordFamily === "SRC-" && typeof record.id === "string" && isObject(record.fields)) sources.set(record.id, record.fields);
+  }
+  return sources;
+}
+
+function validateReviewSourceVerificationContext(value: unknown, sources: ReadonlyMap<string, RecordFields>): string[] {
+  if (value === undefined) return [];
+  const path = "package.reviewSourceVerificationContext";
+  if (!Array.isArray(value) || value.length === 0) {
+    return [`${path} must be a non-empty array when present; it is omitted when the reviewer received no Source Verification Support`];
+  }
+  const errors: string[] = [];
+  let previous: string | undefined;
+  value.forEach((entry, i) => {
+    const sourceId = isObject(entry) ? entry.source_id : undefined;
+    if (typeof sourceId !== "string" || !sources.has(sourceId)) {
+      errors.push(`${path}[${i}].source_id must name an SRC record the reviewer received (candidate or evidence context), got ${JSON.stringify(sourceId)}`);
+      return;
+    }
+    // Same deterministic order buildReviewerInputPackage() produces: by SRC ID, one entry per Source.
+    if (previous !== undefined && sourceId <= previous) errors.push(`${path}[${i}] is out of order or duplicated (support is sorted by SRC ID)`);
+    previous = sourceId;
+    errors.push(...validateSourceVerification(entry, sourceId, sources.get(sourceId)).errors.map((message) => `${path}[${i}]: ${message}`));
+  });
+  return errors;
+}
+
+/**
+ * The reviewer input rebuilt purely from a Gate package's own hash-bound
+ * content: for a package assembled by package-builder.ts it is exactly the
+ * input the independent reviewer received, Source Verification Support
+ * included. Call only on a package whose inputs passed structure checks.
+ */
+export function reviewerInputFromGatePackage(pkg: HumanGatePackage): ReviewerInputPackage {
   const rcs = pkg.researchChangeSet;
-  const reviewerInput: ReviewerInputPackage = {
+  return {
     schemaVersion: "2",
     baseGitSha: pkg.baseGitSha,
     investigationQuestion: rcs.manifest.investigationQuestion,
@@ -181,8 +223,13 @@ function revalidateSemanticReview(pkg: HumanGatePackage): string[] {
     readiness: rcs.readiness,
     evidenceContext: pkg.reviewEvidenceContext,
     signals: pkg.reviewSignals,
+    ...(pkg.reviewSourceVerificationContext !== undefined ? { sourceVerificationContext: pkg.reviewSourceVerificationContext } : {}),
   };
-  return validateIndependentReview(pkg.independentReview, reviewerInput).errors.map(
+}
+
+/** Re-runs the context-aware F00-F review validation against reviewerInputFromGatePackage(). */
+function revalidateSemanticReview(pkg: HumanGatePackage): string[] {
+  return validateIndependentReview(pkg.independentReview, reviewerInputFromGatePackage(pkg)).errors.map(
     (message) => `package.independentReview does not validate against the stored review context: ${message}`
   );
 }
@@ -280,6 +327,7 @@ export function validateHumanGatePackage(value: unknown): HumanGatePackageValida
     const candidateIds = new Set(rcs.deltas.map((delta) => delta.id));
     errors.push(...validateReviewEvidenceContext(pkg.reviewEvidenceContext, candidateIds));
     errors.push(...validateReviewSignals(pkg.reviewSignals, candidateIds));
+    errors.push(...validateReviewSourceVerificationContext(pkg.reviewSourceVerificationContext, reviewedSources(pkg, rcs.candidates, rcs.deltas)));
     if (errors.length === 0) errors.push(...revalidateSemanticReview(asValidatedHumanGatePackage(pkg)));
   }
 

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -376,5 +376,38 @@ test("supplied review material cannot bypass the context-free precheck: a candid
     if (outcome.status !== "FAILED") return;
     assert.equal(outcome.failedCheck, "CLEC_CONTEXT_FREE_BLOCK");
     assert.match(outcome.message, /CLEC-SIG-0001 SRC_RECORD_ID_IN_TEXT SRC-NEW name: "PRB-0001"/);
+  });
+});
+
+test("the Research Change Set path builds its reviewer input with base Source Verification Support and fails closed on invalid applicable support", () => {
+  withTempDir((researchRoot) => {
+    withTempDir((candidatesDir) => {
+      writeCandidate(candidatesDir, "EVD-MATERIAL.yaml", "evidence_id: EVD-MATERIAL\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: claim\nclaim_authority: authoritative\ninference_limits: []\n");
+      const prepare = () => prepareResearchChangeSet({
+        index: { ...materialIndex(), researchRoot },
+        baseGitSha: SHA,
+        candidatesDir,
+        rawManifest: validManifest({ candidateFiles: ["EVD-MATERIAL.yaml"], claimedRecordIds: ["EVD-MATERIAL"] }),
+        rawIndependentReview: validIndependentReview({
+          signalDispositions: [{ signalId: "CLEC-SIG-0001", disposition: "SUPPORTED", reason: "Synthetic disposition.", evidenceReferences: ["SRC-MATERIAL"], relatedFindingIds: [] }],
+        }),
+      });
+      const supportFile = join(researchRoot, "source-verifications", "SRC-MATERIAL.yaml");
+      mkdirSync(join(researchRoot, "source-verifications"));
+      const retrieval = `retrieval:\n  retrieved_at: 2026-09-01\n  content_sha256: ${"e".repeat(64)}\n  media_type: text/html\n`;
+
+      writeFileSync(supportFile, `source_id: SRC-MATERIAL\n${retrieval}verified_claims:\n  - locator: p. 1\n    statement: A fonte publica a afirmação reivindicada.\n`, "utf8");
+      // Valid support passes reviewer-input assembly and review validation; this path then holds the
+      // material Source at admission only because it has no live availability check.
+      const valid = prepare();
+      assert.equal(valid.status === "FAILED" && valid.failedCheck, "PRE_GATE_SAFETY_ADMISSION");
+
+      writeFileSync(supportFile, `source_id: SRC-MATERIAL\n${retrieval}verified_claims:\n  - locator: p. 1\n    statement: A fonte publica a afirmação reivindicada.\n    quote: texto original\n`, "utf8");
+      const outcome = prepare();
+      assert.equal(outcome.status, "FAILED");
+      if (outcome.status !== "FAILED") return;
+      assert.equal(outcome.failedCheck, "SOURCE_VERIFICATION_SUPPORT");
+      assert.match(outcome.message, /verified_claims\[0\] has unexpected field "quote"/);
+    });
   });
 });

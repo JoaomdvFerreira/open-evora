@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { SourceVerificationError, type SourceVerification, type SourceVerificationSet } from "../core/source-verifications.ts";
 import type { CorpusIndex, ParsedRecord, RecordFields, RecordSchema } from "../core/types.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import { detectLanguageSignals } from "../language/signals.ts";
 import { buildProspectiveCorpusIndex } from "../integration/prospective-validation.ts";
+import { sha256Hex } from "./fingerprint.ts";
 import { buildReviewerInputPackage, serializeReviewerInput, type ReviewerInputSource } from "./reviewer-input.ts";
 import type { GenerationManifest } from "./types.ts";
 
@@ -49,8 +51,8 @@ function evidence(id: string, sources: string[], summary: string): RecordFields 
 }
 
 /** Canonical corpus with dependencies the candidates need and records they do not. */
-function corpus(): CorpusIndex {
-  const sources = ["SRC-A", "SRC-B", "SRC-C", "SRC-UNRELATED"].map((id) => ({ source_id: id, name: `Fonte ${id}` }));
+function corpus(sourceFields: RecordFields = {}): CorpusIndex {
+  const sources = ["SRC-A", "SRC-B", "SRC-C", "SRC-UNRELATED"].map((id) => ({ source_id: id, name: `Fonte ${id}`, ...sourceFields }));
   const byPrefix = new Map([
     ["SRC-", family(SOURCE_SCHEMA, sources)],
     ["EVD-", family(EVIDENCE_SCHEMA, [
@@ -93,6 +95,7 @@ function source(overrides: Partial<ReviewerInputSource> = {}): ReviewerInputSour
     ...candidates(),
     validation: { errors: [], totalRecords: 9 },
     readiness: "READY_FOR_INTEGRATION_GATE",
+    sourceVerifications: { bySourceId: new Map(), issues: [] },
     ...overrides,
   };
 }
@@ -168,4 +171,77 @@ test("the reviewer input includes only the allow-listed fields", () => {
 
 test("targetProblemId is omitted for daily-discovery, never present as undefined/null", () => {
   assert.equal(serializeReviewerInput(buildReviewerInputPackage(source())).includes("targetProblemId"), false);
+});
+
+// ---------------------------------------------------------------------------
+// Source Verification Support
+
+/** Public, non-correspondence Sources whose reuse is unknown: eligible for support. */
+const ELIGIBLE = { resource_type: "document", access: { level: "public" }, licensing: { reuse: "unknown" } };
+
+function verification(sourceId: string, statements: string[]): SourceVerification {
+  return {
+    source_id: sourceId,
+    retrieval: { retrieved_at: "2026-08-25", content_sha256: "ab".repeat(32), media_type: "application/pdf" },
+    verified_claims: statements.map((statement, i) => ({ locator: `p. ${i + 1}`, statement })),
+  };
+}
+
+function supportSet(entries: SourceVerification[], issues: SourceVerificationSet["issues"] = []): SourceVerificationSet {
+  return { bySourceId: new Map(entries.map((entry) => [entry.source_id, entry])), issues };
+}
+
+test("a package without applicable support serializes byte-for-byte as before Source Verification Support existed", () => {
+  // Golden fingerprint of this fixture's reviewer input, recorded before the field was introduced.
+  const pkg = buildReviewerInputPackage(source());
+  assert.equal("sourceVerificationContext" in pkg, false);
+  assert.equal(sha256Hex(pkg), "c461423418fa9e2b4d96552ca7a69c855b26dbdbdb0c4ab17be71eb7ec74f101");
+  // Support for Sources the package does not reach leaves it unchanged too.
+  const unrelated = buildReviewerInputPackage(source({ index: corpus(), sourceVerifications: supportSet([verification("SRC-UNRELATED", ["Sem relação."]), verification("SRC-B", ["Fonte da versão substituída."])]) }));
+  assert.equal(serializeReviewerInput(unrelated), serializeReviewerInput(pkg));
+});
+
+test("only support for SRC records the package already carries is included, sorted by SRC ID with claims in file order", () => {
+  const without = buildReviewerInputPackage(source({ index: corpus(ELIGIBLE) }));
+  const pkg = buildReviewerInputPackage(source({
+    index: corpus(ELIGIBLE),
+    sourceVerifications: supportSet([
+      verification("SRC-UNRELATED", ["Sem relação."]),
+      verification("SRC-C", ["Primeira afirmação no ficheiro.", "Segunda afirmação no ficheiro."]),
+      verification("SRC-B", ["SRC-B só é alcançado pela versão canónica substituída de EVD-B."]),
+      verification("SRC-A", ["A fonte regista reclamações sobre atrasos."]),
+    ]),
+  }));
+  assert.deepEqual(pkg.sourceVerificationContext?.map((entry) => entry.source_id), ["SRC-A", "SRC-C"]);
+  assert.deepEqual(pkg.sourceVerificationContext?.[1].verified_claims.map((claim) => claim.statement), ["Primeira afirmação no ficheiro.", "Segunda afirmação no ficheiro."]);
+  // Support is review context: it never widens the evidence graph or adds records.
+  assert.deepEqual(pkg.evidenceContext, without.evidenceContext);
+  assert.deepEqual(pkg.candidates, without.candidates);
+  const json = serializeReviewerInput(pkg);
+  for (const text of ["Sem relação.", "SRC-B só é alcançado"]) assert.equal(json.includes(text), false, `${text} must not reach the reviewer`);
+});
+
+test("support for an SRC candidate is included, judged against the candidate's eligibility", () => {
+  const candidate = { recordFamily: "SRC-", fields: { source_id: "SRC-UNRELATED", name: "Fonte atualizada", ...ELIGIBLE } };
+  const input = source({
+    index: corpus(ELIGIBLE),
+    candidates: [candidate],
+    deltas: [{ recordFamily: "SRC-", id: "SRC-UNRELATED", action: "UPDATE" }],
+    sourceVerifications: supportSet([verification("SRC-UNRELATED", ["Afirmação verificada da fonte."])]),
+  });
+  assert.deepEqual(buildReviewerInputPackage(input).sourceVerificationContext?.map((entry) => entry.source_id), ["SRC-UNRELATED"]);
+  const restricted = { ...candidate, fields: { ...candidate.fields, access: { level: "restricted" } } };
+  assert.throws(() => buildReviewerInputPackage({ ...input, candidates: [restricted] }), SourceVerificationError);
+});
+
+test("invalid applicable support fails closed instead of being silently dropped", () => {
+  const invalid = supportSet([], [{ file: "source-verifications/SRC-A.yaml", sourceId: "SRC-A", errors: ["verified_claims must be a list of 1-8 claims"] }]);
+  assert.throws(() => buildReviewerInputPackage(source({ index: corpus(ELIGIBLE), sourceVerifications: invalid })), /SRC-A\.yaml: verified_claims must be a list of 1-8 claims/);
+});
+
+test("the reviewer-input fingerprint is bound to the applicable support content", () => {
+  const fingerprint = (statement: string) => sha256Hex(buildReviewerInputPackage(source({ index: corpus(ELIGIBLE), sourceVerifications: supportSet([verification("SRC-A", [statement])]) })));
+  assert.equal(fingerprint("A fonte regista reclamações."), fingerprint("A fonte regista reclamações."));
+  assert.notEqual(fingerprint("A fonte regista reclamações."), fingerprint("A fonte regista reclamações em 2025."));
+  assert.notEqual(fingerprint("A fonte regista reclamações."), sha256Hex(buildReviewerInputPackage(source({ index: corpus(ELIGIBLE) }))));
 });
