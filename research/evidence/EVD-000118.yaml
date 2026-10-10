@@ -18,7 +18,7 @@ scope:
   populations:
     - ciclistas atuais e potenciais
   temporal:
-    as_of: "2020"
+    status: unknown
 domains:
   - MOB
   - URB
@@ -26,7 +26,8 @@ domains:
 evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
-  - A cartografia subjacente está datada de 2020 e não deve ser tratada como
-    topologia atual da rede.
+  - A figura apresentada no PMUSE identifica como fonte a Câmara Municipal de
+    Évora, 2020; essa indicação não estabelece a data de produção ou atualização
+    da cartografia subjacente nem a topologia atual da rede.
   - A figura num plano não estabelece a existência de um dataset atual, legível
     por máquina, descarregável ou reutilizável.
