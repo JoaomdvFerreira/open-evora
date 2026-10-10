@@ -1,6 +1,6 @@
 problem_id: PRB-0010
 created_at: 2026-08-28
-updated_at: 2026-08-28
+updated_at: 2026-10-10
 title: Degradação do pavimento rodoviário em Évora, com extensão atual ainda por
   confirmar
 domain:
@@ -14,37 +14,38 @@ affected_populations:
   - condutores
 problem_statement: Uma petição de janeiro de 2026 relatou a existência
   generalizada de buracos e pavimento degradado no município, com impactos na
-  segurança e danos nos veículos; o Município reconheceu a necessidade de
-  manutenção/requalificação e respondeu com reparações na ordem dos 1,5 milhões
-  de euros. Um sinal público posterior, relativo a uma localização específica
+  segurança e danos nos veículos; cobertura jornalística pública descreveu um
+  programa municipal de reparação avaliado em aproximadamente 1,5 milhões de
+  euros e registou o reconhecimento pelo Município da necessidade de
+  manutenção/requalificação. Um sinal público posterior, relativo a uma localização específica
   (entrada da N114 em Évora), alegou persistência do problema; este sinal, de
   natureza social/comunitária, não está verificado. Em fevereiro de 2026, o
   Município descreveu níveis significativos de degradação e informou ter
   realizado um levantamento técnico exaustivo das vias municipais com
   necessidade de intervenção. O procedimento geral de reparação fixou um prazo
   contratual de 10 meses e, até junho, o Município reportou trabalhos em
-  execução ou concluídos em várias avenidas da cidade. Estes registos refinam a
-  resposta como faseada/em curso, mas não estabelecem a condição atual da rede
-  viária em todo o município.
+  execução ou concluídos em várias avenidas da cidade. Estes registos documentam
+  um procedimento geral de reparação e intervenções locais reportadas, mas não
+  estabelecem o estado agregado de execução desse procedimento nem a condição
+  atual da rede viária em todo o município.
 causal_reading: A degradação do pavimento rodoviário é um mecanismo físico de
-  manutenção/infraestrutura, distinto do mecanismo de tráfego/pressão de
-  estacionamento de PRB-0005. A alavancagem digital sobre este mecanismo físico
+  manutenção/infraestrutura. A alavancagem digital sobre este mecanismo físico
   central é esperada como baixa; esta leitura não está validada.
 investigation:
   open_questions:
-    - question: Qual é a condição atual da rede viária municipal durante a
-        implementação faseada das reparações e em que medida a degradação
-        permanece material à escala do concelho?
+    - question: Qual é a condição atual da rede viária municipal, perante o
+        procedimento geral de reparação e as intervenções locais já reportadas,
+        e em que medida a degradação permanece material à escala do concelho?
       why_open: Os novos registos clarificam a cronologia da resposta — incluindo
         levantamento técnico em fevereiro, um procedimento com prazo contratual
         de 10 meses e intervenções locais reportadas até junho — mas não
         disponibilizam um conjunto de dados de agosto de 2026 sobre a condição
         municipal, um estado agregado de execução/conclusão ou uma avaliação
         pós-reparação.
-      latest_result: Registos oficiais refinam o estado da resposta de um programa de
-        reparação anunciado para uma contratação de longo prazo com intervenções
-        locais documentadas; não confirmam nem resolução geral nem persistência
-        geral.
+      latest_result: Registos oficiais documentam um procedimento geral com prazo
+        contratual de 10 meses e intervenções locais reportadas; não estabelecem
+        o estado agregado de execução do procedimento nem confirmam resolução
+        geral ou persistência geral.
       resolution_condition: Um conjunto de dados público municipal, inventário
         técnico, registo agregado de execução/conclusão ou equivalente
         autoritativo que estabeleça a condição atual da rede viária à escala do
@@ -67,11 +68,12 @@ investigation:
       evidence:
         - EVD-000082
     development:
-      summary: O Município reconheceu, através de cobertura jornalística independente,
-        a necessidade de manutenção/requalificação — não atribuível apenas ao
-        clima — e respondeu com um programa de reparações na ordem dos 1,5
-        milhões de euros. Em fevereiro, descreveu níveis significativos de
-        degradação e um levantamento técnico exaustivo; o procedimento geral de
+      summary: A cobertura jornalística pública registou o reconhecimento municipal
+        de que a degradação não era atribuível apenas às condições meteorológicas
+        e exigia manutenção/requalificação, e descreveu um programa municipal de
+        reparação avaliado em aproximadamente 1,5 milhões de euros. Em fevereiro,
+        o Município descreveu níveis significativos de degradação e informou ter
+        realizado um levantamento técnico exaustivo; o procedimento geral de
         reparação fixou um prazo contratual de 10 meses.
       evidence:
         - EVD-000083
@@ -100,7 +102,7 @@ evidence:
       - BOUNDS
     research_roles:
       - LOCAL_OBSERVATION
-      - EXISTING_RESPONSE
+      - PLANNED_RESPONSE
   - evidence_id: EVD-000084
     effects:
       - BOUNDS
@@ -133,39 +135,20 @@ status: OPEN
 decision_basis:
   contract_version: "0.1"
   eligibility_basis: >-
-    PRB-0010 constitui um problema de investigação distinto e bem delimitado:
+    PRB-0010 delimita um problema de investigação relativo à degradação física do
+    pavimento rodoviário no Município de Évora, com residentes e condutores como
+    populações afetadas.
 
-    identifica um mecanismo específico de falha física — degradação do pavimento
-
-    rodoviário e fiabilidade da resposta municipal de manutenção ou
-
-    requalificação —, uma geografia delimitada ao Município de Évora e uma
-
-    população afetada identificada, incluindo residentes e condutores.
-
-
-    A manifestação histórica está documentada por EVD-000082, que regista as
-
-    alegações de uma petição pública de janeiro de 2026, e por EVD-000083, que
-
-    documenta através de cobertura jornalística o reconhecimento municipal da
-
-    necessidade de manutenção ou requalificação e a existência de um programa de
-
-    reparações. A própria petição documenta ainda consequências reportadas
-
-    relacionadas com segurança e danos em veículos.
-
+    A manifestação histórica é documentada por EVD-000082, que regista as
+    alegações de uma petição pública de janeiro de 2026. EVD-000083 regista,
+    através de cobertura jornalística pública, o reconhecimento municipal da
+    necessidade de manutenção ou requalificação e descreve um programa municipal
+    de reparação. A petição relata também consequências relacionadas com segurança
+    e danos em veículos.
 
     O problema não é formulado como uma solução, como a necessidade de uma
-
-    aplicação de reporte rodoviário, e o seu mecanismo é materialmente distinto
-    do
-
-    conflito entre tráfego, pressão de estacionamento e espaço pedonal tratado
-    em
-
-    PRB-0005.
+    aplicação de reporte rodoviário. A revisão de sobreposição é registada
+    separadamente no decision_basis.
   corroboration_basis: >-
     A Corroboration é sustentada apenas para uma afirmação histórica e
 
@@ -174,7 +157,8 @@ decision_basis:
     início de 2026. Não é sustentada uma afirmação de persistência atual, à
     escala
 
-    de todo o município durante a implementação faseada das reparações.
+    de todo o município, nem sobre o estado agregado de execução do procedimento
+    geral de reparação.
 
 
     EVD-000082, com provenance em SRC-0069, regista as alegações apresentadas
@@ -186,7 +170,8 @@ decision_basis:
 
     reconhecimento municipal da necessidade de manutenção ou requalificação e um
 
-    programa de reparações na ordem dos 1,5 milhões de euros. O processo de
+    programa municipal de reparação avaliado em aproximadamente 1,5 milhões de
+    euros. O processo de
     petição
 
     e a documentação da resposta institucional constituem unidades de evidência
@@ -217,13 +202,9 @@ decision_basis:
 
     Assim, permanece em aberto saber se a degradação documentada em
 
-    janeiro-fevereiro de 2026 persiste hoje a uma escala comparável durante a
-    implementação faseada
-
-    de reparações. Nenhum registo canónico estabelece essa condição atual à
-    escala
-
-    municipal, razão pela qual a decisão humana de Corroboration para a
+    janeiro-fevereiro de 2026 persiste hoje a uma escala comparável. Os registos
+    disponíveis não estabelecem a condição municipal atual nem o estado agregado
+    de execução do procedimento geral, razão pela qual a decisão humana de Corroboration para a
     afirmação
 
     de persistência atual permanece HOLD.
@@ -235,34 +216,30 @@ decision_basis:
       Évora.
 
 
-      O reconhecimento do próprio Município, documentado através de cobertura
-      jornalística independente (EVD-000083), confirmou que a degradação não era
-      atribuível apenas às condições meteorológicas, que exigia
-      manutenção/requalificação e que seria objeto de um programa de reparações
-      na ordem dos 1,5 milhões de euros.
+      A cobertura jornalística independente (EVD-000083) registou o reconhecimento
+      pelo Município de que a degradação não era atribuível apenas às condições
+      meteorológicas, que exigia manutenção/requalificação, e descreveu um
+      programa municipal de reparação avaliado em aproximadamente 1,5 milhões
+      de euros.
     evidence:
       - EVD-000082
       - EVD-000083
   consequence:
     summary: >-
-      A própria petição (EVD-000082) documenta consequências concretas
-      reportadas por residentes e condutores: preocupações de segurança
-      associadas à degradação do pavimento, danos em veículos e impactos na
-      mobilidade e na qualidade de vida.
+      A petição pública de janeiro de 2026 (EVD-000082) refere preocupações de segurança, danos em veículos e efeitos na mobilidade e na qualidade de vida associados à degradação do pavimento.
 
 
-      Trata-se de evidência sobre as consequências associadas à manifestação do
-      problema, e não sobre a resposta municipal. O programa de reparações
-      (EVD-000083) é tratado como evidência da resposta institucional e da
-      alteração do estado do problema, e não como evidência das consequências,
-      pelo que não é citado aqui.
+      Estas são alegações registadas na petição; o registo não constitui uma medição representativa nem uma verificação independente da ocorrência, extensão ou prevalência dessas consequências.
+
+
+      EVD-000083 documenta a resposta institucional descrita através de cobertura jornalística e não é utilizado como evidência dessas consequências, pelo que não é citado nesta secção.
     evidence:
       - EVD-000082
   currentness:
     assessment: >-
-      ALTA. O registo canónico inclui evidência relativa ao problema e à
-      resposta até julho de 2026, mas a recência não estabelece a condição
-      municipal atual.
+      A manifestação histórica de âmbito municipal está documentada no início de
+      2026. O registo contém ainda evidência sobre a resposta e um sinal local até
+      julho de 2026, mas não estabelece a condição atual da rede municipal.
 
 
       A petição de janeiro de 2026 (EVD-000082) documenta o problema histórico.
@@ -270,8 +247,8 @@ decision_basis:
       levantamento técnico municipal de fevereiro (EVD-000154), pelo prazo
       contratual de 10 meses do procedimento geral (EVD-000155) e pelas
       intervenções locais reportadas até junho (EVD-000156). Estes registos
-      indicam uma implementação faseada, não um estado necessariamente posterior
-      à execução integral.
+      documentam a cronologia do procedimento e intervenções locais, mas não o
+      estado agregado de execução do procedimento geral.
 
 
       O relato de julho de 2026 relativo à entrada da N114 em Évora (EVD-000084)
@@ -279,9 +256,9 @@ decision_basis:
       registos, permitem sustentar persistência atual em todo o município.
 
 
-      Nenhum registo disponível estabelece, desde agosto de 2026, a condição da
-      rede viária municipal, o estado agregado de execução/conclusão ou uma
-      avaliação pós-reparação.
+      Os registos citados neste decision_basis não estabelecem, desde agosto de
+      2026, a condição da rede viária municipal, o estado agregado de
+      execução/conclusão ou uma avaliação pós-reparação.
     evidence:
       - EVD-000082
       - EVD-000083
@@ -292,30 +269,19 @@ decision_basis:
   contradiction_search:
     performed: true
     summary: >-
-      Foi realizada uma procura deliberada de evidência que pudesse contradizer
-      ou ultrapassar a manifestação histórica documentada, ou que permitisse
-      estabelecer, num sentido ou noutro, se o problema persiste atualmente à
-      escala de todo o município.
+      Na procura deliberada registada neste decision_basis foram considerados
+      EVD-000084, EVD-000155 e EVD-000156 como elementos capazes de limitar uma
+      leitura de persistência municipal.
 
+      EVD-000155 fixa um prazo contratual de 10 meses, mas não demonstra início,
+      progresso ou conclusão do procedimento. EVD-000156 documenta intervenções
+      locais, mas não estabelece a condição da rede municipal nem a conclusão
+      agregada do procedimento geral. EVD-000084 é um relato não verificado
+      relativo a uma localização específica e não sustenta persistência à escala
+      do município.
 
-      EVD-000155 introduz uma explicação temporal material: o procedimento geral
-      prevê 10 meses de execução, mas não demonstra início, progresso ou
-      conclusão. EVD-000156 documenta trabalhos locais, mas não uma condição
-      municipal nem uma conclusão agregada. Também não foi encontrado nenhum
-      registo que estabeleça que a degradação continua atualmente de forma
-      generalizada.
-
-
-      O único sinal posterior, EVD-000084, restringe a conclusão em vez de
-      resolver a questão: trata-se de um relato não verificado relativo a uma
-      única localização, a entrada da N114 em Évora, sem corroboração através de
-      dados operacionais ou municipais. Por isso, não é tratado como evidência
-      de persistência da degradação em todo o município.
-
-
-      A ausência simultânea de evidência que confirme ou contrarie a
-      persistência atual é precisamente a razão pela qual esta questão permanece
-      em aberto.
+      Estes registos não estabelecem nem resolução geral nem persistência geral.
+      A condição atual da rede municipal permanece, por isso, em aberto.
     evidence:
       - EVD-000084
       - EVD-000155
@@ -323,29 +289,26 @@ decision_basis:
   overlap_check:
     performed: true
     summary: >-
-      A degradação física do pavimento rodoviário e a fiabilidade da resposta de
-
-      manutenção ou requalificação são materialmente distintas do mecanismo de
-
-      tráfego, pressão de estacionamento e conflito com o espaço pedonal tratado
-      em
-
-      PRB-0005. Nenhum outro PRB canónico trata a degradação do pavimento
-      rodoviário;
-
-      PRB-0010 não duplica nem se sobrepõe materialmente a outro registo.
+      A revisão de sobreposição está registada como realizada; este
+      decision_basis não contém relações related_problems autoradas. O âmbito
+      substantivo deste Problem é a degradação física do pavimento rodoviário e a
+      condição atual da rede municipal, que permanece por estabelecer.
     related_problems: []
   corroboration_statement: Uma petição de janeiro de 2026 relatou a existência
     generalizada de buracos e pavimento degradado no município, com impactos na
-    segurança e danos nos veículos; o Município reconheceu a necessidade de
-    manutenção/requalificação e respondeu com reparações na ordem dos 1,5
-    milhões de euros. Um sinal público posterior, relativo a uma localização
-    específica (entrada da N114 em Évora), alegou persistência do problema; este
-    sinal, de natureza social/comunitária, não está verificado. Estes elementos
-    evidenciam um problema real de degradação do pavimento rodoviário e de
-    fiabilidade da manutenção, embora a evidência disponível — uma petição e um
-    sinal público posterior não verificado — não permita estimar a prevalência
-    atual em todo o município.
+    segurança e danos nos veículos; cobertura jornalística pública registou o
+    reconhecimento municipal da necessidade de manutenção/requalificação e
+    descreveu um programa municipal de reparação avaliado em aproximadamente
+    1,5 milhões de euros. Em fevereiro de 2026, o Município descreveu níveis
+    significativos de degradação e informou ter realizado um levantamento técnico
+    exaustivo das vias municipais com necessidade de intervenção. Um sinal público
+    posterior, relativo a uma localização específica (entrada da N114 em Évora),
+    alegou persistência do problema; este sinal não está verificado. Estes
+    elementos sustentam uma manifestação histórica de degradação documentada no
+    início de 2026 e documentam uma resposta municipal através de diagnóstico,
+    procedimento de reparação e intervenções locais, mas não estabelecem a
+    prevalência atual da degradação, o estado agregado de execução do procedimento
+    geral nem a condição atual da rede em todo o município.
   supporting_evidence:
     - EVD-000082
     - EVD-000083
@@ -402,16 +365,17 @@ decision_basis:
 
     Évora, reportado através de uma petição pública e posteriormente acompanhado
 
-    por reconhecimento municipal e por um programa de reparações financiado na
-
-    ordem dos 1,5 milhões de euros.
+    por reconhecimento municipal e por um programa municipal de reparação
+    descrito em cobertura jornalística pública como avaliado em aproximadamente
+    1,5 milhões de euros.
 
 
     EVD-000154 documenta um diagnóstico e levantamento técnico municipais em
     fevereiro; EVD-000155 define um prazo contratual de 10 meses; e EVD-000156
-    documenta intervenções locais até junho. Estes registos clarificam que a
-    resposta é faseada/em curso, mas não estabelecem a respetiva execução
-    agregada ou a condição da rede municipal.
+    documenta intervenções locais até junho. Os registos documentam um diagnóstico
+    municipal, um procedimento geral com prazo contratual e intervenções locais,
+    mas não estabelecem a execução agregada do procedimento nem a condição da rede
+    municipal.
 
 
     A evidência disponível não sustenta a conclusão de que a degradação persiste
@@ -426,12 +390,9 @@ decision_basis:
     localização e não permite generalização ao município.
 
 
-    Não foi localizado um conjunto de dados público nem um registo municipal que
-
-    estabeleça a condição do pavimento rodoviário, à escala de todo o município,
-
-    desde agosto de 2026, durante ou após a implementação faseada das
-    reparações.
+    Os registos citados neste decision_basis não estabelecem a condição do
+    pavimento rodoviário à escala de todo o município desde agosto de 2026 nem o
+    estado agregado de execução do procedimento geral.
 
 
     Por essa razão, este decision_basis não produz uma afirmação de âmbito atual
@@ -454,7 +415,7 @@ decision_basis:
     atual precisamente por esta limitação.
 history:
   - date: 2026-08-28
-    summary: Nova evidência oficial estabeleceu uma cronologia de resposta faseada/em curso — levantamento técnico em fevereiro, prazo de execução contratual de 10 meses e intervenções locais até junho — pelo que a investigação deixa de assumir um estado pós-reparação e passa a perguntar pela condição atual da rede em todo o município durante a implementação.
+    summary: Nova evidência oficial documentou uma cronologia da resposta — levantamento técnico em fevereiro, procedimento geral com prazo contratual de 10 meses e intervenções locais reportadas até junho — sem estabelecer o estado agregado de execução do procedimento geral; a investigação passa a perguntar pela condição atual da rede em todo o município.
     evidence:
       - EVD-000154
       - EVD-000155
