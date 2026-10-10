@@ -1,0 +1,17 @@
+source_id: SRC-0070
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 3a6a44292251d6f9b4438acb80aee5bacf109c3df7544f85be616f915fd3d397
+  media_type: text/html
+  archive_reference: https://www.radiocampanario.com/evora-investe-15me-no-arranjo-de-estradas-queremos-rapidamente-tapar-o-maximo-de-buracos-vice-presidente/
+verified_claims:
+  - locator: "Metadados de publicação da página (data de publicação); corpo da notícia, 1.º e 2.º parágrafos"
+    statement: "Notícia publicada a 25 de fevereiro de 2026 que relata declarações prestadas à agência Lusa pelo vice-presidente da Câmara Municipal de Évora, a quem são atribuídas as afirmações sobre o investimento e o estado das vias."
+  - locator: "Corpo da notícia, 1.º e 2.º parágrafos"
+    statement: "Segundo o vice-presidente, a Câmara tenciona aplicar 1,5 milhões de euros em trabalhos de arranjo da rede viária municipal, abrangendo arruamentos urbanos, estradas e caminhos, montante que corresponde ao valor global de dois concursos públicos integrados numa campanha de reparação viária."
+  - locator: "Corpo da notícia, 3.º e 8.º parágrafos"
+    statement: "De acordo com o autarca, os dois concursos destinam-se a contratar obras de reparação de pavimento, pelo que, à data da notícia, estas intervenções estavam ainda por contratar e por executar."
+  - locator: "Corpo da notícia, 1.º e 5.º parágrafos"
+    statement: "O vice-presidente afirma que as vias do concelho já se encontravam em mau estado antes das intempéries do final de janeiro e do início de fevereiro de 2026, que o agravaram, e que esse estado não decorre apenas do desgaste causado por esses episódios de mau tempo."
+  - locator: "Corpo da notícia, 5.º e 6.º parágrafos"
+    statement: "O mesmo autarca atribui o mau estado das vias também a uma manutenção que não foi adequada, defendendo que a infraestrutura rodoviária se degrada a prazo quando não é mantida com regularidade e método."
