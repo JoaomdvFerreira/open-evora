@@ -1,0 +1,17 @@
+source_id: SRC-0126
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 5698c52c5725b1461a19e40777f217f72fd733d5580c8ba3915220e8db3fc684
+  media_type: application/pdf
+  archive_reference: https://files.diariodarepublica.pt/cp_hora/2026/02/041/419952390.pdf
+verified_claims:
+  - locator: "p. 1, cabeçalho; secção 3 (Aviso); secção 6 (Objeto do contrato)"
+    statement: "Anúncio de procedimento n.º 4772/2026, na 2.ª série do Diário da República n.º 41, de 27 de fevereiro de 2026, pelo qual o Município de Évora abre um concurso público para uma empreitada de obras públicas de reparação de estradas municipais no concelho de Évora."
+  - locator: "p. 1, secção 5 (Processo) e secção 6 (Objeto do contrato)"
+    statement: "O anúncio indica um preço base de 745 000 euros, sem IVA, para um procedimento sem divisão em lotes."
+  - locator: "p. 2, secção 10 (Prazo de execução do contrato)"
+    statement: "O campo relativo ao prazo de execução do contrato indica 10 meses, sem previsão de renovações."
+  - locator: "p. 2, secção 13 (Condições de apresentação); p. 3, secção 21 (Critério de adjudicação)"
+    statement: "O anúncio fixa o fim do prazo para apresentação de propostas às 23h59 de 9 de março de 2026 e define o preço como único critério de adjudicação."
+  - locator: "p. 2, secção 9 (Local da execução do contrato)"
+    statement: "Como local de execução, o anúncio indica o concelho de Évora e a União das Freguesias de Évora (São Mamede, Sé, São Pedro e Santo Antão)."

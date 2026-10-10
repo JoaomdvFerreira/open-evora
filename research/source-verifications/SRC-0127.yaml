@@ -1,0 +1,13 @@
+source_id: SRC-0127
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 62850b395a0e3357dc9a3bd5d94720929fa7adbe788f820d8e42567e20025850
+  media_type: text/html
+  archive_reference: https://www.cm-evora.pt/reparar-evora-avenidas-cartaxo-junior-e-das-fontanas/
+verified_claims:
+  - locator: "Cabeçalho da notícia (datas de publicação e de atualização)"
+    statement: "Notícia municipal com data de publicação de 30 de abril de 2026 e data de atualização de 15 de junho de 2026."
+  - locator: "Corpo da notícia, 1.ª frase"
+    statement: "A Câmara Municipal de Évora descreve como estando em curso, por sua iniciativa, trabalhos de aplicação de microaglomerado a frio nas avenidas Cartaxo Júnior e das Fontanas, técnica que apresenta como de conservação preventiva dos pavimentos."
+  - locator: "Corpo da notícia, 2.ª frase"
+    statement: "Na mesma notícia, a Câmara refere a Avenida de São João de Deus e apresenta como já feita a correção da calçada nessa avenida."

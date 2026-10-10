@@ -1,0 +1,17 @@
+source_id: SRC-0069
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 72651d97883b36d511e2be6b5b9ff5195db1da697d521a0d968a4b60a069eb3a
+  media_type: text/html
+  archive_reference: https://peticaopublica.com/?pi=PT129561
+verified_claims:
+  - locator: "Título e destinatário da petição; linha de data de criação sob o texto"
+    statement: "Petição pública dirigida à Câmara Municipal de Évora, com data de criação indicada de 28 de janeiro de 2026, que pede, com caráter de urgência, a requalificação da rede de estradas do concelho de Évora."
+  - locator: "Texto da petição, 1.º parágrafo"
+    statement: "Os signatários exprimem insatisfação com o estado degradado das vias rodoviárias do concelho, que afirmam arrastar-se há vários anos, e atribuem a responsabilidade tanto ao executivo municipal em funções como a executivos anteriores."
+  - locator: "Texto da petição, 2.º parágrafo"
+    statement: "Segundo os peticionários, há buracos e pavimento em mau estado de forma generalizada, a par de manutenção insuficiente, o que, na sua alegação, põe em causa a segurança rodoviária e causa danos materiais nos veículos."
+  - locator: "Texto da petição, 2.º parágrafo"
+    statement: "Os peticionários alegam também que esta situação afeta negativamente a circulação e a mobilidade, o bem-estar e as condições de vida de quem reside no concelho, bem como a imagem deste."
+  - locator: "Texto da petição, 3.º parágrafo"
+    statement: "A petição pede à Câmara que faça com urgência uma avaliação técnica das vias, que torne público um plano de requalificação com calendário definido e que execute intervenções de fundo duradouras em todo o concelho."
