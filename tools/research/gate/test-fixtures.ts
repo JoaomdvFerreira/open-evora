@@ -309,7 +309,7 @@ export function semanticReviewCorpus(): CorpusIndex {
   const byPrefix = new Map([
     ["SRC-", semanticFamily("SRC-", ["SRC-A", "SRC-B", "SRC-C", "SRC-UNRELATED"].map((id) => ({ source_id: id, name: `Fonte ${id}` })))],
     ["EVD-", semanticFamily("EVD-", [
-      semanticEvidence("EVD-A", ["SRC-A"], "Muitas reclamações registadas."),
+      semanticEvidence("EVD-A", ["SRC-A"], "Muitas reclamações de moradores registadas."),
       semanticEvidence("EVD-B", ["SRC-B"], "Versão canónica."),
       semanticEvidence("EVD-UNRELATED", ["SRC-UNRELATED"], "Sem relação."),
     ])],

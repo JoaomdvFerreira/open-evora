@@ -25,6 +25,7 @@ import {
   contextFreeBlockers,
   describeContextFreeBlockers,
   detectLanguageSignals,
+  linkedEvidenceSupportsScopeTerm,
   SIGNAL_CODE,
   SIGNAL_DIMENSION,
   subjectIdsForFiles,
@@ -288,6 +289,97 @@ describe("PRB geography against supporting evidence", () => {
   });
 });
 
+describe("PRB scope terms against linked evidence", () => {
+  const SCOPE_CODES: SignalCode[] = [
+    SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE,
+    SIGNAL_CODE.PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE,
+    SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE,
+  ];
+
+  /** Scope-term signals for a PRB statement linked to EVD-900001 (as given), as [code, match] pairs. */
+  function scopeSignals(statement: string, linked: RecordFields = evd(), extra: { src?: RecordFields[]; evd?: RecordFields[] } = {}): [SignalCode, string | undefined][] {
+    const record = prb({ problem_statement: statement, evidence: [{ evidence_id: "EVD-900001", effects: ["SUPPORTS"], research_roles: ["LOCAL_OBSERVATION"] }] });
+    const signals = detectLanguageSignals(corpus({ src: extra.src, evd: [linked, ...(extra.evd ?? [])], prb: [record] }));
+    return signals.filter((s) => s.field === "problem_statement" && SCOPE_CODES.includes(s.code)).map((s) => [s.code, s.match]);
+  }
+
+  test("an unsupported geographic term is flagged against the linked EVD", () => {
+    const record = prb({ problem_statement: "As carreiras do centro histórico terminam cedo.", evidence: [{ evidence_id: "EVD-900001", effects: ["SUPPORTS"], research_roles: ["LOCAL_OBSERVATION"] }] });
+    const [signal] = detectLanguageSignals(corpus({ evd: [evd()], prb: [record] })).filter((s) => s.code === SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE);
+    assert.deepEqual(
+      [signal.field, signal.match, signal.dimension, signal.severity, signal.evidenceReferences],
+      ["problem_statement", "centro histórico", CLEC_DIMENSION.EXPLICIT_SCOPE, ADVISORY, ["EVD-900001"]]
+    );
+  });
+
+  test("population and temporal terms are flagged when the linked EVD lacks them", () => {
+    assert.deepEqual(scopeSignals("Os estudantes esperam mais ao fim de semana."), [
+      [SIGNAL_CODE.PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE, "estudantes"],
+      [SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE, "fim de semana"],
+    ]);
+  });
+
+  test("a term in the linked EVD's observation summary or scope clears the prompt", () => {
+    const statement = "No centro histórico, os idosos esperam mais à noite em 2025.";
+    assert.deepEqual(scopeSignals(statement, evd({ observation: { summary: "O relatório regista menos carreiras noturnas no centro histórico para pessoas idosas." } })), []);
+    assert.deepEqual(
+      scopeSignals(statement, evd({ observation: { summary: "O relatório regista menos carreiras." }, scope: { geography: { level: "local_area", area: "Centro Histórico de Évora" }, populations: ["idosos"], temporal: { as_of: "2025" } } })),
+      [[SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE, "noite"]]
+    );
+  });
+
+  test("a year is supported by the same year or by the linked EVD's own scope period, not by another year", () => {
+    const period = evd({ scope: { geography: { level: "municipality", area: "Évora" }, temporal: { start: "2024", end: "2027" } } });
+    assert.deepEqual(scopeSignals("A oferta reduzida foi registada em 2025.", period), []);
+    assert.deepEqual(scopeSignals("A oferta reduzida foi registada em 2023.", period), [[SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE, "2023"]]);
+    assert.deepEqual(scopeSignals("A oferta reduzida foi registada em 2026."), [[SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE, "2026"]]);
+  });
+
+  test("a term only in the linked EVD's inference limits is still flagged", () => {
+    const limited = evd({ inference_limits: ["Não abrange o centro histórico nem os estudantes."] });
+    assert.deepEqual(scopeSignals("As carreiras do centro histórico não servem os estudantes.", limited), [
+      [SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE, "centro histórico"],
+      [SIGNAL_CODE.PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE, "estudantes"],
+    ]);
+  });
+
+  test("an SRC or an unlinked EVD carrying the term never supports it", () => {
+    const source = src({ name: "Relatório do centro histórico", scope: { geography: { level: "local_area", area: "Centro histórico" }, domains: ["MOB"] } });
+    const unlinked = evd({ evidence_id: "EVD-900002", observation: { summary: "O relatório regista atrasos no centro histórico." } });
+    assert.deepEqual(scopeSignals("As carreiras do centro histórico terminam cedo.", evd(), { src: [source], evd: [unlinked] }), [
+      [SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE, "centro histórico"],
+    ]);
+  });
+
+  test("one prompt per term family per field, reported verbatim, matching inflections of the same family only", () => {
+    assert.deepEqual(scopeSignals("Os idosos e as idosas referem os bairros; os bairros periféricos também."), [
+      [SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE, "bairros"],
+      [SIGNAL_CODE.PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE, "idosos"],
+    ]);
+    assert.deepEqual(scopeSignals("Os idosos esperam mais.", evd({ observation: { summary: "Uma pessoa idosa relatou esperas." } })), []);
+    assert.deepEqual(scopeSignals("Os estudantes esperam mais.", evd({ observation: { summary: "Os alunos relataram esperas." } })), [
+      [SIGNAL_CODE.PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE, "estudantes"],
+    ]);
+  });
+
+  test("words that merely contain a scope term are not flagged", () => {
+    assert.deepEqual(scopeSignals("A municipalidade e a cidadania regional não são termos de âmbito."), []);
+  });
+
+  test("a PRB without linked Evidence in the index gets no scope-term prompts", () => {
+    const signals = detectLanguageSignals(corpus({ prb: [prb({ problem_statement: "Os estudantes do centro histórico esperam ao fim de semana." })] }));
+    assert.equal(signals.some((s) => SCOPE_CODES.includes(s.code)), false);
+  });
+
+  test("the shared support predicate reads observation.summary and scope only", () => {
+    const record = evd({ observation: { summary: "Regista atrasos." }, scope: { populations: ["estudantes"] }, inference_limits: ["Não abrange o centro histórico."] });
+    assert.equal(linkedEvidenceSupportsScopeTerm(SIGNAL_CODE.PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE, "Estudantes", record), true);
+    assert.equal(linkedEvidenceSupportsScopeTerm(SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE, "centro histórico", record), false);
+    // Only the three scope-term codes are judged by it.
+    assert.equal(linkedEvidenceSupportsScopeTerm(SIGNAL_CODE.VAGUE_QUANTITY, "estudantes", record), false);
+  });
+});
+
 describe("record-ID leakage and SRC wording", () => {
   test("a PRB ID in EVD text is an advisory signal, reported verbatim", () => {
     const record = evd({ inference_limits: ["Não mede a procura.", "Não deve ser tratada como impacto em PRB-0005."] });
@@ -347,7 +439,7 @@ describe("advisory-only, read-only contract", () => {
       prb: [
         prb({
           problem_statement:
-            "Atualmente vários atrasos frequentes em zonas-chave são graves, comprovam falhas devido à obra e afetam os residentes.",
+            "Atualmente vários atrasos frequentes em zonas-chave são graves, comprovam falhas devido à obra desde 2024 e afetam os residentes.",
           evidence: [{ evidence_id: "EVD-900001", effects: ["SUPPORTS"], research_roles: ["LOCAL_OBSERVATION"] }],
         }),
       ],

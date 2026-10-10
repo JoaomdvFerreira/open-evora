@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { validateAuthoringEnvelope } from "./authoring-envelope.ts";
 import { buildPrimaryAuthoringPrompt } from "./primary-prompt.ts";
+import { buildReviewerPrompt } from "./reviewer-prompt.ts";
 
 function validEnvelope(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
@@ -220,4 +221,37 @@ test("the primary prompt still states the structured envelope contract the valid
   assert.match(PRIMARY_PROMPT, /"mode": "daily-discovery" \| "problem-refresh"/);
   assert.match(PRIMARY_PROMPT, /Do not emit anything on stdout other than this JSON object\./);
   assert.ok(PRIMARY_PROMPT.trimEnd().endsWith("match one entry in manifest.candidateFiles."), "envelope contract must remain the final instruction");
+});
+
+test("the primary prompt bounds PRB wording by the linked EVD, never by SRC content or Source Verification Support", () => {
+  assert.match(PRIMARY_PROMPT, /- PRB: .*The linked EVD is the complete evidential boundary for PRB wording: SRC content and Source Verification Support cannot justify PRB wording beyond it\./);
+});
+
+test("the primary prompt frames PRBs on the documented condition and keeps currentness checks honest", () => {
+  assert.match(PRIMARY_PROMPT, /frame the Problem around the documented manifestation or condition first; keep unresolved causality or consequence as an open question/);
+  assert.match(PRIMARY_PROMPT, /Every resolution_condition must be realistically reachable by the project's supported investigation methods/);
+  assert.match(PRIMARY_PROMPT, /If this run cannot perform that check, do not write or imply that it was performed\./);
+});
+
+/** Rules the author and the independent reviewer must state identically. */
+const SHARED_CLEC_RULES = [
+  "Exceptions: official names, proper nouns, URLs, IDs, schema keys and canonical enum values; enum values stay in English.",
+  "(workflow, gate, lane, tooling, work-unit or review-process terms)",
+  "Symmetric fidelity: documented is not unknown, just as UNKNOWN is not NO.",
+  "short sentences, concrete words, each acronym explained at its first occurrence",
+  "would alter scope, attribution, time, uncertainty, causality or other material meaning",
+  "neither materially stronger nor materially weaker than, its supporting evidence",
+  "(1) relevant public information, prioritising competent or claim-authoritative Sources, with secondary, public, social or contextual Sources in their bounded role (discovery, context, reported experience, corroboration); (2) contact with relevant institutions, operators or companies for clarification, follow-up or direct challenge.",
+];
+
+test("the author and reviewer prompts state the same language, clarity, fidelity and investigation-method rules", () => {
+  const reviewerPrompt = buildReviewerPrompt("{}");
+  for (const rule of SHARED_CLEC_RULES) {
+    assert.ok(PRIMARY_PROMPT.includes(rule), `author prompt: ${rule}`);
+    assert.ok(reviewerPrompt.includes(rule), `reviewer prompt: ${rule}`);
+  }
+  for (const prompt of [PRIMARY_PROMPT, reviewerPrompt]) {
+    assert.match(prompt, /prose (that )?is not PT-PT/);
+    assert.match(prompt, /Contact is not itself Evidence[,;] (and )?non-response is not Evidence/);
+  }
 });

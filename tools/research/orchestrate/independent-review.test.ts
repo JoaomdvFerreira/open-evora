@@ -487,7 +487,8 @@ test("the reviewer prompt bounds Source Verification Support to its explicit ver
   for (const rule of [
     "\"sourceVerificationContext\"",
     "It is not Source text, not a quotation and not an EVD.",
-    "Use it only for the bounded factual claims it explicitly contains.",
+    "only for the bounded factual claims it explicitly contains; it never justifies PRB wording.",
+    "only for Sources referenced by EVDs this package creates or updates",
     "It does not establish completeness: silence is not absence, and a fact it does not state stays UNKNOWN, never NO.",
     "Never infer beyond it.",
     "When candidate Source-derived wording exceeds both the canonical SRC metadata and the supplied verified claims, report INSUFFICIENT_EVIDENCE.",
@@ -574,7 +575,7 @@ test("unchanged correspondence-backed Evidence is classified support-ineligible 
     "Compare PRB wording against that EVD's observation, scope, inference_limits and authority/nature metadata",
     "Source-body re-verification is not available for a SOURCE_VERIFICATION_INELIGIBLE Source",
     "For an unchanged evidenceContext EVD, the absence of that Source's body or support is therefore not itself an evidentiary defect and never on its own grounds for INSUFFICIENT_EVIDENCE: judge the PRB against the canonical EVD.",
-    "except as the review boundaries below provide for unchanged Evidence with support-ineligible provenance",
+    "PRB synthesis never needs Source content: review boundary 1 below makes the linked EVD its complete evidential boundary.",
   ]) {
     assert.ok(prompt.includes(rule), rule);
   }
@@ -615,10 +616,10 @@ test("a changed EVD backed by support-ineligible provenance still requires Sourc
   assert.deepEqual(validateIndependentReview(review, CHANGED_EVD_PKG).errors, []);
 });
 
-test("a public Source without support stays eligible, so missing Source content is still an evidence gap", () => {
+test("a public Source without support stays eligible, so missing Source content is still an evidence gap for a changed EVD", () => {
   const prompt = promptOf(PRB_PKG);
   assert.ok(eligibilitySection(prompt).includes("- SRC-PUB: SOURCE_VERIFICATION_ELIGIBLE"));
-  assert.ok(prompt.includes("For a SOURCE_VERIFICATION_ELIGIBLE Source, Source Verification Support is the governed path to Source content; where a judgement needs Source content that neither the SRC metadata nor its support supplies, report INSUFFICIENT_EVIDENCE."));
+  assert.ok(prompt.includes("For a SOURCE_VERIFICATION_ELIGIBLE Source of an EVD this package creates or updates, Source Verification Support is the governed path to Source content; where judging that EVD's fidelity needs Source content that neither the SRC metadata nor its support supplies, report INSUFFICIENT_EVIDENCE."));
   assert.deepEqual(reviewSourceEligibility(PRB_PKG), [
     { sourceId: "SRC-CORR", ineligibility: ["NON_PUBLIC", "CORRESPONDENCE"] },
     { sourceId: "SRC-PUB", ineligibility: [] },
@@ -638,4 +639,161 @@ test("the eligibility section is derived from the frozen input without changing 
   }
   assert.equal(section.join("\n").includes(PRIVATE_SENTINEL), false);
   assert.ok(eligibilitySection(REVIEWER_PROMPT).endsWith("- (no SRC records in the review input)"));
+});
+
+// ---------------------------------------------------------------------------
+// SUPPORTED dispositions of PRB scope-term signals
+
+const LINKED_PROBLEM_SCHEMA: RecordSchema = {
+  prefix: "PRB-",
+  directory: "problems",
+  idField: "problem_id",
+  references: [{ field: "evidence", isList: true, itemField: "evidence_id", targetPrefix: "EVD-", targetDirectory: "evidence" }],
+};
+const SCOPE_TERM = "centro histórico";
+const SCOPE_STATEMENT = `As carreiras do ${SCOPE_TERM} terminam cedo.`;
+
+/**
+ * A PRB candidate linking the unchanged EVD-LINKED, which names the term only
+ * in its inference limits, plus an EVD-UNLINKED candidate (not linked by the
+ * PRB) whose observation and Source support both state the term.
+ */
+function scopeTermPackage(): ReviewerInputPackage {
+  const linked = { ...evidence("EVD-LINKED", "SRC-PUB", "A entidade indicou o horário das carreiras."), inference_limits: [`Não abrange o ${SCOPE_TERM}.`] };
+  return buildReviewerInputPackage({
+    baseGitSha: SHA,
+    manifest: { mode: "direct-pull-request", investigationQuestion: "q" },
+    index: {
+      researchRoot: "/synthetic",
+      totalRecords: 3,
+      byPrefix: new Map([
+        ["SRC-", recordIndex(SOURCE_SCHEMA, [PUBLIC_SOURCE, { ...PUBLIC_SOURCE, source_id: "SRC-OTHER" }])],
+        ["EVD-", recordIndex(EVIDENCE_SCHEMA, [linked])],
+        ["PRB-", recordIndex(LINKED_PROBLEM_SCHEMA, [])],
+      ]),
+    },
+    candidates: [
+      { recordFamily: "EVD-", fields: evidence("EVD-UNLINKED", "SRC-OTHER", `A entidade indicou atrasos no ${SCOPE_TERM}.`) },
+      { recordFamily: "PRB-", fields: { problem_id: "PRB-NEW", problem_statement: SCOPE_STATEMENT, evidence: [{ evidence_id: "EVD-LINKED" }] } },
+    ],
+    deltas: [
+      { recordFamily: "EVD-", id: "EVD-UNLINKED", action: "CREATE" },
+      { recordFamily: "PRB-", id: "PRB-NEW", action: "CREATE" },
+    ],
+    validation: { errors: [], totalRecords: 5 },
+    readiness: "READY_FOR_INTEGRATION_GATE",
+    sourceVerifications: {
+      bySourceId: new Map([["SRC-OTHER", {
+        source_id: "SRC-OTHER",
+        retrieval: { retrieved_at: "2026-08-25", content_sha256: "ab".repeat(32), media_type: "application/pdf" },
+        verified_claims: [{ locator: "p. 1", statement: `A fonte refere atrasos no ${SCOPE_TERM}.` }],
+      }]]),
+      issues: [],
+    },
+  });
+}
+
+const SCOPE_PKG = scopeTermPackage();
+const scopeSignalId = (pkg: ReviewerInputPackage): string => pkg.signals.find(({ signal }) => signal.code === "PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE")!.signalId;
+
+/** A CONCUR review: the scope-term signal SUPPORTED by `references`; every other signal NOT_APPLICABLE. */
+function scopeTermReview(pkg: ReviewerInputPackage, references: string[]): Review {
+  return {
+    schemaVersion: "2",
+    outcome: "CONCUR",
+    rationale: "Revisão sintética do termo de âmbito.",
+    findings: [],
+    signalDispositions: pkg.signals.map(({ signalId }) => signalId === scopeSignalId(pkg)
+      ? { signalId, disposition: "SUPPORTED", reason: "O termo consta da evidência citada.", evidenceReferences: references, relatedFindingIds: [] }
+      : { signalId, disposition: "NOT_APPLICABLE", reason: "Sem relevância para este caso.", evidenceReferences: [], relatedFindingIds: [] }),
+  };
+}
+
+/** A valid replacement: the scope-term signal judged a blocking violation. */
+function scopeTermViolation(pkg: ReviewerInputPackage): Review {
+  const review = scopeTermReview(pkg, []);
+  const signalId = scopeSignalId(pkg);
+  review.outcome = "DISAGREEMENT_FOUND";
+  review.findings = [{
+    findingId: "CLEC-FND-0001", recordId: "PRB-NEW", field: "problem_statement", claim: SCOPE_TERM, dimension: "explicit_scope",
+    kind: "CLEC_VIOLATION", severity: "BLOCKING", reason: "A EVD ligada não abrange este local.", evidenceReferences: ["EVD-LINKED"],
+    correctionDirection: "Limitar o local ao que a EVD ligada regista.", relatedSignalIds: [signalId],
+  }];
+  Object.assign(review.signalDispositions.find((entry) => entry.signalId === signalId)!, { disposition: "VIOLATION", evidenceReferences: ["EVD-LINKED"], relatedFindingIds: ["CLEC-FND-0001"] });
+  return review;
+}
+
+test("the scope-term fixture flags the term and carries support only for the changed EVD's Source", () => {
+  const entry = SCOPE_PKG.signals.find(({ signal }) => signal.code === "PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE");
+  assert.deepEqual([entry?.signal.subjectId, entry?.signal.match, entry?.signal.evidenceReferences], ["PRB-NEW", SCOPE_TERM, ["EVD-LINKED"]]);
+  assert.deepEqual(SCOPE_PKG.sourceVerificationContext?.map((support) => support.source_id), ["SRC-OTHER"]);
+  assert.deepEqual(validateIndependentReview(scopeTermViolation(SCOPE_PKG), SCOPE_PKG).errors, []);
+});
+
+test("SUPPORTED for a PRB scope term is rejected when it rests on an SRC, Source Verification Support, an unlinked EVD or inference_limits", () => {
+  for (const references of [["SRC-OTHER"], ["SRC-PUB"], ["EVD-UNLINKED"], ["EVD-LINKED"], ["SRC-OTHER", "EVD-UNLINKED", "EVD-LINKED"], ["PRB-NEW"]]) {
+    const errors = validateIndependentReview(scopeTermReview(SCOPE_PKG, references), SCOPE_PKG).errors;
+    assert.equal(errors.length, 1, `${references.join(",")}: ${errors.join("; ")}`);
+    assert.match(errors[0], /is SUPPORTED for PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE but cites no EVD linked by PRB-NEW whose observation\.summary or scope contains "centro histórico"/);
+  }
+});
+
+test("SUPPORTED for a PRB scope term is accepted when a cited linked EVD carries the term in observation.summary or scope", () => {
+  for (const change of [
+    { observation: { summary: `A entidade indicou o horário das carreiras do ${SCOPE_TERM}.` } },
+    { scope: { geography: { level: "local_area", area: "Centro Histórico de Évora" } } },
+  ]) {
+    // The same frozen package, with the linked EVD's context record carrying the term.
+    const pkg = structuredClone(SCOPE_PKG) as ReviewerInputPackage;
+    const linked = pkg.evidenceContext.find((record) => record.id === "EVD-LINKED")!;
+    Object.assign(linked.fields, change);
+    assert.deepEqual(validateIndependentReview(scopeTermReview(pkg, ["EVD-LINKED"]), pkg).errors, []);
+    assert.equal(validateIndependentReview(scopeTermReview(pkg, ["EVD-UNLINKED"]), pkg).errors.length, 1);
+  }
+});
+
+test("an invalid SUPPORTED scope-term disposition gets the single structural retry, and a second one fails closed", () => {
+  withReviewWorkbench((dir) => {
+    const invoker = new RecordingReviewer([output(scopeTermReview(SCOPE_PKG, ["SRC-OTHER"])), output(scopeTermViolation(SCOPE_PKG))]);
+    const result = invokeIndependentReview(invoker, SCOPE_PKG, dir);
+    assert.equal(result.status, "VALID");
+    if (result.status === "VALID") assert.equal(result.review.outcome, "DISAGREEMENT_FOUND");
+    assert.equal(invoker.calls.length, 2);
+    const feedback = invoker.calls[1].input.slice(invoker.calls[0].input.length);
+    assert.match(feedback, /STRUCTURAL RETRY[\s\S]*is SUPPORTED for PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE but cites no EVD linked by PRB-NEW/);
+  });
+  withReviewWorkbench((dir) => {
+    const invoker = new RecordingReviewer([output(scopeTermReview(SCOPE_PKG, ["EVD-UNLINKED"])), output(scopeTermReview(SCOPE_PKG, ["SRC-OTHER"]))]);
+    const result = invokeIndependentReview(invoker, SCOPE_PKG, dir);
+    assert.equal(result.status, "FAILED");
+    if (result.status === "FAILED") assert.equal(result.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
+    assert.equal(invoker.calls.length, 2);
+  });
+});
+
+test("the reviewer prompt makes the unchanged linked EVD the complete PRB boundary and states the scope-term SUPPORTED rule", () => {
+  for (const rule of [
+    "For PRB synthesis, an unchanged linked EVD is the complete evidential boundary.",
+    "SRC content and Source Verification Support cannot justify PRB wording beyond that EVD",
+    "whatever the Source's eligibility",
+    "SUPPORTED is valid only when evidenceReferences cite an EVD the PRB links whose observation.summary or scope contains the term.",
+    "An SRC record, Source Verification Support, an EVD the PRB does not link, or a mention only in inference_limits never supports the term",
+  ]) {
+    assert.ok(REVIEWER_PROMPT.includes(rule), rule);
+  }
+  assert.equal(REVIEWER_PROMPT.includes("and any sourceVerificationContext for its Sources"), false);
+});
+
+test("the reviewer prompt makes non-PT-PT prose, process jargon and material weakening blocking", () => {
+  for (const rule of [
+    "citizen-facing authored prose must be PT-PT",
+    "are BLOCKING CLEC_VIOLATION findings under the clarity dimension",
+    "Symmetric fidelity: documented is not unknown, just as UNKNOWN is not NO.",
+    "Wording must not materially strengthen or weaken the Evidence",
+    "materially weakens it, or otherwise changes evidential meaning; when it is citizen-facing prose that is not PT-PT; or when it puts internal process jargon in citizen-facing text",
+    "Every resolution_condition must be realistically reachable",
+    "Contact is not itself Evidence, and non-response is not Evidence",
+  ]) {
+    assert.ok(REVIEWER_PROMPT.includes(rule), rule);
+  }
 });

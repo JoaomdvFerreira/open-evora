@@ -47,6 +47,9 @@ export const SIGNAL_CODE = {
   GENERIC_POPULATION: "GENERIC_POPULATION",
   PRB_GEOGRAPHY_BROADER_THAN_EVIDENCE: "PRB_GEOGRAPHY_BROADER_THAN_EVIDENCE",
   PRB_CURRENTNESS_WORDING_WITHOUT_BASIS: "PRB_CURRENTNESS_WORDING_WITHOUT_BASIS",
+  PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE: "PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE",
+  PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE: "PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE",
+  PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE: "PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE",
   EVD_TEMPORAL_UNKNOWN_PRESENT_WORDING: "EVD_TEMPORAL_UNKNOWN_PRESENT_WORDING",
   EVD_ATTRIBUTION_ABSENT: "EVD_ATTRIBUTION_ABSENT",
   EVD_INFERENCE_LIMITS_EMPTY: "EVD_INFERENCE_LIMITS_EMPTY",
@@ -67,6 +70,9 @@ export const SIGNAL_DIMENSION: Readonly<Record<SignalCode, ClecDimension>> = {
   GENERIC_POPULATION: CLEC_DIMENSION.SPECIFICITY,
   PRB_GEOGRAPHY_BROADER_THAN_EVIDENCE: CLEC_DIMENSION.EXPLICIT_SCOPE,
   PRB_CURRENTNESS_WORDING_WITHOUT_BASIS: CLEC_DIMENSION.TEMPORAL_PRECISION,
+  PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE: CLEC_DIMENSION.EXPLICIT_SCOPE,
+  PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE: CLEC_DIMENSION.EXPLICIT_SCOPE,
+  PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE: CLEC_DIMENSION.TEMPORAL_PRECISION,
   EVD_TEMPORAL_UNKNOWN_PRESENT_WORDING: CLEC_DIMENSION.TEMPORAL_PRECISION,
   EVD_ATTRIBUTION_ABSENT: CLEC_DIMENSION.ATTRIBUTION,
   EVD_INFERENCE_LIMITS_EMPTY: CLEC_DIMENSION.VISIBLE_UNCERTAINTY,
@@ -346,6 +352,91 @@ const ATTRIBUTION_LEXICON: readonly string[] = [
   "(?:inquerito|inqueritos|inquiridos|respondentes|entrevistados|participantes)",
 ];
 
+type ScopeTermCode =
+  | typeof SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE
+  | typeof SIGNAL_CODE.PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE
+  | typeof SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE;
+
+const YEAR_TERM = "(?:19|20)\\d{2}";
+const MONTHS = ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+
+/**
+ * Closed PRB scope-term lexicon (folded, same conventions as LEXICON). Each
+ * entry is one term family: a PRB term is supported only by the same family
+ * in linked Evidence, except a year, which is its own term. Exact lexical
+ * matching only: no stemming beyond the listed inflections, no synonyms, no
+ * semantic similarity.
+ */
+const SCOPE_TERM_LEXICON: Readonly<Record<ScopeTermCode, readonly string[]>> = {
+  PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE: [
+    "evora",
+    "alentejo",
+    "portugal",
+    "centro historico",
+    "intramuros",
+    "extramuros",
+    "(?:zonas?|areas?|meio|freguesias?) rura(?:l|is)",
+    "(?:zonas?|areas?|meio) urban[oa]s?",
+    "periferias?",
+    "freguesias?",
+    "bairros?",
+    "aldeias?",
+    "cidades?",
+    "concelhos?",
+    "municipios?",
+    "distritos?",
+    "regi(?:ao|oes)",
+  ],
+  PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE: [
+    "residentes?",
+    "morador(?:es|as?)?",
+    "habitantes?",
+    "municipes?",
+    "cidada(?:o|os|s)?",
+    "populac(?:ao|oes)",
+    "idos[oa]s?",
+    "senior(?:es)?",
+    "crianc(?:a|as)",
+    "jove(?:m|ns)",
+    "estudantes?",
+    "alun[oa]s?",
+    "famili(?:a|as)",
+    "trabalhador(?:es|as?)?",
+    "turistas?",
+    "visitantes?",
+    "utentes?",
+    "utilizador(?:es|as?)?",
+    "passageir[oa]s?",
+    "pe(?:ao|oes|oas?)",
+    "ciclistas?",
+    "condutor(?:es|as?)?",
+    "comerciantes?",
+    "doentes?",
+    "pessoas? com deficiencia",
+    "pessoas? com mobilidade reduzida",
+    "desempregad[oa]s?",
+    "i?migrantes?",
+    "sem-abrigo",
+    "cuidador(?:es|as?)?",
+  ],
+  PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE: [
+    YEAR_TERM,
+    ...MONTHS,
+    "noites?|noturn[oa]s?",
+    "madrugadas?",
+    "fi(?:m|ns) de semana",
+    "sabados?",
+    "domingos?",
+    "feriados?",
+    "dias? uteis",
+    "horas? de ponta",
+    "(?:ano|periodo) letivo",
+    "ferias(?: escolares)?",
+    "ver(?:ao|oes)",
+    "invernos?",
+  ],
+};
+
 /** Extra SRC-only evaluative wording: judgements of a Source's reliability or strength. */
 const SRC_EVALUATIVE_LEXICON: readonly string[] = [
   "fiave(?:l|is)",
@@ -375,6 +466,15 @@ const LEXICAL_PATTERNS: ReadonlyMap<LexicalCode, RegExp> = new Map(LEXICAL_CODES
 const CURRENTNESS_PATTERN = compile(CURRENTNESS_LEXICON);
 const ATTRIBUTION_PATTERN = compile(ATTRIBUTION_LEXICON);
 const SRC_EVALUATIVE_PATTERN = compile([...LEXICON.INTENSITY_JUDGEMENT, ...LEXICON.CERTAINTY_MARKER, ...SRC_EVALUATIVE_LEXICON]);
+const SCOPE_TERM_CODES_ORDERED = Object.keys(SCOPE_TERM_LEXICON) as ScopeTermCode[];
+/** Per code, one compiled pattern per term family, in lexicon order. */
+const SCOPE_TERM_PATTERNS: ReadonlyMap<ScopeTermCode, readonly { pattern: RegExp; exact: RegExp }[]> = new Map(
+  SCOPE_TERM_CODES_ORDERED.map((code) => [
+    code,
+    SCOPE_TERM_LEXICON[code].map((term) => ({ pattern: compile([term]), exact: new RegExp(`^(?:${term.replace(/ /g, "\\s+")})$`, "u") })),
+  ])
+);
+const YEAR_PATTERN = new RegExp(`^${YEAR_TERM}$`);
 const CANONICAL_ID_PATTERN = /(?<![\p{L}\p{N}])(?:SRC|EVD|PRB)-\d+(?![\p{L}\p{N}])/gu;
 const PRB_ID_PATTERN = /(?<![\p{L}\p{N}])PRB-\d+(?![\p{L}\p{N}])/gu;
 
@@ -642,14 +742,120 @@ function geographySignal(subjectId: string, fields: RecordFields, index: CorpusI
   return [signal(SIGNAL_CODE.PRB_GEOGRAPHY_BROADER_THAN_EVIDENCE, subjectId, "geography.level", level!, { evidenceReferences: comparable.map((c) => c.id) })];
 }
 
+// ---------------------------------------------------------------------------
+// PRB scope terms against linked Evidence. Only an EVD the PRB links supports
+// a term, and only through its observation.summary or scope: inference_limits
+// never count as positive support, and neither does any SRC, Source
+// Verification Support or unlinked EVD. Emission and the review-time check of
+// a SUPPORTED disposition (orchestrate/independent-review.ts) share this one
+// predicate.
+// ---------------------------------------------------------------------------
+
+/** The signal codes judged by linkedEvidenceSupportsScopeTerm(). */
+export const SCOPE_TERM_CODES: ReadonlySet<SignalCode> = new Set(SCOPE_TERM_CODES_ORDERED);
+
+/** Every EVD ID a PRB links through its `evidence[]` relationships, in authored order. */
+export function linkedEvidenceIds(problem: RecordFields): string[] {
+  if (!Array.isArray(problem.evidence)) return [];
+  const ids: string[] = [];
+  for (const entry of problem.evidence) {
+    const id = asString(asObject(entry)?.evidence_id);
+    if (id !== undefined && !ids.includes(id)) ids.push(id);
+  }
+  return ids;
+}
+
+function collectScalars(value: unknown, out: string[]): void {
+  if (typeof value === "string") out.push(value);
+  else if (typeof value === "number") out.push(String(value));
+  else if (Array.isArray(value)) value.forEach((item) => collectScalars(item, out));
+  else if (value !== null && typeof value === "object") Object.values(value).forEach((item) => collectScalars(item, out));
+}
+
+/** The folded text an EVD can support a scope term through: observation.summary and every scope value. */
+function scopeSupportText(evidence: RecordFields): string {
+  const parts: string[] = [];
+  collectScalars(getRecordField(evidence, "observation.summary"), parts);
+  collectScalars(evidence.scope, parts);
+  return fold(parts.join("\n")).folded;
+}
+
+function yearOf(value: unknown): number | undefined {
+  const match = /^(\d{4})/.exec(typeof value === "number" ? String(value) : typeof value === "string" ? value : "");
+  return match ? Number(match[1]) : undefined;
+}
+
+/** A year inside the EVD's own scope.temporal period (as_of, or start–end inclusive) is supported through scope. */
+function yearInScopePeriod(evidence: RecordFields, year: number): boolean {
+  const asOf = yearOf(getRecordField(evidence, "scope.temporal.as_of"));
+  if (asOf !== undefined) return asOf === year;
+  const start = yearOf(getRecordField(evidence, "scope.temporal.start"));
+  const end = yearOf(getRecordField(evidence, "scope.temporal.end"));
+  return start !== undefined && end !== undefined && start <= year && year <= end;
+}
+
+/**
+ * Whether one EVD supports a PRB scope term for `code`: the same term family
+ * (or, for a year, the same year) occurs in its observation.summary or scope.
+ * `match` is the signal's verbatim match. Unknown codes and terms are never
+ * supported.
+ */
+export function linkedEvidenceSupportsScopeTerm(code: SignalCode, match: string, evidence: RecordFields): boolean {
+  if (!SCOPE_TERM_CODES.has(code)) return false;
+  const foldedMatch = fold(match.trim()).folded;
+  const text = scopeSupportText(evidence);
+  if (YEAR_PATTERN.test(foldedMatch)) {
+    return findAll(compile([foldedMatch]), text).length > 0 || yearInScopePeriod(evidence, Number(foldedMatch));
+  }
+  const family = SCOPE_TERM_PATTERNS.get(code as ScopeTermCode)!.find((entry) => entry.exact.test(foldedMatch));
+  return family !== undefined && findAll(family.pattern, text).length > 0;
+}
+
+/**
+ * Scope-term signals for one PRB text field: the first occurrence of each
+ * term family (each year) per field, when no linked EVD supports it. Emitted
+ * only for a PRB linking at least one EVD present in the index; a PRB without
+ * linked Evidence has nothing to compare against here.
+ */
+function scopeTermSignals(subjectId: string, tf: TextField, folded: FoldedText, linked: readonly { id: string; fields: RecordFields }[]): LanguageSignal[] {
+  const out: LanguageSignal[] = [];
+  for (const code of SCOPE_TERM_CODES_ORDERED) {
+    // Within one code, overlapping families yield the longest wording once.
+    const found: (Match & { order: number })[] = [];
+    SCOPE_TERM_PATTERNS.get(code)!.forEach(({ pattern }, order) => {
+      for (const m of findFolded(pattern, folded)) found.push({ ...m, order });
+    });
+    found.sort((a, b) => a.start - b.start || b.end - b.start - (a.end - a.start) || a.order - b.order);
+    const kept: (Match & { order: number })[] = [];
+    for (const m of found) if (!kept.some((k) => m.start < k.end && k.start < m.end)) kept.push(m);
+
+    const seen = new Set<string>();
+    for (const m of kept) {
+      const match = tf.text.slice(m.start, m.end);
+      const key = YEAR_PATTERN.test(match) ? `year:${match}` : `term:${m.order}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if (linked.some((evd) => linkedEvidenceSupportsScopeTerm(code, match, evd.fields))) continue;
+      out.push(signal(code, subjectId, tf.field, excerptAround(tf.text, m.start, m.end), { match, evidenceReferences: linked.map((evd) => evd.id) }));
+    }
+  }
+  return out;
+}
+
 function problemSignals(record: ParsedRecord, index: CorpusIndex, ranks: ReadonlyMap<string, number>): LanguageSignal[] {
   const id = record.fields.problem_id as string;
   const currentnessBasis = hasCurrentnessBasis(record.fields);
+  const evidence = index.byPrefix.get("EVD-");
+  const linked = linkedEvidenceIds(record.fields).flatMap((evidenceId) => {
+    const evd = evidence?.byId.get(evidenceId);
+    return evd ? [{ id: evidenceId, fields: evd.fields }] : [];
+  });
   const out: LanguageSignal[] = [...geographySignal(id, record.fields, index, ranks)];
   for (const tf of problemTextFields(record.fields)) {
     const folded = fold(tf.text);
     out.push(...lexicalSignals(id, tf, folded));
     if (!currentnessBasis) out.push(...matchSignals(SIGNAL_CODE.PRB_CURRENTNESS_WORDING_WITHOUT_BASIS, id, tf, findFolded(CURRENTNESS_PATTERN, folded)));
+    if (linked.length > 0) out.push(...scopeTermSignals(id, tf, folded, linked));
   }
   return out;
 }

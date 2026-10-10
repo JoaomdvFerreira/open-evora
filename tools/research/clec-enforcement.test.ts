@@ -610,10 +610,10 @@ const VERIFIED_STATEMENTS = [
   "O relatório não distingue reclamações por freguesia.",
 ];
 
-function writeSupport(researchRoot: string, statements: readonly string[]): void {
+function writeSupport(researchRoot: string, statements: readonly string[], sourceId = "SRC-BASE"): void {
   mkdirSync(join(researchRoot, "source-verifications"), { recursive: true });
-  writeFileSync(join(researchRoot, "source-verifications", "SRC-BASE.yaml"), stringifyRecordYaml({
-    source_id: "SRC-BASE",
+  writeFileSync(join(researchRoot, "source-verifications", `${sourceId}.yaml`), stringifyRecordYaml({
+    source_id: sourceId,
     retrieval: { retrieved_at: "2026-08-27", content_sha256: "9f".repeat(32), media_type: "application/pdf" },
     verified_claims: statements.map((statement, i) => ({ locator: `p. ${i + 3}`, statement })),
   }), "utf8");
@@ -741,4 +741,110 @@ test("Lane B: Source-derived wording beyond the verified claims stays INSUFFICIE
     assertInsufficient(prepareLaneBReview(unit, sourceFidelityReviewer([COUNT_FACT, TREND_FACT]), workbench), [TREND_FACT]);
     assert.equal(existsSync(join(workbench, "pr-receipt.md")), false, "no receipt exists for a non-CONCUR review");
   });
+});
+
+// ---------------------------------------------------------------------------
+// Both lanes: Source Verification Support follows only the EVDs a change
+// creates or updates. A PRB reaching an unchanged EVD never receives support
+// for that EVD's Sources; the unchanged EVD is the PRB's evidential boundary.
+
+const PRB_ID = "PRB-E2E";
+const PRB_FILE = `${PRB_ID}.yaml`;
+const UNCHANGED_EVD_ID = "EVD-OLD";
+
+function problemYaml(evidenceIds: readonly string[]): string {
+  return stringifyRecordYaml({
+    problem_id: PRB_ID,
+    created_at: "2026-09-15",
+    updated_at: "2026-09-15",
+    title: "Reclamações sobre a recolha de resíduos",
+    domain: ["MOB"],
+    geography: { level: "municipality", area: "Évora" },
+    affected_populations: ["pessoas que apresentaram reclamações sobre a recolha"],
+    problem_statement: "A fonte regista reclamações sobre a recolha de resíduos.",
+    evidence: evidenceIds.map((evidence_id) => ({ evidence_id, effects: ["SUPPORTS"], research_roles: ["LOCAL_OBSERVATION"] })),
+    evidence_status: "discovered",
+    validation_status: "unvalidated",
+    digital_tractability: "not_assessed",
+    solution_landscape_status: "not_assessed",
+    status: "OPEN",
+  });
+}
+
+/** Base additions shared by both lanes: an unchanged EVD on its own eligible Source, and support for both Sources. */
+function seedUnchangedEvidenceBase(research: string): void {
+  writeFileSync(join(research, "sources", "SRC-OTHER.yaml"), sourceYaml("SRC-OTHER", "Other"));
+  writeFileSync(join(research, "evidence", `${UNCHANGED_EVD_ID}.yaml`), stringifyRecordYaml({
+    evidence_id: UNCHANGED_EVD_ID,
+    provenance: { sources: ["SRC-OTHER"], extracted_at: "2026-08-20" },
+    observation: { summary: "A fonte regista reclamações sobre a recolha de resíduos." },
+    scope: { geography: { level: "municipality", area: "Évora" }, temporal: { as_of: "2026" } },
+    domains: ["MOB"],
+    evidence_nature: "fact",
+    claim_authority: "authoritative",
+    inference_limits: ["A contagem de reclamações não mede a frequência dos atrasos."],
+  }));
+  writeSupport(research, VERIFIED_STATEMENTS);
+  writeSupport(research, ["A fonte indica reclamações sobre a recolha de resíduos em Évora."], "SRC-OTHER");
+}
+
+/** The review-unit content both lanes must agree on, independent of lane framing and base SHA. */
+function boundedReviewContent(input: ReviewerInputPackage) {
+  return { candidates: input.candidates, evidenceContext: input.evidenceContext, signals: input.signals, sourceVerificationContext: input.sourceVerificationContext };
+}
+
+/** Reviewer input of one Lane A cycle authoring `files`, captured from the reviewer's prompt. */
+async function laneAReviewerInput(files: { path: string; id: string; yaml: string }[]): Promise<ReviewerInputPackage> {
+  let input: ReviewerInputPackage | undefined;
+  await withLaneACycle(async (cycle) => {
+    const primary = new RecordingInvoker(() => ({
+      schemaVersion: "1",
+      manifest: { schemaVersion: "1", mode: TRIGGER.mode, investigationQuestion: TRIGGER.request, candidateFiles: files.map((f) => f.path), claimedRecordIds: files.map((f) => f.id), rationale: "Synthetic authoring rationale." },
+      candidateFiles: files.map((f) => ({ path: f.path, yaml: f.yaml })),
+    }));
+    const reviewer = new RecordingInvoker((request) => concur(reviewerInputOf(request)));
+    const outcome = await prepareCycle(cycle, primary, reviewer);
+    assert.ok(reviewer.calls.length > 0, outcome.status === "FAILED" ? `${outcome.failedCheck}: ${outcome.message}` : outcome.status);
+    input = reviewerInputOf(reviewer.calls[0]);
+  }, (fixture) => {
+    seedUnchangedEvidenceBase(fixture.research);
+    fixture.commit("unchanged evidence and support on main");
+  });
+  return input!;
+}
+
+/** Reviewer input Lane B derives from Git for the same change written as canonical files. */
+function laneBReviewerInput(files: { path: string; yaml: string }[]): ReviewerInputPackage {
+  let input: ReviewerInputPackage | undefined;
+  withLaneBRepo((repo) => {
+    seedUnchangedEvidenceBase(repo.fixture.research);
+    const base = repo.commit("unchanged evidence and support on main");
+    for (const file of files) writeFileSync(join(repo.fixture.research, file.path), file.yaml, "utf8");
+    input = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: base, head: { kind: "working-tree" } })).reviewerInput;
+  });
+  return input!;
+}
+
+test("both lanes give a PRB plus a changed EVD support only for the changed EVD's Sources", async () => {
+  const prb = problemYaml([UNCHANGED_EVD_ID, EVD_ID]);
+  const laneA = await laneAReviewerInput([{ path: EVD_FILE, id: EVD_ID, yaml: FIDELITY_EVD }, { path: PRB_FILE, id: PRB_ID, yaml: prb }]);
+  const laneB = laneBReviewerInput([{ path: `evidence/${EVD_FILE}`, yaml: FIDELITY_EVD }, { path: `problems/${PRB_FILE}`, yaml: prb }]);
+
+  for (const input of [laneA, laneB]) {
+    assert.deepEqual(input.evidenceContext.map((record) => record.id), [UNCHANGED_EVD_ID, "SRC-BASE", "SRC-OTHER"]);
+    assert.deepEqual(input.sourceVerificationContext?.map((entry) => entry.source_id), ["SRC-BASE"]);
+  }
+  assert.deepEqual(boundedReviewContent(laneA), boundedReviewContent(laneB));
+});
+
+test("both lanes give a PRB-only change no support for the Sources of the unchanged EVD it links", async () => {
+  const prb = problemYaml([UNCHANGED_EVD_ID]);
+  const laneA = await laneAReviewerInput([{ path: PRB_FILE, id: PRB_ID, yaml: prb }]);
+  const laneB = laneBReviewerInput([{ path: `problems/${PRB_FILE}`, yaml: prb }]);
+
+  for (const input of [laneA, laneB]) {
+    assert.deepEqual(input.evidenceContext.map((record) => record.id), [UNCHANGED_EVD_ID, "SRC-OTHER"]);
+    assert.equal(input.sourceVerificationContext, undefined);
+  }
+  assert.deepEqual(boundedReviewContent(laneA), boundedReviewContent(laneB));
 });

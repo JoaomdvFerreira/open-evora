@@ -16,14 +16,16 @@
  * existing context-aware validateIndependentReview() is re-run against them,
  * so no live CorpusIndex is needed at decision time. Stored Source
  * Verification Support is checked the same way: shape, caps and eligibility
- * against the SRC records the package itself carries, never a corpus.
+ * against the SRC records the package itself carries, limited to Sources of
+ * EVDs the change creates or updates, never a corpus.
  */
 import { validateSourceVerification } from "../core/source-verifications.ts";
 import type { RecordFields } from "../core/types.ts";
 import { canonicalJsonStringify } from "../orchestrate/fingerprint.ts";
 import { validateIndependentReview } from "../orchestrate/independent-review.ts";
 import { asValidatedResearchChangeSet, validateResearchChangeSet } from "../orchestrate/rcs-validator.ts";
-import { reviewSignalId, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
+import { reviewSignalId, sourceVerificationSubjectSourceIds, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
+import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import { ADVISORY, SIGNAL_DIMENSION, type SignalCode } from "../language/signals.ts";
 import type { HumanGatePackage } from "./types.ts";
 
@@ -167,16 +169,23 @@ function validateReviewSignals(value: unknown, candidateIds: ReadonlySet<string>
 }
 
 /**
- * The SRC records the reviewer received, by ID: SRC candidates and SRC
- * evidence-context records. Stored support may only ever describe these.
+ * The SRC records stored support may describe, by ID: SRC records the
+ * reviewer received (SRC candidates and SRC evidence-context records) that
+ * are Sources of EVDs the change creates or updates — the same rule
+ * buildReviewerInputPackage() applies.
  */
-function reviewedSources(pkg: Record<string, unknown>, candidates: readonly { recordFamily: string; fields: RecordFields }[], deltas: readonly { recordFamily: string; id: string }[]): Map<string, RecordFields> {
-  const sources = new Map<string, RecordFields>();
+function reviewedSources(pkg: Record<string, unknown>, candidates: readonly CandidateRecord[], deltas: readonly CandidateDelta[]): Map<string, RecordFields> {
+  const received = new Map<string, RecordFields>();
   deltas.forEach((delta, i) => {
-    if (delta.recordFamily === "SRC-" && candidates[i]) sources.set(delta.id, candidates[i].fields);
+    if (delta.recordFamily === "SRC-" && candidates[i]) received.set(delta.id, candidates[i].fields);
   });
   for (const record of Array.isArray(pkg.reviewEvidenceContext) ? pkg.reviewEvidenceContext : []) {
-    if (isObject(record) && record.recordFamily === "SRC-" && typeof record.id === "string" && isObject(record.fields)) sources.set(record.id, record.fields);
+    if (isObject(record) && record.recordFamily === "SRC-" && typeof record.id === "string" && isObject(record.fields)) received.set(record.id, record.fields);
+  }
+  const sources = new Map<string, RecordFields>();
+  for (const id of sourceVerificationSubjectSourceIds(candidates, deltas)) {
+    const fields = received.get(id);
+    if (fields) sources.set(id, fields);
   }
   return sources;
 }
@@ -192,7 +201,7 @@ function validateReviewSourceVerificationContext(value: unknown, sources: Readon
   value.forEach((entry, i) => {
     const sourceId = isObject(entry) ? entry.source_id : undefined;
     if (typeof sourceId !== "string" || !sources.has(sourceId)) {
-      errors.push(`${path}[${i}].source_id must name an SRC record the reviewer received (candidate or evidence context), got ${JSON.stringify(sourceId)}`);
+      errors.push(`${path}[${i}].source_id must name an SRC record the reviewer received (candidate or evidence context) that is a Source of an EVD the change creates or updates, got ${JSON.stringify(sourceId)}`);
       return;
     }
     // Same deterministic order buildReviewerInputPackage() produces: by SRC ID, one entry per Source.

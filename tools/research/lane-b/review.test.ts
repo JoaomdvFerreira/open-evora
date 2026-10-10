@@ -75,7 +75,7 @@ class Fixture {
       source("SRC-A", "Fonte A"),
       source("SRC-B", "Fonte B"),
       source("SRC-UNRELATED", "Fonte sem relação"),
-      evidence("EVD-A", ["SRC-A"], "Muitas reclamações registadas em 2025."),
+      evidence("EVD-A", ["SRC-A"], "Muitas reclamações de moradores registadas em 2025."),
       evidence("EVD-B", ["SRC-B"], "Versão canónica."),
       evidence("EVD-UNRELATED", ["SRC-UNRELATED"], "Sem relação."),
       problem("PRB-OTHER", "Outro problema.", ["EVD-UNRELATED"]),
@@ -408,9 +408,14 @@ function withSupportedBase(statements: string[], fn: (fixture: Fixture, base: st
   });
 }
 
-test("support for a Source the changed records reach is read from the base commit, not from the head or checkout", () => {
+/** A direct update of EVD-A, whose only Source is SRC-A. */
+function changeEvidenceA(fixture: Fixture): void {
+  fixture.record(evidence("EVD-A", ["SRC-A"], "Muitas reclamações de moradores registadas no segundo trimestre de 2025."));
+}
+
+test("support for the Source of a changed EVD is read from the base commit, not from the head or checkout", () => {
   withSupportedBase(["A fonte regista reclamações sobre atrasos em 2025."], (fixture, base) => {
-    addProblemWithSignal(fixture);
+    changeEvidenceA(fixture);
     const head = fixture.commit("direct change");
     writeSupport(fixture, "SRC-A", ["Afirmação não revista no checkout."]);
 
@@ -421,6 +426,16 @@ test("support for a Source the changed records reach is read from the base commi
     assert.equal(serializeReviewerInput(pkg).includes("Afirmação não revista no checkout."), false);
     // The edited checkout is itself a change carrying both canonical records and support.
     assert.equal(fixture.unit(base, { kind: "working-tree" }).status, "SOURCE_VERIFICATION_NOT_SEPARATE");
+  });
+});
+
+test("a PRB-only change receives no support for the Sources of the unchanged EVD it links", () => {
+  withSupportedBase(["A fonte regista reclamações sobre atrasos em 2025."], (fixture, base) => {
+    addProblemWithSignal(fixture);
+    const pkg = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit("direct change") })).reviewerInput;
+    assert.ok(pkg.evidenceContext.some((record) => record.id === "SRC-A"), "SRC-A reaches the reviewer through the unchanged EVD-A");
+    assert.equal(pkg.sourceVerificationContext, undefined);
+    assert.equal(serializeReviewerInput(pkg).includes("A fonte regista reclamações sobre atrasos em 2025."), false);
   });
 });
 
@@ -457,11 +472,16 @@ test("invalid applicable support in the base fails closed; invalid support for a
     writeSupport(fixture, "SRC-UNRELATED", []);
     const base = fixture.commit("invalid support on main");
 
-    addProblemWithSignal(fixture);
+    changeEvidenceA(fixture);
     assert.throws(
       () => fixture.unit(base, { kind: "working-tree" }),
       /SOURCE_VERIFICATION_SUPPORT: applicable Source Verification Support is invalid: source-verifications\/SRC-A\.yaml: SRC-A has licensing\.reuse "prohibited"/
     );
+
+    // Reached only through the unchanged EVD-A, the same support is not applicable to a PRB-only change.
+    fixture.git("checkout", "-q", "--", recordPath("EVD-A"));
+    addProblemWithSignal(fixture);
+    assert.equal(reviewRequired(fixture.unit(base, { kind: "working-tree" })).reviewerInput.sourceVerificationContext, undefined);
 
     fixture.remove(recordPath("PRB-NEW"));
     fixture.record(evidence("EVD-B", ["SRC-B"], "Versão candidata."));
@@ -474,7 +494,7 @@ test("the fingerprinted reviewer input changes with applicable base support and 
     // The same direct change reviewed on another base; only the base SHA itself is neutralised for comparison.
     const reviewOn = (onBase: string): string => {
       fixture.git("checkout", "-q", "--detach", onBase);
-      addProblemWithSignal(fixture);
+      changeEvidenceA(fixture);
       const unit = reviewRequired(fixture.unit(onBase, { kind: "commit", sha: fixture.commit("direct change") }));
       assert.equal(unit.reviewerInputFingerprint, sha256Hex(unit.reviewerInput));
       return sha256Hex({ ...unit.reviewerInput, baseGitSha: "" });
@@ -805,7 +825,7 @@ test("a direct SRC update embedding a canonical record ID is blocked before revi
 
 test("a historical blocker outside the changed records never blocks the change, even within its evidence context", () => {
   withFixture((fixture) => {
-    fixture.record(evidence("EVD-A", ["SRC-A"], "Muitas reclamações registadas em 2025, ver PRB-0001."));
+    fixture.record(evidence("EVD-A", ["SRC-A"], "Muitas reclamações de moradores registadas em 2025, ver PRB-0001."));
     const base = fixture.commit("historical coupling already on main");
     addProblemWithSignal(fixture);
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
