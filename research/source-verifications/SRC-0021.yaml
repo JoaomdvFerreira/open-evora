@@ -1,0 +1,10 @@
+source_id: SRC-0021
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 2fb66638208728b0f16b742489d8665673795d95bba57e7b078c1a93a0858aeb
+  media_type: text/html
+verified_claims:
+  - locator: "página inicial, cabeçalho HTML, título e descrição da página"
+    statement: "O sítio da TREVO identifica-se como pertencente aos transportes rodoviários de Évora e apresenta-se como reunindo informação para o planeamento de viagens de autocarro na cidade."
+  - locator: "página inicial, cabeçalho HTML, descrição da página"
+    statement: "Segundo a descrição da própria página, o sítio disponibiliza notificações e atualizações em tempo real relativas às rotas de autocarro."

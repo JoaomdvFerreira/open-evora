@@ -1,0 +1,20 @@
+source_id: SRC-0019
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 43fd951ccb70241a46c561b8d053f98ca8631719b3e26f3f23a829727e300d9d
+  media_type: application/pdf
+verified_claims:
+  - locator: "p. 22, secção 5, Informação ao Público, parágrafo sobre GTFS"
+    statement: "Segundo o relatório CIMAC/ATAC, a rede TPAC foi convertida em ficheiros GTFS, o que permitiu disponibilizá-la no Google Maps em 2025."
+  - locator: "pp. 20–21, secção 4, parágrafos sobre informação ao público; p. 22, secção 5"
+    statement: "A avaliação da operação TPAC identificou mapas, horários ou identificação de linhas inexistentes ou desatualizados em diversas paragens e terminais e conteúdos digitais incompletos ou desatualizados."
+  - locator: "p. 21, secção 4, síntese da fiscalização"
+    statement: "O relatório classifica as insuficiências na informação ao público do TPAC como desconformidades significativas que dificultam a utilização autónoma do sistema pelos passageiros."
+  - locator: "p. 22, secção 5.1, total anual de comunicações"
+    statement: "O relatório regista 212 comunicações de utilizadores do TPAC entre setembro de 2022 e dezembro de 2025: 56 em 2022, período parcial, 63 em 2023, 58 em 2024 e 35 em 2025."
+  - locator: "pp. 23–24, secção 5.1, tipificação e gráfico 18"
+    statement: "Na tipificação apresentada, o relatório conta 92 comunicações sobre horários, 52 sobre autocarros, 24 sobre atrasos, 9 sobre passes, 8 sobre paragens, 5 sobre bilhética, 4 sobre sobrelotação e 1 sobre alteração de rota. A secção indica 2023–2025, mas o gráfico indica 2022–2025."
+  - locator: "p. 24, secção 5.1, parágrafo após o gráfico 18"
+    statement: "O relatório atribui 43% das comunicações à categoria horários e esclarece que muitas eram pedidos de criação ou sincronização de horários, não relatos de incumprimento."
+  - locator: "pp. 24–26, secção 5.2, resultados do inquérito de dezembro de 2025"
+    statement: "No inquérito presencial de dezembro de 2025 aos utilizadores do TPAC, os aspetos ligados ao pessoal e à segurança a bordo tiveram avaliações mais favoráveis do que a frequência do serviço, o conforto das paragens e a informação ao público."
