@@ -1,0 +1,23 @@
+source_id: SRC-0053
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: a0428d072f9911572c187505f9a78550914b42b6b1370dc9250b32c159b87497
+  media_type: text/html
+  archive_reference: https://www.cm-evora.pt/camara-municipal-de-evora-reforca-resposta-estrutural-para-melhorar-a-limpeza-urbana-no-concelho/
+verified_claims:
+  - locator: "Cabeçalho da notícia (datas de publicação e de atualização)"
+    statement: "Notícia municipal publicada e atualizada em 10 de julho de 2026."
+  - locator: "Corpo da notícia, 1.º e 2.º parágrafos"
+    statement: "O Município apresenta como estando em curso uma estratégia integrada para reforçar a limpeza e a higiene urbanas em todo o concelho, assente no reforço de meios humanos e materiais, na reorganização dos serviços e em novos modelos de recolha de resíduos."
+  - locator: "Secção sobre a recolha seletiva porta-a-porta"
+    statement: "Em articulação com a GESAMB, a Câmara iniciou em abril a recolha seletiva porta-a-porta na freguesia dos Canaviais, depois alargada a Tourega, Guadalupe e Bairro da Torregela; à data da notícia, a extensão ao Centro Histórico estava em preparação."
+  - locator: "Secção sobre as três equipas especializadas"
+    statement: "A notícia anuncia a entrada em funcionamento, a partir de 1 de agosto, de três equipas externas de higiene urbana contratadas por 24 meses, para complementar os recursos próprios da Câmara no perímetro urbano da cidade, no PITÉ e no PIAE."
+  - locator: "Secção sobre a descentralização de competências para as juntas de freguesia"
+    statement: "Segundo a notícia, já tinham sido celebrados contratos interadministrativos com as juntas de freguesia urbanas para descentralizar competências de higiene urbana e de manutenção de espaços verdes; esses contratos estavam aprovados pela Assembleia Municipal, mas a sua entrada em vigor estava prevista apenas para 2027."
+  - locator: "Secção sobre a reestruturação da recolha de resíduos urbanos volumosos"
+    statement: "O Município apresenta como já realizada a reorganização do serviço de recolha de monos, incluindo atendimento, horários de recolha por turnos, adaptação das instalações da Avenida de São João de Deus e recolhas e entregas em horário alargado, com o objetivo declarado de responder mais rapidamente aos pedidos."
+  - locator: "Secção sobre a equipa interna; parágrafo sobre o acompanhamento das medidas"
+    statement: "A notícia refere a criação de uma equipa interna dedicada à gestão da reestruturação da limpeza urbana, encarregada de acompanhar a implementação das medidas e de monitorizar os resultados, e afirma que a Câmara continuará a acompanhar essa implementação."
+  - locator: "Corpo da notícia, parágrafo sobre as dificuldades no concelho"
+    statement: "A Câmara reconhece que ainda persistem dificuldades de limpeza urbana em alguns pontos do concelho e a preocupação dos munícipes com o tema."

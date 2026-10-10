@@ -1,0 +1,23 @@
+source_id: SRC-0081
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 42d9593df36ea01711811985f853ba98ca4fe0cbe7efbfa9459d668d80d41499
+  media_type: text/html
+  archive_reference: https://odigital.sapo.pt/juntas-freguesia-evora-esclarecem-competencias-limpeza-urbana/
+verified_claims:
+  - locator: "Cabeçalho do artigo (data de publicação)"
+    statement: "Artigo jornalístico datado de 28 de julho de 2026."
+  - locator: "Corpo do artigo, 1.º e 2.º parágrafos"
+    statement: "As três uniões de freguesias urbanas de Évora (Malagueira e Horta das Figueiras; Bacelo e Senhora da Saúde; Évora — Centro Histórico) tomaram uma posição conjunta pública para esclarecer o âmbito da descentralização de competências anunciada pela Câmara, na sequência de um comunicado municipal sobre a reestruturação da higiene urbana."
+  - locator: "Secção sobre a recolha de resíduos fora das competências das juntas"
+    statement: "Segundo as uniões de freguesias, as competências a transferir não abrangem a recolha de resíduos urbanos, a recolha de monos nem a manutenção de árvores, e a descentralização não equivale à transferência do serviço municipal de recolha de resíduos."
+  - locator: "Secção sobre a entrada em vigor das competências"
+    statement: "O artigo indica que os autos de transferência já estavam aprovados, mas que só produzirão efeitos a partir de 1 de janeiro de 2027."
+  - locator: "Secção sobre a entrada em vigor das competências, parágrafos sobre cada união de freguesias"
+    statement: "Segundo o artigo, as uniões de Malagueira e Horta das Figueiras e de Bacelo e Senhora da Saúde assumirão limpeza urbana e manutenção de espaços verdes em zonas delimitadas, a união do Centro Histórico apenas manutenção de espaços verdes, e nenhuma das três ficará com a totalidade do seu território, sendo o mapa das áreas divulgado mais tarde."
+  - locator: "Secção sobre a natureza financeira da transferência"
+    statement: "Segundo o comunicado conjunto relatado, a Câmara transferirá apenas recursos financeiros, sem passagem de trabalhadores, máquinas, viaturas ou outros meios operacionais, e nos meses seguintes decorrerá um trabalho técnico de preparação da transferência."
+  - locator: "Secção sobre a natureza financeira da transferência, parágrafos finais"
+    statement: "As uniões de freguesias consideram a experiência-piloto positiva, mas reconhecem que o modelo ainda não tem condições operacionais e financeiras suficientes para garantir autonomia e cobertura total dos seus territórios."
+  - locator: "Secção sobre a recolha de resíduos fora das competências das juntas, 2.º e 3.º parágrafos"
+    statement: "O artigo relata que, antes deste esclarecimento, a Câmara tinha anunciado num comunicado a entrada em funcionamento de mais duas viaturas de recolha de resíduos, passando para 19 os veículos afetos a esse serviço."
