@@ -5,27 +5,18 @@ provenance:
     - SRC-0051
   extracted_at: 2026-08-11
 observation:
-  summary: "O calor e o stresse hídrico têm consequências diretas no quotidiano: o
-    trabalho municipal sobre o clima relaciona o calor projetado com
-    dificuldades nas deslocações a pé e de bicicleta e a diminuição da
-    precipitação com pressão sobre a gestão da água."
+  summary: "O trabalho municipal sobre o clima em Évora distingue situações já reportadas de impactos futuros: participantes mais novos identificaram o calor como uma dificuldade já sentida nas deslocações a pé e de bicicleta, enquanto o planeamento municipal avalia entre os impactos futuros uma menor disponibilidade de recursos hídricos e trata a gestão da água como uma necessidade de adaptação."
 scope:
   geography:
     level: municipality
     area: Município de Évora
-  populations:
-    - residentes
-    - populações vulneráveis
   temporal:
     status: unknown
 domains:
   - CLI
   - MOB
-  - HEA
 evidence_nature: claim
 claim_authority: authoritative
 inference_limits:
-  - A Observação descreve consequências projetadas e não resultados observados
-    no período atual.
-  - A Source não permite, neste registo, fixar com segurança o horizonte
-    temporal específico das projeções.
+  - A dificuldade associada ao calor nas deslocações foi reportada por participantes mais novos e não deve ser generalizada à população do município; a menor disponibilidade futura de recursos hídricos e a necessidade de adaptação na gestão da água são apresentadas no planeamento municipal como impactos e necessidades futuras, não como resultados observados no período atual.
+  - O PMAAC apresenta projeções para vários períodos e cenários; nesta observação, o aviso sobre disponibilidade futura de água não é associado a um horizonte temporal específico.
