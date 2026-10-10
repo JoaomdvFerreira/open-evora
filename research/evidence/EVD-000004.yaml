@@ -5,14 +5,17 @@ provenance:
     - SRC-0017
   extracted_at: 2026-08-10
 observation:
-  summary: O diagnóstico de mobilidade do PUE identifica descontinuidades,
-    infraestruturas pedonais subdimensionadas e numerosas barreiras
-    arquitetónicas e urbanaísticas na cidade, incluindo condicionantes
-    relevantes para pessoas com mobilidade reduzida.
+  summary: O diagnóstico de mobilidade do PUE identifica, na rede pedonal fora
+    do Centro Histórico, descontinuidades e infraestruturas pedonais
+    subdimensionadas; à escala da cidade, identifica barreiras arquitetónicas
+    e urbanísticas como um problema com impacto no quotidiano de grupos
+    vulneráveis.
 scope:
   geography:
     level: city
-    area: cidade, especialmente no exterior e no interior do Centro Histórico
+    area: cidade de Évora; descontinuidades e subdimensionamento da rede
+      pedonal descritos fora do Centro Histórico; barreiras arquitetónicas e
+      urbanísticas descritas à escala da cidade
   populations:
     - peões
     - pessoas com deficiência
@@ -30,3 +33,6 @@ claim_authority: authoritative
 inference_limits:
   - O diagnóstico não estabelece que as barreiras descritas permaneçam
     inalteradas após intervenções posteriores.
+  - As descontinuidades e o subdimensionamento descritos referem-se à rede
+    pedonal fora do Centro Histórico e não estabelecem essas mesmas condições
+    no interior do Centro Histórico.
