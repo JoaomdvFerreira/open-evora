@@ -1,0 +1,15 @@
+source_id: SRC-0104
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: de4b418d2375521f583a7e1efb790c410f1442d7b74fc9d2a4e728324a452b49
+  media_type: application/pdf
+  archive_reference: https://www.cm-evora.pt/wp-content/uploads/2020/07/regulamento-municipal-de-ced%C3%AAncia-e-utiliza%C3%A7%C3%A3o-de-cartografia-digital.pdf
+verified_claims:
+  - locator: "p. 1, Artigo 1.º (Objecto), n.º 1"
+    statement: "O regulamento municipal fixa os critérios e os procedimentos aplicáveis à cedência, gratuita ou onerosa, da cartografia digital pertencente ao Município de Évora ou por ele detida, bem como as condições da sua utilização."
+  - locator: "p. 2, Artigo 4.º (Formato e suporte de fornecimento da informação), n.º 1"
+    statement: "Os formatos previstos no regulamento para a cedência de informação cartográfica são DWG, SHP, ECW e PDF."
+  - locator: "p. 2, Artigo 3.º e Artigo 5.º, n.ºs 2 e 3"
+    statement: "A cedência de cartografia, seja para instrução de operações urbanísticas seja para outros fins, depende de pedido em formulário próprio e, nos casos indicados de cartografia digital, da aceitação do regulamento e da assinatura prévia de um termo de responsabilidade."
+  - locator: "p. 3, Artigo 5.º, n.ºs 4 e 5"
+    statement: "A cedência fica sujeita ao pagamento dos preços previstos, e a informação cedida só pode ser usada pela entidade requerente para as finalidades indicadas no pedido, não podendo ser transmitida a terceiros."

@@ -1,0 +1,22 @@
+source_id: SRC-0103
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 3e3a6aa928f7647d80815c95b073980b681c3c8be215d886af0e6528b8bccc69
+  media_type: application/pdf
+verified_claims:
+  - locator: "p. 203, secção 5.2.4.2, figura 73 e respetiva fonte"
+    statement: "A cartografia da rede ciclável existente apresentada no Volume I do PMUSE identifica como fonte a Câmara Municipal de Évora, 2020."
+  - locator: "pp. 203–204, secção 5.2.4.2, figuras 74–75 e texto associado"
+    statement: "No diagnóstico do Volume I, a infraestrutura exclusivamente ciclável na cidade de Évora tem cerca de 8,5 km e os percursos pedocicláveis cerca de 120 km."
+  - locator: "p. 202, secção 5.2.4.2, primeiro parágrafo"
+    statement: "O Volume I descreve a rede ciclável diagnosticada na cidade de Évora como de extensão e abrangência territorial reduzidas, com percursos descontínuos e sem ligação à generalidade dos equipamentos, serviços e núcleos residenciais mais relevantes."
+  - locator: "p. 215, secção 5.2.4.3, parágrafos sobre a proposta municipal de 2017"
+    statement: "A proposta municipal de 2017, apresentada no Volume I, prevê cerca de 18 km de novos eixos exclusivamente cicláveis e 33 km de percursos pedocicláveis da Grande Rota do Montado; são valores de uma proposta, não de obra concluída."
+  - locator: "p. 216, secção 5.2.4.3, figura 85 e parágrafo seguinte"
+    statement: "O Volume I assinala que a rede proposta não inclui novos eixos cicláveis na zona nascente de Évora, nomeadamente na ligação à Escola 2,3 André de Resende e a núcleos residenciais relevantes."
+  - locator: "p. 217, secção 5.2.4.3, primeiro parágrafo"
+    statement: "O Volume I indica que a possível ligação às áreas da zona nascente não contempladas na proposta ainda carece de estudo mais aprofundado das condições de execução."
+  - locator: "pp. 247–248, secção sobre paragens de transporte coletivo rodoviário, figuras 99–101"
+    statement: "No diagnóstico do Volume I, as paragens sem abrigo descritas no centro histórico são identificadas por uma placa azul e branca com operador e linha, sem cartografia da rede nem horários."
+  - locator: "p. 248, secção sobre paragens de transporte coletivo rodoviário, parágrafo anterior à figura 99"
+    statement: "O diagnóstico refere painéis com informação básica nas paragens com abrigo, mas indica que lhes faltam elementos de acessibilidade universal, como informação em braille e avisos sonoros."

@@ -1,0 +1,12 @@
+source_id: SRC-0105
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: d741da53c291c5ad50993ed696c0bb5d594280c67d6f831f837fdfe1cb7f4c90
+  media_type: text/html
+verified_claims:
+  - locator: "Notícia municipal atualizada em 21/03/2025, parágrafo sobre a ligação pedonal e ciclável"
+    statement: "Em 21 de março de 2025, a Câmara Municipal de Évora referia trabalho já realizado na primeira fase da ligação pedonal e ciclável entre o Bairro de N.ª Sr.ª da Saúde e a ponte do Xarrama, num investimento de 90 000 euros."
+  - locator: "Notícia municipal atualizada em 21/03/2025, parágrafo sobre a segunda fase"
+    statement: "Na mesma notícia, a segunda fase da ligação em direção ao Bairro de Santa Luzia estava em preparação e só avançaria após a conclusão do projeto de infraestrutura para drenagem de águas pluviais."
+  - locator: "Notícia municipal atualizada em 21/03/2025, final do parágrafo sobre a ligação"
+    statement: "A Câmara apresentou a futura ligação integral entre os dois bairros como contributo para executar o Plano de Mobilidade Urbana Sustentável de Évora."

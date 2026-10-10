@@ -1,0 +1,12 @@
+source_id: SRC-0016
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: a5279f489a2832f66bc27790cdf6595dc74611124a645396e3ac06bcffdd40ae
+  media_type: application/pdf
+verified_claims:
+  - locator: "p. 36, quadro Propostas, estratégia A promoção dos transportes públicos e a integração dos modos, linha Benefícios"
+    statement: "O PMUSE prevê intervenções nas paragens de transporte público para melhorar as condições de espera e a informação disponível, tendo em conta a acessibilidade universal."
+  - locator: "p. 36, quadro Propostas, estratégia A promoção dos transportes públicos e a integração dos modos, linha Benefícios"
+    statement: "O PMUSE prevê instalar meios de consulta de informação em tempo real nas paragens principais dos autocarros."
+  - locator: "p. 36, quadro Propostas, estratégia A promoção dos transportes públicos e a integração dos modos, linha Intermodalidade"
+    statement: "O PMUSE prevê uma aplicação móvel e um sítio web para reunir informação sobre os diferentes meios de transporte."
