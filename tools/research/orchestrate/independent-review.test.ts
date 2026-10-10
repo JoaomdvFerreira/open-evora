@@ -778,6 +778,9 @@ test("the reviewer prompt makes the unchanged linked EVD the complete PRB bounda
     "whatever the Source's eligibility",
     "SUPPORTED is valid only when evidenceReferences cite an EVD the PRB links whose observation.summary or scope contains the term.",
     "An SRC record, Source Verification Support, an EVD the PRB does not link, or a mention only in inference_limits never supports the term",
+    "In a coherent package SUPPORTED is not expected for these signals: the signal is emitted only because no linked EVD carries the exact term.",
+    "Use NOT_APPLICABLE when the match is a lexical false positive or the linked EVD states the same scope in equivalent words (contextual equivalence).",
+    "VIOLATION and INSUFFICIENT_EVIDENCE keep their meanings above.",
   ]) {
     assert.ok(REVIEWER_PROMPT.includes(rule), rule);
   }

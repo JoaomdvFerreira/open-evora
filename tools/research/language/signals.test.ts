@@ -352,14 +352,35 @@ describe("PRB scope terms against linked evidence", () => {
   });
 
   test("one prompt per term family per field, reported verbatim, matching inflections of the same family only", () => {
-    assert.deepEqual(scopeSignals("Os idosos e as idosas referem os bairros; os bairros periféricos também."), [
-      [SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE, "bairros"],
+    assert.deepEqual(scopeSignals("Os idosos e as idosas referem as zonas rurais; a zona rural a sul também."), [
+      [SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE, "zonas rurais"],
       [SIGNAL_CODE.PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE, "idosos"],
     ]);
     assert.deepEqual(scopeSignals("Os idosos esperam mais.", evd({ observation: { summary: "Uma pessoa idosa relatou esperas." } })), []);
     assert.deepEqual(scopeSignals("Os estudantes esperam mais.", evd({ observation: { summary: "Os alunos relataram esperas." } })), [
       [SIGNAL_CODE.PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE, "estudantes"],
     ]);
+  });
+
+  test("bare geographic class nouns, generic população and bare month names are not scope terms", () => {
+    assert.deepEqual(
+      scopeSignals("A população da freguesia, do bairro, da aldeia, da cidade, do concelho, do município, do distrito e da região espera em janeiro, fevereiro, março, julho e dezembro."),
+      []
+    );
+    assert.deepEqual(scopeSignals("As populações esperam mais junto ao marco da estrada."), []);
+  });
+
+  test("a named place, a bounded geographic expression, a concrete group and specific temporal scope are still flagged", () => {
+    assert.deepEqual(scopeSignals("No Alentejo, nas freguesias rurais do concelho, os residentes esperam mais à noite, nos dias úteis e nas horas de ponta de julho de 2024."), [
+      [SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE, "Alentejo"],
+      [SIGNAL_CODE.PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE, "freguesias rurais"],
+      [SIGNAL_CODE.PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE, "residentes"],
+      [SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE, "noite"],
+      [SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE, "dias úteis"],
+      [SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE, "horas de ponta"],
+      [SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE, "2024"],
+    ]);
+    assert.deepEqual(scopeSignals("Os idosos, estudantes e passageiros esperam ao fim de semana.").map(([, match]) => match), ["idosos", "estudantes", "passageiros", "fim de semana"]);
   });
 
   test("words that merely contain a scope term are not flagged", () => {

@@ -358,7 +358,6 @@ type ScopeTermCode =
   | typeof SIGNAL_CODE.PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE;
 
 const YEAR_TERM = "(?:19|20)\\d{2}";
-const MONTHS = ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
 
 /**
  * Closed PRB scope-term lexicon (folded, same conventions as LEXICON). Each
@@ -366,6 +365,14 @@ const MONTHS = ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julh
  * in linked Evidence, except a year, which is its own term. Exact lexical
  * matching only: no stemming beyond the listed inflections, no synonyms, no
  * semantic similarity.
+ *
+ * Only terms that state a specific scope are listed. Geography is a named
+ * place or a bounded geographic expression, never a bare class noun
+ * ("freguesia", "bairro", "cidade", "concelho", "município", "região"…);
+ * population is a concrete group, never generic "população"; time is a
+ * year, part of the day or week, or a recurring period, never a bare month
+ * name. Those words name a kind of scope, not a scope, and alone produced
+ * prompts that review could only dismiss.
  */
 const SCOPE_TERM_LEXICON: Readonly<Record<ScopeTermCode, readonly string[]>> = {
   PRB_GEOGRAPHIC_TERM_NOT_IN_LINKED_EVIDENCE: [
@@ -378,14 +385,6 @@ const SCOPE_TERM_LEXICON: Readonly<Record<ScopeTermCode, readonly string[]>> = {
     "(?:zonas?|areas?|meio|freguesias?) rura(?:l|is)",
     "(?:zonas?|areas?|meio) urban[oa]s?",
     "periferias?",
-    "freguesias?",
-    "bairros?",
-    "aldeias?",
-    "cidades?",
-    "concelhos?",
-    "municipios?",
-    "distritos?",
-    "regi(?:ao|oes)",
   ],
   PRB_POPULATION_TERM_NOT_IN_LINKED_EVIDENCE: [
     "residentes?",
@@ -393,7 +392,6 @@ const SCOPE_TERM_LEXICON: Readonly<Record<ScopeTermCode, readonly string[]>> = {
     "habitantes?",
     "municipes?",
     "cidada(?:o|os|s)?",
-    "populac(?:ao|oes)",
     "idos[oa]s?",
     "senior(?:es)?",
     "crianc(?:a|as)",
@@ -421,7 +419,6 @@ const SCOPE_TERM_LEXICON: Readonly<Record<ScopeTermCode, readonly string[]>> = {
   ],
   PRB_TEMPORAL_TERM_NOT_IN_LINKED_EVIDENCE: [
     YEAR_TERM,
-    ...MONTHS,
     "noites?|noturn[oa]s?",
     "madrugadas?",
     "fi(?:m|ns) de semana",
