@@ -3,6 +3,7 @@ retrieval:
   retrieved_at: "2026-10-10"
   content_sha256: de4b418d2375521f583a7e1efb790c410f1442d7b74fc9d2a4e728324a452b49
   media_type: application/pdf
+  archive_reference: https://www.cm-evora.pt/wp-content/uploads/2020/07/regulamento-municipal-de-ced%C3%AAncia-e-utiliza%C3%A7%C3%A3o-de-cartografia-digital.pdf
 verified_claims:
   - locator: "p. 1, Artigo 1.º (Objecto), n.º 1"
     statement: "O regulamento municipal fixa os critérios e os procedimentos aplicáveis à cedência, gratuita ou onerosa, da cartografia digital pertencente ao Município de Évora ou por ele detida, bem como as condições da sua utilização."
