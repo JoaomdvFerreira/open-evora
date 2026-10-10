@@ -7,6 +7,7 @@
  * there is no separate channel by which additional context could reach it.
  */
 import { CLEC_DIMENSION } from "../language/signals.ts";
+import { reviewSourceEligibility, type ReviewerInputPackage } from "./reviewer-input.ts";
 
 const DIMENSION_VALUES = Object.values(CLEC_DIMENSION).map((dimension) => `"${dimension}"`).join(" | ");
 
@@ -80,15 +81,40 @@ Compare each authored claim with its supporting evidence as represented in the p
 10. Evidence fidelity — is each statement traceable to, and no stronger than, its supporting evidence? Check Source→EVD fidelity: an EVD observation that loses the Source's meaning, attribution, qualifications or inference limits is a fidelity loss. Check that no translation or paraphrase strengthens, broadens or resolves the Source, and that no simplification changes evidential meaning.
 Record-specific emphasis: PRB — strictest neutrality, scope and causality; synthesis never broader, stronger or more causal than its EVD and their inference_limits. EVD — strictest fidelity to the Source. SRC — provenance and published identity preserved; no evaluative statement about what the Source proves or how strong it is.
 Challenge vague or loaded wording contextually. Terms such as "vários", "zonas-chave", "significativo", "muitos", "sempre" or "causa" are signals to examine, not banned words and not automatic violations: the evidence and its context decide whether the same wording is supported or unsupported.
-Judge from the supplied evidence and context, not from wording alone. The input's "evidenceContext" holds the existing EVD/SRC records the candidates rely on. SRC records hold provenance and metadata, not the Source's content: where a judgement needs Source content the package does not contain, report it as insufficient evidence — never guess, and never fill the gap from outside the package.
+Judge from the supplied evidence and context, not from wording alone. The input's "evidenceContext" holds the existing EVD/SRC records the candidates rely on. SRC records hold provenance and metadata, not the Source's content: where a judgement needs Source content the package does not contain, report it as insufficient evidence — never guess, and never fill the gap from outside the package — except as the review boundaries below provide for unchanged Evidence with support-ineligible provenance.
 Source Verification Support: the input may carry "sourceVerificationContext", at most one entry per SRC record already in the package, each listing bounded "verified_claims" (a locator and a factual statement). It is a prior, governed verification context — each statement was verified by a human against captured Source bytes before this review. It is not Source text, not a quotation and not an EVD. Use it only for the bounded factual claims it explicitly contains. It does not establish completeness: silence is not absence, and a fact it does not state stays UNKNOWN, never NO. Never infer beyond it. When candidate Source-derived wording exceeds both the canonical SRC metadata and the supplied verified claims, report INSUFFICIENT_EVIDENCE. Do not judge the authenticity of the support (authenticity and publication safety were decided by humans upstream) and do not CLEC-review its statements: they are review context, not candidate text. Findings and dispositions that rely on it cite the associated SRC-* ID in evidenceReferences.
+Review boundaries. Every SRC record in the input is classified, deterministically and by tooling, in the SOURCE VERIFICATION ELIGIBILITY section after the review input: SOURCE_VERIFICATION_ELIGIBLE, or SOURCE_VERIFICATION_INELIGIBLE with a reason category (NON_PUBLIC, CORRESPONDENCE, REUSE_PROHIBITED). Use that classification; do not re-derive it.
+1. PRB → existing EVD. An EVD in "evidenceContext" is existing canonical Evidence already admitted into the base and unchanged by this package: it is the bounded review artifact for PRB synthesis. Compare PRB wording against that EVD's observation, scope, inference_limits and authority/nature metadata, and any sourceVerificationContext for its Sources.
+2. Changed EVD → Source. An EVD candidate is created or updated by this package. Source→EVD fidelity remains mandatory for it whatever its Sources' eligibility: where judging it needs Source content the package does not contain, report INSUFFICIENT_EVIDENCE.
+3. Eligible Source. For a SOURCE_VERIFICATION_ELIGIBLE Source, Source Verification Support is the governed path to Source content; where a judgement needs Source content that neither the SRC metadata nor its support supplies, report INSUFFICIENT_EVIDENCE.
+4. Support-ineligible provenance. Source-body re-verification is not available for a SOURCE_VERIFICATION_INELIGIBLE Source: the review package can never carry its content or Source Verification Support. For an unchanged evidenceContext EVD, the absence of that Source's body or support is therefore not itself an evidentiary defect and never on its own grounds for INSUFFICIENT_EVIDENCE: judge the PRB against the canonical EVD. This does not make the EVD, its Source or correspondence true, verified or stronger, and it never relaxes PRB→EVD fidelity. Do not infer beyond the EVD: PRB wording that exceeds the EVD's observation, drops or weakens an inference limit, broadens place, population or period, increases certainty or causality, or misstates attribution remains a CLEC defect, and a PRB claim the EVD itself does not support remains INSUFFICIENT_EVIDENCE or a violation on the EVD's own terms.
 A CLEC defect that makes a statement stronger, broader, more certain or more causal than its evidence, or that changes evidential meaning, is grounds for DISAGREEMENT_FOUND. If the package lacks the evidence needed to compare a claim, that is grounds for INSUFFICIENT_EVIDENCE. Record each such issue as a structured finding with its record, field, verbatim claim and CLEC dimension.`;
+
+/**
+ * The deterministic SOURCE VERIFICATION ELIGIBILITY section: one line per SRC
+ * record in the frozen input, derived by reviewSourceEligibility() from that
+ * input alone. It carries only SRC IDs and reason categories, never Source
+ * content or further metadata.
+ */
+function sourceEligibilitySection(frozenReviewerInputJson: string): string[] {
+  const input = JSON.parse(frozenReviewerInputJson) as Partial<ReviewerInputPackage>;
+  const entries = reviewSourceEligibility({ candidates: input.candidates ?? [], deltas: input.deltas ?? [], evidenceContext: input.evidenceContext ?? [] });
+  return [
+    "SOURCE VERIFICATION ELIGIBILITY (deterministic, derived from the canonical SRC metadata in the review input):",
+    ...(entries.length === 0
+      ? ["- (no SRC records in the review input)"]
+      : entries.map(({ sourceId, ineligibility }) =>
+          ineligibility.length === 0 ? `- ${sourceId}: SOURCE_VERIFICATION_ELIGIBLE` : `- ${sourceId}: SOURCE_VERIFICATION_INELIGIBLE (${ineligibility.join(", ")})`
+        )),
+  ];
+}
 
 /**
  * `frozenReviewerInputJson` must be exactly the canonical JSON string
  * produced by serializeReviewerInput() — this function does not re-derive or
  * reformat it, so the text the reviewer actually sees is provably identical
- * to what was frozen for it.
+ * to what was frozen for it. The eligibility section that follows it is a
+ * pure function of that same string.
  */
 export function buildReviewerPrompt(frozenReviewerInputJson: string): string {
   return [
@@ -111,6 +137,8 @@ export function buildReviewerPrompt(frozenReviewerInputJson: string): string {
     "",
     "REVIEW INPUT (immutable, JSON):",
     frozenReviewerInputJson,
+    "",
+    ...sourceEligibilitySection(frozenReviewerInputJson),
     "",
     RESULT_CONTRACT,
   ].join("\n");

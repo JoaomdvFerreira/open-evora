@@ -110,20 +110,37 @@ function boundedString(value: unknown, path: string, max: number): string[] {
   return [];
 }
 
+/** Non-sensitive category of why a canonical SRC record may not carry Source Verification Support. */
+export type SourceVerificationIneligibility = "NON_PUBLIC" | "CORRESPONDENCE" | "REUSE_PROHIBITED";
+
 /**
- * Eligibility of one canonical SRC record for Source Verification Support.
- * Only a public, non-correspondence Source whose reuse is not prohibited may
- * carry support; `reuse: unknown` stays eligible because support never
- * carries Source wording or bytes.
+ * The single eligibility rule for Source Verification Support, as reason
+ * categories in fixed order; empty means eligible. Only a public,
+ * non-correspondence Source whose reuse is not prohibited may carry support;
+ * `reuse: unknown` stays eligible because support never carries Source
+ * wording or bytes. Reads only canonical SRC metadata, never Source content.
  */
+export function sourceVerificationIneligibility(source: RecordFields): SourceVerificationIneligibility[] {
+  const reasons: SourceVerificationIneligibility[] = [];
+  if (getRecordField(source, "access.level") !== "public") reasons.push("NON_PUBLIC");
+  if (getRecordField(source, "resource_type") === "correspondence") reasons.push("CORRESPONDENCE");
+  if (getRecordField(source, "licensing.reuse") === "prohibited") reasons.push("REUSE_PROHIBITED");
+  return reasons;
+}
+
+/** Eligibility of one canonical SRC record for Source Verification Support, as validation messages. */
 export function sourceVerificationEligibilityErrors(sourceId: string, source: RecordFields | undefined): string[] {
   if (!source) return [`${sourceId} does not exist as a canonical SRC record`];
-  const errors: string[] = [];
-  const level = getRecordField(source, "access.level");
-  if (level !== "public") errors.push(`${sourceId} has access.level ${JSON.stringify(level)}; only public Sources may carry Source Verification Support`);
-  if (getRecordField(source, "resource_type") === "correspondence") errors.push(`${sourceId} is correspondence; correspondence may not carry Source Verification Support`);
-  if (getRecordField(source, "licensing.reuse") === "prohibited") errors.push(`${sourceId} has licensing.reuse "prohibited"; it may not carry Source Verification Support`);
-  return errors;
+  return sourceVerificationIneligibility(source).map((reason) => {
+    switch (reason) {
+      case "NON_PUBLIC":
+        return `${sourceId} has access.level ${JSON.stringify(getRecordField(source, "access.level"))}; only public Sources may carry Source Verification Support`;
+      case "CORRESPONDENCE":
+        return `${sourceId} is correspondence; correspondence may not carry Source Verification Support`;
+      case "REUSE_PROHIBITED":
+        return `${sourceId} has licensing.reuse "prohibited"; it may not carry Source Verification Support`;
+    }
+  });
 }
 
 function sourceFields(index: CorpusIndex, sourceId: string): RecordFields | undefined {

@@ -52,7 +52,7 @@ Do not publish:
 
 Public accessibility, machine readability, permission to reuse, and permission to republish are separate properties. Do not infer one from another.
 
-Source Verification Support (`research/source-verifications/`) may contain only bounded factual paraphrases about public Sources. It must never contain verbatim Source text or raw Source bytes, and it does not authorize republishing Source wording. Private, restricted or correspondence material remains prohibited there without separate explicit owner authorization. Its semantics are owned by `docs/datamodel.md` §8 and its review use by `docs/investigationstrategy.md` §12.
+Source Verification Support (`research/source-verifications/`) may contain only bounded factual paraphrases about public Sources. It must never contain verbatim Source text or raw Source bytes, and it does not authorize republishing Source wording. It is only for public, non-correspondence Sources whose reuse is not prohibited; private, restricted or correspondence material is never permitted there, and no owner authorization overrides that. Any exceptional review of non-public Sources would require a separate governed mechanism, not Source Verification Support. Its semantics are owned by `docs/datamodel.md` §8 and its review use by `docs/investigationstrategy.md` §12.
 
 When publication safety is genuinely uncertain, stop and report the uncertainty.
 
