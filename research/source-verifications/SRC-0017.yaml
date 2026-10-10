@@ -1,0 +1,14 @@
+source_id: SRC-0017
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 22c4be638d0b5f3dfc6481efa7337f06ccf476057977558a35286de495dbd350
+  media_type: application/pdf
+verified_claims:
+  - locator: "p. 7, secção 2 (Breve caracterização da situação existente), quadro-síntese (Quadro I), linha Pedonal, 3.º parágrafo"
+    statement: "Para a rede pedonal situada fora do Centro Histórico, o diagnóstico aponta, de modo geral, percursos com descontinuidades e sem lógica clara, sobretudo nas travessias, bem como infraestruturas pedonais subdimensionadas, entre outras deficiências."
+  - locator: "p. 7, secção 2, quadro-síntese (Quadro I), linha Pedonal, 4.º parágrafo"
+    statement: "O diagnóstico identifica a quantidade de barreiras arquitetónicas e urbanísticas como um problema que abrange a cidade no seu conjunto, com impacto no quotidiano de grupos vulneráveis, como pessoas com deficiência, pessoas idosas, crianças e pessoas que utilizam carrinhos de bebé."
+  - locator: "p. 9, secção 2, quadro-síntese (Quadro I, continuação), linha Transporte público iniciada na p. 8, parágrafo sobre as interfaces"
+    statement: "O terminal rodoviário de Évora é descrito como tendo vários constrangimentos para quem tem mobilidade reduzida, percursos pedonais frágeis e de baixa qualidade e uma ligação deficiente à mobilidade ciclável."
+  - locator: "p. 9, secção 2, quadro-síntese (Quadro I, continuação), linha Transporte público iniciada na p. 8, parágrafo sobre as interfaces"
+    statement: "No mesmo parágrafo, a estação ferroviária de Évora é descrita como estando em bom estado de conservação e com acessibilidade considerada boa para pessoas com mobilidade reduzida."
