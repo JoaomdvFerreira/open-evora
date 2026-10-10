@@ -1,8 +1,8 @@
 problem_id: PRB-0004
 created_at: "2026-08-28"
-updated_at: "2026-08-31"
-title: Descontinuidades na rede ciclável de Évora e impacto quotidiano ainda por
-  caracterizar
+updated_at: "2026-10-10"
+title: Descontinuidades documentadas na rede ciclável de Évora; impacto nas
+  deslocações quotidianas ainda por estabelecer
 domain:
   - MOB
   - URB
@@ -11,26 +11,34 @@ geography:
   area: Évora
 affected_populations:
   - ciclistas atuais e potenciais
-problem_statement: O planeamento institucional descreve os percursos cicláveis
-  como limitados, descontínuos e insuficientemente ligados a destinos
-  importantes. Não está ainda estabelecido quais as deslocações quotidianas
-  concretas afetadas por esta descontinuidade, nem em que medida ela reduz, na
-  prática, a utilidade da rede para quem se desloca diariamente de bicicleta.
-causal_reading: O problema central é de infraestrutura física — descontinuidade
-  e conectividade da rede ciclável — e não de aplicações de planeamento de
-  percursos. Esta leitura não está validada.
+problem_statement: >-
+  O planeamento institucional documenta uma rede ciclável com extensão e
+  conectividade limitadas no período diagnosticado, mas a evidência disponível
+  não estabelece a topologia nem o estado atual da rede. Também não está
+  estabelecido quais as deslocações quotidianas concretas são hoje afetadas
+  pelas descontinuidades documentadas, nem se e em que medida estas reduzem a
+  utilidade prática da rede para quem se desloca de bicicleta.
+causal_reading: >-
+  A hipótese de trabalho centra-se na infraestrutura física — continuidade e
+  conectividade da rede ciclável — e não em aplicações de planeamento de
+  percursos. Esta interpretação causal não está validada e o estado atual da
+  rede permanece por estabelecer.
 investigation:
   open_questions:
     - question: A Câmara Municipal mantém uma camada operacional e atual de dados
         geográficos (SIG) sobre a rede ciclável? Em que formato e em que
         condições pode ser reutilizada publicamente?
-      why_open: A cartografia oficial pública está datada de 2020; um regulamento
-        municipal confirma a capacidade de fornecimento de dados em formatos
-        estruturados (SHP/DWG/ECW) mediante pedido formal, mas não a existência
-        de um conjunto de dados aberto. Uma notícia de março de 2025 confirma
-        pelo menos uma ligação concluída desde a cartografia de 2020, pelo que a
-        cartografia estática não deve ser interpretada como representando
-        necessariamente a rede operacional atual.
+      why_open: >-
+        A cartografia da rede ciclável apresentada no Volume I do PMUSE identifica
+        como fonte a Câmara Municipal de Évora, 2020. O regulamento municipal
+        estabelece um mecanismo formal de cedência de cartografia digital e prevê
+        formatos como SHP, DWG, ECW e PDF, mas não estabelece a existência de uma
+        camada operacional atual da rede ciclável nem um conjunto de dados aberto.
+        Em março de 2025, o Município reportava trabalho já realizado na primeira
+        fase de uma ligação pedonal/ciclável entre o Bairro de N.ª Sr.ª da Saúde e a
+        ponte do Xarrama, mantendo a segunda fase em direção ao Bairro de Santa Luzia
+        em preparação. Estes elementos mostram que não é seguro tratar a cartografia
+        apresentada no PMUSE como representação da topologia operacional atual.
       resolution_condition: Confirmação institucional pela DAM sobre a existência de
         uma camada operacional atual, o seu formato e as respetivas condições de
         reutilização pública.
@@ -40,11 +48,13 @@ investigation:
         - EVD-000121
     - question: Quais são as deslocações e os percursos quotidianos concretamente
         afetados pela descontinuidade da rede ciclável?
-      why_open: A cartografia oficial confirma a extensão e a composição da rede, mas
-        não identifica quais as deslocações ou percursos do dia a dia
-        concretamente afetados pela descontinuidade, nem em que medida esta
-        reduz a utilidade prática da rede para quem se desloca diariamente de
-        bicicleta.
+      why_open: >-
+        O diagnóstico e a cartografia apresentados no PMUSE documentam a extensão,
+        composição e descontinuidade da rede no período representado, mas não
+        estabelecem a topologia nem o estado atual da rede. Também não identificam
+        quais as deslocações ou percursos quotidianos são atualmente afetados, nem se
+        e em que medida as descontinuidades documentadas reduzem a utilidade prática
+        da rede para quem se desloca diariamente de bicicleta.
       latest_result: Não foi identificada uma deslocação quotidiana recorrente que
         cumprisse o critério delimitado para desafio direto.
       current_action: Não está autorizada nova procura de deslocações no âmbito atual;
@@ -72,10 +82,13 @@ investigation:
         problema.
 
 
-        A cartografia oficial da rede ciclável existente confirma cerca de 8,5
-        km de infraestrutura exclusivamente ciclável e cerca de 120 km de
-        percursos pedonais e cicláveis partilhados, maioritariamente
-        recreativos, reiterando o diagnóstico de descontinuidade.
+        A cartografia da rede ciclável apresentada no Volume I do PMUSE, cuja
+        figura identifica como fonte a Câmara Municipal de Évora, 2020, documenta
+        cerca de 8,5 km de infraestrutura exclusivamente ciclável e cerca de 120
+        km de percursos partilhados por peões e ciclistas no diagnóstico
+        apresentado, e reitera a caracterização de uma rede reduzida e
+        descontínua. Estes valores e essa cartografia não estabelecem a topologia
+        nem o estado atual da rede.
       evidence:
         - EVD-000118
     development:

@@ -4,11 +4,13 @@ provenance:
     - SRC-0105
   extracted_at: 2026-08-12
 observation:
-  summary: Em março de 2025, estava concluída uma primeira fase (90 000 euros) de
-    uma ligação pedonal/ciclável entre o Bairro de Nª Srª da Saúde e a ponte do
-    Xarrama, estando uma segunda fase em direção ao Bairro de Santa Luzia em
-    preparação, dependente de um projeto de drenagem de águas pluviais. O
-    Município enquadra isto explicitamente como concretização prática do PMUSE.
+  summary: Em março de 2025, a Câmara Municipal de Évora referia trabalho já
+    realizado na primeira fase (90 000 euros) de uma ligação pedonal/ciclável
+    entre o Bairro de N.ª Sr.ª da Saúde e a ponte do Xarrama; a segunda fase,
+    em direção ao Bairro de Santa Luzia, estava em preparação e dependia de um
+    projeto de infraestrutura para drenagem de águas pluviais. A Câmara
+    apresentava a futura ligação integral entre os dois bairros como contributo
+    para executar o PMUSE.
 scope:
   geography:
     level: city
