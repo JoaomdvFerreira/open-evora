@@ -1,0 +1,13 @@
+source_id: SRC-0052
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 95cfc3105c4ec3b5acac97eb4ab599dfa78d21f4104fbc5d4ecac3045bbe209f
+  media_type: text/html
+  archive_reference: https://www.cm-evora.pt/municipio-de-evora-sensibiliza-mais-novos-para-a-problematica-das-alteracoes-climaticas/
+verified_claims:
+  - locator: "Corpo da notícia, parágrafo sobre os riscos apresentados na sessão"
+    statement: "Na sessão com participantes mais novos, o Município apresentou para Évora riscos climáticos projetados: mais ondas de calor, menos precipitação média anual e secas mais frequentes e severas."
+  - locator: "Corpo da notícia, parágrafo sobre situações identificadas pelos participantes"
+    statement: "A notícia inclui o calor como dificuldade já sentida pelos mais novos quando caminham ou usam bicicleta."
+  - locator: "Corpo da notícia, aviso sobre água futura no mesmo parágrafo"
+    statement: "A sessão alertou para a possibilidade de, no futuro, a água não bastar para todos os usos hoje assumidos e para a necessidade de melhorar a gestão desse recurso."

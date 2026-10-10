@@ -1,0 +1,19 @@
+source_id: SRC-0051
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: 59a65d0673283a17033f9b17c2d2f961620022dc6cd3606388a388e93f49d200
+  media_type: application/pdf
+  archive_reference: https://www.cm-evora.pt/wp-content/uploads/2025/02/Plano-Municipal-de-Adaptacao-as-Alteracoes-Climaticas-de-Evora.pdf
+verified_claims:
+  - locator: "p. 29, sec. 3.4"
+    statement: "O plano apresenta projeções climáticas para Évora em mais de um período e cenário: prevê mais dias de onda de calor, enquanto a precipitação total varia entre ligeiro aumento e redução acentuada conforme o cenário."
+  - locator: "pp. 43-44, sec. 5.1 e 5.2"
+    statement: "O plano distingue os efeitos de eventos climáticos já registados no concelho dos impactos futuros que estima a partir de projeções."
+  - locator: "pp. 44 e 47, sec. 5.2 e quadro 6; p. 84, objetivo 1"
+    statement: "Entre os impactos futuros avaliados, o plano inclui menos recursos hídricos disponíveis para os seus usos e trata a gestão da água como uma necessidade de adaptação."
+  - locator: "pp. 45-46, sec. 5.2, quadro 5"
+    statement: "O plano prevê riscos para a saúde humana associados a episódios de calor extremo, incluindo maior ocorrência de doença e morte."
+  - locator: "p. 58, sec. 6.5"
+    statement: "Na análise da população residente de Évora, o plano identifica pessoas com 65 ou mais anos e crianças até aos 15 anos como grupos etários mais sensíveis ao calor."
+  - locator: "p. 47, sec. 5.2, quadro 8"
+    statement: "A avaliação de impactos futuros também abrange infraestruturas de transporte e comunicação, incluindo danos por eventos climáticos extremos e adaptação dos revestimentos a temperaturas elevadas."
