@@ -4,11 +4,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
-import type { CorpusIndex, RecordSchema } from "../core/types.ts";
+import type { CorpusIndex, RecordIndex, RecordSchema } from "../core/types.ts";
+import type { CandidateRecord } from "../integration/candidate-delta.ts";
 import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "./ai-invoker.ts";
 import { invokeIndependentReview } from "./independent-review-invocation.ts";
 import { candidateFieldsById, validateIndependentReview, validateIndependentReviewStructure } from "./independent-review.ts";
-import { buildReviewerInputPackage, type ReviewerInputPackage } from "./reviewer-input.ts";
+import { buildReviewerInputPackage, reviewSourceEligibility, serializeReviewerInput, type ReviewerInputPackage } from "./reviewer-input.ts";
 import { buildReviewerPrompt } from "./reviewer-prompt.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
@@ -496,4 +497,145 @@ test("the reviewer prompt bounds Source Verification Support to its explicit ver
   ]) {
     assert.ok(REVIEWER_PROMPT.includes(rule), rule);
   }
+});
+
+// ---------------------------------------------------------------------------
+// Review boundaries for Evidence with support-ineligible provenance
+
+const PROBLEM_SCHEMA: RecordSchema = {
+  prefix: "PRB-",
+  directory: "problems",
+  idField: "problem_id",
+  references: [{ field: "evidence", isList: true, targetPrefix: "EVD-", targetDirectory: "evidence", required: true }],
+};
+
+const PRIVATE_SENTINEL = "PRIVATE_CORRESPONDENCE_SENTINEL";
+const CORRESPONDENCE = { source_id: "SRC-CORR", resource_type: "correspondence", access: { level: "private" }, licensing: { reuse: "unknown" }, acquisition: { notes: PRIVATE_SENTINEL } };
+const PUBLIC_SOURCE = { source_id: "SRC-PUB", resource_type: "document", access: { level: "public" }, licensing: { reuse: "unknown" } };
+
+function evidence(id: string, sourceId: string, summary = "A entidade indicou um horário de funcionamento."): Record<string, unknown> {
+  return {
+    evidence_id: id,
+    provenance: { sources: [sourceId] },
+    observation: { summary },
+    evidence_nature: "reported_claim",
+    claim_authority: "operator",
+    inference_limits: ["Não estabelece o horário efetivamente praticado."],
+  };
+}
+
+function recordIndex(schema: RecordSchema, records: Record<string, unknown>[]): RecordIndex {
+  const items = records.map((fields) => ({ file: `${schema.directory}/${fields[schema.idField]}.yaml`, fields }));
+  return { schema, records: items, byId: new Map(items.map((item) => [item.fields[schema.idField] as string, item])) };
+}
+
+function boundaryPackage(candidate: CandidateRecord, id: string): ReviewerInputPackage {
+  return buildReviewerInputPackage({
+    baseGitSha: SHA,
+    manifest: { mode: "direct-pull-request", investigationQuestion: "q" },
+    index: {
+      researchRoot: "/synthetic",
+      totalRecords: 4,
+      byPrefix: new Map([
+        ["SRC-", recordIndex(SOURCE_SCHEMA, [CORRESPONDENCE, PUBLIC_SOURCE])],
+        ["EVD-", recordIndex(EVIDENCE_SCHEMA, [evidence("EVD-BASE", "SRC-CORR"), evidence("EVD-PUB", "SRC-PUB")])],
+        ["PRB-", recordIndex(PROBLEM_SCHEMA, [])],
+      ]),
+    },
+    candidates: [candidate],
+    deltas: [{ recordFamily: candidate.recordFamily, id, action: "CREATE" }],
+    validation: { errors: [], totalRecords: 5 },
+    readiness: "READY_FOR_INTEGRATION_GATE",
+    sourceVerifications: { bySourceId: new Map(), issues: [] },
+  });
+}
+
+/** A PRB candidate relying on unchanged base Evidence: one correspondence-backed, one public-backed, neither with support. */
+const PRB_PKG = boundaryPackage({ recordFamily: "PRB-", fields: { problem_id: "PRB-NEW", summary: "A entidade indicou um horário.", evidence: ["EVD-BASE", "EVD-PUB"] } }, "PRB-NEW");
+/** A changed EVD candidate whose only Source is correspondence. */
+const CHANGED_EVD_PKG = boundaryPackage({ recordFamily: "EVD-", fields: evidence("EVD-CHANGED", "SRC-CORR", "A entidade respondeu por escrito sobre o serviço.") }, "EVD-CHANGED");
+
+function promptOf(pkg: ReviewerInputPackage): string {
+  return buildReviewerPrompt(serializeReviewerInput(pkg));
+}
+
+function eligibilitySection(prompt: string): string {
+  const start = prompt.indexOf("SOURCE VERIFICATION ELIGIBILITY (");
+  return prompt.slice(start, prompt.indexOf("\n\n", start));
+}
+
+test("unchanged correspondence-backed Evidence is classified support-ineligible and becomes the PRB review boundary", () => {
+  assert.deepEqual(PRB_PKG.evidenceContext.map((record) => record.id), ["EVD-BASE", "EVD-PUB", "SRC-CORR", "SRC-PUB"]);
+  assert.equal("sourceVerificationContext" in PRB_PKG, false);
+  const prompt = promptOf(PRB_PKG);
+  assert.ok(eligibilitySection(prompt).includes("- SRC-CORR: SOURCE_VERIFICATION_INELIGIBLE (NON_PUBLIC, CORRESPONDENCE)"));
+  for (const rule of [
+    "An EVD in \"evidenceContext\" is existing canonical Evidence already admitted into the base and unchanged by this package: it is the bounded review artifact for PRB synthesis.",
+    "Compare PRB wording against that EVD's observation, scope, inference_limits and authority/nature metadata",
+    "Source-body re-verification is not available for a SOURCE_VERIFICATION_INELIGIBLE Source",
+    "For an unchanged evidenceContext EVD, the absence of that Source's body or support is therefore not itself an evidentiary defect and never on its own grounds for INSUFFICIENT_EVIDENCE: judge the PRB against the canonical EVD.",
+    "except as the review boundaries below provide for unchanged Evidence with support-ineligible provenance",
+  ]) {
+    assert.ok(prompt.includes(rule), rule);
+  }
+});
+
+test("support-ineligible provenance never relaxes PRB→EVD fidelity or makes correspondence stronger", () => {
+  const prompt = promptOf(PRB_PKG);
+  for (const rule of [
+    "This does not make the EVD, its Source or correspondence true, verified or stronger, and it never relaxes PRB→EVD fidelity.",
+    "Do not infer beyond the EVD",
+    "exceeds the EVD's observation, drops or weakens an inference limit, broadens place, population or period, increases certainty or causality, or misstates attribution remains a CLEC defect",
+    "a PRB claim the EVD itself does not support remains INSUFFICIENT_EVIDENCE or a violation on the EVD's own terms",
+    "synthesis never broader, stronger or more causal than its EVD and their inference_limits",
+  ]) {
+    assert.ok(prompt.includes(rule), rule);
+  }
+  assert.doesNotMatch(prompt, /correspondence[^.]*\b(is|are) (true|verified|trusted)\b/i);
+});
+
+test("a changed EVD backed by support-ineligible provenance still requires Source fidelity and may fail closed", () => {
+  assert.deepEqual(CHANGED_EVD_PKG.candidates.map((candidate) => candidate.fields.evidence_id), ["EVD-CHANGED"]);
+  const prompt = promptOf(CHANGED_EVD_PKG);
+  assert.ok(eligibilitySection(prompt).includes("- SRC-CORR: SOURCE_VERIFICATION_INELIGIBLE (NON_PUBLIC, CORRESPONDENCE)"));
+  assert.ok(prompt.includes("Source→EVD fidelity remains mandatory for it whatever its Sources' eligibility: where judging it needs Source content the package does not contain, report INSUFFICIENT_EVIDENCE."));
+  // The exemption is scoped to unchanged evidence-context Evidence, never to a candidate.
+  assert.ok(prompt.includes("For an unchanged evidenceContext EVD, the absence"));
+  assert.doesNotMatch(prompt, /candidate[^.]*not itself an evidentiary defect/);
+
+  // A fail-closed review of that changed EVD remains a valid structured result.
+  const signalIds = CHANGED_EVD_PKG.signals.map((signal) => signal.signalId);
+  const review = {
+    schemaVersion: "2",
+    outcome: "INSUFFICIENT_EVIDENCE",
+    rationale: "Fidelity of the changed EVD to its correspondence Source cannot be judged from the package.",
+    findings: [gapFinding({ recordId: "EVD-CHANGED", claim: "respondeu por escrito", dimension: "evidence_fidelity", evidenceReferences: ["SRC-CORR"], relatedSignalIds: signalIds })],
+    signalDispositions: signalIds.map((signalId) => disposition("INSUFFICIENT_EVIDENCE", { signalId, evidenceReferences: ["SRC-CORR"], relatedFindingIds: ["CLEC-FND-0001"] })),
+  };
+  assert.deepEqual(validateIndependentReview(review, CHANGED_EVD_PKG).errors, []);
+});
+
+test("a public Source without support stays eligible, so missing Source content is still an evidence gap", () => {
+  const prompt = promptOf(PRB_PKG);
+  assert.ok(eligibilitySection(prompt).includes("- SRC-PUB: SOURCE_VERIFICATION_ELIGIBLE"));
+  assert.ok(prompt.includes("For a SOURCE_VERIFICATION_ELIGIBLE Source, Source Verification Support is the governed path to Source content; where a judgement needs Source content that neither the SRC metadata nor its support supplies, report INSUFFICIENT_EVIDENCE."));
+  assert.deepEqual(reviewSourceEligibility(PRB_PKG), [
+    { sourceId: "SRC-CORR", ineligibility: ["NON_PUBLIC", "CORRESPONDENCE"] },
+    { sourceId: "SRC-PUB", ineligibility: [] },
+  ]);
+});
+
+test("the eligibility section is derived from the frozen input without changing it and carries only SRC IDs and reason categories", () => {
+  const json = serializeReviewerInput(PRB_PKG);
+  const prompt = buildReviewerPrompt(json);
+  assert.ok(prompt.includes(`REVIEW INPUT (immutable, JSON):\n${json}\n`));
+  assert.equal(buildReviewerPrompt(json), prompt);
+  assert.doesNotMatch(json, /SOURCE_VERIFICATION_(IN)?ELIGIBLE|ineligibility/);
+  const section = eligibilitySection(prompt).split("\n");
+  assert.equal(section.length, 3);
+  for (const line of section.slice(1)) {
+    assert.match(line, /^- SRC-[A-Z]+: SOURCE_VERIFICATION_(ELIGIBLE|INELIGIBLE \((NON_PUBLIC|CORRESPONDENCE|REUSE_PROHIBITED)(, (NON_PUBLIC|CORRESPONDENCE|REUSE_PROHIBITED))*\))$/);
+  }
+  assert.equal(section.join("\n").includes(PRIVATE_SENTINEL), false);
+  assert.ok(eligibilitySection(REVIEWER_PROMPT).endsWith("- (no SRC records in the review input)"));
 });

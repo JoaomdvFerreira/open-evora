@@ -8,7 +8,9 @@ import { fileURLToPath } from "node:url";
 import {
   loadSourceVerifications,
   selectSourceVerificationContext,
+  sourceVerificationEligibilityErrors,
   SourceVerificationError,
+  sourceVerificationIneligibility,
   validateSourceVerifications,
   type SourceVerification,
 } from "./source-verifications.ts";
@@ -93,6 +95,20 @@ test("support must belong to an existing, eligible canonical SRC", () => {
   }
   assert.ok(errorsFor(support("SRC-0001"), publicSource("SRC-0001", { resource_type: "correspondence" })).some((e) => e.includes("is correspondence")));
   assert.ok(errorsFor(support("SRC-0001"), publicSource("SRC-0001", { licensing: { reuse: "prohibited" } })).some((e) => e.includes('licensing.reuse "prohibited"')));
+});
+
+test("eligibility is one rule: its reason categories and its validation errors agree, and correspondence is never eligible", () => {
+  const cases: [RecordFields, string[]][] = [
+    [publicSource("SRC-0001"), []],
+    [publicSource("SRC-0001", { resource_type: "correspondence" }), ["CORRESPONDENCE"]],
+    [publicSource("SRC-0001", { resource_type: "correspondence", access: { level: "private" } }), ["NON_PUBLIC", "CORRESPONDENCE"]],
+    [publicSource("SRC-0001", { access: { level: "restricted" }, licensing: { reuse: "prohibited" } }), ["NON_PUBLIC", "REUSE_PROHIBITED"]],
+  ];
+  for (const [source, reasons] of cases) {
+    assert.deepEqual(sourceVerificationIneligibility(source), reasons);
+    assert.equal(sourceVerificationEligibilityErrors("SRC-0001", source).length, reasons.length);
+    assert.equal(errorsFor(support("SRC-0001"), source).length, reasons.length);
+  }
 });
 
 test("licensing.reuse unknown stays eligible because support carries no Source wording or bytes", () => {

@@ -19,7 +19,13 @@
  * so the review is always judged against exactly the context it was given.
  */
 import { getRecordField } from "../core/record-fields.ts";
-import { selectSourceVerificationContext, type SourceVerification, type SourceVerificationSet } from "../core/source-verifications.ts";
+import {
+  selectSourceVerificationContext,
+  sourceVerificationIneligibility,
+  type SourceVerification,
+  type SourceVerificationIneligibility,
+  type SourceVerificationSet,
+} from "../core/source-verifications.ts";
 import type { CorpusIndex, RecordFields, RecordIndex } from "../core/types.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CanonicalIntegrationReadiness } from "../integration/canonical-integration-review.ts";
@@ -212,6 +218,30 @@ export function buildReviewerInputPackage(source: ReviewerInputSource): Reviewer
     ...(sourceVerificationContext.length > 0 ? { sourceVerificationContext } : {}),
   };
   return deepFreeze(pkg);
+}
+
+/** One SRC record the reviewer received, with its Source Verification Support eligibility. */
+export interface ReviewSourceEligibility {
+  sourceId: string;
+  /** Empty when the Source is eligible for Source Verification Support. */
+  ineligibility: SourceVerificationIneligibility[];
+}
+
+/**
+ * Source Verification Support eligibility of every SRC record a package
+ * carries (SRC candidates and SRC evidence-context records), sorted by SRC
+ * ID. A pure function of the package, using the one eligibility rule in
+ * source-verifications.ts: it adds no Source content and no record, and is
+ * derived rather than stored, so the frozen input, its fingerprint and the
+ * Gate package are unchanged.
+ */
+export function reviewSourceEligibility(pkg: Pick<ReviewerInputPackage, "candidates" | "deltas" | "evidenceContext">): ReviewSourceEligibility[] {
+  const sources = new Map<string, RecordFields>();
+  pkg.deltas.forEach((delta, i) => {
+    if (delta.recordFamily === "SRC-" && pkg.candidates[i]) sources.set(delta.id, pkg.candidates[i].fields);
+  });
+  for (const record of pkg.evidenceContext) if (record.recordFamily === "SRC-") sources.set(record.id, record.fields);
+  return [...sources.keys()].sort().map((sourceId) => ({ sourceId, ineligibility: sourceVerificationIneligibility(sources.get(sourceId)!) }));
 }
 
 /**
