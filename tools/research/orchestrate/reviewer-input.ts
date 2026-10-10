@@ -97,9 +97,9 @@ export interface ReviewerInputPackage {
   /** Candidate-scoped deterministic CLEC signals, in signal-engine order. */
   signals: ReviewSignal[];
   /**
-   * Base-bound Source Verification Support for SRC records the package
-   * already carries (as candidates or in `evidenceContext`), sorted by SRC
-   * ID, claims in file order. Review context only — never Source text and
+   * Base-bound Source Verification Support for the Sources of EVDs this
+   * change creates or updates (sourceVerificationSubjectSourceIds()), which
+   * the package already carries, sorted by SRC ID, claims in file order. Review context only — never Source text and
    * never an EVD. Omitted entirely when no applicable support exists, so such
    * packages serialize exactly as they did before this field existed.
    */
@@ -164,6 +164,28 @@ function evidenceContextOf(prospective: CorpusIndex, deltas: readonly CandidateD
   return context.sort(compareContextRecords);
 }
 
+/** Where an EVD names its Sources (research/schemas/evidence.schema.json). */
+const EVIDENCE_SOURCES_FIELD = "provenance.sources";
+
+/**
+ * The only SRC IDs whose Source Verification Support a review may carry:
+ * Sources referenced by EVD candidates this change creates or updates, in
+ * candidate order. Support exists to judge Source→EVD fidelity of changed
+ * Evidence. An unchanged EVD reached through a PRB is the complete evidential
+ * boundary for that PRB, so it never makes support eligible; neither does a
+ * PRB-only or SRC-only change.
+ */
+export function sourceVerificationSubjectSourceIds(candidates: readonly CandidateRecord[], deltas: readonly CandidateDelta[]): string[] {
+  const ids: string[] = [];
+  deltas.forEach((delta, i) => {
+    const candidate = candidates[i];
+    if (delta.recordFamily !== "EVD-" || (delta.action !== "CREATE" && delta.action !== "UPDATE") || candidate?.recordFamily !== "EVD-") return;
+    const sources = getRecordField(candidate.fields, EVIDENCE_SOURCES_FIELD);
+    for (const id of Array.isArray(sources) ? sources : []) if (typeof id === "string" && !ids.includes(id)) ids.push(id);
+  });
+  return ids;
+}
+
 function deepFreeze<T>(value: T): T {
   if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
     Object.freeze(value);
@@ -183,7 +205,8 @@ function deepFreeze<T>(value: T): T {
  * "must NOT receive... primary free-form rationale outside the immutable
  * package"). Canonical SRC records carry provenance and metadata, not the
  * Source body; no Source content is fetched or synthesized here. Applicable
- * base Source Verification Support is attached as bounded review context;
+ * base Source Verification Support (only for Sources of created or updated
+ * EVD candidates) is attached as bounded review context;
  * invalid or no-longer-eligible applicable support throws
  * SourceVerificationError, on which every caller fails closed.
  */
@@ -197,11 +220,12 @@ export function buildReviewerInputPackage(source: ReviewerInputSource): Reviewer
 
   const evidenceContext = evidenceContextOf(prospective, source.deltas);
   // Only SRC records the package already carries: support never widens the evidence graph.
-  const reachableSourceIds = [
+  const reachableSourceIds = new Set([
     ...source.deltas.filter((delta) => delta.recordFamily === "SRC-").map((delta) => delta.id),
     ...evidenceContext.filter((record) => record.recordFamily === "SRC-").map((record) => record.id),
-  ];
-  const sourceVerificationContext = selectSourceVerificationContext(source.sourceVerifications, reachableSourceIds, prospective);
+  ]);
+  const supportSourceIds = sourceVerificationSubjectSourceIds(source.candidates, source.deltas).filter((id) => reachableSourceIds.has(id));
+  const sourceVerificationContext = selectSourceVerificationContext(source.sourceVerifications, supportSourceIds, prospective);
 
   const pkg: ReviewerInputPackage = {
     schemaVersion: "2",

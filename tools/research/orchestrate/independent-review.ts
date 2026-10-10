@@ -17,10 +17,19 @@
  *   consistency) and needs no corpus index.
  *
  * Neither layer judges whether wording is semantically supported — that is
- * the reviewer's decision. Malformed output is never corrected; it fails
- * closed.
+ * the reviewer's decision. The context-aware layer only rejects a SUPPORTED
+ * PRB scope-term disposition that cites no linked EVD carrying the term
+ * lexically (signals.ts linkedEvidenceSupportsScopeTerm()), a deterministic
+ * reference check. Malformed output is never corrected; it fails closed.
  */
-import { CLEC_DIMENSION, type ClecDimension, type LanguageSignal } from "../language/signals.ts";
+import {
+  CLEC_DIMENSION,
+  linkedEvidenceIds,
+  linkedEvidenceSupportsScopeTerm,
+  SCOPE_TERM_CODES,
+  type ClecDimension,
+  type LanguageSignal,
+} from "../language/signals.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { RecordFields } from "../core/types.ts";
 import type { ReviewerInputPackage } from "./reviewer-input.ts";
@@ -52,9 +61,11 @@ const SIGNAL_ID = /^CLEC-SIG-\d{4,}$/;
 /** Authored candidate fields a review may quote, keyed by candidate record ID. */
 export type ReviewCandidateFields = ReadonlyMap<string, RecordFields>;
 
-/** What the context-aware layer additionally knows: the frozen package's record IDs and signals. */
+/** What the context-aware layer additionally knows: the frozen package's records and signals. */
 interface ReviewContext {
   recordIds: ReadonlySet<string>;
+  /** Every record in the package (candidate version wins), by ID, with its family. */
+  records: ReadonlyMap<string, { recordFamily: string; fields: RecordFields }>;
   signals: ReadonlyMap<string, LanguageSignal>;
 }
 
@@ -198,6 +209,27 @@ function checkFinding(value: unknown, i: number, candidates: ReviewCandidateFiel
   return { findingId: value.findingId, recordId: value.recordId, kind: value.kind, severity: value.severity, relatedSignalIds };
 }
 
+/**
+ * A SUPPORTED PRB scope-term disposition must cite an EVD the subject PRB
+ * links whose observation.summary or scope contains the term, judged on the
+ * frozen package by the same predicate that emitted the signal. SRC records,
+ * Source Verification Support, unlinked EVD and inference_limits never
+ * support the term.
+ */
+function checkScopeTermSupport(signal: LanguageSignal, references: readonly string[], context: ReviewContext, path: string, errors: string[]): void {
+  const problem = context.records.get(signal.subjectId);
+  const linked = new Set(problem?.recordFamily === "PRB-" ? linkedEvidenceIds(problem.fields) : []);
+  const supported = references.some((id) => {
+    const record = context.records.get(id);
+    return linked.has(id) && record?.recordFamily === "EVD-" && linkedEvidenceSupportsScopeTerm(signal.code, signal.match ?? signal.excerpt, record.fields);
+  });
+  if (!supported) {
+    errors.push(
+      `${path} is SUPPORTED for ${signal.code} but cites no EVD linked by ${signal.subjectId} whose observation.summary or scope contains ${JSON.stringify(signal.match ?? signal.excerpt)} (SRC records, Source Verification Support, unlinked EVD and inference_limits do not support it)`
+    );
+  }
+}
+
 function checkDisposition(value: unknown, i: number, context: ReviewContext | undefined, errors: string[]): ParsedDisposition | undefined {
   const path = `signalDispositions[${i}]`;
   if (!isObject(value)) {
@@ -220,6 +252,10 @@ function checkDisposition(value: unknown, i: number, context: ReviewContext | un
     errors.push(`${path} is SUPPORTED but names no evidence in the review input that supports it`);
   }
   checkReferences(references, `${path}.evidenceReferences`, context, errors);
+  const signal = validId && context ? context.signals.get(value.signalId as string) : undefined;
+  if (value.disposition === "SUPPORTED" && signal && context && SCOPE_TERM_CODES.has(signal.code)) {
+    checkScopeTermSupport(signal, references, context, path, errors);
+  }
 
   const relatedFindingIds = stringList(value.relatedFindingIds, `${path}.relatedFindingIds`, errors, FINDING_ID);
   if (!validId) return undefined;
@@ -368,8 +404,14 @@ export function candidateFieldsById(candidates: readonly CandidateRecord[], delt
  */
 export function validateIndependentReview(value: unknown, pkg: ReviewerInputPackage): IndependentReviewValidationResult {
   const recordIds = new Set([...pkg.deltas.map((delta) => delta.id), ...pkg.evidenceContext.map((record) => record.id)]);
+  const records = new Map<string, { recordFamily: string; fields: RecordFields }>();
+  for (const record of pkg.evidenceContext) records.set(record.id, { recordFamily: record.recordFamily, fields: record.fields });
+  pkg.deltas.forEach((delta, i) => {
+    const candidate = pkg.candidates[i];
+    if (candidate && candidate.recordFamily === delta.recordFamily) records.set(delta.id, { recordFamily: delta.recordFamily, fields: candidate.fields });
+  });
   const signals = new Map(pkg.signals.map((entry) => [entry.signalId, entry.signal]));
-  return checkReview(value, candidateFieldsById(pkg.candidates, pkg.deltas), { recordIds, signals });
+  return checkReview(value, candidateFieldsById(pkg.candidates, pkg.deltas), { recordIds, records, signals });
 }
 
 /**

@@ -314,13 +314,23 @@ Governing principle (the global safeguard in `AGENTS.md`):
 
 > Never make a statement stronger, broader, more certain or more causal in order to make it simpler.
 
-Canonical research text should be understandable by a non-specialist citizen. Where plain wording and evidential accuracy conflict, accuracy wins: keep the longer faithful wording rather than a simpler, stronger one.
+Canonical research text should be understandable by a non-specialist citizen. Prefer the shortest wording that preserves evidential meaning. Keep longer wording only where simplifying it would alter scope, attribution, time, uncertainty, causality or other material meaning: there, accuracy wins over a simpler, stronger or weaker one.
+
+Fidelity is symmetric:
+
+> Documented is not unknown, just as `UNKNOWN` is not `NO`.
+
+Wording must not materially strengthen or weaken the Evidence, and must not omit materially relevant linked Evidence where that omission makes the current PRB reading misleading. Omission is a review judgement; no tool detects it.
+
+### Language
+
+Citizen-facing authored prose is PT-PT. Exceptions: official names, proper nouns, URLs, IDs, schema keys and canonical enum values; enum values remain in English. Citizen-facing prose that is not PT-PT, and internal process jargon in citizen-facing text, are `BLOCKING` CLEC violations.
 
 ### Dimensions
 
 | # | Dimension | Requirement |
 | --- | --- | --- |
-| 1 | Clarity | Plain, direct wording a non-specialist can follow, achieved without weakening any other dimension. |
+| 1 | Clarity | Plain, direct wording a non-specialist can follow: short sentences, concrete words, acronyms explained at first occurrence; achieved without weakening any other dimension. |
 | 2 | Specificity | Name the concrete service, place, population, condition or mechanism the evidence concerns; do not replace it with a vaguer or more general category. |
 | 3 | Explicit scope | State the place, population, period and conditions a statement applies to; silence must not imply wider scope. |
 | 4 | Supported quantity | Quantities, frequencies and prevalence words (all, most, many, often, always, increasing) go no further than the evidence; prefer the evidence's own figures or ranges. Discussion volume is not prevalence. |
@@ -329,7 +339,7 @@ Canonical research text should be understandable by a non-specialist citizen. Wh
 | 7 | Temporal precision | State when a statement applies; historical is not presented as current, and planned or announced is not presented as implemented. |
 | 8 | Visible uncertainty | Keep qualifiers, unknowns, contradictions and limits visible; `UNKNOWN` is not `NO`. |
 | 9 | Neutral wording | Descriptive, non-evaluative and non-emotive; no advocacy, blame, intensifiers or rhetorical framing. |
-| 10 | Evidence fidelity | Every statement is traceable to, and no stronger than, its supporting evidence: PRB text to its linked EVD, EVD text to its Source. |
+| 10 | Evidence fidelity | Every statement is traceable to, and neither materially stronger nor materially weaker than, its supporting evidence: PRB text to its linked EVD, EVD text to its Source. |
 
 ### Simplification, paraphrase and translation
 
@@ -341,9 +351,21 @@ Canonical research text should be understandable by a non-specialist citizen. Wh
 
 The dimensions apply to all three record types; each type carries a strictest emphasis matching its role (`docs/datamodel.md` §1–§3).
 
-- **PRB** — strictest neutrality, scope and causality requirements. Problem-level synthesis must not exceed its supporting EVD and their inference limits.
+- **PRB** — strictest neutrality, scope and causality requirements. Problem-level synthesis must not exceed its supporting EVD and their inference limits. For PRB synthesis, an unchanged linked EVD is the complete evidential boundary: SRC content and Source Verification Support cannot justify PRB wording beyond that EVD.
 - **EVD** — strictest fidelity to the Source. Preserve the Source's qualification, attribution and the inference limits of the observation.
 - **SRC** — strictest preservation and provenance requirement. Record the Source as published; no evaluative language about what the Source proves or how strong it is.
+
+### Problem framing
+
+- Frame the Problem around the documented manifestation or condition first. Unresolved causality or consequence stays an open question.
+- Every `resolution_condition` must be realistically reachable by the project's supported investigation methods.
+- Before stating that current state is not established, make a proportionate check for current public primary or claim-authoritative information where that check is realistically possible. A runtime that cannot perform the check must not state or imply that it was performed.
+
+The supported investigation methods are primarily:
+1. relevant public information, prioritising competent or claim-authoritative Sources;
+2. contact with relevant institutions, operators or companies for clarification, follow-up or direct challenge (§8).
+
+Secondary, public, social and contextual Sources keep their bounded role (§4, §5). Contact is not itself Evidence; non-response is not Evidence (§10).
 
 ### Signals and human judgement
 
@@ -385,6 +407,8 @@ Implemented for the independent reviewer in both lanes:
 - a structured disposition for every deterministic signal affecting the changed records.
 
 The tooling rejects a structurally incomplete or inconsistent review result; it does not decide whether wording is supported.
+
+PRB scope-term signals flag a geographic, population or temporal term in PRB text that no linked EVD carries, by conservative exact matching against a code-owned closed lexicon. A linked EVD carries a term only through its observation summary or scope; its inference limits, any SRC, Source Verification Support and unlinked EVD never do. The lexicon lists only terms that state a specific scope: named places and bounded geographic expressions (not bare class nouns such as "freguesia", "bairro", "cidade", "concelho", "município" or "região"), concrete population groups (not generic "população" or "cidadão"/"cidadã"/"cidadãos"), and years, parts of the day or week and recurring periods (not bare month names). For these signals the tooling also rejects a `SUPPORTED` disposition that does not cite a linked EVD carrying the term in that way. This is a lexical reference check against the frozen review package, not a semantic judgement. Because emission already means no linked EVD carries the exact term, `SUPPORTED` is not expected for these signals in a coherent package; the reviewer uses `NOT_APPLICABLE` for a lexical false positive or a contextual equivalence (the linked EVD states the same scope in other words), while `VIOLATION` and `INSUFFICIENT_EVIDENCE` keep their general meanings. The `SUPPORTED` check stays as defence in depth.
 Malformed or invalid reviewer output is never accepted. If the first output is valid JSON but fails deterministic review validation, the shared runtime allows one fresh structural retry against the same immutable semantic input, with validation errors as procedural feedback only. A valid non-`CONCUR` review is never retried; a second invalid output fails closed.
 
 Implemented at Human Gate 1 for orchestrated changes (Lane A):
@@ -407,10 +431,10 @@ Canonical SRC records hold provenance and metadata, not Source content. Where ju
 
 - **Separate prior pull request.** Support is added or changed only in a pull request that changes no canonical PRB/EVD/SRC record; such a pull request needs no Lane B receipt. A change carrying both canonical records and support fails Lane B and must be split: the support merges first. Authenticity and publication safety of support are decided by the owner when that pull request is reviewed.
 - **Base-only.** Both lanes read support from the review base, never from candidates or the prospective head: Lane B reconstructs it from the base commit; Lane A reads it from the canonical research root its base corpus is loaded from, which Gate rendering requires to be exactly the clean base commit. A change can therefore never supply the support its own review relies on.
-- **Bounded input.** The reviewer receives support only for SRC records already in the review package (as candidates or in the evidence context); support never widens the evidence graph. It is deterministically ordered, part of the fingerprinted reviewer input and of the hash-bound Gate package, and presented at the Gate as review support, not Evidence. Without applicable support the reviewer input is unchanged.
-- **Use by the reviewer.** Support counts only for the bounded claims it explicitly states. It does not establish completeness: silence is not absence, and nothing is inferred beyond it. Source-derived wording that exceeds both the canonical SRC metadata and the supplied verified claims remains `INSUFFICIENT_EVIDENCE`. Findings cite the associated `SRC-*` record. The reviewer does not judge the authenticity of support and does not CLEC-review its statements.
+- **Bounded input.** The reviewer receives support only for Sources referenced by EVDs the change creates or updates, and only where that SRC is already in the review package; support never widens the evidence graph. A PRB-only or SRC-only change receives no support, and an unchanged EVD reached through a PRB never makes its Sources' support eligible. It is deterministically ordered, part of the fingerprinted reviewer input and of the hash-bound Gate package, and presented at the Gate as review support, not Evidence. Without applicable support the reviewer input is unchanged.
+- **Use by the reviewer.** Support serves only Source→EVD fidelity of the EVDs the change creates or updates; it never justifies PRB wording. It counts only for the bounded claims it explicitly states. It does not establish completeness: silence is not absence, and nothing is inferred beyond it. Source-derived wording that exceeds both the canonical SRC metadata and the supplied verified claims remains `INSUFFICIENT_EVIDENCE`. Findings cite the associated `SRC-*` record. The reviewer does not judge the authenticity of support and does not CLEC-review its statements.
 - **Fail closed.** Invalid applicable support, or support whose Source is no longer eligible in the reviewed state, stops review preparation in both lanes. `npm run research:check` validates every support file.
-- **Support-ineligible provenance.** Support stays limited to eligible Sources (public, not correspondence, reuse not prohibited); a non-public or correspondence Source can never be re-verified in review. The reviewer prompt therefore classifies every SRC in the package as eligible or ineligible, with only a reason category, derived deterministically from canonical SRC metadata by the same eligibility rule; the reviewer input, its fingerprint and the Gate package are unchanged, and no Source content enters review. For a PRB, an existing EVD unchanged by the change is canonical Evidence already admitted into the base: where its Source is ineligible, that EVD — observation, scope, inference limits, authority and nature — is the review boundary, and the absence of the Source body or support is not on its own an evidence gap. This does not make the EVD or its Source stronger: PRB wording may never exceed the EVD or drop its inference limits, and a PRB claim the EVD does not support still fails. It never waives Source fidelity for an EVD the change creates or updates, which still fails closed when its Source content is unavailable. For an eligible public Source, support remains the governed path to Source content, and its absence may still be `INSUFFICIENT_EVIDENCE`.
+- **Support-ineligible provenance.** Support stays limited to eligible Sources (public, not correspondence, reuse not prohibited); a non-public or correspondence Source can never be re-verified in review. The reviewer prompt therefore classifies every SRC in the package as eligible or ineligible, with only a reason category, derived deterministically from canonical SRC metadata by the same eligibility rule; the reviewer input, its fingerprint and the Gate package are unchanged, and no Source content enters review. For a PRB, an existing EVD unchanged by the change is canonical Evidence already admitted into the base: whatever its Source's eligibility, that EVD — observation, scope, inference limits, authority and nature — is the complete review boundary, and the absence of the Source body or support is not on its own an evidence gap. This does not make the EVD or its Source stronger: PRB wording may never exceed the EVD or drop its inference limits, and a PRB claim the EVD does not support still fails. It never waives Source fidelity for an EVD the change creates or updates, which still fails closed when its Source content is unavailable. For an eligible public Source of such a created or updated EVD, support remains the governed path to Source content, and its absence may still be `INSUFFICIENT_EVIDENCE`.
 
 Implemented as a deterministic pre-review block, in both lanes and again at Human Gate package assembly, for exactly two context-free layer-integrity signal classes:
 - canonical record IDs (`SRC-`, `EVD-`, `PRB-`) embedded in authored SRC text;

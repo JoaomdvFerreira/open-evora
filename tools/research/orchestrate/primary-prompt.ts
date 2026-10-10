@@ -38,8 +38,9 @@ match one entry in manifest.candidateFiles.`;
  */
 const CLEC_AUTHORING_CONTRACT = `Citizen Language & Evidence Contract (CLEC) — applies to all authored text in PRB, EVD and SRC candidates, including simplified, paraphrased or translated text:
 Core rule: Never make a statement stronger, broader, more certain or more causal in order to make it simpler.
-Write so a non-specialist citizen can follow; where plain wording and evidential accuracy conflict, accuracy wins — keep the longer faithful wording.
-1. Clarity: plain, direct wording, never achieved by weakening any other dimension.
+Language: citizen-facing authored prose is PT-PT. Exceptions: official names, proper nouns, URLs, IDs, schema keys and canonical enum values; enum values stay in English. Citizen-facing prose that is not PT-PT, and internal process jargon in citizen-facing text (workflow, gate, lane, tooling, work-unit or review-process terms), are BLOCKING CLEC violations.
+Write so a non-specialist citizen can follow. Prefer the shortest wording that preserves evidential meaning; keep longer wording only where simplifying it would alter scope, attribution, time, uncertainty, causality or other material meaning — then accuracy wins.
+1. Clarity: plain, direct wording — short sentences, concrete words, each acronym explained at its first occurrence — never achieved by weakening any other dimension.
 2. Specificity: name the concrete service, place, population, condition or mechanism the evidence concerns; do not replace it with a vaguer or more general category.
 3. Explicit scope: state the place, population, period and conditions a statement applies to; silence must not imply wider scope.
 4. Supported quantity: quantity, frequency and prevalence words (all, most, many, often, always, increasing) go no further than the evidence; prefer the evidence's own figures or ranges. Discussion volume is not prevalence.
@@ -48,10 +49,11 @@ Write so a non-specialist citizen can follow; where plain wording and evidential
 7. Temporal precision: state when a statement applies; historical is not current, planned or announced is not implemented.
 8. Visible uncertainty: keep qualifiers, unknowns, contradictions and limits visible; UNKNOWN is not NO.
 9. Neutral wording: descriptive, non-evaluative, non-emotive; no advocacy, blame, intensifiers or rhetorical framing.
-10. Evidence fidelity: every statement is traceable to, and no stronger than, its supporting evidence — PRB text to its linked EVD, EVD text to its Source.
+10. Evidence fidelity: every statement is traceable to, and neither materially stronger nor materially weaker than, its supporting evidence — PRB text to its linked EVD, EVD text to its Source.
+Symmetric fidelity: documented is not unknown, just as UNKNOWN is not NO. Do not materially strengthen or weaken the Evidence, and do not omit materially relevant linked Evidence where that omission makes the current PRB reading misleading.
 Simplification must never change evidential meaning. Paraphrase and translation (including into PT-PT) must preserve qualifiers, attribution, scope, temporal markers and uncertainty, and must not strengthen, broaden or resolve what the original leaves qualified or uncertain.
 Record-specific emphasis:
-- PRB: strictest neutrality, scope and causality. Problem-level synthesis is neutral and scoped, and never broader, stronger or more causal than its supporting EVD and their inference_limits.
+- PRB: strictest neutrality, scope and causality. Problem-level synthesis is neutral and scoped, and never broader, stronger or more causal than its supporting EVD and their inference_limits. The linked EVD is the complete evidential boundary for PRB wording: SRC content and Source Verification Support cannot justify PRB wording beyond it.
 - EVD: strictest fidelity to the Source. observation.summary preserves the Source's meaning, attribution, qualifications and the observation's inference limits; a translation or paraphrase must not strengthen the Source. Non-factual observations (reported experience, claim, opinion, recommendation) are attributed, not stated as fact.
 - SRC: strictest preservation and provenance. Record the Source's provenance and published identity as published; add no evaluative statement about what the Source proves or how strong it is.
 Checking your own wording against these dimensions is expected, but author self-review does not substitute for the independent semantic review every canonical research text change requires.`;
@@ -70,7 +72,10 @@ const PRB_SEMANTIC_GUARDRAILS = `PRB semantic guardrails (existing corpus wordin
 - investigation.path is a narrative of how the formulation was reached, not a progress/completion/pending state.
 - PRB evidence[].effects and evidence[].research_roles are independent: choose each on its own terms.
 - Preserve unresolved or contradictory Evidence with its boundary stated; do not suppress it or resolve it by wording.
-- Optional fields stay optional: omit them when not explicitly supported; do not invent values to fill them.`;
+- Optional fields stay optional: omit them when not explicitly supported; do not invent values to fill them.
+- Framing: frame the Problem around the documented manifestation or condition first; keep unresolved causality or consequence as an open question.
+- Every resolution_condition must be realistically reachable by the project's supported investigation methods: (1) relevant public information, prioritising competent or claim-authoritative Sources, with secondary, public, social or contextual Sources in their bounded role (discovery, context, reported experience, corroboration); (2) contact with relevant institutions, operators or companies for clarification, follow-up or direct challenge. Contact is not itself Evidence; non-response is not Evidence.
+- Before writing that current state is not established, make a proportionate check for current public primary or claim-authoritative information where that check is realistically possible. If this run cannot perform that check, do not write or imply that it was performed.`;
 
 /**
  * Builds the complete bounded stdin payload for the primary invocation. The
