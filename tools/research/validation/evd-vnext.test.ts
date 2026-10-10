@@ -5,6 +5,14 @@ import { loadCorpusIndex } from "../core/corpus.ts";
 
 const root = `${process.cwd()}/research`;
 
+/** Exact structured EVD reference strings anywhere in `value`; IDs embedded in prose are not references. */
+function collectEvdReferences(value: unknown): string[] {
+  if (typeof value === "string") return /^EVD-\d{6}$/.test(value) ? [value] : [];
+  if (Array.isArray(value)) return value.flatMap(collectEvdReferences);
+  if (value !== null && typeof value === "object") return Object.values(value as Record<string, unknown>).flatMap(collectEvdReferences);
+  return [];
+}
+
 test("EVD vNext corpus is structurally valid and retains migrated record identities", () => {
   const result = validateResearchRoot(root);
   assert.deepEqual(result.errors, []);
@@ -22,8 +30,9 @@ test("split, merge and nested PRB reference migrations leave no legacy EVD refer
   const ids = (prb3.evidence as Array<{ evidence_id: string }>).map((e) => e.evidence_id);
   assert.ok(ids.includes("EVD-000148"));
   assert.ok(!ids.includes("EVD-000030"));
-  const currentness = ((prb3.decision_basis as Record<string, unknown>).currentness as Record<string, unknown>).evidence as string[];
-  assert.ok(currentness.includes("EVD-000148"));
+  const nestedIds = collectEvdReferences(prb3.decision_basis);
+  assert.ok(nestedIds.includes("EVD-000148"));
+  assert.ok(!nestedIds.includes("EVD-000030"));
 });
 
 test("authored EVD and SRC prose has no known English migration residue", () => {
