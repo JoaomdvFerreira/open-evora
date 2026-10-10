@@ -369,9 +369,9 @@ const YEAR_TERM = "(?:19|20)\\d{2}";
  * Only terms that state a specific scope are listed. Geography is a named
  * place or a bounded geographic expression, never a bare class noun
  * ("freguesia", "bairro", "cidade", "concelho", "município", "região"…);
- * population is a concrete group, never generic "população"; time is a
- * year, part of the day or week, or a recurring period, never a bare month
- * name. Those words name a kind of scope, not a scope, and alone produced
+ * population is a concrete group, never generic "população" or "cidadão";
+ * time is a year, part of the day or week, or a recurring period, never a
+ * bare month name. Those words name a kind of scope, not a scope, and alone produced
  * prompts that review could only dismiss.
  */
 const SCOPE_TERM_LEXICON: Readonly<Record<ScopeTermCode, readonly string[]>> = {
@@ -391,7 +391,6 @@ const SCOPE_TERM_LEXICON: Readonly<Record<ScopeTermCode, readonly string[]>> = {
     "morador(?:es|as?)?",
     "habitantes?",
     "municipes?",
-    "cidada(?:o|os|s)?",
     "idos[oa]s?",
     "senior(?:es)?",
     "crianc(?:a|as)",

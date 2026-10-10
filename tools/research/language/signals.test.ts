@@ -362,12 +362,13 @@ describe("PRB scope terms against linked evidence", () => {
     ]);
   });
 
-  test("bare geographic class nouns, generic população and bare month names are not scope terms", () => {
+  test("bare geographic class nouns, generic população or cidadão and bare month names are not scope terms", () => {
     assert.deepEqual(
       scopeSignals("A população da freguesia, do bairro, da aldeia, da cidade, do concelho, do município, do distrito e da região espera em janeiro, fevereiro, março, julho e dezembro."),
       []
     );
     assert.deepEqual(scopeSignals("As populações esperam mais junto ao marco da estrada."), []);
+    assert.deepEqual(scopeSignals("O cidadão, a cidadã e os cidadãos esperam mais."), []);
   });
 
   test("a named place, a bounded geographic expression, a concrete group and specific temporal scope are still flagged", () => {
