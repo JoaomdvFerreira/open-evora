@@ -1,0 +1,15 @@
+source_id: SRC-0125
+retrieval:
+  retrieved_at: "2026-10-10"
+  content_sha256: f319cd9151ded2222b669741ad0371a2897ccfae6c77437f1574771c5c28f1a8
+  media_type: text/html
+  archive_reference: https://www.cm-evora.pt/estado-da-rede-viaria-do-concelho-de-evora/
+verified_claims:
+  - locator: "Cabeçalho da notícia (datas de publicação e de atualização); corpo, 2.º parágrafo"
+    statement: "Em nota publicada e atualizada a 4 de fevereiro de 2026, a Câmara Municipal de Évora afirma que o executivo, que tinha então tomado posse havia cerca de três meses, encontrou a rede viária municipal com degradação significativa e com falhas de conservação e de manutenção preventiva prolongadas no tempo, que atribui à falta sistemática de manutenção."
+  - locator: "Corpo da notícia, 5.º parágrafo"
+    statement: "Na mesma nota, a Câmara declara já ter feito um levantamento técnico das vias municipais que necessitam de intervenção, levantamento que o próprio Município qualifica como exaustivo."
+  - locator: "Corpo da notícia, 5.º parágrafo"
+    statement: "Segundo a Câmara, o processo estava então na fase de ordenação de prioridades, com critérios que incluem o grau de degradação, o volume de tráfego, a importância funcional de cada via e a segurança de condutores e peões."
+  - locator: "Corpo da notícia, 7.º e 8.º parágrafos"
+    statement: "A nota indica que, à data, o Município aguardava condições meteorológicas favoráveis para intervir plenamente no terreno e que estava ainda a ser preparado o recurso a empresas externas para obras estruturais, a executar por fases."
