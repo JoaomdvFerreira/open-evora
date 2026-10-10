@@ -7,7 +7,7 @@ retrieval:
 verified_claims:
   - locator: "Cabeçalho da notícia (datas de publicação e de atualização)"
     statement: "Notícia municipal com data de publicação de 30 de abril de 2026 e data de atualização de 15 de junho de 2026."
-  - locator: "Corpo da notícia, 1.ª frase"
-    statement: "A Câmara Municipal de Évora descreve como estando em curso, por sua iniciativa, trabalhos de aplicação de microaglomerado a frio nas avenidas Cartaxo Júnior e das Fontanas, técnica que apresenta como de conservação preventiva dos pavimentos."
-  - locator: "Corpo da notícia, 2.ª frase"
-    statement: "Na mesma notícia, a Câmara refere a Avenida de São João de Deus e apresenta como já feita a correção da calçada nessa avenida."
+  - locator: "Cabeçalho da notícia (data de atualização); corpo, 1.ª frase"
+    statement: "Na versão capturada da notícia, cujo cabeçalho indica atualização em 15 de junho de 2026, a Câmara Municipal de Évora descreve como estando em curso trabalhos de aplicação de microaglomerado a frio nas avenidas Cartaxo Júnior e das Fontanas."
+  - locator: "Cabeçalho da notícia (data de atualização); corpo, 2.ª frase"
+    statement: "Na mesma versão capturada da notícia, a Câmara refere a Avenida de São João de Deus e apresenta como já feita a correção da calçada nessa avenida."
