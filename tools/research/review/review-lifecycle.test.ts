@@ -12,6 +12,7 @@ import {
   declareOwnerReady,
   readReviewLifecycleState,
   REVIEW_LIFECYCLE_CHECK,
+  reviewLifecycleTestHooks,
   reviewSubject,
   runOwnerDeclaredReview,
   TOOLING_RUNTIME_FAILURE,
@@ -317,6 +318,60 @@ test("one declaration is consumed by one execution: a competing execution is rej
     assert.equal(existsSync(claimFile(lifecycleDir)), false);
     // The consumed declaration cannot be run again sequentially either.
     assertRejectedBeforeInvocation(lifecycleDir, workbench, input, REVIEW_LIFECYCLE_CHECK.NOT_DECLARED_READY);
+  });
+});
+
+test("declaration and review interleave in neither order: no recorded attempt is ever lost or overwritten", () => {
+  withStore((lifecycleDir, workbench) => {
+    const input = reviewerInput();
+    const corrected = reviewerInput({ statement: CORRECTED });
+    declare(lifecycleDir, input);
+    const attemptsOf = () => {
+      const state = readReviewLifecycleState(lifecycleDir);
+      assert.ok(state.ok);
+      return state.ok ? state.state.lifecycles.map((l) => [l.declaredReviewerInputFingerprint, l.attempts.map((a) => [a.semanticAttempt, a.reviewerInputFingerprint, a.outcome])]) : [];
+    };
+
+    const third = reviewerInput({ statement: "Muitos moradores relatam atrasos na recolha." });
+    const fingerprint = (pkg: ReviewerInputPackage) => reviewSubject(pkg).reviewerInputFingerprint;
+
+    // Declaration first: `input` is declared, so a review of it is permitted. Started between the
+    // re-declaration's read and write, it must be refused before invocation; otherwise it would
+    // record attempt 1 and the declaration's stale snapshot would then overwrite that record.
+    const competitor = new ScriptedReviewer(reviewOf(input, "DISAGREEMENT_FOUND"));
+    let midDeclaration: ReturnType<typeof runOwnerDeclaredReview> | undefined;
+    reviewLifecycleTestHooks.afterDeclarationRead = () => {
+      reviewLifecycleTestHooks.afterDeclarationRead = undefined;
+      assert.equal(existsSync(claimFile(lifecycleDir)), true, "the declaration holds the claim across read/validate/write");
+      assert.deepEqual(checkSemanticAttempt(lifecycleDir, reviewSubject(input)), { ok: true, semanticAttempt: 1 }, "the competing review passes its permission check");
+      midDeclaration = runOwnerDeclaredReview(lifecycleDir, competitor, input, workbench);
+    };
+    try {
+      assert.deepEqual(declare(lifecycleDir, corrected), { ok: true, semanticAttempt: 1 });
+    } finally {
+      reviewLifecycleTestHooks.afterDeclarationRead = undefined;
+    }
+    assert.equal(midDeclaration?.status, "REJECTED");
+    if (midDeclaration?.status === "REJECTED") assert.equal(midDeclaration.failedCheck, REVIEW_LIFECYCLE_CHECK.ATTEMPT_IN_FLIGHT);
+    assert.equal(competitor.calls.length, 0, "the competing review never reached the reviewer");
+    assert.equal(existsSync(claimFile(lifecycleDir)), false);
+    assert.deepEqual(attemptsOf(), [[fingerprint(corrected), []]]);
+
+    // Review first: a declaration attempted while the attempt runs is refused and writes nothing.
+    let midReview: ReturnType<typeof declare> | undefined;
+    const review = new InterleavedReviewer(reviewOf(corrected, "DISAGREEMENT_FOUND"), () => {
+      midReview = declare(lifecycleDir, third);
+    });
+    assert.equal(runOwnerDeclaredReview(lifecycleDir, review, corrected, workbench).status, "REVIEWED");
+    assert.equal(!midReview?.ok && midReview?.failedCheck, REVIEW_LIFECYCLE_CHECK.ATTEMPT_IN_FLIGHT);
+    const attempt1 = [1, fingerprint(corrected), "DISAGREEMENT_FOUND"];
+    assert.deepEqual(attemptsOf(), [[null, [attempt1]]]);
+
+    // A later declaration keeps attempt 1, and its attempt 2 is recorded beside it.
+    assert.deepEqual(declare(lifecycleDir, third), { ok: true, semanticAttempt: 2 });
+    assert.deepEqual(attemptsOf(), [[fingerprint(third), [attempt1]]], "attempt 1 survives the declaration");
+    assert.equal(reviewed(lifecycleDir, workbench, third, "CONCUR").semanticAttempt, 2);
+    assert.deepEqual(attemptsOf(), [[null, [attempt1, [2, fingerprint(third), "CONCUR"]]]]);
   });
 });
 

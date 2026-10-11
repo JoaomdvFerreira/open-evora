@@ -15,11 +15,12 @@
  * - The attempt number is derived from the recorded attempts, never taken
  *   from a caller. A tooling/runtime failure (including two structurally
  *   invalid reviewer outputs) records no attempt and keeps the declaration.
- * - One declaration is consumed by at most one execution: an execution
- *   claims the store exclusively (an O_EXCL claim file) before invoking the
- *   reviewer, revalidates under the claim before recording, and releases it
- *   however the attempt ends. A competing execution is rejected before
- *   invocation; a claim left behind by a killed process fails closed until
+ * - One declaration is consumed by at most one execution: every state
+ *   mutation holds the store's exclusive claim (an O_EXCL claim file). A
+ *   declaration holds it across read/validate/write; a semantic attempt
+ *   claims it before invoking the reviewer, revalidates under it before
+ *   recording, and releases it however the attempt ends. A competing
+ *   execution or declaration is rejected before any invocation or write; a claim left behind by a killed process fails closed until
  *   the owner removes it.
  *
  * State is local workbench material (gitignored), never canonical research
@@ -213,8 +214,13 @@ function writeReviewLifecycleState(lifecycleDir: string, state: ReviewLifecycleS
 
 // --- in-flight claim ---------------------------------------------------------
 
-/** Atomically claims the store for one execution; false when another execution holds it. */
-function acquireClaim(lifecycleDir: string, subject: ReviewSubject, semanticAttempt: SemanticAttemptNumber): boolean {
+/**
+ * Atomically claims the store for one execution; false when another execution
+ * holds it. The claim is the mutex for every lifecycle state mutation: an
+ * owner declaration holds it across its read/validate/write, a semantic
+ * attempt across its check/invoke/record.
+ */
+function acquireClaim(lifecycleDir: string, holder: { operation: "DECLARE_READY" | "SEMANTIC_ATTEMPT"; reviewerInputFingerprint: string }): boolean {
   mkdirSync(lifecycleDir, { recursive: true });
   let fd: number;
   try {
@@ -224,7 +230,7 @@ function acquireClaim(lifecycleDir: string, subject: ReviewSubject, semanticAtte
     throw error;
   }
   try {
-    writeFileSync(fd, `${JSON.stringify({ reviewerInputFingerprint: subject.reviewerInputFingerprint, semanticAttempt })}\n`, "utf8");
+    writeFileSync(fd, `${JSON.stringify(holder)}\n`, "utf8");
   } finally {
     closeSync(fd);
   }
@@ -235,9 +241,12 @@ function releaseClaim(lifecycleDir: string): void {
   rmSync(join(lifecycleDir, CLAIM_FILE), { force: true });
 }
 
-function claimHeld(lifecycleDir: string): boolean {
-  return existsSync(join(lifecycleDir, CLAIM_FILE));
-}
+/**
+ * Test-only seam for deterministic interleaving; never set by tooling.
+ * `afterDeclarationRead` runs while a declaration holds the claim, between
+ * reading and writing the state.
+ */
+export const reviewLifecycleTestHooks: { afterDeclarationRead?: () => void } = {};
 
 const IN_FLIGHT_MESSAGE = `another execution holds the review lifecycle (${CLAIM_FILE}); if no review is running, the owner removes that file`;
 
@@ -268,10 +277,21 @@ export function declareOwnerReady(
   subject: ReviewSubject,
   options: OwnerReadyOptions = {},
 ): { ok: true; semanticAttempt: SemanticAttemptNumber } | LifecycleRejection {
-  // A declaration never changes under a running attempt.
-  if (claimHeld(lifecycleDir)) return reject(REVIEW_LIFECYCLE_CHECK.ATTEMPT_IN_FLIGHT, IN_FLIGHT_MESSAGE);
+  // A declaration never changes under a running attempt, and no attempt is recorded under a declaration.
+  if (!acquireClaim(lifecycleDir, { operation: "DECLARE_READY", reviewerInputFingerprint: subject.reviewerInputFingerprint })) {
+    return reject(REVIEW_LIFECYCLE_CHECK.ATTEMPT_IN_FLIGHT, IN_FLIGHT_MESSAGE);
+  }
+  try {
+    return declareUnderClaim(lifecycleDir, subject, options);
+  } finally {
+    releaseClaim(lifecycleDir);
+  }
+}
+
+function declareUnderClaim(lifecycleDir: string, subject: ReviewSubject, options: OwnerReadyOptions): { ok: true; semanticAttempt: SemanticAttemptNumber } | LifecycleRejection {
   const read = readReviewLifecycleState(lifecycleDir);
   if (!read.ok) return reject(REVIEW_LIFECYCLE_CHECK.STATE_INVALID, read.message);
+  reviewLifecycleTestHooks.afterDeclarationRead?.();
   const state = read.state;
   let active = governing(state, subject);
 
@@ -385,7 +405,7 @@ export function runOwnerDeclaredReview(lifecycleDir: string, invoker: AiInvoker,
   const subject = reviewSubject(reviewerInput);
   const permitted = checkSemanticAttempt(lifecycleDir, subject);
   if (!permitted.ok) return { status: "REJECTED", failedCheck: permitted.failedCheck, message: permitted.message };
-  if (!acquireClaim(lifecycleDir, subject, permitted.semanticAttempt)) {
+  if (!acquireClaim(lifecycleDir, { operation: "SEMANTIC_ATTEMPT", reviewerInputFingerprint: subject.reviewerInputFingerprint })) {
     return { status: "REJECTED", failedCheck: REVIEW_LIFECYCLE_CHECK.ATTEMPT_IN_FLIGHT, message: IN_FLIGHT_MESSAGE };
   }
 
