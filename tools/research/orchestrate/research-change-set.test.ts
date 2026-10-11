@@ -9,7 +9,8 @@ import type { CandidateRecord } from "../integration/candidate-delta.ts";
 import { prepareCanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
 import { evaluateSafetyAdmission } from "../admission/safety-admission.ts";
 import { assembleResearchChangeSet, prepareResearchChangeSet } from "./research-change-set.ts";
-import type { GenerationManifest, IndependentReviewResult } from "./types.ts";
+import type { GenerationManifest } from "./types.ts";
+import type { IndependentReviewResult } from "../review/types.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 

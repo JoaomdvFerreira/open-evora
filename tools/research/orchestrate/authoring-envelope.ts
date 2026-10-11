@@ -8,7 +8,7 @@
  * deterministic chain (§14 case 19).
  */
 import { validateManifest } from "./manifest.ts";
-import { isBoundedRelativePath } from "./path-containment.ts";
+import { isBoundedRelativePath } from "../core/path-containment.ts";
 import type { AuthoredCandidateFile, PrimaryAuthoringEnvelope } from "./types.ts";
 
 export interface AuthoringEnvelopeValidationResult {

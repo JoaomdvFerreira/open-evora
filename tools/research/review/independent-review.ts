@@ -33,13 +33,7 @@ import {
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { RecordFields } from "../core/types.ts";
 import type { ReviewerInputPackage } from "./reviewer-input.ts";
-import type {
-  IndependentReviewOutcome,
-  IndependentReviewResult,
-  ReviewFindingKind,
-  ReviewFindingSeverity,
-  SignalDispositionValue,
-} from "./types.ts";
+import type { IndependentReviewOutcome, IndependentReviewResult, ReviewFindingKind, ReviewFindingSeverity, SignalDispositionValue } from "./types.ts";
 
 export interface IndependentReviewValidationResult {
   errors: string[];

@@ -149,14 +149,14 @@ import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
 import type { CorpusIndex } from "../core/types.ts";
-import type { AiInvoker } from "./ai-invoker.ts";
+import type { AiInvoker } from "../ai/invoker.ts";
 import { asValidatedManifest, validateManifest } from "./manifest.ts";
 import { asValidatedResearchChangeSet, validateResearchChangeSet } from "./rcs-validator.ts";
-import { loadCandidates } from "./candidate-loader.ts";
+import { loadCandidates } from "../integration/candidate-loader.ts";
 import { continueFromFrozenCandidates, frozenCandidateFingerprint, writeHoldFreeze } from "./run-cycle.ts";
-import { sha256Hex } from "./fingerprint.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
 import type { PreparationOutcome } from "./types.ts";
-import { assertWorkbenchBoundary } from "./workbench-boundary.ts";
+import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
 import type { InferenceLimitResolutionChecker, SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
 import type { CandidateRecord } from "../integration/candidate-delta.ts";
 

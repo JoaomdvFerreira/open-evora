@@ -18,7 +18,7 @@ import { readFileSync } from "node:fs";
 
 import { computeContentHash } from "./content-hash.ts";
 import { validateHumanGatePackage, asValidatedHumanGatePackage } from "./package-validator.ts";
-import type { IndependentReviewOutcome } from "../orchestrate/types.ts";
+import type { IndependentReviewOutcome } from "../review/types.ts";
 import type {
   CanonicalAcceptanceDecision,
   DecisionSubmissionOutcome,

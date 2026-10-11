@@ -19,9 +19,9 @@ import {
 import { computeContentHash } from "./content-hash.ts";
 import { buildHumanGatePackage } from "./package-builder.ts";
 import { reviewerInputFromGatePackage, validateHumanGatePackage } from "./package-validator.ts";
-import { canonicalJsonStringify, sha256Hex } from "../orchestrate/fingerprint.ts";
-import { validateIndependentReview } from "../orchestrate/independent-review.ts";
-import { buildReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
+import { canonicalJsonStringify, sha256Hex } from "../core/fingerprint.ts";
+import { validateIndependentReview } from "../review/independent-review.ts";
+import { buildReviewerInputPackage } from "../review/reviewer-input.ts";
 import { loadSourceVerifications } from "../core/source-verifications.ts";
 
 test("the Gate stores exactly the reviewer signals and bounded evidence context buildReviewerInputPackage() reconstructs", () => {

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
-import { buildChildEnv, LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "./ai-invoker.ts";
+import { buildChildEnv, LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "./invoker.ts";
 
 function withTempDir(fn: (dir: string) => void): void {
   const dir = mkdtempSync(join(tmpdir(), "open-evora-ai-invoker-test-"));

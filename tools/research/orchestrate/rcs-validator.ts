@@ -18,12 +18,13 @@
  * produced — it fails closed exactly like a schema-invalid manifest does.
  */
 import { validateManifest, asValidatedManifest } from "./manifest.ts";
-import { asValidatedIndependentReview, candidateFieldsById, validateIndependentReviewStructure } from "./independent-review.ts";
-import { sha256Hex } from "./fingerprint.ts";
+import { asValidatedIndependentReview, candidateFieldsById, validateIndependentReviewStructure } from "../review/independent-review.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
 import type { ValidationResult } from "../validation/validate.ts";
-import type { GenerationManifest, IndependentReviewResult, ResearchChangeSet } from "./types.ts";
+import type { GenerationManifest, ResearchChangeSet } from "./types.ts";
+import type { IndependentReviewResult } from "../review/types.ts";
 import type { SafetyAdmission } from "../admission/safety-admission.ts";
 
 export interface RcsValidationResult {

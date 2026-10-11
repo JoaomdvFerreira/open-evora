@@ -14,7 +14,7 @@
  *   -> freeze the immutable reviewer input (reviewer-input.ts)
  *   -> context-free CLEC precheck over that frozen input (fails closed)
  *   -> FRESH INDEPENDENT REVIEW AI INVOCATION (role INDEPENDENT_REVIEWER,
- *      a brand-new process — see ai-invoker.ts)
+ *      a brand-new process — see ai/invoker.ts)
  *   -> validate the independent-review result
  *   -> assemble the WU045 Research Change Set
  *   -> READY_FOR_HUMAN_REVIEW
@@ -32,16 +32,16 @@ import { loadSourceVerifications, SOURCE_VERIFICATION_SUPPORT, SourceVerificatio
 import type { CorpusIndex } from "../core/types.ts";
 import { prepareCanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
 import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
-import type { AiInvoker } from "./ai-invoker.ts";
+import type { AiInvoker } from "../ai/invoker.ts";
 import { asValidatedAuthoringEnvelope, validateAuthoringEnvelope } from "./authoring-envelope.ts";
-import { loadCandidates } from "./candidate-loader.ts";
-import { invokeIndependentReview } from "./independent-review-invocation.ts";
-import { sha256Hex } from "./fingerprint.ts";
+import { loadCandidates } from "../integration/candidate-loader.ts";
+import { invokeIndependentReview } from "../review/independent-review-invocation.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
 import { asValidatedManifest, validateManifest } from "./manifest.ts";
-import { resolveContainedPath } from "./path-containment.ts";
+import { resolveContainedPath } from "../core/path-containment.ts";
 import { buildPrimaryAuthoringPrompt } from "./primary-prompt.ts";
 import { assembleResearchChangeSet } from "./research-change-set.ts";
-import { buildReviewerInputPackage } from "./reviewer-input.ts";
+import { buildReviewerInputPackage } from "../review/reviewer-input.ts";
 import type { GenerationManifest, PreparationOutcome, ResearchTrigger } from "./types.ts";
 import { deriveMaterialNonPrivateSources, evaluateSafetyAdmission, type InferenceLimitResolutionChecker, type SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
 import { writeSafetyHoldReport } from "../admission/hold-report.ts";

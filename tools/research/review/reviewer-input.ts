@@ -9,7 +9,7 @@
  * candidates are overlaid onto), never from the primary invocation's
  * process object, stdout transcript, or any other live reference to that
  * invocation. Because the reviewer invocation is a brand-new child process
- * (ai-invoker.ts) that only ever receives the string this module returns,
+ * (ai/invoker.ts) that only ever receives the string this module returns,
  * there is no code path by which generator conversational history, scratch
  * reasoning, or free-form rationale beyond `manifest.rationale` itself can
  * reach the reviewer.
@@ -32,19 +32,12 @@ import type { CanonicalIntegrationReadiness } from "../integration/canonical-int
 import { buildProspectiveCorpusIndex } from "../integration/prospective-validation.ts";
 import { detectLanguageSignals, type LanguageSignal } from "../language/signals.ts";
 import type { ValidationResult } from "../validation/validate.ts";
-import { canonicalJsonStringify } from "./fingerprint.ts";
-import type { GenerationManifest } from "./types.ts";
-
-/**
- * The review framing a package carries: an orchestrated cycle's manifest
- * (Lane A), or a fixed, author-independent framing for a direct
- * pull-request change (Lane B). Only these fields are ever read.
- */
-export type ReviewFraming = Pick<GenerationManifest, "investigationQuestion" | "targetProblemId"> & { mode: string };
+import { canonicalJsonStringify } from "../core/fingerprint.ts";
+import type { ReviewFraming } from "./types.ts";
 
 export interface ReviewerInputSource {
   baseGitSha: string;
-  manifest: GenerationManifest | ReviewFraming;
+  manifest: ReviewFraming;
   /** The canonical index the candidates are overlaid onto. */
   index: CorpusIndex;
   /** Candidate records in the same order as `deltas` (CanonicalIntegrationReview order). */

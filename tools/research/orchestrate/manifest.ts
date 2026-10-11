@@ -5,7 +5,7 @@
  * or rationale — only that the required shape is present, matching every
  * other structural-only check in tools/research/.
  */
-import { isBoundedRelativePath } from "./path-containment.ts";
+import { isBoundedRelativePath } from "../core/path-containment.ts";
 import type { GenerationManifest, ResearchMode } from "./types.ts";
 
 export interface ManifestValidationResult {

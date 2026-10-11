@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { validateAuthoringEnvelope } from "./authoring-envelope.ts";
 import { buildPrimaryAuthoringPrompt } from "./primary-prompt.ts";
-import { buildReviewerPrompt } from "./reviewer-prompt.ts";
+import { buildReviewerPrompt } from "../review/reviewer-prompt.ts";
 
 function validEnvelope(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {

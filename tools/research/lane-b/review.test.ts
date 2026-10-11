@@ -8,12 +8,12 @@ import { fileURLToPath } from "node:url";
 
 import type { RecordFields, RecordSchema } from "../core/types.ts";
 import { stringifyRecordYaml } from "../core/yaml.ts";
-import type { AiInvocationRequest, AiInvoker } from "../orchestrate/ai-invoker.ts";
-import { sha256Hex } from "../orchestrate/fingerprint.ts";
-import { validateIndependentReview } from "../orchestrate/independent-review.ts";
-import { serializeReviewerInput, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
-import { buildReviewerPrompt } from "../orchestrate/reviewer-prompt.ts";
-import { assertWorkbenchBoundary } from "../orchestrate/workbench-boundary.ts";
+import type { AiInvocationRequest, AiInvoker } from "../ai/invoker.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
+import { validateIndependentReview } from "../review/independent-review.ts";
+import { serializeReviewerInput, type ReviewerInputPackage } from "../review/reviewer-input.ts";
+import { buildReviewerPrompt } from "../review/reviewer-prompt.ts";
+import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
 import { defaultLaneBWorkbenchDir } from "./cli.ts";
 import {
   extractPullRequestReceipt,

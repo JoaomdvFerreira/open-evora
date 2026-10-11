@@ -31,9 +31,10 @@ import { loadSchemas } from "../core/schemas.ts";
 import type { RecordSchema } from "../core/types.ts";
 import type { CandidateDeltaAction } from "../integration/candidate-delta.ts";
 import { prepareCanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
-import { loadCandidates } from "../orchestrate/candidate-loader.ts";
-import { sha256Hex } from "../orchestrate/fingerprint.ts";
-import { buildReviewerInputPackage, type ReviewerInputPackage, type ReviewFraming } from "../orchestrate/reviewer-input.ts";
+import { loadCandidates } from "../integration/candidate-loader.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
+import { buildReviewerInputPackage, type ReviewerInputPackage } from "../review/reviewer-input.ts";
+import type { ReviewFraming } from "../review/types.ts";
 
 /** Which prospective state the changed records are read from. */
 export type LaneBHead = { kind: "commit"; sha: string } | { kind: "working-tree" };

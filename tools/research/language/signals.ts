@@ -743,7 +743,7 @@ function geographySignal(subjectId: string, fields: RecordFields, index: CorpusI
 // a term, and only through its observation.summary or scope: inference_limits
 // never count as positive support, and neither does any SRC, Source
 // Verification Support or unlinked EVD. Emission and the review-time check of
-// a SUPPORTED disposition (orchestrate/independent-review.ts) share this one
+// a SUPPORTED disposition (review/independent-review.ts) share this one
 // predicate.
 // ---------------------------------------------------------------------------
 

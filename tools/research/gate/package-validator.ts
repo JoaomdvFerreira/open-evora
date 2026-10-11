@@ -21,10 +21,10 @@
  */
 import { validateSourceVerification } from "../core/source-verifications.ts";
 import type { RecordFields } from "../core/types.ts";
-import { canonicalJsonStringify } from "../orchestrate/fingerprint.ts";
-import { validateIndependentReview } from "../orchestrate/independent-review.ts";
+import { canonicalJsonStringify } from "../core/fingerprint.ts";
+import { validateIndependentReview } from "../review/independent-review.ts";
 import { asValidatedResearchChangeSet, validateResearchChangeSet } from "../orchestrate/rcs-validator.ts";
-import { reviewSignalId, sourceVerificationSubjectSourceIds, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
+import { reviewSignalId, sourceVerificationSubjectSourceIds, type ReviewerInputPackage } from "../review/reviewer-input.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import { ADVISORY, SIGNAL_DIMENSION, type SignalCode } from "../language/signals.ts";
 import type { HumanGatePackage } from "./types.ts";

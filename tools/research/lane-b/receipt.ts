@@ -18,13 +18,13 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { AiInvoker } from "../orchestrate/ai-invoker.ts";
+import type { AiInvoker } from "../ai/invoker.ts";
 import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
-import { canonicalJsonStringify } from "../orchestrate/fingerprint.ts";
-import { validateIndependentReview } from "../orchestrate/independent-review.ts";
-import { invokeIndependentReview } from "../orchestrate/independent-review-invocation.ts";
-import { serializeReviewerInput } from "../orchestrate/reviewer-input.ts";
-import type { IndependentReviewResult } from "../orchestrate/types.ts";
+import { canonicalJsonStringify } from "../core/fingerprint.ts";
+import { validateIndependentReview } from "../review/independent-review.ts";
+import { invokeIndependentReview } from "../review/independent-review-invocation.ts";
+import { serializeReviewerInput } from "../review/reviewer-input.ts";
+import type { IndependentReviewResult } from "../review/types.ts";
 import { describeSourceVerificationNotSeparate, type LaneBChangedRecord, type LaneBReviewUnit } from "./review-unit.ts";
 
 type ReviewRequiredUnit = Extract<LaneBReviewUnit, { status: "REVIEW_REQUIRED" }>;
