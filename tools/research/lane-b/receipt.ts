@@ -1,15 +1,19 @@
 /**
- * The Lane B semantic-review receipt: the pull-request-body carrier of an
- * independent CLEC review for a direct change to canonical research
+ * The Lane B semantic-review receipt: the compact pull-request-body binding
+ * of an independent CLEC review for a direct change to canonical research
  * (docs/investigationstrategy.md §12). The receipt is transient governance
  * material, never canonical research state, and is never committed.
  *
- * The receipt embeds the F00-F IndependentReviewResult unchanged and binds
- * it to the exact base commit, the exact changed record files (by Git blob
+ * The complete F00-F IndependentReviewResult is not in the receipt. It is the
+ * hash-addressed review artifact `.research-review/<reviewSha256>.json`,
+ * committed in the same pull request, where `reviewSha256` is the canonical
+ * SHA-256 (core/fingerprint.ts) of the review itself. The receipt binds that
+ * hash to the exact base commit, the exact changed record files (by Git blob
  * ID) and the fingerprint of the exact reviewer input. Verification rebuilds
  * all three from Git (review-unit.ts) — the receipt's own claims are only
- * compared, never trusted — and judges the review with the existing
- * context-aware validateIndependentReview().
+ * compared, never trusted — reads the referenced artifact from the head
+ * commit, checks its hash and judges it with the existing context-aware
+ * validateIndependentReview().
  *
  * A verified CONCUR receipt makes a change eligible for human review only.
  * It is not an approval. Advisory signal presence alone never fails it; a
@@ -20,21 +24,36 @@ import { join } from "node:path";
 
 import type { AiInvoker } from "../ai/invoker.ts";
 import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
-import { canonicalJsonStringify } from "../core/fingerprint.ts";
+import { canonicalJsonStringify, sha256Hex } from "../core/fingerprint.ts";
 import { validateIndependentReview } from "../review/independent-review.ts";
 import { invokeIndependentReview } from "../review/independent-review-invocation.ts";
 import { serializeReviewerInput } from "../review/reviewer-input.ts";
-import type { IndependentReviewResult } from "../review/types.ts";
-import { describeSourceVerificationNotSeparate, type LaneBChangedRecord, type LaneBReviewUnit } from "./review-unit.ts";
+import type { IndependentReviewOutcome, IndependentReviewResult } from "../review/types.ts";
+import {
+  describeSourceVerificationNotSeparate,
+  REVIEW_ARTIFACT_DIRECTORY,
+  type LaneBChangedRecord,
+  type LaneBReviewArtifacts,
+  type LaneBReviewUnit,
+} from "./review-unit.ts";
 
 type ReviewRequiredUnit = Extract<LaneBReviewUnit, { status: "REVIEW_REQUIRED" }>;
 
+/** One changed canonical record file, as the receipt binds it: its path and exact Git blob. */
+export interface LaneBChangedRecordBlob {
+  path: string;
+  blob: string;
+}
+
 export interface LaneBReviewReceipt {
-  schemaVersion: "1";
+  schemaVersion: "2";
+  outcome: IndependentReviewOutcome;
   baseGitSha: string;
+  /** Ordered by `path` (UTF-16 code-unit order), one entry per changed canonical record file. */
+  changedRecordBlobs: LaneBChangedRecordBlob[];
   reviewerInputFingerprint: string;
-  changedRecords: LaneBChangedRecord[];
-  independentReview: IndependentReviewResult;
+  /** sha256Hex() of the complete IndependentReviewResult held in the review artifact. */
+  reviewSha256: string;
 }
 
 /** The pull-request template section that carries the receipt (or `N/A`). */
@@ -42,16 +61,39 @@ export const REVIEW_SECTION_HEADING = "## Research semantic review";
 export const RECEIPT_BEGIN = "<!-- open-evora:lane-b-semantic-review-receipt:begin -->";
 export const RECEIPT_END = "<!-- open-evora:lane-b-semantic-review-receipt:end -->";
 
-const RECEIPT_KEYS = ["schemaVersion", "baseGitSha", "reviewerInputFingerprint", "changedRecords", "independentReview"];
-const CHANGED_RECORD_KEYS = ["recordFamily", "id", "path", "action", "blob"];
+const RECEIPT_KEYS = ["schemaVersion", "outcome", "baseGitSha", "changedRecordBlobs", "reviewerInputFingerprint", "reviewSha256"];
+const CHANGED_RECORD_BLOB_KEYS = ["path", "blob"];
+const SHA256_HEX = /^[0-9a-f]{64}$/;
+const RECEIPT_OUTCOMES: readonly IndependentReviewOutcome[] = ["CONCUR", "DISAGREEMENT_FOUND", "INSUFFICIENT_EVIDENCE"];
+
+/** The receipt's code-owned ordering of changed records: by repository-relative path. */
+export function changedRecordBlobs(records: readonly LaneBChangedRecord[]): LaneBChangedRecordBlob[] {
+  return records.map(({ path, blob }) => ({ path, blob })).sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+}
+
+/** The canonical review hash: independent of key order, whitespace and line endings of any serialization. */
+export function reviewSha256(independentReview: IndependentReviewResult): string {
+  return sha256Hex(independentReview);
+}
+
+/** Repository-relative path of the full review artifact for `sha`. */
+export function reviewArtifactPath(sha: string): string {
+  return `${REVIEW_ARTIFACT_DIRECTORY}/${sha}.json`;
+}
+
+/** Deterministic on-disk form of a review artifact: sorted-key, two-space JSON with a final newline. */
+export function renderReviewArtifact(independentReview: IndependentReviewResult): string {
+  return `${JSON.stringify(JSON.parse(canonicalJsonStringify(independentReview)), null, 2)}\n`;
+}
 
 export function buildLaneBReceipt(unit: ReviewRequiredUnit, independentReview: IndependentReviewResult): LaneBReviewReceipt {
   return {
-    schemaVersion: "1",
+    schemaVersion: "2",
+    outcome: independentReview.outcome,
     baseGitSha: unit.baseGitSha,
+    changedRecordBlobs: changedRecordBlobs(unit.changedRecords),
     reviewerInputFingerprint: unit.reviewerInputFingerprint,
-    changedRecords: structuredClone(unit.changedRecords),
-    independentReview: structuredClone(independentReview),
+    reviewSha256: reviewSha256(independentReview),
   };
 }
 
@@ -129,22 +171,29 @@ function exactKeys(value: Record<string, unknown>, keys: readonly string[], path
   for (const key of keys) if (!(key in value)) errors.push(`${path} is missing field ${JSON.stringify(key)}`);
 }
 
-/** Receipt envelope shape only; the embedded review is judged by validateIndependentReview(). */
+/** Receipt shape only; the referenced review is judged by validateIndependentReview(). */
 function checkReceiptShape(value: unknown): string[] {
   if (!isObject(value)) return ["receipt must be a JSON object"];
   const errors: string[] = [];
   exactKeys(value, RECEIPT_KEYS, "receipt", errors);
-  if (value.schemaVersion !== "1") errors.push(`receipt.schemaVersion must be exactly "1", got ${JSON.stringify(value.schemaVersion)}`);
+  if (value.schemaVersion !== "2") errors.push(`receipt.schemaVersion must be exactly "2", got ${JSON.stringify(value.schemaVersion)}`);
+  if (!RECEIPT_OUTCOMES.includes(value.outcome as IndependentReviewOutcome)) {
+    errors.push(`receipt.outcome must be one of ${RECEIPT_OUTCOMES.join(", ")}, got ${JSON.stringify(value.outcome)}`);
+  }
   if (typeof value.baseGitSha !== "string" || !/^[0-9a-f]{40}$/.test(value.baseGitSha)) errors.push("receipt.baseGitSha must be a full 40-character commit SHA");
-  if (typeof value.reviewerInputFingerprint !== "string" || !/^[0-9a-f]{64}$/.test(value.reviewerInputFingerprint)) {
+  if (typeof value.reviewerInputFingerprint !== "string" || !SHA256_HEX.test(value.reviewerInputFingerprint)) {
     errors.push("receipt.reviewerInputFingerprint must be a 64-character sha256 hex digest");
   }
-  if (!Array.isArray(value.changedRecords)) {
-    errors.push("receipt.changedRecords must be an array");
+  if (typeof value.reviewSha256 !== "string" || !SHA256_HEX.test(value.reviewSha256)) errors.push("receipt.reviewSha256 must be a 64-character sha256 hex digest");
+  if (!Array.isArray(value.changedRecordBlobs)) {
+    errors.push("receipt.changedRecordBlobs must be an array");
   } else {
-    value.changedRecords.forEach((entry, i) => {
-      if (!isObject(entry)) errors.push(`receipt.changedRecords[${i}] must be an object`);
-      else exactKeys(entry, CHANGED_RECORD_KEYS, `receipt.changedRecords[${i}]`, errors);
+    value.changedRecordBlobs.forEach((entry, i) => {
+      if (!isObject(entry)) errors.push(`receipt.changedRecordBlobs[${i}] must be an object`);
+      else {
+        exactKeys(entry, CHANGED_RECORD_BLOB_KEYS, `receipt.changedRecordBlobs[${i}]`, errors);
+        if (typeof entry.path !== "string" || typeof entry.blob !== "string") errors.push(`receipt.changedRecordBlobs[${i}] path and blob must be strings`);
+      }
     });
   }
   return errors;
@@ -172,14 +221,19 @@ export function laneBContextFreeBlock(unit: ReviewRequiredUnit): { failedCheck: 
 }
 
 /**
- * Verifies a pull request's Lane B receipt against the review unit rebuilt
- * from Git. Fails closed on every missing, ambiguous, stale or invalid
- * receipt and on any outcome other than CONCUR. Advisory signals are never
- * failures by themselves: only a missing or inconsistent disposition is.
- * A context-free blocker fails first, before the receipt is even read.
+ * Verifies a pull request's Lane B receipt and its review artifact against
+ * the review unit rebuilt from Git. Fails closed on every missing, ambiguous,
+ * stale or invalid receipt or artifact, on any review artifact changed by
+ * the pull request other than the one the receipt references, and on any
+ * outcome other than CONCUR. Advisory signals are never failures by
+ * themselves: only a missing or inconsistent disposition is. A context-free
+ * blocker fails first, before the receipt is even read.
  */
-export function verifyLaneBPullRequest(unit: LaneBReviewUnit, body: string | null | undefined): LaneBVerification {
+export function verifyLaneBPullRequest(unit: LaneBReviewUnit, body: string | null | undefined, artifacts: LaneBReviewArtifacts): LaneBVerification {
   if (unit.status === "NO_CANONICAL_CHANGE") {
+    if (artifacts.changedPaths.length > 0) {
+      return fail("REVIEW_ARTIFACT_UNREFERENCED", `no canonical record changed, so no review artifact may change: ${artifacts.changedPaths.join(", ")}`);
+    }
     return { ok: true, summary: "no canonical PRB/EVD/SRC record changed; no Lane B receipt is required" };
   }
   if (unit.status === "UNSUPPORTED_DELETION") {
@@ -208,40 +262,65 @@ export function verifyLaneBPullRequest(unit: LaneBReviewUnit, body: string | nul
   if (receipt.baseGitSha !== unit.baseGitSha) {
     return fail("RECEIPT_BASE_MISMATCH", `receipt was prepared against ${receipt.baseGitSha}, but this pull request's base is ${unit.baseGitSha}`);
   }
-  if (canonicalJsonStringify(receipt.changedRecords) !== canonicalJsonStringify(unit.changedRecords)) {
+  if (canonicalJsonStringify(receipt.changedRecordBlobs) !== canonicalJsonStringify(changedRecordBlobs(unit.changedRecords))) {
     return fail(
       "RECEIPT_CHANGE_MISMATCH",
-      `receipt covers ${recordList(receipt.changedRecords) || "no records"} at reviewed content, but Git shows ${recordList(unit.changedRecords)} with different records or content; prepare a new review`
+      `receipt covers ${receipt.changedRecordBlobs.map((entry) => entry.path).join(", ") || "no records"} at reviewed content, but Git shows ${recordList(unit.changedRecords)} with different records or content; prepare a new review`
     );
   }
   if (receipt.reviewerInputFingerprint !== unit.reviewerInputFingerprint) {
     return fail("RECEIPT_FINGERPRINT_MISMATCH", "receipt reviewer-input fingerprint does not match the reviewer input rebuilt from Git; prepare a new review");
   }
 
-  const review = validateIndependentReview(receipt.independentReview, unit.reviewerInput);
-  if (review.errors.length > 0) return fail("INDEPENDENT_REVIEW_INVALID", ...review.errors);
-  if (receipt.independentReview.outcome !== "CONCUR") {
-    return fail("INDEPENDENT_REVIEW_NOT_CONCUR", `independent review outcome is ${receipt.independentReview.outcome}; only CONCUR is eligible for human approval`);
+  // Only the exact hash-addressed artifact the receipt names can carry the review.
+  const artifactPath = reviewArtifactPath(receipt.reviewSha256);
+  const unreferenced = artifacts.changedPaths.filter((path) => path !== artifactPath);
+  if (unreferenced.length > 0) {
+    return fail("REVIEW_ARTIFACT_UNREFERENCED", `this pull request changes review artifacts the receipt does not reference: ${unreferenced.join(", ")}; commit only ${artifactPath}`);
+  }
+  const read = artifacts.read(artifactPath);
+  if (read.status === "MISSING") return fail("REVIEW_ARTIFACT_MISSING", `the receipt references ${artifactPath}, which is not in this pull request's head commit`);
+  if (read.status === "NOT_A_FILE") return fail("REVIEW_ARTIFACT_MISSING", `${artifactPath} is not an ordinary repository file`);
+  let review: IndependentReviewResult;
+  try {
+    review = JSON.parse(read.text) as IndependentReviewResult;
+  } catch (error) {
+    return fail("REVIEW_ARTIFACT_MALFORMED", `${artifactPath} is not valid JSON: ${(error as Error).message}`);
+  }
+  const actualSha = sha256Hex(review);
+  if (actualSha !== receipt.reviewSha256) {
+    return fail("REVIEW_ARTIFACT_HASH_MISMATCH", `${artifactPath} has canonical SHA-256 ${actualSha}, not the ${receipt.reviewSha256} its name and the receipt bind`);
+  }
+
+  const validation = validateIndependentReview(review, unit.reviewerInput);
+  if (validation.errors.length > 0) return fail("INDEPENDENT_REVIEW_INVALID", ...validation.errors);
+  if (review.outcome !== receipt.outcome) {
+    return fail("RECEIPT_OUTCOME_MISMATCH", `receipt outcome ${receipt.outcome} differs from the review artifact outcome ${review.outcome}`);
+  }
+  if (review.outcome !== "CONCUR") {
+    return fail("INDEPENDENT_REVIEW_NOT_CONCUR", `independent review outcome is ${review.outcome}; only CONCUR is eligible for human approval`);
   }
   return {
     ok: true,
-    summary: `independent review CONCUR bound to base ${unit.baseGitSha} covering ${recordList(unit.changedRecords)}; eligible for human review (not an approval)`,
+    summary: `independent review CONCUR (${artifactPath}) bound to base ${unit.baseGitSha} covering ${recordList(unit.changedRecords)}; eligible for human review (not an approval)`,
   };
 }
 
 export type LaneBPreparation =
   | { status: "REVIEW_FAILED"; failedCheck: string; message: string }
   | { status: "NOT_CONCUR"; independentReview: IndependentReviewResult }
-  | { status: "READY"; receipt: LaneBReviewReceipt; receiptBlock: string };
+  | { status: "READY"; receipt: LaneBReviewReceipt; receiptBlock: string; artifactPath: string };
 
 /**
  * Runs the independent review for a Lane B unit through the shared bounded
  * invocation helper. `workbenchDir` must already be boundary-checked as
  * gitignored; the reviewer input, its result and any receipt are written
- * only there. A context-free blocker fails before anything is written or
- * the reviewer is invoked.
+ * there. Only a valid CONCUR review is also written to `repoRoot` as its
+ * hash-addressed review artifact, to be committed with the reviewed records.
+ * A context-free blocker fails before anything is written or the reviewer is
+ * invoked.
  */
-export function prepareLaneBReview(unit: ReviewRequiredUnit, reviewerInvoker: AiInvoker, workbenchDir: string): LaneBPreparation {
+export function prepareLaneBReview(unit: ReviewRequiredUnit, reviewerInvoker: AiInvoker, workbenchDir: string, repoRoot: string): LaneBPreparation {
   const blocked = laneBContextFreeBlock(unit);
   if (blocked) return { status: "REVIEW_FAILED", ...blocked };
   mkdirSync(workbenchDir, { recursive: true });
@@ -255,7 +334,10 @@ export function prepareLaneBReview(unit: ReviewRequiredUnit, reviewerInvoker: Ai
   if (independentReview.outcome !== "CONCUR") return { status: "NOT_CONCUR", independentReview };
 
   const receipt = buildLaneBReceipt(unit, independentReview);
+  const artifactPath = reviewArtifactPath(receipt.reviewSha256);
+  mkdirSync(join(repoRoot, REVIEW_ARTIFACT_DIRECTORY), { recursive: true });
+  writeFileSync(join(repoRoot, ...artifactPath.split("/")), renderReviewArtifact(independentReview), "utf8");
   const receiptBlock = renderReceiptBlock(receipt);
   writeFileSync(join(workbenchDir, "pr-receipt.md"), `${receiptBlock}\n`, "utf8");
-  return { status: "READY", receipt, receiptBlock };
+  return { status: "READY", receipt, receiptBlock, artifactPath };
 }

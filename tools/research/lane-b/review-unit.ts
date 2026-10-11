@@ -330,6 +330,48 @@ export function pullRequestBase(repoRoot: string, baseSha: string, headSha: stri
   return git(repoRoot, ["merge-base", baseSha, headSha]).toString("utf8").trim();
 }
 
+/**
+ * Repository directory of the hash-addressed full Lane B review artifacts
+ * (`<reviewSha256>.json`): durable governance material, never canonical
+ * research state, and outside every record directory.
+ */
+export const REVIEW_ARTIFACT_DIRECTORY = ".research-review";
+
+export type LaneBReviewArtifactRead =
+  | { status: "FILE"; text: string }
+  | { status: "MISSING" }
+  /** Present at the path, but not an ordinary file (a symlink, submodule or directory). */
+  | { status: "NOT_A_FILE" };
+
+/** The review artifacts a pull request carries, read from Git objects only. */
+export interface LaneBReviewArtifacts {
+  /** Every path under REVIEW_ARTIFACT_DIRECTORY created, modified or deleted between base and head, sorted. */
+  changedPaths: string[];
+  /** Reads one repository-relative path from the head commit's tree. */
+  read(path: string): LaneBReviewArtifactRead;
+}
+
+/**
+ * The review artifacts of `headSha` measured from `baseGitSha`. Contents come
+ * from the head commit's tree, never from the checkout or any local path.
+ */
+export function reviewArtifactsAtCommit(repoRoot: string, baseGitSha: string, headSha: string): LaneBReviewArtifacts {
+  assertCommitExists(repoRoot, baseGitSha);
+  assertCommitExists(repoRoot, headSha);
+  const changedPaths = nulSeparated(git(repoRoot, ["diff", "--name-only", "--no-renames", "-z", baseGitSha, headSha, "--", REVIEW_ARTIFACT_DIRECTORY])).sort();
+  return {
+    changedPaths,
+    read(path: string): LaneBReviewArtifactRead {
+      const entries = nulSeparated(git(repoRoot, ["ls-tree", "-z", headSha, "--", path]));
+      const entry = entries.find((line) => line.slice(line.indexOf("\t") + 1) === path);
+      if (!entry) return { status: "MISSING" };
+      const [mode, type, oid] = entry.slice(0, entry.indexOf("\t")).split(" ");
+      if (type !== "blob" || (mode !== "100644" && mode !== "100755")) return { status: "NOT_A_FILE" };
+      return { status: "FILE", text: git(repoRoot, ["cat-file", "blob", oid]).toString("utf8") };
+    },
+  };
+}
+
 /** Resolves a ref (branch, tag, `HEAD` or SHA) to its full commit SHA. */
 export function resolveCommit(repoRoot: string, ref: string): string {
   const sha = git(repoRoot, ["rev-parse", "--verify", "--quiet", `${ref}^{commit}`]).toString("utf8").trim();

@@ -9,12 +9,15 @@
  *     Before any commit/push/PR of the change: reviews the working-tree
  *     canonical record changes against the merge base of <ref> and HEAD with
  *     a fresh INDEPENDENT_REVIEWER process (RESEARCH_AI_COMMAND, as for
- *     orchestrated cycles) and prints the PR receipt on CONCUR. Never
- *     commits, pushes or opens a pull request.
+ *     orchestrated cycles). On CONCUR it writes the full review artifact
+ *     .research-review/<reviewSha256>.json, to be committed with the
+ *     records, and prints a short summary plus the compact PR receipt.
+ *     Never commits, pushes or opens a pull request.
  *   check --event-path <github-event.json>
  *   check --base <sha> --head <sha> --body-file <file>
- *     Verifies a pull request's receipt against the review input rebuilt
- *     from Git. With --event-path the base is the merge base of the event's
+ *     Verifies a pull request's receipt and the review artifact it
+ *     references (read from the head commit) against the review input
+ *     rebuilt from Git. Never invokes a reviewer. With --event-path the base is the merge base of the event's
  *     base and head; the PR body is read from the event file, never from
  *     shell arguments.
  *
@@ -28,7 +31,14 @@ import { fileURLToPath } from "node:url";
 import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "../ai/invoker.ts";
 import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
 import { laneBContextFreeBlock, prepareLaneBReview, verifyLaneBPullRequest } from "./receipt.ts";
-import { describeSourceVerificationNotSeparate, pullRequestBase, resolveCommit, resolveLaneBReviewUnit, type LaneBReviewUnit } from "./review-unit.ts";
+import {
+  describeSourceVerificationNotSeparate,
+  pullRequestBase,
+  resolveCommit,
+  resolveLaneBReviewUnit,
+  reviewArtifactsAtCommit,
+  type LaneBReviewUnit,
+} from "./review-unit.ts";
 
 const USAGE = [
   "Usage:",
@@ -74,7 +84,7 @@ function prepare(repoRoot: string, flag: (name: string) => string | undefined): 
   const workbenchDir = resolve(flag("--workbench") ?? defaultLaneBWorkbenchDir(repoRoot, unit));
   assertWorkbenchBoundary(workbenchDir);
 
-  const outcome = prepareLaneBReview(unit, new LocalCommandAiInvoker(aiConfig), workbenchDir);
+  const outcome = prepareLaneBReview(unit, new LocalCommandAiInvoker(aiConfig), workbenchDir, repoRoot);
   if (outcome.status === "REVIEW_FAILED") return failed(outcome.failedCheck, outcome.message);
   if (outcome.status === "NOT_CONCUR") {
     const review = outcome.independentReview;
@@ -87,8 +97,12 @@ function prepare(repoRoot: string, flag: (name: string) => string | undefined): 
       `independent review outcome is ${review.outcome}; correct the records and prepare again. Review written to ${join(workbenchDir, "independent-review.json")}`
     );
   }
-  console.log(`CONCUR: base ${unit.baseGitSha}, records ${unit.changedRecords.map((record) => record.id).join(", ")}.`);
-  console.log(`Paste the block below into the PR's "## Research semantic review" section (also written to ${join(workbenchDir, "pr-receipt.md")}).`);
+  console.log("CONCUR");
+  console.log(`Base: ${unit.baseGitSha}`);
+  console.log(`Records: ${unit.changedRecords.map((record) => record.id).join(", ")}`);
+  console.log(`Review: ${outcome.receipt.reviewSha256}`);
+  console.log(`Artifact: ${outcome.artifactPath}\n`);
+  console.log(`Commit ${outcome.artifactPath} with the records and paste the block below into the PR's "## Research semantic review" section (also written to ${join(workbenchDir, "pr-receipt.md")}).`);
   console.log("Any later change to these records requires a new review and receipt. CONCUR is not an approval.\n");
   console.log(outcome.receiptBlock);
 }
@@ -118,7 +132,7 @@ function check(repoRoot: string, flag: (name: string) => string | undefined): vo
   }
 
   const unit = resolveLaneBReviewUnit({ repoRoot, baseGitSha, head: { kind: "commit", sha: headSha } });
-  const verification = verifyLaneBPullRequest(unit, body);
+  const verification = verifyLaneBPullRequest(unit, body, reviewArtifactsAtCommit(repoRoot, baseGitSha, headSha));
   if (verification.ok) {
     console.log(`PASS: ${verification.summary}`);
     return;

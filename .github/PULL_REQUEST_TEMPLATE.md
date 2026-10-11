@@ -20,11 +20,13 @@
 
 <!--
 Keep N/A when this PR creates, updates or deletes no canonical PRB/EVD/SRC record file.
-Otherwise replace N/A with the exact block printed by `npm run research:lane-b:prepare -- --base <base>`, run before the research change is committed. Never write or edit the receipt by hand.
-- A self-review is not sufficient; the receipt carries a separate independent reviewer's result.
-- Lexical CLEC signals are not violations by themselves; each carries the reviewer's disposition.
-- The receipt must correspond to this PR's exact base and canonical record content; altering reviewed record content requires a new review receipt.
+Otherwise replace N/A with the exact compact receipt block printed by `npm run research:lane-b:prepare -- --base <base>`, run before the research change is committed. Never write or edit the receipt by hand.
+- A self-review is not sufficient; the receipt binds a separate independent reviewer's result.
+- The complete independent review, including every CLEC signal disposition, is stored in the generated review artifact `.research-review/<reviewSha256>.json`, which must be committed in this PR. The receipt carries only its hash and binding data.
+- CI rebuilds the reviewer input from Git and verifies the receipt and that exact artifact against it.
+- The receipt must correspond to this PR's exact base and canonical record content; altering reviewed record content invalidates the receipt and requires a new review.
 - Only a CONCUR review is eligible for human approval; it is not an approval.
+- Agents do not inspect the full review artifact unless the repository owner explicitly directs it.
 -->
 
 N/A

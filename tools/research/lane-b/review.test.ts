@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
@@ -13,6 +13,7 @@ import { sha256Hex } from "../core/fingerprint.ts";
 import { validateIndependentReview } from "../review/independent-review.ts";
 import { serializeReviewerInput, type ReviewerInputPackage } from "../review/reviewer-input.ts";
 import { buildReviewerPrompt } from "../review/reviewer-prompt.ts";
+import type { IndependentReviewResult } from "../review/types.ts";
 import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
 import { defaultLaneBWorkbenchDir } from "./cli.ts";
 import {
@@ -21,11 +22,20 @@ import {
   RECEIPT_BEGIN,
   RECEIPT_END,
   renderReceiptBlock,
+  renderReviewArtifact,
   buildLaneBReceipt,
+  reviewArtifactPath,
   verifyLaneBPullRequest,
   type LaneBReviewReceipt,
 } from "./receipt.ts";
-import { LaneBReviewUnitError, resolveLaneBReviewUnit, type LaneBHead, type LaneBReviewUnit } from "./review-unit.ts";
+import {
+  LaneBReviewUnitError,
+  resolveLaneBReviewUnit,
+  reviewArtifactsAtCommit,
+  type LaneBHead,
+  type LaneBReviewArtifacts,
+  type LaneBReviewUnit,
+} from "./review-unit.ts";
 
 const realRepoRoot = resolve(fileURLToPath(new URL(".", import.meta.url)), "..", "..", "..");
 const cliPath = fileURLToPath(new URL("./cli.ts", import.meta.url));
@@ -198,7 +208,23 @@ function withFinding(pkg: ReviewerInputPackage, kind: "CLEC_VIOLATION" | "INSUFF
 }
 
 function receiptFor(unit: ReviewRequired, review: Review): LaneBReviewReceipt {
-  return buildLaneBReceipt(unit, review as unknown as LaneBReviewReceipt["independentReview"]);
+  return buildLaneBReceipt(unit, review as unknown as IndependentReviewResult);
+}
+
+/** Review artifacts as a pull request's head would carry them: `files` by path, changed relative to the base. */
+function artifactsWith(files: Record<string, string>, changedPaths: string[] = Object.keys(files).sort()): LaneBReviewArtifacts {
+  return {
+    changedPaths,
+    read: (path) => (path in files ? { status: "FILE", text: files[path] } : { status: "MISSING" }),
+  };
+}
+
+const NO_ARTIFACTS = artifactsWith({});
+
+/** The hash-addressed artifact `prepare` writes for `review`, as the only changed review artifact. */
+function artifactsFor(review: Review): LaneBReviewArtifacts {
+  const artifact = review as unknown as IndependentReviewResult;
+  return artifactsWith({ [reviewArtifactPath(sha256Hex(artifact))]: renderReviewArtifact(artifact) });
 }
 
 /** A PR body in the canonical template shape with `section` as the Research semantic review content. */
@@ -208,8 +234,8 @@ function prBody(section: string): string {
 
 const bodyWith = (receipt: unknown): string => prBody(renderReceiptBlock(receipt as LaneBReviewReceipt));
 
-function assertFails(unit: LaneBReviewUnit, body: string, failedCheck: string, pattern?: RegExp): void {
-  const result = verifyLaneBPullRequest(unit, body);
+function assertFails(unit: LaneBReviewUnit, body: string, failedCheck: string, pattern?: RegExp, artifacts: LaneBReviewArtifacts = NO_ARTIFACTS): void {
+  const result = verifyLaneBPullRequest(unit, body, artifacts);
   assert.equal(result.ok, false, `expected ${failedCheck}`);
   if (result.ok) return;
   assert.equal(result.failedCheck, failedCheck, result.errors.join("; "));
@@ -461,7 +487,7 @@ test("a support-only change has no canonical change and needs no Lane B receipt"
     writeSupport(fixture, "SRC-B", ["Outra afirmação verificada."]);
     const unit = fixture.unit(base, { kind: "commit", sha: fixture.commit("support-only change") });
     assert.deepEqual(unit, { status: "NO_CANONICAL_CHANGE", baseGitSha: base });
-    assert.equal(verifyLaneBPullRequest(unit, prBody("N/A")).ok, true);
+    assert.equal(verifyLaneBPullRequest(unit, prBody("N/A"), NO_ARTIFACTS).ok, true);
   });
 });
 
@@ -567,7 +593,7 @@ test("without canonical record changes the check passes with or without a receip
   withFixture((fixture, base) => {
     fixture.write("docs/notes.md", "# Alterado\n");
     const unit = fixture.unit(base, { kind: "commit", sha: fixture.commit() });
-    for (const body of [prBody("N/A"), "", "## Summary\n\nDocs only."]) assert.equal(verifyLaneBPullRequest(unit, body).ok, true);
+    for (const body of [prBody("N/A"), "", "## Summary\n\nDocs only."]) assert.equal(verifyLaneBPullRequest(unit, body, NO_ARTIFACTS).ok, true);
   });
 });
 
@@ -587,7 +613,12 @@ test("a malformed or duplicated receipt fails", () => {
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
     const receipt = receiptFor(unit, concur(unit.reviewerInput));
     assertFails(unit, bodyWith({ ...receipt, extra: true }), "RECEIPT_INVALID", /unknown field "extra"/);
-    assertFails(unit, bodyWith({ ...receipt, schemaVersion: "2" }), "RECEIPT_INVALID");
+    assertFails(unit, bodyWith({ ...receipt, schemaVersion: "1" }), "RECEIPT_INVALID", /schemaVersion must be exactly "2"/);
+    const { reviewSha256: _omitted, ...withoutHash } = receipt;
+    assertFails(unit, bodyWith(withoutHash), "RECEIPT_INVALID", /missing field "reviewSha256"/);
+    assertFails(unit, bodyWith({ ...receipt, independentReview: concur(unit.reviewerInput) }), "RECEIPT_INVALID", /unknown field "independentReview"/);
+    assertFails(unit, bodyWith({ ...receipt, changedRecordBlobs: [{ ...receipt.changedRecordBlobs[0], id: "PRB-NEW" }] }), "RECEIPT_INVALID", /unknown field "id"/);
+    assertFails(unit, bodyWith({ ...receipt, outcome: "APPROVED" }), "RECEIPT_INVALID", /outcome must be one of/);
     assertFails(unit, prBody(`${renderReceiptBlock(receipt)}\n${renderReceiptBlock(receipt)}`), "RECEIPT_INVALID", /more than one/);
   });
 });
@@ -597,7 +628,8 @@ test("an exact CONCUR receipt with signals and valid dispositions passes; adviso
     addProblemWithSignal(fixture);
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
     assert.ok(unit.reviewerInput.signals.length > 0);
-    const result = verifyLaneBPullRequest(unit, bodyWith(receiptFor(unit, concur(unit.reviewerInput))));
+    const review = concur(unit.reviewerInput);
+    const result = verifyLaneBPullRequest(unit, bodyWith(receiptFor(unit, review)), artifactsFor(review));
     assert.deepEqual(result.ok, true, result.ok ? "" : result.errors.join("; "));
   });
 });
@@ -607,7 +639,7 @@ test("a receipt bound to another base fails", () => {
     addProblemWithSignal(fixture);
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
     const receipt = receiptFor(unit, concur(unit.reviewerInput));
-    assertFails(unit, bodyWith({ ...receipt, baseGitSha: "f".repeat(40) }), "RECEIPT_BASE_MISMATCH");
+    assertFails(unit, bodyWith({ ...receipt, baseGitSha: "f".repeat(40) }), "RECEIPT_BASE_MISMATCH", undefined, artifactsFor(concur(unit.reviewerInput)));
   });
 });
 
@@ -616,7 +648,7 @@ test("a tampered reviewer-input fingerprint fails", () => {
     addProblemWithSignal(fixture);
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
     const receipt = receiptFor(unit, concur(unit.reviewerInput));
-    assertFails(unit, bodyWith({ ...receipt, reviewerInputFingerprint: "0".repeat(64) }), "RECEIPT_FINGERPRINT_MISMATCH");
+    assertFails(unit, bodyWith({ ...receipt, reviewerInputFingerprint: "0".repeat(64) }), "RECEIPT_FINGERPRINT_MISMATCH", undefined, artifactsFor(concur(unit.reviewerInput)));
   });
 });
 
@@ -624,16 +656,18 @@ test("a receipt goes stale when a reviewed record changes or another record is a
   withFixture((fixture, base) => {
     addProblemWithSignal(fixture);
     const reviewed = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
-    const body = bodyWith(receiptFor(reviewed, concur(reviewed.reviewerInput)));
+    const review = concur(reviewed.reviewerInput);
+    const body = bodyWith(receiptFor(reviewed, review));
+    assert.equal(verifyLaneBPullRequest(reviewed, body, artifactsFor(review)).ok, true);
 
     fixture.record(problem("PRB-NEW", "Muitos moradores relatam atrasos frequentes.", ["EVD-A"], ["PRB-OTHER"]));
     const edited = fixture.unit(base, { kind: "commit", sha: fixture.commit("edit after review") });
-    assertFails(edited, body, "RECEIPT_CHANGE_MISMATCH");
+    assertFails(edited, body, "RECEIPT_CHANGE_MISMATCH", undefined, artifactsFor(review));
 
     fixture.record(problem("PRB-NEW", "Muitos moradores relatam atrasos.", ["EVD-A"], ["PRB-OTHER"]));
     fixture.record(evidence("EVD-NEW", ["SRC-A"], "Nova observação."));
     const extended = fixture.unit(base, { kind: "commit", sha: fixture.commit("add after review") });
-    assertFails(extended, body, "RECEIPT_CHANGE_MISMATCH");
+    assertFails(extended, body, "RECEIPT_CHANGE_MISMATCH", undefined, artifactsFor(review));
   });
 });
 
@@ -641,8 +675,12 @@ test("only a CONCUR outcome is eligible; DISAGREEMENT_FOUND and INSUFFICIENT_EVI
   withFixture((fixture, base) => {
     addProblemWithSignal(fixture);
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
-    assertFails(unit, bodyWith(receiptFor(unit, withFinding(unit.reviewerInput, "CLEC_VIOLATION"))), "INDEPENDENT_REVIEW_NOT_CONCUR", /DISAGREEMENT_FOUND/);
-    assertFails(unit, bodyWith(receiptFor(unit, withFinding(unit.reviewerInput, "INSUFFICIENT_EVIDENCE"))), "INDEPENDENT_REVIEW_NOT_CONCUR", /INSUFFICIENT_EVIDENCE/);
+    for (const kind of ["CLEC_VIOLATION", "INSUFFICIENT_EVIDENCE"] as const) {
+      const review = withFinding(unit.reviewerInput, kind);
+      assertFails(unit, bodyWith(receiptFor(unit, review)), "INDEPENDENT_REVIEW_NOT_CONCUR", new RegExp(review.outcome), artifactsFor(review));
+      // Relabelling the receipt cannot turn a non-CONCUR artifact into CONCUR.
+      assertFails(unit, bodyWith({ ...receiptFor(unit, review), outcome: "CONCUR" }), "RECEIPT_OUTCOME_MISMATCH", /differs/, artifactsFor(review));
+    }
   });
 });
 
@@ -654,7 +692,7 @@ test("the embedded review is judged by the context-aware validator against the r
     const check = (mutate: (review: Review) => void, pattern: RegExp): void => {
       const review = concur(pkg);
       mutate(review);
-      assertFails(unit, bodyWith(receiptFor(unit, review)), "INDEPENDENT_REVIEW_INVALID", pattern);
+      assertFails(unit, bodyWith({ ...receiptFor(unit, review), outcome: "CONCUR" }), "INDEPENDENT_REVIEW_INVALID", pattern, artifactsFor(review));
     };
 
     check((review) => review.signalDispositions.pop(), /has no disposition/);
@@ -671,9 +709,147 @@ test("the embedded review is judged by the context-aware validator against the r
 });
 
 // ---------------------------------------------------------------------------
+// Compact receipt and hash-addressed review artifact.
+
+test("the receipt carries only the schema-v2 binding fields and none of the review's content", () => {
+  withFixture((fixture, base) => {
+    addProblemWithSignal(fixture);
+    fixture.record(evidence("EVD-B", ["SRC-B"], "Versão revista."));
+    const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
+    const review = withFinding(unit.reviewerInput, "CLEC_VIOLATION");
+    const receipt = receiptFor(unit, review);
+    assert.deepEqual(Object.keys(receipt).sort(), ["baseGitSha", "changedRecordBlobs", "outcome", "reviewSha256", "reviewerInputFingerprint", "schemaVersion"]);
+    assert.equal(receipt.schemaVersion, "2");
+    assert.equal(receipt.reviewSha256, sha256Hex(review));
+    // Ordered by path, whatever the review unit's own order; path and blob only.
+    assert.deepEqual(receipt.changedRecordBlobs.map(({ path }) => path), [recordPath("EVD-B"), recordPath("PRB-NEW")]);
+    assert.ok(receipt.changedRecordBlobs.every((entry) => Object.keys(entry).sort().join() === "blob,path"));
+
+    const block = renderReceiptBlock(receipt);
+    for (const excluded of [
+      "independentReview", "rationale", "findings", "signalDispositions", "evidenceContext", "validation", "readiness",
+      review.rationale as string, review.findings[0].reason as string, review.findings[0].correctionDirection as string,
+      ...review.signalDispositions.map((entry) => entry.reason as string), ...unit.reviewerInput.signals.map(({ signalId }) => signalId),
+      "Muitos moradores",
+    ]) assert.equal(block.includes(excluded), false, excluded);
+  });
+});
+
+test("receipt size does not grow with the review's prose or its number of dispositions", () => {
+  withFixture((fixture, base) => {
+    addProblemWithSignal(fixture);
+    const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
+    const small = concur(unit.reviewerInput);
+    const large: Review = {
+      ...small,
+      rationale: "Fundamentação extensa. ".repeat(2000),
+      signalDispositions: Array.from({ length: 500 }, (_, i) => ({
+        signalId: `CLEC-SIG-${String(i + 1).padStart(4, "0")}`,
+        disposition: "SUPPORTED",
+        reason: `Justificação detalhada ${i}. `.repeat(40),
+        evidenceReferences: ["EVD-A"],
+        relatedFindingIds: [],
+      })),
+    };
+    const smallBlock = renderReceiptBlock(receiptFor(unit, small));
+    const largeBlock = renderReceiptBlock(receiptFor(unit, large));
+    assert.ok(JSON.stringify(large).length > 500_000);
+    assert.equal(largeBlock.length, smallBlock.length);
+    assert.notEqual(largeBlock, smallBlock);
+  });
+});
+
+test("the review artifact must be the exact, intact, valid hash-addressed review the receipt names", () => {
+  withFixture((fixture, base) => {
+    addProblemWithSignal(fixture);
+    const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
+    const review = concur(unit.reviewerInput);
+    const receipt = receiptFor(unit, review);
+    const path = reviewArtifactPath(receipt.reviewSha256);
+    const body = bodyWith(receipt);
+    const text = renderReviewArtifact(review as unknown as IndependentReviewResult);
+    assert.equal(verifyLaneBPullRequest(unit, body, artifactsWith({ [path]: text })).ok, true);
+    // Whitespace and line endings of the stored file do not change the review it holds.
+    assert.equal(verifyLaneBPullRequest(unit, body, artifactsWith({ [path]: JSON.stringify(review).replace(/$/, "\r\n") })).ok, true);
+
+    assertFails(unit, body, "REVIEW_ARTIFACT_MISSING", /not in this pull request's head commit/);
+    assertFails(unit, body, "REVIEW_ARTIFACT_MISSING", /not an ordinary repository file/, { changedPaths: [path], read: () => ({ status: "NOT_A_FILE" }) });
+    assertFails(unit, body, "REVIEW_ARTIFACT_MALFORMED", /not valid JSON/, artifactsWith({ [path]: text.slice(0, -10) }));
+    assertFails(unit, body, "REVIEW_ARTIFACT_HASH_MISMATCH", undefined, artifactsWith({ [path]: text.replace(review.rationale as string, "Outra fundamentação.") }));
+
+    // Another valid review stored under this review's name: the filename no longer matches the content.
+    const other = { ...review, rationale: "Outra revisão." };
+    assertFails(unit, body, "REVIEW_ARTIFACT_HASH_MISMATCH", /canonical SHA-256/, artifactsWith({ [path]: renderReviewArtifact(other as unknown as IndependentReviewResult) }));
+
+    // Changing only the receipt's hash points at an artifact that does not exist, and leaves the real one unreferenced.
+    const rehashed = bodyWith({ ...receipt, reviewSha256: sha256Hex(other) });
+    assertFails(unit, rehashed, "REVIEW_ARTIFACT_UNREFERENCED", new RegExp(path), artifactsWith({ [path]: text }));
+    assertFails(unit, rehashed, "REVIEW_ARTIFACT_MISSING", undefined, artifactsWith({ [path]: text }, []));
+
+    // A hash-consistent artifact that is not a valid IndependentReviewResult.
+    const invalid = { reviewed: true } as unknown as Review;
+    assertFails(unit, bodyWith({ ...receiptFor(unit, invalid), outcome: "CONCUR" }), "INDEPENDENT_REVIEW_INVALID", undefined, artifactsFor(invalid));
+  });
+});
+
+test("a pull request may change no review artifact other than the one its receipt references", () => {
+  withFixture((fixture, base) => {
+    addProblemWithSignal(fixture);
+    const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
+    const review = concur(unit.reviewerInput);
+    const body = bodyWith(receiptFor(unit, review));
+    const path = reviewArtifactPath(sha256Hex(review));
+    const text = renderReviewArtifact(review as unknown as IndependentReviewResult);
+    const failedAttempt = reviewArtifactPath("e".repeat(64));
+    assertFails(unit, body, "REVIEW_ARTIFACT_UNREFERENCED", new RegExp(failedAttempt), artifactsWith({ [path]: text, [failedAttempt]: "{}" }));
+    // The referenced artifact already on the base (unchanged) still verifies.
+    assert.equal(verifyLaneBPullRequest(unit, body, artifactsWith({ [path]: text }, [])).ok, true);
+  });
+});
+
+test("review artifacts are read from the head commit's tree and judged with the PR's other changes", () => {
+  withFixture((fixture, base) => {
+    // A change without canonical records may not carry a review artifact.
+    fixture.write(reviewArtifactPath("a".repeat(64)), "{}\n");
+    const strayHead = fixture.commit("stray artifact");
+    const stray = verifyLaneBPullRequest(fixture.unit(base, { kind: "commit", sha: strayHead }), prBody("N/A"), reviewArtifactsAtCommit(fixture.root, base, strayHead));
+    assert.equal(stray.ok, false);
+    if (!stray.ok) assert.equal(stray.failedCheck, "REVIEW_ARTIFACT_UNREFERENCED");
+    fixture.git("reset", "-q", "--hard", base);
+
+    addProblemWithSignal(fixture);
+    const review = concur(reviewRequired(fixture.unit(base, { kind: "working-tree" })).reviewerInput);
+    const artifact = review as unknown as IndependentReviewResult;
+    const path = reviewArtifactPath(sha256Hex(artifact));
+    const recordsOnly = fixture.commit("records without their artifact");
+    const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: recordsOnly }));
+    const body = bodyWith(receiptFor(unit, review));
+    assertFails(unit, body, "REVIEW_ARTIFACT_MISSING", undefined, reviewArtifactsAtCommit(fixture.root, base, recordsOnly));
+
+    // An uncommitted artifact in the checkout is not part of the pull request.
+    fixture.write(path, renderReviewArtifact(artifact));
+    assertFails(unit, body, "REVIEW_ARTIFACT_MISSING", undefined, reviewArtifactsAtCommit(fixture.root, base, recordsOnly));
+
+    // A symbolic link at the artifact path is not an ordinary repository file.
+    fixture.remove(path);
+    const target = fixture.git("hash-object", "-w", join(fixture.root, "docs", "notes.md"));
+    fixture.git("update-index", "--add", "--cacheinfo", `120000,${target},${path}`);
+    fixture.git("commit", "-q", "-m", "symlinked artifact");
+    const linked = fixture.git("rev-parse", "HEAD");
+    assertFails(reviewRequired(fixture.unit(base, { kind: "commit", sha: linked })), body, "REVIEW_ARTIFACT_MISSING", /not an ordinary repository file/, reviewArtifactsAtCommit(fixture.root, base, linked));
+
+    fixture.git("rm", "-q", "--cached", path);
+    fixture.write(path, renderReviewArtifact(artifact));
+    const head = fixture.commit("artifact committed");
+    const result = verifyLaneBPullRequest(reviewRequired(fixture.unit(base, { kind: "commit", sha: head })), body, reviewArtifactsAtCommit(fixture.root, base, head));
+    assert.equal(result.ok, true, result.ok ? "" : result.errors.join("; "));
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Preparation: one fresh, bounded INDEPENDENT_REVIEWER invocation.
 
-test("preparation invokes one INDEPENDENT_REVIEWER with only the bounded package prompt and yields a verifiable receipt", () => {
+test("preparation invokes one INDEPENDENT_REVIEWER with only the bounded package prompt and yields a verifiable receipt and artifact", () => {
   withFixture((fixture, base) => {
     addProblemWithSignal(fixture);
     const unit = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
@@ -682,7 +858,7 @@ test("preparation invokes one INDEPENDENT_REVIEWER with only the bounded package
     globalThis.fetch = (() => { throw new Error("network access is not part of Lane B review"); }) as typeof fetch;
     try {
       const invoker = new RecordingInvoker(() => JSON.stringify(concur(unit.reviewerInput)));
-      const outcome = prepareLaneBReview(unit, invoker, workbench);
+      const outcome = prepareLaneBReview(unit, invoker, workbench, fixture.root);
       assert.equal(outcome.status, "READY");
       assert.equal(invoker.requests.length, 1);
       assert.equal(invoker.requests[0].role, "INDEPENDENT_REVIEWER");
@@ -693,8 +869,21 @@ test("preparation invokes one INDEPENDENT_REVIEWER with only the bounded package
       assert.deepEqual(readdirSync(workbench).sort(), ["independent-review-attempt-1.stdout.txt", "independent-review.json", "pr-receipt.md", "reviewer-input.json"]);
 
       if (outcome.status !== "READY") return;
-      const committed = fixture.unit(base, { kind: "commit", sha: fixture.commit() });
-      assert.deepEqual(verifyLaneBPullRequest(committed, prBody(outcome.receiptBlock)).ok, true);
+      // The one hash-addressed artifact holds the complete review; it parses back to the receipt's hash.
+      const review = concur(unit.reviewerInput);
+      assert.equal(outcome.artifactPath, `.research-review/${sha256Hex(review)}.json`);
+      assert.deepEqual(readdirSync(join(fixture.root, ".research-review")), [`${sha256Hex(review)}.json`]);
+      const written = readFileSync(join(fixture.root, ...outcome.artifactPath.split("/")), "utf8");
+      assert.equal(written, renderReviewArtifact(review as unknown as IndependentReviewResult));
+      assert.deepEqual(JSON.parse(written), review);
+      assert.equal(sha256Hex(JSON.parse(written)), outcome.receipt.reviewSha256);
+      assert.equal(sha256Hex(JSON.parse(written.replace(/\n/g, "\r\n").replace(/  /g, "\t"))), outcome.receipt.reviewSha256, "the hash is independent of whitespace and line endings");
+      assert.equal(outcome.receiptBlock.includes(review.rationale as string), false);
+
+      const head = fixture.commit();
+      const committed = fixture.unit(base, { kind: "commit", sha: head });
+      const result = verifyLaneBPullRequest(committed, prBody(outcome.receiptBlock), reviewArtifactsAtCommit(fixture.root, base, head));
+      assert.deepEqual(result.ok, true, result.ok ? "" : result.errors.join("; "));
     } finally {
       globalThis.fetch = savedFetch;
       rmSync(workbench, { recursive: true, force: true });
@@ -712,13 +901,17 @@ test("Lane B retries an invalid finding once and creates a receipt only from the
       invalid.findings[0].evidenceReferences = [];
       let calls = 0;
       const invoker = new RecordingInvoker(() => JSON.stringify(++calls === 1 ? invalid : concur(unit.reviewerInput)));
-      const outcome = prepareLaneBReview(unit, invoker, workbench);
+      const outcome = prepareLaneBReview(unit, invoker, workbench, fixture.root);
       assert.equal(outcome.status, "READY");
       assert.equal(invoker.requests.length, 2);
       assert.ok(invoker.requests[1].input.startsWith(`${invoker.requests[0].input}\n`));
       assert.match(readFileSync(join(workbench, "independent-review-attempt-1.errors.txt"), "utf8"), /evidenceReferences must name at least one record/);
       assert.equal(JSON.parse(readFileSync(join(workbench, "independent-review.json"), "utf8")).outcome, "CONCUR");
-      if (outcome.status === "READY") assert.deepEqual(verifyLaneBPullRequest(reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() })), prBody(outcome.receiptBlock)).ok, true);
+      if (outcome.status === "READY") {
+        const head = fixture.commit();
+        const result = verifyLaneBPullRequest(reviewRequired(fixture.unit(base, { kind: "commit", sha: head })), prBody(outcome.receiptBlock), reviewArtifactsAtCommit(fixture.root, base, head));
+        assert.deepEqual(result.ok, true, result.ok ? "" : result.errors.join("; "));
+      }
     } finally {
       rmSync(workbench, { recursive: true, force: true });
     }
@@ -734,9 +927,10 @@ test("Lane B retains both invalid outputs and fails without a review or receipt"
       const invalid = withFinding(unit.reviewerInput, "CLEC_VIOLATION");
       invalid.findings[0].evidenceReferences = [];
       const invoker = new RecordingInvoker(() => JSON.stringify(invalid));
-      const outcome = prepareLaneBReview(unit, invoker, workbench);
+      const outcome = prepareLaneBReview(unit, invoker, workbench, fixture.root);
       assert.equal(outcome.status, "REVIEW_FAILED");
       if (outcome.status === "REVIEW_FAILED") assert.equal(outcome.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
+      assert.equal(existsSync(join(fixture.root, ".research-review")), false);
       assert.equal(invoker.requests.length, 2);
       assert.deepEqual(readdirSync(workbench).sort(), [
         "independent-review-attempt-1.errors.txt", "independent-review-attempt-1.stdout.txt",
@@ -748,21 +942,24 @@ test("Lane B retains both invalid outputs and fails without a review or receipt"
   });
 });
 
-test("preparation yields no receipt for a non-CONCUR, malformed or self-asserted review", () => {
+test("preparation yields no receipt and no review artifact for a non-CONCUR, malformed or self-asserted review", () => {
   withFixture((fixture, base) => {
     addProblemWithSignal(fixture);
     const unit = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
     const workbench = mkdtempSync(join(tmpdir(), "open-evora-lane-b-workbench-"));
     try {
       const nonConcurInvoker = new RecordingInvoker(() => JSON.stringify(withFinding(unit.reviewerInput, "CLEC_VIOLATION")));
-      const notConcur = prepareLaneBReview(unit, nonConcurInvoker, workbench);
+      const notConcur = prepareLaneBReview(unit, nonConcurInvoker, workbench, fixture.root);
       assert.equal(notConcur.status, "NOT_CONCUR");
       assert.equal(nonConcurInvoker.requests.length, 1);
       for (const stdout of ['{"reviewed": true}', "Reviewed: true", JSON.stringify({ ...concur(unit.reviewerInput), signalDispositions: [] })]) {
-        const outcome = prepareLaneBReview(unit, new RecordingInvoker(() => stdout), workbench);
+        const outcome = prepareLaneBReview(unit, new RecordingInvoker(() => stdout), workbench, fixture.root);
         assert.equal(outcome.status, "REVIEW_FAILED", stdout);
       }
       assert.equal(readdirSync(workbench).includes("pr-receipt.md"), false);
+      // The failed review stays only in the local workbench; nothing tracked is created.
+      assert.equal(existsSync(join(fixture.root, ".research-review")), false);
+      assert.equal(fixture.git("status", "--porcelain", "--untracked-files=all", "--", ".research-review"), "");
     } finally {
       rmSync(workbench, { recursive: true, force: true });
     }
@@ -787,7 +984,7 @@ function assertContextFreeBlocked(fixture: Fixture, base: string, blocker: RegEx
   const workbench = mkdtempSync(join(tmpdir(), "open-evora-lane-b-workbench-"));
   try {
     const invoker = new RecordingInvoker(() => JSON.stringify(waiverAttempt(prepared.reviewerInput, "SUPPORTED")));
-    const outcome = prepareLaneBReview(prepared, invoker, workbench);
+    const outcome = prepareLaneBReview(prepared, invoker, workbench, fixture.root);
     assert.equal(outcome.status, "REVIEW_FAILED");
     if (outcome.status === "REVIEW_FAILED") {
       assert.equal(outcome.failedCheck, "CLEC_CONTEXT_FREE_BLOCK");
@@ -795,6 +992,7 @@ function assertContextFreeBlocked(fixture: Fixture, base: string, blocker: RegEx
     }
     assert.equal(invoker.requests.length, 0);
     assert.deepEqual(readdirSync(workbench), [], "no reviewer input, review or receipt is written");
+    assert.equal(existsSync(join(fixture.root, ".research-review")), false);
   } finally {
     rmSync(workbench, { recursive: true, force: true });
   }
@@ -804,7 +1002,7 @@ function assertContextFreeBlocked(fixture: Fixture, base: string, blocker: RegEx
     // The receipt is otherwise exact and its review validates: only the precheck rejects it.
     assert.deepEqual(validateIndependentReview(review, unit.reviewerInput).errors, []);
     assert.equal(review.outcome, "CONCUR");
-    assertFails(unit, bodyWith(receiptFor(unit, review)), "CLEC_CONTEXT_FREE_BLOCK", blocker);
+    assertFails(unit, bodyWith(receiptFor(unit, review)), "CLEC_CONTEXT_FREE_BLOCK", blocker, artifactsFor(review));
   }
   for (const body of [prBody("N/A"), "## Summary\n\nNo section.", ""]) assertFails(unit, body, "CLEC_CONTEXT_FREE_BLOCK", blocker);
 }
@@ -831,7 +1029,8 @@ test("a historical blocker outside the changed records never blocks the change, 
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
     assert.ok(unit.reviewerInput.evidenceContext.some((record) => record.id === "EVD-A"));
     assert.ok(unit.reviewerInput.signals.every(({ signal }) => signal.subjectId === "PRB-NEW"));
-    const result = verifyLaneBPullRequest(unit, bodyWith(receiptFor(unit, concur(unit.reviewerInput))));
+    const review = concur(unit.reviewerInput);
+    const result = verifyLaneBPullRequest(unit, bodyWith(receiptFor(unit, review)), artifactsFor(review));
     assert.equal(result.ok, true, result.ok ? "" : result.errors.join("; "));
   });
 });
@@ -846,8 +1045,8 @@ test("the default Lane B workbench location is inside the gitignored research wo
 // ---------------------------------------------------------------------------
 // CLI check entry point, as CI runs it.
 
-function runCheck(fixture: Fixture, args: string[]): { status: number | null; output: string } {
-  const result = spawnSync(process.execPath, ["--experimental-strip-types", cliPath, "check", ...args], { cwd: fixture.root, encoding: "utf8" });
+function runCheck(fixture: Fixture, args: string[], env: NodeJS.ProcessEnv = process.env): { status: number | null; output: string } {
+  const result = spawnSync(process.execPath, ["--experimental-strip-types", cliPath, "check", ...args], { cwd: fixture.root, encoding: "utf8", env });
   return { status: result.status, output: `${result.stdout}${result.stderr}` };
 }
 
@@ -856,6 +1055,9 @@ test("the check CLI reads the PR body from the GitHub event file and measures fr
     const mainBranch = fixture.git("rev-parse", "--abbrev-ref", "HEAD");
     fixture.git("checkout", "-q", "-b", "direct-change");
     addProblemWithSignal(fixture);
+    const review = concur(reviewRequired(fixture.unit(base, { kind: "working-tree" })).reviewerInput);
+    const artifact = review as unknown as IndependentReviewResult;
+    fixture.write(reviewArtifactPath(sha256Hex(artifact)), renderReviewArtifact(artifact));
     const head = fixture.commit("direct change");
     fixture.git("checkout", "-q", mainBranch);
     fixture.write("docs/notes.md", "# Main moved\n");
@@ -871,10 +1073,16 @@ test("the check CLI reads the PR body from the GitHub event file and measures fr
       assert.equal(missing.status, 1);
       assert.match(missing.output, /FAILED \[RECEIPT_MISSING\]/);
 
-      writeEvent(bodyWith(receiptFor(unit, concur(unit.reviewerInput))));
-      const passed = runCheck(fixture, ["--event-path", eventPath]);
+      // The check only verifies existing material: a configured reviewer command is never run.
+      const stub = join(eventDir, "reviewer.cjs");
+      const marker = join(eventDir, "invoked");
+      writeFileSync(stub, `require("node:fs").writeFileSync(${JSON.stringify(marker)}, "");
+`);
+      writeEvent(bodyWith(receiptFor(unit, review)));
+      const passed = runCheck(fixture, ["--event-path", eventPath], { ...process.env, RESEARCH_AI_COMMAND: process.execPath, RESEARCH_AI_ARGS: stub });
       assert.equal(passed.status, 0, passed.output);
-      assert.match(passed.output, /^PASS: independent review CONCUR/m);
+      assert.match(passed.output, /^PASS: independent review CONCUR \(\.research-review\/[0-9a-f]{64}\.json\)/m);
+      assert.equal(existsSync(marker), false, "check never invokes a reviewer");
     } finally {
       rmSync(eventDir, { recursive: true, force: true });
     }
