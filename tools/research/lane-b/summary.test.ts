@@ -4,7 +4,17 @@ import test from "node:test";
 import type { ReviewSignal } from "../review/reviewer-input.ts";
 import type { IndependentReviewResult, SignalDisposition, SignalDispositionValue } from "../review/types.ts";
 import type { LaneBReviewUnit } from "./review-unit.ts";
-import { laneBReviewSummary, renderInvalidSummary, renderNotApplicableSummary, renderReviewSummary, REVIEW_SUMMARY_MARKER } from "./summary.ts";
+import {
+  isOwnedSummaryComment,
+  laneBReviewSummary,
+  planSummaryPublication,
+  renderAwaitingReverificationSummary,
+  renderInvalidSummary,
+  renderNotApplicableSummary,
+  renderReviewSummary,
+  REVIEW_SUMMARY_MARKER,
+} from "./summary.ts";
+import type { PullRequestComment, PullRequestReviewState, SummaryPublicationInput } from "./summary.ts";
 
 const RATIONALE = "Racional completo do revisor que nunca aparece no resumo.";
 const SUPPORTED_ONLY_TEXT = "Texto exclusivo de uma justificação SUPPORTED.";
@@ -133,4 +143,84 @@ test("a failed verification renders only its stable failure code", () => {
     `${REVIEW_SUMMARY_MARKER}\n### Revisão semântica da investigação\n\n**Resultado:** Verificação falhou\n**Código:** \`RECEIPT_FINGERPRINT_MISMATCH\`\n\nConsulte o check \`Research semantic review (direct PR)\`.\n`
   );
   assert.equal(renderInvalidSummary("not a <code>"), renderInvalidSummary("VERIFICATION_FAILED"));
+});
+
+const STATE: PullRequestReviewState = { baseSha: "a".repeat(40), headSha: "b".repeat(40), bodySha256: "c".repeat(64) };
+const CONCUR = render(review([disposition(1, "SUPPORTED", "Suportado.")]), [signal(1)]);
+const bot = (id: number, body: string): PullRequestComment => ({ id, user: { login: "github-actions[bot]" }, body });
+const publish = (overrides: Partial<SummaryPublicationInput>) =>
+  planSummaryPublication({ expected: STATE, current: STATE, status: "VERIFIED", rendered: CONCUR, comments: [], ...overrides });
+
+const STALE: [string, PullRequestReviewState][] = [
+  ["head", { ...STATE, headSha: "d".repeat(40) }],
+  ["base", { ...STATE, baseSha: "e".repeat(40) }],
+  ["body", { ...STATE, bodySha256: "f".repeat(64) }],
+];
+
+for (const [changed, current] of STALE) {
+  test(`a ${changed} change after rendering never creates the stale summary`, () => {
+    const plan = publish({ current });
+    assert.equal(plan.action, "skip");
+    assert.equal(plan.message, "PR changed after summary generation; stale summary not published.");
+  });
+
+  test(`a ${changed} change after rendering replaces the owned comment with the awaiting-reverification state`, () => {
+    const plan = publish({ current, comments: [bot(7, CONCUR)] });
+    assert.deepEqual(plan, {
+      action: "update",
+      commentId: 7,
+      body: renderAwaitingReverificationSummary(),
+      message: "PR changed after summary generation; summary replaced with awaiting reverification.",
+    });
+  });
+}
+
+test("the awaiting-reverification state carries no outcome, review detail or hashes", () => {
+  const markdown = renderAwaitingReverificationSummary();
+  assert.equal(
+    markdown,
+    `${REVIEW_SUMMARY_MARKER}\n### Revisão semântica da investigação\n\n**Resultado:** A aguardar nova verificação\n\nO PR foi alterado depois de este resumo ter sido calculado.\nA nova execução do CI atualizará este estado.\n`,
+  );
+  assert.doesNotMatch(markdown, /CONCUR|OBJECT|[0-9a-f]{40}/);
+  assert.equal(publish({ current: STALE[0][1], comments: [bot(7, markdown)] }).action, "skip");
+});
+
+test("an unchanged state publishes VERIFIED, NOT_APPLICABLE and INVALID summaries exactly as rendered", () => {
+  assert.deepEqual(publish({}), { action: "create", body: CONCUR, message: "created VERIFIED summary" });
+  assert.deepEqual(publish({ comments: [bot(7, renderAwaitingReverificationSummary())] }), { action: "update", commentId: 7, body: CONCUR, message: "updated VERIFIED summary" });
+  assert.deepEqual(publish({ comments: [bot(7, CONCUR)] }), { action: "skip", message: "summary unchanged" });
+  const notApplicable = renderNotApplicableSummary();
+  assert.equal(publish({ status: "NOT_APPLICABLE", rendered: notApplicable }).action, "skip");
+  assert.deepEqual(publish({ status: "NOT_APPLICABLE", rendered: notApplicable, comments: [bot(7, CONCUR)] }), {
+    action: "update",
+    commentId: 7,
+    body: notApplicable,
+    message: "updated NOT_APPLICABLE summary",
+  });
+  const invalid = renderInvalidSummary("REVIEW_STALE");
+  assert.deepEqual(publish({ status: "INVALID", rendered: invalid }), { action: "create", body: invalid, message: "created INVALID summary" });
+});
+
+test("human comments are never owned, even when they quote the marker", () => {
+  const human: PullRequestComment[] = [
+    { id: 1, user: { login: "reviewer" }, body: CONCUR },
+    bot(2, `Citação:\n${REVIEW_SUMMARY_MARKER}`),
+    { id: 3, user: null, body: CONCUR },
+  ];
+  assert.equal(human.some(isOwnedSummaryComment), false);
+  assert.deepEqual(publish({ comments: human }), { action: "create", body: CONCUR, message: "created VERIFIED summary" });
+  assert.equal(publish({ current: STALE[2][1], comments: human }).action, "skip");
+});
+
+test("duplicate owned comments fail closed whether or not the state is fresh", () => {
+  for (const current of [STATE, STALE[0][1]]) {
+    assert.deepEqual(publish({ current, comments: [bot(7, CONCUR), bot(9, CONCUR)] }), {
+      action: "fail",
+      message: "found 2 owned summary comments (7, 9); remove the duplicates manually",
+    });
+  }
+});
+
+test("a rendered summary without the owned marker is never published", () => {
+  assert.equal(publish({ rendered: "### sem marcador\n" }).action, "fail");
 });

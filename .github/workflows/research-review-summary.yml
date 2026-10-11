@@ -36,6 +36,7 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
+            const crypto = require("node:crypto");
             const fs = require("node:fs");
             const path = require("node:path");
             const run = context.payload.workflow_run;
@@ -61,6 +62,9 @@ jobs:
             core.setOutput("found", "true");
             core.setOutput("number", String(number));
             core.setOutput("head-sha", pr.head.sha);
+            // The exact state the summary is rendered for; re-checked immediately before publication.
+            core.setOutput("base-sha", pr.base.sha);
+            core.setOutput("body-sha256", crypto.createHash("sha256").update(pr.body ?? "", "utf8").digest("hex"));
             core.setOutput("event-path", eventPath);
 
       # Trusted tooling: the default-branch commit this workflow_run runs at, never the PR head.
@@ -113,29 +117,29 @@ jobs:
         env:
           PR_NUMBER: ${{ steps.pr.outputs.number }}
           SUMMARY_STATUS: ${{ steps.summary.outputs.status }}
+          EXPECTED_BASE_SHA: ${{ steps.pr.outputs.base-sha }}
+          EXPECTED_HEAD_SHA: ${{ steps.pr.outputs.head-sha }}
+          EXPECTED_BODY_SHA256: ${{ steps.pr.outputs.body-sha256 }}
         with:
           script: |
+            const crypto = require("node:crypto");
             const fs = require("node:fs");
             const path = require("node:path");
-            const MARKER = "<!-- open-evora:research-semantic-review-summary -->";
+            const { pathToFileURL } = require("node:url");
+            // Trusted default-branch tooling (checked out above), never PR code.
+            const { planSummaryPublication } = await import(pathToFileURL(path.join(process.env.GITHUB_WORKSPACE, "tools/research/lane-b/summary.ts")).href);
             const { owner, repo } = context.repo;
             const issue_number = Number(process.env.PR_NUMBER);
-            const body = fs.readFileSync(path.join(process.env.RUNNER_TEMP, "review-summary.md"), "utf8");
-            if (body.split("\n")[0] !== MARKER) return core.setFailed("rendered summary does not start with the owned marker");
+            const rendered = fs.readFileSync(path.join(process.env.RUNNER_TEMP, "review-summary.md"), "utf8");
 
-            // Owned = written by this workflow's token and starting with the marker; human comments never match.
+            // Publication-time guard: re-read the pull request now; neither the run's SHAs nor the earlier read suffice.
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: issue_number });
+            const current = { baseSha: pr.base.sha, headSha: pr.head.sha, bodySha256: crypto.createHash("sha256").update(pr.body ?? "", "utf8").digest("hex") };
+            const expected = { baseSha: process.env.EXPECTED_BASE_SHA, headSha: process.env.EXPECTED_HEAD_SHA, bodySha256: process.env.EXPECTED_BODY_SHA256 };
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
-            const owned = comments.filter((c) => c.user?.login === "github-actions[bot]" && (c.body ?? "").split(/\r?\n/)[0] === MARKER);
-            if (owned.length > 1) {
-              return core.setFailed(`found ${owned.length} owned summary comments (${owned.map((c) => c.id).join(", ")}); remove the duplicates manually`);
-            }
-            const [existing] = owned;
-            if (!existing) {
-              // Not applicable and never published: nothing to correct.
-              if (process.env.SUMMARY_STATUS === "NOT_APPLICABLE") return core.info("not applicable; no comment needed");
-              await github.rest.issues.createComment({ owner, repo, issue_number, body });
-              return core.info(`created ${process.env.SUMMARY_STATUS} summary`);
-            }
-            if (existing.body === body) return core.info("summary unchanged");
-            await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
-            core.info(`updated ${process.env.SUMMARY_STATUS} summary`);
+
+            const plan = planSummaryPublication({ expected, current, status: process.env.SUMMARY_STATUS, rendered, comments });
+            if (plan.action === "fail") return core.setFailed(plan.message);
+            if (plan.action === "create") await github.rest.issues.createComment({ owner, repo, issue_number, body: plan.body });
+            if (plan.action === "update") await github.rest.issues.updateComment({ owner, repo, comment_id: plan.commentId, body: plan.body });
+            core.info(plan.message);

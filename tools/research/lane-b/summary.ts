@@ -124,3 +124,84 @@ export function laneBReviewSummary(unit: LaneBReviewUnit, verification: LaneBVer
     markdown: renderReviewSummary({ reviewedRecordCount: unit.changedRecords.length, signals: unit.reviewerInput.signals, review: verification.independentReview }),
   };
 }
+
+/**
+ * The pull-request state a summary was rendered for. The body is bound by
+ * `sha256(pr.body ?? "")` (hex) over the exact string GitHub returns, with no
+ * other normalisation, both at capture and at publication time.
+ */
+export interface PullRequestReviewState {
+  baseSha: string;
+  headSha: string;
+  bodySha256: string;
+}
+
+/** Shown in place of an owned summary once the pull request changed after it was rendered. */
+export function renderAwaitingReverificationSummary(): string {
+  return [
+    REVIEW_SUMMARY_MARKER,
+    HEADING,
+    "",
+    "**Resultado:** A aguardar nova verificação",
+    "",
+    "O PR foi alterado depois de este resumo ter sido calculado.",
+    "A nova execução do CI atualizará este estado.",
+    "",
+  ].join("\n");
+}
+
+export interface PullRequestComment {
+  id: number;
+  user?: { login?: string } | null;
+  body?: string | null;
+}
+
+/** Owned = written by the workflow token and starting with the marker; human comments never match. */
+export function isOwnedSummaryComment(comment: PullRequestComment): boolean {
+  return comment.user?.login === "github-actions[bot]" && (comment.body ?? "").split(/\r?\n/)[0] === REVIEW_SUMMARY_MARKER;
+}
+
+export type SummaryPublication =
+  | { action: "fail"; message: string }
+  | { action: "skip"; message: string }
+  | { action: "create" | "update"; commentId?: number; body: string; message: string };
+
+export interface SummaryPublicationInput {
+  /** The state the rendered summary was computed for. */
+  expected: PullRequestReviewState;
+  /** The state re-read from the GitHub API immediately before publication. */
+  current: PullRequestReviewState;
+  status: ReviewSummaryStatus;
+  rendered: string;
+  comments: readonly PullRequestComment[];
+}
+
+/**
+ * The publication-time guard: a stale summary is worse than none. If the pull
+ * request's base, head or body changed after rendering, the rendered summary is
+ * never published; an existing owned comment is replaced by the neutral
+ * awaiting-reverification state so no earlier outcome stays visible as current.
+ */
+export function planSummaryPublication({ expected, current, status, rendered, comments }: SummaryPublicationInput): SummaryPublication {
+  if (rendered.split("\n")[0] !== REVIEW_SUMMARY_MARKER) return { action: "fail", message: "rendered summary does not start with the owned marker" };
+  const owned = comments.filter(isOwnedSummaryComment);
+  if (owned.length > 1) {
+    return { action: "fail", message: `found ${owned.length} owned summary comments (${owned.map((c) => c.id).join(", ")}); remove the duplicates manually` };
+  }
+  const [existing] = owned;
+  const fresh = expected.baseSha === current.baseSha && expected.headSha === current.headSha && expected.bodySha256 === current.bodySha256;
+  const target = fresh ? rendered : renderAwaitingReverificationSummary();
+  if (!existing) {
+    if (!fresh) return { action: "skip", message: "PR changed after summary generation; stale summary not published." };
+    // Not applicable and never published: nothing to correct.
+    if (status === "NOT_APPLICABLE") return { action: "skip", message: "not applicable; no comment needed" };
+    return { action: "create", body: target, message: `created ${status} summary` };
+  }
+  if (existing.body === target) return { action: "skip", message: fresh ? "summary unchanged" : "PR changed after summary generation; awaiting reverification already shown." };
+  return {
+    action: "update",
+    commentId: existing.id,
+    body: target,
+    message: fresh ? `updated ${status} summary` : "PR changed after summary generation; summary replaced with awaiting reverification.",
+  };
+}
