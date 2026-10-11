@@ -10,11 +10,11 @@
  */
 import { readFileSync } from "node:fs";
 
-import type { CandidateRecord } from "../integration/candidate-delta.ts";
+import type { CandidateRecord } from "./candidate-delta.ts";
 import { getRecordField } from "../core/record-fields.ts";
 import type { CorpusIndex } from "../core/types.ts";
 import { parseRecordYaml } from "../core/yaml.ts";
-import { resolveContainedPath } from "./path-containment.ts";
+import { resolveContainedPath } from "../core/path-containment.ts";
 
 export interface CandidateLoadFailure {
   file: string;

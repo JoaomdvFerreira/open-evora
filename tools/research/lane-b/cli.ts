@@ -25,8 +25,8 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "../orchestrate/ai-invoker.ts";
-import { assertWorkbenchBoundary } from "../orchestrate/workbench-boundary.ts";
+import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "../ai/invoker.ts";
+import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
 import { laneBContextFreeBlock, prepareLaneBReview, verifyLaneBPullRequest } from "./receipt.ts";
 import { describeSourceVerificationNotSeparate, pullRequestBase, resolveCommit, resolveLaneBReviewUnit, type LaneBReviewUnit } from "./review-unit.ts";
 

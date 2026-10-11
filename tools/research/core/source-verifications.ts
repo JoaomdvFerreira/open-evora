@@ -9,7 +9,7 @@
  * publishes it. Each file holds bounded factual paraphrases that were
  * verified, upstream and by a human, against captured bytes of one public
  * Source. Its only consumer is the shared independent-review input
- * (orchestrate/reviewer-input.ts), which receives it from the review base.
+ * (review/reviewer-input.ts), which receives it from the review base.
  *
  * Validation here is deterministic and structural: exact keys, the
  * referenced SRC's existence and eligibility, dates, digest/media-type shape,

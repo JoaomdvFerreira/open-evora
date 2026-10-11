@@ -11,8 +11,9 @@ import type { CandidateDelta, CandidateRecord } from "../integration/candidate-d
 import type { CanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
 import type { ReadinessReport } from "../readiness/readiness.ts";
 import type { ValidationResult } from "../validation/validate.ts";
-import type { GenerationManifest, IndependentReviewResult, ResearchChangeSet } from "../orchestrate/types.ts";
-import type { ReviewContextRecord, ReviewSignal } from "../orchestrate/reviewer-input.ts";
+import type { GenerationManifest, ResearchChangeSet } from "../orchestrate/types.ts";
+import type { IndependentReviewResult } from "../review/types.ts";
+import type { ReviewContextRecord, ReviewSignal } from "../review/reviewer-input.ts";
 import type { SafetyAdmission } from "../admission/safety-admission.ts";
 import type { SourceVerification } from "../core/source-verifications.ts";
 

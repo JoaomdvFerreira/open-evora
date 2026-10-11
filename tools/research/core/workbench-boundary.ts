@@ -1,8 +1,8 @@
 /**
- * Enforces that research orchestration only ever reads/writes under the
- * existing gitignored, non-canonical, non-public research workbench
- * boundary. This
- * is a defense-in-depth structural check inside the orchestrator itself,
+ * Enforces that research tooling (the orchestrated cycle and Lane B) only
+ * ever reads/writes under the existing gitignored, non-canonical, non-public
+ * research workbench boundary. This
+ * is a defense-in-depth structural check inside the tooling itself,
  * additional to (never a replacement for) .gitignore and the existing
  * workbench-boundary.test.ts regression test.
  */

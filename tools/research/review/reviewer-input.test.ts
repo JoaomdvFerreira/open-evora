@@ -6,9 +6,9 @@ import type { CorpusIndex, ParsedRecord, RecordFields, RecordSchema } from "../c
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import { detectLanguageSignals } from "../language/signals.ts";
 import { buildProspectiveCorpusIndex } from "../integration/prospective-validation.ts";
-import { sha256Hex } from "./fingerprint.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
 import { buildReviewerInputPackage, serializeReviewerInput, type ReviewerInputSource } from "./reviewer-input.ts";
-import type { GenerationManifest } from "./types.ts";
+import type { GenerationManifest } from "../orchestrate/types.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 

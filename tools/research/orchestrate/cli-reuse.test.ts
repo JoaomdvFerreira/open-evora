@@ -12,7 +12,7 @@ import { join } from "node:path";
 import test from "node:test";
 
 import type { CorpusIndex, RecordSchema } from "../core/types.ts";
-import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "./ai-invoker.ts";
+import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "../ai/invoker.ts";
 import { tryReuseExistingChangeSet } from "./cli.ts";
 import { runResearchCycle } from "./run-cycle.ts";
 import type { ResearchTrigger } from "./types.ts";

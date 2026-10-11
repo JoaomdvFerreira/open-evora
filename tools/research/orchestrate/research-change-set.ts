@@ -18,12 +18,13 @@ import { prepareCanonicalIntegrationPlan } from "../integration/canonical-integr
 import { loadSourceVerifications, SOURCE_VERIFICATION_SUPPORT, SourceVerificationError } from "../core/source-verifications.ts";
 import type { CorpusIndex } from "../core/types.ts";
 import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
-import { sha256Hex } from "./fingerprint.ts";
-import { loadCandidates } from "./candidate-loader.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
+import { loadCandidates } from "../integration/candidate-loader.ts";
 import { validateManifest, asValidatedManifest } from "./manifest.ts";
-import { validateIndependentReview, asValidatedIndependentReview } from "./independent-review.ts";
-import { buildReviewerInputPackage } from "./reviewer-input.ts";
-import type { GenerationManifest, IndependentReviewResult, PreparationOutcome, ResearchChangeSet } from "./types.ts";
+import { validateIndependentReview, asValidatedIndependentReview } from "../review/independent-review.ts";
+import { buildReviewerInputPackage } from "../review/reviewer-input.ts";
+import type { GenerationManifest, PreparationOutcome, ResearchChangeSet } from "./types.ts";
+import type { IndependentReviewResult } from "../review/types.ts";
 import { evaluateSafetyAdmission, type SafetyAdmission } from "../admission/safety-admission.ts";
 
 export interface PrepareResearchChangeSetInput {

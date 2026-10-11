@@ -6,7 +6,7 @@
  * never reach independent review).
  *
  * A resolution is a deterministic acceptance record bound, via the existing
- * project fingerprint convention (../orchestrate/fingerprint.ts), to the
+ * project fingerprint convention (../core/fingerprint.ts), to the
  * exact base Git SHA, subject (EVD id), candidate content, and
  * inference_limits list the owner actually reviewed. Any drift in any of
  * those four inputs — or in the finding code itself — invalidates the
@@ -23,7 +23,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { sha256Hex } from "../orchestrate/fingerprint.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
 import type { InferenceLimitResolutionChecker } from "./safety-admission.ts";
 
 export const INFERENCE_LIMIT_RESOLUTION_CODE = "CLAIM_INFERENCE_LIMITS_PRESENT" as const;

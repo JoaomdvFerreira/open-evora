@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { validateResearchChangeSet } from "./rcs-validator.ts";
-import { sha256Hex } from "./fingerprint.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 

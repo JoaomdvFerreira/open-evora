@@ -6,11 +6,12 @@ import test from "node:test";
 
 import type { CorpusIndex, RecordIndex, RecordSchema } from "../core/types.ts";
 import type { CandidateRecord } from "../integration/candidate-delta.ts";
-import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "./ai-invoker.ts";
+import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "../ai/invoker.ts";
 import { invokeIndependentReview } from "./independent-review-invocation.ts";
 import { candidateFieldsById, validateIndependentReview, validateIndependentReviewStructure } from "./independent-review.ts";
 import { buildReviewerInputPackage, reviewSourceEligibility, serializeReviewerInput, type ReviewerInputPackage } from "./reviewer-input.ts";
-import { buildReviewerPrompt } from "./reviewer-prompt.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
+import { buildReviewerPrompt, buildReviewerStructuralRetryPrompt } from "./reviewer-prompt.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 
@@ -52,7 +53,7 @@ function sourceDependentPackage(): ReviewerInputPackage {
   };
   return buildReviewerInputPackage({
     baseGitSha: SHA,
-    manifest: { schemaVersion: "1", mode: "daily-discovery", investigationQuestion: "q", candidateFiles: ["EVD-NEW.yaml"], claimedRecordIds: ["EVD-NEW"], rationale: "r" },
+    manifest: { mode: "daily-discovery", investigationQuestion: "q" },
     index,
     candidates: [candidate],
     deltas: [{ recordFamily: "EVD-", id: "EVD-NEW", action: "CREATE" }],
@@ -64,6 +65,16 @@ function sourceDependentPackage(): ReviewerInputPackage {
 
 const PKG = sourceDependentPackage();
 const SIGNAL_ID = "CLEC-SIG-0001";
+
+test("the shared review kernel delivers byte-identical reviewer input, prompt and retry prompt", () => {
+  // Pinned when the review kernel moved out of orchestrate/ (CRR-01): any
+  // change here is a reviewer-visible behaviour change, never a relocation.
+  const input = serializeReviewerInput(PKG);
+  const prompt = buildReviewerPrompt(input);
+  assert.equal(sha256Hex(input), "cf3b57372f442382d5f0fd97a7c00b7bbb7a8fa7cb9bbbfc850c642e4853a7f9");
+  assert.equal(sha256Hex(prompt), "50198c5c713f209fa6936c7aebb40af1029392cd18c03662c18f17643f168024");
+  assert.equal(sha256Hex(buildReviewerStructuralRetryPrompt(prompt, ["e1", "e2"])), "fc9778bb2c53d4e9236e011fc1df21ff69bdfc6e623d238396fcec6111927bcc");
+});
 
 type Review = Record<string, unknown> & { findings: Record<string, unknown>[]; signalDispositions: Record<string, unknown>[] };
 

@@ -5,7 +5,7 @@ import { join, relative, resolve, sep } from "node:path";
 import test from "node:test";
 
 import type { CorpusIndex, RecordSchema } from "../core/types.ts";
-import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "./ai-invoker.ts";
+import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "../ai/invoker.ts";
 import { readHoldFreeze, resumePreGateHold, runResearchCycle } from "./run-cycle.ts";
 import type { ResearchTrigger } from "./types.ts";
 import type { InferenceLimitResolutionChecker, SourceAvailabilityAdapter } from "../admission/safety-admission.ts";

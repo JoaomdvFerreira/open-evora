@@ -2,7 +2,7 @@
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { AiInvoker } from "./ai-invoker.ts";
+import type { AiInvoker } from "../ai/invoker.ts";
 import { asValidatedIndependentReview, validateIndependentReview } from "./independent-review.ts";
 import type { ReviewerInputPackage } from "./reviewer-input.ts";
 import { serializeReviewerInput } from "./reviewer-input.ts";

@@ -16,9 +16,10 @@ import type { CorpusIndex, ParsedRecord, RecordFields, RecordSchema } from "../c
 import { stringifyRecordYaml } from "../core/yaml.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { CanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
-import type { GenerationManifest, IndependentReviewResult, ResearchChangeSet, ReviewFinding, SignalDisposition } from "../orchestrate/types.ts";
-import { sha256Hex } from "../orchestrate/fingerprint.ts";
-import { buildReviewerInputPackage, type ReviewerInputPackage } from "../orchestrate/reviewer-input.ts";
+import type { GenerationManifest, ResearchChangeSet } from "../orchestrate/types.ts";
+import type { IndependentReviewResult, ReviewFinding, SignalDisposition } from "../review/types.ts";
+import { sha256Hex } from "../core/fingerprint.ts";
+import { buildReviewerInputPackage, type ReviewerInputPackage } from "../review/reviewer-input.ts";
 import { loadSourceVerifications } from "../core/source-verifications.ts";
 import { buildHumanGatePackage } from "./package-builder.ts";
 import type { HumanGatePackage } from "./types.ts";

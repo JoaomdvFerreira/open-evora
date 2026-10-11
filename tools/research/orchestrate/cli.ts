@@ -18,7 +18,7 @@
  *
  * AI runtime configuration (OD-A: "do not choose a vendor"): the
  * executable that performs both AI roles is entirely operator-configured
- * via environment variables (see ai-invoker.ts); this module never selects
+ * via environment variables (see ai/invoker.ts); this module never selects
  * or hard-codes a vendor/model. If unset, this command fails closed with
  * AI_RUNTIME_NOT_CONFIGURED rather than silently falling back to
  * pre-generated files.
@@ -55,11 +55,11 @@ import { fileURLToPath } from "node:url";
 import { loadCorpusIndex } from "../core/corpus.ts";
 import { validateCorpusIndex } from "../validation/validate.ts";
 import type { CorpusIndex } from "../core/types.ts";
-import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "./ai-invoker.ts";
+import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "../ai/invoker.ts";
 import { asValidatedResearchChangeSet, validateResearchChangeSet } from "./rcs-validator.ts";
 import { runResearchCycle } from "./run-cycle.ts";
 import type { ResearchChangeSet, ResearchMode, ResearchTrigger } from "./types.ts";
-import { assertWorkbenchBoundary } from "./workbench-boundary.ts";
+import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
 import { resolveAvailabilityAdapter } from "../admission/http-availability-adapter.ts";
 import { createInferenceLimitResolutionChecker } from "../admission/inference-limit-resolution.ts";
 
@@ -201,7 +201,7 @@ async function main(): Promise<void> {
   }
   // A single configured executable may serve both roles; each
   // invocation is still a brand-new child process with no shared session —
-  // see ai-invoker.ts. Two separate AiInvoker instances are constructed so
+  // see ai/invoker.ts. Two separate AiInvoker instances are constructed so
   // that, even if a future configuration diverges the two roles' commands,
   // nothing here could accidentally reuse state between them.
   const primaryInvoker = new LocalCommandAiInvoker(aiConfig);

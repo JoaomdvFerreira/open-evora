@@ -39,7 +39,7 @@ import { fileURLToPath } from "node:url";
 import { loadCorpusIndex } from "../core/corpus.ts";
 import { validateCorpusIndex } from "../validation/validate.ts";
 import type { CorpusIndex } from "../core/types.ts";
-import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "./ai-invoker.ts";
+import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "../ai/invoker.ts";
 import { revalidateFrozenCycleAtNewBase } from "./revalidate-frozen-cycle.ts";
 import type { ResearchChangeSet } from "./types.ts";
 import { resolveAvailabilityAdapter } from "../admission/http-availability-adapter.ts";
