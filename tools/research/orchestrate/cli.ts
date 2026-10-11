@@ -36,6 +36,12 @@
  * WU045 never renders a Markdown view and never computes WU046's separate
  * approval/contentHash binding — see research-change-set.ts.
  *
+ * Owner readiness (docs/investigationstrategy.md §12): a run that freezes and
+ * admits its candidates stops at AWAITING_OWNER_READY, before the reviewer.
+ * The owner inspects <cycle-dir>/candidates, may edit them, declares the
+ * exact content ready with hold-cli.ts `declare-ready`, and continues the
+ * frozen cycle with hold-cli.ts `resume` (same trigger flags).
+ *
  * Usage:
  *   RESEARCH_AI_COMMAND=<executable> [RESEARCH_AI_ARGS="..."] \
  *   node --experimental-strip-types tools/research/orchestrate/cli.ts \
@@ -46,7 +52,8 @@
  *     [--target-problem-id PRB-0001] \
  *     [--dir <researchRoot>]
  *
- * Exit code 0 = READY_FOR_HUMAN_REVIEW; 1 = FAILED (fail-closed) or usage error.
+ * Exit code 0 = READY_FOR_HUMAN_REVIEW; 1 = FAILED (fail-closed),
+ * PRE_GATE_SAFETY_HOLD, AWAITING_OWNER_READY or usage error.
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -58,7 +65,8 @@ import type { CorpusIndex } from "../core/types.ts";
 import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "../ai/invoker.ts";
 import { asValidatedResearchChangeSet, validateResearchChangeSet } from "./rcs-validator.ts";
 import { runResearchCycle } from "./run-cycle.ts";
-import type { ResearchChangeSet, ResearchMode, ResearchTrigger } from "./types.ts";
+import type { PreparationOutcome, ResearchChangeSet, ResearchMode, ResearchTrigger } from "./types.ts";
+import { REPOSITORY_REVIEW_LIFECYCLE_DIR } from "../review/review-lifecycle.ts";
 import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
 import { resolveAvailabilityAdapter } from "../admission/http-availability-adapter.ts";
 import { createInferenceLimitResolutionChecker } from "../admission/inference-limit-resolution.ts";
@@ -115,6 +123,36 @@ export function tryReuseExistingChangeSet(outputPath: string, identity: ReuseIde
   }
 
   return { status: "REUSABLE", changeSet };
+}
+
+/** The repository review-lifecycle store every operational review path uses (shared with Lane B). */
+export function repositoryReviewLifecycleDir(): string {
+  assertWorkbenchBoundary(REPOSITORY_REVIEW_LIFECYCLE_DIR);
+  return REPOSITORY_REVIEW_LIFECYCLE_DIR;
+}
+
+/** Operator report for a frozen cycle that waits for the owner's readiness declaration; no reviewer ran. */
+export function awaitingOwnerReadyOutput(fingerprint: string, cycleDir: string, baseGitSha: string, continueCommand: string): string {
+  return [
+    "AWAITING_OWNER_READY",
+    `  reviewerInputFingerprint: ${fingerprint}`,
+    `  Inspect (and, if needed, correct) the frozen candidates in ${join(cycleDir, "candidates")}, then declare that exact content ready:`,
+    `    node tools/research/orchestrate/hold-cli.ts declare-ready --cycle-dir ${cycleDir} --base-git-sha ${baseGitSha}`,
+    `  and continue the frozen cycle with: ${continueCommand}`,
+  ].join("\n");
+}
+
+/** The lifecycle position a READY_FOR_HUMAN_REVIEW package's review left, or null when none was reported. */
+export function semanticReviewOutput(outcome: PreparationOutcome): string | null {
+  if (outcome.status !== "READY_FOR_HUMAN_REVIEW" || !outcome.semanticReview) return null;
+  const { semanticAttempt, result } = outcome.semanticReview;
+  if (result === "OWNER_ESCALATION") {
+    return `  semanticReview: attempt ${semanticAttempt} non-CONCUR — REVIEW_OWNER_ESCALATION: this lifecycle returns to the owner; no further attempt runs`;
+  }
+  if (result === "CORRECTION_PERMITTED") {
+    return `  semanticReview: attempt ${semanticAttempt} non-CONCUR — one bounded correction of the same records is permitted (declare-ready, then resume)`;
+  }
+  return `  semanticReview: attempt ${semanticAttempt} CONCUR`;
 }
 
 function buildReadyOutput(changeSet: ResearchChangeSet, outputPath: string, suffix?: string): string {
@@ -260,6 +298,7 @@ async function main(): Promise<void> {
     // only (WU053 remediation) — every other blocking finding remains
     // non-overridable; see inference-limit-resolution.ts.
     inferenceLimitResolutionChecker: createInferenceLimitResolutionChecker(cycleDir),
+    reviewLifecycleDir: repositoryReviewLifecycleDir(),
   });
 
   if (outcome.status === "FAILED") {
@@ -272,10 +311,16 @@ async function main(): Promise<void> {
     process.exitCode = 1;
     return;
   }
+  if (outcome.status === "AWAITING_OWNER_READY") {
+    const resumeFlags = `--cycle-dir ${cycleDir} --base-git-sha ${baseGitSha} --mode ${trigger.mode}${trigger.targetProblemId ? ` --target-problem-id ${trigger.targetProblemId}` : ""} --request <same request>`;
+    console.error(awaitingOwnerReadyOutput(outcome.reviewerInputFingerprint, cycleDir, baseGitSha, `node tools/research/orchestrate/hold-cli.ts resume ${resumeFlags}`));
+    process.exitCode = 1;
+    return;
+  }
 
   writeFileSync(outputPath, `${JSON.stringify(outcome.changeSet, null, 2)}\n`, "utf8");
 
-  console.log(buildReadyOutput(outcome.changeSet, outputPath));
+  console.log([buildReadyOutput(outcome.changeSet, outputPath), semanticReviewOutput(outcome)].filter(Boolean).join("\n"));
   process.exitCode = 0;
 }
 

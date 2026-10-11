@@ -7,10 +7,9 @@ import test from "node:test";
 
 import type { CorpusIndex, RecordSchema } from "../core/types.ts";
 import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "../ai/invoker.ts";
-import { resumePreGateHold, resumeRevalidationHold, runResearchCycle } from "./run-cycle.ts";
+import { declareFrozenCycleReady, resumePreGateHold, resumeRevalidationHold } from "./run-cycle.ts";
 import {
   candidateSetsEquivalent,
-  revalidateFrozenCycleAtNewBase,
   verifyNoResearchDrift,
   verifyOldBaseIsAncestor,
 } from "./revalidate-frozen-cycle.ts";
@@ -18,7 +17,7 @@ import type { CandidateRecord } from "../integration/candidate-delta.ts";
 import type { ResearchTrigger } from "./types.ts";
 import { createInferenceLimitResolutionChecker, writeInferenceLimitResolution } from "../admission/inference-limit-resolution.ts";
 import { precheckRepositoryState } from "../gate/repository-state.ts";
-import { gitFixture } from "../gate/test-fixtures.ts";
+import { gitFixture, revalidateOwnerDeclaredCycle, runOwnerDeclaredCycle } from "../gate/test-fixtures.ts";
 
 const OLD_SHA = "0123456789abcdef0123456789abcdef01234567";
 
@@ -149,7 +148,7 @@ function reviewerOutput(stdout: unknown, request: AiInvocationRequest): unknown 
  */
 async function buildFrozenSourceCycle(sourceCycleDir: string, index: CorpusIndex = emptyIndex(), baseGitSha: string = OLD_SHA): Promise<void> {
   const shared = new SharedInvoker(VALID_ENVELOPE, VALID_REVIEW);
-  const outcome = await runResearchCycle({
+  const outcome = await runOwnerDeclaredCycle({
     trigger: TRIGGER,
     index,
     baseGitSha,
@@ -320,7 +319,7 @@ test("non-research-only base drift: exact frozen candidates reused, PRIMARY_AUTH
       await buildFrozenSourceCycle(sourceCycleDir, emptyIndex(), oldBase);
 
       const reviewer = new RoleCountingInvoker(VALID_REVIEW);
-      const outcome = await revalidateFrozenCycleAtNewBase({
+      const outcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -339,7 +338,8 @@ test("non-research-only base drift: exact frozen candidates reused, PRIMARY_AUTH
         outcome.changeSet.candidates.map((c) => c.fields.source_id),
         ["SRC-NEW"]
       );
-      assert.equal(existsSync(join(targetCycleDir, "manifest.json")), false, "target cycle must not materialize a re-authored manifest");
+      // Frozen for the owner's readiness declaration as a copy of the source's exact manifest — never re-authored.
+      assert.equal(readFileSync(join(targetCycleDir, "manifest.json"), "utf8"), readFileSync(join(sourceCycleDir, "manifest.json"), "utf8"), "target cycle must not materialize a re-authored manifest");
     } finally {
       cleanupCycleDir(sourceCycleDir);
       cleanupCycleDir(targetCycleDir);
@@ -363,7 +363,7 @@ test("research/** changed between bases: fails closed before any AI reviewer inv
     try {
       await buildFrozenSourceCycle(sourceCycleDir, emptyIndex(), oldBase);
 
-      const outcome = await revalidateFrozenCycleAtNewBase({
+      const outcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -403,7 +403,7 @@ test("candidate drift from the source frozen set fails closed", async () => {
       // Tamper with the frozen candidate file after freeze, without touching research-change-set.json.
       writeFileSync(join(sourceCycleDir, "candidates", "SRC-NEW.yaml"), "source_id: SRC-NEW\nname: Tampered after freeze\n", "utf8");
 
-      const outcome = await revalidateFrozenCycleAtNewBase({
+      const outcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -443,7 +443,7 @@ test("manifest drift from the source frozen set fails closed", async () => {
       manifest.rationale = "TAMPERED_RATIONALE_AFTER_FREEZE";
       writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 
-      const outcome = await revalidateFrozenCycleAtNewBase({
+      const outcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -482,7 +482,7 @@ test("old base not an ancestor of new base fails closed before any drift/reviewe
     try {
       await buildFrozenSourceCycle(sourceCycleDir, emptyIndex(), branchA);
 
-      const outcome = await revalidateFrozenCycleAtNewBase({
+      const outcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: branchA,
@@ -523,7 +523,7 @@ test("inference-limit resolution recorded at the old base/cycle is not accepted 
         candidateFiles: [{ path: "EVD-NEW.yaml", yaml: "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: claim\nclaim_authority: authoritative\ninference_limits:\n  - a bounded inference limit\n" }],
       };
       const shared = new SharedInvoker(envelopeWithLimits, VALID_REVIEW);
-      const buildOutcome = await runResearchCycle({
+      const buildOutcome = await runOwnerDeclaredCycle({
         trigger: { mode: "daily-discovery", request: TRIGGER.request },
         index: corpus,
         baseGitSha: oldBase,
@@ -547,6 +547,7 @@ test("inference-limit resolution recorded at the old base/cycle is not accepted 
         "owner",
         "reviewed and accepted"
       );
+      assert.equal(declareFrozenCycleReady({ index: corpus, baseGitSha: oldBase, cycleDir: sourceCycleDir }).ok, true);
       const resumeReviewer = new RoleCountingInvoker(VALID_REVIEW);
       const resumeOutcome = await resumePreGateHold({
         index: corpus,
@@ -566,7 +567,7 @@ test("inference-limit resolution recorded at the old base/cycle is not accepted 
       // base with a checker bound to the NEW target cycle directory must
       // NOT see the OLD cycle's resolution — the finding must reappear as a
       // fresh HOLD, never silently reused across bases/cycles.
-      const revalidateOutcome = await revalidateFrozenCycleAtNewBase({
+      const revalidateOutcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -615,7 +616,7 @@ test("fresh reviewer occurs only after admission becomes ELIGIBLE at the new bas
         candidateFiles: [{ path: "EVD-NEW.yaml", yaml: "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: claim\nclaim_authority: authoritative\ninference_limits: []\n" }],
       };
       const buildShared = new SharedInvoker(claimEnvelope, concurringReview);
-      const buildOutcome = await runResearchCycle({
+      const buildOutcome = await runOwnerDeclaredCycle({
         trigger: TRIGGER,
         index: privateCorpus,
         baseGitSha: oldBase,
@@ -633,7 +634,7 @@ test("fresh reviewer occurs only after admission becomes ELIGIBLE at the new bas
       // fail closed (SOURCE_CYCLE_INVALID) rather than ever reaching the
       // reviewer — proving no reviewer call happens on a non-ELIGIBLE source.
       const holdReviewer = new RoleCountingInvoker(concurringReview);
-      const holdOutcome = await revalidateFrozenCycleAtNewBase({
+      const holdOutcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -651,7 +652,7 @@ test("fresh reviewer occurs only after admission becomes ELIGIBLE at the new bas
       cleanupCycleDir(sourceCycleDir);
       const publicCorpus = admissionIndex("public");
       const eligibleShared = new SharedInvoker(claimEnvelope, concurringReview);
-      const eligibleBuild = await runResearchCycle({
+      const eligibleBuild = await runOwnerDeclaredCycle({
         trigger: TRIGGER,
         index: publicCorpus,
         baseGitSha: oldBase,
@@ -665,7 +666,7 @@ test("fresh reviewer occurs only after admission becomes ELIGIBLE at the new bas
       writeFileSync(join(sourceCycleDir, "research-change-set.json"), `${JSON.stringify((eligibleBuild as { changeSet: unknown }).changeSet, null, 2)}\n`, "utf8");
 
       const eligibleReviewer = new RoleCountingInvoker(concurringReview);
-      const eligibleOutcome = await revalidateFrozenCycleAtNewBase({
+      const eligibleOutcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -702,7 +703,7 @@ test("no canonical research/** write occurs on a successful revalidation", async
     const researchRootBefore = readFileSync(join(repoDir, "research", "r.yaml"), "utf8");
     try {
       await buildFrozenSourceCycle(sourceCycleDir, emptyIndex(), oldBase);
-      const outcome = await revalidateFrozenCycleAtNewBase({
+      const outcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -746,7 +747,7 @@ test("target must be a new cycle directory: refuses an already-populated target"
       mkdirSync(targetCycleDir, { recursive: true });
       writeFileSync(join(targetCycleDir, "manifest.json"), "{}", "utf8");
 
-      const outcome = await revalidateFrozenCycleAtNewBase({
+      const outcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -789,7 +790,7 @@ test("target with only a pre-existing resolution artifact is refused as not new"
       mkdirSync(join(targetCycleDir, "resolutions"), { recursive: true });
       writeFileSync(join(targetCycleDir, "resolutions", "EVD-OLD.json"), "{}", "utf8");
 
-      const outcome = await revalidateFrozenCycleAtNewBase({
+      const outcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -838,7 +839,7 @@ test("ADVERSARIAL: a caller-asserted oldBaseGitSha that the source cycle was nev
       // 2 fix, ancestry/drift checks alone would let this through even
       // though the source cycle was never actually frozen against B, only
       // against A (B itself is where research/** drifted).
-      const outcome = await revalidateFrozenCycleAtNewBase({
+      const outcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: b,
@@ -911,7 +912,7 @@ test("a CLAIM_INFERENCE_LIMITS_PRESENT HOLD produced by revalidation is exact-bo
         candidateFiles: [{ path: "EVD-NEW.yaml", yaml: "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: claim\nclaim_authority: authoritative\ninference_limits:\n  - a bounded inference limit\n" }],
       };
       const shared = new SharedInvoker(envelopeWithLimits, VALID_REVIEW);
-      const buildOutcome = await runResearchCycle({
+      const buildOutcome = await runOwnerDeclaredCycle({
         trigger: { mode: "daily-discovery", request: TRIGGER.request },
         index: corpus,
         baseGitSha: oldBase,
@@ -928,6 +929,7 @@ test("a CLAIM_INFERENCE_LIMITS_PRESENT HOLD produced by revalidation is exact-bo
         "owner",
         "reviewed and accepted"
       );
+      assert.equal(declareFrozenCycleReady({ index: corpus, baseGitSha: oldBase, cycleDir: sourceCycleDir }).ok, true);
       const sourceResumeReviewer = new RoleCountingInvoker(VALID_REVIEW);
       const sourceResumeOutcome = await resumePreGateHold({
         index: corpus,
@@ -944,7 +946,7 @@ test("a CLAIM_INFERENCE_LIMITS_PRESENT HOLD produced by revalidation is exact-bo
 
       // --- Revalidation run 1 at the NEW base, still an unresolved claim: PRE_GATE_SAFETY_HOLD, never a second incompatible freeze protocol ---
       const holdRunReviewer = new UnreachableInvoker();
-      const revalidateOutcome = await revalidateFrozenCycleAtNewBase({
+      const revalidateOutcome = await revalidateOwnerDeclaredCycle({
         sourceCycleDir,
         targetCycleDir,
         oldBaseGitSha: oldBase,
@@ -1005,8 +1007,27 @@ test("a CLAIM_INFERENCE_LIMITS_PRESENT HOLD produced by revalidation is exact-bo
         "reviewed and accepted at the new base"
       );
 
+      // Now ELIGIBLE, the frozen target waits for the owner's readiness
+      // declaration: no reviewer runs, and the HOLD consumed no semantic attempt.
+      const awaitingReviewer = new RoleCountingInvoker(VALID_REVIEW);
+      const awaiting = await resumeRevalidationHold({
+        index: corpus,
+        baseGitSha: newBase,
+        sourceCycleDir,
+        oldBaseGitSha: oldBase,
+        cycleDir: targetCycleDir,
+        reviewerInvoker: awaitingReviewer,
+        availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:25:00.000Z" }) },
+        inferenceLimitResolutionChecker: createInferenceLimitResolutionChecker(targetCycleDir),
+        now: () => new Date("2026-09-15T12:25:00.000Z"),
+      });
+      assert.equal(awaiting.status, "AWAITING_OWNER_READY", awaiting.status === "FAILED" ? awaiting.message : "");
+      assert.equal(awaitingReviewer.reviewerCalls, 0);
+      const declared = declareFrozenCycleReady({ index: corpus, baseGitSha: newBase, cycleDir: targetCycleDir });
+      assert.equal(declared.ok && declared.semanticAttempt, 1);
+
       // (c)/(d): fresh availability rechecked, and a fresh INDEPENDENT_REVIEWER
-      // invoked only now that admission is ELIGIBLE.
+      // invoked only now that admission is ELIGIBLE and the owner declared it ready.
       const freshReviewer = new RoleCountingInvoker(VALID_REVIEW);
       const resumedOutcome = await resumeRevalidationHold({
         index: corpus,

@@ -37,12 +37,28 @@
  *                          invoked; a fresh INDEPENDENT_REVIEWER is invoked
  *                          only if admission is now ELIGIBLE.
  *
+ *   declare-ready          The owner's explicit declaration that the exact
+ *                          frozen candidates now at --cycle-dir are ready for
+ *                          semantic review (run-cycle.ts's
+ *                          declareFrozenCycleReady()): binds their reviewer
+ *                          input in the shared review lifecycle and reports
+ *                          which semantic attempt it opens. Required before
+ *                          `resume`/`resume-revalidation` can reach the
+ *                          reviewer, including for the one bounded
+ *                          correction after a non-CONCUR attempt 1. Never
+ *                          invokes AI. --new-lifecycle ends a lifecycle that
+ *                          escalated to the owner or whose correction needs a
+ *                          different record set.
+ *
  * No action ever performs a canonical write or touches `.aiqt/**`.
  *
  * Usage:
  *   node --experimental-strip-types tools/research/orchestrate/hold-cli.ts \
  *     record-resolution --cycle-dir <path> --base-git-sha <sha> \
  *     --subject-id EVD-XXXX --resolved-by <name> --note <text>
+ *
+ *   node --experimental-strip-types tools/research/orchestrate/hold-cli.ts \
+ *     declare-ready --cycle-dir <path> --base-git-sha <sha> [--new-lifecycle] [--dir <researchRoot>]
  *
  *   RESEARCH_AI_COMMAND=<executable> [RESEARCH_AI_ARGS="..."] \
  *   node --experimental-strip-types tools/research/orchestrate/hold-cli.ts \
@@ -55,8 +71,9 @@
  *     resume-revalidation --cycle-dir <path> --source-cycle-dir <path> \
  *     --old-base-git-sha <sha> --new-base-git-sha <sha> [--dir <researchRoot>]
  *
- * Exit code 0 = success (resolution recorded, or resume reached
- * READY_FOR_HUMAN_REVIEW/idempotent reuse); 1 = FAILED/HOLD/usage error.
+ * Exit code 0 = success (resolution recorded, readiness declared, or resume
+ * reached READY_FOR_HUMAN_REVIEW/idempotent reuse); 1 = FAILED/HOLD/
+ * AWAITING_OWNER_READY/usage error.
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -66,14 +83,14 @@ import { loadCorpusIndex } from "../core/corpus.ts";
 import { validateCorpusIndex } from "../validation/validate.ts";
 import type { CorpusIndex } from "../core/types.ts";
 import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "../ai/invoker.ts";
-import { resumePreGateHold, resumeRevalidationHold } from "./run-cycle.ts";
+import { declareFrozenCycleReady, resumePreGateHold, resumeRevalidationHold } from "./run-cycle.ts";
 import type { ResearchMode, ResearchTrigger } from "./types.ts";
 import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
 import { resolveAvailabilityAdapter } from "../admission/http-availability-adapter.ts";
 import { createInferenceLimitResolutionChecker, writeInferenceLimitResolution } from "../admission/inference-limit-resolution.ts";
 import { loadCandidates } from "../integration/candidate-loader.ts";
 import { asValidatedManifest, validateManifest } from "./manifest.ts";
-import { tryReuseExistingChangeSet } from "./cli.ts";
+import { awaitingOwnerReadyOutput, repositoryReviewLifecycleDir, semanticReviewOutput, tryReuseExistingChangeSet } from "./cli.ts";
 import { precheckRepositoryState } from "../gate/repository-state.ts";
 import { asValidatedResearchChangeSet, validateResearchChangeSet } from "./rcs-validator.ts";
 
@@ -178,6 +195,69 @@ function buildReadyOutput(changeSet: import("./types.ts").ResearchChangeSet, out
   ].join("\n");
 }
 
+/** The owner's readiness declaration over the frozen candidates at --cycle-dir. Never invokes AI. */
+function declareReady(args: readonly string[]): number {
+  const flag = flagReader(args);
+  const cycleDirFlag = flag("--cycle-dir");
+  const baseGitSha = flag("--base-git-sha");
+  if (!cycleDirFlag || !baseGitSha) {
+    console.error("Usage: hold-cli.ts declare-ready --cycle-dir <path> --base-git-sha <sha> [--new-lifecycle] [--dir <researchRoot>]");
+    return 1;
+  }
+  const cycleDir = resolve(cycleDirFlag);
+  try {
+    assertWorkbenchBoundary(cycleDir);
+  } catch (error) {
+    console.error(`Refusing to run: ${(error as Error).message}`);
+    return 1;
+  }
+  const index: CorpusIndex = loadCorpusIndex(resolveResearchRoot(flag("--dir")));
+  const { errors } = validateCorpusIndex(index);
+  if (errors.length > 0) {
+    console.error(`Cannot declare readiness: canonical research corpus fails validation (${errors.length} problem(s)).`);
+    return 1;
+  }
+  const declared = declareFrozenCycleReady({
+    index,
+    baseGitSha,
+    cycleDir,
+    reviewLifecycleDir: repositoryReviewLifecycleDir(),
+    newLifecycle: args.includes("--new-lifecycle"),
+  });
+  if (!declared.ok) {
+    console.error(`FAILED [${declared.failedCheck}]: ${declared.message}`);
+    return 1;
+  }
+  console.log(
+    [
+      `READY_DECLARED: semantic attempt ${declared.semanticAttempt} of 2`,
+      `  reviewerInputFingerprint: ${declared.reviewerInputFingerprint}`,
+      ...(declared.rebound ? ["  the cycle's frozen binding now covers the edited candidates"] : []),
+      "  Continue with hold-cli.ts resume (or resume-revalidation). Any later candidate change makes this declaration stale.",
+    ].join("\n")
+  );
+  return 0;
+}
+
+function reportFrozenOutcome(outcome: import("./types.ts").PreparationOutcome, cycleDir: string, baseGitSha: string, continueCommand: string): number {
+  if (outcome.status === "FAILED") {
+    console.error(`FAILED [${outcome.failedCheck}]: ${outcome.message}`);
+    return 1;
+  }
+  if (outcome.status === "PRE_GATE_SAFETY_HOLD") {
+    console.error(`PRE_GATE_SAFETY_HOLD: ${outcome.holdReportPath}`);
+    return 1;
+  }
+  if (outcome.status === "AWAITING_OWNER_READY") {
+    console.error(awaitingOwnerReadyOutput(outcome.reviewerInputFingerprint, cycleDir, baseGitSha, continueCommand));
+    return 1;
+  }
+  const outputPath = join(cycleDir, "research-change-set.json");
+  writeFileSync(outputPath, `${JSON.stringify(outcome.changeSet, null, 2)}\n`, "utf8");
+  console.log([buildReadyOutput(outcome.changeSet, outputPath), semanticReviewOutput(outcome)].filter(Boolean).join("\n"));
+  return 0;
+}
+
 /** Resumes an existing pre-Gate HOLD at --cycle-dir. Never invokes PRIMARY_AUTHOR. */
 async function resume(args: readonly string[]): Promise<number> {
   const flag = flagReader(args);
@@ -252,20 +332,9 @@ async function resume(args: readonly string[]): Promise<number> {
     reviewerInvoker,
     resolveAvailabilityAdapter: (materialSources) => resolveAvailabilityAdapter(materialSources),
     inferenceLimitResolutionChecker: createInferenceLimitResolutionChecker(cycleDir),
+    reviewLifecycleDir: repositoryReviewLifecycleDir(),
   });
-
-  if (outcome.status === "FAILED") {
-    console.error(`FAILED [${outcome.failedCheck}]: ${outcome.message}`);
-    return 1;
-  }
-  if (outcome.status === "PRE_GATE_SAFETY_HOLD") {
-    console.error(`PRE_GATE_SAFETY_HOLD: ${outcome.holdReportPath}`);
-    return 1;
-  }
-
-  writeFileSync(outputPath, `${JSON.stringify(outcome.changeSet, null, 2)}\n`, "utf8");
-  console.log(buildReadyOutput(outcome.changeSet, outputPath));
-  return 0;
+  return reportFrozenOutcome(outcome, cycleDir, baseGitSha, "the same hold-cli.ts resume command");
 }
 
 /**
@@ -368,26 +437,19 @@ async function resumeRevalidation(args: readonly string[]): Promise<number> {
     reviewerInvoker,
     resolveAvailabilityAdapter: (materialSources) => resolveAvailabilityAdapter(materialSources),
     inferenceLimitResolutionChecker: createInferenceLimitResolutionChecker(cycleDir),
+    reviewLifecycleDir: repositoryReviewLifecycleDir(),
   });
-
-  if (outcome.status === "FAILED") {
-    console.error(`FAILED [${outcome.failedCheck}]: ${outcome.message}`);
-    return 1;
-  }
-  if (outcome.status === "PRE_GATE_SAFETY_HOLD") {
-    console.error(`PRE_GATE_SAFETY_HOLD: ${outcome.holdReportPath}`);
-    return 1;
-  }
-
-  writeFileSync(outputPath, `${JSON.stringify(outcome.changeSet, null, 2)}\n`, "utf8");
-  console.log(buildReadyOutput(outcome.changeSet, outputPath));
-  return 0;
+  return reportFrozenOutcome(outcome, cycleDir, newBaseGitSha, "the same hold-cli.ts resume-revalidation command");
 }
 
 async function main(): Promise<void> {
   const [action, ...rest] = process.argv.slice(2);
   if (action === "record-resolution") {
     process.exitCode = recordResolution(rest);
+    return;
+  }
+  if (action === "declare-ready") {
+    process.exitCode = declareReady(rest);
     return;
   }
   if (action === "resume") {
@@ -398,7 +460,7 @@ async function main(): Promise<void> {
     process.exitCode = await resumeRevalidation(rest);
     return;
   }
-  console.error("Usage: hold-cli.ts <record-resolution|resume|resume-revalidation> [...flags]");
+  console.error("Usage: hold-cli.ts <record-resolution|declare-ready|resume|resume-revalidation> [...flags]");
   process.exitCode = 1;
 }
 

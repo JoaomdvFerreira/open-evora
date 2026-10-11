@@ -14,7 +14,7 @@ import test from "node:test";
 import type { CorpusIndex, RecordSchema } from "../core/types.ts";
 import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "../ai/invoker.ts";
 import { tryReuseExistingChangeSet } from "./cli.ts";
-import { runResearchCycle } from "./run-cycle.ts";
+import { runOwnerDeclaredCycle } from "../gate/test-fixtures.ts";
 import type { ResearchTrigger } from "./types.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
@@ -77,7 +77,7 @@ class FixedInvoker implements AiInvoker {
 
 /** Produces a real, genuinely valid research-change-set.json at outputPath via the real assembly path. */
 async function produceGenuineChangeSet(cycleDir: string, outputPath: string): Promise<void> {
-  const outcome = await runResearchCycle({
+  const outcome = await runOwnerDeclaredCycle({
     trigger: TRIGGER,
     index: emptyIndex(),
     baseGitSha: SHA,

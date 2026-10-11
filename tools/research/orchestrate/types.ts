@@ -13,6 +13,7 @@ import type { CanonicalIntegrationPlan } from "../integration/canonical-integrat
 import type { ValidationResult } from "../validation/validate.ts";
 import type { SafetyAdmission } from "../admission/safety-admission.ts";
 import type { IndependentReviewResult } from "../review/types.ts";
+import type { SemanticAttemptNumber, SemanticAttemptResult } from "../review/review-lifecycle.ts";
 
 /** Which prompt/mode a cycle was triggered under (orchestration entry point). */
 export type ResearchMode = "daily-discovery" | "problem-refresh";
@@ -20,9 +21,10 @@ export type ResearchMode = "daily-discovery" | "problem-refresh";
 /**
  * The accepted normal-path trigger input (WU045-B01 remediation: the normal
  * path must start from the trigger). An operator supplies this
- * once per cycle; the trigger decision itself is outside the normal-path
- * handoff count — everything from here to
- * READY_FOR_HUMAN_REVIEW is orchestrated with zero further human handoffs.
+ * once per cycle; authoring, freezing and admission then run without a
+ * handoff, and the owner's explicit readiness declaration over the frozen
+ * candidates (run-cycle.ts declareFrozenCycleReady()) precedes the
+ * independent review.
  */
 export interface ResearchTrigger {
   mode: ResearchMode;
@@ -85,8 +87,15 @@ export interface ResearchChangeSet {
 
 /** Terminal outcome of one WU045 orchestration run. Never a Gate 1 decision. */
 export type PreparationOutcome =
-  | { status: "READY_FOR_HUMAN_REVIEW"; changeSet: ResearchChangeSet }
+  | {
+      status: "READY_FOR_HUMAN_REVIEW";
+      changeSet: ResearchChangeSet;
+      /** Which owner-declared semantic attempt produced the review, and the lifecycle position it left. */
+      semanticReview?: { semanticAttempt: SemanticAttemptNumber; result: SemanticAttemptResult };
+    }
   | { status: "PRE_GATE_SAFETY_HOLD"; admission: import("../admission/safety-admission.ts").SafetyAdmission; holdReportPath: string }
+  /** Frozen and admitted, but the owner has not declared this exact reviewer input ready; no reviewer ran. */
+  | { status: "AWAITING_OWNER_READY"; reviewerInputFingerprint: string }
   | { status: "FAILED"; failedCheck: string; message: string };
 
 /**

@@ -1,7 +1,9 @@
 /**
  * Drives the normal path from an accepted RESEARCH_TRIGGER through both
- * required OD-B AI invocations to READY_FOR_HUMAN_REVIEW, with zero
- * normal-path human handoffs.
+ * required OD-B AI invocations to READY_FOR_HUMAN_REVIEW. The one
+ * normal-path handoff is the owner's explicit readiness declaration over the
+ * exact frozen candidates (declareFrozenCycleReady()), required before the
+ * independent review by the shared review lifecycle (review-lifecycle.ts).
  *
  * Sequence:
  *   RESEARCH_TRIGGER
@@ -13,8 +15,12 @@
  *      preparation (research-change-set.ts, reusing existing primitives)
  *   -> freeze the immutable reviewer input (reviewer-input.ts)
  *   -> context-free CLEC precheck over that frozen input (fails closed)
+ *   -> AWAITING_OWNER_READY until the owner declares exactly that input
+ *      ready (declareFrozenCycleReady()); the frozen cycle then continues
+ *      through resumeHoldByIdentity(), as a HOLD does
  *   -> FRESH INDEPENDENT REVIEW AI INVOCATION (role INDEPENDENT_REVIEWER,
- *      a brand-new process — see ai/invoker.ts)
+ *      a brand-new process — see ai/invoker.ts), as the semantic attempt
+ *      the lifecycle permits
  *   -> validate the independent-review result
  *   -> assemble the WU045 Research Change Set
  *   -> READY_FOR_HUMAN_REVIEW
@@ -24,7 +30,7 @@
  * under research/ — see research-change-set.ts, which this module composes
  * with but does not modify.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import type { CandidateRecord } from "../integration/candidate-delta.ts";
@@ -35,13 +41,23 @@ import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } 
 import type { AiInvoker } from "../ai/invoker.ts";
 import { asValidatedAuthoringEnvelope, validateAuthoringEnvelope } from "./authoring-envelope.ts";
 import { loadCandidates } from "../integration/candidate-loader.ts";
-import { invokeIndependentReview } from "../review/independent-review-invocation.ts";
+import {
+  checkSemanticAttempt,
+  declareOwnerReady,
+  REVIEW_LIFECYCLE_CHECK,
+  reviewSubject,
+  runOwnerDeclaredReview,
+  TOOLING_RUNTIME_FAILURE,
+  type OwnerReadyOptions,
+  type SemanticAttemptNumber,
+} from "../review/review-lifecycle.ts";
 import { sha256Hex } from "../core/fingerprint.ts";
 import { asValidatedManifest, validateManifest } from "./manifest.ts";
 import { resolveContainedPath } from "../core/path-containment.ts";
 import { buildPrimaryAuthoringPrompt } from "./primary-prompt.ts";
 import { assembleResearchChangeSet } from "./research-change-set.ts";
-import { buildReviewerInputPackage } from "../review/reviewer-input.ts";
+import { buildReviewerInputPackage, type ReviewerInputPackage } from "../review/reviewer-input.ts";
+import type { CanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
 import type { GenerationManifest, PreparationOutcome, ResearchTrigger } from "./types.ts";
 import { deriveMaterialNonPrivateSources, evaluateSafetyAdmission, type InferenceLimitResolutionChecker, type SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
 import { writeSafetyHoldReport } from "../admission/hold-report.ts";
@@ -74,6 +90,16 @@ export interface RunResearchCycleInput {
   inferenceLimitResolutionChecker?: InferenceLimitResolutionChecker;
   /** Injectable clock for deterministic tests; admission evidence is runtime-only. */
   now?: () => Date;
+  /**
+   * The review-lifecycle store (review-lifecycle.ts). The operational CLIs
+   * always pass the repository store; defaults to one inside `cycleDir`.
+   */
+  reviewLifecycleDir?: string;
+}
+
+/** The review-lifecycle store a Lane A call uses when none is passed. */
+export function cycleReviewLifecycleDir(cycleDir: string, reviewLifecycleDir: string | undefined): string {
+  return reviewLifecycleDir ?? join(cycleDir, "review-lifecycle");
 }
 
 function failed(failedCheck: string, message: string): PreparationOutcome {
@@ -176,7 +202,8 @@ export async function continueFromFrozenCandidates(
   availabilityAdapter: SourceAvailabilityAdapter | undefined,
   resolveAvailabilityAdapter: ((materialSources: ReadonlyMap<string, Record<string, unknown>>) => Promise<SourceAvailabilityAdapter>) | undefined,
   inferenceLimitResolutionChecker: InferenceLimitResolutionChecker | undefined,
-  now: (() => Date) | undefined
+  now: (() => Date) | undefined,
+  reviewLifecycleDir: string
 ): Promise<PreparationOutcome> {
   // Reuse the existing deterministic review-preparation primitive
   // directly, purely to obtain the candidates/deltas/validation/readiness
@@ -187,18 +214,9 @@ export async function continueFromFrozenCandidates(
   // prepareResearchChangeSet() call below independently fails closed on
   // the same input with the same failedCheck; this step only ever gates
   // whether the reviewer is invoked at all.
-  let review;
-  try {
-    review = prepareCanonicalIntegrationReview(baseGitSha, index, candidates);
-  } catch (error) {
-    return failed("PROSPECTIVE_VALIDATION", (error as Error).message);
-  }
-  if (review.validation.errors.length > 0) {
-    return failed("PROSPECTIVE_VALIDATION", review.validation.errors.join("; "));
-  }
-  if (review.readiness !== "READY_FOR_INTEGRATION_GATE") {
-    return failed("READINESS", "canonical integration review did not reach READY_FOR_INTEGRATION_GATE");
-  }
+  const prospective = prospectiveReview(baseGitSha, index, candidates);
+  if ("failure" in prospective) return prospective.failure;
+  const review = prospective.review;
 
   // --- CANDIDATE FREEZE -> MATERIAL SOURCE REVALIDATION -> SAFETY ADMISSION --
   // No reviewer, RCS, or Human Gate package can be reached on HOLD.
@@ -230,24 +248,9 @@ export async function continueFromFrozenCandidates(
   }
 
   // --- FREEZE THE IMMUTABLE REVIEWER INPUT -----------------------------------
-  // The one frozen package both builds the prompt and validates the result:
-  // the review is never checked against a snapshot reconstructed afterward.
-  let reviewerInput;
-  try {
-    reviewerInput = buildReviewerInputPackage({
-      baseGitSha,
-      manifest,
-      index,
-      candidates: review.candidates,
-      deltas: review.deltas,
-      validation: review.validation,
-      readiness: review.readiness,
-      // Lane A's review base is the canonical root `index` was loaded from; candidates live in the workbench.
-      sourceVerifications: loadSourceVerifications(index),
-    });
-  } catch (error) {
-    return failed(error instanceof SourceVerificationError ? SOURCE_VERIFICATION_SUPPORT : "PROSPECTIVE_VALIDATION", (error as Error).message);
-  }
+  const frozen = freezeReviewerInput(baseGitSha, index, manifest, review);
+  if ("failure" in frozen) return frozen.failure;
+  const reviewerInput = frozen.reviewerInput;
 
   // --- CONTEXT-FREE CLEC PRECHECK --------------------------------------------
   // A candidate embedding internal record IDs across layers is invalid in
@@ -256,13 +259,26 @@ export async function continueFromFrozenCandidates(
   const blockers = contextFreeBlockers(reviewerInput.signals);
   if (blockers.length > 0) return failed(CONTEXT_FREE_BLOCK, describeContextFreeBlockers(blockers));
 
+  // --- OWNER READINESS ---------------------------------------------------------
+  // The reviewer runs only for the exact input the owner declared ready and
+  // only as the semantic attempt the shared lifecycle still permits.
+  const permitted = checkSemanticAttempt(reviewLifecycleDir, reviewSubject(reviewerInput));
+  if (!permitted.ok) {
+    return permitted.failedCheck === REVIEW_LIFECYCLE_CHECK.NOT_DECLARED_READY
+      ? { status: "AWAITING_OWNER_READY", reviewerInputFingerprint: reviewSubject(reviewerInput).reviewerInputFingerprint }
+      : failed(permitted.failedCheck, permitted.message);
+  }
+
   // --- FRESH INDEPENDENT REVIEW AI INVOCATION --------------------------------
   // Invoked only now that admission is provably ELIGIBLE (never on a
   // resume that is still HOLD), and always a brand-new invocation — never
   // the same invoker/process used for PRIMARY_AUTHOR.
-  const reviewerResult = invokeIndependentReview(reviewerInvoker, reviewerInput, cycleDir);
-  if (reviewerResult.status === "FAILED") return failed(reviewerResult.failedCheck, reviewerResult.message);
-  const independentReview = reviewerResult.review;
+  const run = runOwnerDeclaredReview(reviewLifecycleDir, reviewerInvoker, reviewerInput, cycleDir);
+  if (run.status === "REJECTED") return failed(run.failedCheck, run.message);
+  if (run.status === TOOLING_RUNTIME_FAILURE) {
+    return failed(run.failedCheck, `${TOOLING_RUNTIME_FAILURE} (semantic attempt ${run.semanticAttempt} not consumed): ${run.message}`);
+  }
+  const independentReview = run.review;
 
   // Persist the real independent-review result so a rerun (WU048 case 20)
   // observes the same on-disk artifact this run actually produced.
@@ -276,7 +292,53 @@ export async function continueFromFrozenCandidates(
   // potentially-divergent snapshot (WU045-B01 independent-review
   // remediation, finding 3). This is the only call whose output is ever
   // returned as READY_FOR_HUMAN_REVIEW.
-  return assembleResearchChangeSet(index, manifest, review, independentReview, admission);
+  const assembled = assembleResearchChangeSet(index, manifest, review, independentReview, admission);
+  return assembled.status === "READY_FOR_HUMAN_REVIEW" ? { ...assembled, semanticReview: { semanticAttempt: run.semanticAttempt, result: run.result } } : assembled;
+}
+
+/** The deterministic prospective review a frozen candidate set must pass before anything else runs. */
+function prospectiveReview(baseGitSha: string, index: CorpusIndex, candidates: readonly CandidateRecord[]): { review: CanonicalIntegrationReview } | { failure: PreparationOutcome } {
+  let review;
+  try {
+    review = prepareCanonicalIntegrationReview(baseGitSha, index, candidates);
+  } catch (error) {
+    return { failure: failed("PROSPECTIVE_VALIDATION", (error as Error).message) };
+  }
+  if (review.validation.errors.length > 0) return { failure: failed("PROSPECTIVE_VALIDATION", review.validation.errors.join("; ")) };
+  if (review.readiness !== "READY_FOR_INTEGRATION_GATE") {
+    return { failure: failed("READINESS", "canonical integration review did not reach READY_FOR_INTEGRATION_GATE") };
+  }
+  return { review };
+}
+
+/**
+ * The one frozen package that both builds the reviewer prompt and validates
+ * the result — the review is never checked against a snapshot reconstructed
+ * afterward — and whose fingerprint an owner readiness declaration binds.
+ */
+function freezeReviewerInput(
+  baseGitSha: string,
+  index: CorpusIndex,
+  manifest: GenerationManifest,
+  review: CanonicalIntegrationReview
+): { reviewerInput: ReviewerInputPackage } | { failure: PreparationOutcome } {
+  try {
+    return {
+      reviewerInput: buildReviewerInputPackage({
+        baseGitSha,
+        manifest,
+        index,
+        candidates: review.candidates,
+        deltas: review.deltas,
+        validation: review.validation,
+        readiness: review.readiness,
+        // Lane A's review base is the canonical root `index` was loaded from; candidates live in the workbench.
+        sourceVerifications: loadSourceVerifications(index),
+      }),
+    };
+  } catch (error) {
+    return { failure: failed(error instanceof SourceVerificationError ? SOURCE_VERIFICATION_SUPPORT : "PROSPECTIVE_VALIDATION", (error as Error).message) };
+  }
 }
 
 /**
@@ -334,16 +396,17 @@ export async function runResearchCycle(input: RunResearchCycleInput): Promise<Pr
     input.availabilityAdapter,
     input.resolveAvailabilityAdapter,
     input.inferenceLimitResolutionChecker,
-    input.now
+    input.now,
+    cycleReviewLifecycleDir(input.cycleDir, input.reviewLifecycleDir)
   );
 
-  // F3 (resumable pre-Gate HOLD): a HOLD from the normal path is only ever
-  // resumable if the exact frozen manifest/candidates it evaluated are
-  // independently recoverable and re-verifiable later — write the binding
-  // record now, from the same in-memory manifest/candidates just evaluated,
-  // never re-derived. Never written on any other outcome: a resume must
-  // only ever exist for a genuine, freshly-observed HOLD.
-  if (outcome.status === "PRE_GATE_SAFETY_HOLD") {
+  // F3 (resumable pre-Gate HOLD): a HOLD — or a cycle awaiting the owner's
+  // readiness declaration — is only ever continuable if the exact frozen
+  // manifest/candidates it evaluated are independently recoverable and
+  // re-verifiable later: write the binding record now, from the same
+  // in-memory manifest/candidates just evaluated, never re-derived. Never
+  // written on any other outcome.
+  if (isFrozenContinuation(outcome)) {
     writeHoldFreeze(input.cycleDir, {
       schemaVersion: "1",
       baseGitSha: input.baseGitSha,
@@ -353,6 +416,11 @@ export async function runResearchCycle(input: RunResearchCycleInput): Promise<Pr
   }
 
   return outcome;
+}
+
+/** Outcomes a frozen cycle is continued from through resumeHoldByIdentity(). */
+export function isFrozenContinuation(outcome: PreparationOutcome): boolean {
+  return outcome.status === "PRE_GATE_SAFETY_HOLD" || outcome.status === "AWAITING_OWNER_READY";
 }
 
 export function cycleArtifactsExist(cycleDir: string): boolean {
@@ -477,6 +545,16 @@ function isValidLegacyTriggerShape(value: unknown): value is ResearchTrigger {
  * a valid legacy `trigger` remains fail-closed.
  */
 export function readHoldFreeze(cycleDir: string, baseGitSha: string, identity: HoldIdentity): HoldFreezeCheckResult {
+  const parsed = parseHoldFreeze(cycleDir, baseGitSha);
+  if (!parsed.ok) return parsed;
+  if (!identitiesMatch(parsed.record.identity, identity)) {
+    return { ok: false, reason: "hold-freeze.json identity does not match the resume request" };
+  }
+  return parsed;
+}
+
+/** The binding record at `cycleDir` for `baseGitSha`, with a legacy flat trigger normalized; identity unchecked. */
+function parseHoldFreeze(cycleDir: string, baseGitSha: string): HoldFreezeCheckResult {
   const file = holdFreezePath(cycleDir);
   if (!existsSync(file)) {
     return { ok: false, reason: "no pre-Gate HOLD binding record present at this cycle directory (hold-freeze.json)" };
@@ -509,9 +587,6 @@ export function readHoldFreeze(cycleDir: string, baseGitSha: string, identity: H
   if (record.baseGitSha !== baseGitSha) {
     return { ok: false, reason: "hold-freeze.json base Git SHA does not match the resume request" };
   }
-  if (!identitiesMatch(recordIdentity, identity)) {
-    return { ok: false, reason: "hold-freeze.json identity does not match the resume request" };
-  }
   return { ok: true, record: { ...record, identity: recordIdentity } as unknown as HoldFreezeRecord };
 }
 
@@ -527,6 +602,35 @@ export interface ResumeHoldByIdentityInput {
   resolveAvailabilityAdapter?: (materialSources: ReadonlyMap<string, Record<string, unknown>>) => Promise<SourceAvailabilityAdapter>;
   inferenceLimitResolutionChecker?: InferenceLimitResolutionChecker;
   now?: () => Date;
+  /** As RunResearchCycleInput.reviewLifecycleDir. */
+  reviewLifecycleDir?: string;
+}
+
+/** The exact manifest and candidates a frozen cycle materialized, reloaded from disk and never regenerated. */
+function loadFrozenCycle(index: CorpusIndex, cycleDir: string): { manifest: GenerationManifest; candidates: CandidateRecord[] } | { failure: PreparationOutcome } {
+  const manifestPath = join(cycleDir, "manifest.json");
+  if (!existsSync(manifestPath)) {
+    return { failure: failed("HOLD_RESUME_MANIFEST_MISSING", `no manifest.json at ${cycleDir}`) };
+  }
+  let rawManifest: unknown;
+  try {
+    rawManifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  } catch (error) {
+    return { failure: failed("HOLD_RESUME_MANIFEST_INVALID", `manifest.json is not valid JSON: ${(error as Error).message}`) };
+  }
+  const manifestValidation = validateManifest(rawManifest);
+  if (manifestValidation.errors.length > 0) {
+    return { failure: failed("HOLD_RESUME_MANIFEST_INVALID", manifestValidation.errors.join("; ")) };
+  }
+  const manifest = asValidatedManifest(rawManifest);
+
+  // Never re-invokes PRIMARY_AUTHOR: candidates are reloaded exclusively
+  // from the exact files the original run already materialized.
+  const loadResult = loadCandidates(index, join(cycleDir, "candidates"), manifest.candidateFiles);
+  if (loadResult.failures.length > 0) {
+    return { failure: failed("HOLD_RESUME_CANDIDATE_LOAD", loadResult.failures.map((failure) => `${failure.file}: ${failure.message}`).join("; ")) };
+  }
+  return { manifest, candidates: loadResult.candidates };
 }
 
 /**
@@ -571,38 +675,15 @@ export async function resumeHoldByIdentity(input: ResumeHoldByIdentityInput): Pr
     return failed("HOLD_RESUME_IDENTITY_MISMATCH", freeze.reason);
   }
 
-  const manifestPath = join(input.cycleDir, "manifest.json");
-  if (!existsSync(manifestPath)) {
-    return failed("HOLD_RESUME_MANIFEST_MISSING", `no manifest.json at ${input.cycleDir}`);
-  }
-  let rawManifest: unknown;
-  try {
-    rawManifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-  } catch (error) {
-    return failed("HOLD_RESUME_MANIFEST_INVALID", `manifest.json is not valid JSON: ${(error as Error).message}`);
-  }
-  const manifestValidation = validateManifest(rawManifest);
-  if (manifestValidation.errors.length > 0) {
-    return failed("HOLD_RESUME_MANIFEST_INVALID", manifestValidation.errors.join("; "));
-  }
-  const manifest = asValidatedManifest(rawManifest);
-
-  // Never re-invokes PRIMARY_AUTHOR: candidates are reloaded exclusively
-  // from the exact files the original run already materialized.
-  const candidatesDir = join(input.cycleDir, "candidates");
-  const loadResult = loadCandidates(input.index, candidatesDir, manifest.candidateFiles);
-  if (loadResult.failures.length > 0) {
-    return failed(
-      "HOLD_RESUME_CANDIDATE_LOAD",
-      loadResult.failures.map((failure) => `${failure.file}: ${failure.message}`).join("; ")
-    );
-  }
+  const loaded = loadFrozenCycle(input.index, input.cycleDir);
+  if ("failure" in loaded) return loaded.failure;
+  const { manifest, candidates } = loaded;
 
   // Tamper/staleness detection: the reloaded manifest+candidates must
   // reproduce exactly the fingerprint the original HOLD bound. Any edit,
   // replacement, or drift since the HOLD was recorded fails closed here,
   // before prospective validation or admission ever runs again.
-  const currentFingerprint = frozenCandidateFingerprint(manifest, loadResult.candidates);
+  const currentFingerprint = frozenCandidateFingerprint(manifest, candidates);
   if (currentFingerprint !== freeze.record.candidateFingerprint) {
     return failed(
       "HOLD_RESUME_CANDIDATE_MISMATCH",
@@ -615,23 +696,77 @@ export async function resumeHoldByIdentity(input: ResumeHoldByIdentityInput): Pr
     input.baseGitSha,
     input.index,
     manifest,
-    loadResult.candidates,
+    candidates,
     input.reviewerInvoker,
     input.availabilityAdapter,
     input.resolveAvailabilityAdapter,
     input.inferenceLimitResolutionChecker,
-    input.now
+    input.now,
+    cycleReviewLifecycleDir(input.cycleDir, input.reviewLifecycleDir)
   );
 
-  // A resume that is still HOLD refreshes the binding record (same
-  // fingerprint, same identity) so a further resume attempt remains
-  // possible; it never invokes PRIMARY_AUTHOR and never invokes the
-  // reviewer, matching the normal path's own "no reviewer on HOLD" rule.
-  if (outcome.status === "PRE_GATE_SAFETY_HOLD") {
+  // A resume that is still HOLD, or still awaiting the owner's readiness
+  // declaration, refreshes the binding record (same fingerprint, same
+  // identity) so a further resume remains possible; it never invokes
+  // PRIMARY_AUTHOR and never invokes the reviewer.
+  if (isFrozenContinuation(outcome)) {
     writeHoldFreeze(input.cycleDir, freeze.record);
   }
 
   return outcome;
+}
+
+export interface DeclareFrozenCycleReadyInput {
+  index: CorpusIndex;
+  baseGitSha: string;
+  /** Gitignored cycle directory holding a frozen-cycle binding record (already boundary-checked by the caller). */
+  cycleDir: string;
+  reviewLifecycleDir?: string;
+  newLifecycle?: OwnerReadyOptions["newLifecycle"];
+}
+
+export type DeclareFrozenCycleReadyResult =
+  | { ok: true; semanticAttempt: SemanticAttemptNumber; reviewerInputFingerprint: string; rebound: boolean }
+  | { ok: false; failedCheck: string; message: string };
+
+/**
+ * The owner's Lane A readiness declaration: binds the exact reviewer input
+ * the cycle's current frozen manifest/candidates produce at `baseGitSha` in
+ * the shared review lifecycle. Never invokes AI; the frozen cycle is then
+ * continued through resumeHoldByIdentity().
+ *
+ * The owner may edit the candidates in `cycleDir` before declaring — before
+ * attempt 1, or as the one bounded correction after a non-CONCUR attempt 1.
+ * Declaring is the explicit act that rebinds the cycle's binding record to
+ * that content (`rebound`), and only after the lifecycle accepted it; a
+ * research-change-set.json built from superseded content is set aside so it
+ * is never reused. Safety admission still runs again on resume.
+ */
+export function declareFrozenCycleReady(input: DeclareFrozenCycleReadyInput): DeclareFrozenCycleReadyResult {
+  const freeze = parseHoldFreeze(input.cycleDir, input.baseGitSha);
+  if (!freeze.ok) return { ok: false, failedCheck: "FROZEN_CYCLE_BINDING_INVALID", message: freeze.reason };
+  // The helpers below only ever fail with a FAILED outcome.
+  const asRejection = (outcome: PreparationOutcome): DeclareFrozenCycleReadyResult => {
+    const { failedCheck, message } = outcome as Extract<PreparationOutcome, { status: "FAILED" }>;
+    return { ok: false, failedCheck, message };
+  };
+  const loaded = loadFrozenCycle(input.index, input.cycleDir);
+  if ("failure" in loaded) return asRejection(loaded.failure);
+  const prospective = prospectiveReview(input.baseGitSha, input.index, loaded.candidates);
+  if ("failure" in prospective) return asRejection(prospective.failure);
+  const frozen = freezeReviewerInput(input.baseGitSha, input.index, loaded.manifest, prospective.review);
+  if ("failure" in frozen) return asRejection(frozen.failure);
+
+  const subject = reviewSubject(frozen.reviewerInput);
+  const declared = declareOwnerReady(cycleReviewLifecycleDir(input.cycleDir, input.reviewLifecycleDir), subject, { newLifecycle: input.newLifecycle });
+  if (!declared.ok) return declared;
+
+  const candidateFingerprint = frozenCandidateFingerprint(loaded.manifest, loaded.candidates);
+  const rebound = candidateFingerprint !== freeze.record.candidateFingerprint;
+  if (rebound) writeHoldFreeze(input.cycleDir, { ...freeze.record, candidateFingerprint });
+  const changeSetPath = join(input.cycleDir, "research-change-set.json");
+  if (existsSync(changeSetPath)) renameSync(changeSetPath, join(input.cycleDir, "research-change-set.superseded.json"));
+  return { ok: true, semanticAttempt: declared.semanticAttempt, reviewerInputFingerprint: subject.reviewerInputFingerprint, rebound };
 }
 
 export interface ResumePreGateHoldInput {
@@ -644,6 +779,7 @@ export interface ResumePreGateHoldInput {
   resolveAvailabilityAdapter?: (materialSources: ReadonlyMap<string, Record<string, unknown>>) => Promise<SourceAvailabilityAdapter>;
   inferenceLimitResolutionChecker?: InferenceLimitResolutionChecker;
   now?: () => Date;
+  reviewLifecycleDir?: string;
 }
 
 /** Resumes a normal-path (trigger-originated) pre-Gate HOLD. Thin wrapper over resumeHoldByIdentity(). */
@@ -663,6 +799,7 @@ export interface ResumeRevalidationHoldInput {
   resolveAvailabilityAdapter?: (materialSources: ReadonlyMap<string, Record<string, unknown>>) => Promise<SourceAvailabilityAdapter>;
   inferenceLimitResolutionChecker?: InferenceLimitResolutionChecker;
   now?: () => Date;
+  reviewLifecycleDir?: string;
 }
 
 /**
