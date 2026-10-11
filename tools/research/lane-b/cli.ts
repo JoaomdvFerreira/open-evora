@@ -17,8 +17,8 @@
  *   check --base <sha> --head <sha> --body-file <file>
  *     Verifies a pull request's receipt and the review artifact it
  *     references (read from the head commit) against the review input
- *     rebuilt from Git. Never invokes a reviewer. With --event-path the base is the merge base of the event's
- *     base and head; the PR body is read from the event file, never from
+ *     rebuilt from Git. Never invokes a reviewer. With --event-path the
+ *     base is the merge base of the event's base and head; the PR body is read from the event file, never from
  *     shell arguments.
  *
  * Exit code 0 = PASS / receipt produced; 1 = any failure (fail closed).
