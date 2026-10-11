@@ -28,10 +28,11 @@ import {
   linkedEvidenceSupportsScopeTerm,
   SCOPE_TERM_CODES,
   type ClecDimension,
-  type LanguageSignal,
+  type SignalCode,
 } from "../language/signals.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { RecordFields } from "../core/types.ts";
+import { reducedCitableRecords, relationshipEvidenceIds, type ReducedReviewerInputPackage } from "./reduced-reviewer-input.ts";
 import type { ReviewerInputPackage } from "./reviewer-input.ts";
 import type { IndependentReviewOutcome, IndependentReviewResult, ReviewFindingKind, ReviewFindingSeverity, SignalDispositionValue } from "./types.ts";
 
@@ -65,12 +66,30 @@ export type ReviewCandidateFields = ReadonlyMap<string, RecordFields>;
  */
 export type DeferredReviewSubject = (recordId: string) => boolean;
 
+/** Resolves an authored field path of one review subject to its value (undefined when absent). */
+type AuthoredFieldResolver = (field: string) => unknown;
+
+/**
+ * What the context-aware layer needs of one dispositionable signal: a
+ * reference-profile signal, or a reduced-profile group, whose `matches` hold
+ * every underlying occurrence's wording.
+ */
+interface ReviewSignalSubject {
+  subjectId: string;
+  code: SignalCode;
+  matches: string[];
+}
+
 /** What the context-aware layer additionally knows: the frozen package's records and signals. */
 interface ReviewContext {
   recordIds: ReadonlySet<string>;
+  /** Reduced profile: the records each review subject may cite; absent means every record in `recordIds`. */
+  citable?: ReadonlyMap<string, ReadonlySet<string>>;
   /** Every record in the package (candidate version wins), by ID, with its family. */
   records: ReadonlyMap<string, { recordFamily: string; fields: RecordFields }>;
-  signals: ReadonlyMap<string, LanguageSignal>;
+  /** EVD a PRB subject links through `evidence[]`: the only possible positive support for a scope term. */
+  linkedEvidence: (subjectId: string) => readonly string[];
+  signals: ReadonlyMap<string, ReviewSignalSubject>;
 }
 
 interface ParsedFinding {
@@ -143,8 +162,15 @@ function resolveAuthoredField(fields: RecordFields, path: string): unknown {
   return current;
 }
 
-function checkReferences(references: string[], path: string, context: ReviewContext | undefined, errors: string[]): void {
+function checkReferences(references: string[], path: string, context: ReviewContext | undefined, errors: string[], subjectId?: unknown): void {
   if (!context) return;
+  if (context.citable) {
+    const citable = typeof subjectId === "string" ? context.citable.get(subjectId) : undefined;
+    for (const id of references) {
+      if (!citable?.has(id)) errors.push(`${path} references ${JSON.stringify(id)}, which is not a record available to review subject ${JSON.stringify(subjectId)}`);
+    }
+    return;
+  }
   for (const id of references) {
     if (!context.recordIds.has(id)) errors.push(`${path} references ${JSON.stringify(id)}, which is not a record in the review input`);
   }
@@ -153,7 +179,7 @@ function checkReferences(references: string[], path: string, context: ReviewCont
 function checkFinding(
   value: unknown,
   i: number,
-  candidates: ReviewCandidateFields,
+  candidates: ReadonlyMap<string, AuthoredFieldResolver>,
   context: ReviewContext | undefined,
   errors: string[],
   deferred?: DeferredReviewSubject,
@@ -169,16 +195,16 @@ function checkFinding(
     errors.push(`${path}.findingId must match ${FINDING_ID}, got ${JSON.stringify(value.findingId)}`);
   }
 
-  const fields = typeof value.recordId === "string" ? candidates.get(value.recordId) : undefined;
-  if (!fields && !context && typeof value.recordId === "string" && deferred?.(value.recordId)) {
+  const resolve = typeof value.recordId === "string" ? candidates.get(value.recordId) : undefined;
+  if (!resolve && !context && typeof value.recordId === "string" && deferred?.(value.recordId)) {
     if (!isNonEmptyString(value.field)) errors.push(`${path}.field must be a non-empty string`);
     if (!isNonEmptyString(value.claim)) errors.push(`${path}.claim must be a non-empty string`);
-  } else if (!fields) {
+  } else if (!resolve) {
     errors.push(`${path}.recordId must name a candidate record, got ${JSON.stringify(value.recordId)}`);
   } else if (!isNonEmptyString(value.field)) {
     errors.push(`${path}.field must be a non-empty string`);
   } else {
-    const authored = resolveAuthoredField(fields, value.field);
+    const authored = resolve(value.field);
     if (typeof authored !== "string") {
       errors.push(`${path}.field ${JSON.stringify(value.field)} is not an authored text field of ${value.recordId}`);
     } else if (!isNonEmptyString(value.claim)) {
@@ -208,7 +234,7 @@ function checkFinding(
   if (Array.isArray(value.evidenceReferences) && value.evidenceReferences.length === 0) {
     errors.push(`${path}.evidenceReferences must name at least one record the finding was judged against`);
   }
-  checkReferences(references, `${path}.evidenceReferences`, context, errors);
+  checkReferences(references, `${path}.evidenceReferences`, context, errors, value.recordId);
 
   const relatedSignalIds = stringList(value.relatedSignalIds, `${path}.relatedSignalIds`, errors, SIGNAL_ID);
   if (context) {
@@ -230,16 +256,18 @@ function checkFinding(
  * Source Verification Support, unlinked EVD and inference_limits never
  * support the term.
  */
-function checkScopeTermSupport(signal: LanguageSignal, references: readonly string[], context: ReviewContext, path: string, errors: string[]): void {
-  const problem = context.records.get(signal.subjectId);
-  const linked = new Set(problem?.recordFamily === "PRB-" ? linkedEvidenceIds(problem.fields) : []);
-  const supported = references.some((id) => {
-    const record = context.records.get(id);
-    return linked.has(id) && record?.recordFamily === "EVD-" && linkedEvidenceSupportsScopeTerm(signal.code, signal.match ?? signal.excerpt, record.fields);
-  });
-  if (!supported) {
+function checkScopeTermSupport(signal: ReviewSignalSubject, references: readonly string[], context: ReviewContext, path: string, errors: string[]): void {
+  const linked = new Set(context.linkedEvidence(signal.subjectId));
+  // A grouped signal is supported only when every occurrence's wording is.
+  const unsupported = signal.matches.find((match) =>
+    !references.some((id) => {
+      const record = context.records.get(id);
+      return linked.has(id) && record?.recordFamily === "EVD-" && linkedEvidenceSupportsScopeTerm(signal.code, match, record.fields);
+    })
+  );
+  if (unsupported !== undefined) {
     errors.push(
-      `${path} is SUPPORTED for ${signal.code} but cites no EVD linked by ${signal.subjectId} whose observation.summary or scope contains ${JSON.stringify(signal.match ?? signal.excerpt)} (SRC records, Source Verification Support, unlinked EVD and inference_limits do not support it)`
+      `${path} is SUPPORTED for ${signal.code} but cites no EVD linked by ${signal.subjectId} whose observation.summary or scope contains ${JSON.stringify(unsupported)} (SRC records, Source Verification Support, unlinked EVD and inference_limits do not support it)`
     );
   }
 }
@@ -265,8 +293,8 @@ function checkDisposition(value: unknown, i: number, context: ReviewContext | un
   if (value.disposition === "SUPPORTED" && Array.isArray(value.evidenceReferences) && value.evidenceReferences.length === 0) {
     errors.push(`${path} is SUPPORTED but names no evidence in the review input that supports it`);
   }
-  checkReferences(references, `${path}.evidenceReferences`, context, errors);
   const signal = validId && context ? context.signals.get(value.signalId as string) : undefined;
+  checkReferences(references, `${path}.evidenceReferences`, context, errors, signal?.subjectId);
   if (value.disposition === "SUPPORTED" && signal && context && SCOPE_TERM_CODES.has(signal.code)) {
     checkScopeTermSupport(signal, references, context, path, errors);
   }
@@ -333,7 +361,7 @@ function expectedOutcome(findings: readonly ParsedFinding[], dispositions: reado
 
 function checkReview(
   value: unknown,
-  candidates: ReviewCandidateFields,
+  candidates: ReadonlyMap<string, AuthoredFieldResolver>,
   context: ReviewContext | undefined,
   deferred?: DeferredReviewSubject,
 ): IndependentReviewValidationResult {
@@ -444,8 +472,49 @@ export function validateIndependentReview(value: unknown, pkg: ReviewerInputPack
     records.set(subject.id, { recordFamily: subject.recordFamily, fields: subject.fields });
     subjects.set(subject.id, subject.fields);
   }
-  const signals = new Map(pkg.signals.map((entry) => [entry.signalId, entry.signal]));
-  return checkReview(value, subjects, { recordIds, records, signals });
+  const signals = new Map(pkg.signals.map(({ signalId, signal }) => [signalId, { subjectId: signal.subjectId, code: signal.code, matches: [signal.match ?? signal.excerpt] }]));
+  const linkedEvidence = (subjectId: string): string[] => {
+    const problem = records.get(subjectId);
+    return problem?.recordFamily === "PRB-" ? linkedEvidenceIds(problem.fields) : [];
+  };
+  return checkReview(value, resolvers(subjects), { recordIds, records, linkedEvidence, signals });
+}
+
+/**
+ * Context-aware validation against a REDUCED reviewer package
+ * (reduced-reviewer-input.ts), under the same result contract and rule set
+ * as validateIndependentReview(). Reviewable subjects are its candidates
+ * (complete fields) and its impacted PRBs (their exact authored text only);
+ * each subject may cite only reducedCitableRecords(); each signal group needs
+ * exactly one disposition; a SUPPORTED scope-term group must be supported, for
+ * every occurrence, by an EVD the PRB links through `evidence[]`, judged on
+ * the package's linked-EVD boundary — never SRC, support or inference_limits.
+ */
+export function validateReducedIndependentReview(value: unknown, pkg: ReducedReviewerInputPackage): IndependentReviewValidationResult {
+  const records = new Map<string, { recordFamily: string; fields: RecordFields }>();
+  const linked = new Map<string, string[]>();
+  const subjects = new Map<string, AuthoredFieldResolver>();
+  const boundaries = [...pkg.candidates.flatMap((c) => c.linkedEvidenceBoundary ?? []), ...(pkg.impactedSubjects ?? []).flatMap((s) => s.linkedEvidenceBoundary)];
+  for (const boundary of boundaries) records.set(boundary.evidenceId, { recordFamily: "EVD-", fields: boundary.fields });
+  for (const entry of pkg.sourceContext) records.set(entry.sourceId, { recordFamily: "SRC-", fields: entry.fields });
+  for (const candidate of pkg.candidates) {
+    records.set(candidate.id, { recordFamily: candidate.recordFamily, fields: candidate.fields });
+    subjects.set(candidate.id, (field) => resolveAuthoredField(candidate.fields, field));
+    if (candidate.recordFamily === "PRB-") linked.set(candidate.id, linkedEvidenceIds(candidate.fields));
+  }
+  for (const subject of pkg.impactedSubjects ?? []) {
+    const text = new Map(subject.authoredText.map(({ field, text }) => [field, text]));
+    subjects.set(subject.id, (field) => text.get(field));
+    linked.set(subject.id, relationshipEvidenceIds(subject.evidenceLinks));
+  }
+  const citable = reducedCitableRecords(pkg);
+  const recordIds = new Set([...citable.values()].flatMap((ids) => [...ids]));
+  const signals = new Map(pkg.signals.map((group) => [group.signalId, { subjectId: group.subjectId, code: group.code, matches: group.occurrences.map((o) => o.match ?? o.excerpt) }]));
+  return checkReview(value, subjects, { recordIds, citable, records, linkedEvidence: (id) => linked.get(id) ?? [], signals });
+}
+
+function resolvers(fieldsById: ReviewCandidateFields): Map<string, AuthoredFieldResolver> {
+  return new Map([...fieldsById].map(([id, fields]) => [id, (field: string) => resolveAuthoredField(fields, field)]));
 }
 
 /**
@@ -458,7 +527,7 @@ export function validateIndependentReviewStructure(
   candidates: ReviewCandidateFields,
   deferred?: DeferredReviewSubject,
 ): IndependentReviewValidationResult {
-  return checkReview(value, candidates, undefined, deferred);
+  return checkReview(value, resolvers(candidates), undefined, deferred);
 }
 
 /**

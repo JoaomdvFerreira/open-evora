@@ -95,6 +95,50 @@ export function problemEvidenceReferenceIds(problemIndex: RecordIndex, fields: R
   return [...ids].sort();
 }
 
+/**
+ * One place a PRB names an EVD. `declaredField` is the schema reference field
+ * or nested list it was found through; `field` is the exact indexed path of
+ * the ID; `entry` is the authored `evidence[]` relationship object it sits in.
+ */
+export interface ProblemEvidenceReference {
+  evidenceId: string;
+  declaredField: string;
+  field: string;
+  entry?: RecordFields;
+}
+
+/**
+ * Every EVD reference occurrence in a PRB, through exactly the locations
+ * problemEvidenceReferenceIds() reads (schema references in schema order,
+ * then NESTED_PROBLEM_EVIDENCE_LISTS), in authored order. Its distinct IDs
+ * are problemEvidenceReferenceIds().
+ */
+export function problemEvidenceReferences(problemIndex: RecordIndex, fields: RecordFields): ProblemEvidenceReference[] {
+  const out: ProblemEvidenceReference[] = [];
+  const push = (evidenceId: unknown, declaredField: string, field: string, entry?: RecordFields): void => {
+    if (typeof evidenceId === "string" && evidenceId.startsWith("EVD-")) out.push({ evidenceId, declaredField, field, ...(entry ? { entry } : {}) });
+  };
+  for (const ref of problemIndex.schema.references ?? []) {
+    if (ref.targetPrefix !== "EVD-") continue;
+    const value = getRecordField(fields, ref.field);
+    const listed = ref.isList && Array.isArray(value);
+    (listed ? (value as unknown[]) : [value]).forEach((item, i) => {
+      const path = listed ? `${ref.field}[${i}]` : ref.field;
+      if (ref.itemField && isObject(item)) push(getRecordField(item as RecordFields, ref.itemField), ref.field, `${path}.${ref.itemField}`, item as RecordFields);
+      else push(item, ref.field, path);
+    });
+  }
+  for (const { list, field } of NESTED_PROBLEM_EVIDENCE_LISTS) {
+    const owners = list ? getRecordField(fields, list) : fields;
+    (list ? (Array.isArray(owners) ? owners : []) : [owners]).forEach((owner, i) => {
+      const value = isObject(owner) ? getRecordField(owner as RecordFields, field) : undefined;
+      const prefix = list ? `${list}[${i}].${field}` : field;
+      (Array.isArray(value) ? value : []).forEach((item, j) => push(item, list ?? field, `${prefix}[${j}]`));
+    });
+  }
+  return out;
+}
+
 /** EVD IDs this change creates or updates, sorted by ID. */
 export function changedEvidenceIds(deltas: readonly CandidateDelta[]): string[] {
   return [...new Set(deltas.filter((d) => d.recordFamily === "EVD-" && (d.action === "CREATE" || d.action === "UPDATE")).map((d) => d.id))].sort();
