@@ -68,16 +68,26 @@ export interface PrbDetailsPresentationProps {
  */
 function PrbStateValue({ field, value }: { field: "status" | "validation_status" | "evidence_status"; value: string }) {
   const label = field === "status" ? publicEnumLabel(field, value) : publicCompactEnumLabel(field, value);
-  const explanation = field === "evidence_status" && value === "discovered"
-    ? "Foram encontradas evidências relevantes; o problema ainda não foi plenamente validado."
-    : null;
+  return <dd className="prb-state-value">{label}</dd>;
+}
+
+/** Presentation-only explanation for the Evidence state "Identificada". */
+const DISCOVERED_EVIDENCE_EXPLANATION = "Foram encontradas evidências relevantes; o problema ainda não foi plenamente validado.";
+
+/**
+ * State term with an info control beside the label ("Evidência ⓘ"), so the
+ * value rows of all three dimensions keep identical geometry. The term is
+ * one non-wrapping row whose height and baseline come from the label text;
+ * it is also the tooltip's containing block.
+ */
+function PrbStateTermWithInfo({ term, accessibleName, explanation }: { term: string; accessibleName: string; explanation: string }) {
   const explanationId = useId();
-  const controlRef = useRef<HTMLSpanElement>(null);
+  const controlRef = useRef<HTMLElement>(null);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const open = Boolean(explanation) && (hovered || focused || pinned) && !dismissed;
+  const open = (hovered || focused || pinned) && !dismissed;
 
   useEffect(() => {
     if (!open) return;
@@ -93,47 +103,44 @@ function PrbStateValue({ field, value }: { field: "status" | "validation_status"
   }, [open]);
 
   return (
-    <dd className="prb-state-value">
-      <span>{label}</span>
-      {explanation && (
-        <span
-          ref={controlRef}
-          className="prb-state-info-wrap"
-          onPointerEnter={(event) => {
-            if (event.pointerType === "touch") return;
-            setHovered(true);
-            setDismissed(false);
+    <dt ref={controlRef} className="prb-state-term--with-info">
+      <span>{term}</span>
+      <span
+        className="prb-state-info-wrap"
+        onPointerEnter={(event) => {
+          if (event.pointerType === "touch") return;
+          setHovered(true);
+          setDismissed(false);
+        }}
+        onPointerLeave={() => setHovered(false)}
+      >
+        <button
+          type="button"
+          className="prb-state-info-button"
+          aria-label={accessibleName}
+          aria-describedby={explanationId}
+          onFocus={() => { setFocused(true); setDismissed(false); }}
+          onBlur={() => setFocused(false)}
+          onClick={() => {
+            setPinned(!pinned);
+            setDismissed(pinned);
           }}
-          onPointerLeave={() => setHovered(false)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              setPinned(false);
+              setHovered(false);
+              setDismissed(true);
+            }
+          }}
         >
-          <button
-            type="button"
-            className="prb-state-info-button"
-            aria-label="O que significa Evidência identificada?"
-            aria-describedby={explanationId}
-            onFocus={() => { setFocused(true); setDismissed(false); }}
-            onBlur={() => setFocused(false)}
-            onClick={() => {
-              setPinned(!pinned);
-              setDismissed(pinned);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Escape") {
-                event.preventDefault();
-                setPinned(false);
-                setHovered(false);
-                setDismissed(true);
-              }
-            }}
-          >
-            <IconInfo />
-          </button>
-          <span id={explanationId} role="tooltip" className="prb-state-info-tooltip" data-open={open || undefined}>
-            {explanation}
-          </span>
-        </span>
-      )}
-    </dd>
+          <IconInfo />
+        </button>
+      </span>
+      <span id={explanationId} role="tooltip" className="prb-state-info-tooltip" data-open={open || undefined}>
+        {explanation}
+      </span>
+    </dt>
   );
 }
 
@@ -159,7 +166,11 @@ function PrbInvestigationStateSection({ data }: { data: PrbDetailsData }) {
             )}
             {data.evidenceStatus && (
               <div className="prb-state-item">
-                <dt>Evidência</dt>
+                {data.evidenceStatus === "discovered" ? (
+                  <PrbStateTermWithInfo term="Evidência" accessibleName="O que significa Evidência identificada?" explanation={DISCOVERED_EVIDENCE_EXPLANATION} />
+                ) : (
+                  <dt>Evidência</dt>
+                )}
                 <PrbStateValue field="evidence_status" value={data.evidenceStatus} />
               </div>
             )}

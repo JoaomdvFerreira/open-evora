@@ -163,7 +163,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     );
     expect(cells).toEqual([
       ["Estado", "Aberto"],
-      ["Evidência", "IdentificadaForam encontradas evidências relevantes; o problema ainda não foi plenamente validado."],
+      ["EvidênciaForam encontradas evidências relevantes; o problema ainda não foi plenamente validado.", "Identificada"],
       ["Validação", "Por validar"],
       ["Questões abertas", "2"],
       ["Evidências", "2"],
@@ -181,6 +181,9 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     renderPrb({ title: "T", evidence_status: "discovered" });
     const button = screen.getByRole("button", { name: "O que significa Evidência identificada?" });
     expect(screen.getByText("Identificada")).toBeTruthy();
+    // The control belongs to the Evidence term; the value row carries only the value.
+    expect(button.closest("dt")?.firstElementChild?.textContent).toBe("Evidência");
+    expect(screen.getByText("Identificada").closest("dd")?.querySelector("button")).toBeNull();
     expect(screen.queryByText("O que significa?", { exact: true })).toBeNull();
     expect(screen.getByRole("tooltip").hasAttribute("data-open")).toBe(false);
     fireEvent.pointerEnter(button, { pointerType: "mouse" });

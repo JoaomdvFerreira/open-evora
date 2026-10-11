@@ -251,15 +251,26 @@ describe("PRB Details Estado da investigação / Âmbito band — six-column gri
     expect(onlyRuleBody(prbBase, ".prb-state-item:first-child")).toMatch(/border-left:\s*0;/);
   });
 
-  it("keeps the state info trigger line-neutral while retaining a 44px pointer target", () => {
+  it("keeps the state info trigger line-neutral while retaining a centred 44px pointer target", () => {
     const button = onlyRuleBody(prbBase, ".prb-state-info-button");
     expect(button).toMatch(/min-height:\s*0;/);
     expect(button).toMatch(/height:\s*16px;/);
     expect(button).toMatch(/padding:\s*0;/);
     expect(button).toMatch(/line-height:\s*0;/);
-    expect(onlyRuleBody(prbBase, ".prb-state-info-button::after")).toMatch(/inset-block:\s*-14px;[\s\S]*width:\s*44px;/);
+    expect(onlyRuleBody(prbBase, ".prb-state-info-button::after")).toMatch(/position:\s*absolute;[\s\S]*inset:\s*-14px;/);
     expect(onlyRuleBody(prbBase, ".prb-state-info-button > svg")).toMatch(/width:\s*20px;[\s\S]*height:\s*20px;/);
-    expect(onlyRuleBody(prbBase, ".prb-state-info-wrap")).toMatch(/display:\s*inline-flex;[\s\S]*vertical-align:\s*baseline;/);
+    expect(onlyRuleBody(prbBase, ".prb-state-info-wrap")).toMatch(/flex:\s*none;/);
+  });
+
+  it("keeps the info-bearing state term on one line and anchors its tooltip there", () => {
+    const term = onlyRuleBody(prbBase, ".prb-state-term--with-info");
+    expect(term).toMatch(/position:\s*relative;/);
+    expect(term).toMatch(/display:\s*flex;/);
+    expect(term).toMatch(/flex-wrap:\s*nowrap;/);
+    expect(term).toMatch(/align-items:\s*center;/);
+    expect(term).not.toMatch(/font-size|line-height/);
+    expect(onlyRuleBody(prbBase, ".prb-state-info-tooltip")).toMatch(/left:\s*0;[\s\S]*max-width:\s*min\(20rem, calc\(100vw - 32px\)\);/);
+    expect(ruleBodies(prbCompact, ".prb-state-info-tooltip")).toHaveLength(0);
   });
 
   it("keeps six columns at tablet width (no restacking), tightening only the cell tokens", () => {

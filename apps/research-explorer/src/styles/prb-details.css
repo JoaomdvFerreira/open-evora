@@ -342,11 +342,21 @@
   line-height: 1.4;
 }
 
-.prb-state-info-wrap {
+/* Term + info control ("Evidência ⓘ"): one non-wrapping row. The label text
+   keeps the term typography and so sets the row height and baseline; the
+   16px control is centred on that line and never contributes to it. The term
+   is the tooltip's containing block. */
+.prb-state-term--with-info {
   position: relative;
-  display: inline-flex;
-  margin-inline-start: 0.3em;
-  vertical-align: baseline;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.prb-state-info-wrap {
+  display: flex;
+  flex: none;
 }
 
 .prb-state-info-button {
@@ -363,16 +373,15 @@
   color: var(--color-ink-muted);
   font-size: inherit;
   line-height: 0;
-  vertical-align: baseline;
   cursor: pointer;
 }
 
+/* 44×44 pointer target centred on the 16px control; out of flow, so it adds
+   no line height or width. */
 .prb-state-info-button::after {
   content: "";
   position: absolute;
-  inset-block: -14px;
-  inset-inline-start: 0;
-  width: 44px;
+  inset: -14px;
 }
 
 .prb-state-info-button > svg {
@@ -1220,11 +1229,6 @@ body:has(.prb-details-view) .public-footer {
     left: 0;
     right: 0;
     border-top: 1px solid var(--color-separator-standard);
-  }
-
-  .prb-state-info-tooltip {
-    right: 0;
-    left: auto;
   }
 
   .prb-state-grid {
