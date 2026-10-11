@@ -15,12 +15,18 @@
  * - The attempt number is derived from the recorded attempts, never taken
  *   from a caller. A tooling/runtime failure (including two structurally
  *   invalid reviewer outputs) records no attempt and keeps the declaration.
+ * - One declaration is consumed by at most one execution: an execution
+ *   claims the store exclusively (an O_EXCL claim file) before invoking the
+ *   reviewer, revalidates under the claim before recording, and releases it
+ *   however the attempt ends. A competing execution is rejected before
+ *   invocation; a claim left behind by a killed process fails closed until
+ *   the owner removes it.
  *
  * State is local workbench material (gitignored), never canonical research
  * state and never a review artifact; nothing time- or run-specific is
  * stored in it.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { closeSync, existsSync, mkdirSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -39,6 +45,7 @@ export const REVIEW_LIFECYCLE_CHECK = {
   NEW_LIFECYCLE_NOT_PERMITTED: "REVIEW_NEW_LIFECYCLE_NOT_PERMITTED",
   OWNER_ESCALATION: "REVIEW_OWNER_ESCALATION",
   ALREADY_CONCUR: "REVIEW_ALREADY_CONCUR",
+  ATTEMPT_IN_FLIGHT: "REVIEW_ATTEMPT_IN_FLIGHT",
   STATE_INVALID: "REVIEW_LIFECYCLE_STATE_INVALID",
 } as const;
 
@@ -54,6 +61,8 @@ export function reviewLifecycleDirFor(repoRoot: string): string {
 export const REPOSITORY_REVIEW_LIFECYCLE_DIR = reviewLifecycleDirFor(resolve(fileURLToPath(new URL(".", import.meta.url)), "..", "..", ".."));
 
 const STATE_FILE = "review-lifecycle.json";
+/** Exists exactly while one execution holds the store; created with O_EXCL. */
+const CLAIM_FILE = "review-lifecycle.claim";
 
 export interface ReviewTarget {
   recordFamily: string;
@@ -170,7 +179,14 @@ function isLifecycle(value: unknown): value is ReviewLifecycle {
   const attempts = value.attempts;
   if (!Array.isArray(attempts) || attempts.length > 2 || !attempts.every(isAttempt)) return false;
   if (attempts.length === 2 && (attempts[0].outcome === "CONCUR" || attempts[0].reviewerInputFingerprint === attempts[1].reviewerInputFingerprint)) return false;
-  return true;
+  const lifecycle = value as unknown as ReviewLifecycle;
+  const status = lifecycleStatus(lifecycle);
+  // closedByOwner is only ever set on an open or escalated lifecycle.
+  if (lifecycle.closedByOwner && status === "CONCUR") return false;
+  // An open lifecycle exists only from a declaration onwards.
+  if (declared === null) return status !== "OPEN" || attempts.length > 0;
+  // A pending declaration exists only where a next attempt may run, and never for content already reviewed.
+  return status === "OPEN" && !attempts.some((attempt) => attempt.reviewerInputFingerprint === declared);
 }
 
 export function readReviewLifecycleState(lifecycleDir: string): { ok: true; state: ReviewLifecycleState } | { ok: false; message: string } {
@@ -190,8 +206,40 @@ export function readReviewLifecycleState(lifecycleDir: string): { ok: true; stat
 
 function writeReviewLifecycleState(lifecycleDir: string, state: ReviewLifecycleState): void {
   mkdirSync(lifecycleDir, { recursive: true });
-  writeFileSync(join(lifecycleDir, STATE_FILE), `${JSON.stringify(state, null, 2)}\n`, "utf8");
+  const file = join(lifecycleDir, STATE_FILE);
+  writeFileSync(`${file}.tmp`, `${JSON.stringify(state, null, 2)}\n`, "utf8");
+  renameSync(`${file}.tmp`, file);
 }
+
+// --- in-flight claim ---------------------------------------------------------
+
+/** Atomically claims the store for one execution; false when another execution holds it. */
+function acquireClaim(lifecycleDir: string, subject: ReviewSubject, semanticAttempt: SemanticAttemptNumber): boolean {
+  mkdirSync(lifecycleDir, { recursive: true });
+  let fd: number;
+  try {
+    fd = openSync(join(lifecycleDir, CLAIM_FILE), "wx");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "EEXIST") return false;
+    throw error;
+  }
+  try {
+    writeFileSync(fd, `${JSON.stringify({ reviewerInputFingerprint: subject.reviewerInputFingerprint, semanticAttempt })}\n`, "utf8");
+  } finally {
+    closeSync(fd);
+  }
+  return true;
+}
+
+function releaseClaim(lifecycleDir: string): void {
+  rmSync(join(lifecycleDir, CLAIM_FILE), { force: true });
+}
+
+function claimHeld(lifecycleDir: string): boolean {
+  return existsSync(join(lifecycleDir, CLAIM_FILE));
+}
+
+const IN_FLIGHT_MESSAGE = `another execution holds the review lifecycle (${CLAIM_FILE}); if no review is running, the owner removes that file`;
 
 // --- owner readiness -------------------------------------------------------
 
@@ -220,6 +268,8 @@ export function declareOwnerReady(
   subject: ReviewSubject,
   options: OwnerReadyOptions = {},
 ): { ok: true; semanticAttempt: SemanticAttemptNumber } | LifecycleRejection {
+  // A declaration never changes under a running attempt.
+  if (claimHeld(lifecycleDir)) return reject(REVIEW_LIFECYCLE_CHECK.ATTEMPT_IN_FLIGHT, IN_FLIGHT_MESSAGE);
   const read = readReviewLifecycleState(lifecycleDir);
   if (!read.ok) return reject(REVIEW_LIFECYCLE_CHECK.STATE_INVALID, read.message);
   const state = read.state;
@@ -233,7 +283,10 @@ export function declareOwnerReady(
         `the open lifecycle for ${describeScope(correctable)} still permits its bounded correction; declare the corrected content without --new-lifecycle`,
       );
     }
-    for (const lifecycle of active) lifecycle.closedByOwner = true;
+    for (const lifecycle of active) {
+      lifecycle.closedByOwner = true;
+      lifecycle.declaredReviewerInputFingerprint = null;
+    }
     active = [];
   }
 
@@ -325,33 +378,62 @@ export type OwnerDeclaredReview =
  * rejected before invocation unless the owner declared exactly this input
  * ready and an attempt remains. A valid review — whatever its outcome — is
  * recorded as that attempt and consumes the declaration; a tooling/runtime
- * failure records nothing.
+ * failure records nothing. The attempt runs under the store's claim, so a
+ * competing execution is rejected before it invokes the reviewer.
  */
 export function runOwnerDeclaredReview(lifecycleDir: string, invoker: AiInvoker, reviewerInput: ReviewerInputPackage, workbenchDir: string): OwnerDeclaredReview {
   const subject = reviewSubject(reviewerInput);
   const permitted = checkSemanticAttempt(lifecycleDir, subject);
   if (!permitted.ok) return { status: "REJECTED", failedCheck: permitted.failedCheck, message: permitted.message };
-
-  const invocation = invokeIndependentReview(invoker, reviewerInput, workbenchDir);
-  if (invocation.status === "FAILED") {
-    return { status: TOOLING_RUNTIME_FAILURE, semanticAttempt: permitted.semanticAttempt, failedCheck: invocation.failedCheck, message: invocation.message };
+  if (!acquireClaim(lifecycleDir, subject, permitted.semanticAttempt)) {
+    return { status: "REJECTED", failedCheck: REVIEW_LIFECYCLE_CHECK.ATTEMPT_IN_FLIGHT, message: IN_FLIGHT_MESSAGE };
   }
 
-  const read = readReviewLifecycleState(lifecycleDir);
-  if (!read.ok) return { status: "REJECTED", failedCheck: REVIEW_LIFECYCLE_CHECK.STATE_INVALID, message: read.message };
-  const lifecycle = governing(read.state, subject).find((candidate) => sameScope(candidate, subject));
-  if (!lifecycle) return { status: "REJECTED", failedCheck: REVIEW_LIFECYCLE_CHECK.STATE_INVALID, message: "the governing lifecycle changed during the review" };
-  lifecycle.attempts.push({
-    semanticAttempt: permitted.semanticAttempt,
-    reviewerInputFingerprint: subject.reviewerInputFingerprint,
-    outcome: invocation.review.outcome,
-    reviewSha256: sha256Hex(invocation.review),
-    technicalCalls: invocation.technicalCalls,
-  });
-  lifecycle.declaredReviewerInputFingerprint = null;
-  writeReviewLifecycleState(lifecycleDir, read.state);
+  try {
+    // Re-checked under the claim: what was read before claiming may already have been consumed.
+    const claimed = checkSemanticAttempt(lifecycleDir, subject);
+    if (!claimed.ok) return { status: "REJECTED", failedCheck: claimed.failedCheck, message: claimed.message };
+    if (claimed.semanticAttempt !== permitted.semanticAttempt) return lifecycleChanged();
 
-  const status = lifecycleStatus(lifecycle);
-  const result: SemanticAttemptResult = status === "CONCUR" ? "CONCUR" : status === "OWNER_ESCALATION" ? "OWNER_ESCALATION" : "CORRECTION_PERMITTED";
-  return { status: "REVIEWED", semanticAttempt: permitted.semanticAttempt, result, review: invocation.review };
+    const invocation = invokeIndependentReview(invoker, reviewerInput, workbenchDir);
+    if (invocation.status === "FAILED") {
+      return { status: TOOLING_RUNTIME_FAILURE, semanticAttempt: claimed.semanticAttempt, failedCheck: invocation.failedCheck, message: invocation.message };
+    }
+
+    // Recorded only while the same lifecycle, declaration and attempt are still authoritative.
+    const read = readReviewLifecycleState(lifecycleDir);
+    if (!read.ok) return { status: "REJECTED", failedCheck: REVIEW_LIFECYCLE_CHECK.STATE_INVALID, message: read.message };
+    const lifecycle = governing(read.state, subject).find((candidate) => sameScope(candidate, subject));
+    if (
+      !lifecycle ||
+      lifecycleStatus(lifecycle) !== "OPEN" ||
+      lifecycle.declaredReviewerInputFingerprint !== subject.reviewerInputFingerprint ||
+      lifecycle.attempts.length + 1 !== claimed.semanticAttempt
+    ) {
+      return lifecycleChanged();
+    }
+    lifecycle.attempts.push({
+      semanticAttempt: claimed.semanticAttempt,
+      reviewerInputFingerprint: subject.reviewerInputFingerprint,
+      outcome: invocation.review.outcome,
+      reviewSha256: sha256Hex(invocation.review),
+      technicalCalls: invocation.technicalCalls,
+    });
+    lifecycle.declaredReviewerInputFingerprint = null;
+    writeReviewLifecycleState(lifecycleDir, read.state);
+
+    const status = lifecycleStatus(lifecycle);
+    const result: SemanticAttemptResult = status === "CONCUR" ? "CONCUR" : status === "OWNER_ESCALATION" ? "OWNER_ESCALATION" : "CORRECTION_PERMITTED";
+    return { status: "REVIEWED", semanticAttempt: claimed.semanticAttempt, result, review: invocation.review };
+  } finally {
+    releaseClaim(lifecycleDir);
+  }
+}
+
+function lifecycleChanged(): OwnerDeclaredReview {
+  return {
+    status: "REJECTED",
+    failedCheck: REVIEW_LIFECYCLE_CHECK.STATE_INVALID,
+    message: "the governing lifecycle, declaration or attempt changed during the review; nothing was recorded",
+  };
 }

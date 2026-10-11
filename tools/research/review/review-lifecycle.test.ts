@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -268,5 +268,172 @@ test("lifecycle state the transition rules could not have produced fails closed 
     const declared = declare(lifecycleDir, reviewerInput({ statement: CORRECTED }));
     assert.equal(!declared.ok && declared.failedCheck, REVIEW_LIFECYCLE_CHECK.STATE_INVALID);
     assert.equal(readFileSync(file, "utf8"), JSON.stringify(state));
+  });
+});
+
+/** Runs `during` from inside the reviewer call: a competing execution, deterministically mid-attempt. */
+class InterleavedReviewer implements AiInvoker {
+  calls = 0;
+  private readonly stdout: string;
+  private readonly during: () => void;
+  constructor(stdout: string, during: () => void) {
+    this.stdout = stdout;
+    this.during = during;
+  }
+  invoke(_request: AiInvocationRequest): AiInvocationResult {
+    this.calls += 1;
+    this.during();
+    return { status: "OK", stdout: this.stdout };
+  }
+}
+
+const stateFile = (lifecycleDir: string) => join(lifecycleDir, "review-lifecycle.json");
+const claimFile = (lifecycleDir: string) => join(lifecycleDir, "review-lifecycle.claim");
+
+test("one declaration is consumed by one execution: a competing execution is rejected before it invokes the reviewer", () => {
+  withStore((lifecycleDir, workbench) => {
+    const input = reviewerInput();
+    declare(lifecycleDir, input);
+    const competitor = new ScriptedReviewer(reviewOf(input, "CONCUR"));
+    let competing: ReturnType<typeof runOwnerDeclaredReview> | undefined;
+    let redeclared: ReturnType<typeof declare> | undefined;
+    const first = new InterleavedReviewer(reviewOf(input, "DISAGREEMENT_FOUND"), () => {
+      competing = runOwnerDeclaredReview(lifecycleDir, competitor, input, workbench);
+      redeclared = declare(lifecycleDir, reviewerInput({ statement: CORRECTED }));
+    });
+
+    const run = runOwnerDeclaredReview(lifecycleDir, first, input, workbench);
+    assert.equal(run.status, "REVIEWED");
+    assert.equal(first.calls, 1);
+    assert.equal(competing?.status, "REJECTED");
+    if (competing?.status === "REJECTED") assert.equal(competing.failedCheck, REVIEW_LIFECYCLE_CHECK.ATTEMPT_IN_FLIGHT);
+    assert.equal(competitor.calls.length, 0, "the competing execution never reached the reviewer");
+    assert.equal(!redeclared?.ok && redeclared?.failedCheck, REVIEW_LIFECYCLE_CHECK.ATTEMPT_IN_FLIGHT);
+
+    // Exactly one semantic-attempt record, and the claim is released.
+    const state = readReviewLifecycleState(lifecycleDir);
+    assert.ok(state.ok);
+    if (state.ok) assert.deepEqual(state.state.lifecycles[0].attempts.map((a) => [a.semanticAttempt, a.outcome]), [[1, "DISAGREEMENT_FOUND"]]);
+    assert.equal(existsSync(claimFile(lifecycleDir)), false);
+    // The consumed declaration cannot be run again sequentially either.
+    assertRejectedBeforeInvocation(lifecycleDir, workbench, input, REVIEW_LIFECYCLE_CHECK.NOT_DECLARED_READY);
+  });
+});
+
+test("a valid review is not recorded when its declaration stopped being authoritative during the review", () => {
+  withStore((lifecycleDir, workbench) => {
+    const input = reviewerInput();
+    declare(lifecycleDir, input);
+    const reviewer = new InterleavedReviewer(reviewOf(input, "CONCUR"), () => {
+      const state = JSON.parse(readFileSync(stateFile(lifecycleDir), "utf8"));
+      state.lifecycles[0].declaredReviewerInputFingerprint = reviewSubject(reviewerInput({ statement: CORRECTED })).reviewerInputFingerprint;
+      writeFileSync(stateFile(lifecycleDir), JSON.stringify(state), "utf8");
+    });
+    const run = runOwnerDeclaredReview(lifecycleDir, reviewer, input, workbench);
+    assert.equal(run.status, "REJECTED");
+    if (run.status === "REJECTED") assert.equal(run.failedCheck, REVIEW_LIFECYCLE_CHECK.STATE_INVALID);
+    const state = readReviewLifecycleState(lifecycleDir);
+    assert.ok(state.ok);
+    if (state.ok) assert.deepEqual(state.state.lifecycles[0].attempts, []);
+    assert.equal(existsSync(claimFile(lifecycleDir)), false);
+  });
+});
+
+test("a handled tooling/runtime failure releases the claim and leaves the same declaration reusable for the same attempt", () => {
+  withStore((lifecycleDir, workbench) => {
+    const input = reviewerInput();
+    declare(lifecycleDir, input);
+    const before = readFileSync(stateFile(lifecycleDir), "utf8");
+
+    assert.equal(runOwnerDeclaredReview(lifecycleDir, new ScriptedReviewer("{", "{"), input, workbench).status, TOOLING_RUNTIME_FAILURE);
+    assert.equal(existsSync(claimFile(lifecycleDir)), false);
+    assert.equal(readFileSync(stateFile(lifecycleDir), "utf8"), before, "the declaration is untouched and no attempt is recorded");
+
+    const throwing: AiInvoker = {
+      invoke: () => {
+        throw new Error("runtime crashed");
+      },
+    };
+    assert.throws(() => runOwnerDeclaredReview(lifecycleDir, throwing, input, workbench), /runtime crashed/);
+    assert.equal(existsSync(claimFile(lifecycleDir)), false);
+    assert.equal(readFileSync(stateFile(lifecycleDir), "utf8"), before);
+
+    assert.equal(reviewed(lifecycleDir, workbench, input, "CONCUR").semanticAttempt, 1);
+  });
+});
+
+test("a claim left by an execution that never released it fails closed before invocation", () => {
+  withStore((lifecycleDir, workbench) => {
+    const input = reviewerInput();
+    declare(lifecycleDir, input);
+    writeFileSync(claimFile(lifecycleDir), "{}\n", "utf8");
+    assertRejectedBeforeInvocation(lifecycleDir, workbench, input, REVIEW_LIFECYCLE_CHECK.ATTEMPT_IN_FLIGHT);
+    assert.equal(existsSync(claimFile(lifecycleDir)), true, "a claim this execution does not hold is never removed by it");
+  });
+});
+
+test("impossible persisted lifecycle states fail closed with REVIEW_LIFECYCLE_STATE_INVALID", () => {
+  const attempt = (semanticAttempt: number, fingerprint: string, outcome: string) => ({
+    semanticAttempt,
+    reviewerInputFingerprint: fingerprint,
+    outcome,
+    reviewSha256: "e".repeat(64),
+    technicalCalls: 1,
+  });
+  const [a, b, c] = ["a", "b", "c"].map((ch) => ch.repeat(64));
+  const lifecycle = (fields: Record<string, unknown>) => ({
+    baseGitSha: SHA_A,
+    targets: [{ recordFamily: "PRB-", id: "PRB-0001" }],
+    declaredReviewerInputFingerprint: null,
+    attempts: [],
+    closedByOwner: false,
+    ...fields,
+  });
+  const impossible: Record<string, Record<string, unknown>> = {
+    "open, no attempts, no declaration": lifecycle({}),
+    "CONCUR with a pending declaration": lifecycle({ declaredReviewerInputFingerprint: b, attempts: [attempt(1, a, "CONCUR")] }),
+    "pending declaration of already reviewed non-CONCUR content": lifecycle({ declaredReviewerInputFingerprint: a, attempts: [attempt(1, a, "DISAGREEMENT_FOUND")] }),
+    "closed with a pending declaration": lifecycle({ declaredReviewerInputFingerprint: b, attempts: [attempt(1, a, "DISAGREEMENT_FOUND")], closedByOwner: true }),
+    "escalated with a pending declaration": lifecycle({
+      declaredReviewerInputFingerprint: c,
+      attempts: [attempt(1, a, "DISAGREEMENT_FOUND"), attempt(2, b, "INSUFFICIENT_EVIDENCE")],
+    }),
+    "closed after CONCUR": lifecycle({ attempts: [attempt(1, a, "CONCUR")], closedByOwner: true }),
+    "attempt 2 recorded first": lifecycle({ attempts: [attempt(2, a, "DISAGREEMENT_FOUND")] }),
+    "duplicate attempt 1": lifecycle({ attempts: [attempt(1, a, "DISAGREEMENT_FOUND"), attempt(1, b, "CONCUR")] }),
+    "attempt 2 of the same content": lifecycle({ attempts: [attempt(1, a, "DISAGREEMENT_FOUND"), attempt(2, a, "CONCUR")] }),
+    "attempt after CONCUR": lifecycle({ attempts: [attempt(1, a, "CONCUR"), attempt(2, b, "CONCUR")] }),
+    "a third attempt": lifecycle({ attempts: [attempt(1, a, "DISAGREEMENT_FOUND"), attempt(2, b, "DISAGREEMENT_FOUND"), attempt(3, c, "CONCUR")] }),
+  };
+  for (const [name, stored] of Object.entries(impossible)) {
+    withStore((lifecycleDir, workbench) => {
+      mkdirSync(lifecycleDir, { recursive: true });
+      writeFileSync(stateFile(lifecycleDir), JSON.stringify({ schemaVersion: "1", lifecycles: [stored] }), "utf8");
+      assert.equal(readReviewLifecycleState(lifecycleDir).ok, false, name);
+      assertRejectedBeforeInvocation(lifecycleDir, workbench, reviewerInput(), REVIEW_LIFECYCLE_CHECK.STATE_INVALID);
+      const declared = declare(lifecycleDir, reviewerInput());
+      assert.equal(!declared.ok && declared.failedCheck, REVIEW_LIFECYCLE_CHECK.STATE_INVALID, name);
+    });
+  }
+  // Every state the transition rules produce stays valid, including a lifecycle the owner closed before any attempt.
+  withStore((lifecycleDir, workbench) => {
+    declare(lifecycleDir, reviewerInput());
+    reviewed(lifecycleDir, workbench, reviewerInput(), "DISAGREEMENT_FOUND");
+    declare(lifecycleDir, reviewerInput({ statement: CORRECTED }));
+    reviewed(lifecycleDir, workbench, reviewerInput({ statement: CORRECTED }), "DISAGREEMENT_FOUND");
+    assert.equal(declare(lifecycleDir, reviewerInput({ statement: "Muitos moradores relatam atrasos na recolha." }), true).ok, true);
+    assert.equal(declare(lifecycleDir, reviewerInput({ statement: "Outra redação.", widen: true }), true).ok, true);
+    const state = readReviewLifecycleState(lifecycleDir);
+    assert.ok(state.ok, state.ok ? "" : state.message);
+    if (state.ok) {
+      assert.deepEqual(
+        state.state.lifecycles.map((l) => [l.attempts.length, l.closedByOwner, l.declaredReviewerInputFingerprint === null]),
+        [
+          [2, true, true],
+          [0, true, true],
+          [0, false, false],
+        ],
+      );
+    }
   });
 });
