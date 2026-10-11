@@ -430,6 +430,8 @@ Implemented in both lanes, by the shared review kernel (reverse EVD→PRB impact
 - that boundary never recursively carries those EVDs' Sources or Source Verification Support, which therefore never widen PRB support;
 - findings and signal dispositions may target such a PRB, and no other unchanged record; it is part of the fingerprinted reviewer input and the hash-bound Gate package, but it is not a changed record in the Lane B receipt and is never integrated.
 
+The shared kernel also has a deterministic reduced reviewer-input profile, built beside the reference one from the same input. It keeps every changed record complete, with deterministic changed paths. It keeps every reverse-impacted PRB as a subject: its exact authored text, the role of each EVD reference and its complete bounded linked-EVD boundary. Source context is limited to allow-listed metadata of a changed EVD's own Sources, with the same base-only Source Verification Support. Only signals relevant to the change are dispositioned, grouped by record, field, signal code and wording. Full deterministic detection still runs first, so context-free blockers are unaffected. A missing signal never limits findings. Both lanes, the receipt, the pull-request summary and the Gate stay on the reference profile until the equivalence benchmark and owner cutover.
+
 The no-exception independent semantic-review rule is therefore technically enforced for both lanes. A `CONCUR` review makes a change eligible for human review; it is not an approval. Once a change is eligible, the canonical and publication decisions remain human judgement.
 
 ### Source Verification Support in semantic review

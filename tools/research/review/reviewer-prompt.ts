@@ -7,6 +7,7 @@
  * there is no separate channel by which additional context could reach it.
  */
 import { CLEC_DIMENSION } from "../language/signals.ts";
+import { reducedSourceEligibility, type ReducedReviewerInputPackage } from "./reduced-reviewer-input.ts";
 import { reviewSourceEligibility, type ReviewerInputPackage } from "./reviewer-input.ts";
 
 const DIMENSION_VALUES = Object.values(CLEC_DIMENSION).map((dimension) => `"${dimension}"`).join(" | ");
@@ -156,6 +157,68 @@ export function buildReviewerPrompt(frozenReviewerInputJson: string): string {
     frozenReviewerInputJson,
     "",
     ...sourceEligibilitySection(frozenReviewerInputJson),
+    "",
+    RESULT_CONTRACT,
+  ].join("\n");
+}
+
+/**
+ * REDUCED-profile instructions (CRR-03, reduced-reviewer-input.ts). Present
+ * only in buildReducedReviewerPrompt(): the reference prompt never carries
+ * them. They map the shared criteria above onto the reduced shape.
+ */
+const REDUCED_PROFILE_CRITERIA = `Reduced review input (profile "REDUCED", schemaVersion "3"). It frames the same semantic review in a smaller shape; where the criteria above name "evidenceContext", read the linked EVD boundaries and "sourceContext" described here.
+- "candidates" holds every record this package creates or updates, each as its complete canonical candidate value in "fields". "action" CREATE means all of its authored content is new. Otherwise "changedPaths" lists the paths that differ from the base version: they show where the change is, but never limit review — report a material CLEC defect anywhere in a candidate that the change causes or exposes.
+- A PRB candidate carries "evidenceLinks" and "linkedEvidenceBoundary"; it receives no SRC records and no Source Verification Support. An EVD candidate's Sources appear in "sourceContext" with only identity, attribution, eligibility, scope, publication-date and caveat metadata — never Source content. An SRC candidate has no further context.
+- "impactedSubjects" lists unchanged PRBs reviewed because an EVD they link is created or updated by this package ("changedEvidenceIds"). Each gives every authored text field as "authoredText" (exact "field" path and exact "text"), its "structuredScope" values, "evidenceLinks" and "linkedEvidenceBoundary": every EVD it links, each with "changed" and only observation.summary, scope, inference_limits, evidence_nature and claim_authority. Judge each impacted PRB against all of its linked EVD boundaries, never only the changed EVD: another unchanged linked EVD may still support a claim. A finding on an impacted PRB quotes one of its "authoredText" fields by that exact path.
+- "evidenceLinks" says what each reference means: "role" EVIDENCE_RELATIONSHIP is an evidence[] entry whose "relationship" carries its authored effects (SUPPORTS, BOUNDS, REFINES…) and research roles; SUPPORTING_EVIDENCE, BOUNDARY_EVIDENCE, CONTRADICTION_SEARCH, MANIFESTATION_BASIS, CONSEQUENCE_BASIS, CURRENTNESS_BASIS, OPEN_QUESTION and INVESTIGATION_PATH name where else the PRB cites it. A reference is not positive support for every PRB claim: a bounding, contradiction-search or investigation-history EVD bounds or contextualises the PRB.
+- The linked EVD boundary is a PRB's complete evidential boundary. SRC records, "sourceContext" and Source Verification Support never widen it and never support PRB wording. A PRB finding or disposition may cite only that PRB and its linked EVD (a PRB candidate may also cite other candidates); an EVD candidate may cite its own Sources and other candidates. No other record may be cited, and no other unchanged record may be a finding's recordId.
+- Each "signals" entry is a group: one "signalId", one record ("subjectId"), one "field", one "code" and one or more exact "occurrences" of the same wording, each with its excerpt, match and evidenceReferences. Give exactly one disposition per group (signalId), not per occurrence; the disposition covers every occurrence, and SUPPORTED for a scope-term group needs linked-EVD support for every occurrence. Only signals relevant to the change are listed: the absence of a signal never prevents a finding, and a material CLEC defect — including a PRB→EVD mismatch with no signal — must still be reported as a finding with relatedSignalIds [].`;
+
+function reducedSourceEligibilitySection(frozenReducedInputJson: string): string[] {
+  const input = JSON.parse(frozenReducedInputJson) as Partial<ReducedReviewerInputPackage>;
+  const entries = reducedSourceEligibility({ candidates: input.candidates ?? [], sourceContext: input.sourceContext ?? [] });
+  return [
+    "SOURCE VERIFICATION ELIGIBILITY (deterministic, derived from the canonical SRC metadata in the review input):",
+    ...(entries.length === 0
+      ? ["- (no SRC records in the review input)"]
+      : entries.map(({ sourceId, ineligibility }) =>
+          ineligibility.length === 0 ? `- ${sourceId}: SOURCE_VERIFICATION_ELIGIBLE` : `- ${sourceId}: SOURCE_VERIFICATION_INELIGIBLE (${ineligibility.join(", ")})`
+        )),
+  ];
+}
+
+/**
+ * The reviewer prompt for a REDUCED package: `frozenReducedInputJson` must be
+ * exactly serializeReducedReviewerInput()'s string. Same framing, CLEC
+ * criteria and result contract as buildReviewerPrompt(), plus the reduced
+ * profile instructions; buildReviewerStructuralRetryPrompt() applies as is.
+ */
+export function buildReducedReviewerPrompt(frozenReducedInputJson: string): string {
+  return [
+    "You are performing an independent review of the following already-authored",
+    "research candidate package. You did not author it. Evaluate only the",
+    "material below, including the evidence context and the deterministic CLEC",
+    "signals it contains.",
+    "Assess whether:",
+    "- claims are adequately supported by the linked Evidence;",
+    "- Evidence inference limits are respected;",
+    "- candidates are internally consistent;",
+    "- contradictions and boundaries are represented faithfully;",
+    "- unresolved contradiction is explicitly bounded where relevant;",
+    "- no unsupported certainty (causal strength, currentness, prevalence, effectiveness) was introduced.",
+    "A faithfully preserved, bounded unresolved contradiction is legitimate",
+    "research state, not a defect: on its own it is not grounds for",
+    "DISAGREEMENT_FOUND or INSUFFICIENT_EVIDENCE.",
+    "",
+    CLEC_REVIEW_CRITERIA,
+    "",
+    REDUCED_PROFILE_CRITERIA,
+    "",
+    "REVIEW INPUT (immutable, JSON):",
+    frozenReducedInputJson,
+    "",
+    ...reducedSourceEligibilitySection(frozenReducedInputJson),
     "",
     RESULT_CONTRACT,
   ].join("\n");

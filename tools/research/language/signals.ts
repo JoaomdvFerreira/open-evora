@@ -626,6 +626,20 @@ function problemTextFields(fields: RecordFields): TextField[] {
   return out;
 }
 
+/**
+ * The authored PRB text fields this module reads, as exact `{ field, text }`
+ * pairs in field order: the one definition of reviewable PRB text, shared by
+ * the reduced reviewer input (review/reduced-reviewer-input.ts).
+ */
+export function problemAuthoredText(fields: RecordFields): { field: string; text: string }[] {
+  return problemTextFields(fields).map(({ field, text }) => ({ field, text }));
+}
+
+/** Folded comparison form of signal wording: the lexicon's folding, with each whitespace run read as one space. */
+export function foldSignalText(text: string): string {
+  return fold(text).folded.replace(/\s+/gu, " ").trim();
+}
+
 function evidenceTextFields(fields: RecordFields): TextField[] {
   const out: TextField[] = [];
   pushText(out, "observation.summary", getRecordField(fields, "observation.summary"), true, asStringList(getRecordField(fields, "provenance.sources")));
