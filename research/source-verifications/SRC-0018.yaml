@@ -1,0 +1,22 @@
+source_id: SRC-0018
+retrieval:
+  retrieved_at: "2026-10-11"
+  content_sha256: dcd5d16c55d3fd115983542c9227c2819ca2b52626f617378f2e9ffdf005267d
+  media_type: application/pdf
+verified_claims:
+  - locator: "p. 1, capa, data sob o título; pp. 28–29, secção 7, subsecção 7.7, e secção 8, subsecções 8.1 e 8.2"
+    statement: "A capa do relatório de atividades da Autoridade de Transportes do Município de Évora indica a data de junho de 2026, e os dados de segurança e sustentabilidade apresentados nas secções finais são expressamente referidos ao ano de 2025."
+  - locator: "p. 6, secção 2.3 (O serviço público de transporte urbano de Évora), 1.º e 3.º parágrafos"
+    statement: "O serviço público de transporte urbano de Évora é concessionado desde 1 de julho de 2023 à E-BUS, S.A., empresa comercialmente denominada TREVO."
+  - locator: "p. 28, secção 7.5 (Sistema de informação ao público), parágrafo único"
+    statement: "Segundo o relatório, o operador disponibiliza na sua página de internet (www.trevo.com.pt) informação ao público sobre horários e percursos, direitos dos passageiros, títulos de transporte e tarifas em vigor, frota, serviços, locais de afixação de publicidade e respetivas condições e formas alternativas de contacto, bem como acesso ao Livro de Reclamações Eletrónico."
+  - locator: "p. 29, secção 7.5 (continuação), lista Pontos de Informações"
+    statement: "O relatório enumera como pontos de informação a loja de apoio ao cliente TREVO, com contacto telefónico, fax e correio eletrónico e atendimento presencial e telefónico, o website TREVO, as bilheteiras do Terminal Rodoviário de Évora, com atendimento presencial e telefónico, três agentes de vendas (tabacarias) com atendimento presencial e a aplicação PICK, em linha."
+  - locator: "p. 28, secção 7.3 (Inquérito de satisfação), parágrafo único"
+    statement: "O relatório afirma que a E-BUS, S.A. não informou o Município de Évora dos resultados de inquéritos de satisfação que possa ter realizado; o texto não afirma que não tenham sido realizados inquéritos."
+  - locator: "p. 28, secção 7.4 (Reclamações), frase introdutória e tabela com as colunas Reclamações, QTD, Tipo, Resposta e Motivo"
+    statement: "Na secção de reclamações, o relatório apresenta, como reclamações informadas pelo operador, uma tabela com sete linhas, cada uma com quantidade 1, datadas entre março e novembro de 2025 (mar/25, mar/25, jun/25, ago/25, nov/25, nov/25 e nov/25)."
+  - locator: "p. 28, secção 7.4 (Reclamações), tabela, coluna Motivo, linhas 1 a 7"
+    statement: "Os motivos indicados nas sete linhas da tabela são, por ordem: condições do WC do Terminal Rodoviário; atraso na realização do serviço Linha Azul–Zona Sul; atendimento demorado; comportamento de motorista; comportamento de motorista; paragens interditas por causa de obras; atraso do serviço."
+  - locator: "p. 28, secção 7.4 (Reclamações), tabela, colunas Tipo, Resposta e Motivo"
+    statement: "A tabela não tem coluna de categoria temática; as colunas Tipo e Resposta indicam apenas o meio da reclamação e da resposta (digital, física, email, carta), e nenhum motivo da tabela menciona expressamente informação ao público, informação nas paragens ou acessibilidade."
