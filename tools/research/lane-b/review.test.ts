@@ -631,6 +631,10 @@ test("an exact CONCUR receipt with signals and valid dispositions passes; adviso
     const review = concur(unit.reviewerInput);
     const result = verifyLaneBPullRequest(unit, bodyWith(receiptFor(unit, review)), artifactsFor(review));
     assert.deepEqual(result.ok, true, result.ok ? "" : result.errors.join("; "));
+    // The verified receipt and review are handed to deterministic consumers, not re-parsed.
+    assert.ok(result.ok && result.status === "VERIFIED");
+    assert.deepEqual(result.receipt, receiptFor(unit, review));
+    assert.deepEqual(result.independentReview, review);
   });
 });
 
@@ -1116,6 +1120,60 @@ test("the prepare and check CLIs fail a context-free blocker before any reviewer
       assert.match(checked.output, /FAILED \[CLEC_CONTEXT_FREE_BLOCK\]/);
     } finally {
       rmSync(stubDir, { recursive: true, force: true });
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CLI summary entry point, as the trusted pull-request comment publisher runs it.
+
+test("the summary CLI verifies exactly as check does and writes only the bounded PT-PT summary", () => {
+  withFixture((fixture, base) => {
+    const dir = mkdtempSync(join(tmpdir(), "open-evora-lane-b-summary-"));
+    const output = join(dir, "summary.md");
+    const bodyFile = join(dir, "body.md");
+    const runSummary = (head: string, body: string): { status: number | null; stdout: string; stderr: string; markdown: string } => {
+      writeFileSync(bodyFile, body);
+      rmSync(output, { force: true });
+      const result = spawnSync(process.execPath, ["--experimental-strip-types", cliPath, "summary", "--base", base, "--head", head, "--body-file", bodyFile, "--output", output], {
+        cwd: fixture.root,
+        encoding: "utf8",
+      });
+      return { status: result.status, stdout: result.stdout, stderr: result.stderr, markdown: existsSync(output) ? readFileSync(output, "utf8") : "" };
+    };
+    try {
+      const notApplicable = runSummary(base, prBody("N/A"));
+      assert.equal(notApplicable.status, 3, notApplicable.stderr);
+      assert.equal(notApplicable.stdout, "SUMMARY: NOT_APPLICABLE\n");
+      assert.match(notApplicable.markdown, /\*\*Resultado:\*\* Não aplicável/);
+
+      addProblemWithSignal(fixture);
+      const unit = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
+      const review = concur(unit.reviewerInput);
+      const artifact = review as unknown as IndependentReviewResult;
+      fixture.write(reviewArtifactPath(sha256Hex(artifact)), renderReviewArtifact(artifact));
+      const head = fixture.commit("direct change");
+
+      const verified = runSummary(head, bodyWith(receiptFor(unit, review)));
+      assert.equal(verified.status, 0, verified.stderr);
+      assert.equal(verified.stdout, "SUMMARY: VERIFIED\n");
+      assert.match(verified.markdown, /\*\*Resultado:\*\* CONCUR\n\*\*Registos revistos:\*\* 1\n/);
+      assert.match(verified.markdown, new RegExp(`- SUPPORTED: ${unit.reviewerInput.signals.length}\n- VIOLATION: 0\n`));
+      for (const leaked of [review.rationale as string, "EVD-A regista muitas reclamações."]) {
+        assert.equal(`${verified.markdown}${verified.stdout}${verified.stderr}`.includes(leaked), false);
+      }
+
+      const invalid = runSummary(head, bodyWith({ ...receiptFor(unit, review), reviewerInputFingerprint: "f".repeat(64) }));
+      assert.equal(invalid.status, 4);
+      assert.equal(invalid.stdout, "SUMMARY: INVALID\n");
+      assert.match(invalid.markdown, /\*\*Código:\*\* `RECEIPT_FINGERPRINT_MISMATCH`/);
+      assert.doesNotMatch(invalid.markdown, /fingerprint does not match/);
+
+      const unreconstructable = runSummary("0".repeat(40), prBody("N/A"));
+      assert.equal(unreconstructable.status, 4);
+      assert.match(unreconstructable.markdown, /`LANE_B_RECONSTRUCTION_FAILED`/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
     }
   });
 });

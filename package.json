@@ -15,6 +15,7 @@
     "research:signals": "node tools/research/language/cli.ts",
     "research:lane-b:prepare": "node tools/research/lane-b/cli.ts prepare",
     "research:lane-b:check": "node tools/research/lane-b/cli.ts check",
+    "research:lane-b:summary": "node tools/research/lane-b/cli.ts summary",
     "research:typecheck": "tsc --noEmit -p tools/research/tsconfig.json",
     "research:test": "node --test --experimental-strip-types \"tools/research/**/*.test.ts\" apps/research-explorer/benchmark/generator-contract.test.js",
     "research:check": "npm run research:typecheck && npm run research:test && npm run research:validate"

@@ -20,17 +20,24 @@
  *     rebuilt from Git. Never invokes a reviewer. With --event-path the
  *     base is the merge base of the event's base and head; the PR body is read from the event file, never from
  *     shell arguments.
+ *   summary (--event-path <github-event.json> | --base <sha> --head <sha> --body-file <file>) --output <file>
+ *     Runs exactly the check verification and writes only the short PT-PT
+ *     review summary (summary.ts) to <file>, for the trusted pull-request
+ *     comment publisher. Never invokes a reviewer and never prints or writes
+ *     the review itself. Prints one line: `SUMMARY: <status>`.
  *
  * Exit code 0 = PASS / receipt produced; 1 = any failure (fail closed).
+ * summary exit codes: 0 = VERIFIED, 3 = NOT_APPLICABLE, 4 = INVALID (each
+ * with its summary written); 1 = usage or output failure (nothing written).
  */
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "../ai/invoker.ts";
 import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
-import { laneBContextFreeBlock, prepareLaneBReview, verifyLaneBPullRequest } from "./receipt.ts";
+import { laneBContextFreeBlock, prepareLaneBReview, verifyLaneBPullRequest, type LaneBVerification } from "./receipt.ts";
 import {
   describeSourceVerificationNotSeparate,
   pullRequestBase,
@@ -39,13 +46,19 @@ import {
   reviewArtifactsAtCommit,
   type LaneBReviewUnit,
 } from "./review-unit.ts";
+import { laneBReviewSummary, renderInvalidSummary, type ReviewSummary, type ReviewSummaryStatus } from "./summary.ts";
 
 const USAGE = [
   "Usage:",
   "  node tools/research/lane-b/cli.ts prepare --base <ref> [--workbench <dir>]",
   "  node tools/research/lane-b/cli.ts check --event-path <github-event.json>",
   "  node tools/research/lane-b/cli.ts check --base <sha> --head <sha> --body-file <file>",
+  "  node tools/research/lane-b/cli.ts summary --event-path <github-event.json> --output <file>",
+  "  node tools/research/lane-b/cli.ts summary --base <sha> --head <sha> --body-file <file> --output <file>",
 ].join("\n");
+
+/** Stable `summary` exit codes, so the publisher never parses free-form output. */
+export const SUMMARY_EXIT_CODES: Readonly<Record<ReviewSummaryStatus, number>> = { VERIFIED: 0, NOT_APPLICABLE: 3, INVALID: 4 };
 
 function failed(code: string, message: string): void {
   console.error(`FAILED [${code}]: ${message}`);
@@ -107,37 +120,70 @@ function prepare(repoRoot: string, flag: (name: string) => string | undefined): 
   console.log(outcome.receiptBlock);
 }
 
-function check(repoRoot: string, flag: (name: string) => string | undefined): void {
-  let baseGitSha: string;
-  let headSha: string;
-  let body: string | null;
+type PullRequestInput = { baseGitSha: string; headSha: string; body: string | null };
+
+/**
+ * The pull request to verify, from a GitHub event file or explicit
+ * arguments. With --event-path the base is the merge base of the event's
+ * base and head. Returns a failure code instead when the input is unusable.
+ */
+function pullRequestInput(repoRoot: string, flag: (name: string) => string | undefined): PullRequestInput | { failedCheck: string; message: string } {
   const eventPath = flag("--event-path");
   if (eventPath) {
     const event = JSON.parse(readFileSync(eventPath, "utf8")) as { pull_request?: { base?: { sha?: unknown }; head?: { sha?: unknown }; body?: unknown } };
     const pr = event.pull_request;
     if (!pr || typeof pr.base?.sha !== "string" || typeof pr.head?.sha !== "string") {
-      return failed("NOT_A_PULL_REQUEST_EVENT", "the event file has no pull_request base/head SHA");
+      return { failedCheck: "NOT_A_PULL_REQUEST_EVENT", message: "the event file has no pull_request base/head SHA" };
     }
-    headSha = pr.head.sha;
-    baseGitSha = pullRequestBase(repoRoot, pr.base.sha, headSha);
-    body = typeof pr.body === "string" ? pr.body : null;
-  } else {
-    const base = flag("--base");
-    const head = flag("--head");
-    const bodyFile = flag("--body-file");
-    if (!base || !head || !bodyFile) return failed("USAGE", USAGE);
-    baseGitSha = base;
-    headSha = head;
-    body = readFileSync(bodyFile, "utf8");
+    return { baseGitSha: pullRequestBase(repoRoot, pr.base.sha, pr.head.sha), headSha: pr.head.sha, body: typeof pr.body === "string" ? pr.body : null };
   }
+  const base = flag("--base");
+  const head = flag("--head");
+  const bodyFile = flag("--body-file");
+  if (!base || !head || !bodyFile) return { failedCheck: "USAGE", message: USAGE };
+  return { baseGitSha: base, headSha: head, body: readFileSync(bodyFile, "utf8") };
+}
 
+/** The one verification `check` and `summary` share: review unit rebuilt from Git, artifacts read from the head commit. */
+function verifyPullRequest(repoRoot: string, { baseGitSha, headSha, body }: PullRequestInput): { unit: LaneBReviewUnit; verification: LaneBVerification } {
   const unit = resolveLaneBReviewUnit({ repoRoot, baseGitSha, head: { kind: "commit", sha: headSha } });
-  const verification = verifyLaneBPullRequest(unit, body, reviewArtifactsAtCommit(repoRoot, baseGitSha, headSha));
+  return { unit, verification: verifyLaneBPullRequest(unit, body, reviewArtifactsAtCommit(repoRoot, baseGitSha, headSha)) };
+}
+
+function check(repoRoot: string, flag: (name: string) => string | undefined): void {
+  const input = pullRequestInput(repoRoot, flag);
+  if ("failedCheck" in input) return failed(input.failedCheck, input.message);
+  const { verification } = verifyPullRequest(repoRoot, input);
   if (verification.ok) {
     console.log(`PASS: ${verification.summary}`);
     return;
   }
   failed(verification.failedCheck, verification.errors.join("\n  "));
+}
+
+/**
+ * Writes only the PT-PT summary of the check's own verification. Any
+ * reconstruction error becomes the INVALID summary with a stable code; its
+ * detail stays in the check's output, never in the summary.
+ */
+function summary(repoRoot: string, flag: (name: string) => string | undefined): void {
+  const output = flag("--output");
+  if (!output || (!flag("--event-path") && !(flag("--base") && flag("--head") && flag("--body-file")))) return failed("USAGE", USAGE);
+  let result: ReviewSummary;
+  try {
+    const input = pullRequestInput(repoRoot, flag);
+    if ("failedCheck" in input) {
+      result = { status: "INVALID", markdown: renderInvalidSummary(input.failedCheck) };
+    } else {
+      const { unit, verification } = verifyPullRequest(repoRoot, input);
+      result = laneBReviewSummary(unit, verification);
+    }
+  } catch {
+    result = { status: "INVALID", markdown: renderInvalidSummary("LANE_B_RECONSTRUCTION_FAILED") };
+  }
+  writeFileSync(output, result.markdown, "utf8");
+  console.log(`SUMMARY: ${result.status}`);
+  process.exitCode = SUMMARY_EXIT_CODES[result.status];
 }
 
 function main(): void {
@@ -150,6 +196,7 @@ function main(): void {
     const repoRoot = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
     if (command === "prepare") prepare(repoRoot, flag);
     else if (command === "check") check(repoRoot, flag);
+    else if (command === "summary") summary(repoRoot, flag);
     else failed("USAGE", USAGE);
   } catch (error) {
     failed("LANE_B_RECONSTRUCTION_FAILED", (error as Error).message);
