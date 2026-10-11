@@ -489,7 +489,7 @@ function reviewRequired(unit: LaneBReviewUnit): ReviewRequired {
 /** Runs `prepare`'s review step for the working tree and returns its receipt block. */
 function prepareConcurReceipt(repo: LaneBRepo, reviewer: RecordingInvoker): { unit: ReviewRequired; receiptBlock: string } {
   const unit = reviewRequired(repo.workingTreeUnit());
-  const prepared = prepareLaneBReview(unit, reviewer, join(repo.scratch, "workbench"));
+  const prepared = prepareLaneBReview(unit, reviewer, join(repo.scratch, "workbench"), repo.fixture.root);
   assert.equal(prepared.status, "READY", prepared.status === "REVIEW_FAILED" ? `${prepared.failedCheck}: ${prepared.message}` : prepared.status);
   if (prepared.status !== "READY") throw new Error("unreachable");
   return { unit, receiptBlock: prepared.receiptBlock };
@@ -516,15 +516,19 @@ test("Lane B: a direct advisory-signal change gets one independent CONCUR review
     assert.deepEqual(reviewer.calls.map((call) => call.role), ["INDEPENDENT_REVIEWER"]);
     assert.ok(reviewer.calls[0].input.includes(serializeReviewerInput(unit.reviewerInput)));
     const receipt = JSON.parse(/```json\n([\s\S]*?)\n```/.exec(receiptBlock)![1]);
-    assert.deepEqual(receipt.independentReview, concur(unit.reviewerInput));
-    assert.deepEqual(receipt.independentReview.signalDispositions.map((d: { signalId: string }) => d.signalId), unit.reviewerInput.signals.map((s) => s.signalId));
-    assert.ok(receipt.independentReview.signalDispositions.some((d: { signalId: string }) => d.signalId === signalId));
+    // The full review is the hash-addressed artifact the receipt names; the receipt carries none of it.
+    const review = JSON.parse(readFileSync(join(repo.fixture.root, ".research-review", `${receipt.reviewSha256}.json`), "utf8"));
+    assert.deepEqual(review, concur(unit.reviewerInput));
+    assert.equal(sha256Hex(review), receipt.reviewSha256);
+    assert.deepEqual(review.signalDispositions.map((d: { signalId: string }) => d.signalId), unit.reviewerInput.signals.map((s) => s.signalId));
+    assert.ok(review.signalDispositions.some((d: { signalId: string }) => d.signalId === signalId));
 
-    // The receipt binds to the exact base, record content and reviewer input.
+    // The receipt binds to the exact base, record content, reviewer input and review.
+    assert.equal(receipt.outcome, "CONCUR");
     assert.equal(receipt.baseGitSha, repo.base);
     assert.equal(receipt.reviewerInputFingerprint, unit.reviewerInputFingerprint);
     const blob = execFileSync("git", ["-C", repo.fixture.root, "hash-object", EVD_REPO_PATH], { encoding: "utf8" }).trim();
-    assert.deepEqual(receipt.changedRecords.map((record: { id: string; blob: string }) => [record.id, record.blob]), [[EVD_ID, blob]]);
+    assert.deepEqual(receipt.changedRecordBlobs, [{ path: EVD_REPO_PATH, blob }]);
 
     // The exact machine-generated block in the PR's review section passes the CI check.
     const head = repo.commit("direct research change");
@@ -562,7 +566,7 @@ test("Lane B: a direct EVD change embedding a PRB ID is blocked before review, g
     const workbench = join(repo.scratch, "workbench");
     mkdirSync(workbench);
 
-    const prepared = prepareLaneBReview(reviewRequired(repo.workingTreeUnit()), reviewer, workbench);
+    const prepared = prepareLaneBReview(reviewRequired(repo.workingTreeUnit()), reviewer, workbench, repo.fixture.root);
     assert.equal(prepared.status, "REVIEW_FAILED");
     if (prepared.status !== "REVIEW_FAILED") return;
     assert.equal(prepared.failedCheck, CONTEXT_FREE_BLOCK);
@@ -699,7 +703,7 @@ test("Lane B: a Source-fidelity claim is INSUFFICIENT_EVIDENCE without support a
     repo.writeEvidence(FIDELITY_EVD);
     const before = reviewRequired(repo.workingTreeUnit());
     assert.equal(before.reviewerInput.sourceVerificationContext, undefined);
-    assertInsufficient(prepareLaneBReview(before, sourceFidelityReviewer([COUNT_FACT]), join(repo.scratch, "without-support")), [COUNT_FACT]);
+    assertInsufficient(prepareLaneBReview(before, sourceFidelityReviewer([COUNT_FACT]), join(repo.scratch, "without-support"), repo.fixture.root), [COUNT_FACT]);
 
     // Support introduced in the same change is refused, whatever the review section says.
     writeSupport(repo.fixture.research, VERIFIED_STATEMENTS);
@@ -721,7 +725,7 @@ test("Lane B: a Source-fidelity claim is INSUFFICIENT_EVIDENCE without support a
     const reviewer = sourceFidelityReviewer([COUNT_FACT]);
     const unit = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: supportHead, head: { kind: "working-tree" } }));
     assert.deepEqual(unit.reviewerInput.sourceVerificationContext?.map((entry) => entry.source_id), ["SRC-BASE"]);
-    const prepared = prepareLaneBReview(unit, reviewer, join(repo.scratch, "with-support"));
+    const prepared = prepareLaneBReview(unit, reviewer, join(repo.scratch, "with-support"), repo.fixture.root);
     assert.equal(prepared.status, "READY", prepared.status === "REVIEW_FAILED" ? `${prepared.failedCheck}: ${prepared.message}` : prepared.status);
     if (prepared.status !== "READY") return;
     assert.ok(reviewer.calls[0].input.includes(serializeReviewerInput(unit.reviewerInput)));
@@ -739,7 +743,7 @@ test("Lane B: Source-derived wording beyond the verified claims stays INSUFFICIE
     const unit = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: supportHead, head: { kind: "working-tree" } }));
     assert.deepEqual(unit.reviewerInput.sourceVerificationContext?.[0].verified_claims.map((claim) => claim.statement), VERIFIED_STATEMENTS);
     const workbench = join(repo.scratch, "workbench");
-    assertInsufficient(prepareLaneBReview(unit, sourceFidelityReviewer([COUNT_FACT, TREND_FACT]), workbench), [TREND_FACT]);
+    assertInsufficient(prepareLaneBReview(unit, sourceFidelityReviewer([COUNT_FACT, TREND_FACT]), workbench, repo.fixture.root), [TREND_FACT]);
     assert.equal(existsSync(join(workbench, "pr-receipt.md")), false, "no receipt exists for a non-CONCUR review");
   });
 });
