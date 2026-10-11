@@ -26,6 +26,7 @@ Otherwise replace N/A with the exact compact receipt block printed by `npm run r
 - CI rebuilds the reviewer input from Git and verifies the receipt and that exact artifact against it.
 - The receipt must correspond to this PR's exact base and canonical record content; altering reviewed record content invalidates the receipt and requires a new review.
 - Only a CONCUR review is eligible for human approval; it is not an approval.
+- CI publishes a short review summary as a separate PR comment automatically; do not add it here.
 - Agents do not inspect the full review artifact unless the repository owner explicitly directs it.
 -->
 

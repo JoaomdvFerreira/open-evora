@@ -199,8 +199,14 @@ function checkReceiptShape(value: unknown): string[] {
   return errors;
 }
 
+/**
+ * A passed verification is NOT_APPLICABLE (no canonical record changed) or
+ * VERIFIED, carrying the receipt and the review it verified for deterministic
+ * consumers such as the PR review summary. CLI output never prints the review.
+ */
 export type LaneBVerification =
-  | { ok: true; summary: string }
+  | { ok: true; status: "NOT_APPLICABLE"; summary: string }
+  | { ok: true; status: "VERIFIED"; summary: string; receipt: LaneBReviewReceipt; independentReview: IndependentReviewResult }
   | { ok: false; failedCheck: string; errors: string[] };
 
 function fail(failedCheck: string, ...errors: string[]): LaneBVerification {
@@ -234,7 +240,7 @@ export function verifyLaneBPullRequest(unit: LaneBReviewUnit, body: string | nul
     if (artifacts.changedPaths.length > 0) {
       return fail("REVIEW_ARTIFACT_UNREFERENCED", `no canonical record changed, so no review artifact may change: ${artifacts.changedPaths.join(", ")}`);
     }
-    return { ok: true, summary: "no canonical PRB/EVD/SRC record changed; no Lane B receipt is required" };
+    return { ok: true, status: "NOT_APPLICABLE", summary: "no canonical PRB/EVD/SRC record changed; no Lane B receipt is required" };
   }
   if (unit.status === "UNSUPPORTED_DELETION") {
     return fail(
@@ -302,6 +308,9 @@ export function verifyLaneBPullRequest(unit: LaneBReviewUnit, body: string | nul
   }
   return {
     ok: true,
+    status: "VERIFIED",
+    receipt,
+    independentReview: review,
     summary: `independent review CONCUR (${artifactPath}) bound to base ${unit.baseGitSha} covering ${recordList(unit.changedRecords)}; eligible for human review (not an approval)`,
   };
 }

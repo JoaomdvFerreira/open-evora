@@ -421,7 +421,8 @@ Implemented for direct pull-request changes (Lane B):
 - independent semantic review of the changed records by a separate reviewer invocation, against the same bounded evidence context and structured result contract as Lane A;
 - binding of that review to the exact base commit, the exact changed record content and the exact reviewer input;
 - a machine-generated compact binding receipt in the pull-request body, with the complete review stored in a hash-bound governance artifact committed in the same pull request;
-- CI rebuilds the review input from Git, verifies both the compact receipt and the complete review artifact against it, and fails the pull request when either is missing, stale or structurally or contextually invalid, or the review outcome is not `CONCUR`.
+- CI rebuilds the review input from Git, verifies both the compact receipt and the complete review artifact against it, and fails the pull request when either is missing, stale or structurally or contextually invalid, or the review outcome is not `CONCUR`;
+- for human visibility, trusted default-branch CI tooling then repeats that verification without executing pull-request code and keeps one short deterministic PT-PT pull-request comment current: the review outcome, disposition counts, every `NOT_APPLICABLE` and `INSUFFICIENT_EVIDENCE` disposition with its reason, and any blocking findings — or a not-applicable or failed-verification state. The complete review remains only in the hash-bound artifact; the comment is a derived representation, neither research state nor an approval, and invokes no reviewer.
 
 The no-exception independent semantic-review rule is therefore technically enforced for both lanes. A `CONCUR` review makes a change eligible for human review; it is not an approval. Once a change is eligible, the canonical and publication decisions remain human judgement.
 
