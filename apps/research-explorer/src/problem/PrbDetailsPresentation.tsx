@@ -1,12 +1,12 @@
-import { useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
+import { IconInfo } from "../presentation/icons";
 import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { RecordIdentifier } from "../records/RecordIdentifier";
-import { validationVisual } from "./stateVisuals";
 import { PrbHeader, PrbIdentityHeader } from "./PrbPageHeader";
-import { formatPublicCount, publicCompactEnumLabel, publicEnumLabel } from "../presentation/presentation";
+import { formatPublicCount, formatPublicPartialDate, publicCompactEnumLabel, publicEnumExplanation, publicEnumLabel } from "../presentation/presentation";
+import { isHttpUrl } from "../records/sourceView";
 import { Drawer } from "../presentation/Drawer";
-import { describeTopic } from "../presentation/topicMapping";
 import type { PrbDetailsData, PrbEvidenceItem, PrbOpenQuestion, PrbPathStage } from "./prbDetailsProjection";
 import type { PrbDossierData } from "./prbDossierProjection";
 import { PrbDossierAction } from "./PrbDossierAction";
@@ -63,23 +63,84 @@ export interface PrbDetailsPresentationProps {
  * inline-chip form (statusGloss.ts/presentation.ts), matching the terse
  * reference copy ("Identificada", "Por validar").
  *
- * Colour hierarchy: lifecycle and evidence values always read neutral; only
- * an outstanding validation step (validation tone open/partial, e.g. "Por
- * validar") takes the accent, so the band draws the eye to the one
- * human-owned step still pending rather than accenting every value. The
- * explicit text label carries the meaning either way.
+ * All three state dimensions use neutral presentation. Their text labels
+ * carry the canonical meaning without implying urgency or currentness.
  */
 function PrbStateValue({ field, value }: { field: "status" | "validation_status" | "evidence_status"; value: string }) {
   const label = field === "status" ? publicEnumLabel(field, value) : publicCompactEnumLabel(field, value);
-  const tone = field === "validation_status" ? validationVisual(value).tone : null;
-  const accent = tone === "open" || tone === "partial";
-  return <dd className={accent ? "prb-state-value prb-state-value--accent" : "prb-state-value"}>{label}</dd>;
+  const explanation = field === "evidence_status" && value === "discovered"
+    ? "Foram encontradas evidências relevantes; o problema ainda não foi plenamente validado."
+    : null;
+  const explanationId = useId();
+  const controlRef = useRef<HTMLSpanElement>(null);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [pinned, setPinned] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const open = Boolean(explanation) && (hovered || focused || pinned) && !dismissed;
+
+  useEffect(() => {
+    if (!open) return;
+    const dismissOutside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !controlRef.current?.contains(event.target)) {
+        setPinned(false);
+        setHovered(false);
+        setDismissed(true);
+      }
+    };
+    document.addEventListener("pointerdown", dismissOutside);
+    return () => document.removeEventListener("pointerdown", dismissOutside);
+  }, [open]);
+
+  return (
+    <dd className="prb-state-value">
+      <span>{label}</span>
+      {explanation && (
+        <span
+          ref={controlRef}
+          className="prb-state-info-wrap"
+          onPointerEnter={(event) => {
+            if (event.pointerType === "touch") return;
+            setHovered(true);
+            setDismissed(false);
+          }}
+          onPointerLeave={() => setHovered(false)}
+        >
+          <button
+            type="button"
+            className="prb-state-info-button"
+            aria-label="O que significa Evidência identificada?"
+            aria-describedby={explanationId}
+            onFocus={() => { setFocused(true); setDismissed(false); }}
+            onBlur={() => setFocused(false)}
+            onClick={() => {
+              setPinned(!pinned);
+              setDismissed(pinned);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                setPinned(false);
+                setHovered(false);
+                setDismissed(true);
+              }
+            }}
+          >
+            <IconInfo />
+          </button>
+          <span id={explanationId} role="tooltip" className="prb-state-info-tooltip" data-open={open || undefined}>
+            {explanation}
+          </span>
+        </span>
+      )}
+    </dd>
+  );
 }
 
 /**
  * Investigation-state + scope full-width flat band — plain caption/value pairs and plain count metrics, not chip-like status controls. All values come directly from canonical fields; no derived posture.
  *
- * DOM order stays heading → values per group (Estado da investigação, then Âmbito); at >=768 the stylesheet lays both groups onto one six-column grid (group-heading row + data row) without reordering the markup.
+ * DOM order stays heading → values per group (Estado da investigação, then Base da investigação); at >=768 the stylesheet lays both groups onto one six-column grid (group-heading row + data row) without reordering the markup.
  */
 function PrbInvestigationStateSection({ data }: { data: PrbDetailsData }) {
   return (
@@ -111,19 +172,19 @@ function PrbInvestigationStateSection({ data }: { data: PrbDetailsData }) {
           </dl>
         </div>
         <div className="prb-scope-block">
-          <h3 className="detail-panel-label">Âmbito</h3>
+          <h3 className="detail-panel-label">Base da investigação</h3>
           <div className="prb-scope-metrics">
             <a href="#prb-questoes" className="prb-scope-metric">
               <span className="prb-scope-metric-label">{data.openQuestionCount === 1 ? "Questão aberta" : "Questões abertas"}</span>
               <span className="prb-scope-metric-value">{formatPublicCount(data.openQuestionCount)}</span>
             </a>
             <a href="#prb-auditoria" className="prb-scope-metric">
-              <span className="prb-scope-metric-label">{data.evidenceRecordCount === 1 ? "Registo" : "Registos"}</span>
+              <span className="prb-scope-metric-label">{data.evidenceRecordCount === 1 ? "Evidência" : "Evidências"}</span>
               <span className="prb-scope-metric-value">{formatPublicCount(data.evidenceRecordCount)}</span>
             </a>
             <a href="#prb-auditoria" className="prb-scope-metric">
-              <span className="prb-scope-metric-label">{data.evidenceEffectCount === 1 ? "Efeito" : "Efeitos"}</span>
-              <span className="prb-scope-metric-value">{formatPublicCount(data.evidenceEffectCount)}</span>
+              <span className="prb-scope-metric-label">{data.sourceCount === 1 ? "Fonte" : "Fontes"}</span>
+              <span className="prb-scope-metric-value">{formatPublicCount(data.sourceCount)}</span>
             </a>
           </div>
         </div>
@@ -227,32 +288,6 @@ function PrbEffectLabel({ effect, children }: { effect: string; children?: React
   );
 }
 
-/**
- * Open-question fields use two independent vertical stacks at >=1024 and a
- * single column below. The breakpoint is read in JS rather than CSS alone so
- * the DOM order always equals the visual order: a flat list cannot flow as
- * two height-independent columns in CSS, and CSS `order` over stack wrappers
- * would make the single-column reading order diverge from the visual one.
- * Must stay in step with the 1024 breakpoint in styles/prb-details.css.
- * Environments without matchMedia (jsdom) get the single-column order.
- */
-const OPEN_QUESTION_STACKS_QUERY = "(min-width: 1024px)";
-
-function subscribeOpenQuestionStacks(onChange: () => void) {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {};
-  const query = window.matchMedia(OPEN_QUESTION_STACKS_QUERY);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-}
-
-function openQuestionStacksActive() {
-  return typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia(OPEN_QUESTION_STACKS_QUERY).matches;
-}
-
-function useOpenQuestionStacks() {
-  return useSyncExternalStore(subscribeOpenQuestionStacks, openQuestionStacksActive, () => false);
-}
-
 function OpenQuestionTextField({ label, text }: { label: string; text: string | null }) {
   if (!text) return null;
   return (
@@ -264,25 +299,18 @@ function OpenQuestionTextField({ label, text }: { label: string; text: string | 
 }
 
 /**
- * One `investigation.open_questions[]` item. Each canonical field renders in
- * its own labelled block only when authored — never merged into a synthetic
- * summary and never given fallback prose. `current_action` is rendered as
- * authored free text only, exactly as stored — never parsed for a leading
- * "WATCH —"/"STOP —" keyword, never turned into a badge/posture, and never
- * replaced with the approved HTML reference's illustrative "Acompanhar"
- * label, which has no canonical counterpart for every question.
+ * One `investigation.open_questions[]` item. Authored fields remain separate.
+ * The action block is always visible; an absent action gets a neutral
+ * presentation-only fallback while the projection retains null. Authored
+ * actions are never parsed into badges or postures.
  *
- * `latestResult` always spans the full width. Single column (<1024) follows
- * the semantic order latestResult → whyOpen → resolutionCondition →
- * currentAction → relatedEvidenceIds; at >=1024 the remaining fields split
- * into a left stack (whyOpen, currentAction) and a right stack
- * (resolutionCondition, relatedEvidenceIds) that flow independently.
+ * Fields follow the same semantic and visual order at every viewport.
  */
-function OpenQuestionItem({ index, item, stacked, onOpenGeneric }: { index: number; item: PrbOpenQuestion; stacked: boolean; onOpenGeneric: (id: string) => void }) {
-  const latestResult = <OpenQuestionTextField label="O que sabemos até agora" text={item.latestResult} />;
+function OpenQuestionItem({ index, item, onOpenGeneric }: { index: number; item: PrbOpenQuestion; onOpenGeneric: (id: string) => void }) {
+  const latestResult = <OpenQuestionTextField label="Resultado até agora" text={item.latestResult} />;
   const whyOpen = <OpenQuestionTextField label="Porque continua em aberto" text={item.whyOpen} />;
-  const resolutionCondition = <OpenQuestionTextField label="O que falta confirmar" text={item.resolutionCondition} />;
-  const currentAction = <OpenQuestionTextField label="O que estamos a fazer" text={item.currentAction} />;
+  const resolutionCondition = <OpenQuestionTextField label="O que permitiria esclarecer" text={item.resolutionCondition} />;
+  const currentAction = <OpenQuestionTextField label="Ação atual" text={item.currentAction?.trim() ? item.currentAction : "Sem ação em curso"} />;
   const relatedEvidence = item.relatedEvidenceIds.length > 0 && (
     <div className="prb-open-question-field">
       <h4>Evidência relacionada</h4>
@@ -295,44 +323,22 @@ function OpenQuestionItem({ index, item, stacked, onOpenGeneric }: { index: numb
       </ul>
     </div>
   );
-  const hasPrimaryStack = Boolean(item.whyOpen || item.currentAction);
-  const hasSecondaryStack = Boolean(item.resolutionCondition || item.relatedEvidenceIds.length > 0);
   return (
     <li className="prb-open-question-item">
       <div className="prb-open-question-index">Questão {index + 1}</div>
       <p className="prb-open-question-text">{item.question}</p>
-      <div className={stacked ? "prb-open-question-grid prb-open-question-grid--stacked" : "prb-open-question-grid"}>
+      <div className="prb-open-question-grid">
         {latestResult}
-        {stacked ? (
-          <>
-            {hasPrimaryStack && (
-              <div className="prb-open-question-stack prb-open-question-stack--primary">
-                {whyOpen}
-                {currentAction}
-              </div>
-            )}
-            {hasSecondaryStack && (
-              <div className="prb-open-question-stack prb-open-question-stack--secondary">
-                {resolutionCondition}
-                {relatedEvidence}
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            {whyOpen}
-            {resolutionCondition}
-            {currentAction}
-            {relatedEvidence}
-          </>
-        )}
+        {whyOpen}
+        {resolutionCondition}
+        {currentAction}
+        {relatedEvidence}
       </div>
     </li>
   );
 }
 
 function PrbOpenQuestionsSection({ problemId, questions, onOpenGeneric }: { problemId: string; questions: PrbOpenQuestion[]; onOpenGeneric: (id: string) => void }) {
-  const stacked = useOpenQuestionStacks();
   if (questions.length === 0) return null;
   return (
     <PrbSection
@@ -342,7 +348,7 @@ function PrbOpenQuestionsSection({ problemId, questions, onOpenGeneric }: { prob
     >
       <ul className="prb-open-question-list">
         {questions.map((item, index) => (
-          <OpenQuestionItem key={index} index={index} item={item} stacked={stacked} onOpenGeneric={onOpenGeneric} />
+          <OpenQuestionItem key={index} index={index} item={item} onOpenGeneric={onOpenGeneric} />
         ))}
       </ul>
       <p className="prb-contribute-prompt">
@@ -367,8 +373,8 @@ function PrbOpenQuestionsSection({ problemId, questions, onOpenGeneric }: { prob
 function PrbPathSection({ stages }: { stages: PrbPathStage[] }) {
   if (stages.length === 0) return null;
   return (
-    <PrbSection id="prb-percurso" label="Percurso da investigação" note="Sequência dos registos que deram forma ao problema" className="prb-path-section" bleed>
-      <h4 className="prb-path-heading">Como chegámos a este problema</h4>
+    <PrbSection id="prb-percurso" label="Como chegámos a esta leitura" className="prb-path-section" bleed>
+      <h4 className="prb-path-heading">Etapas da investigação</h4>
       <ol className="prb-path-stage-list">
         {stages.map((stage, index) => (
           <li key={stage.key} className="prb-path-stage">
@@ -384,15 +390,13 @@ function PrbPathSection({ stages }: { stages: PrbPathStage[] }) {
 }
 
 /**
- * "Evidência e auditoria" — the audit layer: Toda a evidência (aggregate
- * evidence-record count and effect tally, never a ranking or strength
- * score), Como verificamos (a concise methodology explainer:
- * Sustenta/Refina/Delimita and Observação local/Resposta existente are
- * illustrative examples of the approved copy, not the full vocabulary;
- * "Ler o método" routes to the fuller methodology), and Dossiê canónico (the
+ * "Evidência e verificação" — the audit layer: Toda a evidência (aggregate
+ * evidence count and effect tally, never a ranking or strength score),
+ * Como verificamos (explaining each effect and role present in this Problem;
+ * "Ler o método" routes to the fuller methodology), and Dossiê da investigação (the
  * client-side PDF dossier download, PrbDossierAction.tsx).
- * No per-evidence metadata is rendered in the page itself: "Abrir os N
- * registos" opens PrbEvidenceDrawer in place (no URL change, navigation or
+ * No per-evidence metadata is rendered in the page itself: the evidence
+ * button opens PrbEvidenceDrawer in place (no URL change, navigation or
  * data load), and stays disabled when the PRB links no evidence so an empty
  * drawer can never open.
  */
@@ -405,14 +409,14 @@ function PrbAuditSection({ data, dossier, dossierIdentity, onOpenGeneric }: { da
       <div className="shell-frame shell-frame--wide prb-section-frame">
         <div className="prb-section-intro">
           <h3 id="prb-auditoria-heading" className="detail-panel-label">
-            Evidência e auditoria
+            Evidência e verificação
           </h3>
         </div>
         <div className="prb-section-content">
           <div className="prb-audit-lede">
             <h4 className="prb-audit-heading">Verificar esta investigação</h4>
             <p className="prb-audit-intro">
-              Este problema mantém ligações explícitas a registos de evidência e às respetivas fontes. Aqui pode ver como essas relações são classificadas e
+              Este problema mantém ligações explícitas a evidências e às respetivas fontes. Aqui pode ver como essas relações são classificadas e
               consultar o método usado na investigação.
             </p>
           </div>
@@ -422,7 +426,7 @@ function PrbAuditSection({ data, dossier, dossierIdentity, onOpenGeneric }: { da
               <h5>Toda a evidência</h5>
               <div className="prb-audit-evidence-summary">
                 <span>
-                  <strong>{formatPublicCount(data.evidenceRecordCount)}</strong> {data.evidenceRecordCount === 1 ? "registo" : "registos"}
+                  <strong>{formatPublicCount(data.evidenceRecordCount)}</strong> {data.evidenceRecordCount === 1 ? "evidência" : "evidências"}
                 </span>
                 <span>
                   <strong>{formatPublicCount(data.evidenceEffectCount)}</strong> {data.evidenceEffectCount === 1 ? "efeito" : "efeitos"}
@@ -451,7 +455,7 @@ function PrbAuditSection({ data, dossier, dossierIdentity, onOpenGeneric }: { da
               aria-haspopup="dialog"
               onClick={() => setEvidenceDrawerOpen(true)}
             >
-              Abrir os {formatPublicCount(data.evidenceRecordCount)} registos
+              Ver as {formatPublicCount(data.evidenceRecordCount)} evidências
             </button>
           </div>
           {evidenceDrawerOpen && hasEvidence && (
@@ -470,44 +474,32 @@ function PrbAuditSection({ data, dossier, dossierIdentity, onOpenGeneric }: { da
             <div>
               <h5>Como verificamos</h5>
               <p>
-                Cada ligação entre um registo e este problema é descrita em duas dimensões independentes. Um registo pode ter mais do que um efeito, mais do
+                Cada ligação entre uma evidência e este problema é descrita em duas dimensões independentes. Uma evidência pode ter mais do que um efeito, mais do
                 que um papel e mais do que uma fonte.
               </p>
               <div className="prb-audit-dimension-grid">
                 <div>
                   <h6>Efeito</h6>
-                  <p>Como o registo se relaciona com este problema específico.</p>
+                  <p>Como a evidência se relaciona com este problema específico.</p>
                   <dl className="prb-audit-effect-legend">
-                    <dt>
-                      <PrbEffectLabel effect="SUPPORTS" />
-                    </dt>
-                    <dd>O registo apoia diretamente a formulação do problema.</dd>
-                    <dt>
-                      <PrbEffectLabel effect="REFINES" />
-                    </dt>
-                    <dd>O registo torna a formulação mais precisa ou qualifica-a.</dd>
-                    <dt>
-                      <PrbEffectLabel effect="BOUNDS" />
-                    </dt>
-                    <dd>O registo marca o que fica dentro ou fora do âmbito.</dd>
+                    {[...new Set(data.evidence.flatMap((item) => item.effects))].map((effect) => (
+                      <div key={effect}>
+                        <dt><PrbEffectLabel effect={effect} /></dt>
+                        <dd>{publicEnumExplanation("effects", effect) ?? "Efeito indicado na evidência."}</dd>
+                      </div>
+                    ))}
                   </dl>
                 </div>
                 <div>
                   <h6>Papel na investigação</h6>
-                  <p>Que tipo de contributo o registo representa.</p>
+                  <p>Que tipo de contributo a evidência representa.</p>
                   <dl className="prb-audit-role-legend">
-                    <div>
-                      <dt>
-                        <ResearchRoleTag role="LOCAL_OBSERVATION" variant="compact" />
-                      </dt>
-                      <dd>Dado, medição ou relato recolhido sobre a situação em Évora.</dd>
-                    </div>
-                    <div>
-                      <dt>
-                        <ResearchRoleTag role="EXISTING_RESPONSE" variant="compact" />
-                      </dt>
-                      <dd>Medida, serviço ou plano que já responde, total ou parcialmente, ao problema.</dd>
-                    </div>
+                    {[...new Set(data.evidence.flatMap((item) => item.researchRoles))].map((role) => (
+                      <div key={role}>
+                        <dt><ResearchRoleTag role={role} variant="compact" /></dt>
+                        <dd>{publicEnumExplanation("research_roles", role) ?? "Papel indicado na evidência."}</dd>
+                      </div>
+                    ))}
                   </dl>
                 </div>
               </div>
@@ -519,9 +511,9 @@ function PrbAuditSection({ data, dossier, dossierIdentity, onOpenGeneric }: { da
 
           <div className="prb-audit-row prb-audit-row--dossier">
             <div>
-              <h5>Dossiê canónico</h5>
+              <h5>Dossiê da investigação</h5>
               <p>
-                Representação de auditoria de {data.problemId}: problema, questões, evidência, fontes e percurso num único documento.
+                Documento para consultar {data.problemId}: problema, questões, evidências, fontes e percurso da investigação.
               </p>
             </div>
             <PrbDossierAction dossier={dossier} identity={dossierIdentity ?? null} />
@@ -533,7 +525,7 @@ function PrbAuditSection({ data, dossier, dossierIdentity, onOpenGeneric }: { da
 }
 
 /**
- * One linked evidence record inside the audit drawer: canonical ID, topics,
+ * One linked evidence record inside the audit drawer: canonical ID,
  * the PRB→EVD effects and research roles in authored order, the observation
  * summary and resolved source references — each omitted when unavailable.
  * The primary action opens the canonical EVD Record Detail; the full EVD
@@ -541,13 +533,28 @@ function PrbAuditSection({ data, dossier, dossierIdentity, onOpenGeneric }: { da
  * is shown.
  */
 function PrbEvidenceRow({ item, onOpenRecord }: { item: PrbEvidenceItem; onOpenRecord: (id: string) => void }) {
+  const temporal = item.temporal;
+  const asOfLabel = item.evidenceNature && ({
+    fact: "Observado em",
+    measurement: "Observado em",
+    "reported-experience": "Observado em",
+    recommendation: "Referência temporal",
+    claim: "Referência temporal",
+    opinion: "Referência temporal",
+  } as Record<string, string>)[item.evidenceNature];
+  const intervalInOneYear = temporal?.start && temporal.end && temporal.start.slice(0, 4) === temporal.end.slice(0, 4);
+  const temporalLabel = temporal?.asOf && asOfLabel
+    ? `${asOfLabel}: ${formatPublicPartialDate(temporal.asOf)}`
+    : temporal?.start && temporal.end
+      ? `Período: ${intervalInOneYear ? temporal.start.slice(0, 4) : `${formatPublicPartialDate(temporal.start)} a ${formatPublicPartialDate(temporal.end)}`}`
+      : null;
   return (
     <li className="prb-evidence-item">
       <h3 className="prb-evidence-item-id">
         <RecordIdentifier variant="text" density="compact" id={item.id} />
       </h3>
-      {item.topics.length > 0 && <p className="prb-evidence-item-topics">{item.topics.map((code) => describeTopic(code).label).join(" · ")}</p>}
       {item.summary && <p className="prb-evidence-item-summary">{item.summary}</p>}
+      {temporalLabel && <p className="prb-evidence-item-temporal">{temporalLabel}</p>}
       {(item.effects.length > 0 || item.researchRoles.length > 0 || item.sources.length > 0) && (
         <dl className="prb-evidence-item-facts">
           {item.effects.length > 0 && (
@@ -577,8 +584,13 @@ function PrbEvidenceRow({ item, onOpenRecord }: { item: PrbEvidenceItem; onOpenR
                 <ul className="prb-evidence-item-sources">
                   {item.sources.map((source) => (
                     <li key={source.id}>
+                      {source.name && source.publiclyAvailable && source.canonicalReference && isHttpUrl(source.canonicalReference) ? (
+                        <a className="prb-evidence-item-source-name" href={source.canonicalReference} target="_blank" rel="noopener noreferrer">{source.name}</a>
+                      ) : source.name ? (
+                        <span className="prb-evidence-item-source-name">{source.name}</span>
+                      ) : null}
                       <RecordIdentifier variant="text" density="compact" id={source.id} />
-                      {source.name && <span className="prb-evidence-item-source-name">{source.name}</span>}
+                      {source.publishedAt && <span>Publicado: {formatPublicPartialDate(source.publishedAt)}</span>}
                     </li>
                   ))}
                 </ul>
@@ -587,14 +599,14 @@ function PrbEvidenceRow({ item, onOpenRecord }: { item: PrbEvidenceItem; onOpenR
           )}
         </dl>
       )}
-      <button type="button" className="prb-evidence-item-open" aria-label={`Abrir registo ${item.id}`} onClick={() => onOpenRecord(item.id)}>
-        Abrir registo →
+      <button type="button" className="prb-evidence-item-open" aria-label={`Abrir evidência ${item.id}`} onClick={() => onOpenRecord(item.id)}>
+        Abrir evidência →
       </button>
     </li>
   );
 }
 
-/** "Registos usados neste problema" — every linked evidence record, in `projection.evidence` order, inside the generic modal Drawer. */
+/** Every linked evidence record, in `projection.evidence` order, inside the generic modal Drawer. */
 function PrbEvidenceDrawer({
   evidence,
   returnFocusRef,
@@ -608,8 +620,8 @@ function PrbEvidenceDrawer({
 }) {
   return (
     <Drawer
-      title="Registos usados neste problema"
-      description={`${formatPublicCount(evidence.length)} ${evidence.length === 1 ? "registo" : "registos"}`}
+      title="Evidências usadas neste problema"
+      description={`${formatPublicCount(evidence.length)} ${evidence.length === 1 ? "evidência" : "evidências"}`}
       returnFocusRef={returnFocusRef}
       onDismiss={onDismiss}
     >

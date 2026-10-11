@@ -736,7 +736,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
 
     const pushSpy = vi.spyOn(window.history, "pushState");
     await user.click(screen.getByRole("button", { name: "Verificar" }));
-    const audit = await screen.findByRole("region", { name: "Evidência e auditoria" });
+    const audit = await screen.findByRole("region", { name: "Evidência e verificação" });
     expect(pushSpy).toHaveBeenCalledTimes(1);
     expect(window.location.search).toContain("view=problem");
     expect(window.location.search).toContain("id=PRB-0005");
@@ -769,7 +769,7 @@ describe("Explorer — Problem view (RE-03)", () => {
     expect(title.id).toBe("prb-identity-title");
     expect(title.closest("article")?.className).toBe("prb-details-view");
     expect(screen.getByRole("region", { name: "O que ainda não sabemos" })).toBeTruthy();
-    expect(screen.getByRole("region", { name: "Evidência e auditoria" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Evidência e verificação" })).toBeTruthy();
     // The retired Problem View presentation is gone from the public route.
     expect(document.querySelector(".problem-view, .problem-reading-rail, #problem-evidencia")).toBeNull();
   });
@@ -955,7 +955,7 @@ describe("Explorer — global manifest summary placement", () => {
   it("is absent on PRB Details, whose audit band is the terminal content band", async () => {
     window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
-    await screen.findByRole("region", { name: "Evidência e auditoria" });
+    await screen.findByRole("region", { name: "Evidência e verificação" });
     expect(manifestSummary()).toBeNull();
     expect(screen.queryByText(/Corpus:/)).toBeNull();
   });
@@ -1258,7 +1258,7 @@ describe("Explorer — URL normalization preserves window.location.hash (F08)", 
     window.history.replaceState(null, "", "/?id=PRB-0005&view=problem#prb-auditoria");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    const auditSection = await screen.findByRole("region", { name: "Evidência e auditoria" });
+    const auditSection = await screen.findByRole("region", { name: "Evidência e verificação" });
     await waitFor(() => expect(document.activeElement).toBe(auditSection));
 
     // (2) normalization ran (canonical view-before-id order) without (8)

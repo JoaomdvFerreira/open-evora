@@ -142,6 +142,9 @@ export interface PrbEvidenceSourceRef {
   id: string;
   /** Canonical SRC `name`, when authored. */
   name: string | null;
+  publishedAt: string | null;
+  canonicalReference: string | null;
+  publiclyAvailable: boolean;
 }
 
 /**
@@ -155,6 +158,9 @@ export interface PrbEvidenceItem {
   summary: string | null;
   /** Canonical EVD `domains` codes, in authored order. */
   topics: string[];
+  /** Canonical evidence_nature, when authored. */
+  evidenceNature: string | null;
+  temporal: { asOf: string | null; start: string | null; end: string | null; status: string | null } | null;
   effects: string[];
   researchRoles: string[];
   sources: PrbEvidenceSourceRef[];
@@ -164,13 +170,32 @@ export interface PrbEvidenceItem {
 export function evidenceItems(evidence: EvidenceWithSources[]): PrbEvidenceItem[] {
   return evidence.map((item) => {
     const observation = recordValue(item.detail.record.observation);
+    const scope = recordValue(item.detail.record.scope);
+    const temporal = scope ? recordValue(scope.temporal) : null;
     return {
       id: item.detail.id,
       summary: observation ? fieldValue(observation, "summary") : null,
       topics: stringValues(item.detail.record.domains),
+      evidenceNature: fieldValue(item.detail.record, "evidence_nature"),
+      temporal: temporal ? {
+        asOf: fieldValue(temporal, "as_of"),
+        start: fieldValue(temporal, "start"),
+        end: fieldValue(temporal, "end"),
+        status: fieldValue(temporal, "status"),
+      } : null,
       effects: item.effects ?? [],
       researchRoles: item.researchRoles ?? [],
-      sources: item.sources.map((source) => ({ id: source.id, name: fieldValue(source.record, "name") })),
+      sources: item.sources.map((source) => {
+        const temporal = recordValue(source.record.temporal);
+        const access = recordValue(source.record.access);
+        return {
+          id: source.id,
+          name: fieldValue(source.record, "name"),
+          publishedAt: temporal ? fieldValue(temporal, "published_at") : null,
+          canonicalReference: fieldValue(source.record, "canonical_reference"),
+          publiclyAvailable: access?.level === "public" && access.availability === "available",
+        };
+      }),
     };
   });
 }
@@ -209,6 +234,7 @@ export interface PrbDetailsData extends PrbIdentityData {
   validationStatus: string | null;
   openQuestionCount: number;
   evidenceRecordCount: number;
+  sourceCount: number;
   evidenceEffectCount: number;
   effectTally: PrbEffectTally[];
   openQuestions: PrbOpenQuestion[];
@@ -236,6 +262,7 @@ export function buildPrbDetailsData(projection: ProblemProjection): PrbDetailsDa
     validationStatus: fieldValue(record, "validation_status"),
     openQuestionCount: openQuestions(record).length,
     evidenceRecordCount: projection.evidence.length,
+    sourceCount: new Set(projection.evidence.flatMap((item) => item.sources.map((source) => source.id))).size,
     evidenceEffectCount,
     effectTally: effectTally(projection.evidence),
     openQuestions: openQuestions(record),

@@ -8,8 +8,8 @@ import { buildPrbDossierData } from "./prbDossierProjection";
 import type { RecordDetail } from "../dataProvider/types";
 import type { EvidenceWithSources, ProblemProjection } from "./problemProjection";
 
-function evd(id: string, summary: string, effects: string[] = [], researchRoles: string[] = [], sourcePublishers: string[] = []): EvidenceWithSources {
-  const detail: RecordDetail = { id, type: "EVD-", file: "", outgoingEdges: [], incomingEdges: [], record: { observation: { summary } } };
+function evd(id: string, summary: string, effects: string[] = [], researchRoles: string[] = [], sourcePublishers: string[] = [], evidenceNature = "fact"): EvidenceWithSources {
+  const detail: RecordDetail = { id, type: "EVD-", file: "", outgoingEdges: [], incomingEdges: [], record: { observation: { summary }, evidence_nature: evidenceNature } };
   const sources: RecordDetail[] = sourcePublishers.map((publisher, index) => ({
     id: `SRC-${id}-${index}`, type: "SRC-", file: "", outgoingEdges: [], incomingEdges: [], record: { publisher },
   }));
@@ -78,26 +78,27 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
         path: { initial_signal: { summary: "Sinal." } },
       },
     };
-    const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS"])]);
+    const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS"], [], ["Fonte A"])]);
     const outline = Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6")).map((heading) => [Number(heading.tagName[1]), heading.textContent]);
     expect(outline).toEqual([
       [2, "Título"],
       [3, "Estado da investigação"],
-      [3, "Âmbito"],
+      [3, "Base da investigação"],
       [3, "Leitura atual"],
       [3, "O que ainda não sabemos"],
       [4, "Porque continua em aberto"],
+      [4, "Ação atual"],
       [4, "Evidência relacionada"],
-      [3, "Percurso da investigação"],
-      [4, "Como chegámos a este problema"],
+      [3, "Como chegámos a esta leitura"],
+      [4, "Etapas da investigação"],
       [5, "Sinal inicial"],
-      [3, "Evidência e auditoria"],
+      [3, "Evidência e verificação"],
       [4, "Verificar esta investigação"],
       [5, "Toda a evidência"],
       [5, "Como verificamos"],
       [6, "Efeito"],
       [6, "Papel na investigação"],
-      [5, "Dossiê canónico"],
+      [5, "Dossiê da investigação"],
     ]);
     for (let i = 1; i < outline.length; i += 1) {
       expect((outline[i][0] as number) - (outline[i - 1][0] as number)).toBeLessThanOrEqual(1);
@@ -106,7 +107,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
 
   it("keeps each top-level section labelled by its own h3 heading", () => {
     renderPrb({ title: "T", causal_reading: "Leitura.", investigation: { open_questions: [{ question: "Q?" }], path: { initial_signal: { summary: "S." } } } });
-    for (const name of ["Estado da investigação", "Leitura atual", "O que ainda não sabemos", "Percurso da investigação", "Evidência e auditoria"]) {
+    for (const name of ["Estado da investigação", "Leitura atual", "O que ainda não sabemos", "Como chegámos a esta leitura", "Evidência e verificação"]) {
       const region = screen.getByRole("region", { name });
       const heading = document.getElementById(region.getAttribute("aria-labelledby")!);
       expect(heading?.tagName).toBe("H3");
@@ -128,11 +129,11 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
 
   it("shows singular/plural scope labels driven by the actual count", () => {
     const record = { title: "T", investigation: { open_questions: [{ question: "Única questão?" }] } };
-    const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS"])]);
+    const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS"], [], ["Fonte A"])]);
     const scope = requireElement(container, ".prb-scope-metrics");
     expect(within(scope).getByText("Questão aberta")).toBeTruthy();
-    expect(within(scope).getByText("Registo")).toBeTruthy();
-    expect(within(scope).getByText("Efeito")).toBeTruthy();
+    expect(within(scope).getByText("Evidência")).toBeTruthy();
+    expect(within(scope).getByText("Fonte")).toBeTruthy();
   });
 
   it("shows plural scope labels when counts exceed one", () => {
@@ -140,11 +141,11 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
       title: "T",
       investigation: { open_questions: [{ question: "Q1?" }, { question: "Q2?" }] },
     };
-    const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS", "REFINES"]), evd("EVD-2", "Obs2", ["BOUNDS"])]);
+    const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS", "REFINES"], [], ["Fonte A"]), evd("EVD-2", "Obs2", ["BOUNDS"], [], ["Fonte B"])]);
     const scope = requireElement(container, ".prb-scope-metrics");
     expect(within(scope).getByText("Questões abertas")).toBeTruthy();
-    expect(within(scope).getByText("Registos")).toBeTruthy();
-    expect(within(scope).getByText("Efeitos")).toBeTruthy();
+    expect(within(scope).getByText("Evidências")).toBeTruthy();
+    expect(within(scope).getByText("Fontes")).toBeTruthy();
   });
 
   it("renders all six state/scope dimensions in canonical order, each label before its canonical value", () => {
@@ -155,25 +156,65 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
       validation_status: "unvalidated",
       investigation: { open_questions: [{ question: "Q1?" }, { question: "Q2?" }] },
     };
-    const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS", "REFINES"]), evd("EVD-2", "Obs2", ["BOUNDS"])]);
+    const { container } = renderPrb(record, [evd("EVD-1", "Obs", ["SUPPORTS", "REFINES"], [], ["Fonte A"]), evd("EVD-2", "Obs2", ["BOUNDS"], [], ["Fonte B"])]);
     const band = requireElement(container, ".prb-state-scope-band");
     const cells = Array.from(band.querySelectorAll(".prb-state-item, .prb-scope-metric")).map((cell) =>
       Array.from(cell.children).map((child) => child.textContent),
     );
     expect(cells).toEqual([
       ["Estado", "Aberto"],
-      ["Evidência", "Identificada"],
+      ["Evidência", "IdentificadaForam encontradas evidências relevantes; o problema ainda não foi plenamente validado."],
       ["Validação", "Por validar"],
       ["Questões abertas", "2"],
-      ["Registos", "2"],
-      ["Efeitos", "3"],
+      ["Evidências", "2"],
+      ["Fontes", "2"],
     ]);
     const headings = Array.from(band.querySelectorAll("h3")).map((heading) => heading.textContent);
-    expect(headings).toEqual(["Estado da investigação", "Âmbito"]);
+    expect(headings).toEqual(["Estado da investigação", "Base da investigação"]);
     // Each group heading precedes its own values in DOM order (the six-column layout is CSS-only).
     expect(band.textContent?.indexOf("Estado da investigação")).toBeLessThan(band.textContent?.indexOf("Aberto") ?? -1);
-    expect(band.textContent?.indexOf("Aberto")).toBeLessThan(band.textContent?.indexOf("Âmbito") ?? -1);
-    expect(band.textContent?.indexOf("Âmbito")).toBeLessThan(band.textContent?.indexOf("Questões abertas") ?? -1);
+    expect(band.textContent?.indexOf("Aberto")).toBeLessThan(band.textContent?.indexOf("Base da investigação") ?? -1);
+    expect(band.textContent?.indexOf("Base da investigação")).toBeLessThan(band.textContent?.indexOf("Questões abertas") ?? -1);
+  });
+
+  it("shows the evidence-status explanation on pointer hover and removes the old inline disclosure", () => {
+    renderPrb({ title: "T", evidence_status: "discovered" });
+    const button = screen.getByRole("button", { name: "O que significa Evidência identificada?" });
+    expect(screen.getByText("Identificada")).toBeTruthy();
+    expect(screen.queryByText("O que significa?", { exact: true })).toBeNull();
+    expect(screen.getByRole("tooltip").hasAttribute("data-open")).toBe(false);
+    fireEvent.pointerEnter(button, { pointerType: "mouse" });
+    expect(screen.getByRole("tooltip").textContent).toBe("Foram encontradas evidências relevantes; o problema ainda não foi plenamente validado.");
+    expect(screen.getByRole("tooltip").hasAttribute("data-open")).toBe(true);
+    fireEvent.pointerLeave(button);
+    expect(screen.getByRole("tooltip").hasAttribute("data-open")).toBe(false);
+  });
+
+  it("opens the evidence-status explanation on keyboard focus and closes it with Escape", () => {
+    renderPrb({ title: "T", evidence_status: "discovered" });
+    const button = screen.getByRole("button", { name: "O que significa Evidência identificada?" });
+    fireEvent.focus(button);
+    expect(screen.getByRole("tooltip").hasAttribute("data-open")).toBe(true);
+    fireEvent.keyDown(button, { key: "Escape" });
+    expect(screen.getByRole("tooltip").hasAttribute("data-open")).toBe(false);
+  });
+
+  it("toggles the evidence-status explanation by touch-style taps and dismisses outside", () => {
+    renderPrb({ title: "T", evidence_status: "discovered" });
+    const button = screen.getByRole("button", { name: "O que significa Evidência identificada?" });
+    fireEvent.pointerEnter(button, { pointerType: "touch" });
+    fireEvent.click(button);
+    expect(screen.getByRole("tooltip").hasAttribute("data-open")).toBe(true);
+    fireEvent.click(button);
+    expect(screen.getByRole("tooltip").hasAttribute("data-open")).toBe(false);
+    fireEvent.click(button);
+    fireEvent.pointerDown(document.body, { pointerType: "touch" });
+    expect(screen.getByRole("tooltip").hasAttribute("data-open")).toBe(false);
+  });
+
+  it("does not render an explanation control for state values without explanatory copy", () => {
+    renderPrb({ title: "T", evidence_status: "corroborated", validation_status: "unvalidated" });
+    expect(screen.queryByRole("button", { name: "O que significa Evidência identificada?" })).toBeNull();
   });
 
   it("renders dynamic question/evidence/effect counts matching what is actually authored", () => {
@@ -231,10 +272,10 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
       field.querySelector("p")?.textContent ?? field.querySelector(".rec-identifier")?.textContent,
     ]);
     expect(fields).toEqual([
-      ["O que sabemos até agora", "Resultado mais recente registado."],
+      ["Resultado até agora", "Resultado mais recente registado."],
       ["Porque continua em aberto", "Motivo pelo qual continua em aberto."],
-      ["O que falta confirmar", "Condição que falta confirmar."],
-      ["O que estamos a fazer", "Ação que está em curso."],
+      ["O que permitiria esclarecer", "Condição que falta confirmar."],
+      ["Ação atual", "Ação que está em curso."],
       ["Evidência relacionada", "EVD-1"],
     ]);
   });
@@ -248,78 +289,26 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(href.searchParams.get("prb")).toBe("PRB-9999");
   });
 
-  it("omits each open-question block whose canonical field is absent, never a fallback", () => {
+  it("omits unauthored question fields except for the presentation-only action fallback", () => {
     const record = {
       title: "T",
       investigation: { open_questions: [{ question: "Questão só com motivo?", why_open: "Motivo." }] },
     };
     const { container } = renderPrb(record, []);
     const labels = Array.from(requireElement(container, ".prb-open-question-grid").querySelectorAll("h4")).map((heading) => heading.textContent);
-    expect(labels).toEqual(["Porque continua em aberto"]);
+    expect(labels).toEqual(["Porque continua em aberto", "Ação atual"]);
+    expect(screen.getByText("Sem ação em curso")).toBeTruthy();
   });
 
-  describe("at >=1024 (two independent stacks)", () => {
-    afterEach(() => {
-      vi.unstubAllGlobals();
-    });
-
-    function stubWideViewport() {
-      vi.stubGlobal("matchMedia", (query: string) => ({
-        matches: query === "(min-width: 1024px)",
-        media: query,
-        addEventListener: () => {},
-        removeEventListener: () => {},
-      }));
-    }
-
-    function fieldLabels(scope: Element) {
-      return Array.from(scope.querySelectorAll(":scope > .prb-open-question-field > h4")).map((heading) => heading.textContent);
-    }
-
-    it("keeps latest_result full-width, then why_open/current_action left and resolution_condition/evidence right", () => {
-      stubWideViewport();
-      const { container } = renderPrb({
-        title: "T",
-        investigation: {
-          open_questions: [
-            {
-              question: "Q?",
-              latest_result: "Resultado.",
-              why_open: "Motivo.",
-              resolution_condition: "Condição.",
-              current_action: "Ação.",
-              evidence: ["EVD-1"],
-            },
-          ],
-        },
-      });
-      const grid = requireElement(container, ".prb-open-question-grid--stacked");
-      expect(fieldLabels(grid)).toEqual(["O que sabemos até agora"]);
-      expect(fieldLabels(requireElement(grid, ".prb-open-question-stack--primary"))).toEqual(["Porque continua em aberto", "O que estamos a fazer"]);
-      expect(fieldLabels(requireElement(grid, ".prb-open-question-stack--secondary"))).toEqual(["O que falta confirmar", "Evidência relacionada"]);
-    });
-
-    it("omits absent fields and empty stacks, never a placeholder", () => {
-      stubWideViewport();
-      const { container } = renderPrb({ title: "T", investigation: { open_questions: [{ question: "Q?", why_open: "Motivo." }] } });
-      const grid = requireElement(container, ".prb-open-question-grid--stacked");
-      expect(Array.from(grid.querySelectorAll("h4")).map((heading) => heading.textContent)).toEqual(["Porque continua em aberto"]);
-      expect(grid.querySelector(".prb-open-question-stack--secondary")).toBeNull();
-    });
-
-    it("keeps a WATCH current_action verbatim", () => {
-      stubWideViewport();
-      const watch = "WATCH — monitorizar medições pós-abertura.";
-      const { container } = renderPrb({ title: "T", investigation: { open_questions: [{ question: "Q?", current_action: watch }] } });
-      expect(requireElement(container, ".prb-open-question-stack--primary").querySelector("p")?.textContent).toBe(watch);
-      expect(screen.queryByText("WATCH")).toBeNull();
-    });
+  it("keeps evidence identifiers last in DOM order for every viewport", () => {
+    const { container } = renderPrb({ title: "T", investigation: { open_questions: [{ question: "Q?", latest_result: "Resultado.", why_open: "Motivo.", resolution_condition: "Condição.", evidence: ["EVD-1"], current_action: "Ação." }] } });
+    expect(Array.from(requireElement(container, ".prb-open-question-grid").querySelectorAll("h4")).map((heading) => heading.textContent)).toEqual(["Resultado até agora", "Porque continua em aberto", "O que permitiria esclarecer", "Ação atual", "Evidência relacionada"]);
   });
 
   it("renders a WATCH current_action verbatim as free text — no parsed badge, posture or hidden token", () => {
     const watch = "WATCH — monitorizar medições pós-abertura; a abertura, por si só, não é impacto realizado.";
     const { container } = renderPrb({ title: "T", investigation: { open_questions: [{ question: "Q?", current_action: watch }] } }, []);
-    const field = screen.getByText("O que estamos a fazer").closest(".prb-open-question-field");
+    const field = screen.getByText("Ação atual").closest(".prb-open-question-field");
     expect(field?.querySelector("p")?.textContent).toBe(watch);
     expect(screen.queryByText("WATCH")).toBeNull();
     expect(container.querySelector('[class*="badge"], [class*="posture"], [class*="watch"]')).toBeNull();
@@ -342,7 +331,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
 
   it("has no standalone selected-evidence section — evidence observations never render as page-level statements", () => {
     const { container } = renderPrb({ title: "T", causal_reading: "Leitura." }, [evd("EVD-1", "Observação da evidência.", ["SUPPORTS"], ["LOCAL_OBSERVATION"], ["Fonte A"])]);
-    expect(screen.queryByRole("heading", { level: 3, name: "O que sabemos até agora" })).toBeNull();
+    expect(screen.queryByRole("heading", { level: 3, name: "Resultado até agora" })).toBeNull();
     expect(container.querySelector("#prb-sabemos, .prb-known-evidence-list, .prb-evidence-meta")).toBeNull();
     expect(screen.queryByText("Observação da evidência.")).toBeNull();
   });
@@ -436,14 +425,13 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(within(tally).getByText("Contradiz").closest(".prb-effect")?.className).toContain("prb-effect--neutral");
   });
 
-  it("keeps Como verificamos to the approved effect and research-role examples", () => {
+  it("explains the effects and research roles used by the selected Problem", () => {
     const { container } = renderPrb({ title: "T" }, [evd("EVD-1", "Obs", ["SUPPORTS"], ["PLANNED_RESPONSE"])]);
     const legend = requireElement(container, ".prb-audit-effect-legend");
-    expect(Array.from(legend.querySelectorAll(".evd-effect-tag")).map((tag) => tag.textContent?.trim())).toEqual(["Sustenta", "Refina", "Delimita"]);
+    expect(Array.from(legend.querySelectorAll(".evd-effect-tag")).map((tag) => tag.textContent?.trim())).toEqual(["Sustenta"]);
     const roles = requireElement(container, ".prb-audit-role-legend");
-    expect(Array.from(roles.querySelectorAll("dt")).map((dt) => dt.textContent?.trim())).toEqual(["Observação local", "Resposta existente"]);
-    expect(within(roles).getByText("Dado, medição ou relato recolhido sobre a situação em Évora.")).toBeTruthy();
-    expect(within(roles).getByText("Medida, serviço ou plano que já responde, total ou parcialmente, ao problema.")).toBeTruthy();
+    expect(Array.from(roles.querySelectorAll("dt")).map((dt) => dt.textContent?.trim())).toEqual(["Resposta planeada"]);
+    expect(within(roles).getByText("Medida proposta cuja execução não fica demonstrada.")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Ler o método →" }).getAttribute("href")).toBe("/methodology");
   });
 
@@ -463,10 +451,10 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(container.querySelector(".prb-identity-topic-link")?.tagName).toBe("SPAN");
   });
 
-  it("accents only an outstanding validation step, keeping lifecycle and evidence values neutral", () => {
+  it("presents all investigation state values neutrally", () => {
     const { container } = renderPrb({ title: "T", status: "OPEN", evidence_status: "discovered", validation_status: "unvalidated" });
     const accented = Array.from(container.querySelectorAll(".prb-state-value--accent")).map((node) => node.textContent);
-    expect(accented).toEqual(["Por validar"]);
+    expect(accented).toEqual([]);
   });
 
   it("does not accent a validation value once validation is complete", () => {
@@ -479,14 +467,14 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     const statement = requireElement(container, ".prb-identity-statement");
     const updated = requireElement(container, ".prb-identity-updated");
     expect(statement.compareDocumentPosition(updated) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(updated.textContent).toMatch(/^PRB-9999 · Atualizado em /);
+    expect(updated.textContent).toMatch(/^PRB-9999 · Última edição /);
     expect(updated.querySelector("time")?.getAttribute("dateTime")).toBe("2026-03-05");
   });
 
   it("presents updated_at only as edit metadata, never as a currentness assessment", () => {
     const { container } = renderPrb({ title: "T", updated_at: "2026-03-05" });
     const updated = requireElement(container, ".prb-identity-updated");
-    expect(updated.textContent?.replace(/^PRB-9999 · /, "").replace(/\s+/g, " ").trim()).toMatch(/^Atualizado em \S/);
+    expect(updated.textContent?.replace(/^PRB-9999 · /, "").replace(/\s+/g, " ").trim()).toMatch(/^Última edição \S/);
     expect(container.textContent).not.toMatch(/Atualidade|ainda atual|continua atual|informação atual/i);
   });
 
@@ -561,20 +549,20 @@ describe("PrbDetailsPresentation — audit evidence drawer", () => {
 
   function renderWithEvidence(onOpenGeneric = vi.fn()) {
     render(<PrbDetailsPresentation data={buildPrbDetailsData(baseProjection({ title: "T" }, evidence()))} {...handlers} onOpenGeneric={onOpenGeneric} />);
-    return { trigger: screen.getByRole("button", { name: "Abrir os 2 registos" }), onOpenGeneric };
+    return { trigger: screen.getByRole("button", { name: "Ver as 2 evidências" }), onOpenGeneric };
   }
 
-  it("opens one modal drawer from Abrir os N registos, named by its visible title and carrying the truthful count", async () => {
+  it("opens one modal drawer from Ver as N evidências, named by its visible title and carrying the truthful count", async () => {
     const { trigger } = renderWithEvidence();
     expect(screen.queryByRole("dialog")).toBeNull();
     await userEvent.click(trigger);
 
-    const dialog = screen.getByRole("dialog", { name: "Registos usados neste problema" });
+    const dialog = screen.getByRole("dialog", { name: "Evidências usadas neste problema" });
     expect(screen.getAllByRole("dialog")).toHaveLength(1);
     expect(showModal).toHaveBeenCalledTimes(1);
     expect(dialog.getAttribute("aria-modal")).toBe("true");
-    expect(within(dialog).getByRole("heading", { level: 2, name: "Registos usados neste problema" })).toBeTruthy();
-    expect(within(dialog).getByText("2 registos")).toBeTruthy();
+    expect(within(dialog).getByRole("heading", { level: 2, name: "Evidências usadas neste problema" })).toBeTruthy();
+    expect(within(dialog).getByText("2 evidências")).toBeTruthy();
     expect(within(dialog).getByRole("button", { name: "Fechar" })).toBeTruthy();
   });
 
@@ -596,6 +584,71 @@ describe("PrbDetailsPresentation — audit evidence drawer", () => {
     expect(within(second).queryByText(/^Fontes?$/)).toBeNull();
     // No invented ranking, confidence or strength.
     expect(dialog.textContent).not.toMatch(/confiança|importância|força|relevância/i);
+  });
+
+  it("links a public available Source by its readable name and keeps unsafe references as text", async () => {
+    const publicEvidence = evd("EVD-public", "Observação.", [], [], ["Editor"]);
+    publicEvidence.sources[0].record = {
+      name: "Relatório público",
+      access: { level: "public", availability: "available" },
+      canonical_reference: "https://example.org/report.pdf",
+      temporal: { published_at: "2026-06" },
+    };
+    const unsafeEvidence = evd("EVD-unsafe", "Outra observação.", [], [], ["Editor"]);
+    unsafeEvidence.sources[0].record = {
+      name: "Referência insegura",
+      access: { level: "public", availability: "available" },
+      canonical_reference: "javascript:alert(1)",
+    };
+    render(<PrbDetailsPresentation data={buildPrbDetailsData(baseProjection({ title: "T" }, [publicEvidence, unsafeEvidence]))} {...handlers} />);
+    await userEvent.click(screen.getByRole("button", { name: "Ver as 2 evidências" }));
+    const dialog = screen.getByRole("dialog");
+    const link = within(dialog).getByRole("link", { name: "Relatório público" });
+    expect(link.getAttribute("href")).toBe("https://example.org/report.pdf");
+    expect(link.getAttribute("target")).toBe("_blank");
+    expect(within(dialog).getByText("Referência insegura").closest("a")).toBeNull();
+    expect(within(dialog).getByText("Publicado: junho de 2026")).toBeTruthy();
+  });
+
+  it("labels evidence observation time separately from source publication time", async () => {
+    const observation = evd("EVD-observed", "Observação.", [], [], ["Editor"]);
+    observation.detail.record = { evidence_nature: "fact", observation: { summary: "Observação." }, scope: { temporal: { as_of: "2026-08-10" } }, provenance: { extracted_at: "2026-09-01" } };
+    observation.sources[0].record = { temporal: { published_at: "2026-07" } };
+    renderPrb({ title: "T" }, [observation]);
+    await userEvent.click(screen.getByRole("button", { name: "Ver as 1 evidências" }));
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText("Observado em: 10 de agosto de 2026")).toBeTruthy();
+    expect(within(dialog).getByText("Publicado: julho de 2026")).toBeTruthy();
+    expect(dialog.textContent).not.toContain("setembro de 2026");
+  });
+
+  it("labels point-in-time recommendations as temporal references", async () => {
+    const recommendation = evd("EVD-recommendation", "Intervenções propostas.", [], [], ["Editor"], "recommendation");
+    recommendation.detail.record = { evidence_nature: "recommendation", observation: { summary: "Intervenções propostas." }, scope: { temporal: { as_of: "2025-09" } } };
+    recommendation.sources[0].record = { temporal: { published_at: "2026-06" } };
+    renderPrb({ title: "T" }, [recommendation]);
+    await userEvent.click(screen.getByRole("button", { name: "Ver as 1 evidências" }));
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText("Referência temporal: setembro de 2025")).toBeTruthy();
+    expect(within(dialog).getByText("Publicado: junho de 2026")).toBeTruthy();
+    expect(within(dialog).queryByText("Observado em: setembro de 2025")).toBeNull();
+  });
+
+  it("labels authored evidence intervals and omits unknown temporal dates", async () => {
+    const annual = evd("EVD-annual", "Atividade anual.", [], [], ["Editor"]);
+    annual.detail.record = { observation: { summary: "Atividade anual." }, scope: { temporal: { start: "2025-01", end: "2025-12" } } };
+    annual.sources[0].record = { temporal: { published_at: "2026-06" } };
+    const interval = evd("EVD-interval", "Intervalo.", [], [], []);
+    interval.detail.record = { observation: { summary: "Intervalo." }, scope: { temporal: { start: "2024-09", end: "2025-03" } } };
+    const unknown = evd("EVD-unknown", "Data desconhecida.", [], [], []);
+    unknown.detail.record = { observation: { summary: "Data desconhecida." }, scope: { temporal: { status: "unknown" } } };
+    renderPrb({ title: "T" }, [annual, interval, unknown]);
+    await userEvent.click(screen.getByRole("button", { name: "Ver as 3 evidências" }));
+    const rows = within(screen.getByRole("dialog")).getAllByRole("listitem").filter((item) => item.classList.contains("prb-evidence-item"));
+    expect(within(rows[0]).getByText("Período: 2025")).toBeTruthy();
+    expect(within(rows[0]).getByText("Publicado: junho de 2026")).toBeTruthy();
+    expect(within(rows[1]).getByText("Período: setembro de 2024 a março de 2025")).toBeTruthy();
+    expect(rows[2].querySelector(".prb-evidence-item-temporal")).toBeNull();
   });
 
   it("dismisses with the close button and returns focus to the opener", async () => {
@@ -627,7 +680,7 @@ describe("PrbDetailsPresentation — audit evidence drawer", () => {
     expect(dialog.querySelector(".evd-detail-view")).toBeNull();
     expect(within(dialog).queryByText("Origem e auditoria")).toBeNull();
 
-    await userEvent.click(within(dialog).getByRole("button", { name: "Abrir registo EVD-1" }));
+    await userEvent.click(within(dialog).getByRole("button", { name: "Abrir evidência EVD-1" }));
     expect(onOpenGeneric).toHaveBeenCalledTimes(1);
     expect(onOpenGeneric).toHaveBeenCalledWith("EVD-1");
     expect(screen.queryByRole("dialog")).toBeNull();
@@ -636,7 +689,7 @@ describe("PrbDetailsPresentation — audit evidence drawer", () => {
 
   it("never opens an empty drawer when the Problem links no evidence", async () => {
     renderPrb({ title: "T" }, []);
-    const trigger = screen.getByRole("button", { name: "Abrir os 0 registos" });
+    const trigger = screen.getByRole("button", { name: "Ver as 0 evidências" });
     expect(trigger).toHaveProperty("disabled", true);
     expect(trigger.getAttribute("aria-disabled")).toBe("true");
     await userEvent.click(trigger);

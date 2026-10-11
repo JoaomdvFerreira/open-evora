@@ -35,7 +35,7 @@
   --prb-hero-title-size: 60px;
   --prb-hero-statement-size: 23px;
 
-  /* Estado / Âmbito band (six-column grid at >=768) */
+   /* Estado / Base da investigação band (six-column grid at >=768) */
   --prb-state-head-pad-top: 28px;
   --prb-state-head-pad-bottom: 12px;
   --prb-state-cell-pad-x: 20px;
@@ -159,7 +159,7 @@
 
 /* ---- Identity header: wide editorial hero -------------------------------- */
 
-/* Grid so the "Atualizado em …" line (DOM-ordered after the statement) can
+/* Grid so the "Última edição …" line (DOM-ordered after the statement) can
    sit at the eyebrow row's right edge at >=768 and fall below the statement
    at 360. */
 .prb-identity {
@@ -238,7 +238,7 @@
   border-bottom: 1px dashed var(--color-separator-standard);
 }
 
-/* The id prefix belongs to the compact 360 "Atualizado em …" line only; wider
+/* The id prefix belongs to the compact 360 "Última edição …" line only; wider
    widths already show the id in the local header breadcrumb. */
 .prb-identity-updated-id {
   display: none;
@@ -335,6 +335,95 @@
   border-top: 1px solid var(--color-separator-standard);
 }
 
+.prb-state-item {
+  color: var(--color-ink-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.prb-state-info-wrap {
+  position: relative;
+  display: inline-flex;
+  margin-inline-start: 0.3em;
+  vertical-align: baseline;
+}
+
+.prb-state-info-button {
+  position: relative;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-muted);
+  font-size: inherit;
+  line-height: 0;
+  vertical-align: baseline;
+  cursor: pointer;
+}
+
+.prb-state-info-button::after {
+  content: "";
+  position: absolute;
+  inset-block: -14px;
+  inset-inline-start: 0;
+  width: 44px;
+}
+
+.prb-state-info-button > svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.prb-state-info-button:hover,
+.prb-state-info-button:focus-visible {
+  color: var(--color-ink-primary);
+}
+
+.prb-state-info-button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+.prb-state-info-tooltip {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(20rem, calc(100vw - 32px));
+  padding: 10px 12px;
+  border: 1px solid var(--color-separator-standard);
+  background: var(--color-surface-raised);
+  color: var(--color-ink-primary);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.prb-state-info-tooltip[data-open] {
+  visibility: visible;
+  opacity: 1;
+}
+
+.prb-scope-metric {
+  color: inherit;
+  text-decoration: none;
+}
+
 .prb-state-item,
 .prb-scope-metric {
   display: flex;
@@ -367,15 +456,6 @@
   font-weight: 600;
   line-height: 1.2;
   overflow-wrap: break-word;
-}
-
-.prb-state-value--accent {
-  color: var(--color-accent-hover);
-}
-
-.prb-scope-metric {
-  color: inherit;
-  text-decoration: none;
 }
 
 .prb-scope-metric:hover {
@@ -413,7 +493,7 @@
 /* ---- Full-width band gutter bleed ----------------------------------------- */
 
 /* Every PRB Details band whose surface or rules span the page (local header,
-   Estado/Âmbito, Percurso, Evidência e auditoria) bleeds through
+   Estado/Âmbito, Percurso, Evidência e verificação) bleeds through
    `main.explorer-shell`'s inline gutter via the shell's own
    `--explorer-shell-gutter` (2rem, 1rem <=767px), so its background and
    horizontal rules reach the same outer edges as the Header/PublicFooter.
@@ -559,39 +639,11 @@
   text-wrap: pretty;
 }
 
-/* Up to five independently authored fields per question. Single column by
-   default (semantic order); at >=1024 the component renders the `--stacked`
-   form: latest result full-width, then two independently flowing stacks
-   (PrbDetailsPresentation.tsx, OPEN_QUESTION_STACKS_QUERY). */
+/* The authored question fields retain the same reading order at every width. */
 .prb-open-question-grid {
   display: flex;
   flex-direction: column;
   gap: var(--prb-question-grid-gap);
-}
-
-.prb-open-question-grid--stacked {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
-}
-
-.prb-open-question-grid--stacked > .prb-open-question-field {
-  grid-column: 1 / -1;
-}
-
-.prb-open-question-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prb-question-grid-gap);
-  min-width: 0;
-}
-
-.prb-open-question-stack--primary {
-  grid-column: 1;
-}
-
-.prb-open-question-stack--secondary {
-  grid-column: 2;
 }
 
 .prb-open-question-field h4 {
@@ -638,7 +690,7 @@
   font-weight: 600;
 }
 
-/* ---- "Percurso da investigação" — vertical timeline at every width ------ */
+/* ---- "Como chegámos a esta leitura" — vertical timeline at every width ------ */
 
 .prb-path-section {
   margin-top: var(--prb-path-margin-top);
@@ -720,7 +772,7 @@
   line-height: 1.62;
 }
 
-/* ---- "Evidência e auditoria" --------------------------------------------- */
+/* ---- "Evidência e verificação" --------------------------------------------- */
 
 /* Terminal band (explorerarchitecture.md §3.5): its outer surface (background
    + top rule) bleeds through the shell gutter with the other full-width
@@ -934,6 +986,10 @@ body:has(.prb-details-view) .public-footer {
   align-items: baseline;
 }
 
+.prb-audit-effect-legend > div {
+  display: contents;
+}
+
 .prb-audit-dimension-grid dd {
   margin: 0;
   color: var(--color-ink-secondary);
@@ -1093,7 +1149,7 @@ body:has(.prb-details-view) .public-footer {
   }
 
   /* Hero: eyebrow, topics, title, statement, then the compact
-     "PRB-xxxx · Atualizado em …" record-edit line. */
+     "PRB-xxxx · Última edição …" record-edit line. */
   .prb-identity {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1164,6 +1220,11 @@ body:has(.prb-details-view) .public-footer {
     left: 0;
     right: 0;
     border-top: 1px solid var(--color-separator-standard);
+  }
+
+  .prb-state-info-tooltip {
+    right: 0;
+    left: auto;
   }
 
   .prb-state-grid {
@@ -1335,7 +1396,7 @@ body:has(.prb-details-view) .public-footer {
   line-height: var(--text-technical-line-height);
 }
 
-.prb-evidence-item-topics {
+.prb-evidence-item-temporal {
   margin: 0;
   color: var(--color-ink-muted);
   font-size: var(--text-interface-label-size);
@@ -1397,8 +1458,13 @@ body:has(.prb-details-view) .public-footer {
 }
 
 .prb-evidence-item-source-name {
-  color: var(--color-ink-secondary);
+  color: var(--color-ink-primary);
+  font-weight: 600;
   overflow-wrap: anywhere;
+}
+
+.prb-evidence-item-sources .rec-identifier {
+  color: var(--color-ink-secondary);
 }
 
 .prb-evidence-item-open {

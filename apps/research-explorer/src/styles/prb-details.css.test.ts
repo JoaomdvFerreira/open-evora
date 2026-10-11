@@ -196,7 +196,11 @@ describe("PRB Details full-width bands — gutter bleed", () => {
   });
 
   it("never uses viewport-width geometry for the bleed", () => {
-    expect(prbCss).not.toMatch(/100vw/);
+    const bleed = (prbCss.match(/[^{}]+\{[^{}]*\}/g) ?? []).find(
+      (rule) => normalizeSelector(rule.split("{")[0]) === normalizeSelector(BAND_BLEED_SELECTOR),
+    );
+    expect(bleed).toBeTruthy();
+    expect(bleed).not.toMatch(/100vw/);
   });
 
   it("never introduces an overflow-x: hidden workaround on html/body/main", () => {
@@ -245,6 +249,17 @@ describe("PRB Details Estado da investigação / Âmbito band — six-column gri
     expect(cell).toMatch(/border-left:\s*1px solid var\(--color-separator-standard\);/);
     expect(ruleBodies(prbBase, ".prb-scope-metric")).toContain(cell);
     expect(onlyRuleBody(prbBase, ".prb-state-item:first-child")).toMatch(/border-left:\s*0;/);
+  });
+
+  it("keeps the state info trigger line-neutral while retaining a 44px pointer target", () => {
+    const button = onlyRuleBody(prbBase, ".prb-state-info-button");
+    expect(button).toMatch(/min-height:\s*0;/);
+    expect(button).toMatch(/height:\s*16px;/);
+    expect(button).toMatch(/padding:\s*0;/);
+    expect(button).toMatch(/line-height:\s*0;/);
+    expect(onlyRuleBody(prbBase, ".prb-state-info-button::after")).toMatch(/inset-block:\s*-14px;[\s\S]*width:\s*44px;/);
+    expect(onlyRuleBody(prbBase, ".prb-state-info-button > svg")).toMatch(/width:\s*20px;[\s\S]*height:\s*20px;/);
+    expect(onlyRuleBody(prbBase, ".prb-state-info-wrap")).toMatch(/display:\s*inline-flex;[\s\S]*vertical-align:\s*baseline;/);
   });
 
   it("keeps six columns at tablet width (no restacking), tightening only the cell tokens", () => {

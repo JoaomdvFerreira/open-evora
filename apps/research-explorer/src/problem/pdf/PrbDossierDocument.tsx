@@ -254,6 +254,7 @@ function OpenQuestions({ section }: { section: NonNullable<DossierDocumentModel[
           {item.prose.slice(1).map((prose) => (
             <ProseBlock key={prose.label} prose={prose} />
           ))}
+          <ProseBlock prose={item.action} />
           {item.evidence.length > 0 && (
             <View wrap={false}>
               <Text style={styles.labelSpaced}>Evidência relacionada</Text>
@@ -268,7 +269,7 @@ function OpenQuestions({ section }: { section: NonNullable<DossierDocumentModel[
 
 function InvestigationPath({ section }: { section: NonNullable<DossierDocumentModel["path"]> }) {
   return (
-    <Section id="percurso" title="Percurso da investigação" intro={section.intro}>
+    <Section id="percurso" title="Como chegámos a esta leitura" intro={section.intro}>
       {section.stages.map((stage) => (
         <View key={stage.number} style={styles.stage} wrap={characterCount(stage.paragraphs) > KEEP_TOGETHER_CHARACTERS}>
           <Text style={styles.stageNumber}>{stage.number}</Text>
