@@ -193,6 +193,8 @@ export function buildHumanGatePackage(index: CorpusIndex, changeSet: ResearchCha
     ...(reviewerInput.sourceVerificationContext
       ? { reviewSourceVerificationContext: structuredClone([...reviewerInput.sourceVerificationContext]) }
       : {}),
+    // Present only when the change reverse-impacts unchanged PRBs; never part of the integration plan.
+    ...(reviewerInput.impactedSubjects ? { reviewImpactedSubjects: structuredClone([...reviewerInput.impactedSubjects]) } : {}),
     integrationPlan: changeSet.integrationPlan,
     manifest: changeSet.manifest,
     safetyAdmission: changeSet.safetyAdmission,

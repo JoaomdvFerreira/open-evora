@@ -14,6 +14,7 @@ import type { ValidationResult } from "../validation/validate.ts";
 import type { GenerationManifest, ResearchChangeSet } from "../orchestrate/types.ts";
 import type { IndependentReviewResult } from "../review/types.ts";
 import type { ReviewContextRecord, ReviewSignal } from "../review/reviewer-input.ts";
+import type { ImpactedProblemSubject } from "../review/reverse-impact.ts";
 import type { SafetyAdmission } from "../admission/safety-admission.ts";
 import type { SourceVerification } from "../core/source-verifications.ts";
 
@@ -60,6 +61,14 @@ export interface HumanGatePackage {
    * reviewer received none, so such packages keep their exact shape.
    */
   reviewSourceVerificationContext?: SourceVerification[];
+  /**
+   * The reverse-impacted unchanged PRBs the reviewer received as review
+   * subjects (reviewer input `impactedSubjects`, reverse-impact.ts), with
+   * their bounded linked-EVD boundaries. Review subjects only: never
+   * candidates and never integrated. Absent when there is no reverse impact,
+   * so such packages keep their exact shape.
+   */
+  reviewImpactedSubjects?: ImpactedProblemSubject[];
   /** Convenience projection of researchChangeSet.integrationPlan. */
   integrationPlan: CanonicalIntegrationPlan | null;
   /** Convenience projection of researchChangeSet.manifest. */

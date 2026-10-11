@@ -27,6 +27,7 @@ import { asValidatedResearchChangeSet, validateResearchChangeSet } from "../orch
 import { reviewSignalId, sourceVerificationSubjectSourceIds, type ReviewerInputPackage } from "../review/reviewer-input.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import { ADVISORY, SIGNAL_DIMENSION, type SignalCode } from "../language/signals.ts";
+import { linkedEvidenceBoundaryFields } from "../review/reverse-impact.ts";
 import type { HumanGatePackage } from "./types.ts";
 
 export interface HumanGatePackageValidationResult {
@@ -125,6 +126,76 @@ function validateReviewEvidenceContext(value: unknown, candidateIds: ReadonlySet
     }
     if (!isObject(record.fields)) errors.push(`${path}.fields must be an object`);
   });
+  return errors;
+}
+
+const IMPACTED_SUBJECT_KEYS = ["recordFamily", "id", "changedEvidenceIds", "fields", "linkedEvidenceBoundary"];
+const BOUNDARY_KEYS = ["evidenceId", "changed", "fields"];
+const BOUNDARY_FIELD_KEYS = ["observation", "scope", "inference_limits", "evidence_nature", "claim_authority"];
+
+function isSortedUnique(ids: readonly string[]): boolean {
+  return ids.every((id, i) => i === 0 || ids[i - 1] < id);
+}
+
+/**
+ * Structure of the stored reverse-impact subjects, against the package's own
+ * candidates only: sorted unchanged PRBs, each caused by created or updated
+ * EVD candidates it links, each linked EVD exactly once in its bounded
+ * projection. A changed EVD's projection must equal its candidate's. Whether
+ * the set is complete is decided where the corpus exists: package-builder.ts
+ * reconstructs it with buildReviewerInputPackage(), and contentHash binds it.
+ */
+function validateReviewImpactedSubjects(value: unknown, candidates: readonly CandidateRecord[], deltas: readonly CandidateDelta[]): string[] {
+  if (value === undefined) return [];
+  const path = "package.reviewImpactedSubjects";
+  if (!Array.isArray(value) || value.length === 0) return [`${path} must be a non-empty array when present; it is omitted when there is no reverse impact`];
+  const candidateIds = new Set(deltas.map((delta) => delta.id));
+  const changed = new Map<string, RecordFields>();
+  deltas.forEach((delta, i) => {
+    if (delta.recordFamily === "EVD-" && (delta.action === "CREATE" || delta.action === "UPDATE") && candidates[i]) changed.set(delta.id, candidates[i].fields);
+  });
+  const errors: string[] = [];
+  const ids: string[] = [];
+  value.forEach((subject, i) => {
+    const at = `${path}[${i}]`;
+    if (!isObject(subject)) {
+      errors.push(`${at} must be an object`);
+      return;
+    }
+    errors.push(...unknownKeys(subject, IMPACTED_SUBJECT_KEYS, at));
+    if (subject.recordFamily !== "PRB-" || !isNonEmptyString(subject.id) || !subject.id.startsWith("PRB-")) {
+      errors.push(`${at} must be a PRB- record with a PRB ID`);
+      return;
+    }
+    if (candidateIds.has(subject.id)) errors.push(`${at}.id ${subject.id} is a candidate; a changed PRB is reviewed as a candidate, not as an impacted subject`);
+    ids.push(subject.id);
+    if (!isObject(subject.fields)) errors.push(`${at}.fields must be an object`);
+    const causes = isStringArray(subject.changedEvidenceIds) ? subject.changedEvidenceIds : [];
+    if (causes.length === 0 || !isSortedUnique(causes) || causes.some((id) => !changed.has(id))) {
+      errors.push(`${at}.changedEvidenceIds must be a non-empty, sorted list of EVD IDs this change creates or updates`);
+    }
+    const boundary = Array.isArray(subject.linkedEvidenceBoundary) ? subject.linkedEvidenceBoundary : [];
+    if (!Array.isArray(subject.linkedEvidenceBoundary) || boundary.length === 0) errors.push(`${at}.linkedEvidenceBoundary must be a non-empty array`);
+    const boundaryIds: string[] = [];
+    boundary.forEach((entry, j) => {
+      const bt = `${at}.linkedEvidenceBoundary[${j}]`;
+      if (!isObject(entry) || typeof entry.evidenceId !== "string" || !isObject(entry.fields)) {
+        errors.push(`${bt} must be an object with an evidenceId and fields`);
+        return;
+      }
+      errors.push(...unknownKeys(entry, BOUNDARY_KEYS, bt), ...unknownKeys(entry.fields, BOUNDARY_FIELD_KEYS, `${bt}.fields`));
+      if (isObject(entry.fields.observation)) errors.push(...unknownKeys(entry.fields.observation, ["summary"], `${bt}.fields.observation`));
+      boundaryIds.push(entry.evidenceId);
+      if (entry.changed !== causes.includes(entry.evidenceId)) errors.push(`${bt}.changed must be true exactly when ${entry.evidenceId} is in changedEvidenceIds`);
+      const candidate = changed.get(entry.evidenceId);
+      if (entry.changed === true && candidate && canonicalJsonStringify(entry.fields) !== canonicalJsonStringify(linkedEvidenceBoundaryFields(candidate))) {
+        errors.push(`${bt}.fields must be the bounded projection of candidate ${entry.evidenceId}`);
+      }
+    });
+    if (!isSortedUnique(boundaryIds)) errors.push(`${at}.linkedEvidenceBoundary must list each linked EVD once, sorted by EVD ID`);
+    if (causes.some((id) => !boundaryIds.includes(id))) errors.push(`${at}.linkedEvidenceBoundary must include every changed EVD that caused the impact`);
+  });
+  if (!isSortedUnique(ids)) errors.push(`${path} must be sorted by PRB ID without duplicates`);
   return errors;
 }
 
@@ -233,6 +304,7 @@ export function reviewerInputFromGatePackage(pkg: HumanGatePackage): ReviewerInp
     evidenceContext: pkg.reviewEvidenceContext,
     signals: pkg.reviewSignals,
     ...(pkg.reviewSourceVerificationContext !== undefined ? { sourceVerificationContext: pkg.reviewSourceVerificationContext } : {}),
+    ...(pkg.reviewImpactedSubjects !== undefined ? { impactedSubjects: pkg.reviewImpactedSubjects } : {}),
   };
 }
 
@@ -335,7 +407,10 @@ export function validateHumanGatePackage(value: unknown): HumanGatePackageValida
     }
     const candidateIds = new Set(rcs.deltas.map((delta) => delta.id));
     errors.push(...validateReviewEvidenceContext(pkg.reviewEvidenceContext, candidateIds));
-    errors.push(...validateReviewSignals(pkg.reviewSignals, candidateIds));
+    errors.push(...validateReviewImpactedSubjects(pkg.reviewImpactedSubjects, rcs.candidates, rcs.deltas));
+    // Signals may name the stored impacted subjects beside the candidates, never another record.
+    const impactedIds = Array.isArray(pkg.reviewImpactedSubjects) ? pkg.reviewImpactedSubjects.map((s) => (isObject(s) ? s.id : undefined)) : [];
+    errors.push(...validateReviewSignals(pkg.reviewSignals, new Set([...candidateIds, ...impactedIds.filter((id): id is string => typeof id === "string")])));
     errors.push(...validateReviewSourceVerificationContext(pkg.reviewSourceVerificationContext, reviewedSources(pkg, rcs.candidates, rcs.deltas)));
     if (errors.length === 0) errors.push(...revalidateSemanticReview(asValidatedHumanGatePackage(pkg)));
   }
