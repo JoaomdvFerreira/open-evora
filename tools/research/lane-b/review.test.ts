@@ -16,6 +16,7 @@ import { buildReviewerPrompt } from "../review/reviewer-prompt.ts";
 import type { IndependentReviewResult } from "../review/types.ts";
 import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
 import { defaultLaneBWorkbenchDir } from "./cli.ts";
+import { laneBReviewSummary } from "./summary.ts";
 import {
   extractPullRequestReceipt,
   prepareLaneBReview,
@@ -1175,5 +1176,58 @@ test("the summary CLI verifies exactly as check does and writes only the bounded
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Reverse EVD→PRB impact (CRR-02).
+
+test("an EVD-only change reviews the unchanged PRB that links it without adding it to the receipt", () => {
+  withFixture((fixture, base) => {
+    fixture.record(evidence("EVD-A", ["SRC-A"], "Reclamações de moradores registadas apenas em 2024."));
+    const head = fixture.commit();
+    const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: head }));
+    assert.deepEqual(unit.changedRecords.map(({ id }) => id), ["EVD-A"]);
+    assert.deepEqual(unit.reviewerInput.impactedSubjects?.map(({ id, changedEvidenceIds }) => [id, changedEvidenceIds]), [["PRB-0001", ["EVD-A"]]]);
+    // CI reconstructs the identical package, impacted subject included.
+    assert.equal(reviewRequired(fixture.unit(base, { kind: "commit", sha: head })).reviewerInputFingerprint, unit.reviewerInputFingerprint);
+
+    const review = concur(unit.reviewerInput);
+    for (const entry of review.signalDispositions) Object.assign(entry, { disposition: "NOT_APPLICABLE", evidenceReferences: [] });
+    review.findings = [{
+      findingId: "CLEC-FND-0001",
+      recordId: "PRB-0001",
+      field: "problem_statement",
+      claim: "Atrasos relatados",
+      dimension: "temporal_precision",
+      kind: "CLEC_VIOLATION",
+      severity: "BLOCKING",
+      reason: "A EVD-A revista limita as reclamações a 2024; o problema não indica o período.",
+      evidenceReferences: ["EVD-A"],
+      correctionDirection: "Indicar o período documentado pela evidência ligada.",
+      relatedSignalIds: [],
+    }];
+    review.outcome = "DISAGREEMENT_FOUND";
+    assert.deepEqual(validateIndependentReview(review, unit.reviewerInput).errors, []);
+    assert.deepEqual(receiptFor(unit, review).changedRecordBlobs.map(({ path }) => path), [recordPath("EVD-A")]);
+
+    const accepted = { ...review, outcome: "CONCUR", findings: [] };
+    const receipt = receiptFor(unit, accepted);
+    assert.deepEqual(receipt.changedRecordBlobs.map(({ path }) => path), [recordPath("EVD-A")]);
+    assert.deepEqual(Object.keys(receipt).sort(), ["baseGitSha", "changedRecordBlobs", "outcome", "reviewSha256", "reviewerInputFingerprint", "schemaVersion"]);
+    const result = verifyLaneBPullRequest(unit, bodyWith(receipt), artifactsFor(accepted));
+    assert.equal(result.ok, true, result.ok ? "" : result.errors.join("; "));
+    // The summary counts unique review subjects: the changed EVD and the impacted PRB.
+    const summary = laneBReviewSummary(unit, result);
+    assert.match(summary.markdown, /\*\*Registos revistos:\*\* 2\n/);
+  });
+});
+
+test("an EVD change no PRB links adds no impacted subject", () => {
+  withFixture((fixture, base) => {
+    fixture.record(evidence("EVD-B", ["SRC-B"], "Versão revista."));
+    const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
+    assert.equal("impactedSubjects" in unit.reviewerInput, false);
+    assert.equal(serializeReviewerInput(unit.reviewerInput).includes("impactedSubjects"), false);
   });
 });

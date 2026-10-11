@@ -52,8 +52,18 @@ const DISPOSITION_KEYS = ["signalId", "disposition", "reason", "evidenceReferenc
 const FINDING_ID = /^CLEC-FND-\d{4,}$/;
 const SIGNAL_ID = /^CLEC-SIG-\d{4,}$/;
 
-/** Authored candidate fields a review may quote, keyed by candidate record ID. */
+/**
+ * Authored fields a review may quote, keyed by record ID: the candidates and,
+ * in the context-aware layer, the package's reverse-impacted PRB subjects.
+ */
 export type ReviewCandidateFields = ReadonlyMap<string, RecordFields>;
+
+/**
+ * Structure-only layer: a non-candidate record ID whose authored-field check
+ * is deferred to the context-aware layer because it may be a reverse-impacted
+ * subject the frozen RCS does not itself carry.
+ */
+export type DeferredReviewSubject = (recordId: string) => boolean;
 
 /** What the context-aware layer additionally knows: the frozen package's records and signals. */
 interface ReviewContext {
@@ -140,7 +150,14 @@ function checkReferences(references: string[], path: string, context: ReviewCont
   }
 }
 
-function checkFinding(value: unknown, i: number, candidates: ReviewCandidateFields, context: ReviewContext | undefined, errors: string[]): ParsedFinding | undefined {
+function checkFinding(
+  value: unknown,
+  i: number,
+  candidates: ReviewCandidateFields,
+  context: ReviewContext | undefined,
+  errors: string[],
+  deferred?: DeferredReviewSubject,
+): ParsedFinding | undefined {
   const path = `findings[${i}]`;
   if (!isObject(value)) {
     errors.push(`${path} must be an object`);
@@ -153,7 +170,10 @@ function checkFinding(value: unknown, i: number, candidates: ReviewCandidateFiel
   }
 
   const fields = typeof value.recordId === "string" ? candidates.get(value.recordId) : undefined;
-  if (!fields) {
+  if (!fields && !context && typeof value.recordId === "string" && deferred?.(value.recordId)) {
+    if (!isNonEmptyString(value.field)) errors.push(`${path}.field must be a non-empty string`);
+    if (!isNonEmptyString(value.claim)) errors.push(`${path}.claim must be a non-empty string`);
+  } else if (!fields) {
     errors.push(`${path}.recordId must name a candidate record, got ${JSON.stringify(value.recordId)}`);
   } else if (!isNonEmptyString(value.field)) {
     errors.push(`${path}.field must be a non-empty string`);
@@ -311,7 +331,12 @@ function expectedOutcome(findings: readonly ParsedFinding[], dispositions: reado
   return gap ? "INSUFFICIENT_EVIDENCE" : "CONCUR";
 }
 
-function checkReview(value: unknown, candidates: ReviewCandidateFields, context: ReviewContext | undefined): IndependentReviewValidationResult {
+function checkReview(
+  value: unknown,
+  candidates: ReviewCandidateFields,
+  context: ReviewContext | undefined,
+  deferred?: DeferredReviewSubject,
+): IndependentReviewValidationResult {
   // A missing result is reported explicitly rather than treated as
   // absent-but-acceptable: "no independent review occurred" must fail closed
   // exactly like a malformed one.
@@ -339,7 +364,7 @@ function checkReview(value: unknown, candidates: ReviewCandidateFields, context:
     errors.push("independentReview.findings must be an array");
   } else {
     value.findings.forEach((entry, i) => {
-      const finding = checkFinding(entry, i, candidates, context, errors);
+      const finding = checkFinding(entry, i, candidates, context, errors, deferred);
       if (!finding) return;
       if (findings.has(finding.findingId)) errors.push(`findings contain duplicate findingId ${finding.findingId}`);
       else findings.set(finding.findingId, finding);
@@ -397,15 +422,30 @@ export function candidateFieldsById(candidates: readonly CandidateRecord[], delt
  * package object used to build the reviewer prompt.
  */
 export function validateIndependentReview(value: unknown, pkg: ReviewerInputPackage): IndependentReviewValidationResult {
+  const impacted = pkg.impactedSubjects ?? [];
   const recordIds = new Set([...pkg.deltas.map((delta) => delta.id), ...pkg.evidenceContext.map((record) => record.id)]);
   const records = new Map<string, { recordFamily: string; fields: RecordFields }>();
+  // A linked-EVD boundary is citable PRB→EVD context; a fuller version of the same record wins below.
+  for (const subject of impacted) {
+    for (const boundary of subject.linkedEvidenceBoundary) {
+      recordIds.add(boundary.evidenceId);
+      records.set(boundary.evidenceId, { recordFamily: "EVD-", fields: boundary.fields });
+    }
+  }
   for (const record of pkg.evidenceContext) records.set(record.id, { recordFamily: record.recordFamily, fields: record.fields });
   pkg.deltas.forEach((delta, i) => {
     const candidate = pkg.candidates[i];
     if (candidate && candidate.recordFamily === delta.recordFamily) records.set(delta.id, { recordFamily: delta.recordFamily, fields: candidate.fields });
   });
+  // Only the package's own impacted subjects become reviewable beside the candidates: never another unchanged record.
+  const subjects = new Map(candidateFieldsById(pkg.candidates, pkg.deltas));
+  for (const subject of impacted) {
+    recordIds.add(subject.id);
+    records.set(subject.id, { recordFamily: subject.recordFamily, fields: subject.fields });
+    subjects.set(subject.id, subject.fields);
+  }
   const signals = new Map(pkg.signals.map((entry) => [entry.signalId, entry.signal]));
-  return checkReview(value, candidateFieldsById(pkg.candidates, pkg.deltas), { recordIds, records, signals });
+  return checkReview(value, subjects, { recordIds, records, signals });
 }
 
 /**
@@ -413,8 +453,24 @@ export function validateIndependentReview(value: unknown, pkg: ReviewerInputPack
  * Research Change Set's own candidates permit. Does not re-run the
  * context-aware checks that need the reviewer package.
  */
-export function validateIndependentReviewStructure(value: unknown, candidates: ReviewCandidateFields): IndependentReviewValidationResult {
-  return checkReview(value, candidates, undefined);
+export function validateIndependentReviewStructure(
+  value: unknown,
+  candidates: ReviewCandidateFields,
+  deferred?: DeferredReviewSubject,
+): IndependentReviewValidationResult {
+  return checkReview(value, candidates, undefined, deferred);
+}
+
+/**
+ * The records a frozen RCS cannot check by itself: a non-candidate PRB is a
+ * possible reverse-impacted subject only when the change creates or updates
+ * EVD. Its record, field and claim are verified by the context-aware layer,
+ * which every Gate path runs against the reconstructed reviewer package.
+ */
+export function possibleImpactedSubject(deltas: readonly CandidateDelta[]): DeferredReviewSubject {
+  const evidenceChanged = deltas.some((d) => isObject(d) && d.recordFamily === "EVD-" && (d.action === "CREATE" || d.action === "UPDATE"));
+  const candidateIds = new Set(deltas.map((d) => (isObject(d) ? d.id : undefined)));
+  return (recordId) => evidenceChanged && recordId.startsWith("PRB-") && !candidateIds.has(recordId);
 }
 
 export function asValidatedIndependentReview(value: unknown): IndependentReviewResult {

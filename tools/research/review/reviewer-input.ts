@@ -33,6 +33,7 @@ import { buildProspectiveCorpusIndex } from "../integration/prospective-validati
 import { detectLanguageSignals, type LanguageSignal } from "../language/signals.ts";
 import type { ValidationResult } from "../validation/validate.ts";
 import { canonicalJsonStringify } from "../core/fingerprint.ts";
+import { impactedProblemSubjects, type ImpactedProblemSubject } from "./reverse-impact.ts";
 import type { ReviewFraming } from "./types.ts";
 
 export interface ReviewerInputSource {
@@ -97,6 +98,15 @@ export interface ReviewerInputPackage {
    * packages serialize exactly as they did before this field existed.
    */
   sourceVerificationContext?: SourceVerification[];
+  /**
+   * Unchanged PRBs that reference an EVD this change creates or updates
+   * (reverse-impact.ts), sorted by PRB ID: review subjects with their complete
+   * authored fields and a bounded projection of every EVD they link — never
+   * candidates, never Git-changed records, and never a path to their EVDs'
+   * Sources or Source Verification Support. Omitted entirely when there is no
+   * reverse impact, so such packages serialize exactly as before.
+   */
+  impactedSubjects?: ImpactedProblemSubject[];
 }
 
 /** Record families a candidate's evidence chain follows: PRB -> EVD -> SRC, never to other problems. */
@@ -192,8 +202,8 @@ function deepFreeze<T>(value: T): T {
  * signals both come from the one prospective corpus produced by overlaying
  * the candidates onto `index` (buildProspectiveCorpusIndex()), so candidate
  * replacements win over canonical versions. Signal subjects are limited to
- * the candidate records; cross-record signal context still reads the whole
- * prospective index. Deliberately omits `manifest.rationale`: the primary
+ * the candidate records and the reverse-impacted unchanged PRBs; cross-record
+ * signal context still reads the whole prospective index. Deliberately omits `manifest.rationale`: the primary
  * author's free-form justification is not on the allow-list (contract §6
  * "must NOT receive... primary free-form rationale outside the immutable
  * package"). Canonical SRC records carry provenance and metadata, not the
@@ -205,8 +215,10 @@ function deepFreeze<T>(value: T): T {
  */
 export function buildReviewerInputPackage(source: ReviewerInputSource): ReviewerInputPackage {
   const prospective = buildProspectiveCorpusIndex(source.index, source.candidates);
-  const candidateIds = new Set(source.deltas.map((delta) => delta.id));
-  const signals = detectLanguageSignals(prospective, { subjectIds: candidateIds }).map((signal, position) => ({
+  const impactedSubjects = impactedProblemSubjects(prospective, source.deltas);
+  // Impacted PRBs are signal subjects too, judged on the prospective corpus (the changed EVD version).
+  const subjectIds = new Set([...source.deltas.map((delta) => delta.id), ...impactedSubjects.map((subject) => subject.id)]);
+  const signals = detectLanguageSignals(prospective, { subjectIds }).map((signal, position) => ({
     signalId: reviewSignalId(position),
     signal,
   }));
@@ -233,6 +245,7 @@ export function buildReviewerInputPackage(source: ReviewerInputSource): Reviewer
     evidenceContext,
     signals,
     ...(sourceVerificationContext.length > 0 ? { sourceVerificationContext } : {}),
+    ...(impactedSubjects.length > 0 ? { impactedSubjects } : {}),
   };
   return deepFreeze(pkg);
 }
@@ -259,6 +272,15 @@ export function reviewSourceEligibility(pkg: Pick<ReviewerInputPackage, "candida
   });
   for (const record of pkg.evidenceContext) if (record.recordFamily === "SRC-") sources.set(record.id, record.fields);
   return [...sources.keys()].sort().map((sourceId) => ({ sourceId, ineligibility: sourceVerificationIneligibility(sources.get(sourceId)!) }));
+}
+
+/**
+ * Unique semantic review subjects: every candidate record plus every
+ * impacted unchanged PRB. Impacted subjects are never candidates, so nothing
+ * is counted twice.
+ */
+export function reviewSubjectCount(pkg: Pick<ReviewerInputPackage, "deltas" | "impactedSubjects">): number {
+  return pkg.deltas.length + (pkg.impactedSubjects?.length ?? 0);
 }
 
 /**

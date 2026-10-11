@@ -95,6 +95,17 @@ Review boundaries. Every SRC record in the input is classified, deterministicall
 A CLEC defect that makes a statement stronger, broader, more certain or more causal than its evidence, or that changes evidential meaning, is grounds for DISAGREEMENT_FOUND. If the package lacks the evidence needed to compare a claim, that is grounds for INSUFFICIENT_EVIDENCE. Record each such issue as a structured finding with its record, field, verbatim claim and CLEC dimension.`;
 
 /**
+ * Reverse-impact review (CRR-02): present only when the input carries
+ * "impactedSubjects", so prompts for packages without reverse impact are
+ * unchanged.
+ */
+const REVERSE_IMPACT_CRITERIA = `Reverse-impact review subjects. The input's "impactedSubjects" lists PRBs that are unchanged in this package (not candidates, not changed files) and are reviewed because one or more EVD they link is created or updated by this package. Each entry gives the PRB's complete authored "fields", "changedEvidenceIds" (the changed EVD that caused the impact) and "linkedEvidenceBoundary": every EVD the PRB links, each with "changed" marking whether this package changes it and only its observation.summary, scope, inference_limits, evidence_nature and claim_authority (the changed EVD's candidate version).
+- The PRB must still be supported by the complete set of its linked EVD boundaries. Judge it against all of them, never only against the changed EVD: another unchanged linked EVD may still support a claim.
+- The linked EVD boundary is the PRB's complete evidential boundary. SRC records and Source Verification Support never widen it, including those the package carries for a changed EVD.
+- Report a material mismatch between the unchanged PRB and its linked EVD — for example wording broader than a narrowed scope — even where no signal flags it.
+- A finding may name an impacted PRB as its recordId and quote its authored fields; signals may have it as subjectId. Cite the linked EVD IDs judged in evidenceReferences. No other unchanged record may be a finding's recordId.`;
+
+/**
  * The deterministic SOURCE VERIFICATION ELIGIBILITY section: one line per SRC
  * record in the frozen input, derived by reviewSourceEligibility() from that
  * input alone. It carries only SRC IDs and reason categories, never Source
@@ -121,6 +132,7 @@ function sourceEligibilitySection(frozenReviewerInputJson: string): string[] {
  * pure function of that same string.
  */
 export function buildReviewerPrompt(frozenReviewerInputJson: string): string {
+  const impacted = (JSON.parse(frozenReviewerInputJson) as Partial<ReviewerInputPackage>).impactedSubjects !== undefined;
   return [
     "You are performing an independent review of the following already-authored",
     "research candidate package. You did not author it. Evaluate only the",
@@ -139,6 +151,7 @@ export function buildReviewerPrompt(frozenReviewerInputJson: string): string {
     "",
     CLEC_REVIEW_CRITERIA,
     "",
+    ...(impacted ? [REVERSE_IMPACT_CRITERIA, ""] : []),
     "REVIEW INPUT (immutable, JSON):",
     frozenReviewerInputJson,
     "",

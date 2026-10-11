@@ -18,7 +18,7 @@
  * disposition entries in the reviewer's `signalDispositions` order; blocking
  * findings by `findingId` (UTF-16 code-unit order).
  */
-import type { ReviewSignal } from "../review/reviewer-input.ts";
+import { reviewSubjectCount, type ReviewSignal } from "../review/reviewer-input.ts";
 import type { IndependentReviewResult, SignalDisposition, SignalDispositionValue } from "../review/types.ts";
 import type { LaneBVerification } from "./receipt.ts";
 import type { LaneBReviewUnit } from "./review-unit.ts";
@@ -50,7 +50,7 @@ function section(title: string, lines: string[], none: string): string[] {
 }
 
 export interface ReviewSummaryInput {
-  /** Number of canonical record files the review unit covers. */
+  /** Unique semantic review subjects: changed canonical records plus reverse-impacted unchanged PRBs. */
   reviewedRecordCount: number;
   /** The signals of the reviewer input the review was verified against. */
   signals: readonly ReviewSignal[];
@@ -121,7 +121,7 @@ export function laneBReviewSummary(unit: LaneBReviewUnit, verification: LaneBVer
   if (unit.status !== "REVIEW_REQUIRED") return { status: "INVALID", markdown: renderInvalidSummary("VERIFICATION_FAILED") };
   return {
     status: "VERIFIED",
-    markdown: renderReviewSummary({ reviewedRecordCount: unit.changedRecords.length, signals: unit.reviewerInput.signals, review: verification.independentReview }),
+    markdown: renderReviewSummary({ reviewedRecordCount: reviewSubjectCount(unit.reviewerInput), signals: unit.reviewerInput.signals, review: verification.independentReview }),
   };
 }
 

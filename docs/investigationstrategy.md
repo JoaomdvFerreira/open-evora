@@ -424,6 +424,12 @@ Implemented for direct pull-request changes (Lane B):
 - CI rebuilds the review input from Git, verifies both the compact receipt and the complete review artifact against it, and fails the pull request when either is missing, stale or structurally or contextually invalid, or the review outcome is not `CONCUR`;
 - for human visibility, trusted default-branch CI tooling then repeats that verification without executing pull-request code and keeps one short deterministic PT-PT pull-request comment current: the review outcome, disposition counts, every `NOT_APPLICABLE` and `INSUFFICIENT_EVIDENCE` disposition with its reason, and any blocking findings — or a not-applicable or failed-verification state. The complete review remains only in the hash-bound artifact; the comment is a derived representation, neither research state nor an approval, and invokes no reviewer.
 
+Implemented in both lanes, by the shared review kernel (reverse EVD→PRB impact):
+- when a change creates or updates an EVD, every PRB that references it in the prospective state, through any EVD reference the PRB schema declares, is deterministically identified; an unchanged such PRB becomes a semantic review subject, with its scope-term and other CLEC signals, even though its file is unchanged;
+- it is reviewed against its complete linked-EVD boundary — every EVD it links, each limited to observation summary, scope, inference limits, Evidence nature and claim authority, with the changed EVD explicitly marked — never against the changed EVD alone;
+- that boundary never recursively carries those EVDs' Sources or Source Verification Support, which therefore never widen PRB support;
+- findings and signal dispositions may target such a PRB, and no other unchanged record; it is part of the fingerprinted reviewer input and the hash-bound Gate package, but it is not a changed record in the Lane B receipt and is never integrated.
+
 The no-exception independent semantic-review rule is therefore technically enforced for both lanes. A `CONCUR` review makes a change eligible for human review; it is not an approval. Once a change is eligible, the canonical and publication decisions remain human judgement.
 
 ### Source Verification Support in semantic review

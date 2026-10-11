@@ -153,6 +153,15 @@ function renderEvidenceContext(pkg: HumanGatePackage): string {
     "Canonical SRC- records carry provenance and metadata, not the Source body; no Source content was fetched or reproduced.",
     "",
     records,
+    // Present only for reverse impact, so other views are unchanged.
+    ...(pkg.reviewImpactedSubjects
+      ? [
+          "",
+          "Unchanged PRBs reviewed because linked EVD changed (`reviewImpactedSubjects`; review subjects only, never integrated):",
+          "",
+          bulletList(pkg.reviewImpactedSubjects.map((s) => `${code(s.id)} — changed EVD ${s.changedEvidenceIds.map(code).join(", ")}; linked EVD boundary ${s.linkedEvidenceBoundary.map((b) => code(b.evidenceId)).join(", ")}`)),
+        ]
+      : []),
   ].join("\n");
 }
 

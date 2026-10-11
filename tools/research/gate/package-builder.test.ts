@@ -17,6 +17,7 @@ import {
   withTempDir,
 } from "./test-fixtures.ts";
 import { computeContentHash } from "./content-hash.ts";
+import { renderHumanGateMarkdown } from "./markdown-view.ts";
 import { buildHumanGatePackage } from "./package-builder.ts";
 import { reviewerInputFromGatePackage, validateHumanGatePackage } from "./package-validator.ts";
 import { canonicalJsonStringify, sha256Hex } from "../core/fingerprint.ts";
@@ -271,4 +272,82 @@ test("stored Source Verification Support is validated structurally against the S
     const restricted = pkg.reviewEvidenceContext.map((r: { id: string; fields: object }) => (r.id === "SRC-C" ? { ...r, fields: { ...r.fields, access: { level: "restricted" } } } : r));
     assert.ok(validateHumanGatePackage({ ...pkg, reviewEvidenceContext: restricted }).errors.some((e) => e.includes('SRC-C has access.level "restricted"')));
   });
+});
+
+// ---------------------------------------------------------------------------
+// Reverse EVD→PRB impact (CRR-02).
+
+/** semanticReviewCorpus() plus an unchanged PRB linking EVD-B, which the semantic candidates update. */
+function impactedCorpus() {
+  const index = semanticReviewCorpus();
+  const problems = index.byPrefix.get("PRB-")!;
+  const record = { file: "problems/PRB-IMPACTED.yaml", fields: { problem_id: "PRB-IMPACTED", problem_statement: "Atrasos frequentes relatados por moradores.", evidence: [{ evidence_id: "EVD-B" }] } };
+  const byPrefix = new Map(index.byPrefix);
+  byPrefix.set("PRB-", { schema: problems.schema, records: [...problems.records, record], byId: new Map([...problems.byId, ["PRB-IMPACTED", record]]) });
+  return { ...index, byPrefix, totalRecords: index.totalRecords + 1 };
+}
+
+function impactedReview(index: ReturnType<typeof impactedCorpus>) {
+  const input = semanticReviewerInput(index, SHA_A);
+  const review = semanticReview(input, "DISAGREEMENT_FOUND");
+  // The impacted PRB's signals are judged against its own boundary, not EVD-A.
+  for (const disposition of review.signalDispositions) {
+    const signal = input.signals.find((s) => s.signalId === disposition.signalId)!.signal;
+    if (signal.subjectId === "PRB-IMPACTED" && disposition.relatedFindingIds.length === 0) Object.assign(disposition, { disposition: "NOT_APPLICABLE", evidenceReferences: [], relatedFindingIds: [] });
+  }
+  review.findings.push({
+    findingId: "CLEC-FND-0002",
+    recordId: "PRB-IMPACTED",
+    field: "problem_statement",
+    claim: "Atrasos frequentes",
+    dimension: "supported_quantity",
+    kind: "CLEC_VIOLATION",
+    severity: "BLOCKING",
+    reason: "A EVD-B revista não sustenta a frequência afirmada.",
+    evidenceReferences: ["EVD-B"],
+    correctionDirection: "Limitar a afirmação ao que a evidência ligada regista.",
+    relatedSignalIds: [],
+  });
+  return { input, review };
+}
+
+test("the Gate carries reverse-impacted subjects and revalidates findings against an unchanged impacted PRB", () => {
+  const index = impactedCorpus();
+  const { input, review } = impactedReview(index);
+  assert.deepEqual(input.impactedSubjects?.map((s) => s.id), ["PRB-IMPACTED"]);
+  const built = buildHumanGatePackage(index, semanticResearchChangeSet(index, SHA_A, review));
+  assert.deepEqual(built.errors, []);
+  const pkg = built.pkg!;
+  assert.deepEqual(pkg.reviewImpactedSubjects, input.impactedSubjects);
+  assert.deepEqual(reviewerInputFromGatePackage(pkg), JSON.parse(JSON.stringify(input)));
+  assert.deepEqual(validateHumanGatePackage(pkg).errors, []);
+  assert.match(renderHumanGateMarkdown(pkg), /`PRB-IMPACTED` — changed EVD `EVD-B`; linked EVD boundary `EVD-B`/);
+  // Never a candidate and never integrated.
+  assert.equal(pkg.candidates.some((c) => c.fields.problem_id === "PRB-IMPACTED"), false);
+  assert.equal(canonicalJsonStringify(pkg.integrationPlan).includes("PRB-IMPACTED"), false);
+
+  // The stored subjects are hash-bound and structurally checked.
+  const tampered = structuredClone(pkg);
+  tampered.reviewImpactedSubjects![0].linkedEvidenceBoundary[0].changed = false;
+  assert.notEqual(computeContentHash(tampered), computeContentHash(pkg));
+  assert.match(validateHumanGatePackage(tampered).errors.join("\n"), /changed must be true exactly when EVD-B/);
+  const widened = structuredClone(pkg);
+  (widened.reviewImpactedSubjects![0].linkedEvidenceBoundary[0].fields as Record<string, unknown>).provenance = { sources: ["SRC-B"] };
+  assert.match(validateHumanGatePackage(widened).errors.join("\n"), /unknown field "provenance"/);
+  const dropped = structuredClone(pkg);
+  delete dropped.reviewImpactedSubjects;
+  assert.match(validateHumanGatePackage(dropped).errors.join("\n"), /must name a candidate record, got "PRB-IMPACTED"/);
+});
+
+test("the Gate rejects a finding against an unchanged PRB that is not an impacted subject", () => {
+  const index = impactedCorpus();
+  const { review } = impactedReview(index);
+  review.findings[1] = { ...review.findings[1], recordId: "PRB-OTHER", claim: "Outro problema" };
+  const built = buildHumanGatePackage(index, semanticResearchChangeSet(index, SHA_A, review));
+  assert.match(built.errors.join("\n"), /recordId must name a candidate record, got "PRB-OTHER"/);
+});
+
+test("a package without reverse impact has no reviewImpactedSubjects field", () => {
+  assert.equal("reviewImpactedSubjects" in semanticHumanGatePackage("CONCUR"), false);
+  assert.equal(renderHumanGateMarkdown(semanticHumanGatePackage("CONCUR")).includes("reviewImpactedSubjects"), false);
 });
