@@ -122,7 +122,7 @@ function VersionMismatchReview() {
 }
 
 function DossierChunkRecoveryReview() {
-  return <><main className="explorer-shell"><ExplorerHeader activeView="problem" onProblemas={noop} onRegistos={noop} /><section className="prb-audit-section"><div className="prb-section-frame"><div className="prb-audit-row prb-audit-row--dossier"><div><h5>Dossiê canónico</h5><p>Representação de auditoria de PRB-0005: problema, questões, evidência, fontes e percurso num único documento.</p></div><div className="prb-dossier-action"><PrbDossierChunkRecovery /></div></div></div></section></main><PublicFooter /></>;
+  return <><main className="explorer-shell"><ExplorerHeader activeView="problem" onProblemas={noop} onRegistos={noop} /><section className="prb-audit-section"><div className="prb-section-frame"><div className="prb-audit-row prb-audit-row--dossier"><div><h5>Dossiê da investigação</h5><p>Documento para consultar PRB-0005: problema, questões, evidências, fontes e percurso da investigação.</p></div><div className="prb-dossier-action"><PrbDossierChunkRecovery /></div></div></div></section></main><PublicFooter /></>;
 }
 
 export const VersionMismatchRecovery1440: Story = {
@@ -151,7 +151,7 @@ export const DossierChunkRecovery360: Story = {
 
 /** Opens the audit evidence drawer through its real trigger, as a reader would. */
 async function openEvidenceDrawer({ canvasElement }: { canvasElement: HTMLElement }) {
-  const trigger = await within(canvasElement).findByRole("button", { name: /^Abrir os \d+ registos$/ }, { timeout: 5000 });
+  const trigger = await within(canvasElement).findByRole("button", { name: /^Ver as \d+ evidências$/ }, { timeout: 5000 });
   await userEvent.click(trigger);
 }
 
@@ -170,7 +170,7 @@ export const EvidenceDrawer360: Story = {
 };
 
 /**
- * Brings the enabled "Dossiê canónico" action into view and focus. Activating
+ * Brings the enabled "Dossiê da investigação" action into view and focus. Activating
  * it generates the real PRB-0005 PDF dossier client-side and downloads it.
  */
 async function focusDossierAction({ canvasElement }: { canvasElement: HTMLElement }) {

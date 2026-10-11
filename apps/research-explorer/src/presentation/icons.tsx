@@ -254,3 +254,14 @@ export function IconMenu(props: IconProps) {
     </IconBase>
   );
 }
+
+/** Information affordance for a value with an authored presentation explanation. */
+export function IconInfo(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="10" cy="10" r="7" />
+      <circle cx="10" cy="6.2" r="0.8" fill="currentColor" stroke="none" />
+      <path d="M10 9v5" />
+    </IconBase>
+  );
+}

@@ -182,7 +182,7 @@ describe("ProblemHistoryView — composition", () => {
     expect(within(hero).getByText("Declaração canónica do problema.")).toBeTruthy();
     expect(within(hero).getByLabelText("Temas").textContent).toBe("Mobilidade·Urbanismo·Acessibilidade");
     const updated = hero.querySelector(".prb-identity-updated");
-    expect(updated?.textContent).toContain("Atualizado em");
+    expect(updated?.textContent).toContain("Última edição");
     expect(updated?.querySelector("time")?.getAttribute("dateTime")).toBe("2026-09-25");
   });
 

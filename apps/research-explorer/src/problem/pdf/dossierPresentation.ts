@@ -63,6 +63,7 @@ export interface DossierOpenQuestion {
   question: string;
   prose: DossierProse[];
   evidence: DossierRef[];
+  action: DossierProse;
 }
 
 export interface DossierPathStage {
@@ -124,7 +125,7 @@ export const DOSSIER_KIND = "Dossiê de investigação";
 export const DOSSIER_SECTION_TITLES: Record<DossierSectionId, string> = {
   sintese: "Síntese",
   questoes: "Questões em aberto",
-  percurso: "Percurso da investigação",
+  percurso: "Como chegámos a esta leitura",
   evidencia: "Evidência",
   fontes: "Fontes",
   base: "Base da investigação",
@@ -155,7 +156,7 @@ function plural(count: number, one: string, many: string): string {
 /**
  * Authored prose keeps its paragraph breaks (blank lines); single hard line
  * wraps inside a paragraph are source formatting and read as spaces — the
- * same whitespace handling the web presentation applies. Words are untouched.
+ * same whitespace handling the web presentation applies. Prose remains as authored.
  */
 export function dossierParagraphs(value: string | null): string[] {
   if (!value) return [];
@@ -366,12 +367,12 @@ export function buildDossierDocumentModel(dossier: PrbDossierData, generation: D
           number: number(index),
           question: singleLine(item.question),
           prose: [
-            { label: "O que sabemos até agora", paragraphs: dossierParagraphs(item.latestResult) },
+            { label: "Resultado até agora", paragraphs: dossierParagraphs(item.latestResult) },
             { label: "Porque continua em aberto", paragraphs: dossierParagraphs(item.whyOpen) },
-            { label: "O que falta confirmar", paragraphs: dossierParagraphs(item.resolutionCondition) },
-            { label: "O que estamos a fazer", paragraphs: dossierParagraphs(item.currentAction) },
+            { label: "O que permitiria esclarecer", paragraphs: dossierParagraphs(item.resolutionCondition) },
           ].filter((entry) => entry.paragraphs.length > 0),
           evidence: item.evidenceIds.map(evidenceRef),
+          action: { label: "Ação atual", paragraphs: dossierParagraphs(item.currentAction?.trim() ? item.currentAction : "Sem ação em curso") },
         })),
       }
     : null;

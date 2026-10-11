@@ -173,10 +173,10 @@ describe("ProblemView — ready PRB Details", () => {
     expect(screen.getByRole("region", { name: "Leitura atual" }).textContent).toContain("Leitura causal registada.");
     expect(screen.getByText("Questão em aberto.")).toBeTruthy();
     expect(screen.getByText("Sinal inicial registado.")).toBeTruthy();
-    expect(screen.getByRole("region", { name: "Evidência e auditoria" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Evidência e verificação" })).toBeTruthy();
     // Projection-derived counts reach the presentation unchanged: 2 evidence records, 3 effect occurrences.
     const tally = document.querySelector(".prb-audit-evidence-summary")!;
-    expect(tally.textContent).toContain("2 registos");
+    expect(tally.textContent).toContain("2 evidências");
     expect(tally.textContent).toContain("3 efeitos");
   });
 
@@ -218,7 +218,7 @@ describe("ProblemView — initial URL fragment vs. title focus", () => {
   it("applies a valid PRB Details fragment instead of focusing the title", async () => {
     window.location.hash = "#prb-auditoria";
     render(<ProblemView {...props} problemId="PRB-1" />);
-    const audit = await screen.findByRole("region", { name: "Evidência e auditoria" });
+    const audit = await screen.findByRole("region", { name: "Evidência e verificação" });
     await vi.waitFor(() => expect(document.activeElement).toBe(audit));
     expect(Element.prototype.scrollIntoView).toHaveBeenCalledTimes(1);
   });
@@ -237,7 +237,7 @@ describe("ProblemView — initial URL fragment vs. title focus", () => {
   it("does not reapply the initial fragment on later in-app PRB navigation", async () => {
     window.location.hash = "#prb-auditoria";
     const { rerender } = render(<ProblemView {...props} problemId="PRB-1" />);
-    const audit = await screen.findByRole("region", { name: "Evidência e auditoria" });
+    const audit = await screen.findByRole("region", { name: "Evidência e verificação" });
     await vi.waitFor(() => expect(document.activeElement).toBe(audit));
 
     // The hash is still in the URL, but a later PRB selection on the same

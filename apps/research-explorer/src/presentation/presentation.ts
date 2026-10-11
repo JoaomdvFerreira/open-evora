@@ -38,6 +38,20 @@ const LABELS: Record<string, Record<string, string>> = {
  * without an entry has no public explanation rather than an improvised one.
  */
 const EXPLANATIONS: Record<string, Record<string, string>> = {
+  effects: {
+    SUPPORTS: "Apoia diretamente a formulação do problema.",
+    REFINES: "Torna a formulação mais precisa ou qualifica-a.",
+    BOUNDS: "Marca os limites da conclusão.",
+    CONTRADICTS: "Contesta uma parte da formulação do problema.",
+  },
+  research_roles: {
+    LOCAL_OBSERVATION: "Observação sobre a situação no local indicado.",
+    CONTEXTUAL: "Informação de contexto que ajuda a interpretar o problema.",
+    EXISTING_RESPONSE: "Resposta ou canal existente no período documentado.",
+    PLANNED_RESPONSE: "Medida proposta cuja execução não fica demonstrada.",
+    COMPARATIVE_MECHANISM: "Comparação que ajuda a compreender um mecanismo.",
+    COMPARATIVE_RESPONSE: "Resposta observada noutro contexto para comparação.",
+  },
   evidence_nature: {
     fact: "a fonte regista um dado ou acontecimento.",
     "reported-experience": "a fonte relata uma experiência vivida.",

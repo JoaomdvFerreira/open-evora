@@ -91,12 +91,12 @@ export function PrbHeader({ identity, active, onBackToOverview, onViewDetails, o
 }
 
 /**
- * Editorial hero. The "Atualizado em …" line is canonical `updated_at` —
+ * Editorial hero. The "Última edição …" line is canonical `updated_at` —
  * the date the PRB record was last edited. It is record metadata only, not
  * a currentness assessment: nothing here infers that the reading is still
  * current from it. It follows the statement in DOM order: at >=768 the hero
  * grid lifts it into the eyebrow row's right edge; at 360 it stays below the
- * statement as the compact "PRB-xxxx · Atualizado em …" line (the id prefix
+ * statement as the compact "PRB-xxxx · Última edição …" line (the id prefix
  * is shown only there — the local header breadcrumb already carries it at
  * wider widths).
  *
@@ -133,7 +133,7 @@ export function PrbIdentityHeader({ identity, titleRef }: { identity: PrbIdentit
       {identity.updatedAt && (
         <p className="prb-identity-updated">
           <span className="prb-identity-updated-id">{`${identity.problemId} · `}</span>
-          Atualizado em <time dateTime={identity.updatedAt}>{formatPublicDate(identity.updatedAt)}</time>
+          Última edição <time dateTime={identity.updatedAt}>{formatPublicDate(identity.updatedAt)}</time>
         </p>
       )}
     </header>

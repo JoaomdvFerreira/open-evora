@@ -11,7 +11,7 @@ function evd(id: string, summary: string, effects: string[] = [], researchRoles:
     file: "",
     outgoingEdges: [],
     incomingEdges: [],
-    record: { observation: { summary } },
+    record: { observation: { summary }, evidence_nature: "fact" },
   };
   const sources: RecordDetail[] = sourcePublishers.map((publisher, index) => ({
     id: `SRC-${index}`,
@@ -195,18 +195,29 @@ describe("prbDetailsProjection — canonical mapping for the generic PRB Details
     expect(data.evidence[1]).toEqual({
       id: "EVD-B",
       summary: "Observação B.",
+      evidenceNature: null,
+      temporal: null,
       topics: ["MOB", "ACC"],
       effects: ["REFINES", "SUPPORTS"],
       researchRoles: ["EXISTING_RESPONSE"],
-      sources: [{ id: "SRC-0002", name: "Plano de Desenvolvimento Social" }],
+      sources: [{ id: "SRC-0002", name: "Plano de Desenvolvimento Social", publishedAt: null, canonicalReference: null, publiclyAvailable: false }],
     });
     // Unavailable fields stay empty/null — no fallback meaning is invented.
-    expect(data.evidence[2]).toEqual({ id: "EVD-A", summary: "Observação A.", topics: [], effects: [], researchRoles: ["LOCAL_OBSERVATION"], sources: [{ id: "SRC-0", name: null }] });
+    expect(data.evidence[2]).toEqual({ id: "EVD-A", summary: "Observação A.", topics: [], evidenceNature: "fact", temporal: null, effects: [], researchRoles: ["LOCAL_OBSERVATION"], sources: [{ id: "SRC-0", name: null, publishedAt: null, canonicalReference: null, publiclyAvailable: false }] });
+    expect(data.sourceCount).toBe(2);
     expect(data.evidence.length).toBe(data.evidenceRecordCount);
   });
 
   it("omits an unauthored observation summary rather than substituting other text", () => {
     const bare: EvidenceWithSources = { detail: { id: "EVD-1", type: "EVD-", file: "", outgoingEdges: [], incomingEdges: [], record: {} }, sources: [] };
-    expect(buildPrbDetailsData(problem({ title: "T" }, [bare])).evidence).toEqual([{ id: "EVD-1", summary: null, topics: [], effects: [], researchRoles: [], sources: [] }]);
+    expect(buildPrbDetailsData(problem({ title: "T" }, [bare])).evidence).toEqual([{ id: "EVD-1", summary: null, topics: [], evidenceNature: null, temporal: null, effects: [], researchRoles: [], sources: [] }]);
+  });
+
+  it("projects authored evidence observation time without using extraction metadata", () => {
+    const observation = evd("EVD-1", "Observação.");
+    observation.detail.record = { observation: { summary: "Observação." }, provenance: { extracted_at: "2026-09-01" }, scope: { temporal: { as_of: "2026-08-10" } } };
+    observation.detail.record.evidence_nature = "fact";
+    expect(buildPrbDetailsData(problem({ title: "T" }, [observation])).evidence[0].temporal).toEqual({ asOf: "2026-08-10", start: null, end: null, status: null });
+    expect(buildPrbDetailsData(problem({ title: "T" }, [observation])).evidence[0].evidenceNature).toBe("fact");
   });
 });

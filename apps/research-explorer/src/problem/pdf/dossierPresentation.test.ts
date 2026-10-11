@@ -198,7 +198,7 @@ describe("PDF dossier document model", () => {
     expect(rich().contents.map((entry) => `${entry.number} ${entry.title}`)).toEqual([
       "01 Síntese",
       "02 Questões em aberto",
-      "03 Percurso da investigação",
+      "03 Como chegámos a esta leitura",
       "04 Evidência",
       "05 Fontes",
       "06 Base da investigação",
@@ -231,14 +231,15 @@ describe("PDF dossier document model", () => {
     expect(openQuestions?.items.map((item) => item.question)).toEqual(["Primeira questão sintética?", "Segunda questão sintética?"]);
     const [first, second] = openQuestions!.items;
     expect(first.prose).toEqual([
-      { label: "O que sabemos até agora", paragraphs: ["Resultado sintético."] },
+      { label: "Resultado até agora", paragraphs: ["Resultado sintético."] },
       { label: "Porque continua em aberto", paragraphs: ["Motivo sintético."] },
-      { label: "O que falta confirmar", paragraphs: ["Condição sintética."] },
-      { label: "O que estamos a fazer", paragraphs: ["WATCH — monitorizar dados sintéticos."] },
+      { label: "O que permitiria esclarecer", paragraphs: ["Condição sintética."] },
     ]);
     expect(first.evidence.map((ref) => ref.id)).toEqual(["EVD-999002", "EVD-999001"]);
+    expect(first.action).toEqual({ label: "Ação atual", paragraphs: ["WATCH — monitorizar dados sintéticos."] });
     expect(second.prose).toEqual([]);
     expect(second.evidence).toEqual([]);
+    expect(second.action).toEqual({ label: "Ação atual", paragraphs: ["Sem ação em curso"] });
   });
 
   it("presents the investigation path as authored narrative stages", () => {

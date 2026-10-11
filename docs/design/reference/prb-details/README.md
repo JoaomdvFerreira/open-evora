@@ -55,9 +55,13 @@ contract, and these HTML files are not updated to track the deltas below.
 
 - The standalone selected-evidence "O que sabemos até agora" block is removed.
 - `Leitura atual` renders canonical `causal_reading`.
-- "O que sabemos até agora" now belongs to each open question and renders
-  that question's `latest_result`.
-- Open-question fields remain semantically separate.
+- "Resultado até agora" belongs to each open question and renders that
+  question's `latest_result`.
+- Open-question fields remain semantically separate and read, at every
+  breakpoint and in the PDF dossier, in the order "Resultado até agora" →
+  "Porque continua em aberto" → "O que permitiria esclarecer" → "Ação atual"
+  → "Evidência relacionada". "Ação atual" is always shown; an unauthored
+  `current_action` displays the presentation-only "Sem ação em curso".
 - No arbitrary EVD subset or ranking is presented.
 - The investigation path is vertical at every breakpoint.
 - The responsive open-question layout preserves reading order.
