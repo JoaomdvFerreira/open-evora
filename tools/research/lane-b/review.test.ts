@@ -16,6 +16,8 @@ import { buildReviewerPrompt } from "../review/reviewer-prompt.ts";
 import type { IndependentReviewResult } from "../review/types.ts";
 import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
 import { defaultLaneBWorkbenchDir } from "./cli.ts";
+import { prepareOwnerDeclaredLaneBReview } from "../gate/test-fixtures.ts";
+import { declareOwnerReady, REVIEW_LIFECYCLE_CHECK, reviewSubject } from "../review/review-lifecycle.ts";
 import { laneBReviewSummary } from "./summary.ts";
 import {
   extractPullRequestReceipt,
@@ -854,6 +856,14 @@ test("review artifacts are read from the head commit's tree and judged with the 
 // ---------------------------------------------------------------------------
 // Preparation: one fresh, bounded INDEPENDENT_REVIEWER invocation.
 
+const lifecycleRoot = mkdtempSync(join(tmpdir(), "open-evora-lane-b-lifecycle-"));
+test.after(() => rmSync(lifecycleRoot, { recursive: true, force: true }));
+
+/** `ready` then `prepare`, with a fresh lifecycle store kept outside the asserted workbench. */
+function prepareDeclared(unit: ReviewRequired, invoker: AiInvoker, workbench: string, repoRoot: string) {
+  return prepareOwnerDeclaredLaneBReview(unit, invoker, workbench, repoRoot, mkdtempSync(join(lifecycleRoot, "store-")));
+}
+
 test("preparation invokes one INDEPENDENT_REVIEWER with only the bounded package prompt and yields a verifiable receipt and artifact", () => {
   withFixture((fixture, base) => {
     addProblemWithSignal(fixture);
@@ -863,7 +873,7 @@ test("preparation invokes one INDEPENDENT_REVIEWER with only the bounded package
     globalThis.fetch = (() => { throw new Error("network access is not part of Lane B review"); }) as typeof fetch;
     try {
       const invoker = new RecordingInvoker(() => JSON.stringify(concur(unit.reviewerInput)));
-      const outcome = prepareLaneBReview(unit, invoker, workbench, fixture.root);
+      const outcome = prepareDeclared(unit, invoker, workbench, fixture.root);
       assert.equal(outcome.status, "READY");
       assert.equal(invoker.requests.length, 1);
       assert.equal(invoker.requests[0].role, "INDEPENDENT_REVIEWER");
@@ -906,7 +916,7 @@ test("Lane B retries an invalid finding once and creates a receipt only from the
       invalid.findings[0].evidenceReferences = [];
       let calls = 0;
       const invoker = new RecordingInvoker(() => JSON.stringify(++calls === 1 ? invalid : concur(unit.reviewerInput)));
-      const outcome = prepareLaneBReview(unit, invoker, workbench, fixture.root);
+      const outcome = prepareDeclared(unit, invoker, workbench, fixture.root);
       assert.equal(outcome.status, "READY");
       assert.equal(invoker.requests.length, 2);
       assert.ok(invoker.requests[1].input.startsWith(`${invoker.requests[0].input}\n`));
@@ -932,7 +942,7 @@ test("Lane B retains both invalid outputs and fails without a review or receipt"
       const invalid = withFinding(unit.reviewerInput, "CLEC_VIOLATION");
       invalid.findings[0].evidenceReferences = [];
       const invoker = new RecordingInvoker(() => JSON.stringify(invalid));
-      const outcome = prepareLaneBReview(unit, invoker, workbench, fixture.root);
+      const outcome = prepareDeclared(unit, invoker, workbench, fixture.root);
       assert.equal(outcome.status, "REVIEW_FAILED");
       if (outcome.status === "REVIEW_FAILED") assert.equal(outcome.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
       assert.equal(existsSync(join(fixture.root, ".research-review")), false);
@@ -954,11 +964,11 @@ test("preparation yields no receipt and no review artifact for a non-CONCUR, mal
     const workbench = mkdtempSync(join(tmpdir(), "open-evora-lane-b-workbench-"));
     try {
       const nonConcurInvoker = new RecordingInvoker(() => JSON.stringify(withFinding(unit.reviewerInput, "CLEC_VIOLATION")));
-      const notConcur = prepareLaneBReview(unit, nonConcurInvoker, workbench, fixture.root);
+      const notConcur = prepareDeclared(unit, nonConcurInvoker, workbench, fixture.root);
       assert.equal(notConcur.status, "NOT_CONCUR");
       assert.equal(nonConcurInvoker.requests.length, 1);
       for (const stdout of ['{"reviewed": true}', "Reviewed: true", JSON.stringify({ ...concur(unit.reviewerInput), signalDispositions: [] })]) {
-        const outcome = prepareLaneBReview(unit, new RecordingInvoker(() => stdout), workbench, fixture.root);
+        const outcome = prepareDeclared(unit, new RecordingInvoker(() => stdout), workbench, fixture.root);
         assert.equal(outcome.status, "REVIEW_FAILED", stdout);
       }
       assert.equal(readdirSync(workbench).includes("pr-receipt.md"), false);
@@ -989,7 +999,7 @@ function assertContextFreeBlocked(fixture: Fixture, base: string, blocker: RegEx
   const workbench = mkdtempSync(join(tmpdir(), "open-evora-lane-b-workbench-"));
   try {
     const invoker = new RecordingInvoker(() => JSON.stringify(waiverAttempt(prepared.reviewerInput, "SUPPORTED")));
-    const outcome = prepareLaneBReview(prepared, invoker, workbench, fixture.root);
+    const outcome = prepareDeclared(prepared, invoker, workbench, fixture.root);
     assert.equal(outcome.status, "REVIEW_FAILED");
     if (outcome.status === "REVIEW_FAILED") {
       assert.equal(outcome.failedCheck, "CLEC_CONTEXT_FREE_BLOCK");
@@ -1121,6 +1131,98 @@ test("the prepare and check CLIs fail a context-free blocker before any reviewer
       assert.match(checked.output, /FAILED \[CLEC_CONTEXT_FREE_BLOCK\]/);
     } finally {
       rmSync(stubDir, { recursive: true, force: true });
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Owner-controlled review lifecycle (review/review-lifecycle.ts) through Lane B.
+
+test("prepare refuses before any reviewer process runs until the owner declares the exact content ready", () => {
+  withFixture((fixture, base) => {
+    addProblemWithSignal(fixture);
+    const stubDir = mkdtempSync(join(tmpdir(), "open-evora-lane-b-stub-"));
+    const stub = join(stubDir, "reviewer.cjs");
+    writeFileSync(stub, `require("node:fs").writeFileSync(${JSON.stringify(join(stubDir, "invoked"))}, "");\nprocess.stdout.write("{}");\n`);
+    try {
+      const prepared = spawnSync(process.execPath, ["--experimental-strip-types", cliPath, "prepare", "--base", base], {
+        cwd: fixture.root,
+        encoding: "utf8",
+        env: { ...process.env, RESEARCH_AI_COMMAND: process.execPath, RESEARCH_AI_ARGS: stub },
+      });
+      assert.equal(prepared.status, 1, prepared.stdout);
+      assert.match(prepared.stderr, /^FAILED \[REVIEW_NOT_DECLARED_READY\]: the owner has not declared this exact content ready/m);
+      assert.equal(readdirSync(stubDir).includes("invoked"), false, "the reviewer command never ran");
+    } finally {
+      rmSync(stubDir, { recursive: true, force: true });
+    }
+  });
+});
+
+test("Lane B runs one bounded correction as semantic attempt 2 and returns a second non-CONCUR to the owner", () => {
+  withFixture((fixture, base) => {
+    addProblemWithSignal(fixture);
+    const lifecycle = mkdtempSync(join(lifecycleRoot, "store-"));
+    const workbench = mkdtempSync(join(tmpdir(), "open-evora-lane-b-workbench-"));
+    try {
+      const first = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
+      assert.equal(declareOwnerReady(lifecycle, reviewSubject(first.reviewerInput)).ok, true);
+      const attempt1 = prepareLaneBReview(first, new RecordingInvoker(() => JSON.stringify(withFinding(first.reviewerInput, "CLEC_VIOLATION"))), workbench, fixture.root, lifecycle);
+      assert.equal(attempt1.status, "NOT_CONCUR");
+      if (attempt1.status === "NOT_CONCUR") assert.deepEqual([attempt1.semanticAttempt, attempt1.result], [1, "CORRECTION_PERMITTED"]);
+
+      // The owner corrects the same record and declares the corrected content.
+      fixture.record(problem("PRB-NEW", "Muitos moradores relatam atrasos na recolha.", ["EVD-A"], ["PRB-OTHER"]));
+      const corrected = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
+      assert.deepEqual(declareOwnerReady(lifecycle, reviewSubject(corrected.reviewerInput)), { ok: true, semanticAttempt: 2 });
+      const attempt2 = prepareLaneBReview(corrected, new RecordingInvoker(() => JSON.stringify(withFinding(corrected.reviewerInput, "INSUFFICIENT_EVIDENCE"))), workbench, fixture.root, lifecycle);
+      assert.equal(attempt2.status, "NOT_CONCUR");
+      if (attempt2.status === "NOT_CONCUR") assert.deepEqual([attempt2.semanticAttempt, attempt2.result], [2, "OWNER_ESCALATION"]);
+
+      // No third attempt: refused before the reviewer runs, whatever the content.
+      fixture.record(problem("PRB-NEW", "Muitos moradores relatam atrasos semanais.", ["EVD-A"], ["PRB-OTHER"]));
+      const third = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
+      const declared = declareOwnerReady(lifecycle, reviewSubject(third.reviewerInput));
+      assert.equal(!declared.ok && declared.failedCheck, REVIEW_LIFECYCLE_CHECK.OWNER_ESCALATION);
+      const reviewer = new RecordingInvoker(() => JSON.stringify(concur(third.reviewerInput)));
+      const refused = prepareLaneBReview(third, reviewer, workbench, fixture.root, lifecycle);
+      assert.equal(refused.status, "REVIEW_REJECTED");
+      if (refused.status === "REVIEW_REJECTED") assert.equal(refused.failedCheck, REVIEW_LIFECYCLE_CHECK.OWNER_ESCALATION);
+      assert.equal(reviewer.requests.length, 0);
+      assert.equal(existsSync(join(fixture.root, ".research-review")), false);
+    } finally {
+      rmSync(workbench, { recursive: true, force: true });
+    }
+  });
+});
+
+test("a CONCUR binds only the reviewed content: a later change makes its receipt stale and needs a new owner declaration", () => {
+  withFixture((fixture, base) => {
+    addProblemWithSignal(fixture);
+    const lifecycle = mkdtempSync(join(lifecycleRoot, "store-"));
+    const workbench = mkdtempSync(join(tmpdir(), "open-evora-lane-b-workbench-"));
+    try {
+      const reviewedUnit = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
+      declareOwnerReady(lifecycle, reviewSubject(reviewedUnit.reviewerInput));
+      const ready = prepareLaneBReview(reviewedUnit, new RecordingInvoker(() => JSON.stringify(concur(reviewedUnit.reviewerInput))), workbench, fixture.root, lifecycle);
+      assert.equal(ready.status, "READY");
+      if (ready.status !== "READY") return;
+
+      fixture.record(problem("PRB-NEW", "Muitos moradores relatam atrasos na recolha.", ["EVD-A"], ["PRB-OTHER"]));
+      const head = fixture.commit();
+      const stale = verifyLaneBPullRequest(fixture.unit(base, { kind: "commit", sha: head }), prBody(ready.receiptBlock), reviewArtifactsAtCommit(fixture.root, base, head));
+      assert.equal(stale.ok, false);
+      if (!stale.ok) assert.equal(stale.failedCheck, "RECEIPT_CHANGE_MISMATCH");
+
+      const changed = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
+      const reviewer = new RecordingInvoker(() => JSON.stringify(concur(changed.reviewerInput)));
+      const undeclared = prepareLaneBReview(changed, reviewer, workbench, fixture.root, lifecycle);
+      assert.equal(undeclared.status, "REVIEW_REJECTED");
+      if (undeclared.status === "REVIEW_REJECTED") assert.equal(undeclared.failedCheck, REVIEW_LIFECYCLE_CHECK.NOT_DECLARED_READY);
+      assert.equal(reviewer.requests.length, 0);
+      assert.deepEqual(declareOwnerReady(lifecycle, reviewSubject(changed.reviewerInput)), { ok: true, semanticAttempt: 1 });
+    } finally {
+      rmSync(workbench, { recursive: true, force: true });
     }
   });
 });

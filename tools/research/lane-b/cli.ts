@@ -5,11 +5,20 @@
  * argument parsing, AI-runtime configuration, console output and exit codes.
  *
  * Usage:
+ *   ready --base <ref> [--new-lifecycle]
+ *     The owner's declaration that the exact working-tree canonical record
+ *     changes against the merge base of <ref> and HEAD are ready for semantic
+ *     review. Binds to the fingerprint of that exact reviewer input in the
+ *     shared review lifecycle (review/review-lifecycle.ts) and reports which
+ *     semantic attempt it opens. Never invokes a reviewer. --new-lifecycle
+ *     ends a lifecycle that escalated to the owner or whose correction needs
+ *     a different base or record set.
  *   prepare --base <ref> [--workbench <dir>]
- *     Before any commit/push/PR of the change: reviews the working-tree
- *     canonical record changes against the merge base of <ref> and HEAD with
- *     a fresh INDEPENDENT_REVIEWER process (RESEARCH_AI_COMMAND, as for
- *     orchestrated cycles). On CONCUR it writes the full review artifact
+ *     Before any commit/push/PR of the change: runs the declared semantic
+ *     attempt with a fresh INDEPENDENT_REVIEWER process (RESEARCH_AI_COMMAND,
+ *     as for orchestrated cycles), refusing before invocation when the
+ *     content was not declared ready, changed since, or has no attempt left.
+ *     On CONCUR it writes the full review artifact
  *     .research-review/<reviewSha256>.json, to be committed with the
  *     records, and prints a short summary plus the compact PR receipt.
  *     Never commits, pushes or opens a pull request.
@@ -37,6 +46,7 @@ import { fileURLToPath } from "node:url";
 
 import { LocalCommandAiInvoker, loadLocalCommandAiInvokerConfigFromEnv } from "../ai/invoker.ts";
 import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
+import { checkSemanticAttempt, declareOwnerReady, reviewLifecycleDirFor, reviewSubject } from "../review/review-lifecycle.ts";
 import { laneBContextFreeBlock, prepareLaneBReview, verifyLaneBPullRequest, type LaneBVerification } from "./receipt.ts";
 import {
   describeSourceVerificationNotSeparate,
@@ -50,6 +60,7 @@ import { laneBReviewSummary, renderInvalidSummary, type ReviewSummary, type Revi
 
 const USAGE = [
   "Usage:",
+  "  node tools/research/lane-b/cli.ts ready --base <ref> [--new-lifecycle]",
   "  node tools/research/lane-b/cli.ts prepare --base <ref> [--workbench <dir>]",
   "  node tools/research/lane-b/cli.ts check --event-path <github-event.json>",
   "  node tools/research/lane-b/cli.ts check --base <sha> --head <sha> --body-file <file>",
@@ -70,22 +81,61 @@ export function defaultLaneBWorkbenchDir(repoRoot: string, unit: Extract<LaneBRe
   return join(repoRoot, ".research-workbench", "lane-b", `${unit.baseGitSha.slice(0, 12)}-${unit.reviewerInputFingerprint.slice(0, 12)}`);
 }
 
-function prepare(repoRoot: string, flag: (name: string) => string | undefined): void {
+type ReviewRequiredUnit = Extract<LaneBReviewUnit, { status: "REVIEW_REQUIRED" }>;
+
+/** The working-tree review unit `ready` and `prepare` share, or null after reporting why there is none. */
+function workingTreeUnit(repoRoot: string, flag: (name: string) => string | undefined): ReviewRequiredUnit | null {
   const baseRef = flag("--base");
-  if (!baseRef) return failed("USAGE", USAGE);
+  if (!baseRef) {
+    failed("USAGE", USAGE);
+    return null;
+  }
   const baseGitSha = pullRequestBase(repoRoot, resolveCommit(repoRoot, baseRef), resolveCommit(repoRoot, "HEAD"));
   const unit = resolveLaneBReviewUnit({ repoRoot, baseGitSha, head: { kind: "working-tree" } });
   if (unit.status === "NO_CANONICAL_CHANGE") {
     console.log(`NO_CANONICAL_CHANGE: no canonical PRB/EVD/SRC record changed against ${baseGitSha}. Use "N/A" in the PR's Research semantic review section.`);
-    return;
+    return null;
   }
   if (unit.status === "UNSUPPORTED_DELETION") {
-    return failed("UNSUPPORTED_CANONICAL_DELETION", `Lane B direct review does not support deleting or renaming canonical records: ${unit.paths.join(", ")}`);
+    failed("UNSUPPORTED_CANONICAL_DELETION", `Lane B direct review does not support deleting or renaming canonical records: ${unit.paths.join(", ")}`);
+    return null;
   }
-  if (unit.status === "SOURCE_VERIFICATION_NOT_SEPARATE") return failed("SOURCE_VERIFICATION_NOT_SEPARATE", describeSourceVerificationNotSeparate(unit));
+  if (unit.status === "SOURCE_VERIFICATION_NOT_SEPARATE") {
+    failed("SOURCE_VERIFICATION_NOT_SEPARATE", describeSourceVerificationNotSeparate(unit));
+    return null;
+  }
   // Deterministic, so reported even before the reviewer runtime is configured.
   const blocked = laneBContextFreeBlock(unit);
-  if (blocked) return failed(blocked.failedCheck, blocked.message);
+  if (blocked) {
+    failed(blocked.failedCheck, blocked.message);
+    return null;
+  }
+  return unit;
+}
+
+function ready(repoRoot: string, flag: (name: string) => string | undefined, args: readonly string[]): void {
+  const unit = workingTreeUnit(repoRoot, flag);
+  if (!unit) return;
+  const lifecycle = reviewLifecycleDirFor(repoRoot);
+  assertWorkbenchBoundary(lifecycle);
+  const declared = declareOwnerReady(lifecycle, reviewSubject(unit.reviewerInput), { newLifecycle: args.includes("--new-lifecycle") });
+  if (!declared.ok) return failed(declared.failedCheck, declared.message);
+  console.log(`READY_DECLARED: semantic attempt ${declared.semanticAttempt} of 2`);
+  console.log(`Base: ${unit.baseGitSha}`);
+  console.log(`Records: ${unit.changedRecords.map((record) => record.id).join(", ")}`);
+  console.log(`Reviewer input: ${unit.reviewerInputFingerprint}`);
+  console.log("Run prepare with the same --base. Any change to these records before then makes this declaration stale.");
+}
+
+function prepare(repoRoot: string, flag: (name: string) => string | undefined): void {
+  const unit = workingTreeUnit(repoRoot, flag);
+  if (!unit) return;
+  // The repository's review-lifecycle store, shared with Lane A. Refused
+  // before the runtime is even needed: no declaration, stale content or no
+  // attempt left.
+  const lifecycle = reviewLifecycleDirFor(repoRoot);
+  const permitted = checkSemanticAttempt(lifecycle, reviewSubject(unit.reviewerInput));
+  if (!permitted.ok) return failed(permitted.failedCheck, permitted.message);
 
   const aiConfig = loadLocalCommandAiInvokerConfigFromEnv();
   if (!aiConfig) {
@@ -96,27 +146,42 @@ function prepare(repoRoot: string, flag: (name: string) => string | undefined): 
   }
   const workbenchDir = resolve(flag("--workbench") ?? defaultLaneBWorkbenchDir(repoRoot, unit));
   assertWorkbenchBoundary(workbenchDir);
+  assertWorkbenchBoundary(lifecycle);
 
-  const outcome = prepareLaneBReview(unit, new LocalCommandAiInvoker(aiConfig), workbenchDir, repoRoot);
-  if (outcome.status === "REVIEW_FAILED") return failed(outcome.failedCheck, outcome.message);
+  const outcome = prepareLaneBReview(unit, new LocalCommandAiInvoker(aiConfig), workbenchDir, repoRoot, lifecycle);
+  if (outcome.status === "REVIEW_REJECTED") return failed(outcome.failedCheck, outcome.message);
+  if (outcome.status === "REVIEW_FAILED") {
+    if (!outcome.classification) return failed(outcome.failedCheck, outcome.message);
+    return failed(
+      outcome.failedCheck,
+      `${outcome.classification}: no valid review was produced (${outcome.message}). No semantic attempt was consumed and the declaration stands; investigate the reviewer runtime before running prepare again.`
+    );
+  }
   if (outcome.status === "NOT_CONCUR") {
     const review = outcome.independentReview;
     for (const finding of review.findings) {
       console.error(`${finding.findingId} ${finding.severity} ${finding.kind} ${finding.recordId} ${finding.field} [${finding.dimension}]: ${finding.reason}`);
       console.error(`  correction: ${finding.correctionDirection}`);
     }
+    const reviewPath = join(workbenchDir, "independent-review.json");
+    if (outcome.result === "OWNER_ESCALATION") {
+      return failed(
+        "REVIEW_OWNER_ESCALATION",
+        `semantic attempt 2 outcome is ${review.outcome}; this review lifecycle returns to the owner and no further attempt runs. Review written to ${reviewPath}`
+      );
+    }
     return failed(
       "INDEPENDENT_REVIEW_NOT_CONCUR",
-      `independent review outcome is ${review.outcome}; correct the records and prepare again. Review written to ${join(workbenchDir, "independent-review.json")}`
+      `semantic attempt 1 outcome is ${review.outcome}; one bounded correction of the same records is permitted: correct them, run ready, then prepare again. Review written to ${reviewPath}`
     );
   }
-  console.log("CONCUR");
+  console.log(`CONCUR (semantic attempt ${outcome.semanticAttempt})`);
   console.log(`Base: ${unit.baseGitSha}`);
   console.log(`Records: ${unit.changedRecords.map((record) => record.id).join(", ")}`);
   console.log(`Review: ${outcome.receipt.reviewSha256}`);
   console.log(`Artifact: ${outcome.artifactPath}\n`);
   console.log(`Commit ${outcome.artifactPath} with the records and paste the block below into the PR's "## Research semantic review" section (also written to ${join(workbenchDir, "pr-receipt.md")}).`);
-  console.log("Any later change to these records requires a new review and receipt. CONCUR is not an approval.\n");
+  console.log("Any later change to these records requires a new owner declaration, review and receipt. CONCUR is not an approval.\n");
   console.log(outcome.receiptBlock);
 }
 
@@ -194,7 +259,8 @@ function main(): void {
   };
   try {
     const repoRoot = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
-    if (command === "prepare") prepare(repoRoot, flag);
+    if (command === "ready") ready(repoRoot, flag, args);
+    else if (command === "prepare") prepare(repoRoot, flag);
     else if (command === "check") check(repoRoot, flag);
     else if (command === "summary") summary(repoRoot, flag);
     else failed("USAGE", USAGE);

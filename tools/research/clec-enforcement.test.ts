@@ -27,7 +27,7 @@ import { join, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { gitFixture, loadIndexFor, remoteGitFixture, sourceYaml, type GitFixture, type RemoteGitFixture } from "./gate/test-fixtures.ts";
+import { gitFixture, loadIndexFor, prepareOwnerDeclaredLaneBReview, remoteGitFixture, runOwnerDeclaredCycle, sourceYaml, type GitFixture, type RemoteGitFixture } from "./gate/test-fixtures.ts";
 import { MARKDOWN_FILENAME, PACKAGE_FILENAME } from "./gate/cli.ts";
 import { computeContentHash } from "./gate/content-hash.ts";
 import { DECISION_RECORD_FILENAME, writeDecisionRecord } from "./gate/decision-record.ts";
@@ -37,12 +37,11 @@ import { sha256Hex } from "./core/fingerprint.ts";
 import { runPostApprovalPath } from "./gate/promote.ts";
 import type { HumanGatePackage } from "./gate/types.ts";
 import { ADVISORY, CONTEXT_FREE_BLOCK, contextFreeBlockers, SIGNAL_CODE } from "./language/signals.ts";
-import { buildLaneBReceipt, prepareLaneBReview, renderReceiptBlock } from "./lane-b/receipt.ts";
+import { buildLaneBReceipt, renderReceiptBlock, type LaneBPreparation } from "./lane-b/receipt.ts";
 import { pullRequestBase, resolveCommit, resolveLaneBReviewUnit, type LaneBReviewUnit } from "./lane-b/review-unit.ts";
 import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "./ai/invoker.ts";
 import { validateIndependentReview } from "./review/independent-review.ts";
 import { serializeReviewerInput, type ReviewerInputPackage } from "./review/reviewer-input.ts";
-import { runResearchCycle } from "./orchestrate/run-cycle.ts";
 import type { ResearchTrigger } from "./orchestrate/types.ts";
 import type { IndependentReviewResult } from "./review/types.ts";
 
@@ -232,7 +231,7 @@ function assertNothingPublished(cycle: LaneACycle): void {
 
 /** Runs the real orchestration and, on READY_FOR_HUMAN_REVIEW, persists the RCS where `gate render` reads it (as orchestrate/cli.ts does). */
 async function prepareCycle(cycle: LaneACycle, primary: RecordingInvoker, reviewer: RecordingInvoker) {
-  const outcome = await runResearchCycle({
+  const outcome = await runOwnerDeclaredCycle({
     trigger: TRIGGER,
     index: loadIndexFor(cycle.fixture.research),
     baseGitSha: cycle.base,
@@ -489,7 +488,7 @@ function reviewRequired(unit: LaneBReviewUnit): ReviewRequired {
 /** Runs `prepare`'s review step for the working tree and returns its receipt block. */
 function prepareConcurReceipt(repo: LaneBRepo, reviewer: RecordingInvoker): { unit: ReviewRequired; receiptBlock: string } {
   const unit = reviewRequired(repo.workingTreeUnit());
-  const prepared = prepareLaneBReview(unit, reviewer, join(repo.scratch, "workbench"), repo.fixture.root);
+  const prepared = prepareOwnerDeclaredLaneBReview(unit, reviewer, join(repo.scratch, "workbench"), repo.fixture.root);
   assert.equal(prepared.status, "READY", prepared.status === "REVIEW_FAILED" ? `${prepared.failedCheck}: ${prepared.message}` : prepared.status);
   if (prepared.status !== "READY") throw new Error("unreachable");
   return { unit, receiptBlock: prepared.receiptBlock };
@@ -566,7 +565,7 @@ test("Lane B: a direct EVD change embedding a PRB ID is blocked before review, g
     const workbench = join(repo.scratch, "workbench");
     mkdirSync(workbench);
 
-    const prepared = prepareLaneBReview(reviewRequired(repo.workingTreeUnit()), reviewer, workbench, repo.fixture.root);
+    const prepared = prepareOwnerDeclaredLaneBReview(reviewRequired(repo.workingTreeUnit()), reviewer, workbench, repo.fixture.root, join(repo.scratch, "review-lifecycle"));
     assert.equal(prepared.status, "REVIEW_FAILED");
     if (prepared.status !== "REVIEW_FAILED") return;
     assert.equal(prepared.failedCheck, CONTEXT_FREE_BLOCK);
@@ -658,7 +657,7 @@ function sourceFidelityReviewer(statedFacts: readonly string[]): RecordingInvoke
   });
 }
 
-function assertInsufficient(prepared: ReturnType<typeof prepareLaneBReview>, claims: string[]): void {
+function assertInsufficient(prepared: LaneBPreparation, claims: string[]): void {
   assert.equal(prepared.status, "NOT_CONCUR", prepared.status === "REVIEW_FAILED" ? `${prepared.failedCheck}: ${prepared.message}` : prepared.status);
   if (prepared.status !== "NOT_CONCUR") return;
   assert.equal(prepared.independentReview.outcome, "INSUFFICIENT_EVIDENCE");
@@ -703,7 +702,7 @@ test("Lane B: a Source-fidelity claim is INSUFFICIENT_EVIDENCE without support a
     repo.writeEvidence(FIDELITY_EVD);
     const before = reviewRequired(repo.workingTreeUnit());
     assert.equal(before.reviewerInput.sourceVerificationContext, undefined);
-    assertInsufficient(prepareLaneBReview(before, sourceFidelityReviewer([COUNT_FACT]), join(repo.scratch, "without-support"), repo.fixture.root), [COUNT_FACT]);
+    assertInsufficient(prepareOwnerDeclaredLaneBReview(before, sourceFidelityReviewer([COUNT_FACT]), join(repo.scratch, "without-support"), repo.fixture.root), [COUNT_FACT]);
 
     // Support introduced in the same change is refused, whatever the review section says.
     writeSupport(repo.fixture.research, VERIFIED_STATEMENTS);
@@ -725,7 +724,7 @@ test("Lane B: a Source-fidelity claim is INSUFFICIENT_EVIDENCE without support a
     const reviewer = sourceFidelityReviewer([COUNT_FACT]);
     const unit = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: supportHead, head: { kind: "working-tree" } }));
     assert.deepEqual(unit.reviewerInput.sourceVerificationContext?.map((entry) => entry.source_id), ["SRC-BASE"]);
-    const prepared = prepareLaneBReview(unit, reviewer, join(repo.scratch, "with-support"), repo.fixture.root);
+    const prepared = prepareOwnerDeclaredLaneBReview(unit, reviewer, join(repo.scratch, "with-support"), repo.fixture.root);
     assert.equal(prepared.status, "READY", prepared.status === "REVIEW_FAILED" ? `${prepared.failedCheck}: ${prepared.message}` : prepared.status);
     if (prepared.status !== "READY") return;
     assert.ok(reviewer.calls[0].input.includes(serializeReviewerInput(unit.reviewerInput)));
@@ -743,7 +742,7 @@ test("Lane B: Source-derived wording beyond the verified claims stays INSUFFICIE
     const unit = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: supportHead, head: { kind: "working-tree" } }));
     assert.deepEqual(unit.reviewerInput.sourceVerificationContext?.[0].verified_claims.map((claim) => claim.statement), VERIFIED_STATEMENTS);
     const workbench = join(repo.scratch, "workbench");
-    assertInsufficient(prepareLaneBReview(unit, sourceFidelityReviewer([COUNT_FACT, TREND_FACT]), workbench, repo.fixture.root), [TREND_FACT]);
+    assertInsufficient(prepareOwnerDeclaredLaneBReview(unit, sourceFidelityReviewer([COUNT_FACT, TREND_FACT]), workbench, repo.fixture.root), [TREND_FACT]);
     assert.equal(existsSync(join(workbench, "pr-receipt.md")), false, "no receipt exists for a non-CONCUR review");
   });
 });

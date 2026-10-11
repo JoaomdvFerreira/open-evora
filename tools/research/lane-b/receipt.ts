@@ -26,7 +26,7 @@ import type { AiInvoker } from "../ai/invoker.ts";
 import { CONTEXT_FREE_BLOCK, contextFreeBlockers, describeContextFreeBlockers } from "../language/signals.ts";
 import { canonicalJsonStringify, sha256Hex } from "../core/fingerprint.ts";
 import { validateIndependentReview } from "../review/independent-review.ts";
-import { invokeIndependentReview } from "../review/independent-review-invocation.ts";
+import { runOwnerDeclaredReview, TOOLING_RUNTIME_FAILURE, type SemanticAttemptNumber } from "../review/review-lifecycle.ts";
 import { serializeReviewerInput } from "../review/reviewer-input.ts";
 import type { IndependentReviewOutcome, IndependentReviewResult } from "../review/types.ts";
 import {
@@ -316,37 +316,44 @@ export function verifyLaneBPullRequest(unit: LaneBReviewUnit, body: string | nul
 }
 
 export type LaneBPreparation =
-  | { status: "REVIEW_FAILED"; failedCheck: string; message: string }
-  | { status: "NOT_CONCUR"; independentReview: IndependentReviewResult }
-  | { status: "READY"; receipt: LaneBReviewReceipt; receiptBlock: string; artifactPath: string };
+  /** Refused by the owner-controlled lifecycle before any reviewer invocation. */
+  | { status: "REVIEW_REJECTED"; failedCheck: string; message: string }
+  /** No valid review: a tooling/runtime failure that consumed no semantic attempt. */
+  | { status: "REVIEW_FAILED"; classification: typeof TOOLING_RUNTIME_FAILURE | null; failedCheck: string; message: string }
+  | { status: "NOT_CONCUR"; semanticAttempt: SemanticAttemptNumber; result: "CORRECTION_PERMITTED" | "OWNER_ESCALATION"; independentReview: IndependentReviewResult }
+  | { status: "READY"; semanticAttempt: SemanticAttemptNumber; receipt: LaneBReviewReceipt; receiptBlock: string; artifactPath: string };
 
 /**
- * Runs the independent review for a Lane B unit through the shared bounded
- * invocation helper. `workbenchDir` must already be boundary-checked as
- * gitignored; the reviewer input, its result and any receipt are written
- * there. Only a valid CONCUR review is also written to `repoRoot` as its
- * hash-addressed review artifact, to be committed with the reviewed records.
- * A context-free blocker fails before anything is written or the reviewer is
- * invoked.
+ * Runs the owner-declared semantic attempt for a Lane B unit through the
+ * shared review lifecycle (review-lifecycle.ts). `workbenchDir` and
+ * `lifecycleDir` must already be boundary-checked as gitignored; the reviewer
+ * input, its result and any receipt are written to the workbench. Only a
+ * valid CONCUR review is also written to `repoRoot` as its hash-addressed
+ * review artifact, to be committed with the reviewed records. A context-free
+ * blocker fails before anything is written or the reviewer is invoked.
  */
-export function prepareLaneBReview(unit: ReviewRequiredUnit, reviewerInvoker: AiInvoker, workbenchDir: string, repoRoot: string): LaneBPreparation {
+export function prepareLaneBReview(unit: ReviewRequiredUnit, reviewerInvoker: AiInvoker, workbenchDir: string, repoRoot: string, lifecycleDir: string): LaneBPreparation {
   const blocked = laneBContextFreeBlock(unit);
-  if (blocked) return { status: "REVIEW_FAILED", ...blocked };
+  if (blocked) return { status: "REVIEW_FAILED", classification: null, ...blocked };
   mkdirSync(workbenchDir, { recursive: true });
   const reviewerInputJson = serializeReviewerInput(unit.reviewerInput);
-  writeFileSync(join(workbenchDir, "reviewer-input.json"), `${reviewerInputJson}\n`, "utf8");
+  writeFileSync(join(workbenchDir, "reviewer-input.json"), `${reviewerInputJson}
+`, "utf8");
 
-  const result = invokeIndependentReview(reviewerInvoker, unit.reviewerInput, workbenchDir);
-  if (result.status === "FAILED") return { status: "REVIEW_FAILED", failedCheck: result.failedCheck, message: result.message };
-  const independentReview = result.review;
-  writeFileSync(join(workbenchDir, "independent-review.json"), `${JSON.stringify(independentReview, null, 2)}\n`, "utf8");
-  if (independentReview.outcome !== "CONCUR") return { status: "NOT_CONCUR", independentReview };
+  const run = runOwnerDeclaredReview(lifecycleDir, reviewerInvoker, unit.reviewerInput, workbenchDir);
+  if (run.status === "REJECTED") return { status: "REVIEW_REJECTED", failedCheck: run.failedCheck, message: run.message };
+  if (run.status === TOOLING_RUNTIME_FAILURE) return { status: "REVIEW_FAILED", classification: TOOLING_RUNTIME_FAILURE, failedCheck: run.failedCheck, message: run.message };
+  const independentReview = run.review;
+  writeFileSync(join(workbenchDir, "independent-review.json"), `${JSON.stringify(independentReview, null, 2)}
+`, "utf8");
+  if (run.result !== "CONCUR") return { status: "NOT_CONCUR", semanticAttempt: run.semanticAttempt, result: run.result, independentReview };
 
   const receipt = buildLaneBReceipt(unit, independentReview);
   const artifactPath = reviewArtifactPath(receipt.reviewSha256);
   mkdirSync(join(repoRoot, REVIEW_ARTIFACT_DIRECTORY), { recursive: true });
   writeFileSync(join(repoRoot, ...artifactPath.split("/")), renderReviewArtifact(independentReview), "utf8");
   const receiptBlock = renderReceiptBlock(receipt);
-  writeFileSync(join(workbenchDir, "pr-receipt.md"), `${receiptBlock}\n`, "utf8");
-  return { status: "READY", receipt, receiptBlock, artifactPath };
+  writeFileSync(join(workbenchDir, "pr-receipt.md"), `${receiptBlock}
+`, "utf8");
+  return { status: "READY", semanticAttempt: run.semanticAttempt, receipt, receiptBlock, artifactPath };
 }

@@ -6,7 +6,8 @@ import test from "node:test";
 
 import type { CorpusIndex, RecordSchema } from "../core/types.ts";
 import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "../ai/invoker.ts";
-import { readHoldFreeze, resumePreGateHold, runResearchCycle } from "./run-cycle.ts";
+import { declareFrozenCycleReady, readHoldFreeze, resumePreGateHold, runResearchCycle } from "./run-cycle.ts";
+import { runOwnerDeclaredCycle } from "../gate/test-fixtures.ts";
 import type { ResearchTrigger } from "./types.ts";
 import type { InferenceLimitResolutionChecker, SourceAvailabilityAdapter } from "../admission/safety-admission.ts";
 import { createInferenceLimitResolutionChecker, writeInferenceLimitResolution } from "../admission/inference-limit-resolution.ts";
@@ -126,7 +127,7 @@ class SharedInvoker implements AiInvoker {
 test("one accepted trigger causes exactly two role-specific invocations, primary before reviewer", async () => {
   await withTempDir(async (cycleDir) => {
     const shared = new SharedInvoker();
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -172,7 +173,7 @@ test("a private-Source HOLD through real orchestration prevents reviewer/RCS and
     for (const sentinel of privateSentinels) assert.equal(JSON.stringify(source).includes(sentinel), true);
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = await runResearchCycle({ trigger: TRIGGER, index: corpus, baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    const outcome = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: corpus, baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
     assert.equal(outcome.status, "PRE_GATE_SAFETY_HOLD", outcome.status === "FAILED" ? outcome.message : "");
     assert.equal(reviewer.calls.length, 0);
     assert.equal(existsSync(join(cycleDir, "independent-review.json")), false);
@@ -193,7 +194,7 @@ test("a valid claim reaches the independent reviewer through real orchestration"
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewer = new RecordingInvoker(concurringResponder);
-    const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    const outcome = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
     assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
     assert.equal(reviewer.calls.length, 1);
   });
@@ -223,7 +224,7 @@ test("a candidate EVD embedding a PRB ID fails the context-free precheck before 
     const envelope = singleCandidateEnvelope("EVD-NEW", "evidence_id: EVD-NEW\nprovenance:\n  sources:\n    - SRC-MATERIAL\nevidence_nature: fact\nclaim_authority: authoritative\ninference_limits:\n  - Não é impacto em PRB-0005.\n");
     const primary = new RecordingInvoker(fixedResponder(envelope));
     const reviewer = new RecordingInvoker(concurringResponder);
-    const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: AVAILABLE, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    const outcome = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: AVAILABLE, now: () => new Date("2026-09-15T12:00:00.000Z") });
     assertContextFreeBlocked(outcome, reviewer, cycleDir, /CLEC-SIG-\d{4} PRB_ID_IN_EVD_TEXT EVD-NEW inference_limits\[0\]: "PRB-0005"/);
   });
 });
@@ -233,7 +234,7 @@ test("a candidate SRC embedding a canonical record ID fails the context-free pre
     const envelope = singleCandidateEnvelope("SRC-NEW", "source_id: SRC-NEW\nname: Synthetic source\ncaveats:\n  - Ver EVD-000001.\n");
     const primary = new RecordingInvoker(fixedResponder(envelope));
     const reviewer = new RecordingInvoker(concurringResponder);
-    const outcome = await runResearchCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer });
+    const outcome = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer });
     assertContextFreeBlocked(outcome, reviewer, cycleDir, /CLEC-SIG-\d{4} SRC_RECORD_ID_IN_TEXT SRC-NEW caveats\[0\]: "EVD-000001"/);
   });
 });
@@ -244,13 +245,13 @@ test("an advisory-only lexical signal still reaches the independent reviewer and
     const primary = new RecordingInvoker(fixedResponder(envelope));
 
     const undispositioned = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const failed = await runResearchCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: undispositioned });
+    const failed = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: undispositioned });
     assert.equal(undispositioned.calls.length, 2);
     assert.deepEqual(frozenReviewerInput(undispositioned.calls[0]).signals.map((s) => s.signal.code), ["SRC_EVALUATIVE_WORDING"]);
     assert.equal(failed.status === "FAILED" && failed.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
 
     const reviewer = new RecordingInvoker(concurringResponder);
-    const outcome = await runResearchCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer });
+    const outcome = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer });
     assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
     if (outcome.status !== "READY_FOR_HUMAN_REVIEW") return;
     assert.deepEqual(outcome.changeSet.independentReview.signalDispositions.map((d) => d.disposition), ["SUPPORTED"]);
@@ -261,7 +262,7 @@ test("the reviewer receives the candidate's evidence context and signals, and a 
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    const outcome = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
 
     const input = frozenReviewerInput(reviewer.calls[0]);
     assert.deepEqual(input.evidenceContext.map((record) => record.id), ["SRC-MATERIAL"]);
@@ -279,7 +280,7 @@ test("the validated v2 review is persisted and carried unchanged by the Research
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewer = new RecordingInvoker(concurringResponder);
-    const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    const outcome = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
     assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
     if (outcome.status !== "READY_FOR_HUMAN_REVIEW") return;
     const persisted = JSON.parse(readFileSync(join(cycleDir, "independent-review.json"), "utf8"));
@@ -299,7 +300,7 @@ test("Lane A accepts a valid replacement after one structurally invalid independ
       invalid.signalDispositions[0].evidenceReferences = [];
       return { status: "OK", stdout: JSON.stringify(invalid) };
     });
-    const outcome = await runResearchCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    const outcome = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: admissionIndex("public"), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer, availabilityAdapter: { check: () => ({ sourceId: "SRC-MATERIAL", status: "available", checkedAt: "2026-09-15T12:00:00.000Z" }) }, now: () => new Date("2026-09-15T12:00:00.000Z") });
     assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
     assert.equal(reviewer.calls.length, 2);
     assert.ok(reviewer.calls[1].input.startsWith(`${reviewer.calls[0].input}\n`));
@@ -312,7 +313,7 @@ test("the normal path does not require pre-created manifest/independent-review/c
   await withTempDir(async (cycleDir) => {
     assert.equal(existsSync(join(cycleDir, "manifest.json")), false);
     const shared = new SharedInvoker();
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -328,7 +329,7 @@ test("reviewer input is built from immutable validated artifacts, and generator 
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -350,7 +351,7 @@ test("generator conversation/scratch state cannot flow into reviewer input: dist
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    await runResearchCycle({
+    await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -371,7 +372,7 @@ test("malformed primary output fails closed before any reviewer invocation occur
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder({ not: "a valid envelope" }));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -390,7 +391,7 @@ test("non-JSON primary stdout fails closed as PRIMARY_AI_OUTPUT_INVALID", async 
   await withTempDir(async (cycleDir) => {
     const primary: AiInvoker = { invoke: () => ({ status: "OK", stdout: "not json at all" }) };
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -408,7 +409,7 @@ test("primary invocation failure fails closed as PRIMARY_AI_INVOCATION_FAILED", 
   await withTempDir(async (cycleDir) => {
     const primary: AiInvoker = { invoke: () => ({ status: "INVOCATION_FAILED", message: "process exited 1" }) };
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -427,7 +428,7 @@ test("primary invocation timeout fails closed as PRIMARY_AI_TIMEOUT", async () =
   await withTempDir(async (cycleDir) => {
     const primary: AiInvoker = { invoke: () => ({ status: "TIMEOUT", message: "exceeded 120000ms" }) };
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -445,7 +446,7 @@ test("malformed reviewer output fails closed and never reaches READY_FOR_HUMAN_R
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer = new RecordingInvoker(fixedResponder({ outcome: "NOT_A_REAL_OUTCOME" }));
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -463,7 +464,7 @@ test("reviewer invocation failure fails closed as INDEPENDENT_REVIEW_INVOCATION_
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer: AiInvoker = { invoke: () => ({ status: "INVOCATION_FAILED", message: "process exited 1" }) };
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -481,7 +482,7 @@ test("reviewer invocation timeout fails closed as INDEPENDENT_REVIEW_TIMEOUT", a
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
     const reviewer: AiInvoker = { invoke: () => ({ status: "TIMEOUT", message: "exceeded 120000ms" }) };
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -518,7 +519,7 @@ test("disagreement is surfaced in the final package, never auto-resolved", async
         }],
       })
     );
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -535,7 +536,7 @@ test("disagreement is surfaced in the final package, never auto-resolved", async
 test("no candidate material leaves the gitignored cycle directory boundary", async () => {
   await withTempDir(async (cycleDir) => {
     const shared = new SharedInvoker();
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -554,7 +555,7 @@ test("no candidate material leaves the gitignored cycle directory boundary", asy
 test("no canonical write occurs and the promoter is never invoked (module boundary)", async () => {
   await withTempDir(async (cycleDir) => {
     const shared = new SharedInvoker();
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -571,7 +572,7 @@ test("no canonical write occurs and the promoter is never invoked (module bounda
 test("materialized artifacts persist the real independent-review result for idempotent rerun observation", async () => {
   await withTempDir(async (cycleDir) => {
     const shared = new SharedInvoker();
-    await runResearchCycle({
+    await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -606,7 +607,7 @@ test("a deep ../ traversal write never escapes the cycle directory, even far out
     const primary: AiInvoker = { invoke: () => ({ status: "OK", stdout: JSON.stringify(maliciousEnvelope) }) };
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
 
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: { mode: "daily-discovery", request: "q" },
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -651,7 +652,7 @@ test("a traversal targeting the repository root never writes there", async () =>
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
 
     try {
-      const outcome = await runResearchCycle({
+      const outcome = await runOwnerDeclaredCycle({
         trigger: { mode: "daily-discovery", request: "q" },
         index: emptyIndex(),
         baseGitSha: SHA,
@@ -692,7 +693,7 @@ test("a manifest.candidateFiles traversal entry never reads content from outside
     const primary: AiInvoker = { invoke: () => ({ status: "OK", stdout: JSON.stringify(maliciousEnvelope) }) };
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
 
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: { mode: "daily-discovery", request: "q" },
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -730,7 +731,7 @@ test("the final package reflects the exact snapshot frozen for the reviewer, eve
       },
     };
 
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -757,6 +758,7 @@ test("resolveAvailabilityAdapter is invoked with exactly the material non-privat
     const reviewer = new RecordingInvoker(concurringResponder);
     let resolveCalls = 0;
     let seenSourceIds: string[] = [];
+    // One frozen evaluation: the run stops for owner readiness after admission.
     const outcome = await runResearchCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
@@ -774,9 +776,10 @@ test("resolveAvailabilityAdapter is invoked with exactly the material non-privat
         return adapter;
       },
     });
-    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
+    assert.equal(outcome.status, "AWAITING_OWNER_READY", outcome.status === "FAILED" ? outcome.message : "");
     assert.equal(resolveCalls, 1);
     assert.deepEqual(seenSourceIds, ["SRC-MATERIAL"]);
+    assert.equal(reviewer.calls.length, 0);
   });
 });
 
@@ -785,7 +788,7 @@ test("resolveAvailabilityAdapter is never called when a synchronous availability
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewer = new RecordingInvoker(concurringResponder);
     let resolveCalls = 0;
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -808,7 +811,7 @@ test("a real unavailable adapter result HOLDs through the async resolution hook"
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -827,7 +830,7 @@ test("an unresolved CLAIM_INFERENCE_LIMITS_PRESENT HOLDs through real orchestrat
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -856,7 +859,7 @@ test("an exact-match resolution lets a claim with inference limits reach the ind
         return true;
       },
     };
-    const outcome = await runResearchCycle({
+    const outcome = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -877,7 +880,7 @@ test("an exact-match resolution lets a claim with inference limits reach the ind
 test("identical materialized input/content remains idempotent: rerunning against the same materialized artifacts yields the same fingerprint", async () => {
   await withTempDir(async (cycleDir) => {
     const shared = new SharedInvoker();
-    const first = await runResearchCycle({
+    const first = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: emptyIndex(),
       baseGitSha: SHA,
@@ -889,7 +892,7 @@ test("identical materialized input/content remains idempotent: rerunning against
     // and identical AI responses.
     await withTempDir(async (secondCycleDir) => {
       const secondShared = new SharedInvoker();
-      const second = await runResearchCycle({
+      const second = await runOwnerDeclaredCycle({
         trigger: TRIGGER,
         index: emptyIndex(),
         baseGitSha: SHA,
@@ -913,7 +916,7 @@ test("two-run regression: run 1 HOLDs, an exact resolution is recorded, and resu
     // --- run 1: normal path, unresolved inference limits -> HOLD ----------
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome1 = await runResearchCycle({
+    const outcome1 = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -951,6 +954,10 @@ test("two-run regression: run 1 HOLDs, an exact resolution is recorded, and resu
 
     // --- resume: must not re-invoke PRIMARY_AUTHOR, must reach ELIGIBLE, ---
     // --- must invoke a fresh reviewer exactly once ---------------------------
+    // The owner declares the frozen content ready while it is still HOLD:
+    // the HOLD consumed no semantic attempt, so this opens attempt 1.
+    const declared = declareFrozenCycleReady({ index: admissionIndex("public"), baseGitSha: SHA, cycleDir });
+    assert.equal(declared.ok && declared.semanticAttempt, 1);
     const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
     const checker = createInferenceLimitResolutionChecker(cycleDir);
     const outcome2 = await resumePreGateHold({
@@ -992,7 +999,7 @@ test("backcompat: a legacy v1 hold-freeze.json (flat `trigger`, no `identity`) r
     // normal path, before the current `identity`-carrying shape.
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    const outcome1 = await runResearchCycle({
+    const outcome1 = await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -1039,6 +1046,10 @@ test("backcompat: a legacy v1 hold-freeze.json (flat `trigger`, no `identity`) r
     // resumePreGateHold() must accept the legacy record when base/trigger/
     // fingerprint match, never re-invoke PRIMARY_AUTHOR, and reach
     // READY_FOR_HUMAN_REVIEW via exactly one fresh reviewer invocation.
+    // The owner declares the frozen content ready while it is still HOLD:
+    // the HOLD consumed no semantic attempt, so this opens attempt 1.
+    const declared = declareFrozenCycleReady({ index: admissionIndex("public"), baseGitSha: SHA, cycleDir });
+    assert.equal(declared.ok && declared.semanticAttempt, 1);
     const reviewerResume = new RecordingInvoker(fixedResponder(VALID_REVIEW));
     const checker = createInferenceLimitResolutionChecker(cycleDir);
     const outcome2 = await resumePreGateHold({
@@ -1063,7 +1074,7 @@ test("backcompat: a legacy v1 hold-freeze.json with tampered candidates still fa
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    await runResearchCycle({
+    await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -1110,7 +1121,7 @@ test("backcompat: a legacy v1 hold-freeze.json with a mismatched trigger fails c
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    await runResearchCycle({
+    await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -1149,7 +1160,7 @@ test("resuming with a mismatched baseGitSha fails closed without reloading candi
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    await runResearchCycle({
+    await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -1182,7 +1193,7 @@ test("resuming with a mismatched trigger request fails closed", async () => {
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    await runResearchCycle({
+    await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -1232,7 +1243,7 @@ test("a candidate file edited after the HOLD was recorded (tamper/staleness) fai
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    await runResearchCycle({
+    await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -1272,7 +1283,7 @@ test("resuming while the resolution is still absent stays HOLD, does not invoke 
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimWithLimitsEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    await runResearchCycle({
+    await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -1305,7 +1316,7 @@ test("no other blocker becomes overridable through resume — a HOLD caused by a
   await withTempDir(async (cycleDir) => {
     const primary = new RecordingInvoker(fixedResponder(claimEnvelope()));
     const reviewerRun1 = new RecordingInvoker(fixedResponder(VALID_REVIEW));
-    await runResearchCycle({
+    await runOwnerDeclaredCycle({
       trigger: TRIGGER,
       index: admissionIndex("public"),
       baseGitSha: SHA,
@@ -1349,7 +1360,7 @@ function writeMaterialSupport(researchRoot: string, statements: string[]): void 
 test("orchestration hands the reviewer the Source Verification Support of the base it reviews against, and fails closed on invalid support", async () => {
   await withTempDir(async (researchRoot) => {
     const index = { ...admissionIndex("public"), researchRoot };
-    const run = (cycleDir: string, reviewer: RecordingInvoker) => runResearchCycle({ trigger: TRIGGER, index, baseGitSha: SHA, cycleDir, primaryInvoker: new RecordingInvoker(fixedResponder(claimEnvelope())), reviewerInvoker: reviewer, availabilityAdapter: AVAILABLE, now: () => new Date("2026-09-15T12:00:00.000Z") });
+    const run = (cycleDir: string, reviewer: RecordingInvoker) => runOwnerDeclaredCycle({ trigger: TRIGGER, index, baseGitSha: SHA, cycleDir, primaryInvoker: new RecordingInvoker(fixedResponder(claimEnvelope())), reviewerInvoker: reviewer, availabilityAdapter: AVAILABLE, now: () => new Date("2026-09-15T12:00:00.000Z") });
 
     writeMaterialSupport(researchRoot, ["A fonte publica a afirmação reivindicada."]);
     await withTempDir(async (cycleDir) => {
@@ -1375,5 +1386,117 @@ test("orchestration hands the reviewer the Source Verification Support of the ba
       assert.equal(reviewer.calls.length, 0);
       assert.equal(existsSync(join(cycleDir, "research-change-set.json")), false);
     });
+  });
+});
+
+// --- owner-controlled review lifecycle ----------------------------------------
+
+const DISAGREEMENT_ON_SOURCE_NAME = {
+  ...VALID_REVIEW,
+  outcome: "DISAGREEMENT_FOUND",
+  rationale: "Scope mismatch found.",
+  findings: [{
+    findingId: "CLEC-FND-0001",
+    recordId: "SRC-NEW",
+    field: "name",
+    claim: "Synthetic source",
+    dimension: "evidence_fidelity",
+    kind: "CLEC_VIOLATION",
+    severity: "BLOCKING",
+    reason: "Scope mismatch found.",
+    evidenceReferences: ["SRC-NEW"],
+    correctionDirection: "Record the Source name as published.",
+    relatedSignalIds: [],
+  }],
+};
+
+const correctSourceName = (cycleDir: string, name: string): void =>
+  writeFileSync(join(cycleDir, "candidates", "SRC-NEW.yaml"), `source_id: SRC-NEW\nname: ${name}\n`, "utf8");
+
+test("the normal path stops for the owner's readiness declaration before any reviewer runs, and continues only for the declared content", async () => {
+  await withTempDir(async (cycleDir) => {
+    const primary = new RecordingInvoker(fixedResponder(VALID_ENVELOPE));
+    const reviewer = new RecordingInvoker(fixedResponder(VALID_REVIEW));
+    const frozen = await runResearchCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: primary, reviewerInvoker: reviewer });
+    assert.equal(frozen.status, "AWAITING_OWNER_READY", frozen.status === "FAILED" ? frozen.message : "");
+    assert.equal(reviewer.calls.length, 0);
+    assert.equal(readHoldFreeze(cycleDir, SHA, { kind: "TRIGGER", trigger: TRIGGER }).ok, true, "the frozen cycle is continuable");
+
+    const resume = () => resumePreGateHold({ index: emptyIndex(), baseGitSha: SHA, trigger: TRIGGER, cycleDir, reviewerInvoker: reviewer });
+    assert.equal((await resume()).status, "AWAITING_OWNER_READY", "resuming is not a declaration");
+    assert.equal(reviewer.calls.length, 0);
+
+    assert.equal(declareFrozenCycleReady({ index: emptyIndex(), baseGitSha: SHA, cycleDir }).ok, true);
+    // Content changed after the declaration: never reviewed silently.
+    correctSourceName(cycleDir, "Synthetic source, as published");
+    const changed = await resume();
+    assert.equal(changed.status === "FAILED" && changed.failedCheck, "HOLD_RESUME_CANDIDATE_MISMATCH");
+    assert.equal(reviewer.calls.length, 0);
+
+    // Declaring the current content is the explicit act that rebinds the frozen cycle.
+    const declared = declareFrozenCycleReady({ index: emptyIndex(), baseGitSha: SHA, cycleDir });
+    assert.deepEqual(declared.ok && [declared.semanticAttempt, declared.rebound], [1, true]);
+    const outcome = await resume();
+    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
+    if (outcome.status !== "READY_FOR_HUMAN_REVIEW") return;
+    assert.deepEqual(outcome.semanticReview, { semanticAttempt: 1, result: "CONCUR" });
+    assert.equal(outcome.changeSet.candidates[0].fields.name, "Synthetic source, as published");
+    assert.equal(primary.calls.length, 1);
+    assert.equal(reviewer.calls.length, 1);
+  });
+});
+
+test("Lane A runs one bounded correction of the frozen candidates as attempt 2, and a second non-CONCUR returns the cycle to the owner", async () => {
+  await withTempDir(async (cycleDir) => {
+    const reviewer = new RecordingInvoker(fixedResponder(DISAGREEMENT_ON_SOURCE_NAME));
+    const first = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: new RecordingInvoker(fixedResponder(VALID_ENVELOPE)), reviewerInvoker: reviewer });
+    assert.equal(first.status, "READY_FOR_HUMAN_REVIEW");
+    if (first.status !== "READY_FOR_HUMAN_REVIEW") return;
+    assert.deepEqual(first.semanticReview, { semanticAttempt: 1, result: "CORRECTION_PERMITTED" });
+    assert.equal(reviewer.calls.length, 1, "a valid non-CONCUR is never retried");
+    writeFileSync(join(cycleDir, "research-change-set.json"), `${JSON.stringify(first.changeSet)}\n`, "utf8");
+
+    const resume = () => resumePreGateHold({ index: emptyIndex(), baseGitSha: SHA, trigger: TRIGGER, cycleDir, reviewerInvoker: reviewer });
+    // Unchanged content is never rerun as attempt 2.
+    const unchanged = declareFrozenCycleReady({ index: emptyIndex(), baseGitSha: SHA, cycleDir });
+    assert.equal(!unchanged.ok && unchanged.failedCheck, "REVIEW_CORRECTION_UNCHANGED");
+    assert.equal((await resume()).status, "AWAITING_OWNER_READY");
+    assert.equal(reviewer.calls.length, 1);
+
+    correctSourceName(cycleDir, "Synthetic source, as published");
+    const declared = declareFrozenCycleReady({ index: emptyIndex(), baseGitSha: SHA, cycleDir });
+    assert.deepEqual(declared.ok && [declared.semanticAttempt, declared.rebound], [2, true]);
+    assert.equal(existsSync(join(cycleDir, "research-change-set.json")), false, "the package of superseded content is never reused");
+    const second = await resume();
+    assert.equal(second.status, "READY_FOR_HUMAN_REVIEW");
+    if (second.status !== "READY_FOR_HUMAN_REVIEW") return;
+    assert.deepEqual(second.semanticReview, { semanticAttempt: 2, result: "OWNER_ESCALATION" });
+    assert.equal(second.changeSet.independentReview.outcome, "DISAGREEMENT_FOUND");
+    assert.equal(reviewer.calls.length, 2);
+
+    correctSourceName(cycleDir, "Synthetic source, third wording");
+    const third = declareFrozenCycleReady({ index: emptyIndex(), baseGitSha: SHA, cycleDir });
+    assert.equal(!third.ok && third.failedCheck, "REVIEW_OWNER_ESCALATION");
+    correctSourceName(cycleDir, "Synthetic source, as published");
+    const refused = await resume();
+    assert.equal(refused.status === "FAILED" && refused.failedCheck, "REVIEW_OWNER_ESCALATION");
+    assert.equal(reviewer.calls.length, 2, "no third attempt reaches the reviewer");
+  });
+});
+
+test("two structurally invalid reviewer outputs in Lane A are a tooling/runtime failure that keeps the declared attempt", async () => {
+  await withTempDir(async (cycleDir) => {
+    let calls = 0;
+    const reviewer = new RecordingInvoker(() => ({ status: "OK", stdout: ++calls <= 2 ? "not JSON" : JSON.stringify(VALID_REVIEW) }));
+    const failed = await runOwnerDeclaredCycle({ trigger: TRIGGER, index: emptyIndex(), baseGitSha: SHA, cycleDir, primaryInvoker: new RecordingInvoker(fixedResponder(VALID_ENVELOPE)), reviewerInvoker: reviewer });
+    assert.equal(failed.status === "FAILED" && failed.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
+    assert.match(failed.status === "FAILED" ? failed.message : "", /^TOOLING_RUNTIME_FAILURE \(semantic attempt 1 not consumed\)/);
+    assert.equal(reviewer.calls.length, 2);
+    assert.equal(reviewer.calls[1].input.split("REVIEW INPUT (immutable, JSON):\n")[1].split("\n")[0], reviewer.calls[0].input.split("REVIEW INPUT (immutable, JSON):\n")[1].split("\n")[0]);
+
+    // After investigation the same declared content is still semantic attempt 1.
+    const outcome = await resumePreGateHold({ index: emptyIndex(), baseGitSha: SHA, trigger: TRIGGER, cycleDir, reviewerInvoker: reviewer });
+    assert.equal(outcome.status, "READY_FOR_HUMAN_REVIEW", outcome.status === "FAILED" ? outcome.message : "");
+    if (outcome.status === "READY_FOR_HUMAN_REVIEW") assert.deepEqual(outcome.semanticReview, { semanticAttempt: 1, result: "CONCUR" });
   });
 });

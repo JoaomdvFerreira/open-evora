@@ -19,7 +19,9 @@
  * `resume-revalidation` action (PR #127 remediation, finding 1) — the same
  * supported operator path the normal AI-driven path's HOLD already uses,
  * never a second incompatible protocol. An owner may also still choose to
- * re-run this command against a fresh target cycle instead.
+ * re-run this command against a fresh target cycle instead. An
+ * AWAITING_OWNER_READY target is continued the same way, after the owner's
+ * hold-cli.ts `declare-ready` over the target cycle.
  *
  * Usage:
  *   RESEARCH_AI_COMMAND=<executable> [RESEARCH_AI_ARGS="..."] \
@@ -30,7 +32,8 @@
  *     --new-base-git-sha <40-char-sha> \
  *     [--dir <researchRoot>]
  *
- * Exit code 0 = READY_FOR_HUMAN_REVIEW; 1 = FAILED (fail-closed), HOLD, or usage error.
+ * Exit code 0 = READY_FOR_HUMAN_REVIEW; 1 = FAILED (fail-closed), HOLD,
+ * AWAITING_OWNER_READY, or usage error.
  */
 import { writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -45,6 +48,7 @@ import type { ResearchChangeSet } from "./types.ts";
 import { resolveAvailabilityAdapter } from "../admission/http-availability-adapter.ts";
 import { createInferenceLimitResolutionChecker } from "../admission/inference-limit-resolution.ts";
 import { precheckRepositoryState } from "../gate/repository-state.ts";
+import { awaitingOwnerReadyOutput, repositoryReviewLifecycleDir, semanticReviewOutput } from "./cli.ts";
 
 const FULL_GIT_SHA = /^[0-9a-fA-F]{40}$/;
 
@@ -150,6 +154,7 @@ async function main(): Promise<void> {
     // existing record-resolution action, if this run reaches a
     // CLAIM_INFERENCE_LIMITS_PRESENT HOLD.
     inferenceLimitResolutionChecker: createInferenceLimitResolutionChecker(targetCycleDir),
+    reviewLifecycleDir: repositoryReviewLifecycleDir(),
   });
 
   if (outcome.status === "FAILED") {
@@ -167,11 +172,17 @@ async function main(): Promise<void> {
     process.exitCode = 1;
     return;
   }
+  if (outcome.status === "AWAITING_OWNER_READY") {
+    const resume = `node tools/research/orchestrate/hold-cli.ts resume-revalidation --cycle-dir ${targetCycleDir} --source-cycle-dir ${sourceCycleDir} --old-base-git-sha ${oldBaseGitSha} --new-base-git-sha ${newBaseGitSha}`;
+    console.error(awaitingOwnerReadyOutput(outcome.reviewerInputFingerprint, targetCycleDir, newBaseGitSha, resume));
+    process.exitCode = 1;
+    return;
+  }
 
   const outputPath = join(targetCycleDir, "research-change-set.json");
   writeFileSync(outputPath, `${JSON.stringify(outcome.changeSet, null, 2)}\n`, "utf8");
 
-  console.log(buildReadyOutput(outcome.changeSet, outputPath));
+  console.log([buildReadyOutput(outcome.changeSet, outputPath), semanticReviewOutput(outcome)].filter(Boolean).join("\n"));
   process.exitCode = 0;
 }
 

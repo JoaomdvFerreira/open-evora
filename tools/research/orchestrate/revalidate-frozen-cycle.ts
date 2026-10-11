@@ -153,7 +153,7 @@ import type { AiInvoker } from "../ai/invoker.ts";
 import { asValidatedManifest, validateManifest } from "./manifest.ts";
 import { asValidatedResearchChangeSet, validateResearchChangeSet } from "./rcs-validator.ts";
 import { loadCandidates } from "../integration/candidate-loader.ts";
-import { continueFromFrozenCandidates, frozenCandidateFingerprint, writeHoldFreeze } from "./run-cycle.ts";
+import { continueFromFrozenCandidates, cycleReviewLifecycleDir, frozenCandidateFingerprint, isFrozenContinuation, writeHoldFreeze } from "./run-cycle.ts";
 import { sha256Hex } from "../core/fingerprint.ts";
 import type { PreparationOutcome } from "./types.ts";
 import { assertWorkbenchBoundary } from "../core/workbench-boundary.ts";
@@ -234,6 +234,8 @@ export interface RevalidateFrozenCycleInput {
   now?: () => Date;
   /** Overridable for tests only; defaults to this repository's own root. */
   repoRoot?: string;
+  /** As RunResearchCycleInput.reviewLifecycleDir, defaulting inside `targetCycleDir`. */
+  reviewLifecycleDir?: string;
 }
 
 /**
@@ -505,7 +507,8 @@ export async function revalidateFrozenCycleAtNewBase(input: RevalidateFrozenCycl
     input.availabilityAdapter,
     input.resolveAvailabilityAdapter,
     input.inferenceLimitResolutionChecker,
-    input.now
+    input.now,
+    cycleReviewLifecycleDir(input.targetCycleDir, input.reviewLifecycleDir)
   );
 
   // Requirement 11 (PR #127 remediation, finding 1): a fresh frozen HOLD is
@@ -521,8 +524,10 @@ export async function revalidateFrozenCycleAtNewBase(input: RevalidateFrozenCycl
   // normal-path HOLD uses, so hold-cli.ts's `resume-revalidation` action
   // (backed by resumeRevalidationHold()) can reload and resume this HOLD
   // through the same supported operator path — never a second, incompatible
-  // freeze protocol.
-  if (outcome.status === "PRE_GATE_SAFETY_HOLD") {
+  // freeze protocol. A target awaiting the owner's readiness declaration is
+  // frozen identically, so the owner's declaration and the same resume path
+  // continue it.
+  if (isFrozenContinuation(outcome)) {
     materializeFrozenSourceIntoTarget(input.sourceCycleDir, input.targetCycleDir, source.manifest);
     writeHoldFreeze(input.targetCycleDir, {
       schemaVersion: "1",

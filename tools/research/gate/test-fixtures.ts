@@ -1,9 +1,9 @@
 /**
- * Shared synthetic fixtures for tools/research/gate/*.test.ts. Not a test
- * file itself (no `node --test` assertions here) — a fixture-only module,
- * matching the pattern already used by canonical-promoter.test.ts's own
- * local fixture() helpers, just factored out because multiple gate test
- * files need the identical synthetic RCS/package/corpus shape.
+ * Shared synthetic fixtures for tools/research/gate/*.test.ts and the other
+ * research-tooling suites that need the same RCS/package/corpus shape or the
+ * owner-declared review flow. Not a test file itself (no `node --test`
+ * assertions here) — a fixture-only module, matching the pattern already
+ * used by canonical-promoter.test.ts's own local fixture() helpers.
  */
 import { execFileSync } from "node:child_process";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -23,6 +23,13 @@ import { buildReviewerInputPackage, type ReviewerInputPackage } from "../review/
 import { loadSourceVerifications } from "../core/source-verifications.ts";
 import { buildHumanGatePackage } from "./package-builder.ts";
 import type { HumanGatePackage } from "./types.ts";
+import type { AiInvoker } from "../ai/invoker.ts";
+import { prepareLaneBReview, type LaneBPreparation } from "../lane-b/receipt.ts";
+import type { LaneBReviewUnit } from "../lane-b/review-unit.ts";
+import { revalidateFrozenCycleAtNewBase, type RevalidateFrozenCycleInput } from "../orchestrate/revalidate-frozen-cycle.ts";
+import { declareFrozenCycleReady, resumePreGateHold, resumeRevalidationHold, runResearchCycle, type RunResearchCycleInput } from "../orchestrate/run-cycle.ts";
+import type { PreparationOutcome } from "../orchestrate/types.ts";
+import { declareOwnerReady, reviewSubject } from "../review/review-lifecycle.ts";
 
 export const SHA_A = "0123456789abcdef0123456789abcdef01234567";
 export const SHA_B = "abcdef0123456789abcdef0123456789abcdef01";
@@ -440,4 +447,54 @@ export function semanticHumanGatePackage(scenario: SemanticReviewScenario, baseG
     throw new Error(`semanticHumanGatePackage fixture failed to assemble: ${built.errors.join("; ")}`);
   }
   return built.pkg;
+}
+
+// --- owner-controlled review lifecycle -------------------------------------
+
+/**
+ * Lane A as an owner drives it: the run stops at AWAITING_OWNER_READY, the
+ * owner declares the exact frozen candidates ready, and the frozen cycle is
+ * continued once. Any other first outcome is returned unchanged.
+ */
+export async function runOwnerDeclaredCycle(input: RunResearchCycleInput): Promise<PreparationOutcome> {
+  const frozen = await runResearchCycle(input);
+  if (frozen.status !== "AWAITING_OWNER_READY") return frozen;
+  const declared = declareFrozenCycleReady({ index: input.index, baseGitSha: input.baseGitSha, cycleDir: input.cycleDir, reviewLifecycleDir: input.reviewLifecycleDir });
+  if (!declared.ok) throw new Error(`owner readiness declaration failed: ${declared.failedCheck}: ${declared.message}`);
+  const { primaryInvoker: _primaryInvoker, ...resume } = input;
+  return resumePreGateHold(resume);
+}
+
+/** The base-revalidation path as an owner drives it, mirroring runOwnerDeclaredCycle(). */
+export async function revalidateOwnerDeclaredCycle(input: RevalidateFrozenCycleInput): Promise<PreparationOutcome> {
+  const frozen = await revalidateFrozenCycleAtNewBase(input);
+  if (frozen.status !== "AWAITING_OWNER_READY") return frozen;
+  const declared = declareFrozenCycleReady({ index: input.index, baseGitSha: input.newBaseGitSha, cycleDir: input.targetCycleDir, reviewLifecycleDir: input.reviewLifecycleDir });
+  if (!declared.ok) throw new Error(`owner readiness declaration failed: ${declared.failedCheck}: ${declared.message}`);
+  return resumeRevalidationHold({
+    index: input.index,
+    baseGitSha: input.newBaseGitSha,
+    sourceCycleDir: input.sourceCycleDir,
+    oldBaseGitSha: input.oldBaseGitSha,
+    cycleDir: input.targetCycleDir,
+    reviewerInvoker: input.reviewerInvoker,
+    availabilityAdapter: input.availabilityAdapter,
+    resolveAvailabilityAdapter: input.resolveAvailabilityAdapter,
+    inferenceLimitResolutionChecker: input.inferenceLimitResolutionChecker,
+    now: input.now,
+    reviewLifecycleDir: input.reviewLifecycleDir,
+  });
+}
+
+/** Lane B as an owner drives it: `ready` over the unit's exact reviewer input, then `prepare`. */
+export function prepareOwnerDeclaredLaneBReview(
+  unit: Extract<LaneBReviewUnit, { status: "REVIEW_REQUIRED" }>,
+  reviewerInvoker: AiInvoker,
+  workbenchDir: string,
+  repoRoot: string,
+  lifecycleDir = join(workbenchDir, "review-lifecycle"),
+): LaneBPreparation {
+  const declared = declareOwnerReady(lifecycleDir, reviewSubject(unit.reviewerInput));
+  if (!declared.ok) throw new Error(`owner readiness declaration failed: ${declared.failedCheck}: ${declared.message}`);
+  return prepareLaneBReview(unit, reviewerInvoker, workbenchDir, repoRoot, lifecycleDir);
 }

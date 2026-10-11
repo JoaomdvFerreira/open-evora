@@ -136,7 +136,7 @@ test("no operational route builds, prompts or validates the reduced profile", ()
     readdirSync(dir, { withFileTypes: true }).flatMap((entry) => (entry.isDirectory() ? files(join(dir, entry.name)) : entry.name.endsWith(".ts") && !entry.name.endsWith(".test.ts") ? [join(dir, entry.name)] : []));
   const operational = ["lane-b", "orchestrate", "gate"].flatMap((dir) => files(join(root, dir)));
   assert.ok(operational.length > 0);
-  for (const file of [...operational, join(root, "review", "independent-review-invocation.ts")]) {
+  for (const file of [...operational, join(root, "review", "independent-review-invocation.ts"), join(root, "review", "review-lifecycle.ts")]) {
     assert.doesNotMatch(readFileSync(file, "utf8"), /reduced-reviewer-input|Reduced(?:Reviewer|IndependentReview)/, file);
   }
 });

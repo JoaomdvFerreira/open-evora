@@ -224,12 +224,18 @@ export function buildReducedReviewerPrompt(frozenReducedInputJson: string): stri
   ].join("\n");
 }
 
-/** Procedural feedback only: the original prompt, including its frozen input, is unchanged. */
-export function buildReviewerStructuralRetryPrompt(originalPrompt: string, validationErrors: readonly string[]): string {
+/**
+ * Procedural feedback only: the original prompt, including its frozen input,
+ * is unchanged. `outputKind` names why the previous stdout was structurally
+ * invalid: JSON that failed result validation, or stdout that was not JSON.
+ */
+export function buildReviewerStructuralRetryPrompt(originalPrompt: string, validationErrors: readonly string[], outputKind: "INVALID_REVIEW" | "NOT_JSON" = "INVALID_REVIEW"): string {
   return [
     originalPrompt,
     "",
-    "STRUCTURAL RETRY: Your previous JSON parsed but failed deterministic result validation:",
+    outputKind === "NOT_JSON"
+      ? "STRUCTURAL RETRY: Your previous stdout was not a parseable JSON object:"
+      : "STRUCTURAL RETRY: Your previous JSON parsed but failed deterministic result validation:",
     ...validationErrors.map((error) => `- ${error}`),
     "Return a complete replacement JSON review object under the original result contract.",
     "Use the same immutable REVIEW INPUT above. Do not add research facts, evidence, or interpretation from this feedback.",

@@ -13,6 +13,7 @@
     "research:analyze": "node tools/research/analysis/cli.ts --all",
     "research:readiness": "node tools/research/readiness/cli.ts --all",
     "research:signals": "node tools/research/language/cli.ts",
+    "research:lane-b:ready": "node tools/research/lane-b/cli.ts ready",
     "research:lane-b:prepare": "node tools/research/lane-b/cli.ts prepare",
     "research:lane-b:check": "node tools/research/lane-b/cli.ts check",
     "research:lane-b:summary": "node tools/research/lane-b/cli.ts summary",

@@ -168,6 +168,7 @@ test("a valid review of any outcome is accepted after one invocation", () => {
       const result = invokeIndependentReview(invoker, PKG, dir);
       assert.equal(result.status, "VALID");
       if (result.status === "VALID") assert.deepEqual(result.review, review);
+      if (result.status === "VALID") assert.equal(result.technicalCalls, 1, "a valid non-CONCUR is substantive, never retried");
       assert.equal(invoker.calls.length, 1);
       assert.equal(invoker.calls[0].role, "INDEPENDENT_REVIEWER");
       assert.equal(existsSync(join(dir, "independent-review-attempt-2.stdout.txt")), false);
@@ -182,6 +183,7 @@ test("a finding with no evidence reference gets one fresh structural retry over 
     const result = invokeIndependentReview(invoker, PKG, dir);
     assert.equal(result.status, "VALID");
     if (result.status === "VALID") assert.equal(result.review.outcome, "CONCUR");
+    if (result.status === "VALID") assert.equal(result.technicalCalls, 2);
     assert.equal(invoker.calls.length, 2);
     const original = invoker.calls[0].input;
     const retry = invoker.calls[1].input;
@@ -212,11 +214,46 @@ test("two structurally invalid reviews fail closed after exactly two invocations
   });
 });
 
-test("timeout, invocation failure, and non-JSON stdout do not trigger a structural retry", () => {
+/** The frozen `REVIEW INPUT (immutable, JSON)` payload exactly as one reviewer call carried it. */
+function frozenPayload(request: AiInvocationRequest): string {
+  return request.input.split("REVIEW INPUT (immutable, JSON):\n")[1].split("\n")[0];
+}
+
+test("malformed JSON stdout gets exactly one technical retry carrying the byte-identical frozen input", () => {
+  withReviewWorkbench((dir) => {
+    const invoker = new RecordingReviewer([{ status: "OK", stdout: "not JSON {" }, output(insufficientReview())]);
+    const result = invokeIndependentReview(invoker, PKG, dir);
+    assert.equal(result.status, "VALID");
+    if (result.status === "VALID") {
+      assert.equal(result.review.outcome, "INSUFFICIENT_EVIDENCE");
+      assert.equal(result.technicalCalls, 2);
+    }
+    assert.equal(invoker.calls.length, 2);
+    const [first, retry] = invoker.calls;
+    assert.equal(frozenPayload(first), serializeReviewerInput(PKG));
+    assert.equal(frozenPayload(retry), frozenPayload(first), "the technical retry never rebuilds or widens the semantic input");
+    assert.ok(retry.input.startsWith(`${first.input}\n`));
+    assert.match(retry.input.slice(first.input.length), /STRUCTURAL RETRY: Your previous stdout was not a parseable JSON object:\n- stdout was not valid JSON/);
+    assert.equal(readFileSync(join(dir, "independent-review-attempt-1.stdout.txt"), "utf8"), "not JSON {");
+    assert.match(readFileSync(join(dir, "independent-review-attempt-1.errors.txt"), "utf8"), /stdout was not valid JSON/);
+  });
+});
+
+test("malformed JSON twice fails closed after exactly two technical calls", () => {
+  withReviewWorkbench((dir) => {
+    const invoker = new RecordingReviewer([{ status: "OK", stdout: "not JSON" }, output(emptyFindingReferences())]);
+    const result = invokeIndependentReview(invoker, PKG, dir);
+    assert.equal(result.status, "FAILED");
+    if (result.status === "FAILED") assert.equal(result.failedCheck, "INDEPENDENT_REVIEW_OUTPUT_INVALID");
+    assert.equal(invoker.calls.length, 2);
+    assert.equal(frozenPayload(invoker.calls[1]), frozenPayload(invoker.calls[0]));
+  });
+});
+
+test("timeout and invocation failure do not trigger a technical retry", () => {
   const failures: AiInvocationResult[] = [
     { status: "TIMEOUT", message: "timed out" },
     { status: "INVOCATION_FAILED", message: "process failed" },
-    { status: "OK", stdout: "not JSON" },
   ];
   for (const failure of failures) withReviewWorkbench((dir) => {
     const invoker = new RecordingReviewer([failure]);
