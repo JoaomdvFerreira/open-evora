@@ -68,7 +68,7 @@ it("preserves authored Evidence order and unrelated relationships for a PRB with
 
 it("projects every canonical PRB Evidence ID exactly once in authored order", async () => {
   const problemIds = corpusIndex.filter((item) => item.type === "PRB-").map((item) => item.id);
-  expect(problemIds).toHaveLength(12);
+  expect(problemIds).toHaveLength(13);
   for (const problemId of problemIds) {
     const projection = await loadProblemProjection(corpusProvider, corpusLookup, problemId);
     const authoredIds = (projection.problem.record.evidence as { evidence_id: string }[]).map((entry) => entry.evidence_id);
