@@ -39,10 +39,16 @@ test("the import scan resolves relative specifiers, including type-only and dyna
   assert.deepEqual(specifiers, ["../orchestrate/types.ts", "./x.ts", "../orchestrate/run-cycle.ts"]);
 });
 
-test("Lane B imports nothing from the orchestration namespace", () => {
-  const files = tsFiles(join(researchRoot, "lane-b"));
-  assert.ok(files.length > 0);
+test("the direct semantic-review path imports no orchestration or persisted lifecycle state", () => {
+  const files = [
+    join(researchRoot, "review", "cli.ts"),
+    join(researchRoot, "review", "review-unit.ts"),
+    join(researchRoot, "review", "independent-review-invocation.ts"),
+  ];
   assert.deepEqual(orchestrateImports(files), []);
+  for (const file of files) {
+    assert.doesNotMatch(importSpecifiers(file).join("\n"), /review-lifecycle/);
+  }
 });
 
 test("the shared review kernel and its neutral dependencies import nothing from the orchestration namespace", () => {

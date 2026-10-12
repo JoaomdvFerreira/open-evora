@@ -23,13 +23,9 @@ import { buildReviewerInputPackage, type ReviewerInputPackage } from "../review/
 import { loadSourceVerifications } from "../core/source-verifications.ts";
 import { buildHumanGatePackage } from "./package-builder.ts";
 import type { HumanGatePackage } from "./types.ts";
-import type { AiInvoker } from "../ai/invoker.ts";
-import { prepareLaneBReview, type LaneBPreparation } from "../lane-b/receipt.ts";
-import type { LaneBReviewUnit } from "../lane-b/review-unit.ts";
 import { revalidateFrozenCycleAtNewBase, type RevalidateFrozenCycleInput } from "../orchestrate/revalidate-frozen-cycle.ts";
 import { declareFrozenCycleReady, resumePreGateHold, resumeRevalidationHold, runResearchCycle, type RunResearchCycleInput } from "../orchestrate/run-cycle.ts";
 import type { PreparationOutcome } from "../orchestrate/types.ts";
-import { declareOwnerReady, reviewSubject } from "../review/review-lifecycle.ts";
 
 export const SHA_A = "0123456789abcdef0123456789abcdef01234567";
 export const SHA_B = "abcdef0123456789abcdef0123456789abcdef01";
@@ -484,17 +480,4 @@ export async function revalidateOwnerDeclaredCycle(input: RevalidateFrozenCycleI
     now: input.now,
     reviewLifecycleDir: input.reviewLifecycleDir,
   });
-}
-
-/** Lane B as an owner drives it: `ready` over the unit's exact reviewer input, then `prepare`. */
-export function prepareOwnerDeclaredLaneBReview(
-  unit: Extract<LaneBReviewUnit, { status: "REVIEW_REQUIRED" }>,
-  reviewerInvoker: AiInvoker,
-  workbenchDir: string,
-  repoRoot: string,
-  lifecycleDir = join(workbenchDir, "review-lifecycle"),
-): LaneBPreparation {
-  const declared = declareOwnerReady(lifecycleDir, reviewSubject(unit.reviewerInput));
-  if (!declared.ok) throw new Error(`owner readiness declaration failed: ${declared.failedCheck}: ${declared.message}`);
-  return prepareLaneBReview(unit, reviewerInvoker, workbenchDir, repoRoot, lifecycleDir);
 }

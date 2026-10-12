@@ -1,6 +1,6 @@
 /**
- * Shared Lane A/Lane B reviewer invocation within one semantic attempt
- * (review-lifecycle.ts owns the attempts themselves). A structurally invalid
+ * Shared provider-neutral reviewer invocation for orchestration and direct
+ * semantic review. A structurally invalid
  * response — stdout that is not JSON, or JSON failing validateIndependentReview()
  * — gets exactly one technical retry built from the same frozen prompt plus
  * procedural feedback; it never counts as a semantic attempt. A valid result,
@@ -35,7 +35,7 @@ function structuralErrors(stdout: string, reviewerInput: ReviewerInputPackage): 
 export function invokeIndependentReview(
   invoker: AiInvoker,
   reviewerInput: ReviewerInputPackage,
-  workbenchDir: string,
+  workbenchDir?: string,
 ): IndependentReviewInvocation {
   // Serialized once: both technical calls carry exactly this frozen input.
   const originalPrompt = buildReviewerPrompt(serializeReviewerInput(reviewerInput));
@@ -45,11 +45,11 @@ export function invokeIndependentReview(
     if (result.status === "TIMEOUT") return { status: "FAILED", failedCheck: "INDEPENDENT_REVIEW_TIMEOUT", message: result.message };
     if (result.status === "INVOCATION_FAILED") return { status: "FAILED", failedCheck: "INDEPENDENT_REVIEW_INVOCATION_FAILED", message: result.message };
 
-    writeFileSync(join(workbenchDir, `independent-review-attempt-${technicalCall}.stdout.txt`), result.stdout, "utf8");
+    if (workbenchDir) writeFileSync(join(workbenchDir, `independent-review-attempt-${technicalCall}.stdout.txt`), result.stdout, "utf8");
     const { value, errors, outputKind } = structuralErrors(result.stdout, reviewerInput);
     if (errors.length === 0) return { status: "VALID", review: asValidatedIndependentReview(value), technicalCalls: technicalCall };
 
-    writeFileSync(join(workbenchDir, `independent-review-attempt-${technicalCall}.errors.txt`), `${errors.join("\n")}\n`, "utf8");
+    if (workbenchDir) writeFileSync(join(workbenchDir, `independent-review-attempt-${technicalCall}.errors.txt`), `${errors.join("\n")}\n`, "utf8");
     if (technicalCall === 2) return { status: "FAILED", failedCheck: "INDEPENDENT_REVIEW_OUTPUT_INVALID", message: errors.join("; ") };
     prompt = buildReviewerStructuralRetryPrompt(originalPrompt, errors, outputKind);
   }

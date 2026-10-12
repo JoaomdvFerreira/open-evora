@@ -3,7 +3,7 @@
  * deterministic, smaller representation of the same semantic review the
  * REFERENCE package (reviewer-input.ts, buildReviewerInputPackage()) frames.
  * It is built from the same ReviewerInputSource and is not yet used by any
- * review route: Lane A, Lane B, the Gate and every receipt stay on the
+ * review route: orchestration, direct review and the Gate stay on the
  * reference profile until the CRR-07 equivalence benchmark and owner cutover.
  *
  * Less context, never less coverage:

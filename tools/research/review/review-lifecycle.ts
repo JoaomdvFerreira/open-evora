@@ -1,5 +1,5 @@
 /**
- * The owner-controlled semantic review lifecycle shared by Lane A and Lane B
+ * The owner-controlled semantic review lifecycle for orchestrated cycles
  * (docs/investigationstrategy.md §12): the only route from a frozen
  * REFERENCE reviewer input to an INDEPENDENT_REVIEWER invocation.
  *
@@ -341,7 +341,7 @@ function declareUnderClaim(lifecycleDir: string, subject: ReviewSubject, options
     return reject(REVIEW_LIFECYCLE_CHECK.CORRECTION_UNCHANGED, "this exact reviewer input already received a valid non-CONCUR review; it is never reviewed again unchanged");
   }
   if (reviewed.length > 0 && !options.newLifecycle) {
-    return reject(REVIEW_LIFECYCLE_CHECK.ALREADY_CONCUR, "this exact reviewer input already received CONCUR; its review artifact and receipt remain valid");
+    return reject(REVIEW_LIFECYCLE_CHECK.ALREADY_CONCUR, "this exact reviewer input already has a recorded CONCUR result");
   }
   state.lifecycles.push({ baseGitSha: subject.baseGitSha, targets: subject.targets, declaredReviewerInputFingerprint: subject.reviewerInputFingerprint, attempts: [], closedByOwner: false });
   writeReviewLifecycleState(lifecycleDir, state);

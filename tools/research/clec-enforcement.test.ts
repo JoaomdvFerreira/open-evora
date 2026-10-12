@@ -1,18 +1,14 @@
 /**
  * End-to-end regression for the Citizen Language & Evidence Contract
- * enforcement chain (docs/investigationstrategy.md §12) as one system, across
- * both research lanes:
+ * enforcement chain (docs/investigationstrategy.md §12) through the
+ * orchestrated canonical-integration path:
  *
  *   Lane A: candidate -> deterministic signals -> context-free precheck ->
  *   independent semantic review -> Research Change Set -> Human Gate package
  *   -> hash-bound human decision -> post-approval promotion -> Git/PR ->
  *   READY_FOR_OWNER_MERGE.
  *
- *   Lane B: Git-derived canonical change -> deterministic signals ->
- *   context-free precheck -> independent semantic review -> receipt ->
- *   pull-request receipt check.
- *
- * Every step runs the real production orchestration, Gate and Lane B code
+ * Every step runs the real production orchestration and Gate code
  * against temporary Git repositories shaped like the real research tree and
  * validated by its real schemas. Only true external boundaries are replaced:
  * the AI invocations (recording stubs), GitHub (the fake `gh` from
@@ -23,11 +19,11 @@ import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { gitFixture, loadIndexFor, prepareOwnerDeclaredLaneBReview, remoteGitFixture, runOwnerDeclaredCycle, sourceYaml, type GitFixture, type RemoteGitFixture } from "./gate/test-fixtures.ts";
+import { loadIndexFor, remoteGitFixture, runOwnerDeclaredCycle, type RemoteGitFixture } from "./gate/test-fixtures.ts";
 import { MARKDOWN_FILENAME, PACKAGE_FILENAME } from "./gate/cli.ts";
 import { computeContentHash } from "./gate/content-hash.ts";
 import { DECISION_RECORD_FILENAME, writeDecisionRecord } from "./gate/decision-record.ts";
@@ -37,17 +33,13 @@ import { sha256Hex } from "./core/fingerprint.ts";
 import { runPostApprovalPath } from "./gate/promote.ts";
 import type { HumanGatePackage } from "./gate/types.ts";
 import { ADVISORY, CONTEXT_FREE_BLOCK, contextFreeBlockers, SIGNAL_CODE } from "./language/signals.ts";
-import { buildLaneBReceipt, renderReceiptBlock, type LaneBPreparation } from "./lane-b/receipt.ts";
-import { pullRequestBase, resolveCommit, resolveLaneBReviewUnit, type LaneBReviewUnit } from "./lane-b/review-unit.ts";
 import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "./ai/invoker.ts";
 import { validateIndependentReview } from "./review/independent-review.ts";
-import { serializeReviewerInput, type ReviewerInputPackage } from "./review/reviewer-input.ts";
+import type { ReviewerInputPackage } from "./review/reviewer-input.ts";
 import type { ResearchTrigger } from "./orchestrate/types.ts";
 import type { IndependentReviewResult } from "./review/types.ts";
 
-const REPO_ROOT = resolve(fileURLToPath(new URL(".", import.meta.url)), "..", "..");
 const GATE_CLI = fileURLToPath(new URL("./gate/cli.ts", import.meta.url));
-const LANE_B_CLI = fileURLToPath(new URL("./lane-b/cli.ts", import.meta.url));
 
 // ---------------------------------------------------------------------------
 // One EVD record, valid under the real schemas, citing the fixture's SRC-BASE.
@@ -417,198 +409,13 @@ test("Lane A: an independent semantic disagreement on an advisory-only candidate
 });
 
 // ---------------------------------------------------------------------------
-// Lane B harness: the same research tree, changed directly in Git.
-
-interface LaneBRepo {
-  fixture: GitFixture;
-  base: string;
-  scratch: string;
-  writeEvidence(yaml: string): void;
-  commit(message: string): string;
-  /** The review unit `research:lane-b:prepare` computes from the uncommitted working tree. */
-  workingTreeUnit(): LaneBReviewUnit;
-  /** `research:lane-b:check` against a pull-request body in the repository's own template; `base` defaults to the fixture base. */
-  check(head: string, reviewSection: string, base?: string): { status: number | null; output: string };
-}
-
-const PR_TEMPLATE = readFileSync(join(REPO_ROOT, ".github", "PULL_REQUEST_TEMPLATE.md"), "utf8");
-
-function pullRequestBody(reviewSection: string): string {
-  assert.match(PR_TEMPLATE, /^## Research semantic review$[\s\S]*^N\/A$/m);
-  return PR_TEMPLATE.replace(/^N\/A$/m, () => reviewSection);
-}
-
-function withLaneBRepo(fn: (repo: LaneBRepo) => void): void {
-  const fixture = gitFixture();
-  const scratch = mkdtempSync(join(tmpdir(), "open-evora-clec-lane-b-"));
-  try {
-    execFileSync("git", ["-C", fixture.root, "config", "core.autocrlf", "false"]);
-    writeFileSync(join(fixture.research, "sources", "SRC-UNRELATED.yaml"), sourceYaml("SRC-UNRELATED", "Unrelated"));
-    mkdirSync(join(fixture.root, "docs"));
-    writeFileSync(join(fixture.root, "docs", "notes.md"), "# Notas\n");
-    const commit = (message: string): string => {
-      fixture.commit(message);
-      return fixture.head();
-    };
-    const base = commit("base corpus");
-    fn({
-      fixture,
-      base,
-      scratch,
-      writeEvidence: (yaml) => writeFileSync(join(fixture.research, "evidence", EVD_FILE), yaml, "utf8"),
-      commit,
-      workingTreeUnit: () => resolveLaneBReviewUnit({
-        repoRoot: fixture.root,
-        baseGitSha: pullRequestBase(fixture.root, base, resolveCommit(fixture.root, "HEAD")),
-        head: { kind: "working-tree" },
-      }),
-      check: (head, reviewSection, prBase = base) => {
-        const bodyFile = join(scratch, "pr-body.md");
-        writeFileSync(bodyFile, pullRequestBody(reviewSection), "utf8");
-        const result = spawnSync(process.execPath, ["--experimental-strip-types", LANE_B_CLI, "check", "--base", prBase, "--head", head, "--body-file", bodyFile], {
-          cwd: fixture.root,
-          encoding: "utf8",
-        });
-        return { status: result.status, output: `${result.stdout}${result.stderr}` };
-      },
-    });
-  } finally {
-    rmSync(scratch, { recursive: true, force: true });
-    fixture.cleanup();
-  }
-}
-
-type ReviewRequired = Extract<LaneBReviewUnit, { status: "REVIEW_REQUIRED" }>;
-
-function reviewRequired(unit: LaneBReviewUnit): ReviewRequired {
-  assert.equal(unit.status, "REVIEW_REQUIRED");
-  return unit as ReviewRequired;
-}
-
-/** Runs `prepare`'s review step for the working tree and returns its receipt block. */
-function prepareConcurReceipt(repo: LaneBRepo, reviewer: RecordingInvoker): { unit: ReviewRequired; receiptBlock: string } {
-  const unit = reviewRequired(repo.workingTreeUnit());
-  const prepared = prepareOwnerDeclaredLaneBReview(unit, reviewer, join(repo.scratch, "workbench"), repo.fixture.root);
-  assert.equal(prepared.status, "READY", prepared.status === "REVIEW_FAILED" ? `${prepared.failedCheck}: ${prepared.message}` : prepared.status);
-  if (prepared.status !== "READY") throw new Error("unreachable");
-  return { unit, receiptBlock: prepared.receiptBlock };
-}
-
-// ---------------------------------------------------------------------------
-// Lane B
-
-test("Lane B: a direct advisory-signal change gets one independent CONCUR review whose exact receipt passes the pull-request check", () => {
-  withLaneBRepo((repo) => {
-    repo.writeEvidence(ADVISORY_EVD);
-    const reviewer = new RecordingInvoker((request) => concur(reviewerInputOf(request)));
-    const { unit, receiptBlock } = prepareConcurReceipt(repo, reviewer);
-
-    // Git-derived detection: exactly the changed canonical record, with its normal bounded evidence context.
-    assert.equal(unit.baseGitSha, repo.base);
-    assert.deepEqual(unit.changedRecords.map(({ id, path, action }) => [id, path, action]), [[EVD_ID, EVD_REPO_PATH, "CREATE"]]);
-    assert.deepEqual(unit.reviewerInput.evidenceContext.map((record) => record.id), ["SRC-BASE"]);
-    const { signalId } = quantitySignal(unit.reviewerInput);
-    assert.ok(unit.reviewerInput.signals.every(({ signal }) => signal.severity === ADVISORY));
-    assert.deepEqual(contextFreeBlockers(unit.reviewerInput.signals), []);
-
-    // One fresh reviewer, fed only the bounded package; every signal dispositioned.
-    assert.deepEqual(reviewer.calls.map((call) => call.role), ["INDEPENDENT_REVIEWER"]);
-    assert.ok(reviewer.calls[0].input.includes(serializeReviewerInput(unit.reviewerInput)));
-    const receipt = JSON.parse(/```json\n([\s\S]*?)\n```/.exec(receiptBlock)![1]);
-    // The full review is the hash-addressed artifact the receipt names; the receipt carries none of it.
-    const review = JSON.parse(readFileSync(join(repo.fixture.root, ".research-review", `${receipt.reviewSha256}.json`), "utf8"));
-    assert.deepEqual(review, concur(unit.reviewerInput));
-    assert.equal(sha256Hex(review), receipt.reviewSha256);
-    assert.deepEqual(review.signalDispositions.map((d: { signalId: string }) => d.signalId), unit.reviewerInput.signals.map((s) => s.signalId));
-    assert.ok(review.signalDispositions.some((d: { signalId: string }) => d.signalId === signalId));
-
-    // The receipt binds to the exact base, record content, reviewer input and review.
-    assert.equal(receipt.outcome, "CONCUR");
-    assert.equal(receipt.baseGitSha, repo.base);
-    assert.equal(receipt.reviewerInputFingerprint, unit.reviewerInputFingerprint);
-    const blob = execFileSync("git", ["-C", repo.fixture.root, "hash-object", EVD_REPO_PATH], { encoding: "utf8" }).trim();
-    assert.deepEqual(receipt.changedRecordBlobs, [{ path: EVD_REPO_PATH, blob }]);
-
-    // The exact machine-generated block in the PR's review section passes the CI check.
-    const head = repo.commit("direct research change");
-    const checked = repo.check(head, receiptBlock);
-    assert.equal(checked.status, 0, checked.output);
-    assert.match(checked.output, /^PASS: independent review CONCUR .* eligible for human review \(not an approval\)/m);
-    assert.equal(reviewer.calls.length, 1);
-  });
-});
-
-test("Lane B: changing reviewed record content after the receipt makes the same receipt fail closed", () => {
-  withLaneBRepo((repo) => {
-    repo.writeEvidence(ADVISORY_EVD);
-    const reviewer = new RecordingInvoker((request) => concur(reviewerInputOf(request)));
-    const { unit, receiptBlock } = prepareConcurReceipt(repo, reviewer);
-    const reviewedHead = repo.commit("direct research change");
-    assert.equal(repo.check(reviewedHead, receiptBlock).status, 0);
-
-    repo.writeEvidence(evidenceYaml("A fonte regista a maioria das reclamações sobre a recolha de resíduos em 2026.", "A contagem de reclamações não mede a frequência dos atrasos."));
-    const changedHead = repo.commit("edit after review");
-    const checked = repo.check(changedHead, receiptBlock);
-    assert.equal(checked.status, 1);
-    assert.match(checked.output, /FAILED \[RECEIPT_CHANGE_MISMATCH\]/);
-
-    const changedUnit = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: repo.base, head: { kind: "commit", sha: changedHead } }));
-    assert.notEqual(changedUnit.reviewerInputFingerprint, unit.reviewerInputFingerprint);
-    assert.equal(reviewer.calls.length, 1, "the earlier review is never re-run or reused for the changed content");
-  });
-});
-
-test("Lane B: a direct EVD change embedding a PRB ID is blocked before review, gets no receipt, and no CONCUR receipt or N/A waives it", () => {
-  withLaneBRepo((repo) => {
-    repo.writeEvidence(BLOCKED_EVD);
-    const reviewer = new RecordingInvoker((request) => concur(reviewerInputOf(request)));
-    const workbench = join(repo.scratch, "workbench");
-    mkdirSync(workbench);
-
-    const prepared = prepareOwnerDeclaredLaneBReview(reviewRequired(repo.workingTreeUnit()), reviewer, workbench, repo.fixture.root, join(repo.scratch, "review-lifecycle"));
-    assert.equal(prepared.status, "REVIEW_FAILED");
-    if (prepared.status !== "REVIEW_FAILED") return;
-    assert.equal(prepared.failedCheck, CONTEXT_FREE_BLOCK);
-    assert.match(prepared.message, /CLEC-SIG-\d{4} PRB_ID_IN_EVD_TEXT EVD-E2E inference_limits\[0\]: "PRB-0001"/);
-    assert.equal(reviewer.calls.length, 0);
-    assert.deepEqual(readdirSync(workbench), [], "no reviewer input, review or receipt is written");
-
-    // An exact, structurally valid CONCUR receipt for the committed change cannot waive the blocker.
-    const head = repo.commit("direct research change");
-    const unit = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: repo.base, head: { kind: "commit", sha: head } }));
-    const waiver = concur(unit.reviewerInput);
-    assert.deepEqual(validateIndependentReview(waiver, unit.reviewerInput).errors, []);
-    const receiptBlock = renderReceiptBlock(buildLaneBReceipt(unit, waiver));
-    for (const section of [receiptBlock, "N/A"]) {
-      const checked = repo.check(head, section);
-      assert.equal(checked.status, 1);
-      assert.match(checked.output, /FAILED \[CLEC_CONTEXT_FREE_BLOCK\]/);
-    }
-    assert.equal(reviewer.calls.length, 0);
-  });
-});
-
-test("Lane B: a change touching no canonical PRB/EVD/SRC record needs no receipt and passes with N/A", () => {
-  withLaneBRepo((repo) => {
-    writeFileSync(join(repo.fixture.root, "docs", "notes.md"), "# Notas revistas\n");
-    mkdirSync(join(repo.fixture.root, "tools"));
-    writeFileSync(join(repo.fixture.root, "tools", "tool.ts"), "export {};\n");
-    assert.deepEqual(repo.workingTreeUnit(), { status: "NO_CANONICAL_CHANGE", baseGitSha: repo.base });
-
-    const checked = repo.check(repo.commit("tooling and docs change"), "N/A");
-    assert.equal(checked.status, 0, checked.output);
-    assert.match(checked.output, /^PASS: no canonical PRB\/EVD\/SRC record changed; no Lane B receipt is required/m);
-  });
-});
 
 // ---------------------------------------------------------------------------
 // Source Verification Support: bounded, base-bound review context for Source fidelity.
 
 const COUNT_FACT = "312 reclamações";
-const TREND_FACT = "duplicaram";
 const FIDELITY_SUMMARY = `A fonte regista ${COUNT_FACT} sobre a recolha de resíduos no primeiro semestre de 2026.`;
 const FIDELITY_EVD = evidenceYaml(FIDELITY_SUMMARY, "A contagem de reclamações não mede a frequência dos atrasos.");
-const BEYOND_SUPPORT_EVD = evidenceYaml(`${FIDELITY_SUMMARY.slice(0, -1)}, que ${TREND_FACT} face a 2025.`, "A contagem de reclamações não mede a frequência dos atrasos.");
 const VERIFIED_STATEMENTS = [
   `O relatório indica ${COUNT_FACT} sobre a recolha de resíduos entre janeiro e junho de 2026.`,
   "O relatório não distingue reclamações por freguesia.",
@@ -657,15 +464,6 @@ function sourceFidelityReviewer(statedFacts: readonly string[]): RecordingInvoke
   });
 }
 
-function assertInsufficient(prepared: LaneBPreparation, claims: string[]): void {
-  assert.equal(prepared.status, "NOT_CONCUR", prepared.status === "REVIEW_FAILED" ? `${prepared.failedCheck}: ${prepared.message}` : prepared.status);
-  if (prepared.status !== "NOT_CONCUR") return;
-  assert.equal(prepared.independentReview.outcome, "INSUFFICIENT_EVIDENCE");
-  assert.deepEqual(
-    prepared.independentReview.findings.map((finding) => [finding.kind, finding.claim, finding.evidenceReferences]),
-    claims.map((claim) => ["INSUFFICIENT_EVIDENCE", claim, ["SRC-BASE"]])
-  );
-}
 
 test("Lane A: base Source Verification Support reaches the reviewer and the Gate identically, presented as review context", async () => {
   await withLaneACycle(async (cycle) => {
@@ -694,161 +492,4 @@ test("Lane A: base Source Verification Support reaches the reviewer and the Gate
     writeSupport(fixture.research, VERIFIED_STATEMENTS);
     fixture.commit("source verification support");
   });
-});
-
-test("Lane B: a Source-fidelity claim is INSUFFICIENT_EVIDENCE without support and becomes reviewable once bounded support is merged first", () => {
-  withLaneBRepo((repo) => {
-    // Without support, the canonical SRC metadata cannot decide the Source-derived count.
-    repo.writeEvidence(FIDELITY_EVD);
-    const before = reviewRequired(repo.workingTreeUnit());
-    assert.equal(before.reviewerInput.sourceVerificationContext, undefined);
-    assertInsufficient(prepareOwnerDeclaredLaneBReview(before, sourceFidelityReviewer([COUNT_FACT]), join(repo.scratch, "without-support"), repo.fixture.root), [COUNT_FACT]);
-
-    // Support introduced in the same change is refused, whatever the review section says.
-    writeSupport(repo.fixture.research, VERIFIED_STATEMENTS);
-    assert.equal(repo.workingTreeUnit().status, "SOURCE_VERIFICATION_NOT_SEPARATE");
-    const mixed = repo.check(repo.commit("canonical change with its own support"), "N/A");
-    assert.equal(mixed.status, 1);
-    assert.match(mixed.output, /FAILED \[SOURCE_VERIFICATION_NOT_SEPARATE\]: .*Source Verification Support must be merged first in a separate pull request/);
-
-    // The support-only pull request needs no receipt; once merged it is the next change's base.
-    execFileSync("git", ["-C", repo.fixture.root, "reset", "-q", "--hard", repo.base]);
-    writeSupport(repo.fixture.research, VERIFIED_STATEMENTS);
-    const supportHead = repo.commit("source verification support");
-    const supportOnly = repo.check(supportHead, "N/A");
-    assert.equal(supportOnly.status, 0, supportOnly.output);
-    assert.match(supportOnly.output, /^PASS: no canonical PRB\/EVD\/SRC record changed/m);
-
-    mkdirSync(join(repo.fixture.research, "evidence"), { recursive: true }); // Git dropped the emptied directory
-    repo.writeEvidence(FIDELITY_EVD);
-    const reviewer = sourceFidelityReviewer([COUNT_FACT]);
-    const unit = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: supportHead, head: { kind: "working-tree" } }));
-    assert.deepEqual(unit.reviewerInput.sourceVerificationContext?.map((entry) => entry.source_id), ["SRC-BASE"]);
-    const prepared = prepareOwnerDeclaredLaneBReview(unit, reviewer, join(repo.scratch, "with-support"), repo.fixture.root);
-    assert.equal(prepared.status, "READY", prepared.status === "REVIEW_FAILED" ? `${prepared.failedCheck}: ${prepared.message}` : prepared.status);
-    if (prepared.status !== "READY") return;
-    assert.ok(reviewer.calls[0].input.includes(serializeReviewerInput(unit.reviewerInput)));
-    const checked = repo.check(repo.commit("direct research change"), prepared.receiptBlock, supportHead);
-    assert.equal(checked.status, 0, checked.output);
-    assert.match(checked.output, /^PASS: independent review CONCUR /m);
-  });
-});
-
-test("Lane B: Source-derived wording beyond the verified claims stays INSUFFICIENT_EVIDENCE even with support", () => {
-  withLaneBRepo((repo) => {
-    writeSupport(repo.fixture.research, VERIFIED_STATEMENTS);
-    const supportHead = repo.commit("source verification support");
-    repo.writeEvidence(BEYOND_SUPPORT_EVD);
-    const unit = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: supportHead, head: { kind: "working-tree" } }));
-    assert.deepEqual(unit.reviewerInput.sourceVerificationContext?.[0].verified_claims.map((claim) => claim.statement), VERIFIED_STATEMENTS);
-    const workbench = join(repo.scratch, "workbench");
-    assertInsufficient(prepareOwnerDeclaredLaneBReview(unit, sourceFidelityReviewer([COUNT_FACT, TREND_FACT]), workbench, repo.fixture.root), [TREND_FACT]);
-    assert.equal(existsSync(join(workbench, "pr-receipt.md")), false, "no receipt exists for a non-CONCUR review");
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Both lanes: Source Verification Support follows only the EVDs a change
-// creates or updates. A PRB reaching an unchanged EVD never receives support
-// for that EVD's Sources; the unchanged EVD is the PRB's evidential boundary.
-
-const PRB_ID = "PRB-E2E";
-const PRB_FILE = `${PRB_ID}.yaml`;
-const UNCHANGED_EVD_ID = "EVD-OLD";
-
-function problemYaml(evidenceIds: readonly string[]): string {
-  return stringifyRecordYaml({
-    problem_id: PRB_ID,
-    created_at: "2026-09-15",
-    updated_at: "2026-09-15",
-    title: "Reclamações sobre a recolha de resíduos",
-    domain: ["MOB"],
-    geography: { level: "municipality", area: "Évora" },
-    affected_populations: ["pessoas que apresentaram reclamações sobre a recolha"],
-    problem_statement: "A fonte regista reclamações sobre a recolha de resíduos.",
-    evidence: evidenceIds.map((evidence_id) => ({ evidence_id, effects: ["SUPPORTS"], research_roles: ["LOCAL_OBSERVATION"] })),
-    evidence_status: "discovered",
-    validation_status: "unvalidated",
-    digital_tractability: "not_assessed",
-    solution_landscape_status: "not_assessed",
-    status: "OPEN",
-  });
-}
-
-/** Base additions shared by both lanes: an unchanged EVD on its own eligible Source, and support for both Sources. */
-function seedUnchangedEvidenceBase(research: string): void {
-  writeFileSync(join(research, "sources", "SRC-OTHER.yaml"), sourceYaml("SRC-OTHER", "Other"));
-  writeFileSync(join(research, "evidence", `${UNCHANGED_EVD_ID}.yaml`), stringifyRecordYaml({
-    evidence_id: UNCHANGED_EVD_ID,
-    provenance: { sources: ["SRC-OTHER"], extracted_at: "2026-08-20" },
-    observation: { summary: "A fonte regista reclamações sobre a recolha de resíduos." },
-    scope: { geography: { level: "municipality", area: "Évora" }, temporal: { as_of: "2026" } },
-    domains: ["MOB"],
-    evidence_nature: "fact",
-    claim_authority: "authoritative",
-    inference_limits: ["A contagem de reclamações não mede a frequência dos atrasos."],
-  }));
-  writeSupport(research, VERIFIED_STATEMENTS);
-  writeSupport(research, ["A fonte indica reclamações sobre a recolha de resíduos em Évora."], "SRC-OTHER");
-}
-
-/** The review-unit content both lanes must agree on, independent of lane framing and base SHA. */
-function boundedReviewContent(input: ReviewerInputPackage) {
-  return { candidates: input.candidates, evidenceContext: input.evidenceContext, signals: input.signals, sourceVerificationContext: input.sourceVerificationContext };
-}
-
-/** Reviewer input of one Lane A cycle authoring `files`, captured from the reviewer's prompt. */
-async function laneAReviewerInput(files: { path: string; id: string; yaml: string }[]): Promise<ReviewerInputPackage> {
-  let input: ReviewerInputPackage | undefined;
-  await withLaneACycle(async (cycle) => {
-    const primary = new RecordingInvoker(() => ({
-      schemaVersion: "1",
-      manifest: { schemaVersion: "1", mode: TRIGGER.mode, investigationQuestion: TRIGGER.request, candidateFiles: files.map((f) => f.path), claimedRecordIds: files.map((f) => f.id), rationale: "Synthetic authoring rationale." },
-      candidateFiles: files.map((f) => ({ path: f.path, yaml: f.yaml })),
-    }));
-    const reviewer = new RecordingInvoker((request) => concur(reviewerInputOf(request)));
-    const outcome = await prepareCycle(cycle, primary, reviewer);
-    assert.ok(reviewer.calls.length > 0, outcome.status === "FAILED" ? `${outcome.failedCheck}: ${outcome.message}` : outcome.status);
-    input = reviewerInputOf(reviewer.calls[0]);
-  }, (fixture) => {
-    seedUnchangedEvidenceBase(fixture.research);
-    fixture.commit("unchanged evidence and support on main");
-  });
-  return input!;
-}
-
-/** Reviewer input Lane B derives from Git for the same change written as canonical files. */
-function laneBReviewerInput(files: { path: string; yaml: string }[]): ReviewerInputPackage {
-  let input: ReviewerInputPackage | undefined;
-  withLaneBRepo((repo) => {
-    seedUnchangedEvidenceBase(repo.fixture.research);
-    const base = repo.commit("unchanged evidence and support on main");
-    for (const file of files) writeFileSync(join(repo.fixture.research, file.path), file.yaml, "utf8");
-    input = reviewRequired(resolveLaneBReviewUnit({ repoRoot: repo.fixture.root, baseGitSha: base, head: { kind: "working-tree" } })).reviewerInput;
-  });
-  return input!;
-}
-
-test("both lanes give a PRB plus a changed EVD support only for the changed EVD's Sources", async () => {
-  const prb = problemYaml([UNCHANGED_EVD_ID, EVD_ID]);
-  const laneA = await laneAReviewerInput([{ path: EVD_FILE, id: EVD_ID, yaml: FIDELITY_EVD }, { path: PRB_FILE, id: PRB_ID, yaml: prb }]);
-  const laneB = laneBReviewerInput([{ path: `evidence/${EVD_FILE}`, yaml: FIDELITY_EVD }, { path: `problems/${PRB_FILE}`, yaml: prb }]);
-
-  for (const input of [laneA, laneB]) {
-    assert.deepEqual(input.evidenceContext.map((record) => record.id), [UNCHANGED_EVD_ID, "SRC-BASE", "SRC-OTHER"]);
-    assert.deepEqual(input.sourceVerificationContext?.map((entry) => entry.source_id), ["SRC-BASE"]);
-  }
-  assert.deepEqual(boundedReviewContent(laneA), boundedReviewContent(laneB));
-});
-
-test("both lanes give a PRB-only change no support for the Sources of the unchanged EVD it links", async () => {
-  const prb = problemYaml([UNCHANGED_EVD_ID]);
-  const laneA = await laneAReviewerInput([{ path: PRB_FILE, id: PRB_ID, yaml: prb }]);
-  const laneB = laneBReviewerInput([{ path: `problems/${PRB_FILE}`, yaml: prb }]);
-
-  for (const input of [laneA, laneB]) {
-    assert.deepEqual(input.evidenceContext.map((record) => record.id), [UNCHANGED_EVD_ID, "SRC-OTHER"]);
-    assert.equal(input.sourceVerificationContext, undefined);
-  }
-  assert.deepEqual(boundedReviewContent(laneA), boundedReviewContent(laneB));
 });

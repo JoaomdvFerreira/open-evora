@@ -11,13 +11,13 @@
  * Both profiles are built from one ReviewerInputSource per case, so they
  * frame the same semantic change. A run is an experiment, never a semantic
  * attempt: this module never reads or writes the owner-controlled review
- * lifecycle (review-lifecycle.ts), never writes a review artifact or receipt,
- * and never changes which profile Lane A, Lane B or the Gate use. Each run is
+ * lifecycle (review-lifecycle.ts), never writes a review artifact,
+ * and never changes which profile Lane A, direct canonical review or the Gate use. Each run is
  * one fresh reviewer process with the same structural retry rule as
  * independent-review-invocation.ts (one technical retry on the same frozen
  * prompt, never on a valid result).
  *
- * Usage (from any directory; reviewer runtime as for Lane B, RESEARCH_AI_*):
+ * Usage (from any directory; reviewer runtime as for direct canonical review, RESEARCH_AI_*):
  *   node tools/research/benchmark/review-profile-equivalence.ts prepare --repo <dir>
  *   node tools/research/benchmark/review-profile-equivalence.ts run --repo <dir> --case <id> --profile <REFERENCE|REDUCED> --run <n> --out <dir>
  *   node tools/research/benchmark/review-profile-equivalence.ts evaluate --results <dir> --out <file.json>
@@ -36,7 +36,7 @@ import { loadSourceVerifications } from "../core/source-verifications.ts";
 import type { RecordFields } from "../core/types.ts";
 import { loadCandidates } from "../integration/candidate-loader.ts";
 import { prepareCanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
-import { LANE_B_REVIEW_FRAMING, resolveLaneBReviewUnit } from "../lane-b/review-unit.ts";
+import { DIRECT_REVIEW_FRAMING, resolveReviewUnit } from "../review/review-unit.ts";
 import { contextFreeBlockers } from "../language/signals.ts";
 import { asValidatedIndependentReview, validateIndependentReview, validateReducedIndependentReview } from "../review/independent-review.ts";
 import { buildReducedReviewerInputPackage, ReducedReviewContextFreeBlockError, serializeReducedReviewerInput } from "../review/reduced-reviewer-input.ts";
@@ -91,7 +91,7 @@ export const PR191_RECONSTRUCTED_ATTEMPT_1_FINGERPRINT = "8e7ebdb9683c1b9c3cca44
 export const PR191_PRE_CORRECTION_BLOB = "623e322099d15080905727a758aa987901cd087b";
 
 /**
- * The PRB-0001 corrections made between the two PR #191 Lane B attempts, as
+ * The PRB-0001 corrections made between the two PR #191 direct canonical review attempts, as
  * [corrected, original] text, in reverse order of application. Undoing them
  * on the merged PRB-0001 restores the attempt-1 content. Never canonical.
  */
@@ -144,7 +144,7 @@ export function applyInverseReplacements(text: string, inverse: readonly (readon
 export const BENCHMARK_CASES: readonly BenchmarkCase[] = [
   {
     caseId: "PR191-PRE-CORRECTION",
-    origin: `PR #191 Lane B attempt-1 content: base ${PR191_BASE}, head ${PR191_HEAD} with PRB-0001 reconstructed (blob ${PR191_PRE_CORRECTION_BLOB})`,
+    origin: `PR #191 direct canonical review attempt-1 content: base ${PR191_BASE}, head ${PR191_HEAD} with PRB-0001 reconstructed (blob ${PR191_PRE_CORRECTION_BLOB})`,
     expectation: "DETECT",
     expectedDefects: [
       {
@@ -273,16 +273,16 @@ export function gitBlobId(content: string): string {
 }
 
 /**
- * The reviewer source of a historical case, built exactly as Lane B builds
+ * The reviewer source of a historical case, built exactly as direct canonical review builds
  * it (same framing and primitives) from the base corpus and the changed
  * head files, with optional head-content overrides. Without overrides the
- * REFERENCE package must reproduce Lane B's own fingerprint, or this throws.
+ * REFERENCE package must reproduce direct canonical review's own fingerprint, or this throws.
  */
 export function historicalCaseSource(repoRoot: string, caseId: string): ReviewerInputSource {
   const spec = HISTORICAL[caseId];
   if (!spec) throw new Error(`${caseId} is not a historical case`);
-  const unit = resolveLaneBReviewUnit({ repoRoot, baseGitSha: spec.base, head: { kind: "commit", sha: spec.head } });
-  if (unit.status !== "REVIEW_REQUIRED") throw new Error(`${caseId}: Lane B unit is ${unit.status}`);
+  const unit = resolveReviewUnit({ repoRoot, baseGitSha: spec.base, head: { kind: "commit", sha: spec.head } });
+  if (unit.status !== "REVIEW_REQUIRED") throw new Error(`${caseId}: direct canonical review unit is ${unit.status}`);
   const paths = unit.changedRecords.map((record) => record.path).sort();
   const overrides = spec.overrides?.(repoRoot) ?? new Map<string, string>();
 
@@ -307,7 +307,7 @@ export function historicalCaseSource(repoRoot: string, caseId: string): Reviewer
     const review = prepareCanonicalIntegrationReview(spec.base, index, loaded.candidates);
     const source: ReviewerInputSource = {
       baseGitSha: spec.base,
-      manifest: LANE_B_REVIEW_FRAMING,
+      manifest: DIRECT_REVIEW_FRAMING,
       index,
       candidates: review.candidates,
       deltas: review.deltas,
@@ -316,7 +316,7 @@ export function historicalCaseSource(repoRoot: string, caseId: string): Reviewer
       sourceVerifications: loadSourceVerifications(index),
     };
     if (overrides.size === 0 && sha256Hex(buildReviewerInputPackage(source)) !== unit.reviewerInputFingerprint) {
-      throw new Error(`${caseId}: benchmark REFERENCE input differs from Lane B's reviewer input ${unit.reviewerInputFingerprint}`);
+      throw new Error(`${caseId}: benchmark REFERENCE input differs from direct canonical review's reviewer input ${unit.reviewerInputFingerprint}`);
     }
     return source;
   } finally {

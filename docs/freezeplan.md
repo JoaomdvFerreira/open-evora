@@ -22,9 +22,12 @@ process.
 - Noncanonical drafts, deterministic checks, tooling, Explorer work and
   authorized support-only Source Verification Support (SVS) work may proceed.
 - Canonical PRB/EVD/SRC changes require explicit owner authorization.
-- Until CRR cutover, authorized canonical direct changes continue through the
-  currently enforced Lane B.
-- PRB-0002 is explicitly authorized to continue through current Lane B.
+- The owner-approved Phase 1 target for authorized canonical direct changes is
+  `research:validate` → `research:review -- --base <ref>` → `research:check`,
+  followed by explicit owner publication authorization before any push or PR.
+- PRB-0002's historical authorization does not resume FZ-02 in this action.
+- This plan does not start or resume FZ-02; its status remains as recorded in
+  the FZ-02 section.
 - FZ-02 does not depend on CRR.
 - The owner remains the final merge authority.
 
@@ -54,7 +57,7 @@ migration (see §3 and §4), not removal on the assumption that it was unused.
 - Repair confirmed evidence-boundary/layer-integrity defects without weakening
   uncertainty or broadening claims.
 - Status: content-approved draft; canonical integration remains pending
-  through the current Lane B.
+  through the active direct review workflow defined in `docs/investigationstrategy.md` §12.
 
 ### FZ-04 — PT-PT canonical repair
 
@@ -112,7 +115,15 @@ safety-admission path (see §4).
 - Define a bounded way for readers to follow Problem updates without
   introducing a second research-state source of truth.
 
-## 3. CRR migration relationship
+## 3. Historical CRR migration plan
+
+The sequencing and lifecycle requirements below record the plan that preceded
+the owner's Phase 1 simplification decision. They are historical context, not
+current operator instructions. The current workflow and safeguards are owned
+by `docs/investigationstrategy.md` §12. Phase 1 removes the old direct-review
+commands, receipt transport and summary workflow. Lifecycle and Gate
+machinery remains in use by orchestrated cycles and is a Phase 2 retirement
+dependency; this historical plan does not instruct current direct-review use.
 
 CRR is review-tooling work carried out during the FREEZE. It does not block
 FZ-02 or PRB-0002.
@@ -224,7 +235,11 @@ Rules:
   material defects than the reference package.
 - Also record false blockers on expected-CONCUR/control material.
 
-## 4. Safety-admission migration decisions
+## 4. Historical safety-admission migration decisions
+
+These owner decisions record the Lane A retirement plan. Current publication
+safety is defined in `AGENTS.md` and implemented for direct review and the
+retained Gate publisher by the shared path-safety component.
 
 Owner-approved decisions for retiring the Lane A safety-admission path:
 
@@ -243,14 +258,14 @@ Owner-approved decisions for retiring the Lane A safety-admission path:
 3. **Private Sources**
    - Remove the blanket `PRIVATE_SOURCE` semantic-review blocker.
    - Replace it with publication-safety enforcement.
-   - **Before CRR cutover**, present the owner with the exact rule and a
-     regression proving both:
+   - The migration required an explicit rule and regression proving both:
      a. a canonical record may reference a private Source where otherwise
         permitted;
      b. attempting to publish raw/private Source content is blocked.
-   - The current publication guard is path-oriented and is **not** claimed to
-     already prove (b); this may require an extension or an additional
-     deterministic publication-safety check.
+   - Phase 1's path guard rejects known private-material and workbench paths,
+     rejects unrecognized artifacts under `research/`, and validates SVS
+     through `research:check`. It does not detect private prose inside an
+     otherwise permitted canonical field.
 
 4. **Source availability**
    - Move live Source availability/freshness monitoring to FZ-08.
