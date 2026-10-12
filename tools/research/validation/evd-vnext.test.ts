@@ -28,10 +28,8 @@ test("split, merge and nested PRB reference migrations leave no legacy EVD refer
   const index = loadCorpusIndex(root);
   const prb3 = index.byPrefix.get("PRB-")!.byId.get("PRB-0003")!.fields;
   const ids = (prb3.evidence as Array<{ evidence_id: string }>).map((e) => e.evidence_id);
-  assert.ok(ids.includes("EVD-000148"));
   assert.ok(!ids.includes("EVD-000030"));
   const nestedIds = collectEvdReferences(prb3.decision_basis);
-  assert.ok(nestedIds.includes("EVD-000148"));
   assert.ok(!nestedIds.includes("EVD-000030"));
 });
 

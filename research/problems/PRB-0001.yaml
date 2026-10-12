@@ -1,8 +1,7 @@
 problem_id: PRB-0001
 created_at: 2026-08-28
 updated_at: "2026-10-12"
-title: Oferta de transporte urbano reduzida à noite, aos fins de semana e nos
-  feriados, e atrasos recorrentes nas horas de ponta em dois corredores de Évora
+title: "Autocarros urbanos: oferta reduzida à noite, fins de semana e feriados e atrasos nas horas de ponta em Évora"
 domain:
   - MOB
 geography:
@@ -34,9 +33,8 @@ investigation:
         descritas no percurso da investigação; a oferta à noite só é descrita
         como reduzida.
       current_action: >-
-        Consultar os horários oficiais em vigor da rede TREVO, ainda não
-        consultados, antes de pedir a uma instituição informação que já seja
-        pública.
+        Está pendente a consulta dos horários oficiais em vigor da rede TREVO,
+        ainda não consultados, para delimitar a informação institucional necessária.
       resolution_condition: >-
         Horários oficiais em vigor, com data de consulta, que permitam contar as
         partidas de cada carreira por tipo de dia e à noite.
@@ -77,10 +75,10 @@ investigation:
         referida uma petição com mais de 250 assinaturas. Os registos ligados
         não indicam se houve resposta.
       current_action: >-
-        Procurar uma resposta publicada pelo Município de Évora, pela
-        Universidade de Évora, pelo operador da rede TREVO ou na imprensa. Só se
-        a resposta não estiver disponível publicamente, incluir a questão no
-        pedido documental ao Município.
+        Está pendente a verificação de uma eventual resposta publicada pelo
+        Município de Évora, pela Universidade de Évora, pelo operador TREVO ou
+        na imprensa. Se não houver resposta pública, a questão integra o pedido
+        documental ao Município partilhado com PRB-0002, preparado mas não enviado.
       resolution_condition: >-
         Informação pública ou institucional que indique se houve resposta à
         petição e qual foi.
@@ -138,7 +136,7 @@ investigation:
         que associa a trânsito lento, nas principais vias de acesso ao Centro
         Histórico e, em particular, na circular de acesso ao Parque Industrial,
         entre as 08h00 e as 09h30 e entre as 17h00 e as 19h00. No conjunto do
-        serviço, 84,4% das chegadas tiveram menos de 5 minutos de atraso; este
+        serviço, o índice de pontualidade foi de 84,4% (atraso inferior a 5 minutos); este
         indicador não identifica as carreiras, partidas ou paragens afetadas.
       evidence:
         - EVD-000002
@@ -161,7 +159,9 @@ investigation:
         reclamações individuais de 2025 são relatos que não estabelecem a
         frequência das situações descritas. Este problema trata da oferta e da
         pontualidade do serviço; a informação aos passageiros nas paragens é
-        investigada separadamente no PRB-0002.
+        investigada separadamente no PRB-0002. O tráfego lento atribuído pelo
+        Município aos atrasos dos autocarros não altera este foco; PRB-0005
+        trata do tráfego motorizado e da segurança rodoviária.
       evidence:
         - EVD-000002
         - EVD-000011
@@ -328,8 +328,8 @@ decision_basis:
       horas de ponta (08h00–09h30 e 17h00–19h00), que associa a trânsito lento,
       nas principais artérias de acesso ao Centro Histórico e, em particular, na
       circular de acesso ao Parque Industrial. Os indicadores de regularidade
-      (99,5%) e de pontualidade (84,4% das chegadas com menos de 5 minutos de
-      atraso) são agregados e não identificam carreiras, partidas ou paragens.
+      (99,5%) e o índice de pontualidade de 84,4% (atraso inferior a 5 minutos)
+      são agregados e não identificam carreiras, partidas ou paragens.
 
 
       O PDS 2024-2027 (EVD-000001) refere as linhas e os horários como
@@ -435,13 +435,16 @@ decision_basis:
       elementos de acessibilidade nas paragens descritas pelo PMUSE. Os atrasos
       documentados neste registo não são evidência do problema de informação de
       PRB-0002, e as lacunas de informação nas paragens não explicam a oferta
-      nem a pontualidade aqui documentadas.
+      nem a pontualidade aqui documentadas. PRB-0005 trata do tráfego motorizado
+      e da segurança rodoviária; a atribuição municipal de atrasos dos autocarros
+      ao tráfego lento não altera o foco deste problema na oferta e pontualidade.
 
 
       EVD-000011 está também ligado a PRB-0002, por uma questão distinta de
       informação aos passageiros. EVD-000080 está ligado apenas a PRB-0001.
     related_problems:
       - PRB-0002
+      - PRB-0005
   corroboration_statement: Os relatórios municipais referentes a 2022, 2023 e
     2025 documentam redução da oferta da rede urbana à noite, aos fins de
     semana e nos feriados. Dados oficiais de 2025 mostram diferenças de oferta

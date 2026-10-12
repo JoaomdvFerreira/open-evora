@@ -10,22 +10,16 @@ affected_populations:
   - estudantes que procuram alojamento em Évora, incluindo estudantes da Universidade de Évora
 problem_statement: >-
   Documentos de planeamento de 2024–2025 identificam escassez de alojamento
-  estudantil em Évora. A Universidade de Évora e os seus Serviços de Ação Social
-  (SASUÉ) indicam uma capacidade nominal de 525 lugares em sete residências,
-  encerramentos temporários para
-  obras em 2025/2026 e encaminhamento para alojamento privado ou alternativo
-  quando os lugares são limitados. A Universidade comunicou em 2022 financiamento
-  aprovado pelo Plano de Recuperação e Resiliência (PRR) para mais 105 camas,
-  sem que isso estabeleça a sua entrega ou entrada em funcionamento. Em maio de
-  2026, publicou informação sobre a reabilitação da
-  Residência Universitária Manuel Álvares; a publicação não confirma a conclusão
-  das obras, a reabertura ou a capacidade disponível. A imprensa refere quartos
-  por cerca de 500 €/mês, T2 por cerca de 1 000 €/mês e aproximadamente 70% dos
-  estudantes da Universidade deslocados e dependentes de alojamento arrendado;
-  estes valores não foram verificados em dados primários e a sua representatividade
-  é desconhecida. A evidência ligada não quantifica os estudantes atualmente sem
-  lugar em residência. Os SASUÉ dizem dispor de dados agregados sobre candidaturas,
-  vagas, não colocados e listas de espera, mas não forneceram os valores.
+  estudantil em Évora. A Universidade de Évora e os Serviços de Ação Social
+  (SASUÉ) indicam 525 lugares nominais em sete residências, mas houve
+  encerramentos temporários para obras em 2025/2026 e encaminhamento para
+  alojamento privado ou alternativo quando os lugares são limitados. Em 2022,
+  a Universidade comunicou financiamento aprovado para mais 105 camas, sem
+  comprovar entrega ou funcionamento. A publicação de maio de 2026 sobre a
+  reabilitação da Residência Manuel Álvares não confirma a conclusão das obras,
+  a reabertura ou a capacidade disponível. Os SASUÉ dizem dispor de dados
+  agregados sobre candidaturas e colocações, mas não forneceram os valores;
+  a procura atual não satisfeita permanece por quantificar.
 investigation:
   open_questions:
     - question: >-
@@ -75,7 +69,10 @@ investigation:
       summary: >-
         O planeamento de 2024–2025 identificou escassez de alojamento estudantil
         e capacidade insuficiente das residências face à procura de estudantes.
-      evidence: [EVD-000031, EVD-000033]
+        O plano de 2025 incluiu a avaliação das necessidades de alojamento
+        estudantil e trabalho de candidatura a financiamento; não demonstra
+        que a avaliação ou as medidas tenham sido concluídas.
+      evidence: [EVD-000031, EVD-000032, EVD-000033]
     development:
       summary: >-
         A Universidade e os SASUÉ documentaram capacidade nominal, encerramentos
@@ -87,8 +84,12 @@ investigation:
     delimitation:
       summary: >-
         A procura não satisfeita e a capacidade atualmente disponível continuam
-        por quantificar na evidência ligada. Os preços e a proporção de estudantes
-        deslocados referidos pela imprensa não são medições verificadas.
+        por quantificar na evidência ligada. A imprensa secundária refere
+        quartos por cerca de 500 €/mês, T2 por cerca de 1 000 €/mês e
+        aproximadamente 70% de estudantes da Universidade deslocados e
+        dependentes de alojamento arrendado. Estes valores não foram verificados
+        em dados primários; a sua representatividade e o período a que se
+        aplicam não estão estabelecidos.
         A habitação municipal a preços comportáveis e as respetivas intervenções
         são tratadas separadamente em PRB-0013.
       evidence: [EVD-000043, EVD-000099, EVD-000126]
@@ -124,7 +125,7 @@ solution_landscape_status: not_assessed
 status: OPEN
 history:
   - date: 2026-08-31
-    summary: O desafio institucional documentou a descrição dos SASUÉ de um processo de candidatura em linha estruturado, que consideram plenamente operacional, e restringiu a hipótese de falha no processo institucional; a usabilidade, clareza, acessibilidade e experiência de espera dos estudantes mantêm-se por estabelecer.
+    summary: A resposta institucional dos SASUÉ descreveu um processo de candidatura em linha estruturado, que consideram plenamente operacional, e restringiu a hipótese de falha no processo institucional; a usabilidade, clareza, acessibilidade e experiência de espera dos estudantes mantêm-se por estabelecer.
     state_changes:
       validation_status:
         from: unvalidated

@@ -42,11 +42,11 @@ investigation:
         plano local de acessibilidade para acompanhar a implementação e incluir
         outras centralidades. Estes registos não indicam se houve intervenções
         sobre as barreiras documentadas, nem o seu estado atual por localização.
-      current_action: Preparar pedido documental ao Município de Évora, ainda não
-        enviado, sobre a revisão do plano local de acessibilidade, o levantamento
-        atualizado de obstáculos, a existência de intervenções e, caso tenham
-        ocorrido, a sua relação com os obstáculos identificados e o estado por
-        localização.
+      current_action: >-
+        O pedido documental único ao Município de Évora está
+        preparado, mas não enviado. Esta questão integra a componente 1:
+        revisão do plano local de acessibilidade, levantamento atualizado de
+        obstáculos, intervenções e estado por localização.
       resolution_condition: Documentação municipal que estabeleça se houve
         intervenções, quais obstáculos e locais abrangeram caso tenham ocorrido,
         e o estado atual de cada local relevante, distinguindo correção
@@ -67,10 +67,10 @@ investigation:
         degradadas. O Plano de Desenvolvimento Social 2024-2027 preconiza a
         melhoria da ligação à Praça do Giraldo; não confirma execução ou
         correção dos constrangimentos.
-      current_action: Preparar pedido documental ao Município de Évora, ainda não
-        enviado, sobre o estado da medida Terminal Rodoviário–Praça do Giraldo,
-        as intervenções no Terminal e na ligação pedonal e os resultados por
-        percurso.
+      current_action: >-
+        O mesmo pedido municipal, preparado mas não enviado,
+        inclui a componente 2: estado da medida Terminal Rodoviário–Praça do
+        Giraldo, intervenções no Terminal e na ligação pedonal e resultados por percurso.
       resolution_condition: Registos de execução e avaliação que relacionem os
         constrangimentos identificados com intervenções e estabeleçam quais
         foram corrigidos e quais permanecem no Terminal e na ligação indicada.
@@ -90,11 +90,12 @@ investigation:
         entre outros fatores, à inclinação e à localização. Em agosto de 2026,
         relatou que algumas barreiras das edições 1.0 e 1.1 foram posteriormente
         alvo de intervenção; não confirmou que tivessem sido corrigidas.
-      current_action: Preparar pedido documental à APCE, ainda não enviado, para
-        relacionar os diagnósticos das edições 1.0 e 1.1 com as intervenções de
-        que tem conhecimento e esclarecer que resultados conhece por local;
-        solicitar ao Município de Évora confirmação documental das intervenções
-        no espaço público da sua competência, também ainda não solicitada.
+      current_action: >-
+        O pedido único à APCE está preparado, mas não enviado.
+        Esta questão integra a componente 1: relação entre diagnósticos das
+        edições 1.0 e 1.1, intervenções conhecidas e resultados por local.
+        O pedido municipal inclui a componente 3: confirmação documental das
+        intervenções no espaço público da competência do Município.
       resolution_condition: Correspondência por localização entre barreiras
         identificadas e intervenções, acompanhada de informação que distinga
         intervenção reportada, correção confirmada e barreira ainda presente.
@@ -114,9 +115,10 @@ investigation:
         conjunto de condições existentes, condições em falta e possíveis
         soluções para os equipamentos avaliados. A conclusão do levantamento
         não confirma a execução dessas soluções.
-      current_action: Preparar pedido documental ao Município de Évora, ainda não
-        enviado, do levantamento de dezembro de 2025 e de informação sobre
-        medidas executadas e estado atual por equipamento.
+      current_action: >-
+        O pedido municipal, preparado mas não enviado, inclui a
+        componente 4: levantamento de dezembro de 2025, medidas executadas e
+        estado atual por equipamento.
       resolution_condition: Levantamento detalhado e documentação posterior que
         permitam identificar, para cada equipamento avaliado, as condições em
         falta, as intervenções e o que está corrigido ou continua pendente.
@@ -133,10 +135,11 @@ investigation:
       latest_result: Há indicação de impacto e um método participativo assente
         em dificuldades vividas; falta relacionar situações ainda presentes com
         dificuldades atuais específicas das pessoas afetadas.
-      current_action: Após a clarificação documental dos locais com barreiras
-        ainda presentes, preparar esclarecimento delimitado junto da APCE sobre
-        dificuldades atuais conhecidas nesses percursos; pedido ainda não
-        enviado.
+      current_action: >-
+        A clarificação documental dos locais com barreiras ainda
+        presentes está pendente. O pedido único à APCE, preparado mas não enviado,
+        inclui a componente 2, condicionada a essa clarificação: dificuldades
+        atuais conhecidas nos percursos identificados.
       resolution_condition: Informação delimitada por local ou percurso que
         relacione barreiras atualmente confirmadas com dificuldades atuais
         concretas das pessoas afetadas, sem presumir que diagnósticos antigos
@@ -158,23 +161,17 @@ investigation:
         - EVD-000004
         - EVD-000006
     development:
-      summary: A investigação de Open Évora incorporou o trabalho participativo
-        Acesso Universal da APCE. Em 2025, a APCE descreveu a participação de
-        pessoas com deficiência na identificação e melhoria de barreiras no
-        Centro Histórico. Em outubro, comunicou que continuava a verificar a
-        acessibilidade de equipamentos culturais municipais; em dezembro, a
-        APCE e a Câmara Municipal comunicaram um levantamento conjunto das
-        condições existentes, das condições em falta e de possíveis melhorias
-        nos equipamentos avaliados, sem enumerar os equipamentos e défices no
-        texto público. Em agosto de 2026, a APCE descreveu avaliações no local
-        com pessoas com mobilidade reduzida e problemas nos acessos associados,
-        entre outros fatores, à inclinação e à localização. Os documentos de
-        planeamento municipal também recomendaram rever o plano local de
-        acessibilidade de 2022, atualizar o levantamento de obstáculos e
-        melhorar o acesso entre o Terminal Rodoviário e a Praça do Giraldo. Em
-        maio de 2026, a Évora_27 comunicou que desenvolvia com a Acesso Cultura
-        um plano de acessibilidade cultural; o registo não estabelece a sua
-        conclusão nem resolve diretamente a acessibilidade do espaço público.
+      summary: A investigação do Open Évora incorporou o trabalho participativo
+        Acesso Universal da APCE no Centro Histórico. Em outubro de 2025, a
+        APCE verificava equipamentos culturais municipais; em dezembro, a APCE
+        e a Câmara comunicaram um levantamento conjunto, sem discriminar no
+        texto público os défices por equipamento. Em agosto de 2026, a APCE
+        descreveu avaliações no local e problemas nos acessos, sem inventário
+        atualizado por localização. O planeamento municipal recomendou rever
+        o plano local de acessibilidade, atualizar o levantamento de obstáculos
+        e melhorar a ligação Terminal–Praça do Giraldo. Em maio de 2026, a
+        Évora_27 comunicou o desenvolvimento de um plano de acessibilidade
+        cultural com a Acesso Cultura; a sua conclusão não está estabelecida.
       evidence:
         - EVD-000009
         - EVD-000085
@@ -194,7 +191,10 @@ investigation:
         participação adicional na 1.3. Isso não mede a prevalência de barreiras
         nem a eficácia do programa. As plataformas de turismo acessível
         descrevem outras barreiras em Évora, mas não indicam quando foram
-        verificadas; não permitem afirmar que persistem hoje.
+        verificadas; não permitem afirmar que persistem hoje. Este problema
+        trata de barreiras e condições pedonais; PRB-0005 trata de velocidades
+        dos veículos, tráfego motorizado e segurança rodoviária, uma fronteira
+        temática sem sobreposição forte estabelecida.
       evidence:
         - EVD-000131
         - EVD-000114
@@ -214,17 +214,6 @@ evidence:
     effects:
       - BOUNDS
       - REFINES
-    research_roles:
-      - LOCAL_OBSERVATION
-      - PLANNED_RESPONSE
-  - evidence_id: EVD-000081
-    effects:
-      - BOUNDS
-    research_roles:
-      - LOCAL_OBSERVATION
-  - evidence_id: EVD-000148
-    effects:
-      - BOUNDS
     research_roles:
       - LOCAL_OBSERVATION
       - PLANNED_RESPONSE
@@ -315,16 +304,13 @@ decision_basis:
     permanece HOLD. A manifestação ao nível da cidade assenta no diagnóstico
     institucional de planeamento do PUE (EVD-000004, EVD-000006) e no trabalho
     de avaliação in loco da APCE, que identificou fatores de barreira nos
-    acessos (EVD-000113). Os registos de sítio da EB1 da Azaruja (EVD-000081,
-    EVD-000148) são mantidos apenas como evidência de limite e não são usados
-    como linha de corroboração dessa manifestação.
+    acessos (EVD-000113).
 
     Persistem, contudo, duas limitações distintas. Em primeiro lugar, a
     evidência mais recente não permite estabelecer quais as barreiras
     específicas que continuam hoje por corrigir em cada localização:
-    EVD-000148 documenta uma resposta corretiva prevista, de âmbito de sítio,
-    sem estabelecer a sua conclusão; EVD-000113 e EVD-000131 registam,
-    respetivamente, fatores de barreira identificados em avaliação in loco e o
+    EVD-000113 e EVD-000131 registam, respetivamente, fatores de barreira
+    identificados em avaliação in loco e o
     relato de intervenção posterior sobre algumas barreiras anteriormente
     identificadas, sem mapeamento diagnóstico-intervenção ou discriminação
     completa por localização. Esta é uma limitação de atualidade e
@@ -370,11 +356,6 @@ decision_basis:
     algumas barreiras anteriormente identificadas foram posteriormente alvo de
     intervenção, sem mapeamento diagnóstico-intervenção nem inventário de
     situações resolvidas ou pendentes por localização.
-
-    EVD-000081 (SRC-0068) documenta barreiras pré-intervenção num sítio
-    específico, a EB1 da Azaruja. O seu âmbito de sítio impede que seja usado
-    como corroboração da afirmação ao nível da cidade; é mantido apenas como
-    evidência de limite, a par de EVD-000148.
 
     Em conjunto, as linhas ao nível da cidade sustentam a afirmação delimitada
     de que existem barreiras pedonais e de acessibilidade documentadas em
@@ -481,12 +462,10 @@ decision_basis:
     - EVD-000112
     - EVD-000113
   boundary_evidence:
-    - EVD-000081
     - EVD-000086
     - EVD-000088
     - EVD-000114
     - EVD-000131
-    - EVD-000148
   independence_assessment: >-
     A independência da evidência é MÉDIA e não é reforçada pelo número de
     registos EVD, de fontes ou de linhagens.
@@ -509,12 +488,6 @@ decision_basis:
     de dezembro de 2025 foi comunicado conjuntamente pela APCE e pela Câmara
     (EVD-000104).
 
-    O registo do projeto PRR da EB1 da Azaruja (EVD-000081, EVD-000148;
-    SRC-0068) provém de uma fonte e de um processo públicos materialmente
-    distintos, mas é de âmbito de sítio e, por isso, não corrobora a
-    manifestação ao nível da cidade nem é contado nesta avaliação de
-    independência.
-
     Em síntese, a avaliação assenta em duas vozes institucionais distintas,
     ligadas por uma relação de parceria, e não na existência confirmada de
     várias instituições observadoras independentes. Por essa razão, a
@@ -526,8 +499,7 @@ decision_basis:
       Histórico e o conjunto de equipamentos culturais municipais avaliado no
       âmbito do Acesso Universal, e acessos avaliados in loco pela APCE sem
       inventário por localização. Não está corroborado como uma condição
-      uniforme em toda a cidade. Os registos de sítio da EB1 da Azaruja são
-      mantidos apenas como evidência de limite e não integram este âmbito.
+      uniforme em toda a cidade.
     population: Pessoas com mobilidade reduzida e outros grupos de peões
       vulneráveis. A evidência da APCE diz respeito especificamente a pessoas
       com deficiência ou mobilidade reduzida envolvidas nos seus processos
@@ -554,12 +526,6 @@ decision_basis:
     que todas as barreiras identificadas historicamente permanecem hoje
     inalteradas em cada localização, nem a conclusão de que uma intervenção
     reportada ou prevista equivale a correção concluída ou eficaz.
-
-    Limite geográfico: EVD-000081 e EVD-000148 são registos de sítio da EB1 da
-    Azaruja — barreiras pré-intervenção e uma intervenção corretiva prevista
-    para 2025-2026 — e não são usados para corroborar a manifestação ao nível
-    da cidade nem para estabelecer o estado atual na cidade. EVD-000148 não
-    estabelece a conclusão da obra nem o estado após a intervenção.
 
     EVD-000088 é mantida apenas como evidência de limite relativa a
     plataformas de turismo acessível cuja atualidade não está estabelecida.

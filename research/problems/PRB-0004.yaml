@@ -36,8 +36,8 @@ investigation:
       current_action: >-
         Está pendente a consulta de informação pública atual sobre a rede, a
         execução ou revisão da proposta e a ligação Saúde–Xarrama–Santa Luzia.
-        Se permanecerem lacunas, está definido um pedido ao Município de Évora
-        para obter cartografia atual e esclarecimentos sobre esses pontos.
+        Se permanecerem lacunas, está definido, mas não enviado, um pedido ao
+        Município de Évora de cartografia atual e esclarecimentos sobre esses pontos.
       resolution_condition: >-
         Informação atual que permita identificar os troços exclusivamente
         cicláveis e os percursos partilhados relevantes, a sua continuidade e
@@ -92,38 +92,28 @@ investigation:
   path:
     initial_signal:
       summary: >-
-        Os diagnósticos institucionais descrevem a rede ciclável de Évora como
-        limitada em extensão, espacialmente descontínua e sem ligação a vários
-        equipamentos, serviços e zonas residenciais relevantes. A cartografia
-        apresentada no PMUSE distingue cerca de 8,5 km de infraestrutura
-        exclusivamente ciclável e cerca de 120 km de percursos partilhados por
-        peões e ciclistas. A figura indica como fonte «Câmara Municipal de
-        Évora, 2020», mas essa indicação não data a produção nem a última
+        Os diagnósticos institucionais descrevem uma rede ciclável limitada e
+        descontínua. A cartografia do PMUSE distingue infraestrutura exclusiva
+        de percursos partilhados por peões e ciclistas; a indicação de fonte
+        «Câmara Municipal de Évora, 2020» não data a produção nem a última
         atualização da cartografia.
       evidence:
         - EVD-000005
         - EVD-000118
     development:
       summary: >-
-        Para 2020, o diagnóstico do PUE regista a bicicleta em cerca de 0,5 %
-        das deslocações dos residentes de Évora; este valor contextualiza o uso
-        da bicicleta nesse ano. O PMUSE representa uma expansão baseada numa
-        proposta municipal de 2017: cerca de 18 km de novos eixos
-        exclusivamente cicláveis, mais 33 km da «Grande Rota do Montado»,
-        partilhada por peões e ciclistas. A zona nascente da cidade, incluindo
-        a ligação à Escola 2,3 André de Resende, ficou fora dessa proposta e
-        exigiria estudo adicional. A proposta não equivale a infraestrutura
-        executada. Em março de 2025, a Câmara Municipal de Évora referia
-        trabalho já realizado na primeira fase da ligação pedonal e ciclável
-        entre o Bairro de N.ª Sr.ª da Saúde e a ponte do Xarrama, com o valor
-        comunicado de 90 000 euros. A segunda fase, em direção ao Bairro de
-        Santa Luzia, estava em preparação e dependia de um projeto de drenagem
-        de águas pluviais. Não está estabelecido se esta ligação integra os
-        eixos da proposta de 2017. No diagnóstico do PUE, ciclistas referiram
-        falta de infraestrutura dedicada, velocidade dos veículos, estado do
-        pavimento e comportamento dos condutores; a data desses relatos é
-        desconhecida e não há estimativa da sua frequência, representatividade
-        ou gravidade.
+        Para 2020, o PUE regista a bicicleta em cerca de 0,5 % das deslocações
+        dos residentes. O PMUSE representa uma proposta municipal de 2017 de
+        cerca de 18 km de novos eixos exclusivos e 33 km da «Grande Rota do
+        Montado» partilhada. A ligação da zona nascente à Escola 2,3 André de
+        Resende ficou fora da proposta e exigiria estudo adicional; a proposta
+        não equivale a execução. Em março de 2025, a Câmara referia trabalho
+        na primeira fase da ligação Saúde–Xarrama, pelo valor comunicado de
+        90 000 euros; a fase rumo a Santa Luzia estava em preparação e dependia
+        de drenagem. A relação com a proposta de 2017 não está estabelecida.
+        Os relatos de ciclistas no PUE sobre infraestrutura, velocidade,
+        pavimento e condutores não têm data nem frequência, representatividade
+        ou gravidade conhecida.
       evidence:
         - EVD-000140
         - EVD-000119
@@ -138,14 +128,11 @@ investigation:
         que foram apresentadas, mas não o seu conteúdo detalhado, correção
         factual, representatividade ou aprovação. Também não confirma um
         defeito físico atual nem uma deslocação afetada.
-        Os oito registos ligados não estabelecem a configuração da rede em 2026,
+        A evidência disponível não estabelece a configuração da rede em 2026,
         quanto da expansão proposta foi executado, revisto ou abandonado, nem
         os efeitos em deslocações concretas. O regulamento municipal prevê um
         processo formal para pedir cartografia digital, sem confirmar que exista
-        cartografia atual específica da rede ciclável. Está por verificar em
-        fontes públicas o estado posterior da rede, da expansão proposta e dos
-        trabalhos documentados. Se persistirem lacunas, poderá ser pedido
-        esclarecimento delimitado ao Município de Évora.
+        cartografia atual específica da rede ciclável.
       evidence:
         - EVD-000012
         - EVD-000118
