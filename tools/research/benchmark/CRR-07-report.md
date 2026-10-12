@@ -27,4 +27,4 @@ The synthetic REFERENCE output repeatedly flagged changed-EVD source fidelity. R
 
 Decision: `NO CUTOVER`. REDUCED remains non-operational. This benchmark does not authorize operationalization, lifecycle changes, or changes to canonical research records or SVS.
 
-The benchmark implementation previously passed `npm run research:check` (843 tests passed, 1 skipped; 279 records validated). On this report-only update, `git diff --check` passed. A fresh `npm run research:check` could not complete in the current environment: all 56 test files failed to spawn with `EPERM`; typecheck completed before the test stage. The report adds no benchmark executions.
+The first sandbox attempt at `npm run research:check` failed with `spawn EPERM`. The authorized rerun outside the sandbox completed successfully: 843 passed, 1 skipped, 0 failed; 279 records validated. `git diff --check` passed. No benchmark reviewer calls were made for this report-only correction.
