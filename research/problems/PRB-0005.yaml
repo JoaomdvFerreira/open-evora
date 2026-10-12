@@ -1,7 +1,7 @@
 problem_id: PRB-0005
 created_at: 2026-08-28
 updated_at: "2026-10-12"
-title: Tráfego motorizado em Évora, efeito da Variante Nascente e segurança rodoviária
+title: Tráfego lento documentado e segurança rodoviária em Évora; efeito da Variante Nascente por apurar
 domain:
   - MOB
   - URB
@@ -21,8 +21,9 @@ problem_statement: O diagnóstico de mobilidade do PUE regista congestionamento
   Para 2025, o Município atribuiu atrasos recorrentes dos autocarros urbanos a
   tráfego lento nas principais vias, sobretudo nos acessos ao Centro Histórico
   e na circular que serve o Parque Industrial em períodos de ponta, sem isolar
-  o peso do tráfego face a outros fatores operacionais. A Variante Nascente de
-  Évora (IP2) está aberta à circulação. O Município estimou uma redução de
+  o peso do tráfego face a outros fatores operacionais. A Infraestruturas de
+  Portugal identifica a Variante Nascente de Évora (IP2) como aberta à
+  circulação. O Município estimou uma redução de
   cerca de 30-40% no tráfego da envolvente urbana, sobretudo de veículos
   pesados; não se trata de uma medição antes e depois da abertura, e o efeito
   real continua por apurar.
@@ -31,7 +32,8 @@ investigation:
     - question: Que efeito mensurável teve a Variante Nascente no volume e na
         composição do tráfego na envolvente urbana de Évora e em que dados ou
         método assenta a estimativa municipal de redução de 30-40%?
-      why_open: A via está aberta, mas a redução estimada pelo Município não é
+      why_open: A Infraestruturas de Portugal identifica a via como aberta, mas
+        a redução estimada pelo Município não é
         uma medição antes e depois da abertura; o efeito real continua por
         apurar.
       latest_result: A pesquisa delimitada até 16 de setembro de 2026 não
@@ -102,7 +104,8 @@ investigation:
         autocarros urbanos a tráfego lento nas principais vias, sobretudo nos
         acessos ao Centro Histórico e na circular que serve o Parque
         Industrial em períodos de ponta, sem isolar o contributo do tráfego
-        face a outros fatores operacionais. A Variante Nascente está aberta; a
+        face a outros fatores operacionais. A Infraestruturas de Portugal
+        identifica a Variante Nascente como aberta à circulação; a
         redução de cerca de 30-40% estimada pelo Município para o tráfego da
         envolvente urbana, sobretudo de pesados, não está demonstrada por
         contagens comparáveis antes e depois da abertura na evidência revista.
@@ -151,7 +154,7 @@ solution_landscape_status: not_assessed
 status: OPEN
 history:
   - date: 2026-08-31
-    summary: O desafio direto não resolveu se a disponibilidade de informação de
+    summary: A verificação direta não resolveu se a disponibilidade de informação de
       estacionamento é uma causa material; o enquadramento físico e operacional
       de tráfego e estacionamento mantém-se distinto da hipótese informacional,
       que reabre apenas com evidência local direta de contribuição causal

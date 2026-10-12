@@ -45,7 +45,7 @@ const noop = () => {};
 const EMPTY_LOOKUP = new Map<string, RecordSummary>();
 
 /**
- * Loads the real PRB-0005 projection (problem + all 11 linked EVD + their
+ * Loads the real PRB-0005 projection (problem + all linked EVD + their
  * SRC provenance) through the same data-access path production uses
  * (useRecordIndex + useProblemProjection over a DataProvider) — the only
  * difference from production is the DataProvider implementation itself

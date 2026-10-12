@@ -13,20 +13,12 @@ problem_statement: >-
   Documentos de planeamento de 2024–2025 identificam no Município de Évora
   preços elevados de compra e arrendamento, oferta insuficiente de habitação
   a preços comportáveis, social e a custos controlados, e degradação
-  habitacional. O plano de 2025 prevê reabilitação, arrendamento apoiado,
-  habitação a custos controlados e alojamento temporário para pessoas
-  vulneráveis, sem demonstrar a sua execução. O Município documentou em 2026
-  financiamento de 67,1 milhões de euros para 459 habitações, projetos de
-  40 casas para arrendamento acessível no Bairro do Moinho e 122 novas casas
-  no Bairro do Escurinho, um centro de acolhimento transitório para pelo
-  menos 24 pessoas e a intenção de beneficiar cerca de 500 famílias.
-  Documentou também a entrega de 12 casas para arrendamento apoiado na
-  Malagueira em janeiro de 2026, sem estabelecer se entram na contagem das 459.
-  A evidência ligada não quantifica a necessidade habitacional ainda não
-  satisfeita em 2026, os preços atuais representativos, quantas das 459 casas
-  estão concluídas ou ocupadas, nem a conclusão das intervenções no Moinho,
-  no Escurinho ou do centro de acolhimento. As intervenções documentadas não
-  demonstram, por si só, que as necessidades identificadas foram resolvidas.
+  habitacional. O plano de 2025 prevê respostas, sem demonstrar a sua execução.
+  Em 2026, o Município documentou financiamento e projetos habitacionais e a
+  entrega de 12 casas para arrendamento apoiado na Malagueira. Não está
+  estabelecido se estas 12 integram o programa de 459 habitações anunciado,
+  qual o estado das restantes intervenções ou quanta necessidade permanece
+  por satisfazer. Os projetos e o financiamento não equivalem a casas entregues.
 investigation:
   open_questions:
     - question: >-
@@ -35,9 +27,10 @@ investigation:
         e qual é o estado dos projetos no Bairro do Moinho, no Bairro do
         Escurinho e do centro de acolhimento transitório?
       why_open: >-
-        O financiamento, as metas e os projetos não indicam quantas casas
-        estão concluídas ou ocupadas. A relação entre as 12 entregas na
-        Malagueira e as 459 habitações anunciadas não está esclarecida.
+        São conhecidas 12 casas entregues na Malagueira, mas não está
+        estabelecido quantas das restantes intervenções documentadas foram
+        concluídas, entregues ou ocupadas, nem se as 12 integram as 459
+        habitações anunciadas.
       latest_result: >-
         O Município documentou financiamento e projetos, bem como 12 casas
         entregues na Malagueira em janeiro de 2026, sem estabelecer o estado
@@ -80,15 +73,19 @@ investigation:
     initial_signal:
       summary: >-
         O planeamento de 2024–2025 identificou preços elevados, oferta
-        insuficiente de habitação acessível, social e a custos controlados,
+        insuficiente de habitação a preços comportáveis, social e a custos controlados,
         e degradação habitacional.
       evidence: [EVD-000031]
     development:
       summary: >-
-        O plano de 2025 descreveu respostas previstas. Em 2026, o Município
-        documentou financiamento, projetos e 12 casas entregues na Malagueira;
-        a execução e o efeito das restantes medidas continuam por estabelecer
-        na evidência ligada.
+        O plano de 2025 descreveu reabilitação, arrendamento apoiado, habitação
+        a custos controlados e alojamento temporário previstos. Em 2026, o
+        Município documentou 67,1 milhões de euros de financiamento para 459
+        habitações, projetos de 40 casas no Bairro do Moinho e 122 no Bairro
+        do Escurinho, um centro transitório para pelo menos 24 pessoas e a
+        intenção de beneficiar cerca de 500 famílias. Também comunicou 12
+        casas entregues na Malagueira em janeiro; a relação destas com as 459
+        não está estabelecida, nem a execução das restantes medidas.
       evidence: [EVD-000032, EVD-000042]
     delimitation:
       summary: >-

@@ -13,19 +13,15 @@ affected_populations:
   - pessoas que utilizam as paragens de autocarro descritas pelo PMUSE em Évora
   - pessoas que dependem de informação acessível nessas paragens
 problem_statement: >-
-  O diagnóstico do Plano de Mobilidade Urbana Sustentável de Évora (PMUSE)
-  descreve, no Centro Histórico, paragens sem abrigo identificadas apenas pelo
-  operador e pela linha, sem mapa da rede nem horários, e paragens com abrigo
-  cujos painéis têm informação básica, mas sem braille nem avisos sonoros.
-  Esta descrição não se aplica automaticamente a todas as paragens de Évora.
-  Informação mais recente documenta canais de informação do
-  serviço urbano TREVO, como o sítio do operador em agosto de 2026 e os pontos
-  de informação descritos no relatório municipal sobre 2025; a existência
-  destes canais não demonstra que a informação seja completa, consistente,
-  acessível ou utilizável. Não está estabelecido se as condições descritas pelo
-  PMUSE persistem nem se as melhorias propostas foram executadas. Também não
-  está estabelecido se alguma lacuna de informação que persista causa falhas
-  em deslocações concretas.
+  O Plano de Mobilidade Urbana Sustentável de Évora (PMUSE) descreve paragens
+  sem abrigo no Centro Histórico identificadas apenas pelo operador e pela
+  linha, sem mapa nem horários, e paragens com abrigo cujos painéis têm
+  informação básica, mas sem braille nem avisos sonoros. Esta descrição não
+  abrange automaticamente todas as paragens de Évora. Existem canais mais
+  recentes de informação do serviço urbano TREVO, mas não está estabelecido
+  se são completos, consistentes, acessíveis ou utilizáveis, se as condições
+  descritas pelo PMUSE persistem, se as melhorias propostas foram executadas
+  ou se alguma lacuna persistente causa falhas em deslocações concretas.
 investigation:
   open_questions:
     - question: >-
@@ -34,21 +30,20 @@ investigation:
         elementos de acessibilidade — e foram executadas as medidas de
         informação propostas pelo plano?
       latest_result: >-
-        O diagnóstico do PMUSE descreveu condições nas paragens sem estabelecer
-        a sua persistência. Estão documentados canais de informação do serviço
-        urbano TREVO no sítio do operador, em agosto de 2026, e no relatório
-        municipal de junho de 2026 sobre 2025. O PMUSE propôs melhorias, mas a
-        condição atual das paragens e a execução dessas medidas continuam por
-        estabelecer.
+        Estão documentados canais de informação do serviço urbano TREVO no
+        sítio do operador, em agosto de 2026, e no relatório municipal de
+        junho de 2026 sobre 2025. Nenhum destes registos estabelece o estado
+        atual das paragens descritas pelo PMUSE ou a execução das melhorias propostas.
       why_open: >-
         A evidência disponível não identifica a condição atual das paragens
         descritas nem o estado de execução das medidas propostas.
       current_action: >-
-        Está preparado um pedido de esclarecimento documental ao Município de
-        Évora sobre intervenções e estado atual das paragens, informação ao
+        Está preparado, mas não enviado, um pedido documental ao Município de
+        Évora, partilhado com PRB-0001, sobre intervenções e estado atual das
+        paragens, informação ao
         passageiro instalada, informação em tempo real, acessibilidade,
         execução das medidas relevantes do PMUSE e responsabilidades e
-        acompanhamento associados. O pedido ainda não foi enviado.
+        acompanhamento associados.
       resolution_condition: >-
         Documentação pública atual ou resposta documentada da autoridade
         competente ou do operador que identifique as condições presentes nas
@@ -75,11 +70,10 @@ investigation:
         A investigação dos efeitos nas deslocações fica a aguardar a resposta à
         primeira questão.
       resolution_condition: >-
-        Identificada uma lacuna material atual, informação documentada da
-        autoridade competente ou do operador, reclamações ou comunicações
-        delimitadas ou, se necessário, uma viagem concreta, documentada de
-        forma verificável, que permitam estabelecer se essa lacuna causa uma
-        falha prática na viagem.
+        Informação documentada da autoridade competente ou do operador,
+        reclamações ou comunicações delimitadas ou, se necessário, uma viagem
+        concreta documentada de forma verificável, que permitam estabelecer
+        se uma lacuna material atual causa uma falha prática na viagem.
       evidence:
         - EVD-000123
         - EVD-000168
@@ -120,6 +114,8 @@ investigation:
         documentadas historicamente da situação atual das paragens, ainda por
         esclarecer, e não generaliza essas condições a todas as paragens de
         Évora. A evidência TPAC serve apenas de contexto intermunicipal.
+        PRB-0001 trata da oferta e pontualidade do serviço urbano, não da
+        informação nas paragens; o pedido documental ao Município é partilhado.
       evidence:
         - EVD-000016
         - EVD-000122
