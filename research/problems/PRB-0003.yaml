@@ -1,8 +1,8 @@
 problem_id: PRB-0003
 created_at: "2026-08-28"
 updated_at: "2026-10-12"
-title: Barreiras pedonais e de acessibilidade em partes de Évora, com
-  persistência atual ainda por validar
+title: Barreiras pedonais e de acessibilidade documentadas em diferentes locais
+  da cidade de Évora, sem estado atual estabelecido em cada local
 domain:
   - ACC
   - MOB
@@ -12,103 +12,193 @@ geography:
   area: Évora
 affected_populations:
   - pessoas com mobilidade reduzida
-  - outros grupos de peões vulneráveis
-problem_statement: Em Évora, estão documentadas barreiras pedonais e de
-  acessibilidade em partes específicas da cidade, mas a evidência disponível não
-  permite estabelecer quais permanecem hoje por corrigir em cada localização nem
-  caracteriza suficientemente a consequência atualmente vivida pela população
-  afetada.
-causal_reading: "Esta é uma interpretação não validada: as barreiras apontam
-  sobretudo para infraestrutura física; a informação/coordenação digital é lida
-  como secundária e contingente, dependente de evidência futura que a
-  estabeleça."
+  - pessoas com deficiência
+  - pessoas idosas
+  - crianças
+  - pessoas que utilizam carrinhos de bebé
+problem_statement: O diagnóstico do PUE documenta, na cidade de Évora,
+  descontinuidades e infraestruturas pedonais subdimensionadas fora do Centro
+  Histórico e dificuldades de acesso no Terminal
+  Rodoviário de Évora. A APCE identificou problemas nos acessos avaliados; a
+  APCE e a Câmara Municipal identificaram condições de acessibilidade em falta
+  em equipamentos culturais municipais avaliados.
+  Os registos ligados a este problema não estabelecem, local a local, o que foi
+  corrigido e o que permanece, nem caracterizam suficientemente as consequências
+  atuais para as pessoas afetadas.
 investigation:
   open_questions:
-    - question: Que barreiras pedonais e de acessibilidade concretas permanecem
-        hoje por resolver, e em que localizações da cidade de Évora, e que
-        consequência vivida atual produzem para as pessoas com mobilidade
-        reduzida e outros peões vulneráveis?
-      why_open: A APCE reporta que algumas barreiras identificadas em edições
-        anteriores do Acesso Universal foram posteriormente alvo de
-        intervenção, mas os registos citados não mapeiam cada diagnóstico à
-        intervenção correspondente nem distinguem, por localização, barreiras
-        resolvidas e pendentes. Os registos citados também não caracterizam a
-        consequência vivida atual pelas pessoas com mobilidade reduzida e
-        outros peões vulneráveis. O registo
-        da intervenção corretiva prevista para a EB1 da Azaruja é de âmbito de
-        sítio e não informa esta questão ao nível da cidade; as plataformas de
-        turismo acessível consultadas têm atualidade desconhecida.
-      latest_result: A APCE descreveu a avaliação in loco com participação direta
-        de pessoas com mobilidade reduzida, referiu que essas avaliações
-        identificaram problemas nos acessos associados, entre outros fatores, à
-        inclinação e à localização, e reportou que algumas barreiras
-        identificadas anteriormente foram posteriormente alvo de intervenção.
-        Isto não estabelece se essas intervenções corrigiram as barreiras, que
-        localizações estão resolvidas ou pendentes, nem a consequência vivida
-        atual.
-      current_action: Não é seguro nem proporcional prosseguir observação no local sem
-        uma base suficiente de acesso público e salvaguarda.
-      resolution_condition: Evidência autoritativa ou proporcional — por exemplo, um
-        inventário atual por localização ou uma observação do estado atual
-        proporcional e executável em segurança — que estabeleça, no âmbito da
-        cidade de Évora, que barreiras concretas permanecem por resolver em cada
-        localização, e evidência suficientemente delimitada sobre a consequência
-        vivida atual dessas barreiras para as pessoas com mobilidade reduzida e
-        outros peões vulneráveis.
+    - question: Que intervenções, se as houve, incidiram sobre as descontinuidades
+        e infraestruturas pedonais subdimensionadas documentadas pelo PUE fora do
+        Centro Histórico, que barreiras e locais abrangeram e qual é o estado
+        atual de cada local?
+      why_open: O diagnóstico não data essas observações nem estabelece o estado
+        atual ou se houve intervenções posteriores. O levantamento atualizado de
+        obstáculos e a revisão do plano local de acessibilidade de 2022 foram
+        recomendados, mas os registos ligados a este problema não indicam os
+        seus resultados.
+      latest_result: O PUE documenta descontinuidades e subdimensionamento fora
+        do Centro Histórico. O Plano de Desenvolvimento Social 2024-2027 propõe
+        um levantamento atualizado; o plano de mobilidade recomenda rever o
+        plano local de acessibilidade para acompanhar a implementação e incluir
+        outras centralidades. Estes registos não indicam se houve intervenções
+        sobre as barreiras documentadas, nem o seu estado atual por localização.
+      current_action: Preparar pedido documental ao Município de Évora, ainda não
+        enviado, sobre a revisão do plano local de acessibilidade, o levantamento
+        atualizado de obstáculos, a existência de intervenções e, caso tenham
+        ocorrido, a sua relação com os obstáculos identificados e o estado por
+        localização.
+      resolution_condition: Documentação municipal que estabeleça se houve
+        intervenções, quais obstáculos e locais abrangeram caso tenham ocorrido,
+        e o estado atual de cada local relevante, distinguindo correção
+        confirmada de situação ainda pendente.
+      evidence:
+        - EVD-000004
+        - EVD-000009
+        - EVD-000112
+    - question: Foram executadas medidas para melhorar o acesso ao Terminal
+        Rodoviário e a ligação à Praça do Giraldo, e que constrangimentos
+        identificados persistem nesses percursos?
+      why_open: O PUE documenta dificuldades de acesso ao Terminal Rodoviário e
+        ligações pedonais deficientes ou degradadas. A melhoria do acesso entre
+        o Terminal e a Praça do Giraldo é uma medida proposta, sem resultado ou
+        estado atual estabelecido nos registos ligados a este problema.
+      latest_result: O diagnóstico do PUE refere constrangimentos para pessoas
+        com mobilidade reduzida no Terminal e ligações pedonais deficientes ou
+        degradadas. O Plano de Desenvolvimento Social 2024-2027 preconiza a
+        melhoria da ligação à Praça do Giraldo; não confirma execução ou
+        correção dos constrangimentos.
+      current_action: Preparar pedido documental ao Município de Évora, ainda não
+        enviado, sobre o estado da medida Terminal Rodoviário–Praça do Giraldo,
+        as intervenções no Terminal e na ligação pedonal e os resultados por
+        percurso.
+      resolution_condition: Registos de execução e avaliação que relacionem os
+        constrangimentos identificados com intervenções e estabeleçam quais
+        foram corrigidos e quais permanecem no Terminal e na ligação indicada.
+      evidence:
+        - EVD-000006
+        - EVD-000009
+        - EVD-000112
+    - question: Quais barreiras identificadas nas edições 1.0 e 1.1 do Acesso
+        Universal foram objeto de intervenção e qual é o seu estado em cada
+        localização?
+      why_open: A APCE relatou intervenções posteriores sobre algumas barreiras,
+        sem relacionar cada diagnóstico com a intervenção correspondente, indicar
+        as datas necessárias ou distinguir correções confirmadas de situações
+        pendentes por localização.
+      latest_result: A APCE descreveu avaliações no local com participação de
+        pessoas com mobilidade reduzida e problemas nos acessos associados,
+        entre outros fatores, à inclinação e à localização. Em agosto de 2026,
+        relatou que algumas barreiras das edições 1.0 e 1.1 foram posteriormente
+        alvo de intervenção; não confirmou que tivessem sido corrigidas.
+      current_action: Preparar pedido documental à APCE, ainda não enviado, para
+        relacionar os diagnósticos das edições 1.0 e 1.1 com as intervenções de
+        que tem conhecimento e esclarecer que resultados conhece por local;
+        solicitar ao Município de Évora confirmação documental das intervenções
+        no espaço público da sua competência, também ainda não solicitada.
+      resolution_condition: Correspondência por localização entre barreiras
+        identificadas e intervenções, acompanhada de informação que distinga
+        intervenção reportada, correção confirmada e barreira ainda presente.
       evidence:
         - EVD-000112
         - EVD-000113
         - EVD-000131
+    - question: Que condições de acessibilidade em falta foram identificadas
+        nos equipamentos culturais municipais avaliados e qual é o seu estado
+        em cada equipamento?
+      why_open: O levantamento conjunto comunicado em dezembro de 2025 não
+        enumera no texto público os equipamentos e défices específicos; também
+        não estabelece que medidas foram aplicadas ou quais condições em falta
+        permanecem.
+      latest_result: A APCE comunicou em outubro de 2025 a verificação em curso.
+        A APCE e a Câmara Municipal comunicaram em dezembro um levantamento
+        conjunto de condições existentes, condições em falta e possíveis
+        soluções para os equipamentos avaliados. A conclusão do levantamento
+        não confirma a execução dessas soluções.
+      current_action: Preparar pedido documental ao Município de Évora, ainda não
+        enviado, do levantamento de dezembro de 2025 e de informação sobre
+        medidas executadas e estado atual por equipamento.
+      resolution_condition: Levantamento detalhado e documentação posterior que
+        permitam identificar, para cada equipamento avaliado, as condições em
+        falta, as intervenções e o que está corrigido ou continua pendente.
+      evidence:
+        - EVD-000086
+        - EVD-000104
+    - question: Que dificuldades concretas enfrentam atualmente as pessoas nos
+        locais ou percursos da cidade de Évora onde se confirmar a presença de
+        barreiras?
+      why_open: O PUE refere impacto no quotidiano de grupos vulneráveis e a
+        APCE parte das dificuldades relatadas por pessoas com mobilidade
+        reduzida, mas os registos ligados a este problema não caracterizam
+        suficientemente uma consequência atual por local ou percurso.
+      latest_result: Há indicação de impacto e um método participativo assente
+        em dificuldades vividas; falta relacionar situações ainda presentes com
+        dificuldades atuais específicas das pessoas afetadas.
+      current_action: Após a clarificação documental dos locais com barreiras
+        ainda presentes, preparar esclarecimento delimitado junto da APCE sobre
+        dificuldades atuais conhecidas nesses percursos; pedido ainda não
+        enviado.
+      resolution_condition: Informação delimitada por local ou percurso que
+        relacione barreiras atualmente confirmadas com dificuldades atuais
+        concretas das pessoas afetadas, sem presumir que diagnósticos antigos
+        descrevem a experiência presente.
+      evidence:
+        - EVD-000004
+        - EVD-000112
   path:
     initial_signal:
-      summary: O relatório setorial de mobilidade do PUE documentou, na rede pedonal
-        fora do Centro Histórico, descontinuidades e infraestruturas pedonais
-        subdimensionadas; à escala da cidade, documentou barreiras
-        arquitetónicas e urbanísticas como um problema com impacto em grupos
-        vulneráveis e registou constrangimentos de acessibilidade no terminal
-        rodoviário de Évora.
+      summary: O relatório setorial de mobilidade do Plano de Urbanização de Évora
+        (PUE), publicado em 2025, apresenta um diagnóstico cuja data não está
+        estabelecida nos registos ligados a este problema. Descreve
+        descontinuidades e infraestruturas pedonais subdimensionadas fora do
+        Centro Histórico; identifica barreiras arquitetónicas e urbanísticas
+        com impacto no quotidiano de grupos vulneráveis à escala da cidade; e
+        refere constrangimentos para pessoas com mobilidade reduzida e ligações
+        pedonais deficientes ou degradadas no Terminal Rodoviário de Évora.
       evidence:
         - EVD-000004
         - EVD-000006
     development:
-      summary: O programa participativo Acesso Universal da APCE desenvolveu a
-        investigação ao nível da cidade. A APCE descreve o Acesso Universal 1.3
-        como continuação de edições anteriores, destinada a promover a
-        participação ativa de pessoas com deficiência na melhoria da
-        acessibilidade no Centro Histórico; a APCE e a Câmara Municipal de
-        Évora comunicaram, em dezembro de 2025, um levantamento conjunto de
-        condições de acessibilidade existentes e em falta e de possíveis
-        soluções para o conjunto de equipamentos culturais municipais avaliado.
-        Estes registos documentam trabalho participativo de identificação de
-        barreiras e de acessibilidade; não enumeram as barreiras por
-        localização nem estabelecem que tenham sido corrigidas ou que
-        permaneçam presentes.
+      summary: A investigação de Open Évora incorporou o trabalho participativo
+        Acesso Universal da APCE. Em 2025, a APCE descreveu a participação de
+        pessoas com deficiência na identificação e melhoria de barreiras no
+        Centro Histórico. Em outubro, comunicou que continuava a verificar a
+        acessibilidade de equipamentos culturais municipais; em dezembro, a
+        APCE e a Câmara Municipal comunicaram um levantamento conjunto das
+        condições existentes, das condições em falta e de possíveis melhorias
+        nos equipamentos avaliados, sem enumerar os equipamentos e défices no
+        texto público. Em agosto de 2026, a APCE descreveu avaliações no local
+        com pessoas com mobilidade reduzida e problemas nos acessos associados,
+        entre outros fatores, à inclinação e à localização. Os documentos de
+        planeamento municipal também recomendaram rever o plano local de
+        acessibilidade de 2022, atualizar o levantamento de obstáculos e
+        melhorar o acesso entre o Terminal Rodoviário e a Praça do Giraldo. Em
+        maio de 2026, a Évora_27 comunicou que desenvolvia com a Acesso Cultura
+        um plano de acessibilidade cultural; o registo não estabelece a sua
+        conclusão nem resolve diretamente a acessibilidade do espaço público.
       evidence:
+        - EVD-000009
         - EVD-000085
+        - EVD-000086
+        - EVD-000087
         - EVD-000104
-    delimitation:
-      summary: A resposta institucional direta da APCE (agosto de 2026) descreveu a
-        metodologia (avaliação in loco com participação direta de pessoas com
-        mobilidade reduzida, em parceria com a Câmara Municipal), referiu
-        problemas nos acessos associados a fatores como a inclinação e a
-        localização e reportou que algumas barreiras identificadas nas edições
-        1.0 e 1.1 do Acesso Universal foram posteriormente alvo de intervenção,
-        sem mapeamento diagnóstico-intervenção nem discriminação, por
-        localização, entre situações resolvidas e pendentes. Um programa
-        distinto de acessibilidade em comércios do Centro Histórico foi
-        identificado como uma segunda via de resposta existente. Os registos do
-        projeto PRR da EB1 da Azaruja documentam barreiras pré-intervenção
-        nesse sítio e uma intervenção corretiva prevista para 2025-2026; são de
-        âmbito de sítio, não estabelecem a conclusão da intervenção nem o estado
-        posterior e não são usados para estabelecer a manifestação ao nível da
-        cidade nem o estado atual na cidade.
-      evidence:
         - EVD-000112
         - EVD-000113
-        - EVD-000114
+    delimitation:
+      summary: Em agosto de 2026, a APCE relatou que algumas barreiras das
+        edições 1.0 e 1.1 do Acesso Universal foram posteriormente alvo de
+        intervenção, sem relacionar diagnósticos e intervenções por local nem
+        confirmar as correções. A APCE também descreveu um programa continuado
+        de acessibilidade em estabelecimentos comerciais do Centro Histórico,
+        iniciado com a Associação Comercial e depois continuado com o NERE;
+        cerca de 30 estabelecimentos foram avaliados na versão 1.2, com
+        participação adicional na 1.3. Isso não mede a prevalência de barreiras
+        nem a eficácia do programa. As plataformas de turismo acessível
+        descrevem outras barreiras em Évora, mas não indicam quando foram
+        verificadas; não permitem afirmar que persistem hoje.
+      evidence:
         - EVD-000131
-        - EVD-000081
-        - EVD-000148
+        - EVD-000114
+        - EVD-000088
 evidence:
   - evidence_id: EVD-000004
     effects:
@@ -209,6 +299,13 @@ history:
       validation_status:
         from: unvalidated
         to: partially_validated
+  - date: 2026-10-12
+    summary: O problema foi reformulado para tornar mais claros os tipos e locais
+      das barreiras documentadas, separar dúvidas que podem ser esclarecidas por
+      frente de investigação e distinguir diagnóstico, intervenção reportada,
+      correção confirmada e estado atual desconhecido. Foram incorporadas
+      respostas documentadas e a ação passou a ser esclarecimento documental
+      delimitado, ainda não solicitado.
 decision_basis:
   contract_version: "0.1"
   eligibility_basis: >-
