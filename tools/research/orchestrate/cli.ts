@@ -125,7 +125,7 @@ export function tryReuseExistingChangeSet(outputPath: string, identity: ReuseIde
   return { status: "REUSABLE", changeSet };
 }
 
-/** The repository review-lifecycle store every operational review path uses (shared with Lane B). */
+/** The repository review-lifecycle store used by the orchestrated cycle. */
 export function repositoryReviewLifecycleDir(): string {
   assertWorkbenchBoundary(REPOSITORY_REVIEW_LIFECYCLE_DIR);
   return REPOSITORY_REVIEW_LIFECYCLE_DIR;

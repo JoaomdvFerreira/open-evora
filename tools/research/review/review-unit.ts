@@ -1,6 +1,6 @@
 /**
- * Derives the Lane B (direct pull-request) semantic-review unit from Git
- * alone (docs/investigationstrategy.md §12 "Mandatory independent semantic
+ * Derives the direct canonical review (direct pull-request) semantic-review unit from Git
+ * alone (docs/investigationstrategy.md Â§12 "Mandatory independent semantic
  * review"). The unit is every canonical record file created or updated
  * between an exact base commit and a prospective head, reviewed against the
  * canonical corpus reconstructed from that base.
@@ -15,9 +15,9 @@
  * a change touching both canonical records and support is refused outright
  * (the support must be merged first, in its own pull request).
  *
- * Every comparison step reuses the existing primitives — the corpus loader,
+ * Every comparison step reuses the existing primitives â€” the corpus loader,
  * candidate loader, canonical-integration review and F00-F reviewer input
- * package — so Lane B is judged by exactly the Lane A review contract.
+ * package â€” so direct canonical review uses the shared review contract.
  */
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -33,14 +33,14 @@ import type { CandidateDeltaAction } from "../integration/candidate-delta.ts";
 import { prepareCanonicalIntegrationReview } from "../integration/canonical-integration-review.ts";
 import { loadCandidates } from "../integration/candidate-loader.ts";
 import { sha256Hex } from "../core/fingerprint.ts";
-import { buildReviewerInputPackage, type ReviewerInputPackage } from "../review/reviewer-input.ts";
-import type { ReviewFraming } from "../review/types.ts";
+import { buildReviewerInputPackage, type ReviewerInputPackage } from "./reviewer-input.ts";
+import type { ReviewFraming } from "./types.ts";
 
 /** Which prospective state the changed records are read from. */
-export type LaneBHead = { kind: "commit"; sha: string } | { kind: "working-tree" };
+export type ReviewHead = { kind: "commit"; sha: string } | { kind: "working-tree" };
 
 /** One changed canonical record file, as Git and the base corpus classify it. */
-export interface LaneBChangedRecord {
+export interface ChangedCanonicalRecord {
   recordFamily: string;
   id: string;
   /** Repository-relative path. */
@@ -50,7 +50,7 @@ export interface LaneBChangedRecord {
   blob: string;
 }
 
-export type LaneBReviewUnit =
+export type CanonicalReviewUnit =
   | { status: "NO_CANONICAL_CHANGE"; baseGitSha: string }
   | { status: "UNSUPPORTED_DELETION"; baseGitSha: string; paths: string[] }
   /** Canonical records and Source Verification Support changed together; never reviewable. */
@@ -58,21 +58,21 @@ export type LaneBReviewUnit =
   | {
       status: "REVIEW_REQUIRED";
       baseGitSha: string;
-      changedRecords: LaneBChangedRecord[];
+      changedRecords: ChangedCanonicalRecord[];
       reviewerInput: ReviewerInputPackage;
       /** sha256 over the canonical JSON of `reviewerInput`, exactly as the reviewer receives it. */
       reviewerInputFingerprint: string;
     };
 
 /** Any Git, reconstruction or candidate failure; callers fail closed on it. */
-export class LaneBReviewUnitError extends Error {}
+export class ReviewUnitError extends Error {}
 
 /**
- * The fixed framing every Lane B package carries. It is author-independent
+ * The fixed framing every direct canonical review package carries. It is author-independent
  * by construction, so CI can rebuild the identical package from Git and no
  * free-form author justification reaches the reviewer.
  */
-export const LANE_B_REVIEW_FRAMING: ReviewFraming = {
+export const DIRECT_REVIEW_FRAMING: ReviewFraming = {
   mode: "direct-pull-request",
   investigationQuestion: "Direct pull-request change to canonical research records: review each changed record against its evidence.",
 };
@@ -87,7 +87,7 @@ function git(repoRoot: string, args: string[], input?: string): Buffer {
     return execFileSync("git", args, { cwd: repoRoot, input, maxBuffer: 256 * 1024 * 1024, stdio: ["pipe", "pipe", "pipe"] });
   } catch (error) {
     const stderr = (error as { stderr?: Buffer }).stderr?.toString("utf8").trim();
-    throw new LaneBReviewUnitError(`git ${args[0]} failed${stderr ? `: ${stderr}` : ""}`);
+    throw new ReviewUnitError(`git ${args[0]} failed${stderr ? `: ${stderr}` : ""}`);
   }
 }
 
@@ -98,10 +98,10 @@ function nulSeparated(output: Buffer): string[] {
 /** Verifies that `sha` is a full commit SHA present in the repository. */
 export function assertCommitExists(repoRoot: string, sha: string): void {
   if (typeof sha !== "string" || !FULL_GIT_SHA.test(sha)) {
-    throw new LaneBReviewUnitError(`expected a full lower-case 40-character commit SHA, got ${JSON.stringify(sha)}`);
+    throw new ReviewUnitError(`expected a full lower-case 40-character commit SHA, got ${JSON.stringify(sha)}`);
   }
   const resolved = git(repoRoot, ["rev-parse", "--verify", "--quiet", `${sha}^{commit}`]).toString("utf8").trim();
-  if (resolved !== sha) throw new LaneBReviewUnitError(`commit ${sha} does not exist in this repository`);
+  if (resolved !== sha) throw new ReviewUnitError(`commit ${sha} does not exist in this repository`);
 }
 
 /** Reads blob contents at `rev` for each path through one `git cat-file --batch` process. */
@@ -109,14 +109,14 @@ function readBlobs(repoRoot: string, rev: string, paths: readonly string[]): Map
   const out = new Map<string, { oid: string; content: Buffer }>();
   if (paths.length === 0) return out;
   for (const path of paths) {
-    if (/[\r\n]/.test(path)) throw new LaneBReviewUnitError(`refusing to read a path containing a line break: ${JSON.stringify(path)}`);
+    if (/[\r\n]/.test(path)) throw new ReviewUnitError(`refusing to read a path containing a line break: ${JSON.stringify(path)}`);
   }
   const output = git(repoRoot, ["cat-file", "--batch"], paths.map((path) => `${rev}:${path}\n`).join(""));
   let offset = 0;
   for (const path of paths) {
     const headerEnd = output.indexOf(0x0a, offset);
     const header = output.subarray(offset, headerEnd).toString("utf8").split(" ");
-    if (header.length !== 3 || header[1] !== "blob") throw new LaneBReviewUnitError(`${path} is not a file at ${rev}`);
+    if (header.length !== 3 || header[1] !== "blob") throw new ReviewUnitError(`${path} is not a file at ${rev}`);
     const size = Number(header[2]);
     out.set(path, { oid: header[0], content: output.subarray(headerEnd + 1, headerEnd + 1 + size) });
     offset = headerEnd + 1 + size + 1;
@@ -130,7 +130,7 @@ function parseSchemas(files: Iterable<{ path: string; text: string }>): RecordSc
     try {
       schemas.push(JSON.parse(text) as RecordSchema);
     } catch (error) {
-      throw new LaneBReviewUnitError(`could not parse ${path}: ${(error as Error).message}`);
+      throw new ReviewUnitError(`could not parse ${path}: ${(error as Error).message}`);
     }
   }
   return schemas;
@@ -150,13 +150,13 @@ function schemasInWorkingTree(repoRoot: string): RecordSchema[] {
   try {
     return loadSchemas(join(repoRoot, RESEARCH_ROOT));
   } catch (error) {
-    throw new LaneBReviewUnitError(`could not read working-tree schemas: ${(error as Error).message}`);
+    throw new ReviewUnitError(`could not read working-tree schemas: ${(error as Error).message}`);
   }
 }
 
 /**
  * A canonical record file is a top-level YAML file in a schema-declared
- * record directory — the same discovery rule the corpus loader uses.
+ * record directory â€” the same discovery rule the corpus loader uses.
  */
 function isCanonicalRecordPath(path: string, recordDirs: ReadonlySet<string>): boolean {
   const slash = path.lastIndexOf("/");
@@ -164,7 +164,7 @@ function isCanonicalRecordPath(path: string, recordDirs: ReadonlySet<string>): b
 }
 
 /** The deterministic refusal for a change that carries both canonical records and Source Verification Support. */
-export function describeSourceVerificationNotSeparate(unit: Extract<LaneBReviewUnit, { status: "SOURCE_VERIFICATION_NOT_SEPARATE" }>): string {
+export function describeSourceVerificationNotSeparate(unit: Extract<CanonicalReviewUnit, { status: "SOURCE_VERIFICATION_NOT_SEPARATE" }>): string {
   return (
     `this change modifies canonical records (${unit.recordPaths.join(", ")}) and Source Verification Support (${unit.supportPaths.join(", ")}) together. ` +
     "Source Verification Support must be merged first in a separate pull request; the canonical change is then reviewed against a base that already contains it."
@@ -183,7 +183,7 @@ function parseNameStatus(output: Buffer): PathChange[] {
   return changes;
 }
 
-function changedPaths(repoRoot: string, baseGitSha: string, head: LaneBHead): PathChange[] {
+function changedPaths(repoRoot: string, baseGitSha: string, head: ReviewHead): PathChange[] {
   // --no-renames: a rename is always observed as a deletion plus a creation.
   if (head.kind === "commit") {
     return parseNameStatus(git(repoRoot, ["diff", "--name-status", "--no-renames", "-z", baseGitSha, head.sha, "--", RESEARCH_ROOT]));
@@ -208,18 +208,18 @@ function workingTreeBlobs(repoRoot: string, paths: readonly string[]): Map<strin
   return new Map(paths.map((path, i) => [path, oids[i]]));
 }
 
-export interface ResolveLaneBReviewUnitInput {
+export interface ResolveReviewUnitInput {
   repoRoot: string;
   baseGitSha: string;
-  head: LaneBHead;
+  head: ReviewHead;
 }
 
 /**
- * Builds the Lane B review unit for `head` against the exact `baseGitSha`.
+ * Builds the direct canonical review review unit for `head` against the exact `baseGitSha`.
  * The base corpus is reconstructed from Git objects into a temporary
  * directory that is always removed; no worktree is created or touched.
  */
-export function resolveLaneBReviewUnit({ repoRoot, baseGitSha, head }: ResolveLaneBReviewUnitInput): LaneBReviewUnit {
+export function resolveReviewUnit({ repoRoot, baseGitSha, head }: ResolveReviewUnitInput): CanonicalReviewUnit {
   assertCommitExists(repoRoot, baseGitSha);
   if (head.kind === "commit") assertCommitExists(repoRoot, head.sha);
 
@@ -239,12 +239,12 @@ export function resolveLaneBReviewUnit({ repoRoot, baseGitSha, head }: ResolveLa
   if (deleted.length > 0) return { status: "UNSUPPORTED_DELETION", baseGitSha, paths: deleted };
   const unexpected = changes.filter((change) => !["A", "M", "T"].includes(change.status));
   if (unexpected.length > 0) {
-    throw new LaneBReviewUnitError(`unsupported Git change status for ${unexpected.map((change) => `${change.status} ${change.path}`).join(", ")}`);
+    throw new ReviewUnitError(`unsupported Git change status for ${unexpected.map((change) => `${change.status} ${change.path}`).join(", ")}`);
   }
   const paths = [...new Set(changes.map((change) => change.path))].sort();
   if (paths.length === 0) return { status: "NO_CANONICAL_CHANGE", baseGitSha };
 
-  const staging = mkdtempSync(join(tmpdir(), "open-evora-lane-b-"));
+  const staging = mkdtempSync(join(tmpdir(), "open-evora-review-unit-"));
   try {
     const baseDirs = baseSchemas.map((schema) => `${RESEARCH_ROOT}/${schema.directory}`);
     // Source Verification Support is staged from the base alongside the corpus, so it is loaded from the same base root.
@@ -256,7 +256,7 @@ export function resolveLaneBReviewUnit({ repoRoot, baseGitSha, head }: ResolveLa
     try {
       index = loadCorpusIndex(join(baseRoot, RESEARCH_ROOT));
     } catch (error) {
-      throw new LaneBReviewUnitError(`could not reconstruct the base corpus at ${baseGitSha}: ${(error as Error).message}`);
+      throw new ReviewUnitError(`could not reconstruct the base corpus at ${baseGitSha}: ${(error as Error).message}`);
     }
 
     let candidatesRoot: string;
@@ -273,7 +273,7 @@ export function resolveLaneBReviewUnit({ repoRoot, baseGitSha, head }: ResolveLa
 
     const loaded = loadCandidates(index, candidatesRoot, paths);
     if (loaded.failures.length > 0) {
-      throw new LaneBReviewUnitError(loaded.failures.map((failure) => `${failure.file}: ${failure.message}`).join("; "));
+      throw new ReviewUnitError(loaded.failures.map((failure) => `${failure.file}: ${failure.message}`).join("; "));
     }
 
     // A changed file must be the canonical file of the record it holds, so
@@ -285,7 +285,7 @@ export function resolveLaneBReviewUnit({ repoRoot, baseGitSha, head }: ResolveLa
       const expectedDir = `${RESEARCH_ROOT}/${schema.directory}`;
       const path = paths[i];
       if (path !== `${expectedDir}/${id}.yaml` && path !== `${expectedDir}/${id}.yml`) {
-        throw new LaneBReviewUnitError(`${path} holds ${id}, whose canonical file is ${expectedDir}/${id}.yaml`);
+        throw new ReviewUnitError(`${path} holds ${id}, whose canonical file is ${expectedDir}/${id}.yaml`);
       }
       pathByTarget.set(`${candidate.recordFamily}\u0000${id}`, path);
     });
@@ -294,13 +294,13 @@ export function resolveLaneBReviewUnit({ repoRoot, baseGitSha, head }: ResolveLa
     try {
       review = prepareCanonicalIntegrationReview(baseGitSha, index, loaded.candidates);
     } catch (error) {
-      throw new LaneBReviewUnitError((error as Error).message);
+      throw new ReviewUnitError((error as Error).message);
     }
     let reviewerInput;
     try {
       reviewerInput = buildReviewerInputPackage({
         baseGitSha,
-        manifest: LANE_B_REVIEW_FRAMING,
+        manifest: DIRECT_REVIEW_FRAMING,
         index,
         candidates: review.candidates,
         deltas: review.deltas,
@@ -309,7 +309,7 @@ export function resolveLaneBReviewUnit({ repoRoot, baseGitSha, head }: ResolveLa
         sourceVerifications: loadSourceVerifications(index),
       });
     } catch (error) {
-      if (error instanceof SourceVerificationError) throw new LaneBReviewUnitError(`${SOURCE_VERIFICATION_SUPPORT}: ${error.message}`);
+      if (error instanceof SourceVerificationError) throw new ReviewUnitError(`${SOURCE_VERIFICATION_SUPPORT}: ${error.message}`);
       throw error;
     }
 
@@ -330,51 +330,9 @@ export function pullRequestBase(repoRoot: string, baseSha: string, headSha: stri
   return git(repoRoot, ["merge-base", baseSha, headSha]).toString("utf8").trim();
 }
 
-/**
- * Repository directory of the hash-addressed full Lane B review artifacts
- * (`<reviewSha256>.json`): durable governance material, never canonical
- * research state, and outside every record directory.
- */
-export const REVIEW_ARTIFACT_DIRECTORY = ".research-review";
-
-export type LaneBReviewArtifactRead =
-  | { status: "FILE"; text: string }
-  | { status: "MISSING" }
-  /** Present at the path, but not an ordinary file (a symlink, submodule or directory). */
-  | { status: "NOT_A_FILE" };
-
-/** The review artifacts a pull request carries, read from Git objects only. */
-export interface LaneBReviewArtifacts {
-  /** Every path under REVIEW_ARTIFACT_DIRECTORY created, modified or deleted between base and head, sorted. */
-  changedPaths: string[];
-  /** Reads one repository-relative path from the head commit's tree. */
-  read(path: string): LaneBReviewArtifactRead;
-}
-
-/**
- * The review artifacts of `headSha` measured from `baseGitSha`. Contents come
- * from the head commit's tree, never from the checkout or any local path.
- */
-export function reviewArtifactsAtCommit(repoRoot: string, baseGitSha: string, headSha: string): LaneBReviewArtifacts {
-  assertCommitExists(repoRoot, baseGitSha);
-  assertCommitExists(repoRoot, headSha);
-  const changedPaths = nulSeparated(git(repoRoot, ["diff", "--name-only", "--no-renames", "-z", baseGitSha, headSha, "--", REVIEW_ARTIFACT_DIRECTORY])).sort();
-  return {
-    changedPaths,
-    read(path: string): LaneBReviewArtifactRead {
-      const entries = nulSeparated(git(repoRoot, ["ls-tree", "-z", headSha, "--", path]));
-      const entry = entries.find((line) => line.slice(line.indexOf("\t") + 1) === path);
-      if (!entry) return { status: "MISSING" };
-      const [mode, type, oid] = entry.slice(0, entry.indexOf("\t")).split(" ");
-      if (type !== "blob" || (mode !== "100644" && mode !== "100755")) return { status: "NOT_A_FILE" };
-      return { status: "FILE", text: git(repoRoot, ["cat-file", "blob", oid]).toString("utf8") };
-    },
-  };
-}
-
 /** Resolves a ref (branch, tag, `HEAD` or SHA) to its full commit SHA. */
 export function resolveCommit(repoRoot: string, ref: string): string {
   const sha = git(repoRoot, ["rev-parse", "--verify", "--quiet", `${ref}^{commit}`]).toString("utf8").trim();
-  if (!FULL_GIT_SHA.test(sha)) throw new LaneBReviewUnitError(`${ref} does not resolve to a commit`);
+  if (!FULL_GIT_SHA.test(sha)) throw new ReviewUnitError(`${ref} does not resolve to a commit`);
   return sha;
 }

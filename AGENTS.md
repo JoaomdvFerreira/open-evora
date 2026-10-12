@@ -40,9 +40,9 @@ User/public-facing Open Évora content uses PT-PT. Internal technical documentat
 
 ### Publication boundary
 
-The repository is public. Treat commits, branches, pull requests, generated artifacts, and deployments as potential publication acts.
+The repository is public. Treat pushes, pull-request creation or update carrying material, deployments, releases, and equivalent external actions as publication acts. Working-tree edits and local Git commits are not external publication.
 
-Publication safety must be established *before* the first repository publication act involving the material, not after it. For candidate research material this means the Gate 1 canonical-integration decision precedes any commit, push, pull request, or preview publication that carries it. Local, gitignored workbench material (for example `.research-workbench/`) is not itself a repository publication act, but it becomes one as soon as it is committed, pushed, or published in any form. This is a timing clarification of the existing gate; it creates no additional gate.
+Publication safety must be established before the first external publication boundary involving the material. Explicit owner authorization is required before externally publishing canonical research. A local commit does not itself cross that boundary. Local, gitignored workbench material (for example `.research-workbench/`) becomes publication material if pushed or otherwise externally published.
 
 Do not publish:
 - private correspondence or raw stakeholder material;
@@ -188,6 +188,4 @@ Do not claim validation that was not performed.
 
 ### Direct canonical research changes
 
-An agent directly modifying canonical PRB/EVD/SRC record files (outside an orchestrated research cycle) must run the Lane B independent semantic review (`npm run research:lane-b:prepare -- --base <base>`) before committing or pushing that material — only after the owner's readiness declaration over the exact changed content (`npm run research:lane-b:ready -- --base <base>`, run by the owner or on the owner's explicit instruction) — must commit the generated review artifact (`.research-review/<reviewSha256>.json`) with the records, and must use the generated compact receipt in the PR's `Research semantic review` section. The policy is owned by `docs/investigationstrategy.md` §12.
-
-Full semantic-review artifacts under `.research-review/**` are CI/governance inputs, not normal agent context. Agents must not open, read, quote, summarise, copy or use as reasoning context a full `.research-review/**` artifact unless the repository owner explicitly requests inspection of a specific artifact. For normal work, agents use the deterministic CLI output of `research:lane-b:prepare` and `research:lane-b:check`, the compact PR receipt and the deterministic PT-PT review summary CI publishes as a pull-request comment. This rule does not restrict deterministic tooling or CI, which parse and validate these artifacts.
+An agent directly modifying canonical PRB/EVD/SRC record files must run `npm run research:validate`, `npm run research:review -- --base <base>`, and `npm run research:check`. The review command writes `.research-review-attestation.json` only after a validated `CONCUR`; CI independently reconstructs and verifies it without using PR-body content. Obtain explicit owner authorization before the first external publication of the canonical material. The review and publication-safety policy is owned by `docs/investigationstrategy.md` §12.

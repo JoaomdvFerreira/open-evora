@@ -81,6 +81,25 @@ test("ADVERSARIAL: a staged .research-workbench/** path fails the guard even tho
   }
 });
 
+test("ADVERSARIAL: an explicitly allowed metadata path cannot override the shared private-material path rules", () => {
+  const fixture = gitFixture();
+  try {
+    const targetFile = "research/sources/SRC-NEW.yaml";
+    writeFileSync(join(fixture.root, targetFile), "source_id: SRC-NEW\nname: New\n", "utf8");
+    execFileSync("git", ["-C", fixture.root, "add", targetFile]);
+    const privatePath = "research/private-notes/field.md";
+    mkdirSync(join(fixture.root, "research", "private-notes"), { recursive: true });
+    writeFileSync(join(fixture.root, privatePath), "private material", "utf8");
+    execFileSync("git", ["-C", fixture.root, "add", "-f", privatePath]);
+
+    const result = checkPublicationGuard(fixture.root, planFor(fixture.head(), "sources/SRC-NEW.yaml"), [privatePath]);
+    assert.equal(result.ok, false);
+    assert.ok(result.unexpectedPaths.includes(privatePath));
+  } finally {
+    fixture.cleanup();
+  }
+});
+
 test("ADVERSARIAL: an untracked file present but not staged still fails the guard (guard inspects working-tree state, not only the index)", () => {
   const fixture = gitFixture();
   try {

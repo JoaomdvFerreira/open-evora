@@ -15,6 +15,7 @@
 import { spawnSync } from "node:child_process";
 
 import type { CanonicalIntegrationPlan } from "../integration/canonical-integration-plan.ts";
+import { checkResearchPublicationPaths } from "../publication-safety.ts";
 
 export interface PublicationGuardResult {
   ok: boolean;
@@ -117,9 +118,11 @@ export function checkPublicationGuard(
   const inspectedPaths = runGitPorcelainStatus(repoRoot);
   const approved = approvedPathsFromPlan(plan, researchRootRelativeToRepo);
   const allowed = new Set(additionalAllowedPaths);
+  const pathSafety = checkResearchPublicationPaths(inspectedPaths);
+  const unsafe = new Set([...pathSafety.prohibitedPaths, ...pathSafety.unexpectedResearchPaths]);
 
   const unexpectedPaths = inspectedPaths.filter((path) => {
-    if (isWorkbenchPath(path)) return true;
+    if (unsafe.has(path) || isWorkbenchPath(path)) return true;
     if (approved.has(path)) return false;
     if (allowed.has(path)) return false;
     return true;

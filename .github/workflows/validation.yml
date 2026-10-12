@@ -2,8 +2,7 @@ name: Project validation
 
 on:
   pull_request:
-    # `edited` re-checks the Research semantic review receipt when the PR body changes.
-    types: [opened, synchronize, reopened, edited]
+    types: [opened, synchronize, reopened]
   push:
     branches: [main]
 
@@ -14,15 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          # The Lane B check rebuilds the review input from the PR base and head commits.
+          # Review verification rebuilds the reviewer input from the PR base and head commits.
           fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version: 24
       - run: npm ci
-      - name: Research semantic review (direct PR)
+      - name: Research semantic review attestation (direct PR)
         if: github.event_name == 'pull_request'
-        run: npm run research:lane-b:check -- --event-path "$GITHUB_EVENT_PATH"
+        run: npm run research:review -- --event-path "$GITHUB_EVENT_PATH"
       - run: npm ci --prefix apps/research-explorer
       - run: npm run research:check
       - run: npm run build-data:test --prefix apps/research-explorer

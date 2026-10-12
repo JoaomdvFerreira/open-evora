@@ -158,10 +158,10 @@ test("a failed run counts as a structural failure and misses every expected defe
   assert.deepEqual(row, { caseId: SYNTHETIC.caseId, profile: "REDUCED", runs: 2, reviewerInvocations: 3, validRuns: 1, expectedDefectDetections: 1, misses: 1, falseBlockers: 0, structuralFailures: 1 });
 });
 
-test("the benchmark never touches the owner-controlled review lifecycle, receipts or review artifacts", () => {
+test("the benchmark never touches lifecycle state or direct review attestation transport", () => {
   const source = readFileSync(new URL("./review-profile-equivalence.ts", import.meta.url), "utf8");
   const imports = [...source.matchAll(/^import .* from "([^"]+)";$/gm)].map((m) => m[1]);
   assert.ok(imports.length > 0);
-  for (const path of imports) assert.doesNotMatch(path, /review-lifecycle|lane-b\/receipt|independent-review-invocation/);
-  assert.doesNotMatch(source, /reviewLifecycleDirFor|REVIEW_ARTIFACT_DIRECTORY|"\.research-review/);
+  for (const path of imports) assert.doesNotMatch(path, /review-lifecycle|research\/cli|independent-review-invocation/);
+  assert.doesNotMatch(source, /reviewLifecycleDirFor|REVIEW_ATTESTATION_PATH|"\.research-review-attestation/);
 });

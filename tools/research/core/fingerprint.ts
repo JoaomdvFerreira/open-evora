@@ -6,7 +6,7 @@
  * HIGH-2 remedy): that protocol governs what an owner approved and is
  * WU046's responsibility to implement; this module only lets WU045 detect
  * that a rerun against identical inputs produced an identical package.
- * It is shared, unchanged, by the review kernel, Lane B, the Human Gate and
+ * It is shared, unchanged, by the review kernel, direct review, the Human Gate and
  * admission wherever they need the same canonical serialization.
  */
 import { createHash } from "node:crypto";

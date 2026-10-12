@@ -1,5 +1,5 @@
 /**
- * Enforces that research tooling (the orchestrated cycle and Lane B) only
+ * Enforces that research tooling (the orchestrated cycle and direct review) only
  * ever reads/writes under the existing gitignored, non-canonical, non-public
  * research workbench boundary. This
  * is a defense-in-depth structural check inside the tooling itself,
