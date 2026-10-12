@@ -453,7 +453,7 @@ describe("buildPrbDossierData — counts and reference integrity", () => {
 
     expectResolvedIntegrity(data);
     expect(data.evidence.map((item) => item.id)).toEqual(projection.evidence.map((item) => item.detail.id));
-    expect(data.counts).toEqual({ evidenceRecordCount: 11, distinctSourceCount: 9, effectCount: 15, openQuestionCount: 2 });
+    expect(data.counts).toEqual({ evidenceRecordCount: 4, distinctSourceCount: 5, effectCount: 5, openQuestionCount: 3 });
     expect(data.decisionBasis).toBeNull();
     expect(JSON.parse(JSON.stringify(data))).toStrictEqual(data);
   });

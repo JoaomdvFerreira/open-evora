@@ -12,51 +12,29 @@ import problemIndex from "../../generated/index.json";
  * docs/design/foundations.md's synthetic-content rule ("Synthetic design
  * content must use unmistakably synthetic identifiers... Canonical
  * identifiers may appear only with their canonical content") is why this
- * fixture carries the complete real PRB-0005 projection — every one of its
- * 11 linked EVD- records and their SRC- provenance — rather than a partial
+ * fixture carries the complete real PRB-0005 projection — all currently
+ * linked EVD- records and their SRC- provenance — rather than a partial
  * or hand-authored substitute under the real PRB-0005 id.
  */
 import prb0005 from "../../generated/record-detail/PRB-0005.json";
-import evd000003 from "../../generated/record-detail/EVD-000003.json";
 import evd000007 from "../../generated/record-detail/EVD-000007.json";
-import evd000008 from "../../generated/record-detail/EVD-000008.json";
-import evd000012 from "../../generated/record-detail/EVD-000012.json";
-import evd000105 from "../../generated/record-detail/EVD-000105.json";
-import evd000106 from "../../generated/record-detail/EVD-000106.json";
-import evd000107 from "../../generated/record-detail/EVD-000107.json";
 import evd000139 from "../../generated/record-detail/EVD-000139.json";
-import evd000142 from "../../generated/record-detail/EVD-000142.json";
 import evd000166 from "../../generated/record-detail/EVD-000166.json";
 import evd000167 from "../../generated/record-detail/EVD-000167.json";
-import src0003 from "../../generated/record-detail/SRC-0003.json";
 import src0017 from "../../generated/record-detail/SRC-0017.json";
 import src0018 from "../../generated/record-detail/SRC-0018.json";
-import src0092 from "../../generated/record-detail/SRC-0092.json";
-import src0093 from "../../generated/record-detail/SRC-0093.json";
-import src0094 from "../../generated/record-detail/SRC-0094.json";
 import src0132 from "../../generated/record-detail/SRC-0132.json";
 import src0133 from "../../generated/record-detail/SRC-0133.json";
 import src0134 from "../../generated/record-detail/SRC-0134.json";
 
 const RECORDS = [
   prb0005,
-  evd000003,
   evd000007,
-  evd000008,
-  evd000012,
-  evd000105,
-  evd000106,
-  evd000107,
   evd000139,
-  evd000142,
   evd000166,
   evd000167,
-  src0003,
   src0017,
   src0018,
-  src0092,
-  src0093,
-  src0094,
   src0132,
   src0133,
   src0134,

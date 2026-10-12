@@ -44,11 +44,16 @@ describe("Public/PRB Details / PRB0005 story shell", () => {
     expect(screen.getByRole("button", { name: "Recarregar página" })).toBeTruthy();
   });
 
-  it("renders the canonical PRB-0005 causal reading and open-question fields verbatim, with no manually selected evidence subset", async () => {
-    const record = prb0005.record as { causal_reading?: string; investigation: { open_questions: Record<string, unknown>[] } };
+  it("renders the canonical optional current reading and open-question fields verbatim, with no manually selected evidence subset", async () => {
+    const record = prb0005.record as { title: string; causal_reading?: string; investigation: { open_questions: Record<string, unknown>[] } };
     render(<composed.Desktop1440 />);
-    const reading = await screen.findByRole("region", { name: "Leitura atual" });
-    expect(reading.querySelector(".prb-current-reading")?.textContent).toBe(record.causal_reading);
+    await screen.findByRole("heading", { level: 2, name: record.title });
+    if (typeof record.causal_reading === "string") {
+      const reading = await screen.findByRole("region", { name: "Leitura atual" });
+      expect(reading.querySelector(".prb-current-reading")?.textContent).toBe(record.causal_reading);
+    } else {
+      expect(screen.queryByRole("region", { name: "Leitura atual" })).toBeNull();
+    }
 
     const renderedTexts = Array.from(document.querySelectorAll(".prb-open-question-field p")).map((node) => node.textContent);
     for (const question of record.investigation.open_questions) {
