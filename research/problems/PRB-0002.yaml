@@ -1,9 +1,7 @@
 problem_id: PRB-0002
 created_at: "2026-08-28"
 updated_at: "2026-10-12"
-title: >-
-  Informação ao passageiro no TREVO: condições documentadas nas paragens e
-  impacto nas viagens por apurar
+title: Informação limitada e ausência de elementos de acessibilidade em paragens de autocarro descritas pelo PMUSE de Évora
 domain:
   - MOB
   - DIG
@@ -12,102 +10,118 @@ geography:
   level: city
   area: Évora cidade
 affected_populations:
-  - pessoas que utilizam o transporte público urbano TREVO em Évora
-  - pessoas que dependem de informação acessível nas paragens
+  - pessoas que utilizam as paragens de autocarro descritas pelo PMUSE em Évora
+  - pessoas que dependem de informação acessível nessas paragens
 problem_statement: >-
   O diagnóstico do Plano de Mobilidade Urbana Sustentável de Évora (PMUSE)
-  descreve, no Centro Histórico, paragens sem abrigo identificadas por uma
-  placa com o operador e a linha, sem mapa da rede nem horários. Descreve
-  também paragens com abrigo com informação básica sobre linhas, paragens e
-  horários, mas sem braille nem avisos sonoros. O sítio TREVO disponibilizava
-  informação sobre a rede, horários, notificações e atualizações de percursos
-  em agosto de 2026. O PMUSE propôs melhorias na informação ao passageiro,
-  mas não estabelece a sua implementação ou eficácia. Não está estabelecido
-  se as condições descritas nas paragens persistem, se a informação ao longo
-  de uma viagem urbana é fiável, utilizável e consistente, nem se alguma
-  lacuna de informação causa falhas em viagens concretas.
+  descreve paragens sem mapa da rede nem horários e painéis sem braille nem
+  avisos sonoros. Informação mais recente documenta canais de informação do
+  serviço urbano TREVO, como o sítio do operador em agosto de 2026 e os pontos
+  de informação descritos no relatório municipal sobre 2025; a existência
+  destes canais não demonstra que a informação seja completa, consistente,
+  acessível ou utilizável. Não está estabelecido se as condições descritas pelo
+  PMUSE persistem nem se as melhorias propostas foram executadas. Também não
+  está estabelecido se alguma lacuna de informação que persista causa falhas
+  em deslocações concretas.
 investigation:
   open_questions:
     - question: >-
-        A informação atualmente disponível ao longo de uma viagem real no
-        serviço urbano TREVO é fiável, utilizável e consistente? Alguma lacuna
-        documentada causa uma falha prática nessa viagem?
+        Qual é o estado atual da informação ao passageiro nas paragens
+        descritas pelo PMUSE — informação instalada, informação em tempo real e
+        elementos de acessibilidade — e foram executadas as medidas de
+        informação propostas pelo plano?
+      latest_result: >-
+        O diagnóstico do PMUSE descreveu condições nas paragens sem estabelecer
+        a sua persistência. Estão documentados canais de informação do serviço
+        urbano TREVO no sítio do operador, em agosto de 2026, e no relatório
+        municipal de junho de 2026 sobre 2025. O PMUSE propôs melhorias, mas a
+        condição atual das paragens e a execução dessas medidas continuam por
+        estabelecer.
       why_open: >-
-        O sítio TREVO disponibilizava canais de informação em agosto de 2026
-        e o diagnóstico histórico do PMUSE documenta diferenças na informação
-        física das paragens. A disponibilidade de canais não estabelece a
-        qualidade da informação numa viagem real. Não existe ainda evidência
-        sobre viagens concretamente afetadas nem sobre se as lacunas
-        documentadas causam falhas reais para os passageiros.
-      latest_result: Não estava disponível uma deslocação real delimitada que
-        permitisse distinguir uma falha de viagem causada pela informação de
-        inconveniência ou de uma falha operacional.
-      current_action: Não é proporcional prosseguir desafio direto a passageiros sem
-        uma deslocação real delimitada que permita testar essa cadeia causal.
-      resolution_condition: Uma deslocação real delimitada que permita estabelecer se
-        e como estas lacunas de informação causam falhas práticas nas deslocações.
+        A evidência disponível não identifica a condição atual das paragens
+        descritas nem o estado de execução das medidas propostas.
+      current_action: >-
+        Está preparado um pedido de esclarecimento documental ao Município de
+        Évora sobre intervenções e estado atual das paragens, informação ao
+        passageiro instalada, informação em tempo real, acessibilidade,
+        execução das medidas relevantes do PMUSE e responsabilidades e
+        acompanhamento associados. O pedido ainda não foi enviado.
+      resolution_condition: >-
+        Documentação pública atual ou resposta documentada da autoridade
+        competente ou do operador que identifique as condições presentes nas
+        paragens e o estado de execução das medidas.
       evidence:
         - EVD-000016
-        - EVD-000123
-    - question: >-
-        Qual é o estado atual da informação física nas paragens descritas pelo
-        PMUSE? As melhorias propostas pelo plano foram implementadas e, em caso
-        afirmativo, alteraram materialmente a experiência dos passageiros?
-      why_open: >-
-        O plano de ação do PMUSE propõe melhorias na informação ao passageiro — nas
-        paragens, em tempo real e através de uma aplicação/sítio Web multimodal —,
-        enquanto o seu diagnóstico documenta diferenças na informação física das
-        paragens e ausência de certos elementos de acessibilidade nos painéis
-        descritos. As propostas não estabelecem implementação, operação ou eficácia,
-        e o diagnóstico não estabelece o estado atual das paragens após eventuais
-        intervenções.
-      evidence:
         - EVD-000122
         - EVD-000123
+        - EVD-000168
+    - question: >-
+        Se persistirem lacunas materiais na informação ao passageiro, causam
+        essas lacunas falhas práticas numa deslocação real, distintas de
+        inconveniência ou de falhas operacionais do serviço?
+      latest_result: >-
+        A evidência reunida não estabelece que uma lacuna de informação tenha
+        causado uma falha numa deslocação concreta. Não estava disponível uma
+        deslocação real delimitada que permitisse distinguir essa falha de
+        inconveniência ou de uma falha operacional.
+      why_open: >-
+        Ainda não está estabelecido se persistem lacunas materiais de
+        informação; o diagnóstico histórico do PMUSE não demonstra efeitos
+        atuais nas deslocações.
+      current_action: >-
+        A investigação dos efeitos nas deslocações fica a aguardar a resposta à
+        primeira questão.
+      resolution_condition: >-
+        Identificada uma lacuna material atual, informação documentada da
+        autoridade competente ou do operador, reclamações ou comunicações
+        delimitadas ou, se necessário, uma deslocação real delimitada que
+        permitam estabelecer se essa lacuna causa uma falha prática na viagem.
+      evidence:
+        - EVD-000123
+        - EVD-000168
   path:
     initial_signal:
       summary: >-
         O diagnóstico do PMUSE documentou diferenças na informação disponível
-        nas paragens de Évora e o plano propôs melhorias, sem confirmação de
-        implementação. O sítio TREVO disponibilizava informação sobre a rede
-        urbana em agosto de 2026. Não estava estabelecido se as lacunas
-        documentadas causavam falhas em viagens concretas.
+        nas paragens que descreve, incluindo paragens sem abrigo do Centro
+        Histórico sem mapa da rede nem horários, e o plano propôs melhorias,
+        sem confirmação de execução. Estavam documentados canais de informação
+        do serviço urbano TREVO.
       evidence:
         - EVD-000016
         - EVD-000122
         - EVD-000123
+        - EVD-000168
     development:
       summary: >-
-        Foi reconhecido que a qualidade e completude da informação destinada
+        Foi reconhecido que a qualidade e a completude da informação destinada
         ao passageiro e a reutilização de dados por terceiros são questões
-        distintas. Este registo ficou delimitado à informação orientada ao
+        distintas; este registo ficou delimitado à informação orientada ao
         passageiro. A avaliação do serviço intermunicipal TPAC documentou
-        informação sobre horários e percursos no Google Maps através de dados
-        GTFS e insuficiências na informação ao público. Essa evidência é
-        contexto intermunicipal e não descreve as condições do serviço urbano
-        TREVO.
+        horários e percursos no Google Maps através de dados GTFS e
+        insuficiências na informação ao público; essa evidência é apenas
+        contexto intermunicipal. O relatório municipal de junho de 2026 sobre
+        2025 documentou canais de informação e reclamações do serviço urbano
+        TREVO, sem descrever a condição atual das paragens referidas pelo
+        PMUSE.
       evidence:
         - EVD-000010
         - EVD-000011
+        - EVD-000168
     delimitation:
       summary: >-
-        O plano de ação do PMUSE propõe melhorias na informação ao passageiro —
-        conforto, acessibilidade e informação nas paragens, informação em tempo
-        real e uma aplicação/sítio Web multimodal —, estabelecendo necessidades e
-        intervenções propostas, não a sua implementação, operação ou eficácia.
-
-
-        O problema centra-se na informação destinada aos passageiros do
-        transporte público urbano TREVO em Évora. O diagnóstico do PMUSE
-        descreve, no Centro Histórico, paragens sem abrigo identificadas por
-        operador e linha, sem mapa da rede nem horários. Descreve painéis de
-        paragens com abrigo com informação básica, mas sem braille nem avisos
-        sonoros. O diagnóstico não estabelece o estado atual dessas condições
-        após eventuais intervenções; a evidência TPAC serve apenas de contexto
-        intermunicipal.
+        O problema centra-se na informação ao passageiro nas paragens de
+        autocarro descritas pelo PMUSE em Évora. As propostas do plano de ação
+        do PMUSE são intervenções propostas e não estabelecem a sua execução,
+        operação ou eficácia. A investigação distingue as condições
+        documentadas historicamente da situação atual das paragens, ainda por
+        esclarecer, e não generaliza essas condições a todas as paragens de
+        Évora. A evidência TPAC serve apenas de contexto intermunicipal.
       evidence:
+        - EVD-000016
         - EVD-000122
         - EVD-000123
+        - EVD-000168
 evidence:
   - evidence_id: EVD-000010
     effects:
@@ -139,6 +153,13 @@ evidence:
       - REFINES
     research_roles:
       - LOCAL_OBSERVATION
+  - evidence_id: EVD-000168
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+      - EXISTING_RESPONSE
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
@@ -150,8 +171,10 @@ history:
   - date: 2026-10-11
     summary: >-
       A investigação foi reformulada para distinguir as condições históricas
-      documentadas pelo PMUSE da situação atual das paragens, delimitar o
-      problema ao transporte público urbano TREVO em Évora e reorganizar as
-      questões em torno da verificação do estado atual e, caso persistam
-      lacunas materiais de informação, dos seus efeitos nas deslocações.
-      A evidência TPAC foi mantida apenas como contexto intermunicipal.
+      documentadas pelo PMUSE da situação atual das paragens e para delimitar
+      o problema às paragens descritas pelo plano. As questões foram
+      reorganizadas: primeiro a verificação do estado atual e, só depois,
+      caso persistam lacunas materiais de informação, os seus efeitos nas
+      deslocações. Foi incorporada evidência municipal relativa a 2025 sobre
+      canais de informação e reclamações; a evidência TPAC foi mantida apenas
+      como contexto intermunicipal.

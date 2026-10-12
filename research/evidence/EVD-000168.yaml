@@ -1,0 +1,50 @@
+evidence_id: EVD-000168
+lineage_id: MOB-2026-07-CME-TRANSPORT-AUTHORITY-ANNUAL-REPORT
+provenance:
+  sources:
+    - SRC-0018
+  extracted_at: 2026-10-11
+observation:
+  summary: >-
+    O relatório de junho de 2026 da Autoridade de Transportes do Município de
+    Évora, relativo ao serviço público de transporte de passageiros em 2025,
+    refere que o operador do serviço urbano, a E-BUS, S.A., comercialmente
+    denominada TREVO, disponibiliza na sua página de internet informação sobre
+    horários e percursos, direitos dos passageiros, títulos de transporte e
+    tarifas. Enumera também como pontos de informação a loja de apoio ao
+    cliente TREVO, as bilheteiras do Terminal Rodoviário de Évora, três agentes
+    de vendas e a aplicação PICK. O relatório afirma que a E-BUS não informou o
+    Município dos resultados de inquéritos de satisfação que possa ter
+    realizado. A tabela de reclamações informadas pelo operador apresenta sete
+    reclamações em 2025, com os motivos: condições do WC do Terminal
+    Rodoviário; atraso na realização do serviço Linha Azul–Zona Sul;
+    atendimento demorado; comportamento de motorista (duas); paragens
+    interditas por causa de obras; e atraso do serviço. Nenhum dos motivos
+    indicados menciona expressamente informação ao público, informação nas
+    paragens ou acessibilidade.
+scope:
+  geography:
+    level: municipality
+    area: cidade de Évora
+  populations:
+    - utilizadores da rede urbana TREVO
+  temporal:
+    as_of: "2025"
+domains:
+  - MOB
+  - DIG
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - Os canais de informação documentados não demonstram a sua completude,
+    utilizabilidade, consistência ou acessibilidade ao longo de uma
+    deslocação.
+  - As sete reclamações da tabela não demonstram que não tenham existido
+    outras reclamações nem que não existam problemas de informação ao
+    passageiro ou de acessibilidade.
+  - A falta de comunicação de resultados de inquéritos ao Município não
+    demonstra que não tenham sido realizados inquéritos de satisfação.
+  - O período de referência do relatório não estabelece, por si, o estado
+    físico atual das paragens descritas pelo PMUSE em outubro de 2026.
+  - Esta evidência não demonstra que uma lacuna de informação tenha causado
+    uma falha prática numa deslocação.
