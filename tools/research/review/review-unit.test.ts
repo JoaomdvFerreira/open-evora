@@ -60,10 +60,10 @@ class Fixture {
     for (const record of [
       source("SRC-A", "Fonte A"),
       source("SRC-B", "Fonte B"),
-      source("SRC-UNRELATED", "Fonte sem relaÃ§Ã£o"),
-      evidence("EVD-A", ["SRC-A"], "Muitas reclamaÃ§Ãµes de moradores registadas em 2025."),
-      evidence("EVD-B", ["SRC-B"], "VersÃ£o canÃ³nica."),
-      evidence("EVD-UNRELATED", ["SRC-UNRELATED"], "Sem relaÃ§Ã£o."),
+      source("SRC-UNRELATED", "Fonte sem relação"),
+      evidence("EVD-A", ["SRC-A"], "Muitas reclamações de moradores registadas em 2025."),
+      evidence("EVD-B", ["SRC-B"], "Versão canónica."),
+      evidence("EVD-UNRELATED", ["SRC-UNRELATED"], "Sem relação."),
       problem("PRB-OTHER", "Outro problema.", ["EVD-UNRELATED"]),
       problem("PRB-0001", "Atrasos relatados.", ["EVD-A"]),
     ]) this.record(record);
@@ -141,12 +141,12 @@ function concur(pkg: ReviewerInputPackage): Review {
   return {
     schemaVersion: "2",
     outcome: "CONCUR",
-    rationale: "As afirmaÃ§Ãµes alteradas correspondem Ã  evidÃªncia fornecida.",
+    rationale: "As afirmações alteradas correspondem à evidência fornecida.",
     findings: [],
     signalDispositions: pkg.signals.map(({ signalId }) => ({
       signalId,
       disposition: "SUPPORTED",
-      reason: "EVD-A regista muitas reclamaÃ§Ãµes.",
+      reason: "EVD-A regista muitas reclamações.",
       evidenceReferences: ["EVD-A"],
       relatedFindingIds: [],
     })),
@@ -170,9 +170,9 @@ function withFinding(pkg: ReviewerInputPackage, kind: "CLEC_VIOLATION" | "INSUFF
     dimension: "supported_quantity",
     kind,
     severity: "BLOCKING",
-    reason: "A evidÃªncia regista reclamaÃ§Ãµes, nÃ£o a proporÃ§Ã£o de moradores afetados.",
+    reason: "A evidência regista reclamações, não a proporção de moradores afetados.",
     evidenceReferences: ["EVD-A"],
-    correctionDirection: "Atribuir a afirmaÃ§Ã£o Ã s reclamaÃ§Ãµes registadas.",
+    correctionDirection: "Atribuir a afirmação às reclamações registadas.",
     relatedSignalIds: [signalId],
   }];
   const disposition = review.signalDispositions.find((entry) => entry.signalId === signalId)!;
@@ -208,9 +208,9 @@ test("a schema-only research change needs no semantic review", () => {
 test("canonical PRB creates and EVD/SRC updates are review units, alongside unrelated changes", () => {
   withFixture((fixture, base) => {
     addProblemWithSignal(fixture);
-    fixture.record(evidence("EVD-B", ["SRC-B"], "VersÃ£o candidata."));
+    fixture.record(evidence("EVD-B", ["SRC-B"], "Versão candidata."));
     fixture.record(source("SRC-B", "Fonte B (editora revista)"));
-    fixture.write("docs/notes.md", "# Outra alteraÃ§Ã£o\n");
+    fixture.write("docs/notes.md", "# Outra alteração\n");
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
     assert.deepEqual(
       unit.changedRecords.map(({ recordFamily, id, path, action }) => ({ recordFamily, id, path, action })),
@@ -267,7 +267,7 @@ test("the reviewer package follows PRB -> EVD -> SRC only and excludes unrelated
     const json = serializeReviewerInput(unit.reviewerInput);
     // PRB-OTHER is named by the candidate itself, but its record is never followed;
     // whole-corpus validation may name other record files, never their content.
-    for (const excluded of ["Outro problema.", "Sem relaÃ§Ã£o.", "Fonte sem relaÃ§Ã£o", "Atrasos relatados.", "VersÃ£o canÃ³nica.", "Fonte B"]) {
+    for (const excluded of ["Outro problema.", "Sem relação.", "Fonte sem relação", "Atrasos relatados.", "Versão canónica.", "Fonte B"]) {
       assert.equal(json.includes(excluded), false, `${excluded} must not reach the reviewer`);
     }
     assert.equal(unit.reviewerInput.mode, "direct-pull-request");
@@ -277,18 +277,18 @@ test("the reviewer package follows PRB -> EVD -> SRC only and excludes unrelated
 
 test("a candidate version wins over its canonical version in the reviewer package", () => {
   withFixture((fixture, base) => {
-    fixture.record(evidence("EVD-B", ["SRC-A"], "VersÃ£o candidata."));
+    fixture.record(evidence("EVD-B", ["SRC-A"], "Versão candidata."));
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
     const json = serializeReviewerInput(unit.reviewerInput);
-    assert.equal(json.includes("VersÃ£o candidata."), true);
-    assert.equal(json.includes("VersÃ£o canÃ³nica."), false);
+    assert.equal(json.includes("Versão candidata."), true);
+    assert.equal(json.includes("Versão canónica."), false);
     assert.deepEqual(unit.reviewerInput.evidenceContext.map((record) => record.id), ["SRC-A"]);
   });
 });
 
 test("the base corpus is reconstructed from the base commit, not from the checked-out tree", () => {
   withFixture((fixture, first) => {
-    fixture.record(evidence("EVD-A", ["SRC-A"], "ReclamaÃ§Ãµes registadas no segundo trimestre de 2025."));
+    fixture.record(evidence("EVD-A", ["SRC-A"], "Reclamações registadas no segundo trimestre de 2025."));
     const base = fixture.commit("evidence revised on main");
     addProblemWithSignal(fixture);
     const head = fixture.commit("direct change");
@@ -297,7 +297,7 @@ test("the base corpus is reconstructed from the base commit, not from the checke
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: head }));
     assert.deepEqual(unit.changedRecords.map((record) => record.id), ["PRB-NEW"]);
     const evdA = unit.reviewerInput.evidenceContext.find((record) => record.id === "EVD-A");
-    assert.deepEqual(evdA?.fields.observation, { summary: "ReclamaÃ§Ãµes registadas no segundo trimestre de 2025." });
+    assert.deepEqual(evdA?.fields.observation, { summary: "Reclamações registadas no segundo trimestre de 2025." });
 
     // Against an older base, the same head carries the EVD-A revision as a change of its own.
     assert.deepEqual(reviewRequired(fixture.unit(first, { kind: "commit", sha: head })).changedRecords.map((record) => record.id), ["EVD-A", "PRB-NEW"]);
@@ -330,7 +330,7 @@ test("an uncommitted working-tree change yields the same review unit as its late
   withFixture((fixture, base) => {
     fixture.git("config", "core.autocrlf", "true");
     addProblemWithSignal(fixture); // untracked
-    fixture.write(recordPath("EVD-B"), stringifyRecordYaml(evidence("EVD-B", ["SRC-B"], "VersÃ£o candidata.")).replace(/\n/g, "\r\n")); // modified, CRLF
+    fixture.write(recordPath("EVD-B"), stringifyRecordYaml(evidence("EVD-B", ["SRC-B"], "Versão candidata.")).replace(/\n/g, "\r\n")); // modified, CRLF
     const prepared = reviewRequired(fixture.unit(base, { kind: "working-tree" }));
     const committed = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
     assert.deepEqual(committed.changedRecords, prepared.changedRecords);
@@ -363,32 +363,32 @@ function withSupportedBase(statements: string[], fn: (fixture: Fixture, base: st
 
 /** A direct update of EVD-A, whose only Source is SRC-A. */
 function changeEvidenceA(fixture: Fixture): void {
-  fixture.record(evidence("EVD-A", ["SRC-A"], "Muitas reclamaÃ§Ãµes de moradores registadas no segundo trimestre de 2025."));
+  fixture.record(evidence("EVD-A", ["SRC-A"], "Muitas reclamações de moradores registadas no segundo trimestre de 2025."));
 }
 
 test("support for the Source of a changed EVD is read from the base commit, not from the head or checkout", () => {
-  withSupportedBase(["A fonte regista reclamaÃ§Ãµes sobre atrasos em 2025."], (fixture, base) => {
+  withSupportedBase(["A fonte regista reclamações sobre atrasos em 2025."], (fixture, base) => {
     changeEvidenceA(fixture);
     const head = fixture.commit("direct change");
-    writeSupport(fixture, "SRC-A", ["AfirmaÃ§Ã£o nÃ£o revista no checkout."]);
+    writeSupport(fixture, "SRC-A", ["Afirmação não revista no checkout."]);
 
     const pkg = reviewRequired(fixture.unit(base, { kind: "commit", sha: head })).reviewerInput;
     assert.deepEqual(pkg.sourceVerificationContext?.map((entry) => [entry.source_id, entry.verified_claims.map((claim) => claim.statement)]), [
-      ["SRC-A", ["A fonte regista reclamaÃ§Ãµes sobre atrasos em 2025."]],
+      ["SRC-A", ["A fonte regista reclamações sobre atrasos em 2025."]],
     ]);
-    assert.equal(serializeReviewerInput(pkg).includes("AfirmaÃ§Ã£o nÃ£o revista no checkout."), false);
+    assert.equal(serializeReviewerInput(pkg).includes("Afirmação não revista no checkout."), false);
     // The edited checkout is itself a change carrying both canonical records and support.
     assert.equal(fixture.unit(base, { kind: "working-tree" }).status, "SOURCE_VERIFICATION_NOT_SEPARATE");
   });
 });
 
 test("a PRB-only change receives no support for the Sources of the unchanged EVD it links", () => {
-  withSupportedBase(["A fonte regista reclamaÃ§Ãµes sobre atrasos em 2025."], (fixture, base) => {
+  withSupportedBase(["A fonte regista reclamações sobre atrasos em 2025."], (fixture, base) => {
     addProblemWithSignal(fixture);
     const pkg = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit("direct change") })).reviewerInput;
     assert.ok(pkg.evidenceContext.some((record) => record.id === "SRC-A"), "SRC-A reaches the reviewer through the unchanged EVD-A");
     assert.equal(pkg.sourceVerificationContext, undefined);
-    assert.equal(serializeReviewerInput(pkg).includes("A fonte regista reclamaÃ§Ãµes sobre atrasos em 2025."), false);
+    assert.equal(serializeReviewerInput(pkg).includes("A fonte regista reclamações sobre atrasos em 2025."), false);
   });
 });
 
@@ -397,7 +397,7 @@ test("support introduced together with a canonical change cannot influence its r
     fixture.record({ ...source("SRC-A", "Fonte A"), ...ELIGIBLE_SOURCE });
     const base = fixture.commit("eligible source on main");
     addProblemWithSignal(fixture);
-    writeSupport(fixture, "SRC-A", ["AfirmaÃ§Ã£o trazida pela prÃ³pria alteraÃ§Ã£o."]);
+    writeSupport(fixture, "SRC-A", ["Afirmação trazida pela própria alteração."]);
 
     for (const unit of [fixture.unit(base, { kind: "working-tree" }), fixture.unit(base, { kind: "commit", sha: fixture.commit("mixed change") })]) {
       assert.deepEqual(unit, { status: "SOURCE_VERIFICATION_NOT_SEPARATE", baseGitSha: base, recordPaths: [recordPath("PRB-NEW")], supportPaths: [SUPPORT_PATH] });
@@ -409,9 +409,9 @@ test("support introduced together with a canonical change cannot influence its r
 });
 
 test("a support-only change has no canonical change and needs no semantic attestation", () => {
-  withSupportedBase(["A fonte regista reclamaÃ§Ãµes sobre atrasos em 2025."], (fixture, base) => {
-    writeSupport(fixture, "SRC-A", ["A fonte regista reclamaÃ§Ãµes sobre atrasos no segundo trimestre de 2025."]);
-    writeSupport(fixture, "SRC-B", ["Outra afirmaÃ§Ã£o verificada."]);
+  withSupportedBase(["A fonte regista reclamações sobre atrasos em 2025."], (fixture, base) => {
+    writeSupport(fixture, "SRC-A", ["A fonte regista reclamações sobre atrasos no segundo trimestre de 2025."]);
+    writeSupport(fixture, "SRC-B", ["Outra afirmação verificada."]);
     const unit = fixture.unit(base, { kind: "commit", sha: fixture.commit("support-only change") });
     assert.deepEqual(unit, { status: "NO_CANONICAL_CHANGE", baseGitSha: base });
     assert.equal(unit.status, "NO_CANONICAL_CHANGE");
@@ -421,7 +421,7 @@ test("a support-only change has no canonical change and needs no semantic attest
 test("invalid applicable support in the base fails closed; invalid support for an unreached Source does not", () => {
   withFixture((fixture) => {
     fixture.record({ ...source("SRC-A", "Fonte A"), ...ELIGIBLE_SOURCE, licensing: { reuse: "prohibited" } });
-    writeSupport(fixture, "SRC-A", ["A fonte regista reclamaÃ§Ãµes."]);
+    writeSupport(fixture, "SRC-A", ["A fonte regista reclamações."]);
     writeSupport(fixture, "SRC-UNRELATED", []);
     const base = fixture.commit("invalid support on main");
 
@@ -437,13 +437,13 @@ test("invalid applicable support in the base fails closed; invalid support for a
     assert.equal(reviewRequired(fixture.unit(base, { kind: "working-tree" })).reviewerInput.sourceVerificationContext, undefined);
 
     fixture.remove(recordPath("PRB-NEW"));
-    fixture.record(evidence("EVD-B", ["SRC-B"], "VersÃ£o candidata."));
+    fixture.record(evidence("EVD-B", ["SRC-B"], "Versão candidata."));
     assert.equal(reviewRequired(fixture.unit(base, { kind: "working-tree" })).reviewerInput.sourceVerificationContext, undefined);
   });
 });
 
 test("the fingerprinted reviewer input changes with applicable base support and not with support for unreached Sources", () => {
-  withSupportedBase(["A fonte regista reclamaÃ§Ãµes sobre atrasos em 2025."], (fixture, base) => {
+  withSupportedBase(["A fonte regista reclamações sobre atrasos em 2025."], (fixture, base) => {
     // The same direct change reviewed on another base; only the base SHA itself is neutralised for comparison.
     const reviewOn = (onBase: string): string => {
       fixture.git("checkout", "-q", "--detach", onBase);
@@ -455,11 +455,11 @@ test("the fingerprinted reviewer input changes with applicable base support and 
     const original = reviewOn(base);
 
     fixture.git("checkout", "-q", "--detach", base);
-    writeSupport(fixture, "SRC-A", ["A fonte regista reclamaÃ§Ãµes sobre atrasos no segundo trimestre de 2025."]);
+    writeSupport(fixture, "SRC-A", ["A fonte regista reclamações sobre atrasos no segundo trimestre de 2025."]);
     const revisedBase = fixture.commit("support revised on main");
     fixture.git("checkout", "-q", "--detach", base);
-    fixture.record({ ...source("SRC-UNRELATED", "Fonte sem relaÃ§Ã£o"), ...ELIGIBLE_SOURCE });
-    writeSupport(fixture, "SRC-UNRELATED", ["AfirmaÃ§Ã£o sobre outra fonte."]);
+    fixture.record({ ...source("SRC-UNRELATED", "Fonte sem relação"), ...ELIGIBLE_SOURCE });
+    writeSupport(fixture, "SRC-UNRELATED", ["Afirmação sobre outra fonte."]);
     const unrelatedBase = fixture.commit("unrelated support on main");
 
     assert.notEqual(reviewOn(revisedBase), original);
@@ -611,11 +611,11 @@ test("research:review rejects a context-free layer violation before invoking the
 });
 
 // ---------------------------------------------------------------------------
-// Reverse EVDâ†’PRB impact (CRR-02).
+// Reverse EVD→PRB impact (CRR-02).
 
 test("an EVD-only change includes the unchanged linked PRB as a review subject", () => {
   withFixture((fixture, base) => {
-    fixture.record(evidence("EVD-A", ["SRC-A"], "ReclamaÃ§Ãµes de moradores registadas apenas em 2024."));
+    fixture.record(evidence("EVD-A", ["SRC-A"], "Reclamações de moradores registadas apenas em 2024."));
     const head = fixture.commit();
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: head }));
     assert.deepEqual(unit.changedRecords.map(({ id }) => id), ["EVD-A"]);
@@ -633,9 +633,9 @@ test("an EVD-only change includes the unchanged linked PRB as a review subject",
       dimension: "temporal_precision",
       kind: "CLEC_VIOLATION",
       severity: "BLOCKING",
-      reason: "A EVD-A revista limita as reclamaÃ§Ãµes a 2024; o problema nÃ£o indica o perÃ­odo.",
+      reason: "A EVD-A revista limita as reclamações a 2024; o problema não indica o período.",
       evidenceReferences: ["EVD-A"],
-      correctionDirection: "Indicar o perÃ­odo documentado pela evidÃªncia ligada.",
+      correctionDirection: "Indicar o período documentado pela evidência ligada.",
       relatedSignalIds: [],
     }];
     review.outcome = "DISAGREEMENT_FOUND";
@@ -646,7 +646,7 @@ test("an EVD-only change includes the unchanged linked PRB as a review subject",
 
 test("an EVD change no PRB links adds no impacted subject", () => {
   withFixture((fixture, base) => {
-    fixture.record(evidence("EVD-B", ["SRC-B"], "VersÃ£o revista."));
+    fixture.record(evidence("EVD-B", ["SRC-B"], "Versão revista."));
     const unit = reviewRequired(fixture.unit(base, { kind: "commit", sha: fixture.commit() }));
     assert.equal("impactedSubjects" in unit.reviewerInput, false);
     assert.equal(serializeReviewerInput(unit.reviewerInput).includes("impactedSubjects"), false);

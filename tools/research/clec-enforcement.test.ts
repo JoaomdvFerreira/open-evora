@@ -1,6 +1,6 @@
 /**
  * End-to-end regression for the Citizen Language & Evidence Contract
- * enforcement chain (docs/investigationstrategy.md Â§12) through the
+ * enforcement chain (docs/investigationstrategy.md §12) through the
  * orchestrated canonical-integration path:
  *
  *   Lane A: candidate -> deterministic signals -> context-free precheck ->
@@ -49,7 +49,7 @@ const GATE_CLI = fileURLToPath(new URL("./gate/cli.ts", import.meta.url));
 const EVD_ID = "EVD-E2E";
 const EVD_FILE = `${EVD_ID}.yaml`;
 const EVD_REPO_PATH = `research/evidence/${EVD_FILE}`;
-const ADVISORY_SUMMARY = "A fonte regista muitas reclamaÃ§Ãµes sobre a recolha de resÃ­duos em 2026.";
+const ADVISORY_SUMMARY = "A fonte regista muitas reclamações sobre a recolha de resíduos em 2026.";
 
 function evidenceYaml(summary: string, inferenceLimit: string): string {
   return [
@@ -63,7 +63,7 @@ function evidenceYaml(summary: string, inferenceLimit: string): string {
     "scope:",
     "  geography:",
     "    level: municipality",
-    "    area: Ã‰vora",
+    "    area: Évora",
     "  temporal:",
     '    as_of: "2026"',
     "domains:",
@@ -76,8 +76,8 @@ function evidenceYaml(summary: string, inferenceLimit: string): string {
   ].join("\n");
 }
 
-const ADVISORY_EVD = evidenceYaml(ADVISORY_SUMMARY, "A contagem de reclamaÃ§Ãµes nÃ£o mede a frequÃªncia dos atrasos.");
-const BLOCKED_EVD = evidenceYaml(ADVISORY_SUMMARY, "A contagem de reclamaÃ§Ãµes nÃ£o se refere a PRB-0001.");
+const ADVISORY_EVD = evidenceYaml(ADVISORY_SUMMARY, "A contagem de reclamações não mede a frequência dos atrasos.");
+const BLOCKED_EVD = evidenceYaml(ADVISORY_SUMMARY, "A contagem de reclamações não se refere a PRB-0001.");
 
 // ---------------------------------------------------------------------------
 // AI boundary: recording stubs. The reviewer reads only the frozen reviewer
@@ -106,12 +106,12 @@ function concur(input: ReviewerInputPackage): IndependentReviewResult {
   return {
     schemaVersion: "2",
     outcome: "CONCUR",
-    rationale: "A afirmaÃ§Ã£o alterada corresponde ao que a fonte regista.",
+    rationale: "A afirmação alterada corresponde ao que a fonte regista.",
     findings: [],
     signalDispositions: input.signals.map(({ signalId, signal }) => ({
       signalId,
       disposition: "SUPPORTED",
-      reason: "A fonte citada regista a contagem de reclamaÃ§Ãµes referida.",
+      reason: "A fonte citada regista a contagem de reclamações referida.",
       evidenceReferences: signal.evidenceReferences?.length ? [...signal.evidenceReferences] : [signal.subjectId],
       relatedFindingIds: [],
     })),
@@ -129,7 +129,7 @@ function disagreement(input: ReviewerInputPackage): IndependentReviewResult {
   const review = concur(input);
   const { signalId, signal } = quantitySignal(input);
   review.outcome = "DISAGREEMENT_FOUND";
-  review.rationale = "A quantidade afirmada vai alÃ©m do que a fonte regista.";
+  review.rationale = "A quantidade afirmada vai além do que a fonte regista.";
   review.findings = [{
     findingId: "CLEC-FND-0001",
     recordId: EVD_ID,
@@ -138,9 +138,9 @@ function disagreement(input: ReviewerInputPackage): IndependentReviewResult {
     dimension: signal.dimension,
     kind: "CLEC_VIOLATION",
     severity: "BLOCKING",
-    reason: "A fonte nÃ£o regista um nÃºmero de reclamaÃ§Ãµes que suporte \"muitas\".",
+    reason: "A fonte não regista um número de reclamações que suporte \"muitas\".",
     evidenceReferences: ["SRC-BASE"],
-    correctionDirection: "Indicar o nÃºmero de reclamaÃ§Ãµes registado pela fonte, ou retirar o quantificador.",
+    correctionDirection: "Indicar o número de reclamações registado pela fonte, ou retirar o quantificador.",
     relatedSignalIds: [signalId],
   }];
   const disposition = review.signalDispositions.find((entry) => entry.signalId === signalId)!;
@@ -151,7 +151,7 @@ function disagreement(input: ReviewerInputPackage): IndependentReviewResult {
 // ---------------------------------------------------------------------------
 // Lane A harness.
 
-const TRIGGER: ResearchTrigger = { mode: "daily-discovery", request: "O que mudou na recolha de resÃ­duos?" };
+const TRIGGER: ResearchTrigger = { mode: "daily-discovery", request: "O que mudou na recolha de resíduos?" };
 const NOW = () => new Date("2026-09-15T12:00:00.000Z");
 const SOURCE_AVAILABLE = { check: (sourceId: string) => ({ sourceId, status: "available" as const, checkedAt: "2026-09-15T12:00:00.000Z" }) };
 const NOOP_POST_PROMOTION = {
@@ -320,7 +320,7 @@ test("Lane A: an advisory-signal candidate reaches READY_FOR_OWNER_MERGE only th
     if (promoted.status !== "READY_FOR_OWNER_MERGE") return;
     assert.equal(cycle.git("rev-parse", `${promoted.commitSha}^`), cycle.base);
     assert.deepEqual(cycle.git("diff", "--name-only", cycle.base, promoted.commitSha).split("\n"), [EVD_REPO_PATH]);
-    assert.match(cycle.git("show", `${promoted.commitSha}:${EVD_REPO_PATH}`), /muitas reclamaÃ§Ãµes/);
+    assert.match(cycle.git("show", `${promoted.commitSha}:${EVD_REPO_PATH}`), /muitas reclamações/);
 
     // No automatic merge: the base branch is untouched locally and never pushed; only the PR branch exists remotely.
     const { prs } = cycle.fixture.readFakeGhState();
@@ -413,12 +413,12 @@ test("Lane A: an independent semantic disagreement on an advisory-only candidate
 // ---------------------------------------------------------------------------
 // Source Verification Support: bounded, base-bound review context for Source fidelity.
 
-const COUNT_FACT = "312 reclamaÃ§Ãµes";
-const FIDELITY_SUMMARY = `A fonte regista ${COUNT_FACT} sobre a recolha de resÃ­duos no primeiro semestre de 2026.`;
-const FIDELITY_EVD = evidenceYaml(FIDELITY_SUMMARY, "A contagem de reclamaÃ§Ãµes nÃ£o mede a frequÃªncia dos atrasos.");
+const COUNT_FACT = "312 reclamações";
+const FIDELITY_SUMMARY = `A fonte regista ${COUNT_FACT} sobre a recolha de resíduos no primeiro semestre de 2026.`;
+const FIDELITY_EVD = evidenceYaml(FIDELITY_SUMMARY, "A contagem de reclamações não mede a frequência dos atrasos.");
 const VERIFIED_STATEMENTS = [
-  `O relatÃ³rio indica ${COUNT_FACT} sobre a recolha de resÃ­duos entre janeiro e junho de 2026.`,
-  "O relatÃ³rio nÃ£o distingue reclamaÃ§Ãµes por freguesia.",
+  `O relatório indica ${COUNT_FACT} sobre a recolha de resíduos entre janeiro e junho de 2026.`,
+  "O relatório não distingue reclamações por freguesia.",
 ];
 
 function writeSupport(researchRoot: string, statements: readonly string[], sourceId = "SRC-BASE"): void {
@@ -446,7 +446,7 @@ function sourceFidelityReviewer(statedFacts: readonly string[]): RecordingInvoke
     const review = concur(input);
     if (unsupported.length === 0) return review;
     review.outcome = "INSUFFICIENT_EVIDENCE";
-    review.rationale = "A metadata canÃ³nica da fonte nÃ£o permite verificar a afirmaÃ§Ã£o derivada da fonte.";
+    review.rationale = "A metadata canónica da fonte não permite verificar a afirmação derivada da fonte.";
     review.findings = unsupported.map((fact, i) => ({
       findingId: `CLEC-FND-${String(i + 1).padStart(4, "0")}`,
       recordId: EVD_ID,
@@ -455,9 +455,9 @@ function sourceFidelityReviewer(statedFacts: readonly string[]): RecordingInvoke
       dimension: "evidence_fidelity",
       kind: "INSUFFICIENT_EVIDENCE",
       severity: "BLOCKING",
-      reason: "Nem a metadata de SRC-BASE nem as afirmaÃ§Ãµes verificadas fornecidas indicam este facto.",
+      reason: "Nem a metadata de SRC-BASE nem as afirmações verificadas fornecidas indicam este facto.",
       evidenceReferences: ["SRC-BASE"],
-      correctionDirection: "Limitar a observaÃ§Ã£o ao que a fonte verificada indica, ou obter verificaÃ§Ã£o da fonte para este facto.",
+      correctionDirection: "Limitar a observação ao que a fonte verificada indica, ou obter verificação da fonte para este facto.",
       relatedSignalIds: [],
     }));
     return review;

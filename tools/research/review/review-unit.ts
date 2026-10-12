@@ -1,6 +1,6 @@
 /**
  * Derives the direct canonical review (direct pull-request) semantic-review unit from Git
- * alone (docs/investigationstrategy.md Â§12 "Mandatory independent semantic
+ * alone (docs/investigationstrategy.md §12 "Mandatory independent semantic
  * review"). The unit is every canonical record file created or updated
  * between an exact base commit and a prospective head, reviewed against the
  * canonical corpus reconstructed from that base.
@@ -15,9 +15,9 @@
  * a change touching both canonical records and support is refused outright
  * (the support must be merged first, in its own pull request).
  *
- * Every comparison step reuses the existing primitives â€” the corpus loader,
+ * Every comparison step reuses the existing primitives — the corpus loader,
  * candidate loader, canonical-integration review and F00-F reviewer input
- * package â€” so direct canonical review uses the shared review contract.
+ * package — so direct canonical review uses the shared review contract.
  */
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -156,7 +156,7 @@ function schemasInWorkingTree(repoRoot: string): RecordSchema[] {
 
 /**
  * A canonical record file is a top-level YAML file in a schema-declared
- * record directory â€” the same discovery rule the corpus loader uses.
+ * record directory — the same discovery rule the corpus loader uses.
  */
 function isCanonicalRecordPath(path: string, recordDirs: ReadonlySet<string>): boolean {
   const slash = path.lastIndexOf("/");
