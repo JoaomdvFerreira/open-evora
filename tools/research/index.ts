@@ -1,3 +1,3 @@
-/** Public API consumed by the Research Explorer benchmark. */
-export { loadCorpusIndex } from "./core/corpus.ts";
-export { validateResearchRoot } from "./validation/validate.ts";
+/** Public API consumed by Research Explorer tooling. */
+export { loadCorpusIndex, loadCorpusIndexTolerant } from "./core/corpus.ts";
+export { validateCorpusIndex, validateResearchRoot } from "./validation/validate.ts";
