@@ -13,9 +13,8 @@ geography:
 affected_populations:
   - população migrante residente no concelho de Évora
 problem_statement: >-
-  O diagnóstico municipal de 2023, retomado publicamente pelo Município em
-  fevereiro de 2026 no contexto do Plano Municipal para a Integração de
-  Migrantes, identificou barreiras linguísticas e dificuldades no acesso à saúde
+  O diagnóstico municipal de 2023, cujas conclusões foram reportadas numa ata
+  municipal de 2026, identificou barreiras linguísticas e dificuldades no acesso à saúde
   e à saúde mental para a população migrante em Évora. A AIMA registou 5 621
   cidadãos estrangeiros residentes no concelho em 2024, confirmando uma
   população local numericamente relevante, mas esta contagem não mede a
@@ -35,8 +34,8 @@ investigation:
     - question: Persistem em 2026 barreiras linguísticas e dificuldades materiais no
         acesso à saúde ou saúde mental entre residentes migrantes em Évora?
       why_open: A evidência local que identifica as dificuldades deriva de um
-        diagnóstico de 2023, embora tenha sido retomada pelo Município na
-        aprovação do PMIM em 2026.
+        diagnóstico de 2023, embora as suas conclusões tenham sido reportadas
+        numa ata municipal de 2026.
       current_action: Procurar apenas evidência local atual capaz de confirmar,
         delimitar ou contrariar a persistência das barreiras, preferindo dados
         de serviço ou experiência de jornada a novas fontes genéricas.

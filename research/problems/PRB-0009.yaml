@@ -19,13 +19,12 @@ problem_statement: "A fiabilidade dos serviços de recolha de resíduos sólidos
   publicamente a higiene urbana como um dos desafios mais urgentes da gestão
   municipal, avançando com uma reestruturação substancial da frota, dos recursos
   humanos, dos modelos de recolha, da distribuição de responsabilidades e da
-  monitorização, ao mesmo tempo que reconheceram explicitamente que persistem
-  dificuldades em algumas zonas."
+  monitorização."
 causal_reading: A causa dominante é sobretudo operacional e de capacidade —
   frota envelhecida ou avariada, capacidade insuficiente de veículos de reserva,
   pessoal e logística, organização das rotas e do serviço de recolha e
-  distribuição de responsabilidades entre entidades, incluindo Município, Gesamb
-  e juntas de freguesia. Esta leitura não está validada; o potencial de
+  distribuição de responsabilidades entre entidades, incluindo Município e juntas
+  de freguesia. Esta leitura não está validada; o potencial de
   intervenção digital sobre este mecanismo dominante é avaliado como baixo,
   embora possam existir oportunidades mais estreitas relacionadas com
   transparência, coordenação e informação, distintas do mecanismo operacional
@@ -78,8 +77,7 @@ investigation:
         identificaram publicamente a higiene urbana como um dos desafios mais
         urgentes da gestão municipal e avançaram com uma reestruturação
         substancial da frota, dos recursos humanos, dos modelos de recolha, da
-        distribuição de responsabilidades e da monitorização, reconhecendo
-        simultaneamente que persistiam dificuldades em algumas zonas.
+        distribuição de responsabilidades e da monitorização.
       evidence:
         - EVD-000065
         - EVD-000066
@@ -91,8 +89,8 @@ investigation:
         desconhecida.
 
 
-        Uma normalização parcial da frota em maio de 2026 e o reforço para 19
-        veículos em julho demonstraram uma alteração material desde fevereiro.
+        Uma normalização parcial da frota em maio de 2026 e o reforço de pessoal
+        e veículos documentado entre julho e agosto demonstraram uma alteração material desde fevereiro.
         Esta evolução impede que a situação próxima de colapso documentada em
         fevereiro seja tratada como representando automaticamente o estado
         operacional existente em agosto.
@@ -292,15 +290,16 @@ decision_basis:
 
 
       Uma normalização parcial da frota em maio de 2026 (EVD-000095) e o reforço
-      para 19 veículos em julho de 2026, documentado através de EVD-000066,
-      demonstram uma alteração material desde fevereiro.
+      de pessoal e veículos documentado entre julho e agosto de 2026
+      (EVD-000066) demonstram uma alteração material desde fevereiro.
 
 
       As declarações institucionais de julho e agosto de 2026 (EVD-000065,
       EVD-000066) constituem a evidência primária e oficial mais
       recente e sustentam a afirmação corroborada: o próprio Município
-      reconhecia, nesse período, que persistiam dificuldades em algumas zonas
-      apesar da reestruturação em curso.
+      descrevia, nesse período, a higiene urbana como um problema urgente, sem
+      que a reorganização documentada demonstre que a fiabilidade do serviço
+      tenha sido restaurada.
 
 
       Não foi localizado nenhum conjunto de dados público sobre o desempenho
@@ -330,10 +329,11 @@ decision_basis:
       ser ignorado.
 
 
-      Do mesmo modo, foi preservado o reconhecimento do próprio Município, em
-      julho e agosto de 2026, de que persistiam dificuldades em algumas zonas
-      (EVD-000065, EVD-000066), em vez de se assumir que a
-      reestruturação já tinha resolvido o problema.
+      Do mesmo modo, foi preservada a descrição, pelo próprio Município, da
+      higiene urbana como um problema urgente em julho de 2026 (EVD-000065) e
+      o limite de que a reorganização de julho e agosto de 2026 não demonstra
+      que a fiabilidade do serviço tenha sido restaurada (EVD-000066), em vez
+      de se assumir que a reestruturação já tinha resolvido o problema.
     evidence:
       - EVD-000095
   overlap_check:
@@ -350,8 +350,7 @@ decision_basis:
     Município identificaram publicamente a higiene urbana como um dos desafios
     mais urgentes da gestão municipal, avançando com uma reestruturação
     substancial da frota, dos recursos humanos, dos modelos de recolha, da
-    distribuição de responsabilidades e da monitorização, ao mesmo tempo que
-    reconheceram explicitamente que persistem dificuldades em algumas zonas."
+    distribuição de responsabilidades e da monitorização."
   supporting_evidence:
     - EVD-000065
     - EVD-000066
@@ -414,8 +413,7 @@ decision_basis:
       Circunscrito ao período documentado no registo: uma interrupção do serviço
       em fevereiro de 2026, uma normalização parcial da frota em maio de 2026 e
       o reconhecimento institucional, em julho e agosto de 2026, de que a
-      higiene urbana continuava a constituir um desafio urgente e de que
-      persistiam dificuldades em algumas zonas.
+      higiene urbana continuava a constituir um desafio urgente.
 
 
       A afirmação não se estende a qualquer estado operacional posterior a
@@ -425,9 +423,8 @@ decision_basis:
     A afirmação corroborada é SUPORTADA apenas nos seguintes termos: durante
     2026, Évora registou uma falha material e institucionalmente documentada na
     fiabilidade dos serviços de recolha de resíduos e higiene urbana, seguida de
-    uma intervenção municipal substancial, mantendo o próprio Município, em
-    julho e agosto de 2026, o reconhecimento de dificuldades persistentes em
-    algumas zonas.
+    uma intervenção municipal substancial, sem que a evidência estabeleça que
+    essa intervenção tenha restaurado a fiabilidade do serviço.
 
 
     NÃO É SUPORTADA como uma afirmação de que o serviço continua atualmente a
