@@ -5,20 +5,20 @@ provenance:
     - SRC-0103
   extracted_at: 2026-08-12
 observation:
-  summary: "O Volume I do PMUSE documenta informação física heterogénea nas
-    paragens de autocarro: as paragens sem abrigo têm apenas uma placa
-    azul/branca que identifica o operador e a linha, enquanto as paragens com
-    abrigo têm um painel que apresenta linhas/paragens/horários — mas o próprio
-    plano afirma que este painel não dispõe dos elementos de acessibilidade (por
-    exemplo, braille, avisos sonoros) necessários para a acessibilidade
-    universal."
+  summary: >-
+    O diagnóstico do Volume I do PMUSE descreve, no Centro Histórico, paragens
+    sem abrigo identificadas por uma placa azul e branca com o operador e a
+    linha, sem mapa da rede nem horários. Descreve também paragens com abrigo
+    cujos painéis apresentam informação básica sobre linhas, paragens e
+    horários, mas não incluem elementos de acessibilidade universal como
+    informação em braille e avisos sonoros.
 scope:
   geography:
     level: city
     area: Évora cidade
   populations:
-    - transporte público utilizadores
-    - pessoas com mobilidade reduzida / sensory impairments
+    - pessoas que utilizam o transporte público em Évora
+    - pessoas que dependem de informação acessível nas paragens, incluindo pessoas com deficiência sensorial
   temporal:
     status: unknown
 domains:
@@ -28,6 +28,8 @@ domains:
 evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
-  - O diagnóstico não identifica neste registo quais as paragens concretas
-    afetadas nem o impacto material numa viagem real.
+  - O diagnóstico não identifica neste registo todas as paragens afetadas. A
+    descrição e a figura 99 relativas ao Centro Histórico não demonstram que
+    todas as paragens sem abrigo de Évora tenham a mesma informação.
   - O estado atual das paragens após o diagnóstico não está estabelecido.
+  - Não está estabelecido qualquer impacto prático numa viagem concreta.
