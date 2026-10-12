@@ -1,0 +1,120 @@
+problem_id: PRB-0013
+created_at: "2026-10-12"
+updated_at: "2026-10-12"
+title: "Habitação a preços comportáveis em Évora: necessidade identificada e respostas municipais"
+domain: [HOU, SOC]
+geography:
+  level: municipality
+  area: Évora
+affected_populations:
+  - residentes que procuram habitação adequada e a preços comportáveis
+  - pessoas vulneráveis que necessitam de alojamento temporário
+problem_statement: >-
+  Documentos de planeamento de 2024–2025 identificam no Município de Évora
+  preços elevados de compra e arrendamento, oferta insuficiente de habitação
+  a preços comportáveis, social e a custos controlados, e degradação
+  habitacional. O plano de 2025 prevê reabilitação, arrendamento apoiado,
+  habitação a custos controlados e alojamento temporário para pessoas
+  vulneráveis, sem demonstrar a sua execução. O Município documentou em 2026
+  financiamento de 67,1 milhões de euros para 459 habitações, projetos de
+  40 casas para arrendamento acessível no Bairro do Moinho e 122 novas casas
+  no Bairro do Escurinho, um centro de acolhimento transitório para pelo
+  menos 24 pessoas e a intenção de beneficiar cerca de 500 famílias.
+  Documentou também a entrega de 12 casas para arrendamento apoiado na
+  Malagueira em janeiro de 2026, sem estabelecer se entram na contagem das 459.
+  A evidência ligada não quantifica a necessidade habitacional ainda não
+  satisfeita em 2026, os preços atuais representativos, quantas das 459 casas
+  estão concluídas ou ocupadas, nem a conclusão das intervenções no Moinho,
+  no Escurinho ou do centro de acolhimento. As intervenções documentadas não
+  demonstram, por si só, que as necessidades identificadas foram resolvidas.
+investigation:
+  open_questions:
+    - question: >-
+        Qual é o estado de execução das intervenções habitacionais municipais
+        documentadas para 2026, quantas habitações estão concluídas ou entregues
+        e qual é o estado dos projetos no Bairro do Moinho, no Bairro do
+        Escurinho e do centro de acolhimento transitório?
+      why_open: >-
+        O financiamento, as metas e os projetos não indicam quantas casas
+        estão concluídas ou ocupadas. A relação entre as 12 entregas na
+        Malagueira e as 459 habitações anunciadas não está esclarecida.
+      latest_result: >-
+        O Município documentou financiamento e projetos, bem como 12 casas
+        entregues na Malagueira em janeiro de 2026, sem estabelecer o estado
+        de execução das restantes intervenções.
+      current_action: >-
+        Está por verificar se informação pública municipal atual esclarece
+        conclusões, entregas e o estado do Moinho, do Escurinho e do centro
+        de acolhimento. Está preparado, mas não enviado, um pedido ao Município
+        sobre a execução do programa de 459 habitações, números concluídos,
+        entregues e ocupados, quando disponíveis, estado do Moinho, do
+        Escurinho e do centro, e se as 12 casas da Malagueira integram
+        ou não a contagem das 459.
+      resolution_condition: >-
+        Informação municipal que distinga financiamento, obra, conclusão,
+        entrega e ocupação e esclareça a contagem das casas da Malagueira.
+      evidence: [EVD-000042, EVD-000032]
+    - question: >-
+        Existem dados oficiais recentes que permitam caracterizar os preços de
+        compra e arrendamento e a oferta de habitação a preços comportáveis em
+        Évora com detalhe geográfico adequado?
+      why_open: >-
+        O diagnóstico de 2024–2025 não mede a necessidade ou os preços atuais;
+        a evidência ligada não estabelece se existem dados oficiais recentes
+        com detalhe geográfico e definições utilizáveis para essa caracterização.
+      latest_result: >-
+        O planeamento identificou preços elevados e oferta insuficiente em
+        2024–2025; as respostas municipais documentadas não medem a
+        necessidade residual em 2026 nem confirmam a existência de dados
+        recentes, geograficamente adequados e utilizáveis sobre preços e oferta.
+      current_action: >-
+        Está por verificar se existem dados oficiais sobre preços, oferta e
+        necessidade, se são recentes, se têm detalhe geográfico adequado a
+        Évora e se as suas definições permitem utilizá-los nesta análise.
+      resolution_condition: >-
+        Verificação da existência, recência, cobertura geográfica e definições
+        de dados oficiais utilizáveis, ou documentação das limitações das
+        fontes consultadas caso não permitam essa caracterização.
+      evidence: [EVD-000031, EVD-000032, EVD-000042]
+  path:
+    initial_signal:
+      summary: >-
+        O planeamento de 2024–2025 identificou preços elevados, oferta
+        insuficiente de habitação acessível, social e a custos controlados,
+        e degradação habitacional.
+      evidence: [EVD-000031]
+    development:
+      summary: >-
+        O plano de 2025 descreveu respostas previstas. Em 2026, o Município
+        documentou financiamento, projetos e 12 casas entregues na Malagueira;
+        a execução e o efeito das restantes medidas continuam por estabelecer
+        na evidência ligada.
+      evidence: [EVD-000032, EVD-000042]
+    delimitation:
+      summary: >-
+        Este problema trata da habitação geral e das respostas municipais.
+        A capacidade das residências universitárias, as listas de espera,
+        estudantes sem colocação e a expansão do alojamento universitário
+        são tratados em PRB-0006.
+      evidence: [EVD-000031, EVD-000032, EVD-000042]
+evidence:
+  - evidence_id: EVD-000031
+    effects: [SUPPORTS, REFINES]
+    research_roles: [LOCAL_OBSERVATION]
+  - evidence_id: EVD-000032
+    effects: [BOUNDS, REFINES]
+    research_roles: [PLANNED_RESPONSE]
+  - evidence_id: EVD-000042
+    effects: [BOUNDS, REFINES]
+    research_roles: [EXISTING_RESPONSE, PLANNED_RESPONSE]
+evidence_status: discovered
+validation_status: unvalidated
+digital_tractability: not_assessed
+solution_landscape_status: not_assessed
+status: OPEN
+history:
+  - date: 2026-10-12
+    summary: >-
+      PRB-0013 foi criado pela separação da habitação geral e das respostas
+      municipais antes incluídas em PRB-0006. O alojamento estudantil
+      permanece em PRB-0006.
