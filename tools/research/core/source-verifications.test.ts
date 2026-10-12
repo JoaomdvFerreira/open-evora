@@ -7,12 +7,9 @@ import { fileURLToPath } from "node:url";
 
 import {
   loadSourceVerifications,
-  selectSourceVerificationContext,
   sourceVerificationEligibilityErrors,
-  SourceVerificationError,
   sourceVerificationIneligibility,
   validateSourceVerifications,
-  type SourceVerification,
 } from "./source-verifications.ts";
 import type { CorpusIndex, RecordFields, RecordSchema } from "./types.ts";
 import { stringifyRecordYaml } from "./yaml.ts";
@@ -169,41 +166,6 @@ test("parsing is deterministic: malformed YAML, duplicate keys and stray files a
       "[source-verifications/SRC-0001.yml] only SRC-*.yaml support files are allowed in this directory",
       "[source-verifications/notes.md] only SRC-*.yaml support files are allowed in this directory",
     ]);
-  });
-});
-
-test("selection returns only applicable support, sorted by SRC ID; absent support is simply absent", () => {
-  withSupportRoot({
-    "SRC-0003.yaml": stringifyRecordYaml(support("SRC-0003")),
-    "SRC-0001.yaml": stringifyRecordYaml(support("SRC-0001")),
-    "SRC-0009.yaml": stringifyRecordYaml(support("SRC-0009")),
-  }, (root) => {
-    const index = indexOf(root, ["SRC-0001", "SRC-0002", "SRC-0003", "SRC-0009"].map((id) => publicSource(id)));
-    const set = loadSourceVerifications(index);
-    const selected = selectSourceVerificationContext(set, ["SRC-0003", "SRC-0002", "SRC-0001", "SRC-0003"], index);
-    assert.deepEqual(selected.map((entry: SourceVerification) => entry.source_id), ["SRC-0001", "SRC-0003"]);
-    assert.deepEqual(selectSourceVerificationContext(set, [], index), []);
-  });
-});
-
-test("invalid applicable support fails closed, while unrelated invalid support does not affect selection", () => {
-  withSupportRoot({
-    "SRC-0001.yaml": stringifyRecordYaml(support("SRC-0001", { verified_claims: [] })),
-    "SRC-0002.yaml": stringifyRecordYaml(support("SRC-0002")),
-  }, (root) => {
-    const index = indexOf(root, [publicSource("SRC-0001"), publicSource("SRC-0002")]);
-    const set = loadSourceVerifications(index);
-    assert.throws(() => selectSourceVerificationContext(set, ["SRC-0001", "SRC-0002"], index), SourceVerificationError);
-    assert.deepEqual(selectSourceVerificationContext(set, ["SRC-0002"], index).map((entry) => entry.source_id), ["SRC-0002"]);
-  });
-});
-
-test("support stops applying when the prospective SRC is no longer eligible", () => {
-  withSupportRoot({ "SRC-0001.yaml": stringifyRecordYaml(support("SRC-0001")) }, (root) => {
-    const base = indexOf(root, [publicSource("SRC-0001")]);
-    const set = loadSourceVerifications(base);
-    const prospective = indexOf(root, [publicSource("SRC-0001", { access: { level: "restricted" } })]);
-    assert.throws(() => selectSourceVerificationContext(set, ["SRC-0001"], prospective), /no longer eligible: .*access.level "restricted"/);
   });
 });
 

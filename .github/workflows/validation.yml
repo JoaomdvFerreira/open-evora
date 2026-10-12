@@ -13,15 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          # Review verification rebuilds the reviewer input from the PR base and head commits.
+          # Publication-path safety compares the PR base and head commits.
           fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version: 24
       - run: npm ci
-      - name: Research semantic review attestation (direct PR)
-        if: github.event_name == 'pull_request'
-        run: npm run research:review -- --event-path "$GITHUB_EVENT_PATH"
       - run: npm ci --prefix apps/research-explorer
       - run: npm run research:check
       - run: npm run build-data:test --prefix apps/research-explorer

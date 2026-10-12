@@ -18,7 +18,7 @@
 
 ## Research semantic review
 
-<!-- CI reconstructs and validates the committed .research-review-attestation.json for canonical research changes. PR-body content is not used for semantic-review verification. -->
+<!-- For canonical research changes, record the outcome or reference of the already-completed independent owner-side review. For noncanonical changes, use N/A. -->
 
 N/A
 

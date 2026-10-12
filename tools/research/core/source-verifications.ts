@@ -8,8 +8,8 @@
  * canonical corpus loader (corpus.ts) never reads it, and the Explorer never
  * publishes it. Each file holds bounded factual paraphrases that were
  * verified, upstream and by a human, against captured bytes of one public
- * Source. Its only consumer is the shared independent-review input
- * (review/reviewer-input.ts), which receives it from the review base.
+ * Source. It is validated by the research check and can inform owner-side
+ * semantic review of Source-to-EVD fidelity.
  *
  * Validation here is deterministic and structural: exact keys, the
  * referenced SRC's existence and eligibility, dates, digest/media-type shape,
@@ -67,12 +67,6 @@ export interface SourceVerificationSet {
   bySourceId: ReadonlyMap<string, SourceVerification>;
   issues: readonly SourceVerificationIssue[];
 }
-
-/** Applicable support that cannot be used; review callers fail closed on it. */
-export class SourceVerificationError extends Error {}
-
-/** The failed-check code every review path reports for a SourceVerificationError. */
-export const SOURCE_VERIFICATION_SUPPORT = "SOURCE_VERIFICATION_SUPPORT";
 
 const TOP_LEVEL_KEYS = ["source_id", "retrieval", "verified_claims"];
 const RETRIEVAL_KEYS = ["retrieved_at", "content_sha256", "media_type", "archive_reference"];
@@ -222,8 +216,8 @@ export function validateSourceVerification(
 
 /**
  * Loads and validates every file under `<index.researchRoot>/source-verifications/`
- * against the SRC records of `index` — the review base the caller is bound
- * to. Deterministic: entries are read in sorted name order. A missing
+ * against the SRC records of `index`. Deterministic: entries are read in
+ * sorted name order. A missing
  * directory is an empty set. Never throws for file content; every problem
  * is reported in `issues`.
  */
@@ -258,31 +252,4 @@ export function loadSourceVerifications(index: CorpusIndex): SourceVerificationS
 /** Validation-report lines for every invalid support file under the research root of `index`. */
 export function validateSourceVerifications(index: CorpusIndex): string[] {
   return loadSourceVerifications(index).issues.flatMap((issue) => issue.errors.map((error) => `[${issue.file}] ${error}`));
-}
-
-/**
- * The support applicable to exactly `sourceIds` (SRC IDs already reachable
- * from the candidates), sorted by SRC ID; Sources without support are simply
- * absent (absence is UNKNOWN, never NO). Fails closed when an applicable
- * file is invalid, or when the prospective SRC — which a candidate may
- * replace — is no longer eligible.
- */
-export function selectSourceVerificationContext(
-  support: SourceVerificationSet,
-  sourceIds: Iterable<string>,
-  prospective: CorpusIndex
-): SourceVerification[] {
-  const wanted = new Set(sourceIds);
-  const invalid = support.issues.filter((issue) => issue.sourceId !== undefined && wanted.has(issue.sourceId));
-  if (invalid.length > 0) {
-    throw new SourceVerificationError(
-      `applicable Source Verification Support is invalid: ${invalid.map((issue) => `${issue.file}: ${issue.errors.join("; ")}`).join(" | ")}`
-    );
-  }
-  const selected = [...wanted].filter((id) => support.bySourceId.has(id)).sort();
-  for (const id of selected) {
-    const errors = sourceVerificationEligibilityErrors(id, sourceFields(prospective, id));
-    if (errors.length > 0) throw new SourceVerificationError(`applicable Source Verification Support for ${id} is no longer eligible: ${errors.join("; ")}`);
-  }
-  return selected.map((id) => structuredClone(support.bySourceId.get(id)!));
 }
