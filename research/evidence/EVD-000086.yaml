@@ -11,7 +11,7 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade — equipamentos culturais municipais
+    area: cidade de Évora — equipamentos culturais municipais
   populations:
     - pessoas com deficiência
   temporal:

@@ -5,7 +5,7 @@ resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: Norfolk do Norte Distrito, Reino Unido
+    area: North Norfolk, Reino Unido
   domains:
     - ENV
     - PUB

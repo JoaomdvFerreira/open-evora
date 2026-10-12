@@ -14,7 +14,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - event organisers
+    - organizadores de eventos
     - equipas culturais municipais
     - event/agenda utilizadores
   temporal:

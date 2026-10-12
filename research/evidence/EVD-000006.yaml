@@ -13,12 +13,12 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade
+    area: cidade de Évora
   populations:
-    - bus passengers
+    - passageiros de autocarro
     - pessoas com mobilidade reduzida
     - peões
-    - cyclists
+    - ciclistas
   temporal:
     status: unknown
 domains:

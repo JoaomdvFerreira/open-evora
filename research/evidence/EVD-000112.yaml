@@ -14,7 +14,7 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade — espaço público
+    area: cidade de Évora — espaço público
   populations:
     - pessoas com mobilidade reduzida
   temporal:

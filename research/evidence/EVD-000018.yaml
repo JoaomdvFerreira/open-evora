@@ -10,7 +10,7 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade (Centro Histórico e principais access/exit axes)
+    area: cidade de Évora (Centro Histórico e principais eixos de entrada e saída)
   populations:
     - pessoas com mobilidade reduzida
     - peões
@@ -25,5 +25,4 @@ evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
   - A existência e o âmbito do R.A.M.P.A.-Évora não estabelecem o estado atual
-    das barreiras nem a existência ou disponibilidade de um dataset público
-    associado.
+    das barreiras nem a existência ou disponibilidade de um conjunto de dados público associado.

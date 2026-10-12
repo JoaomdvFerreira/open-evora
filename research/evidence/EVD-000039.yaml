@@ -11,7 +11,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - university estudantes e diplomados recentes
+    - estudantes universitários e diplomados recentes
   temporal:
     start: "2024"
     end: "2027"

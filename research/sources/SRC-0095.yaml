@@ -5,7 +5,7 @@ resource_type: webpage
 scope:
   geography:
     level: municipality
-    area: Havant Distrito, Hampshire, Reino Unido
+    area: Havant, Hampshire, Reino Unido
   domains:
     - ENV
     - PUB

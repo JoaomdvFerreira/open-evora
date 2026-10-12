@@ -12,10 +12,10 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade
+    area: cidade de Évora
   populations:
-    - businesses
-    - investors
+    - empresas
+    - investidores
   temporal:
     start: "2013"
     end: "2026"

@@ -9,9 +9,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade
+    area: cidade de Évora
   populations:
-    - TREVO passengers
+    - passageiros do TREVO
     - potenciais utilizadores de dados
   temporal:
     as_of: 2026-08-10

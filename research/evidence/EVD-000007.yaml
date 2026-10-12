@@ -17,7 +17,7 @@ scope:
   populations:
     - peões
     - residentes
-    - road utilizadores
+    - utilizadores das vias rodoviárias
   temporal:
     status: unknown
 domains:

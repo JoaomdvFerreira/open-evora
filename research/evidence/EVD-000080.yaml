@@ -12,9 +12,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade (urbana TREVO rede)
+    area: cidade de Évora (rede urbana TREVO)
   populations:
-    - TREVO passengers
+    - passageiros do TREVO
   temporal:
     start: 2025-02
     end: 2025-10

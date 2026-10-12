@@ -7,7 +7,7 @@ provenance:
     - SRC-0055
   extracted_at: 2026-08-11
 observation:
-  summary: As Sources municipais associadas à perturbação e reorganização da
+  summary: As fontes municipais associadas à perturbação e reorganização da
     recolha de resíduos apontam para fatores operacionais como envelhecimento e
     avarias da frota, capacidade de reserva, dotação de pessoal, organização dos
     circuitos e do serviço e condições logísticas.
@@ -26,5 +26,5 @@ domains:
 evidence_nature: claim
 claim_authority: authoritative
 inference_limits:
-  - Os fatores são explicações operacionais atribuídas pelas Sources e não uma
+  - Os fatores são explicações operacionais atribuídas pelas fontes e não uma
     decomposição causal independente da contribuição relativa de cada fator.

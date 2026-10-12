@@ -15,7 +15,7 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade
+    area: cidade de Évora
   populations:
     - pessoas que utilizam o transporte público em Évora
     - pessoas que dependem de informação acessível nas paragens, incluindo pessoas com deficiência sensorial

@@ -30,7 +30,7 @@ domains:
 evidence_nature: measurement
 claim_authority: authoritative
 inference_limits:
-  - O piloto combinou sensing, informação em tempo real, preços ajustados à
+  - O piloto combinou deteção por sensores, informação em tempo real, preços ajustados à
     procura e alterações de pagamento, pelo que o efeito da informação isolada
     não é identificado.
   - Os resultados não estabelecem transferibilidade causal para Évora.

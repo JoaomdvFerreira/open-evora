@@ -15,8 +15,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - students
-    - job seekers
+    - estudantes
+    - pessoas à procura de emprego
     - grupos vulneráveis à procura de emprego
   temporal:
     as_of: "2025"

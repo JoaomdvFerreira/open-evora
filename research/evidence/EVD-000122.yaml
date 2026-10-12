@@ -15,9 +15,9 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade
+    area: cidade de Évora
   populations:
-    - transporte público utilizadores
+    - utilizadores dos transportes públicos
   temporal:
     as_of: 2025-09
 domains:

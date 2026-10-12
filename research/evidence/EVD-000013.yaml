@@ -13,8 +13,8 @@ scope:
     level: intermunicipal
     area: Alentejo Central
   populations:
-    - citizens
-    - planners
+    - cidadãos
+    - planeadores
     - potenciais promotores/utilizadores de dados
   temporal:
     status: unknown

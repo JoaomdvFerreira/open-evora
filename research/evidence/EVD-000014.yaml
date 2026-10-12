@@ -11,7 +11,7 @@ scope:
     level: intermunicipal
     area: Alentejo Central
   populations:
-    - transporte público utilizadores
+    - utilizadores dos transportes públicos
     - promotores/utilizadores de dados
   temporal:
     as_of: "2025"
@@ -22,5 +22,5 @@ evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
   - A disponibilização de GTFS através do Google Maps não estabelece a
-    existência de um endpoint público de descarga nem condições explícitas de
+    existência de um ponto de acesso público para descarga nem condições explícitas de
     reutilização do GTFS.

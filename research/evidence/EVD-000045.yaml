@@ -13,8 +13,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - informal caregivers
-    - cared-para pessoas
+    - cuidadores informais
+    - pessoas cuidadas
   temporal:
     start: "2025"
     end: "2026"

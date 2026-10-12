@@ -50,5 +50,6 @@ test("authored EVD and SRC prose has no known English migration residue", () => 
     authored.push(String(geography.area ?? ""), ...((fields.caveats as string[]) ?? []));
   }
   const residue = /\b(people|residents|drivers|pedestrians|users|using|seeking|developers|consumers|vulnerable|accommodation|associations|sports|facilities|participants|surrounding|outside|within|parking|collection|council|connections)\b/i;
-  assert.deepEqual(authored.filter((value) => residue.test(value.replaceAll("Parking Buddy", ""))), []);
+  const protectedNames = ["Parking Buddy", "Havant Borough Council", "Oxford City Council", "North Norfolk District Council"];
+  assert.deepEqual(authored.filter((value) => residue.test(protectedNames.reduce((text, name) => text.replaceAll(name, ""), value))), []);
 });

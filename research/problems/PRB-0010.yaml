@@ -1,6 +1,6 @@
 problem_id: PRB-0010
 created_at: 2026-08-28
-updated_at: 2026-10-10
+updated_at: 2026-10-12
 title: Degradação do pavimento rodoviário em Évora, com extensão atual ainda por
   confirmar
 domain:
@@ -150,7 +150,7 @@ decision_basis:
     aplicação de reporte rodoviário. A revisão de sobreposição é registada
     separadamente no decision_basis.
   corroboration_basis: >-
-    A Corroboration é sustentada apenas para uma afirmação histórica e
+    A corroboração é sustentada apenas para uma afirmação histórica e
 
     temporalmente delimitada, relativa ao episódio de degradação documentado no
 
@@ -161,10 +161,10 @@ decision_basis:
     geral de reparação.
 
 
-    EVD-000082, com provenance em SRC-0069, regista as alegações apresentadas
+    EVD-000082, com proveniência em SRC-0069, regista as alegações apresentadas
     numa
 
-    petição pública criada em janeiro de 2026. EVD-000083, com provenance em
+    petição pública criada em janeiro de 2026. EVD-000083, com proveniência em
 
     SRC-0070 e SRC-0071, documenta através de cobertura jornalística o
 
@@ -204,7 +204,7 @@ decision_basis:
 
     janeiro-fevereiro de 2026 persiste hoje a uma escala comparável. Os registos
     disponíveis não estabelecem a condição municipal atual nem o estado agregado
-    de execução do procedimento geral, razão pela qual a decisão humana de Corroboration para a
+    de execução do procedimento geral, razão pela qual a decisão humana de corroboração para a
     afirmação
 
     de persistência atual permanece HOLD.
@@ -291,7 +291,7 @@ decision_basis:
     summary: >-
       A revisão de sobreposição está registada como realizada; este
       decision_basis não contém relações related_problems autoradas. O âmbito
-      substantivo deste Problem é a degradação física do pavimento rodoviário e a
+      substantivo deste problema é a degradação física do pavimento rodoviário e a
       condição atual da rede municipal, que permanece por estabelecer.
     related_problems: []
   corroboration_statement: Uma petição de janeiro de 2026 relatou a existência
@@ -325,17 +325,17 @@ decision_basis:
 
     resposta institucional municipal. Esta distinção contribui para sustentar a
 
-    manifestação histórica, mas a existência de Sources ou registos distintos
+    manifestação histórica, mas a existência de fontes ou registos distintos
     não
 
     é, por si só, tratada como prova automática de independência.
 
 
-    EVD-000083 utiliza SRC-0070 e SRC-0071 como provenance do mesmo registo de
+    EVD-000083 utiliza SRC-0070 e SRC-0071 como proveniência do mesmo registo de
 
-    Evidence; não existe no modelo vNext uma distinção entre Source principal e
+    evidência; não existe no modelo vNext uma distinção entre fonte principal e
 
-    Source adicional.
+    fonte adicional.
 
 
     EVD-000084 corresponde a uma terceira unidade de fonte/evento, mas essa
@@ -409,7 +409,7 @@ decision_basis:
     municipal. Criar esse âmbito excederia o que EVD-000084 suporta.
 
 
-    A decisão humana de Corroboration permanece HOLD para a questão da
+    A decisão humana de corroboração permanece HOLD para a questão da
     persistência
 
     atual precisamente por esta limitação.

@@ -11,7 +11,7 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora urbana rede
+    area: rede urbana de Évora
   populations:
     - passageiros da rede urbana
   temporal:
