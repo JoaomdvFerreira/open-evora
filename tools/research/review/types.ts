@@ -2,16 +2,13 @@
  * Structural types for the shared semantic review kernel: the structured
  * independent-review result contract, its findings and signal dispositions,
  * and the neutral review framing a reviewer input package carries. These are
- * consumed by every review route (the orchestrated cycle and direct review) and
- * are never by themselves a Gate decision or a canonical record type.
+ * consumed by direct review and are never by themselves a publication decision
+ * or a canonical record type.
  */
 import type { ClecDimension } from "../language/signals.ts";
 
 /**
- * The review framing a package carries: an orchestrated cycle's manifest
- * (Lane A, supplied structurally as its GenerationManifest), or a fixed,
- * author-independent framing for a direct canonical research change.
- * Only these fields are ever read.
+ * The author-independent framing a direct canonical research review carries.
  */
 export interface ReviewFraming {
   investigationQuestion: string;
@@ -70,9 +67,9 @@ export interface SignalDisposition {
 /**
  * The distinct, structurally-required independent-review result (OD-B).
  * Produced by a separate invocation/role that consumes the
- * immutable candidate/RCS input without power to revise it — a schema
+ * immutable reviewer input without power to revise it — a schema
  * shape only; this module never verifies that a separate invocation
- * actually occurred, which is an orchestration-process requirement
+ * actually occurred, which is a provider invocation requirement
  * enforced by each review route, not a structural property of the
  * output object itself.
  */

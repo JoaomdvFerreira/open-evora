@@ -1,5 +1,5 @@
 /**
- * Reverse EVD→PRB impact (CRR-02, docs/freezeplan.md §3.2): the one
+ * Reverse EVD-to-PRB impact: the one
  * deterministic derivation of which Problems a change to Evidence reaches.
  * When an EVD is created or updated, every PRB that references it in the
  * prospective corpus is semantically affected even if its own file is

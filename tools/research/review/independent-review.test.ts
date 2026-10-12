@@ -8,7 +8,7 @@ import type { CorpusIndex, RecordIndex, RecordSchema } from "../core/types.ts";
 import type { CandidateRecord } from "../integration/candidate-delta.ts";
 import type { AiInvocationRequest, AiInvocationResult, AiInvoker } from "../ai/invoker.ts";
 import { invokeIndependentReview } from "./independent-review-invocation.ts";
-import { candidateFieldsById, validateIndependentReview, validateIndependentReviewStructure } from "./independent-review.ts";
+import { validateIndependentReview } from "./independent-review.ts";
 import { buildReviewerInputPackage, reviewSourceEligibility, serializeReviewerInput, type ReviewerInputPackage } from "./reviewer-input.ts";
 import { sha256Hex } from "../core/fingerprint.ts";
 import { buildReviewerPrompt, buildReviewerStructuralRetryPrompt } from "./reviewer-prompt.ts";
@@ -58,7 +58,7 @@ function sourceDependentPackage(): ReviewerInputPackage {
     candidates: [candidate],
     deltas: [{ recordFamily: "EVD-", id: "EVD-NEW", action: "CREATE" }],
     validation: { errors: [], totalRecords: 2 },
-    readiness: "READY_FOR_INTEGRATION_GATE",
+    readiness: "READY_FOR_REVIEW",
     sourceVerifications: { bySourceId: new Map(), issues: [] },
   });
 }
@@ -67,13 +67,11 @@ const PKG = sourceDependentPackage();
 const SIGNAL_ID = "CLEC-SIG-0001";
 
 test("the shared review kernel delivers byte-identical reviewer input, prompt and retry prompt", () => {
-  // Pinned when the review kernel moved out of orchestrate/ (CRR-01): any
-  // change here is a reviewer-visible behaviour change, never a relocation.
   const input = serializeReviewerInput(PKG);
   const prompt = buildReviewerPrompt(input);
-  assert.equal(sha256Hex(input), "cf3b57372f442382d5f0fd97a7c00b7bbb7a8fa7cb9bbbfc850c642e4853a7f9");
-  assert.equal(sha256Hex(prompt), "50198c5c713f209fa6936c7aebb40af1029392cd18c03662c18f17643f168024");
-  assert.equal(sha256Hex(buildReviewerStructuralRetryPrompt(prompt, ["e1", "e2"])), "fc9778bb2c53d4e9236e011fc1df21ff69bdfc6e623d238396fcec6111927bcc");
+  assert.equal(sha256Hex(input), "c4f3a51a74954cb88c7b08d4f4555e53b9ccc9337d5fd9ee82d717ac1c235ba7");
+  assert.equal(sha256Hex(prompt), "00f4ef8bdb827a5d666b5d560eb4709621c82a0f8590cc90a456766b6f545711");
+  assert.equal(sha256Hex(buildReviewerStructuralRetryPrompt(prompt, ["e1", "e2"])), "09f8909fb2a6a341fd01278542743609efcfe088e1e7779e971d8a6f65f3a9e0");
 });
 
 type Review = Record<string, unknown> & { findings: Record<string, unknown>[]; signalDispositions: Record<string, unknown>[] };
@@ -445,17 +443,6 @@ test("a missing or non-object independent review fails closed", () => {
   assert.match(errorsOf({ ...insufficientReview(), rationale: "" }), /rationale must be a non-empty string/);
 });
 
-test("the corpus-independent layer checks shape, linkage and claims against candidates without the reviewer package", () => {
-  const candidates = candidateFieldsById(PKG.candidates, PKG.deltas);
-  assert.deepEqual(validateIndependentReviewStructure(insufficientReview(), candidates).errors, []);
-
-  const paraphrase = insufficientReview();
-  paraphrase.findings = [gapFinding({ claim: "várias comunicações" })];
-  assert.match(validateIndependentReviewStructure(paraphrase, candidates).errors.join("\n"), /does not occur verbatim/);
-  assert.match(validateIndependentReviewStructure({ ...insufficientReview(), outcome: "CONCUR" }, candidates).errors.join("\n"), /CONCUR is inconsistent/);
-  assert.match(validateIndependentReviewStructure({ schemaVersion: "1", outcome: "CONCUR", rationale: "r" }, candidates).errors.join("\n"), /schemaVersion must be exactly "2"/);
-});
-
 const FROZEN_INPUT = '{"frozen":"REVIEW_INPUT_SENTINEL"}';
 const REVIEWER_PROMPT = buildReviewerPrompt(FROZEN_INPUT);
 
@@ -594,7 +581,7 @@ function boundaryPackage(candidate: CandidateRecord, id: string): ReviewerInputP
     candidates: [candidate],
     deltas: [{ recordFamily: candidate.recordFamily, id, action: "CREATE" }],
     validation: { errors: [], totalRecords: 5 },
-    readiness: "READY_FOR_INTEGRATION_GATE",
+    readiness: "READY_FOR_REVIEW",
     sourceVerifications: { bySourceId: new Map(), issues: [] },
   });
 }
@@ -729,7 +716,7 @@ function scopeTermPackage(): ReviewerInputPackage {
       { recordFamily: "PRB-", id: "PRB-NEW", action: "CREATE" },
     ],
     validation: { errors: [], totalRecords: 5 },
-    readiness: "READY_FOR_INTEGRATION_GATE",
+    readiness: "READY_FOR_REVIEW",
     sourceVerifications: {
       bySourceId: new Map([["SRC-OTHER", {
         source_id: "SRC-OTHER",

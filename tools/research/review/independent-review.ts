@@ -1,20 +1,9 @@
 /**
  * Deterministic validation for the OD-B structured independent-review
  * output (strengthened minimum bar points 1-6). This module enforces only
- * points 3-4 (structured outcome + deterministic schema validation) — points
- * 1-2 and 5-6 (separate invocation/role, immutable input, context isolation,
- * self-assessment never counting as review) are process/orchestration
- * properties enforced by run-cycle.ts's control flow, not properties a
- * schema check can observe from the output value alone.
- *
- * Two layers, one rule set:
- * - validateIndependentReview() checks a result against the exact frozen
- *   reviewer package it answered (signal coverage, evidence references,
- *   finding/signal subject agreement) on top of every structural rule;
- * - validateIndependentReviewStructure() checks only what a frozen Research
- *   Change Set itself permits (exact shape, enums, internal references,
- *   candidate record/field/claim against the RCS candidates, outcome
- *   consistency) and needs no corpus index.
+ * points 3-4 (structured outcome + deterministic schema validation). The
+ * separate provider-neutral invocation boundary enforces role and input
+ * isolation; this module checks the result against the exact frozen input.
  *
  * Neither layer judges whether wording is semantically supported — that is
  * the reviewer's decision. The context-aware layer only rejects a SUPPORTED
@@ -32,7 +21,7 @@ import {
 } from "../language/signals.ts";
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import type { RecordFields } from "../core/types.ts";
-import { reducedCitableRecords, relationshipEvidenceIds, type ReducedReviewerInputPackage } from "./reduced-reviewer-input.ts";
+
 import type { ReviewerInputPackage } from "./reviewer-input.ts";
 import type { IndependentReviewOutcome, IndependentReviewResult, ReviewFindingKind, ReviewFindingSeverity, SignalDispositionValue } from "./types.ts";
 
@@ -57,22 +46,14 @@ const SIGNAL_ID = /^CLEC-SIG-\d{4,}$/;
  * Authored fields a review may quote, keyed by record ID: the candidates and,
  * in the context-aware layer, the package's reverse-impacted PRB subjects.
  */
-export type ReviewCandidateFields = ReadonlyMap<string, RecordFields>;
-
-/**
- * Structure-only layer: a non-candidate record ID whose authored-field check
- * is deferred to the context-aware layer because it may be a reverse-impacted
- * subject the frozen RCS does not itself carry.
- */
-export type DeferredReviewSubject = (recordId: string) => boolean;
+type ReviewCandidateFields = ReadonlyMap<string, RecordFields>;
 
 /** Resolves an authored field path of one review subject to its value (undefined when absent). */
 type AuthoredFieldResolver = (field: string) => unknown;
 
 /**
  * What the context-aware layer needs of one dispositionable signal: a
- * reference-profile signal, or a reduced-profile group, whose `matches` hold
- * every underlying occurrence's wording.
+ * reference-profile signal whose `matches` hold its wording.
  */
 interface ReviewSignalSubject {
   subjectId: string;
@@ -83,8 +64,6 @@ interface ReviewSignalSubject {
 /** What the context-aware layer additionally knows: the frozen package's records and signals. */
 interface ReviewContext {
   recordIds: ReadonlySet<string>;
-  /** Reduced profile: the records each review subject may cite; absent means every record in `recordIds`. */
-  citable?: ReadonlyMap<string, ReadonlySet<string>>;
   /** Every record in the package (candidate version wins), by ID, with its family. */
   records: ReadonlyMap<string, { recordFamily: string; fields: RecordFields }>;
   /** EVD a PRB subject links through `evidence[]`: the only possible positive support for a scope term. */
@@ -162,15 +141,8 @@ function resolveAuthoredField(fields: RecordFields, path: string): unknown {
   return current;
 }
 
-function checkReferences(references: string[], path: string, context: ReviewContext | undefined, errors: string[], subjectId?: unknown): void {
+function checkReferences(references: string[], path: string, context: ReviewContext | undefined, errors: string[]): void {
   if (!context) return;
-  if (context.citable) {
-    const citable = typeof subjectId === "string" ? context.citable.get(subjectId) : undefined;
-    for (const id of references) {
-      if (!citable?.has(id)) errors.push(`${path} references ${JSON.stringify(id)}, which is not a record available to review subject ${JSON.stringify(subjectId)}`);
-    }
-    return;
-  }
   for (const id of references) {
     if (!context.recordIds.has(id)) errors.push(`${path} references ${JSON.stringify(id)}, which is not a record in the review input`);
   }
@@ -182,7 +154,6 @@ function checkFinding(
   candidates: ReadonlyMap<string, AuthoredFieldResolver>,
   context: ReviewContext | undefined,
   errors: string[],
-  deferred?: DeferredReviewSubject,
 ): ParsedFinding | undefined {
   const path = `findings[${i}]`;
   if (!isObject(value)) {
@@ -196,10 +167,7 @@ function checkFinding(
   }
 
   const resolve = typeof value.recordId === "string" ? candidates.get(value.recordId) : undefined;
-  if (!resolve && !context && typeof value.recordId === "string" && deferred?.(value.recordId)) {
-    if (!isNonEmptyString(value.field)) errors.push(`${path}.field must be a non-empty string`);
-    if (!isNonEmptyString(value.claim)) errors.push(`${path}.claim must be a non-empty string`);
-  } else if (!resolve) {
+  if (!resolve) {
     errors.push(`${path}.recordId must name a candidate record, got ${JSON.stringify(value.recordId)}`);
   } else if (!isNonEmptyString(value.field)) {
     errors.push(`${path}.field must be a non-empty string`);
@@ -234,7 +202,7 @@ function checkFinding(
   if (Array.isArray(value.evidenceReferences) && value.evidenceReferences.length === 0) {
     errors.push(`${path}.evidenceReferences must name at least one record the finding was judged against`);
   }
-  checkReferences(references, `${path}.evidenceReferences`, context, errors, value.recordId);
+  checkReferences(references, `${path}.evidenceReferences`, context, errors);
 
   const relatedSignalIds = stringList(value.relatedSignalIds, `${path}.relatedSignalIds`, errors, SIGNAL_ID);
   if (context) {
@@ -294,7 +262,7 @@ function checkDisposition(value: unknown, i: number, context: ReviewContext | un
     errors.push(`${path} is SUPPORTED but names no evidence in the review input that supports it`);
   }
   const signal = validId && context ? context.signals.get(value.signalId as string) : undefined;
-  checkReferences(references, `${path}.evidenceReferences`, context, errors, signal?.subjectId);
+  checkReferences(references, `${path}.evidenceReferences`, context, errors);
   if (value.disposition === "SUPPORTED" && signal && context && SCOPE_TERM_CODES.has(signal.code)) {
     checkScopeTermSupport(signal, references, context, path, errors);
   }
@@ -363,7 +331,6 @@ function checkReview(
   value: unknown,
   candidates: ReadonlyMap<string, AuthoredFieldResolver>,
   context: ReviewContext | undefined,
-  deferred?: DeferredReviewSubject,
 ): IndependentReviewValidationResult {
   // A missing result is reported explicitly rather than treated as
   // absent-but-acceptable: "no independent review occurred" must fail closed
@@ -392,7 +359,7 @@ function checkReview(
     errors.push("independentReview.findings must be an array");
   } else {
     value.findings.forEach((entry, i) => {
-      const finding = checkFinding(entry, i, candidates, context, errors, deferred);
+      const finding = checkFinding(entry, i, candidates, context, errors);
       if (!finding) return;
       if (findings.has(finding.findingId)) errors.push(`findings contain duplicate findingId ${finding.findingId}`);
       else findings.set(finding.findingId, finding);
@@ -431,10 +398,10 @@ function checkReview(
 
 /**
  * Pairs candidates with their record IDs by position. Both the
- * CanonicalIntegrationReview and a Research Change Set keep `candidates` in
+ * The canonical integration review keeps `candidates` in
  * the same deterministic order as `deltas`.
  */
-export function candidateFieldsById(candidates: readonly CandidateRecord[], deltas: readonly CandidateDelta[]): ReviewCandidateFields {
+function candidateFieldsById(candidates: readonly CandidateRecord[], deltas: readonly CandidateDelta[]): ReviewCandidateFields {
   const byId = new Map<string, RecordFields>();
   deltas.forEach((delta, i) => {
     const candidate = candidates[i];
@@ -480,66 +447,8 @@ export function validateIndependentReview(value: unknown, pkg: ReviewerInputPack
   return checkReview(value, resolvers(subjects), { recordIds, records, linkedEvidence, signals });
 }
 
-/**
- * Context-aware validation against a REDUCED reviewer package
- * (reduced-reviewer-input.ts), under the same result contract and rule set
- * as validateIndependentReview(). Reviewable subjects are its candidates
- * (complete fields) and its impacted PRBs (their exact authored text only);
- * each subject may cite only reducedCitableRecords(); each signal group needs
- * exactly one disposition; a SUPPORTED scope-term group must be supported, for
- * every occurrence, by an EVD the PRB links through `evidence[]`, judged on
- * the package's linked-EVD boundary — never SRC, support or inference_limits.
- */
-export function validateReducedIndependentReview(value: unknown, pkg: ReducedReviewerInputPackage): IndependentReviewValidationResult {
-  const records = new Map<string, { recordFamily: string; fields: RecordFields }>();
-  const linked = new Map<string, string[]>();
-  const subjects = new Map<string, AuthoredFieldResolver>();
-  const boundaries = [...pkg.candidates.flatMap((c) => c.linkedEvidenceBoundary ?? []), ...(pkg.impactedSubjects ?? []).flatMap((s) => s.linkedEvidenceBoundary)];
-  for (const boundary of boundaries) records.set(boundary.evidenceId, { recordFamily: "EVD-", fields: boundary.fields });
-  for (const entry of pkg.sourceContext) records.set(entry.sourceId, { recordFamily: "SRC-", fields: entry.fields });
-  for (const candidate of pkg.candidates) {
-    records.set(candidate.id, { recordFamily: candidate.recordFamily, fields: candidate.fields });
-    subjects.set(candidate.id, (field) => resolveAuthoredField(candidate.fields, field));
-    if (candidate.recordFamily === "PRB-") linked.set(candidate.id, linkedEvidenceIds(candidate.fields));
-  }
-  for (const subject of pkg.impactedSubjects ?? []) {
-    const text = new Map(subject.authoredText.map(({ field, text }) => [field, text]));
-    subjects.set(subject.id, (field) => text.get(field));
-    linked.set(subject.id, relationshipEvidenceIds(subject.evidenceLinks));
-  }
-  const citable = reducedCitableRecords(pkg);
-  const recordIds = new Set([...citable.values()].flatMap((ids) => [...ids]));
-  const signals = new Map(pkg.signals.map((group) => [group.signalId, { subjectId: group.subjectId, code: group.code, matches: group.occurrences.map((o) => o.match ?? o.excerpt) }]));
-  return checkReview(value, subjects, { recordIds, citable, records, linkedEvidence: (id) => linked.get(id) ?? [], signals });
-}
-
 function resolvers(fieldsById: ReviewCandidateFields): Map<string, AuthoredFieldResolver> {
   return new Map([...fieldsById].map(([id, fields]) => [id, (field: string) => resolveAuthoredField(fields, field)]));
-}
-
-/**
- * Corpus-independent validation of a stored review, as far as the frozen
- * Research Change Set's own candidates permit. Does not re-run the
- * context-aware checks that need the reviewer package.
- */
-export function validateIndependentReviewStructure(
-  value: unknown,
-  candidates: ReviewCandidateFields,
-  deferred?: DeferredReviewSubject,
-): IndependentReviewValidationResult {
-  return checkReview(value, resolvers(candidates), undefined, deferred);
-}
-
-/**
- * The records a frozen RCS cannot check by itself: a non-candidate PRB is a
- * possible reverse-impacted subject only when the change creates or updates
- * EVD. Its record, field and claim are verified by the context-aware layer,
- * which every Gate path runs against the reconstructed reviewer package.
- */
-export function possibleImpactedSubject(deltas: readonly CandidateDelta[]): DeferredReviewSubject {
-  const evidenceChanged = deltas.some((d) => isObject(d) && d.recordFamily === "EVD-" && (d.action === "CREATE" || d.action === "UPDATE"));
-  const candidateIds = new Set(deltas.map((d) => (isObject(d) ? d.id : undefined)));
-  return (recordId) => evidenceChanged && recordId.startsWith("PRB-") && !candidateIds.has(recordId);
 }
 
 export function asValidatedIndependentReview(value: unknown): IndependentReviewResult {

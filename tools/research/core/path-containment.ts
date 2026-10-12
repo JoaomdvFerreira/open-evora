@@ -1,8 +1,8 @@
 /**
  * Shared path-containment enforcement for untrusted, AI-authored candidate
  * paths (WU045-B01 independent-review remediation, finding 2 — path
- * traversal in `candidateFiles[].path`). `AuthoredCandidateFile.path` and
- * `GenerationManifest.candidateFiles[]` entries originate from PRIMARY_AUTHOR
+ * traversal in candidate file paths). `AuthoredCandidateFile.path` and
+ * Candidate paths originate from untrusted PRIMARY_AUTHOR
  * AI stdout: untrusted external output the contract's own threat model
  * requires WU045 to structurally validate before acting on it (contract §5
  * "Primary authoring contract"). This module is the single place that

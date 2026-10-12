@@ -1,6 +1,6 @@
 /**
- * Read-only preparation of a candidate set for the human Gate 1 canonical
- * integration decision. This module reports structural readiness only; it
+ * Read-only preparation of a candidate set for direct semantic review. This
+ * module reports structural readiness only; it
  * never approves, applies, or otherwise changes canonical research.
  */
 import { classifyCandidateDelta, type CandidateDelta, type CandidateRecord } from "./candidate-delta.ts";
@@ -8,11 +8,11 @@ import type { CorpusIndex, RecordFields } from "../core/types.ts";
 import { validateCandidateSet, type CandidateSetValidationResult } from "./prospective-validation.ts";
 import type { ValidationResult } from "../validation/validate.ts";
 
-/** Structural outcome for a prepared Gate 1 review unit, never a human decision. */
-export type CanonicalIntegrationReadiness = "READY_FOR_INTEGRATION_GATE" | "REVIEW_REQUIRED";
+/** Structural outcome for a prepared direct review unit, never a human decision. */
+export type CanonicalIntegrationReadiness = "READY_FOR_REVIEW" | "REVIEW_REQUIRED";
 
 /**
- * Detached, deterministic material for one human Gate 1 review.
+ * Detached, deterministic material for one direct review.
  *
  * `readiness` says only whether prospective structural validation reported
  * errors. It does not express approval, research truth, corroboration,
@@ -27,7 +27,7 @@ export interface CanonicalIntegrationReview {
   deltas: CandidateDelta[];
   /** Structural result from validating the complete prospective candidate set. */
   validation: ValidationResult;
-  /** Structural readiness for human Gate 1 review only. */
+  /** Structural readiness for direct review only. */
   readiness: CanonicalIntegrationReadiness;
 }
 
@@ -83,6 +83,6 @@ export function prepareCanonicalIntegrationReview(
     candidates: candidatesInDeltaOrder(index, candidates, result),
     deltas: result.deltas,
     validation: result.validation,
-    readiness: result.validation.errors.length === 0 ? "READY_FOR_INTEGRATION_GATE" : "REVIEW_REQUIRED",
+    readiness: result.validation.errors.length === 0 ? "READY_FOR_REVIEW" : "REVIEW_REQUIRED",
   };
 }

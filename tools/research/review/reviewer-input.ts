@@ -1,18 +1,11 @@
 /**
  * Builds the immutable, bounded input handed to the INDEPENDENT_REVIEWER AI
- * invocation (WU045-B01 remediation; contract §9 OD-B strengthened point 6,
- * §6 "Independent review contract"). This module is the sole place the
- * reviewer's input is assembled — it is constructed exclusively from
- * already-validated, already-written artifacts (the manifest, the
- * materialized candidate YAML, the deterministic
- * validation/readiness/delta results, and the canonical corpus index the
- * candidates are overlaid onto), never from the primary invocation's
- * process object, stdout transcript, or any other live reference to that
- * invocation. Because the reviewer invocation is a brand-new child process
- * (ai/invoker.ts) that only ever receives the string this module returns,
- * there is no code path by which generator conversational history, scratch
- * reasoning, or free-form rationale beyond `manifest.rationale` itself can
- * reach the reviewer.
+ * invocation. This module is the sole place the reviewer's input is
+ * assembled. It uses the review framing, candidate records, deterministic
+ * validation/readiness/delta results, and canonical base corpus; it does not
+ * receive unrelated process state. The reviewer invocation is a fresh child
+ * process (`ai/invoker.ts`) that receives only the string this module returns,
+ * with no channel for unrelated authoring context.
  *
  * The same frozen package object is used both to build the reviewer prompt
  * and to validate the reviewer's structured result (independent-review.ts),
@@ -262,8 +255,8 @@ export interface ReviewSourceEligibility {
  * carries (SRC candidates and SRC evidence-context records), sorted by SRC
  * ID. A pure function of the package, using the one eligibility rule in
  * source-verifications.ts: it adds no Source content and no record, and is
- * derived rather than stored, so the frozen input, its fingerprint and the
- * Gate package are unchanged.
+ * derived rather than stored, so the frozen input and its fingerprint are
+ * unchanged.
  */
 export function reviewSourceEligibility(pkg: Pick<ReviewerInputPackage, "candidates" | "deltas" | "evidenceContext">): ReviewSourceEligibility[] {
   const sources = new Map<string, RecordFields>();

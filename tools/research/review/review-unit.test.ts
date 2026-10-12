@@ -538,8 +538,6 @@ test("research:review writes only an exact CONCUR attestation and CI ignores PR-
       assert.equal(attestation.independentReview.outcome, "CONCUR");
       assert.match(attestation.integritySha256, /^[0-9a-f]{64}$/);
       assert.deepEqual(verifyResearchReviewAttestation(unit, attestation), []);
-      assert.equal(existsSync(join(fixture.root, ".research-workbench", "review-lifecycle")), false);
-      assert.equal(existsSync(join(fixture.root, ".research-review")), false);
 
       // Missing attestation fails even if the event body contains arbitrary claims.
       const attestationText = readFileSync(attestationPath, "utf8");
@@ -611,7 +609,7 @@ test("research:review rejects a context-free layer violation before invoking the
 });
 
 // ---------------------------------------------------------------------------
-// Reverse EVD→PRB impact (CRR-02).
+// Reverse EVD-to-PRB impact.
 
 test("an EVD-only change includes the unchanged linked PRB as a review subject", () => {
   withFixture((fixture, base) => {

@@ -629,7 +629,7 @@ function problemTextFields(fields: RecordFields): TextField[] {
 /**
  * The authored PRB text fields this module reads, as exact `{ field, text }`
  * pairs in field order: the one definition of reviewable PRB text, shared by
- * the reduced reviewer input (review/reduced-reviewer-input.ts).
+ * semantic review input.
  */
 export function problemAuthoredText(fields: RecordFields): { field: string; text: string }[] {
   return problemTextFields(fields).map(({ field, text }) => ({ field, text }));
