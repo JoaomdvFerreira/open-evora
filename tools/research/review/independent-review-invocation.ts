@@ -1,5 +1,5 @@
 /**
- * Shared provider-neutral reviewer invocation for orchestration and direct
+ * Shared provider-neutral reviewer invocation for direct
  * semantic review. A structurally invalid
  * response — stdout that is not JSON, or JSON failing validateIndependentReview()
  * — gets exactly one technical retry built from the same frozen prompt plus

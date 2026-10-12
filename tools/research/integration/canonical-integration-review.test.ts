@@ -49,7 +49,7 @@ test("a clean candidate set is structurally ready and preserves its supplied bas
   const review = prepareCanonicalIntegrationReview(SHA, index(), [candidate("SRC-NEW")]);
 
   assert.equal(review.baseGitSha, SHA);
-  assert.equal(review.readiness, "READY_FOR_INTEGRATION_GATE");
+  assert.equal(review.readiness, "READY_FOR_REVIEW");
   assert.deepEqual(review.validation.errors, []);
 });
 
@@ -103,7 +103,7 @@ test("clean CREATE, UPDATE, and NO_CHANGE candidates are equally ready", () => {
     candidate("SRC-NO-CHANGE"),
   ]);
 
-  assert.equal(review.readiness, "READY_FOR_INTEGRATION_GATE");
+  assert.equal(review.readiness, "READY_FOR_REVIEW");
   assert.deepEqual(review.deltas.map((item) => item.action), ["CREATE", "NO_CHANGE", "UPDATE"]);
 });
 
@@ -117,6 +117,6 @@ test("a structurally valid PRB history UPDATE reaches the integration gate as an
   }];
 
   const prepared = prepareCanonicalIntegrationReview(SHA, canonical, [{ recordFamily: "PRB-", fields }]);
-  assert.equal(prepared.readiness, "READY_FOR_INTEGRATION_GATE");
+  assert.equal(prepared.readiness, "READY_FOR_REVIEW");
   assert.deepEqual(prepared.deltas, [{ recordFamily: "PRB-", id: "PRB-0001", action: "UPDATE" }]);
 });

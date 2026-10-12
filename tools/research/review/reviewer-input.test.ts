@@ -8,7 +8,7 @@ import { detectLanguageSignals } from "../language/signals.ts";
 import { buildProspectiveCorpusIndex } from "../integration/prospective-validation.ts";
 import { sha256Hex } from "../core/fingerprint.ts";
 import { buildReviewerInputPackage, serializeReviewerInput, type ReviewerInputSource } from "./reviewer-input.ts";
-import type { GenerationManifest } from "../orchestrate/types.ts";
+import type { ReviewFraming } from "./types.ts";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 
@@ -29,14 +29,10 @@ const PROBLEM_SCHEMA: RecordSchema = {
   ],
 };
 
-function manifest(overrides: Partial<GenerationManifest> = {}): GenerationManifest {
+function manifest(overrides: Partial<ReviewFraming> = {}): ReviewFraming {
   return {
-    schemaVersion: "1",
     mode: "daily-discovery",
     investigationQuestion: "What changed for waste collection this week?",
-    candidateFiles: ["PRB-NEW.yaml", "EVD-B.yaml"],
-    claimedRecordIds: ["PRB-NEW", "EVD-B"],
-    rationale: "SECRET_GENERATOR_SCRATCH_REASONING_MUST_NOT_LEAK",
     ...overrides,
   };
 }
@@ -94,7 +90,7 @@ function source(overrides: Partial<ReviewerInputSource> = {}): ReviewerInputSour
     index: corpus(),
     ...candidates(),
     validation: { errors: [], totalRecords: 9 },
-    readiness: "READY_FOR_INTEGRATION_GATE",
+    readiness: "READY_FOR_REVIEW",
     sourceVerifications: { bySourceId: new Map(), issues: [] },
     ...overrides,
   };
@@ -195,7 +191,7 @@ test("a package without applicable support serializes byte-for-byte without a su
   // Golden fingerprint of this fixture's reviewer input, which carries no support.
   const pkg = buildReviewerInputPackage(source());
   assert.equal("sourceVerificationContext" in pkg, false);
-  assert.equal(sha256Hex(pkg), "085826a0f985475fc0afc0709d17b7db614022a45b6076510df4ba4a27bcf2db");
+  assert.equal(sha256Hex(pkg), "4c91dce1cb2bddb2524049f456fa16dfc061bd7e0d7df9549cc60450a600ed6b");
   // Support for Sources the package does not reach leaves it unchanged too.
   const unrelated = buildReviewerInputPackage(source({ index: corpus(), sourceVerifications: supportSet([verification("SRC-UNRELATED", ["Sem relação."]), verification("SRC-B", ["Fonte da versão substituída."])]) }));
   assert.equal(serializeReviewerInput(unrelated), serializeReviewerInput(pkg));

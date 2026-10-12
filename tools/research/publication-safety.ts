@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 
-/** Path-only publication boundary shared by direct review and Gate promotion. */
+/** Path-only publication boundary shared by direct review and the research check. */
 
 const CANONICAL_RECORD = /^research\/(?:problems\/PRB-[A-Z0-9-]+|evidence\/EVD-[A-Z0-9-]+|sources\/SRC-[A-Z0-9-]+)\.ya?ml$/i;
 const SOURCE_VERIFICATION = /^research\/source-verifications\/SRC-[A-Z0-9-]+\.ya?ml$/i;

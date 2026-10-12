@@ -7,7 +7,7 @@ import type { CorpusIndex, ParsedRecord, RecordFields, RecordSchema } from "../c
 import type { CandidateDelta, CandidateRecord } from "../integration/candidate-delta.ts";
 import { buildProspectiveCorpusIndex } from "../integration/prospective-validation.ts";
 import { SIGNAL_CODE } from "../language/signals.ts";
-import { candidateFieldsById, possibleImpactedSubject, validateIndependentReview, validateIndependentReviewStructure } from "./independent-review.ts";
+import { validateIndependentReview } from "./independent-review.ts";
 import { deriveReverseEvidenceImpacts, LINKED_EVIDENCE_BOUNDARY_FIELDS, problemEvidenceReferenceIds } from "./reverse-impact.ts";
 import { buildReviewerInputPackage, reviewSubjectCount, serializeReviewerInput, type ReviewerInputPackage, type ReviewerInputSource } from "./reviewer-input.ts";
 import { buildReviewerPrompt } from "./reviewer-prompt.ts";
@@ -78,7 +78,7 @@ function change(index: CorpusIndex, changes: { candidate: CandidateRecord; actio
     candidates: sorted.map((c) => c.candidate),
     deltas: sorted.map((c) => ({ recordFamily: c.candidate.recordFamily, id: (c.candidate.fields.problem_id ?? c.candidate.fields.evidence_id ?? c.candidate.fields.source_id) as string, action: c.action })),
     validation: { errors: [], totalRecords: index.totalRecords },
-    readiness: "READY_FOR_INTEGRATION_GATE",
+    readiness: "READY_FOR_REVIEW",
     sourceVerifications: { bySourceId: new Map(), issues: [] },
     ...overrides,
   };
@@ -129,9 +129,9 @@ function violationOn(pkg: ReviewerInputPackage, recordId: string): Review {
 }
 
 // ---------------------------------------------------------------------------
-// Hard regression (docs/freezeplan.md CRR-02)
+// Durable reverse-impact behavior.
 
-test("CRR-02: a narrowed EVD makes the unchanged PRB a reviewable subject against its complete boundary", () => {
+test("a narrowed EVD makes the unchanged PRB reviewable against its complete evidence boundary", () => {
   const pkg = narrowScopeChange();
   // 1. EVD-A is the only changed candidate.
   assert.deepEqual(pkg.deltas.map((d) => [d.id, d.action]), [["EVD-A", "UPDATE"]]);
@@ -332,19 +332,6 @@ test("findings may target the impacted PRB, never an unrelated unchanged PRB", (
   const misquoted = violationOn(pkg, "PRB-A");
   misquoted.findings[0].claim = "Moradores de todo o Alentejo";
   assert.match(validateIndependentReview(misquoted, pkg).errors.join("\n"), /does not occur verbatim in PRB-A problem_statement/);
-});
-
-test("the RCS structural layer defers only non-candidate PRBs of an EVD-changing package", () => {
-  const pkg = narrowScopeChange();
-  const review = violationOn(pkg, "PRB-A");
-  const candidates = candidateFieldsById(pkg.candidates, pkg.deltas);
-  assert.deepEqual(validateIndependentReviewStructure(review, candidates, possibleImpactedSubject(pkg.deltas)).errors, []);
-  assert.match(validateIndependentReviewStructure(review, candidates).errors.join("\n"), /must name a candidate record/);
-  const prbOnly: CandidateDelta[] = [{ recordFamily: "PRB-", id: "PRB-Z", action: "UPDATE" }];
-  assert.equal(possibleImpactedSubject(prbOnly)("PRB-0001"), false);
-  const evdChange: CandidateDelta[] = [{ recordFamily: "EVD-", id: "EVD-0001", action: "UPDATE" }];
-  assert.equal(possibleImpactedSubject(evdChange)("PRB-0001"), true);
-  assert.equal(possibleImpactedSubject(evdChange)("EVD-0002"), false);
 });
 
 test("reverse-impact packages are deterministic", () => {

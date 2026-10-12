@@ -1,22 +1,18 @@
 /**
  * Deterministic CLEC language signals: lexical families, cross-record
- * structural signals, the advisory-only boundary, and the inspection CLI.
+ * structural signals, and the advisory-only boundary.
  *
  * Engine fixtures are in-memory corpus indexes built on the real executable
- * schemas (research/schemas/*); CLI fixtures are temporary Git repositories.
+ * schemas (research/schemas/*).
  * Nothing here reads canonical research records.
  */
 import assert from "node:assert/strict";
-import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadSchemas } from "../core/schemas.ts";
 import type { CorpusIndex, ParsedRecord, RecordFields, RecordIndex } from "../core/types.ts";
-import { stringifyRecordYaml } from "../core/yaml.ts";
 import {
   ADVISORY,
   CLEC_DIMENSION,
@@ -33,9 +29,7 @@ import {
 import type { LanguageSignal, SignalCode } from "./signals.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
-const SCHEMAS_DIR = join(HERE, "..", "..", "..", "research", "schemas");
 const SCHEMAS = loadSchemas(join(HERE, "..", "..", "..", "research"));
-const CLI = join(HERE, "cli.ts");
 
 function src(overrides: RecordFields = {}): RecordFields {
   return {
@@ -573,102 +567,5 @@ describe("context-free blocking policy", () => {
     assert.match(report, /CLEC-SIG-\d{4} PRB_ID_IN_EVD_TEXT EVD-900001 observation\.summary: "PRB-0003" in "Muitos atrasos causam queixas em PRB-0003\."/);
     assert.match(report, /SRC_RECORD_ID_IN_TEXT SRC-9001 caveats\[0\]: "EVD-000001"/);
     assert.equal(report, describeContextFreeBlockers(blockers));
-  });
-});
-
-describe("language signal CLI", () => {
-  function fixtureRepo(): { root: string; research: string; cleanup: () => void } {
-    const root = mkdtempSync(join(tmpdir(), "open-evora-language-signals-"));
-    const research = join(root, "research");
-    for (const dir of ["sources", "evidence", "problems", "schemas"]) mkdirSync(join(research, dir), { recursive: true });
-    for (const f of readdirSync(SCHEMAS_DIR)) writeFileSync(join(research, "schemas", f), readFileSync(join(SCHEMAS_DIR, f), "utf8"));
-    writeFileSync(join(research, "sources", "SRC-9001.yaml"), stringifyRecordYaml(src()));
-    writeFileSync(join(research, "evidence", "EVD-900001.yaml"), stringifyRecordYaml(evd()));
-    writeFileSync(join(research, "evidence", "EVD-900002.yaml"), stringifyRecordYaml(evd({ evidence_id: "EVD-900002" })));
-    writeFileSync(join(research, "problems", "PRB-9001.yaml"), stringifyRecordYaml(prb({ problem_statement: "Há vários atrasos." })));
-    execFileSync("git", ["init", "--quiet", root]);
-    execFileSync("git", ["-C", root, "add", "."]);
-    execFileSync("git", ["-C", root, "-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--quiet", "-m", "initial"]);
-    return { root, research, cleanup: () => rmSync(root, { recursive: true, force: true }) };
-  }
-
-  function run(args: string[]) {
-    return spawnSync(process.execPath, [CLI, ...args], { encoding: "utf8" });
-  }
-
-  test("corpus mode reports advisories and exits 0", () => {
-    const repo = fixtureRepo();
-    try {
-      const result = run(["--all", "--dir", repo.research]);
-      assert.equal(result.status, 0, result.stderr);
-      assert.match(result.stdout, /PRB-9001 problem_statement VAGUE_QUANTITY \[supported_quantity\] advisory/);
-      assert.match(result.stdout, /1 advisory signal\(s\) across 1 record\(s\)\./);
-    } finally {
-      repo.cleanup();
-    }
-  });
-
-  test("corpus mode stays advisory when context-free blocker codes are present", () => {
-    const repo = fixtureRepo();
-    try {
-      writeFileSync(join(repo.research, "evidence", "EVD-900002.yaml"), stringifyRecordYaml(evd({ evidence_id: "EVD-900002", inference_limits: ["Não é impacto em PRB-0005."] })));
-      writeFileSync(join(repo.research, "sources", "SRC-9001.yaml"), stringifyRecordYaml(src({ caveats: ["Ver EVD-900001."] })));
-      const result = run(["--all", "--dir", repo.research]);
-      assert.equal(result.status, 0, result.stderr);
-      assert.match(result.stdout, /EVD-900002 inference_limits\[0\] PRB_ID_IN_EVD_TEXT \[evidence_fidelity\] advisory/);
-      assert.match(result.stdout, /SRC-9001 caveats\[0\] SRC_RECORD_ID_IN_TEXT \[evidence_fidelity\] advisory/);
-    } finally {
-      repo.cleanup();
-    }
-  });
-
-  test("changed-record mode inspects only committed, uncommitted and untracked record changes", () => {
-    const repo = fixtureRepo();
-    try {
-      const base = execFileSync("git", ["-C", repo.root, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
-      writeFileSync(join(repo.research, "evidence", "EVD-900001.yaml"), stringifyRecordYaml(evd({ inference_limits: ["Ver PRB-9001."] })));
-      execFileSync("git", ["-C", repo.root, "-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--quiet", "-am", "edit"]);
-      writeFileSync(join(repo.research, "evidence", "EVD-900002.yaml"), stringifyRecordYaml(evd({ evidence_id: "EVD-900002", evidence_nature: "claim", observation: { summary: "Há atrasos." } })));
-      writeFileSync(join(repo.research, "sources", "SRC-9002.yaml"), stringifyRecordYaml(src({ source_id: "SRC-9002", caveats: ["Dados fiáveis."] })));
-
-      const result = run(["--changed-since", base, "--dir", repo.research, "--json"]);
-      assert.equal(result.status, 0, result.stderr);
-      const report = JSON.parse(result.stdout) as { mode: string; subjects: string[]; signals: LanguageSignal[] };
-      assert.equal(report.mode, "changed");
-      assert.deepEqual(report.subjects, ["EVD-900001", "EVD-900002", "SRC-9002"]);
-      assert.deepEqual(
-        report.signals.map((s) => [s.subjectId, s.code, s.severity]),
-        [
-          ["EVD-900001", SIGNAL_CODE.PRB_ID_IN_EVD_TEXT, ADVISORY],
-          ["EVD-900002", SIGNAL_CODE.EVD_ATTRIBUTION_ABSENT, ADVISORY],
-          ["SRC-9002", SIGNAL_CODE.SRC_EVALUATIVE_WORDING, ADVISORY],
-        ]
-      );
-    } finally {
-      repo.cleanup();
-    }
-  });
-
-  test("changed-record mode with no record changes reports nothing and exits 0", () => {
-    const repo = fixtureRepo();
-    try {
-      const result = run(["--changed-since", "HEAD", "--dir", repo.research, "--json"]);
-      assert.equal(result.status, 0, result.stderr);
-      assert.deepEqual(JSON.parse(result.stdout).signals, []);
-    } finally {
-      repo.cleanup();
-    }
-  });
-
-  test("only usage and Git errors exit non-zero", () => {
-    const repo = fixtureRepo();
-    try {
-      assert.equal(run(["--dir", repo.research]).status, 1);
-      assert.equal(run(["--all", "--changed-since", "HEAD", "--dir", repo.research]).status, 1);
-      assert.equal(run(["--changed-since", "--dir", repo.research]).status, 1);
-      assert.equal(run(["--changed-since", "no-such-ref", "--dir", repo.research]).status, 1);
-    } finally {
-      repo.cleanup();
-    }
   });
 });

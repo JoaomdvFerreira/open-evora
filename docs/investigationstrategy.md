@@ -47,7 +47,7 @@ For new research:
 
 Gate 1 — Canonical Integration is the human decision that authorizes a reviewed candidate interpretation to enter canonical Open Évora research and, under the current public-repository model, confirms that the material is safe enough to enter the public repository under the safeguards in `AGENTS.md`.
 
-Deterministic tooling may prepare the review unit and report structural readiness only. It cannot make the Gate 1 decision or establish research truth, corroboration, validation, acceptance, or publication safety. Gate 1 does not publish material in the Research Explorer; Explorer publication is a separate future Gate 2. An approved Gate 1 decision must be tied to the exact canonical integration plan and candidate delta reviewed against its specific canonical Git base.
+Deterministic tooling prepares the direct review unit and validates its exact-content attestation; it cannot make the owner decision or establish research truth, corroboration, validation, acceptance, or publication safety. The owner reviews the pull request after CI verifies the attestation and authorizes publication under `AGENTS.md`. Canonical integration does not publish material in the Research Explorer; Explorer publication is a separate future Gate 2.
 
 ## 4. Integrating Sources
 
@@ -218,11 +218,11 @@ Recording requires a concrete need, appropriate consent, and an explicit retenti
 
 ## 9. Material change and authored PRB history
 
-Assessment (`ASM-*`) remains retired; no new canonical record type or full PRB snapshot/versioning system is introduced. A material change may be recorded as a concise, authored public PRB-history entry. It is not mechanically generated, Git-derived, or retrospectively reconstructed. Gate 1 retains the human semantic authority to decide materiality and authorize the entry.
+Assessment (`ASM-*`) remains retired; no new canonical record type or full PRB snapshot/versioning system is introduced. A material change may be recorded as a concise, authored public PRB-history entry. It is not mechanically generated, Git-derived, or retrospectively reconstructed. Human semantic review retains authority to decide materiality and authorize the entry.
 
 Do not backfill history where reliable continuous investigation history does not exist. A full historical-snapshot design remains deferred (`docs/datamodel.md` §4).
 
-For a PRB UPDATE, human review determines whether the change is materially significant. Where that reviewed change is material, the Gate 1 candidate should contain the appropriate authored history entry. Deterministic tooling validates authored history but does not decide whether it is required; CREATE, UPDATE and NO_CHANGE remain structural observations, not materiality decisions.
+For a PRB UPDATE, human review determines whether the change is materially significant. Where that reviewed change is material, the proposed PRB should contain the appropriate authored history entry. Deterministic tooling validates authored history but does not decide whether it is required; CREATE, UPDATE and NO_CHANGE remain structural observations, not materiality decisions.
 
 ### Effect test
 
@@ -380,47 +380,22 @@ Secondary, public, social and contextual Sources keep their bounded role (§4, �
 
 ### Mandatory independent semantic review
 
-Every canonical research text change requires an independent semantic review before human approval. Self-review by the author, human or agent, does not satisfy this requirement. A valid `DISAGREEMENT_FOUND` or `INSUFFICIENT_EVIDENCE` result fails the change; it is not retried as a new semantic review. One fresh technical retry is permitted only when reviewer output is structurally invalid, against the same immutable input. A valid `CONCUR` is not approval and does not authorize publication.
+Every canonical research text change requires an independent semantic review before human approval. The active control plane is:
 
-The active direct canonical-edit path is `npm run research:review -- --base <ref>`:
+`research:validate` → `research:review -- --base <ref>` → `research:check` → owner publication authorization → PR → CI → owner merge.
 
-- Git identifies each created or updated canonical SRC, EVD or PRB file against the exact merge base. Deletions and renames fail closed.
-- The prospective corpus and bounded reviewer input are reconstructed from the base and candidate content. EVD changes include unchanged reverse-impacted PRBs and their complete linked-EVD boundary.
-- The command invokes a fresh independent reviewer through the provider-neutral local invocation boundary. REFERENCE is the only active reviewer profile; REDUCED is not authorized.
-- Only a structurally valid `CONCUR` writes `.research-review-attestation.json`. Its version 1 JSON fields are `schemaVersion`, `reviewerProfile` (`REFERENCE`), `outcome`, `baseGitSha`, `changedRecords`, `reviewerInputFingerprint`, `independentReview` and `integritySha256`. Each changed record binds `recordFamily`, `id`, repository-relative `path`, `action` and Git blob `blob`. `independentReview` is the validated structured result. `integritySha256` is SHA-256 over the canonical JSON of all other attestation fields.
-- CI reconstructs the same review unit from PR base and head, then checks the base, changed-record blobs, reviewer-input fingerprint, canonical integrity hash, structured review and `CONCUR` outcome. PR-body content is not an input to verification. No canonical change requires no semantic attestation.
+The review command derives the exact changed PRB/EVD/SRC records from Git, rejects deletions, reconstructs the prospective corpus and bounded reviewer input, and invokes a fresh independent reviewer through the provider-neutral boundary. EVD changes include reverse-impact review of unchanged PRBs against all linked EVDs. REFERENCE is the only active reviewer profile. CLEC signals guide semantic review; only the defined context-free layer-integrity signals block before invocation. Valid reviewer output is checked structurally and semantically against the frozen input. One technical retry is allowed only for structurally invalid output, using the same input. Valid disagreement or insufficient evidence requires correction and a fresh review.
 
-The active command and attestation verifier do not call owner-readiness declarations, semantic-attempt lifecycle state, lifecycle locks or persisted attempt bookkeeping. Changing any reviewed canonical content changes the rebuilt record blobs and/or reviewer-input fingerprint and makes the attestation stale.
+Only validated `CONCUR` writes `.research-review-attestation.json`. CI independently rebuilds the review unit from PR base and head and rejects a missing, malformed, stale, or non-CONCUR attestation. PR-body text is not a verification input. An attestation is not owner approval or publication authorization. The review has no semantic-attempt or owner-readiness state.
 
-Publication safety applies before external publication. Editing the working tree and making a local commit are not external publication. Push, PR creation or update carrying the material, deployment, release and equivalent external actions are publication boundaries. Explicit owner authorization is required before the first such boundary for canonical research. The deterministic publication path check rejects workbench, private-material and unapproved research-artifact paths; `research:check` also validates Source Verification Support. These checks are path and structure based. They cannot detect arbitrary private prose placed inside an otherwise permitted canonical field. If publication safety or reuse rights are uncertain, stop and seek owner direction under `AGENTS.md`.
+Publication safety applies before external publication. Explicit owner authorization is required before the first external publication of canonical research. The path guard rejects workbench, private-material and unapproved research-artifact paths; `research:check` validates Source Verification Support. These checks are path and structure based and cannot detect arbitrary private prose inside a permitted canonical field. If publication safety or reuse rights are uncertain, stop under `AGENTS.md`.
 
-The semantic contract remains structural, not automatic: the reviewer result is validated deterministically, but tooling does not decide whether wording is supported. CLEC signals remain advisory except for the existing context-free layer-integrity blocks. Human review owns corroboration, validation, investigation posture, canonical acceptance and publication decisions.
 ### Source Verification Support in semantic review
 
-Canonical SRC records hold provenance and metadata, not Source content. Where judging a change requires Source content — typically EVD fidelity to its Source — the independent reviewer returns `INSUFFICIENT_EVIDENCE`. To make such wording reviewable, the bounded facts it relies on may first be recorded as Source Verification Support (`docs/datamodel.md` §8): factual paraphrases a human verified against captured bytes of the public Source.
+Source Verification Support is bounded factual paraphrase context for public, non-correspondence Sources whose reuse is not prohibited. It contains no verbatim Source text or bytes. Its record semantics and eligibility are defined in `docs/datamodel.md` §8 and `AGENTS.md`.
 
-- **Separate prior pull request.** Support is added or changed only in a pull request that changes no canonical PRB/EVD/SRC record. A change carrying both canonical records and support fails direct review and must be split: the support merges first. Authenticity and publication safety of support are decided by the owner when that pull request is reviewed.
-- **Base-only.** Review reads support from the review base, never from candidates or the prospective head: direct review reconstructs it from the base commit; any retained Human Gate path reads it from the canonical research root its base corpus is loaded from, which Gate rendering requires to be exactly the clean base commit. A change can therefore never supply the support its own review relies on.
-- **Bounded input.** The reviewer receives support only for Sources referenced by EVDs the change creates or updates, and only where that SRC is already in the review package; support never widens the evidence graph. A PRB-only or SRC-only change receives no support, and an unchanged EVD reached through a PRB never makes its Sources' support eligible. It is deterministically ordered, part of the fingerprinted reviewer input and of the hash-bound Gate package, and presented at the Gate as review support, not Evidence. Without applicable support the reviewer input is unchanged.
-- **Use by the reviewer.** Support serves only Source→EVD fidelity of the EVDs the change creates or updates; it never justifies PRB wording. It counts only for the bounded claims it explicitly states. It does not establish completeness: silence is not absence, and nothing is inferred beyond it. Source-derived wording that exceeds both the canonical SRC metadata and the supplied verified claims remains `INSUFFICIENT_EVIDENCE`. Findings cite the associated `SRC-*` record. The reviewer does not judge the authenticity of support and does not CLEC-review its statements.
-- **Fail closed.** Invalid applicable support, or support whose Source is no longer eligible in the reviewed state, stops review preparation. `npm run research:check` validates every support file.
-- **Support-ineligible provenance.** Support stays limited to eligible Sources (public, not correspondence, reuse not prohibited); a non-public or correspondence Source can never be re-verified in review. The reviewer prompt therefore classifies every SRC in the package as eligible or ineligible, with only a reason category, derived deterministically from canonical SRC metadata by the same eligibility rule; the reviewer input, its fingerprint and the Gate package are unchanged, and no Source content enters review. For a PRB, an existing EVD unchanged by the change is canonical Evidence already admitted into the base: whatever its Source's eligibility, that EVD — observation, scope, inference limits, authority and nature — is the complete review boundary, and the absence of the Source body or support is not on its own an evidence gap. This does not make the EVD or its Source stronger: PRB wording may never exceed the EVD or drop its inference limits, and a PRB claim the EVD does not support still fails. It never waives Source fidelity for an EVD the change creates or updates, which still fails closed when its Source content is unavailable. For an eligible public Source of such a created or updated EVD, support remains the governed path to Source content, and its absence may still be `INSUFFICIENT_EVIDENCE`.
+Support must be present in the review base; candidates and prospective content cannot supply support for their own review. It is included only for Sources referenced by EVDs created or updated in the change and already present in the reviewer input. It can inform Source-to-EVD fidelity for those changed EVDs, never PRB wording. Silence is not absence; the reviewer must not infer beyond a supported claim. Invalid applicable support or support for an ineligible Source fails review preparation, and `research:check` validates support files.
 
-Implemented as a deterministic pre-review block and again at Human Gate package assembly, for exactly two context-free layer-integrity signal classes:
-- canonical record IDs (`SRC-`, `EVD-`, `PRB-`) embedded in authored SRC text;
-- PRB IDs embedded in authored EVD text.
+For PRB wording, linked EVDs are the complete evidence boundary. SRC metadata and Source Verification Support do not widen it. A changed EVD still requires enough context to judge fidelity to its Source; where the review input lacks necessary evidence, the result is `INSUFFICIENT_EVIDENCE`.
 
-These couple a record to internal research state of another layer; Problem relationships belong in Problem structures. No evidence interpretation can make that coupling valid, so a change whose own changed or candidate records carry either class fails before the independent reviewer is invoked, and no review or disposition can waive it. This is a structural rule, not a semantic judgement.
-
-Every other CLEC signal remains advisory: lexical wording is never automatically a violation, and a change that passes the precheck still requires the mandatory independent semantic review. No automatic semantic judgement has been introduced. The block applies only to the records in the current change unit; legacy corpus signals, including these two classes in unchanged records, are not turned into corpus-wide validation or CI failures.
-
-The enforcement chain has hermetic end-to-end regression coverage from candidate precheck, independent review, Human Gate decision binding and post-approval promotion to the owner-merge boundary, and from Git-derived direct changes through attestation verification in the pull-request check. This coverage verifies that the gates hold; it does not judge wording.
-
-Not yet implemented:
-- automatic semantic decisions from lexical signals.
-
-Advisory signal presence does not itself fail validation or CI; only a context-free block, or a missing, invalid or non-`CONCUR` independent review, does.
-
-Boundaries of initial enforcement:
-- Explorer-generated copy is outside initial CLEC enforcement; the global evidence-integrity safeguard in `AGENTS.md` still applies to it.
-- Adopting this contract does not require rewriting the existing corpus.
+The semantic contract remains human-owned: deterministic tooling validates structure and bindings but does not decide whether wording is supported, corroborated, validated, or accepted. Human review owns canonical research decisions.

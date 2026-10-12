@@ -1,6 +1,6 @@
 /**
- * Reads already-authored candidate YAML files from a local, gitignored
- * cycle directory into the CandidateRecord shape candidate-delta.ts and
+ * Reads the exact candidate YAML files selected by direct review into the
+ * CandidateRecord shape candidate-delta.ts and
  * prospective-validation.ts already consume. This module performs no
  * classification, validation, or canonical-write decision of its own — it
  * only reads files and infers each candidate's schema-declared record
@@ -35,21 +35,17 @@ function inferRecordFamily(index: CorpusIndex, fields: Record<string, unknown>):
 }
 
 /**
- * Loads exactly the candidate files listed by the manifest (never an entire
- * directory scan) so an orchestration run only ever considers candidates
- * the AI-assisted authoring pass explicitly declared. Every failure
+ * Loads exactly the candidate files selected by the review unit (never an
+ * entire directory scan). Every failure
  * (missing file, malformed YAML, unrecognized record family) is collected
  * rather than thrown, so the caller can report every problem and fail
  * closed in one pass (§11 fail-closed requirement).
  *
- * `candidateFiles` entries are untrusted AI-authored input (WU045-B01
- * independent-review remediation, finding 2): each is resolved through
+ * Candidate paths are resolved through
  * resolveContainedPath() before being read, so a traversal/absolute/rooted
  * path — or a path that resolves outside `candidatesDir` via a symlink —
  * fails closed as a load failure rather than reading arbitrary filesystem
- * content. This is the same containment helper materializeAuthoringEnvelope()
- * (run-cycle.ts) uses on the write side, so read/write containment can never
- * diverge.
+ * content.
  */
 export function loadCandidates(index: CorpusIndex, candidatesDir: string, candidateFiles: readonly string[]): CandidateLoadResult {
   const candidates: CandidateRecord[] = [];

@@ -1,22 +1,10 @@
-/**
- * Deterministic canonical JSON serialization and fingerprinting used for
- * WU045's own idempotency identity (§11 fail-closed/idempotency
- * requirement; §14 case 20). This is intentionally a separate, narrower
- * mechanism from WU046's approval/contentHash binding protocol (§12,
- * HIGH-2 remedy): that protocol governs what an owner approved and is
- * WU046's responsibility to implement; this module only lets WU045 detect
- * that a rerun against identical inputs produced an identical package.
- * It is shared, unchanged, by the review kernel, direct review, the Human Gate and
- * admission wherever they need the same canonical serialization.
- */
+/** Deterministic canonical JSON serialization for reviewer input and attestations. */
 import { createHash } from "node:crypto";
 
 /**
  * Produces a stable string for any JSON-serializable value: object keys are
  * sorted recursively, array order is preserved exactly as authored, and no
- * insignificant whitespace is emitted. This mirrors the ordering contract
- * §12 requires for the RCS contentHash, applied here to WU045's own
- * preparation fingerprint.
+ * insignificant whitespace is emitted.
  */
 export function canonicalJsonStringify(value: unknown): string {
   return JSON.stringify(sortKeysDeep(value));
