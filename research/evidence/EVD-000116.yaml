@@ -16,8 +16,8 @@ scope:
     level: intermunicipal
     area: área de abrangência do CTEF Évora — 14 municípios
   populations:
-    - job seekers
-    - employers
+    - pessoas à procura de emprego
+    - empregadores
   temporal:
     status: unknown
 domains:

@@ -15,7 +15,7 @@ scope:
     area: Município de Évora
   populations:
     - residentes
-    - urbana parish councils
+    - juntas de freguesia urbanas
   temporal:
     start: 2026-07
     end: 2026-08
@@ -25,6 +25,6 @@ domains:
 evidence_nature: fact
 claim_authority: unknown
 inference_limits:
-  - A combinação de uma Source municipal e cobertura jornalística não estabelece
+  - A combinação de uma fonte municipal e cobertura jornalística não estabelece
     que os residentes estejam confusos sobre responsabilidades nem a prevalência
     de problemas de encaminhamento.

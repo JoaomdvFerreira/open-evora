@@ -13,8 +13,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - employers
-    - training/education providers
+    - empregadores
+    - entidades de formação/ensino
     - trabalhadores e pessoas à procura de emprego
   temporal:
     status: unknown

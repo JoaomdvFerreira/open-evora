@@ -14,8 +14,8 @@ scope:
     level: regional
     area: Alentejo
   populations:
-    - training/education providers
-    - employers
+    - entidades de formação/ensino
+    - empregadores
     - trabalhadores e pessoas à procura de emprego
   temporal:
     status: unknown

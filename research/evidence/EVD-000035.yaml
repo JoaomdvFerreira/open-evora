@@ -14,7 +14,7 @@ scope:
     area: Município de Évora
   populations:
     - pessoas que necessitam de apoio de saúde mental
-    - informal caregivers
+    - cuidadores informais
   temporal:
     start: "2024"
     end: "2027"

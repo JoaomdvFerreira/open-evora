@@ -13,7 +13,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - prospective e admitted university students
+    - potenciais estudantes universitários e estudantes admitidos
   temporal:
     as_of: "2025"
 domains:

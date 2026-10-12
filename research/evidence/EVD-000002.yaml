@@ -17,8 +17,8 @@ scope:
     level: municipality
     area: cidade / município
   populations:
-    - urbana transporte público utilizadores
-    - residentes de lower-demand settlements
+    - utilizadores da rede urbana de transportes públicos
+    - residentes de localidades de baixa procura
   temporal:
     as_of: "2025"
 domains:

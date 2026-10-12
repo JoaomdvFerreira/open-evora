@@ -14,7 +14,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - cultural e civic associações
+    - associações culturais e cívicas
     - equipas culturais municipais
   temporal:
     start: "2025"

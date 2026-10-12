@@ -15,9 +15,9 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - residentes affected by housing shortage
+    - residentes afetados pela escassez de habitação
     - populações vulneráveis que necessitam de alojamento temporário
-    - students
+    - estudantes
   temporal:
     as_of: "2025"
 domains:

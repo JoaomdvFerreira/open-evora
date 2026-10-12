@@ -11,7 +11,7 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade
+    area: cidade de Évora
   populations:
     - pessoas com mobilidade reduzida
   temporal:

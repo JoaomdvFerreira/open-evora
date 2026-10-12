@@ -13,7 +13,7 @@ scope:
     level: city
     area: strategic cidade locations / Centro Histórico project context
   populations:
-    - municipal mobility management
+    - gestão municipal da mobilidade
     - potenciais utilizadores de dados
   temporal:
     as_of: 2026-08-10
@@ -24,6 +24,6 @@ domains:
 evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
-  - O deployment comunicado em 2023 não estabelece que sensores ou plataforma
+  - A implementação comunicada em 2023 não estabelece que sensores ou plataforma
     permaneçam operacionais em 2026 nem que os dados estejam publicamente
     acessíveis ou reutilizáveis.

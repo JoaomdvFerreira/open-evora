@@ -7,15 +7,15 @@ provenance:
   extracted_at: 2026-08-10
 observation:
   summary: O planeamento institucional local identifica um desajustamento entre as
-    qualificações da paraça de trabalho e as necessidades dos empregadores.
+    qualificações da força de trabalho e as necessidades dos empregadores.
 scope:
   geography:
     level: municipality
     area: Município de Évora
   populations:
     - workers
-    - employers
-    - training/education providers
+    - empregadores
+    - entidades de formação/ensino
   temporal:
     start: "2024"
     end: "2025"

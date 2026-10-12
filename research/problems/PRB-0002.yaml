@@ -8,7 +8,7 @@ domain:
   - ACC
 geography:
   level: city
-  area: Évora cidade
+  area: cidade de Évora
 affected_populations:
   - pessoas que utilizam as paragens de autocarro descritas pelo PMUSE em Évora
   - pessoas que dependem de informação acessível nessas paragens

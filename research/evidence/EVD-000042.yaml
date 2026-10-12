@@ -16,7 +16,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - residentes à procura de adequate/affordable housing
+    - residentes à procura de habitação adequada/a preços comportáveis
     - populações vulneráveis que necessitam de alojamento temporário
   temporal:
     as_of: "2026"

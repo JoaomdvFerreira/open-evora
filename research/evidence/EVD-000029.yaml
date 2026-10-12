@@ -4,14 +4,13 @@ provenance:
     - SRC-0026
   extracted_at: 2026-08-10
 observation:
-  summary: No âmbito da 4.ª revisão do PUE, o Município lançou as Experimental
-    Actions em junho de 2026 e convidou o público a selecionar e testar
+  summary: No âmbito da 4.ª revisão do PUE, o Município lançou as Ações Experimentais de Mobilidade em junho de 2026 e convidou o público a selecionar e testar
     fisicamente percursos pedonais/de mobilidade suave, para contribuir com
     perceções e propostas sobre inclusão, acessibilidade e sustentabilidade.
 scope:
   geography:
     level: city
-    area: Évora cidade
+    area: cidade de Évora
   populations:
     - residentes e entidades interessadas participantes no processo PUE
   temporal:

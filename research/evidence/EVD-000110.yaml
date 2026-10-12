@@ -5,14 +5,14 @@ provenance:
     - SRC-0097
   extracted_at: 2026-08-11
 observation:
-  summary: O Norfolk do Norte Distrito Conselho publica uma lista de locais onde
+  summary: O North Norfolk District Council publica uma lista de locais onde
     uma recolha prevista não foi efetuada e indica que os residentes de zonas já
     identificadas como afetadas não necessitam de apresentar uma comunicação
     individual sobre essa ocorrência.
 scope:
   geography:
     level: municipality
-    area: Norfolk do Norte, Reino Unido
+    area: North Norfolk, Reino Unido
   populations:
     - residentes
   temporal:

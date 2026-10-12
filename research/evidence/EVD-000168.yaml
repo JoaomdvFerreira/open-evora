@@ -25,7 +25,7 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade
+    area: cidade de Évora
   populations:
     - utilizadores da rede urbana TREVO
   temporal:

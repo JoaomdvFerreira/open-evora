@@ -1,6 +1,6 @@
 problem_id: PRB-0003
 created_at: "2026-08-28"
-updated_at: "2026-10-10"
+updated_at: "2026-10-12"
 title: Barreiras pedonais e de acessibilidade em partes de Évora, com
   persistência atual ainda por validar
 domain:
@@ -392,7 +392,7 @@ decision_basis:
     - EVD-000148
   independence_assessment: >-
     A independência da evidência é MÉDIA e não é reforçada pelo número de
-    registos EVD, de Sources ou de linhagens.
+    registos EVD, de fontes ou de linhagens.
 
     As linhas relevantes para a afirmação ao nível da cidade são duas: (1) o
     Relatório Setorial do PUE: Mobilidade (EVD-000004, EVD-000006; SRC-0017),

@@ -15,8 +15,8 @@ scope:
     level: regional
     area: Alentejo
   populations:
-    - employers
-    - job seekers
+    - empregadores
+    - pessoas à procura de emprego
   temporal:
     status: unknown
 domains:

@@ -12,8 +12,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - job seekers
-    - employers
+    - pessoas à procura de emprego
+    - empregadores
   temporal:
     as_of: 2026-08-11
 domains:
@@ -24,5 +24,5 @@ claim_authority: authoritative
 inference_limits:
   - Um retrato de ofertas anunciadas mede procura publicitada e não escassez
     efetiva de competências.
-  - O snapshot não informa sobre duração das vagas, recrutamentos falhados,
+  - O retrato pontual não informa sobre duração das vagas, recrutamentos falhados,
     restrições salariais ou dificuldade de contratação.

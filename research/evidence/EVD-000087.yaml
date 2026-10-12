@@ -9,7 +9,7 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora cidade
+    area: cidade de Évora
   populations:
     - pessoas com deficiência
     - programa cultural visitantes e residentes

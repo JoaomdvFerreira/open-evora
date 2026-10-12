@@ -20,8 +20,8 @@ scope:
     area: Município de Évora
   populations:
     - estudantes e diplomados recentes
-    - employers
-    - job seekers
+    - empregadores
+    - pessoas à procura de emprego
   temporal:
     status: unknown
 domains:

@@ -13,7 +13,7 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - cultural e agentes do ecossistema criativo
+    - agentes culturais e do ecossistema criativo
     - equipas culturais municipais
   temporal:
     start: "2022"

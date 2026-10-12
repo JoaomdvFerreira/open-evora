@@ -14,8 +14,8 @@ scope:
     level: municipality
     area: Município de Évora
   populations:
-    - students
-    - residentes à procura de adequate/affordable housing
+    - estudantes
+    - residentes à procura de habitação adequada/a preços comportáveis
   temporal:
     status: unknown
 domains:

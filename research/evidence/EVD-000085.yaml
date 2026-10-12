@@ -14,7 +14,7 @@ observation:
 scope:
   geography:
     level: city
-    area: Évora Centro Histórico
+    area: Centro Histórico de Évora
   populations:
     - pessoas com deficiência
   temporal:
