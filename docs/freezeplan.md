@@ -21,10 +21,11 @@ process.
   not freeze all repository work.
 - Noncanonical drafts, deterministic checks, tooling, Explorer work and
   authorized support-only Source Verification Support (SVS) work may proceed.
-- Canonical PRB/EVD/SRC changes require explicit owner authorization.
-- The owner-approved Phase 1 target for authorized canonical direct changes is
-  `research:validate` → `research:review -- --base <ref>` → `research:check`,
-  followed by explicit owner publication authorization before any push or PR.
+- External publication of canonical PRB/EVD/SRC changes requires explicit owner authorization.
+- Authorized canonical direct changes follow `npm run research:check` →
+  `git diff --check` → local commit → independent owner-side semantic review
+  of the exact commit/diff → explicit owner publication authorization before
+  push or PR → deterministic CI → owner merge.
 - PRB-0002's historical authorization does not resume FZ-02 in this action.
 - This plan does not start or resume FZ-02; its status remains as recorded in
   the FZ-02 section.
@@ -112,14 +113,8 @@ Live Source availability and freshness are FZ-08 monitoring concerns, not semant
 
 ## 3. Historical review-tooling decisions
 
-The owner approved the direct review control plane now documented in `docs/investigationstrategy.md` §12. This section records only programme history; it is not an operator procedure. Git history preserves implementation detail.
-
-- CRR-02 reverse EVD-to-PRB impact review and CRR-03 bounded reviewer context were incorporated into the active REFERENCE review.
-- CRR-04/05 receipt and summary proposals were superseded by the exact-content attestation and CI verification path.
-- CRR-06 semantic-attempt lifecycle tooling was retired; only a same-input technical retry for structurally invalid reviewer output remains.
-- CRR-07 concluded `BENCHMARK_INCONCLUSIVE`; the owner decision is `NO CUTOVER`. REFERENCE remains the only active profile.
-- Lane A, Human Gate, admission/HOLD, lifecycle, and REDUCED benchmark machinery were retired after the direct control plane was established.
+CRR experiments are historical. CRR-07 concluded `BENCHMARK_INCONCLUSIVE / NO CUTOVER`. The automated semantic-review and attestation machinery was subsequently retired. Semantic review remains independent of the implementing agent and owner-side. Git history preserves implementation detail; the active workflow is owned by `docs/investigationstrategy.md` §12.
 
 The historical safety-admission decisions remain: source availability/freshness belongs to FZ-08; non-authoritative claim authority is not an automatic blocker; non-empty inference limits do not require a separate human-resolution process; private/publication safety is governed by `AGENTS.md` and the surviving publication-safety checks.
 
-Preserved safeguards include canonical schema/reference/prospective-corpus validation, CLEC review, PRB-to-EVD evidence boundaries, base-only Source Verification Support semantics, independent semantic review, fail-closed publication-path checks, exact-content attestation verification, and owner publication/merge authority.
+Preserved safeguards include canonical schema/reference and Source Verification Support validation, the CLEC, PRB-to-EVD evidence boundaries, independent owner-side semantic review, fail-closed publication-path checks, and owner publication/merge authority.

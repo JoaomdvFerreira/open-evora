@@ -3,14 +3,13 @@ import test from "node:test";
 
 import { checkResearchPublicationPaths } from "./publication-safety.ts";
 
-test("canonical records, bounded Source Verification Support, schemas and the review attestation are permitted paths", () => {
+test("canonical records, bounded Source Verification Support and schemas are permitted paths", () => {
   const result = checkResearchPublicationPaths([
     "research/problems/PRB-0001.yaml",
     "research/evidence/EVD-0001.yaml",
     "research/sources/SRC-0001.yaml",
     "research/source-verifications/SRC-0001.yaml",
     "research/schemas/problem.schema.json",
-    ".research-review-attestation.json",
   ]);
   assert.deepEqual(result, { ok: true, prohibitedPaths: [], unexpectedResearchPaths: [] });
 });
@@ -19,6 +18,7 @@ test("workbench, legacy review artifacts, correspondence and private-material pa
   const paths = [
     ".research-workbench/cycle/candidate.yaml",
     ".research-review/old-review.json",
+    ".research-review-old.json",
     "research/correspondence/request.txt",
     "research/transcripts/interview.txt",
     "research/private-notes/field.md",
@@ -26,7 +26,7 @@ test("workbench, legacy review artifacts, correspondence and private-material pa
   ];
   const result = checkResearchPublicationPaths(paths);
   assert.equal(result.ok, false);
-  assert.deepEqual(result.prohibitedPaths, paths.slice(0, 6).sort());
+  assert.deepEqual(result.prohibitedPaths, paths.slice().sort());
 });
 
 test("unrecognized research artifacts fail closed while unrelated application files remain outside this path policy", () => {

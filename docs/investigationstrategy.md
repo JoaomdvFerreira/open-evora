@@ -47,7 +47,7 @@ For new research:
 
 Gate 1 — Canonical Integration is the human decision that authorizes a reviewed candidate interpretation to enter canonical Open Évora research and, under the current public-repository model, confirms that the material is safe enough to enter the public repository under the safeguards in `AGENTS.md`.
 
-Deterministic tooling prepares the direct review unit and validates its exact-content attestation; it cannot make the owner decision or establish research truth, corroboration, validation, acceptance, or publication safety. The owner reviews the pull request after CI verifies the attestation and authorizes publication under `AGENTS.md`. Canonical integration does not publish material in the Research Explorer; Explorer publication is a separate future Gate 2.
+Deterministic tooling validates corpus integrity and publication paths; it cannot make the owner decision or establish research truth, corroboration, validation, acceptance, or publication safety. Independent owner-side semantic review of the exact local commit/diff precedes explicit owner authorization to publish under `AGENTS.md`. Canonical integration does not publish material in the Research Explorer; Explorer publication is a separate future Gate 2.
 
 ## 4. Integrating Sources
 
@@ -367,26 +367,17 @@ The supported investigation methods are primarily:
 
 Secondary, public, social and contextual Sources keep their bounded role (§4, §5). Contact is not itself Evidence; non-response is not Evidence (§10).
 
-### Signals and human judgement
+### Human judgement
 
-- Lexical or other deterministic signals (for example a quantifier, an absolute, or causal wording) are review prompts, not automatic wording violations. No word is banned as such; the same wording may be supported in one context and unsupported in another.
-- Where deterministic signals are produced, each requires an explicit semantic disposition in review; a signal is neither a finding nor a pass by itself. The dispositions are:
-  - `SUPPORTED` — the flagged wording is relevant and the supplied evidence supports it;
-  - `VIOLATION` — the flagged wording is relevant and semantic review confirms a CLEC defect;
-  - `NOT_APPLICABLE` — the signal is contextually irrelevant or a false positive for its dimension;
-  - `INSUFFICIENT_EVIDENCE` — the signal is semantically relevant, but the supplied evidence/context is insufficient to decide support versus violation (for example, EVD wording whose fidelity depends on Source content that the canonical SRC record does not hold). It is an evidence gap, never a violation or a non-applicable signal by default; `UNKNOWN` is not `NO`.
-- Semantic review must compare each changed claim with its supporting evidence — PRB text with its linked EVD, EVD text with its Source. Reading the text in isolation is not semantic review.
-- Human judgement remains final. Deterministic tooling may flag wording; it does not decide whether wording complies.
+Semantic review compares each changed claim with its supporting evidence — PRB text with its linked EVDs, EVD text with its Source and available Source Verification Support. Reading text in isolation is not semantic review. No word is banned as such; its support depends on context. Human judgement remains final. Deterministic tooling validates structure and does not decide whether wording complies.
 
 ### Mandatory independent semantic review
 
-Every canonical research text change requires an independent semantic review before human approval. The active control plane is:
+Every canonical research text change requires independent owner-side semantic review of the exact proposed local commit/diff, separate from the implementation agent, before external publication. The active workflow is:
 
-`research:validate` → `research:review -- --base <ref>` → `research:check` → owner publication authorization → PR → CI → owner merge.
+edit locally → `npm run research:check` → `git diff --check` → local commit → independent owner-side semantic review → explicit owner publication authorization → push/PR → deterministic CI → owner merge.
 
-The review command derives the exact changed PRB/EVD/SRC records from Git, rejects deletions, reconstructs the prospective corpus and bounded reviewer input, and invokes a fresh independent reviewer through the provider-neutral boundary. EVD changes include reverse-impact review of unchanged PRBs against all linked EVDs. REFERENCE is the only active reviewer profile. CLEC signals guide semantic review; only the defined context-free layer-integrity signals block before invocation. Valid reviewer output is checked structurally and semantically against the frozen input. One technical retry is allowed only for structurally invalid output, using the same input. Valid disagreement or insufficient evidence requires correction and a fresh review.
-
-Only validated `CONCUR` writes `.research-review-attestation.json`. CI independently rebuilds the review unit from PR base and head and rejects a missing, malformed, stale, or non-CONCUR attestation. PR-body text is not a verification input. An attestation is not owner approval or publication authorization. The review has no semantic-attempt or owner-readiness state.
+The implementation handoff identifies the exact commit SHA, canonical files changed, and canonical Git diff/patch. The reviewer inspects changed PRB wording against **all** linked EVDs, changed EVD wording against Source and available Source Verification Support, inference limits, material omissions, CLEC dimensions, and unresolved evidence gaps. For every changed EVD, the reviewer searches the canonical corpus for every referencing PRB and inspects each materially affected unchanged PRB against all its linked EVDs. A review may result in approval or concrete findings/evidence gaps. There is no machine review schema or repository review artifact.
 
 Publication safety applies before external publication. Explicit owner authorization is required before the first external publication of canonical research. The path guard rejects workbench, private-material and unapproved research-artifact paths; `research:check` validates Source Verification Support. These checks are path and structure based and cannot detect arbitrary private prose inside a permitted canonical field. If publication safety or reuse rights are uncertain, stop under `AGENTS.md`.
 
@@ -394,8 +385,8 @@ Publication safety applies before external publication. Explicit owner authoriza
 
 Source Verification Support is bounded factual paraphrase context for public, non-correspondence Sources whose reuse is not prohibited. It contains no verbatim Source text or bytes. Its record semantics and eligibility are defined in `docs/datamodel.md` §8 and `AGENTS.md`.
 
-Support must be present in the review base; candidates and prospective content cannot supply support for their own review. It is included only for Sources referenced by EVDs created or updated in the change and already present in the reviewer input. It can inform Source-to-EVD fidelity for those changed EVDs, never PRB wording. Silence is not absence; the reviewer must not infer beyond a supported claim. Invalid applicable support or support for an ineligible Source fails review preparation, and `research:check` validates support files.
+Support can inform Source-to-EVD fidelity for changed EVDs, never PRB wording. Silence is not absence; the reviewer must not infer beyond a supported claim. `research:check` validates support files deterministically, including Source eligibility.
 
-For PRB wording, linked EVDs are the complete evidence boundary. SRC metadata and Source Verification Support do not widen it. A changed EVD still requires enough context to judge fidelity to its Source; where the review input lacks necessary evidence, the result is `INSUFFICIENT_EVIDENCE`.
+For PRB wording, linked EVDs are the complete evidence boundary. SRC metadata and Source Verification Support do not widen it. A changed EVD still requires enough context to judge fidelity to its Source; missing context remains an evidence gap.
 
 The semantic contract remains human-owned: deterministic tooling validates structure and bindings but does not decide whether wording is supported, corroborated, validated, or accepted. Human review owns canonical research decisions.

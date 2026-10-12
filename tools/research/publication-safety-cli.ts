@@ -4,7 +4,24 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
 import { assertResearchPublicationPaths, gitChangedPaths } from "./publication-safety.ts";
-import { pullRequestBase, resolveCommit } from "./review/review-unit.ts";
+
+function resolveCommit(repoRoot: string, ref: string): string {
+  const sha = execFileSync("git", ["rev-parse", "--verify", "--quiet", `${ref}^{commit}`], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  }).trim();
+  if (!/^[0-9a-f]{40}$/.test(sha)) throw new Error(`${ref} does not resolve to a commit`);
+  return sha;
+}
+
+function pullRequestBase(repoRoot: string, baseSha: string, headSha: string): string {
+  const base = execFileSync("git", ["merge-base", baseSha, headSha], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  }).trim();
+  if (!/^[0-9a-f]{40}$/.test(base)) throw new Error("cannot resolve pull-request merge base");
+  return base;
+}
 
 interface GitHubEvent {
   pull_request?: { base?: { sha?: unknown }; head?: { sha?: unknown } };

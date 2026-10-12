@@ -1,13 +1,12 @@
 import { execFileSync } from "node:child_process";
 
-/** Path-only publication boundary shared by direct review and the research check. */
+/** Path-only publication boundary used by the research check and CI. */
 
 const CANONICAL_RECORD = /^research\/(?:problems\/PRB-[A-Z0-9-]+|evidence\/EVD-[A-Z0-9-]+|sources\/SRC-[A-Z0-9-]+)\.ya?ml$/i;
 const SOURCE_VERIFICATION = /^research\/source-verifications\/SRC-[A-Z0-9-]+\.ya?ml$/i;
 const RESEARCH_SCHEMA = /^research\/schemas\/[^/]+\.schema\.json$/i;
-const ATTESTATION = /^\.research-review-attestation\.json$/;
 
-const PRIVATE_SEGMENT = /^(?:\.research-workbench|\.research-review|private(?:[-_].*)?|raw(?:[-_].*)?|correspondence(?:[-_].*)?|transcripts?(?:[-_].*)?|recordings?(?:[-_].*)?|working[-_ ]?materials?|private[-_ ]?notes)$/i;
+const PRIVATE_SEGMENT = /^(?:\.research-workbench|\.research-review(?:-.*)?|private(?:[-_].*)?|raw(?:[-_].*)?|correspondence(?:[-_].*)?|transcripts?(?:[-_].*)?|recordings?(?:[-_].*)?|working[-_ ]?materials?|private[-_ ]?notes)$/i;
 const PRIVATE_FILENAME = /(?:^|[-_.])(?:private[-_ ]?notes|raw[-_ ]?(?:source|material)|transcripts?|recordings?)(?:$|[-_.])/i;
 
 export interface PublicationPathSafetyResult {
@@ -26,7 +25,7 @@ function isPrivatePath(path: string): boolean {
 }
 
 function isPermittedResearchPath(path: string): boolean {
-  return CANONICAL_RECORD.test(path) || SOURCE_VERIFICATION.test(path) || RESEARCH_SCHEMA.test(path) || ATTESTATION.test(path);
+  return CANONICAL_RECORD.test(path) || SOURCE_VERIFICATION.test(path) || RESEARCH_SCHEMA.test(path);
 }
 
 /**
