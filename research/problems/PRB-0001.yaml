@@ -1,8 +1,8 @@
 problem_id: PRB-0001
 created_at: 2026-08-28
-updated_at: 2026-10-09
-title: A utilidade prática dos transportes públicos varia consoante os horários
-  e os territórios
+updated_at: "2026-10-12"
+title: Oferta de transporte urbano reduzida à noite, aos fins de semana e nos
+  feriados, e atrasos recorrentes nas horas de ponta em dois corredores de Évora
 domain:
   - MOB
 geography:
@@ -10,86 +10,165 @@ geography:
   area: Évora
 affected_populations:
   - residentes que dependem dos transportes públicos
-problem_statement: O relatório municipal de 2026 indica que a rede urbana cobre
-  praticamente toda a cidade de Évora durante o dia, com oferta reduzida à
-  noite, aos fins de semana e nos feriados. A evidência institucional indica
-  que a utilidade prática do serviço varia consoante o período horário, o
-  tipo de deslocação e os locais de baixa procura; o Plano de Desenvolvimento Social aponta a falta de uma rede de transportes
-  públicos eficaz, citando as linhas e os horários.
-causal_reading: A variação na utilidade prática do serviço está associada
-  sobretudo ao desenho e à capacidade do serviço, e não apenas a uma lacuna de
-  informação; esta leitura não está validada e não exclui outros fatores
-  operacionais que possam contribuir para o problema.
+problem_statement: >-
+  Os relatórios municipais de transportes referentes a 2022, 2023 e 2025
+  indicam que a rede urbana de transportes públicos de Évora reduz a oferta à
+  noite, aos fins de semana e nos feriados. Para 2025, um quadro anual da
+  oferta prevista mostra diferenças entre carreiras e tipos de dia: em 9 das 13
+  carreiras e percursos representados, o quadro não indica oferta prevista ao
+  domingo e feriados. Este quadro não é o horário de uma data concreta. O
+  relatório sobre 2025 regista também atrasos recorrentes nas horas de ponta
+  nas principais vias de acesso ao Centro Histórico e na circular de acesso ao
+  Parque Industrial. Ainda não está estabelecido que efeitos práticos estas
+  condições têm nas deslocações atuais.
 investigation:
   open_questions:
-    - question: Em que medida as diferenças de oferta já identificadas por carreira e
-        tipo de dia, e os atrasos recorrentes nas horas de ponta, se traduzem em
-        tempos de espera, ligações inviáveis ou outros impactos materiais para
-        os utilizadores, e quais horários ou paragens são mais críticos?
-      why_open: Os quilómetros comerciais programados por carreira e tipo de dia, e as
-        janelas/corredores de atraso recorrente, estão agora documentados para
-        2025. Porém, quilómetros comerciais não estabelecem frequência, tempo de
-        espera, viabilidade de uma deslocação, capacidade ou prevalência dos
-        utilizadores afetados.
-      latest_result: O contexto de carreiras e corredores de 2025 foi mais delimitado,
-        mas não foi possível estabelecer uma deslocação atual reproduzível por
-        linha, paragem e partida, nem o seu impacto prático para utilizadores.
-      current_action: Não é proporcional prosseguir desafio direto sem dados
-        operacionais atuais ao nível de linha/paragem ou uma deslocação afetada
-        delimitada.
-      resolution_condition: Dados operacionais atuais ao nível de linha/paragem ou uma
-        deslocação afetada delimitada que permitam estabelecer o impacto
-        prático, mantendo separadas frequência, espera, capacidade e
-        prevalência.
+    - question: >-
+        Quantas partidas tem atualmente cada carreira urbana em dia útil, ao
+        sábado, ao domingo e feriados e à noite?
+      why_open: >-
+        Os dados de 2025 medem o volume anual de oferta prevista por tipo de
+        dia, não o número de partidas nem a oferta noturna de cada carreira.
+      latest_result: >-
+        O quadro de 2025 mostra diferenças entre carreiras e tipos de dia,
+        descritas no percurso da investigação; a oferta à noite só é descrita
+        como reduzida.
+      current_action: >-
+        Consultar os horários oficiais em vigor da rede TREVO, ainda não
+        consultados, antes de pedir a uma instituição informação que já seja
+        pública.
+      resolution_condition: >-
+        Horários oficiais em vigor, com data de consulta, que permitam contar as
+        partidas de cada carreira por tipo de dia e à noite.
+      evidence:
+        - EVD-000002
+        - EVD-000117
+        - EVD-000157
+    - question: >-
+        Que carreiras, partidas, paragens e sentidos concentram os atrasos
+        recorrentes registados em 2025 nas horas de ponta nos acessos ao Centro
+        Histórico e ao Parque Industrial, e esses atrasos mantêm-se?
+      why_open: >-
+        Os indicadores de pontualidade do relatório são agregados para todo o
+        serviço e não identificam carreiras, partidas, paragens ou sentidos,
+        nem a duração dos atrasos.
+      latest_result: >-
+        O relatório sobre 2025 identifica os corredores e os períodos de atraso,
+        sem desagregação.
+      current_action: >-
+        Verificar se há informação pública mais recente; o que continuar por
+        esclarecer será incluído num pedido documental ao Município de Évora,
+        partilhado com o PRB-0002, preparado mas ainda não enviado.
+      resolution_condition: >-
+        Dados do Município ou do operador que identifiquem as carreiras,
+        partidas, paragens e sentidos afetados nos dois corredores e indiquem
+        se os atrasos se mantêm.
+      evidence:
+        - EVD-000158
+    - question: >-
+        Que resposta institucional, se alguma, foi dada à petição de estudantes
+        da Universidade de Évora, de março de 2026, por mais horários de
+        transporte?
+      why_open: >-
+        A notícia ligada relata o protesto e a petição, mas não indica se o
+        Município, a Universidade ou o operador responderam.
+      latest_result: >-
+        Segundo a reportagem, cerca de 30 estudantes manifestaram-se e foi
+        referida uma petição com mais de 250 assinaturas. Os registos ligados
+        não indicam se houve resposta.
+      current_action: >-
+        Procurar uma resposta publicada pelo Município de Évora, pela
+        Universidade de Évora, pelo operador da rede TREVO ou na imprensa. Só se
+        a resposta não estiver disponível publicamente, incluir a questão no
+        pedido documental ao Município.
+      resolution_condition: >-
+        Informação pública ou institucional que indique se houve resposta à
+        petição e qual foi.
+      evidence:
+        - EVD-000079
+    - question: >-
+        Que efeitos concretos, se os houver, têm a oferta atual e os atrasos nas
+        deslocações, como tempos de espera, ligações perdidas ou impossibilidade de viajar à
+        hora necessária?
+      why_open: >-
+        Os dados ligados medem oferta prevista e pontualidade agregada, não
+        efeitos nas deslocações; os relatos ligados não estabelecem a frequência
+        das situações descritas.
+      latest_result: >-
+        Os registos ligados não estabelecem efeitos nas deslocações; existem
+        apenas relatos individuais não verificados.
+      current_action: >-
+        Depois de esclarecidas a oferta atual e a localização dos atrasos,
+        analisar deslocações concretas, por carreira, paragem e horário, com
+        horários oficiais e dados do operador.
+      resolution_condition: >-
+        Evidência sobre deslocações concretas que mostre esses efeitos,
+        distinguindo relatos individuais de situações verificadas.
+      evidence:
+        - EVD-000079
+        - EVD-000080
+        - EVD-000157
+        - EVD-000158
+  path:
+    initial_signal:
+      summary: >-
+        O Plano de Desenvolvimento Social de Évora 2024-2027 refere a falta de
+        uma rede de transportes públicos eficaz, citando as linhas e os
+        horários, e dificuldades de deslocação no município para quem depende
+        destes transportes; é uma preocupação de planeamento, não uma medição.
+        O relatório municipal de transportes de 2026 indica que a rede urbana
+        cobre praticamente toda a zona urbana de Évora durante o dia e reduz a
+        oferta à noite, aos fins de semana e nos feriados.
+      evidence:
+        - EVD-000001
+        - EVD-000002
+    development:
+      summary: >-
+        Os relatórios municipais referentes a 2022, 2023 e 2025 descrevem o
+        mesmo padrão de redução da oferta. À noite, indicam oferta reduzida, sem
+        detalhe por carreira. Para os fins de semana, um quadro de 2025 indica o volume
+        diário de oferta prevista por carreira e tipo de dia. Sem oferta
+        prevista no quadro ao fim de semana: carreiras 22, 24, 26 e 32. Com
+        oferta prevista ao sábado, mas sem oferta prevista ao domingo e feriados: 21, 34,
+        41 e as duas LinhAzul. Com oferta prevista em todos os tipos de dia, mas
+        reduzida ao domingo e feriados: 23, 25, 31 e 33. O quadro representa
+        oferta anual prevista por tipo de dia e não substitui o horário
+        operacional de uma data concreta.
+        Nas horas de ponta, o relatório sobre 2025 regista atrasos recorrentes,
+        que associa a trânsito lento, nas principais vias de acesso ao Centro
+        Histórico e, em particular, na circular de acesso ao Parque Industrial,
+        entre as 08h00 e as 09h30 e entre as 17h00 e as 19h00. No conjunto do
+        serviço, 84,4% das chegadas tiveram menos de 5 minutos de atraso; este
+        indicador não identifica as carreiras, partidas ou paragens afetadas.
       evidence:
         - EVD-000002
         - EVD-000117
         - EVD-000157
         - EVD-000158
-  path:
-    initial_signal:
-      summary: O Plano de Desenvolvimento Social (PDS 2024-2027) identifica
-        dificuldades de deslocação para residentes que dependem dos transportes
-        públicos, incluindo linhas e horários. O relatório anual da Autoridade
-        de Transportes municipal descreve a cobertura diurna da rede urbana em
-        praticamente toda a cidade de Évora e a redução da oferta à noite,
-        aos fins de semana e nos feriados.
+    delimitation:
+      summary: >-
+        Os dados descrevem oferta prevista e pontualidade agregada, não o
+        horário de uma data concreta nem efeitos nas deslocações. Algumas
+        carreiras mantêm oferta prevista ao fim de semana, embora reduzida face
+        aos dias úteis. A cobertura diurna, o aumento de passageiros na rede
+        urbana em 2025, os passageiros dos serviços intermunicipais e o
+        transporte flexível em táxi para quatro localidades de baixa procura
+        afastam uma leitura de ausência geral de serviço, sem demonstrarem que
+        a oferta é adequada. No serviço intermunicipal, a Comunidade
+        Intermunicipal do Alentejo Central regista os horários como o tema mais
+        frequente das comunicações dos utilizadores, mas estes dados não
+        descrevem a rede urbana. O protesto estudantil de 2026 e três
+        reclamações individuais de 2025 são relatos que não estabelecem a
+        frequência das situações descritas. Este problema trata da oferta e da
+        pontualidade do serviço; a informação aos passageiros nas paragens é
+        investigada separadamente no PRB-0002.
       evidence:
-        - EVD-000001
         - EVD-000002
-    development:
-      summary: A avaliação intermunicipal CIMAC/ATAC regista que as comunicações
-        relacionadas com horários constituem a maior categoria entre questões,
-        sugestões e reclamações; muitas pedem a criação ou sincronização de
-        horários e não resultam de incumprimento do serviço. A experiência de
-        acesso e espera é avaliada de forma menos favorável do que a experiência
-        a bordo. Estes dados acrescentam contexto intermunicipal, sem medir a
-        prevalência de falhas na rede urbana de Évora. O crescimento da
-        utilização da rede urbana, os passageiros registados nos lotes
-        intermunicipais e a existência de transporte flexível para locais de
-        baixa procura delimitam uma leitura de ausência geral de serviço,
-        sem estabelecer cobertura populacional TPAC/TPF no município.
-      evidence:
         - EVD-000011
         - EVD-000023
-        - EVD-000002
         - EVD-000027
-    delimitation:
-      summary: Um protesto estudantil em março de 2026 e reclamações individuais
-        publicadas numa plataforma pública independente sobre o TREVO registam
-        relatos não verificados de dificuldades com opções de transporte,
-        capacidade, tempos de viagem e incidentes operacionais. Não estabelecem
-        a ocorrência independente, prevalência ou representatividade dessas
-        situações. Os relatórios institucionais de 2022 e 2023 documentam o
-        padrão de redução do serviço à noite, aos fins de semana e nos feriados
-        em vários anos. Para 2025, dados oficiais identificam diferenças de
-        oferta programada por carreira e tipo de dia, bem como corredores e
-        janelas de atraso recorrente nas horas de ponta, sem medir o impacto
-        prático em cada deslocação.
-      evidence:
         - EVD-000079
         - EVD-000080
-        - EVD-000117
         - EVD-000157
         - EVD-000158
 evidence:
@@ -118,11 +197,6 @@ evidence:
   - evidence_id: EVD-000027
     effects:
       - BOUNDS
-    research_roles:
-      - CONTEXTUAL
-  - evidence_id: EVD-000028
-    effects:
-      - REFINES
     research_roles:
       - CONTEXTUAL
   - evidence_id: EVD-000079
@@ -163,133 +237,114 @@ decision_basis:
   contract_version: "0.1"
   eligibility_basis: >-
     PRB-0001 constitui um problema de investigação distinto e bem definido:
-    identifica uma preocupação cívica específica e delimitada relativa a um
-    serviço público — a utilidade prática dos transportes públicos varia
-    consoante o período e o contexto territorial e do serviço —, com uma
-    geografia delimitada (Município de Évora), uma população afetada
-    identificada (residentes que dependem dos transportes públicos) e uma
-    manifestação documentada institucionalmente (EVD-000001, EVD-000002,
-    EVD-000011, EVD-000117), mostrando que esta variação é uma característica
-    reconhecida e recorrente do serviço, e não uma suposição.
+    diferenças temporais documentadas na oferta de serviço prevista da rede
+    urbana de transportes públicos de Évora — redução à noite, aos fins de
+    semana e nos feriados — e atrasos recorrentes documentados nas horas de
+    ponta em dois corredores, ficando por estabelecer as consequências
+    práticas nas deslocações. Tem uma geografia delimitada (Município de
+    Évora), uma população afetada identificada (residentes que dependem dos
+    transportes públicos) e uma manifestação documentada por fontes
+    institucionais (EVD-000002, EVD-000117, EVD-000157, EVD-000158), com a
+    preocupação de planeamento do PDS (EVD-000001) como sinal institucional
+    distinto.
 
 
-    Evidência de experiência vivida fraca e anedótica (EVD-000079, EVD-000080)
-    regista relatos de deslocações e incidentes operacionais compatíveis
-    com essa variação documentada institucionalmente, sem verificação
-    independente da ocorrência ou do impacto relatado. Esta evidência não é
-    utilizada para estabelecer prevalência, desigualdade ou impacto à escala
-    da população.
+    Os relatos de experiência vivida (EVD-000079, EVD-000080) registam
+    dificuldades e incidentes operacionais reportados, sem verificação
+    independente da ocorrência ou do impacto. Não são utilizados para
+    estabelecer prevalência, impacto ou desigualdade à escala da população.
 
 
-    EVD-000002 documenta uma solução existente de transporte flexível para
-    locais identificados de baixa procura e não é deliberadamente utilizado como
-    evidência da manifestação. Mostra que uma formulação mais forte de «ausência
-    de serviço ou de resposta nos territórios de baixa procura» seria incorreta;
-    a lacuna que permanece documentada diz respeito à utilidade prática, à
-    variação consoante horários e territórios e à eficácia ainda por esclarecer,
-    e não à ausência de qualquer resposta. O problema não é formulado como uma
-    solução («é necessária uma aplicação») e não duplica nem se sobrepõe a outro
-    PRB-* canónico.
+    EVD-000002 documenta também uma resposta existente de transporte flexível
+    para localidades de baixa procura e não é utilizado, nessa parte, como
+    evidência da manifestação; mostra que uma formulação de «ausência de
+    serviço ou de resposta» seria incorreta. O problema não é formulado como
+    uma solução e distingue-se de PRB-0002, que trata da informação aos
+    passageiros nas paragens.
   corroboration_basis: >-
-    A corroboração assenta em evidência institucional que documenta de forma
-    consistente e repetida que a utilidade prática dos transportes públicos
-    varia consoante o período, o contexto da deslocação ou do serviço e os
-    territórios de menor procura, apesar da cobertura diurna documentada para a
-    rede urbana de Évora.
+    A corroboração assenta em evidência institucional que documenta, de forma
+    repetida, a redução da oferta da rede urbana à noite, aos fins de semana e
+    nos feriados, apesar da cobertura diurna de praticamente toda a zona urbana
+    de Évora, e em dados oficiais de 2025 sobre a oferta prevista por carreira
+    e tipo de dia e sobre atrasos recorrentes nas horas de ponta.
+
+
+    EVD-000002 (relatório de 2026 da Autoridade de Transportes municipal,
+    SRC-0018, referente a 2025) é a fonte primária e oficial mais atual para o
+    padrão temporal. EVD-000117 (edições de 2022 e 2023 da mesma série)
+    confirma o mesmo padrão em anos anteriores, reforçando a sua persistência
+    sem acrescentar uma voz institucional independente.
+
+
+    EVD-000157 e EVD-000158, do mesmo relatório de 2026, refinam a leitura para
+    2025. O quadro anual de oferta prevista mostra diferenças por carreira e
+    tipo de dia, com 9 das 13 carreiras e percursos representados sem oferta
+    prevista indicada ao domingo/feriado; este quadro não é o horário
+    operacional de uma data concreta. O relatório identifica atrasos
+    recorrentes nas horas de ponta em dois corredores, com indicadores de
+    pontualidade agregados. Ambos pertencem à família institucional de
+    SRC-0018.
 
 
     EVD-000001 (PDS 2024-2027, SRC-0002) constitui uma linha distinta de
-    planeamento institucional que identifica de forma independente a
-    conectividade efetiva dos transportes públicos como uma preocupação para
-    residentes que dependem do serviço.
+    planeamento institucional que refere as linhas e os horários como
+    preocupação para residentes que dependem do serviço; não mede a oferta nem
+    os efeitos nas deslocações e não é uma medição específica da cidade.
 
 
-    EVD-000002 (relatório anual de 2026 da Autoridade de Transportes municipal,
-    SRC-0018) é a fonte primária e oficial mais atual, indicando que a rede
-    urbana cobre praticamente toda a cidade de Évora durante o dia, mas reduz o
-    serviço à noite, aos fins de semana e nos feriados.
+    EVD-000011 (avaliação anual CIMAC/ATAC de 2026, SRC-0019) acrescenta
+    contexto intermunicipal: as comunicações relativas a horários são a maior
+    categoria no serviço TPAC, muitas como pedidos de criação ou sincronização
+    de horários. Não descreve a rede urbana TREVO e não é contado como
+    corroboração direta.
 
 
-    EVD-000117 (edições de 2022 e 2023 da mesma série de relatórios) confirma,
-    com formulação equivalente à do relatório atual de 2026, que este padrão de
-    variação entre dia, noite, fins de semana e feriados não constitui uma
-    observação nova ou transitória, mas uma característica documentada da rede
-    ao longo de vários anos. Isto reforça a atualidade e persistência da leitura
-    sem acrescentar uma nova voz institucional independente, por pertencer à
-    mesma linhagem documental de SRC-0018.
-
-
-    EVD-000011 (avaliação anual CIMAC/ATAC de 2026, SRC-0019) refina a
-    leitura ao nível intermunicipal: entre as questões, sugestões e
-    reclamações, as comunicações relacionadas com horários constituem a
-    maior categoria. Muitas são pedidos de criação ou sincronização de
-    horários, não incumprimentos do serviço. A experiência de acesso e
-    espera é menos favorável do que a experiência a bordo. É tratado como contexto e refinamento coerente
-    com a mesma afirmação de variação temporal e do contexto do serviço, e não,
-    por si só, como uma linha independente de suporte direto com o mesmo peso
-    das fontes primárias da manifestação. A existência de uma fonte e linhagem
-    distintas (SRC-0019) não é suficiente para a tornar equivalente às fontes
-    primárias e oficiais de corroboração direta.
-
-
-    A evidência de experiência vivida fraca e anedótica (EVD-000079, EVD-000080)
-    documenta relatos não verificados de situações e consequências compatíveis
-    com a afirmação institucional, mas não é utilizada para estabelecer
-    prevalência ou desigualdade à escala da população, nem é contabilizada como corroboração
-    institucional independente adicional.
-
-
-    EVD-000002, que documenta transporte flexível existente em locais de baixa
-    procura, em conjunto com o crescimento da utilização (EVD-000023) e
-    a utilização registada nos lotes intermunicipais (EVD-000027), constitui
-    contexto que limita uma leitura de ausência geral de serviço. A cobertura diurna de praticamente toda a cidade de Évora
-    (EVD-000002) e o transporte flexível documentado nesse registo delimitam
-    a afirmação apenas no âmbito urbano e dos locais de baixa procura
-    identificados, sem estabelecer cobertura TPAC/TPF para o município.
-    Por essa razão, estes registos são deliberadamente excluídos da corroboração direta e da evidência de suporte
-    da manifestação.
+    EVD-000079 e EVD-000080 documentam relatos não verificados e não são
+    contabilizados como corroboração institucional independente. O
+    crescimento da utilização (EVD-000023), os passageiros dos lotes
+    intermunicipais (EVD-000027) e o transporte flexível documentado em
+    EVD-000002 limitam uma leitura de ausência geral de serviço e não provam
+    adequação prática.
   manifestation:
-    kind: variação da utilidade do serviço / lacuna de adequação temporal-territorial
+    kind: redução temporal da oferta de serviço prevista / atrasos recorrentes nas horas de ponta
     summary: >-
-      A evidência institucional estabelece que a utilidade prática dos
-      transportes públicos em Évora não é uniforme. O relatório anual atual da
-      Autoridade de Transportes municipal (EVD-000002) indica que a rede urbana
-      cobre praticamente toda a cidade de Évora durante o dia, mas reduz o
-      serviço à noite, aos fins de semana e nos feriados. As edições de 2022 e
-      2023 do mesmo relatório (EVD-000117) confirmam que este é um padrão
-      documentado ao longo de vários anos, e não uma observação nova ou
-      transitória.
+      Os relatórios anuais da Autoridade de Transportes municipal documentam que
+      a rede urbana cobre praticamente toda a zona urbana de Évora durante o dia
+      e reduz a oferta à noite, aos fins de semana e nos feriados: no relatório
+      de 2026, referente a 2025 (EVD-000002), e nas edições de 2022 e 2023
+      (EVD-000117), da mesma família institucional.
 
 
-      O Plano de Desenvolvimento Social municipal (EVD-000001) identifica, de
-      forma independente, a conectividade efetiva dos transportes públicos como
-      uma preocupação para residentes que dependem do serviço, citando as linhas e os horários.
+      Para 2025, o quadro anual de oferta prevista por carreira e tipo de dia
+      (EVD-000157), medida em quilómetros comerciais, mostra diferenças entre
+      carreiras: em 9 das 13 carreiras e percursos representados, o quadro não
+      indica oferta prevista ao domingo/feriado, e as carreiras com oferta
+      nesse tipo de dia têm um volume previsto inferior ao dos dias úteis. O
+      quadro não é o horário operacional de uma data concreta, e células sem
+      quilómetros não provam, por si só, ausência de serviço numa data.
 
 
-      A avaliação intermunicipal CIMAC/ATAC (EVD-000011) acrescenta contexto e
-      detalhe: as comunicações relacionadas com horários constituem a maior
-      categoria entre questões, sugestões e reclamações; muitas são pedidos
-      de criação ou sincronização de horários, não incumprimentos do serviço.
-      A experiência de acesso e espera é avaliada de forma menos favorável do que a experiência a bordo. Esta evidência é
-      consistente com a mesma variação temporal e de contexto do serviço, mas
-      não é tratada, por si só, como uma demonstração independente de igual
-      peso.
+      O mesmo relatório (EVD-000158) identifica atrasos recorrentes em 2025 nas
+      horas de ponta (08h00–09h30 e 17h00–19h00), que associa a trânsito lento,
+      nas principais artérias de acesso ao Centro Histórico e, em particular, na
+      circular de acesso ao Parque Industrial. Os indicadores de regularidade
+      (99,5%) e de pontualidade (84,4% das chegadas com menos de 5 minutos de
+      atraso) são agregados e não identificam carreiras, partidas ou paragens.
 
 
-      O mesmo relatório municipal desagrega para 2025 os quilómetros comerciais
-      programados por carreira e tipo de dia (EVD-000157), identificando
-      diferenças de oferta de fim de semana entre carreiras, e regista atrasos
-      recorrentes em corredores e janelas de hora de ponta, com indicadores
-      agregados de regularidade e pontualidade (EVD-000158). Estes dados refinam
-      a manifestação por carreira/tipo de dia e corredor/período, sem
-      estabelecer frequência, espera, capacidade ou severidade ao nível de cada
-      utilizador.
+      O PDS 2024-2027 (EVD-000001) refere as linhas e os horários como
+      preocupação de planeamento institucional, sem medir a oferta. A avaliação
+      CIMAC/ATAC (EVD-000011) acrescenta contexto intermunicipal sobre
+      comunicações relativas a horários no serviço TPAC, sem descrever a rede
+      urbana.
 
 
-      A existência de transporte flexível para locais de baixa procura
-      (EVD-000002) não é utilizada como evidência da manifestação do problema.
-      Documenta uma resposta já existente e é considerada evidência que delimita
-      a conclusão.
+      A manifestação consiste em diferenças temporais documentadas na oferta de
+      serviço prevista e em atrasos recorrentes documentados nas horas de
+      ponta; as consequências práticas nas deslocações permanecem por
+      estabelecer. O transporte flexível documentado em EVD-000002 não é
+      utilizado como evidência da manifestação; documenta uma resposta
+      existente e delimita a conclusão.
     evidence:
       - EVD-000001
       - EVD-000002
@@ -305,51 +360,40 @@ decision_basis:
       permitir generalizar para a população.
 
 
-      EVD-000079 relata que estudantes da Universidade de Évora
-      participaram, em março de 2026, num protesto relacionado com opções de
-      transporte pouco utilizáveis na prática, autocarros cheios e tempos
-      efetivos de deslocação longos, segundo os relatos.
-      Trata-se de experiência reportada num único evento, de
-      representatividade desconhecida.
+      EVD-000079 relata que cerca de 30 estudantes da Universidade de Évora se
+      manifestaram, em março de 2026, pedindo horários adicionais de
+      transporte; a reportagem refere uma petição com mais de 250 assinaturas e
+      relatos de opções pouco utilizáveis na prática, autocarros cheios e
+      tempos efetivos de deslocação longos. Trata-se de experiência reportada
+      num único evento, de representatividade desconhecida, e a resposta
+      institucional à petição não está estabelecida.
 
 
-      EVD-000080 documenta reclamações individuais numa plataforma pública
-      independente sobre o TREVO: relatos de um autocarro atrasado, de uma
-      interrupção do serviço e de um autocarro que não parou após sinalização.
-      São relatos distintos publicados nessa plataforma, e não dados sobre a
-      frequência destas ocorrências no conjunto da rede.
+      EVD-000080 documenta três reclamações individuais de 2025 numa plataforma
+      pública independente sobre o TREVO: um atraso, uma interrupção do serviço
+      e um autocarro que não parou após sinalização. São relatos
+      autosselecionados, e não dados sobre a frequência destas ocorrências na
+      rede.
 
 
       Esta evidência demonstra a existência dos relatos, não a ocorrência
-      independente das situações nem o impacto descrito nas deslocações.
-      Não estabelece a frequência ou prevalência das falhas relatadas entre
-      residentes, nem permite concluir pela existência de um efeito
-      generalizado ou de uma desigualdade à escala da população.
+      independente das situações nem o impacto descrito nas deslocações. As
+      consequências práticas da oferta e dos atrasos documentados permanecem
+      uma questão aberta.
     evidence:
       - EVD-000079
       - EVD-000080
   currentness:
     assessment: >-
-      ALTA para a manifestação institucional documentada, com limites temporais
-      explícitos. EVD-000002, do relatório de 2026 da Autoridade de Transportes municipal, confirma a variação entre o serviço diurno e
-      o serviço noturno, de fim de semana e de feriados, enquanto EVD-000157 e
-      EVD-000158 descrevem a oferta por carreira/tipo de dia e os atrasos
-      recorrentes por corredor/período em 2025.
-
-
-      As edições de 2022 e 2023 do mesmo relatório (EVD-000117) confirmam que
-      este padrão está documentado ao longo de vários anos, reforçando a sua
-      persistência sem constituir uma voz institucional independente adicional.
-
-
-      EVD-000079 e EVD-000080 acrescentam sinais de experiência vivida relativos
-      a 2025-2026 que são consistentes com a manifestação institucional.
-
-
-      Os dados de 2025 não estabelecem que o horário, a frequência, os tempos de
-      espera ou o impacto para utilizadores sejam idênticos em outubro de 2026. A
-      questão mantém-se aberta quanto às partidas, paragens e utilizadores
-      atualmente mais afetados.
+      A redução temporal da oferta está documentada nas edições de 2022 e 2023
+      e no relatório de 2026 referente a 2025; EVD-000157 e EVD-000158 delimitam
+      para 2025 a oferta prevista por carreira e tipo de dia e os atrasos
+      recorrentes por corredor e período. Estes registos não estabelecem que a
+      mesma configuração de oferta nem os mesmos atrasos persistam em outubro
+      de 2026. EVD-000079 e EVD-000080 acrescentam relatos de 2025-2026, mas
+      não estabelecem essa persistência. Os horários públicos em vigor ainda
+      não foram consultados; essa consulta é uma ação de investigação
+      pendente.
     evidence:
       - EVD-000002
       - EVD-000117
@@ -359,29 +403,25 @@ decision_basis:
     performed: true
     summary: >-
       Foi realizada uma procura deliberada de evidência que pudesse contradizer
-      ou ultrapassar a leitura institucional de que a utilidade do serviço varia
-      consoante o período e o contexto.
+      ou ultrapassar a leitura institucional de redução da oferta à noite, aos
+      fins de semana e nos feriados.
 
 
-      A procura considerou as edições de 2022 e 2023 dos relatórios anuais
-      da Autoridade de Transportes municipal (EVD-000117) e o transporte
-      flexível documentado em EVD-000002 para locais de baixa procura.
+      A procura considerou as edições de 2022 e 2023 dos relatórios anuais da
+      Autoridade de Transportes municipal (EVD-000117) e o transporte flexível
+      documentado em EVD-000002 para localidades de baixa procura. Não foi
+      encontrada evidência que contradiga a manifestação delimitada; EVD-000117
+      confirma o mesmo padrão em anos anteriores. Esta revisão não realizou
+      nova pesquisa.
 
 
-      Não foi encontrada evidência que contradiga a manifestação delimitada.
-      Pelo contrário, EVD-000117 confirma que o mesmo padrão de variação está
-      documentado ao longo de vários anos.
-
-
-      O crescimento da utilização da rede (EVD-000023), a utilização
-      registada nos lotes intermunicipais (EVD-000027), a existência de
-      transporte flexível (EVD-000002), a
-      regularidade agregada de 99,5% reportada para 2025 (EVD-000158), a oferta
-      substancial ao sábado e domingo/feriado em algumas carreiras, em especial
-      a carreira 25 (EVD-000157) foram considerados como evidência que restringe uma
-      leitura mais abrangente do problema. Estes elementos mostram que não
-      estamos perante uma ausência generalizada de serviço, mas não demonstram
-      que a variação da sua utilidade prática esteja resolvida.
+      O crescimento da utilização da rede (EVD-000023), os passageiros dos
+      lotes intermunicipais (EVD-000027), o transporte flexível (EVD-000002), a
+      regularidade agregada de 99,5% reportada para 2025 (EVD-000158) e a oferta
+      prevista ao fim de semana em algumas carreiras, embora reduzida face aos
+      dias úteis (EVD-000157), restringem uma leitura mais abrangente. Mostram
+      que não há ausência generalizada de serviço, mas não demonstram que a
+      oferta seja adequada nem que os atrasos estejam resolvidos.
     evidence:
       - EVD-000117
       - EVD-000157
@@ -389,25 +429,31 @@ decision_basis:
   overlap_check:
     performed: true
     summary: >-
-      Nenhum outro PRB-* canónico aborda a utilidade prática do serviço de
-      transporte público e a sua adequação temporal-territorial em Évora;
-      PRB-0001 não duplica nem se sobrepõe a outro registo.
+      Nenhum outro PRB-* canónico aborda a oferta de serviço e a pontualidade
+      da rede urbana de transportes públicos de Évora. PRB-0002 está
+      relacionado, mas é distinto: trata da informação aos passageiros e de
+      elementos de acessibilidade nas paragens descritas pelo PMUSE. Os atrasos
+      documentados neste registo não são evidência do problema de informação de
+      PRB-0002, e as lacunas de informação nas paragens não explicam a oferta
+      nem a pontualidade aqui documentadas.
 
 
-      EVD-000011 e EVD-000080 estão também associados a PRB-0002 por uma questão
-      distinta relacionada com informação e interoperabilidade, e não pela
-      afirmação de variação da utilidade do serviço que define PRB-0001.
-    related_problems: []
-  corroboration_statement: O relatório municipal de 2026 indica cobertura
-    diurna da rede urbana em praticamente toda a cidade de Évora e oferta reduzida à noite, aos fins de
-    semana e nos feriados. A evidência institucional indica variação da utilidade
-    prática consoante o período, o tipo de deslocação e os locais de baixa
-    procura; o PDS identifica linhas e horários como preocupação.
+      EVD-000011 está também ligado a PRB-0002, por uma questão distinta de
+      informação aos passageiros. EVD-000080 está ligado apenas a PRB-0001.
+    related_problems:
+      - PRB-0002
+  corroboration_statement: Os relatórios municipais referentes a 2022, 2023 e
+    2025 documentam redução da oferta da rede urbana à noite, aos fins de
+    semana e nos feriados. Dados oficiais de 2025 mostram diferenças de oferta
+    prevista por carreira e tipo de dia e atrasos recorrentes nas horas de
+    ponta em dois corredores. Os efeitos práticos nas deslocações não estão
+    estabelecidos.
   supporting_evidence:
     - EVD-000001
     - EVD-000002
-    - EVD-000011
     - EVD-000117
+    - EVD-000157
+    - EVD-000158
   boundary_evidence:
     - EVD-000023
     - EVD-000002
@@ -424,7 +470,9 @@ decision_basis:
     família de voz institucional para efeitos de independência, apesar de cada
     edição possuir um identificador de fonte distinto. O papel de EVD-000117 é
     corroborar a persistência da mesma afirmação ao longo de várias edições, e
-    não acrescentar uma segunda voz independente.
+    não acrescentar uma segunda voz independente. EVD-000157 e EVD-000158
+    provêm do mesmo relatório de 2026 (SRC-0018) e refinam a leitura sem
+    acrescentar independência.
 
 
     EVD-000011 (SRC-0019, avaliação anual CIMAC/ATAC) provém de uma instituição
@@ -468,38 +516,36 @@ decision_basis:
     por isso, avaliada como MÉDIA.
   scope:
     geography: >-
-      Município de Évora. EVD-000011 e EVD-000027 incluem também evidência à
-      escala intermunicipal do Alentejo Central/CIMAC, utilizada apenas quando
-      ajuda a interpretar a situação específica de Évora e não como fundamento
-      para uma afirmação regional mais ampla.
-
-
-      EVD-000028 não é utilizado para delimitar este âmbito. O registo apresenta a média mensal de passageiros dos lotes 1 e 2;
-      essa média não estabelece a proporção de estudantes ou jovens entre
-      passageiros nem descreve a composição demográfica da rede urbana TREVO
-      em Évora.
+      Município de Évora. A evidência sobre oferta e pontualidade (EVD-000002,
+      EVD-000117, EVD-000157, EVD-000158) refere-se à rede urbana; EVD-000001 e
+      a parte de EVD-000002 relativa ao transporte flexível abrangem também
+      contexto municipal e localidades de baixa procura. EVD-000011 e
+      EVD-000027 incluem evidência à escala intermunicipal do Alentejo
+      Central/CIMAC, utilizada apenas quando ajuda a interpretar a situação
+      específica de Évora e não como fundamento para uma afirmação regional mais
+      ampla.
     population: >-
       Residentes que dependem dos transportes públicos no Município de Évora,
-      incluindo subpopulações concretas e delimitadas identificadas no registo:
-      estudantes que se deslocam para um campus específico, utilizadores
-      dependentes do serviço noturno, de fim de semana ou de feriados e
-      residentes de locais de baixa procura abrangidos por respostas
-      específicas.
+      em particular utilizadores da rede urbana à noite, aos fins de semana e
+      nos feriados e nos corredores com atrasos recorrentes nas horas de ponta.
+      Os relatos ligados referem também estudantes da Universidade de Évora; o
+      transporte flexível abrange residentes de localidades de baixa procura.
 
 
       A evidência não permite generalizar a conclusão para toda a população do
       município.
     temporal: >-
       Circunscrito ao período documentado no registo. A evidência institucional
-      abrange 2022-2026 e mostra a persistência do padrão de redução do serviço
-      à noite, aos fins de semana e nos feriados (EVD-000117, EVD-000002).
+      abrange as edições de 2022 e 2023 e o relatório de 2026 referente a 2025,
+      e mostra a persistência do padrão de redução da oferta à noite, aos fins
+      de semana e nos feriados (EVD-000117, EVD-000002).
 
 
-      EVD-000157 documenta quilómetros comerciais programados por carreira e
-      tipo de dia em 2025; EVD-000158 documenta, também para 2025, indicadores
-      agregados e corredores/janelas de atrasos recorrentes. Embora constem do relatório
-      de 2026, estes elementos não descrevem diretamente
-      o horário ou desempenho em outubro de 2026.
+      EVD-000157 documenta a oferta prevista por carreira e tipo de dia em
+      2025; EVD-000158 documenta, também para 2025, indicadores agregados e
+      corredores e períodos de atrasos recorrentes. Embora constem do relatório
+      de 2026, estes elementos não descrevem diretamente o horário nem o
+      desempenho em outubro de 2026.
 
 
       A evidência de experiência vivida inclui o protesto estudantil de março de
@@ -507,87 +553,67 @@ decision_basis:
       outubro de 2025 (EVD-000080).
 
 
-      A conclusão não se estende a uma comparação atual, em outubro de 2026, da
-      frequência, espera, viabilidade de deslocação, capacidade, severidade ou
-      prevalência por linha, corredor, paragem ou período horário. Essa questão
-      continua em aberto.
+      A conclusão não se estende ao horário em vigor nem aos efeitos atuais nas
+      deslocações, como espera, ligações ou impossibilidade de viajar à hora
+      necessária. Essas questões continuam em aberto.
     bounded: true
   limitations: >-
-    A afirmação corroborada é SUPORTADA apenas nos seguintes termos: a evidência
-    institucional mostra de forma consistente que a utilidade prática dos
-    transportes públicos em Évora varia consoante o período, o contexto da
-    deslocação ou do serviço e os territórios de menor procura, apesar de a
-    cobertura global permanecer ampla.
+    A afirmação corroborada é SUPORTADA apenas nos seguintes termos: relatórios
+    institucionais documentam, em vários anos, redução da oferta da rede urbana
+    à noite, aos fins de semana e nos feriados; para 2025, a oferta prevista
+    difere por carreira e tipo de dia e há atrasos recorrentes nas horas de
+    ponta em dois corredores identificados de forma agregada.
 
 
-    NÃO É SUPORTADA como: uma afirmação de impacto material à escala de toda a
-    população; uma desigualdade geral demonstrada; uma afirmação de deficiência
-    atual grave numa linha ou corredor específico; uma afirmação sobre a
-    frequência ou prevalência das falhas sentidas pelos residentes; ou uma
-    afirmação de que os transportes públicos estão, em termos gerais, ausentes
-    ou em declínio.
+    NÃO É SUPORTADA como: uma afirmação de que a utilidade prática do serviço
+    ou os efeitos nas deslocações estão estabelecidos; uma variação por tipo de
+    deslocação; uma afirmação de impacto material à escala da população; uma
+    desigualdade geral demonstrada; uma atribuição dos atrasos a carreiras,
+    partidas ou paragens concretas; uma afirmação sobre a frequência das falhas
+    sentidas pelos residentes; ou uma afirmação de que os transportes públicos
+    estão, em termos gerais, ausentes ou em declínio.
 
 
-    EVD-000157 permite afirmar apenas que o quadro oficial de 2025 desagrega os
-    quilómetros comerciais programados por carreira e tipo de dia; EVD-000158
-    permite afirmar apenas que o relatório agrega indicadores de desempenho e
-    identifica atrasos recorrentes nos corredores e janelas indicados. Nenhum
-    dos dois estabelece frequência atual, tempos de espera, ligações inviáveis,
-    capacidade, impacto ao nível do utilizador ou prevalência. Em particular,
-    células sem quilómetros no quadro não são tratadas como observação
-    independente de ausência de serviço numa data concreta.
+    EVD-000157 mede volume de oferta prevista em quilómetros comerciais por
+    tipo de dia; não estabelece número de partidas, intervalos, tempos de
+    espera, capacidade ou utilidade de uma deslocação concreta. Células sem
+    quilómetros no quadro não são tratadas como prova de ausência de serviço
+    numa data concreta, e o quadro não substitui a consulta do horário
+    operacional. EVD-000158 apresenta indicadores agregados e não permite
+    atribuir os atrasos no Parque Industrial a carreiras específicas que
+    sirvam essa zona.
 
 
-    O crescimento da utilização urbana (EVD-000023), os passageiros registados
-    nos lotes intermunicipais (EVD-000027) e a cobertura diurna urbana e o
-    transporte flexível documentados em EVD-000002 restringem uma leitura
-    de ausência geral de serviço, dentro dos respetivos âmbitos. Mostram
-    que uma formulação mais forte de «ausência de serviço ou de resposta nos territórios de baixa procura» seria incorreta e que a lacuna
-    documentada que permanece diz respeito à utilidade prática, à variação
-    consoante horários e territórios e à eficácia ainda por esclarecer, e não à
-    ausência de qualquer resposta. Estes registos são deliberadamente excluídos
-    da manifestação e da evidência de suporte direto e não devem ser
-    interpretados como demonstrando que a lacuna de utilidade prática está
-    resolvida.
+    O crescimento da utilização urbana (EVD-000023), os passageiros dos lotes
+    intermunicipais (EVD-000027) e a cobertura diurna urbana e o transporte
+    flexível documentados em EVD-000002 restringem uma leitura de ausência
+    geral de serviço, dentro dos respetivos âmbitos, e não devem ser
+    interpretados como demonstração de adequação prática.
 
 
-    O uso canónico de EVD-000011 é de suporte, refinamento e contexto ao nível
-    intermunicipal. É mantido como contexto corroborativo da mesma afirmação de
-    variação e não é tratado, por si só, como uma linha independente de suporte
-    direto com igual peso, uma vez que uma fonte ou linhagem distinta não
-    estabelece automaticamente corroboração direta equivalente.
+    O uso canónico de EVD-000011 é de contexto intermunicipal e não é tratado
+    como uma linha independente de suporte direto, uma vez que não descreve a
+    rede urbana TREVO.
 
 
-    EVD-000028 é excluído de `boundary_evidence`: o registo apresenta apenas a média mensal de passageiros dos lotes 1 e 2
-    e explicita que ela não estabelece a proporção de estudantes ou jovens
-    entre passageiros nem descreve a composição demográfica da rede urbana
-    TREVO em Évora. Por isso, não delimita de forma
-    válida a geografia ou a população desta afirmação e é mantido apenas como
-    contexto, conforme descrito em `scope.geography`.
-
-
-    EVD-000079 e EVD-000080 suportam a existência de relatos de situações
-    concretas e incidentes operacionais, não a sua verificação independente.
-    São evidência anedótica, autosselecionada e de representatividade DESCONHECIDA e não são tratados, nem devem ser
-    reforçados, como evidência de prevalência ou de desigualdade à escala da
-    população. Em particular, EVD-000080 não é considerado evidência
-    representativa da experiência vivida.
-
-
-    Está estabelecido para 2025 que a oferta programada em quilómetros
-    comerciais varia por carreira e tipo de dia, e que existem corredores e
-    janelas de atraso recorrente identificados de forma agregada. Não está
-    estabelecido em que medida essas diferenças se traduzem em frequência,
-    espera, viabilidade de deslocação, capacidade ou severidade para
-    utilizadores, nem quais linhas, paragens ou períodos são atualmente mais
-    críticos em outubro de 2026. O número de `lineage_id` não é interpretado como
-    independência semântica: registos de diferentes edições anuais provenientes
-    da mesma voz institucional (SRC-0018 e os seus antecedentes de 2022/2023,
-    EVD-000117) são agrupados para efeitos de avaliação da independência apesar
-    de possuírem diferentes `source_id`.
+    EVD-000079 e EVD-000080 suportam a existência de relatos, não a sua
+    verificação independente. São evidência anedótica, autosselecionada e de
+    representatividade DESCONHECIDA e não são tratados como evidência de
+    prevalência ou de desigualdade à escala da população. O número de
+    `lineage_id` não é interpretado como independência semântica: registos de
+    diferentes edições anuais da mesma voz institucional (SRC-0018 e os seus
+    antecedentes de 2022/2023, EVD-000117) são agrupados para efeitos de
+    avaliação da independência.
 history:
   - date: 2026-08-31
     summary: O contexto de serviço de 2025 foi mais delimitado, mas não foi possível
       estabelecer uma deslocação atual reproduzível por linha, paragem e
       partida; a investigação passa a aguardar dados operacionais atuais ou uma
       deslocação afetada delimitada.
+  - date: 2026-10-12
+    summary: O problema foi reformulado para descrever a oferta e a pontualidade
+      documentadas, sem dar por estabelecida a utilidade prática do serviço.
+      Separou as dúvidas sobre oferta atual, atrasos nas horas de ponta,
+      resposta à petição estudantil e efeitos nas deslocações, substituiu a
+      ação anterior por consulta de fontes públicas e pedido documental e
+      passou a distinguir-se do PRB-0002.
