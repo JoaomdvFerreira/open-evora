@@ -27,16 +27,8 @@ export interface FieldGloss {
 type FieldGlossMap = Record<string, FieldGloss>;
 
 const STATUS_GLOSS: FieldGlossMap = {
-  OPEN: {
-    label: "Aberto",
-    explanation:
-      "ainda não atingiu um dos resultados terminais do modelo canónico — por exemplo, rejeitado, identificado como duplicado, considerado não digital, já resolvido, ou encerrado por evidência insuficiente.",
-  },
-  REJECTED: { label: "Rejeitado" },
-  DUPLICATE: { label: "Duplicado" },
-  NON_DIGITAL: { label: "Não digital" },
-  ALREADY_SOLVED: { label: "Já resolvido" },
-  INSUFFICIENT_EVIDENCE: { label: "Evidência insuficiente" },
+  OPEN: { label: "Aberto" },
+  CLOSED: { label: "Encerrado" },
 };
 
 const VALIDATION_STATUS_GLOSS: FieldGlossMap = {

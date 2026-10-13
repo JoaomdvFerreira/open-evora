@@ -2,7 +2,8 @@
 const LABELS: Record<string, Record<string, string>> = {
   validation_status: { unvalidated: "Por validar", partially_validated: "Parcialmente validado", validated: "Validado" },
   solution_landscape_status: { not_assessed: "Não avaliadas", assessed: "Avaliadas" },
-  status: { OPEN: "Aberto", REJECTED: "Rejeitado", DUPLICATE: "Duplicado", NON_DIGITAL: "Não digital", ALREADY_SOLVED: "Já resolvido", INSUFFICIENT_EVIDENCE: "Evidência insuficiente" },
+  status: { OPEN: "Aberto", CLOSED: "Encerrado" },
+  "closure.reason": { NOT_DEMONSTRATED_CURRENT: "Atualidade n\u00e3o demonstrada", RESOLVED: "Lacuna resolvida", NO_FOLLOWABLE_INFORMATION: "Sem via de investiga\u00e7\u00e3o execut\u00e1vel", SUPERSEDED: "Enquadramento substitu\u00eddo", OUT_OF_SCOPE: "Fora do \u00e2mbito do programa" },
   evidence_status: { discovered: "Evidência identificada", corroborated: "Evidência corroborada" },
   digital_tractability: { not_assessed: "Não avaliada", low: "Baixa", medium: "Média", high: "Alta" },
   evidence_nature: { fact: "Facto", "reported-experience": "Experiência relatada", opinion: "Opinião", claim: "Alegação", measurement: "Medição", recommendation: "Recomendação" },

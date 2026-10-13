@@ -214,7 +214,7 @@ describe("EVD Detail — synthetic contract cases", () => {
   });
 
   it("counts a Problem that uses the Evidence twice once, and says 'em investigação' only when every Problem is open", () => {
-    const open = problem("PRB-0101"); const closed = problem("PRB-0102", "REJECTED");
+    const open = problem("PRB-0101"); const closed = problem("PRB-0102", "CLOSED");
     const { container, unmount } = renderEvd(base, { problemUses: ready([use(open, "evidence[0]"), use(open, "evidence[4]")]) });
     expect(metadata(container).Problemas).toBe("1");
     expect(screen.getByText("1 problema em investigação")).toBeTruthy();

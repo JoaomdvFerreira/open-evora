@@ -390,3 +390,12 @@ Support can inform Source-to-EVD fidelity for changed EVDs, never PRB wording. S
 For PRB wording, linked EVDs are the complete evidence boundary. SRC metadata and Source Verification Support do not widen it. A changed EVD still requires enough context to judge fidelity to its Source; missing context remains an evidence gap.
 
 The semantic contract remains human-owned: deterministic tooling validates structure and bindings but does not decide whether wording is supported, corroborated, validated, or accepted. Human review owns canonical research decisions.
+
+
+## Problem closure and reopening
+
+Stopping a research method records a method decision; it does not close the Problem. `CLOSED` means the Problem is no longer active in the programme and requires an authored reason, explanation, reopen condition, date and matching history transition. It remains independent of corroboration, validation, digital tractability and solution-landscape assessment.
+
+`CLOSED` never means “the problem does not exist” unless the evidence genuinely supports the narrower `RESOLVED` conclusion. A currentness-based closure describes an evidential limit, not cessation. An out-of-scope closure describes programme boundaries. Closure because no followable information remains means no proportionate executable route remains, not that the issue is false. Closure after supersession means a better canonical framing replaces it.
+
+Reopen when the authored `reopen_condition` is met only through human review and an authored `CLOSED` → `OPEN` history transition. A late Source, stakeholder response or new Evidence does not automatically reopen a closed PRB; it becomes incoming research for human review.

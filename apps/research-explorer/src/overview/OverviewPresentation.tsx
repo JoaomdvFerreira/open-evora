@@ -34,6 +34,7 @@ export function OverviewPresentation({
   sourceCount,
   totalRecordCount,
   citizenProblems,
+  closedProblems,
   visibleProblems,
   paginatedProblems,
   currentPage,
@@ -60,6 +61,7 @@ export function OverviewPresentation({
   /** The canonical corpus total — every record in the loaded index, every type (the same figure `manifest.totalRecords` reports elsewhere as "Corpus: X registos" — see overviewStats.ts's `PublicOverviewData` doc comment). Shown in the Hero metrics as "Total de registos". */
   totalRecordCount: number;
   citizenProblems: CitizenProblem[] | null;
+  closedProblems: CitizenProblem[] | null;
   /** The full filtered+sorted result set (pre-pagination) — its length is the sole source for the toolbar's "N problemas" count, never `paginatedProblems.length`. */
   visibleProblems: CitizenProblem[] | null;
   /** `visibleProblems` sliced to the current page (Overview visual-completion — pagination) — this is what actually renders as rows. */
@@ -290,6 +292,16 @@ export function OverviewPresentation({
           </div>
         )}
       </section>
+      {closedProblems !== null && closedProblems.length > 0 && (
+        <section aria-labelledby="overview-closed-heading" className="overview-closed-problems">
+          <div className="shell-frame shell-frame--wide">
+            <h2 id="overview-closed-heading">Problemas encerrados</h2>
+            <ul className="overview-problem-list">
+              {closedProblems.map((problem) => <ProblemRow key={problem.id} problem={problem} onExplore={onExploreProblem} />)}
+            </ul>
+          </div>
+        </section>
+      )}
     </section>
   );
 }

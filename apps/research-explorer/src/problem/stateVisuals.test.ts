@@ -3,7 +3,7 @@ import { evidenceVisual, lifecycleVisual, validationVisual } from "./stateVisual
 
 describe("lifecycleVisual", () => {
   it("covers every canonical status value", () => {
-    for (const value of ["OPEN", "REJECTED", "DUPLICATE", "NON_DIGITAL", "ALREADY_SOLVED", "INSUFFICIENT_EVIDENCE"]) {
+    for (const value of ["OPEN", "CLOSED"]) {
       expect(lifecycleVisual(value).icon).toBeDefined();
     }
   });

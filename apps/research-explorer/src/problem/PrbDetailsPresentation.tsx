@@ -4,7 +4,7 @@ import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { RecordIdentifier } from "../records/RecordIdentifier";
 import { PrbHeader, PrbIdentityHeader } from "./PrbPageHeader";
-import { formatPublicCount, formatPublicPartialDate, publicCompactEnumLabel, publicEnumExplanation, publicEnumLabel } from "../presentation/presentation";
+import { formatPublicCount, formatPublicDate, formatPublicPartialDate, publicCompactEnumLabel, publicEnumExplanation, publicEnumLabel } from "../presentation/presentation";
 import { isHttpUrl } from "../records/sourceView";
 import { Drawer } from "../presentation/Drawer";
 import type { PrbDetailsData, PrbEvidenceItem, PrbOpenQuestion, PrbPathStage } from "./prbDetailsProjection";
@@ -655,6 +655,16 @@ export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, 
       </div>
 
       <PrbInvestigationStateSection data={data} />
+      {data.status === "CLOSED" && <section className="shell-frame shell-frame--wide prb-details-frame" aria-labelledby="prb-closure-heading">
+        <h2 id="prb-closure-heading">Encerramento</h2>
+        <dl>
+          {data.closureReason && <div><dt>Motivo</dt><dd>{publicEnumLabel("closure.reason", data.closureReason)}</dd></div>}
+          {data.closureExplanation && <div><dt>Porque deixou de estar ativo</dt><dd>{data.closureExplanation}</dd></div>}
+          {data.closureClosedAt && <div><dt>Data de encerramento</dt><dd><time dateTime={data.closureClosedAt}>{formatPublicDate(data.closureClosedAt)}</time></dd></div>}
+          {data.reopenCondition && <div><dt>Condi&ccedil;&atilde;o para reabrir</dt><dd>{data.reopenCondition}</dd></div>}
+          <div><dt>O que significa</dt><dd>O encerramento indica que este registo deixou de estar ativo no programa; n&atilde;o significa, por si s&oacute;, que a condi&ccedil;&atilde;o c&iacute;vica tenha desaparecido.</dd></div>
+        </dl>
+      </section>}
 
       <div className="shell-frame shell-frame--wide prb-details-frame">
         <PrbCurrentReadingSection causalReading={data.causalReading} />

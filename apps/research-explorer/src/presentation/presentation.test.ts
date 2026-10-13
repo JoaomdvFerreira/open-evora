@@ -2,6 +2,17 @@ import { describe, expect, it } from "vitest";
 import { formatPublicCompactDate, formatPublicCount, formatPublicDate, formatPublicDateTime, formatPublicPartialDate, formatPublicRelativeDays, publicCompactEnumLabel, publicEnumExplanation, publicEnumLabel, publicFieldCaption, publicTriStateLabel } from "./presentation";
 
 describe("PT-PT public presentation terminology", () => {
+  it("labels the current Problem lifecycle and closure reasons in PT-PT", () => {
+    expect(publicEnumLabel("status", "OPEN")).toBe("Aberto");
+    expect(publicEnumLabel("status", "CLOSED")).toBe("Encerrado");
+    expect(publicEnumLabel("closure.reason", "NOT_DEMONSTRATED_CURRENT")).toBe("Atualidade n\u00e3o demonstrada");
+    expect(publicEnumLabel("closure.reason", "RESOLVED")).toBe("Lacuna resolvida");
+    expect(publicEnumLabel("closure.reason", "NO_FOLLOWABLE_INFORMATION")).toBe("Sem via de investiga\u00e7\u00e3o execut\u00e1vel");
+    expect(publicEnumLabel("closure.reason", "SUPERSEDED")).toBe("Enquadramento substitu\u00eddo");
+    expect(publicEnumLabel("closure.reason", "OUT_OF_SCOPE")).toBe("Fora do \u00e2mbito do programa");
+    for (const retired of ["REJECTED", "DUPLICATE", "NON_DIGITAL", "ALREADY_SOLVED", "INSUFFICIENT_EVIDENCE"]) expect(publicEnumLabel("status", retired)).toBe(retired);
+  });
+
   it("uses field-aware PRB validation labels", () => {
     expect(publicEnumLabel("validation_status", "unvalidated")).toBe("Por validar");
     expect(publicEnumLabel("solution_landscape_status", "not_assessed")).toBe("Não avaliadas");

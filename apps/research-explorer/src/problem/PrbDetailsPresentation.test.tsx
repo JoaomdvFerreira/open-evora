@@ -50,6 +50,16 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(onViewHistory).toHaveBeenCalledWith("PRB-9999");
   });
 
+  it("presents authored closure details without equating closure with resolution", () => {
+    renderPrb({ title: "Encerrado", status: "CLOSED", closure: { reason: "OUT_OF_SCOPE", explanation: "O \u00e2mbito documentado fica fora do programa.", closed_at: "2026-08-28", reopen_condition: "O programa altera o seu \u00e2mbito." } });
+    const section = screen.getByRole("region", { name: "Encerramento" });
+    expect(within(section).getByText("Fora do \u00e2mbito do programa")).toBeTruthy();
+    expect(within(section).getByText("O \u00e2mbito documentado fica fora do programa.")).toBeTruthy();
+    expect(within(section).getByText("28/08/2026")).toBeTruthy();
+    expect(within(section).getByText("O programa altera o seu \u00e2mbito.")).toBeTruthy();
+    expect(within(section).getByText(/n\u00e3o significa, por si s\u00f3, que a condi\u00e7\u00e3o c\u00edvica tenha desaparecido/)).toBeTruthy();
+  });
+
   it("renders the canonical title and statement exactly as authored", () => {
     renderPrb({ title: "Título canónico do problema", problem_statement: "Formulação canónica delimitada." });
     expect(screen.getByRole("heading", { name: "Título canónico do problema" })).toBeTruthy();

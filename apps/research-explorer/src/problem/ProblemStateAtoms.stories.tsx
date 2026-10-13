@@ -45,7 +45,7 @@ function StandaloneDemo({ heading, children }: { heading: string; children: Reac
 
 /* ---- ProblemLifecycleStatus -------------------------------------------- */
 
-const LIFECYCLE_VALUES = ["OPEN", "REJECTED", "DUPLICATE", "NON_DIGITAL", "ALREADY_SOLVED", "INSUFFICIENT_EVIDENCE"];
+const LIFECYCLE_VALUES = ["OPEN", "CLOSED"];
 
 function LifecycleOverviewRow({ value }: { value: string }) {
   return <ProblemLifecycleStatus value={value} form="overview" />;
@@ -222,7 +222,7 @@ export const InvestigationStatusUnknown: Story = {
 function ComparisonRow() {
   return (
     <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "var(--space-standard)", padding: "var(--space-standard) 0", borderTop: "1px solid var(--color-separator-standard)" }}>
-      <ProblemLifecycleStatus value="INSUFFICIENT_EVIDENCE" form="reading" />
+      <ProblemLifecycleStatus value="CLOSED" form="reading" />
       <ValidationStatus value="unvalidated" form="reading" />
       <EvidenceStatus value="corroborated" form="reading" />
     </div>

@@ -293,7 +293,7 @@ export function Overview({
 
   const currentDetailState = detailState?.key === datasetKey ? detailState : null;
   const resolved = currentDetailState ? [...currentDetailState.details.values()] : [];
-  const citizenProblems = currentDetailState && resolved.length === (overview?.problemCount ?? -1)
+  const citizenProblems = currentDetailState && resolved.length === (overview?.totalProblemCount ?? -1)
     ? resolved.map(({ summary, detail }) => toCitizenProblem(summary, detail)).sort((a, b) => a.id.localeCompare(b.id)) : null;
   const materialChangeEntries = useMemo(() => projectMaterialChangeEntries(resolved), [currentDetailState]);
 
@@ -316,16 +316,23 @@ export function Overview({
     [materialChangeEntries, lisbonCivilDate]
   );
 
+  const activeProblems = citizenProblems?.filter((problem) => problem.lifecycleStatus === "OPEN") ?? null;
+  const closedProblems = citizenProblems?.filter((problem) => problem.lifecycleStatus === "CLOSED") ?? null;
+  const activeProblemIds = useMemo(() => new Set(activeProblems?.map((problem) => problem.id) ?? []), [activeProblems]);
+  const activeAlteredThisWeekIds = useMemo(
+    () => new Set([...alteredThisWeekIds].filter((id) => activeProblemIds.has(id))),
+    [alteredThisWeekIds, activeProblemIds]
+  );
   const visibleProblems = useMemo(() => {
-    if (!citizenProblems) return null;
-    const matched = citizenProblems.filter(
+    if (!activeProblems) return null;
+    const matched = activeProblems.filter(
       (problem) =>
         matchesCitizenSearch(problem, searchQuery) &&
         matchesTopicFilter(problem, topicFilter) &&
-        (!alteredThisWeekSelected || alteredThisWeekIds.has(problem.id))
+        (!alteredThisWeekSelected || activeAlteredThisWeekIds.has(problem.id))
     );
     return sortProblems(matched, sortOrder);
-  }, [citizenProblems, searchQuery, topicFilter, alteredThisWeekSelected, alteredThisWeekIds, sortOrder]);
+  }, [activeProblems, searchQuery, topicFilter, alteredThisWeekSelected, activeAlteredThisWeekIds, sortOrder]);
 
   const pageCount = visibleProblems === null ? 1 : overviewPageCount(visibleProblems.length);
   const paginatedProblems = visibleProblems === null ? null : paginateProblems(visibleProblems, currentPage);
@@ -364,7 +371,8 @@ export function Overview({
       evidenceCount={overview.evidenceCount}
       sourceCount={overview.sourceCount}
       totalRecordCount={overview.totalRecordCount}
-      citizenProblems={citizenProblems}
+      citizenProblems={activeProblems}
+      closedProblems={closedProblems}
       visibleProblems={visibleProblems}
       paginatedProblems={paginatedProblems}
       currentPage={currentPage}
@@ -376,12 +384,12 @@ export function Overview({
       onTopicFilterChange={handleTopicFilterChange}
       alteredThisWeekSelected={alteredThisWeekSelected}
       onAlteredThisWeekChange={handleAlteredThisWeekChange}
-      alteredThisWeekCount={alteredThisWeekIds.size}
+      alteredThisWeekCount={activeAlteredThisWeekIds.size}
       latestChangeByProblem={latestChangeByProblem}
       sortOrder={sortOrder}
       onSortOrderChange={setSortOrder}
       onExploreProblem={onExploreProblem}
-      partialState={currentDetailState && currentDetailState.failedIds.length > 0 ? { failedIds: currentDetailState.failedIds, total: overview.problemCount, retrying: currentDetailState.retrying, onRetry: retryFailedDetails } : null}
+      partialState={currentDetailState && currentDetailState.failedIds.length > 0 ? { failedIds: currentDetailState.failedIds, total: overview.totalProblemCount, retrying: currentDetailState.retrying, onRetry: retryFailedDetails } : null}
     />
   );
 }

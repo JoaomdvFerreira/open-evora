@@ -50,7 +50,7 @@ const problems: CitizenProblem[] = [
     id: "PRB-XXXX-4", title: "Disponibilidade de consultas de cuidados primários",
     problemStatement: "Utentes reportam tempos de espera prolongados para marcação de consultas em centros de saúde locais.",
     domainCodes: ["HEA"], affectedPopulations: ["Famílias com crianças pequenas"], geographyArea: "Évora",
-    lifecycleStatus: "INSUFFICIENT_EVIDENCE", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-02-20",
+    lifecycleStatus: "CLOSED", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-02-20",
   },
   {
     id: "PRB-XXXX-5", title: "Dificuldades persistentes nas deslocações quotidianas entre bairros, equipamentos e serviços públicos no centro histórico e periferia de Évora",
@@ -76,7 +76,9 @@ const latestChangeByProblem = new Map<string, MaterialChangeEntry>([
 ]);
 
 function useOverviewState(initial: { search?: string; source?: CitizenProblem[] } = {}) {
-  const source = initial.source ?? problems;
+  const allProblems = initial.source ?? problems;
+  const source = allProblems.filter((problem) => problem.lifecycleStatus === "OPEN");
+  const closedProblems = allProblems.filter((problem) => problem.lifecycleStatus === "CLOSED");
   const [searchQuery, setSearchQuery] = useState(initial.search ?? "");
   const [topicFilter, setTopicFilter] = useState<string | null>(null);
   const [alteredThisWeekSelected, setAlteredThisWeekSelected] = useState(false);
@@ -95,7 +97,7 @@ function useOverviewState(initial: { search?: string; source?: CitizenProblem[] 
   const pageCount = overviewPageCount(visibleProblems.length);
   const paginatedProblems = paginateProblems(visibleProblems, currentPage);
   return {
-    searchQuery, setSearchQuery, visibleProblems, source,
+    searchQuery, setSearchQuery, visibleProblems, source, allProblems, closedProblems,
     topicFilter, setTopicFilter,
     alteredThisWeekSelected, setAlteredThisWeekSelected,
     sortOrder, setSortOrder,
@@ -119,16 +121,23 @@ function FullOverview({
   partial?: boolean;
 }) {
   const state = useOverviewState({ search, source });
-  const citizenProblems = citizenProblemsOverride !== undefined ? citizenProblemsOverride : state.source;
-  const visibleProblems = visibleProblemsOverride !== undefined ? visibleProblemsOverride : state.visibleProblems;
-  const paginatedProblems = visibleProblemsOverride !== undefined ? visibleProblemsOverride : state.paginatedProblems;
+  const allProblems = citizenProblemsOverride !== undefined ? citizenProblemsOverride : state.allProblems;
+  const citizenProblems = allProblems?.filter((problem) => problem.lifecycleStatus === "OPEN") ?? null;
+  const closedProblems = allProblems?.filter((problem) => problem.lifecycleStatus === "CLOSED") ?? null;
+  const visibleProblems = visibleProblemsOverride !== undefined
+    ? visibleProblemsOverride?.filter((problem) => problem.lifecycleStatus === "OPEN") ?? null
+    : state.visibleProblems;
+  const paginatedProblems = visibleProblemsOverride !== undefined
+    ? visibleProblems === null ? null : paginateProblems(visibleProblems, state.currentPage)
+    : state.paginatedProblems;
   return (
     <OverviewPresentation
-      problemCount={state.source.length}
+      problemCount={citizenProblems?.length ?? state.source.length}
       evidenceCount={41}
       sourceCount={17}
-      totalRecordCount={state.source.length + 41 + 17}
+      totalRecordCount={state.allProblems.length + 41 + 17}
       citizenProblems={citizenProblems}
+      closedProblems={closedProblems}
       visibleProblems={visibleProblems}
       paginatedProblems={paginatedProblems}
       currentPage={state.currentPage}
@@ -253,7 +262,7 @@ const stressProblems: CitizenProblem[] = [
     id: "PRB-XXXX-8", title: "Acessibilidade de edifícios públicos municipais",
     problemStatement: "Vários edifícios de atendimento público carecem de rampas, elevadores ou sinalética acessível.",
     domainCodes: ["PUB"], affectedPopulations: ["Pessoas com mobilidade reduzida"], geographyArea: "Évora",
-    lifecycleStatus: "INSUFFICIENT_EVIDENCE", validationStatus: null, evidenceStatus: "corroborated", updatedAt: "2026-01-15",
+    lifecycleStatus: "CLOSED", validationStatus: null, evidenceStatus: "corroborated", updatedAt: "2026-01-15",
   },
 ];
 
