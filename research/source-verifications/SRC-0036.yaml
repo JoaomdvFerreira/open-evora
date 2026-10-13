@@ -1,0 +1,14 @@
+source_id: SRC-0036
+retrieval:
+  retrieved_at: "2026-10-13"
+  content_sha256: 9f8a38db453bf6b88210d7b62635a1bb14af0c4874c68c9b1ccbefd4f7fbdbd3
+  media_type: text/html
+verified_claims:
+  - locator: "Notícia ‘Câmara de Évora entregou mais 12 casas em regime de arrendamento apoiado’, título e primeiro parágrafo"
+    statement: "O Município apresenta a entrega de 12 habitações a famílias como ocorrida numa cerimónia municipal."
+  - locator: "Cabeçalho da notícia, data de publicação; primeiro parágrafo, data da cerimónia"
+    statement: "A notícia foi publicada em 30 de janeiro de 2026 e situa a cerimónia de entrega nesse dia."
+  - locator: "Título da notícia; parágrafos sobre a cerimónia e o concurso de atribuição"
+    statement: "As 12 habitações foram destinadas a arrendamento apoiado."
+  - locator: "Parágrafos sobre a reabilitação das 12 moradias e a visita após a cerimónia"
+    statement: "As 12 habitações situam-se no Bairro da Malagueira, na freguesia da Malagueira, em Évora."
