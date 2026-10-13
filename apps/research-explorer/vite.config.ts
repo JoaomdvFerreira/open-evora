@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { robotsTxt, sitemapXml } from "./src/publicCrawler";
 
 const APP_ROOT = fileURLToPath(new URL(".", import.meta.url));
-const TRUST_PAGE_INPUTS = ["about", "methodology", "corrections", "contact", "privacy"];
+const TRUST_PAGE_INPUTS = ["about", "methodology", "corrections", "contact", "privacy", "out-of-scope"];
 
 function publicCrawlerFiles(): Plugin {
   return {

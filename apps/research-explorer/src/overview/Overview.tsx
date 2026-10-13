@@ -295,6 +295,13 @@ export function Overview({
   const resolved = currentDetailState ? [...currentDetailState.details.values()] : [];
   const citizenProblems = currentDetailState && resolved.length === (overview?.totalProblemCount ?? -1)
     ? resolved.map(({ summary, detail }) => toCitizenProblem(summary, detail)).sort((a, b) => a.id.localeCompare(b.id)) : null;
+  const archivedOutOfScopeIds = new Set((citizenProblems ?? [])
+    .filter((problem) => problem.lifecycleStatus === "CLOSED" && problem.closureReason === "OUT_OF_SCOPE")
+    .map((problem) => problem.id));
+  const overviewPageData = overview === null ? null : computePublicOverviewData(
+    indexState.status === "ready" ? indexState.records : [],
+    archivedOutOfScopeIds,
+  );
   const materialChangeEntries = useMemo(() => projectMaterialChangeEntries(resolved), [currentDetailState]);
 
   // This-civil-week latest material change per Problem (row-level changed
@@ -317,7 +324,9 @@ export function Overview({
   );
 
   const activeProblems = citizenProblems?.filter((problem) => problem.lifecycleStatus === "OPEN") ?? null;
-  const closedProblems = citizenProblems?.filter((problem) => problem.lifecycleStatus === "CLOSED") ?? null;
+  const closedProblems = citizenProblems?.filter((problem) =>
+    problem.lifecycleStatus === "CLOSED" && problem.closureReason !== null && problem.closureReason !== "OUT_OF_SCOPE"
+  ) ?? null;
   const activeProblemIds = useMemo(() => new Set(activeProblems?.map((problem) => problem.id) ?? []), [activeProblems]);
   const activeAlteredThisWeekIds = useMemo(
     () => new Set([...alteredThisWeekIds].filter((id) => activeProblemIds.has(id))),
@@ -370,7 +379,7 @@ export function Overview({
       problemCount={overview.problemCount}
       evidenceCount={overview.evidenceCount}
       sourceCount={overview.sourceCount}
-      totalRecordCount={overview.totalRecordCount}
+      totalRecordCount={citizenProblems === null || currentDetailState?.failedIds.length ? null : overviewPageData?.totalRecordCount ?? null}
       citizenProblems={activeProblems}
       closedProblems={closedProblems}
       visibleProblems={visibleProblems}
@@ -389,7 +398,7 @@ export function Overview({
       sortOrder={sortOrder}
       onSortOrderChange={setSortOrder}
       onExploreProblem={onExploreProblem}
-      partialState={currentDetailState && currentDetailState.failedIds.length > 0 ? { failedIds: currentDetailState.failedIds, total: overview.totalProblemCount, retrying: currentDetailState.retrying, onRetry: retryFailedDetails } : null}
+      partialState={currentDetailState && currentDetailState.failedIds.length > 0 ? { failedIds: currentDetailState.failedIds, retrying: currentDetailState.retrying, onRetry: retryFailedDetails } : null}
     />
   );
 }

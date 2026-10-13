@@ -109,7 +109,7 @@ export function PrbIdentityHeader({ identity, titleRef }: { identity: PrbIdentit
       <div className="prb-identity-eyebrow-row">
         <span className="prb-identity-eyebrow">
           <span className="prb-identity-eyebrow-dot" aria-hidden="true" />
-          Problema em investigação
+          {identity.status === "CLOSED" ? "Problema encerrado" : "Problema em investigação"}
         </span>
         {identity.topics.length > 0 && (
           <span className="prb-identity-topics" aria-label="Temas">

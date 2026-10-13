@@ -2,10 +2,13 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { ContributionForm } from "./ContributionForm";
 import { ExplorerHeader } from "./ExplorerHeader";
 import { documentTitle } from "./documentTitle";
+import type { DataProvider } from "../dataProvider/types";
+import { OutOfScopeArchive } from "./OutOfScopeArchive";
 
 const GITHUB_ISSUES_URL = "https://github.com/JoaomdvFerreira/open-evora/issues";
 
-type TrustPagePath = "/about" | "/methodology" | "/corrections" | "/contact" | "/privacy";
+type TrustNavigationPath = "/about" | "/methodology" | "/corrections" | "/contact" | "/privacy";
+type TrustPagePath = TrustNavigationPath | "/out-of-scope";
 
 interface TrustPageContent {
   heading: string;
@@ -15,6 +18,7 @@ interface TrustPageContent {
 
 export interface TrustPageEntry extends TrustPageContent {
   path: TrustPagePath;
+  informationPath: TrustNavigationPath;
 }
 
 /** The Information area's one ordered sequence: it drives the local
@@ -31,7 +35,7 @@ const TRUST_NAVIGATION: Array<{ path: TrustPagePath; label: string }> = [
  * longer H1) plus the shared site suffix. Each page's static
  * `<path>/index.html` carries this exact string as its `<title>`. */
 function trustPageTitle(path: TrustPagePath): string {
-  return documentTitle(TRUST_NAVIGATION.find((item) => item.path === path)!.label);
+  return documentTitle(path === "/out-of-scope" ? "Registos fora do âmbito" : TRUST_NAVIGATION.find((item) => item.path === path)!.label);
 }
 
 /** Global-header item each Information page represents: Metodologia is the
@@ -62,7 +66,7 @@ function InfoAction({ href, children }: { href: string; children: string }) {
   return <p className="info-action"><a className="info-action-link" href={href}>{children}<span aria-hidden="true"> ↗</span></a></p>;
 }
 
-const TRUST_PAGES: Record<TrustPagePath, TrustPageContent> = {
+const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
   "/about": {
     heading: "Sobre o Open Évora",
     summary: "Um projeto independente.",
@@ -95,6 +99,9 @@ const TRUST_PAGES: Record<TrustPagePath, TrustPageContent> = {
       <InfoSection id="methodology-validation" title="Validação">
         <p>Os registos são sujeitos a validação antes de serem integrados no conjunto de dados canónico e publicados.</p>
         <p>A existência de uma fonte não significa que todas as conclusões possíveis a partir dessa fonte estejam estabelecidas; o Explorador procura tornar explícitos o âmbito e os limites da evidência apresentada.</p>
+      </InfoSection>
+      <InfoSection id="methodology-scope" title="Âmbito geográfico">
+        <p>Alguns registos são encerrados quando a evidência disponível não permite estabelecer uma manifestação específica da cidade. Consulte <a href="/out-of-scope">Registos fora do âmbito</a>.</p>
       </InfoSection>
     </>,
   },
@@ -155,9 +162,18 @@ const TRUST_PAGES: Record<TrustPagePath, TrustPageContent> = {
 
 export function trustPageForPath(pathname: string): TrustPageEntry | null {
   const normalized = pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
+  if (normalized === "/out-of-scope") {
+    return {
+      path: "/out-of-scope",
+      informationPath: "/methodology",
+      heading: "Registos fora do âmbito",
+      summary: "O Open Évora acompanha problemas da cidade de Évora. Estes registos foram encerrados porque a evidência disponível não é específica da cidade. O encerramento não significa que o problema não exista.",
+      body: null,
+    };
+  }
   if (!Object.prototype.hasOwnProperty.call(TRUST_PAGES, normalized)) return null;
-  const path = normalized as TrustPagePath;
-  return { path, ...TRUST_PAGES[path] };
+  const path = normalized as TrustNavigationPath;
+  return { path, informationPath: path, ...TRUST_PAGES[path] };
 }
 
 /**
@@ -201,20 +217,20 @@ function InformationSequence({ currentPath }: { currentPath: TrustPagePath }) {
  * App.tsx's skip link bypasses both navigations, never a second competing
  * main landmark.
  */
-export function TrustPage({ page, skipTargetId }: { page: TrustPageEntry; skipTargetId?: string }) {
+export function TrustPage({ page, skipTargetId, dataProvider }: { page: TrustPageEntry; skipTargetId?: string; dataProvider: DataProvider }) {
   useEffect(() => {
     document.title = trustPageTitle(page.path);
   }, [page.path]);
   return <>
-    <ExplorerHeader activeView={trustHeaderView(page.path)} />
+      <ExplorerHeader activeView={trustHeaderView(page.informationPath)} />
     <div className="info-page shell-frame shell-frame--wide">
-      <InformationNavigation currentPath={page.path} />
+      <InformationNavigation currentPath={page.informationPath} />
       <article id={skipTargetId} tabIndex={skipTargetId ? -1 : undefined} className="info-article">
         <p className="info-back"><a href="/">← Explorar problemas</a></p>
         <h1 className="info-title">{page.heading}</h1>
         <p className="info-summary">{page.summary}</p>
-        <div className="info-content">{page.body}</div>
-        <InformationSequence currentPath={page.path} />
+        <div className="info-content">{page.path === "/out-of-scope" ? <OutOfScopeArchive dataProvider={dataProvider} /> : page.body}</div>
+        <InformationSequence currentPath={page.informationPath} />
       </article>
     </div>
   </>;

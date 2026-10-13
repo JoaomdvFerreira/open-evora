@@ -135,6 +135,19 @@ describe("computePublicOverviewData", () => {
       { id: "PRB-0010", lifecycleStatus: "OPEN", title: "Later problem", validationStatus: "validated", evidenceStatus: "discovered" },
     ]);
   });
+  it("excludes only the identified archived PRB from the Overview page total", () => {
+    const records = [
+      summary({ id: "PRB-ARCHIVED", type: "PRB-", summaryFields: { status: "CLOSED" } }),
+      summary({ id: "PRB-RESOLVED", type: "PRB-", summaryFields: { status: "CLOSED" } }),
+      summary({ id: "EVD-1", type: "EVD-" }),
+      summary({ id: "SRC-1", type: "SRC-" }),
+    ];
+    const data = computePublicOverviewData(records, new Set(["PRB-ARCHIVED"]));
+    expect(data.totalRecordCount).toBe(3);
+    expect(data.evidenceCount).toBe(1);
+    expect(data.sourceCount).toBe(1);
+    expect(data.totalProblemCount).toBe(2);
+  });
 });
 
 function detail(record: Record<string, unknown>): RecordDetail {
@@ -164,6 +177,7 @@ describe("toCitizenProblem", () => {
       affectedPopulations: ["residentes", "estudantes"],
       geographyArea: "Évora",
       lifecycleStatus: "OPEN",
+      closureReason: null,
       validationStatus: "unvalidated",
       evidenceStatus: "corroborated",
       updatedAt: "2026-09-10",
@@ -504,6 +518,7 @@ function citizenProblem(overrides: Partial<CitizenProblem>): CitizenProblem {
     affectedPopulations: [],
     geographyArea: null,
     lifecycleStatus: null,
+    closureReason: null,
     validationStatus: null,
     evidenceStatus: null,
     updatedAt: null,
@@ -717,7 +732,7 @@ describe("public Overview metrics count grammar", () => {
     expect(sourceCountLabel(2)).toBe("Fontes");
   });
 
-  it("uses a fixed phrase for the total corpus record count, regardless of count", () => {
+  it("uses a fixed phrase for the Overview page record count, regardless of count", () => {
     expect(totalRecordCountLabel()).toBe("Total de registos");
   });
 });

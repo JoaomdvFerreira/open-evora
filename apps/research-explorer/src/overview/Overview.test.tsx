@@ -19,7 +19,11 @@ function makeProvider(index: RecordSummary[]): DataProvider {
         file: summary.file,
         record: {
           title: summary.label,
+          problem_statement: summary.summaryFields.problem_statement,
+          domain: summary.summaryFields.domain,
           status: summary.summaryFields.status,
+          closure: summary.summaryFields.status === "CLOSED" ? { reason: summary.summaryFields.closureReason ?? "RESOLVED" } : undefined,
+          history: summary.summaryFields.history,
           validation_status: summary.summaryFields.validation_status,
           evidence_status: summary.summaryFields.evidence_status,
         },
@@ -56,6 +60,48 @@ it("omits the closed section when the corpus has no closed Problems", async () =
   render(<OverviewFixture dataProvider={provider} onExploreProblem={vi.fn()} />);
   await screen.findByRole("button", { name: "Explorar Problema ativo" });
   expect(screen.queryByRole("heading", { name: "Problemas encerrados" })).toBeNull();
+});
+
+it("archives only CLOSED OUT_OF_SCOPE Problems from every Overview surface and page total", async () => {
+  const records: RecordSummary[] = [
+    { id: "PRB-OPEN", type: "PRB-", label: "Problema ativo", file: "", summaryFields: { status: "OPEN", domain: ["MOB"] } },
+    { id: "PRB-ARCHIVED", type: "PRB-", label: "Registo municipal arquivado", file: "", summaryFields: { status: "CLOSED", closureReason: "OUT_OF_SCOPE", domain: ["MOB"], history: [{ date: thisWeekMonday(), summary: "Alteração na semana" }] } },
+    { id: "PRB-RESOLVED", type: "PRB-", label: "Problema resolvido", file: "", summaryFields: { status: "CLOSED", closureReason: "RESOLVED" } },
+    { id: "EVD-1", type: "EVD-", label: "Evidência", file: "", summaryFields: {} },
+    { id: "SRC-1", type: "SRC-", label: "Fonte", file: "", summaryFields: {} },
+  ];
+  render(<OverviewFixture dataProvider={makeProvider(records)} onExploreProblem={vi.fn()} />);
+  await screen.findByRole("button", { name: "Explorar Problema ativo" });
+  expect(screen.getByRole("button", { name: "Explorar Problema resolvido" })).toBeTruthy();
+  expect(screen.queryByText("PRB-ARCHIVED")).toBeNull();
+  expect(screen.queryByText("Registo municipal arquivado")).toBeNull();
+  expect(screen.getByText("4", { selector: ".overview-metric-value" }).closest(".overview-metric")?.textContent).toBe("4 Total de registos");
+
+  const user = userEvent.setup();
+  await user.type(screen.getByLabelText("Pesquisar problemas"), "PRB-ARCHIVED");
+  expect(screen.queryByText("PRB-ARCHIVED")).toBeNull();
+  await user.clear(screen.getByLabelText("Pesquisar problemas"));
+  await user.click(openDrawer());
+  await user.click(screen.getByRole("button", { name: /Mobilidade/ }));
+  expect(screen.queryByText("PRB-ARCHIVED")).toBeNull();
+  await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
+  expect(screen.queryByText("PRB-ARCHIVED")).toBeNull();
+  expect(screen.getByRole("heading", { name: "Problemas encerrados" })).toBeTruthy();
+});
+
+it("does not include archived Problems when navigating Overview result pages", async () => {
+  const records: RecordSummary[] = [
+    ...Array.from({ length: 21 }, (_, index) => ({ id: `PRB-OPEN-${index + 1}`, type: "PRB-", label: `Problema ativo ${index + 1}`, file: "", summaryFields: { status: "OPEN" } })),
+    { id: "PRB-ARCHIVED", type: "PRB-", label: "Problema arquivado", file: "", summaryFields: { status: "CLOSED", closureReason: "OUT_OF_SCOPE" } },
+    { id: "PRB-CLOSED", type: "PRB-", label: "Problema encerrado", file: "", summaryFields: { status: "CLOSED", closureReason: "RESOLVED" } },
+  ];
+  const user = userEvent.setup();
+  render(<OverviewFixture dataProvider={makeProvider(records)} onExploreProblem={vi.fn()} />);
+  await user.click(await screen.findByRole("button", { name: "Seguinte" }));
+  expect(screen.getByRole("button", { name: "Anterior" })).toBeTruthy();
+  expect((screen.getByRole("button", { name: "Seguinte" }) as HTMLButtonElement).disabled).toBe(true);
+  expect(screen.queryByText("PRB-ARCHIVED")).toBeNull();
+  expect(screen.getByRole("button", { name: "Explorar Problema encerrado" })).toBeTruthy();
 });
 
 it("uses the Overview macro-layout skeleton while the index loads", () => {
@@ -188,7 +234,7 @@ describe("Overview — final Hero", () => {
     expect(screen.queryByText("O que sabemos, o que falta saber, e a fonte de cada afirmação.")).toBeNull();
   });
 
-  it("renders exactly the four intended Hero metric concepts — problems, evidence records, sources, total corpus records", async () => {
+  it("renders exactly the four intended Hero metric concepts — problems, evidence records, sources, and Overview page records", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },
       { id: "PRB-2", type: "PRB-", label: "Problema dois", file: "", summaryFields: {} },
@@ -211,8 +257,8 @@ describe("Overview — final Hero", () => {
     const sourceMetric = screen.getByText("1", { selector: ".overview-metric-value" }).closest(".overview-metric");
     expect(sourceMetric?.textContent).toBe("1 Fonte");
 
-    // Total corpus record count (owner request) — every record in the
-    // loaded index regardless of type: 2 PRB + 3 EVD + 1 SRC = 6.
+    // This fixture has no archived OUT_OF_SCOPE PRB, so all loaded records
+    // are represented in its Overview page total: 2 PRB + 3 EVD + 1 SRC = 6.
     const totalMetric = screen.getByText("6", { selector: ".overview-metric-value" }).closest(".overview-metric");
     expect(totalMetric?.textContent).toBe("6 Total de registos");
 
@@ -527,7 +573,7 @@ describe("Overview — Filtros disclosure and category drawer", () => {
     provider.getRecord = async (id) => {
       const domain = id === "PRB-3" ? ["PUB"] : ["MOB"];
       const title = id === "PRB-1" ? "Mobilidade corroborada aberta" : id === "PRB-2" ? "Mobilidade discovered fechada" : "Espaço público corroborado aberto";
-      return { id, type: "PRB-", file: "", record: { title, domain, status: id === "PRB-2" ? "CLOSED" : "OPEN" }, outgoingEdges: [], incomingEdges: [] };
+      return { id, type: "PRB-", file: "", record: { title, domain, status: id === "PRB-2" ? "CLOSED" : "OPEN", closure: id === "PRB-2" ? { reason: "RESOLVED" } : undefined }, outgoingEdges: [], incomingEdges: [] };
     };
     const user = userEvent.setup();
     render(<OverviewFixture dataProvider={provider} {...props} />);
@@ -908,7 +954,7 @@ describe("Overview — material-change row treatment", () => {
     expect([...document.querySelectorAll(".overview-metric")].every((metric) => !metric.textContent?.includes("parcial"))).toBe(true);
     const failedRow = screen.getByText("Problema com falha de leitura").closest(".overview-problem-row");
     expect(failedRow?.classList.contains("overview-problem-row--changed")).toBe(false);
-    expect(screen.getByText(/detalhes de 1 de 2 problemas/)).toBeTruthy();
+    expect(screen.getByText(/detalhes de 1 problema/)).toBeTruthy();
     expect(getRecord.mock.calls.map(([id]) => id).sort()).toEqual(["PRB-1", "PRB-2"]);
     const user = userEvent.setup();
     await user.click(openDrawer());
@@ -978,7 +1024,7 @@ describe("Overview — Alterados esta semana shortcut", () => {
       getEdges: async () => [],
       getRecord: async (id) => {
         const p = problems.find((entry) => entry.id === id)!;
-        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], status: p.status ?? "OPEN", history: p.history }, outgoingEdges: [], incomingEdges: [] };
+        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], status: p.status ?? "OPEN", closure: p.status === "CLOSED" ? { reason: "RESOLVED" } : undefined, history: p.history }, outgoingEdges: [], incomingEdges: [] };
       },
     };
   }

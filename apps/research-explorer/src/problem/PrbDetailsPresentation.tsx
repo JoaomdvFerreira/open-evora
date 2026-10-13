@@ -186,7 +186,7 @@ function PrbInvestigationStateSection({ data }: { data: PrbDetailsData }) {
           <h3 className="detail-panel-label">Base da investigação</h3>
           <div className="prb-scope-metrics">
             <a href="#prb-questoes" className="prb-scope-metric">
-              <span className="prb-scope-metric-label">{data.openQuestionCount === 1 ? "Questão aberta" : "Questões abertas"}</span>
+              <span className="prb-scope-metric-label">{data.status === "CLOSED" ? "Questões que ficaram por responder" : data.openQuestionCount === 1 ? "Questão aberta" : "Questões abertas"}</span>
               <span className="prb-scope-metric-value">{formatPublicCount(data.openQuestionCount)}</span>
             </a>
             <a href="#prb-auditoria" className="prb-scope-metric">
@@ -317,11 +317,12 @@ function OpenQuestionTextField({ label, text }: { label: string; text: string | 
  *
  * Fields follow the same semantic and visual order at every viewport.
  */
-function OpenQuestionItem({ index, item, onOpenGeneric }: { index: number; item: PrbOpenQuestion; onOpenGeneric: (id: string) => void }) {
-  const latestResult = <OpenQuestionTextField label="Resultado até agora" text={item.latestResult} />;
-  const whyOpen = <OpenQuestionTextField label="Porque continua em aberto" text={item.whyOpen} />;
+function OpenQuestionItem({ index, item, status, onOpenGeneric }: { index: number; item: PrbOpenQuestion; status: string | null; onOpenGeneric: (id: string) => void }) {
+  const closed = status === "CLOSED";
+  const latestResult = <OpenQuestionTextField label={closed ? "Último resultado registado" : "Resultado até agora"} text={item.latestResult} />;
+  const whyOpen = <OpenQuestionTextField label={closed ? "Porque ficou por responder" : "Porque continua em aberto"} text={item.whyOpen} />;
   const resolutionCondition = <OpenQuestionTextField label="O que permitiria esclarecer" text={item.resolutionCondition} />;
-  const currentAction = <OpenQuestionTextField label="Ação atual" text={item.currentAction?.trim() ? item.currentAction : "Sem ação em curso"} />;
+  const currentAction = <OpenQuestionTextField label={closed ? "Ação registada" : "Ação atual"} text={item.currentAction?.trim() ? item.currentAction : "Sem ação em curso"} />;
   const relatedEvidence = item.relatedEvidenceIds.length > 0 && (
     <div className="prb-open-question-field">
       <h4>Evidência relacionada</h4>
@@ -349,22 +350,23 @@ function OpenQuestionItem({ index, item, onOpenGeneric }: { index: number; item:
   );
 }
 
-function PrbOpenQuestionsSection({ problemId, questions, onOpenGeneric }: { problemId: string; questions: PrbOpenQuestion[]; onOpenGeneric: (id: string) => void }) {
+function PrbOpenQuestionsSection({ problemId, questions, status, onOpenGeneric }: { problemId: string; questions: PrbOpenQuestion[]; status: string | null; onOpenGeneric: (id: string) => void }) {
   if (questions.length === 0) return null;
+  const closed = status === "CLOSED";
   return (
     <PrbSection
       id="prb-questoes"
-      label="O que ainda não sabemos"
-      note={`${formatPublicCount(questions.length)} ${questions.length === 1 ? "questão em acompanhamento" : "questões em acompanhamento"}`}
+      label={closed ? "Questões que ficaram por responder" : "O que ainda não sabemos"}
+      note={closed ? undefined : `${formatPublicCount(questions.length)} ${questions.length === 1 ? "questão em acompanhamento" : "questões em acompanhamento"}`}
     >
       <ul className="prb-open-question-list">
         {questions.map((item, index) => (
-          <OpenQuestionItem key={index} index={index} item={item} onOpenGeneric={onOpenGeneric} />
+          <OpenQuestionItem key={index} index={index} item={item} status={status} onOpenGeneric={onOpenGeneric} />
         ))}
       </ul>
-      <p className="prb-contribute-prompt">
+      {!closed && <p className="prb-contribute-prompt">
         Tem informação ou documentação sobre uma destas questões? <a href={`/contact?${new URLSearchParams({ type: "evidence", prb: problemId })}`}>Contribuir para a investigação →</a>
-      </p>
+      </p>}
     </PrbSection>
   );
 }
@@ -668,7 +670,7 @@ export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, 
 
       <div className="shell-frame shell-frame--wide prb-details-frame">
         <PrbCurrentReadingSection causalReading={data.causalReading} />
-        <PrbOpenQuestionsSection problemId={data.problemId} questions={data.openQuestions} onOpenGeneric={onOpenGeneric} />
+        <PrbOpenQuestionsSection problemId={data.problemId} questions={data.openQuestions} status={data.status} onOpenGeneric={onOpenGeneric} />
       </div>
 
       <PrbPathSection stages={data.pathStages} />

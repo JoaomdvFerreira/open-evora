@@ -29,15 +29,12 @@ export interface OverviewProblem {
 
 export interface PublicOverviewData {
   problemCount: number;
+  /** Indexed PRB count used only to wait for all loaded PRB details; not shown as a public total. */
   totalProblemCount: number;
   evidenceCount: number;
   sourceCount: number;
-  /** The canonical corpus total — every record in the loaded index, every
-   * type, same plain `records.length` count `manifest.totalRecords` itself
-   * reports for the "Corpus: X registos" summary shown on every other view
-   * (Explorer.tsx) — not a separately derived figure. Restored to the Hero
-   * metrics ruler on owner request; every other view continues to read its
-   * own total from the manifest, unaffected. */
+  /** Page count: loaded records minus CLOSED + OUT_OF_SCOPE PRB records.
+   * Distinct from the full canonical corpus total used elsewhere. */
   totalRecordCount: number;
   problems: OverviewProblem[];
 }
@@ -86,8 +83,8 @@ export function sourceCountLabel(count: number): string {
 }
 
 /**
- * Metrics label only, for the canonical corpus total (`totalRecordCount` —
- * every record in the loaded index, every type). Unlike the other metric
+ * Metrics label only, for the Overview page record total (`totalRecordCount`).
+ * Unlike the other metric
  * labels, this is a fixed phrase rather than a count-dependent singular/
  * plural — "Total de registo" reads as broken PT-PT for a count of one, so
  * "Total de registos" is used at every count, matching how the same figure
@@ -102,7 +99,7 @@ export function totalRecordCountLabel(): string {
  * summaries: canonical PRB title/identity and schema-derived status fields.
  * It is not persisted and does not introduce an Overview-specific dataset.
  */
-export function computePublicOverviewData(records: RecordSummary[]): PublicOverviewData {
+export function computePublicOverviewData(records: RecordSummary[], archivedOutOfScopeIds: ReadonlySet<string> = new Set()): PublicOverviewData {
   const problems = records
     .filter((record) => record.type === "PRB-")
     .map((record) => ({
@@ -119,7 +116,7 @@ export function computePublicOverviewData(records: RecordSummary[]): PublicOverv
     totalProblemCount: problems.length,
     evidenceCount: records.filter((record) => record.type === "EVD-").length,
     sourceCount: records.filter((record) => record.type === "SRC-").length,
-    totalRecordCount: records.length,
+    totalRecordCount: records.length - records.filter((record) => record.type === "PRB-" && archivedOutOfScopeIds.has(record.id)).length,
     problems,
   };
 }
@@ -142,6 +139,7 @@ export interface CitizenProblem {
   affectedPopulations: string[];
   geographyArea: string | null;
   lifecycleStatus: string | null;
+  closureReason: string | null;
   validationStatus: string | null;
   evidenceStatus: string | null;
   updatedAt: string | null;
@@ -179,6 +177,9 @@ export function toCitizenProblem(summary: RecordSummary, detail: RecordDetail): 
     affectedPopulations: asStringArray(record.affected_populations),
     geographyArea: typeof record.geography === "object" && record.geography !== null ? asString((record.geography as Record<string, unknown>).area) : null,
     lifecycleStatus: asString(record.status) ?? summaryStringField(summary, "status"),
+    closureReason: typeof record.closure === "object" && record.closure !== null
+      ? asString((record.closure as Record<string, unknown>).reason)
+      : null,
     validationStatus: asString(record.validation_status) ?? summaryStringField(summary, "validation_status"),
     evidenceStatus: asString(record.evidence_status) ?? summaryStringField(summary, "evidence_status"),
     updatedAt: asString(record.updated_at),
