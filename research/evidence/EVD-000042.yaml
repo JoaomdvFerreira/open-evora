@@ -2,15 +2,13 @@ evidence_id: EVD-000042
 provenance:
   sources:
     - SRC-0035
-    - SRC-0036
   extracted_at: 2026-08-11
 observation:
   summary: O Município documenta uma intervenção habitacional que inclui
     financiamento de 67,1 milhões de euros para 459 habitações, 40 habitações
     para arrendamento acessível no Bairro do Moinho, 122 novas habitações no
     Bairro do Escurinho, um centro de acolhimento transitório para pelo menos 24
-    pessoas, previsão de beneficiar cerca de 500 famílias e 12 habitações para
-    arrendamento apoiado entregues na Malagueira em janeiro de 2026.
+    pessoas e previsão de beneficiar cerca de 500 famílias.
 scope:
   geography:
     level: municipality
@@ -29,3 +27,6 @@ inference_limits:
     respostas plenamente operacionais.
   - A escala da intervenção não estabelece a dimensão da necessidade
     habitacional residual nem que essa necessidade esteja resolvida.
+  - O agregado municipal não estabelece quantas das 459 habitações, dos 67,1
+    milhões de euros ou das cerca de 500 famílias correspondem à cidade de Évora
+    sem desagregação geográfica.

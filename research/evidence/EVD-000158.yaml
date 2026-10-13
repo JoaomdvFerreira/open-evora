@@ -14,7 +14,7 @@ observation:
     19h00, qualificando a situação como recorrente.
 scope:
   geography:
-    level: municipality
+    level: city
     area: cidade de Évora
   populations:
     - utilizadores da rede urbana TREVO

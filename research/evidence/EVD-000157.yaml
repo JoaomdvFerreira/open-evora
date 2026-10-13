@@ -22,7 +22,7 @@ observation:
     percursos.
 scope:
   geography:
-    level: municipality
+    level: city
     area: cidade de Évora
   populations:
     - utilizadores da rede urbana TREVO

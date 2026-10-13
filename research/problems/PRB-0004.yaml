@@ -1,6 +1,6 @@
 problem_id: PRB-0004
 created_at: "2026-08-28"
-updated_at: "2026-10-12"
+updated_at: "2026-10-13"
 title: Rede ciclável de Évora com limitações documentadas; estado atual e
   execução da expansão proposta por apurar
 domain:
@@ -14,10 +14,13 @@ affected_populations:
 problem_statement: >-
   O planeamento institucional descreve a rede ciclável de Évora como reduzida,
   espacialmente descontínua e sem ligação a vários equipamentos, serviços e
-  zonas residenciais relevantes. A cartografia apresentada no PMUSE distingue
-  cerca de 8,5 km de infraestrutura exclusivamente ciclável e cerca de 120 km
-  de percursos partilhados por peões e ciclistas, sem estabelecer o estado atual
-  da rede. O plano representa também uma proposta de expansão e existe trabalho
+  zonas residenciais relevantes. A cartografia apresentada no PMUSE representa
+  cerca de 8,5 km de infraestrutura exclusivamente ciclável, cerca de 120 km
+  de percursos partilhados por peões e ciclistas e uma componente proposta de
+  33 km da Grande Rota do Montado. Estas extensões são referências
+  cartográficas e de planeamento: não medem a rede atual da cidade nem
+  estabelecem que a totalidade dos percursos representados fique dentro da
+  cidade. O plano representa também uma proposta de expansão e existe trabalho
   pedonal e ciclável posterior documentado, mas a evidência ligada não permite
   saber quanto da expansão foi executado nem qual é hoje a configuração da rede.
 investigation:
@@ -36,7 +39,7 @@ investigation:
       current_action: >-
         Está pendente a consulta de informação pública atual sobre a rede, a
         execução ou revisão da proposta e a ligação Saúde–Xarrama–Santa Luzia.
-        Se permanecerem lacunas, está definido, mas não enviado, um pedido ao
+        Se permanecerem lacunas, está previsto, mas não enviado, um pedido ao
         Município de Évora de cartografia atual e esclarecimentos sobre esses pontos.
       resolution_condition: >-
         Informação atual que permita identificar os troços exclusivamente
@@ -94,7 +97,9 @@ investigation:
       summary: >-
         Os diagnósticos institucionais descrevem uma rede ciclável limitada e
         descontínua. A cartografia do PMUSE distingue infraestrutura exclusiva
-        de percursos partilhados por peões e ciclistas; a indicação de fonte
+        de percursos partilhados por peões e ciclistas. Os cerca de 8,5 km e
+        120 km são valores representados no PMUSE, não a extensão atualmente
+        entregue dentro da cidade; a indicação de fonte
         «Câmara Municipal de Évora, 2020» não data a produção nem a última
         atualização da cartografia.
       evidence:
@@ -105,7 +110,9 @@ investigation:
         Para 2020, o PUE regista a bicicleta em cerca de 0,5 % das deslocações
         dos residentes. O PMUSE representa uma proposta municipal de 2017 de
         cerca de 18 km de novos eixos exclusivos e 33 km da «Grande Rota do
-        Montado» partilhada. A ligação da zona nascente à Escola 2,3 André de
+        Montado» partilhada. Os 33 km são uma componente da proposta
+        cartográfica, sem prova de execução ou de que todo o percurso se situe
+        dentro da cidade. A ligação da zona nascente à Escola 2,3 André de
         Resende ficou fora da proposta e exigiria estudo adicional; a proposta
         não equivale a execução. Em março de 2025, a Câmara referia trabalho
         na primeira fase da ligação Saúde–Xarrama, pelo valor comunicado de
@@ -196,3 +203,5 @@ history:
     summary: Não foi identificada uma deslocação quotidiana recorrente que cumprisse o critério delimitado para desafio direto; a investigação deixa de procurar novas deslocações e reabre apenas perante uma deslocação concreta e segura ou evidência operacional atual materialmente melhor.
   - date: 2026-10-12
     summary: A investigação foi reformulada e reaberta para apurar a rede ciclável atual, a execução ou revisão da expansão proposta e a relação com trabalhos posteriores; prevê consulta de informação pública e, onde esta não bastar, pedido delimitado de esclarecimento ao Município de Évora.
+  - date: 2026-10-13
+    summary: O proprietário fixou que os valores de extensão do PMUSE permanecem como referências cartográficas e de planeamento, sem provar a extensão atual entregue da rede da cidade nem que todos os percursos representados se situem dentro dela.

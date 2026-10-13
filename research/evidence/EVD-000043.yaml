@@ -12,8 +12,8 @@ observation:
     a disponibilidade nas residências é limitada.
 scope:
   geography:
-    level: municipality
-    area: Município de Évora
+    level: city
+    area: Évora
   populations:
     - estudantes
   temporal:

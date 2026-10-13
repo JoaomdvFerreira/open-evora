@@ -1,0 +1,33 @@
+evidence_id: EVD-000169
+provenance:
+  sources:
+    - SRC-0029
+  extracted_at: 2026-10-13
+observation:
+  summary: >-
+    O relatório setorial do Plano de Urbanização de Évora, datado de maio de
+    2023, descreve aumento dos preços da habitação à venda nas freguesias do
+    espaço urbano e uma disponibilidade muito reduzida de casas para arrendar
+    nas plataformas consultadas, considerando a dimensão da cidade e a procura
+    esperada. Regista também aumento da sobrelotação de alguns alojamentos e
+    degradação de edifícios, com variação entre zonas da cidade.
+scope:
+  geography:
+    level: city
+    area: Évora
+  populations:
+    - residentes que procuram habitação na cidade de Évora
+  temporal:
+    as_of: "2023"
+domains:
+  - HOU
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - O diagnóstico usa dados dos Censos 2021 e séries anteriores; não mede a
+    necessidade habitacional residual em 2026 nem confirma que as condições
+    descritas persistam atualmente.
+  - A oferta observada nas plataformas consultadas não equivale à totalidade
+    da oferta de arrendamento nem quantifica por si só a procura não satisfeita.
+  - O diagnóstico não demonstra que respostas planeadas tenham sido executadas
+    nem que a necessidade de habitação a preços comportáveis esteja resolvida.

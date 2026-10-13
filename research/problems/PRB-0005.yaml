@@ -1,6 +1,6 @@
 problem_id: PRB-0005
 created_at: 2026-08-28
-updated_at: "2026-10-12"
+updated_at: "2026-10-13"
 title: Tráfego lento documentado e segurança rodoviária em Évora; efeito da Variante Nascente por apurar
 domain:
   - MOB
@@ -13,20 +13,17 @@ affected_populations:
   - residentes
   - condutores
   - peões
-problem_statement: O diagnóstico de mobilidade do PUE regista congestionamento
-  em torno das muralhas e na circular sul, velocidades excessivas de veículos
-  em corredores com forte presença pedonal e um problema significativo de
-  sinistralidade, incluindo no Centro Histórico. O período de observação não é
-  conhecido, pelo que o diagnóstico não mostra se estas condições persistem.
-  Para 2025, o Município atribuiu atrasos recorrentes dos autocarros urbanos a
-  tráfego lento nas principais vias, sobretudo nos acessos ao Centro Histórico
-  e na circular que serve o Parque Industrial em períodos de ponta, sem isolar
-  o peso do tráfego face a outros fatores operacionais. A Infraestruturas de
-  Portugal identifica a Variante Nascente de Évora (IP2) como aberta à
-  circulação. O Município estimou uma redução de
-  cerca de 30-40% no tráfego da envolvente urbana, sobretudo de veículos
-  pesados; não se trata de uma medição antes e depois da abertura, e o efeito
-  real continua por apurar.
+problem_statement: >-
+  O diagnóstico de mobilidade do PUE regista congestionamento, velocidades
+  excessivas de veículos e problemas de segurança rodoviária em Évora. O seu
+  período de observação é desconhecido e não estabelece a persistência atual.
+  Para 2025, o Município associou atrasos recorrentes dos autocarros urbanos
+  a tráfego lento nas horas de ponta, sem isolar o peso do tráfego face a
+  outros fatores operacionais. A Infraestruturas de Portugal identifica a
+  Variante Nascente como aberta. O Município estimou uma redução de cerca de
+  30–40% no tráfego da envolvente urbana, sobretudo de veículos pesados; não é
+  uma medição comparável antes e depois da abertura, e o efeito real permanece
+  por apurar.
 investigation:
   open_questions:
     - question: Que efeito mensurável teve a Variante Nascente no volume e na
