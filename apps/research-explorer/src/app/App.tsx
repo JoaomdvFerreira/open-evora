@@ -46,7 +46,7 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
         Saltar para o conteúdo
       </a>
       <main id="main-content" className="explorer-shell">
-        {trustPage ? <TrustPage page={trustPage} skipTargetId={SKIP_TARGET_ID} /> : <>
+        {trustPage ? <TrustPage page={trustPage} skipTargetId={SKIP_TARGET_ID} dataProvider={dataProvider} /> : <>
         {state.status === "loading" && <div id={SKIP_TARGET_ID} tabIndex={-1}><AppSkeleton /></div>}
 
         {state.status === "error" && (

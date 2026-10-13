@@ -3,7 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { App } from "./App";
-import type { DataProvider } from "../dataProvider/types";
+import type { DataProvider, RecordDetail, RecordSummary } from "../dataProvider/types";
 
 const provider: DataProvider = {
   getManifest: () => Promise.reject(new Error("not used on trust pages")),
@@ -22,6 +22,38 @@ it("renders the approved privacy surface without a data dependency", () => {
   expect(screen.getByText("Não é necessária.")).toBeTruthy();
   expect(screen.getByRole("heading", { name: "Compromisso" })).toBeTruthy();
   expect(screen.getAllByRole("link", { name: "Correções" }).every((link) => link.getAttribute("href") === "/corrections")).toBe(true);
+});
+
+it("renders a data-backed OUT_OF_SCOPE archive under the Methodology information parent", async () => {
+  const summaries: RecordSummary[] = [
+    { id: "PRB-0007", type: "PRB-", label: "Necessidades de apoio e de informação de cuidadores informais no concelho de Évora", file: "research/problems/PRB-0007.yaml", summaryFields: { status: "CLOSED" } },
+    { id: "PRB-RESOLVED", type: "PRB-", label: "Problema resolvido", file: "research/problems/PRB-RESOLVED.yaml", summaryFields: { status: "CLOSED" } },
+  ];
+  const details: Record<string, RecordDetail> = {
+    "PRB-0007": { id: "PRB-0007", type: "PRB-", file: summaries[0].file, record: { title: "Necessidades de apoio e de informação de cuidadores informais no concelho de Évora", status: "CLOSED", closure: { reason: "OUT_OF_SCOPE" } }, outgoingEdges: [], incomingEdges: [] },
+    "PRB-RESOLVED": { id: "PRB-RESOLVED", type: "PRB-", file: summaries[1].file, record: { title: "Problema resolvido", status: "CLOSED", closure: { reason: "RESOLVED" } }, outgoingEdges: [], incomingEdges: [] },
+  };
+  const archiveProvider: DataProvider = {
+    ...provider,
+    listRecords: async () => summaries,
+    getRecord: async (id) => { const detail = details[id]; if (!detail) throw new Error("not found"); return detail; },
+  };
+  window.history.replaceState(null, "", "/out-of-scope");
+  render(<App dataProvider={archiveProvider} />);
+
+  expect(await screen.findByRole("heading", { level: 1, name: "Registos fora do âmbito" })).toBeTruthy();
+  expect(document.title).toBe("Registos fora do âmbito — Explorador de Investigação Open Évora");
+  expect(screen.getByText("O Open Évora acompanha problemas da cidade de Évora. Estes registos foram encerrados porque a evidência disponível não é específica da cidade. O encerramento não significa que o problema não exista.")).toBeTruthy();
+  const archivedLink = screen.getByRole("link", { name: "Necessidades de apoio e de informação de cuidadores informais no concelho de Évora" });
+  expect(archivedLink.getAttribute("href")).toBe("/?view=problem&id=PRB-0007");
+  expect(screen.getByText("Fora do âmbito do programa")).toBeTruthy();
+  expect(screen.queryByText("Problema resolvido")).toBeNull();
+  const globalNav = screen.getByRole("navigation", { name: "Navegação principal", hidden: true });
+  expect(within(globalNav).getByRole("link", { name: "Método", hidden: true }).getAttribute("aria-current")).toBe("page");
+  const localNav = screen.getByRole("navigation", { name: "Informação sobre o Open Évora" });
+  expect(within(localNav).getByRole("link", { name: "Metodologia" }).getAttribute("aria-current")).toBe("page");
+  const staticHtml = readFileSync(path.join(__dirname, "..", "..", "out-of-scope", "index.html"), "utf-8");
+  expect(/<title>([^<]*)<\/title>/.exec(staticHtml)?.[1]).toBe(document.title);
 });
 
 it("renders the owner-confirmed About accountability facts in the shared trust structure", () => {

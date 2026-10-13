@@ -58,8 +58,8 @@ export function OverviewPresentation({
   evidenceCount: number;
   /** Canonical `SRC-` record count (docs/datamodel.md §1) — same counting pattern as `evidenceCount`, shown in the Hero metrics as "Fontes" (the data model does not classify Sources as primary vs secondary/additional). */
   sourceCount: number;
-  /** The canonical corpus total — every record in the loaded index, every type (the same figure `manifest.totalRecords` reports elsewhere as "Corpus: X registos" — see overviewStats.ts's `PublicOverviewData` doc comment). Shown in the Hero metrics as "Total de registos". */
-  totalRecordCount: number;
+  /** Overview page record total: loaded records minus CLOSED + OUT_OF_SCOPE PRBs. Distinct from the complete manifest corpus total used on other surfaces. */
+  totalRecordCount: number | null;
   citizenProblems: CitizenProblem[] | null;
   closedProblems: CitizenProblem[] | null;
   /** The full filtered+sorted result set (pre-pagination) — its length is the sole source for the toolbar's "N problemas" count, never `paginatedProblems.length`. */
@@ -84,7 +84,7 @@ export function OverviewPresentation({
   sortOrder: ProblemSortOrder;
   onSortOrderChange: (order: ProblemSortOrder) => void;
   onExploreProblem: (id: string) => void;
-  partialState: { failedIds: string[]; total: number; retrying: boolean; onRetry: () => void } | null;
+  partialState: { failedIds: string[]; retrying: boolean; onRetry: () => void } | null;
   initialDrawerOpen?: boolean;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(initialDrawerOpen);
@@ -152,7 +152,7 @@ export function OverviewPresentation({
                 <span className="overview-metric-value">{sourceCount}</span> {sourceCountLabel(sourceCount)}
               </li>
               <li className="overview-metric">
-                <span className="overview-metric-value">{totalRecordCount}</span> {totalRecordCountLabel()}
+                <span className="overview-metric-value">{totalRecordCount ?? "—"}</span> {totalRecordCountLabel()}
               </li>
             </ul>
           </div>
@@ -225,7 +225,7 @@ export function OverviewPresentation({
         <div className="overview-partial-notice shell-frame shell-frame--wide" role="status" aria-live="polite">
           <div>
             <strong>Dados parciais</strong>
-            <p>Não foi possível carregar os detalhes de {partialState.failedIds.length} de {partialState.total} problemas. Todos os problemas continuam na lista; a pesquisa, os filtros, a ordenação por atualização e algumas contagens podem estar incompletos.</p>
+            <p>Não foi possível carregar os detalhes de {partialState.failedIds.length} {partialState.failedIds.length === 1 ? "problema" : "problemas"}. A lista, a pesquisa, os filtros, a ordenação por atualização e algumas contagens podem estar incompletos.</p>
           </div>
           <button type="button" onClick={partialState.onRetry} disabled={partialState.retrying}>
             {partialState.retrying ? "A tentar novamente…" : "Tentar novamente"}

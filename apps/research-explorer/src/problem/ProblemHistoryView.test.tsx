@@ -11,6 +11,7 @@ const summaries: RecordSummary[] = [
   { id: "PRB-0001", type: "PRB-", label: "Sem histórico", file: "research/problems/PRB-0001.yaml", summaryFields: {} },
   { id: "PRB-0002", type: "PRB-", label: "Com transição", file: "research/problems/PRB-0002.yaml", summaryFields: {} },
   { id: "PRB-0003", type: "PRB-", label: "Três entradas", file: "research/problems/PRB-0003.yaml", summaryFields: {} },
+  { id: "PRB-0004", type: "PRB-", label: "Encerrado", file: "research/problems/PRB-0004.yaml", summaryFields: {} },
   { id: "EVD-000154", type: "EVD-", label: "Levantamento", file: "research/evidence/EVD-000154.yaml", summaryFields: {} },
   { id: "EVD-000155", type: "EVD-", label: "Procedimento", file: "research/evidence/EVD-000155.yaml", summaryFields: {} },
   { id: "EVD-000156", type: "EVD-", label: "Intervenções", file: "research/evidence/EVD-000156.yaml", summaryFields: {} },
@@ -45,6 +46,7 @@ const details: Record<string, RecordDetail> = {
       ],
     },
   },
+  "PRB-0004": { id: "PRB-0004", type: "PRB-", file: "research/problems/PRB-0004.yaml", incomingEdges: [], outgoingEdges: [], record: { title: "Problema arquivado", status: "CLOSED", history: [] } },
 };
 
 function provider(): DataProvider {
@@ -184,6 +186,13 @@ describe("ProblemHistoryView — composition", () => {
     const updated = hero.querySelector(".prb-identity-updated");
     expect(updated?.textContent).toContain("Última edição");
     expect(updated?.querySelector("time")?.getAttribute("dateTime")).toBe("2026-09-25");
+  });
+
+  it("uses the canonical CLOSED lifecycle label in the shared History identity", async () => {
+    render(<ProblemHistoryView {...props} problemId="PRB-0004" />);
+    const hero = (await screen.findByRole("heading", { level: 2, name: "Problema arquivado" })).closest("header") as HTMLElement;
+    expect(within(hero).getByText("Problema encerrado")).toBeTruthy();
+    expect(within(hero).queryByText("Problema em investigação")).toBeNull();
   });
 
   it("presents updated_at only as record-edit metadata — never as a history entry", async () => {

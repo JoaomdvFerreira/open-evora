@@ -5,6 +5,7 @@ import "../styles/information.css";
 import "../styles/feedback.css";
 import { ToastProvider } from "../presentation/Toast";
 import { PublicFooter, TrustPage, trustPageForPath } from "./TrustPage";
+import { StaticDataProvider } from "../dataProvider/StaticDataProvider";
 
 const meta = { title: "Public/Informação" } satisfies Meta;
 export default meta;
@@ -22,7 +23,7 @@ type InformationPath = "/about" | "/methodology" | "/corrections" | "/contact" |
 function InformationShell({ path }: { path: InformationPath }) {
   const page = trustPageForPath(path);
   if (!page) throw new Error(`Missing Information page for ${path}`);
-  return <ToastProvider><main className="explorer-shell"><TrustPage page={page} /></main><PublicFooter /></ToastProvider>;
+  return <ToastProvider><main className="explorer-shell"><TrustPage page={page} dataProvider={new StaticDataProvider()} /></main><PublicFooter /></ToastProvider>;
 }
 
 const desktop = { viewport: { value: "reviewDesktop" } };

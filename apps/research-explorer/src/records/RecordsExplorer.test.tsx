@@ -23,14 +23,28 @@ const DETAILS: Record<string, RecordDetail> = Object.fromEntries(
   RECORDS.map((r) => [r.id, { id: r.id, type: r.type, file: r.file, record: { title: r.label }, outgoingEdges: [], incomingEdges: [] }])
 );
 
-function makeProvider(): DataProvider {
+function makeProvider(records: RecordSummary[] = RECORDS): DataProvider {
+  const details = records === RECORDS ? DETAILS : Object.fromEntries(records.map((record) => [record.id, {
+    id: record.id, type: record.type, file: record.file,
+    record: { title: record.label, status: "CLOSED", closure: { reason: "OUT_OF_SCOPE" } },
+    outgoingEdges: [], incomingEdges: [],
+  }]));
   return {
     getManifest: async () => { throw new Error("unused"); },
-    listRecords: async () => RECORDS,
+    listRecords: async () => records,
     getEdges: async () => [],
-    getRecord: async (id: string) => DETAILS[id],
+    getRecord: async (id: string) => details[id],
   };
 }
+
+it("keeps a CLOSED OUT_OF_SCOPE PRB discoverable through Records search", async () => {
+  const archived: RecordSummary = {
+    id: "PRB-0007", type: "PRB-", label: "Necessidades de apoio e de informação de cuidadores informais", file: "research/problems/PRB-0007.yaml", summaryFields: { status: "CLOSED" },
+  };
+  render(<RecordsExplorer dataProvider={makeProvider([archived])} selectedId={null} onSelect={vi.fn()} query="cuidadores informais" onQueryChange={vi.fn()} typeFilter="all" onTypeFilterChange={vi.fn()} onViewAsProblem={vi.fn()} onViewInGraph={vi.fn()} onBackToRecords={vi.fn()} />);
+  expect(await screen.findByText("PRB-0007")).toBeTruthy();
+  expect(screen.getByText("Necessidades de apoio e de informação de cuidadores informais")).toBeTruthy();
+});
 
 /** Mirrors how Explorer.tsx wires RecordsExplorer: selectedId lives in the caller, above RecordsExplorer/RecordsTable. */
 function Harness() {

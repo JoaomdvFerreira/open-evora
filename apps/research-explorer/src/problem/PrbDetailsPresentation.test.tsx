@@ -52,12 +52,31 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
 
   it("presents authored closure details without equating closure with resolution", () => {
     renderPrb({ title: "Encerrado", status: "CLOSED", closure: { reason: "OUT_OF_SCOPE", explanation: "O \u00e2mbito documentado fica fora do programa.", closed_at: "2026-08-28", reopen_condition: "O programa altera o seu \u00e2mbito." } });
+    expect(screen.getByText("Problema encerrado")).toBeTruthy();
+    expect(screen.queryByText("Problema em investigação")).toBeNull();
     const section = screen.getByRole("region", { name: "Encerramento" });
     expect(within(section).getByText("Fora do \u00e2mbito do programa")).toBeTruthy();
     expect(within(section).getByText("O \u00e2mbito documentado fica fora do programa.")).toBeTruthy();
     expect(within(section).getByText("28/08/2026")).toBeTruthy();
     expect(within(section).getByText("O programa altera o seu \u00e2mbito.")).toBeTruthy();
     expect(within(section).getByText(/n\u00e3o significa, por si s\u00f3, que a condi\u00e7\u00e3o c\u00edvica tenha desaparecido/)).toBeTruthy();
+  });
+
+  it("presents preserved questions as unanswered history on CLOSED Problems", () => {
+    renderPrb({
+      title: "Encerrado com questões históricas",
+      status: "CLOSED",
+      investigation: { open_questions: [{ question: "Pergunta preservada?", why_open: "Permanece sem resposta documentada.", current_action: "Sem ação ativa no âmbito atual do programa.", evidence: ["EVD-1"] }] },
+    });
+    expect(screen.getAllByText("Questões que ficaram por responder")).toHaveLength(2);
+    expect(screen.queryByText("Questões abertas")).toBeNull();
+    expect(screen.queryByText(/questões? em acompanhamento/)).toBeNull();
+    expect(screen.queryByText("Porque continua em aberto")).toBeNull();
+    expect(screen.queryByText("Ação atual")).toBeNull();
+    expect(screen.getByText("Porque ficou por responder")).toBeTruthy();
+    expect(screen.getByText("Ação registada")).toBeTruthy();
+    expect(screen.getByText("Pergunta preservada?")).toBeTruthy();
+    expect(screen.queryByText(/Contribuir para a investigação/)).toBeNull();
   });
 
   it("renders the canonical title and statement exactly as authored", () => {
@@ -126,6 +145,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
 
   it("renders state/evidence/validation labels only when their canonical field is present", () => {
     renderPrb({ title: "T", status: "OPEN", evidence_status: "discovered", validation_status: "unvalidated" });
+    expect(screen.getByText("Problema em investigação")).toBeTruthy();
     expect(screen.getByText("Aberto")).toBeTruthy();
     expect(screen.getByText("Identificada")).toBeTruthy();
     expect(screen.getByText("Por validar")).toBeTruthy();

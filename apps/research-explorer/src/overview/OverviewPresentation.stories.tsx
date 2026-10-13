@@ -32,37 +32,37 @@ const problems: CitizenProblem[] = [
     id: "PRB-XXXX-1", title: "Percursos pedonais entre bairros e serviços",
     problemStatement: "Pessoas que se deslocam a pé entre bairros residenciais e serviços essenciais descrevem passeios interrompidos e desvios frequentes.",
     domainCodes: ["MOB"], affectedPopulations: ["Pessoas idosas", "Pessoas com mobilidade reduzida"], geographyArea: "Évora",
-    lifecycleStatus: "OPEN", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-04-08",
+    lifecycleStatus: "OPEN", closureReason: null, validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-04-08",
   },
   {
     id: "PRB-XXXX-2", title: "Acesso a informação de estacionamento",
     problemStatement: "A informação pública sobre disponibilidade de estacionamento está dispersa por múltiplas fontes desatualizadas.",
     domainCodes: ["MOB", "PUB"], affectedPopulations: [], geographyArea: "Centro histórico",
-    lifecycleStatus: "OPEN", validationStatus: null, evidenceStatus: "corroborated", updatedAt: "2026-03-12",
+    lifecycleStatus: "OPEN", closureReason: null, validationStatus: null, evidenceStatus: "corroborated", updatedAt: "2026-03-12",
   },
   {
     id: "PRB-XXXX-3", title: "Continuidade dos horários de recolha de resíduos",
     problemStatement: null,
     domainCodes: ["ENV"], affectedPopulations: [], geographyArea: null,
-    lifecycleStatus: "OPEN", validationStatus: "unvalidated", evidenceStatus: null, updatedAt: null,
+    lifecycleStatus: "OPEN", closureReason: null, validationStatus: "unvalidated", evidenceStatus: null, updatedAt: null,
   },
   {
     id: "PRB-XXXX-4", title: "Disponibilidade de consultas de cuidados primários",
     problemStatement: "Utentes reportam tempos de espera prolongados para marcação de consultas em centros de saúde locais.",
     domainCodes: ["HEA"], affectedPopulations: ["Famílias com crianças pequenas"], geographyArea: "Évora",
-    lifecycleStatus: "CLOSED", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-02-20",
+    lifecycleStatus: "CLOSED", closureReason: "RESOLVED", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-02-20",
   },
   {
     id: "PRB-XXXX-5", title: "Dificuldades persistentes nas deslocações quotidianas entre bairros, equipamentos e serviços públicos no centro histórico e periferia de Évora",
     problemStatement: "Pessoas que atravessam a cidade para aceder a serviços essenciais descrevem interrupções e desvios frequentes, com impacto desproporcional em quem depende de transporte público ou percursos pedonais para tarefas do quotidiano, incluindo deslocações a serviços de saúde, educação e comércio local.",
     domainCodes: ["MOB", "PUB", "HEA"], affectedPopulations: ["Pessoas idosas", "Pessoas com mobilidade reduzida", "Famílias com crianças pequenas"], geographyArea: "Évora e freguesias limítrofes",
-    lifecycleStatus: "OPEN", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-04-01",
+    lifecycleStatus: "OPEN", closureReason: null, validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-04-01",
   },
   {
     id: "PRB-XXXX-6", title: "Sinalização de obras em espaço público",
     problemStatement: "Obras em curso no espaço público carecem de sinalização consistente para peões e condutores.",
     domainCodes: ["future-domain"], affectedPopulations: [], geographyArea: "Évora",
-    lifecycleStatus: null, validationStatus: null, evidenceStatus: null, updatedAt: null,
+    lifecycleStatus: null, closureReason: null, validationStatus: null, evidenceStatus: null, updatedAt: null,
   },
 ];
 
@@ -154,7 +154,7 @@ function FullOverview({
       sortOrder={state.sortOrder}
       onSortOrderChange={state.setSortOrder}
       onExploreProblem={() => {}}
-      partialState={partial ? { failedIds: ["PRB-XXXX-6"], total: state.source.length, retrying: false, onRetry: () => {} } : null}
+      partialState={partial ? { failedIds: ["PRB-XXXX-6"], retrying: false, onRetry: () => {} } : null}
       initialDrawerOpen={partial}
     />
   );
@@ -256,13 +256,13 @@ const stressProblems: CitizenProblem[] = [
     id: "PRB-XXXX-7", title: "Fiabilidade dos horários de transporte público interurbano",
     problemStatement: "Utentes de transporte público interurbano descrevem atrasos frequentes e falta de informação em tempo real, com impacto acrescido para quem depende exclusivamente deste serviço para aceder a emprego, educação e cuidados de saúde fora do centro urbano.",
     domainCodes: ["MOB", "PUB", "HEA", "future-domain"], affectedPopulations: ["Pessoas idosas", "Pessoas com mobilidade reduzida", "Famílias com crianças pequenas", "Trabalhadores deslocados"], geographyArea: "Évora e concelhos limítrofes",
-    lifecycleStatus: "OPEN", validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-04-10",
+    lifecycleStatus: "OPEN", closureReason: null, validationStatus: "unvalidated", evidenceStatus: "corroborated", updatedAt: "2026-04-10",
   },
   {
     id: "PRB-XXXX-8", title: "Acessibilidade de edifícios públicos municipais",
     problemStatement: "Vários edifícios de atendimento público carecem de rampas, elevadores ou sinalética acessível.",
     domainCodes: ["PUB"], affectedPopulations: ["Pessoas com mobilidade reduzida"], geographyArea: "Évora",
-    lifecycleStatus: "CLOSED", validationStatus: null, evidenceStatus: "corroborated", updatedAt: "2026-01-15",
+    lifecycleStatus: "CLOSED", closureReason: "RESOLVED", validationStatus: null, evidenceStatus: "corroborated", updatedAt: "2026-01-15",
   },
 ];
 

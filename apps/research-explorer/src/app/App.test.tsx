@@ -2,8 +2,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
-import { DataLoadError, type DataProvider, type ReadModelManifest } from "../dataProvider/types";
+import { DataLoadError, type DataProvider, type ReadModelManifest, type RecordDetail, type RecordSummary } from "../dataProvider/types";
 import { prb0005DataProvider } from "../problem/prb0005Fixture";
+import prb0007Generated from "../../generated/record-detail/PRB-0007.json";
 
 const generateDossierInWorker = vi.hoisted(() => vi.fn());
 vi.mock("../problem/pdf/prbDossierWorkerClient", () => ({ generateDossierInWorker }));
@@ -21,6 +22,45 @@ const manifest: ReadModelManifest = {
 
 afterEach(() => {
   window.history.replaceState(null, "", "/");
+});
+
+it("opens a CLOSED OUT_OF_SCOPE PRB through the ordinary direct Problem route", async () => {
+  const detail = prb0007Generated as unknown as RecordDetail;
+  const record = detail.record;
+  const title = String(record.title);
+  const evidenceIds = Array.isArray((record.evidence))
+    ? record.evidence.flatMap((entry) => entry && typeof entry === "object" && typeof (entry as Record<string, unknown>).evidence_id === "string" ? [(entry as Record<string, unknown>).evidence_id as string] : [])
+    : [];
+  const summary: RecordSummary = {
+    id: detail.id, type: detail.type, label: title, file: detail.file,
+    summaryFields: { status: record.status, validation_status: record.validation_status, evidence_status: record.evidence_status },
+  };
+  const summaries: RecordSummary[] = [summary, ...evidenceIds.map((id) => ({ id, type: "EVD-", label: id, file: `research/evidence/${id}.yaml`, summaryFields: {} }))];
+  const evidenceDetails = Object.fromEntries(evidenceIds.map((id) => [id, { id, type: "EVD-", file: `research/evidence/${id}.yaml`, record: {}, outgoingEdges: [], incomingEdges: [] }]));
+  const directProvider: DataProvider = {
+    getManifest: async () => ({ ...manifest, totalRecords: summaries.length, counts: { "PRB-": 1, "EVD-": evidenceIds.length }, schemaPrefixes: ["PRB-", "EVD-"] }),
+    listRecords: async () => summaries,
+    getRecord: async (id) => { if (id === detail.id) return detail; const evidence = evidenceDetails[id]; if (evidence) return evidence; throw new Error("not found"); },
+    getEdges: async () => [],
+  };
+  window.history.replaceState(null, "", "/?view=problem&id=PRB-0007");
+  render(<App dataProvider={directProvider} />);
+
+  expect(await screen.findByRole("heading", { level: 2, name: title })).toBeTruthy();
+  expect(screen.getByText("Problema encerrado")).toBeTruthy();
+  expect(screen.queryByText("Problema em investigação")).toBeNull();
+  expect(screen.getByRole("region", { name: "Encerramento" })).toBeTruthy();
+  const closure = record.closure as Record<string, unknown>;
+  expect(screen.getByText(String(closure.explanation))).toBeTruthy();
+  expect(screen.getAllByText("Questões que ficaram por responder")).toHaveLength(2);
+  expect(screen.queryByText("Questões abertas")).toBeNull();
+  expect(screen.queryByText(/questões? em acompanhamento/)).toBeNull();
+  expect(screen.queryByText("Porque continua em aberto")).toBeNull();
+  expect(screen.queryByText("Ação atual")).toBeNull();
+  expect(screen.getAllByText("Porque ficou por responder")).toHaveLength(2);
+  expect(screen.getAllByText("Ação registada")).toHaveLength(2);
+  const questions = (record.investigation as Record<string, unknown>).open_questions as Array<Record<string, unknown>>;
+  for (const question of questions) expect(screen.getByText(String(question.question))).toBeTruthy();
 });
 
 it("retries a failed startup manifest load", async () => {

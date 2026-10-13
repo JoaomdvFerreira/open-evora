@@ -211,6 +211,7 @@ export interface PrbIdentityData {
   title: string;
   statement: string | null;
   topics: string[];
+  status: string | null;
   /** Canonical `updated_at`: the date the PRB record was last edited — record metadata, not a currentness assessment. */
   updatedAt: string | null;
 }
@@ -221,6 +222,7 @@ export function prbIdentity(problemId: string, record: Record<string, unknown>):
     title: fieldValue(record, "title") ?? problemId,
     statement: fieldValue(record, "problem_statement"),
     topics: stringValues(record.domain),
+    status: fieldValue(record, "status"),
     updatedAt: fieldValue(record, "updated_at"),
   };
 }
