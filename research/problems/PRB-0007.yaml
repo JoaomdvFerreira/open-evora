@@ -1,9 +1,7 @@
 problem_id: PRB-0007
 created_at: 2026-08-28
 updated_at: 2026-10-13
-title: O Plano Concelhio dos Cuidadores Informais documenta, entre cuidadores
-  consultados em Évora, necessidades de informação e dificuldades relacionadas
-  com apoios
+title: Necessidades de apoio e de informação de cuidadores informais no concelho de Évora
 domain:
   - SOC
   - HEA
@@ -14,28 +12,23 @@ affected_populations:
   - cuidadores informais
   - pessoas cuidadas
 problem_statement: >-
-  Os cuidadores informais em Évora têm necessidades documentadas de informação
-  que abrangem saúde, mobilidade, estruturas de apoio e apoio financeiro e
-  social. Num questionário a 133 cuidadores incluído no Plano Concelhio dos
-  Cuidadores Informais, 35% dos respondentes indicaram que a pessoa de quem
-  cuidavam não utilizava qualquer serviço formal de apoio — um resultado
-  específico dessa amostra, que não pode ser generalizado ao conjunto dos
-  cuidadores de Évora.
+  No questionário a 133 cuidadores incluído no Plano Concelhio dos Cuidadores
+  Informais, as necessidades mais referidas foram apoio na prestação de
+  cuidados (cerca de 41%), descanso do cuidador (40%), apoio financeiro (37%) e
+  apoio psicológico (31%). O plano identifica também necessidades de informação
+  nas áreas da saúde, mobilidade, estruturas de apoio e apoios financeiros e
+  sociais. Em grupos focais de uma amostra distinta, foram referidas burocracia
+  e dificuldade em conhecer os direitos dos cuidadores.
 
 
-  Material de grupos focais do mesmo plano regista, entre as dificuldades
-  relativas aos apoios sociais, a burocracia e a dificuldade em conhecer os
-  direitos dos cuidadores, e identifica o acesso a informação e direitos como
-  necessidade. A evidência atual não estabelece uma relação causal entre estas
-  dificuldades e a não utilização de apoio formal indicada no questionário a
-  133 cuidadores.
-
-
-  O mesmo questionário regista também necessidades de apoio direto no cuidar,
-  descanso, apoio financeiro e apoio psicológico. A importância relativa da
-  orientação e destas necessidades para o acesso a apoios permanece por
-  estabelecer, apesar de Évora dispor de uma densa rede interinstitucional de
-  apoio social (CLASE/Rede Social).
+  No mesmo questionário, 35% dos respondentes indicaram que a pessoa de quem
+  cuidavam não utilizava qualquer serviço formal de apoio. Este resultado
+  aplica-se apenas à amostra e não pode ser generalizado ao conjunto dos
+  cuidadores do concelho de Évora. A evidência disponível não estabelece uma
+  relação causal entre as dificuldades de informação e a não utilização de
+  apoio formal. O concelho dispõe também da rede interinstitucional CLASE/Rede
+  Social, com cerca de 120 instituições participantes; a dimensão da rede, por
+  si só, não demonstra facilidade de navegação ou acesso às respostas.
 investigation:
   open_questions:
     - question: Os cuidadores conhecem o Cantinho do Cuidador e outros serviços já
@@ -98,10 +91,9 @@ investigation:
   path:
     initial_signal:
       summary: Foram identificadas necessidades de informação dos cuidadores informais
-        em Évora, abrangendo saúde, mobilidade, estruturas de apoio e apoio
-        financeiro e social, apesar de Évora dispor de uma densa rede
-        interinstitucional de apoio social — CLASE/Rede Social, com cerca de 120
-        instituições.
+        no concelho de Évora, abrangendo saúde, mobilidade, estruturas de apoio e
+        apoio financeiro e social. O concelho dispõe da rede interinstitucional
+        CLASE/Rede Social, com cerca de 120 instituições.
       evidence:
         - EVD-000034
         - EVD-000036
@@ -129,8 +121,9 @@ investigation:
         - EVD-000165
     delimitation:
       summary: >-
-        No questionário a 133 cuidadores, 35% dos respondentes indicaram que a
-        pessoa de quem cuidavam não utilizava qualquer serviço formal de apoio.
+        No questionário a 133 cuidadores incluído no Plano Concelhio dos
+        Cuidadores Informais, 35% dos respondentes indicaram que a pessoa de quem
+        cuidavam não utilizava qualquer serviço formal de apoio.
         Material de grupos focais, relativo a uma amostra distinta, registou a
         burocracia e a dificuldade em conhecer os direitos entre as dificuldades
         relativas aos apoios sociais e identificou o acesso a informação e
@@ -280,3 +273,7 @@ history:
       status:
         from: OPEN
         to: CLOSED
+  - date: 2026-10-13
+    summary: A formulação pública foi revista para destacar as necessidades de
+      apoio documentadas, distinguir o âmbito municipal da cidade e preservar
+      os limites amostrais e causais da evidência.
