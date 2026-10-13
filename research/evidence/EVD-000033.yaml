@@ -18,7 +18,7 @@ scope:
   populations:
     - estudantes
   temporal:
-    start: "2024"
+    start: "2023"
     end: "2025"
 domains:
   - HOU

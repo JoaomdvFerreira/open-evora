@@ -1,0 +1,20 @@
+source_id: SRC-0029
+retrieval:
+  retrieved_at: "2026-10-13"
+  content_sha256: 3caa8bd799063172ac290313471671bdf5285c0e83e642d7831f9f05d58d33e6
+  media_type: application/pdf
+verified_claims:
+  - locator: "Capa (PDF p. 1)"
+    statement: "O relatório setorial de habitação e mercado imobiliário do Plano de Urbanização de Évora está datado de maio de 2023."
+  - locator: "Sumário Executivo, pp. 5–6 (PDF pp. 5–6)"
+    statement: "O relatório descreve uma subida dos preços da habitação para venda, particularmente no último ano, na generalidade das freguesias do espaço urbano de Évora."
+  - locator: "Sumário Executivo, p. 6 (PDF p. 6); secção 3.2, p. 28 (PDF p. 28)"
+    statement: "O relatório considera muito reduzida a oferta de casas para arrendar nas plataformas online consultadas, face à dimensão da cidade de Évora e à procura que estima existir."
+  - locator: "Secção 2.2.4, p. 11 (PDF p. 11)"
+    statement: "Na comparação dos Censos de 2011 e 2021 para as freguesias urbanas, o relatório identifica aumento da proporção de alojamentos sobrelotados, incluindo no Centro Histórico e nos Canaviais."
+  - locator: "Secções 2.2.5–2.2.6, p. 12 (PDF p. 12)"
+    statement: "Na comparação de 2011 com 2021, o relatório descreve aumento de edifícios com necessidades de reparação em várias freguesias urbanas, com evolução diferente no Centro Histórico, onde o indicador diminuiu."
+  - locator: "Sumário Executivo, p. 5 (PDF p. 5); secção 2.3.1, pp. 12–13 (PDF pp. 12–13)"
+    statement: "No diagnóstico de maio de 2023 para Évora, o relatório considera insuficientes os lugares nas residências universitárias públicas face à procura de estudantes deslocados e internacionais; apresenta a localização e capacidade das residências na cidade."
+  - locator: "Sumário Executivo, p. 5 (PDF p. 5); secção 2.3.2, p. 15 (PDF p. 15)"
+    statement: "O relatório identifica mais de 200 unidades de alojamento local no município de Évora e situa a maior concentração na freguesia do Centro Histórico."
