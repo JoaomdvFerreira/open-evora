@@ -1,6 +1,6 @@
 problem_id: PRB-0007
 created_at: 2026-08-28
-updated_at: 2026-10-09
+updated_at: 2026-10-13
 title: O Plano Concelhio dos Cuidadores Informais documenta, entre cuidadores
   consultados em Évora, necessidades de informação e dificuldades relacionadas
   com apoios
@@ -49,11 +49,11 @@ investigation:
         Informais se encontram operacionalizadas. A implementação é recente e
         ainda não estão disponíveis resultados consistentes nem avaliação de
         impacto; a DEIS considera essa avaliação prematura nesta fase.
-      current_action: Não é proporcional efetuar novo contacto imediato com a DEIS.
-        Monitorizar evidência específica de execução e futuros resultados de
-        monitorização e avaliação; reconsiderar se surgir evidência direta
-        material ou caso a avaliação prevista para 2027 venha a ficar
-        disponível.
+      current_action: >-
+        Nenhuma ação ativa no âmbito atual do programa. Informação futura sobre a
+        execução ou avaliação do plano municipal só justifica reavaliação deste PRB
+        se produzir evidência específica da cidade compatível com a condição de
+        reabertura.
       resolution_condition: Evidência sobre a execução das medidas específicas de
         orientação relevantes para este problema, o conhecimento e a utilização
         pelos cuidadores das respostas disponíveis e o efeito na orientação e no
@@ -84,10 +84,10 @@ investigation:
       latest_result: Não estava disponível um episódio concreto de procura de apoio
         que permitisse testar esta relação; a recolha não foi alargada apenas
         para obter evidência de validação.
-      current_action: "A via de percurso afetado está parada: não é proporcional
-        recrutar ou procurar novos episódios no âmbito atual. A questão reabre
-        apenas com um episódio delimitado adequado ou evidência direta
-        materialmente mais forte."
+      current_action: >-
+        Nenhuma ação ativa no âmbito atual do programa. Reconsiderar apenas perante
+        evidência diretamente aplicável à cidade que satisfaça a condição de
+        reabertura.
       resolution_condition: Evidência que relacione diretamente as dificuldades de
         informação e orientação com a não utilização de apoio formal ou que
         permita estabelecer a importância relativa das diferentes explicações.
@@ -213,7 +213,6 @@ evidence:
       - LOCAL_OBSERVATION
   - evidence_id: EVD-000124
     effects:
-      - SUPPORTS
       - REFINES
     research_roles:
       - CONTEXTUAL
@@ -235,7 +234,22 @@ evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
-status: OPEN
+status: CLOSED
+closure:
+  reason: OUT_OF_SCOPE
+  explanation: >-
+    A evidência canónica disponível documenta necessidades e respostas relativas
+    a cuidadores ao nível do Município de Évora, ou a nível nacional, mas não
+    estabelece uma manifestação específica da cidade de Évora. O encerramento
+    indica que este registo fica fora do âmbito geográfico atual do Open Évora;
+    não estabelece que as necessidades dos cuidadores não existam.
+  reopen_condition: >-
+    Reconsiderar este registo se surgir evidência específica da cidade de Évora,
+    ou de uma área ou local dentro da cidade, que documente uma manifestação
+    material relevante para este problema. Uma avaliação municipal posterior,
+    incluindo a prevista para 2027, só é suficiente para esta reavaliação se
+    fornecer essa desagregação ou outra evidência diretamente aplicável à cidade.
+  closed_at: 2026-10-13
 history:
   - date: 2026-08-31
     summary: Não estava disponível um episódio concreto de procura de apoio adequado
@@ -257,3 +271,12 @@ history:
       35% dos respondentes indicaram que a pessoa de quem cuidavam não utilizava
       qualquer serviço formal de apoio; o resultado não estabelece que 35% do
       conjunto das pessoas cuidadas não utilizava apoio formal."
+  - date: 2026-10-13
+    summary: O registo foi encerrado porque a evidência disponível é municipal ou
+      nacional, sem especificidade para a cidade de Évora. Este encerramento não
+      estabelece a ausência das necessidades subjacentes dos cuidadores. A
+      reabertura requer evidência aplicável à cidade.
+    state_changes:
+      status:
+        from: OPEN
+        to: CLOSED
