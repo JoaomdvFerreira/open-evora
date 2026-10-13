@@ -65,7 +65,12 @@ describe("SRC Detail — canonical regression cases", () => {
     const checked = screen.getByText(/^Verificada em/);
     expect(checked.textContent).toBe("Verificada em 10 ago 2026");
     expect(checked.querySelector("time")?.dateTime).toBe("2026-08-10");
-    expect(screen.getByText("A Open Évora extraiu desta fonte 7 observações, usadas em 5 problemas em investigação.")).toBeTruthy();
+    expect(
+      screen.getByText(
+        "A Open Évora extraiu desta fonte 7 observações, usadas em 5 problemas."
+      )
+    ).toBeTruthy();
+    expect(screen.queryByText(/5 problemas em investigação/)).toBeNull();
   });
 
   it("SRC-0002 maps the six public metadata facts from canonical data and the one relation state", () => {
