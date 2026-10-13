@@ -266,6 +266,16 @@ The Problem is the canonical answer to:
 
 This includes the current representation of the Problem's manifestation, affected journey/population, consequences, scope, supported causal reading, relevant Evidence, existing/planned solutions, and material unresolved uncertainty.
 
+### Problem lifecycle and closure
+
+The canonical lifecycle is `OPEN` or `CLOSED`. Lifecycle answers whether the Problem remains active in the programme; it is independent of evidence, validation, tractability and solution-landscape dimensions. The executable schema owns the exact closure fields and reason inventory.
+
+A `CLOSED` Problem carries authored closure reasoning, a date and a condition under which it could be reopened, plus an authored `OPEN` → `CLOSED` history transition on that date. `OPEN` records carry no current closure object. Reopening is represented by an authored `CLOSED` → `OPEN` history transition and removal of current closure metadata.
+
+`CLOSED` never means “the problem does not exist” unless the evidence genuinely supports the narrower `RESOLVED` conclusion. Stopping a research method means only that the method is no longer being pursued; it does not itself close the Problem. Resolution means evidence supports that the material gap has been resolved. A currentness-based closure says current manifestation is not demonstrated, not that it ceased. An out-of-scope closure says the available evidence falls outside programme boundaries, not that the issue does not exist. Reopening may be considered when the authored `reopen_condition` is met; that remains a human-owned canonical decision.
+
+A late Source, stakeholder response or new Evidence becomes incoming research and does not automatically reopen a closed PRB. Reopening remains a human-owned canonical decision.
+
 ### Current investigation state
 
 The Problem owns the current human-authored research standing of the investigation.

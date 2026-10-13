@@ -230,6 +230,10 @@ export interface PrbDetailsData extends PrbIdentityData {
   causalReading: string | null;
   geographyScope: PrbScope | null;
   status: string | null;
+  closureReason: string | null;
+  closureExplanation: string | null;
+  closureClosedAt: string | null;
+  reopenCondition: string | null;
   evidenceStatus: string | null;
   validationStatus: string | null;
   openQuestionCount: number;
@@ -258,6 +262,10 @@ export function buildPrbDetailsData(projection: ProblemProjection): PrbDetailsDa
     causalReading: fieldValue(record, "causal_reading"),
     geographyScope: scope(record),
     status: fieldValue(record, "status"),
+    closureReason: fieldValue(recordValue(record.closure) ?? {}, "reason"),
+    closureExplanation: fieldValue(recordValue(record.closure) ?? {}, "explanation"),
+    closureClosedAt: fieldValue(recordValue(record.closure) ?? {}, "closed_at"),
+    reopenCondition: fieldValue(recordValue(record.closure) ?? {}, "reopen_condition"),
     evidenceStatus: fieldValue(record, "evidence_status"),
     validationStatus: fieldValue(record, "validation_status"),
     openQuestionCount: openQuestions(record).length,

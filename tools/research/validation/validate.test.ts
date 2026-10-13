@@ -201,3 +201,34 @@ test("PRB authored relationship, investigation and decision-basis structures are
   assert.match(decisionBasis, /field "decision_basis\.manifestation\.invented" is not an allowed field/);
   assert.match(decisionBasis, /field "decision_basis\.manifestation\.evidence\[0\]" must be a string/);
 });
+
+
+test("PRB lifecycle closure metadata and authored transitions stay consistent", () => {
+  assert.deepEqual(validateCorpusIndex(loadCorpusIndex(root)).errors, []);
+  const valid = loadCorpusIndex(root);
+  const record = prb(valid);
+  record.status = "CLOSED";
+  record.updated_at = "2026-09-01";
+  record.evidence_status = "discovered"; record.validation_status = "unvalidated";
+  record.closure = { reason: "OUT_OF_SCOPE", explanation: "O registo excede o \u00e2mbito definido.", reopen_condition: "O programa passa a abranger este \u00e2mbito.", closed_at: "2026-08-28" };
+  record.history = [{ date: "2026-08-28", summary: "Encerramento do registo.", state_changes: { status: { from: "OPEN", to: "CLOSED" } } }];
+  assert.deepEqual(validateCorpusIndex(valid).errors, []);
+
+  assert.match(errorsAfter((index) => { prb(index).status = "REJECTED"; }), /status.*invalid value/);
+  assert.match(errorsAfter((index) => { prb(index).status = "CLOSED"; }), /requires closure metadata/);
+  for (const field of ["reason", "explanation", "reopen_condition", "closed_at"]) {
+    assert.match(errorsAfter((index) => { const r = prb(index); r.status = "CLOSED"; r.closure = { reason: "RESOLVED", explanation: "x", reopen_condition: "y", closed_at: "2026-08-28" }; r.history = [{ date: "2026-08-28", summary: "Fecho.", state_changes: { status: { from: "OPEN", to: "CLOSED" } } }]; delete r.closure[field]; }), new RegExp(`closure\.${field}`));
+  }
+  assert.match(errorsAfter((index) => { const r = prb(index); r.closure = { reason: "OTHER" }; }), /closure\.reason.*invalid value/);
+  assert.match(errorsAfter((index) => { const r = prb(index); r.closure = { reason: "RESOLVED", explanation: " ", reopen_condition: "x", closed_at: "2026-08-28" }; }), /closure\.explanation/);
+  assert.match(errorsAfter((index) => { const r = prb(index); r.closure = { reason: "RESOLVED", explanation: "x", reopen_condition: " ", closed_at: "2026-08-28" }; }), /closure\.reopen_condition/);
+  assert.match(errorsAfter((index) => { const r = prb(index); r.closure = { reason: "RESOLVED", explanation: "x", reopen_condition: "y", closed_at: "2026-02-30" }; }), /closure\.closed_at.*valid calendar date/);
+  assert.match(errorsAfter((index) => { const r = prb(index); r.status = "CLOSED"; r.updated_at = "2026-08-27"; r.closure = { reason: "RESOLVED", explanation: "x", reopen_condition: "y", closed_at: "2026-08-28" }; r.history = [{ date: "2026-08-28", summary: "Fecho.", state_changes: { status: { from: "OPEN", to: "CLOSED" } } }]; }), /closure.closed_at must not be later/);
+  assert.match(errorsAfter((index) => { prb(index).closure = {}; }), /OPEN Problem must not contain/);
+  assert.match(errorsAfter((index) => { prb(index).history = [{ date: "2026-08-28", summary: "Fecho.", state_changes: { status: { from: "OPEN", to: "CLOSED" } } }]; }), /final lifecycle history transition must match current status/);
+  assert.match(errorsAfter((index) => { const r = prb(index); r.status = "CLOSED"; r.closure = { reason: "RESOLVED", explanation: "x", reopen_condition: "y", closed_at: "2026-08-28" }; }), /requires authored OPEN to CLOSED history/);
+  assert.match(errorsAfter((index) => { const r = prb(index); r.status = "CLOSED"; r.updated_at = "2026-09-01"; r.closure = { reason: "RESOLVED", explanation: "x", reopen_condition: "y", closed_at: "2026-08-28" }; r.history = [{ date: "2026-08-27", summary: "Fecho.", state_changes: { status: { from: "OPEN", to: "CLOSED" } } }]; }), /requires authored OPEN to CLOSED history/);
+  assert.match(errorsAfter((index) => { const r = prb(index); r.closure = { unexpected: true }; }), /closure.unexpected.*not an allowed field/);
+  const reopened = loadCorpusIndex(root); const reopenedPrb = prb(reopened); reopenedPrb.history = [{ date: "2026-08-28", summary: "Fecho.", state_changes: { status: { from: "OPEN", to: "CLOSED" } } }, { date: "2026-08-30", summary: "Reabertura.", state_changes: { status: { from: "CLOSED", to: "OPEN" } } }];
+  assert.deepEqual(validateCorpusIndex(reopened).errors, []);
+});

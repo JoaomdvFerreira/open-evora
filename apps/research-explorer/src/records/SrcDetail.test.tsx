@@ -286,7 +286,7 @@ describe("SRC Detail — relation state", () => {
     const relations = ready({ evidence: [evidence], uniqueEvidenceCount: 1, relatedProblems: [{ problemId: "PRB-1", viaEvidenceIds: ["EVD-1"] }, { problemId: "PRB-2", viaEvidenceIds: ["EVD-1"] }], problemDomainCodes: {} });
     const mixed = new Map<string, RecordSummary>([
       ["PRB-1", { id: "PRB-1", type: "PRB-", label: "Um", file: "", summaryFields: { status: "OPEN" } }],
-      ["PRB-2", { id: "PRB-2", type: "PRB-", label: "Dois", file: "", summaryFields: { status: "REJECTED" } }],
+      ["PRB-2", { id: "PRB-2", type: "PRB-", label: "Dois", file: "", summaryFields: { status: "CLOSED" } }],
     ]);
     const { unmount } = renderSrc(src, { lookup: mixed, relations });
     expect(screen.getByText("A Open Évora extraiu desta fonte 1 observação, usada em 2 problemas.")).toBeTruthy();

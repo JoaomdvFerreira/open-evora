@@ -2,10 +2,9 @@ import { describe, expect, it } from "vitest";
 import { glossFor } from "./statusGloss";
 
 describe("glossFor", () => {
-  it("returns a grounded gloss for OPEN, defined negatively via the terminal-outcome list", () => {
+  it("returns the lifecycle label for OPEN without defining closure as a list of prior terminal outcomes", () => {
     const gloss = glossFor("status", "OPEN");
     expect(gloss?.label).toBe("Aberto");
-    expect(gloss?.explanation).toMatch(/resultados terminais/);
   });
 
   it("returns a grounded gloss for validation_status's three D5-contract values", () => {

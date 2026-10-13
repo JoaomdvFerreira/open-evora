@@ -31,11 +31,7 @@ export interface StateVisual {
 
 const LIFECYCLE_VISUALS: Record<string, StateVisual> = {
   OPEN: { tone: "open", icon: IconStateOpen },
-  REJECTED: { tone: "closed", icon: IconStateClosed },
-  DUPLICATE: { tone: "closed", icon: IconStateClosed },
-  NON_DIGITAL: { tone: "closed", icon: IconStateClosed },
-  ALREADY_SOLVED: { tone: "affirmed", icon: IconStateAffirmed },
-  INSUFFICIENT_EVIDENCE: { tone: "closed", icon: IconStateClosed },
+  CLOSED: { tone: "closed", icon: IconStateClosed },
 };
 
 const VALIDATION_VISUALS: Record<string, StateVisual> = {

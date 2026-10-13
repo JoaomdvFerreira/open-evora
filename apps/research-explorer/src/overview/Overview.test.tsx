@@ -7,8 +7,11 @@ import { getLisbonCivilDate, isDateInCivilWeekOf } from "./overviewStats";
 import { describeTopic } from "../presentation/topicMapping";
 
 function makeProvider(index: RecordSummary[]): DataProvider {
+  const indexedRecords = index.map((summary) => summary.type === "PRB-" && !Object.prototype.hasOwnProperty.call(summary.summaryFields, "status")
+    ? { ...summary, summaryFields: { ...summary.summaryFields, status: "OPEN" } }
+    : summary);
   const details: Record<string, RecordDetail> = Object.fromEntries(
-    index.map((summary) => [
+    indexedRecords.map((summary) => [
       summary.id,
       {
         id: summary.id,
@@ -27,13 +30,33 @@ function makeProvider(index: RecordSummary[]): DataProvider {
   );
   return {
     getManifest: async () => { throw new Error("unused"); },
-    listRecords: async () => index,
+    listRecords: async () => indexedRecords,
     getEdges: async () => [],
     getRecord: async (id) => details[id],
   };
 }
 
 const props = { onExploreProblem: vi.fn() };
+
+it("keeps closed Problems outside active discovery and exposes them in a separate section", async () => {
+  const provider = makeProvider([
+    { id: "PRB-OPEN", type: "PRB-", label: "Problema ativo", file: "", summaryFields: { status: "OPEN" } },
+    { id: "PRB-CLOSED", type: "PRB-", label: "Problema encerrado", file: "", summaryFields: { status: "CLOSED" } },
+  ]);
+  render(<OverviewFixture dataProvider={provider} onExploreProblem={vi.fn()} />);
+  expect(await screen.findByRole("heading", { name: "Problemas encerrados" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Explorar Problema ativo" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Explorar Problema encerrado" })).toBeTruthy();
+  expect(screen.getByText("1 de 1 problemas")).toBeTruthy();
+  expect(within(screen.getByRole("region", { name: "Explorar problemas" })).getByRole("button", { name: "Explorar Problema ativo" })).toBeTruthy();
+});
+
+it("omits the closed section when the corpus has no closed Problems", async () => {
+  const provider = makeProvider([{ id: "PRB-OPEN", type: "PRB-", label: "Problema ativo", file: "", summaryFields: { status: "OPEN" } }]);
+  render(<OverviewFixture dataProvider={provider} onExploreProblem={vi.fn()} />);
+  await screen.findByRole("button", { name: "Explorar Problema ativo" });
+  expect(screen.queryByRole("heading", { name: "Problemas encerrados" })).toBeNull();
+});
 
 it("uses the Overview macro-layout skeleton while the index loads", () => {
   const pending: DataProvider = {
@@ -128,15 +151,13 @@ describe("Overview — Problem investigation-state dimensions", () => {
     expect(row?.textContent).not.toMatch(/Validação:/);
   });
 
-  it("omits only the lifecycle text when status is null", async () => {
+  it("excludes a Problem with no lifecycle status from active discovery", async () => {
     const provider = makeProvider([
-      { id: "PRB-2", type: "PRB-", label: "Problema sem estado de ciclo de vida", file: "", summaryFields: { validation_status: "unvalidated", evidence_status: "corroborated" } },
+      { id: "PRB-2", type: "PRB-", label: "Problema sem estado de ciclo de vida", file: "", summaryFields: { status: null, validation_status: "unvalidated", evidence_status: "corroborated" } },
     ]);
     render(<OverviewFixture dataProvider={provider} {...props} />);
-
-    const row = (await screen.findByText("PRB-2")).closest(".overview-problem-row-meta");
-    expect(row?.querySelector(".prb-status-chip")?.textContent).toMatch(/Evidência:\s*Corroborada/);
-    expect(within(row as HTMLElement).queryByText("Aberto")).toBeNull();
+    expect(screen.queryByText("PRB-2")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Problemas encerrados" })).toBeNull();
   });
 
   it("omits only the evidence chip when evidence_status is null", async () => {
@@ -150,16 +171,7 @@ describe("Overview — Problem investigation-state dimensions", () => {
     expect(row?.querySelector(".prb-status-chip")).toBeNull();
   });
 
-  it("omits both the evidence chip and lifecycle text when both dimensions are null", async () => {
-    const provider = makeProvider([
-      { id: "PRB-4", type: "PRB-", label: "Problema sem dimensões", file: "", summaryFields: {} },
-    ]);
-    render(<OverviewFixture dataProvider={provider} {...props} />);
 
-    const row = (await screen.findByText("PRB-4")).closest(".overview-problem-row-meta");
-    expect(row?.querySelector(".prb-status-chip")).toBeNull();
-    expect(row?.querySelector(".overview-problem-row-lifecycle")).toBeNull();
-  });
 });
 
 describe("Overview — final Hero", () => {
@@ -509,13 +521,13 @@ describe("Overview — Filtros disclosure and category drawer", () => {
   it("composes search, category selection, and sort together", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Mobilidade corroborada aberta", file: "", summaryFields: { status: "OPEN", evidence_status: "corroborated" } },
-      { id: "PRB-2", type: "PRB-", label: "Mobilidade discovered fechada", file: "", summaryFields: { status: "REJECTED", evidence_status: "discovered" } },
+      { id: "PRB-2", type: "PRB-", label: "Mobilidade discovered fechada", file: "", summaryFields: { status: "CLOSED", evidence_status: "discovered" } },
       { id: "PRB-3", type: "PRB-", label: "Espaço público corroborado aberto", file: "", summaryFields: { status: "OPEN", evidence_status: "corroborated" } },
     ]);
     provider.getRecord = async (id) => {
       const domain = id === "PRB-3" ? ["PUB"] : ["MOB"];
       const title = id === "PRB-1" ? "Mobilidade corroborada aberta" : id === "PRB-2" ? "Mobilidade discovered fechada" : "Espaço público corroborado aberto";
-      return { id, type: "PRB-", file: "", record: { title, domain, status: id === "PRB-2" ? "REJECTED" : "OPEN" }, outgoingEdges: [], incomingEdges: [] };
+      return { id, type: "PRB-", file: "", record: { title, domain, status: id === "PRB-2" ? "CLOSED" : "OPEN" }, outgoingEdges: [], incomingEdges: [] };
     };
     const user = userEvent.setup();
     render(<OverviewFixture dataProvider={provider} {...props} />);
@@ -528,7 +540,8 @@ describe("Overview — Filtros disclosure and category drawer", () => {
 
     expect(await screen.findByText("1 problemas")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Explorar Mobilidade corroborada aberta" })).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Explorar Mobilidade discovered fechada" })).toBeNull();
+    expect(within(screen.getByRole("heading", { name: "Problemas encerrados" }).parentElement as HTMLElement)
+      .getByRole("button", { name: "Explorar Mobilidade discovered fechada" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Explorar Espaço público corroborado aberto" })).toBeNull();
   });
 
@@ -807,14 +820,14 @@ describe("Overview — end-of-results row", () => {
  */
 describe("Overview — material-change row treatment", () => {
   function providerWithHistory(problems: { id: string; label: string; history?: { date: string; summary: string }[]; domain?: string[] }[]): DataProvider {
-    const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: {} }));
+    const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: { status: "OPEN" } }));
     return {
       getManifest: async () => { throw new Error("unused"); },
       listRecords: async () => index,
       getEdges: async () => [],
       getRecord: async (id) => {
         const p = problems.find((entry) => entry.id === id)!;
-        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], history: p.history }, outgoingEdges: [], incomingEdges: [] };
+        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], status: "OPEN", history: p.history }, outgoingEdges: [], incomingEdges: [] };
       },
     };
   }
@@ -882,8 +895,8 @@ describe("Overview — material-change row treatment", () => {
     });
     provider.getRecord = getRecord;
     provider.listRecords = async () => [
-      { id: "PRB-1", type: "PRB-", label: "Problema saudável", file: "", summaryFields: {} },
-      { id: "PRB-2", type: "PRB-", label: "Problema com falha de leitura", file: "", summaryFields: {} },
+      { id: "PRB-1", type: "PRB-", label: "Problema saudável", file: "", summaryFields: { status: "OPEN" } },
+      { id: "PRB-2", type: "PRB-", label: "Problema com falha de leitura", file: "", summaryFields: { status: "OPEN" } },
     ];
     render(<OverviewFixture dataProvider={provider} {...props} />);
 
@@ -957,18 +970,60 @@ describe("Overview — material-change row treatment", () => {
 });
 
 describe("Overview — Alterados esta semana shortcut", () => {
-  function providerWithHistory(problems: { id: string; label: string; history?: { date: string; summary: string }[]; domain?: string[] }[]): DataProvider {
-    const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: {} }));
+  function providerWithHistory(problems: { id: string; label: string; history?: { date: string; summary: string }[]; domain?: string[]; status?: "OPEN" | "CLOSED" }[]): DataProvider {
+    const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: { status: p.status ?? "OPEN" } }));
     return {
       getManifest: async () => { throw new Error("unused"); },
       listRecords: async () => index,
       getEdges: async () => [],
       getRecord: async (id) => {
         const p = problems.find((entry) => entry.id === id)!;
-        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], history: p.history }, outgoingEdges: [], incomingEdges: [] };
+        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], status: p.status ?? "OPEN", history: p.history }, outgoingEdges: [], incomingEdges: [] };
       },
     };
   }
+
+  it("excludes a changed CLOSED Problem from the active shortcut count and results", async () => {
+    const monday = thisWeekMonday();
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Encerrado com alteração", status: "CLOSED", history: [{ date: monday, summary: "Alteração em Problem encerrado." }] },
+      { id: "PRB-2", label: "Aberto sem alteração", status: "OPEN" },
+    ]);
+    const user = userEvent.setup();
+    render(<OverviewFixture dataProvider={provider} {...props} />);
+
+    await screen.findByText("Aberto sem alteração");
+    await user.click(openDrawer());
+    const shortcut = screen.getByRole("button", { name: /^Alterados esta semana/ });
+    expect(shortcut.textContent?.replace(/\s+/g, " ").trim()).toBe("Alterados esta semana 0");
+    await user.click(shortcut);
+
+    expect(await screen.findByText("0 problemas")).toBeTruthy();
+    const closedResult = screen.getByRole("button", { name: "Explorar Encerrado com alteração" });
+    expect(closedResult.closest(".overview-closed-problems")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Explorar Aberto sem alteração" })).toBeNull();
+  });
+
+  it("counts and returns only changed OPEN Problems when OPEN and CLOSED both changed this week", async () => {
+    const monday = thisWeekMonday();
+    const provider = providerWithHistory([
+      { id: "PRB-1", label: "Encerrado com alteração", status: "CLOSED", history: [{ date: monday, summary: "Alteração em Problem encerrado." }] },
+      { id: "PRB-2", label: "Aberto com alteração", status: "OPEN", history: [{ date: monday, summary: "Alteração em Problem aberto." }] },
+    ]);
+    const user = userEvent.setup();
+    render(<OverviewFixture dataProvider={provider} {...props} />);
+
+    await screen.findByText("Aberto com alteração");
+    await user.click(openDrawer());
+    const shortcut = screen.getByRole("button", { name: /^Alterados esta semana/ });
+    expect(shortcut.textContent?.replace(/\s+/g, " ").trim()).toBe("Alterados esta semana 1");
+    await user.click(shortcut);
+
+    expect(await screen.findByText("1 problemas")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Explorar Aberto com alteração" })).toBeTruthy();
+    const closedResult = screen.getByRole("button", { name: "Explorar Encerrado com alteração" });
+    expect(closedResult.closest(".overview-closed-problems")).toBeTruthy();
+  });
 
   it("always renders the shortcut in the open drawer, including at a truthful count of 0", async () => {
     const provider = providerWithHistory([{ id: "PRB-1", label: "Problema sem alterações" }]);
@@ -1184,14 +1239,14 @@ describe("Overview — Alterados esta semana shortcut", () => {
  */
 describe("Overview — Lisbon civil-date-boundary hardening", () => {
   function providerWithHistory(problems: { id: string; label: string; history?: { date: string; summary: string }[]; domain?: string[] }[]): DataProvider {
-    const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: {} }));
+    const index: RecordSummary[] = problems.map((p) => ({ id: p.id, type: "PRB-", label: p.label, file: "", summaryFields: { status: "OPEN" } }));
     return {
       getManifest: async () => { throw new Error("unused"); },
       listRecords: async () => index,
       getEdges: async () => [],
       getRecord: async (id) => {
         const p = problems.find((entry) => entry.id === id)!;
-        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], history: p.history }, outgoingEdges: [], incomingEdges: [] };
+        return { id, type: "PRB-", file: "", record: { title: p.label, domain: p.domain ?? [], status: "OPEN", history: p.history }, outgoingEdges: [], incomingEdges: [] };
       },
     };
   }
@@ -1320,7 +1375,7 @@ describe("Overview — error state retry (ODM-021)", () => {
           ? Promise.reject(new DataLoadError("falha temporária", "network"))
           : Promise.resolve([{ id: "PRB-9", type: "PRB-", label: "Problema recuperado", file: "", summaryFields: {} }]),
       getEdges: async () => [],
-      getRecord: async (id) => ({ id, type: "PRB-", file: "", record: { title: "Problema recuperado" }, outgoingEdges: [], incomingEdges: [] }),
+      getRecord: async (id) => ({ id, type: "PRB-", file: "", record: { title: "Problema recuperado", status: "OPEN" }, outgoingEdges: [], incomingEdges: [] }),
     };
     const user = userEvent.setup();
     render(<OverviewFixture dataProvider={provider} {...props} />);

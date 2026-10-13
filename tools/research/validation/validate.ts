@@ -455,6 +455,44 @@ function validatePrbHistory(
   });
 }
 
+function validatePrbLifecycle(file: string, record: RecordFields, errors: string[]): void {
+  const closure = record.closure;
+  const status = record.status;
+  if (status === "OPEN" && closure !== undefined) errors.push(`[${file}] OPEN Problem must not contain current closure metadata`);
+  if (status === "CLOSED" && (closure === undefined || closure === null || typeof closure !== "object" || Array.isArray(closure))) {
+    errors.push(`[${file}] CLOSED Problem requires closure metadata`);
+  }
+  if (closure && typeof closure === "object" && !Array.isArray(closure)) {
+    const c = closure as Record<string, unknown>;
+    validatePrbObjectKeys(file, "closure", c, ["reason", "explanation", "reopen_condition", "closed_at"], errors);
+    for (const key of ["reason", "explanation", "reopen_condition", "closed_at"] as const) {
+      if (status === "CLOSED" && (typeof c[key] !== "string" || c[key].trim() === "")) errors.push(`[${file}] missing required non-empty field: closure.${key}`);
+    }
+    if (typeof c.explanation === "string" && !c.explanation.trim()) errors.push(`[${file}] field "closure.explanation" must be non-empty`);
+    if (typeof c.reopen_condition === "string" && !c.reopen_condition.trim()) errors.push(`[${file}] field "closure.reopen_condition" must be non-empty`);
+    if (typeof c.closed_at === "string" && typeof record.updated_at === "string" && c.closed_at > record.updated_at) errors.push(`[${file}] closure.closed_at must not be later than updated_at`);
+  }
+  const history = Array.isArray(record.history) ? record.history : [];
+  const transitions = history.flatMap((raw) => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return [];
+    const item = raw as Record<string, unknown>;
+    const changes = item.state_changes;
+    if (!changes || typeof changes !== "object" || Array.isArray(changes)) return [];
+    const statusChange = (changes as Record<string, unknown>).status;
+    if (!statusChange || typeof statusChange !== "object" || Array.isArray(statusChange)) return [];
+    const t = statusChange as Record<string, unknown>;
+    if (t.from !== "OPEN" && t.from !== "CLOSED" || t.to !== "OPEN" && t.to !== "CLOSED") return [];
+    return [{ date: item.date, from: t.from, to: t.to }];
+  });
+  if (status === "CLOSED") {
+    const closureDate = (closure as Record<string, unknown> | undefined)?.closed_at;
+    const matching = transitions.find((t) => t.from === "OPEN" && t.to === "CLOSED" && t.date === closureDate);
+    if (!matching) errors.push(`[${file}] CLOSED Problem requires authored OPEN to CLOSED history dated closure.closed_at`);
+  }
+  const final = transitions.at(-1);
+  if (final && final.to !== status) errors.push(`[${file}] final lifecycle history transition must match current status`);
+}
+
 function validateNestedPrbEvidenceMembership(file: string, record: RecordFields, errors: string[]): void {
   const linked = new Set(
     (Array.isArray(record.evidence) ? record.evidence : []).map((entry) => entry && typeof entry === "object" && !Array.isArray(entry) ? (entry as Record<string, unknown>).evidence_id : undefined).filter((id): id is string => typeof id === "string")
@@ -642,6 +680,7 @@ export function validateCorpusIndex(index: CorpusIndex): ValidationResult {
         validateNestedPrbEvidenceMembership(file, fields, errors);
         validateInvestigation(file, fields, evidenceById, errors);
         validatePrbHistory(file, fields, schema, evidenceById, errors);
+        validatePrbLifecycle(file, fields, errors);
       }
     }
   }

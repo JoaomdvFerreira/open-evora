@@ -30,7 +30,7 @@ const details: Record<string, RecordDetail> = {
     id: "PRB-0001", type: "PRB-", file: "research/problems/PRB-0001.yaml", incomingEdges: [], outgoingEdges: [],
     record: { title: "Sem histórico", problem_statement: "Declaração canónica sem histórico.", domain: ["MOB"], updated_at: "2026-09-20" },
   },
-  "PRB-0002": { id: "PRB-0002", type: "PRB-", file: "research/problems/PRB-0002.yaml", incomingEdges: [], outgoingEdges: [], record: { title: "Com transição", history: [{ date: "2026-08-27", summary: "Entrada anterior." }, { date: "2026-08-28", summary: "Mudança de estado.", state_changes: { status: { from: "OPEN", to: "NON_DIGITAL" } } }] } },
+  "PRB-0002": { id: "PRB-0002", type: "PRB-", file: "research/problems/PRB-0002.yaml", incomingEdges: [], outgoingEdges: [], record: { title: "Com transição", history: [{ date: "2026-08-27", summary: "Entrada anterior." }, { date: "2026-08-28", summary: "Mudança de estado.", state_changes: { status: { from: "OPEN", to: "CLOSED" } } }] } },
   "PRB-0003": {
     id: "PRB-0003", type: "PRB-", file: "research/problems/PRB-0003.yaml", incomingEdges: [], outgoingEdges: [],
     record: {
@@ -280,7 +280,7 @@ describe("ProblemHistoryView — material history", () => {
     const changes = screen.getByRole("definition").closest("dl") as HTMLElement;
     expect(changes.getAttribute("aria-label")).toBe("Alterações de estado");
     expect(within(changes).getByText("Estado")).toBeTruthy();
-    expect(within(changes).getByText("Aberto → Não digital")).toBeTruthy();
+    expect(within(changes).getByText("Aberto \u2192 Encerrado")).toBeTruthy();
     expect(document.querySelectorAll(".prb-history-entry-meta")).toHaveLength(1);
   });
 

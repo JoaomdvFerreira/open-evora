@@ -50,7 +50,7 @@ describe("computeOverviewStats", () => {
     const records = [
       summary({ id: "PRB-0001", summaryFields: { status: "OPEN" } }),
       summary({ id: "PRB-0002", summaryFields: { status: "OPEN" } }),
-      summary({ id: "PRB-0003", summaryFields: { status: "REJECTED" } }),
+      summary({ id: "PRB-0003", summaryFields: { status: "CLOSED" } }),
       summary({ id: "PRB-0004", summaryFields: { status: "OPEN" } }),
     ];
     const stats = computeOverviewStats(records);
@@ -58,7 +58,7 @@ describe("computeOverviewStats", () => {
     expect(statusDist).toBeDefined();
     expect(statusDist!.values).toEqual([
       { value: "OPEN", count: 3 },
-      { value: "REJECTED", count: 1 },
+      { value: "CLOSED", count: 1 },
     ]);
   });
 
@@ -117,19 +117,22 @@ describe("computePublicOverviewData", () => {
   it("derives PRB-only ordered public entries and PRB/EVD counts from arbitrary index data", () => {
     const data = computePublicOverviewData([
       summary({ id: "EVD-0002", type: "EVD-", label: "Evidence two" }),
-      summary({ id: "PRB-0010", type: "PRB-", label: "Later problem", summaryFields: { validation_status: "validated", evidence_status: "discovered" } }),
+      summary({ id: "PRB-0010", type: "PRB-", label: "Later problem", summaryFields: { status: "OPEN", validation_status: "validated", evidence_status: "discovered" } }),
       summary({ id: "SRC-0001", type: "SRC-", label: "Source" }),
-      summary({ id: "PRB-0002", type: "PRB-", label: "Earlier problem", summaryFields: { validation_status: "unvalidated", evidence_status: "corroborated" } }),
+      summary({ id: "PRB-0002", type: "PRB-", label: "Earlier problem", summaryFields: { status: "OPEN", validation_status: "unvalidated", evidence_status: "corroborated" } }),
       summary({ id: "EVD-0001", type: "EVD-", label: "Evidence one" }),
+      summary({ id: "PRB-0001", type: "PRB-", label: "Closed problem", summaryFields: { status: "CLOSED" } }),
     ]);
 
     expect(data.problemCount).toBe(2);
+    expect(data.totalProblemCount).toBe(3);
     expect(data.evidenceCount).toBe(2);
     expect(data.sourceCount).toBe(1);
-    expect(data.totalRecordCount).toBe(5);
+    expect(data.totalRecordCount).toBe(6);
     expect(data.problems).toEqual([
-      { id: "PRB-0002", title: "Earlier problem", validationStatus: "unvalidated", evidenceStatus: "corroborated" },
-      { id: "PRB-0010", title: "Later problem", validationStatus: "validated", evidenceStatus: "discovered" },
+      { id: "PRB-0001", lifecycleStatus: "CLOSED", title: "Closed problem", validationStatus: null, evidenceStatus: null },
+      { id: "PRB-0002", lifecycleStatus: "OPEN", title: "Earlier problem", validationStatus: "unvalidated", evidenceStatus: "corroborated" },
+      { id: "PRB-0010", lifecycleStatus: "OPEN", title: "Later problem", validationStatus: "validated", evidenceStatus: "discovered" },
     ]);
   });
 });

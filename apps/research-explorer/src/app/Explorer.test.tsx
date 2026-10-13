@@ -1029,7 +1029,7 @@ describe("Explorer — Overview discovery-context preservation across Problem na
       const id = `PRB-${String(i).padStart(4, "0")}`;
       const domain = i % 2 === 0 ? "PUB" : "MOB";
       const title = i === 1 ? "Pressão de estacionamento em Évora" : `Problema sintético ${String(i).padStart(2, "0")}`;
-      index.push({ id, type: "PRB-", label: title, file: "", summaryFields: {} });
+      index.push({ id, type: "PRB-", label: title, file: "", summaryFields: { status: "OPEN" } });
       details[id] = {
         id,
         type: "PRB-",
@@ -1037,7 +1037,7 @@ describe("Explorer — Overview discovery-context preservation across Problem na
         // PRB-0001 alone carries a this-week material change, so the
         // `Alterados esta semana` shortcut (test C below) has exactly one
         // real result to open, rather than filtering to zero.
-        record: { title, domain: [domain], history: i === 1 ? [{ date: today, summary: "Alteração desta semana." }] : undefined },
+        record: { title, domain: [domain], status: "OPEN", history: i === 1 ? [{ date: today, summary: "Alteração desta semana." }] : undefined },
         outgoingEdges: [],
         incomingEdges: [],
       };

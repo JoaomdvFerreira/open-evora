@@ -83,7 +83,12 @@
     "decision_basis.scope.population",
     "decision_basis.scope.temporal",
     "decision_basis.scope.bounded",
-    "decision_basis.limitations"
+    "decision_basis.limitations",
+    "closure",
+    "closure.reason",
+    "closure.explanation",
+    "closure.reopen_condition",
+    "closure.closed_at"
   ],
   "fieldTypes": {
     "problem_id": [
@@ -272,6 +277,21 @@
     ],
     "decision_basis.limitations": [
       "string"
+    ],
+    "closure": [
+      "object"
+    ],
+    "closure.reason": [
+      "string"
+    ],
+    "closure.explanation": [
+      "string"
+    ],
+    "closure.reopen_condition": [
+      "string"
+    ],
+    "closure.closed_at": [
+      "string"
     ]
   },
   "enums": {
@@ -296,16 +316,20 @@
     ],
     "status": [
       "OPEN",
-      "REJECTED",
-      "DUPLICATE",
-      "NON_DIGITAL",
-      "ALREADY_SOLVED",
-      "INSUFFICIENT_EVIDENCE"
+      "CLOSED"
+    ],
+    "closure.reason": [
+      "NOT_DEMONSTRATED_CURRENT",
+      "RESOLVED",
+      "NO_FOLLOWABLE_INFORMATION",
+      "SUPERSEDED",
+      "OUT_OF_SCOPE"
     ]
   },
   "patterns": {
     "created_at": "\\d{4}-\\d{2}-\\d{2}",
-    "updated_at": "\\d{4}-\\d{2}-\\d{2}"
+    "updated_at": "\\d{4}-\\d{2}-\\d{2}",
+    "closure.closed_at": "\\d{4}-\\d{2}-\\d{2}"
   },
   "booleanFields": [
     "decision_basis.scope.bounded",
@@ -387,6 +411,7 @@
   ],
   "calendarDateFields": [
     "created_at",
-    "updated_at"
+    "updated_at",
+    "closure.closed_at"
   ]
 }

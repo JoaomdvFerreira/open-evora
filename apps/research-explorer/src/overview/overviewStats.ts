@@ -21,6 +21,7 @@ export interface OverviewStats {
 
 export interface OverviewProblem {
   id: string;
+  lifecycleStatus: string | null;
   title: string;
   validationStatus: string | null;
   evidenceStatus: string | null;
@@ -28,6 +29,7 @@ export interface OverviewProblem {
 
 export interface PublicOverviewData {
   problemCount: number;
+  totalProblemCount: number;
   evidenceCount: number;
   sourceCount: number;
   /** The canonical corpus total — every record in the loaded index, every
@@ -105,6 +107,7 @@ export function computePublicOverviewData(records: RecordSummary[]): PublicOverv
     .filter((record) => record.type === "PRB-")
     .map((record) => ({
       id: record.id,
+      lifecycleStatus: typeof record.summaryFields.status === "string" ? record.summaryFields.status : null,
       title: record.label,
       validationStatus: typeof record.summaryFields.validation_status === "string" ? record.summaryFields.validation_status : null,
       evidenceStatus: typeof record.summaryFields.evidence_status === "string" ? record.summaryFields.evidence_status : null,
@@ -112,7 +115,8 @@ export function computePublicOverviewData(records: RecordSummary[]): PublicOverv
     .sort((a, b) => a.id.localeCompare(b.id));
 
   return {
-    problemCount: problems.length,
+    problemCount: problems.filter((problem) => problem.lifecycleStatus === "OPEN").length,
+    totalProblemCount: problems.length,
     evidenceCount: records.filter((record) => record.type === "EVD-").length,
     sourceCount: records.filter((record) => record.type === "SRC-").length,
     totalRecordCount: records.length,
