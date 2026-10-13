@@ -65,7 +65,7 @@ describe("SRC Detail — canonical regression cases", () => {
     const checked = screen.getByText(/^Verificada em/);
     expect(checked.textContent).toBe("Verificada em 10 ago 2026");
     expect(checked.querySelector("time")?.dateTime).toBe("2026-08-10");
-    expect(screen.getByText("A Open Évora extraiu desta fonte 7 observações, usadas em 6 problemas em investigação.")).toBeTruthy();
+    expect(screen.getByText("A Open Évora extraiu desta fonte 7 observações, usadas em 5 problemas em investigação.")).toBeTruthy();
   });
 
   it("SRC-0002 maps the six public metadata facts from canonical data and the one relation state", () => {
@@ -76,7 +76,7 @@ describe("SRC Detail — canonical regression cases", () => {
       Temas: "8 temas",
       Acesso: "Público · PDF",
       Reutilização: "Desconhecida",
-      Observações: "7 · 6 problemas",
+      Observações: "7 · 5 problemas",
     });
   });
 
@@ -107,24 +107,18 @@ describe("SRC Detail — canonical regression cases", () => {
     const { onViewAsProblem } = renderSrc(detail("SRC-0002"));
     const investigation = screen.getByRole("region", { name: "Na investigação" });
     const rows = investigation.querySelectorAll(".src-problem");
-    expect(Array.from(rows).map((row) => row.querySelector(".rec-identifier")?.textContent)).toEqual(["PRB-0001", "PRB-0003", "PRB-0006", "PRB-0013", "PRB-0007", "PRB-0008"]);
+    expect(Array.from(rows).map((row) => row.querySelector(".rec-identifier")?.textContent)).toEqual(["PRB-0001", "PRB-0003", "PRB-0006", "PRB-0007", "PRB-0008"]);
     const studentHousing = Array.from(rows).find((row) => row.querySelector(".rec-identifier")?.textContent === "PRB-0006") as HTMLElement;
-    const municipalHousing = Array.from(rows).find((row) => row.querySelector(".rec-identifier")?.textContent === "PRB-0013") as HTMLElement;
-    expect(municipalHousing).not.toBe(studentHousing);
     expect(studentHousing.querySelector(".src-problem-via")?.textContent).toBe("através de EVD-000031, EVD-000033");
-    expect(municipalHousing.querySelector(".src-problem-via")?.textContent).toBe("através de EVD-000031");
-    expect(within(municipalHousing).getByRole("button", { name: "Habitação · Social" })).toBeTruthy();
     fireEvent.click(within(studentHousing).getByRole("button", { name: "Habitação · Educação" }));
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0006");
-    fireEvent.click(within(municipalHousing).getByRole("button", { name: "Habitação · Social" }));
-    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0013");
   });
 
   it("SRC-0002 labels each Problem by its canonical domains' shared topic labels, never the truncated index title", () => {
     renderSrc(detail("SRC-0002"));
     const rows = screen.getByRole("region", { name: "Na investigação" }).querySelectorAll(".src-problem");
     const labels = Array.from(rows).map((row) => row.querySelector(".src-problem-title")?.textContent);
-    expect(labels).toEqual(["Mobilidade", "Acessibilidade · Mobilidade · Urbanismo", "Habitação · Educação", "Habitação · Social", "Social · Saúde", "Emprego · Educação · Economia"]);
+    expect(labels).toEqual(["Mobilidade", "Acessibilidade · Mobilidade · Urbanismo", "Habitação · Educação", "Social · Saúde", "Emprego · Educação · Economia"]);
     for (const label of labels) expect(label).not.toContain("…");
   });
 

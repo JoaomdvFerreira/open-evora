@@ -13,7 +13,7 @@ observation:
     de alojamento local concentradas no Centro Histórico.
 scope:
   geography:
-    level: municipality
+    level: city
     area: cidade de Évora, especialmente Centro Histórico
   populations:
     - estudantes

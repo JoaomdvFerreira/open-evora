@@ -16,11 +16,10 @@ observation:
     apenas recentemente ou transitória.
 scope:
   geography:
-    level: municipality
-    area: cidade / município
+    level: city
+    area: cidade de Évora
   populations:
     - utilizadores da rede urbana de transportes públicos
-    - residentes de localidades de baixa procura
   temporal:
     start: "2022"
     end: "2023"

@@ -1,10 +1,10 @@
 problem_id: PRB-0006
 created_at: "2026-08-28"
-updated_at: "2026-10-12"
+updated_at: "2026-10-13"
 title: "Alojamento estudantil em Évora: lugares disponíveis e procura não satisfeita"
 domain: [HOU, EDU]
 geography:
-  level: municipality
+  level: city
   area: Évora
 affected_populations:
   - estudantes que procuram alojamento em Évora, incluindo estudantes da Universidade de Évora
@@ -67,11 +67,11 @@ investigation:
   path:
     initial_signal:
       summary: >-
-        O planeamento de 2024–2025 identificou escassez de alojamento estudantil
-        e capacidade insuficiente das residências face à procura de estudantes.
-        O plano de 2025 incluiu a avaliação das necessidades de alojamento
-        estudantil e trabalho de candidatura a financiamento; não demonstra
-        que a avaliação ou as medidas tenham sido concluídas.
+        O planeamento relativo à cidade identificou escassez de alojamento
+        estudantil e capacidade insuficiente das residências face à procura de
+        estudantes (EVD-000033). O planeamento municipal mais amplo
+        (EVD-000031, EVD-000032) é contexto e prevê avaliação de necessidades e
+        trabalho de candidatura a financiamento, sem demonstrar conclusão.
       evidence: [EVD-000031, EVD-000032, EVD-000033]
     development:
       summary: >-
@@ -83,20 +83,16 @@ investigation:
       evidence: [EVD-000043, EVD-000145, EVD-000100, EVD-000126]
     delimitation:
       summary: >-
-        A procura não satisfeita e a capacidade atualmente disponível continuam
-        por quantificar na evidência ligada. A imprensa secundária refere
-        quartos por cerca de 500 €/mês, T2 por cerca de 1 000 €/mês e
-        aproximadamente 70% de estudantes da Universidade deslocados e
-        dependentes de alojamento arrendado. Estes valores não foram verificados
-        em dados primários; a sua representatividade e o período a que se
-        aplicam não estão estabelecidos.
+        A procura não satisfeita e a capacidade atualmente disponível na cidade
+        continuam por quantificar na evidência ligada. O planeamento municipal
+        mais amplo não mede por si só a manifestação na cidade.
         A habitação municipal a preços comportáveis e as respetivas intervenções
         são tratadas separadamente em PRB-0013.
-      evidence: [EVD-000043, EVD-000099, EVD-000126]
+      evidence: [EVD-000043, EVD-000126, EVD-000031]
 evidence:
   - evidence_id: EVD-000031
-    effects: [SUPPORTS]
-    research_roles: [LOCAL_OBSERVATION]
+    effects: [REFINES]
+    research_roles: [CONTEXTUAL]
   - evidence_id: EVD-000032
     effects: [BOUNDS, REFINES]
     research_roles: [PLANNED_RESPONSE]
@@ -109,9 +105,6 @@ evidence:
   - evidence_id: EVD-000145
     effects: [BOUNDS, REFINES]
     research_roles: [PLANNED_RESPONSE]
-  - evidence_id: EVD-000099
-    effects: [SUPPORTS, REFINES]
-    research_roles: [LOCAL_OBSERVATION]
   - evidence_id: EVD-000100
     effects: [BOUNDS, REFINES]
     research_roles: [CONTEXTUAL]
@@ -143,27 +136,32 @@ history:
       validation_status:
         from: partially_validated
         to: unvalidated
+  - date: 2026-10-13
+    summary: >-
+      O proprietário fixou o âmbito na cidade de Évora; o planeamento municipal
+      mais amplo passou a contexto e foi retirada imprensa secundária que não
+      era necessária à formulação do alojamento estudantil na cidade.
 decision_basis:
   contract_version: "0.1"
   eligibility_basis: >-
-    O problema diz respeito aos estudantes que procuram alojamento em Évora,
+    O problema diz respeito aos estudantes que procuram alojamento na cidade de Évora,
     particularmente aos lugares nas residências da Universidade de Évora e à
     procura que essas residências não consigam satisfazer. O planeamento
-    identifica escassez específica (EVD-000031, EVD-000033), e a informação da
+    identifica escassez específica na cidade (EVD-000033), e a informação da
     Universidade e dos SASUÉ documenta capacidade nominal, encerramentos
     temporários e encaminhamento para alternativas (EVD-000043). A delimitação
     distingue este problema da habitação municipal geral em PRB-0013. Não
     pressupõe uma solução digital nem quantifica a procura atual não satisfeita.
+    EVD-000031 é contexto de planeamento municipal, não prova direta da cidade.
   corroboration_basis: >-
-    EVD-000031 e EVD-000033 sustentam que o planeamento de 2024–2025 reconheceu
-    escassez de alojamento estudantil; pertencem a uma família institucional
-    sobreposta e não contam como duas vozes independentes. EVD-000043 acrescenta
+    EVD-000033 sustenta que o planeamento relativo à cidade reconheceu
+    escassez de alojamento estudantil. EVD-000031 pertence a planeamento
+    municipal mais amplo e não é contado como prova direta da cidade nem como
+    voz independente. EVD-000043 acrescenta
     uma linha institucional materialmente distinta, da Universidade de Évora e
     dos SASUÉ: 525 lugares nominais em sete residências, encerramentos
     temporários em 2025/2026 e encaminhamento para alternativas quando a
-    disponibilidade é limitada. EVD-000099 é uma classe secundária de imprensa,
-    com preços e proporção de estudantes deslocados reportados, sem verificação
-    primária nem representatividade estabelecida. Em conjunto, estas linhas
+    disponibilidade é limitada. Em conjunto, estas linhas
     sustentam a leitura delimitada de escassez identificada no planeamento e
     constrangimentos documentados nas residências, não a magnitude ou
     persistência atual da procura não satisfeita. Planos, financiamento e
@@ -173,19 +171,17 @@ decision_basis:
     summary: >-
       O planeamento de 2024–2025 identifica escassez de alojamento estudantil e
       insuficiência da capacidade das residências face à procura de estudantes
-      (EVD-000031, EVD-000033). A Universidade e os SASUÉ documentam
+      (EVD-000033). A Universidade e os SASUÉ documentam
       encerramentos temporários para obras em 2025/2026 e disponibilidade
       limitada que pode levar ao encaminhamento para alternativas (EVD-000043).
-    evidence: [EVD-000031, EVD-000033, EVD-000043]
+    evidence: [EVD-000033, EVD-000043]
   consequence:
     summary: >-
       As residências temporariamente encerradas ficam indisponíveis durante as
       obras e a Universidade encaminha estudantes para alojamento privado ou
-      alternativo quando os lugares são limitados (EVD-000043). A imprensa
-      reporta custos de arrendamento e a proporção de estudantes deslocados
-      (EVD-000099), mas não permite concluir que os valores sejam representativos
-      ou que haja consequências individuais ou académicas determinadas.
-    evidence: [EVD-000043, EVD-000099]
+      alternativo quando os lugares são limitados (EVD-000043). Estes registos
+      não demonstram consequências individuais ou académicas determinadas.
+    evidence: [EVD-000043]
   currentness:
     assessment: >-
       EVD-000043 abrange a capacidade nominal e os encerramentos de 2025/2026.
@@ -193,10 +189,9 @@ decision_basis:
       reabilitação da Residência Manuel Álvares, não a conclusão ou reabertura.
       EVD-000126 regista em agosto de 2026 que os SASUÉ dizem ter agregados
       operacionais, mas não os seus valores. EVD-000145 regista financiamento
-      aprovado em 2022, não camas entregues. O período e a representatividade
-      dos números reportados em EVD-000099 são desconhecidos. O estado efetivo
+      aprovado em 2022, não camas entregues. O estado efetivo
       atual das residências e a procura não satisfeita permanecem por confirmar.
-    evidence: [EVD-000043, EVD-000100, EVD-000126, EVD-000145, EVD-000099]
+    evidence: [EVD-000043, EVD-000100, EVD-000126, EVD-000145]
   contradiction_search:
     performed: false
     summary: >-
@@ -222,42 +217,40 @@ decision_basis:
     residências, encerramentos temporários em 2025/2026 e encaminhamento para
     alternativas quando os lugares são limitados. A magnitude e a persistência
     atual da procura não satisfeita não estão estabelecidas.
-  supporting_evidence: [EVD-000031, EVD-000033, EVD-000043, EVD-000099]
-  boundary_evidence: [EVD-000032, EVD-000145, EVD-000100, EVD-000126]
+  supporting_evidence: [EVD-000033, EVD-000043]
+  boundary_evidence: [EVD-000031, EVD-000032, EVD-000145, EVD-000100, EVD-000126]
   independence_assessment: >-
-    EVD-000031 e EVD-000033 partilham fontes e o ecossistema de planeamento
-    local; a repetição não equivale a corroboração institucional independente.
+    EVD-000031 é planeamento municipal mais amplo e partilha o ecossistema de
+    fontes de EVD-000033; não é prova direta da cidade nem uma voz independente.
     EVD-000043 provém da Universidade de Évora e dos SASUÉ, uma instituição
     materialmente distinta da família de planeamento municipal, embora a sua
-    comunicação também não quantifique a procura não satisfeita. EVD-000099
-    provém de imprensa, com produção separada, mas permanece secundária e
-    não verificada. EVD-000126 é outra comunicação dos SASUÉ, não uma voz
+    comunicação também não quantifique a procura não satisfeita. EVD-000126
+    é outra comunicação dos SASUÉ, não uma voz
     independente de EVD-000043 nem prova da magnitude da escassez.
   scope:
     geography: >-
-      Município de Évora provisoriamente. EVD-000031, EVD-000032, EVD-000043
-      e EVD-000099 têm âmbito municipal; EVD-000033 especifica a cidade e o
-      Centro Histórico; EVD-000145 e EVD-000126 têm âmbito de cidade; EVD-000100
-      diz respeito a uma residência concreta. Estes âmbitos não são tomados
-      como geograficamente idênticos.
+      Cidade de Évora. EVD-000033 especifica a cidade e o Centro Histórico;
+      EVD-000043, EVD-000145 e EVD-000126 têm âmbito de cidade; EVD-000100
+      diz respeito a uma residência concreta. EVD-000031 e EVD-000032 têm
+      âmbito municipal e permanecem apenas como contexto de planeamento e
+      resposta prevista, sem serem tratados como prova da cidade.
     population: >-
-      Estudantes que procuram alojamento em Évora, em especial candidatos às
+      Estudantes que procuram alojamento na cidade de Évora, em especial candidatos às
       residências da Universidade de Évora. Os dados sobre candidaturas dizem
       respeito apenas a esses candidatos; a evidência não é generalizada aos
       restantes residentes.
     temporal: >-
       Financiamento aprovado em 2022; planeamento em 2024–2025; residências e
-      obras em 2025/2026; publicação e declaração dos SASUÉ em 2026. O período
-      dos números da imprensa é desconhecido. Não se infere capacidade efetiva
-      ou procura não satisfeita posterior a estes registos.
+      obras em 2025/2026; publicação e declaração dos SASUÉ em 2026. Não se
+      infere capacidade efetiva ou procura não satisfeita posterior a
+      estes registos.
     bounded: true
   limitations: >-
     Não há magnitude quantificada da procura atual não satisfeita. Os 525
     lugares nominais não equivalem à capacidade efetivamente disponível. A
     aprovação de financiamento para 105 camas não prova a sua entrega ou
     operação. A publicação sobre a Residência Manuel Álvares não prova
-    conclusão, reabertura ou capacidade final. Os preços e a percentagem
-    reportados pela imprensa carecem de verificação primária e não têm
-    representatividade estabelecida. Não há afirmação causal validada sobre
+    conclusão, reabertura ou capacidade final. O planeamento municipal não
+    quantifica a manifestação na cidade. Não há afirmação causal validada sobre
     o processo de candidatura. EVD-000126 confirma apenas que os SASUÉ dizem
     possuir agregados operacionais, sem fornecer valores ou definições.

@@ -1,0 +1,27 @@
+evidence_id: EVD-000170
+provenance:
+  sources:
+    - SRC-0036
+  extracted_at: 2026-10-13
+observation:
+  summary: >-
+    O Município de Évora documenta a entrega, em janeiro de 2026, de 12
+    habitações para arrendamento apoiado no Bairro da Malagueira.
+scope:
+  geography:
+    level: local_area
+    area: Bairro da Malagueira, Évora
+  populations:
+    - famílias destinatárias de arrendamento apoiado
+  temporal:
+    as_of: "2026-01"
+domains:
+  - HOU
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A fonte não estabelece se estas 12 habitações integram o programa municipal
+    de 459 habitações.
+  - A entrega local não mede a escala da necessidade habitacional na cidade,
+    o estado de outras intervenções ou a resolução da necessidade de habitação
+    a preços comportáveis.
