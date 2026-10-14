@@ -1,0 +1,28 @@
+source_id: SRC-0135
+publisher: Câmara Municipal de Évora
+name: Ata n.º 2/2026 — Reunião de 22 de janeiro de 2026
+resource_type: document
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: 2026-01-22
+  domains:
+    - ENV
+    - PUB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/wp-content/uploads/2026/04/Ata-no2-da-RPC-de-22-de-janeiro-de-2026.pdf
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-04
+  last_checked_at: 2026-10-14

@@ -1,0 +1,11 @@
+source_id: SRC-0135
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: b75f073d53c6a5075ab389283ca6bf5149c88337bb63b0d7d239eb0d6b81fd76
+  media_type: application/pdf
+  archive_reference: https://www.cm-evora.pt/wp-content/uploads/2026/04/Ata-no2-da-RPC-de-22-de-janeiro-de-2026.pdf
+verified_claims:
+  - locator: "Ata n.º 2/2026, reunião de 22 de janeiro de 2026, p. 72; intervenção de residente no Centro Histórico"
+    statement: "O residente descreveu como extremamente deficiente a recolha de lixo no Centro Histórico e relatou que o ponto junto à Igreja da Misericórdia estava frequentemente cheio, em qualquer altura do dia."
+  - locator: "Ata n.º 2/2026, reunião de 22 de janeiro de 2026, p. 72; intervenção de residente, referência à Estrada de Santo Antonico"
+    statement: "O residente relatou pouca regularidade na recolha na Estrada de Santo Antonico e acumulação de resíduos transportados para o terreno do outro lado da estrada."

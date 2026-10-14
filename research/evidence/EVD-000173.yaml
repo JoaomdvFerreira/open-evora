@@ -1,0 +1,25 @@
+evidence_id: EVD-000173
+lineage_id: MAR-2026-COUNCILLOR-RELAYED-RESIDENT-COMPLAINTS
+provenance:
+  sources:
+    - SRC-0136
+  extracted_at: 2026-10-14
+observation:
+  summary: "Na reunião pública de 19 de março de 2026, um vereador referiu queixas de residentes sobre acumulação de resíduos no Bairro António Sérgio, particularmente no Largo da Boa Vontade, entre outros problemas de estado e manutenção."
+scope:
+  geography:
+    level: local_area
+    area: Bairro António Sérgio / Largo da Boa Vontade, Évora
+  populations:
+    - residentes
+  temporal:
+    as_of: 2026-03-19
+domains:
+  - ENV
+  - PUB
+evidence_nature: reported-experience
+claim_authority: non_authoritative
+inference_limits:
+  - "As atas registam um vereador a relatar queixas de residentes; as queixas individuais subjacentes não estão disponíveis como evidência canónica independente."
+  - "A fonte não estabelece frequência ou prevalência das situações."
+  - "A evidência não estabelece o desempenho geral do serviço na cidade."
