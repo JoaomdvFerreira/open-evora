@@ -104,6 +104,10 @@ export function PrbHeader({ identity, active, onBackToOverview, onViewDetails, o
  * title is an <h2> on both views.
  */
 export function PrbIdentityHeader({ identity, titleRef }: { identity: PrbIdentityData; titleRef?: RefObject<HTMLHeadingElement> }) {
+  const statementParagraphs = identity.statement
+    ?.split(/\r?\n[\t ]*\r?\n(?:[\t ]*\r?\n)*/)
+    .map((paragraph) => paragraph.replace(/\s*\r?\n\s*/g, " ").trim())
+    .filter(Boolean) ?? [];
   return (
     <header className="prb-identity">
       <div className="prb-identity-eyebrow-row">
@@ -129,7 +133,9 @@ export function PrbIdentityHeader({ identity, titleRef }: { identity: PrbIdentit
       <h2 id="prb-identity-title" ref={titleRef} tabIndex={-1} className="prb-identity-title">
         {identity.title}
       </h2>
-      {identity.statement && <p className="prb-identity-statement">{identity.statement}</p>}
+      {statementParagraphs.map((paragraph, index) => (
+        <p key={index} className="prb-identity-statement">{paragraph}</p>
+      ))}
       {identity.updatedAt && (
         <p className="prb-identity-updated">
           <span className="prb-identity-updated-id">{`${identity.problemId} · `}</span>

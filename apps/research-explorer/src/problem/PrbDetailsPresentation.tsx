@@ -4,7 +4,7 @@ import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { RecordIdentifier } from "../records/RecordIdentifier";
 import { PrbHeader, PrbIdentityHeader } from "./PrbPageHeader";
-import { formatPublicCount, formatPublicDate, formatPublicPartialDate, publicCompactEnumLabel, publicEnumExplanation, publicEnumLabel } from "../presentation/presentation";
+import { formatPublicCount, formatPublicDate, formatPublicPartialDate, formatPublicPeriod, publicCompactEnumLabel, publicEnumExplanation, publicEnumLabel } from "../presentation/presentation";
 import { isHttpUrl } from "../records/sourceView";
 import { Drawer } from "../presentation/Drawer";
 import type { PrbDetailsData, PrbEvidenceItem, PrbOpenQuestion, PrbPathStage } from "./prbDetailsProjection";
@@ -555,11 +555,10 @@ function PrbEvidenceRow({ item, onOpenRecord }: { item: PrbEvidenceItem; onOpenR
     claim: "Referência temporal",
     opinion: "Referência temporal",
   } as Record<string, string>)[item.evidenceNature];
-  const intervalInOneYear = temporal?.start && temporal.end && temporal.start.slice(0, 4) === temporal.end.slice(0, 4);
   const temporalLabel = temporal?.asOf && asOfLabel
     ? `${asOfLabel}: ${formatPublicPartialDate(temporal.asOf)}`
     : temporal?.start && temporal.end
-      ? `Período: ${intervalInOneYear ? temporal.start.slice(0, 4) : `${formatPublicPartialDate(temporal.start)} a ${formatPublicPartialDate(temporal.end)}`}`
+      ? `Período: ${formatPublicPeriod(temporal.start, temporal.end)}`
       : null;
   return (
     <li className="prb-evidence-item">
