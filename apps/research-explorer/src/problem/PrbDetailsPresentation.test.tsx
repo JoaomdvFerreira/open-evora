@@ -63,7 +63,29 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(within(section).getByText("O \u00e2mbito documentado fica fora do programa.")).toBeTruthy();
     expect(within(section).getByText("28/08/2026")).toBeTruthy();
     expect(within(section).getByText("O programa altera o seu \u00e2mbito.")).toBeTruthy();
+    expect(within(section).getByText(/o encerramento n\u00e3o \u00e9 uma conclus\u00e3o de que o problema n\u00e3o exista/)).toBeTruthy();
+    const terms = Array.from(section.querySelectorAll("dt"), (dt) => dt.textContent);
+    expect(terms).toEqual(["Motivo", "Porque deixou de estar ativo", "Data de encerramento", "Condi\u00e7\u00e3o para reabrir", "O que significa"]);
+  });
+
+  it("invites city-specific information on OUT_OF_SCOPE closures through the existing evidence contribution path", () => {
+    renderPrb({ title: "Encerrado", status: "CLOSED", closure: { reason: "OUT_OF_SCOPE", explanation: "Explica\u00e7\u00e3o.", closed_at: "2026-08-28", reopen_condition: "Condi\u00e7\u00e3o." } });
+    const section = screen.getByRole("region", { name: "Encerramento" });
+    expect(within(section).getByText(/Tem informa\u00e7\u00e3o sobre uma situa\u00e7\u00e3o concreta na cidade de \u00c9vora\?/)).toBeTruthy();
+    const link = within(section).getByRole("link", { name: "Partilhar informa\u00e7\u00e3o \u2192" });
+    const href = new URL(link.getAttribute("href") ?? "", "https://example.test");
+    expect(href.pathname).toBe("/contact");
+    expect(href.searchParams.get("type")).toBe("evidence");
+    expect(href.searchParams.get("prb")).toBe("PRB-9999");
+    expect(screen.getAllByRole("link", { name: /Partilhar informa\u00e7\u00e3o|Contribuir para a investiga\u00e7\u00e3o/ })).toHaveLength(1);
+  });
+
+  it.each(["RESOLVED", "NOT_DEMONSTRATED_CURRENT", "NO_FOLLOWABLE_INFORMATION", "SUPERSEDED"])("keeps the generic closure meaning and no contribution invitation for %s closures", (reason) => {
+    renderPrb({ title: "Encerrado", status: "CLOSED", closure: { reason, explanation: "Explica\u00e7\u00e3o.", closed_at: "2026-08-28", reopen_condition: "Condi\u00e7\u00e3o." } });
+    const section = screen.getByRole("region", { name: "Encerramento" });
     expect(within(section).getByText(/n\u00e3o significa, por si s\u00f3, que a condi\u00e7\u00e3o c\u00edvica tenha desaparecido/)).toBeTruthy();
+    expect(within(section).queryByText(/Open \u00c9vora acompanha problemas da cidade/)).toBeNull();
+    expect(screen.queryByRole("link", { name: /Partilhar informa\u00e7\u00e3o|Contribuir para a investiga\u00e7\u00e3o/ })).toBeNull();
   });
 
   it("presents preserved questions as unanswered history on CLOSED Problems", () => {
@@ -95,7 +117,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(container.querySelectorAll(".prb-identity-statement:empty")).toHaveLength(0);
   });
 
-  it.each([["PRB-0001", 1], ["PRB-0003", 1], ["PRB-0009", 3]])("preserves the canonical %s statement paragraphs", (id, paragraphCount) => {
+  it.each([["PRB-0001", 1], ["PRB-0003", 1], ["PRB-0009", 3], ["PRB-0011", 2], ["PRB-0012", 3]])("preserves the canonical %s statement paragraphs", (id, paragraphCount) => {
     const source = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../../../research/problems", `${id}.yaml`), "utf8");
     const record = YAML.parse(source) as Record<string, unknown>;
     const statement = record.problem_statement as string;
