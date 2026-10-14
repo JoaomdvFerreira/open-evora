@@ -1,0 +1,13 @@
+source_id: SRC-0150
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 68be82ff8a57e1d5d2df6f19d481e34a30a6e405217e0f5d7160f0afee8112e7
+  media_type: text/html
+  archive_reference: https://www.uevora.pt/ue-media/noticias?item=44759
+verified_claims:
+  - locator: "Título e primeiro parágrafo da notícia"
+    statement: "A Universidade de Évora e a AIMA assinaram em 29 de outubro um protocolo de colaboração para criar um gabinete do CLAIM da comunidade académica da Universidade, apresentado como espaço de atendimento e apoio destinado apenas à comunidade académica migrante da Universidade, incluindo requerentes e beneficiários de proteção internacional."
+  - locator: "Parágrafo com a intervenção da Vogal do Conselho Diretivo da AIMA"
+    statement: "Uma responsável da AIMA atribuiu ao CLAIM universitário o apoio à integração em componentes como o emprego e a habitação, com enfoque adicional na atração de talentos e na capacitação dos serviços públicos."
+  - locator: "Rodapé do artigo, data de publicação"
+    statement: "A página indica publicação em 3 de novembro de 2025."

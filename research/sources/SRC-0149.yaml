@@ -1,0 +1,33 @@
+source_id: SRC-0149
+publisher: DE-SNS — Portal da Transparência do SNS
+name: Caracterização das Valências de Urgência
+resource_type: dataset
+identity:
+  persistent_identifier:
+    scheme: Portal da Transparência do SNS (conjunto de dados)
+    value: caracterizacao-das-valencias-de-urgencia
+scope:
+  geography:
+    level: national
+    area: Portugal
+  temporal:
+    as_of: 2023-06-22
+  domains:
+    - HEA
+access:
+  level: public
+  availability: available
+  machine_readable: true
+  method: download
+  format: csv
+acquisition:
+  method: public_web
+canonical_reference: https://transparencia.sns.gov.pt/explore/assets/caracterizacao-das-valencias-de-urgencia/view/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: 2026-10-14
+caveats:
+  - Os metadados do portal indicam o último processamento dos dados em 22 de junho de 2023; as designações institucionais registadas podem não corresponder à organização atual dos serviços.
+  - O campo de coordenadas geográficas não é consistente entre linhas da mesma unidade hospitalar e algumas linhas de uma unidade indicam serviços de urgência de outros hospitais.

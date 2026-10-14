@@ -1,0 +1,11 @@
+source_id: SRC-0149
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 32a8cfd74d828246f3ddc1c70e277e3eadf285b950756d9159a0f19e0e6594af
+  media_type: text/csv
+  archive_reference: https://transparencia.sns.gov.pt/api/explore/v2.1/catalog/datasets/caracterizacao-das-valencias-de-urgencia/exports/csv
+verified_claims:
+  - locator: "Linhas com unidade_hospitalar «H. Espírito Santo - Évora» e nome_do_servico_de_urgencia «Urgência do Hospital Espírito Santo - Évora» (18 linhas)"
+    statement: "Estas linhas registam a unidade H. Espírito Santo - Évora, da entidade Hospital Espírito Santo - Évora, E.P.E., na região ARS Alentejo, com endereço no Largo Senhor da Pobreza, código postal 7000-811, localidade Évora, na União das freguesias de Évora (São Mamede, Sé, São Pedro e Santo Antão)."
+  - locator: "Todas as linhas com unidade_hospitalar «H. Espírito Santo - Évora» (27 linhas), campos endereco, codigo_postal, localidade e localizacao_geografica"
+    statement: "As 27 linhas da unidade têm o mesmo endereço, código postal e localidade; as coordenadas geográficas variam entre linhas, e 9 dessas linhas indicam serviços de urgência de outros hospitais."
