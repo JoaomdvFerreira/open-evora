@@ -59,7 +59,7 @@ requests:
   - request_id: IREQ-0006
     prb_references: [PRB-0009]
     intended_recipient: Município de Évora
-    requested_information: Indicadores posteriores a agosto de recolhas falhadas, atrasos, relatos de residentes, tempos de resposta e desagregação geográfica disponível; documentação sobre responsabilidades urbanas e encaminhamento de falhas.
+    requested_information: Para a cidade de Évora depois de agosto de 2026, circuitos de recolha programados e realizados; atrasos e recolhas falhadas registados; incidentes e registos operacionais do serviço; queixas recebidas, por data e zona quando disponível; tempos de resposta e de resolução; relatórios de monitorização posteriores à reorganização; e nível de desagregação geográfica da informação disponível. Documentação sobre responsabilidades urbanas e encaminhamento de falhas.
     why_needed: Avaliar o funcionamento habitual após a reorganização e a divisão efetiva de tarefas com as juntas urbanas.
     already_known_sources: [PRB-0009]
     last_known_contact_state: Pedido de informação pendente e não enviado.

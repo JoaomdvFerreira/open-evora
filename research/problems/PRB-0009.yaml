@@ -20,14 +20,15 @@ problem_statement: >-
   A pesquisa pública realizada até 14 de outubro de 2026 não encontrou, nas fontes consultadas, relatos concretos de falhas no funcionamento habitual da recolha depois de agosto, nem dados públicos suficientes para avaliar o serviço. Dois documentos identificados ficaram por consultar. Isto não significa que o problema tenha sido resolvido; continua por esclarecer como funcionou o serviço depois das alterações de julho e agosto.
 investigation:
   open_questions:
-    - question: Qual é o desempenho operacional da recolha de resíduos e da higiene urbana na cidade de Évora após a reorganização de julho e agosto de 2026?
+    - question: Depois da reorganização de julho e agosto de 2026, com que regularidade foram realizados os circuitos de recolha na cidade de Évora, que falhas foram registadas e em quanto tempo foram resolvidas?
       why_open: >-
-        As falhas relatadas em janeiro e março ocorreram antes das medidas municipais de maio e de julho/agosto. Ainda não se sabe se o serviço passou a funcionar de forma mais fiável, nem se houve falhas depois dessas alterações no funcionamento habitual da recolha.
+        Os relatos datados de falhas localizadas na cidade, de janeiro e março de 2026, são anteriores às medidas municipais de maio e de julho/agosto. Essas medidas, por si, não mostram como passou a funcionar a recolha. Nas fontes públicas consultadas não foi encontrada informação operacional suficientemente detalhada sobre o período depois de agosto.
       latest_result: >-
-        Foram verificados relatos de falhas localizadas em janeiro e março de 2026. Existe ainda um relato público sem data estabelecida na zona dos Canaviais. A pesquisa pública realizada até 14 de outubro não encontrou, nas fontes consultadas, relatos concretos de falhas no funcionamento habitual da recolha depois de agosto. Dois documentos identificados ficaram por consultar. Faltam dados públicos suficientes para avaliar o serviço; permanece por verificar se existem indicadores públicos de qualidade aplicáveis a Évora e a que escala geográfica.
+        Os relatos datados de falhas localizadas na cidade são de janeiro e março de 2026, anteriores à reorganização municipal. A pesquisa pública realizada até 14 de outubro não identificou, nas fontes consultadas, informação suficiente sobre circuitos programados e realizados, atrasos, falhas e tempos de resposta depois de agosto. Os indicadores públicos de qualidade do serviço de resíduos identificados nessa pesquisa não permitem avaliar especificamente os circuitos da cidade nesse período. Permanecem por consultar dois documentos institucionais identificados.
       current_action: >-
-        Continua por verificar a existência e a escala geográfica de indicadores públicos aplicáveis a Évora. O pedido de informação e documentação ao Município sobre o desempenho e a monitorização do serviço está pendente e não foi enviado.
-      resolution_condition: Dados públicos ou informação do Município suficientes para avaliar o funcionamento da recolha depois de agosto na cidade, preferencialmente por zona geográfica.
+        Na evidência pública consultada continuam indisponíveis registos operacionais dos circuitos de recolha depois de agosto. Continuam por conhecer os circuitos programados e realizados, os atrasos e as recolhas falhadas; as queixas e os tempos de resolução não estão documentados com o detalhe geográfico e temporal necessário. O relatório de atividades da União das Freguesias de Bacelo e Senhora da Saúde e o documento de deliberação da Assembleia Municipal de 25 de setembro de 2026 ainda não foram consultados. O pedido de informação ao Município está pendente, não foi enviado e o seu envio não está autorizado.
+      resolution_condition: >-
+        Registos públicos ou informação documentada do Município, na medida em que existam, suficientes para avaliar, na cidade de Évora e num período que cubra o funcionamento depois das alterações de julho e agosto de 2026: os circuitos de recolha programados e efetivamente realizados; as recolhas falhadas ou atrasadas; os incidentes operacionais registados; as queixas e respetivas datas; o tempo de resolução das falhas; e as zonas da cidade ou de recolha a que respeitam. Não é necessário detalhe por rua se informação fiável por zona ou por circuito responder à pergunta.
       evidence:
         - EVD-000171
         - EVD-000172
@@ -165,7 +166,7 @@ decision_basis:
       - EVD-000094
   currentness:
     assessment: >-
-      As falhas relatadas em janeiro e março são anteriores à entrada em serviço de quatro veículos de recolha em maio e às medidas anunciadas em julho/agosto. Os dados públicos consultados não permitem avaliar o funcionamento da recolha depois de agosto. Nem a recuperação da fiabilidade nem a continuação de falhas generalizadas foram demonstradas.
+      As falhas relatadas em janeiro e março são anteriores à entrada em serviço de quatro veículos de recolha em maio e às medidas anunciadas em julho/agosto. Os dados públicos consultados não permitem avaliar o funcionamento dos circuitos de recolha na cidade depois de agosto. Nem a recuperação da fiabilidade nem a continuação de falhas generalizadas foram demonstradas.
     evidence:
       - EVD-000171
       - EVD-000172
@@ -177,7 +178,7 @@ decision_basis:
   contradiction_search:
     performed: true
     summary: >-
-      A pesquisa pública até 14 de outubro de 2026 consultou material do Município, reuniões da Câmara e da Assembleia Municipal quando acessíveis, fontes das juntas urbanas, meios locais e regionais e relatos públicos de residentes localizáveis. Não foram encontrados relatos concretos de falhas no funcionamento habitual da recolha depois de agosto nas fontes consultadas. O relatório de atividades de julho a setembro de 2026 da União das Freguesias de Bacelo e Senhora da Saúde e o documento de deliberação da Assembleia Municipal de 25 de setembro de 2026 ficaram por consultar. O STAL comunicou elevada adesão à greve nacional de 2 de outubro nos primeiros serviços noturnos de recolha e higiene urbana em Évora, sem que o impacto efetivo na recolha na cidade tenha sido verificado. O episódio foi considerado separadamente porque não mostra o funcionamento habitual da recolha. Não foram encontrados dados públicos suficientes sobre recolhas falhadas, atrasos, pedidos ou tempos de resposta; a existência e escala geográfica de indicadores aplicáveis a Évora permanecem por verificar. A pesquisa não demonstra resolução nem continuação de falhas.
+      A pesquisa pública até 14 de outubro de 2026 consultou material do Município, reuniões da Câmara e da Assembleia Municipal quando acessíveis, fontes das juntas urbanas, meios locais e regionais e relatos públicos de residentes localizáveis. Não foram encontrados relatos concretos de falhas no funcionamento habitual da recolha depois de agosto nas fontes consultadas. O relatório de atividades de julho a setembro de 2026 da União das Freguesias de Bacelo e Senhora da Saúde e o documento de deliberação da Assembleia Municipal de 25 de setembro de 2026 ficaram por consultar. O STAL comunicou elevada adesão à greve nacional de 2 de outubro nos primeiros serviços noturnos de recolha e higiene urbana em Évora, sem que o impacto efetivo na recolha na cidade tenha sido verificado. O episódio foi considerado separadamente porque não mostra o funcionamento habitual da recolha. Não foram encontrados dados públicos suficientes sobre circuitos programados e realizados, recolhas falhadas, atrasos, pedidos ou tempos de resposta; os indicadores públicos de qualidade do serviço de resíduos identificados não permitem avaliar especificamente os circuitos da cidade depois de agosto. A pesquisa não demonstra resolução nem continuação de falhas.
     evidence:
       - EVD-000186
   overlap_check:
@@ -205,10 +206,10 @@ decision_basis:
   scope:
     geography: Cidade de Évora. Manifestações em locais ou freguesias estabelecem presença dentro da cidade sem generalização ao conjunto.
     population: Residentes da cidade. As uniões urbanas são atores de governação e serviço, não população afetada estabelecida pela evidência.
-    temporal: Manifestações localizadas datadas em janeiro e março de 2026; o relato adicional na zona dos Canaviais não tem data estabelecida. O contexto mudou em maio e julho/agosto. O desempenho posterior a agosto não foi estabelecido.
+    temporal: Manifestações localizadas datadas em janeiro e março de 2026; o relato adicional na zona dos Canaviais não tem data estabelecida. O contexto mudou em maio e julho/agosto. O desempenho operacional dos circuitos de recolha posterior a agosto não foi estabelecido.
     bounded: true
   limitations: >-
-    Os relatos descrevem locais específicos e não permitem saber a dimensão do problema na cidade. A data do relato da zona dos Canaviais não está estabelecida. O funcionamento da recolha depois de agosto não está quantificado; a disponibilidade e escala geográfica de indicadores públicos permanecem por verificar. Não se afirma falha generalizada e contínua em toda a cidade.
+    Os relatos descrevem locais específicos e não permitem saber a dimensão do problema na cidade. A data do relato da zona dos Canaviais não está estabelecida. O funcionamento dos circuitos de recolha depois de agosto não está quantificado; os indicadores públicos de qualidade do serviço identificados não permitem avaliar especificamente os circuitos da cidade nesse período. Não se afirma falha generalizada e contínua em toda a cidade.
 history:
   - date: 2026-10-14
     summary: >-
