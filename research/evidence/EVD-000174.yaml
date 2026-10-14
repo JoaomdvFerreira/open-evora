@@ -12,7 +12,7 @@ scope:
   populations:
     - residentes
   temporal:
-    as_of: 2026-08
+    as_of: "2026-07"
 domains:
   - ENV
   - PUB
