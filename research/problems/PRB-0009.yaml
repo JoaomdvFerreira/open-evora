@@ -83,6 +83,7 @@ evidence:
     research_roles:
       - CONTEXTUAL
       - EXISTING_RESPONSE
+      - PLANNED_RESPONSE
   - evidence_id: EVD-000071
     effects:
       - BOUNDS

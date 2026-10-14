@@ -120,7 +120,7 @@ evidence:
       - BOUNDS
     research_roles:
       - LOCAL_OBSERVATION
-      - EXISTING_RESPONSE
+      - PLANNED_RESPONSE
   - evidence_id: EVD-000041
     effects:
       - BOUNDS
