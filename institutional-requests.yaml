@@ -1,0 +1,146 @@
+# Non-canonical information backlog. It does not authorize contact or change PRB state.
+# Dates are null where the canonical record does not establish the event date.
+requests:
+  - request_id: IREQ-0001
+    prb_references: [PRB-0001, PRB-0002]
+    intended_recipient: Município de Évora
+    requested_information: Horários e partidas atuais da rede urbana, atrasos por carreira e sentido nos acessos ao Centro Histórico e Parque Industrial, resposta à petição estudantil se existente, estado da informação e acessibilidade nas paragens descritas pelo PMUSE e execução das medidas propostas.
+    why_needed: Distinguir oferta e condições atuais dos diagnósticos históricos e avaliar efeitos concretos nas deslocações.
+    already_known_sources: [PRB-0001, PRB-0002]
+    last_known_contact_state: Pedido documental partilhado preparado, mas não enviado; consulta pública adicional pendente.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Delimitar o pedido após consultar os horários oficiais e verificar respostas públicas.
+  - request_id: IREQ-0002
+    prb_references: [PRB-0003]
+    intended_recipient: Município de Évora
+    requested_information: Inventário e estado atual das barreiras de acessibilidade nos locais identificados, documentação das correções e informação sobre acessibilidade dos equipamentos culturais municipais.
+    why_needed: Distinguir barreiras históricas de condições atuais e verificar as intervenções relatadas.
+    already_known_sources: [PRB-0003]
+    last_known_contact_state: Pedido municipal preparado, mas não enviado.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Rever o âmbito do pedido à luz da informação pública disponível.
+  - request_id: IREQ-0003
+    prb_references: [PRB-0003]
+    intended_recipient: APCE
+    requested_information: Inventário atual dos locais avaliados, barreiras ainda presentes, intervenções posteriores e resultados verificados.
+    why_needed: A resposta institucional anterior não estabeleceu que barreiras foram integralmente corrigidas.
+    already_known_sources: [SRC-0118, PRB-0003]
+    last_known_contact_state: Houve contacto D5 com resposta e seguimento em agosto de 2026; novo pedido preparado, mas não enviado.
+    authorization_status: Novo envio não autorizado.
+    send_date: null
+    response_date: 2026-08-12
+    follow_up_decision: Rever proporcionalidade e âmbito do novo pedido antes de qualquer contacto.
+  - request_id: IREQ-0004
+    prb_references: [PRB-0004]
+    intended_recipient: Município de Évora
+    requested_information: Cartografia atual da rede ciclável, destino dos eixos propostos em 2017, estado da ligação Saúde–Xarrama–Santa Luzia e da ligação à Escola André de Resende.
+    why_needed: Verificar o que foi executado e a configuração atual antes de avaliar deslocações afetadas.
+    already_known_sources: [PRB-0004]
+    last_known_contact_state: Consulta pública pendente; pedido municipal previsto se persistirem lacunas, sem envio documentado.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Consultar primeiro a informação pública e delimitar as lacunas remanescentes.
+  - request_id: IREQ-0005
+    prb_references: [PRB-0006]
+    intended_recipient: Serviços de Ação Social da Universidade de Évora
+    requested_information: Séries anuais de capacidade nominal e efetiva, ocupação, encerramentos e reaberturas das residências, com datas e critérios de contagem.
+    why_needed: Separar lugares nominais de oferta efetiva e de procura não satisfeita.
+    already_known_sources: [SRC-0119, PRB-0006]
+    last_known_contact_state: Contacto D5 respondido em agosto de 2026; novo pedido de dados preparado, mas não enviado.
+    authorization_status: Novo envio não autorizado.
+    send_date: null
+    response_date: 2026-08-13
+    follow_up_decision: Rever os agregados necessários e a disponibilidade pública antes de eventual seguimento.
+  - request_id: IREQ-0006
+    prb_references: [PRB-0009]
+    intended_recipient: Município de Évora
+    requested_information: Indicadores posteriores a agosto de recolhas falhadas, atrasos, relatos de residentes, tempos de resposta e desagregação geográfica disponível; documentação sobre responsabilidades urbanas e encaminhamento de falhas.
+    why_needed: Avaliar o funcionamento habitual após a reorganização e a divisão efetiva de tarefas com as juntas urbanas.
+    already_known_sources: [PRB-0009]
+    last_known_contact_state: Pedido de informação pendente e não enviado.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Verificar primeiro os indicadores públicos e a documentação das competências.
+  - request_id: IREQ-0007
+    prb_references: [PRB-0009]
+    intended_recipient: União das Freguesias de Bacelo e Senhora da Saúde
+    requested_information: Relatório de atividades de julho a setembro de 2026, incluindo informação sobre higiene urbana disponível por zona.
+    why_needed: Completar a revisão documental da atividade após a reorganização.
+    already_known_sources: [PRB-0009]
+    last_known_contact_state: Documento identificado, ainda não consultado; sem contacto documentado.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Procurar o documento público antes de considerar pedido.
+  - request_id: IREQ-0008
+    prb_references: [PRB-0009]
+    intended_recipient: Assembleia Municipal de Évora
+    requested_information: Documento da deliberação de 25 de setembro de 2026 e anexos sobre as tarefas de higiene urbana das juntas, se aplicáveis.
+    why_needed: Confirmar o alcance e a data prevista das mudanças de responsabilidade.
+    already_known_sources: [PRB-0009]
+    last_known_contact_state: Documento identificado, ainda não consultado; sem contacto documentado.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Consultar primeiro o documento público.
+  - request_id: IREQ-0009
+    prb_references: [PRB-0010]
+    intended_recipient: Município de Évora
+    requested_information: Contrato assinado do procedimento 4772/2026, consignação, prazo efetivo, alterações, ordens de trabalho, ruas selecionadas e reparadas com datas e estado de conclusão; contrato e execução do procedimento 6244/2026; levantamento técnico de fevereiro e documentação que reconcilie os dois procedimentos no programa anunciado.
+    why_needed: Distinguir anúncio, adjudicação, assinatura, início e execução e avaliar as condições da cidade após as intervenções.
+    already_known_sources: [SRC-0125, SRC-0126, SRC-0127, SRC-0138, SRC-0139, SRC-0140, SRC-0141]
+    last_known_contact_state: Pedido pendente de preparação e não enviado.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Preparar perguntas documentais delimitadas, sem contactar a instituição nesta fase.
+  - request_id: IREQ-0010
+    prb_references: [PRB-0010]
+    intended_recipient: Município de Évora e Infraestruturas de Portugal, conforme competência a confirmar
+    requested_information: Delimitação exata do troço da EN114 à entrada de Évora referido no relato de julho e identificação da entidade responsável pela conservação desse troço.
+    why_needed: O relato é localizado e não verificado; não permite atribuir responsabilidade automaticamente.
+    already_known_sources: [SRC-0072, PRB-0010]
+    last_known_contact_state: Sem contacto documentado sobre este troço.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Confirmar primeiro o troço e a delimitação pública de jurisdição.
+  - request_id: IREQ-0011
+    prb_references: [PRB-0007]
+    intended_recipient: Município de Évora / DEIS
+    requested_information: Informação futura sobre execução e avaliação das ações do Plano Concelhio dos Cuidadores Informais, quando houver período suficiente para avaliação.
+    why_needed: Distinguir ações iniciadas de resultados observados.
+    already_known_sources: [SRC-0131, PRB-0007]
+    last_known_contact_state: Contacto institucional respondido em setembro de 2026; nenhum novo envio documentado.
+    authorization_status: Novo envio não autorizado.
+    send_date: null
+    response_date: 2026-09-09
+    follow_up_decision: Aguardar momento proporcional para reavaliar a necessidade de seguimento.
+  - request_id: IREQ-0012
+    prb_references: []
+    intended_recipient: CIMAC
+    requested_information: Eventual esclarecimento futuro sobre cobertura, atualização e condições de reutilização de informação geográfica relevante no GEOCIMAC.
+    why_needed: Preservar o seguimento potencial do esclarecimento D5 sobre informação geográfica, sem atribuí-lo a uma PRB não documentada.
+    already_known_sources: [SRC-0130]
+    last_known_contact_state: Contacto institucional respondido em setembro de 2026; nenhum novo envio documentado.
+    authorization_status: Novo envio não autorizado.
+    send_date: null
+    response_date: 2026-09-03
+    follow_up_decision: Só reabrir se uma questão específica não puder ser resolvida por informação pública.
+  - request_id: IREQ-0013
+    prb_references: [PRB-0005]
+    intended_recipient: Município de Évora
+    requested_information: Dados e método da estimativa de redução de 30–40% do tráfego após a abertura da Variante Nascente, contagens comparáveis antes e depois por ponto, período e tipo de veículo, e dados atuais localizados sobre tráfego lento nos acessos ao Centro Histórico e à circular do Parque Industrial.
+    why_needed: Distinguir uma estimativa municipal do efeito medido da variante e verificar as condições atuais nos corredores identificados.
+    already_known_sources: [PRB-0005]
+    last_known_contact_state: Questão delimitada sobre a estimativa preparada, mas não enviada; pesquisa de dados oficiais públicos ainda pendente.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Verificar primeiro contagens e dados públicos da Infraestruturas de Portugal e de outras fontes oficiais.
