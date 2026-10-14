@@ -1,8 +1,7 @@
 problem_id: PRB-0012
 created_at: 2026-08-28
-updated_at: 2026-09-09
-title: O encerramento prolongado da Escola Básica do Chafariz d'El-Rei obriga a
-  soluções temporárias enquanto a reabilitação permanece pendente
+updated_at: 2026-10-14
+title: Escola Básica do Chafariz d’El-Rei fechada desde novembro de 2025
 domain:
   - EDU
   - URB
@@ -14,76 +13,101 @@ affected_populations:
   - pais e encarregados de educação
   - comunidade educativa da escola
 problem_statement: >-
-  A Escola Básica do Chafariz d'El-Rei está encerrada desde novembro de 2025
-  depois de terem sido identificados problemas estruturais no edifício. Os
-  alunos foram acolhidos noutra escola e, para o início de 2026/2027, o
-  Município está a instalar estruturas pré-fabricadas junto à escola de origem
-  enquanto se aguarda a reabilitação do edifício.
+  A Escola Básica do Chafariz d'El-Rei fechou em 14 de novembro de 2025,
+  após a queda de estuque numa sala. Foram identificados problemas estruturais
+  no edifício e os alunos passaram temporariamente para a Escola André de
+  Resende.
 
-  A solução temporária procura garantir continuidade letiva, segurança e
-  proximidade à escola e constitui uma resposta material ao problema. Ainda
-  assim, o edifício original permanece indisponível e não está estabelecido um
-  calendário confirmado de conclusão e regresso. A evidência disponível também
-  não caracteriza de forma suficiente os efeitos quotidianos das soluções
-  temporárias sobre refeições, acessibilidade, conforto, rotinas e deslocações
-  dos alunos e famílias.
+  Em setembro de 2026, foram reportados 16 monoblocos instalados junto à
+  escola para as aulas. A solução anunciada previa acesso ao refeitório e ao
+  recreio da escola por uma ligação pedonal. Estes relatos não confirmam o
+  início efetivo das aulas nos monoblocos nem mostram como funcionaram, na
+  prática, as refeições e o uso dos espaços.
+
+  A reabilitação do edifício continuava prevista. Em 4 de setembro, a
+  vereadora responsável disse que ainda aguardava a avaliação da laje
+  superior e que não havia data definida para o início da obra. A pesquisa
+  pública delimitada até 14 de outubro não identificou concurso, adjudicação,
+  contrato ou calendário confirmado para a reabilitação; isso não demonstra
+  que não exista um procedimento.
 investigation:
   open_questions:
     - question: Qual é o âmbito, estado de contratação ou execução e calendário
         verificável da reabilitação do edifício da Escola Básica do Chafariz
         d'El-Rei?
-      why_open: A comunicação municipal confirma que a reabilitação permanece
-        necessária e aponta como objetivo o regresso antes do final do ano
-        letivo 2026/2027, mas não fornece um marco de conclusão confirmado nem o
-        estado detalhado da empreitada.
-      current_action: Procurar apenas informação institucional atual sobre projeto,
-        contratação, execução e condições de reabertura.
+      latest_result: Em 4 de setembro de 2026, a vereadora disse que a avaliação
+        da laje superior ainda estava pendente e que não havia data definida
+        para o início da obra. A pesquisa pública delimitada até 14 de outubro
+        não identificou concurso, adjudicação, contrato nem calendário
+        confirmado para esta reabilitação.
+      why_open: O âmbito técnico da intervenção pode depender da avaliação da
+        laje superior; não estão documentados marcos contratuais ou de execução
+        que permitam confirmar o calendário de reabertura.
+      current_action: Não foi identificado concurso publicado, adjudicação ou
+        calendário confirmado na pesquisa pública delimitada; a falta de
+        documentação encontrada não prova que não exista procedimento.
       resolution_condition: Evidência institucional que estabeleça os trabalhos
         necessários, o estado de execução e marcos verificáveis para a
         reabertura.
       evidence:
         - EVD-000159
         - EVD-000160
+        - EVD-000185
     - question: Que efeitos materiais têm as instalações temporárias sobre a
         experiência quotidiana dos alunos e famílias depois de entrarem em
         funcionamento?
-      why_open: A Associação de Pais reportou limitações na alternativa anterior,
-        nomeadamente nas refeições, mas a evidência disponível não estabelece
-        como funcionarão na prática os novos monoblocos quanto a refeições,
-        acessibilidade, conforto, rotinas ou deslocações.
-      current_action: Procurar experiência atual da comunidade escolar apenas após o
-        início efetivo do funcionamento das instalações temporárias.
+      latest_result: Em abril, o Município referiu uma situação ligada às
+        refeições dos alunos na Escola André de Resende e uma resposta imediata.
+        Em setembro, as notícias apontavam o início das aulas nos monoblocos
+        para meados desse mês e descreviam acesso previsto ao refeitório e ao
+        recreio da escola por uma ligação pedonal. Não foi encontrada confirmação
+        datada do início efetivo dessa operação.
+      why_open: Falta evidência sobre o funcionamento efetivo das refeições,
+        da circulação entre instalações, da acessibilidade, do conforto das
+        salas, do uso do recreio e das rotinas e deslocações de alunos e famílias.
+      current_action: O início efetivo das aulas nos monoblocos e os efeitos
+        quotidianos sobre alunos e famílias continuam sem confirmação documentada.
       resolution_condition: Evidência atual da experiência de alunos, famílias ou
         escola que permita caracterizar efeitos concretos das instalações
         temporárias e distinguir constrangimentos resolvidos dos que persistem.
       evidence:
         - EVD-000160
         - EVD-000161
+        - EVD-000182
+        - EVD-000183
+        - EVD-000184
   path:
     initial_signal:
-      summary: O Município confirmou que a escola permanece encerrada desde novembro
-        de 2025 devido a problemas estruturais e que o edifício continua a
-        necessitar de reabilitação.
+      summary: A escola fechou em 14 de novembro de 2025 após a queda de estuque
+        numa sala. O Município identificou problemas estruturais e indicou a
+        necessidade de reabilitação.
       evidence:
         - EVD-000159
+        - EVD-000183
     development:
-      summary: Para o ano letivo 2026/2027, o Município está a instalar uma solução
-        temporária junto à escola de origem; a Associação de Pais reportou que a
-        alternativa anterior de permanência noutra escola teria novas limitações
-        práticas, incluindo nas refeições.
+      summary: Os alunos passaram temporariamente para a Escola André de Resende,
+        onde o Município referiu uma situação ligada às refeições em abril. Em
+        setembro, foram reportados 16 monoblocos junto à escola de origem, com
+        utilização prevista do refeitório e recreio. A avaliação da laje superior
+        ainda estava pendente em 4 de setembro.
       evidence:
         - EVD-000160
         - EVD-000161
+        - EVD-000182
+        - EVD-000184
+        - EVD-000185
     delimitation:
-      summary: "O candidato é estritamente site-specific. Não infere uma crise do
-        parque escolar municipal, impactos de aprendizagem, inadequação dos
-        monoblocos ou responsabilidade causal por atrasos. A resposta temporária
-        é reconhecida como um limite material da leitura: existe continuidade
-        letiva planeada apesar de o edifício original permanecer indisponível."
+      summary: A informação diz respeito a esta escola em Évora. Não estabelece
+        problemas semelhantes noutras escolas, efeitos na aprendizagem ou
+        inadequação dos monoblocos. A solução temporária foi anunciada, mas
+        faltam confirmação do seu funcionamento e informação sobre a experiência
+        diária de alunos e famílias.
       evidence:
         - EVD-000159
         - EVD-000160
         - EVD-000161
+        - EVD-000182
+        - EVD-000184
 evidence:
   - evidence_id: EVD-000159
     effects:
@@ -103,8 +127,37 @@ evidence:
       - REFINES
     research_roles:
       - LOCAL_OBSERVATION
+  - evidence_id: EVD-000182
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000183
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
+  - evidence_id: EVD-000184
+    effects:
+      - REFINES
+      - BOUNDS
+    research_roles:
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000185
+    effects:
+      - REFINES
+    research_roles:
+      - LOCAL_OBSERVATION
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
 status: OPEN
+history:
+  - date: 2026-10-14
+    summary: A ficha passou a indicar a data de encerramento e a distinguir as condições relatadas na escola provisória dos acessos previstos junto aos monoblocos. A avaliação estrutural ainda estava pendente no início de setembro; continuam por confirmar o funcionamento efetivo da solução temporária e os marcos da reabilitação.
+    evidence:
+      - EVD-000182
+      - EVD-000183
+      - EVD-000184
+      - EVD-000185
