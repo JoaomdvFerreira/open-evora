@@ -11,13 +11,13 @@ geography:
 affected_populations:
   - residentes
 problem_statement: >-
-  Em janeiro e março de 2026 foram registadas falhas localizadas de recolha ou acumulação de resíduos em vários pontos da cidade de Évora, incluindo o Centro Histórico, a Estrada de Santo Antonico e o Bairro António Sérgio / Largo da Boa Vontade. Existe ainda um relato público sem data estabelecida sobre acumulação de resíduos na zona dos Canaviais. Estes casos não permitem determinar a frequência ou dimensão do problema no conjunto da cidade.
+  Em janeiro e março de 2026 foram registadas falhas localizadas de recolha ou acumulação de resíduos em vários pontos da cidade de Évora, incluindo o Centro Histórico, a Estrada de Santo Antonico e o Bairro António Sérgio / Largo da Boa Vontade. Há ainda um relato público, sem data estabelecida, de acumulação de resíduos na zona dos Canaviais. Estes casos não mostram a frequência nem a dimensão do problema no conjunto da cidade.
 
 
-  Em fevereiro, o Município comunicou uma perturbação mais ampla da recolha no concelho. Em maio, o Município pôs ao serviço quatro veículos de recolha e, em julho, identificou a higiene urbana como um problema urgente. Entre julho e agosto anunciou reforços de pessoal e viaturas, alterações de horários e circuitos, reorganização do serviço, equipas para o perímetro urbano e monitorização interna. Estas medidas mostram uma resposta municipal, mas não permitem saber se o serviço passou a funcionar de forma mais fiável.
+  Em fevereiro, o Município comunicou uma perturbação da recolha no concelho. Em maio, pôs ao serviço quatro veículos de recolha e, entre julho e agosto, anunciou reforços de pessoal e viaturas, alterações de horários e circuitos e a reorganização do serviço.
 
 
-  A pesquisa pública realizada até 14 de outubro de 2026 não encontrou, nas fontes consultadas, relatos concretos de falhas no funcionamento habitual da recolha depois de agosto, nem dados públicos suficientes para avaliar o serviço. Dois documentos identificados ficaram por consultar. Isto não significa que o problema tenha sido resolvido; continua por esclarecer como funcionou o serviço depois das alterações de julho e agosto.
+  Nas fontes públicas consultadas até 14 de outubro de 2026, não foram encontrados relatos concretos de falhas no funcionamento habitual da recolha depois de agosto, nem dados suficientes para avaliar o serviço; dois documentos identificados ficaram por consultar. Isto não significa que o problema tenha sido resolvido.
 investigation:
   open_questions:
     - question: Depois da reorganização de julho e agosto de 2026, com que regularidade foram realizados os circuitos de recolha na cidade de Évora, que falhas foram registadas e em quanto tempo foram resolvidas?
@@ -213,7 +213,7 @@ decision_basis:
 history:
   - date: 2026-10-14
     summary: >-
-      A investigação renovada estabeleceu manifestações localizadas dentro da cidade e estreitou a geografia de município para cidade. Foram revistos os limites da evidência e as questões de investigação, e foi desligada a evidência de comparação estrangeira. PRB-0009 permanece OPEN; o desempenho operacional posterior a agosto continua por estabelecer.
+      A investigação foi aprofundada e estabeleceu falhas localizadas de recolha ou acumulação de resíduos dentro da cidade; o âmbito passou do concelho para a cidade. Foram revistos os limites da informação reunida e as questões de investigação, e deixou de ser usada informação de outros países como termo de comparação. O problema continua em aberto; o funcionamento do serviço depois de agosto continua por estabelecer.
   - date: 2026-10-14
     summary: >-
       A revisão confirmou apenas os relatos com data de janeiro e março, manteve o relato da zona dos Canaviais sem data estabelecida e desligou dois registos de evidência contextual que deixaram de integrar a delimitação do problema. A pesquisa pública até 14 de outubro de 2026 foi concluída nas fontes acessíveis, com dois documentos por consultar. O funcionamento da recolha depois das alterações de julho e agosto permanece por esclarecer.

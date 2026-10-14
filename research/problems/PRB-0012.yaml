@@ -1,7 +1,7 @@
 problem_id: PRB-0012
 created_at: 2026-08-28
 updated_at: 2026-10-14
-title: Escola Básica do Chafariz d’El-Rei fechada desde novembro de 2025
+title: Escola Básica do Chafariz d'El-Rei fechada desde novembro de 2025
 domain:
   - EDU
   - URB
@@ -26,7 +26,7 @@ problem_statement: >-
   prática, as refeições e o uso dos espaços.
 
 
-  A reabilitação do edifício continuava prevista. Em 4 de setembro, a
+  A reabilitação do edifício continuava prevista. O Município declarou como objetivo o regresso dos alunos à escola antes do final do ano letivo 2026/2027, depois de concluídos os trabalhos e reunidas as condições de segurança; não é uma data de reabertura confirmada. Em 4 de setembro, a
   vereadora responsável disse que ainda aguardava a avaliação da laje
   superior e que não havia data definida para o início da obra. A pesquisa
   pública delimitada até 14 de outubro não identificou concurso, adjudicação,
@@ -34,9 +34,7 @@ problem_statement: >-
   que não exista um procedimento.
 investigation:
   open_questions:
-    - question: Qual é o âmbito, estado de contratação ou execução e calendário
-        verificável da reabilitação do edifício da Escola Básica do Chafariz
-        d'El-Rei?
+    - question: Quando começa e quando termina a obra de reabilitação da escola?
       latest_result: Em 4 de setembro de 2026, a vereadora disse que a avaliação
         da laje superior ainda estava pendente e que não havia data definida
         para o início da obra. A pesquisa pública delimitada até 14 de outubro
@@ -45,9 +43,7 @@ investigation:
       why_open: O âmbito técnico da intervenção pode depender da avaliação da
         laje superior; não estão documentados marcos contratuais ou de execução
         que permitam confirmar o calendário de reabertura.
-      current_action: Não foi identificado concurso publicado, adjudicação ou
-        calendário confirmado na pesquisa pública delimitada; a falta de
-        documentação encontrada não prova que não exista procedimento.
+      current_action: Pedido de informação ao Município preparado, não enviado.
       resolution_condition: Evidência institucional que estabeleça os trabalhos
         necessários, o estado de execução e marcos verificáveis para a
         reabertura.
@@ -55,9 +51,7 @@ investigation:
         - EVD-000159
         - EVD-000160
         - EVD-000185
-    - question: Que efeitos materiais têm as instalações temporárias sobre a
-        experiência quotidiana dos alunos e famílias depois de entrarem em
-        funcionamento?
+    - question: Como estão a correr as aulas nos monoblocos para alunos e famílias?
       latest_result: Em abril, o Município referiu uma situação ligada às
         refeições dos alunos na Escola André de Resende e uma resposta imediata.
         Em setembro, as notícias apontavam o início das aulas nos monoblocos
