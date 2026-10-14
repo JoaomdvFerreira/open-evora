@@ -1,7 +1,7 @@
 problem_id: PRB-0003
 created_at: "2026-08-28"
 updated_at: "2026-10-14"
-title: Barreiras pedonais e de acessibilidade em diferentes locais da cidade de Évora
+title: Barreiras à circulação pedonal e à acessibilidade identificadas em locais da cidade de Évora
 domain:
   - ACC
   - MOB
@@ -273,7 +273,7 @@ solution_landscape_status: not_assessed
 status: OPEN
 history:
   - date: 2026-08-31
-    summary: Em resposta a um contacto direto do Open Évora, a APCE descreveu avaliações in loco e fatores concretos de barreira e reportou que algumas barreiras anteriormente identificadas foram posteriormente alvo de intervenção, sem estabelecer se essas intervenções as corrigiram integralmente, que localizações estão resolvidas ou pendentes, nem a consequência vivida atual; a investigação passa a aguardar um inventário atual ou uma observação no local que possa ser feita com segurança.
+    summary: Em resposta a um contacto direto do Open Évora, a APCE descreveu avaliações in loco e fatores concretos de barreira e reportou que algumas barreiras anteriormente identificadas foram posteriormente alvo de intervenção, sem estabelecer se essas intervenções as corrigiram integralmente, que localizações estão resolvidas ou pendentes, nem a consequência vivida atual; a investigação passa a aguardar um inventário atual ou uma observação no local que seja exequível.
     state_changes:
       validation_status:
         from: unvalidated
