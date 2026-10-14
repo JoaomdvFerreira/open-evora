@@ -1,0 +1,10 @@
+source_id: SRC-0143
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 9b85399a69042f7b3889ec318dc24f32651498b84f594d9fdd0521437360851d
+  media_type: application/pdf
+verified_claims:
+  - locator: "Página 14, intervenção da vereadora Carmen Carvalheira"
+    statement: "A vereadora referiu uma situação relacionada com as refeições das crianças do Chafariz d'El-Rei provisoriamente instaladas na Escola André de Resende; indicou a colocação de uma tarefeira e acompanhamento após reunião com encarregados de educação."
+  - locator: "Página 14, resposta sobre a escola do Chafariz d'El-Rei"
+    statement: "A vereadora declarou que ainda não era possível apresentar datas definitivas para os trabalhos e expressou a intenção de a escola funcionar no ano letivo seguinte."

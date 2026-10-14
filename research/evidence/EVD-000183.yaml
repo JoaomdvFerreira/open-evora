@@ -1,0 +1,23 @@
+evidence_id: EVD-000183
+provenance:
+  sources:
+    - SRC-0144
+  extracted_at: 2026-10-14
+observation:
+  summary: A Tribuna Alentejo reportou que a Escola Básica do Chafariz d'El-Rei encerrou em 14 de novembro de 2025, após a queda de estuque numa sala, e que os alunos foram transferidos temporariamente para a Escola André de Resende.
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei e Escola André de Resende, Évora
+  populations:
+    - alunos do 1.º ciclo da Escola Básica do Chafariz d'El-Rei
+  temporal:
+    as_of: 2026-09-01
+domains:
+  - EDU
+  - URB
+evidence_nature: fact
+claim_authority: non_authoritative
+inference_limits:
+  - A notícia fornece a data do encerramento e a transferência, mas não descreve tecnicamente os problemas estruturais posteriormente identificados.
+  - O título da peça refere o início das aulas; o corpo apresenta a utilização dos monoblocos em meados de setembro como previsão, não como facto já ocorrido.

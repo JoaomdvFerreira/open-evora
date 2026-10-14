@@ -1,0 +1,23 @@
+evidence_id: EVD-000184
+provenance:
+  sources:
+    - SRC-0144
+    - SRC-0145
+  extracted_at: 2026-10-14
+observation:
+  summary: Em setembro de 2026, a Tribuna Alentejo e a Rádio Elvas reportaram a instalação de 16 monoblocos junto à escola e uma ligação pedonal às instalações de origem. Segundo os relatos, a solução previa aulas nos monoblocos e acesso ao refeitório e ao recreio da escola; a vereadora Carmen Carvalheira disse que as refeições seriam numa parte da escola de origem.
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei e monoblocos junto ao Hospital do Patrocínio, Évora
+  populations:
+    - alunos do 1.º ciclo da Escola Básica do Chafariz d'El-Rei
+  temporal:
+    as_of: 2026-09-04
+domains:
+  - EDU
+evidence_nature: fact
+claim_authority: non_authoritative
+inference_limits:
+  - A comunicação descreve a instalação e o uso previsto; não comprova o início efetivo das aulas, as refeições na escola ou as condições vividas depois da abertura.
+  - Não avalia a acessibilidade, o conforto, as rotinas, as deslocações nem o uso efetivo do recreio.
