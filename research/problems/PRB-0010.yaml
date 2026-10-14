@@ -12,30 +12,28 @@ affected_populations:
   - residentes
   - condutores
 problem_statement: |-
-  Em janeiro de 2026, uma vereadora relatou buracos em várias vias da cidade de Évora, incluindo a circular. Uma petição pública do mesmo mês denunciou buracos e pavimento degradado no concelho, com preocupações de segurança e danos em veículos. Em fevereiro, o Município reconheceu uma degradação significativa da rede viária municipal e informou ter feito um levantamento técnico.
+  Em janeiro de 2026, uma vereadora relatou buracos em várias vias da cidade de Évora, incluindo a circular. No mesmo mês, uma petição pública denunciou buracos e pavimento degradado nas estradas do concelho, com preocupações de segurança e danos em veículos. Em fevereiro, o Município reconheceu uma degradação significativa da rede viária municipal e informou ter feito um levantamento técnico. A petição e o diagnóstico referem-se a todo o concelho e não mostram a extensão do problema nas ruas da cidade.
 
-  O Município aprovou dois procedimentos de reparação, com preços base que somam 1 494 990 euros sem IVA: um para estradas municipais do concelho e outro para a zona da Garraia e Sizuda. Em maio, anunciou decisões de adjudicação distintas. Comunicou também trabalhos em curso nas avenidas Cartaxo Júnior e das Fontanas e uma correção já feita na Avenida de São João de Deus. Em outubro, comunicou o início de obras na Garraia e Sizuda.
+  Em fevereiro, o Município aprovou uma empreitada geral de reparação de estradas municipais no concelho e, em maio, aprovou a sua adjudicação à Tecnovia por 745 000 euros mais IVA. O valor de cerca de 1,5 milhões de euros então anunciado soma os preços base desta empreitada e de outra, para caminhos municipais na zona da Garraia e Sizuda; não é despesa executada, e essa segunda obra não mostra reparações nas ruas da cidade. Até junho, o Município comunicou trabalhos em curso nas avenidas Cartaxo Júnior e das Fontanas e uma correção já feita na Avenida de São João de Deus. Em setembro, a DianaFM noticiou o início de uma correção do pavimento na Estrada Nacional 114, depois de uma rotura recente, e intervenções previstas junto à Escola do Bairro da Câmara e nas passadeiras das Portas da Lagoa.
 
-  Não está estabelecido que ruas da cidade foram selecionadas e reparadas pela empreitada geral, nem o estado completo da sua execução. Também não foi encontrada, nas fontes consultadas, uma avaliação atual e representativa do pavimento nas ruas da cidade. Os relatos disponíveis não demonstram que a degradação continue de forma generalizada nem que tenha sido resolvida.
+  Não se sabe que ruas da cidade foram selecionadas e reparadas pela empreitada geral, nem se o contrato foi assinado e a obra iniciada ou concluída. Também não está demonstrado que as intervenções comunicadas façam parte dessa empreitada, nem que as de setembro tenham sido concluídas. Não foi encontrada, nas fontes consultadas, uma avaliação atual e representativa do pavimento nas ruas da cidade. As intervenções relatadas não demonstram que a degradação tenha sido resolvida nem que continue de forma generalizada.
 investigation:
   open_questions:
     - question: Que ruas da cidade foram selecionadas para reparação e em que ponto estão os trabalhos?
-      why_open: O concurso geral abrange o concelho, mas o anúncio não identifica as ruas da cidade a reparar. A decisão de adjudicação não mostra quais foram efetivamente intervencionadas nem o avanço da empreitada.
-      latest_result: O Município aprovou a adjudicação da empreitada geral à Tecnovia em maio de 2026. As intervenções comunicadas nas avenidas Cartaxo Júnior e das Fontanas estavam em curso, e a correção da calçada na Avenida de São João de Deus já tinha sido feita; não está demonstrado que integrem a empreitada geral. A obra da Garraia e Sizuda pertence a outro procedimento e foi apresentada como iniciada em outubro.
-      current_action: O pedido de informação ao Município está pendente de preparação e não foi enviado. Faltam o contrato assinado da empreitada geral, a consignação e a data de início, as ordens de trabalho, a lista das ruas selecionadas e reparadas, as datas, alterações e o estado de conclusão. Para a Garraia e Sizuda, faltam confirmação do contrato assinado e documentação da execução e conclusão.
-      resolution_condition: Contrato e registos municipais suficientes para identificar as ruas da cidade selecionadas e reparadas, as datas das intervenções e o estado de execução e conclusão de cada empreitada.
+      why_open: A empreitada geral abrange todo o concelho. A decisão de adjudicação não identifica as ruas da cidade selecionadas, nem mostra quais foram intervencionadas ou concluídas.
+      latest_result: Em maio de 2026, o Município aprovou a adjudicação da empreitada geral à Tecnovia e a minuta do contrato. Até junho, comunicou trabalhos em curso nas avenidas Cartaxo Júnior e das Fontanas e uma correção da calçada já feita na Avenida de São João de Deus. Em setembro, a DianaFM noticiou o início de uma correção do pavimento na Estrada Nacional 114 e intervenções previstas junto à Escola do Bairro da Câmara e nas passadeiras das Portas da Lagoa. Não está demonstrado que alguma destas intervenções integre a empreitada geral.
+      current_action: Não estão confirmadas a assinatura do contrato nem a consignação da empreitada geral. Continuam sem documentação as ruas da cidade selecionadas, as ordens de trabalho, as datas de execução e as intervenções concluídas. O pedido de informação ao Município não foi enviado nem está autorizado.
+      resolution_condition: Contrato e registos municipais de execução suficientes para identificar as ruas da cidade incluídas, os trabalhos realizados e as datas de conclusão.
       evidence:
         - EVD-000155
         - EVD-000156
         - EVD-000176
         - EVD-000177
-        - EVD-000178
-        - EVD-000179
-        - EVD-000180
+        - EVD-000188
     - question: Qual é o estado atual do pavimento nas ruas da cidade de Évora?
       why_open: Os relatos de janeiro e o diagnóstico municipal de fevereiro são históricos. As intervenções conhecidas dizem respeito a vias determinadas; falta uma avaliação atual que cubra as ruas da cidade de forma suficiente.
-      latest_result: Uma vereadora relatou buracos em várias vias da cidade em janeiro. A petição e o diagnóstico municipal referem-se ao concelho. O Município reportou intervenções em três avenidas da cidade. Um relato de julho sobre a entrada pela N114 continua não verificado, e o troço preciso e a responsabilidade pela via estão por esclarecer. Estes elementos não medem o estado atual da cidade.
-      current_action: O pedido de informação e do levantamento técnico ao Município está pendente de preparação e não foi enviado. A pesquisa pública disponível ainda não produziu uma avaliação atual e representativa das ruas da cidade.
+      latest_result: Uma vereadora relatou buracos em várias vias da cidade em janeiro. A petição e o diagnóstico municipal referem-se ao concelho. O Município reportou intervenções em três avenidas da cidade até junho. Em setembro, a DianaFM noticiou o início de uma correção localizada do pavimento na Estrada Nacional 114, depois de uma rotura recente, e outras intervenções previstas; a notícia não descreve o estado das vias depois dos trabalhos. Um relato de julho numa rede social sobre a entrada pela N114 continua não verificado e não está ligado à intervenção de setembro; o troço preciso e a responsabilidade pela via estão por esclarecer. Estes elementos não medem o estado atual das ruas da cidade.
+      current_action: O pedido de informação e do levantamento técnico ao Município não foi enviado nem está autorizado. A pesquisa pública disponível ainda não produziu uma avaliação atual e representativa das ruas da cidade.
       resolution_condition: Levantamento técnico atual, informação municipal por rua ou outra evidência verificável com cobertura suficiente para avaliar o estado do pavimento nas ruas da cidade após as intervenções.
       evidence:
         - EVD-000082
@@ -43,6 +41,7 @@ investigation:
         - EVD-000154
         - EVD-000156
         - EVD-000175
+        - EVD-000188
   path:
     initial_signal:
       summary: Em janeiro de 2026, uma vereadora relatou buracos em várias vias da cidade, incluindo a circular. Uma petição pública relatou degradação das estradas do concelho e preocupações de segurança e danos em veículos.
@@ -59,24 +58,19 @@ investigation:
         - EVD-000178
         - EVD-000179
     delimitation:
-      summary: O Município reportou trabalhos em três avenidas da cidade e o início de obras na Garraia e Sizuda, sem estabelecer a condição atual da rede urbana nem a execução completa da empreitada geral. O relato de julho na entrada pela N114 permanece localizado e não verificado.
+      summary: O Município reportou trabalhos em três avenidas da cidade até junho e, em setembro, foi noticiado o início de uma correção do pavimento na Estrada Nacional 114, com outras intervenções previstas na cidade. A empreitada da Garraia e Sizuda, com contrato celebrado em junho e obras apresentadas como iniciadas em outubro, ficou delimitada como contexto do programa e não como prova de reparações nas ruas da cidade. Nenhum destes registos estabelece a condição atual das ruas da cidade nem a execução da empreitada geral. O relato de julho na entrada pela N114 permanece localizado e não verificado.
       evidence:
         - EVD-000084
         - EVD-000156
+        - EVD-000188
         - EVD-000180
+        - EVD-000187
 evidence:
   - evidence_id: EVD-000082
     effects:
       - SUPPORTS
     research_roles:
       - LOCAL_OBSERVATION
-  - evidence_id: EVD-000083
-    effects:
-      - SUPPORTS
-      - BOUNDS
-    research_roles:
-      - LOCAL_OBSERVATION
-      - PLANNED_RESPONSE
   - evidence_id: EVD-000084
     effects:
       - BOUNDS
@@ -118,20 +112,31 @@ evidence:
       - PLANNED_RESPONSE
   - evidence_id: EVD-000178
     effects:
-      - REFINES
+      - BOUNDS
     research_roles:
-      - PLANNED_RESPONSE
+      - CONTEXTUAL
   - evidence_id: EVD-000179
     effects:
-      - REFINES
+      - BOUNDS
     research_roles:
-      - PLANNED_RESPONSE
+      - CONTEXTUAL
   - evidence_id: EVD-000180
+    effects:
+      - BOUNDS
+    research_roles:
+      - CONTEXTUAL
+  - evidence_id: EVD-000187
+    effects:
+      - BOUNDS
+    research_roles:
+      - CONTEXTUAL
+  - evidence_id: EVD-000188
     effects:
       - BOUNDS
       - REFINES
     research_roles:
       - EXISTING_RESPONSE
+      - PLANNED_RESPONSE
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: low
@@ -154,20 +159,20 @@ decision_basis:
       - EVD-000082
       - EVD-000175
   currentness:
-    assessment: Os relatos sobre a manifestação são de janeiro e o diagnóstico municipal é de fevereiro de 2026. Foram comunicadas intervenções em três avenidas da cidade até junho e o início de obras distintas na Garraia e Sizuda em outubro. O relato de julho sobre a N114 é único, não verificado e de localização e responsabilidade ainda incertas. Nenhum destes registos estabelece a condição atual das ruas da cidade ou a execução completa da empreitada geral.
+    assessment: Os relatos sobre a manifestação são de janeiro e o diagnóstico municipal é de fevereiro de 2026. Foram comunicadas intervenções em três avenidas da cidade até junho e, em setembro, foi noticiado o início de uma correção do pavimento na Estrada Nacional 114, com outras intervenções previstas. O relato de julho sobre a N114 é único, não verificado e de localização e responsabilidade ainda incertas. Nenhum destes registos estabelece a condição atual das ruas da cidade ou a execução completa da empreitada geral.
     evidence:
       - EVD-000175
       - EVD-000082
       - EVD-000154
       - EVD-000084
       - EVD-000156
-      - EVD-000180
+      - EVD-000188
   contradiction_search:
     performed: true
-    summary: Foram considerados os trabalhos reportados nas três avenidas (EVD-000156), o início de obras na Garraia e Sizuda (EVD-000180) e o relato não verificado na N114 (EVD-000084). Os trabalhos podem alterar condições locais; nenhum registo comprova a resolução geral, a continuação generalizada dos danos ou o estado atual da cidade.
+    summary: Foram considerados os trabalhos reportados nas três avenidas (EVD-000156), a correção do pavimento noticiada em setembro na Estrada Nacional 114 e as intervenções então previstas (EVD-000188) e o relato não verificado na N114 (EVD-000084). Os trabalhos podem alterar condições locais; nenhum registo comprova a resolução geral, a continuação generalizada dos danos ou o estado atual da cidade.
     evidence:
       - EVD-000156
-      - EVD-000180
+      - EVD-000188
       - EVD-000084
   overlap_check:
     performed: true
@@ -186,9 +191,9 @@ decision_basis:
     - EVD-000177
     - EVD-000178
     - EVD-000179
-    - EVD-000180
-  independence_assessment: O relato de uma vereadora em reunião pública, a petição e o diagnóstico do Município têm origens e âmbitos diferentes. A ata regista uma declaração, sem medição independente; a petição não é uma amostra representativa. As comunicações do Município sobre diagnóstico, concursos, adjudicações e obras pertencem à mesma voz institucional e não contam como confirmações independentes da condição atual.
-  limitations: A manifestação na cidade é histórica e relatada, sem inventário público por rua. A petição e o diagnóstico municipal não permitem atribuir ao conjunto da cidade a extensão referida para o concelho. Os preços base dos dois concursos somam 1 494 990 euros sem IVA, mas são limites dos procedimentos, não despesa executada; a adjudicação da Garraia e Sizuda foi comunicada por valor inferior ao preço base. A decisão de adjudicação e a aprovação da minuta não provam assinatura, consignação ou conclusão. As intervenções em três avenidas não demonstram que integrem a empreitada geral. O relato da N114 não está verificado; o troço preciso e a responsabilidade pela via permanecem incertos. Não há avaliação atual representativa da cidade.
+    - EVD-000188
+  independence_assessment: O relato de uma vereadora em reunião pública, a petição e o diagnóstico do Município têm origens e âmbitos diferentes. A ata regista uma declaração, sem medição independente; a petição não é uma amostra representativa. As comunicações do Município sobre diagnóstico, concursos, adjudicações e obras pertencem à mesma voz institucional e não contam como confirmações independentes da condição atual. A notícia de setembro relata trabalhos do Município e também não é uma verificação independente do estado das vias.
+  limitations: A manifestação na cidade é histórica e relatada, sem inventário público por rua. A petição e o diagnóstico municipal não permitem atribuir ao conjunto da cidade a extensão referida para o concelho. Os preços base dos dois concursos somam 1 494 990 euros sem IVA, mas são limites dos procedimentos, não despesa executada; a adjudicação da Garraia e Sizuda foi comunicada por valor inferior ao preço base, e essa empreitada não mostra reparações nas ruas da cidade. A decisão de adjudicação e a aprovação da minuta não provam assinatura, consignação ou conclusão. As intervenções em três avenidas e as noticiadas em setembro não demonstram que integrem a empreitada geral, e as de setembro não têm conclusão documentada. O relato da N114 não está verificado; o troço preciso e a responsabilidade pela via permanecem incertos. Não há avaliação atual representativa da cidade.
 history:
   - date: 2026-08-28
     summary: Nova evidência oficial documentou uma cronologia da resposta — levantamento técnico em fevereiro, procedimento geral com prazo contratual de 10 meses e intervenções locais reportadas até junho — sem estabelecer a execução completa do procedimento geral; a investigação passa a perguntar pela condição atual da rede em todo o município.
@@ -205,3 +210,8 @@ history:
       - EVD-000178
       - EVD-000179
       - EVD-000180
+  - date: 2026-10-14
+    summary: A ficha passou a centrar-se nas ruas da cidade. A empreitada da Garraia e Sizuda, um procedimento distinto, ficou apenas como contexto do programa de reparação. Foi acrescentada uma notícia de setembro sobre o início de uma correção do pavimento na Estrada Nacional 114 e outras intervenções previstas na cidade. Continuam por apurar as ruas abrangidas e a execução da empreitada geral, bem como o estado atual do pavimento nas ruas da cidade.
+    evidence:
+      - EVD-000187
+      - EVD-000188
