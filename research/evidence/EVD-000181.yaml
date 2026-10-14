@@ -1,0 +1,20 @@
+evidence_id: EVD-000181
+provenance:
+  sources:
+    - SRC-0142
+  extracted_at: 2026-10-14
+observation:
+  summary: A lista da Direção-Geral da Saúde atualizada em agosto de 2026 situa o Hospital do Espírito Santo de Évora, da ULS do Alentejo Central, no Largo Senhor da Pobreza, 7000-811 Évora.
+scope:
+  geography:
+    level: site
+    area: Hospital do Espírito Santo de Évora, Largo Senhor da Pobreza, Évora
+  temporal:
+    as_of: 2026-08-27
+domains:
+  - HEA
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A lista estabelece a localização do hospital; não identifica os serviços concretos usados pelas pessoas abrangidas pelo diagnóstico municipal de 2023.
+  - Não informa se ocorreram ou persistem barreiras linguísticas, nem mede a sua frequência ou extensão.
