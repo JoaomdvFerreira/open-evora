@@ -1,0 +1,31 @@
+source_id: SRC-0146
+publisher: Sindicato Nacional dos Trabalhadores da Administração Local e Regional (STAL)
+name: Greve 2 Out. | Recolha do lixo paralisada ao início desta noite
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  temporal:
+    as_of: 2026-10-02
+  domains:
+    - ENV
+    - PUB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://stal.pt/arquivomenu/2149-greve-2-out-recolha-do-lixo-paralisada-ao-inicio-desta-noite.html
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-10-02
+  last_checked_at: 2026-10-14
+  update_frequency: one_off
+caveats:
+  - A percentagem de adesão comunicada pelo sindicato não mede recolhas falhadas nem delimita áreas da cidade afetadas.

@@ -1,0 +1,8 @@
+source_id: SRC-0146
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 19d0667b15b4063f00127dc0b717b5571b34da4ad07c594605098002d92446e8
+  media_type: text/html
+verified_claims:
+  - locator: "Data e corpo da comunicação, primeiros serviços noturnos"
+    statement: "Em 2 de outubro de 2026, o STAL comunicou adesão de 99% à greve em Évora no contexto dos primeiros serviços noturnos de recolha de resíduos e higiene urbana."
