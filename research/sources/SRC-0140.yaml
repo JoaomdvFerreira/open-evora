@@ -1,0 +1,31 @@
+source_id: SRC-0140
+publisher: Diário da República
+creators:
+  - Município de Évora
+name: Anúncio de procedimento n.º 6244/2026 — pavimentos viários na zona da Garraia e Sizuda
+resource_type: document
+scope:
+  geography:
+    level: local_area
+    area: Garraia e Sizuda, Évora
+  temporal:
+    as_of: 2026-03-13
+  domains:
+    - URB
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: https://files.diariodarepublica.pt/cp_hora/2026/03/051/419954046.pdf
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-03-13
+  last_checked_at: 2026-10-14
+  update_frequency: one_off

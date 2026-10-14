@@ -1,0 +1,29 @@
+source_id: SRC-0141
+publisher: Câmara Municipal de Évora
+name: Reunião pública de 1 de outubro de 2026 — início de obras na Garraia e Sizuda
+resource_type: webpage
+scope:
+  geography:
+    level: local_area
+    area: Garraia e Sizuda, Évora
+  temporal:
+    as_of: 2026-10-01
+  domains:
+    - URB
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/em-reuniao-publica-de-camara-de-1-de-outubro-de-2026-iniciadas-obras-de-reabilitacao-de-pavimentos-varios-na-zona-da-garraia-e-sizuda-no-quadro-da-cooperacao-entre-a-camara-municipal-de-evora/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-10-02
+  updated_at: 2026-10-02
+  last_checked_at: 2026-10-14

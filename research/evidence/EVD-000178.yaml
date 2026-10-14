@@ -1,0 +1,24 @@
+evidence_id: EVD-000178
+provenance:
+  sources:
+    - SRC-0140
+  extracted_at: 2026-10-14
+observation:
+  summary: O anúncio oficial do procedimento n.º 6244/2026 abriu concurso para reabilitar pavimentos na zona da Garraia e Sizuda, nos caminhos municipais CM1090 e CM1090-1 e no troço entre a EN18 e o CM1090, com preço base de 749 990 euros sem IVA e prazo contratual de 60 dias.
+scope:
+  geography:
+    level: local_area
+    area: Garraia e Sizuda, Évora
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-03-13
+domains:
+  - URB
+  - MOB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - O preço base e o prazo são condições do concurso, não o valor final adjudicado nem prova de início ou conclusão das obras.
+  - O objeto local deste procedimento não identifica as ruas abrangidas pela empreitada geral do concelho.
