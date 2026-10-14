@@ -1,6 +1,6 @@
 problem_id: PRB-0007
 created_at: 2026-08-28
-updated_at: 2026-10-13
+updated_at: 2026-10-14
 title: Necessidades de apoio e de informação de cuidadores informais no concelho de Évora
 domain:
   - SOC
@@ -231,17 +231,22 @@ status: CLOSED
 closure:
   reason: OUT_OF_SCOPE
   explanation: >-
-    A evidência canónica disponível documenta necessidades e respostas relativas
-    a cuidadores ao nível do Município de Évora, ou a nível nacional, mas não
-    estabelece uma manifestação específica da cidade de Évora. O encerramento
-    indica que este registo fica fora do âmbito geográfico atual do Open Évora;
-    não estabelece que as necessidades dos cuidadores não existam.
+    Este registo foi encerrado porque a informação disponível descreve
+    necessidades de cuidadores e respostas de apoio no concelho de Évora ou a
+    nível nacional, mas não permite identificar uma situação específica na
+    cidade de Évora, a área que o Open Évora acompanha. O encerramento não
+    significa que estas dificuldades não existam.
   reopen_condition: >-
-    Reconsiderar este registo se surgir evidência específica da cidade de Évora,
-    ou de uma área ou local dentro da cidade, que documente uma manifestação
-    material relevante para este problema. Uma avaliação municipal posterior,
-    incluindo a prevista para 2027, só é suficiente para esta reavaliação se
-    fornecer essa desagregação ou outra evidência diretamente aplicável à cidade.
+    Este registo pode ser reconsiderado se surgir informação específica da
+    cidade de Évora, ou de uma zona ou local dentro da cidade, que documente
+    uma situação concreta e significativa relacionada com este problema. Por
+    exemplo: dados sobre dificuldades de cuidadores residentes na cidade no
+    acesso a informação ou apoio, ou relatos verificáveis de dificuldades no
+    acesso a apoios prestados na cidade. Informação apenas sobre o concelho no
+    seu conjunto ou a nível nacional não é suficiente. Uma avaliação municipal
+    posterior, incluindo a prevista para 2027, só é suficiente se apresentar
+    resultados separados para a cidade ou outra evidência diretamente aplicável
+    à cidade.
   closed_at: 2026-10-13
 history:
   - date: 2026-08-31

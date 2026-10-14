@@ -663,8 +663,13 @@ export function PrbDetailsPresentation({ data, onOpenGeneric, onBackToOverview, 
           {data.closureExplanation && <div><dt>Porque deixou de estar ativo</dt><dd>{data.closureExplanation}</dd></div>}
           {data.closureClosedAt && <div><dt>Data de encerramento</dt><dd><time dateTime={data.closureClosedAt}>{formatPublicDate(data.closureClosedAt)}</time></dd></div>}
           {data.reopenCondition && <div><dt>Condi&ccedil;&atilde;o para reabrir</dt><dd>{data.reopenCondition}</dd></div>}
-          <div><dt>O que significa</dt><dd>O encerramento indica que este registo deixou de estar ativo no programa; n&atilde;o significa, por si s&oacute;, que a condi&ccedil;&atilde;o c&iacute;vica tenha desaparecido.</dd></div>
+          <div><dt>O que significa</dt><dd>{data.closureReason === "OUT_OF_SCOPE"
+            ? "O Open Évora acompanha problemas da cidade de Évora. Este registo ficou fora do âmbito porque a informação disponível não é específica da cidade; o encerramento não é uma conclusão de que o problema não exista."
+            : "O encerramento indica que este registo deixou de estar ativo no programa; não significa, por si só, que a condição cívica tenha desaparecido."}</dd></div>
         </dl>
+        {data.closureReason === "OUT_OF_SCOPE" && <p className="prb-contribute-prompt">
+          Tem informação sobre uma situação concreta na cidade de Évora? Pode partilhá-la para que a reabertura deste registo seja avaliada. <a href={`/contact?${new URLSearchParams({ type: "evidence", prb: data.problemId })}`}>Partilhar informação →</a>
+        </p>}
       </section>}
 
       <div className="shell-frame shell-frame--wide prb-details-frame">
