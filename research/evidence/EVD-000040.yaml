@@ -6,10 +6,15 @@ provenance:
     - SRC-0010
   extracted_at: 2026-08-10
 observation:
-  summary: As iniciativas atuais incluem medidas de empregabilidade e formação,
-    iniciativas universitárias de integração no mercado de trabalho,
-    envolvimento de empregadores, apoio ao empreendedorismo e programas
-    relacionados com o emprego.
+  summary: O Plano de Ação de 2025 do Plano de Desenvolvimento Social (PDS) de
+    Évora e o Plano de Atividades 2025 da Universidade de Évora preveem medidas
+    de empregabilidade e formação, incluindo levantamento de competências e
+    formação ajustada ao mercado de trabalho, incentivos à contratação, emprego
+    inclusivo e formação para grupos vulneráveis e migrantes, articulação com
+    empregadores e iniciativas universitárias de integração dos estudantes no
+    mercado de trabalho e de apoio ao empreendedorismo. Os documentos
+    apresentam estas medidas com metas, prazos e entidades responsáveis, mas
+    não registam a sua execução.
 scope:
   geography:
     level: municipality
@@ -28,3 +33,6 @@ claim_authority: authoritative
 inference_limits:
   - As iniciativas documentadas no plano de 2025 não devem ser tratadas como
     comprovadamente operacionais ou eficazes em 2026 sem evidência adicional.
+  - Os documentos não estabelecem se estas medidas ou outros programas de
+    emprego e formação já estavam em funcionamento; a falta de registo de
+    execução não significa que não existissem.

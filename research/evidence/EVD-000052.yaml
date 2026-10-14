@@ -5,10 +5,15 @@ provenance:
     - SRC-0044
   extracted_at: 2026-08-11
 observation:
-  summary: A estratégia cultural municipal e a programação de Évora 2027
-    documentam atividade cultural, investimento institucional e programação de
-    âmbito local, regional e internacional na preparação da Capital Europeia da
-    Cultura de 2027.
+  summary: O Plano Estratégico para a Cultura de Évora 2022-2030, de fevereiro
+    de 2022, propõe 25 ações prioritárias, incluindo novos equipamentos
+    culturais e reabilitação de edifícios, a candidatura de Évora a Capital
+    Europeia da Cultura 2027 e programas de apoio ao setor cultural. A página de
+    programação de Évora 2027 apresenta a programação de 2026 como preparação
+    para o ano de Capital Europeia da Cultura, com propostas nacionais e
+    internacionais e iniciativas de proximidade com comunidades do Alentejo, e
+    identifica projetos financiados, com indicação de custos, financiamento e
+    duração.
 scope:
   geography:
     level: municipality
@@ -27,3 +32,6 @@ claim_authority: authoritative
 inference_limits:
   - A existência de programação e investimento não estabelece acesso,
     participação, descoberta ou inclusão efetiva para todos os públicos.
+  - As ações propostas, a programação anunciada e o financiamento atribuído não
+    demonstram, por si só, que as atividades se realizaram nem que os
+    investimentos foram executados.

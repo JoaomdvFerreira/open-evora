@@ -1,0 +1,14 @@
+source_id: SRC-0044
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 40547971bcd3dc9dcf9d9359a858b83fb1c089c1d4ea16c1de75f67b2d5df8b0
+  media_type: text/html
+verified_claims:
+  - locator: "Secção «Programação 2026», 1.º parágrafo"
+    statement: "A página apresenta a programação de 2026 como preparação para o ano de Évora_27 como Capital Europeia da Cultura, organizada em torno do conceito de Vagar."
+  - locator: "Secção «Programação 2026», 2.º e 3.º parágrafos"
+    statement: "Segundo a página, a programação de 2026 inclui propostas nacionais e internacionais e iniciativas de proximidade com as comunidades e o território, entre elas uma iniciativa que junta artistas e populações dos concelhos do Alentejo Central e de cidades alentejanas."
+  - locator: "Bloco sobre o festival GUADIANA"
+    statement: "À data da consulta, a página anunciava a primeira edição do festival literário GUADIANA, em Évora, de 9 a 11 de outubro de 2026, com 28 autores de nove países."
+  - locator: "Secção «Projetos Financiados»"
+    statement: "A página identifica três projetos financiados (Internacionalização Évora_27, VAGAR e ECOC Echo), indicando para cada um a duração, entre 2025 e 2029, o custo total e a taxa de financiamento."

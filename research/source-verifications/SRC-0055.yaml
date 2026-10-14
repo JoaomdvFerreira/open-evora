@@ -1,0 +1,14 @@
+source_id: SRC-0055
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: f90a71455cedfd7668a89f5fab77104005ff7691ee1b298c80d0198c0d902ec6
+  media_type: text/html
+verified_claims:
+  - locator: "Cabeçalho da notícia (datas de publicação e de atualização)"
+    statement: "Notícia municipal publicada em 23 de julho de 2026 e atualizada em 28 de julho de 2026."
+  - locator: "Corpo da notícia, 1.º parágrafo"
+    statement: "Segundo o Município, duas viaturas adicionais entraram em funcionamento na recolha de resíduos sólidos urbanos, passando o serviço a contar com 19 veículos."
+  - locator: "Corpo da notícia, 2.º parágrafo"
+    statement: "O Município enquadra o reforço na reestruturação da higiene urbana e afirma que, em condições normais, permitirá ter viaturas de reserva ou de substituição em caso de avaria, com o objetivo declarado de reduzir o impacto dessas avarias na recolha diária."
+  - locator: "Corpo da notícia, 3.º parágrafo"
+    statement: "A notícia refere como medidas já em curso a recolha seletiva porta-a-porta, a contratação de equipas especializadas de higiene urbana, a reorganização da recolha de resíduos volumosos e a descentralização de competências para as juntas de freguesia."
