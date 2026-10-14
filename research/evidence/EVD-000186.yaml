@@ -17,7 +17,7 @@ domains:
   - ENV
   - PUB
 evidence_nature: claim
-claim_authority: authoritative
+claim_authority: non_authoritative
 inference_limits:
   - A percentagem é comunicada pelo sindicato e refere-se à adesão à greve; não mede recolhas falhadas, atrasos ou impacto efetivo em zonas da cidade.
   - Um episódio excecional de greve não permite avaliar a fiabilidade habitual da recolha depois da reorganização de julho e agosto.
