@@ -9,8 +9,10 @@ observation:
     2023, descreve aumento dos preços da habitação à venda nas freguesias do
     espaço urbano e uma disponibilidade muito reduzida de casas para arrendar
     nas plataformas consultadas, considerando a dimensão da cidade e a procura
-    esperada. Regista também aumento da sobrelotação de alguns alojamentos e
-    degradação de edifícios, com variação entre zonas da cidade.
+    esperada. Identifica aumento da proporção de alojamentos sobrelotados nas
+    freguesias urbanas, entre os Censos de 2011 e 2021. O indicador de edifícios
+    com necessidades de reparação aumentou em várias freguesias urbanas, mas
+    diminuiu no Centro Histórico no mesmo período.
 scope:
   geography:
     level: city

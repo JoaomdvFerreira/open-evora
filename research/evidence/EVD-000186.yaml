@@ -1,0 +1,23 @@
+evidence_id: EVD-000186
+provenance:
+  sources:
+    - SRC-0146
+  extracted_at: 2026-10-14
+observation:
+  summary: O STAL comunicou 99% de adesão à greve nacional de 2 de outubro de 2026 em Évora no contexto dos primeiros serviços noturnos de recolha de resíduos e higiene urbana.
+scope:
+  geography:
+    level: municipality
+    area: Serviços em Évora, sem delimitação de zonas da cidade
+  populations:
+    - trabalhadores dos serviços de recolha de resíduos e higiene urbana
+  temporal:
+    as_of: 2026-10-02
+domains:
+  - ENV
+  - PUB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - A percentagem é comunicada pelo sindicato e refere-se à adesão à greve; não mede recolhas falhadas, atrasos ou impacto efetivo em zonas da cidade.
+  - Um episódio excecional de greve não permite avaliar a fiabilidade habitual da recolha depois da reorganização de julho e agosto.
