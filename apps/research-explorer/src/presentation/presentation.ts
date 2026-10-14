@@ -213,3 +213,14 @@ export function formatPublicPartialDate(value: string): string {
 
   return value;
 }
+
+/** Preserve the authored precision of both ends of a bounded period. */
+export function formatPublicPeriod(start: string, end: string): string {
+  if (start === end) return formatPublicPartialDate(start);
+  if (YEAR_MONTH.test(start) && YEAR_MONTH.test(end) && start.slice(0, 4) === end.slice(0, 4)) {
+    const first = formatPublicPartialDate(start);
+    const last = formatPublicPartialDate(end);
+    if (first !== start && last !== end) return `${first.replace(/ de \d{4}$/, "")} a ${last}`;
+  }
+  return `${formatPublicPartialDate(start)} a ${formatPublicPartialDate(end)}`;
+}

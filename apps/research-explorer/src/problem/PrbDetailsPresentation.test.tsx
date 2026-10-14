@@ -1,4 +1,8 @@
 import { createRef } from "react";
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import YAML from "yaml";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -83,6 +87,22 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     renderPrb({ title: "Título canónico do problema", problem_statement: "Formulação canónica delimitada." });
     expect(screen.getByRole("heading", { name: "Título canónico do problema" })).toBeTruthy();
     expect(screen.getByText("Formulação canónica delimitada.")).toBeTruthy();
+  });
+
+  it("renders authored statement paragraphs in order without empty paragraphs", () => {
+    const { container } = renderPrb({ title: "T", problem_statement: "Primeiro.\n\n\nSegundo.\n\n\n\nTerceiro." });
+    expect(Array.from(container.querySelectorAll(".prb-identity-statement"), (p) => p.textContent)).toEqual(["Primeiro.", "Segundo.", "Terceiro."]);
+    expect(container.querySelectorAll(".prb-identity-statement:empty")).toHaveLength(0);
+  });
+
+  it.each([["PRB-0001", 1], ["PRB-0003", 1], ["PRB-0009", 3]])("preserves the canonical %s statement paragraphs", (id, paragraphCount) => {
+    const source = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../../../research/problems", `${id}.yaml`), "utf8");
+    const record = YAML.parse(source) as Record<string, unknown>;
+    const statement = record.problem_statement as string;
+    const expected = statement.split(/\r?\n[\t ]*\r?\n(?:[\t ]*\r?\n)*/).map((part) => part.replace(/\s*\r?\n\s*/g, " ").trim()).filter(Boolean);
+    const { container } = renderPrb(record);
+    expect(expected).toHaveLength(paragraphCount);
+    expect(Array.from(container.querySelectorAll(".prb-identity-statement"), (p) => p.textContent)).toEqual(expected);
   });
 
   it("renders the PRB title as a programmatically focusable h2 below the Explorer's page-level h1, exposed through titleRef", () => {
@@ -678,7 +698,7 @@ describe("PrbDetailsPresentation — audit evidence drawer", () => {
     renderPrb({ title: "T" }, [annual, interval, unknown]);
     await userEvent.click(screen.getByRole("button", { name: "Ver as 3 evidências" }));
     const rows = within(screen.getByRole("dialog")).getAllByRole("listitem").filter((item) => item.classList.contains("prb-evidence-item"));
-    expect(within(rows[0]).getByText("Período: 2025")).toBeTruthy();
+    expect(within(rows[0]).getByText("Período: janeiro a dezembro de 2025")).toBeTruthy();
     expect(within(rows[0]).getByText("Publicado: junho de 2026")).toBeTruthy();
     expect(within(rows[1]).getByText("Período: setembro de 2024 a março de 2025")).toBeTruthy();
     expect(rows[2].querySelector(".prb-evidence-item-temporal")).toBeNull();

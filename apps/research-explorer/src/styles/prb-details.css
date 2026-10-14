@@ -265,6 +265,10 @@
   line-height: 1.6;
 }
 
+.prb-identity-statement + .prb-identity-statement {
+  margin-block-start: 0.75em;
+}
+
 /* ---- Investigation state + scope full-width flat band -------------------- */
 
 /* One systematic six-column grid at >=768: a group-heading row (Estado da

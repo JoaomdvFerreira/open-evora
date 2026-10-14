@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { formatPublicCompactDate, formatPublicCount, formatPublicDate, formatPublicDateTime, formatPublicPartialDate, formatPublicRelativeDays, publicCompactEnumLabel, publicEnumExplanation, publicEnumLabel, publicFieldCaption, publicTriStateLabel } from "./presentation";
+import { formatPublicCompactDate, formatPublicCount, formatPublicDate, formatPublicDateTime, formatPublicPartialDate, formatPublicPeriod, formatPublicRelativeDays, publicCompactEnumLabel, publicEnumExplanation, publicEnumLabel, publicFieldCaption, publicTriStateLabel } from "./presentation";
+
+describe("formatPublicPeriod", () => {
+  it.each([
+    ["2026-07", "2026-08", "julho a agosto de 2026"],
+    ["2026-01", "2026-03", "janeiro a março de 2026"],
+    ["2026", "2026", "2026"],
+    ["2026-07", "2026-07", "julho de 2026"],
+    ["2025-09", "2026-03", "setembro de 2025 a março de 2026"],
+    ["2026-07-01", "2026-07-31", "1 de julho de 2026 a 31 de julho de 2026"],
+  ])("formats %s to %s as %s", (start, end, expected) => {
+    expect(formatPublicPeriod(start, end)).toBe(expected);
+  });
+});
 
 describe("PT-PT public presentation terminology", () => {
   it("labels the current Problem lifecycle and closure reasons in PT-PT", () => {
