@@ -1,0 +1,23 @@
+evidence_id: EVD-000185
+provenance:
+  sources:
+    - SRC-0145
+  extracted_at: 2026-10-14
+observation:
+  summary: Em declarações reportadas pela Rádio Elvas em 4 de setembro de 2026, a vereadora Carmen Carvalheira disse que ainda aguardava uma avaliação da laje superior da Escola Básica do Chafariz d'El-Rei, que poderia alterar a intervenção prevista, e que não existia data definida para o início da empreitada de reabilitação.
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei, Évora
+  populations:
+    - comunidade educativa da Escola Básica do Chafariz d'El-Rei
+  temporal:
+    as_of: 2026-09-04
+domains:
+  - EDU
+  - URB
+evidence_nature: fact
+claim_authority: non_authoritative
+inference_limits:
+  - A declaração descreve o estado informado em 4 de setembro; não comprova que a avaliação continuasse pendente numa data posterior.
+  - Não estabelece se algum procedimento de contratação foi entretanto aberto, adjudicado ou contratado.

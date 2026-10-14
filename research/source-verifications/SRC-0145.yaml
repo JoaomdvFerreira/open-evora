@@ -1,0 +1,10 @@
+source_id: SRC-0145
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: a795ca6e98bad8991b8b122908f86dfb1511c7fd240086f608786f8f28bad51c
+  media_type: text/html
+verified_claims:
+  - locator: "Corpo da notícia, descrição da ligação entre instalações"
+    statement: "A notícia descreve um corredor entre os monoblocos e uma passagem no muro da escola; a vereadora anunciou refeições numa parte das instalações escolares."
+  - locator: "Corpo da notícia, intervenção sobre a reabilitação"
+    statement: "A vereadora disse que aguardava uma avaliação da laje superior, que poderia alterar a intervenção, e que ainda não havia data definida para iniciar a empreitada."

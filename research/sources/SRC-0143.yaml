@@ -1,0 +1,29 @@
+source_id: SRC-0143
+publisher: Câmara Municipal de Évora
+name: Ata da reunião pública de Câmara de 16 de abril de 2026
+resource_type: document
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei e Escola André de Resende, Évora
+  temporal:
+    as_of: 2026-04-16
+  domains:
+    - EDU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/wp-content/uploads/2026/06/Ata-7-da-RPC-de-16-04-2026.pdf
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: 2026-10-14
+  update_frequency: one_off
+caveats:
+  - A ata regista declarações na reunião; não verifica diretamente o efeito das medidas anunciadas nas refeições.

@@ -1,0 +1,10 @@
+source_id: SRC-0144
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: af6d9868dbb65d95edee64b988224bd59eb830eb009cd9e6eba37833dd81f87f
+  media_type: text/html
+verified_claims:
+  - locator: "Corpo da notícia, parágrafo sobre o encerramento"
+    statement: "A peça situa o encerramento da escola em 14 de novembro de 2025, após queda de estuque numa sala, e relata a transferência temporária dos alunos para a Escola André de Resende."
+  - locator: "Início da notícia"
+    statement: "Em 1 de setembro, a peça apresentava as aulas nos monoblocos em meados de setembro como expectativa e referia uma ligação pedonal para acesso previsto ao refeitório e ao recreio da escola."

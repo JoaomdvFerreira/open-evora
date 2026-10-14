@@ -1,0 +1,31 @@
+source_id: SRC-0145
+publisher: Rádio Elvas
+name: "Évora: Monoblocos garantem condições para início do ano letivo na Escola do Chafariz D’El Rei"
+resource_type: webpage
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei, Évora
+  temporal:
+    as_of: 2026-09-04
+  domains:
+    - EDU
+    - URB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://radioelvas.com/2026/09/04/evora-monoblocos-garantem-condicoes-para-inicio-do-ano-letivo-na-escola-do-chafariz-del-rei/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-09-04
+  last_checked_at: 2026-10-14
+  update_frequency: one_off
+caveats:
+  - A notícia assenta em declarações da vereadora sobre preparativos e planos; não documenta a operação posterior dos monoblocos.

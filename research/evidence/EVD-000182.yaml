@@ -1,0 +1,22 @@
+evidence_id: EVD-000182
+provenance:
+  sources:
+    - SRC-0143
+  extracted_at: 2026-10-14
+observation:
+  summary: Na reunião municipal de 16 de abril de 2026, a vereadora Carmen Carvalheira referiu uma situação relacionada com as refeições dos alunos do Chafariz d'El-Rei então acolhidos na Escola André de Resende. Indicou que tinha sido colocada uma tarefeira, que se reunira com encarregados de educação e que a situação continuava em acompanhamento e resolução.
+scope:
+  geography:
+    level: site
+    area: Escola André de Resende, Évora
+  populations:
+    - alunos do 1.º ciclo da Escola Básica do Chafariz d'El-Rei
+  temporal:
+    as_of: 2026-04-16
+domains:
+  - EDU
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A ata não caracteriza o problema concreto nas refeições, quantos alunos afetou nem se ficou resolvido.
+  - A situação ocorreu na instalação anterior e não estabelece problemas nas refeições após a mudança prevista para os monoblocos.

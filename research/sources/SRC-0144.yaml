@@ -1,0 +1,31 @@
+source_id: SRC-0144
+publisher: Tribuna Alentejo
+name: Alunos de escola encerrada em Évora por queda de parte do teto começam as aulas em contentores
+resource_type: webpage
+scope:
+  geography:
+    level: site
+    area: Escola Básica do Chafariz d'El-Rei, Évora
+  temporal:
+    as_of: 2026-09-01
+  domains:
+    - EDU
+    - URB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://tribunaalentejo.pt/artigos/alunos-de-escola-encerrada-em-evora-por-queda-de-parte-do-teto-comecam-as-aulas-em-contentores/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-09-01
+  last_checked_at: 2026-10-14
+  update_frequency: one_off
+caveats:
+  - A peça reporta declarações municipais e da Associação de Pais sobre planos; não documenta o início efetivo das aulas nos monoblocos.
