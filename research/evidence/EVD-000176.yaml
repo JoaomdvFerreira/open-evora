@@ -1,0 +1,24 @@
+evidence_id: EVD-000176
+provenance:
+  sources:
+    - SRC-0138
+  extracted_at: 2026-10-14
+observation:
+  summary: O Município informou que, na reunião de 19 de fevereiro de 2026, foram aprovados dois procedimentos de reparação de estradas e caminhos municipais — o procedimento geral no concelho e o relativo à Garraia e Sizuda —, apresentados em conjunto como tendo valor aproximado de 1,5 milhões de euros.
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-02-19
+domains:
+  - URB
+  - MOB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - A aprovação dos procedimentos e o valor anunciado não estabelecem adjudicação, assinatura de contratos, início de obras ou despesa efetiva.
+  - Os dois procedimentos têm objetos e contratos distintos.

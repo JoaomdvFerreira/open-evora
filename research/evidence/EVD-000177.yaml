@@ -1,0 +1,24 @@
+evidence_id: EVD-000177
+provenance:
+  sources:
+    - SRC-0139
+  extracted_at: 2026-10-14
+observation:
+  summary: O Município informou que, na reunião de 28 de maio de 2026, foi aprovada a decisão de adjudicação da empreitada geral de reparação de estradas municipais no concelho de Évora à Tecnovia — Sociedade de Empreitadas, S.A., por 745 000 euros acrescidos de IVA, bem como a minuta do contrato.
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-05-28
+domains:
+  - URB
+  - MOB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - A aprovação da decisão de adjudicação e da minuta não prova que o contrato tenha sido assinado, consignado ou executado.
+  - A publicação não identifica as ruas efetivamente reparadas por esta empreitada.

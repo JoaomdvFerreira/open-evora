@@ -1,0 +1,9 @@
+source_id: SRC-0138
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 59a246dd9a63c6b4050369e34dbf4dee09e05fefec9ed64798cfc8a43eb05fc7
+  media_type: text/html
+  archive_reference: https://www.cm-evora.pt/em-reuniao-publica-de-19-de-fevereiro-camara-de-evora-lanca-campanha-de-primavera-para-reparar-vias-municipais/
+verified_claims:
+  - locator: "Notícia municipal, parágrafos iniciais sobre a Campanha da Primavera"
+    statement: "O Município apresentou em conjunto dois procedimentos aprovados em 19 de fevereiro de 2026, um geral de reparação de estradas municipais e outro para os pavimentos da Garraia e Sizuda, com valor anunciado de cerca de 1,5 milhões de euros."

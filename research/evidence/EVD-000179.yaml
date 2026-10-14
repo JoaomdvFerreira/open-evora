@@ -1,0 +1,24 @@
+evidence_id: EVD-000179
+provenance:
+  sources:
+    - SRC-0139
+  extracted_at: 2026-10-14
+observation:
+  summary: O Município informou que, na reunião de 28 de maio de 2026, foi aprovada a decisão de adjudicação da empreitada da Garraia e Sizuda à empresa Construções J.J.R. & Filhos, S.A., por 554 801,74 euros acrescidos de IVA, bem como a minuta do contrato.
+scope:
+  geography:
+    level: local_area
+    area: Garraia e Sizuda, Évora
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-05-28
+domains:
+  - URB
+  - MOB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - O valor adjudicado difere do preço base do concurso e não deve ser tratado como tal.
+  - A aprovação da decisão de adjudicação e da minuta não prova, por si, assinatura ou execução do contrato.

@@ -1,0 +1,24 @@
+evidence_id: EVD-000180
+provenance:
+  sources:
+    - SRC-0141
+  extracted_at: 2026-10-14
+observation:
+  summary: Numa publicação de 2 de outubro de 2026 sobre a reunião pública do dia anterior, o Município apresentou como iniciadas obras de reabilitação de pavimentos na zona da Garraia e Sizuda.
+scope:
+  geography:
+    level: local_area
+    area: Garraia e Sizuda, Évora
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-10-01
+domains:
+  - URB
+  - MOB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - A publicação reporta o início dos trabalhos nessa zona; não prova a sua conclusão nem o estado final do pavimento.
+  - Não estabelece início, execução ou conclusão da empreitada geral do concelho.

@@ -1,0 +1,9 @@
+source_id: SRC-0137
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: b75f073d53c6a5075ab389283ca6bf5149c88337bb63b0d7d239eb0d6b81fd76
+  media_type: application/pdf
+  archive_reference: https://www.cm-evora.pt/wp-content/uploads/2026/04/Ata-no2-da-RPC-de-22-de-janeiro-de-2026.pdf
+verified_claims:
+  - locator: "Ata n.º 2/2026, pp. 4–5, intervenção da vereadora Patrícia Raposinho"
+    statement: "A ata atribui à vereadora Patrícia Raposinho um relato de buracos em várias vias da cidade, incluindo a circular, e a preocupação de que afetavam a mobilidade e a segurança."

@@ -1,0 +1,11 @@
+source_id: SRC-0139
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 785aca4e8fcfaa20ff346fd8db0405614937f707ecffc7d8860ee737f8bfa000
+  media_type: text/html
+  archive_reference: https://www.cm-evora.pt/em-reuniao-publica-de-camara-de-28-de-maio-de-2026-aprovado-o-projeto-da-segunda-fase-da-reabilitacao-do-rossio-de-s-bras-no-valor-de-3-milhoes-335-mil-euros/
+verified_claims:
+  - locator: "Notícia municipal, lista de ratificações de empreitadas, entrada sobre reparação de estradas no concelho"
+    statement: "O Município informou que foi aprovada a adjudicação da empreitada geral à Tecnovia, por 745 000 euros mais IVA, juntamente com a minuta do contrato."
+  - locator: "Notícia municipal, lista de ratificações de empreitadas, entrada sobre Garraia e Sizuda"
+    statement: "O Município informou que foi aprovada a adjudicação da empreitada da Garraia e Sizuda à empresa Construções J.J.R. & Filhos, por 554 801,74 euros mais IVA, juntamente com a minuta do contrato."

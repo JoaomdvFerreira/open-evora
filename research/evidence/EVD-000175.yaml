@@ -1,0 +1,24 @@
+evidence_id: EVD-000175
+provenance:
+  sources:
+    - SRC-0137
+  extracted_at: 2026-10-14
+observation:
+  summary: A ata da reunião pública da Câmara de 22 de janeiro de 2026 regista que uma vereadora afirmou haver buracos em várias vias da cidade de Évora, incluindo a circular, e associou essa situação a dificuldades de mobilidade e segurança.
+scope:
+  geography:
+    level: city
+    area: Évora
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-01-22
+domains:
+  - URB
+  - MOB
+evidence_nature: claim
+claim_authority: non_authoritative
+inference_limits:
+  - Trata-se de uma declaração registada em ata, não de uma inspeção ou medição representativa das vias da cidade.
+  - A declaração não identifica todas as vias afetadas nem estabelece a condição atual do pavimento.

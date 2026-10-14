@@ -1,0 +1,29 @@
+source_id: SRC-0138
+publisher: Câmara Municipal de Évora
+name: Em reunião pública de 19 de fevereiro, Câmara de Évora lança Campanha de Primavera para reparar vias municipais
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: Évora
+  temporal:
+    as_of: 2026-02-19
+  domains:
+    - URB
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/em-reuniao-publica-de-19-de-fevereiro-camara-de-evora-lanca-campanha-de-primavera-para-reparar-vias-municipais/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-02-20
+  updated_at: 2026-05-20
+  last_checked_at: 2026-10-14
