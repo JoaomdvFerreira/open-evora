@@ -332,6 +332,8 @@ Wording must not materially strengthen or weaken the Evidence, and must not omit
 
 Citizen-facing authored prose is PT-PT. Exceptions: official names, proper nouns, URLs, IDs, schema keys and canonical enum values; enum values remain in English. Citizen-facing prose that is not PT-PT, and internal process jargon in citizen-facing text, are `BLOCKING` CLEC violations.
 
+The prohibited-expression rules enforced by `research:check` apply to the designated public PRB text fields defined by that check. They are not a blanket prohibition on that terminology in technical documentation, structured metadata or research records outside that public-field contract.
+
 ### Dimensions
 
 | # | Dimension | Requirement |
