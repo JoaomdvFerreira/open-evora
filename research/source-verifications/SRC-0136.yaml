@@ -1,0 +1,9 @@
+source_id: SRC-0136
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: e788acd807ae758240e9be4fdee0e688b8207f5123de23b809007f6647581440
+  media_type: application/pdf
+  archive_reference: https://www.cm-evora.pt/wp-content/uploads/2026/06/Ata-n.o-6-da-RPC-de-19-de-marco-de-2026.pdf
+verified_claims:
+  - locator: "Ata n.º 6/2026, Reunião Pública de 19 de março de 2026, p. 12; intervenção de vereador sobre o Bairro António Sérgio e o Largo da Boa Vontade"
+    statement: "Um vereador referiu ter recebido queixas de residentes sobre o estado degradado do Bairro António Sérgio, em particular do Largo da Boa Vontade, incluindo acumulação de resíduos, além de problemas de manutenção, iluminação e pavimento."

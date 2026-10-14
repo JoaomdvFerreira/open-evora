@@ -1,0 +1,23 @@
+evidence_id: EVD-000174
+provenance:
+  sources:
+    - SRC-0053
+  extracted_at: 2026-10-14
+observation:
+  summary: "O Município anunciou três equipas externas de higiene urbana para complementar os seus meios no perímetro urbano da cidade, no PITÉ e no PIAE, com entrada em funcionamento prevista a partir de 1 de agosto de 2026."
+scope:
+  geography:
+    level: city
+    area: Cidade de Évora
+  populations:
+    - residentes
+  temporal:
+    as_of: 2026-08
+domains:
+  - ENV
+  - PUB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - "Esta é evidência de resposta anunciada e não de manifestação, execução efetiva ou eficácia operacional."
+  - "A fonte trata também de outras áreas e ações; este registo extrai apenas a resposta relativa às equipas externas e ao perímetro urbano."

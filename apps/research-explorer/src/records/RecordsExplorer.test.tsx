@@ -132,3 +132,64 @@ describe("RecordsExplorer — sort/page persistence across select-then-return (O
     await expectPageTwoOfTwo();
   });
 });
+
+describe("Records record selection", () => {
+  const prb: RecordSummary = {
+    id: "PRB-0001", type: "PRB-", label: "Problema de teste",
+    file: "research/problems/PRB-0001.yaml", summaryFields: { status: "OPEN" },
+  };
+  const evd: RecordSummary = {
+    id: "EVD-0001", type: "EVD-", label: "Evidência de teste",
+    file: "research/evidence/EVD-0001.yaml", summaryFields: {},
+  };
+
+  function selectionProvider(): DataProvider {
+    return {
+      getManifest: async () => { throw new Error("unused"); },
+      listRecords: async () => [evd, prb],
+      getEdges: async () => [],
+      getRecord: async (id) => ({
+        id, type: id.startsWith("PRB-") ? "PRB-" : "EVD-",
+        file: id.startsWith("PRB-") ? prb.file : evd.file,
+        record: { title: id }, outgoingEdges: [], incomingEdges: [],
+      }),
+    };
+  }
+
+  it("opens PRB rows in Problem view and keeps EVD rows in generic Record Detail", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    const onViewAsProblem = vi.fn();
+    render(<RecordsExplorer dataProvider={selectionProvider()} selectedId={null} onSelect={onSelect} query="" onQueryChange={vi.fn()} typeFilter="all" onTypeFilterChange={vi.fn()} onViewAsProblem={onViewAsProblem} onViewInGraph={vi.fn()} onBackToRecords={vi.fn()} />);
+
+    await user.click(await screen.findByRole("button", { name: /EVD-0001/ }));
+    expect(onSelect).toHaveBeenCalledWith("EVD-0001");
+    expect(onViewAsProblem).not.toHaveBeenCalled();
+
+    onSelect.mockClear();
+    await user.click(screen.getByRole("button", { name: /PRB-0001/ }));
+    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0001");
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("opens a related PRB from generic Record Detail in Problem view", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    const onViewAsProblem = vi.fn();
+    const provider = selectionProvider();
+    provider.getRecord = async (id) => ({
+      id, type: id.startsWith("PRB-") ? "PRB-" : "EVD-",
+      file: id.startsWith("PRB-") ? prb.file : evd.file,
+      record: id === prb.id
+        ? { title: id, evidence: [{ evidence_id: evd.id, effects: ["SUPPORTS"], research_roles: ["LOCAL_OBSERVATION"] }] }
+        : { title: id },
+      outgoingEdges: [],
+      incomingEdges: id === evd.id ? [{ field: "evidence", ordinal: 0, from: prb.id }] : [],
+    });
+    render(<RecordsExplorer dataProvider={provider} selectedId={evd.id} onSelect={onSelect} query="" onQueryChange={vi.fn()} typeFilter="all" onTypeFilterChange={vi.fn()} onViewAsProblem={onViewAsProblem} onViewInGraph={vi.fn()} onBackToRecords={vi.fn()} />);
+
+    await user.click(await screen.findByRole("button", { name: "Ver problema PRB-0001" }));
+    expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0001");
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+});

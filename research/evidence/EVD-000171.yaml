@@ -1,0 +1,25 @@
+evidence_id: EVD-000171
+lineage_id: JAN-2026-RESIDENT-MINUTES-WASTE-REPORT
+provenance:
+  sources:
+    - SRC-0135
+  extracted_at: 2026-10-14
+observation:
+  summary: "Na reunião de 22 de janeiro de 2026, um residente do Centro Histórico relatou recolha deficiente e acumulação recorrente junto ao ponto de recolha perto da Igreja da Misericórdia, em Évora."
+scope:
+  geography:
+    level: site
+    area: Ponto de recolha junto à Igreja da Misericórdia, Centro Histórico, Évora
+  populations:
+    - residentes
+  temporal:
+    as_of: 2026-01-22
+domains:
+  - ENV
+  - PUB
+evidence_nature: reported-experience
+claim_authority: non_authoritative
+inference_limits:
+  - "As atas estabelecem que o residente fez este relato, não que a experiência seja representativa."
+  - "Um único relato não permite estimar frequência ou prevalência nem inferir o desempenho na cidade em geral."
+  - "Este relato partilha orador, reunião e processo de produção de evidência com EVD-000172."

@@ -3,28 +3,27 @@ provenance:
   sources:
     - SRC-0081
     - SRC-0053
-  extracted_at: 2026-08-11
+  extracted_at: 2026-10-14
 observation:
-  summary: Entre julho e agosto de 2026, o Município documentou a descentralização
-    de responsabilidades de higiene urbana para juntas de freguesia urbanas,
-    enquanto cobertura jornalística registou juntas de freguesia a esclarecer
-    publicamente as suas competências e limites face ao Município.
+  summary: "Os autos de transferência de competências de higiene urbana e manutenção de espaços verdes para as uniões de freguesias urbanas foram aprovados, com efeitos apenas a partir de 1 de janeiro de 2027. As tarefas e áreas são delimitadas e diferem entre uniões; a recolha de resíduos urbanos e de monos não é transferida em bloco. A preparação técnica e operacional permanecia necessária."
 scope:
   geography:
-    level: municipality
-    area: Município de Évora
+    level: city
+    area: Uniões de freguesias urbanas de Évora, nas áreas delimitadas pelos autos de transferência
   populations:
     - residentes
-    - juntas de freguesia urbanas
+    - uniões de freguesias urbanas
   temporal:
     start: 2026-07
-    end: 2026-08
+    end: 2027-01
 domains:
   - ENV
   - PUB
 evidence_nature: fact
-claim_authority: unknown
+claim_authority: non_authoritative
 inference_limits:
-  - A combinação de uma fonte municipal e cobertura jornalística não estabelece
-    que os residentes estejam confusos sobre responsabilidades nem a prevalência
-    de problemas de encaminhamento.
+  - "A informação sobre competências e áreas provém do relato jornalístico do esclarecimento conjunto das uniões e da comunicação municipal."
+  - "A aprovação não significa entrada em vigor em 2026; os efeitos estavam previstos apenas para 1 de janeiro de 2027."
+  - "As responsabilidades não são idênticas nem abrangem integralmente os territórios das uniões."
+  - "A recolha de resíduos urbanos e de monos não se transfere em bloco para as uniões."
+  - "A preparação operacional/ técnica permanecia necessária; a evidência não demonstra o funcionamento efetivo do modelo."
