@@ -154,22 +154,17 @@ describe("Explorer — Records workflow (fake provider)", () => {
   });
 
   it("selecting a record triggers exactly one lazy getRecord() call, not one per row", async () => {
-    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     const getRecord = vi.fn(fakeProvider().getRecord);
     render(<Explorer dataProvider={fakeProvider({ getRecord })} />);
-
-    const button = await screen.findByRole("button", { name: /PRB-0005/ });
-    await user.click(button);
-
     await screen.findByText("Estrutura técnica completa");
     expect(getRecord).toHaveBeenCalledTimes(1);
     expect(getRecord).toHaveBeenCalledWith("PRB-0005");
   });
 
   it("resolves outgoing PRB references to related summary labels via Referências canónicas", async () => {
-    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
 
     const detailPanel = (await screen.findByText("Detalhes")).closest("section")!;
     // RD-01G: PRB Relações no corpus now shows only incoming records — PRB-0005's outgoing evidence[0] -> EVD-000105 reference is owned exclusively by Referências canónicas.
@@ -179,8 +174,8 @@ describe("Explorer — Records workflow (fake provider)", () => {
 
   it("resolves incoming relationships to related summary labels from the index", async () => {
     const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
 
     let detailPanel = await getDetailPanel();
     const referenciasCanonicas = within(detailPanel).getByLabelText("Referências canónicas");
@@ -194,9 +189,8 @@ describe("Explorer — Records workflow (fake provider)", () => {
 
   it("navigates PRB-0005 -> EVD-000105 -> SRC-0092, each step reachable back to Registos via the breadcrumb", async () => {
     const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
-
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
 
     let detailPanel = await getDetailPanel();
@@ -233,10 +227,9 @@ describe("Explorer — Records workflow (fake provider)", () => {
 
   it("a malformed/failed detail load produces a local actionable error, still reachable back to Records via the breadcrumb", async () => {
     const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     const getRecord = () => Promise.reject(new Error("boom: malformed JSON"));
     render(<Explorer dataProvider={fakeProvider({ getRecord })} />);
-
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByRole("alert");
     expect(screen.getByText(/boom: malformed JSON/)).toBeTruthy();
     // V2: the error still renders inside the Record Detail composition, so
@@ -249,11 +242,11 @@ describe("Explorer — Records workflow (fake provider)", () => {
 
   it("retries a failed record detail and restores the selected detail", async () => {
     const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     let attempts = 0;
     const getRecord = (id: string) => (attempts++ === 0 ? Promise.reject(new Error("temporary detail failure")) : Promise.resolve(DETAILS[id]));
     render(<Explorer dataProvider={fakeProvider({ getRecord })} />);
 
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     const detailPanel = await getDetailPanel();
     const alert = await within(detailPanel).findByRole("alert");
     await user.click(within(alert).getByRole("button", { name: "Tentar novamente" }));
@@ -409,8 +402,8 @@ describe("Explorer — URL-addressable state", () => {
 
   it("selecting the same already-selected record again (via breadcrumb back, then reselect) adds exactly one further history entry", async () => {
     const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     const detailPanel = await getDetailPanel();
     const breadcrumb = within(detailPanel).getByLabelText("Localização");
 
@@ -442,9 +435,8 @@ describe("Explorer — URL-addressable state", () => {
 
   it("browser back restores the previous selection after navigating to a related record", async () => {
     const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
-
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
     let detailPanel = await getDetailPanel();
     // RD-01G: PRB-0005's outgoing reference to EVD-000105 is owned by Referências canónicas, not Relações no corpus.
@@ -669,8 +661,8 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
 
   it("navigating from a selected Record Detail to global Problemas clears the hidden selectedId", async () => {
     const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
     expect(window.location.search).toContain("id=PRB-0005");
 
@@ -704,10 +696,6 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
-    const detailPanel = await getDetailPanel();
-    expect(within(detailPanel).queryByRole("navigation", { name: "Vistas do problema" })).toBeNull();
-
-    await user.click(await within(detailPanel).findByRole("button", { name: "Ver página do problema" }));
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
     expect(window.location.search).toContain("view=problem");
     expect(window.location.search).toContain("id=PRB-0005");
@@ -749,14 +737,14 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
     await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
-    await screen.findByText("Estrutura técnica completa");
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
     await user.click(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }));
     await screen.findByRole("heading", { name: "Visão geral" });
 
     window.history.back();
     await waitFor(() => expect(window.location.search).toContain("id=PRB-0005"));
-    await screen.findByText("Estrutura técnica completa");
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
   });
 });
 
@@ -776,9 +764,8 @@ describe("Explorer — Problem view (RE-03)", () => {
 
   it("the PRB Record Detail 'Ver página do problema' action switches to the Problem view for the same ID", async () => {
     const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
-
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     const detailPanel = await getDetailPanel();
     await user.click(await within(detailPanel).findByRole("button", { name: "Ver página do problema" }));
 
@@ -826,9 +813,8 @@ describe("Explorer — Problem view (RE-03)", () => {
   });
 
   it("UX-F: browser Back/Forward across a normalized Graph URL stays deterministic and never lands on Graph", async () => {
-    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
 
     window.history.pushState(null, "", "/?view=graph&id=PRB-0005");
@@ -913,15 +899,20 @@ describe("Explorer — Problem view (RE-03)", () => {
   });
 
   it("UX-C: the global reading guide is absent on Records, including Record Detail", async () => {
-    window.history.replaceState(null, "", "/?view=records");
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
     expect(screen.queryByText("Como ler o Explorer")).toBeNull();
-
-    const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
     expect(screen.queryByText("Como ler o Explorer")).toBeNull();
+  });
+
+  it("keeps an explicit Records URL for a PRB on generic Record Detail", async () => {
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
+    render(<Explorer dataProvider={fakeProvider()} />);
+
+    await screen.findByText("Estrutura técnica completa");
+    expect(window.location.search).toBe("?view=records&id=PRB-0005");
+    expect(screen.queryByRole("navigation", { name: "Vistas do problema" })).toBeNull();
   });
 
   it("UX-C: the global reading guide is absent on Problem View", async () => {
@@ -1236,11 +1227,10 @@ describe("Explorer — URL normalization preserves window.location.hash (F08)", 
     window.history.replaceState(null, "", "/?view=records#evd-limits");
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /WID-0001/ }));
+    await screen.findByText("widget_id");
 
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
-    await screen.findByText("Estrutura técnica completa");
-
-    expect(window.location.search).toContain("id=PRB-0005");
+    expect(window.location.search).toContain("id=WID-0001");
     expect(window.location.hash).toBe("");
   });
 
@@ -1308,10 +1298,9 @@ describe("Explorer workflow — never loads edges.json or canonical YAML (real S
 
   it("selecting and navigating records never issues a fetch for edges.json or research/**/*.yaml", async () => {
     const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     const provider = new StaticDataProvider();
     render(<Explorer dataProvider={provider} />);
-
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
     await screen.findByText("Estrutura técnica completa");
     let detailPanel = await getDetailPanel();
     // RD-01G: PRB-0005's outgoing reference to EVD-000105 is owned by Referências canónicas, not Relações no corpus.

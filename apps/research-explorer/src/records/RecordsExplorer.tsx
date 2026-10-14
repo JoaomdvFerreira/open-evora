@@ -102,7 +102,7 @@ export function RecordsExplorer({
         dataProvider={dataProvider}
         lookup={indexState.lookup}
         selectedId={selectedId}
-        onSelect={onSelect}
+        onSelect={handleSelectRecord}
         onBackToRecords={onBackToRecords}
         onViewAsProblem={onViewAsProblem}
         onViewInGraph={onViewInGraph}
@@ -113,7 +113,7 @@ export function RecordsExplorer({
   return (
     <RecordsTable
       records={indexState.records}
-      onSelect={onSelect}
+      onSelect={handleSelectRecord}
       query={query}
       onQueryChange={onQueryChange}
       typeFilter={typeFilter}
@@ -122,4 +122,13 @@ export function RecordsExplorer({
       dispatchController={dispatchRecordsController}
     />
   );
+
+  function handleSelectRecord(id: string) {
+    const record = indexState.status === "ready" ? indexState.lookup.get(id) : undefined;
+    if (record?.type === "PRB-") {
+      onViewAsProblem(id);
+      return;
+    }
+    onSelect(id);
+  }
 }
