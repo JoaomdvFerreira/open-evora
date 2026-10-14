@@ -1,0 +1,32 @@
+source_id: SRC-0150
+publisher: Universidade de Évora
+name: Criação de Gabinete do Centro Local de Apoio à Integração de Migrantes na Universidade de Évora será o primeiro a Sul do Tejo
+resource_type: webpage
+scope:
+  geography:
+    level: site
+    area: Universidade de Évora, Évora
+  temporal:
+    as_of: 2025-10-29
+  domains:
+    - SOC
+    - EDU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.uevora.pt/ue-media/noticias?item=44759
+licensing:
+  status: unknown
+  reuse: unknown
+  attribution: Universidade de Évora
+temporal:
+  published_at: 2025-11-03
+  last_checked_at: 2026-10-14
+  update_frequency: one_off
+caveats:
+  - A notícia indica o dia e o mês da assinatura do protocolo (29 de outubro) sem o ano; o ano de 2025 resulta da data de publicação da página.
