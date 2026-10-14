@@ -1,0 +1,9 @@
+source_id: SRC-0141
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: c847a1f174eddd463c4620fe78ff5950dd5cb2d320d8a7a1f31dbfc9c98638fd
+  media_type: text/html
+  archive_reference: https://www.cm-evora.pt/em-reuniao-publica-de-camara-de-1-de-outubro-de-2026-iniciadas-obras-de-reabilitacao-de-pavimentos-varios-na-zona-da-garraia-e-sizuda-no-quadro-da-cooperacao-entre-a-camara-municipal-de-evora/
+verified_claims:
+  - locator: "Cabeçalho da notícia municipal publicada em 2 de outubro de 2026"
+    statement: "O Município apresentou como iniciadas as obras de reabilitação de pavimentos na zona da Garraia e Sizuda na comunicação relativa à reunião de 1 de outubro."

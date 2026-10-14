@@ -1,0 +1,11 @@
+source_id: SRC-0140
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: e74af57b5c027daac339cde714009a7b47bc0950587c72e523c3fcb13781e817
+  media_type: application/pdf
+  archive_reference: https://files.diariodarepublica.pt/cp_hora/2026/03/051/419954046.pdf
+verified_claims:
+  - locator: "Anúncio n.º 6244/2026, p. 1, secções 5 e 6"
+    statement: "O anúncio abre um concurso distinto para pavimentos na Garraia e Sizuda, incluindo os caminhos CM1090 e CM1090-1 e o troço entre a EN18 e o CM1090; indica preço base de 749 990 euros sem IVA."
+  - locator: "Anúncio n.º 6244/2026, p. 2, secção 10"
+    statement: "O campo do prazo de execução contratual indica 60 dias, sem confirmar a data em que a execução começou."
