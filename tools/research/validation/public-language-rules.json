@@ -1,0 +1,35 @@
+{
+  "description": "Expressions forbidden in citizen-facing PRB text fields. Each rule's pattern is a regular-expression source matched as a whole word. Rules are case- and accent-insensitive unless caseSensitive is true. Spaces in a pattern match any run of whitespace. Add a rule here to extend the check; the validator needs no change.",
+  "rules": [
+    { "category": "record-identifier", "expression": "EVD-", "pattern": "EVD-\\d+", "caseSensitive": true },
+    { "category": "record-identifier", "expression": "SRC-", "pattern": "SRC-\\d+", "caseSensitive": true },
+    { "category": "record-identifier", "expression": "PRB-", "pattern": "PRB-(?:\\d+|\\*)", "caseSensitive": true },
+    { "category": "record-identifier", "expression": "IREQ-", "pattern": "IREQ-\\d+", "caseSensitive": true },
+
+    { "category": "internal-governance", "expression": "proprietário", "pattern": "proprietários?" },
+    { "category": "internal-governance", "expression": "proprietária", "pattern": "proprietárias?" },
+    { "category": "internal-governance", "expression": "owner", "pattern": "owners?" },
+
+    { "category": "internal-status", "expression": "OPEN", "pattern": "OPEN", "caseSensitive": true },
+    { "category": "internal-status", "expression": "CLOSED", "pattern": "CLOSED", "caseSensitive": true },
+    { "category": "internal-status", "expression": "UNKNOWN", "pattern": "UNKNOWN", "caseSensitive": true },
+    { "category": "internal-status", "expression": "HOLD", "pattern": "HOLD", "caseSensitive": true },
+    { "category": "internal-status", "expression": "OUT_OF_SCOPE", "pattern": "OUT_OF_SCOPE", "caseSensitive": true },
+
+    { "category": "internal-jargon", "expression": "challenge", "pattern": "challenges?" },
+    { "category": "internal-jargon", "expression": "desafio direto", "pattern": "desafios? diretos?" },
+    { "category": "internal-jargon", "expression": "desafio institucional", "pattern": "desafios? institucion(?:al|ais)" },
+    { "category": "internal-jargon", "expression": "candidato", "pattern": "candidat[oa]s?" },
+    { "category": "internal-jargon", "expression": "corpus", "pattern": "corpus" },
+    { "category": "internal-jargon", "expression": "evidência canónica", "pattern": "evidências? canónicas?" },
+    { "category": "internal-jargon", "expression": "autoritativo", "pattern": "autoritativ[oa]s?" },
+    { "category": "internal-jargon", "expression": "site-specific", "pattern": "site-specific" },
+    { "category": "internal-jargon", "expression": "manifestação qualificável", "pattern": "manifestaç(?:ão|ões) qualificáve(?:l|is)" },
+    { "category": "internal-jargon", "expression": "série operacional", "pattern": "séries? operaciona(?:l|is)" },
+    { "category": "internal-jargon", "expression": "registos ligados", "pattern": "registos ligados(?: a este problema)?" },
+    { "category": "internal-jargon", "expression": "critério delimitado", "pattern": "critérios? delimitados?" },
+    { "category": "internal-jargon", "expression": "hipótese informacional", "pattern": "hipóteses? informaciona(?:l|is)" },
+    { "category": "internal-jargon", "expression": "observação seguramente executável", "pattern": "observaç(?:ão|ões) seguramente executáve(?:l|is)" },
+    { "category": "internal-jargon", "expression": "restringiu a hipótese de falha", "pattern": "restringiu a hipótese de falha" }
+  ]
+}

@@ -195,11 +195,11 @@ function generate(scale, outDir) {
       problem_id: id,
       created_at: "2026-08-10",
       updated_at: "2026-08-10",
-      title: `Synthetic problem statement for ${id}`,
+      title: `Synthetic problem statement ${id.slice("PRB-".length)}`,
       domain: pickN(rng, DOMAINS, 1 + Math.floor(rng() * 2)),
       geography: { level: "municipality" },
       affected_populations: [`synthetic affected population ${1 + Math.floor(rng() * 4)}`],
-      problem_statement: `Synthetic problem statement body for ${id}, deterministically generated for RE-05 scale benchmarking.`,
+      problem_statement: `Synthetic problem statement body ${id.slice("PRB-".length)}, deterministically generated for RE-05 scale benchmarking.`,
       evidence: pickN(rng, evdIds, evCount).map((evidence_id) => ({
         evidence_id,
         effects: ["SUPPORTS"],
