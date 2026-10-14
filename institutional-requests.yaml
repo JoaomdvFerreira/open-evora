@@ -92,9 +92,9 @@ requests:
   - request_id: IREQ-0009
     prb_references: [PRB-0010]
     intended_recipient: Município de Évora
-    requested_information: Contrato assinado do procedimento 4772/2026, consignação, prazo efetivo, alterações, ordens de trabalho, ruas selecionadas e reparadas com datas e estado de conclusão; contrato e execução do procedimento 6244/2026; levantamento técnico de fevereiro e documentação que reconcilie os dois procedimentos no programa anunciado.
-    why_needed: Distinguir anúncio, adjudicação, assinatura, início e execução e avaliar as condições da cidade após as intervenções.
-    already_known_sources: [SRC-0125, SRC-0126, SRC-0127, SRC-0138, SRC-0139, SRC-0140, SRC-0141]
+    requested_information: Contrato assinado da empreitada geral do procedimento 4772/2026, consignação e data efetiva de início; ordens de trabalho e lista das ruas da cidade selecionadas; intervenções concluídas por rua, com datas; alterações, atrasos e estado de conclusão; levantamento técnico de fevereiro ou avaliação municipal atual do estado do pavimento nas ruas da cidade; execução das intervenções noticiadas em setembro na Estrada Nacional 114, junto à Escola do Bairro da Câmara e nas Portas da Lagoa.
+    why_needed: Distinguir adjudicação, assinatura, início e execução da empreitada geral nas ruas da cidade e avaliar as condições da cidade após as intervenções. O preço, a data de celebração e o prazo do contrato do procedimento 6244/2026 já constam do Portal BASE e não são pedidos.
+    already_known_sources: [SRC-0125, SRC-0126, SRC-0127, SRC-0138, SRC-0139, SRC-0140, SRC-0141, SRC-0147, SRC-0148]
     last_known_contact_state: Pedido pendente de preparação e não enviado.
     authorization_status: Envio não autorizado.
     send_date: null

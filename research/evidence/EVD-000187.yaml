@@ -1,0 +1,26 @@
+evidence_id: EVD-000187
+provenance:
+  sources:
+    - SRC-0147
+  extracted_at: 2026-10-14
+observation:
+  summary: O registo do contrato n.º 15522521 no Portal BASE, publicado em 24 de agosto de 2026, indica que o Município de Évora celebrou em 8 de junho de 2026 com a Construções J.J.R. & Filhos, S.A. o contrato para reabilitar pavimentos na zona da Garraia e Sizuda, nos caminhos CM1090 e CM1090-1 e no troço entre a EN18 e o CM1090, com preço contratual inicial de 554 801,74 euros e prazo de execução de 60 dias.
+scope:
+  geography:
+    level: local_area
+    area: Garraia e Sizuda, Évora
+  populations:
+    - residentes
+    - condutores
+  temporal:
+    as_of: 2026-06-08
+domains:
+  - URB
+  - MOB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - O prazo de 60 dias é contratual; o registo não estabelece as datas efetivas de início ou de conclusão das obras.
+  - O registo não documenta a execução física dos trabalhos nem o estado do pavimento.
+  - O objeto do contrato é a zona da Garraia e Sizuda; não identifica ruas da cidade nem documenta a empreitada geral de reparação de estradas no concelho.
+  - A falta de data de encerramento no registo, na consulta, não demonstra que a obra esteja ou não concluída.

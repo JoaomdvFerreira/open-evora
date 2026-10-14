@@ -1,0 +1,15 @@
+source_id: SRC-0147
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: ce87e0d5ff10ff52c074da5362eb88f8d01d78c203321033bd8932893b15080c
+  media_type: text/plain
+  archive_reference: https://www.base.gov.pt/Base4/pt/detalhe/?type=contratos&id=15522521
+verified_claims:
+  - locator: "Registo do contrato n.º 15522521, campos de objeto, entidade adjudicante, adjudicatário e local de execução"
+    statement: "O registo identifica um contrato do Município de Évora com a Construções J.J.R. & Filhos, S.A. para reabilitar pavimentos na zona da Garraia e Sizuda, nos caminhos CM1090 e CM1090-1 e no troço entre a EN18 e o CM1090."
+  - locator: "Registo do contrato n.º 15522521, campos de data de celebração e de data de publicação"
+    statement: "O registo indica que o contrato foi celebrado em 8 de junho de 2026 e publicado no portal em 24 de agosto de 2026."
+  - locator: "Registo do contrato n.º 15522521, campos de preço contratual inicial e de prazo de execução"
+    statement: "O registo indica um preço contratual inicial de 554 801,74 euros e um prazo de execução de 60 dias."
+  - locator: "Registo do contrato n.º 15522521, campos de data de encerramento e de preço efetivo total"
+    statement: "Na consulta, os campos de data de encerramento e de preço efetivo total do contrato estavam vazios."
