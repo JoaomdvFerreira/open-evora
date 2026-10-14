@@ -1,9 +1,8 @@
 problem_id: PRB-0008
 created_at: "2026-08-28"
-updated_at: "2026-08-31"
-title: O alinhamento entre competências e necessidades dos empregadores é uma
-  preocupação institucional ativa, mas o desfasamento específico em Évora ainda
-  não está caracterizado
+updated_at: "2026-10-14"
+title: Alinhamento entre competências e necessidades dos empregadores no concelho
+  de Évora
 domain:
   - EMP
   - EDU
@@ -16,69 +15,64 @@ affected_populations:
   - empregadores
   - entidades de formação e ensino
 problem_statement: >-
-  O planeamento institucional local trata o alinhamento entre as competências da
-  força de trabalho e as necessidades dos empregadores — através do mapeamento
-  de competências, da adaptação da formação e de uma articulação mais forte
-  entre entidades de ensino e empregadores — como uma linha de trabalho atual e
-  ativa, e não como uma preocupação resolvida, apesar da considerável
-  infraestrutura existente de apoio económico e empresarial e das iniciativas de
-  transição entre ensino e emprego.
+  O diagnóstico do PDS identifica, à escala do concelho de Évora, um desajustamento
+  entre as qualificações da força de trabalho e as necessidades dos empregadores,
+  mas não quantifica a sua dimensão nem identifica as competências em falta.
+  Existem ou estão previstos mecanismos de empregabilidade, formação e articulação
+  entre empregadores e entidades de ensino; a sua existência não demonstra que o
+  desajustamento esteja resolvido nem a eficácia global dessas respostas.
 
 
-  Ainda não está estabelecido quais as competências ou profissões concretamente
-  em falta no concelho de Évora, por oposição à região do Alentejo em geral,
-  para a qual existe uma lista regional de profissões em escassez.
+  Os retratos de ofertas do IEFP e do Indeed mostram procura anunciada ou requisitos
+  especializados, mas não demonstram escassez de competências nem recrutamento
+  sem sucesso. A EURES identifica profissões em escassez apenas para a região do
+  Alentejo. Os dados do CTEF Évora abrangem 14 municípios e não apresentam uma
+  lista de profissões em escassez. Nenhuma destas evidências permite estabelecer
+  a situação especificamente na cidade de Évora.
+
+
+  O crescimento empresarial e a feira do emprego prevista são contexto e respostas
+  à escala da cidade; nenhum demonstra um desajustamento de competências na cidade.
 investigation:
   open_questions:
-    - question: Quais são as competências ou profissões concretamente em falta no
-        concelho de Évora, por oposição à região do Alentejo em geral?
+    - question: Que profissões ou competências estão documentadas como de difícil
+        recrutamento especificamente na cidade de Évora?
       why_open: >-
-        A lista regional de profissões em escassez do EURES para o Alentejo é
-        mais informativa do que simples listagens pontuais de ofertas de emprego
-        do IEFP ou Indeed, porque identifica profissões em situação de escassez
-        e não apenas vagas anunciadas. No entanto, trata-se de evidência à
-        escala regional, não municipal, e não deve ser generalizada para Évora
-        sem corroboração local.
-
-
-        O boletim do IEFP confirma ainda que a área estatística do CTEF Évora
-        abrange catorze municípios, pelo que os dados dos centros de emprego do
-        IEFP também não permitem obter uma lista específica para o concelho de
-        Évora.
+        A EURES identifica profissões em escassez à escala regional do Alentejo.
+        O boletim do IEFP para o CTEF Évora cobre 14 municípios e não apresenta
+        uma lista de profissões em escassez. O diagnóstico municipal e as ofertas
+        anunciadas não respondem à questão específica da cidade.
       latest_result: A via institucional terminou sem resposta após uma sequência de
         contacto delimitada; a ausência de resposta não é evidência a favor nem
         contra o problema.
-      current_action: Não é proporcional prosseguir contacto institucional; a questão
-        permanece em aberto até existirem dados municipais específicos ou evidência
-        institucional de igual alcance.
-      resolution_condition: Dados ou validação institucional específicos do concelho
-        de Évora, e não apenas regionais, sobre profissões ou competências em
-        situação de escassez.
+      current_action: Nenhuma ação ativa no âmbito atual do programa.
+      resolution_condition: Evidência específica da cidade ou validação institucional
+        com recorte específico para a cidade sobre profissões ou competências de
+        difícil recrutamento.
       evidence:
         - EVD-000115
         - EVD-000116
   path:
     initial_signal:
-      summary: O planeamento institucional local identificou o alinhamento entre as
-        competências da força de trabalho e as necessidades dos empregadores
-        como uma linha de trabalho ativa, através do mapeamento de competências,
-        da adaptação da formação e de uma articulação mais forte entre entidades
-        de ensino e empregadores.
+      summary: O diagnóstico de planeamento municipal identificou um desajustamento
+        entre as qualificações da força de trabalho e as necessidades dos
+        empregadores; foram também documentados mapeamento de competências,
+        adaptação da formação e articulação entre entidades de ensino e empregadores.
+        O crescimento empresarial registado à escala da cidade não demonstra esse
+        desajustamento.
       evidence:
         - EVD-000037
         - EVD-000144
         - EVD-000040
         - EVD-000041
     development:
-      summary: Foi confirmado que já existe uma infraestrutura substancial de
-        intermediação entre ofertas de emprego e candidatos — iniciativas
-        universitárias de carreira e empregabilidade, ofertas do IEFP,
-        mecanismos de formação e o Portal de Emprego da Universidade de Évora.
-        Os instrumentos institucionais preveem também mapeamento de
-        competências, adaptação da formação e articulação educação-empregadores,
-        e a Universidade anunciou uma terceira edição da Feira do Emprego para
-        outubro de 2026. Assim, o foco permanece no alinhamento e na sua
-        eficácia, não na ausência de uma bolsa de emprego genérica.
+      summary: Existem mecanismos de empregabilidade, formação e articulação entre
+        empregadores e entidades de ensino, e estão previstos mapeamento de
+        competências, adaptação da formação e uma terceira edição da Feira do
+        Emprego da Universidade de Évora para outubro de 2026. A evidência não
+        demonstra a eficácia global destas respostas. O crescimento empresarial
+        e a feira prevista são contexto e resposta à escala da cidade, não prova
+        de desajustamento de competências nessa escala.
       evidence:
         - EVD-000048
         - EVD-000144
@@ -86,22 +80,23 @@ investigation:
     delimitation:
       summary: >-
         As listagens públicas de ofertas de emprego, por si só, não permitem
-        identificar uma escassez real de competências. O levantamento do IEFP
-        Évora, com 102 ofertas, não contém dados sobre o tempo necessário para
-        preencher as vagas, tentativas de recrutamento sem sucesso, limitações
-        salariais ou escassez reportada pelos empregadores.
+        identificar uma escassez real de competências. O retrato municipal do
+        IEFP em Évora, com 102 ofertas, e o retrato municipal do Indeed para o
+        setor aeroespacial mostram procura anunciada ou requisitos especializados,
+        mas não contêm dados sobre o tempo necessário para preencher as vagas,
+        tentativas de recrutamento sem sucesso, limitações salariais ou escassez
+        reportada pelos empregadores.
 
 
-        Foi também identificado um sinal de procura especializada no setor
-        aeroespacial, sem que este permita estabelecer, por si só, uma situação
-        real de escassez.
+        O sinal de procura especializada no setor aeroespacial não permite
+        estabelecer, por si só, uma situação real de escassez.
 
 
-        Foram ainda identificados dois mecanismos já em funcionamento para
-        alinhamento de competências e recolha de informação junto dos
-        empregadores — PlaQuaR e o plano de ação anual UÉ/TE Connectivity —, sem
-        que a evidência disponível permita concluir que estes mecanismos são
-        sistemáticos ou suficientes para o conjunto da economia de Évora.
+        Foram ainda identificados o PlaQuaR, concebido à escala regional do
+        Alentejo, e o plano de ação anual UÉ/TE Connectivity, à escala do concelho,
+        para alinhamento de competências e recolha de informação junto dos
+        empregadores. A evidência disponível não permite concluir que estes
+        mecanismos sejam sistemáticos ou suficientes para a economia do concelho.
       evidence:
         - EVD-000049
         - EVD-000101
@@ -183,7 +178,43 @@ evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
-status: OPEN
+status: CLOSED
+closure:
+  reason: OUT_OF_SCOPE
+  explanation: >-
+    A evidência canónica inclui um diagnóstico de planeamento autoritativo à escala
+    do concelho que identifica um desajustamento entre as qualificações da força
+    de trabalho e as necessidades dos empregadores (EVD-000037). Esse diagnóstico
+    não quantifica o desajustamento nem identifica as competências concretamente
+    em falta. As respostas existentes e previstas estão documentadas sobretudo à
+    escala do concelho ou mais ampla. A evidência que identifica profissões em
+    escassez é regional (Alentejo, EVD-000115); os dados do CTEF Évora são
+    intermunicipais (14 municípios) e não apresentam uma lista de profissões em
+    escassez (EVD-000116). Os registos à escala da cidade (EVD-000041, EVD-000147)
+    documentam crescimento empresarial e uma feira do emprego prevista, mas não
+    estabelecem um desajustamento de competências na cidade. Por isso, a evidência não
+    estabelece uma manifestação específica na cidade de Évora. Este encerramento
+    não estabelece que não exista um desajustamento de competências.
+  reopen_condition: >-
+    Reconsiderar este registo se surgir evidência específica da cidade de Évora
+    sobre profissões ou competências de difícil recrutamento ou sobre um
+    desajustamento entre as competências disponíveis e as necessidades dos
+    empregadores. Pode incluir, por exemplo, um levantamento junto de empregadores
+    da cidade, dados da Universidade de Évora, do NERE ou de outra entidade com
+    esse recorte, ou o mapeamento de competências previsto no PDS caso produza
+    evidência aplicável especificamente à cidade. Evidência apenas municipal,
+    regional ou intermunicipal não é suficiente, por si só, para satisfazer esta
+    condição.
+  closed_at: 2026-10-14
 history:
   - date: 2026-08-31
     summary: A via institucional terminou sem resposta e essa ausência não é evidência a favor nem contra o problema; a questão municipal sobre competências e profissões em escassez mantém-se em aberto até existir evidência específica do concelho.
+  - date: 2026-10-14
+    summary: O registo foi encerrado porque a evidência disponível não estabelece
+      uma manifestação específica na cidade de Évora; este encerramento não afirma
+      que o desajustamento subjacente não exista. A redação pública foi alinhada
+      com o limite geográfico da evidência.
+    state_changes:
+      status:
+        from: OPEN
+        to: CLOSED
