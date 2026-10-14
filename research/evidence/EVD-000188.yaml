@@ -1,0 +1,28 @@
+evidence_id: EVD-000188
+provenance:
+  sources:
+    - SRC-0148
+  extracted_at: 2026-10-14
+observation:
+  summary: Numa notícia de 8 de setembro de 2026, a DianaFM noticiou que tinham começado na noite de segunda-feira trabalhos da Câmara Municipal para corrigir o pavimento na Estrada Nacional 114, depois de uma rotura recente. Segundo a mesma notícia, as intervenções iriam estender-se à envolvente da Escola do Bairro da Câmara e às passadeiras das Portas da Lagoa, no sentido Lisboa/Portas de Aviz, e, segundo a autarquia, poderiam abranger outras áreas sem localização indicada.
+scope:
+  geography:
+    level: city
+    area: Évora
+  populations:
+    - residentes
+    - condutores
+    - peões
+  temporal:
+    as_of: 2026-09-08
+domains:
+  - URB
+  - MOB
+evidence_nature: claim
+claim_authority: non_authoritative
+inference_limits:
+  - A notícia reporta o início dos trabalhos na Estrada Nacional 114; não estabelece a sua conclusão nem o estado do pavimento depois da intervenção.
+  - As intervenções junto à Escola do Bairro da Câmara, nas Portas da Lagoa e noutras áreas são apresentadas como previstas, não como executadas.
+  - A notícia não identifica o troço exato da Estrada Nacional 114 nem a entidade responsável pela sua conservação, e não permite associar esta intervenção ao relato de julho sobre a entrada de Évora pela N114.
+  - A notícia não indica se estas intervenções integram a empreitada geral de reparação de estradas municipais.
+  - Uma notícia sobre intervenções localizadas não avalia o estado do pavimento nas ruas da cidade no seu conjunto.

@@ -1,0 +1,37 @@
+source_id: SRC-0147
+publisher: Instituto dos Mercados Públicos, do Imobiliário e da Construção (IMPIC) — Portal BASE
+creators:
+  - Município de Évora
+name: Portal BASE — contrato n.º 15522521, empreitada de reabilitação dos pavimentos viários na zona da Garraia e Sizuda
+resource_type: database
+identity:
+  persistent_identifier:
+    scheme: Portal BASE (contrato)
+    value: "15522521"
+scope:
+  geography:
+    level: local_area
+    area: Garraia e Sizuda, Évora
+  temporal:
+    as_of: 2026-06-08
+  domains:
+    - URB
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: true
+  method: api
+  format: json
+acquisition:
+  method: public_web
+canonical_reference: https://www.base.gov.pt/Base4/pt/detalhe/?type=contratos&id=15522521
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-08-24
+  last_checked_at: 2026-10-14
+  update_frequency: irregular
+caveats:
+  - Os campos de data de encerramento e de preço efetivo total do registo não estavam preenchidos na consulta de 14 de outubro de 2026.

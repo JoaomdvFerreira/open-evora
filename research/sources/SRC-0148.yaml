@@ -1,0 +1,31 @@
+source_id: SRC-0148
+publisher: DianaFM
+name: Évora avança com obras de beneficiação rodoviária em várias zonas da cidade
+resource_type: webpage
+scope:
+  geography:
+    level: city
+    area: Évora
+  temporal:
+    as_of: 2026-09-08
+  domains:
+    - URB
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.dianafm.com/evora-avanca-com-obras-de-beneficiacao-rodoviaria-em-varias-zonas-da-cidade/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-09-08
+  last_checked_at: 2026-10-14
+  update_frequency: one_off
+caveats:
+  - A peça não cita um documento municipal; atribui expressamente ao Município apenas os objetivos das intervenções e a possibilidade de abrangerem outras áreas.

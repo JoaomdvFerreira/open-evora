@@ -1,0 +1,17 @@
+source_id: SRC-0148
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 88ade69cd83a94c32c7e410b4386667e727c09f389cf889e1025b2b3db5f6795
+  media_type: text/html
+  archive_reference: https://www.dianafm.com/evora-avanca-com-obras-de-beneficiacao-rodoviaria-em-varias-zonas-da-cidade/
+verified_claims:
+  - locator: "Data da notícia e primeiro parágrafo"
+    statement: "A notícia está datada de terça-feira, 8 de setembro de 2026, e apresenta um conjunto de intervenções de conservação da rede viária da cidade previstas para os dias seguintes, cujo objetivo atribui ao Município."
+  - locator: "Segundo parágrafo"
+    statement: "A notícia indica que as obras começaram na noite de segunda-feira, com uma primeira operação na Estrada Nacional 114, onde a Câmara corrigia o pavimento depois de uma rotura recente."
+  - locator: "Terceiro parágrafo"
+    statement: "A notícia indica que os trabalhos decorriam de preferência à noite para reduzir o impacto no trânsito."
+  - locator: "Quarto parágrafo"
+    statement: "A notícia indica que o plano se estenderia à envolvente da Escola do Bairro da Câmara e às passadeiras das Portas da Lagoa, no sentido Lisboa/Portas de Aviz, e que, segundo a autarquia, poderia abranger outras áreas a necessitar de correção do pavimento."
+  - locator: "Crédito da fotografia, no final do texto"
+    statement: "A fotografia que acompanha a notícia é creditada à Câmara Municipal de Évora."
