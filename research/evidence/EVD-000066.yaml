@@ -6,11 +6,21 @@ provenance:
     - SRC-0055
   extracted_at: 2026-08-11
 observation:
-  summary: Entre julho e agosto de 2026, o Município documentou uma resposta de
-    reorganização da higiene urbana que incluiu reforço de pessoal e veículos,
-    alterações nos horários e modelos de recolha, medidas logísticas, alterações
-    de responsabilidades, monitorização interna e intenção de responder mais
-    rapidamente aos pedidos dos munícipes relativos a resíduos volumosos.
+  summary: Em julho de 2026, o Município de Évora comunicou medidas de
+    reorganização da higiene urbana em fases diferentes. Apresentou como já
+    iniciadas ou realizadas a recolha seletiva porta-a-porta, iniciada em abril
+    nos Canaviais com a GESAMB e alargada a Tourega, Guadalupe e Bairro da
+    Torregela; a reorganização da recolha de resíduos volumosos (atendimento,
+    horários por turnos, instalações e horário alargado); a criação de uma
+    equipa interna para acompanhar e monitorizar as medidas; e a entrada em
+    funcionamento de duas novas viaturas de recolha, num total de 19.
+    Apresentou como previstas a entrada em funcionamento, a partir de 1 de
+    agosto, de três equipas externas de higiene urbana contratadas por 24
+    meses; a extensão da recolha porta-a-porta ao Centro Histórico, então em
+    preparação; e a descentralização de competências para as juntas de
+    freguesia urbanas, com contratos aprovados pela Assembleia Municipal e
+    entrada em vigor prevista para 2027. O Município declarou o objetivo de
+    responder mais rapidamente aos pedidos de recolha de resíduos volumosos.
 scope:
   geography:
     level: municipality
@@ -29,3 +39,7 @@ inference_limits:
   - As medidas e prioridades da resposta municipal não demonstram que esses
     fatores sejam as causas dominantes nem que a reorganização tenha sido
     plenamente executada ou restaurado a fiabilidade do serviço.
+  - As medidas apresentadas como realizadas são descritas pelo próprio
+    Município. As fontes não confirmam que as medidas previstas, como as
+    equipas externas a partir de 1 de agosto, tenham entrado em funcionamento,
+    nem demonstram o funcionamento das medidas depois de julho de 2026.
