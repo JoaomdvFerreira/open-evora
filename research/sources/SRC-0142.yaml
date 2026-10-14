@@ -2,6 +2,8 @@ source_id: SRC-0142
 publisher: Direção-Geral da Saúde
 name: Estabelecimentos de saúde oficiais e oficialmente reconhecidos para realização da interrupção da gravidez por opção da mulher — atualização de 27 de agosto de 2026
 resource_type: document
+identity:
+  version: "2026-08-27"
 scope:
   geography:
     level: national
