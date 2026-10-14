@@ -22,7 +22,7 @@ investigation:
     - question: Que ruas da cidade foram selecionadas para reparação e em que ponto estão os trabalhos?
       why_open: A empreitada geral abrange todo o concelho. A decisão de adjudicação não identifica as ruas da cidade selecionadas, nem mostra quais foram intervencionadas ou concluídas.
       latest_result: Em maio de 2026, o Município aprovou a adjudicação da empreitada geral à Tecnovia e a minuta do contrato. Até junho, comunicou trabalhos em curso nas avenidas Cartaxo Júnior e das Fontanas e uma correção da calçada já feita na Avenida de São João de Deus. Em setembro, a DianaFM noticiou o início de uma correção do pavimento na Estrada Nacional 114 e intervenções previstas junto à Escola do Bairro da Câmara e nas passadeiras das Portas da Lagoa. Não está demonstrado que alguma destas intervenções integre a empreitada geral.
-      current_action: Não estão confirmadas a assinatura do contrato nem a consignação da empreitada geral. Continuam sem documentação as ruas da cidade selecionadas, as ordens de trabalho, as datas de execução e as intervenções concluídas. O pedido de informação ao Município não foi enviado nem está autorizado.
+      current_action: Não estão confirmadas a assinatura do contrato nem a consignação da empreitada geral. Continuam sem documentação as ruas da cidade selecionadas, as ordens de trabalho, as datas de execução e as intervenções concluídas. O pedido de informação ao Município ainda não foi enviado.
       resolution_condition: Contrato e registos municipais de execução suficientes para identificar as ruas da cidade incluídas, os trabalhos realizados e as datas de conclusão.
       evidence:
         - EVD-000155
@@ -33,7 +33,7 @@ investigation:
     - question: Qual é o estado atual do pavimento nas ruas da cidade de Évora?
       why_open: Os relatos de janeiro e o diagnóstico municipal de fevereiro são históricos. As intervenções conhecidas dizem respeito a vias determinadas; falta uma avaliação atual que cubra as ruas da cidade de forma suficiente.
       latest_result: Uma vereadora relatou buracos em várias vias da cidade em janeiro. A petição e o diagnóstico municipal referem-se ao concelho. O Município reportou intervenções em três avenidas da cidade até junho. Em setembro, a DianaFM noticiou o início de uma correção localizada do pavimento na Estrada Nacional 114, depois de uma rotura recente, e outras intervenções previstas; a notícia não descreve o estado das vias depois dos trabalhos. Um relato de julho numa rede social sobre a entrada pela N114 continua não verificado e não está ligado à intervenção de setembro; o troço preciso e a responsabilidade pela via estão por esclarecer. Estes elementos não medem o estado atual das ruas da cidade.
-      current_action: O pedido de informação e do levantamento técnico ao Município não foi enviado nem está autorizado. A pesquisa pública disponível ainda não produziu uma avaliação atual e representativa das ruas da cidade.
+      current_action: O pedido de informação e do levantamento técnico ao Município ainda não foi enviado. A pesquisa pública disponível ainda não produziu uma avaliação atual e representativa das ruas da cidade.
       resolution_condition: Levantamento técnico atual, informação municipal por rua ou outra evidência verificável com cobertura suficiente para avaliar o estado do pavimento nas ruas da cidade após as intervenções.
       evidence:
         - EVD-000082

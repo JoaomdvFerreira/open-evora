@@ -1,6 +1,6 @@
 problem_id: PRB-0006
 created_at: "2026-08-28"
-updated_at: "2026-10-13"
+updated_at: "2026-10-14"
 title: "Alojamento estudantil em Évora: lugares disponíveis e procura não satisfeita"
 domain: [HOU, EDU]
 geography:
@@ -68,9 +68,7 @@ investigation:
     initial_signal:
       summary: >-
         O planeamento relativo à cidade identificou escassez de alojamento
-        estudantil e capacidade insuficiente das residências face à procura de
-        estudantes (EVD-000033). O planeamento municipal mais amplo
-        (EVD-000031, EVD-000032) é contexto e prevê avaliação de necessidades e
+        estudantil e capacidade insuficiente das residências face à procura de estudantes. O planeamento municipal mais amplo é contexto e prevê avaliação de necessidades e
         trabalho de candidatura a financiamento, sem demonstrar conclusão.
       evidence: [EVD-000031, EVD-000032, EVD-000033]
     development:
@@ -87,7 +85,7 @@ investigation:
         continuam por quantificar na evidência ligada. O planeamento municipal
         mais amplo não mede por si só a manifestação na cidade.
         A habitação municipal a preços comportáveis e as respetivas intervenções
-        são tratadas separadamente em PRB-0013.
+        são tratadas separadamente no problema sobre habitação a preços comportáveis em Évora.
       evidence: [EVD-000043, EVD-000126, EVD-000031]
 evidence:
   - evidence_id: EVD-000031
@@ -118,7 +116,7 @@ solution_landscape_status: not_assessed
 status: OPEN
 history:
   - date: 2026-08-31
-    summary: A resposta institucional dos SASUÉ descreveu um processo de candidatura em linha estruturado, que consideram plenamente operacional, e restringiu a hipótese de falha no processo institucional; a usabilidade, clareza, acessibilidade e experiência de espera dos estudantes mantêm-se por estabelecer.
+    summary: A resposta institucional dos SASUÉ descreveu um processo de candidatura em linha estruturado, que consideram plenamente operacional, e, a partir dessa resposta, a possível falha no processo institucional ficou mais delimitada; a usabilidade, clareza, acessibilidade e experiência de espera dos estudantes mantêm-se por estabelecer.
     state_changes:
       validation_status:
         from: unvalidated
@@ -127,18 +125,15 @@ history:
     summary: O Problema foi corrigido para representar o financiamento aprovado comunicado pela Universidade de Évora em 2022 para 105 camas adicionais de alojamento estudantil, sem estabelecer entrega, entrada em operação ou efeito na procura não satisfeita.
   - date: 2026-10-12
     summary: >-
-      O anterior problema misto foi dividido: PRB-0006 passou a centrar-se no
-      alojamento estudantil e a habitação municipal mais ampla passou para
-      PRB-0013. A hipótese de navegação digital saiu do problema atual. A
-      validação foi reposta porque o desafio anterior incidiu no processo de
-      candidatura, e não na capacidade ou procura não satisfeita.
+      O anterior problema misto foi dividido: este problema passou a centrar-se no alojamento estudantil e a habitação municipal mais ampla passou para o problema sobre habitação a preços comportáveis em Évora. A hipótese de navegação digital saiu do problema atual. A
+      validação foi reposta porque a verificação anterior junto das instituições incidiu no processo de candidatura, e não na capacidade ou procura não satisfeita.
     state_changes:
       validation_status:
         from: partially_validated
         to: unvalidated
   - date: 2026-10-13
     summary: >-
-      O proprietário fixou o âmbito na cidade de Évora; o planeamento municipal
+      O âmbito passou a ser a cidade de Évora; o planeamento municipal
       mais amplo passou a contexto e foi retirada imprensa secundária que não
       era necessária à formulação do alojamento estudantil na cidade.
 decision_basis:

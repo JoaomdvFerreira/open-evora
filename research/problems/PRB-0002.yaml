@@ -1,7 +1,7 @@
 problem_id: PRB-0002
 created_at: "2026-08-28"
-updated_at: "2026-10-12"
-title: Informação limitada e ausência de elementos de acessibilidade em paragens de autocarro descritas pelo PMUSE de Évora
+updated_at: "2026-10-14"
+title: Informação limitada e falta de elementos de acessibilidade em paragens de autocarro de Évora
 domain:
   - MOB
   - DIG
@@ -38,8 +38,7 @@ investigation:
         A evidência disponível não identifica a condição atual das paragens
         descritas nem o estado de execução das medidas propostas.
       current_action: >-
-        Está preparado, mas não enviado, um pedido documental ao Município de
-        Évora, partilhado com PRB-0001, sobre intervenções e estado atual das
+        Está preparado, mas não enviado, um pedido documental ao Município de Évora, partilhado com o problema da oferta e pontualidade dos autocarros urbanos, sobre intervenções e estado atual das
         paragens, informação ao
         passageiro instalada, informação em tempo real, acessibilidade,
         execução das medidas relevantes do PMUSE e responsabilidades e
@@ -94,9 +93,7 @@ investigation:
         Foi reconhecido que a qualidade e a completude da informação destinada
         ao passageiro e a reutilização de dados por terceiros são questões
         distintas; este registo ficou delimitado à informação orientada ao
-        passageiro. A avaliação do serviço intermunicipal TPAC documentou
-        horários e percursos no Google Maps através de dados GTFS e
-        insuficiências na informação ao público; essa evidência é apenas
+        passageiro. A avaliação do serviço intermunicipal de transporte público do Alentejo Central documentou a publicação de horários e percursos no Google Maps e insuficiências na informação ao público; essa evidência é apenas
         contexto intermunicipal. O relatório municipal de junho de 2026 sobre
         2025 documentou canais de informação e reclamações do serviço urbano
         TREVO, sem descrever a condição atual das paragens referidas pelo
@@ -113,9 +110,7 @@ investigation:
         operação ou eficácia. A investigação distingue as condições
         documentadas historicamente da situação atual das paragens, ainda por
         esclarecer, e não generaliza essas condições a todas as paragens de
-        Évora. A evidência TPAC serve apenas de contexto intermunicipal.
-        PRB-0001 trata da oferta e pontualidade do serviço urbano, não da
-        informação nas paragens; o pedido documental ao Município é partilhado.
+        Évora. A avaliação do serviço intermunicipal serve apenas de contexto. A oferta e a pontualidade do serviço urbano, e não a informação nas paragens, são tratadas no problema sobre os autocarros urbanos, com o qual é partilhado o pedido documental ao Município.
       evidence:
         - EVD-000016
         - EVD-000122
@@ -175,5 +170,4 @@ history:
       reorganizadas: primeiro a verificação do estado atual e, só depois,
       caso persistam lacunas materiais de informação, os seus efeitos nas
       deslocações. Foi incorporada evidência municipal relativa a 2025 sobre
-      canais de informação e reclamações; a evidência TPAC foi mantida apenas
-      como contexto intermunicipal.
+      canais de informação e reclamações; a avaliação do serviço intermunicipal foi mantida apenas como contexto.

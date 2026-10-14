@@ -1,8 +1,7 @@
 problem_id: PRB-0004
 created_at: "2026-08-28"
-updated_at: "2026-10-13"
-title: Rede ciclável de Évora com limitações documentadas; estado atual e
-  execução da expansão proposta por apurar
+updated_at: "2026-10-14"
+title: Limitações e falta de ligações na rede ciclável de Évora
 domain:
   - MOB
   - URB
@@ -14,8 +13,7 @@ affected_populations:
 problem_statement: >-
   O planeamento institucional descreve a rede ciclável de Évora como reduzida,
   espacialmente descontínua e sem ligação a vários equipamentos, serviços e
-  zonas residenciais relevantes. A cartografia apresentada no PMUSE representa
-  cerca de 8,5 km de infraestrutura exclusivamente ciclável, cerca de 120 km
+  zonas residenciais relevantes. A cartografia apresentada no Plano de Mobilidade Urbana Sustentável de Évora (PMUSE) representa cerca de 8,5 km de infraestrutura exclusivamente ciclável e cerca de 120 km
   de percursos partilhados por peões e ciclistas. A proposta municipal de 2017
   representada no PMUSE prevê cerca de 18 km de novos eixos exclusivamente
   cicláveis. Estas extensões são referências cartográficas e de planeamento:
@@ -108,7 +106,7 @@ investigation:
         - EVD-000118
     development:
       summary: >-
-        Para 2020, o PUE regista a bicicleta em cerca de 0,5 % das deslocações
+        Para 2020, o Plano de Urbanização de Évora (PUE) regista a bicicleta em cerca de 0,5 % das deslocações
         dos residentes. O PMUSE representa uma proposta municipal de 2017 de
         cerca de 18 km de novos eixos exclusivos e 33 km da «Grande Rota do
         Montado» partilhada. Os 33 km são uma componente da proposta
@@ -201,8 +199,8 @@ solution_landscape_status: not_assessed
 status: OPEN
 history:
   - date: 2026-08-31
-    summary: Não foi identificada uma deslocação quotidiana recorrente que cumprisse o critério delimitado para desafio direto; a investigação deixa de procurar novas deslocações e reabre apenas perante uma deslocação concreta e segura ou evidência operacional atual materialmente melhor.
+    summary: Não foi identificada uma deslocação quotidiana recorrente que reunisse as condições definidas para verificar diretamente o problema; a investigação deixa de procurar novas deslocações e reabre apenas perante uma deslocação concreta e segura ou evidência operacional atual materialmente melhor.
   - date: 2026-10-12
     summary: A investigação foi reformulada e reaberta para apurar a rede ciclável atual, a execução ou revisão da expansão proposta e a relação com trabalhos posteriores; prevê consulta de informação pública e, onde esta não bastar, pedido delimitado de esclarecimento ao Município de Évora.
   - date: 2026-10-13
-    summary: O proprietário fixou que os valores de extensão do PMUSE permanecem como referências cartográficas e de planeamento, sem provar a extensão atual entregue da rede da cidade nem que todos os percursos representados se situem dentro dela.
+    summary: Ficou estabelecido que os valores de extensão do PMUSE permanecem como referências cartográficas e de planeamento, sem provar a extensão atual entregue da rede da cidade nem que todos os percursos representados se situem dentro dela.

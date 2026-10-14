@@ -1,6 +1,6 @@
 problem_id: PRB-0005
 created_at: 2026-08-28
-updated_at: "2026-10-13"
+updated_at: "2026-10-14"
 title: Tráfego lento documentado e segurança rodoviária em Évora; efeito da Variante Nascente por apurar
 domain:
   - MOB
@@ -14,8 +14,7 @@ affected_populations:
   - condutores
   - peões
 problem_statement: >-
-  O diagnóstico de mobilidade do PUE regista congestionamento em torno das
-  muralhas e na circular sul, velocidades excessivas de veículos e problemas
+  O diagnóstico de mobilidade do Plano de Urbanização de Évora (PUE) regista congestionamento em torno das muralhas e na circular sul, velocidades excessivas de veículos e problemas
   de segurança rodoviária em Évora. O seu período de observação é desconhecido
   e não estabelece a persistência atual. Para 2025, o Município associou
   atrasos recorrentes dos autocarros urbanos a tráfego lento nas horas de ponta,
@@ -113,12 +112,10 @@ investigation:
         - EVD-000166
         - EVD-000167
     delimitation:
-      summary: PRB-0001 trata da oferta e da pontualidade dos autocarros
-        urbanos; aqui, a atribuição municipal dos atrasos serve apenas para
-        investigar o tráfego lento. PRB-0003 trata das barreiras e condições
-        para peões; aqui, o foco são as velocidades dos veículos e a segurança
+      summary: A oferta e a pontualidade dos autocarros urbanos são tratadas num problema próprio; aqui, a atribuição municipal dos atrasos serve apenas para
+        investigar o tráfego lento. As barreiras e condições para peões também são tratadas num problema próprio; aqui, o foco são as velocidades dos veículos e a segurança
         rodoviária. A degradação física e a manutenção do pavimento rodoviário
-        pertencem a PRB-0010.
+        pertencem ao problema sobre buracos e pavimento degradado nas ruas de Évora.
       evidence:
         - EVD-000007
         - EVD-000139
@@ -155,8 +152,7 @@ history:
   - date: 2026-08-31
     summary: A verificação direta não resolveu se a disponibilidade de informação de
       estacionamento é uma causa material; o enquadramento físico e operacional
-      de tráfego e estacionamento mantém-se distinto da hipótese informacional,
-      que reabre apenas com evidência local direta de contribuição causal
+      de tráfego e estacionamento mantém-se distinto da hipótese sobre informação de estacionamento, que reabre apenas com evidência local direta de contribuição causal
       material.
   - date: 2026-09-16
     summary: A Variante Nascente de Évora (IP2) foi identificada pela

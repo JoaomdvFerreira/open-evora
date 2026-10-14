@@ -1,6 +1,6 @@
 problem_id: PRB-0001
 created_at: 2026-08-28
-updated_at: "2026-10-13"
+updated_at: "2026-10-14"
 title: "Autocarros urbanos: oferta reduzida à noite, fins de semana e feriados e atrasos nas horas de ponta em Évora"
 domain:
   - MOB
@@ -55,8 +55,7 @@ investigation:
         sem desagregação.
       current_action: >-
         A verificação de informação pública mais recente está pendente; o que
-        continuar por esclarecer integra o pedido documental ao Município de
-        Évora, partilhado com o PRB-0002, preparado mas ainda não enviado.
+        continuar por esclarecer integra o pedido documental ao Município de Évora, partilhado com o problema da informação e acessibilidade em paragens de autocarro, preparado mas ainda não enviado.
       resolution_condition: >-
         Dados do Município ou do operador que identifiquem as carreiras,
         partidas, paragens e sentidos afetados nos dois corredores e indiquem
@@ -72,13 +71,11 @@ investigation:
         Município, a Universidade ou o operador responderam.
       latest_result: >-
         Segundo a reportagem, cerca de 30 estudantes manifestaram-se e foi
-        referida uma petição com mais de 250 assinaturas. Os registos ligados
-        não indicam se houve resposta.
+        referida uma petição com mais de 250 assinaturas. A informação reunida não indica se houve resposta.
       current_action: >-
         Está pendente a verificação de uma eventual resposta publicada pelo
         Município de Évora, pela Universidade de Évora, pelo operador TREVO ou
-        na imprensa. Se não houver resposta pública, a questão integra o pedido
-        documental ao Município partilhado com PRB-0002, preparado mas não enviado.
+        na imprensa. Se não houver resposta pública, a questão integra o pedido documental ao Município partilhado com o problema da informação e acessibilidade em paragens de autocarro, preparado mas não enviado.
       resolution_condition: >-
         Informação pública ou institucional que indique se houve resposta à
         petição e qual foi.
@@ -93,7 +90,7 @@ investigation:
         efeitos nas deslocações; os relatos ligados não estabelecem a frequência
         das situações descritas.
       latest_result: >-
-        Os registos ligados não estabelecem efeitos nas deslocações; existem
+        A informação reunida não estabelece efeitos nas deslocações; existem
         apenas relatos individuais não verificados.
       current_action: >-
         A análise de deslocações concretas permanece dependente do
@@ -153,10 +150,7 @@ investigation:
         sem demonstrarem que a oferta é adequada. O protesto estudantil de 2026 e três
         reclamações individuais de 2025 são relatos que não estabelecem a
         frequência das situações descritas. Este problema trata da oferta e da
-        pontualidade do serviço; a informação aos passageiros nas paragens é
-        investigada separadamente no PRB-0002. O tráfego lento atribuído pelo
-        Município aos atrasos dos autocarros não altera este foco; PRB-0005
-        trata do tráfego motorizado e da segurança rodoviária.
+        pontualidade do serviço; a informação aos passageiros nas paragens é investigada num problema próprio. O tráfego lento atribuído pelo Município aos atrasos dos autocarros não altera este foco; o tráfego motorizado e a segurança rodoviária são tratados no problema sobre tráfego e segurança rodoviária.
       evidence:
         - EVD-000002
         - EVD-000023
@@ -560,7 +554,6 @@ history:
       documentadas, sem dar por estabelecida a utilidade prática do serviço.
       Separou as dúvidas sobre oferta atual, atrasos nas horas de ponta,
       resposta à petição estudantil e efeitos nas deslocações, substituiu a
-      ação anterior por consulta de fontes públicas e pedido documental e
-      passou a distinguir-se do PRB-0002.
+      ação anterior por consulta de fontes públicas e pedido documental e passou a distinguir-se do problema da informação e acessibilidade em paragens de autocarro.
   - date: 2026-10-13
-    summary: O proprietário fixou o âmbito na cidade de Évora e retirou da delimitação da rede urbana TREVO o transporte flexível municipal e o contexto intermunicipal sem pertinência direta.
+    summary: O âmbito passou a ser a cidade de Évora, e foram retirados da delimitação da rede urbana TREVO o transporte flexível municipal e o contexto intermunicipal sem pertinência direta.
