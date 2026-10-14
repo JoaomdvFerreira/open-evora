@@ -4,9 +4,7 @@ provenance:
     - SRC-0079
   extracted_at: 2026-08-11
 observation:
-  summary: Uma publicação num grupo público de Facebook relata acumulação de
-    resíduos especificamente na zona dos Canaviais, em Évora, descrevendo uma
-    ocorrência geograficamente localizada de resíduos por recolher e acumulados.
+  summary: Um relato público sem data estabelecida descreve acumulação de resíduos na zona dos Canaviais, em Évora.
 scope:
   geography:
     level: parish
@@ -21,5 +19,4 @@ domains:
 evidence_nature: reported-experience
 claim_authority: non_authoritative
 inference_limits:
-  - Trata-se de um único relato autosselecionado nos Canaviais e não permite
-    estimar frequência ou prevalência.
+  - Trata-se de um único relato autosselecionado nos Canaviais e não permite estimar frequência ou prevalência.
