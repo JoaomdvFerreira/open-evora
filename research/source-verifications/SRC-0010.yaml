@@ -1,0 +1,14 @@
+source_id: SRC-0010
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 01160d337e96979923eb8afe8085c5441231ffe8502eb43fae79c5da0cdf10e2
+  media_type: application/pdf
+verified_claims:
+  - locator: "Secção 3.9 «Ligação com a Sociedade», página 30 do documento (35 do PDF)"
+    statement: "A Universidade indica que estava prevista para 2025 a criação de uma estrutura para oferecer formações breves ajustadas às necessidades do mercado e cursos para executivos, em articulação com operadores económicos, associações e outras entidades."
+  - locator: "Secção 3.9 «Ligação com a Sociedade», página 30 do documento (35 do PDF)"
+    statement: "A secção anuncia, no futuro, iniciativas de capacitação para orientar a integração dos estudantes no mercado de trabalho e apoiar a sua capacidade empreendedora."
+  - locator: "Quadro 15, página 31 do documento (36 do PDF)"
+    statement: "O quadro da ligação à sociedade fixa ações, indicadores e metas para 2025, incluindo protocolos, iniciativas com municípios da região e formação para executivos."
+  - locator: "Quadro 5 «Submedida Reforço das competências digitais», página 12 do documento (16 do PDF)"
+    statement: "Para 2025, a Universidade assume uma meta de 240 formandos em formações de curta duração (microcredenciais) destinadas a capacitar profissionais para o mercado de trabalho na área das tecnologias de informação e comunicação."

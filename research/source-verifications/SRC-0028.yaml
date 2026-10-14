@@ -1,0 +1,12 @@
+source_id: SRC-0028
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 720b6d9177df39eaf26bacf8e60f6bc56fbb1bb3d15fcfaaa039f39c4dc2e4b8
+  media_type: application/pdf
+verified_claims:
+  - locator: "Página 3 do PDF, quadro «Eixo 1 – Fixação da População – Mercado de Trabalho» (estratégias, objetivos e medidas prioritárias)"
+    statement: "Para aumentar a empregabilidade, o plano define uma estratégia de articulação entre instituições de ensino e formação e entidades empregadoras, com medidas prioritárias de levantamento de competências, formação ajustada ao mercado, incentivo à contratação, emprego inclusivo e programa de competências para grupos vulneráveis, e formação para a população migrante."
+  - locator: "Página 4 do PDF, continuação do quadro (entidades responsáveis, calendarização e coluna PA 2025)"
+    statement: "Para essas medidas, o quadro indica entidades responsáveis, entre elas o IEFP, a Universidade de Évora, a Câmara Municipal e gabinetes de inserção profissional, calendarização entre 2024 e 2027 e metas para 2025, como integrar 100 pessoas e realizar ações de formação e sessões de sensibilização."
+  - locator: "Páginas 3 e 4 do PDF, coluna «Indicadores de execução»"
+    statement: "Nas páginas relativas ao mercado de trabalho, os indicadores de execução são apresentados como categorias a medir, sem valores de execução registados."
