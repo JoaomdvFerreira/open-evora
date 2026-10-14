@@ -13,16 +13,21 @@ affected_populations:
 problem_statement: >-
   O diagnóstico municipal realizado em 2023 identificou barreiras de língua e
   dificuldades no acesso à saúde e à saúde mental entre pessoas migrantes do
-  concelho de Évora. O Hospital do Espírito Santo de Évora situa-se na cidade;
-  esta localização permite considerar o diagnóstico um sinal de dificuldades
-  no acesso a serviços de saúde na cidade, sem medir quantas pessoas foram
-  afetadas aí ou afirmar que recorreram a esse hospital.
+  concelho de Évora. Dados do Serviço Nacional de Saúde (SNS) situam o
+  Hospital do Espírito Santo de Évora na cidade; esta localização permite
+  considerar o diagnóstico um sinal de dificuldades no acesso a serviços de
+  saúde na cidade. O diagnóstico não mediu dificuldades nesse hospital, não
+  indica quantas pessoas foram afetadas na cidade e não mostra que tenham
+  recorrido a esse hospital.
 
-  O projeto municipal Acolher no VAGAR prevê respostas de integração e a
-  Universidade de Évora mantém um Centro Local de Apoio à Integração de
-  Migrantes (CLAIM). A sua existência ou previsão não demonstra cobertura ou
-  eficácia no acesso à saúde. A pesquisa pública delimitada de outubro de 2026
-  não estabeleceu se as barreiras de 2023 persistem nos serviços da cidade.
+  O projeto municipal Acolher no VAGAR prevê medidas e metas de integração. A
+  Universidade de Évora anunciou um Centro Local de Apoio à Integração de
+  Migrantes (CLAIM) destinado à sua comunidade académica migrante. Nos serviços
+  de saúde da cidade, não está verificado que apoio de interpretação ou
+  mediação existe nem que resultados teve. A existência ou previsão destas
+  respostas não demonstra melhoria no acesso à saúde. A pesquisa pública
+  delimitada de outubro de 2026 não estabeleceu se as barreiras de 2023
+  persistem nos serviços de saúde da cidade.
 investigation:
   open_questions:
     - question: Persistem em 2026 barreiras de língua e dificuldades de acesso à
@@ -47,22 +52,41 @@ investigation:
       evidence:
         - EVD-000149
         - EVD-000181
-    - question: Que apoio existe ou está previsto para superar estas dificuldades
-        e que resultados são conhecidos nos serviços de saúde da cidade?
-      why_open: Acolher no VAGAR apresenta objetivos e metas e a Universidade
-        de Évora mantém um CLAIM, mas a informação disponível não estabelece
-        quantas pessoas foram atendidas nem se as dificuldades de acesso à saúde
-        diminuíram.
-      latest_result: O CLAIM é um serviço anunciado como existente; as medidas
-        de Acolher no VAGAR são objetivos previstos. Nenhuma destas fontes
-        apresenta resultados que demonstrem melhoria no acesso aos cuidados
-        de saúde da cidade.
-      current_action: O pedido de informação agregada à ULS do Alentejo Central
-        está preparado e pendente de autorização; não foi enviado. Não há
-        avaliação documentada dos resultados destas respostas no acesso à saúde.
-      resolution_condition: Dados verificáveis sobre execução, utilização e
-        resultados das respostas relevantes, com cobertura e período definidos,
-        que permitam avaliar o seu contributo para o acesso à saúde na cidade.
+    - question: Que apoios de integração, interpretação ou mediação existem ou
+        estão previstos para pessoas migrantes em Évora, quais foram
+        efetivamente utilizados e que resultados estão documentados no acesso
+        aos cuidados de saúde da cidade?
+      why_open: O Acolher no VAGAR apresenta atividades de integração previstas
+        e metas de participantes. O CLAIM da Universidade de Évora destina-se à
+        comunidade académica migrante da Universidade. As fontes disponíveis não
+        estabelecem que apoios foram efetivamente utilizados nem que resultados
+        tiveram no acesso aos serviços de saúde da cidade. A informação em falta
+        cabe a instituições com responsabilidades diferentes, o Município, a
+        Universidade e a Unidade Local de Saúde (ULS) do Alentejo Central.
+      latest_result: "Município: o Acolher no VAGAR tem objetivos, medidas
+        previstas e metas de destinatários e participantes; a sua execução e os
+        resultados no acesso à saúde não estão estabelecidos. Universidade: em
+        2025 foi anunciado um CLAIM para a comunidade académica migrante e, em
+        agosto de 2026, uma página pública identificava a sua equipa e
+        contacto; a utilização, os tipos de apoio prestados e os encaminhamentos
+        para cuidados de saúde não estão estabelecidos. ULS do Alentejo Central:
+        não foi encontrada informação documentada dos serviços de saúde que
+        estabeleça se interpretação, tradução ou mediação reduziram barreiras
+        de língua na cidade."
+      current_action: O pedido de informação à ULS do Alentejo Central está
+        preparado e pendente de autorização; não foi enviado. Não há números
+        agregados verificados sobre a execução e os resultados do Acolher no
+        VAGAR, nem sobre a utilização e os encaminhamentos do CLAIM. Os pedidos
+        ao Município e à Universidade estão em rascunho e não foram enviados;
+        cada envio exige autorização própria.
+      resolution_condition: Informação específica, datada e verificável que
+        permita distinguir, para cada apoio, a disponibilidade efetiva, a
+        população e a área abrangidas, a utilização quando registada, os
+        encaminhamentos para cuidados de saúde quando existam, os resultados no
+        acesso à saúde quando mensuráveis e as limitações dos dados. Não se
+        exige ao Município ou à Universidade informação clínica. A atividade de
+        um programa não basta, por si só, para concluir que melhorou o acesso à
+        saúde.
       evidence:
         - EVD-000151
         - EVD-000152
@@ -78,7 +102,8 @@ investigation:
         - EVD-000150
     development:
       summary: Foram identificados os objetivos do projeto municipal Acolher
-        no VAGAR e o CLAIM da Universidade de Évora. Informação nacional
+        no VAGAR e o CLAIM da Universidade de Évora, destinado à comunidade
+        académica migrante da Universidade. Informação nacional
         descreve dificuldades semelhantes no acesso de pessoas imigrantes aos
         cuidados de saúde primários, sem medir a situação em Évora.
       evidence:
@@ -130,7 +155,7 @@ evidence:
     effects:
       - REFINES
     research_roles:
-      - LOCAL_OBSERVATION
+      - CONTEXTUAL
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
@@ -141,4 +166,9 @@ history:
     summary: O âmbito geográfico passou para a cidade porque o hospital aqui considerado se situa em Évora. O diagnóstico do concelho continua a descrever dificuldades identificadas em 2023; não está confirmado se persistem em 2026 nos serviços da cidade.
     evidence:
       - EVD-000149
+      - EVD-000181
+  - date: 2026-10-14
+    summary: A localização do Hospital do Espírito Santo passou a apoiar-se em dados do Portal da Transparência do SNS. O CLAIM da Universidade de Évora passou a ser descrito como destinado à comunidade académica migrante. A questão sobre apoios passou a distinguir disponibilidade, utilização e resultados documentados e a separar a informação a obter junto do Município, da Universidade e da ULS do Alentejo Central. Continua por saber se as barreiras identificadas em 2023 persistem em 2026 nos serviços de saúde da cidade.
+    evidence:
+      - EVD-000152
       - EVD-000181
