@@ -149,7 +149,7 @@ requests:
     intended_recipient: ULS Alentejo Central
     requested_information: Informação operacional agregada para 2025 e 2026 sobre interpretação, tradução e mediação cultural nas unidades de saúde situadas na cidade de Évora, incluindo línguas apoiadas, utilização, barreiras de acesso documentadas e encaminhamentos para serviços de saúde mental. Sem dados individuais, registos identificáveis ou histórias clínicas.
     why_needed: Estabelecer se as barreiras identificadas no diagnóstico de 2023 persistem e avaliar a disponibilidade e cobertura das respostas existentes.
-    already_known_sources: [SRC-0120, SRC-0122, SRC-0123, SRC-0142, PRB-0011]
+    already_known_sources: [SRC-0120, SRC-0122, SRC-0123, SRC-0149, PRB-0011]
     last_known_contact_state: Pedido identificado e preparado, mas não enviado; não há contacto anterior com a ULS documentado neste registo.
     authorization_status: Envio não autorizado.
     send_date: null
@@ -166,3 +166,25 @@ requests:
     send_date: null
     response_date: null
     follow_up_decision: Aguardar autorização expressa do owner antes de qualquer envio.
+  - request_id: IREQ-0016
+    prb_references: [PRB-0011]
+    intended_recipient: Município de Évora
+    requested_information: Execução do projeto Acolher no VAGAR, com atividades efetivamente realizadas, períodos e área abrangida; número de participantes, quando disponível; apoios relacionados com a língua e com o acesso à saúde; encaminhamentos agregados e avaliações do projeto, quando existam. Sem dados individuais, registos identificáveis ou informação clínica.
+    why_needed: A ficha do projeto apresenta medidas previstas e metas, que não estabelecem a execução nem resultados no acesso à saúde na cidade.
+    already_known_sources: [SRC-0120, SRC-0122, PRB-0011]
+    last_known_contact_state: Pedido em rascunho, não enviado; sem contacto documentado sobre este projeto.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Rever o rascunho e decidir separadamente sobre qualquer envio, apenas após autorização expressa do owner.
+  - request_id: IREQ-0017
+    prb_references: [PRB-0011]
+    intended_recipient: Universidade de Évora
+    requested_information: Funcionamento do gabinete do CLAIM da comunidade académica, com data de início de atendimento, público efetivamente atendido e utilização agregada; tipos de apoio prestados; encaminhamentos relacionados com cuidados de saúde, se registados; limitações conhecidas dos dados de acompanhamento. Sem dados individuais, registos identificáveis ou informação clínica.
+    why_needed: As fontes públicas identificam o CLAIM e o seu público académico, mas não estabelecem utilização, tipos de apoio ou encaminhamentos para cuidados de saúde.
+    already_known_sources: [SRC-0123, SRC-0150, PRB-0011]
+    last_known_contact_state: Pedido em rascunho, não enviado; sem contacto documentado sobre o CLAIM.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Rever o rascunho e decidir separadamente sobre qualquer envio, apenas após autorização expressa do owner.
