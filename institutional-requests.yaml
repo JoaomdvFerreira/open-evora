@@ -144,3 +144,14 @@ requests:
     send_date: null
     response_date: null
     follow_up_decision: Verificar primeiro contagens e dados públicos da Infraestruturas de Portugal e de outras fontes oficiais.
+  - request_id: IREQ-0014
+    prb_references: [PRB-0011]
+    intended_recipient: ULS Alentejo Central
+    requested_information: Informação operacional agregada para 2025 e 2026 sobre interpretação, tradução e mediação cultural nas unidades de saúde situadas na cidade de Évora, incluindo línguas apoiadas, utilização, barreiras de acesso documentadas e encaminhamentos para serviços de saúde mental. Sem dados individuais, registos identificáveis ou histórias clínicas.
+    why_needed: Estabelecer se as barreiras identificadas no diagnóstico de 2023 persistem e avaliar a disponibilidade e cobertura das respostas existentes.
+    already_known_sources: [SRC-0120, SRC-0122, SRC-0123, SRC-0142, PRB-0011]
+    last_known_contact_state: Pedido identificado e preparado, mas não enviado; não há contacto anterior com a ULS documentado neste registo.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Manter o pedido para autorização separada do owner antes de qualquer envio.
