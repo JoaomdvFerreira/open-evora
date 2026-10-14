@@ -155,3 +155,14 @@ requests:
     send_date: null
     response_date: null
     follow_up_decision: Manter o pedido para autorização separada do owner antes de qualquer envio.
+  - request_id: IREQ-0015
+    prb_references: [PRB-0012]
+    intended_recipient: Município de Évora
+    requested_information: Avaliação técnica do edifício, incluindo a laje superior, e projeto de reabilitação; referência e publicação do procedimento de contratação; decisão de adjudicação e contrato assinado, se aplicáveis; valor contratual e prazo de execução; datas previstas de início e conclusão dos trabalhos; condições de segurança estrutural e de reabertura; data atualmente prevista para a reabertura da Escola Básica do Chafariz d'El-Rei.
+    why_needed: Esclarecer o âmbito técnico, a contratação e o calendário da reabilitação, ainda sem marcos verificáveis na pesquisa pública delimitada.
+    already_known_sources: [SRC-0128, SRC-0143, SRC-0145, PRB-0012]
+    last_known_contact_state: Pedido preparado e não enviado; sem contacto documentado sobre esta reabilitação.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Aguardar autorização expressa do owner antes de qualquer envio.
