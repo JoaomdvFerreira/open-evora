@@ -1,0 +1,9 @@
+source_id: SRC-0142
+retrieval:
+  retrieved_at: "2026-10-14"
+  content_sha256: 028d09bfb6f9c249f2685330d607106180e726ff02b6cbdf6b45b8999ba3625f
+  media_type: application/pdf
+  archive_reference: https://www.dgs.pt/pns-e-programas/programas-de-saude/saude-sexual-e-reprodutiva/interrupcao-da-gravidez/informacao-a-populacao/estabelecimentos-oficiais-e-oficialmente-reconhecidos-para-a-realizacao-de-interrupcao-da-gravidez1.aspx
+verified_claims:
+  - locator: "Capa (página 1), atualização de 27 de agosto de 2026; página 8, linha da ULS do Alentejo Central"
+    statement: "A lista da Direção-Geral da Saúde foi atualizada em 27 de agosto de 2026 e identifica o Hospital do Espírito Santo de Évora como unidade da ULS do Alentejo Central, com morada no Largo Senhor da Pobreza, 7000-811 Évora."

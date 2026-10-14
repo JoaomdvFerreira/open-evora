@@ -1,0 +1,29 @@
+source_id: SRC-0142
+publisher: Direção-Geral da Saúde
+name: Estabelecimentos de saúde oficiais e oficialmente reconhecidos para realização da interrupção da gravidez por opção da mulher — atualização de 27 de agosto de 2026
+resource_type: document
+identity:
+  version: "2026-08-27"
+scope:
+  geography:
+    level: national
+    area: Portugal
+  temporal:
+    as_of: 2026-08-27
+  domains:
+    - HEA
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: https://www.dgs.pt/pns-e-programas/programas-de-saude/saude-sexual-e-reprodutiva/interrupcao-da-gravidez/informacao-a-populacao/estabelecimentos-oficiais-e-oficialmente-reconhecidos-para-a-realizacao-de-interrupcao-da-gravidez1.aspx
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  updated_at: 2026-08-27
+  last_checked_at: 2026-10-14

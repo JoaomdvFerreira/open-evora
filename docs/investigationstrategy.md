@@ -131,6 +131,12 @@ Problem boundaries should follow meaningful differences in manifestation, affect
 
 Several observations in one domain may represent different Problems; observations from different places may represent one underlying Problem.
 
+### City geography for services
+
+Quando o problema acontece em serviços situados na cidade (por exemplo, hospital, centros de saúde, escolas, serviços de atendimento), a evidência do concelho conta como sinal do problema na cidade, a menos que a fonte indique que os serviços afetados ficam fora da cidade. A localização dos serviços tem de estar suportada por evidência ligada. Não se aplica a serviços prestados em todo o território (como a recolha de resíduos ou as estradas).
+
+This does not turn municipality-wide prevalence into a city-level estimate or establish that every affected person used a particular facility. Preserve the Evidence's place, population, time and inference limits.
+
 ### Existing and planned solutions
 
 Distinguish what already operates, what is planned/announced, and what remains unresolved.
