@@ -6,6 +6,7 @@ import type { DataProvider } from "../dataProvider/types";
 import { OutOfScopeArchive } from "./OutOfScopeArchive";
 
 const GITHUB_ISSUES_URL = "https://github.com/JoaomdvFerreira/open-evora/issues";
+const GITHUB_REPOSITORY_URL = "https://github.com/JoaomdvFerreira/open-evora";
 
 type TrustNavigationPath = "/about" | "/methodology" | "/corrections" | "/contact" | "/privacy";
 type TrustPagePath = TrustNavigationPath | "/out-of-scope";
@@ -69,18 +70,19 @@ function InfoAction({ href, children }: { href: string; children: string }) {
 const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
   "/about": {
     heading: "Sobre o Open Évora",
-    summary: "Um projeto independente.",
+    summary: "Uma iniciativa cívica independente, operada individualmente.",
     body: <>
       <InfoSection id="about-accountability" title="Responsabilidade">
         <InfoFacts facts={[
-          ["Responsável", "Projeto Open Évora"],
-          ["Independência", "Projeto independente, sem ligação à autarquia"],
+          ["Operação", "Iniciativa cívica operada individualmente"],
+          ["Independência", "Sem ligação à autarquia"],
           ["Financiamento", "Autofinanciado"],
         ]} />
       </InfoSection>
       <InfoSection id="about-publication" title="Como é publicado">
         <InfoSteps steps={["Corpus de investigação com controlo de versões", "Validação e revisão", "Publicação no Explorador de Investigação"]} />
         <p className="info-closing">A proveniência, as limitações e a incerteza são apresentadas de forma explícita.</p>
+        <p>O <a href={GITHUB_REPOSITORY_URL}>repositório público no GitHub</a> permite consultar o código, as fontes, as evidências e o histórico de alterações. Essa transparência não substitui a responsabilidade editorial nem a proteção de dados pessoais.</p>
       </InfoSection>
     </>,
   },
@@ -97,8 +99,11 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
         ["Limitações", "O que a informação disponível não permite afirmar."],
       ]} />
       <InfoSection id="methodology-validation" title="Validação">
-        <p>Os registos são sujeitos a validação antes de serem integrados no conjunto de dados canónico e publicados.</p>
+        <p>Os registos passam por verificações estruturais e decisões editoriais humanas antes da integração no conjunto de dados canónico. Estas verificações não demonstram, por si só, que uma afirmação é verdadeira.</p>
         <p>A existência de uma fonte não significa que todas as conclusões possíveis a partir dessa fonte estejam estabelecidas; o Explorador procura tornar explícitos o âmbito e os limites da evidência apresentada.</p>
+      </InfoSection>
+      <InfoSection id="methodology-ai" title="Apoio de inteligência artificial">
+        <p>Assistentes de inteligência artificial apoiam a pesquisa, a análise, a redação e o desenvolvimento técnico do projeto. As decisões editoriais e a publicação de investigação canónica são controladas pelo responsável humano. Este apoio não significa que todas as fontes ou conclusões tenham sido integralmente revistas por uma pessoa ou verificadas de forma independente.</p>
       </InfoSection>
       <InfoSection id="methodology-scope" title="Âmbito geográfico">
         <p>Alguns registos são encerrados quando a evidência disponível não permite estabelecer uma manifestação específica da cidade. Consulte <a href="/out-of-scope">Registos fora do âmbito</a>.</p>
@@ -110,6 +115,7 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
     summary: "Como sinalizar informação que deve ser revista.",
     body: <>
       <p>Se encontrar informação incorreta, desatualizada, uma fonte problemática ou uma interpretação que deva ser revista, pode reportá-la através do <a href={GITHUB_ISSUES_URL}>GitHub Issues do projeto Open Évora</a>.</p>
+      <p className="info-notice" role="note">Os GitHub Issues são públicos. Não inclua dados pessoais nem informação sensível na descrição, nos anexos ou nas ligações partilhadas.</p>
       <InfoSection id="corrections-include" title="O que incluir">
         <InfoNumberedList items={[
           "A página ou registo em causa — de preferência com o ID (ex. PRB-0005).",
@@ -128,7 +134,7 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
         ["Questões e sugestões", <a href={GITHUB_ISSUES_URL}>Issues do repositório do projeto</a>],
         ["Correções factuais", <>Ver o processo em <a href="/corrections">Correções</a></>],
       ]} />
-      <p className="info-notice" role="note"><strong>Atenção:</strong> Evite publicar dados pessoais ou informação sensível num issue público.</p>
+      <p className="info-notice" role="note"><strong>Atenção:</strong> Os GitHub Issues são públicos. Não publique dados pessoais ou informação sensível, incluindo em anexos ou ligações.</p>
       <InfoAction href={GITHUB_ISSUES_URL}>Abrir issue no GitHub</InfoAction>
       <InfoSection id="contact-contribute" title="Contribuir para a investigação">
         <p>Pode sugerir um problema para investigação ou contribuir com informação ou evidência para um problema existente.</p>
@@ -149,10 +155,11 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
     body: <>
       <InfoFacts facts={[
         ["Conta", "Não é necessária."],
-        ["Dados pessoais", "Não são pedidos diretamente pelo Open Évora."],
+        ["Contribuições", "O formulário prepara um issue público no GitHub; o envio é concluído nessa plataforma."],
         ["Alojamento", "Infraestrutura de terceiros."],
         ["Dados técnicos", "Endereços IP e registos de acesso, processados pelo alojamento para funcionamento e segurança, segundo as respetivas políticas."],
       ]} />
+      <p>A ausência de uma conta ou de um formulário de envio próprio não significa ausência de tratamento de dados pessoais. A consulta do website envolve dados técnicos tratados pela infraestrutura de alojamento; as contribuições feitas no GitHub seguem também as práticas dessa plataforma.</p>
       <InfoSection id="privacy-commitment" title="Compromisso">
         <p>O Open Évora não deve introduzir formulários de recolha de dados pessoais, analytics adicionais, cookies não essenciais ou mecanismos semelhantes sem rever e atualizar previamente esta informação.</p>
       </InfoSection>

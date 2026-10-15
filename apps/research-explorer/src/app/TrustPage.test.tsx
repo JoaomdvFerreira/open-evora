@@ -14,13 +14,15 @@ const provider: DataProvider = {
 
 afterEach(() => window.history.replaceState(null, "", "/"));
 
-it("renders the approved privacy surface without a data dependency", () => {
+it("explains website and GitHub data handling without a data dependency", () => {
   window.history.replaceState(null, "", "/privacy");
   render(<App dataProvider={provider} />);
 
   expect(screen.getByRole("heading", { name: "Privacidade" })).toBeTruthy();
   expect(screen.getByText("Não é necessária.")).toBeTruthy();
   expect(screen.getByRole("heading", { name: "Compromisso" })).toBeTruthy();
+  expect(screen.getByText(/não significa ausência de tratamento de dados pessoais/)).toBeTruthy();
+  expect(screen.getByText(/O formulário prepara um issue público no GitHub/)).toBeTruthy();
   expect(screen.getAllByRole("link", { name: "Correções" }).every((link) => link.getAttribute("href") === "/corrections")).toBe(true);
 });
 
@@ -56,15 +58,17 @@ it("renders a data-backed OUT_OF_SCOPE archive under the Methodology information
   expect(/<title>([^<]*)<\/title>/.exec(staticHtml)?.[1]).toBe(document.title);
 });
 
-it("renders the owner-confirmed About accountability facts in the shared trust structure", () => {
+it("explains independent operation and the public repository in the About page", () => {
   window.history.replaceState(null, "", "/about");
   render(<App dataProvider={provider} />);
 
   expect(screen.getByRole("heading", { name: "Sobre o Open Évora" })).toBeTruthy();
   expect(screen.getByRole("navigation", { name: "Navegação principal", hidden: true })).toBeTruthy();
-  expect(screen.getByText("Projeto Open Évora")).toBeTruthy();
-  expect(screen.getByText("Projeto independente, sem ligação à autarquia")).toBeTruthy();
+  expect(screen.getByText("Iniciativa cívica operada individualmente")).toBeTruthy();
+  expect(screen.getByText("Sem ligação à autarquia")).toBeTruthy();
   expect(screen.getByText("Autofinanciado")).toBeTruthy();
+  expect(screen.getByRole("link", { name: "repositório público no GitHub" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora");
+  expect(screen.getByText(/responsabilidade editorial nem a proteção de dados pessoais/)).toBeTruthy();
   expect(screen.getAllByRole("link", { name: "Sobre" }).some((link) => link.getAttribute("aria-current") === "page")).toBe(true);
   expect(screen.getAllByRole("link", { name: "Metodologia" }).every((link) => link.getAttribute("href") === "/methodology")).toBe(true);
 });
@@ -76,6 +80,7 @@ it("renders the approved corrections action to the canonical public Issues page"
   expect(screen.getByRole("heading", { name: "Correções" })).toBeTruthy();
   expect(screen.getByRole("link", { name: /GitHub Issues do projeto Open Évora/ }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
   expect(screen.getByRole("link", { name: "Reportar correção no GitHub" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
+  expect(screen.getByRole("note").textContent).toContain("Os GitHub Issues são públicos.");
   const include = screen.getByRole("region", { name: "O que incluir" });
   expect(within(include).getAllByRole("listitem")).toHaveLength(3);
 });
@@ -194,12 +199,20 @@ it("renders the About publication sequence as three ordered steps", () => {
   ]);
 });
 
+it("discloses AI assistance and human editorial control without claiming exhaustive verification", () => {
+  renderInformationPage("/methodology");
+  const section = screen.getByRole("region", { name: "Apoio de inteligência artificial" });
+  expect(section.textContent).toContain("a pesquisa, a análise, a redação e o desenvolvimento técnico");
+  expect(section.textContent).toContain("decisões editoriais e a publicação de investigação canónica são controladas pelo responsável humano");
+  expect(section.textContent).toContain("não significa que todas as fontes ou conclusões tenham sido integralmente revistas");
+});
+
 it("renders the Contact channels, privacy notice and GitHub action with their existing destinations", () => {
   renderInformationPage("/contact");
   expect(screen.getByRole("link", { name: "Issues do repositório do projeto" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
   const factual = screen.getByText("Correções factuais").nextElementSibling as HTMLElement;
   expect(within(factual).getByRole("link", { name: "Correções" }).getAttribute("href")).toBe("/corrections");
-  expect(screen.getByRole("note").textContent).toBe("Atenção: Evite publicar dados pessoais ou informação sensível num issue público.");
+  expect(screen.getByRole("note").textContent).toBe("Atenção: Os GitHub Issues são públicos. Não publique dados pessoais ou informação sensível, incluindo em anexos ou ligações.");
   expect(screen.getByRole("link", { name: "Abrir issue no GitHub" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
 });
 
