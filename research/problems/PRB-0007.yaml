@@ -44,7 +44,7 @@ investigation:
         impacto; a DEIS considera essa avaliação prematura nesta fase.
       current_action: >-
         Nenhuma ação ativa no âmbito atual do programa. Informação futura sobre a
-        execução ou avaliação do plano municipal só justifica reavaliação deste PRB
+        execução ou avaliação do plano municipal só justifica reavaliação deste problema
         se produzir evidência específica da cidade compatível com a condição de
         reabertura.
       resolution_condition: Evidência sobre a execução das medidas específicas de
@@ -65,7 +65,7 @@ investigation:
       why_open: >-
         Os resultados dos grupos focais e do questionário a 133 cuidadores
         provêm de amostras distintas dentro do mesmo Plano Concelhio dos
-        Cuidadores Informais e da mesma fonte (SRC-0030). A evidência atual não
+        Cuidadores Informais e da mesma fonte. A evidência atual não
         estabelece uma relação causal entre as dificuldades de informação e
         direitos e a não utilização de apoio formal.
 

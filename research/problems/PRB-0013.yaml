@@ -1,6 +1,6 @@
 problem_id: PRB-0013
 created_at: "2026-10-12"
-updated_at: "2026-10-13"
+updated_at: "2026-10-14"
 title: "Habitação a preços comportáveis em Évora: necessidade identificada e respostas municipais"
 domain: [HOU, SOC]
 geography:
@@ -9,8 +9,7 @@ geography:
 affected_populations:
   - residentes que procuram habitação adequada e a preços comportáveis
 problem_statement: >-
-  O relatório setorial do Plano de Urbanização de Évora, datado de maio de
-  2023, descreve aumento dos preços das casas à venda nas freguesias urbanas e
+  O relatório setorial do Plano de Urbanização de Évora (PUE), datado de maio de 2023, descreve aumento dos preços das casas à venda nas freguesias urbanas e
   oferta muito reduzida de casas para arrendar nas plataformas consultadas,
   face à dimensão da cidade e à procura esperada. O Município documentou a
   entrega de 12 casas para arrendamento apoiado na Malagueira em janeiro de
@@ -95,7 +94,7 @@ investigation:
         local, não uma medida da necessidade residual da cidade.
         A capacidade das residências universitárias, as listas de espera,
         estudantes sem colocação e a expansão do alojamento universitário
-        são tratados em PRB-0006.
+        são tratados no problema sobre alojamento estudantil em Évora.
       evidence: [EVD-000169, EVD-000032, EVD-000042, EVD-000170]
 evidence:
   - evidence_id: EVD-000169
@@ -118,12 +117,10 @@ status: OPEN
 history:
   - date: 2026-10-12
     summary: >-
-      PRB-0013 foi criado pela separação da habitação geral e das respostas
-      municipais antes incluídas em PRB-0006. O alojamento estudantil
-      permanece em PRB-0006.
+      Este problema foi criado pela separação da habitação geral e das respostas municipais antes incluídas no problema sobre alojamento estudantil em Évora, onde o alojamento estudantil permanece.
   - date: 2026-10-13
     summary: >-
-      O âmbito foi fixado pelo proprietário na cidade de Évora. Os agregados
+      O âmbito passou a ser a cidade de Évora. Os agregados
       do programa municipal foram separados da evidência da cidade e a entrega
       na Malagueira passou a ter evidência própria; os totais municipais
       deixaram de ser tratados como totais da cidade.
