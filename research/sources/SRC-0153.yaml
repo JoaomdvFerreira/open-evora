@@ -1,0 +1,27 @@
+source_id: SRC-0153
+publisher: Município de Évora
+name: Prestação de Contas | Relatório de Gestão do Município de Évora | Ano 2025
+resource_type: document
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: "2025"
+  domains:
+    - HOU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/wp-content/uploads/2026/05/PRESTACAO_CONTAS_2025.pdf
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-05-21
+  last_checked_at: 2026-10-15

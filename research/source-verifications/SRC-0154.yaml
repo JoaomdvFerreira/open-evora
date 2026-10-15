@@ -1,0 +1,12 @@
+source_id: SRC-0154
+retrieval:
+  retrieved_at: "2026-10-15"
+  content_sha256: 12bd51e464bc1b77703e6f04de7cbe8a62c6481edb60fba49fe8e58dcd39356d
+  media_type: application/pdf
+verified_claims:
+  - locator: "P. 1, eixo 1, medida 1.3.2, colunas Entidades responsáveis, Calendarização e PA 2026"
+    statement: "O plano de ação de 2026 inclui a reabilitação de 62 fogos na Rua Alexandre Rosado mediante financiamento do 1.º Direito/PRR, na medida relativa a arrendamento apoiado."
+  - locator: "P. 1, eixo 1, medida 1.3.2"
+    statement: "A medida indica Habévora e «IRHU» como entidades responsáveis, segundo a grafia do plano, e 2026 como ano de calendarização; o indicador de execução é o número de fogos reabilitados."
+  - locator: "P. 1, eixo 1, medida 1.3.2"
+    statement: "A linha integra programação para 2026; não apresenta o número de fogos da Rua Alexandre Rosado já concluídos, entregues ou ocupados."

@@ -1,0 +1,26 @@
+source_id: SRC-0152
+publisher: Município de Évora
+name: ASSINADO AUTO DE CONSIGNAÇÃO DA EMPREITADA PARA REABILITAÇÃO DE 4 EDIFÍCIOS (64 FOGOS) NA RUA ALEXANDRE ROSADO, BAIRRO GENERAL HUMBERTO DELGADO
+resource_type: webpage
+scope:
+  geography:
+    level: local_area
+    area: Bairro General Humberto Delgado, cidade de Évora
+  domains:
+    - HOU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/assinado-auto-de-consignacao-da-empreitada-para-reabilitacao-de-4-edificios-64-fogos-na-rua-alexandre-rosado-bairro-general-humberto-delgado/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2025-04-23
+  updated_at: 2026-05-05
+  last_checked_at: 2026-10-15

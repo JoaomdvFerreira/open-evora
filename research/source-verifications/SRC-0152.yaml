@@ -1,0 +1,14 @@
+source_id: SRC-0152
+retrieval:
+  retrieved_at: "2026-10-15"
+  content_sha256: 82bed1e4df573e3af9de8372b0bb844ba2d802815abbedfa57f56044b7043d19
+  media_type: text/html
+verified_claims:
+  - locator: "Título, data de publicação e primeiro parágrafo"
+    statement: "A notícia municipal, publicada em 23 de abril de 2025, identifica a assinatura nessa data do auto de consignação para reabilitar quatro edifícios na Rua Alexandre Rosado, no Bairro General Humberto Delgado."
+  - locator: "Primeiro parágrafo"
+    statement: "O auto foi assinado entre a Habévora e a empresa Construções Fernando Manuel Fernandes Lourenço, pelo valor de 2 360 384,50 euros; a notícia previa início dos trabalhos em maio de 2025 e prazo de execução de 365 dias."
+  - locator: "Segundo parágrafo"
+    statement: "A notícia indica que o processo visava a reabilitação de 64 frações existentes, propriedade da Habévora."
+  - locator: "Primeiro e segundo parágrafos"
+    statement: "A notícia relata a consignação e prevê trabalhos posteriores; não informa a data de início efetivo, a conclusão, a entrega ou a ocupação das frações."

@@ -1,0 +1,28 @@
+evidence_id: EVD-000193
+provenance:
+  sources:
+    - SRC-0154
+  extracted_at: 2026-10-15
+observation:
+  summary: >-
+    O Plano de Ação 2026 do Plano de Desenvolvimento Social de Évora inclui,
+    entre as ações previstas para arrendamento apoiado, a reabilitação de 62
+    fogos na Rua Alexandre Rosado, na cidade de Évora, através de financiamento
+    do 1.º Direito/PRR. A medida identifica a Habévora e «IRHU», segundo a
+    grafia do plano, como entidades responsáveis e está calendarizada para 2026.
+scope:
+  geography:
+    level: local_area
+    area: Rua Alexandre Rosado, cidade de Évora
+  populations:
+    - destinatários de arrendamento apoiado
+  temporal:
+    as_of: "2026"
+domains:
+  - HOU
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A ação programada e a referência a financiamento não estabelecem a execução integral do financiamento, a reabilitação efetiva, a conclusão, a entrega ou a ocupação dos 62 fogos.
+  - O plano não estabelece que os 62 fogos sejam exatamente um subconjunto das 64 frações referidas na empreitada, nem explica a diferença entre as contagens.
+  - A programação não estabelece que os 62 fogos integrem o agregado municipal de 459 habitações nem mede a necessidade habitacional residual na cidade.

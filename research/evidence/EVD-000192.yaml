@@ -1,0 +1,30 @@
+evidence_id: EVD-000192
+provenance:
+  sources:
+    - SRC-0152
+    - SRC-0153
+  extracted_at: 2026-10-15
+observation:
+  summary: >-
+    O Município de Évora documentou a assinatura, em 23 de abril de 2025, do
+    auto de consignação de uma empreitada para reabilitar quatro edifícios com
+    64 frações existentes da Habévora, na Rua Alexandre Rosado, Bairro
+    General Humberto Delgado, cidade de Évora. Na Prestação de Contas de 2025,
+    descreveu a empreitada como em curso no âmbito desse exercício.
+scope:
+  geography:
+    level: local_area
+    area: Rua Alexandre Rosado, Bairro General Humberto Delgado, cidade de Évora
+  populations:
+    - moradores das frações abrangidas pela empreitada
+  temporal:
+    as_of: "2025"
+domains:
+  - HOU
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A consignação não estabelece a data de início efetivo dos trabalhos; o estado de execução descrito na Prestação de Contas refere-se ao exercício de 2025, não a outubro de 2026.
+  - As fontes não confirmam conclusão da empreitada, entrega ou ocupação das 64 frações.
+  - A reabilitação de frações existentes não equivale à construção de 64 novas habitações nem demonstra aumento líquido da oferta ou redução quantificada da necessidade habitacional.
+  - As fontes não estabelecem que as 64 frações integrem o agregado municipal de 459 habitações nem que correspondam exatamente aos 62 fogos de programação financeira.
