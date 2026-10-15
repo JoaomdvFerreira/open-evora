@@ -1,0 +1,27 @@
+evidence_id: EVD-000189
+provenance:
+  sources:
+    - SRC-0151
+  extracted_at: 2026-10-15
+observation:
+  summary: >-
+    No relatório de atividades da União das Freguesias de Bacelo e Senhora da Saúde, a junta regista, entre 1 de julho e 18 de setembro de 2026, 124 comunicações, individualizadas em 137 ocorrências, além de 15 reforços de ocorrências anteriores. Uma comunicação pode conter mais de uma situação tratada autonomamente. Das ocorrências, 48 foram classificadas em Higiene Urbana (19 em julho, 14 em agosto e 15 de 1 a 18 de setembro) e 11 em Resíduos Urbanos (5 de 1 a 18 de setembro). O relatório associa esta última categoria à deposição, recolha e gestão de resíduos. Uma situação de agosto com conteúdo de higiene urbana permaneceu classificada em Sugestões, Reclamações e Informações para evitar dupla contagem.
+scope:
+  geography:
+    level: parish
+    area: União das Freguesias de Bacelo e Senhora da Saúde, Évora
+  populations:
+    - pessoas que comunicaram situações à junta
+  temporal:
+    start: 2026-07-01
+    end: 2026-09-18
+domains:
+  - ENV
+  - PUB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - As contagens descrevem a classificação administrativa da junta, não a frequência de falhas de recolha nem a execução de circuitos.
+  - A categoria Resíduos Urbanos abrange deposição, recolha e gestão; não é possível identificar quantos registos correspondem a recolhas falhadas ou atrasadas.
+  - O relatório não publica datas e desfechos por ocorrência nem tempos de resposta, e cobre apenas a união de freguesias e o período indicado.
+  - O número de comunicações ou ocorrências não mede prevalência nem representa uma verificação operacional independente.

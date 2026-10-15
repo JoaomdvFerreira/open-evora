@@ -1,6 +1,6 @@
 problem_id: PRB-0010
 created_at: 2026-08-28
-updated_at: 2026-10-14
+updated_at: 2026-10-15
 title: Buracos e pavimento degradado nas ruas de Évora
 domain:
   - URB
@@ -16,7 +16,7 @@ problem_statement: |-
 
   Em maio, o Município aprovou a adjudicação à Tecnovia, por 745 000 euros mais IVA, de uma empreitada geral de reparação de estradas municipais no concelho. Uma segunda obra, nos caminhos municipais da Garraia e Sizuda, não mostra reparações na cidade. Até junho, o Município comunicou trabalhos em três avenidas da cidade; outras intervenções foram noticiadas em setembro.
 
-  Não se sabe que ruas da cidade foram reparadas pela empreitada geral, em que fase está essa obra, nem se as intervenções comunicadas fazem parte dela. Não foi encontrada uma avaliação atual e representativa do pavimento nas ruas da cidade.
+  O relatório da União das Freguesias de Bacelo e Senhora da Saúde regista situações classificadas em vias, passeios e pavimentos até 18 de setembro e refere a identificação de buracos e de situações de degradação que, segundo a junta, se agravaram, sem publicar uma avaliação do estado das ruas da cidade. Não se sabe que ruas foram reparadas pela empreitada geral, em que fase está essa obra, nem se as intervenções comunicadas fazem parte dela.
 investigation:
   open_questions:
     - question: Que ruas da cidade foram selecionadas para reparação e em que ponto estão os trabalhos?
@@ -31,9 +31,9 @@ investigation:
         - EVD-000177
         - EVD-000188
     - question: Qual é o estado atual do pavimento nas ruas da cidade de Évora?
-      why_open: Os relatos de janeiro e o diagnóstico municipal de fevereiro são históricos. As intervenções conhecidas dizem respeito a vias determinadas; falta uma avaliação atual que cubra as ruas da cidade de forma suficiente.
-      latest_result: Uma vereadora relatou buracos em várias vias da cidade em janeiro. A petição e o diagnóstico municipal referem-se ao concelho. O Município reportou intervenções em três avenidas da cidade até junho. Em setembro, a DianaFM noticiou o início de uma correção localizada do pavimento na Estrada Nacional 114, depois de uma rotura recente, e outras intervenções previstas; a notícia não descreve o estado das vias depois dos trabalhos. Um relato de julho numa rede social sobre a entrada pela N114 continua não verificado e não está ligado à intervenção de setembro; o troço preciso e a responsabilidade pela via estão por esclarecer. Estes elementos não medem o estado atual das ruas da cidade.
-      current_action: O pedido de informação e do levantamento técnico ao Município ainda não foi enviado. A pesquisa pública disponível ainda não produziu uma avaliação atual e representativa das ruas da cidade.
+      why_open: Os relatos de janeiro e o diagnóstico municipal de fevereiro são históricos. O relatório da junta acrescenta registos classificados e refere observação direta, mas não publica um levantamento com resultados por rua. As intervenções conhecidas dizem respeito a vias determinadas; falta uma avaliação atual que cubra as ruas da cidade de forma suficiente.
+      latest_result: A junta de Bacelo e Senhora da Saúde registou 19 ocorrências em Vias, Passeios e Pavimentos entre 1 de julho e 18 de setembro, 9 em julho e 6 de 1 a 18 de setembro; o anexo identifica locais, incluindo a Avenida Heróis do Ultramar, a Avenida Dona Leonor de Oliveira Fernandes e a Rua de Timor, mas não descreve os danos em cada local. A junta refere um levantamento de arruamentos, a identificação de buracos e de outras situações de degradação dos pavimentos que afirma terem-se agravado, e a conjugação de comunicações com observação direta, sem publicar os resultados por rua. Uma vereadora relatou buracos na cidade em janeiro; a petição e o diagnóstico municipal abrangem o concelho. O Município reportou trabalhos em três avenidas até junho e, em setembro, a DianaFM noticiou uma correção localizada iniciada na Estrada Nacional 114 e outras intervenções previstas, sem documentar o estado posterior. O relato de julho sobre a N114 continua não verificado, com troço e responsabilidade por esclarecer. Estes elementos não medem o estado atual das ruas da cidade.
+      current_action: O pedido de informação e do levantamento técnico ao Município ainda não foi enviado. É necessário obter os resultados e a localização das observações diretas referidas pela junta; a pesquisa pública disponível ainda não produziu uma avaliação atual e representativa das ruas da cidade.
       resolution_condition: Levantamento técnico atual, informação municipal por rua ou outra evidência verificável com cobertura suficiente para avaliar o estado do pavimento nas ruas da cidade após as intervenções.
       evidence:
         - EVD-000082
@@ -42,6 +42,7 @@ investigation:
         - EVD-000156
         - EVD-000175
         - EVD-000188
+        - EVD-000190
   path:
     initial_signal:
       summary: Em janeiro de 2026, uma vereadora relatou buracos em várias vias da cidade, incluindo a circular. Uma petição pública relatou degradação das estradas do concelho e preocupações de segurança e danos em veículos.
@@ -58,13 +59,14 @@ investigation:
         - EVD-000178
         - EVD-000179
     delimitation:
-      summary: O Município reportou trabalhos em três avenidas da cidade até junho e, em setembro, foi noticiado o início de uma correção do pavimento na Estrada Nacional 114, com outras intervenções previstas na cidade. A empreitada da Garraia e Sizuda, com contrato celebrado em junho e obras apresentadas como iniciadas em outubro, ficou delimitada como contexto do programa e não como prova de reparações nas ruas da cidade. Nenhum destes registos estabelece a condição atual das ruas da cidade nem a execução da empreitada geral. O relato de julho na entrada pela N114 permanece localizado e não verificado.
+      summary: O Município reportou trabalhos em três avenidas da cidade até junho e, em setembro, foi noticiado o início de uma correção do pavimento na Estrada Nacional 114, com outras intervenções previstas na cidade. O relatório da junta regista situações classificadas em Vias, Passeios e Pavimentos até 18 de setembro e refere observação direta e identificação de buracos, mas não publica resultados por rua nem permite converter cada ocorrência em dano no pavimento. A empreitada da Garraia e Sizuda, com contrato celebrado em junho e obras apresentadas como iniciadas em outubro, ficou delimitada como contexto do programa e não como prova de reparações nas ruas da cidade. Nenhum destes registos estabelece a condição atual das ruas da cidade nem a execução da empreitada geral. O relato de julho na entrada pela N114 permanece localizado e não verificado.
       evidence:
         - EVD-000084
         - EVD-000156
         - EVD-000188
         - EVD-000180
         - EVD-000187
+        - EVD-000190
 evidence:
   - evidence_id: EVD-000082
     effects:
@@ -137,6 +139,12 @@ evidence:
     research_roles:
       - EXISTING_RESPONSE
       - PLANNED_RESPONSE
+  - evidence_id: EVD-000190
+    effects:
+      - REFINES
+      - BOUNDS
+    research_roles:
+      - CONTEXTUAL
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: low
@@ -144,8 +152,8 @@ solution_landscape_status: assessed
 status: OPEN
 decision_basis:
   contract_version: "0.1"
-  eligibility_basis: A manifestação histórica na cidade assenta no relato de uma vereadora registado em ata em janeiro de 2026 (EVD-000175). A petição e o diagnóstico municipal referem-se ao concelho (EVD-000082, EVD-000154), pelo que não alargam por si a manifestação à cidade. As intervenções em três avenidas (EVD-000156) mostram atividade localizada, não a extensão dos danos. A condição atual das ruas da cidade continua por apurar.
-  corroboration_basis: O relato registado em ata de janeiro (EVD-000175) sustenta uma manifestação histórica reportada em várias vias da cidade, incluindo a circular. Não é uma medição independente nem representativa. A petição e o diagnóstico municipal são de âmbito concelhio (EVD-000082, EVD-000154). As obras localizadas e o relato não verificado na N114 não confirmam a extensão ou persistência atual da degradação na cidade. A evidência ainda não confirma o estado atual da cidade.
+  eligibility_basis: A manifestação histórica na cidade assenta no relato de uma vereadora registado em ata em janeiro de 2026 (EVD-000175). A petição e o diagnóstico municipal referem-se ao concelho (EVD-000082, EVD-000154), pelo que não alargam por si a manifestação à cidade. O relatório da junta contém registos classificados e refere observação direta, sem inventário publicado por rua (EVD-000190). As intervenções em três avenidas (EVD-000156) mostram atividade localizada, não a extensão dos danos. A condição atual das ruas da cidade continua por apurar.
+  corroboration_basis: O relato registado em ata de janeiro (EVD-000175) sustenta uma manifestação histórica reportada em várias vias da cidade, incluindo a circular. Não é uma medição independente nem representativa. A petição e o diagnóstico municipal são de âmbito concelhio (EVD-000082, EVD-000154). O relatório da junta (EVD-000190) acrescenta registos administrativos e referência a identificação de buracos, sem resultados por rua; não confirma a extensão ou o estado atual da cidade. As obras localizadas e o relato não verificado na N114 também não confirmam a extensão ou persistência atual da degradação na cidade.
   manifestation:
     kind: buracos e pavimento degradado em vias da cidade
     summary: Em janeiro de 2026, uma vereadora relatou buracos em várias vias da cidade, incluindo a circular (EVD-000175). Uma petição relatou degradação no concelho (EVD-000082), e o Município descreveu degradação da rede municipal em fevereiro (EVD-000154).
@@ -159,7 +167,7 @@ decision_basis:
       - EVD-000082
       - EVD-000175
   currentness:
-    assessment: Os relatos sobre a manifestação são de janeiro e o diagnóstico municipal é de fevereiro de 2026. Foram comunicadas intervenções em três avenidas da cidade até junho e, em setembro, foi noticiado o início de uma correção do pavimento na Estrada Nacional 114, com outras intervenções previstas. O relato de julho sobre a N114 é único, não verificado e de localização e responsabilidade ainda incertas. Nenhum destes registos estabelece a condição atual das ruas da cidade ou a execução completa da empreitada geral.
+    assessment: Os relatos iniciais são de janeiro e o diagnóstico municipal é de fevereiro de 2026. O relatório da junta regista ocorrências de Vias, Passeios e Pavimentos até 18 de setembro e refere identificação de buracos e de outras situações de degradação que afirma terem-se agravado, além de comunicações e observação direta, sem resultados publicados por rua. Foram comunicadas intervenções em três avenidas até junho e, em setembro, foi noticiado o início de uma correção na Estrada Nacional 114, com outras intervenções previstas. O relato de julho sobre a N114 é único, não verificado e de localização e responsabilidade ainda incertas. Nenhum destes elementos estabelece a condição atual das ruas da cidade ou a execução completa da empreitada geral.
     evidence:
       - EVD-000175
       - EVD-000082
@@ -167,18 +175,20 @@ decision_basis:
       - EVD-000084
       - EVD-000156
       - EVD-000188
+      - EVD-000190
   contradiction_search:
     performed: true
-    summary: Foram considerados os trabalhos reportados nas três avenidas (EVD-000156), a correção do pavimento noticiada em setembro na Estrada Nacional 114 e as intervenções então previstas (EVD-000188) e o relato não verificado na N114 (EVD-000084). Os trabalhos podem alterar condições locais; nenhum registo comprova a resolução geral, a continuação generalizada dos danos ou o estado atual da cidade.
+    summary: Foram considerados os trabalhos reportados nas três avenidas (EVD-000156), a correção do pavimento noticiada em setembro na Estrada Nacional 114 e as intervenções então previstas (EVD-000188), o relato não verificado na N114 (EVD-000084) e os registos classificados e a observação direta referidos pela junta (EVD-000190). Os trabalhos podem alterar condições locais; os registos da junta indicam necessidades no território da freguesia sem quantificar danos nas ruas da cidade. Nenhum elemento comprova a resolução geral, a continuação generalizada dos danos ou o estado atual da cidade.
     evidence:
       - EVD-000156
       - EVD-000188
       - EVD-000084
+      - EVD-000190
   overlap_check:
     performed: true
     summary: Não foi identificado outro problema registado com a mesma manifestação de degradação física do pavimento nas vias da cidade.
     related_problems: []
-  corroboration_statement: Há um relato histórico registado em ata de buracos em várias vias da cidade em janeiro de 2026. A petição e o diagnóstico municipal descrevem o concelho. Os dois procedimentos e as intervenções conhecidas documentam a resposta, mas não estabelecem a condição atual das ruas da cidade. O estado atual do pavimento continua por estabelecer.
+  corroboration_statement: Há um relato histórico registado em ata de buracos em várias vias da cidade em janeiro de 2026. A petição e o diagnóstico municipal descrevem o concelho. Os registos administrativos e a referência a observação direta da junta não quantificam os danos por rua. Os dois procedimentos e as intervenções conhecidas documentam a resposta, mas não estabelecem a condição atual das ruas da cidade. O estado atual do pavimento continua por estabelecer.
   supporting_evidence:
     - EVD-000175
     - EVD-000082
@@ -192,8 +202,9 @@ decision_basis:
     - EVD-000178
     - EVD-000179
     - EVD-000188
-  independence_assessment: O relato de uma vereadora em reunião pública, a petição e o diagnóstico do Município têm origens e âmbitos diferentes. A ata regista uma declaração, sem medição independente; a petição não é uma amostra representativa. As comunicações do Município sobre diagnóstico, concursos, adjudicações e obras pertencem à mesma voz institucional e não contam como confirmações independentes da condição atual. A notícia de setembro relata trabalhos do Município e também não é uma verificação independente do estado das vias.
-  limitations: A manifestação na cidade é histórica e relatada, sem inventário público por rua. A petição e o diagnóstico municipal não permitem atribuir ao conjunto da cidade a extensão referida para o concelho. Os preços base dos dois concursos somam 1 494 990 euros sem IVA, mas são limites dos procedimentos, não despesa executada; a adjudicação da Garraia e Sizuda foi comunicada por valor inferior ao preço base, e essa empreitada não mostra reparações nas ruas da cidade. A decisão de adjudicação e a aprovação da minuta não provam assinatura, consignação ou conclusão. As intervenções em três avenidas e as noticiadas em setembro não demonstram que integrem a empreitada geral, e as de setembro não têm conclusão documentada. O relato da N114 não está verificado; o troço preciso e a responsabilidade pela via permanecem incertos. Não há avaliação atual representativa da cidade.
+    - EVD-000190
+  independence_assessment: O relato de uma vereadora em reunião pública, a petição e o diagnóstico do Município têm origens e âmbitos diferentes. A ata regista uma declaração, sem medição independente; a petição não é uma amostra representativa. As comunicações do Município sobre diagnóstico, concursos, adjudicações e obras pertencem à mesma voz institucional e não contam como confirmações independentes da condição atual. O relatório da junta reúne comunicações recebidas e refere observação direta, sem discriminar os seus resultados por rua; os registos administrativos não são uma verificação independente de cada dano nem uma avaliação representativa. A notícia de setembro relata trabalhos do Município e também não é uma verificação independente do estado das vias.
+  limitations: A manifestação inicial na cidade é histórica e relatada, sem inventário público por rua. O relatório da junta cobre apenas uma união de freguesias; a categoria Vias, Passeios e Pavimentos inclui tipos diferentes de situações, e o anexo não descreve o dano, data ou desfecho de cada ocorrência. A referência a observação direta não vem acompanhada de resultados por rua. A petição e o diagnóstico municipal não permitem atribuir ao conjunto da cidade a extensão referida para o concelho. Os preços base dos dois concursos somam 1 494 990 euros sem IVA, mas são limites dos procedimentos, não despesa executada; a adjudicação da Garraia e Sizuda foi comunicada por valor inferior ao preço base, e essa empreitada não mostra reparações nas ruas da cidade. A decisão de adjudicação e a aprovação da minuta não provam assinatura, consignação ou conclusão. As intervenções em três avenidas e as noticiadas em setembro não demonstram que integrem a empreitada geral, e as de setembro não têm conclusão documentada. O relato da N114 não está verificado; o troço preciso e a responsabilidade pela via permanecem incertos. Não há avaliação atual representativa da cidade.
 history:
   - date: 2026-08-28
     summary: Nova evidência oficial documentou uma cronologia da resposta — levantamento técnico em fevereiro, procedimento geral com prazo contratual de 10 meses e intervenções locais reportadas até junho — sem estabelecer a execução completa do procedimento geral; a investigação passa a perguntar pela condição atual da rede em todo o município.
@@ -215,3 +226,8 @@ history:
     evidence:
       - EVD-000187
       - EVD-000188
+  - date: 2026-10-15
+    summary: >-
+      Foi integrado o relatório da União das Freguesias de Bacelo e Senhora da Saúde, com registos classificados em vias, passeios e pavimentos até 18 de setembro, referência a identificação de buracos e de situações de degradação que a junta diz terem-se agravado, e menção a comunicações e observação direta. Os registos não foram equiparados a danos específicos em cada local. A localização e os resultados do levantamento, o estado atual das ruas da cidade e a execução da empreitada geral continuam por esclarecer; os estados canónicos permanecem inalterados.
+    evidence:
+      - EVD-000190
