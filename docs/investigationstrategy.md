@@ -45,9 +45,9 @@ For new research:
 
 ### Gate 1 — Canonical Integration
 
-Gate 1 — Canonical Integration is the human decision that authorizes a reviewed candidate interpretation to enter canonical Open Évora research and, under the current public-repository model, confirms that the material is safe enough to enter the public repository under the safeguards in `AGENTS.md`.
+Gate 1 — Canonical Integration is the human decision that authorizes a reviewed candidate interpretation to enter integrated canonical Open Évora research and, under the current public-repository model, confirms that the material is safe to merge under the safeguards in `AGENTS.md`. Authorization to publish a reviewable PR is a separate earlier decision.
 
-Deterministic tooling validates corpus integrity and publication paths; it cannot make the owner decision or establish research truth, corroboration, validation, acceptance, or publication safety. Independent owner-side semantic review of the exact local commit/diff precedes explicit owner authorization to publish under `AGENTS.md`. Canonical integration does not publish material in the Research Explorer; Explorer publication is a separate future Gate 2.
+Deterministic tooling validates corpus integrity and publication paths; it cannot make the owner decision or establish research truth, corroboration, validation, acceptance, or publication safety. Before the first external publication of canonical research, the owner explicitly authorizes that publication after a safety review under `AGENTS.md`. Independent owner-side semantic review may then take place in the consolidated pre-launch PR; the owner makes the Gate 1 decision before merge. Canonical integration does not publish material in the Research Explorer; Explorer publication is a separate future Gate 2.
 
 ## 4. Integrating Sources
 
@@ -73,7 +73,7 @@ Public bodies, operators and other institutions may publish statements that docu
 
 Admissibility depends on the claim, provenance and ability to verify it, not solely on whether the publisher is an institution. Assess identifiable, substantiated journalism; verifiable public documents and data; technical studies and publications; documented direct observations; and other independent sources on those terms. Independence is a substantive judgement under §5, not a count of Sources.
 
-Keep leads received from private individuals outside the public corpus pending an explicit integration and publication decision under Gate 1 and `AGENTS.md`. Do not automatically publish names, personal identifiers, private messages or personal URLs, or copy private correspondence into versioned files or pull requests. A publicly accessible post does not itself grant permission to republish its contents. Do not infer retention periods or a legal basis from this method rule.
+Keep leads received from private individuals outside the public repository until explicit pre-publication safety authorization under `AGENTS.md`, and outside integrated canonical research until a Gate 1 decision. Do not automatically publish names, personal identifiers, private messages or personal URLs, or copy private correspondence into versioned files or pull requests. A publicly accessible post does not itself grant permission to republish its contents. Do not infer retention periods or a legal basis from this method rule.
 
 ### Reuse, evaluation, and replication
 
@@ -308,7 +308,7 @@ Problem.
 
 If a substantive response arrives after a phase has closed, treat it as new
 incoming research. It must pass the normal human Gate 1 review before any
-canonical Source, Evidence, or Problem change is made. A late response does
+canonical Source, Evidence, or Problem change is integrated. A late response does
 not automatically reopen a closed phase or invalidate its historical closure.
 
 Before completing an integration:
@@ -393,11 +393,11 @@ Semantic review compares each changed claim with its supporting evidence — PRB
 
 ### Mandatory independent semantic review
 
-Every canonical research text change requires independent owner-side semantic review of the exact proposed local commit/diff, separate from the implementation agent, before external publication. The active workflow is:
+Every canonical research text change requires independent owner-side semantic review of the exact proposed change, separate from the implementation agent, before owner merge. For the approved pre-launch sequence, the workflow is:
 
-edit locally → `npm run research:check` → `git diff --check` → local commit → independent owner-side semantic review → explicit owner publication authorization → push/PR → deterministic CI → owner merge.
+one local branch → one commit per completed action after appropriate tests and `git diff --check` → integrated validation and publication-safety review of the accumulated diff → explicit owner authorization before the first push of canonical research → one consolidated PR → independent owner-side semantic review and deterministic CI → corrections as needed → owner Gate 1 decision and merge.
 
-The implementation handoff identifies the exact commit SHA, canonical files changed, and canonical Git diff/patch. The reviewer inspects changed PRB wording against **all** linked EVDs, changed EVD wording against Source and available Source Verification Support, inference limits, material omissions, CLEC dimensions, and unresolved evidence gaps. For every changed EVD, the reviewer searches the canonical corpus for every referencing PRB and inspects each materially affected unchanged PRB against all its linked EVDs. A review may result in approval or concrete findings/evidence gaps. There is no machine review schema or repository review artifact.
+The pre-push safety review checks the full diff for unnecessary personal data, private correspondence, credentials, secrets, local-machine state, and uncertain publication or reuse rights. The implementation handoff identifies the commit SHAs and canonical files changed; the Git diff in the branch or PR is the review surface, with no separately exported patch. The reviewer inspects changed PRB wording against **all** linked EVDs, changed EVD wording against Source and available Source Verification Support, inference limits, material omissions, CLEC dimensions, and unresolved evidence gaps. For every changed EVD, the reviewer searches the canonical corpus for every referencing PRB and inspects each materially affected unchanged PRB against all its linked EVDs. A review may result in approval or concrete findings/evidence gaps. There is no machine review schema or repository review artifact. Push authorization is not semantic approval or merge approval; the owner alone merges.
 
 Publication safety applies before external publication. Explicit owner authorization is required before the first external publication of canonical research. The path guard rejects workbench, private-material and unapproved research-artifact paths; `research:check` validates Source Verification Support. These checks are path and structure based and cannot detect arbitrary private prose inside a permitted canonical field. If publication safety or reuse rights are uncertain, stop under `AGENTS.md`.
 
