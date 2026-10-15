@@ -1,6 +1,7 @@
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { normalizeForSearch } from "../records/normalize";
 import { describeTopic, auditedDomainCodes } from "../presentation/topicMapping";
+import { keywordsByProblemId } from "./problemKeywords";
 
 export interface TypeCount {
   type: string;
@@ -457,10 +458,10 @@ export function allTopicCodes(): string[] {
   return [...auditedDomainCodes()].sort((a, b) => describeTopic(a).label.localeCompare(describeTopic(b).label, "pt-PT"));
 }
 
-export type ProblemSortOrder = "id" | "updatedAt";
+export type ProblemSortOrder = "id" | "updatedAt" | "relevance";
 
 /**
- * The editorial list's two sort orders. `"id"` is the existing deterministic
+ * The editorial list's explicit sort orders. `"id"` is the existing deterministic
  * PRB-ID ascending order (unchanged default, matches every other Problem
  * ordering in Overview/Records). `"updatedAt"` orders by canonical
  * `CitizenProblem.updatedAt` descending (most recently updated first); a
@@ -472,10 +473,13 @@ export type ProblemSortOrder = "id" | "updatedAt";
  * "Última alteração" (the authored material-change date) — see
  * OverviewPresentation.tsx's own note against conflating the two.
  */
-export function sortProblems(problems: CitizenProblem[], order: ProblemSortOrder): CitizenProblem[] {
+export function sortProblems(problems: CitizenProblem[], order: ProblemSortOrder, query = ""): CitizenProblem[] {
   const sorted = [...problems];
   if (order === "id") {
     return sorted.sort((a, b) => a.id.localeCompare(b.id));
+  }
+  if (order === "relevance") {
+    return sorted.sort((a, b) => (searchRelevance(b, query) ?? -1) - (searchRelevance(a, query) ?? -1) || a.id.localeCompare(b.id));
   }
   return sorted.sort((a, b) => {
     if (a.updatedAt === b.updatedAt) return a.id.localeCompare(b.id);
@@ -525,26 +529,82 @@ export function paginateProblems(problems: CitizenProblem[], page: number): Citi
 }
 
 /**
- * Citizen-facing search fields only, per WU054 scope: title, problem
- * statement, affected populations, geography, and the PT-PT topic label
- * (never PRB history, decision_basis, evidence IDs, or other technical
- * fields). Deterministic, case- and accent-insensitive
- * (`normalizeForSearch`, shared with Records search), and purely
- * client-side.
+ * Citizen-facing public fields plus internal editorial keywords. History,
+ * evidence IDs and technical fields never participate. Search is entirely
+ * client-side and uses the shared case/accent normalizer.
  */
+function searchTokens(value: string): string[] {
+  return normalizeForSearch(value).match(/[\p{L}\p{N}]+/gu) ?? [];
+}
+
+// A deliberately narrow plural fold: vowel+s only. Irregular forms need
+// explicit editorial terms; no fuzzy or broad Portuguese stemming is implied.
+function comparableToken(token: string): string {
+  return token.length > 4 && /[aeiou]s$/.test(token) ? token.slice(0, -1) : token;
+}
+
+function tokenMatches(candidate: string, query: string, allowPrefix: boolean): boolean {
+  const exact = comparableToken(candidate) === comparableToken(query);
+  // Preserve the existing live-search ability to type a partial final word.
+  // The prefix starts at a token boundary; it cannot match inside a word.
+  return exact || (allowPrefix && (query.length >= 3 || /^\d/.test(query)) && candidate.startsWith(query));
+}
+
+function fieldScore(field: string, queryTokens: string[], weight: number): number | null {
+  const tokens = searchTokens(field);
+  if (!queryTokens.every((token, index) => tokens.some((candidate) => tokenMatches(candidate, token, index === queryTokens.length - 1)))) return null;
+  const phrase = queryTokens.join(" ");
+  const exactPhrase = tokens.join(" ") === phrase;
+  const contiguousPhrase = tokens.join(" ").includes(phrase);
+  return weight + (exactPhrase ? 20 : contiguousPhrase ? 10 : 0);
+}
+
+/** Search rank is discovery metadata only; it never ranks evidence or claims. */
+export function searchRelevance(problem: CitizenProblem, query: string): number | null {
+  const queryTokens = searchTokens(query);
+  if (query.trim() === "") return 0;
+  if (queryTokens.length === 0) return null;
+  const keywords = keywordsByProblemId.get(problem.id);
+  const fields: { text: string; weight: number }[] = [
+    ...(keywords?.primary.map((text) => ({ text, weight: 160 })) ?? []),
+    ...(keywords?.secondary.map((text) => ({ text, weight: 125 })) ?? []),
+    { text: problem.title, weight: 90 },
+    { text: problem.problemStatement ?? "", weight: 70 },
+    ...problem.affectedPopulations.map((text) => ({ text, weight: 55 })),
+    { text: problem.geographyArea ?? "", weight: 45 },
+    ...problem.domainCodes.map((code) => ({ text: describeTopic(code).label, weight: 35 })),
+  ];
+  const fieldScores = fields.map(({ text, weight }) => fieldScore(text, queryTokens, weight)).filter((score): score is number => score !== null);
+  if (fieldScores.length > 0) return Math.max(...fieldScores);
+  // A multiword query may span public fields or editorial expressions, but
+  // every query token still has to be present as a complete token.
+  const allTokens = fields.flatMap(({ text }) => searchTokens(text));
+  if (queryTokens.every((token, index) => allTokens.some((candidate) => tokenMatches(candidate, token, index === queryTokens.length - 1)))) return 25;
+
+  // Contextual cues cannot independently create a result. A multiword query
+  // must include the whole cue and another term from this PRB's editorial
+  // primary/secondary vocabulary. This keeps broad place/domain words useful
+  // without assigning a Problem to every standalone mention of them.
+  if (queryTokens.length < 2) return null;
+  const anchorTokens = [
+    ...(keywords?.primary ?? []),
+    ...(keywords?.secondary ?? []),
+  ].flatMap(searchTokens);
+  for (const context of keywords?.contextual ?? []) {
+    const contextTokens = searchTokens(context);
+    const hasContext = contextTokens.every((token) => queryTokens.some((candidate) => comparableToken(candidate) === comparableToken(token)));
+    const hasAnchor = queryTokens.some((token) =>
+      !contextTokens.some((contextToken) => comparableToken(contextToken) === comparableToken(token)) &&
+      anchorTokens.some((candidate) => tokenMatches(candidate, token, false))
+    );
+    const combinedTokens = [...allTokens, ...contextTokens];
+    if (hasContext && hasAnchor && queryTokens.every((token, index) => combinedTokens.some((candidate) => tokenMatches(candidate, token, index === queryTokens.length - 1)))) return 15;
+  }
+  return null;
+}
+
 export function matchesCitizenSearch(problem: CitizenProblem, query: string): boolean {
-  const normalizedQuery = normalizeForSearch(query.trim());
-  if (normalizedQuery === "") return true;
-
-  const haystack = [
-    problem.title,
-    problem.problemStatement ?? "",
-    ...problem.affectedPopulations,
-    problem.geographyArea ?? "",
-    ...problem.domainCodes.map((code) => describeTopic(code).label),
-  ].join(" ␟ ");
-
-  return normalizeForSearch(haystack).includes(normalizedQuery);
+  return searchRelevance(problem, query) !== null;
 }
 
 // Tuned to surface a handful of genuinely informative distributions (e.g. a

@@ -1050,6 +1050,23 @@ describe("Explorer — Overview discovery-context preservation across Problem na
     return screen.getByRole("button", { name: /^Filtros/ });
   }
 
+  it("preserves an editorial keyword query and relevance order after returning from a Problem", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/");
+    render(<Explorer dataProvider={discoveryProvider(30)} />);
+    await screen.findByText("30 problemas");
+    await user.type(screen.getByLabelText("Pesquisar problemas"), "bicicletas");
+    expect(await screen.findByText("1 problemas")).toBeTruthy();
+    expect((screen.getByLabelText("Ordenar por") as HTMLSelectElement).value).toBe("relevance");
+    await user.click(screen.getByRole("button", { name: "Explorar Problema sintético 04" }));
+    await screen.findByRole("heading", { name: "Problema sintético 04" });
+    window.history.back();
+    await screen.findByRole("heading", { name: "Visão geral" });
+    expect((screen.getByLabelText("Pesquisar problemas") as HTMLInputElement).value).toBe("bicicletas");
+    expect((screen.getByLabelText("Ordenar por") as HTMLSelectElement).value).toBe("relevance");
+    expect(screen.getByRole("button", { name: "Explorar Problema sintético 04" })).toBeTruthy();
+  });
+
   /** Configures search + topic filter + sort in the open Overview, leaving a non-default, non-page-1 state ready to assert against after returning. */
   async function configureOverviewDiscovery(user: ReturnType<typeof userEvent.setup>) {
     await screen.findByText("30 problemas");

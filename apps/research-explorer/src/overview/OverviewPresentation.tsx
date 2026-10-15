@@ -49,6 +49,7 @@ export function OverviewPresentation({
   alteredThisWeekCount,
   latestChangeByProblem,
   sortOrder,
+  hasSearchQuery = false,
   onSortOrderChange,
   onExploreProblem,
   partialState,
@@ -82,6 +83,7 @@ export function OverviewPresentation({
   /** Each Problem's newest material-change entry, keyed by `problemId` (Phase 2, §2/§3) — `undefined` for a Problem with no canonical history, which renders on the unchanged neutral row path. */
   latestChangeByProblem: Map<string, MaterialChangeEntry>;
   sortOrder: ProblemSortOrder;
+  hasSearchQuery?: boolean;
   onSortOrderChange: (order: ProblemSortOrder) => void;
   onExploreProblem: (id: string) => void;
   partialState: { failedIds: string[]; retrying: boolean; onRetry: () => void } | null;
@@ -203,7 +205,7 @@ export function OverviewPresentation({
             </div>
           </div>
           <div className="overview-toolbar-meta">
-            <SortControl value={sortOrder} onChange={onSortOrderChange} />
+            <SortControl value={sortOrder} onChange={onSortOrderChange} hasSearchQuery={hasSearchQuery} />
           </div>
         </div>
 

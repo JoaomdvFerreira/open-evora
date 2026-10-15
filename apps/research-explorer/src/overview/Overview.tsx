@@ -92,9 +92,15 @@ export function useOverviewDiscoveryState() {
   // comment). Rendered as "Última atualização ↓" (CitizenDiscovery.tsx's
   // SortControl) — deliberately not "última alteração", which names the Hero
   // ruler's authored material-change date, a different canonical signal (see
-  // OverviewPresentation.tsx). `id` remains available as the alternative
-  // order via SortControl.
+  // OverviewPresentation.tsx). `id` remains the alternative browse order.
+  // A non-empty query defaults to relevance until the user selects a sort.
   const [sortOrder, setSortOrder] = useState<ProblemSortOrder>("updatedAt");
+  const [sortExplicit, setSortExplicit] = useState(false);
+  const effectiveSortOrder: ProblemSortOrder = searchQuery.trim() && !sortExplicit ? "relevance" : sortOrder;
+  const handleSortOrderChange = (order: ProblemSortOrder) => {
+    setSortOrder(order === "relevance" ? "updatedAt" : order);
+    setSortExplicit(order !== "relevance");
+  };
   // Pagination (Overview visual-completion): applies strictly after search,
   // filters, and sort (see overviewStats.ts's `paginateProblems`). Resets to
   // page 1 whenever any of those upstream inputs change, below, so a stale
@@ -118,7 +124,7 @@ export function useOverviewDiscoveryState() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, topicFilter, alteredThisWeekSelected, sortOrder]);
+  }, [searchQuery, topicFilter, alteredThisWeekSelected, effectiveSortOrder]);
 
   return {
     searchQuery,
@@ -127,8 +133,8 @@ export function useOverviewDiscoveryState() {
     onTopicFilterChange: handleTopicFilterChange,
     alteredThisWeekSelected,
     onAlteredThisWeekChange: handleAlteredThisWeekChange,
-    sortOrder,
-    setSortOrder,
+    sortOrder: effectiveSortOrder,
+    setSortOrder: handleSortOrderChange,
     currentPage,
     setCurrentPage,
   };
@@ -340,7 +346,7 @@ export function Overview({
         matchesTopicFilter(problem, topicFilter) &&
         (!alteredThisWeekSelected || activeAlteredThisWeekIds.has(problem.id))
     );
-    return sortProblems(matched, sortOrder);
+    return sortProblems(matched, sortOrder, searchQuery);
   }, [activeProblems, searchQuery, topicFilter, alteredThisWeekSelected, activeAlteredThisWeekIds, sortOrder]);
 
   const pageCount = visibleProblems === null ? 1 : overviewPageCount(visibleProblems.length);
@@ -396,6 +402,7 @@ export function Overview({
       alteredThisWeekCount={activeAlteredThisWeekIds.size}
       latestChangeByProblem={latestChangeByProblem}
       sortOrder={sortOrder}
+      hasSearchQuery={searchQuery.trim() !== ""}
       onSortOrderChange={setSortOrder}
       onExploreProblem={onExploreProblem}
       partialState={currentDetailState && currentDetailState.failedIds.length > 0 ? { failedIds: currentDetailState.failedIds, retrying: currentDetailState.retrying, onRetry: retryFailedDetails } : null}
