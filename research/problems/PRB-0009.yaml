@@ -11,10 +11,10 @@ geography:
 affected_populations:
   - residentes
 problem_statement: >-
-  Em janeiro e março de 2026 foram registadas falhas localizadas de recolha ou acumulação de resíduos em vários pontos da cidade de Évora, incluindo o Centro Histórico, a Estrada de Santo Antonico e o Bairro António Sérgio / Largo da Boa Vontade. Há ainda um relato público, sem data estabelecida, de acumulação de resíduos na zona dos Canaviais. Estes casos não mostram a frequência nem a dimensão do problema no conjunto da cidade.
+  Em janeiro de 2026, um residente relatou recolha deficiente ou irregular e acumulação de resíduos junto à Igreja da Misericórdia, no Centro Histórico, e na Estrada de Santo Antonico. Em março, um vereador referiu queixas de residentes sobre acumulação no Bairro António Sérgio / Largo da Boa Vontade. As atas documentam estas declarações, sem confirmar de forma independente as ocorrências nem mostrar a frequência ou a dimensão do problema na cidade de Évora.
 
 
-  Em fevereiro, o Município comunicou uma perturbação da recolha no concelho. Em maio, pôs ao serviço quatro veículos de recolha e, entre julho e agosto, anunciou reforços de pessoal e viaturas, alterações de horários e circuitos e a reorganização do serviço.
+  Em fevereiro, o Município comunicou uma perturbação da recolha no concelho. Em maio, comunicou a entrada em serviço de quatro veículos de recolha e, entre julho e agosto, anunciou reforços de pessoal e viaturas, alterações de horários e circuitos e a reorganização do serviço.
 
 
   O relatório de atividades da União das Freguesias de Bacelo e Senhora da Saúde regista situações de higiene urbana e resíduos urbanos até 18 de setembro, mas não permite identificar falhas nos circuitos municipais de recolha nem avaliar a fiabilidade do serviço depois de agosto.
@@ -22,9 +22,9 @@ investigation:
   open_questions:
     - question: Depois da reorganização de julho e agosto de 2026, com que regularidade foram realizados os circuitos de recolha na cidade de Évora, que falhas foram registadas e em quanto tempo foram resolvidas?
       why_open: >-
-        Os relatos datados de falhas localizadas na cidade, de janeiro e março de 2026, são anteriores às medidas municipais de maio e de julho/agosto. O relatório da junta regista situações até 18 de setembro, mas não discrimina recolhas falhadas, circuitos realizados ou tempos de resolução. As medidas e os registos administrativos não mostram como passou a funcionar a recolha municipal.
+        As declarações sobre situações localizadas na cidade, registadas em janeiro e março de 2026, são anteriores às medidas municipais de maio e de julho/agosto. O relatório da junta regista situações até 18 de setembro, mas não discrimina recolhas falhadas, circuitos realizados ou tempos de resolução. As medidas e os registos administrativos não mostram como passou a funcionar a recolha municipal.
       latest_result: >-
-        Os relatos datados de falhas localizadas na cidade são de janeiro e março de 2026. Entre 1 de julho e 18 de setembro, a junta de Bacelo e Senhora da Saúde recebeu 124 comunicações e registou 137 ocorrências distintas, além de 15 reforços; 48 ocorrências foram classificadas em Higiene Urbana (19 em julho, 14 em agosto e 15 de 1 a 18 de setembro) e 11 em Resíduos Urbanos (5 de 1 a 18 de setembro). Estas categorias não identificam quantas situações foram falhas de recolha. Continuam sem dados suficientes os circuitos programados e realizados, atrasos, falhas e tempos de resposta na cidade. O documento de deliberação da Assembleia Municipal de 25 de setembro permanece por consultar.
+        As declarações sobre situações localizadas na cidade foram registadas em janeiro e março de 2026. Entre 1 de julho e 18 de setembro, a junta de Bacelo e Senhora da Saúde recebeu 124 comunicações e registou 137 ocorrências distintas, além de 15 reforços; 48 ocorrências foram classificadas em Higiene Urbana (19 em julho, 14 em agosto e 15 de 1 a 18 de setembro) e 11 em Resíduos Urbanos (5 de 1 a 18 de setembro). Estas categorias não identificam quantas situações foram falhas de recolha. Continuam sem dados suficientes os circuitos programados e realizados, atrasos, falhas e tempos de resposta na cidade. O documento de deliberação da Assembleia Municipal de 25 de setembro permanece por consultar.
       current_action: >-
         Consultado o relatório da junta, falta obter registos operacionais dos circuitos municipais depois de agosto, incluindo circuitos programados e realizados, recolhas falhadas ou atrasadas e tempos de resolução por zona ou circuito. O documento de deliberação da Assembleia Municipal de 25 de setembro de 2026 permanece por consultar. O pedido de informação ao Município ainda não foi enviado.
       resolution_condition: >-
@@ -33,7 +33,6 @@ investigation:
         - EVD-000171
         - EVD-000172
         - EVD-000173
-        - EVD-000094
         - EVD-000095
         - EVD-000066
         - EVD-000174
@@ -50,15 +49,14 @@ investigation:
   path:
     initial_signal:
       summary: >-
-        Em janeiro, um residente relatou recolha deficiente e acumulação junto ao ponto de recolha perto da Igreja da Misericórdia, no Centro Histórico, e pouca regularidade da recolha e acumulação na Estrada de Santo Antonico. Em março, um vereador referiu queixas de residentes sobre acumulação no Bairro António Sérgio / Largo da Boa Vontade. Existe ainda um relato público sem data estabelecida na zona dos Canaviais. A confirmação das falhas em janeiro e março não depende deste relato sem data.
+        Em janeiro, um residente relatou recolha deficiente e acumulação junto ao ponto de recolha perto da Igreja da Misericórdia, no Centro Histórico, e pouca regularidade da recolha e acumulação na Estrada de Santo Antonico. Em março, um vereador referiu queixas de residentes sobre acumulação no Bairro António Sérgio / Largo da Boa Vontade. As atas registam estas declarações, sem confirmar de forma independente as ocorrências relatadas.
       evidence:
         - EVD-000171
         - EVD-000172
         - EVD-000173
-        - EVD-000094
     development:
       summary: >-
-        Em fevereiro, o Município comunicou uma perturbação da recolha no concelho. Em maio, o Município pôs ao serviço quatro veículos de recolha. Em julho de 2026, descreveu a higiene urbana como um problema urgente. Entre julho e agosto, anunciou reforços de pessoal e viaturas, alterações de horários e circuitos, reorganização do serviço, medidas logísticas, monitorização interna e equipas externas no perímetro urbano. As competências transferidas para as uniões de freguesias urbanas têm efeitos previstos a partir de 1 de janeiro de 2027.
+        Em fevereiro, o Município comunicou uma perturbação da recolha no concelho. Em maio, comunicou a entrada em serviço de quatro veículos de recolha. Em julho de 2026, descreveu a higiene urbana como um problema urgente. Entre julho e agosto, anunciou reforços de pessoal e viaturas, alterações de horários e circuitos, reorganização do serviço, medidas logísticas, monitorização interna e equipas externas no perímetro urbano. As competências transferidas para as uniões de freguesias urbanas têm efeitos previstos a partir de 1 de janeiro de 2027.
       evidence:
         - EVD-000071
         - EVD-000095
@@ -68,7 +66,7 @@ investigation:
         - EVD-000096
     delimitation:
       summary: >-
-        Os relatos localizados não mostram a frequência das falhas na cidade, e o relato da zona dos Canaviais não tem data estabelecida. O relatório da junta contabiliza ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, incluindo depois de agosto, sem identificar quais correspondem a falhas de recolha ou descrever o desempenho dos circuitos municipais. O documento de deliberação da Assembleia Municipal de 25 de setembro permanece por consultar. O STAL comunicou elevada adesão à greve nacional de 2 de outubro de 2026 nos primeiros serviços noturnos de recolha e higiene urbana em Évora, mas não foi verificado o impacto efetivo na recolha na cidade. Este episódio pontual não permite avaliar a fiabilidade habitual da recolha depois da reorganização; nem a recuperação da fiabilidade nem a continuação de falhas no funcionamento habitual foram demonstradas.
+        As declarações sobre situações localizadas não confirmam a frequência das falhas na cidade. O relatório da junta contabiliza ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, incluindo depois de agosto, sem identificar quais correspondem a falhas de recolha ou descrever o desempenho dos circuitos municipais. O documento de deliberação da Assembleia Municipal de 25 de setembro permanece por consultar. O STAL comunicou elevada adesão à greve nacional de 2 de outubro de 2026 nos primeiros serviços noturnos de recolha e higiene urbana em Évora, mas não foi verificado o impacto efetivo na recolha na cidade. Este episódio pontual não permite avaliar a fiabilidade habitual da recolha depois da reorganização; nem a recuperação da fiabilidade nem a continuação de falhas no funcionamento habitual foram demonstradas.
       evidence:
         - EVD-000095
         - EVD-000066
@@ -94,11 +92,6 @@ evidence:
       - BOUNDS
     research_roles:
       - CONTEXTUAL
-  - evidence_id: EVD-000094
-    effects:
-      - SUPPORTS
-    research_roles:
-      - LOCAL_OBSERVATION
   - evidence_id: EVD-000095
     effects:
       - BOUNDS
@@ -151,7 +144,7 @@ evidence:
       - BOUNDS
     research_roles:
       - EXISTING_RESPONSE
-evidence_status: corroborated
+evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: low
 solution_landscape_status: assessed
@@ -159,29 +152,27 @@ status: OPEN
 decision_basis:
   contract_version: "0.1"
   eligibility_basis: >-
-    O problema diz respeito à fiabilidade da recolha de resíduos e da higiene urbana para residentes da cidade de Évora. Os relatos localizados com data vêm de uma intervenção de um residente em janeiro e de queixas referidas numa reunião pública em março. A perturbação comunicada pelo Município em fevereiro diz respeito ao concelho e, por si só, não documenta uma falha na cidade. Em maio, o Município pôs ao serviço quatro veículos de recolha; as medidas de julho/agosto também não demonstram, por si, melhoria da fiabilidade. O relatório da junta inclui registos administrativos até setembro, mas não documenta o desempenho dos circuitos municipais. O relato da zona dos Canaviais não tem data estabelecida. As perguntas em aberto dizem respeito ao funcionamento depois de agosto e às responsabilidades futuras. Este registo não propõe uma solução digital.
+    O problema diz respeito à fiabilidade da recolha de resíduos e da higiene urbana para residentes da cidade de Évora. As situações localizadas com data foram relatadas por um residente em janeiro e referidas como queixas de residentes por um vereador numa reunião pública em março; as atas não verificam as ocorrências. A perturbação comunicada pelo Município em fevereiro diz respeito ao concelho e, por si só, não documenta uma falha na cidade. Em maio, o Município comunicou a entrada em serviço de quatro veículos de recolha; as medidas de julho/agosto também não demonstram, por si, melhoria da fiabilidade. O relatório da junta inclui registos administrativos até setembro, mas não documenta o desempenho dos circuitos municipais. As perguntas em aberto dizem respeito ao funcionamento depois de agosto e às responsabilidades futuras. Este registo não propõe uma solução digital.
   corroboration_basis: >-
-    A decisão de confirmar os relatos limita-se a falhas localizadas de recolha ou acumulação documentadas em janeiro e março de 2026 dentro da cidade. Dois registos de janeiro descrevem locais diferentes na mesma intervenção de um residente; não são relatos independentes. Um registo de março contém queixas de residentes referidas por um vereador em reunião pública, num evento separado. O relato adicional da zona dos Canaviais não tem data estabelecida e não sustenta a conclusão sobre janeiro e março. Os registos do Município representam uma só voz institucional. As ocorrências classificadas pela junta até setembro não identificam falhas dos circuitos e não alargam esta confirmação. Esta confirmação não estabelece frequência, dimensão na cidade, persistência depois de agosto ou ineficácia da reorganização.
+    Os registos de janeiro e março documentam declarações sobre recolha deficiente ou acumulação de resíduos em locais da cidade, sem verificar de forma independente as ocorrências. Os dois registos de janeiro vêm da mesma intervenção de um residente; o de março regista queixas referidas por um vereador, sem acesso independente às queixas subjacentes. Os registos do Município representam uma só voz institucional e dizem respeito ao concelho ou a medidas de resposta. As ocorrências classificadas pela junta até setembro não identificam falhas dos circuitos. A evidência atual não é suficiente para confirmar as ocorrências localizadas, a frequência ou dimensão do problema na cidade, a sua persistência depois de agosto ou a eficácia da reorganização.
   manifestation:
-    kind: Falhas localizadas de recolha e acumulação de resíduos
+    kind: Recolha deficiente e acumulação de resíduos relatadas em locais da cidade
     summary: >-
-      Em janeiro, foram relatadas recolha deficiente e acumulação junto ao ponto perto da Igreja da Misericórdia, no Centro Histórico, e pouca regularidade e acumulação na Estrada de Santo Antonico. Em março, foram referidas queixas sobre acumulação no Bairro António Sérgio / Largo da Boa Vontade. Existe também um relato público sem data estabelecida sobre acumulação de resíduos na zona dos Canaviais. Este último não é uma manifestação datada de 2026.
+      Em janeiro, um residente relatou recolha deficiente e acumulação junto ao ponto perto da Igreja da Misericórdia, no Centro Histórico, e pouca regularidade e acumulação na Estrada de Santo Antonico. Em março, um vereador referiu queixas de residentes sobre acumulação no Bairro António Sérgio / Largo da Boa Vontade. As atas registam as declarações, não a verificação das ocorrências.
     evidence:
       - EVD-000171
       - EVD-000172
       - EVD-000173
-      - EVD-000094
   consequence:
     summary: >-
-      Os relatos de janeiro e março descrevem acumulação de resíduos e recolha deficiente ou irregular nos locais identificados. O relato adicional na zona dos Canaviais também descreve acumulação, mas não tem data estabelecida. A extensão, duração e impacto para além desses relatos não estão estabelecidos.
+      O residente em janeiro descreveu acumulação de resíduos e recolha deficiente ou irregular nos dois locais que indicou. Em março, o vereador referiu queixas de residentes sobre acumulação noutro local. A extensão, duração e impacto para além destas declarações não estão estabelecidos.
     evidence:
       - EVD-000171
       - EVD-000172
       - EVD-000173
-      - EVD-000094
   currentness:
     assessment: >-
-      As falhas relatadas em janeiro e março são anteriores à entrada em serviço de quatro veículos de recolha em maio e às medidas anunciadas em julho/agosto. O relatório da junta regista ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, mas não identifica falhas de recolha nem mede o funcionamento dos circuitos municipais. Nem a recuperação da fiabilidade nem a continuação de falhas generalizadas foram demonstradas.
+      As declarações sobre falhas em janeiro e março são anteriores à entrada em serviço de quatro veículos de recolha comunicada pelo Município em maio e às medidas anunciadas em julho/agosto. O relatório da junta regista ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, mas não identifica falhas de recolha nem mede o funcionamento dos circuitos municipais. Nem a recuperação da fiabilidade nem a continuação de falhas generalizadas foram demonstradas.
     evidence:
       - EVD-000171
       - EVD-000172
@@ -204,12 +195,11 @@ decision_basis:
     summary: Nenhum outro PRB-* canónico aborda a fiabilidade dos serviços municipais de higiene urbana e recolha de resíduos; PRB-0009 não duplica nem se sobrepõe a outro registo.
     related_problems: []
   corroboration_statement: >-
-    Em janeiro e março de 2026 foram documentadas falhas localizadas de recolha ou acumulação de resíduos dentro da cidade de Évora. A evidência não estabelece frequência, prevalência ou continuidade no conjunto da cidade, nem o desempenho operacional depois da reorganização de julho e agosto.
+    Em janeiro e março de 2026 foram documentadas declarações sobre recolha deficiente ou acumulação de resíduos em locais da cidade de Évora. As ocorrências relatadas não foram confirmadas de forma independente. A evidência não estabelece frequência, prevalência ou continuidade no conjunto da cidade, nem o desempenho operacional depois da reorganização de julho e agosto.
   supporting_evidence:
     - EVD-000171
     - EVD-000172
     - EVD-000173
-    - EVD-000094
   boundary_evidence:
     - EVD-000065
     - EVD-000066
@@ -222,14 +212,14 @@ decision_basis:
     - EVD-000189
     - EVD-000191
   independence_assessment: >-
-    EVD-000171 e EVD-000172 correspondem a um residente, uma reunião e uma intervenção em janeiro, ainda que descrevam dois locais. EVD-000173 corresponde a um evento separado de relato de queixas em março; as queixas individuais subjacentes não estão disponíveis como evidência canónica independente. EVD-000094 é um relato público separado na zona dos Canaviais, sem data estabelecida. O Município representa uma única voz institucional; os seus registos não são vozes institucionais independentes. Os registos da junta são uma classificação administrativa de comunicações, não verificação operacional independente das falhas de recolha. Não se contam mecanicamente IDs, fontes ou documentos para inferir independência ou representatividade.
+    EVD-000171 e EVD-000172 correspondem a um residente, uma reunião e uma intervenção em janeiro, ainda que descrevam dois locais. EVD-000173 corresponde a um evento separado de relato de queixas em março; as queixas individuais subjacentes não estão disponíveis como evidência canónica independente. A separação das reuniões não confirma as ocorrências descritas. O Município representa uma única voz institucional; os seus registos não são vozes institucionais independentes. Os registos da junta são uma classificação administrativa de comunicações, não verificação operacional independente das falhas de recolha. Não se contam mecanicamente IDs, fontes ou documentos para inferir independência ou representatividade.
   scope:
-    geography: Cidade de Évora. Manifestações em locais ou freguesias estabelecem presença dentro da cidade sem generalização ao conjunto.
+    geography: Cidade de Évora. As declarações registadas em atas dizem respeito a locais da cidade; não confirmam as ocorrências nesses locais nem permitem generalizar ao conjunto da cidade.
     population: Residentes da cidade. As uniões urbanas são atores de governação e serviço, não população afetada estabelecida pela evidência.
-    temporal: Manifestações localizadas datadas em janeiro e março de 2026; o relato adicional na zona dos Canaviais não tem data estabelecida. O contexto mudou em maio e julho/agosto. A junta registou ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, sem identificar falhas dos circuitos; o desempenho operacional posterior a agosto não foi estabelecido.
+    temporal: Declarações sobre situações localizadas registadas em janeiro e março de 2026, sem confirmação independente das ocorrências. O Município comunicou a entrada em serviço de veículos em maio e anunciou medidas em julho/agosto. A junta registou ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, sem identificar falhas dos circuitos; o desempenho operacional posterior a agosto não foi estabelecido.
     bounded: true
   limitations: >-
-    Os relatos descrevem locais específicos e não permitem saber a dimensão do problema na cidade. A data do relato da zona dos Canaviais não está estabelecida. O relatório da junta cobre uma união de freguesias até 18 de setembro e classifica situações sem identificar recolhas falhadas, datas por ocorrência ou tempos de resolução. O funcionamento dos circuitos depois de agosto não está quantificado para a cidade. Não se afirma falha generalizada e contínua em toda a cidade.
+    As atas registam declarações sobre locais específicos, sem confirmar as ocorrências ou permitir saber a dimensão do problema na cidade. O relatório da junta cobre uma união de freguesias até 18 de setembro e classifica situações sem identificar recolhas falhadas, datas por ocorrência ou tempos de resolução. O funcionamento dos circuitos depois de agosto não está quantificado para a cidade. Não se afirma falha generalizada e contínua em toda a cidade.
 history:
   - date: 2026-10-14
     summary: >-
@@ -243,3 +233,6 @@ history:
     evidence:
       - EVD-000189
       - EVD-000191
+  - date: 2026-10-15
+    summary: >-
+      A revisão de admissibilidade retirou um relato individual da fundamentação atual e passou a distinguir as declarações registadas em atas das ocorrências relatadas. A evidência restante não confirma de forma independente as falhas localizadas; o estado da evidência passou de corroborated para discovered. Mantêm-se por esclarecer o funcionamento da recolha depois de agosto e os tempos de resolução.
