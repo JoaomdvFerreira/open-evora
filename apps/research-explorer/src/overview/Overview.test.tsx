@@ -89,6 +89,28 @@ it("archives only CLOSED OUT_OF_SCOPE Problems from every Overview surface and p
   expect(screen.getByRole("heading", { name: "Problemas encerrados" })).toBeTruthy();
 });
 
+it("does not restore archived Problems through their editorial keywords", async () => {
+  const provider = makeProvider([
+    { id: "PRB-0007", type: "PRB-", label: "Apoio aos cuidadores", file: "", summaryFields: { status: "CLOSED", closureReason: "OUT_OF_SCOPE" } },
+    { id: "PRB-0008", type: "PRB-", label: "Competências profissionais", file: "", summaryFields: { status: "CLOSED", closureReason: "OUT_OF_SCOPE" } },
+    { id: "PRB-0009", type: "PRB-", label: "Recolha de resíduos", file: "", summaryFields: { status: "OPEN" } },
+  ]);
+  const user = userEvent.setup();
+  render(<OverviewFixture dataProvider={provider} {...props} />);
+  await screen.findByText("1 problemas");
+  const search = screen.getByLabelText("Pesquisar problemas");
+  for (const query of ["cuidador", "emprego"]) {
+    await user.clear(search);
+    await user.type(search, query);
+    expect(screen.getByText("0 problemas")).toBeTruthy();
+    expect(screen.queryByText("Apoio aos cuidadores")).toBeNull();
+    expect(screen.queryByText("Competências profissionais")).toBeNull();
+  }
+  await user.clear(search);
+  await user.type(search, "lixo");
+  expect(screen.getByRole("button", { name: "Explorar Recolha de resíduos" })).toBeTruthy();
+});
+
 it("does not include archived Problems when navigating Overview result pages", async () => {
   const records: RecordSummary[] = [
     ...Array.from({ length: 21 }, (_, index) => ({ id: `PRB-OPEN-${index + 1}`, type: "PRB-", label: `Problema ativo ${index + 1}`, file: "", summaryFields: { status: "OPEN" } })),

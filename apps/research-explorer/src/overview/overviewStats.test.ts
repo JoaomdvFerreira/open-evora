@@ -761,11 +761,12 @@ describe("editorial Problem discovery", () => {
 
   it("rejects duplicate IDs, invalid IDs and malformed vocabulary", () => {
     expect(() => validateProblemKeywords([problemKeywords[0], problemKeywords[0]])).toThrow(/Duplicate/);
-    expect(() => validateProblemKeywords([{ id: "PRB-1", primary: ["termo"], secondary: [] }])).toThrow(/Invalid/);
-    expect(() => validateProblemKeywords([{ id: "PRB-0000", primary: ["termo"], secondary: [] }])).toThrow(/Invalid/);
-    expect(() => validateProblemKeywords([{ id: "PRB-0014", primary: [], secondary: [] }])).toThrow(/Malformed/);
-    expect(() => validateProblemKeywords([{ id: "PRB-0014", primary: [" lixo "], secondary: [] }])).toThrow(/Malformed/);
-    expect(() => validateProblemKeywords([{ id: "PRB-0014", primary: ["lixo"], secondary: ["LIXO"] }])).toThrow(/Duplicate/);
+    expect(() => validateProblemKeywords([{ id: "PRB-1", primary: ["termo"], secondary: [], contextual: [] }])).toThrow(/Invalid/);
+    expect(() => validateProblemKeywords([{ id: "PRB-0000", primary: ["termo"], secondary: [], contextual: [] }])).toThrow(/Invalid/);
+    expect(() => validateProblemKeywords([{ id: "PRB-0014", primary: [], secondary: [], contextual: [] }])).toThrow(/Malformed/);
+    expect(() => validateProblemKeywords([{ id: "PRB-0014", primary: [" lixo "], secondary: [], contextual: [] }])).toThrow(/Malformed/);
+    expect(() => validateProblemKeywords([{ id: "PRB-0014", primary: ["lixo"], secondary: ["LIXO"], contextual: [] }])).toThrow(/Duplicate/);
+    expect(() => validateProblemKeywords([{ id: "PRB-0014", primary: ["lixo"], secondary: [], contextual: ["líxo"] }])).toThrow(/Duplicate/);
   });
 
   it("matches narrow plural variants, accents, case and whitespace", () => {
@@ -800,6 +801,45 @@ describe("editorial Problem discovery", () => {
     ];
     expect(sortProblems(problems, "relevance", "bicicletas").map(({ id }) => id)).toEqual(["PRB-0004", "PRB-0005", "PRB-0099"]);
     expect(sortProblems(problems, "id").map(({ id }) => id)).toEqual(["PRB-0004", "PRB-0005", "PRB-0099"]);
+  });
+
+  it("matches approved aliases and verified normalized singular/plural equivalents", () => {
+    for (const [id, query] of [
+      ["PRB-0001", "autocarro"], ["PRB-0001", "bus"],
+      ["PRB-0003", "passeio"], ["PRB-0004", "bicicletas"],
+      ["PRB-0004", "ciclovias"], ["PRB-0009", "recolha do lixo"],
+      ["PRB-0010", "calcada"], ["PRB-0011", "intérprete"],
+      ["PRB-0012", "escola Chafariz"], ["PRB-0013", "arrendamento"],
+    ]) {
+      expect(matchesCitizenSearch(citizenProblem({ id, title: "Outro assunto" }), query)).toBe(true);
+    }
+  });
+
+  it("scores primary above secondary and keeps contextual cues dependent on another term", () => {
+    const bus = citizenProblem({ id: "PRB-0001", title: "Outro assunto" });
+    expect(searchRelevance(bus, "autocarros")).toBeGreaterThan(searchRelevance(bus, "horários")!);
+    expect(searchRelevance(bus, "horários")).toBeGreaterThan(searchRelevance(bus, "linha autocarros")!);
+    expect(searchRelevance(bus, "linha")).toBeNull();
+    expect(searchRelevance(citizenProblem({ id: "PRB-0004" }), "Santa Luzia")).toBeNull();
+    expect(searchRelevance(citizenProblem({ id: "PRB-0004" }), "Santa Luzia bicicleta")).toBe(15);
+    expect(searchRelevance(citizenProblem({ id: "PRB-0004" }), "Santa bicicleta")).toBeNull();
+    expect(searchRelevance(citizenProblem({ id: "PRB-0005" }), "circular")).toBeNull();
+    expect(searchRelevance(citizenProblem({ id: "PRB-0005" }), "circular trânsito")).toBe(15);
+    expect(searchRelevance(citizenProblem({ id: "PRB-0013" }), "Malagueira")).toBeNull();
+    expect(searchRelevance(citizenProblem({ id: "PRB-0013" }), "Malagueira habitação")).toBe(15);
+  });
+
+  it("includes both relevant Problems for shared approved terms with deterministic ranking", () => {
+    const problems = [
+      citizenProblem({ id: "PRB-0002", title: "Outro assunto" }),
+      citizenProblem({ id: "PRB-0001", title: "Outro assunto" }),
+      citizenProblem({ id: "PRB-0005", title: "Outro assunto", domainCodes: ["MOB"] }),
+    ];
+    for (const query of ["TREVO", "horarios"]) {
+      expect(sortProblems(problems.filter((problem) => matchesCitizenSearch(problem, query)), "relevance", query).map(({ id }) => id))
+        .toEqual(["PRB-0001", "PRB-0002"]);
+    }
+    expect(matchesCitizenSearch(problems[2], "TREVO")).toBe(false);
   });
 });
 

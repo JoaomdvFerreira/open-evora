@@ -579,7 +579,28 @@ export function searchRelevance(problem: CitizenProblem, query: string): number 
   // A multiword query may span public fields or editorial expressions, but
   // every query token still has to be present as a complete token.
   const allTokens = fields.flatMap(({ text }) => searchTokens(text));
-  return queryTokens.every((token, index) => allTokens.some((candidate) => tokenMatches(candidate, token, index === queryTokens.length - 1))) ? 25 : null;
+  if (queryTokens.every((token, index) => allTokens.some((candidate) => tokenMatches(candidate, token, index === queryTokens.length - 1)))) return 25;
+
+  // Contextual cues cannot independently create a result. A multiword query
+  // must include the whole cue and another term from this PRB's editorial
+  // primary/secondary vocabulary. This keeps broad place/domain words useful
+  // without assigning a Problem to every standalone mention of them.
+  if (queryTokens.length < 2) return null;
+  const anchorTokens = [
+    ...(keywords?.primary ?? []),
+    ...(keywords?.secondary ?? []),
+  ].flatMap(searchTokens);
+  for (const context of keywords?.contextual ?? []) {
+    const contextTokens = searchTokens(context);
+    const hasContext = contextTokens.every((token) => queryTokens.some((candidate) => comparableToken(candidate) === comparableToken(token)));
+    const hasAnchor = queryTokens.some((token) =>
+      !contextTokens.some((contextToken) => comparableToken(contextToken) === comparableToken(token)) &&
+      anchorTokens.some((candidate) => tokenMatches(candidate, token, false))
+    );
+    const combinedTokens = [...allTokens, ...contextTokens];
+    if (hasContext && hasAnchor && queryTokens.every((token, index) => combinedTokens.some((candidate) => tokenMatches(candidate, token, index === queryTokens.length - 1)))) return 15;
+  }
+  return null;
 }
 
 export function matchesCitizenSearch(problem: CitizenProblem, query: string): boolean {
