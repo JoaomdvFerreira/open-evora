@@ -144,7 +144,7 @@ evidence:
       - REFINES
     research_roles:
       - LOCAL_OBSERVATION
-evidence_status: discovered
+evidence_status: corroborated
 validation_status: unvalidated
 digital_tractability: not_assessed
 solution_landscape_status: not_assessed
@@ -157,3 +157,25 @@ history:
       - EVD-000183
       - EVD-000184
       - EVD-000185
+  - date: 2026-10-15
+    summary: >-
+      O encerramento da Escola Básica do Chafariz d'El-Rei e os problemas
+      estruturais do edifício estão documentados, bem como a transferência
+      temporária dos alunos para a Escola André de Resende. Os monoblocos foram
+      apresentados como solução temporária, com utilização prevista para aulas
+      e acesso ao refeitório e ao recreio da escola. Em 4 de setembro de 2026,
+      a vereadora indicou que ainda aguardava a avaliação da laje superior e
+      que não havia data definida para o início da reabilitação. A informação
+      reunida sustenta o problema do encerramento da escola, mas não confirma
+      o início das aulas nos monoblocos nem as condições da sua utilização.
+    evidence:
+      - EVD-000159
+      - EVD-000160
+      - EVD-000182
+      - EVD-000183
+      - EVD-000184
+      - EVD-000185
+    state_changes:
+      evidence_status:
+        from: discovered
+        to: corroborated
