@@ -7,6 +7,7 @@ import { OutOfScopeArchive } from "./OutOfScopeArchive";
 
 const GITHUB_ISSUES_URL = "https://github.com/JoaomdvFerreira/open-evora/issues";
 const GITHUB_REPOSITORY_URL = "https://github.com/JoaomdvFerreira/open-evora";
+const CONTACT_EMAIL = "openevora@gmail.com";
 
 type TrustNavigationPath = "/about" | "/methodology" | "/corrections" | "/contact" | "/privacy";
 type TrustPagePath = TrustNavigationPath | "/out-of-scope";
@@ -114,8 +115,9 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
     heading: "Correções",
     summary: "Como sinalizar informação que deve ser revista.",
     body: <>
-      <p>Se encontrar informação incorreta, desatualizada, uma fonte problemática ou uma interpretação que deva ser revista, pode reportá-la através do <a href={GITHUB_ISSUES_URL}>GitHub Issues do projeto Open Évora</a>.</p>
-      <p className="info-notice" role="note">Os GitHub Issues são públicos. Não inclua dados pessoais nem informação sensível na descrição, nos anexos ou nas ligações partilhadas.</p>
+      <p>Se encontrar informação incorreta, desatualizada, uma fonte problemática ou uma interpretação que deva ser revista, pode reportá-la através do <a href={GITHUB_ISSUES_URL}>GitHub Issues do projeto Open Évora</a> quando a questão puder ser discutida publicamente.</p>
+      <p>Se a correção puder revelar dados pessoais, informação sensível ou um problema de privacidade, contacte-nos por email: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Envie apenas a informação necessária para explicar a questão.</p>
+      <p className="info-notice" role="note">Os GitHub Issues são públicos. Não inclua dados pessoais desnecessários nem informação sensível, incluindo em anexos ou ligações partilhadas. Não envie anexos privados.</p>
       <InfoSection id="corrections-include" title="O que incluir">
         <InfoNumberedList items={[
           "A página ou registo em causa — de preferência com o ID (ex. PRB-0005).",
@@ -128,14 +130,18 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
   },
   "/contact": {
     heading: "Contacto",
-    summary: "Canais públicos para questões e sugestões.",
+    summary: "Canais para questões, contribuições e correções.",
     body: <>
-      <InfoFacts facts={[
-        ["Questões e sugestões", <a href={GITHUB_ISSUES_URL}>Issues do repositório do projeto</a>],
-        ["Correções factuais", <>Ver o processo em <a href="/corrections">Correções</a></>],
-      ]} />
-      <p className="info-notice" role="note"><strong>Atenção:</strong> Os GitHub Issues são públicos. Não publique dados pessoais ou informação sensível, incluindo em anexos ou ligações.</p>
-      <InfoAction href={GITHUB_ISSUES_URL}>Abrir issue no GitHub</InfoAction>
+      <InfoSection id="contact-private" title="Contacto privado por email">
+        <p>Escreva para <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> para questões gerais, contribuições de cidadãos, correções factuais ou pedidos relacionados com privacidade e dados pessoais.</p>
+        <p>O email é o canal preferencial se a comunicação puder envolver informação pessoal ou sensível. Envie apenas a informação necessária.</p>
+      </InfoSection>
+      <InfoSection id="contact-public" title="Contacto público pelo GitHub">
+        <p>Para questões que podem ser discutidas publicamente, use os <a href={GITHUB_ISSUES_URL}>Issues do repositório do projeto</a>. O GitHub pode exigir autenticação e as contribuições são publicadas através dessa plataforma.</p>
+        <p>Para saber como sinalizar informação a rever, consulte <a href="/corrections">Correções</a>.</p>
+        <p className="info-notice" role="note"><strong>Atenção:</strong> Os GitHub Issues são públicos. Não publique dados pessoais desnecessários, informação sensível ou anexos privados, incluindo em ligações partilhadas.</p>
+        <InfoAction href={GITHUB_ISSUES_URL}>Abrir issue no GitHub</InfoAction>
+      </InfoSection>
       <InfoSection id="contact-contribute" title="Contribuir para a investigação">
         <p>Pode sugerir um problema para investigação ou contribuir com informação ou evidência para um problema existente.</p>
         <ul className="info-guidance">
@@ -160,6 +166,9 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
         ["Dados técnicos", "Endereços IP e registos de acesso, processados pelo alojamento para funcionamento e segurança, segundo as respetivas políticas."],
       ]} />
       <p>A ausência de uma conta ou de um formulário de envio próprio não significa ausência de tratamento de dados pessoais. A consulta do website envolve dados técnicos tratados pela infraestrutura de alojamento; as contribuições feitas no GitHub seguem também as práticas dessa plataforma.</p>
+      <InfoSection id="privacy-contact" title="Contacto para questões de privacidade">
+        <p>Para pedidos relativos a dados pessoais, contacte <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. O contacto por email pode envolver o tratamento dos dados que fornecer; o serviço de email utiliza um prestador externo. Envie apenas a informação necessária para analisarmos o pedido.</p>
+      </InfoSection>
       <InfoSection id="privacy-commitment" title="Compromisso">
         <p>O Open Évora não deve introduzir formulários de recolha de dados pessoais, analytics adicionais, cookies não essenciais ou mecanismos semelhantes sem rever e atualizar previamente esta informação.</p>
       </InfoSection>
