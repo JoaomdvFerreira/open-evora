@@ -66,3 +66,17 @@ describe("production and Storybook visual runtime contracts", () => {
     expect(productionEntry + storybookEntry).not.toMatch(/@fontsource\/inter\//);
   });
 });
+
+describe("focus indicators", () => {
+  const uncommented = appCss.replace(/\/\*[\s\S]*?\*\//g, "");
+
+  it("draws no ring around the programmatically focused Record Detail container only", () => {
+    expect(ruleBody(appCss, ".record-detail-focus-target:focus")).toMatch(/outline:\s*none\s*;/);
+    const suppressed = [...uncommented.matchAll(/([^{}]+)\{[^{}]*outline:\s*(?:none|0)\s*;[^{}]*\}/g)].map((match) => match[1].trim());
+    expect(suppressed).toEqual([".record-detail-focus-target:focus"]);
+  });
+
+  it("keeps the global keyboard focus outline for interactive elements", () => {
+    expect(ruleBody(appCss, ":focus-visible")).toMatch(/outline:\s*3px solid/);
+  });
+});

@@ -137,6 +137,7 @@ export function Explorer({ dataProvider, schemaPrefixes, totalRecords, generated
         <RecordsExplorer
           dataProvider={dataProvider}
           selectedId={url.state.selectedId}
+          navigation={url.navigation}
           onSelect={url.setSelectedId}
           query={url.state.query}
           onQueryChange={url.setQuery}

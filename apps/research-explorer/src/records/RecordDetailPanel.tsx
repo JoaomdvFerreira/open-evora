@@ -16,6 +16,7 @@ import { RecordDetailSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { EmptyState } from "../presentation/EmptyState";
 import { applyInitialFragment } from "../navigation/applyInitialFragment";
+import type { HistoryNavigation } from "../navigation/useExplorerUrlState";
 import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
 
 const ERROR_TITLES: Record<string, string> = {
@@ -861,6 +862,8 @@ interface RecordDetailPanelProps {
   dataProvider: DataProvider;
   lookup: Map<string, RecordSummary>;
   selectedId: string | null;
+  /** How the current location was reached; defaults to the document's initial load. */
+  navigation?: HistoryNavigation;
   onSelect: (id: string) => void;
   onBackToRecords: () => void;
   onViewAsProblem: (id: string) => void;
@@ -871,7 +874,7 @@ interface RecordDetailPanelProps {
  * A failure loading one record's detail is isolated here (useRecordDetail's
  * own state) and never affects the already-loaded Records table/index.
  */
-export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, onBackToRecords, onViewAsProblem, onViewInGraph }: RecordDetailPanelProps) {
+export function RecordDetailPanel({ dataProvider, lookup, selectedId, navigation = "load", onSelect, onBackToRecords, onViewAsProblem, onViewInGraph }: RecordDetailPanelProps) {
   const state = useRecordDetail(dataProvider, selectedId);
   const contentRef = useRef<HTMLDivElement>(null);
   const readyId = state.status === "ready" ? state.detail.id : null;
@@ -881,10 +884,21 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
   // URL/back-forward-driven selection) — so keyboard/AT users land on the
   // new content instead of it silently appearing off-screen from their
   // current focus position.
+  //
+  // The container is taller than the viewport, so a plain focus() either
+  // leaves the previous page's scroll in place (it is already partly
+  // visible) or shifts the page to align it. Focus never scrolls; the scroll
+  // position is decided explicitly instead: a fresh in-app navigation opens
+  // the record at the top (title and breadcrumb visible), while the initial
+  // load and browser Back/Forward leave scrolling to the browser's own
+  // restoration, and a URL fragment to applyInitialFragment below.
   useEffect(() => {
-    if (readyId !== null) {
-      contentRef.current?.focus();
+    if (readyId === null) return;
+    contentRef.current?.focus({ preventScroll: true });
+    if (navigation === "push" && !window.location.hash) {
+      window.scrollTo(0, 0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readyId]);
 
   // ODM-016A: a direct deep link's fragment (e.g. #evd-limits) targets a
@@ -934,7 +948,7 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, onSelect, 
       )}
 
       {state.status === "ready" && (
-        <div ref={contentRef} tabIndex={-1} aria-label={`Detalhe de ${state.detail.id}`}>
+        <div ref={contentRef} tabIndex={-1} className="record-detail-focus-target" aria-label={`Detalhe de ${state.detail.id}`}>
           <RecordDetailContent
             dataProvider={dataProvider}
             detail={state.detail}

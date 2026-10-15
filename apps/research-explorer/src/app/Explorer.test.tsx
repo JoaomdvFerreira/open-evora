@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Explorer, GraphLoadingFallback } from "./Explorer";
@@ -112,6 +112,9 @@ beforeEach(() => {
   // URL carries a real, resolvable fragment (F07/F08's applyInitialFragment
   // path below); harmless no-op stub for every other test.
   Element.prototype.scrollIntoView = vi.fn() as unknown as typeof Element.prototype.scrollIntoView;
+  // jsdom does not implement window.scrollTo either — reached whenever an
+  // in-app navigation opens a Record Detail at the top.
+  window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
   // Most workflow tests exercise the existing Records flow explicitly; root
   // routing itself is covered in the Overview suite below.
   window.history.replaceState(null, "", "/?view=records");
@@ -1414,5 +1417,132 @@ describe("Explorer — document titles (D01-019)", () => {
     window.history.replaceState(null, "", url);
     render(<Explorer dataProvider={fakeProvider(pending)} />);
     expect(document.title).toBe(titleOf(label));
+  });
+});
+
+/**
+ * Record Detail (EVD/SRC) arrival: the detail content container receives
+ * focus without scrolling, and the scroll position is owned explicitly — a
+ * fresh in-app navigation opens the record at the top (title and breadcrumb
+ * visible), while a direct URL, a URL fragment and browser Back/Forward keep
+ * the browser's own positioning. PRB pages keep their heading-focus arrival.
+ */
+describe("Explorer — Record Detail scroll and focus on arrival", () => {
+  let scrollY: number;
+  let scrollTo: MockInstance<typeof window.scrollTo>;
+  let focus: MockInstance<HTMLElement["focus"]>;
+
+  beforeEach(() => {
+    scrollY = 0;
+    scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(((x: number | ScrollToOptions, y?: number) => {
+      scrollY = typeof x === "number" ? (y ?? 0) : (x.top ?? scrollY);
+    }) as typeof window.scrollTo);
+    focus = vi.spyOn(HTMLElement.prototype, "focus");
+  });
+
+  afterEach(() => {
+    window.location.hash = "";
+  });
+
+  async function detailContent(id: string): Promise<HTMLElement> {
+    return screen.findByLabelText(`Detalhe de ${id}`);
+  }
+
+  /** Every focus() call made on `element`, by its options argument. */
+  function focusOptionsFor(element: HTMLElement): unknown[] {
+    return focus.mock.contexts.flatMap((context, i) => (context === element ? [focus.mock.calls[i][0]] : []));
+  }
+
+  async function expectFocusedWithoutScroll(id: string) {
+    const content = await detailContent(id);
+    await waitFor(() => expect(document.activeElement).toBe(content));
+    expect(content.className).toBe("record-detail-focus-target");
+    expect(focusOptionsFor(content)).toEqual([{ preventScroll: true }]);
+  }
+
+  it("opens an EVD at the top when reached from a scrolled PRB page", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=problem&id=PRB-0005");
+    render(<Explorer dataProvider={fakeProvider(withOpenQuestionEvidence())} />);
+    await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
+
+    scrollY = 1800;
+    const openQuestions = screen.getByRole("region", { name: "O que ainda não sabemos" });
+    await user.click(within(openQuestions).getByRole("button", { name: "Abrir EVD-000105" }));
+
+    await expectFocusedWithoutScroll("EVD-000105");
+    expect(scrollY).toBe(0);
+  });
+
+  it("opens an SRC at the top when reached from a scrolled EVD page", async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, "", "/?view=records&id=EVD-000105");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await detailContent("EVD-000105");
+
+    scrollY = 2400;
+    const detailPanel = await getDetailPanel();
+    await user.click(await within(detailPanel).findByRole("button", { name: "Abrir fonte SRC-0092" }));
+
+    await expectFocusedWithoutScroll("SRC-0092");
+    expect(scrollY).toBe(0);
+  });
+
+  it.each(["EVD-000105", "SRC-0092"])("a direct %s URL focuses the content without moving the page", async (id) => {
+    window.history.replaceState(null, "", `/?view=records&id=${id}`);
+    render(<Explorer dataProvider={fakeProvider()} />);
+
+    await expectFocusedWithoutScroll(id);
+    expect(scrollTo).not.toHaveBeenCalled();
+  });
+
+  it("a direct URL fragment still lands on its section, not on the top of the record", async () => {
+    window.history.replaceState(null, "", "/?view=records&id=EVD-000105#evd-limits");
+    render(<Explorer dataProvider={fakeProvider()} />);
+
+    const section = await waitFor(() => {
+      const el = document.getElementById("evd-limits");
+      if (!el) throw new Error("evd-limits section not yet mounted");
+      return el;
+    });
+    await waitFor(() => expect(document.activeElement).toBe(section));
+    expect(section.scrollIntoView).toHaveBeenCalled();
+    expect(scrollTo).not.toHaveBeenCalled();
+    expect(focusOptionsFor(await detailContent("EVD-000105"))).toEqual([{ preventScroll: true }]);
+  });
+
+  it("browser Back/Forward leaves scroll restoration to the browser", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /EVD-000105/ }));
+    await detailContent("EVD-000105");
+    const detailPanel = await getDetailPanel();
+    await user.click(await within(detailPanel).findByRole("button", { name: "Abrir fonte SRC-0092" }));
+    await detailContent("SRC-0092");
+    const pushedArrivals = scrollTo.mock.calls.length;
+    expect(pushedArrivals).toBe(2);
+
+    window.history.back();
+    const evd = await detailContent("EVD-000105");
+    await waitFor(() => expect(document.activeElement).toBe(evd));
+
+    window.history.forward();
+    const src = await detailContent("SRC-0092");
+    await waitFor(() => expect(document.activeElement).toBe(src));
+
+    expect(scrollTo).toHaveBeenCalledTimes(pushedArrivals);
+    expect(focusOptionsFor(evd).every((options) => (options as FocusOptions).preventScroll === true)).toBe(true);
+    expect(focusOptionsFor(src).every((options) => (options as FocusOptions).preventScroll === true)).toBe(true);
+  });
+
+  it("PRB pages keep their own heading-focus arrival, untouched by Record Detail scrolling", async () => {
+    const user = userEvent.setup();
+    render(<Explorer dataProvider={fakeProvider()} />);
+    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+
+    const title = await screen.findByRole("heading", { level: 2, name: /Pressão de estacionamento/ });
+    await waitFor(() => expect(document.activeElement).toBe(title));
+    expect(focusOptionsFor(title)).toEqual([undefined]);
+    expect(scrollTo).not.toHaveBeenCalled();
   });
 });
