@@ -1,6 +1,6 @@
 problem_id: PRB-0013
 created_at: "2026-10-12"
-updated_at: "2026-10-14"
+updated_at: "2026-10-15"
 title: "Habitação a preços comportáveis em Évora: necessidade identificada e respostas municipais"
 domain: [HOU, SOC]
 geography:
@@ -13,36 +13,51 @@ problem_statement: >-
   oferta muito reduzida de casas para arrendar nas plataformas consultadas,
   face à dimensão da cidade e à procura esperada. O Município documentou a
   entrega de 12 casas para arrendamento apoiado na Malagueira em janeiro de
-  2026. O programa habitacional municipal mais amplo prevê financiamento e
-  intervenções, mas os seus totais não estão desagregados para a cidade. Não
-  está estabelecido se as 12 casas integram esse programa, qual a execução das
-  restantes intervenções na cidade ou quanta necessidade atual permanece por
-  satisfazer.
+  2026. Na Rua Alexandre Rosado, documentou uma empreitada de reabilitação
+  habitacional em 2025. O programa habitacional municipal mais amplo prevê
+  financiamento e intervenções, mas os seus totais não estão desagregados para
+  a cidade. Não está estabelecido se as 12 casas integram esse programa, qual
+  a execução das restantes intervenções na cidade ou quanta necessidade atual
+  permanece por satisfazer.
 investigation:
   open_questions:
     - question: >-
         Que intervenções habitacionais municipais documentadas dizem respeito à
         cidade de Évora e qual é o seu estado de execução, entrega e ocupação?
       why_open: >-
-        São conhecidas 12 casas entregues na Malagueira. O programa de 459
-        habitações tem âmbito municipal e não está desagregado para a cidade;
-        também não está estabelecido se inclui as 12 casas.
+        São conhecidas 12 casas entregues na Malagueira e uma empreitada de
+        reabilitação na Rua Alexandre Rosado descrita como em curso no
+        exercício de 2025. Não está documentada a conclusão, entrega ou
+        ocupação das frações desta empreitada. O programa de 459 habitações
+        tem âmbito municipal e não está desagregado para a cidade; também não
+        está estabelecido se inclui as 12 casas ou a intervenção da Rua
+        Alexandre Rosado.
       latest_result: >-
         O Município documentou 12 casas entregues na Malagueira em janeiro de
-        2026 e um programa municipal mais amplo, sem estabelecer a sua parcela
-        na cidade nem a execução das restantes intervenções aí localizadas.
+        2026. Na Rua Alexandre Rosado, documentou a consignação em abril de
+        2025 de uma empreitada para reabilitar quatro edifícios com 64 frações
+        existentes, descrita como em curso na Prestação de Contas de 2025. O
+        Plano de Ação 2026 prevê a reabilitação de 62 fogos naquela rua com
+        financiamento do 1.º Direito/PRR. As fontes ligadas não confirmam a
+        conclusão, entrega ou ocupação das frações da Rua Alexandre Rosado,
+        nem esclarecem a relação exata entre as duas contagens. O programa
+        municipal de 459 habitações continua sem desagregação completa para a
+        cidade.
       current_action: >-
         Está por verificar se informação pública municipal atual identifica as
-        intervenções situadas na cidade e as respetivas conclusões, entregas e
-        ocupações. Está preparado, mas não enviado, um pedido ao Município para
-        desagregar por localização o programa de 459 habitações, indicar os
-        números da cidade concluídos, entregues e ocupados, quando disponíveis,
-        e esclarecer se as 12 casas da Malagueira integram essa contagem.
+        restantes intervenções situadas na cidade e as respetivas conclusões,
+        entregas e ocupações, incluindo o estado posterior à informação de
+        2025 sobre a Rua Alexandre Rosado. Está preparado, mas não enviado, um
+        pedido ao Município para desagregar por localização o programa de 459
+        habitações, indicar os números da cidade concluídos, entregues e
+        ocupados, quando disponíveis, e esclarecer se as 12 casas da Malagueira
+        e a intervenção da Rua Alexandre Rosado integram essa contagem.
       resolution_condition: >-
         Informação municipal com localização que distinga financiamento, obra,
-        conclusão, entrega e ocupação na cidade e esclareça a contagem das
-        casas da Malagueira.
-      evidence: [EVD-000170, EVD-000042, EVD-000032]
+        conclusão, entrega e ocupação na cidade e esclareça a relação da
+        intervenção da Rua Alexandre Rosado e das casas da Malagueira com o
+        programa municipal.
+      evidence: [EVD-000170, EVD-000192, EVD-000193, EVD-000042, EVD-000032]
     - question: >-
         Existem dados oficiais recentes que permitam caracterizar os preços de
         compra e arrendamento e a oferta de habitação a preços comportáveis
@@ -82,8 +97,12 @@ investigation:
         estabelecem quantas habitações, despesas ou famílias correspondem à
         cidade, nem comprovam entregas. Separadamente, o Município documentou
         12 casas entregues na Malagueira em janeiro de 2026; não estabeleceu
-        se integram as 459 habitações.
-      evidence: [EVD-000032, EVD-000042, EVD-000170]
+        se integram as 459 habitações. Na Rua Alexandre Rosado, documentou a
+        consignação de uma empreitada para reabilitar 64 frações em 2025,
+        descrita como em curso na prestação de contas desse exercício; o plano
+        de ação de 2026 prevê, separadamente, a reabilitação de 62 fogos nessa
+        rua através de financiamento do 1.º Direito/PRR.
+      evidence: [EVD-000032, EVD-000042, EVD-000170, EVD-000192, EVD-000193]
     delimitation:
       summary: >-
         Este problema trata da habitação geral na cidade de Évora. Os agregados
@@ -91,11 +110,15 @@ investigation:
         desagregação geográfica; os projetos do Moinho, do Escurinho e do centro
         de acolhimento não são aqui atribuídos à cidade sem localização
         explícita na fonte ligada. A entrega na Malagueira é uma resposta
-        local, não uma medida da necessidade residual da cidade.
+        local, não uma medida da necessidade residual da cidade. A empreitada
+        da Rua Alexandre Rosado e a programação de 62 fogos referem-se à cidade,
+        mas não comprovam conclusão, entrega ou ocupação; não está estabelecida
+        a correspondência exata entre as contagens de 64 frações e 62 fogos,
+        nem a sua inclusão nas 459 habitações do programa municipal.
         A capacidade das residências universitárias, as listas de espera,
         estudantes sem colocação e a expansão do alojamento universitário
         são tratados no problema sobre alojamento estudantil em Évora.
-      evidence: [EVD-000169, EVD-000032, EVD-000042, EVD-000170]
+      evidence: [EVD-000169, EVD-000032, EVD-000042, EVD-000170, EVD-000192, EVD-000193]
 evidence:
   - evidence_id: EVD-000169
     effects: [SUPPORTS, REFINES]
@@ -109,6 +132,12 @@ evidence:
   - evidence_id: EVD-000170
     effects: [BOUNDS, REFINES]
     research_roles: [EXISTING_RESPONSE]
+  - evidence_id: EVD-000192
+    effects: [BOUNDS, REFINES]
+    research_roles: [EXISTING_RESPONSE]
+  - evidence_id: EVD-000193
+    effects: [BOUNDS, REFINES]
+    research_roles: [PLANNED_RESPONSE]
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed
@@ -124,3 +153,10 @@ history:
       do programa municipal foram separados da evidência da cidade e a entrega
       na Malagueira passou a ter evidência própria; os totais municipais
       deixaram de ser tratados como totais da cidade.
+  - date: 2026-10-15
+    summary: >-
+      Foi integrada documentação sobre a empreitada de reabilitação da Rua
+      Alexandre Rosado e, separadamente, sobre a programação de 62 fogos com
+      financiamento do 1.º Direito/PRR. Permanecem por confirmar a conclusão,
+      entrega e ocupação das frações, a relação entre as duas contagens e a
+      desagregação das restantes intervenções municipais na cidade.

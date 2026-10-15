@@ -1,0 +1,12 @@
+source_id: SRC-0153
+retrieval:
+  retrieved_at: "2026-10-15"
+  content_sha256: e63102753216d573a3cd6f60a886919cd88ec53df88692c800214a546d47b13f
+  media_type: application/pdf
+verified_claims:
+  - locator: "Capa; p. 27, Relatório de Gestão, área da habitação (p. 29 do PDF)"
+    statement: "O documento apresenta-se como Prestação de Contas de 2025 e, na página 27 do relatório de gestão, refere que decorria a empreitada de reabilitação de quatro edifícios da Rua Alexandre Rosado, no Bairro General Humberto Delgado."
+  - locator: "P. 27, Relatório de Gestão (p. 29 do PDF)"
+    statement: "O relatório associa a empreitada à reabilitação prevista de 64 frações propriedade da Habévora e descreve trabalhos de melhoria da eficiência energética e das condições de habitabilidade."
+  - locator: "P. 27, Relatório de Gestão (p. 29 do PDF)"
+    statement: "O estado descrito pertence à prestação de contas do exercício de 2025; a passagem não confirma conclusão, entrega ou ocupação das frações em 2026."
