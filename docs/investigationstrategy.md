@@ -65,6 +65,16 @@ Prefer primary or authoritative sources when they directly support the required 
 
 Apply the publication and rights safeguards in `AGENTS.md`; preserve unknown rights as unknown.
 
+### Source admissibility and citizen leads
+
+Personal social-media posts and messages or accounts sent directly to Open Évora may initiate an investigation. They are leads, not by themselves admissible evidence for factual claims in the public canonical corpus. Check the underlying claim against independent sources appropriate to that claim before using it as a factual evidence basis. Lack of verification does not establish that an account is false. An attributed record of what someone reported does not establish that the reported event occurred.
+
+Public bodies, operators and other institutions may publish statements that document what they said. Such a statement does not by itself verify that a described action was carried out, was effective, or remains current. Preserve the statement's factual, geographic and temporal limits; seek independent verification when the claim concerns the underlying event or outcome rather than the statement itself.
+
+Admissibility depends on the claim, provenance and ability to verify it, not solely on whether the publisher is an institution. Assess identifiable, substantiated journalism; verifiable public documents and data; technical studies and publications; documented direct observations; and other independent sources on those terms. Independence is a substantive judgement under §5, not a count of Sources.
+
+Keep leads received from private individuals outside the public corpus pending an explicit integration and publication decision under Gate 1 and `AGENTS.md`. Do not automatically publish names, personal identifiers, private messages or personal URLs, or copy private correspondence into versioned files or pull requests. A publicly accessible post does not itself grant permission to republish its contents. Do not infer retention periods or a legal basis from this method rule.
+
 ### Reuse, evaluation, and replication
 
 Reuse readiness and evaluation readiness are different.
@@ -85,6 +95,8 @@ Apply four checks before integrating Evidence:
 ### Public and social signals
 
 Public comments, complaints, social posts, and community discussions can identify experiences, recurring themes, journeys worth investigating, and candidate Problems.
+
+Apply the source-admissibility rule in §4 before using a lead as the basis for a canonical factual claim.
 
 They do not by themselves establish prevalence, statistical importance, or representativeness. Discussion volume must not be treated mechanically as civic importance.
 
