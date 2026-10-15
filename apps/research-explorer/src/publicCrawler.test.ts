@@ -1,15 +1,21 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { PRODUCTION_ORIGIN, PUBLIC_SITEMAP_PATHS, escapeXml, robotsTxt, sitemapUrls, sitemapXml } from "./publicCrawler";
 
 describe("public crawler files", () => {
+  it("uses the canonical public domain as the production origin", () => {
+    expect(PRODUCTION_ORIGIN).toBe("https://openevora.pt");
+  });
+
   it("lists exactly the approved path-based public routes deterministically", () => {
     expect(sitemapUrls()).toEqual([
-      "https://open-evora.vercel.app/",
-      "https://open-evora.vercel.app/about",
-      "https://open-evora.vercel.app/methodology",
-      "https://open-evora.vercel.app/corrections",
-      "https://open-evora.vercel.app/contact",
-      "https://open-evora.vercel.app/privacy",
+      "https://openevora.pt/",
+      "https://openevora.pt/about",
+      "https://openevora.pt/methodology",
+      "https://openevora.pt/corrections",
+      "https://openevora.pt/contact",
+      "https://openevora.pt/privacy",
     ]);
     expect(sitemapXml()).toBe(sitemapXml());
   });
@@ -23,7 +29,7 @@ describe("public crawler files", () => {
       expect(url.origin).toBe(PRODUCTION_ORIGIN);
       expect(url.search).toBe("");
       expect(url.hash).toBe("");
-      expect(url.hostname).toBe("open-evora.vercel.app");
+      expect(url.hostname).toBe("openevora.pt");
     }
   });
 
@@ -39,6 +45,47 @@ describe("public crawler files", () => {
   });
 
   it("keeps the approved crawler policy", () => {
-    expect(robotsTxt()).toBe("User-agent: *\nAllow: /\nSitemap: https://open-evora.vercel.app/sitemap.xml\n");
+    expect(robotsTxt()).toBe("User-agent: *\nAllow: /\nSitemap: https://openevora.pt/sitemap.xml\n");
+  });
+});
+
+describe("static HTML entry canonical metadata", () => {
+  const PATH_ENTRIES = ["/about", "/methodology", "/corrections", "/contact", "/privacy", "/out-of-scope"];
+
+  function staticHead(entryPath: string): Document {
+    const html = readFileSync(path.join(__dirname, "..", entryPath, "index.html"), "utf-8");
+    return new DOMParser().parseFromString(html, "text/html");
+  }
+
+  it.each(PATH_ENTRIES)("%s declares its own production URL as canonical and og:url", (entryPath) => {
+    const head = staticHead(entryPath);
+    const canonical = head.querySelectorAll('link[rel="canonical"]');
+    const ogUrl = head.querySelectorAll('meta[property="og:url"]');
+    expect(canonical).toHaveLength(1);
+    expect(ogUrl).toHaveLength(1);
+    expect(canonical[0].getAttribute("href")).toBe(`${PRODUCTION_ORIGIN}${entryPath}`);
+    expect(ogUrl[0].getAttribute("content")).toBe(`${PRODUCTION_ORIGIN}${entryPath}`);
+  });
+
+  it("every sitemap trust route has a static entry with matching canonical metadata", () => {
+    for (const route of PUBLIC_SITEMAP_PATHS.filter((value) => value !== "/")) {
+      expect(PATH_ENTRIES).toContain(route);
+    }
+  });
+
+  // The root entry also serves query-state deep links (Problem and Record
+  // selection); a static canonical/og:url would collapse every shared deep
+  // link onto the home page.
+  it("leaves the root entry without a static canonical or og:url so deep links keep their own URL", () => {
+    const head = staticHead("");
+    expect(head.querySelector('link[rel="canonical"]')).toBeNull();
+    expect(head.querySelector('meta[property="og:url"]')).toBeNull();
+  });
+
+  it("references no previous deployment domain in any static entry", () => {
+    for (const entryPath of ["", ...PATH_ENTRIES]) {
+      const html = readFileSync(path.join(__dirname, "..", entryPath, "index.html"), "utf-8");
+      expect(html).not.toMatch(/vercel\.app/);
+    }
   });
 });

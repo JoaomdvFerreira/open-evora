@@ -1,4 +1,4 @@
-export const PRODUCTION_ORIGIN = "https://open-evora.vercel.app";
+export const PRODUCTION_ORIGIN = "https://openevora.pt";
 
 /**
  * WU047 intentionally lists only existing, path-based public routes. Explorer
