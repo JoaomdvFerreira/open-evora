@@ -1,6 +1,6 @@
 problem_id: PRB-0012
 created_at: 2026-08-28
-updated_at: 2026-10-14
+updated_at: 2026-10-15
 title: Escola Básica do Chafariz d'El-Rei fechada desde novembro de 2025
 domain:
   - EDU
@@ -144,6 +144,172 @@ evidence:
       - REFINES
     research_roles:
       - LOCAL_OBSERVATION
+decision_basis:
+  contract_version: "0.1"
+  eligibility_basis: >-
+    O encerramento da Escola Básica do Chafariz d'El-Rei é um problema
+    delimitado a uma escola da cidade de Évora e aos seus alunos do 1.º ciclo
+    e comunidade educativa (EVD-000159, EVD-000183). A transferência
+    temporária para a Escola André de Resende está documentada (EVD-000182,
+    EVD-000183). O registo não pressupõe uma solução digital nem se confunde
+    com a questão da rede ciclável junto à Escola André de Resende em PRB-0004.
+  corroboration_basis: >-
+    A comunicação municipal documenta o encerramento desde novembro de 2025
+    e a identificação de problemas estruturais (EVD-000159). A Tribuna Alentejo
+    situa o encerramento em 14 de novembro, após a queda de estuque numa sala,
+    e relata a transferência temporária dos alunos para a Escola André de
+    Resende (EVD-000183). A ata municipal de abril confirma que os alunos
+    estavam então provisoriamente nessa escola, ao registar uma declaração
+    da vereadora sobre uma situação ligada às refeições (EVD-000182).
+
+    O Município comunicou em agosto a instalação de 16 monoblocos; as notícias
+    de setembro reportaram a instalação e a utilização prevista para aulas,
+    com acesso planeado ao refeitório e ao recreio da escola (EVD-000159,
+    EVD-000184). Estes registos não documentam o início efetivo das aulas nos
+    monoblocos nem as condições da sua utilização (EVD-000160, EVD-000184).
+    A corroboração aprovada incide no encerramento e na deslocação temporária,
+    com os problemas estruturais identificados pelo Município; não constitui
+    verificação técnica independente desses problemas.
+  manifestation:
+    kind: encerramento de escola e deslocação temporária dos alunos
+    summary: >-
+      O Município comunicou o encerramento da escola em novembro de 2025
+      (EVD-000159). A Tribuna Alentejo situa o encerramento em 14 de novembro,
+      após a queda de estuque numa sala, e relata a transferência temporária
+      dos alunos para a Escola André de Resende (EVD-000183). A presença
+      provisória dos alunos nesta escola consta também da declaração municipal
+      registada em abril (EVD-000182). O Município identificou problemas
+      estruturais no edifício, sem descrição técnica dos defeitos no registo
+      ligado (EVD-000159).
+    evidence:
+      - EVD-000159
+      - EVD-000182
+      - EVD-000183
+  consequence:
+    summary: >-
+      Os alunos foram transferidos temporariamente para a Escola André de
+      Resende (EVD-000183). Em abril, a vereadora referiu uma situação ligada
+      às refeições nessa instalação, a colocação de uma tarefeira e o
+      acompanhamento da situação, sem caracterizar o problema nem confirmar
+      a sua resolução (EVD-000182). A presidente da Associação de Pais
+      referiu limitações nas refeições caso os alunos permanecessem nessa
+      escola, sem representar a experiência de todas as famílias
+      (EVD-000161). Não estão estabelecidos efeitos na aprendizagem ou no
+      bem-estar dos alunos (EVD-000159).
+    evidence:
+      - EVD-000159
+      - EVD-000161
+      - EVD-000182
+      - EVD-000183
+  currentness:
+    assessment: >-
+      O encerramento está documentado desde novembro de 2025 (EVD-000159,
+      EVD-000183); a presença provisória na Escola André de Resende consta
+      da ata de abril (EVD-000182). Em agosto e setembro de 2026 foram
+      comunicadas a instalação e a utilização prevista dos monoblocos, sem
+      confirmação do início efetivo das aulas neles (EVD-000159, EVD-000160,
+      EVD-000184). Em 4 de setembro, a vereadora disse que aguardava a
+      avaliação da laje superior e que não havia data definida para o início
+      da reabilitação (EVD-000185). Os registos ligados não estabelecem o
+      estado posterior das instalações temporárias, da obra ou da reabertura.
+    evidence:
+      - EVD-000159
+      - EVD-000160
+      - EVD-000182
+      - EVD-000183
+      - EVD-000184
+      - EVD-000185
+  contradiction_search:
+    performed: false
+    summary: >-
+      Não está documentada uma procura deliberada de evidência contrária à
+      presente formulação do encerramento e da deslocação temporária. A
+      pesquisa pública delimitada até 14 de outubro sobre os marcos da
+      reabilitação, já descrita neste problema, não equivale a esse teste.
+      A ausência de contradição identificada nos registos ligados não prova
+      que a escola continue encerrada ou que não existam informações
+      posteriores.
+    evidence: []
+  overlap_check:
+    performed: true
+    summary: >-
+      A revisão dos PRB canónicos não encontrou outro registo sobre o
+      encerramento da Escola Básica do Chafariz d'El-Rei. PRB-0004 menciona
+      a Escola André de Resende numa pergunta sobre uma ligação ciclável;
+      trata de outra manifestação e não duplica este problema.
+    related_problems:
+      - PRB-0004
+  corroboration_statement: >-
+    O encerramento da Escola Básica do Chafariz d'El-Rei desde novembro de
+    2025 e a transferência temporária dos alunos para a Escola André de
+    Resende estão documentados (EVD-000159, EVD-000182, EVD-000183). O
+    Município identificou problemas estruturais no edifício (EVD-000159).
+    A utilização efetiva dos monoblocos e o início da reabilitação não estão
+    confirmados pelos registos ligados (EVD-000160, EVD-000184, EVD-000185).
+  supporting_evidence:
+    - EVD-000159
+    - EVD-000182
+    - EVD-000183
+  boundary_evidence:
+    - EVD-000160
+    - EVD-000161
+    - EVD-000184
+    - EVD-000185
+  independence_assessment: >-
+    EVD-000159 e EVD-000160 provêm da mesma comunicação municipal
+    (SRC-0128) e não são linhas independentes. EVD-000182 provém de uma ata
+    municipal distinta (SRC-0143), sobre um episódio de abril, mas mantém
+    a mesma voz institucional; confirma a presença provisória dos alunos
+    na Escola André de Resende nesse momento, não uma avaliação independente
+    do edifício. EVD-000183 provém de uma notícia da Tribuna Alentejo
+    (SRC-0144), que acrescenta a data do encerramento e a transferência;
+    o registo não permite afirmar que o jornal verificou autonomamente a
+    causa ou os defeitos estruturais. EVD-000184 combina notícias da Tribuna
+    Alentejo e da Rádio Elvas (SRC-0144, SRC-0145), mas ambas transmitem
+    sobretudo preparativos e declarações municipais sobre a solução
+    temporária; não constituem duas verificações independentes da sua
+    operação. EVD-000185 é outra declaração da vereadora, reportada pela
+    Rádio Elvas (SRC-0145), e não uma verificação independente do estado da
+    obra. EVD-000161 (SRC-0129) acrescenta a perspetiva distinta da
+    Associação de Pais sobre a alternativa de permanência na Escola André
+    de Resende, sem verificar a condição estrutural ou a operação dos
+    monoblocos. A independência é, assim, limitada para os problemas
+    estruturais e para a resposta temporária.
+  scope:
+    geography: >-
+      Escola Básica do Chafariz d'El-Rei, Escola André de Resende e
+      instalações temporárias junto ao Hospital do Patrocínio, na cidade de
+      Évora (EVD-000159, EVD-000182, EVD-000183, EVD-000184).
+    population: >-
+      Alunos do 1.º ciclo da Escola Básica do Chafariz d'El-Rei e respetiva
+      comunidade educativa; a perspetiva relatada da Associação de Pais
+      não representa necessariamente todas as famílias (EVD-000159,
+      EVD-000161).
+    temporal: >-
+      Encerramento desde novembro de 2025, com data de 14 de novembro
+      reportada pela Tribuna Alentejo (EVD-000159, EVD-000183); instalação
+      provisória na Escola André de Resende documentada em abril de 2026
+      (EVD-000182); monoblocos e planos de utilização comunicados entre agosto
+      e setembro de 2026 (EVD-000159, EVD-000160, EVD-000184); declaração
+      sobre a avaliação da laje e o início da obra em 4 de setembro de 2026
+      (EVD-000185). Não se infere o estado atual a partir destas datas.
+    bounded: true
+  limitations: >-
+    A identificação municipal de problemas estruturais não inclui descrição
+    técnica dos defeitos (EVD-000159, EVD-000183). Os relatos de instalação
+    e planos para os monoblocos não demonstram que as aulas tenham começado
+    neles, nem verificam refeições, acessibilidade, conforto, recreio ou
+    efeitos nas rotinas após a entrada em funcionamento (EVD-000160,
+    EVD-000184). A situação das refeições referida em abril dizia respeito
+    à Escola André de Resende e não demonstra problema idêntico nos
+    monoblocos (EVD-000182). O objetivo municipal de regresso antes do fim
+    do ano letivo 2026/2027 não é uma data confirmada (EVD-000160). A
+    declaração de 4 de setembro não comprova o estado posterior da
+    avaliação da laje, do procedimento de contratação ou da execução da
+    reabilitação (EVD-000185). A pesquisa pública delimitada descrita neste
+    problema não identificou marcos contratuais ou calendário confirmado;
+    não demonstra inexistência de procedimento nem permite afirmar que a
+    obra começou ou que a escola reabriu.
 evidence_status: corroborated
 validation_status: unvalidated
 digital_tractability: not_assessed
