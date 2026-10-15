@@ -1,0 +1,34 @@
+source_id: SRC-0151
+publisher: União das Freguesias de Bacelo e Senhora da Saúde
+name: Prestação de Contas e Relatório de Atividades — Gerência do Exercício, julho a setembro de 2026
+resource_type: document
+scope:
+  geography:
+    level: parish
+    area: União das Freguesias de Bacelo e Senhora da Saúde, Évora
+  temporal:
+    start: 2026-07-01
+    end: 2026-09-18
+  domains:
+    - ENV
+    - PUB
+    - URB
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: https://www.uf-bacelosaude.pt/junta/gestao/6-relatorios-de-atividades?download=1307%3Arelatorio-de-atividades-julho-a-setembro-2026
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  last_checked_at: 2026-10-15
+  update_frequency: one_off
+caveats:
+  - A atividade descrita termina em 18 de setembro de 2026, apesar de o título indicar julho a setembro; a informação financeira termina em 31 de agosto.
+  - O anexo de ocorrências identifica assunto e local, mas não descreve cada situação, a sua data ou o seu desfecho.

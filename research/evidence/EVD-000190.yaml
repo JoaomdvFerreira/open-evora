@@ -1,0 +1,27 @@
+evidence_id: EVD-000190
+provenance:
+  sources:
+    - SRC-0151
+  extracted_at: 2026-10-15
+observation:
+  summary: >-
+    O relatório da União das Freguesias de Bacelo e Senhora da Saúde regista 19 ocorrências classificadas em Vias, Passeios e Pavimentos entre 1 de julho e 18 de setembro de 2026, das quais 9 em julho e 6 de 1 a 18 de setembro. A junta relaciona esta categoria sobretudo com condições de circulação e conservação de pavimentos, passeios e outras infraestruturas do espaço público. O anexo identifica assunto e local, incluindo Avenida Heróis do Ultramar, Avenida Dona Leonor de Oliveira Fernandes e Rua de Timor. Nas considerações finais, a junta refere o levantamento de arruamentos com necessidade de intervenção urgente, a identificação de buracos e de outras situações de degradação dos pavimentos que afirma terem-se agravado, e a conjugação de comunicações dos fregueses com observação direta do território.
+scope:
+  geography:
+    level: parish
+    area: União das Freguesias de Bacelo e Senhora da Saúde, Évora
+  populations:
+    - pessoas que comunicaram situações à junta
+  temporal:
+    start: 2026-07-01
+    end: 2026-09-18
+domains:
+  - URB
+  - MOB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A categoria inclui vias, passeios e outras infraestruturas; as 19 ocorrências não equivalem a 19 buracos ou ruas com pavimento degradado.
+  - O anexo não apresenta descrições, datas e desfechos por ocorrência; os locais exemplificados não podem ser ligados especificamente a buracos ou a observações diretas.
+  - O relatório menciona observação direta e levantamento, mas não publica inventário, método, resultados por rua ou avaliação representativa do estado do pavimento.
+  - Os registos administrativos e a descrição da junta não constituem verificação operacional independente nem mostram a condição atual da cidade no seu conjunto.

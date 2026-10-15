@@ -1,0 +1,23 @@
+source_id: SRC-0151
+retrieval:
+  retrieved_at: "2026-10-15"
+  content_sha256: 5c8b602f2ff9da658a189658ceba69f0a98bad28618363afab91b42ea61fd4ee
+  media_type: application/pdf
+  archive_reference: https://www.uf-bacelosaude.pt/junta/gestao/6-relatorios-de-atividades?download=1307%3Arelatorio-de-atividades-julho-a-setembro-2026
+verified_claims:
+  - locator: "p. 2, introdução"
+    statement: "O período de atividade descrito vai de 1 de julho a 18 de setembro de 2026; a parte financeira reporta-se a 31 de agosto."
+  - locator: "p. 11, secção 6.1, Introdução"
+    statement: "A junta contabiliza 124 comunicações e 137 ocorrências, além de 15 reforços. Uma comunicação pode abranger várias situações que a junta regista e encaminha separadamente como ocorrências."
+  - locator: "p. 12, secções 6.1 e 6.2"
+    statement: "A tabela atribui 48 ocorrências à Higiene Urbana, 11 aos Resíduos Urbanos e 19 às Vias, Passeios e Pavimentos; a Higiene Urbana tem 19 registos em julho, 14 em agosto e 15 de 1 a 18 de setembro."
+  - locator: "p. 12, secção 6.2, classificação administrativa"
+    statement: "Uma situação de agosto relacionada com higiene urbana permanece na categoria administrativa de sugestões, reclamações e informações para não duplicar a contagem."
+  - locator: "p. 13, secções 6.2 e 6.3"
+    statement: "O relatório relaciona Resíduos Urbanos com deposição, recolha e gestão; de 1 a 18 de setembro contabiliza 5 ocorrências nessa categoria e 6 em Vias, Passeios e Pavimentos."
+  - locator: "p. 14, secções 6.4 e 6.5"
+    statement: "A junta descreve acompanhamento de ocorrências, levantamento de arruamentos a intervir, identificação de buracos e de situações de degradação dos pavimentos que afirma terem-se agravado, e conjugação das comunicações com observação direta."
+  - locator: "pp. 2–6, secção 2.a, tabela de intervenções"
+    statement: "A tabela de trabalhos da junta inclui limpeza do Largo da Senhora da Saúde, limpeza e corte de ervas na Avenida Heróis do Ultramar e trabalhos em papeleiras."
+  - locator: "pp. 15–20, anexo I, tabela de ocorrências"
+    statement: "O anexo lista referências, assuntos e locais; entre os locais na categoria Vias, Passeios e Pavimentos estão a Avenida Heróis do Ultramar, a Avenida Dona Leonor de Oliveira Fernandes e a Rua de Timor."

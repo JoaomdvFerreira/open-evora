@@ -1,0 +1,23 @@
+evidence_id: EVD-000191
+provenance:
+  sources:
+    - SRC-0151
+  extracted_at: 2026-10-15
+observation:
+  summary: >-
+    Na tabela de trabalhos operacionais de 1 de julho a 18 de setembro de 2026, a União das Freguesias de Bacelo e Senhora da Saúde regista limpezas no Largo da Senhora da Saúde, limpeza e corte de ervas na Avenida Heróis do Ultramar e arranjo ou substituição de papeleiras em locais da freguesia. São trabalhos apresentados pela junta como realizados.
+scope:
+  geography:
+    level: parish
+    area: União das Freguesias de Bacelo e Senhora da Saúde, Évora
+  temporal:
+    start: 2026-07-01
+    end: 2026-09-18
+domains:
+  - ENV
+  - PUB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - Os trabalhos de limpeza e papeleiras não documentam a execução dos circuitos municipais de recolha de resíduos.
+  - O registo da junta não estabelece a eficácia ou cobertura territorial dos trabalhos nem a resolução das ocorrências comunicadas.
