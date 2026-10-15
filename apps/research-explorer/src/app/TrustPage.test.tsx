@@ -23,6 +23,10 @@ it("explains website and GitHub data handling without a data dependency", () => 
   expect(screen.getByRole("heading", { name: "Compromisso" })).toBeTruthy();
   expect(screen.getByText(/não significa ausência de tratamento de dados pessoais/)).toBeTruthy();
   expect(screen.getByText(/O formulário prepara um issue público no GitHub/)).toBeTruthy();
+  const privacyContact = screen.getByRole("region", { name: "Contacto para questões de privacidade" });
+  expect(within(privacyContact).getByRole("link", { name: "openevora@gmail.com" }).getAttribute("href")).toBe("mailto:openevora@gmail.com");
+  expect(privacyContact.textContent).toContain("prestador externo");
+  expect(privacyContact.textContent).toContain("apenas a informação necessária");
   expect(screen.getAllByRole("link", { name: "Correções" }).every((link) => link.getAttribute("href") === "/corrections")).toBe(true);
 });
 
@@ -80,6 +84,9 @@ it("renders the approved corrections action to the canonical public Issues page"
   expect(screen.getByRole("heading", { name: "Correções" })).toBeTruthy();
   expect(screen.getByRole("link", { name: /GitHub Issues do projeto Open Évora/ }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
   expect(screen.getByRole("link", { name: "Reportar correção no GitHub" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
+  expect(screen.getByRole("link", { name: "openevora@gmail.com" }).getAttribute("href")).toBe("mailto:openevora@gmail.com");
+  expect(screen.getByText(/quando a questão puder ser discutida publicamente/)).toBeTruthy();
+  expect(screen.getByText(/Envie apenas a informação necessária para explicar a questão/)).toBeTruthy();
   expect(screen.getByRole("note").textContent).toContain("Os GitHub Issues são públicos.");
   const include = screen.getByRole("region", { name: "O que incluir" });
   expect(within(include).getAllByRole("listitem")).toHaveLength(3);
@@ -209,10 +216,17 @@ it("discloses AI assistance and human editorial control without claiming exhaust
 
 it("renders the Contact channels, privacy notice and GitHub action with their existing destinations", () => {
   renderInformationPage("/contact");
+  const privateContact = screen.getByRole("region", { name: "Contacto privado por email" });
+  expect(within(privateContact).getByRole("link", { name: "openevora@gmail.com" }).getAttribute("href")).toBe("mailto:openevora@gmail.com");
+  expect(privateContact.textContent).toContain("questões gerais, contribuições de cidadãos, correções factuais ou pedidos relacionados com privacidade e dados pessoais");
+  expect(privateContact.textContent).toContain("canal preferencial");
   expect(screen.getByRole("link", { name: "Issues do repositório do projeto" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
-  const factual = screen.getByText("Correções factuais").nextElementSibling as HTMLElement;
-  expect(within(factual).getByRole("link", { name: "Correções" }).getAttribute("href")).toBe("/corrections");
-  expect(screen.getByRole("note").textContent).toBe("Atenção: Os GitHub Issues são públicos. Não publique dados pessoais ou informação sensível, incluindo em anexos ou ligações.");
+  const publicContact = screen.getByRole("region", { name: "Contacto público pelo GitHub" });
+  expect(within(publicContact).getByRole("link", { name: "Correções" }).getAttribute("href")).toBe("/corrections");
+  expect(publicContact.textContent).toContain("O GitHub pode exigir autenticação");
+  expect(publicContact.textContent).toContain("contribuições são publicadas através dessa plataforma");
+  expect(screen.getByRole("note").textContent).toContain("Os GitHub Issues são públicos.");
+  expect(screen.getByRole("note").textContent).toContain("anexos privados");
   expect(screen.getByRole("link", { name: "Abrir issue no GitHub" }).getAttribute("href")).toBe("https://github.com/JoaomdvFerreira/open-evora/issues");
 });
 
