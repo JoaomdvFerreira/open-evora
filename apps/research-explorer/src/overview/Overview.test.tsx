@@ -613,6 +613,44 @@ describe("Overview — Filtros disclosure and category drawer", () => {
 });
 
 describe("Overview — toolbar result count and sort", () => {
+  it("uses relevance for a query until the user selects another order, then restores the empty-query default", async () => {
+    const provider = makeProvider([
+      { id: "PRB-0004", type: "PRB-", label: "Rede ciclável", file: "", summaryFields: { domain: ["MOB"] } },
+      { id: "PRB-0005", type: "PRB-", label: "Bicicletas na rua", file: "", summaryFields: { domain: ["MOB"] } },
+      { id: "PRB-0003", type: "PRB-", label: "Barreiras pedonais", file: "", summaryFields: { domain: ["MOB"] } },
+    ]);
+    const user = userEvent.setup();
+    render(<OverviewFixture dataProvider={provider} {...props} />);
+    await screen.findByText("3 problemas");
+    const search = screen.getByLabelText("Pesquisar problemas");
+    const sort = screen.getByLabelText("Ordenar por") as HTMLSelectElement;
+    expect(sort.value).toBe("updatedAt");
+    await user.type(search, "bicicletas");
+    expect(sort.value).toBe("relevance");
+    expect(screen.getAllByRole("heading", { level: 4 }).map((heading) => heading.textContent)).toEqual(["Rede ciclável", "Bicicletas na rua"]);
+    expect(screen.queryByText("Barreiras pedonais")).toBeNull();
+    await user.selectOptions(sort, "Identificador ↑");
+    expect(screen.getAllByRole("heading", { level: 4 }).map((heading) => heading.textContent)).toEqual(["Rede ciclável", "Bicicletas na rua"]);
+    await user.clear(search);
+    expect(sort.value).toBe("id");
+    await user.type(search, "bicicletas");
+    expect(sort.value).toBe("id");
+    await user.selectOptions(sort, "Relevância");
+    expect(sort.value).toBe("relevance");
+    await user.clear(search);
+    expect(sort.value).toBe("updatedAt");
+  });
+
+  it("uses keywords for discovery while rendering only canonical Problem content", async () => {
+    const provider = makeProvider([{ id: "PRB-0009", type: "PRB-", label: "Fiabilidade da recolha de resíduos", file: "", summaryFields: {} }]);
+    const user = userEvent.setup();
+    render(<OverviewFixture dataProvider={provider} {...props} />);
+    await screen.findByText("Fiabilidade da recolha de resíduos");
+    await user.type(screen.getByLabelText("Pesquisar problemas"), "lixo");
+    expect(screen.getByRole("button", { name: "Explorar Fiabilidade da recolha de resíduos" })).toBeTruthy();
+    expect(screen.queryByText("lixo")).toBeNull();
+  });
+
   it("shows the filtered total in the toolbar's compact presentation", async () => {
     const provider = makeProvider([
       { id: "PRB-1", type: "PRB-", label: "Problema um", file: "", summaryFields: {} },

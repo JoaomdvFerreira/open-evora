@@ -10,6 +10,7 @@ import {
   latestMaterialChangeByProblem,
   latestMaterialChangeInCivilWeekOfByProblem,
   matchesCitizenSearch,
+  searchRelevance,
   matchesTopicFilter,
   overviewPageCount,
   paginateProblems,
@@ -26,6 +27,7 @@ import {
 } from "./overviewStats";
 import type { RecordDetail, RecordSummary } from "../dataProvider/types";
 import { auditedDomainCodes, describeTopic } from "../presentation/topicMapping";
+import { problemKeywords, validateProblemKeywords } from "./problemKeywords";
 
 function summary(overrides: Partial<RecordSummary>): RecordSummary {
   return { id: "PRB-0001", type: "PRB-", label: "Fixture", file: "research/problems/PRB-0001.yaml", summaryFields: {}, ...overrides };
@@ -716,6 +718,88 @@ describe("matchesCitizenSearch", () => {
   it("does not match on the technical PRB ID alone", () => {
     const problem = citizenProblem({ id: "PRB-0042", title: "Outro problema" });
     expect(matchesCitizenSearch(problem, "PRB-0042")).toBe(false);
+  });
+});
+
+describe("editorial Problem discovery", () => {
+  const keywords = [
+    ["PRB-0001", "autocarros atrasados"],
+    ["PRB-0002", "paragens de autocarro"],
+    ["PRB-0003", "barreiras nos passeios"],
+    ["PRB-0004", "bicicletas"],
+    ["PRB-0005", "trânsito lento"],
+    ["PRB-0006", "quartos estudantes"],
+    ["PRB-0007", "cuidadores informais"],
+    ["PRB-0008", "competências profissionais"],
+    ["PRB-0009", "lixo"],
+    ["PRB-0010", "buracos"],
+    ["PRB-0011", "barreiras linguísticas na saúde"],
+    ["PRB-0012", "escola do chafariz d'el-rei"],
+    ["PRB-0013", "casas caras"],
+  ] as const;
+
+  it("maps each of the thirteen stable identifiers to its own discovery terms", () => {
+    expect(problemKeywords.map(({ id }) => id)).toEqual(keywords.map(([id]) => id));
+    for (const [id, term] of keywords) {
+      expect(searchRelevance(citizenProblem({ id, title: "Outro assunto" }), term)).toBeGreaterThan(0);
+    }
+  });
+
+  it("returns the intended Problem first for each everyday query", () => {
+    const candidates = problemKeywords.map(({ id }) => citizenProblem({ id, title: "Descrição canónica" }));
+    for (const [query, expected] of [
+      ["lixo", "PRB-0009"],
+      ["bicicletas", "PRB-0004"],
+      ["buracos", "PRB-0010"],
+      ["quartos estudantes", "PRB-0006"],
+      ["casas caras", "PRB-0013"],
+    ]) {
+      const matches = sortProblems(candidates.filter((problem) => matchesCitizenSearch(problem, query)), "relevance", query);
+      expect(matches[0]?.id).toBe(expected);
+    }
+  });
+
+  it("rejects duplicate IDs, invalid IDs and malformed vocabulary", () => {
+    expect(() => validateProblemKeywords([problemKeywords[0], problemKeywords[0]])).toThrow(/Duplicate/);
+    expect(() => validateProblemKeywords([{ id: "PRB-1", primary: ["termo"], secondary: [] }])).toThrow(/Invalid/);
+    expect(() => validateProblemKeywords([{ id: "PRB-0000", primary: ["termo"], secondary: [] }])).toThrow(/Invalid/);
+    expect(() => validateProblemKeywords([{ id: "PRB-0014", primary: [], secondary: [] }])).toThrow(/Malformed/);
+    expect(() => validateProblemKeywords([{ id: "PRB-0014", primary: [" lixo "], secondary: [] }])).toThrow(/Malformed/);
+    expect(() => validateProblemKeywords([{ id: "PRB-0014", primary: ["lixo"], secondary: ["LIXO"] }])).toThrow(/Duplicate/);
+  });
+
+  it("matches narrow plural variants, accents, case and whitespace", () => {
+    const bike = citizenProblem({ id: "PRB-0004", title: "Rede ciclável" });
+    for (const query of ["bicicleta", "bicicletas", "ciclovia", "ciclovias", "  BICICLÉTAS  "]) {
+      expect(matchesCitizenSearch(bike, query)).toBe(true);
+    }
+    const waste = citizenProblem({ id: "PRB-0009", title: "Recolha municipal" });
+    for (const query of ["lixo", "resíduos", "residuos"]) expect(matchesCitizenSearch(waste, query)).toBe(true);
+    expect(matchesCitizenSearch(citizenProblem({ id: "PRB-0006" }), "  QUARTOS   ESTUDANTES ")).toBe(true);
+    expect(matchesCitizenSearch(citizenProblem({ id: "PRB-0013" }), "CASAS caras")).toBe(true);
+  });
+
+  it("requires complete query tokens and excludes unrelated domain peers", () => {
+    const bike = citizenProblem({ id: "PRB-0004", domainCodes: ["MOB"] });
+    expect(matchesCitizenSearch(bike, "bicicletas")).toBe(true);
+    for (const id of ["PRB-0003", "PRB-0005"]) {
+      expect(matchesCitizenSearch(citizenProblem({ id, domainCodes: ["MOB"] }), "bicicletas")).toBe(false);
+    }
+    expect(matchesCitizenSearch(citizenProblem({ title: "Alixolado" }), "lixo")).toBe(false);
+    expect(matchesCitizenSearch(bike, "bicicletas inexistentes")).toBe(false);
+    expect(matchesCitizenSearch(bike, "assunto desconhecido")).toBe(false);
+    expect(matchesCitizenSearch(bike, "!!!")).toBe(false);
+    expect(matchesCitizenSearch(bike, " ")).toBe(true);
+  });
+
+  it("ranks exact primary keywords over public content, then breaks equal scores by ID", () => {
+    const problems = [
+      citizenProblem({ id: "PRB-0005", title: "Bicicletas na rua" }),
+      citizenProblem({ id: "PRB-0004", title: "Rede ciclável" }),
+      citizenProblem({ id: "PRB-0099", title: "Bicicletas na cidade" }),
+    ];
+    expect(sortProblems(problems, "relevance", "bicicletas").map(({ id }) => id)).toEqual(["PRB-0004", "PRB-0005", "PRB-0099"]);
+    expect(sortProblems(problems, "id").map(({ id }) => id)).toEqual(["PRB-0004", "PRB-0005", "PRB-0099"]);
   });
 });
 

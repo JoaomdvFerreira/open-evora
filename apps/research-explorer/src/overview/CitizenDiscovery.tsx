@@ -216,10 +216,10 @@ export function TopicFilterGroup({ topicCodes, activeTopic, onChange }: {
 
 // Direction arrows are a truthful restatement of sortProblems's own fixed
 // per-order direction (Overview visual-convergence pass — quiet editorial
-// control, TARGET's "Última atualização ↓" wording) — neither order is
-// user-toggleable between ascending/descending, so the arrow is part of each
-// option's label, not a separate control.
+// control, TARGET's "Última atualização ↓" wording). Relevance is available
+// only with a query; the two browse orders keep their fixed directions.
 const SORT_LABELS: Record<ProblemSortOrder, string> = {
+  relevance: "Relevância",
   id: "Identificador ↑",
   // Deliberately not "última alteração" — that phrase names the Hero
   // ruler's authored material-change date (a different canonical signal;
@@ -235,6 +235,7 @@ const SORT_LABELS: Record<ProblemSortOrder, string> = {
 // only the rendered option text shortens. Screen readers still get the full
 // meaning via `SORT_LABELS_ACCESSIBLE` below regardless of viewport width.
 const SORT_LABELS_COMPACT: Record<ProblemSortOrder, string> = {
+  relevance: "Relevância",
   id: "ID ↑",
   updatedAt: "alteração ↓",
 };
@@ -243,6 +244,7 @@ const SORT_LABELS_COMPACT: Record<ProblemSortOrder, string> = {
 // is currently rendered — folded into the `<select>`'s own `aria-label` so
 // the compact short text never narrows the accessible meaning (task §3).
 const SORT_LABELS_ACCESSIBLE: Record<ProblemSortOrder, string> = {
+  relevance: "Relevância da pesquisa",
   id: "Identificador, ordem ascendente",
   updatedAt: "Última atualização, mais recente primeiro",
 };
@@ -276,9 +278,10 @@ const SORT_LABELS_ACCESSIBLE: Record<ProblemSortOrder, string> = {
  * (`SORT_LABELS_ACCESSIBLE`, restating the full order name so the accessible
  * name never shrinks to the short visible text) apply ONLY while
  * `isNarrow`. */
-export function SortControl({ value, onChange, id = "overview-sort" }: {
+export function SortControl({ value, onChange, hasSearchQuery = false, id = "overview-sort" }: {
   value: ProblemSortOrder;
   onChange: (order: ProblemSortOrder) => void;
+  hasSearchQuery?: boolean;
   id?: string;
 }) {
   const isNarrow = useNarrowViewport();
@@ -292,7 +295,7 @@ export function SortControl({ value, onChange, id = "overview-sort" }: {
         aria-label={isNarrow ? `Ordenar por: ${SORT_LABELS_ACCESSIBLE[value]}` : undefined}
         onChange={(event) => onChange(event.target.value as ProblemSortOrder)}
       >
-        {(Object.entries(labels) as [ProblemSortOrder, string][]).map(([order, text]) => (
+        {(Object.entries(labels) as [ProblemSortOrder, string][]).filter(([order]) => hasSearchQuery || order !== "relevance").map(([order, text]) => (
           <option key={order} value={order}>{text}</option>
         ))}
       </select>
