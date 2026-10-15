@@ -1,7 +1,8 @@
 import { defineConfig, type Plugin } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { robotsTxt, sitemapXml } from "./src/publicCrawler";
+import { SOCIAL_SHARE_IMAGE_PATH, SOCIAL_SHARE_IMAGE_SOURCE, robotsTxt, sitemapXml } from "./src/publicCrawler";
 
 const APP_ROOT = fileURLToPath(new URL(".", import.meta.url));
 const TRUST_PAGE_INPUTS = ["about", "methodology", "corrections", "contact", "privacy", "out-of-scope"];
@@ -12,6 +13,11 @@ function publicCrawlerFiles(): Plugin {
     generateBundle() {
       this.emitFile({ type: "asset", fileName: "robots.txt", source: robotsTxt() });
       this.emitFile({ type: "asset", fileName: "sitemap.xml", source: sitemapXml() });
+      this.emitFile({
+        type: "asset",
+        fileName: SOCIAL_SHARE_IMAGE_PATH.slice(1),
+        source: readFileSync(`${APP_ROOT}${SOCIAL_SHARE_IMAGE_SOURCE}`),
+      });
     },
   };
 }

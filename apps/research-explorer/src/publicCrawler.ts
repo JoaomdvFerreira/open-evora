@@ -1,6 +1,14 @@
 export const PRODUCTION_ORIGIN = "https://openevora.pt";
 
 /**
+ * The one global social-sharing image. Crawlers need an absolute, unhashed
+ * URL, so the build emits it at this fixed root path (vite.config.ts) and every
+ * static HTML entry references it on the production origin.
+ */
+export const SOCIAL_SHARE_IMAGE_PATH = "/social-share.png";
+export const SOCIAL_SHARE_IMAGE_SOURCE = "src/assets/social-share.png";
+
+/**
  * WU047 intentionally lists only existing, path-based public routes. Explorer
  * problem and record selection is query-state routing, so detail URLs are not
  * sitemap entries until a separately authorised routing change exists.
