@@ -26,7 +26,8 @@ it("explains website and GitHub data handling without a data dependency", () => 
 
   const controller = screen.getByRole("region", { name: "Responsável pelo tratamento" });
   expect(controller.textContent).toContain("iniciativa cívica individual e independente");
-  expect(controller.textContent).toContain("ainda não consta desta página");
+  expect(controller.textContent).toContain("O responsável pelo tratamento é João Ferreira");
+  expect(within(controller).getByRole("link", { name: "openevora@gmail.com" }).getAttribute("href")).toBe("mailto:openevora@gmail.com");
   const website = screen.getByRole("region", { name: "Consulta do website" });
   expect(website.textContent).toContain("alojado na Vercel");
   expect(website.textContent).toContain("Vercel Analytics e o Speed Insights estão atualmente desativados");
@@ -37,7 +38,11 @@ it("explains website and GitHub data handling without a data dependency", () => 
   const github = screen.getByRole("region", { name: "Contribuições no GitHub" });
   expect(github.textContent).toContain("Os GitHub Issues são públicos");
   expect(github.textContent).toContain("o envio é concluído no GitHub");
-  expect(screen.getByRole("region", { name: "Finalidades e fundamentos jurídicos" }).textContent).toContain("não foi concluída uma avaliação de interesse legítimo");
+  const legalBasis = screen.getByRole("region", { name: "Finalidades e fundamentos jurídicos" });
+  expect(legalBasis.textContent).toContain("Interesse legítimo (artigo 6.º, n.º 1, alínea f), do RGPD)");
+  expect(legalBasis.textContent).toContain("Cumprimento de uma obrigação jurídica (artigo 6.º, n.º 1, alínea c), do RGPD)");
+  expect(legalBasis.textContent).toContain("realizado pela Vercel, cujo papel nesse tratamento é definido pelas respetivas condições e políticas");
+  expect(legalBasis.textContent).not.toContain("em análise");
   expect(screen.getByRole("region", { name: "Conservação" }).textContent).toContain("vai adotar uma revisão anual");
   const rights = screen.getByRole("region", { name: "Os seus direitos" });
   expect(within(rights).getByRole("link", { name: "CNPD" }).getAttribute("href")).toBe("https://www.cnpd.pt");

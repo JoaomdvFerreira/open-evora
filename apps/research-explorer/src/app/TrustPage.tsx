@@ -175,7 +175,7 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
       ]} />
       <p>A ausência de uma conta ou de um formulário de envio próprio não significa ausência de tratamento de dados pessoais. A consulta do website, o contacto por email e as contribuições no GitHub podem envolver o tratamento de dados pessoais, descrito abaixo.</p>
       <InfoSection id="privacy-controller" title="Responsável pelo tratamento">
-        <p>O Open Évora é uma iniciativa cívica individual e independente, sem ligação à autarquia. A identificação formal do responsável pelo tratamento ainda não consta desta página. Os pedidos relativos a dados pessoais podem ser enviados para <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+        <p>O responsável pelo tratamento é João Ferreira, no âmbito do Open Évora, uma iniciativa cívica individual e independente, sem ligação à autarquia. Contacto: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
       </InfoSection>
       <InfoSection id="privacy-website" title="Consulta do website">
         <p>O website está alojado na Vercel. A consulta pode envolver o tratamento de dados técnicos de acesso, como endereços IP e registos de acesso, pela Vercel, para assegurar o funcionamento e a segurança do serviço, segundo as respetivas políticas.</p>
@@ -189,7 +189,10 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
         <p>Os GitHub Issues são públicos. O formulário de contribuição apenas prepara o issue: o envio é concluído no GitHub, que pode exigir autenticação e trata os dados segundo as suas próprias políticas. Não inclua dados pessoais desnecessários nem informação sensível.</p>
       </InfoSection>
       <InfoSection id="privacy-legal-basis" title="Finalidades e fundamentos jurídicos">
-        <p>As finalidades de cada tratamento são as indicadas acima. O fundamento jurídico aplicável a cada tratamento ainda está em análise e não é indicado nesta página; não foi concluída uma avaliação de interesse legítimo.</p>
+        <p>As finalidades de cada tratamento são as indicadas acima e assentam nos seguintes fundamentos jurídicos:</p>
+        <p><strong>Interesse legítimo</strong> (artigo 6.º, n.º 1, alínea f), do RGPD): responder a contactos, analisar contributos, realizar investigação cívica e manter um arquivo documental proporcional que assegure a rastreabilidade da investigação.</p>
+        <p><strong>Cumprimento de uma obrigação jurídica</strong> (artigo 6.º, n.º 1, alínea c), do RGPD): tratar os dados necessários para responder a pedidos de exercício dos direitos previstos no RGPD.</p>
+        <p><strong>Alojamento:</strong> o tratamento de dados técnicos de acesso descrito em «Consulta do website» é realizado pela Vercel, cujo papel nesse tratamento é definido pelas respetivas condições e políticas.</p>
       </InfoSection>
       <InfoSection id="privacy-retention" title="Conservação">
         <p>Os dados pessoais são conservados apenas enquanto forem necessários para responder aos pedidos e para a documentação da investigação. O projeto vai adotar uma revisão anual da correspondência arquivada, para eliminar o que deixar de ser necessário.</p>
