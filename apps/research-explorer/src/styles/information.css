@@ -121,6 +121,23 @@ body:has(.info-page) .public-footer {
   line-height: 1.45;
 }
 
+/* ---- Not-found page ------------------------------------------------------- */
+
+/* No INFORMAÇÃO sidebar: the article is the page's only column, on the same
+   reading measure. The <=1023px single-column rule below still applies. */
+.info-page--standalone {
+  grid-template-columns: minmax(0, var(--info-measure));
+}
+
+.info-not-found-navigation ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: var(--info-content-gap) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
 /* ---- Page content --------------------------------------------------------- */
 
 .info-content {

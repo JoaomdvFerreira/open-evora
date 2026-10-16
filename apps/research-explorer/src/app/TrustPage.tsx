@@ -307,6 +307,34 @@ export function TrustPage({ page, skipTargetId, dataProvider }: { page: TrustPag
 }
 
 /**
+ * The public not-found page, rendered only by the static 404.html entry. It
+ * shares the Information shell's global header, page header and footer but
+ * has no INFORMAÇÃO navigation: it is not part of that sequence. Its two
+ * destinations are the same ordinary navigations the header uses outside the
+ * live Explorer.
+ */
+export function NotFoundPage({ skipTargetId }: { skipTargetId?: string }) {
+  useEffect(() => {
+    document.title = documentTitle("Página não encontrada");
+  }, []);
+  return <>
+    <ExplorerHeader activeView="not-found" />
+    <div className="info-page info-page--standalone shell-frame shell-frame--wide">
+      <article id={skipTargetId} tabIndex={skipTargetId ? -1 : undefined} className="info-article">
+        <h1 className="info-title">Página não encontrada</h1>
+        <p className="info-summary">O endereço indicado não corresponde a nenhuma página do Open Évora. Pode conter um erro ou a página pode ter deixado de estar disponível.</p>
+        <nav className="info-not-found-navigation" aria-label="Continuar no Open Évora">
+          <ul>
+            <li><a className="info-action-link" href="/">Visão geral</a></li>
+            <li><a className="info-action-link" href="/?view=records">Registos</a></li>
+          </ul>
+        </nav>
+      </article>
+    </div>
+  </>;
+}
+
+/**
  * Editorial footer (Overview final redesign, Phase 3B §6; converged to a
  * two-region horizontal distribution in the visual-completion pass, task
  * §13): identity/supporting copy on the left, PROJETO and DADOS grouped into
