@@ -100,17 +100,6 @@ requests:
     send_date: null
     response_date: null
     follow_up_decision: Preparar perguntas documentais delimitadas, sem contactar a instituição nesta fase.
-  - request_id: IREQ-0010
-    prb_references: [PRB-0010]
-    intended_recipient: Município de Évora
-    requested_information: Delimitação exata do troço da EN114 à entrada de Évora referido no relato de julho e identificação da entidade responsável pela conservação desse troço.
-    why_needed: O relato é localizado e não verificado; não permite atribuir responsabilidade automaticamente.
-    already_known_sources: [SRC-0072, PRB-0010]
-    last_known_contact_state: Sem contacto documentado sobre este troço.
-    authorization_status: Envio não autorizado.
-    send_date: null
-    response_date: null
-    follow_up_decision: Solicitar primeiro ao Município esclarecimento sobre o troço, apenas após autorização expressa do owner. Considerar contacto posterior com a Infraestruturas de Portugal só se informação de jurisdição verificada o justificar ou por decisão separada do owner; não há comunicação simultânea ou automática.
   - request_id: IREQ-0011
     prb_references: [PRB-0007]
     intended_recipient: Município de Évora / DEIS
