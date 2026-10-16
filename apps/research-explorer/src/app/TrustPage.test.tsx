@@ -38,6 +38,10 @@ it("explains website and GitHub data handling without a data dependency", () => 
   const github = screen.getByRole("region", { name: "Contribuições no GitHub" });
   expect(github.textContent).toContain("Os GitHub Issues são públicos");
   expect(github.textContent).toContain("o envio é concluído no GitHub");
+  const externalServices = screen.getByRole("region", { name: "Serviços externos" });
+  expect(externalServices.textContent).toContain("fora do Espaço Económico Europeu");
+  expect(externalServices.textContent).toContain("dependem do prestador e do serviço utilizado");
+  expect(externalServices.textContent).not.toMatch(/cláusulas contratuais-tipo|DPA/);
   const legalBasis = screen.getByRole("region", { name: "Finalidades e fundamentos jurídicos" });
   expect(legalBasis.textContent).toContain("Interesse legítimo (artigo 6.º, n.º 1, alínea f), do RGPD)");
   expect(legalBasis.textContent).toContain("Cumprimento de uma obrigação jurídica (artigo 6.º, n.º 1, alínea c), do RGPD)");

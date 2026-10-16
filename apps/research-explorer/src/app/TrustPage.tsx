@@ -188,6 +188,9 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
       <InfoSection id="privacy-github" title="Contribuições no GitHub">
         <p>Os GitHub Issues são públicos. O formulário de contribuição apenas prepara o issue: o envio é concluído no GitHub, que pode exigir autenticação e trata os dados segundo as suas próprias políticas. Não inclua dados pessoais desnecessários nem informação sensível.</p>
       </InfoSection>
+      <InfoSection id="privacy-external-services" title="Serviços externos">
+        <p>Os serviços externos utilizados pelo Open Évora podem envolver o tratamento de dados pessoais fora do Espaço Económico Europeu. As condições e garantias aplicáveis dependem do prestador e do serviço utilizado, incluindo os mecanismos de proteção de dados previstos na legislação aplicável.</p>
+      </InfoSection>
       <InfoSection id="privacy-legal-basis" title="Finalidades e fundamentos jurídicos">
         <p>As finalidades de cada tratamento são as indicadas acima e assentam nos seguintes fundamentos jurídicos:</p>
         <p><strong>Interesse legítimo</strong> (artigo 6.º, n.º 1, alínea f), do RGPD): responder a contactos, analisar contributos, realizar investigação cívica e manter um arquivo documental proporcional que assegure a rastreabilidade da investigação.</p>
