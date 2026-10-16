@@ -107,6 +107,17 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
         <p>A existência de uma fonte não significa que todas as conclusões possíveis a partir dessa fonte estejam estabelecidas; o Explorador procura tornar explícitos o âmbito e os limites da evidência apresentada.</p>
         <p>Uma declaração institucional documenta o que uma entidade comunicou, mas não demonstra, por si só, que uma medida foi executada, foi eficaz ou continua em vigor. Os relatos de cidadãos podem indicar situações a investigar, mas não constituem automaticamente evidência admissível para sustentar afirmações factuais.</p>
       </InfoSection>
+      <InfoSection id="methodology-investigation-status" title="Estados da investigação">
+        <p>O estado da evidência indica o juízo editorial sobre o apoio da evidência à leitura atual do Problema. O estado de validação indica até que ponto essa leitura resistiu a uma avaliação direta. São dimensões distintas.</p>
+        <InfoFacts facts={[
+          ["Evidência: Identificada", "Foi identificada evidência relevante para o Problema. Este estado não significa que a leitura atual esteja corroborada."],
+          ["Evidência: Corroborada", "Há um juízo humano de que a leitura atual do Problema tem apoio em evidência aprovada. Isto não significa, por si só, que o Problema tenha sido validado."],
+          ["Validação: Por validar", "Ainda não foi concluída uma avaliação direta da leitura atual, ou a evidência direta é insuficiente para a sustentar. Não significa que o Problema seja falso."],
+          ["Validação: Parcialmente validada", "Uma ou mais partes relevantes da leitura foram avaliadas diretamente e apoiadas ou revistas; pelo menos uma questão decisiva continua por resolver."],
+          ["Validação: Validada", "A leitura atual resistiu a uma avaliação direta proporcional à próxima decisão do projeto."],
+        ]} />
+        <p>Corroborar a evidência não substitui validar a leitura do Problema. A validação também não demonstra que o Problema esteja resolvido ou que a situação descrita se mantenha atual.</p>
+      </InfoSection>
       <InfoSection id="methodology-ai" title="Apoio de inteligência artificial">
         <p>Assistentes de inteligência artificial apoiam a pesquisa, a análise, a redação e o desenvolvimento técnico do projeto. As decisões editoriais e a publicação de investigação canónica são controladas pelo responsável humano. Este apoio não significa que todas as fontes ou conclusões tenham sido integralmente revistas por uma pessoa ou verificadas de forma independente.</p>
       </InfoSection>
@@ -274,6 +285,11 @@ function InformationSequence({ currentPath }: { currentPath: TrustPagePath }) {
 export function TrustPage({ page, skipTargetId, dataProvider }: { page: TrustPageEntry; skipTargetId?: string; dataProvider: DataProvider }) {
   useEffect(() => {
     document.title = trustPageTitle(page.path);
+  }, [page.path]);
+  useEffect(() => {
+    if (page.path === "/methodology" && window.location.hash === "#methodology-investigation-status") {
+      document.getElementById("methodology-investigation-status")?.scrollIntoView?.();
+    }
   }, [page.path]);
   return <>
       <ExplorerHeader activeView={trustHeaderView(page.informationPath)} />

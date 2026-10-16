@@ -82,6 +82,15 @@ body:has(.records-page) .public-footer {
   line-height: 1.55;
 }
 
+.records-scope {
+  max-width: 68ch;
+  margin: 12px 0 0;
+  color: var(--color-ink-secondary);
+  font-family: var(--font-reading);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 /* ---- Filters + search ----------------------------------------------------- */
 
 /* >=1024: filters and search share one row over a single rule; the active

@@ -157,6 +157,7 @@ export function OverviewPresentation({
                 <span className="overview-metric-value">{totalRecordCount ?? "—"}</span> {totalRecordCountLabel()}
               </li>
             </ul>
+            <p className="overview-count-scope">O número de Problemas conta os que estão em investigação; outros Problemas encerrados podem surgir abaixo. O total exclui apenas os <a href="/out-of-scope">registos fora do âmbito</a>. Em <a href="/?view=records">Registos</a> pode consultar a coleção completa, incluindo esses registos.</p>
           </div>
           {/* Deliberate negative space (TARGET) — no replacement content. */}
         </div>

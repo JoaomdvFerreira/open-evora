@@ -321,6 +321,14 @@
   grid-column: 1 / 4;
 }
 
+.prb-state-method-link {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .prb-scope-metrics {
   grid-column: 4 / 7;
 }
@@ -1081,7 +1089,7 @@ body:has(.prb-details-view) .public-footer {
     --prb-state-cell-pad-top: 18px;
     --prb-state-cell-pad-bottom: 20px;
     --prb-state-label-size: 13px;
-    --prb-state-value-size: 16px;
+    --prb-state-value-size: 15px;
     --prb-section-pad-top: 80px;
     --prb-current-reading-size: 20px;
     --prb-question-size: 25px;

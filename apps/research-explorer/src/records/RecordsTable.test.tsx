@@ -73,6 +73,8 @@ describe("RecordsTable — page composition", () => {
     renderTable();
     expect(screen.getByText("Corpus de investigação")).toBeTruthy();
     expect(screen.getByRole("heading", { level: 2, name: "Registos" })).toBeTruthy();
+    expect(screen.getByText(/Esta lista inclui a coleção completa/).textContent).toContain("registos fora do âmbito");
+    expect(within(filterGroup()).getByRole("button", { name: /Todos/ }).textContent).toContain(String(RECORDS.length));
   });
 
   it("offers no type <select> and no Tipo/Rótulo/Ficheiro columns", () => {
