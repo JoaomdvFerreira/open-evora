@@ -36,6 +36,11 @@
   cursor: default;
 }
 
+.prb-view-selector-item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 @media (max-width: 767px) {
   .prb-view-selector-item {
     height: 40px;

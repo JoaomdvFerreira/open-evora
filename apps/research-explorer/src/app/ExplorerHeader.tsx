@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Logo } from "../presentation/Logo";
 import { IconMenu } from "../presentation/icons";
 
@@ -41,6 +41,7 @@ export function ExplorerHeader({ activeView, onProblemas, onRegistos }: {
   onRegistos?: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const menuId = useId();
   const isProblemas = activeView === "overview" || activeView === "problem" || activeView === "history";
   // Registos is the whole Records area — every type filter and Record
@@ -49,7 +50,12 @@ export function ExplorerHeader({ activeView, onProblemas, onRegistos }: {
   const isMetodo = activeView === "methodology";
   const isSobre = activeView === "about";
   return (
-    <header className="explorer-chrome">
+    <header className="explorer-chrome" onKeyDown={(event) => {
+      if (event.key !== "Escape" || !menuOpen) return;
+      event.stopPropagation();
+      setMenuOpen(false);
+      toggleRef.current?.focus();
+    }}>
       <div className="explorer-chrome-inner shell-frame shell-frame--wide">
         <div className="explorer-chrome-group">
           <h1 className="explorer-identity">
@@ -57,6 +63,7 @@ export function ExplorerHeader({ activeView, onProblemas, onRegistos }: {
           </h1>
         </div>
         <button
+          ref={toggleRef}
           type="button"
           className="explorer-menu-toggle"
           aria-expanded={menuOpen}

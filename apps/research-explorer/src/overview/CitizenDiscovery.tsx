@@ -6,6 +6,7 @@ import { IconMenu, IconSearch, IconTrendUp } from "../presentation/icons";
 import { EvidenceStatus } from "../problem/InvestigationStatus";
 import { publicEnumLabel } from "../presentation/presentation";
 import { useNarrowViewport } from "../records/useNarrowViewport";
+import { ExplorerLink } from "../navigation/ExplorerLink";
 
 /** True on a Mac keyboard layout (Cmd-based shortcut copy), false everywhere
  * else (Ctrl-based) — read once per render rather than cached at module
@@ -377,7 +378,7 @@ export function ProblemRow({ problem, onExplore, latestChange }: { problem: Citi
   return (
     <li className={rowClassName}>
       <div className="overview-problem-row-link shell-frame shell-frame--wide">
-        <button type="button" className="overview-problem-row-action" aria-label={`Explorar ${problem.title}`} onClick={() => onExplore(problem.id)} />
+        <ExplorerLink to={{ view: "problem", selectedId: problem.id }} onNavigate={() => onExplore(problem.id)} className="overview-problem-row-action" aria-label={`Explorar ${problem.title}`} />
         {latestChange !== undefined && (
           <p className="overview-problem-row-change-marker">
             <IconTrendUp />

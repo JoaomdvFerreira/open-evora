@@ -4,6 +4,7 @@ import { useRecordIndex } from "../records/useRecordIndex";
 import { formatPublicCount, formatPublicDate, formatPublicRelativeDays, publicEnumLabel, publicFieldCaption } from "../presentation/presentation";
 import { formatTypedId } from "../presentation/typeGlossary";
 import { RecordIdentifier } from "../records/RecordIdentifier";
+import { ExplorerLink } from "../navigation/ExplorerLink";
 import { PrbHistorySkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { DataLoadError } from "../dataProvider/types";
@@ -254,11 +255,11 @@ export function ProblemHistoryView({ dataProvider, problemId, onOpenGeneric, onB
     const recovery = problemLoadRecovery(indexState.error, "index", indexState.retry, onBackToRecords, onBackToOverview);
     return <div className="shell-frame"><ErrorNotice titleAs="h2" title={recovery.title} message={recovery.message} action={recovery.action} /></div>;
   }
-  if (problemId === null) return <div><p>Nenhum Problema selecionado.</p><button type="button" onClick={onBackToRecords}>Procurar um Problema em Registos</button></div>;
+  if (problemId === null) return <div><p>Nenhum Problema selecionado.</p><ExplorerLink to={{ view: "records", selectedId: null }} onNavigate={onBackToRecords}>Procurar um Problema em Registos</ExplorerLink></div>;
 
   const summary = indexState.lookup.get(problemId);
   if (summary && summary.type !== "PRB-") {
-    return <ErrorNotice titleAs="h2" title="Este registo não é um Problema" message={`${formatTypedId(summary.type, problemId)} não pode ser aberto como histórico.`} action={<button type="button" onClick={() => onOpenGeneric(problemId)}>Ver detalhe genérico</button>} />;
+    return <ErrorNotice titleAs="h2" title="Este registo não é um Problema" message={`${formatTypedId(summary.type, problemId)} não pode ser aberto como histórico.`} action={<ExplorerLink to={{ view: "records", selectedId: problemId }} onNavigate={() => onOpenGeneric(problemId)}>Ver detalhe genérico</ExplorerLink>} />;
   }
   return <ProblemHistoryContent dataProvider={dataProvider} problemId={problemId} onOpenGeneric={onOpenGeneric} onBackToRecords={onBackToRecords} onBackToOverview={onBackToOverview} onViewAsProblem={onViewAsProblem} onVerifyInDetails={onVerifyInDetails} />;
 }

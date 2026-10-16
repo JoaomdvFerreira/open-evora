@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DataProvider } from "../dataProvider/types";
+import { ExplorerLink } from "../navigation/ExplorerLink";
 import { describeType, formatTypedId } from "../presentation/typeGlossary";
 import { normalizeForSearch } from "../records/normalize";
 import { recordMatchesQuery, recordSearchText } from "../records/recordIndex";
@@ -330,13 +331,13 @@ export function GraphExplorer({
                 <dd>{focusSummary.label}</dd>
               </dl>
               <p>
-                <button type="button" onClick={() => onOpenGeneric(focusSummary.id)}>
+                <ExplorerLink to={{ view: "records", selectedId: focusSummary.id }} onNavigate={() => onOpenGeneric(focusSummary.id)}>
                   Ver detalhe do registo
-                </button>{" "}
+                </ExplorerLink>{" "}
                 {focusSummary.type === "PRB-" && (
-                  <button type="button" onClick={() => onViewAsProblem(focusSummary.id)}>
+                  <ExplorerLink to={{ view: "problem", selectedId: focusSummary.id }} onNavigate={() => onViewAsProblem(focusSummary.id)}>
                     Ver como Problema (contexto completo)
-                  </button>
+                  </ExplorerLink>
                 )}
               </p>
             </section>

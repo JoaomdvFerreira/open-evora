@@ -1,5 +1,6 @@
 import { useEffect, useRef, type MutableRefObject } from "react";
 import { applyInitialFragment } from "../navigation/applyInitialFragment";
+import { ExplorerLink } from "../navigation/ExplorerLink";
 import type { DataProvider, RecordSummary } from "../dataProvider/types";
 import { useRecordIndex } from "../records/useRecordIndex";
 import { useProblemProjection } from "./useProblemProjection";
@@ -159,9 +160,9 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
     return (
       <div>
         <p>Nenhum Problema selecionado.</p>
-        <button type="button" onClick={onBackToRecords}>
+        <ExplorerLink to={{ view: "records", selectedId: null }} onNavigate={onBackToRecords}>
           Procurar um Problema em Registos
-        </button>
+        </ExplorerLink>
       </div>
     );
   }
@@ -174,9 +175,9 @@ export function ProblemView({ dataProvider, problemId, onOpenGeneric, onBackToRe
         title="Este registo não é um Problema"
         message={`${formatTypedId(summary.type, problemId)} não pode ser aberto como vista de Problema.`}
         action={
-          <button type="button" onClick={() => onOpenGeneric(problemId)}>
+          <ExplorerLink to={{ view: "records", selectedId: problemId }} onNavigate={() => onOpenGeneric(problemId)}>
             Ver detalhe genérico
-          </button>
+          </ExplorerLink>
         }
       />
     );

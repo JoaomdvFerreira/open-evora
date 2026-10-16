@@ -213,14 +213,15 @@ describe("ProblemHistoryView — shared PRB header", () => {
     expect(nav.textContent).toBe("DetalhesHistórico");
     expect(within(nav).getByText("Histórico").getAttribute("aria-current")).toBe("page");
     expect(screen.queryByRole("tablist")).toBeNull();
-    fireEvent.click(within(nav).getByRole("button", { name: "Detalhes" }));
+    fireEvent.click(within(nav).getByRole("link", { name: "Detalhes" }));
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0001");
   });
 
   it("routes Verificar to the same PRB's Detalhes audit section instead of a dead local anchor", async () => {
     const onVerifyInDetails = vi.fn();
     render(<ProblemHistoryView {...props} problemId="PRB-0001" onVerifyInDetails={onVerifyInDetails} />);
-    const verify = await screen.findByRole("button", { name: "Verificar" });
+    const verify = await screen.findByRole("link", { name: "Verificar" });
+    expect(verify.getAttribute("href")).toContain("view=problem&id=PRB-0001#prb-auditoria");
     expect(document.querySelector('a[href="#prb-auditoria"]')).toBeNull();
     expect(document.getElementById("prb-auditoria")).toBeNull();
     fireEvent.click(verify);
@@ -297,7 +298,7 @@ describe("ProblemHistoryView — material history", () => {
     const onOpenGeneric = vi.fn();
     render(<ProblemHistoryView {...props} problemId="PRB-0010" onOpenGeneric={onOpenGeneric} />);
     await screen.findByText(/Nova evidência oficial estabeleceu uma cronologia de resposta faseada/);
-    const links = ["EVD-000154", "EVD-000155", "EVD-000156"].map((id) => screen.getByRole("button", { name: `Abrir ${id}` }));
+    const links = ["EVD-000154", "EVD-000155", "EVD-000156"].map((id) => screen.getByRole("link", { name: `Abrir ${id}` }));
     expect(links.every((link) => link.closest(".prb-history-entry-meta"))).toBe(true);
     fireEvent.click(links[0]);
     expect(onOpenGeneric).toHaveBeenCalledWith("EVD-000154");

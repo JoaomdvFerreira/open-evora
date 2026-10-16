@@ -69,6 +69,32 @@ describe("ExplorerHeader — compact menu disclosure", () => {
     expect(controlled?.hidden).toBe(true);
   });
 
+  it("closes on Escape within the open menu and restores focus to its toggle", async () => {
+    const user = userEvent.setup();
+    renderHeader();
+    const toggle = screen.getByRole("button", { name: "Abrir menu" });
+    await user.click(toggle);
+    const destination = screen.getByRole("button", { name: "Registos" });
+    destination.focus();
+    await user.keyboard("{Escape}");
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(toggle);
+    expect(document.getElementById(toggle.getAttribute("aria-controls")!)?.hidden).toBe(true);
+  });
+
+  it("leaves Escape outside the menu to the focused control", async () => {
+    const user = userEvent.setup();
+    renderHeader();
+    const toggle = screen.getByRole("button", { name: "Abrir menu" });
+    await user.click(toggle);
+    const outside = document.createElement("button");
+    document.body.append(outside);
+    outside.focus();
+    await user.keyboard("{Escape}");
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    outside.remove();
+  });
+
   it("is a native button (keyboard accessible, no custom key handling required) with no popup/dialog role", () => {
     renderHeader();
     const toggle = screen.getByRole("button", { name: "Abrir menu" });

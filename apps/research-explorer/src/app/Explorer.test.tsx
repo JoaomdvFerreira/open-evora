@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Explorer, GraphLoadingFallback } from "./Explorer";
 import { StaticDataProvider } from "../dataProvider/StaticDataProvider";
@@ -130,14 +130,14 @@ describe("Explorer — Records workflow (fake provider)", () => {
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText(/temporary index failure/)).toBeTruthy();
     await user.click(within(alert).getByRole("button", { name: "Tentar novamente" }));
-    expect(await screen.findByRole("button", { name: /PRB-0005/ })).toBeTruthy();
+    expect(await screen.findByRole("link", { name: /PRB-0005/ })).toBeTruthy();
     expect(attempts).toBe(2);
   });
 
   it("shows the Records table before any selection, and does not eagerly load a detail", async () => {
     const getRecord = vi.fn(fakeProvider().getRecord);
     render(<Explorer dataProvider={fakeProvider({ getRecord })} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
     expect(recordsHeading()).toBeTruthy();
     expect(getRecord).not.toHaveBeenCalled();
   });
@@ -172,7 +172,7 @@ describe("Explorer — Records workflow (fake provider)", () => {
     const detailPanel = (await screen.findByText("Detalhes")).closest("section")!;
     // RD-01G: PRB Relações no corpus now shows only incoming records — PRB-0005's outgoing evidence[0] -> EVD-000105 reference is owned exclusively by Referências canónicas.
     const referenciasCanonicas = within(detailPanel).getByLabelText("Referências canónicas");
-    expect(within(referenciasCanonicas).getByRole("button", { name: /EVD-000105/ })).toBeTruthy();
+    expect(within(referenciasCanonicas).getByRole("link", { name: /EVD-000105/ })).toBeTruthy();
   });
 
   it("resolves incoming relationships to related summary labels from the index", async () => {
@@ -182,7 +182,7 @@ describe("Explorer — Records workflow (fake provider)", () => {
 
     let detailPanel = await getDetailPanel();
     const referenciasCanonicas = within(detailPanel).getByLabelText("Referências canónicas");
-    const outgoingButton = await within(referenciasCanonicas).findByRole("button", { name: /EVD-000105/ });
+    const outgoingButton = await within(referenciasCanonicas).findByRole("link", { name: /EVD-000105/ });
     await user.click(outgoingButton);
 
     detailPanel = await getDetailPanel();
@@ -198,11 +198,11 @@ describe("Explorer — Records workflow (fake provider)", () => {
 
     let detailPanel = await getDetailPanel();
     // RD-01G: PRB-0005's outgoing reference to EVD-000105 is owned by Referências canónicas, not Relações no corpus.
-    await user.click(await within(within(detailPanel).getByLabelText("Referências canónicas")).findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await within(within(detailPanel).getByLabelText("Referências canónicas")).findByRole("link", { name: /EVD-000105/ }));
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
 
-    await user.click(await within(detailPanel).findByRole("button", { name: "Abrir fonte SRC-0092" }));
+    await user.click(await within(detailPanel).findByRole("link", { name: "Abrir fonte SRC-0092" }));
 
     detailPanel = await getDetailPanel();
     expect(within(detailPanel).getAllByText("SRC-0092").length).toBeGreaterThan(0);
@@ -211,16 +211,16 @@ describe("Explorer — Records workflow (fake provider)", () => {
     // "Registos" is reachable again only via the breadcrumb.
     expect(screen.queryByRole("heading", { name: "Registos" })).toBeNull();
     const breadcrumb = within(detailPanel).getByLabelText("Localização");
-    await user.click(within(breadcrumb).getByRole("button", { name: "Registos" }));
+    await user.click(within(breadcrumb).getByRole("link", { name: "Registos" }));
     expect(recordsHeading()).toBeTruthy();
-    expect(await screen.findByRole("button", { name: /PRB-0005/ })).toBeTruthy();
+    expect(await screen.findByRole("link", { name: /PRB-0005/ })).toBeTruthy();
   });
 
   it("renders a future generic record type (WID-) through the same generic detail renderer, including nested objects/arrays", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    await user.click(await screen.findByRole("button", { name: /WID-0001/ }));
+    await user.click(await screen.findByRole("link", { name: /WID-0001/ }));
     const detailPanel = await getDetailPanel();
     await within(detailPanel).findByText("widget_id");
     expect(within(detailPanel).getByText("nested")).toBeTruthy();
@@ -238,9 +238,9 @@ describe("Explorer — Records workflow (fake provider)", () => {
     // V2: the error still renders inside the Record Detail composition, so
     // the breadcrumb (not a persistent table) is the way back to Records.
     const breadcrumb = screen.getByLabelText("Localização");
-    await user.click(within(breadcrumb).getByRole("button", { name: "Registos" }));
+    await user.click(within(breadcrumb).getByRole("link", { name: "Registos" }));
     expect(recordsHeading()).toBeTruthy();
-    expect(await screen.findByRole("button", { name: /EVD-000105/ })).toBeTruthy();
+    expect(await screen.findByRole("link", { name: /EVD-000105/ })).toBeTruthy();
   });
 
   it("retries a failed record detail and restores the selected detail", async () => {
@@ -260,14 +260,14 @@ describe("Explorer — Records workflow (fake provider)", () => {
   it("filters rows as the user types, case- and diacritic-insensitively", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
 
     const search = screen.getByLabelText("Pesquisar");
     await user.type(search, "PRESSAO");
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
-      expect(screen.queryByRole("button", { name: /EVD-000105/ })).toBeNull();
+      expect(screen.getByRole("link", { name: /PRB-0005/ })).toBeTruthy();
+      expect(screen.queryByRole("link", { name: /EVD-000105/ })).toBeNull();
     });
   });
 });
@@ -340,7 +340,7 @@ describe("Explorer — Overview view", () => {
     window.history.replaceState(null, "", "/");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    await user.click(await screen.findByRole("button", { name: /Explorar/ }));
+    await user.click(await screen.findByRole("link", { name: /Explorar/ }));
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
     expect(window.location.search).toContain("view=problem");
     expect(window.location.search).toContain("id=PRB-0005");
@@ -362,7 +362,7 @@ describe("Explorer — Registos stays current on EVD Record Detail", () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/?view=records");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await screen.findByRole("link", { name: /EVD-000105/ }));
     await screen.findByRole("region", { name: "Origem e auditoria" });
     expect(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }).getAttribute("aria-current")).toBe("page");
     expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }).getAttribute("aria-current")).toBeNull();
@@ -370,10 +370,29 @@ describe("Explorer — Registos stays current on EVD Record Detail", () => {
 });
 
 describe("Explorer — URL-addressable state", () => {
+  it("exposes a reloadable record URL and leaves modified, middle and context clicks to the browser", async () => {
+    window.history.replaceState(null, "", "/?view=records&q=PRB-0005&type=PRB-");
+    const pushSpy = vi.spyOn(window.history, "pushState");
+    render(<Explorer dataProvider={fakeProvider()} />);
+    const link = await screen.findByRole("link", { name: /PRB-0005/ });
+    const target = new URL(link.getAttribute("href")!, window.location.href);
+    expect(target.searchParams.get("view")).toBe("problem");
+    expect(target.searchParams.get("id")).toBe("PRB-0005");
+    expect(target.searchParams.get("q")).toBe("PRB-0005");
+    expect(target.searchParams.get("type")).toBe("PRB-");
+
+    fireEvent.click(link, { ctrlKey: true });
+    fireEvent.click(link, { metaKey: true });
+    fireEvent.click(link, { button: 1 });
+    fireEvent.contextMenu(link);
+    expect(pushSpy).not.toHaveBeenCalled();
+    expect(window.location.search).toBe("?view=records&q=PRB-0005&type=PRB-");
+  });
+
   it("selecting a record updates the URL with view/id", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    await user.click(await screen.findByRole("link", { name: /PRB-0005/ }));
 
     expect(window.location.search).toContain("id=PRB-0005");
   });
@@ -382,7 +401,7 @@ describe("Explorer — URL-addressable state", () => {
     const user = userEvent.setup();
     const pushSpy = vi.spyOn(window.history, "pushState");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
 
     await user.type(screen.getByLabelText("Pesquisar"), "PRB");
 
@@ -394,12 +413,12 @@ describe("Explorer — URL-addressable state", () => {
     const user = userEvent.setup();
     const pushSpy = vi.spyOn(window.history, "pushState");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
 
     await user.click(typeFilterButton("Todos"));
     expect(pushSpy).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole("button", { name: /PRB-0005/ }));
+    await user.click(screen.getByRole("link", { name: /PRB-0005/ }));
     expect(pushSpy).toHaveBeenCalledTimes(1);
   });
 
@@ -411,8 +430,8 @@ describe("Explorer — URL-addressable state", () => {
     const breadcrumb = within(detailPanel).getByLabelText("Localização");
 
     const pushSpy = vi.spyOn(window.history, "pushState");
-    await user.click(within(breadcrumb).getByRole("button", { name: "Registos" }));
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    await user.click(within(breadcrumb).getByRole("link", { name: "Registos" }));
+    await user.click(await screen.findByRole("link", { name: /PRB-0005/ }));
     expect(pushSpy).toHaveBeenCalledTimes(2);
   });
 
@@ -430,7 +449,7 @@ describe("Explorer — URL-addressable state", () => {
 
     const detailPanel = await getDetailPanel();
     const breadcrumb = within(detailPanel).getByLabelText("Localização");
-    await user.click(within(breadcrumb).getByRole("button", { name: "Registos" }));
+    await user.click(within(breadcrumb).getByRole("link", { name: "Registos" }));
 
     expect((await screen.findByLabelText("Pesquisar") as HTMLInputElement).value).toBe("PRB");
     expect(activeTypeFilterLabel()).toBe("Problemas");
@@ -443,7 +462,7 @@ describe("Explorer — URL-addressable state", () => {
     await screen.findByText("Estrutura técnica completa");
     let detailPanel = await getDetailPanel();
     // RD-01G: PRB-0005's outgoing reference to EVD-000105 is owned by Referências canónicas, not Relações no corpus.
-    await user.click(await within(within(detailPanel).getByLabelText("Referências canónicas")).findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await within(within(detailPanel).getByLabelText("Referências canónicas")).findByRole("link", { name: /EVD-000105/ }));
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
     expect(window.location.search).toContain("id=EVD-000105");
@@ -473,19 +492,19 @@ describe("Explorer — URL-addressable state", () => {
     expect(within(alert).getByRole("heading", { level: 3, name: "Falha ao carregar o registo" })).toBeTruthy();
     // V2: Records is reachable again via the breadcrumb, not a persistent table.
     const breadcrumb = screen.getByLabelText("Localização");
-    await user.click(within(breadcrumb).getByRole("button", { name: "Registos" }));
+    await user.click(within(breadcrumb).getByRole("link", { name: "Registos" }));
     expect(recordsHeading()).toBeTruthy();
-    expect(await screen.findByRole("button", { name: /EVD-000105/ })).toBeTruthy();
+    expect(await screen.findByRole("link", { name: /EVD-000105/ })).toBeTruthy();
   });
 
   it("a stale/unknown type filter in the URL degrades to 'all' rather than breaking the table", async () => {
     window.history.replaceState(null, "", "/?view=records&type=NOPE-");
     render(<Explorer dataProvider={fakeProvider()} />);
 
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
     expect(activeTypeFilterLabel()).toBe("Todos");
-    expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /EVD-000105/ })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /PRB-0005/ })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /EVD-000105/ })).toBeTruthy();
   });
 
   describe("Registos — header entry into the complete, unfiltered Records area", () => {
@@ -504,7 +523,7 @@ describe("Explorer — URL-addressable state", () => {
       expect((await screen.findByLabelText("Pesquisar") as HTMLInputElement).value).toBe("");
       expect(activeTypeFilterLabel()).toBe("Todos");
       for (const id of ["PRB-0005", "EVD-000105", "SRC-0092", "WID-0001"]) {
-        expect(screen.getByRole("button", { name: new RegExp(id) })).toBeTruthy();
+        expect(screen.getByRole("link", { name: new RegExp(id) })).toBeTruthy();
       }
     });
 
@@ -512,7 +531,7 @@ describe("Explorer — URL-addressable state", () => {
       const user = userEvent.setup();
       window.history.replaceState(null, "", "/?view=records&type=SRC-");
       render(<Explorer dataProvider={fakeProvider()} />);
-      await screen.findByRole("button", { name: /SRC-0092/ });
+      await screen.findByRole("link", { name: /SRC-0092/ });
 
       await user.click(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }));
 
@@ -524,7 +543,7 @@ describe("Explorer — URL-addressable state", () => {
       const user = userEvent.setup();
       window.history.replaceState(null, "", "/?view=records&q=PRB&type=PRB-&d=2");
       render(<Explorer dataProvider={fakeProvider()} />);
-      await screen.findByRole("button", { name: /PRB-0005/ });
+      await screen.findByRole("link", { name: /PRB-0005/ });
 
       await user.click(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }));
 
@@ -536,7 +555,7 @@ describe("Explorer — URL-addressable state", () => {
       const user = userEvent.setup();
       const registos = () => within(globalNav()).getByRole("button", { name: "Registos", hidden: true });
       render(<Explorer dataProvider={fakeProvider()} />);
-      await screen.findByRole("button", { name: /PRB-0005/ });
+      await screen.findByRole("link", { name: /PRB-0005/ });
       expect(registos().getAttribute("aria-current")).toBe("page");
 
       for (const label of ["Problemas", "Fontes", "Evidências", "Todos"]) {
@@ -545,7 +564,7 @@ describe("Explorer — URL-addressable state", () => {
         expect(registos().getAttribute("aria-current")).toBe("page");
       }
 
-      await user.click(screen.getByRole("button", { name: /SRC-0092/ }));
+      await user.click(screen.getByRole("link", { name: /SRC-0092/ }));
       await getDetailPanel();
       expect(registos().getAttribute("aria-current")).toBe("page");
       expect(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }).getAttribute("aria-current")).toBeNull();
@@ -562,12 +581,12 @@ describe("Explorer — URL-addressable state", () => {
   it("selecting a type filter is a URL-synced push navigation, restorable with browser back", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
 
     await user.click(typeFilterButton("Fontes"));
     expect(window.location.search).toContain("type=SRC-");
-    expect(screen.getByRole("button", { name: /SRC-0092/ })).toBeTruthy();
-    expect(screen.queryByRole("button", { name: /PRB-0005/ })).toBeNull();
+    expect(screen.getByRole("link", { name: /SRC-0092/ })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /PRB-0005/ })).toBeNull();
 
     window.history.back();
     await waitFor(() => expect(activeTypeFilterLabel()).toBe("Todos"));
@@ -590,7 +609,7 @@ function globalNav(): HTMLElement {
 describe("Explorer — chrome header identity", () => {
   it("renders the Open Évora logo alongside the public chrome navigation", async () => {
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
 
     expect(screen.getByRole("heading", { level: 1, name: "Open Évora" })).toBeTruthy();
     expect(globalNav()).toBeTruthy();
@@ -605,7 +624,7 @@ describe("Explorer — chrome header identity", () => {
 
   it("renders Método/Sobre as ordinary pathname links and the CTA as a normal link to Contact", async () => {
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
 
     expect(within(globalNav()).getByRole("link", { name: "Método", hidden: true }).getAttribute("href")).toBe("/methodology");
     expect(within(globalNav()).getByRole("link", { name: "Sobre", hidden: true }).getAttribute("href")).toBe("/about");
@@ -645,14 +664,14 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     expect(window.location.search).toContain("view=records");
     expect(window.location.search).not.toContain("id=PRB-0005");
     // Records renders its unfiltered list, not Record Detail.
-    expect(screen.getByRole("button", { name: /SRC-0092/ })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /PRB-0005/ })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /SRC-0092/ })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /PRB-0005/ })).toBeTruthy();
   });
 
   it("GlobalNav Problemas / Registos remain fully navigable", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
 
     await user.click(within(globalNav()).getByRole("button", { name: "Registos", hidden: true }));
     expect(await screen.findByRole("heading", { name: "Registos" })).toBeTruthy();
@@ -684,7 +703,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     const user = userEvent.setup();
     window.history.replaceState(null, "", "/?view=records&q=PRB&type=PRB-");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
 
     await user.click(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }));
     await screen.findByRole("heading", { name: "Visão geral" });
@@ -698,21 +717,21 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
   it("PRB-local Detalhes|Histórico navigation preserves PRB identity, unlike GlobalNav", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    await user.click(await screen.findByRole("link", { name: /PRB-0005/ }));
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
     expect(window.location.search).toContain("view=problem");
     expect(window.location.search).toContain("id=PRB-0005");
 
     const problemNav = await screen.findByRole("navigation", { name: "Vistas do problema" });
     expect(within(problemNav).getByText("Detalhes").getAttribute("aria-current")).toBe("page");
-    await user.click(within(problemNav).getByRole("button", { name: "Histórico" }));
+    await user.click(within(problemNav).getByRole("link", { name: "Histórico" }));
     expect(await screen.findByText("Não existe histórico material registado para este problema.")).toBeTruthy();
     expect(window.location.search).toContain("view=history");
     expect(window.location.search).toContain("id=PRB-0005");
 
     const historyNav = await screen.findByRole("navigation", { name: "Vistas do problema" });
     expect(within(historyNav).getByText("Histórico").getAttribute("aria-current")).toBe("page");
-    await user.click(within(historyNav).getByRole("button", { name: "Detalhes" }));
+    await user.click(within(historyNav).getByRole("link", { name: "Detalhes" }));
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
     expect(window.location.search).toContain("view=problem");
     expect(window.location.search).toContain("id=PRB-0005");
@@ -726,7 +745,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
     expect(history?.className).toBe("prb-history-view");
 
     const pushSpy = vi.spyOn(window.history, "pushState");
-    await user.click(screen.getByRole("button", { name: "Verificar" }));
+    await user.click(screen.getByRole("link", { name: "Verificar" }));
     const audit = await screen.findByRole("region", { name: "Evidência e verificação" });
     expect(pushSpy).toHaveBeenCalledTimes(1);
     expect(window.location.search).toContain("view=problem");
@@ -739,7 +758,7 @@ describe("Explorer — GlobalNav destination semantics (UX-D §1)", () => {
   it("browser back after a GlobalNav area change restores the prior area and selection deterministically", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    await user.click(await screen.findByRole("link", { name: /PRB-0005/ }));
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
     await user.click(within(globalNav()).getByRole("button", { name: "Problemas", hidden: true }));
@@ -770,7 +789,7 @@ describe("Explorer — Problem view (RE-03)", () => {
     window.history.replaceState(null, "", "/?view=records&id=PRB-0005");
     render(<Explorer dataProvider={fakeProvider()} />);
     const detailPanel = await getDetailPanel();
-    await user.click(await within(detailPanel).findByRole("button", { name: "Ver página do problema" }));
+    await user.click(await within(detailPanel).findByRole("link", { name: "Ver página do problema" }));
 
     const heading = await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
     expect(window.location.search).toContain("view=problem");
@@ -845,7 +864,7 @@ describe("Explorer — Problem view (RE-03)", () => {
     // its first action returns to Overview, clearing the selection outright.
     const problemBreadcrumb = await screen.findByLabelText("Localização");
     expect(within(problemBreadcrumb).queryByRole("button", { name: "Registos" })).toBeNull();
-    await user.click(within(problemBreadcrumb).getByRole("button", { name: "Visão geral" }));
+    await user.click(within(problemBreadcrumb).getByRole("link", { name: "Visão geral" }));
 
     await screen.findByRole("heading", { name: "Visão geral" });
     expect(window.location.search).not.toContain("view=problem");
@@ -855,11 +874,11 @@ describe("Explorer — Problem view (RE-03)", () => {
   it("generic Record Detail's breadcrumb remains Registos-based, unlike Problem View's", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await screen.findByRole("link", { name: /EVD-000105/ }));
 
     const detailPanel = await getDetailPanel();
     const breadcrumb = within(detailPanel).getByLabelText("Localização");
-    expect(within(breadcrumb).getByRole("button", { name: "Registos" })).toBeTruthy();
+    expect(within(breadcrumb).getByRole("link", { name: "Registos" })).toBeTruthy();
     expect(within(breadcrumb).queryByRole("button", { name: "Visão geral" })).toBeNull();
   });
 
@@ -870,7 +889,7 @@ describe("Explorer — Problem view (RE-03)", () => {
     const nav = await screen.findByRole("navigation", { name: "Vistas do problema" });
     expect(nav.textContent).toBe("DetalhesHistórico");
     expect(within(nav).queryByRole("button", { name: "Detalhe" })).toBeNull();
-    expect(within(nav).queryByRole("button", { name: "Problema" })).toBeNull();
+    expect(within(nav).queryByRole("link", { name: "Problema" })).toBeNull();
     expect(screen.queryByRole("tablist")).toBeNull();
   });
 
@@ -891,7 +910,7 @@ describe("Explorer — Problem view (RE-03)", () => {
 
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
     const openQuestions = screen.getByRole("region", { name: "O que ainda não sabemos" });
-    await user.click(within(openQuestions).getByRole("button", { name: "Abrir EVD-000105" }));
+    await user.click(within(openQuestions).getByRole("link", { name: "Abrir EVD-000105" }));
 
     // V2: opens the Record Detail composition for EVD-000105 (Records view,
     // not Problem view) — not the Records table, since a record is selected.
@@ -964,9 +983,9 @@ describe("Explorer — global manifest summary placement", () => {
   it("is absent on the Records landing, whose pagination row is the terminal content band, and present on generic Record Detail", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
     expect(manifestSummary()).toBeNull();
-    await user.click(screen.getByRole("button", { name: /WID-0001/ }));
+    await user.click(screen.getByRole("link", { name: /WID-0001/ }));
     await getDetailPanel();
     expect(manifestSummary()?.textContent).toContain("Corpus: 4 registos");
   });
@@ -974,7 +993,7 @@ describe("Explorer — global manifest summary placement", () => {
   it("is absent on SRC Record Detail, whose Acesso e auditoria band is the terminal content band", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
-    await user.click(await screen.findByRole("button", { name: /SRC-0092/ }));
+    await user.click(await screen.findByRole("link", { name: /SRC-0092/ }));
     await screen.findByRole("region", { name: "Acesso e auditoria" });
     expect(manifestSummary()).toBeNull();
   });
@@ -982,7 +1001,7 @@ describe("Explorer — global manifest summary placement", () => {
   it("is absent on EVD Record Detail, whose Origem e auditoria band is the terminal content band", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
-    await user.click(await screen.findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await screen.findByRole("link", { name: /EVD-000105/ }));
     await screen.findByRole("region", { name: "Origem e auditoria" });
     expect(manifestSummary()).toBeNull();
   });
@@ -993,7 +1012,7 @@ describe("Explorer — global manifest summary placement", () => {
     render(<Explorer dataProvider={fakeProvider()} {...manifestProps} />);
     const nav = await screen.findByRole("navigation", { name: "Vistas do problema" });
     expect(manifestSummary()).toBeNull();
-    await user.click(within(nav).getByRole("button", { name: "Histórico" }));
+    await user.click(within(nav).getByRole("link", { name: "Histórico" }));
     await screen.findByText("Não existe histórico material registado para este problema.");
     expect(window.location.search).toContain("view=history");
     expect(manifestSummary()).toBeNull();
@@ -1061,13 +1080,13 @@ describe("Explorer — Overview discovery-context preservation across Problem na
     await user.type(screen.getByLabelText("Pesquisar problemas"), "bicicletas");
     expect(await screen.findByText("1 problemas")).toBeTruthy();
     expect((screen.getByLabelText("Ordenar por") as HTMLSelectElement).value).toBe("relevance");
-    await user.click(screen.getByRole("button", { name: "Explorar Problema sintético 04" }));
+    await user.click(screen.getByRole("link", { name: "Explorar Problema sintético 04" }));
     await screen.findByRole("heading", { name: "Problema sintético 04" });
     window.history.back();
     await screen.findByRole("heading", { name: "Visão geral" });
     expect((screen.getByLabelText("Pesquisar problemas") as HTMLInputElement).value).toBe("bicicletas");
     expect((screen.getByLabelText("Ordenar por") as HTMLSelectElement).value).toBe("relevance");
-    expect(screen.getByRole("button", { name: "Explorar Problema sintético 04" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Explorar Problema sintético 04" })).toBeTruthy();
   });
 
   /** Configures search + topic filter + sort in the open Overview, leaving a non-default, non-page-1 state ready to assert against after returning. */
@@ -1089,7 +1108,7 @@ describe("Explorer — Overview discovery-context preservation across Problem na
     const search = screen.getByLabelText("Pesquisar problemas") as HTMLInputElement;
     expect(search.value).toBe("sintético");
 
-    await user.click(screen.getAllByRole("button", { name: /Explorar/ })[0]);
+    await user.click(screen.getAllByRole("link", { name: /Explorar/ })[0]);
     await screen.findByRole("heading", { name: /Problema sintético/ });
 
     window.history.back();
@@ -1112,11 +1131,11 @@ describe("Explorer — Overview discovery-context preservation across Problem na
 
     await configureOverviewDiscovery(user);
 
-    await user.click(screen.getAllByRole("button", { name: /Explorar/ })[0]);
+    await user.click(screen.getAllByRole("link", { name: /Explorar/ })[0]);
     await screen.findByRole("heading", { name: /Problema sintético/ });
 
     const breadcrumb = screen.getByLabelText("Localização");
-    await user.click(within(breadcrumb).getByRole("button", { name: "Visão geral" }));
+    await user.click(within(breadcrumb).getByRole("link", { name: "Visão geral" }));
     await screen.findByRole("heading", { name: "Visão geral" });
 
     expect((screen.getByLabelText("Pesquisar problemas") as HTMLInputElement).value).toBe("sintético");
@@ -1136,7 +1155,7 @@ describe("Explorer — Overview discovery-context preservation across Problem na
     expect(screen.getByRole("button", { name: /^Alterados esta semana/ }).getAttribute("aria-pressed")).toBe("true");
     await screen.findByText("1 problemas");
 
-    await user.click(screen.getAllByRole("button", { name: /Explorar/ })[0]);
+    await user.click(screen.getAllByRole("link", { name: /Explorar/ })[0]);
     await screen.findByRole("heading", { name: /Pressão de estacionamento/ });
 
     window.history.back();
@@ -1166,7 +1185,7 @@ describe("Explorer — Overview discovery-context preservation across Problem na
     await user.click(screen.getByRole("button", { name: "Seguinte" }));
     await screen.findByText(/^Página 2 de 2/);
 
-    await user.click(screen.getAllByRole("button", { name: /Explorar/ })[0]);
+    await user.click(screen.getAllByRole("link", { name: /Explorar/ })[0]);
     await screen.findByRole("heading", { name: /Problema/ });
     window.history.back();
     await screen.findByRole("heading", { name: "Visão geral" });
@@ -1221,7 +1240,7 @@ describe("Explorer — URL normalization preserves window.location.hash (F08)", 
 
   it("preserves a valid hash across a popstate-driven normalization", async () => {
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
 
     window.history.pushState(null, "", "/?id=EVD-000105&view=records#evd-limits");
     window.location.hash = "#evd-limits";
@@ -1234,7 +1253,7 @@ describe("Explorer — URL normalization preserves window.location.hash (F08)", 
   it("typing a search query (replace, same-context refinement) preserves an existing hash", async () => {
     window.history.replaceState(null, "", "/?view=records#evd-limits");
     render(<Explorer dataProvider={fakeProvider()} />);
-    await screen.findByRole("button", { name: /PRB-0005/ });
+    await screen.findByRole("link", { name: /PRB-0005/ });
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText("Pesquisar"), "PRB");
@@ -1247,7 +1266,7 @@ describe("Explorer — URL normalization preserves window.location.hash (F08)", 
     window.history.replaceState(null, "", "/?view=records#evd-limits");
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /WID-0001/ }));
+    await user.click(await screen.findByRole("link", { name: /WID-0001/ }));
     await screen.findByText("widget_id");
 
     expect(window.location.search).toContain("id=WID-0001");
@@ -1324,7 +1343,7 @@ describe("Explorer workflow — never loads edges.json or canonical YAML (real S
     await screen.findByText("Estrutura técnica completa");
     let detailPanel = await getDetailPanel();
     // RD-01G: PRB-0005's outgoing reference to EVD-000105 is owned by Referências canónicas, not Relações no corpus.
-    await user.click(await within(within(detailPanel).getByLabelText("Referências canónicas")).findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await within(within(detailPanel).getByLabelText("Referências canónicas")).findByRole("link", { name: /EVD-000105/ }));
     detailPanel = await getDetailPanel();
     await within(detailPanel).findByText(/Via Verde/);
 
@@ -1369,11 +1388,11 @@ describe("Explorer — document titles (D01-019)", () => {
     await screen.findByRole("heading", { name: "Registos" });
     expect(document.title).toBe(titleOf("Registos"));
 
-    await user.click(await screen.findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await screen.findByRole("link", { name: /EVD-000105/ }));
     expect(document.title).toBe(titleOf("Evidência EVD-000105"));
 
     const detailPanel = await getDetailPanel();
-    await user.click(await within(detailPanel).findByRole("button", { name: "Abrir fonte SRC-0092" }));
+    await user.click(await within(detailPanel).findByRole("link", { name: "Abrir fonte SRC-0092" }));
     expect(window.location.search).toContain("id=SRC-0092");
     expect(document.title).toBe(titleOf("Fonte SRC-0092"));
 
@@ -1399,7 +1418,7 @@ describe("Explorer — document titles (D01-019)", () => {
     expect(document.title).toBe(titleOf("Fonte SRC-0092"));
 
     const detailPanel = await getDetailPanel();
-    await user.click(await within(detailPanel).findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await within(detailPanel).findByRole("link", { name: /EVD-000105/ }));
     expect(window.location.search).toContain("id=EVD-000105");
     expect(document.title).toBe(titleOf("Evidência EVD-000105"));
   });
@@ -1468,7 +1487,7 @@ describe("Explorer — Record Detail scroll and focus on arrival", () => {
 
     scrollY = 1800;
     const openQuestions = screen.getByRole("region", { name: "O que ainda não sabemos" });
-    await user.click(within(openQuestions).getByRole("button", { name: "Abrir EVD-000105" }));
+    await user.click(within(openQuestions).getByRole("link", { name: "Abrir EVD-000105" }));
 
     await expectFocusedWithoutScroll("EVD-000105");
     expect(scrollY).toBe(0);
@@ -1482,7 +1501,7 @@ describe("Explorer — Record Detail scroll and focus on arrival", () => {
 
     scrollY = 2400;
     const detailPanel = await getDetailPanel();
-    await user.click(await within(detailPanel).findByRole("button", { name: "Abrir fonte SRC-0092" }));
+    await user.click(await within(detailPanel).findByRole("link", { name: "Abrir fonte SRC-0092" }));
 
     await expectFocusedWithoutScroll("SRC-0092");
     expect(scrollY).toBe(0);
@@ -1514,10 +1533,10 @@ describe("Explorer — Record Detail scroll and focus on arrival", () => {
   it("browser Back/Forward leaves scroll restoration to the browser", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /EVD-000105/ }));
+    await user.click(await screen.findByRole("link", { name: /EVD-000105/ }));
     await detailContent("EVD-000105");
     const detailPanel = await getDetailPanel();
-    await user.click(await within(detailPanel).findByRole("button", { name: "Abrir fonte SRC-0092" }));
+    await user.click(await within(detailPanel).findByRole("link", { name: "Abrir fonte SRC-0092" }));
     await detailContent("SRC-0092");
     const pushedArrivals = scrollTo.mock.calls.length;
     expect(pushedArrivals).toBe(2);
@@ -1538,7 +1557,7 @@ describe("Explorer — Record Detail scroll and focus on arrival", () => {
   it("PRB pages keep their own heading-focus arrival, untouched by Record Detail scrolling", async () => {
     const user = userEvent.setup();
     render(<Explorer dataProvider={fakeProvider()} />);
-    await user.click(await screen.findByRole("button", { name: /PRB-0005/ }));
+    await user.click(await screen.findByRole("link", { name: /PRB-0005/ }));
 
     const title = await screen.findByRole("heading", { level: 2, name: /Pressão de estacionamento/ });
     await waitFor(() => expect(document.activeElement).toBe(title));

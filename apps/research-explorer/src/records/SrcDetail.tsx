@@ -10,6 +10,7 @@ import { dataLoadRecovery } from "../presentation/dataLoadRecovery";
 import { EmptyState } from "../presentation/EmptyState";
 import { useToast } from "../presentation/Toast";
 import { RecordIdentifier } from "./RecordIdentifier";
+import { ExplorerLink } from "../navigation/ExplorerLink";
 import { extractSourceCaveats, extractSourceCoverage, extractSourceDatesAccess, extractSourceLicensing, extractSourceOverview, extractSourceProvenance, isHttpUrl, type SourceCoverage } from "./sourceView";
 import type { SourceEvidenceRelations } from "./sourceEvidenceRelations";
 import type { SourceEvidenceRelationsState } from "./useSourceEvidenceRelations";
@@ -90,7 +91,7 @@ function SrcLocalHeader({ detail, originalUrl, onBackToRecords }: { detail: Reco
         <div className="src-header">
           <Breadcrumb
             label="Localização"
-            ancestors={[{ key: "registos", action: <button type="button" className="src-breadcrumb-ancestor" onClick={onBackToRecords}>Registos</button> }]}
+            ancestors={[{ key: "registos", action: <ExplorerLink to={{ view: "records", selectedId: null }} onNavigate={onBackToRecords} className="src-breadcrumb-ancestor">Registos</ExplorerLink> }]}
             current={<RecordIdentifier variant="text" density="compact" id={detail.id} />}
           />
           <div className="src-header-utilities">
@@ -264,7 +265,7 @@ function SrcFinding({ evidence, sourceId, problemIds, onSelect, onViewAsProblem 
             <dt>{problemIds.length === 1 ? "Problema" : "Problemas"}</dt>
             <dd>
               {problemIds.map((id) => (
-                <RecordIdentifier key={id} variant="action" density="compact" id={id} onActivate={() => onViewAsProblem(id)} accessibleLabel={`Ver problema ${id}`} />
+                <RecordIdentifier key={id} variant="action" view="problem" density="compact" id={id} onActivate={() => onViewAsProblem(id)} accessibleLabel={`Ver problema ${id}`} />
               ))}
             </dd>
           </div>
@@ -317,8 +318,8 @@ function SrcInvestigation({ state, lookup, onViewAsProblem }: { state: Relations
       <ul className="src-problem-list">
         {state.relations.relatedProblems.map((problem) => (
           <li key={problem.problemId} className="src-problem">
-            <RecordIdentifier variant="action" density="compact" id={problem.problemId} onActivate={() => onViewAsProblem(problem.problemId)} accessibleLabel={`Ver problema ${problem.problemId}`} />
-            <button type="button" className="src-problem-title" onClick={() => onViewAsProblem(problem.problemId)}>{problemTopicLabel(problem.problemId, state.relations, lookup)}</button>
+            <RecordIdentifier variant="action" view="problem" density="compact" id={problem.problemId} onActivate={() => onViewAsProblem(problem.problemId)} accessibleLabel={`Ver problema ${problem.problemId}`} />
+            <ExplorerLink to={{ view: "problem", selectedId: problem.problemId }} onNavigate={() => onViewAsProblem(problem.problemId)} className="src-problem-title">{problemTopicLabel(problem.problemId, state.relations, lookup)}</ExplorerLink>
             <p className="src-problem-via">através de <span className="src-problem-via-ids">{problem.viaEvidenceIds.join(", ")}</span></p>
           </li>
         ))}

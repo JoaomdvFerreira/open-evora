@@ -11,6 +11,7 @@ import { EmptyState } from "../presentation/EmptyState";
 import { ShareAction } from "../problem/ShareAction";
 import { useToast } from "../presentation/Toast";
 import { RecordIdentifier } from "./RecordIdentifier";
+import { ExplorerLink } from "../navigation/ExplorerLink";
 import { EvidenceEffectTag } from "./EvidenceEffectTag";
 import { ResearchRoleTag } from "./ResearchRoleTag";
 import type { EVDProblemUsesState } from "./useEvdProblemUses";
@@ -61,7 +62,7 @@ function EvdLocalHeader({ detail, title, onBackToRecords }: { detail: RecordDeta
         <div className="evd-header">
           <Breadcrumb
             label="Localização"
-            ancestors={[{ key: "registos", action: <button type="button" className="evd-breadcrumb-ancestor" onClick={onBackToRecords}>Registos</button> }]}
+            ancestors={[{ key: "registos", action: <ExplorerLink to={{ view: "records", selectedId: null }} onNavigate={onBackToRecords} className="evd-breadcrumb-ancestor">Registos</ExplorerLink> }]}
             current={<RecordIdentifier variant="text" density="compact" id={detail.id} />}
           />
           <div className="evd-header-utilities">
@@ -193,8 +194,8 @@ function EvdUse({ use, onViewAsProblem }: { use: EVDProblemUse; onViewAsProblem:
   const title = text(use.detail.record.title) ?? use.detail.id;
   return (
     <li className="evd-use">
-      <RecordIdentifier variant="action" density="compact" id={use.detail.id} onActivate={() => onViewAsProblem(use.detail.id)} accessibleLabel={`Ver problema ${use.detail.id}`} />
-      <button type="button" className="evd-use-title" onClick={() => onViewAsProblem(use.detail.id)}>{title}</button>
+      <RecordIdentifier variant="action" view="problem" density="compact" id={use.detail.id} onActivate={() => onViewAsProblem(use.detail.id)} accessibleLabel={`Ver problema ${use.detail.id}`} />
+      <ExplorerLink to={{ view: "problem", selectedId: use.detail.id }} onNavigate={() => onViewAsProblem(use.detail.id)} className="evd-use-title">{title}</ExplorerLink>
       <dl className="evd-use-facts">
         <div>
           <dt>Efeito</dt>
@@ -286,7 +287,7 @@ function EvdAudit({ detail, lookup, onSelect }: { detail: RecordDetail; lookup: 
                     {title && <h4>{title}</h4>}
                     {extractedAt && <p>Extraída pela Open Évora em <time dateTime={extractedAt}>{formatPublicDate(extractedAt)}</time></p>}
                   </div>
-                  <button type="button" className="evd-audit-secondary-cta" onClick={() => onSelect(id)} aria-label={`Abrir fonte ${id}`}>Abrir fonte</button>
+                  <ExplorerLink to={{ view: "records", selectedId: id }} onNavigate={() => onSelect(id)} className="evd-audit-secondary-cta" aria-label={`Abrir fonte ${id}`}>Abrir fonte</ExplorerLink>
                 </li>
               );
             })}

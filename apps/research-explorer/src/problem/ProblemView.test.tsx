@@ -80,7 +80,7 @@ describe("ProblemView — record index and selection guards", () => {
     const onBackToRecords = vi.fn();
     render(<ProblemView {...props} problemId={null} onBackToRecords={onBackToRecords} />);
     expect(await screen.findByText("Nenhum Problema selecionado.")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Procurar um Problema em Registos" }));
+    fireEvent.click(screen.getByRole("link", { name: "Procurar um Problema em Registos" }));
     expect(onBackToRecords).toHaveBeenCalled();
   });
 
@@ -89,7 +89,7 @@ describe("ProblemView — record index and selection guards", () => {
     const getRecord = vi.fn(provider.getRecord);
     render(<ProblemView {...props} dataProvider={{ ...provider, getRecord }} problemId="EVD-1" onOpenGeneric={onOpenGeneric} />);
     expect(await screen.findByText("Este registo não é um Problema")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Ver detalhe genérico" }));
+    fireEvent.click(screen.getByRole("link", { name: "Ver detalhe genérico" }));
     expect(onOpenGeneric).toHaveBeenCalledWith("EVD-1");
     expect(getRecord).not.toHaveBeenCalled();
     expect(document.getElementById("prb-identity-title")).toBeNull();
@@ -203,13 +203,13 @@ describe("ProblemView — ready PRB Details", () => {
     render(<ProblemView {...props} problemId="PRB-1" onBackToOverview={onBackToOverview} onViewHistory={onViewHistory} onOpenGeneric={onOpenGeneric} />);
     await prbTitle("Problema de teste");
 
-    fireEvent.click(within(screen.getByLabelText("Localização")).getByRole("button", { name: "Visão geral" }));
+    fireEvent.click(within(screen.getByLabelText("Localização")).getByRole("link", { name: "Visão geral" }));
     expect(onBackToOverview).toHaveBeenCalled();
 
-    fireEvent.click(within(screen.getByRole("navigation", { name: "Vistas do problema" })).getByRole("button", { name: "Histórico" }));
+    fireEvent.click(within(screen.getByRole("navigation", { name: "Vistas do problema" })).getByRole("link", { name: "Histórico" }));
     expect(onViewHistory).toHaveBeenCalledWith("PRB-1");
 
-    fireEvent.click(screen.getByRole("button", { name: "Abrir EVD-1" }));
+    fireEvent.click(screen.getByRole("link", { name: "Abrir EVD-1" }));
     expect(onOpenGeneric).toHaveBeenCalledWith("EVD-1");
   });
 });

@@ -451,7 +451,7 @@ describe("ProblemRow", () => {
     const user = userEvent.setup();
     render(<ul><ProblemRow problem={rowProblem} onExplore={onExplore} /></ul>);
 
-    const action = screen.getByRole("button", { name: "Explorar Percursos diários no centro de Évora" });
+    const action = screen.getByRole("link", { name: "Explorar Percursos diários no centro de Évora" });
     await user.click(action);
     expect(onExplore).toHaveBeenCalledWith("PRB-EXEMPLO");
   });
@@ -538,7 +538,7 @@ describe("ProblemRow — material-change treatment", () => {
     const user = userEvent.setup();
     render(<ul><ProblemRow problem={rowProblem} onExplore={onExplore} latestChange={rowLatestChange} /></ul>);
 
-    const action = screen.getByRole("button", { name: "Explorar Percursos diários no centro de Évora" });
+    const action = screen.getByRole("link", { name: "Explorar Percursos diários no centro de Évora" });
     await user.click(action);
     expect(onExplore).toHaveBeenCalledWith("PRB-EXEMPLO");
   });
