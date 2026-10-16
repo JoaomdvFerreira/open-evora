@@ -1,3 +1,5 @@
+import { ExplorerLink } from "./ExplorerLink";
+
 export type ContextTabsActive = "details" | "history";
 
 interface ContextTabsProps {
@@ -18,21 +20,21 @@ interface ContextTabsProps {
  */
 export function ContextTabs({ prbId, active, onViewDetails, onViewHistory }: ContextTabsProps) {
   const destinations = [
-    { key: "details", label: "Detalhes", onActivate: () => onViewDetails(prbId) },
-    { key: "history", label: "Histórico", onActivate: () => onViewHistory(prbId) },
+    { key: "details", view: "problem", label: "Detalhes", onActivate: () => onViewDetails(prbId) },
+    { key: "history", view: "history", label: "Histórico", onActivate: () => onViewHistory(prbId) },
   ] as const;
 
   return (
     <nav aria-label="Vistas do problema" className="prb-view-selector">
-      {destinations.map(({ key, label, onActivate }) =>
+      {destinations.map(({ key, view, label, onActivate }) =>
         key === active ? (
           <span key={key} aria-current="page" className="prb-view-selector-item prb-view-selector-item--active">
             {label}
           </span>
         ) : (
-          <button key={key} type="button" className="prb-view-selector-item" onClick={onActivate}>
+          <ExplorerLink key={key} to={{ view, selectedId: prbId }} onNavigate={onActivate} className="prb-view-selector-item">
             {label}
-          </button>
+          </ExplorerLink>
         )
       )}
     </nav>

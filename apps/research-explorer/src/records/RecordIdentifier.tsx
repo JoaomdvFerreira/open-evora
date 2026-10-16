@@ -1,3 +1,5 @@
+import { ExplorerLink } from "../navigation/ExplorerLink";
+
 /**
  * DS-04D Slice 3A — records/presentation domain: canonical record ID
  * presentation only (docs/design/component-model.md §4.4 "RecordIdentifier").
@@ -11,11 +13,12 @@
  * Renders the bare canonical ID in technical typography — nothing else.
  * It never concatenates a type gloss (`formatTypedId`'s `[Evidência]`
  * prefix stays with `RecordTypeLabel`/its call sites), never accepts a
- * status/effect/research-role value, and never derives a route: an
+ * status/effect/research-role value. Action links use the PRB prefix for
+ * Problem context and generic Record Detail for other IDs; the
  * actionable identifier's `onActivate` is caller-supplied, exactly as
  * `RelatedRecordButton`'s `onSelect`/`TypedLinkButton`'s `onOpenGeneric`
  * are today. Text and action forms are kept explicit — `variant` chooses
- * between a non-interactive `<span>` (text) and a native `<button>`
+ * between a non-interactive `<span>` (text) and a native link
  * (action), never a polymorphic element (component-model.md §4.3 "no
  * polymorphic Action component" applies equally here).
  *
@@ -41,8 +44,10 @@ export interface RecordIdentifierActionProps {
   id: string;
   /** `standard` — bounded identifier treatment. `compact` — bare technical identity for dense rows/prose. Defaults to `standard`. */
   density?: "standard" | "compact";
-  /** Caller-owned navigation/action intent — this component derives no route. */
+  /** Caller-owned SPA navigation for an ordinary click. */
   onActivate: () => void;
+  /** Problem context uses its own public view; all other records use generic Detail. */
+  view?: "records" | "problem";
   /** Optional caller-owned accessible name override (e.g. "Abrir EVD-000105 referenciado em ..."); defaults to the visible id text. */
   accessibleLabel?: string;
 }
@@ -55,14 +60,14 @@ export function RecordIdentifier(props: RecordIdentifierProps) {
 
   if (props.variant === "action") {
     return (
-      <button
-        type="button"
+      <ExplorerLink
+        to={{ view: props.view ?? (props.id.startsWith("PRB-") ? "problem" : "records"), selectedId: props.id }}
+        onNavigate={props.onActivate}
         className={`rec-identifier rec-identifier--action ${densityClass}`}
-        onClick={props.onActivate}
         aria-label={props.accessibleLabel}
       >
         {props.id}
-      </button>
+      </ExplorerLink>
     );
   }
   return <span className={`rec-identifier ${densityClass}`}>{props.id}</span>;

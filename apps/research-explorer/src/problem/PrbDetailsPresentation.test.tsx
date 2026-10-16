@@ -45,7 +45,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     const nav = screen.getByRole("navigation", { name: "Vistas do problema" });
     expect(nav.tagName).toBe("NAV");
     expect(within(nav).getByText("Detalhes").getAttribute("aria-current")).toBe("page");
-    const history = within(nav).getByRole("button", { name: "Histórico" });
+    const history = within(nav).getByRole("link", { name: "Histórico" });
     expect(history.getAttribute("aria-current")).toBeNull();
     expect(nav.textContent).toBe("DetalhesHistórico");
     expect(screen.queryByRole("tablist")).toBeNull();
@@ -479,7 +479,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(within(path).getByText("01")).toBeTruthy();
     expect(within(path).getByText("Sinal inicial.")).toBeTruthy();
     // Open questions keep their related evidence.
-    expect(within(requireElement(container, ".prb-open-question-list")).getByRole("button", { name: "Abrir EVD-888" })).toBeTruthy();
+    expect(within(requireElement(container, ".prb-open-question-list")).getByRole("link", { name: "Abrir EVD-888" })).toBeTruthy();
   });
 
   it("orders known effects Sustenta · Refina · Delimita · Contradiz in the tally, followed by unknown effects in their existing order", () => {
@@ -758,7 +758,7 @@ describe("PrbDetailsPresentation — audit evidence drawer", () => {
     expect(dialog.querySelector(".evd-detail-view")).toBeNull();
     expect(within(dialog).queryByText("Origem e auditoria")).toBeNull();
 
-    await userEvent.click(within(dialog).getByRole("button", { name: "Abrir evidência EVD-1" }));
+    await userEvent.click(within(dialog).getByRole("link", { name: "Abrir evidência EVD-1" }));
     expect(onOpenGeneric).toHaveBeenCalledTimes(1);
     expect(onOpenGeneric).toHaveBeenCalledWith("EVD-1");
     expect(screen.queryByRole("dialog")).toBeNull();

@@ -49,16 +49,16 @@ it("keeps closed Problems outside active discovery and exposes them in a separat
   ]);
   render(<OverviewFixture dataProvider={provider} onExploreProblem={vi.fn()} />);
   expect(await screen.findByRole("heading", { name: "Problemas encerrados" })).toBeTruthy();
-  expect(screen.getByRole("button", { name: "Explorar Problema ativo" })).toBeTruthy();
-  expect(screen.getByRole("button", { name: "Explorar Problema encerrado" })).toBeTruthy();
+  expect(screen.getByRole("link", { name: "Explorar Problema ativo" })).toBeTruthy();
+  expect(screen.getByRole("link", { name: "Explorar Problema encerrado" })).toBeTruthy();
   expect(screen.getByText("1 de 1 problemas")).toBeTruthy();
-  expect(within(screen.getByRole("region", { name: "Explorar problemas" })).getByRole("button", { name: "Explorar Problema ativo" })).toBeTruthy();
+  expect(within(screen.getByRole("region", { name: "Explorar problemas" })).getByRole("link", { name: "Explorar Problema ativo" })).toBeTruthy();
 });
 
 it("omits the closed section when the corpus has no closed Problems", async () => {
   const provider = makeProvider([{ id: "PRB-OPEN", type: "PRB-", label: "Problema ativo", file: "", summaryFields: { status: "OPEN" } }]);
   render(<OverviewFixture dataProvider={provider} onExploreProblem={vi.fn()} />);
-  await screen.findByRole("button", { name: "Explorar Problema ativo" });
+  await screen.findByRole("link", { name: "Explorar Problema ativo" });
   expect(screen.queryByRole("heading", { name: "Problemas encerrados" })).toBeNull();
 });
 
@@ -71,8 +71,8 @@ it("archives only CLOSED OUT_OF_SCOPE Problems from every Overview surface and p
     { id: "SRC-1", type: "SRC-", label: "Fonte", file: "", summaryFields: {} },
   ];
   render(<OverviewFixture dataProvider={makeProvider(records)} onExploreProblem={vi.fn()} />);
-  await screen.findByRole("button", { name: "Explorar Problema ativo" });
-  expect(screen.getByRole("button", { name: "Explorar Problema resolvido" })).toBeTruthy();
+  await screen.findByRole("link", { name: "Explorar Problema ativo" });
+  expect(screen.getByRole("link", { name: "Explorar Problema resolvido" })).toBeTruthy();
   expect(screen.queryByText("PRB-ARCHIVED")).toBeNull();
   expect(screen.queryByText("Registo municipal arquivado")).toBeNull();
   expect(screen.getByText("4", { selector: ".overview-metric-value" }).closest(".overview-metric")?.textContent).toBe("4 Total de registos");
@@ -113,7 +113,7 @@ it("does not restore archived Problems through their editorial keywords", async 
   }
   await user.clear(search);
   await user.type(search, "lixo");
-  expect(screen.getByRole("button", { name: "Explorar Recolha de resíduos" })).toBeTruthy();
+  expect(screen.getByRole("link", { name: "Explorar Recolha de resíduos" })).toBeTruthy();
 });
 
 it("does not include archived Problems when navigating Overview result pages", async () => {
@@ -128,7 +128,7 @@ it("does not include archived Problems when navigating Overview result pages", a
   expect(screen.getByRole("button", { name: "Anterior" })).toBeTruthy();
   expect((screen.getByRole("button", { name: "Seguinte" }) as HTMLButtonElement).disabled).toBe(true);
   expect(screen.queryByText("PRB-ARCHIVED")).toBeNull();
-  expect(screen.getByRole("button", { name: "Explorar Problema encerrado" })).toBeTruthy();
+  expect(screen.getByRole("link", { name: "Explorar Problema encerrado" })).toBeTruthy();
 });
 
 it("uses the Overview macro-layout skeleton while the index loads", () => {
@@ -422,8 +422,8 @@ describe("Overview — Problem ordering transparency and citizen discovery contr
     ]);
     render(<OverviewFixture dataProvider={provider} {...props} />);
 
-    const firstAction = await screen.findByRole("button", { name: "Explorar Problema de mobilidade" });
-    expect(screen.getByRole("button", { name: "Explorar Problema digital" })).toBeTruthy();
+    const firstAction = await screen.findByRole("link", { name: "Explorar Problema de mobilidade" });
+    expect(screen.getByRole("link", { name: "Explorar Problema digital" })).toBeTruthy();
     expect(firstAction.closest('[aria-live="polite"]')).toBeNull();
     const row = firstAction.closest(".overview-problem-row")!;
     expect(row.querySelector("h4")?.contains(firstAction)).toBe(false);
@@ -565,8 +565,8 @@ describe("Overview — Filtros disclosure and category drawer", () => {
     await user.click(within(drawer).getByRole("button", { name: /^Mobilidade/ }));
 
     expect(await screen.findByText("1 problemas")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Explorar Problema de mobilidade" })).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Explorar Problema de espaço público" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Explorar Problema de mobilidade" })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Explorar Problema de espaço público" })).toBeNull();
     // The drawer stays open.
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
     expect(screen.getByRole("group", { name: "Filtrar por tema" })).toBeTruthy();
@@ -612,10 +612,10 @@ describe("Overview — Filtros disclosure and category drawer", () => {
     await user.type(screen.getByLabelText("Pesquisar problemas"), "corroborada");
 
     expect(await screen.findByText("1 problemas")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Explorar Mobilidade corroborada aberta" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Explorar Mobilidade corroborada aberta" })).toBeTruthy();
     expect(within(screen.getByRole("heading", { name: "Problemas encerrados" }).parentElement as HTMLElement)
-      .getByRole("button", { name: "Explorar Mobilidade discovered fechada" })).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Explorar Espaço público corroborado aberto" })).toBeNull();
+      .getByRole("link", { name: "Explorar Mobilidade discovered fechada" })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Explorar Espaço público corroborado aberto" })).toBeNull();
   });
 
   it("renders every category option as an individually wrappable inline control (no fixed-width overflow container)", async () => {
@@ -674,7 +674,7 @@ describe("Overview — toolbar result count and sort", () => {
     render(<OverviewFixture dataProvider={provider} {...props} />);
     await screen.findByText("Fiabilidade da recolha de resíduos");
     await user.type(screen.getByLabelText("Pesquisar problemas"), "lixo");
-    expect(screen.getByRole("button", { name: "Explorar Fiabilidade da recolha de resíduos" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Explorar Fiabilidade da recolha de resíduos" })).toBeTruthy();
     expect(screen.queryByText("lixo")).toBeNull();
   });
 
@@ -1110,9 +1110,9 @@ describe("Overview — Alterados esta semana shortcut", () => {
     await user.click(shortcut);
 
     expect(await screen.findByText("0 problemas")).toBeTruthy();
-    const closedResult = screen.getByRole("button", { name: "Explorar Encerrado com alteração" });
+    const closedResult = screen.getByRole("link", { name: "Explorar Encerrado com alteração" });
     expect(closedResult.closest(".overview-closed-problems")).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Explorar Aberto sem alteração" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Explorar Aberto sem alteração" })).toBeNull();
   });
 
   it("counts and returns only changed OPEN Problems when OPEN and CLOSED both changed this week", async () => {
@@ -1131,8 +1131,8 @@ describe("Overview — Alterados esta semana shortcut", () => {
     await user.click(shortcut);
 
     expect(await screen.findByText("1 problemas")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Explorar Aberto com alteração" })).toBeTruthy();
-    const closedResult = screen.getByRole("button", { name: "Explorar Encerrado com alteração" });
+    expect(screen.getByRole("link", { name: "Explorar Aberto com alteração" })).toBeTruthy();
+    const closedResult = screen.getByRole("link", { name: "Explorar Encerrado com alteração" });
     expect(closedResult.closest(".overview-closed-problems")).toBeTruthy();
   });
 
@@ -1215,8 +1215,8 @@ describe("Overview — Alterados esta semana shortcut", () => {
     await user.click(screen.getByRole("button", { name: /^Alterados esta semana/ }));
 
     expect(await screen.findByText("1 problemas")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Explorar Mobilidade alterada" })).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Explorar Mobilidade sem alteração" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Explorar Mobilidade alterada" })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Explorar Mobilidade sem alteração" })).toBeNull();
 
     await user.type(screen.getByLabelText("Pesquisar problemas"), "inexistente");
     expect(await screen.findByText("0 problemas")).toBeTruthy();

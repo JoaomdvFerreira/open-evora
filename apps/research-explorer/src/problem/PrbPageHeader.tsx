@@ -1,5 +1,6 @@
 import type { RefObject } from "react";
 import { RecordIdentifier } from "../records/RecordIdentifier";
+import { ExplorerLink } from "../navigation/ExplorerLink";
 import { Breadcrumb } from "../presentation/Breadcrumb";
 import { ContextTabs, type ContextTabsActive } from "../navigation/ContextTabs";
 import { describeTopic } from "../presentation/topicMapping";
@@ -63,9 +64,9 @@ export function PrbHeader({ identity, active, onBackToOverview, onViewDetails, o
               {
                 key: "visao-geral",
                 action: (
-                  <button type="button" className="prb-breadcrumb-ancestor" onClick={onBackToOverview}>
+                  <ExplorerLink to={{ view: "overview", selectedId: null }} onNavigate={onBackToOverview} className="prb-breadcrumb-ancestor">
                     Visão geral
-                  </button>
+                  </ExplorerLink>
                 ),
               },
             ]}
@@ -74,9 +75,9 @@ export function PrbHeader({ identity, active, onBackToOverview, onViewDetails, o
           <ContextTabs prbId={identity.problemId} active={active} onViewDetails={onViewDetails} onViewHistory={onViewHistory} />
           <div className="prb-header-utilities">
             {onVerify ? (
-              <button type="button" className="prb-header-utility prb-header-utility--verify" onClick={onVerify}>
+              <ExplorerLink to={{ view: "problem", selectedId: identity.problemId }} fragment="prb-auditoria" onNavigate={onVerify} className="prb-header-utility prb-header-utility--verify">
                 {verifyContent}
-              </button>
+              </ExplorerLink>
             ) : (
               <a href="#prb-auditoria" className="prb-header-utility prb-header-utility--verify">
                 {verifyContent}

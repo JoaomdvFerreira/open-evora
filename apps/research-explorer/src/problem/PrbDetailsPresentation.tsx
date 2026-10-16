@@ -3,6 +3,7 @@ import { IconInfo } from "../presentation/icons";
 import { EvidenceEffectTag } from "../records/EvidenceEffectTag";
 import { ResearchRoleTag } from "../records/ResearchRoleTag";
 import { RecordIdentifier } from "../records/RecordIdentifier";
+import { ExplorerLink } from "../navigation/ExplorerLink";
 import { PrbHeader, PrbIdentityHeader } from "./PrbPageHeader";
 import { formatPublicCount, formatPublicDate, formatPublicPartialDate, formatPublicPeriod, publicCompactEnumLabel, publicEnumExplanation, publicEnumLabel } from "../presentation/presentation";
 import { isHttpUrl } from "../records/sourceView";
@@ -612,9 +613,9 @@ function PrbEvidenceRow({ item, onOpenRecord }: { item: PrbEvidenceItem; onOpenR
           )}
         </dl>
       )}
-      <button type="button" className="prb-evidence-item-open" aria-label={`Abrir evidência ${item.id}`} onClick={() => onOpenRecord(item.id)}>
+      <ExplorerLink to={{ view: "records", selectedId: item.id }} onNavigate={() => onOpenRecord(item.id)} className="prb-evidence-item-open" aria-label={`Abrir evidência ${item.id}`}>
         Abrir evidência →
-      </button>
+      </ExplorerLink>
     </li>
   );
 }

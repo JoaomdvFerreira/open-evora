@@ -58,15 +58,15 @@ describe("RecordDetailPanel vNext", () => {
     expect(screen.getAllByText("Évora").length).toBeGreaterThan(0);
     expect(screen.getAllByText("pessoas residentes").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Sem inferência adicional.").length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "Abrir fonte SRC-1" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Abrir fonte SRC-1" })).toBeTruthy();
   });
 
   it("navigates to the resolved Source, and routes 'Ver Problema' to the Problem experience, not technical Detail (ODM-019)", async () => {
     const { onSelect, onViewAsProblem } = renderDetail();
-    fireEvent.click(await screen.findByRole("button", { name: "Abrir fonte SRC-1" }));
+    fireEvent.click(await screen.findByRole("link", { name: "Abrir fonte SRC-1" }));
     expect(onSelect).toHaveBeenCalledWith("SRC-1");
 
-    fireEvent.click(await screen.findByRole("button", { name: "Ver problema PRB-1" }));
+    fireEvent.click(await screen.findByRole("link", { name: "Ver problema PRB-1" }));
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-1");
     expect(onSelect).not.toHaveBeenCalledWith("PRB-1");
   });
@@ -100,7 +100,7 @@ describe("RecordDetailPanel vNext", () => {
     expect(await screen.findByText("Relações no corpus")).toBeTruthy();
     expect(screen.getByText("← Referenciado por")).toBeTruthy();
     expect(screen.getByText("Problema relacionado")).toBeTruthy();
-    const relatedButton = screen.getByRole("button", { name: "Abrir PRB-2" });
+    const relatedButton = screen.getByRole("link", { name: "Abrir PRB-2" });
     fireEvent.click(relatedButton);
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect).toHaveBeenCalledWith("PRB-2");
@@ -150,10 +150,10 @@ describe("RecordDetailPanel DS-05I — EmptyState adoption", () => {
 
   it("offers PRB technical inspection one explicit 'Ver página do problema' action instead of PRB-local navigation", async () => {
     const { onViewAsProblem } = renderDetail(records["PRB-1"], vi.fn(), vi.fn(), "PRB-1");
-    const action = await screen.findByRole("button", { name: "Ver página do problema" });
+    const action = await screen.findByRole("link", { name: "Ver página do problema" });
     expect(screen.queryByRole("navigation", { name: "Vistas do problema" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Histórico" })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Detalhes" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Detalhes" })).toBeNull();
     fireEvent.click(action);
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-1");
   });
@@ -207,7 +207,7 @@ describe("RecordDetailPanel — SRC public page and relation authority", () => {
   it("loads SRC → EVD → PRB once through the provider and shares it between the summary, the Observações cell, findings and Na investigação", async () => {
     renderDetail(src, vi.fn(), vi.fn(), "SRC-1");
     const investigation = await screen.findByRole("region", { name: "Na investigação" });
-    expect(within(investigation).getByRole("button", { name: "Ver problema PRB-1" })).toBeTruthy();
+    expect(within(investigation).getByRole("link", { name: "Ver problema PRB-1" })).toBeTruthy();
     expect(within(investigation).getByText("EVD-1")).toBeTruthy();
     expect(document.querySelector(".src-meta-cell--usage dd")?.textContent).toBe("1 · 1 problema");
     expect(screen.getByText("A Open Évora extraiu desta fonte 1 observação, usada em 1 problema.")).toBeTruthy();
@@ -220,7 +220,7 @@ describe("RecordDetailPanel — EVD Problem-use relation authority", () => {
   it("loads the EVD's Problem uses through the provider and shares them between the metadata count and Como é usada", async () => {
     renderDetail();
     const uses = await screen.findByRole("region", { name: "Como é usada" });
-    expect(await within(uses).findByRole("button", { name: "Problema" })).toBeTruthy();
+    expect(await within(uses).findByRole("link", { name: "Problema" })).toBeTruthy();
     const problemsCell = document.querySelector(".evd-meta-cell--problems dd");
     expect(problemsCell?.textContent).toBe("1");
   });

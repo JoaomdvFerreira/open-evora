@@ -245,10 +245,10 @@ describe("GraphExplorer", () => {
     );
 
     const user = userEvent.setup();
-    await user.click(await screen.findByRole("button", { name: "Ver detalhe do registo" }));
+    await user.click(await screen.findByRole("link", { name: "Ver detalhe do registo" }));
     expect(onOpenGeneric).toHaveBeenCalledWith("PRB-0005");
 
-    await user.click(screen.getByRole("button", { name: /Ver como Problema/ }));
+    await user.click(screen.getByRole("link", { name: /Ver como Problema/ }));
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0005");
   });
 
@@ -339,7 +339,7 @@ describe("GraphExplorer", () => {
     );
 
     await screen.findByRole("heading", { name: "Nós visíveis" });
-    expect(screen.getByRole("button", { name: "Ver como Problema (contexto completo)" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Ver como Problema (contexto completo)" })).toBeTruthy();
     expect(screen.queryByRole("navigation", { name: "Vistas do problema" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Histórico" })).toBeNull();
   });

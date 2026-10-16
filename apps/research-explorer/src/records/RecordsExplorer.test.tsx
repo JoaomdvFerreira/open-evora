@@ -101,11 +101,11 @@ describe("RecordsExplorer — sort/page persistence across select-then-return (O
     const firstLabelOnPage2 = firstRowOnPage2.textContent;
 
     // Select a record (unmounts RecordsTable in favour of RecordDetailPanel).
-    await user.click(firstRowOnPage2.closest("button")!);
-    await screen.findByRole("button", { name: "Registos" });
+    await user.click(firstRowOnPage2.closest("a")!);
+    await screen.findByRole("link", { name: "Registos" });
 
     // Return to Records via the detail breadcrumb.
-    await user.click(screen.getByRole("button", { name: "Registos" }));
+    await user.click(screen.getByRole("link", { name: "Registos" }));
 
     // Sort direction and page position must be exactly as left.
     const sortButtonAgain = await screen.findByRole("button", { name: /^ID/ });
@@ -125,9 +125,9 @@ describe("RecordsExplorer — sort/page persistence across select-then-return (O
     await expectPageTwoOfTwo();
 
     const [firstRow] = screen.getAllByText(/Fixture evidence label/);
-    await user.click(firstRow.closest("button")!);
-    await screen.findByRole("button", { name: "Registos" });
-    await user.click(screen.getByRole("button", { name: "Registos" }));
+    await user.click(firstRow.closest("a")!);
+    await screen.findByRole("link", { name: "Registos" });
+    await user.click(screen.getByRole("link", { name: "Registos" }));
 
     await expectPageTwoOfTwo();
   });
@@ -162,12 +162,12 @@ describe("Records record selection", () => {
     const onViewAsProblem = vi.fn();
     render(<RecordsExplorer dataProvider={selectionProvider()} selectedId={null} onSelect={onSelect} query="" onQueryChange={vi.fn()} typeFilter="all" onTypeFilterChange={vi.fn()} onViewAsProblem={onViewAsProblem} onViewInGraph={vi.fn()} onBackToRecords={vi.fn()} />);
 
-    await user.click(await screen.findByRole("button", { name: /EVD-0001/ }));
+    await user.click(await screen.findByRole("link", { name: /EVD-0001/ }));
     expect(onSelect).toHaveBeenCalledWith("EVD-0001");
     expect(onViewAsProblem).not.toHaveBeenCalled();
 
     onSelect.mockClear();
-    await user.click(screen.getByRole("button", { name: /PRB-0001/ }));
+    await user.click(screen.getByRole("link", { name: /PRB-0001/ }));
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0001");
     expect(onSelect).not.toHaveBeenCalled();
   });
@@ -188,7 +188,7 @@ describe("Records record selection", () => {
     });
     render(<RecordsExplorer dataProvider={provider} selectedId={evd.id} onSelect={onSelect} query="" onQueryChange={vi.fn()} typeFilter="all" onTypeFilterChange={vi.fn()} onViewAsProblem={onViewAsProblem} onViewInGraph={vi.fn()} onBackToRecords={vi.fn()} />);
 
-    await user.click(await screen.findByRole("button", { name: "Ver problema PRB-0001" }));
+    await user.click(await screen.findByRole("link", { name: "Ver problema PRB-0001" }));
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0001");
     expect(onSelect).not.toHaveBeenCalled();
   });

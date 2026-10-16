@@ -24,8 +24,8 @@ describe("ContextTabs — PRB-local Detalhes|Histórico navigation", () => {
   it("marks Detalhes as the current page and navigates to Histórico for the same PRB id", () => {
     const { nav, onViewDetails, onViewHistory } = renderTabs("details");
     expect(within(nav).getByText("Detalhes").getAttribute("aria-current")).toBe("page");
-    expect(within(nav).queryByRole("button", { name: "Detalhes" })).toBeNull();
-    const history = within(nav).getByRole("button", { name: "Histórico" });
+    expect(within(nav).queryByRole("link", { name: "Detalhes" })).toBeNull();
+    const history = within(nav).getByRole("link", { name: "Histórico" });
     expect(history.getAttribute("aria-current")).toBeNull();
     fireEvent.click(history);
     expect(onViewHistory).toHaveBeenCalledWith("PRB-0005");
@@ -35,8 +35,8 @@ describe("ContextTabs — PRB-local Detalhes|Histórico navigation", () => {
   it("marks Histórico as the current page and navigates to Detalhes for the same PRB id", () => {
     const { nav, onViewDetails, onViewHistory } = renderTabs("history");
     expect(within(nav).getByText("Histórico").getAttribute("aria-current")).toBe("page");
-    expect(within(nav).queryByRole("button", { name: "Histórico" })).toBeNull();
-    fireEvent.click(within(nav).getByRole("button", { name: "Detalhes" }));
+    expect(within(nav).queryByRole("link", { name: "Histórico" })).toBeNull();
+    fireEvent.click(within(nav).getByRole("link", { name: "Detalhes" }));
     expect(onViewDetails).toHaveBeenCalledWith("PRB-0005");
     expect(onViewHistory).not.toHaveBeenCalled();
   });

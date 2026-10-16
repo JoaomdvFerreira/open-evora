@@ -68,7 +68,7 @@ describe("EVD Detail — canonical regression cases", () => {
     const audit = auditRegion();
     expect(within(audit).getByRole("heading", { name: "Plano de Desenvolvimento Social de Évora 2024-2027" })).toBeTruthy();
     expect(within(audit).getByText(/Extraída pela Open Évora em/).textContent).toBe("Extraída pela Open Évora em 10/08/2026");
-    fireEvent.click(within(audit).getByRole("button", { name: "Abrir fonte SRC-0002" }));
+    fireEvent.click(within(audit).getByRole("link", { name: "Abrir fonte SRC-0002" }));
     expect(onSelect).toHaveBeenCalledWith("SRC-0002");
 
     expect(within(audit).getByText("research/evidence/EVD-000001.yaml")).toBeTruthy();
@@ -106,8 +106,8 @@ describe("EVD Detail — canonical regression cases", () => {
     renderEvd(detail("EVD-000096"), { onSelect });
     const rows = within(auditRegion()).getByRole("list", { name: "Fontes" }).querySelectorAll(":scope > li");
     expect(Array.from(rows).map((row) => row.querySelector(".rec-identifier")?.textContent)).toEqual(["SRC-0081", "SRC-0053"]);
-    fireEvent.click(screen.getByRole("button", { name: "Abrir fonte SRC-0081" }));
-    fireEvent.click(screen.getByRole("button", { name: "Abrir fonte SRC-0053" }));
+    fireEvent.click(screen.getByRole("link", { name: "Abrir fonte SRC-0081" }));
+    fireEvent.click(screen.getByRole("link", { name: "Abrir fonte SRC-0053" }));
     expect(onSelect.mock.calls).toEqual([["SRC-0081"], ["SRC-0053"]]);
     expect(screen.queryByText(/linhagem/)).toBeNull();
   });
@@ -119,8 +119,8 @@ describe("EVD Detail — canonical regression cases", () => {
     expect(screen.getByText("O estudo não demonstra uma redução proporcional da distância total percorrida ou das emissões e não estabelece um efeito equivalente em Évora.")).toBeTruthy();
     expect(screen.getByText("Refina")).toBeTruthy(); expect(screen.getByText("Mecanismo comparativo")).toBeTruthy();
     expect(screen.getByText(/Extraída pela Open Évora em/).textContent).toBe("Extraída pela Open Évora em 11/08/2026");
-    fireEvent.click(screen.getByRole("button", { name: problem.record.title as string }));
-    fireEvent.click(screen.getByRole("button", { name: "Ver problema PRB-0005" }));
+    fireEvent.click(screen.getByRole("link", { name: problem.record.title as string }));
+    fireEvent.click(screen.getByRole("link", { name: "Ver problema PRB-0005" }));
     expect(onViewAsProblem.mock.calls).toEqual([["PRB-0005"], ["PRB-0005"]]);
     expect(onSelect).not.toHaveBeenCalled();
   });
@@ -247,7 +247,7 @@ describe("EVD Detail — synthetic contract cases", () => {
 
   it("returns to Registos from the breadcrumb", () => {
     const { onBackToRecords } = renderEvd(base);
-    fireEvent.click(within(screen.getByRole("navigation", { name: "Localização" })).getByRole("button", { name: "Registos" }));
+    fireEvent.click(within(screen.getByRole("navigation", { name: "Localização" })).getByRole("link", { name: "Registos" }));
     expect(onBackToRecords).toHaveBeenCalledTimes(1);
   });
 
@@ -299,6 +299,6 @@ describe("Public/EVD Detail stories", () => {
     render(<composed.EvdDetail1440 />);
     const item = detail("EVD-000001");
     expect(await screen.findByRole("heading", { level: 1, name: (item.record.observation as Record<string, unknown>).summary as string })).toBeTruthy();
-    expect(await screen.findByRole("button", { name: "Ver problema PRB-0001" })).toBeTruthy();
+    expect(await screen.findByRole("link", { name: "Ver problema PRB-0001" })).toBeTruthy();
   });
 });

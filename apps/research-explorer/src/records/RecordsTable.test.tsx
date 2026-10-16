@@ -60,7 +60,7 @@ function filterGroup() {
 
 function rowIds(): string[] {
   return within(screen.getByRole("list", { name: "Registos" }))
-    .getAllByRole("button")
+    .getAllByRole("link")
     .map((row) => row.querySelector(".records-row-id")?.textContent ?? "");
 }
 
@@ -171,16 +171,18 @@ describe("RecordsTable — record rows", () => {
   it("shows the canonical ID and the label as the row title, and the whole row selects the record", async () => {
     const user = userEvent.setup();
     const { props } = renderTable({ typeFilter: "PRB-" });
-    const row = screen.getByRole("button", { name: /PRB-0006/ });
+    const row = screen.getByRole("link", { name: /PRB-0006/ });
+    expect(new URL(row.getAttribute("href")!, window.location.href).searchParams.get("view")).toBe("problem");
     expect(row.textContent).toContain("Adequate and affordable housing is difficult to access for some population groups");
-    expect(row.tagName).toBe("BUTTON");
+    expect(row.tagName).toBe("A");
     await user.click(row);
     expect(props.onSelect).toHaveBeenCalledWith("PRB-0006");
   });
 
   it("renders the label after its first em dash as secondary text, keeping the full label verbatim", () => {
     renderTable({ typeFilter: "SRC-" });
-    const row = screen.getByRole("button", { name: /SRC-0003/ });
+    const row = screen.getByRole("link", { name: /SRC-0003/ });
+    expect(new URL(row.getAttribute("href")!, window.location.href).searchParams.get("view")).toBe("records");
     expect(row.querySelector(".records-row-title")?.textContent).toBe("Plano de Urbanização de Évora — material da 4.ª revisão");
     expect(row.querySelector(".records-row-title-primary")?.textContent).toBe("Plano de Urbanização de Évora");
     expect(row.querySelector(".records-row-title-secondary")?.textContent).toBe(" — material da 4.ª revisão");
@@ -188,14 +190,14 @@ describe("RecordsTable — record rows", () => {
 
   it("renders a label without an em dash entirely as primary text", () => {
     renderTable({ typeFilter: "SRC-" });
-    const row = screen.getByRole("button", { name: /SRC-0011/ });
+    const row = screen.getByRole("link", { name: /SRC-0011/ });
     expect(row.querySelector(".records-row-title-primary")?.textContent).toBe("NERE");
     expect(row.querySelector(".records-row-title-secondary")).toBeNull();
   });
 
   it("does not repeat the ID as a title when the label is only the ID", () => {
     renderTable({ typeFilter: "WID-" });
-    const row = screen.getByRole("button", { name: /WID-0002/ });
+    const row = screen.getByRole("link", { name: /WID-0002/ });
     expect((row.textContent!.match(/WID-0002/g) ?? []).length).toBe(1);
   });
 });

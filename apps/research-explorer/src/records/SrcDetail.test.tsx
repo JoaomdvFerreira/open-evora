@@ -96,8 +96,8 @@ describe("SRC Detail — canonical regression cases", () => {
     expect(within(first).getByText("Mobilidade")).toBeTruthy();
     expect(within(first).getByText((detail("EVD-000001").record.observation as { summary: string }).summary)).toBeTruthy();
     expect(within(first).queryByText("Também em")).toBeNull();
-    fireEvent.click(within(first).getByRole("button", { name: "Abrir EVD-000001" }));
-    fireEvent.click(within(first).getByRole("button", { name: "Ver problema PRB-0001" }));
+    fireEvent.click(within(first).getByRole("link", { name: "Abrir EVD-000001" }));
+    fireEvent.click(within(first).getByRole("link", { name: "Ver problema PRB-0001" }));
     expect(onSelect).toHaveBeenCalledWith("EVD-000001");
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0001");
 
@@ -115,7 +115,7 @@ describe("SRC Detail — canonical regression cases", () => {
     expect(Array.from(rows).map((row) => row.querySelector(".rec-identifier")?.textContent)).toEqual(["PRB-0001", "PRB-0003", "PRB-0006", "PRB-0007", "PRB-0008"]);
     const studentHousing = Array.from(rows).find((row) => row.querySelector(".rec-identifier")?.textContent === "PRB-0006") as HTMLElement;
     expect(studentHousing.querySelector(".src-problem-via")?.textContent).toBe("através de EVD-000031, EVD-000033");
-    fireEvent.click(within(studentHousing).getByRole("button", { name: "Habitação · Educação" }));
+    fireEvent.click(within(studentHousing).getByRole("link", { name: "Habitação · Educação" }));
     expect(onViewAsProblem).toHaveBeenCalledWith("PRB-0006");
   });
 

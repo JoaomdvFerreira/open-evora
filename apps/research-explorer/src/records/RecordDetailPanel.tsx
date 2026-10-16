@@ -5,6 +5,7 @@ import { RecordFieldTree } from "./RecordFieldTree";
 import { describeType, knownTypePrefixes } from "../presentation/typeGlossary";
 import { RecordTypeLabel } from "./RecordTypeLabel";
 import { RecordIdentifier } from "./RecordIdentifier";
+import { ExplorerLink } from "../navigation/ExplorerLink";
 import { Breadcrumb } from "../presentation/Breadcrumb";
 import { findMeaningField } from "./meaningField";
 import { publicEnumLabel, publicFieldCaption, formatPublicCount } from "../presentation/presentation";
@@ -218,9 +219,9 @@ function RecordDetailBreadcrumb({ detail, onBackToRecords }: { detail: RecordDet
         {
           key: "registos",
           action: (
-            <button type="button" onClick={onBackToRecords}>
+            <ExplorerLink to={{ view: "records", selectedId: null }} onNavigate={onBackToRecords}>
               Registos
-            </button>
+            </ExplorerLink>
           ),
         },
       ]}
@@ -836,14 +837,14 @@ function RecordDetailContent({
                 page through one ordinary action — not PRB-local
                 navigation (Detalhes|Histórico lives on that page). */}
             {isPrb && (
-              <button type="button" onClick={() => onViewAsProblem(detail.id)}>
+              <ExplorerLink to={{ view: "problem", selectedId: detail.id }} onNavigate={() => onViewAsProblem(detail.id)}>
                 Ver página do problema
-              </button>
+              </ExplorerLink>
             )}
             {relatedProblemId && (
-              <button type="button" onClick={() => onViewAsProblem(relatedProblemId)}>
+              <ExplorerLink to={{ view: "problem", selectedId: relatedProblemId }} onNavigate={() => onViewAsProblem(relatedProblemId)}>
                 Ver como Problema ({relatedProblemId})
-              </button>
+              </ExplorerLink>
             )}
             {detail.type !== "PRB-" && (
               <button type="button" onClick={() => onViewInGraph(detail.id)}>
@@ -930,9 +931,9 @@ export function RecordDetailPanel({ dataProvider, lookup, selectedId, navigation
       {state.status === "error" && (
         <>
           <nav aria-label="Localização" className="detail-breadcrumb">
-            <button type="button" onClick={onBackToRecords}>
+            <ExplorerLink to={{ view: "records", selectedId: null }} onNavigate={onBackToRecords}>
               Registos
-            </button>
+            </ExplorerLink>
           </nav>
           {/* DS-05E: this error branch never had a current-item ID to show
               (the record failed to load), so it keeps its own minimal

@@ -72,11 +72,11 @@
   background: none;
 }
 
-/* The action form is a native <button>: current evidence
+/* The action form is a native link: current evidence
    (.prb-reference-target, RelatedRecordButton/TypedLinkButton) always wraps
    the identifier text in a real interactive element rather than adding a
    role to the static span, so this recipe only adjusts appearance —
-   interactivity itself is the browser's own button semantics. Density
+   interactivity itself is the browser's own link semantics. Density
    (border/fill vs. bare) still applies via .rec-identifier--standard/
    --compact; only the text colour/decoration changes here. */
 .rec-identifier--action {
@@ -91,6 +91,11 @@
   color: var(--color-accent-hover);
   text-decoration-thickness: 2px;
   text-underline-offset: 0.16em;
+}
+
+.rec-identifier--action:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* =========================================================================

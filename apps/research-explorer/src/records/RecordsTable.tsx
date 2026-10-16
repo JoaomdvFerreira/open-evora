@@ -10,6 +10,7 @@ import { useNarrowViewport } from "./useNarrowViewport";
 import { formatPublicCount } from "../presentation/presentation";
 import { EmptyState } from "../presentation/EmptyState";
 import { IconSearch } from "../presentation/icons";
+import { ExplorerLink } from "../navigation/ExplorerLink";
 
 interface RecordsTableProps {
   records: RecordSummary[];
@@ -265,11 +266,11 @@ export function RecordsTable({
             <ul className="records-list" aria-label="Registos">
               {table.getRowModel().rows.map(({ original: record }) => (
                 <li key={record.id}>
-                  <button type="button" className="records-row" onClick={() => onSelect(record.id)}>
+                  <ExplorerLink to={{ view: record.type === "PRB-" ? "problem" : "records", selectedId: record.id }} onNavigate={() => onSelect(record.id)} className="records-row">
                     <span className="records-row-id">{record.id}</span>
                     <span className="records-row-title">{record.label !== record.id && <RecordTitle label={record.label} />}</span>
                     <span className="records-row-arrow" aria-hidden="true">→</span>
-                  </button>
+                  </ExplorerLink>
                 </li>
               ))}
             </ul>
