@@ -3,6 +3,7 @@ import { useToast } from "../presentation/Toast";
 
 const GITHUB_NEW_ISSUE_URL = "https://github.com/JoaomdvFerreira/open-evora/issues/new";
 const GITHUB_ISSUES_URL = GITHUB_NEW_ISSUE_URL;
+const CONTACT_EMAIL = "openevora@gmail.com";
 export const MAX_PREFILLED_ISSUE_URL_LENGTH = 7000;
 export const isPrefilledIssueUrlEligible = (url: string): boolean => url.length <= MAX_PREFILLED_ISSUE_URL_LENGTH;
 
@@ -255,7 +256,8 @@ export function ContributionForm({ initialSearch }: { initialSearch?: string }) 
       </div>
 
       <div className="info-form-actions">
-        <button type="submit" className="info-action-link info-form-submit">Preparar issue no GitHub<span aria-hidden="true"> ↗</span></button>
+        <p id={id("public-notice")} className="info-notice">A contribuição será pública no GitHub. Não inclua dados pessoais nem informação privada. Para comunicações confidenciais, utilize <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+        <button type="submit" className="info-action-link info-form-submit" aria-describedby={id("public-notice")}>Preparar issue no GitHub<span aria-hidden="true"> ↗</span></button>
         <p className="info-form-hint">Abre um issue público pré-preenchido num novo separador. O envio só fica concluído no GitHub.</p>
       </div>
       {prepared && (

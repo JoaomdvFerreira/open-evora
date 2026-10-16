@@ -151,6 +151,7 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
           <li>Não inclua dados pessoais nem informação sensível.</li>
         </ul>
         <p>A contribuição é enviada através de um <strong>issue público no GitHub</strong>: o formulário prepara o issue e o envio é concluído no GitHub.</p>
+        <p>Os contributos são avaliados antes de poderem integrar a investigação. O envio não garante a abertura de um novo problema nem a aceitação ou publicação da informação como evidência.</p>
         <ContributionForm />
       </InfoSection>
     </>,

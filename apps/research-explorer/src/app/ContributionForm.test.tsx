@@ -47,6 +47,13 @@ describe("ContributionForm — fields and prefill", () => {
     expect(container.textContent).not.toMatch(/\b(nome|e-?mail|telefone|morada)\b/i);
   });
 
+  it("warns next to the submit action that the contribution will be public, pointing to private email", () => {
+    renderForm();
+    const notice = document.getElementById(submit().getAttribute("aria-describedby")!)!;
+    expect(notice.textContent).toBe("A contribuição será pública no GitHub. Não inclua dados pessoais nem informação privada. Para comunicações confidenciais, utilize openevora@gmail.com.");
+    expect(screen.getByRole("link", { name: "openevora@gmail.com" }).getAttribute("href")).toBe("mailto:openevora@gmail.com");
+  });
+
   it("preselects a problem suggestion from ?type=problem", () => {
     renderForm("?type=problem");
     expect(problemOption().checked).toBe(true);

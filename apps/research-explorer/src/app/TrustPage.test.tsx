@@ -254,6 +254,7 @@ it("renders the Contact contribution section with its public-GitHub guidance and
   const section = screen.getByRole("region", { name: "Contribuir para a investigação" });
   expect(section.textContent).toContain("issue público no GitHub");
   expect(section.textContent).toContain("Não inclua dados pessoais nem informação sensível.");
+  expect(section.textContent).toContain("Os contributos são avaliados antes de poderem integrar a investigação. O envio não garante a abertura de um novo problema nem a aceitação ou publicação da informação como evidência.");
   expect(within(section).getByRole("group", { name: /Tipo de contribuição/ })).toBeTruthy();
   expect(within(section).getByRole("button", { name: "Preparar issue no GitHub" })).toBeTruthy();
 });
