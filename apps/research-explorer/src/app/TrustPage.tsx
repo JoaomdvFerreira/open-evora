@@ -99,12 +99,19 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
         ["Inferências", "Conclusões retiradas da evidência, assinaladas como tal."],
         ["Limitações", "O que a informação disponível não permite afirmar."],
       ]} />
+      <InfoSection id="methodology-records" title="Tipos de registo">
+        <p>A investigação organiza-se em três tipos de registo: Problemas (PRB), que descrevem questões cívicas em investigação; Evidências (EVD), que registam observações delimitadas e os seus limites; e Fontes (SRC), que identificam a origem da informação.</p>
+      </InfoSection>
       <InfoSection id="methodology-validation" title="Validação">
         <p>Os registos passam por verificações estruturais e decisões editoriais humanas antes da integração no conjunto de dados canónico. Estas verificações não demonstram, por si só, que uma afirmação é verdadeira.</p>
         <p>A existência de uma fonte não significa que todas as conclusões possíveis a partir dessa fonte estejam estabelecidas; o Explorador procura tornar explícitos o âmbito e os limites da evidência apresentada.</p>
+        <p>Uma declaração institucional documenta o que uma entidade comunicou, mas não demonstra, por si só, que uma medida foi executada, foi eficaz ou continua em vigor. Os relatos de cidadãos podem indicar situações a investigar, mas não constituem automaticamente evidência admissível para sustentar afirmações factuais.</p>
       </InfoSection>
       <InfoSection id="methodology-ai" title="Apoio de inteligência artificial">
         <p>Assistentes de inteligência artificial apoiam a pesquisa, a análise, a redação e o desenvolvimento técnico do projeto. As decisões editoriais e a publicação de investigação canónica são controladas pelo responsável humano. Este apoio não significa que todas as fontes ou conclusões tenham sido integralmente revistas por uma pessoa ou verificadas de forma independente.</p>
+      </InfoSection>
+      <InfoSection id="methodology-closure" title="Encerramento de problemas">
+        <p>Um problema pode ser encerrado por resolução demonstrada, ausência de demonstração da sua manifestação atual, falta de informação que permita continuar a acompanhá-lo, substituição por outro registo ou exclusão do âmbito do projeto. Encerramento não significa necessariamente resolução.</p>
       </InfoSection>
       <InfoSection id="methodology-scope" title="Âmbito geográfico">
         <p>Alguns registos são encerrados quando a evidência disponível não permite estabelecer uma manifestação específica da cidade. Consulte <a href="/out-of-scope">Registos fora do âmbito</a>.</p>

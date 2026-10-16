@@ -225,6 +225,18 @@ it("renders the About publication sequence as three ordered steps", () => {
   ]);
 });
 
+it("explains record types, the limits of statements and reports, and every closure reason on Methodology", () => {
+  renderInformationPage("/methodology");
+  expect(screen.getByRole("region", { name: "Tipos de registo" }).textContent).toContain("Problemas (PRB), que descrevem questões cívicas em investigação; Evidências (EVD), que registam observações delimitadas e os seus limites; e Fontes (SRC), que identificam a origem da informação.");
+  const validation = screen.getByRole("region", { name: "Validação" });
+  expect(validation.textContent).toContain("não demonstra, por si só, que uma medida foi executada, foi eficaz ou continua em vigor");
+  expect(validation.textContent).toContain("não constituem automaticamente evidência admissível");
+  const closure = screen.getByRole("region", { name: "Encerramento de problemas" });
+  for (const reason of ["resolução demonstrada", "ausência de demonstração da sua manifestação atual", "falta de informação que permita continuar a acompanhá-lo", "substituição por outro registo", "exclusão do âmbito do projeto"]) expect(closure.textContent).toContain(reason);
+  expect(closure.textContent).toContain("Encerramento não significa necessariamente resolução.");
+  expect(screen.getByRole("link", { name: "Registos fora do âmbito" }).getAttribute("href")).toBe("/out-of-scope");
+});
+
 it("discloses AI assistance and human editorial control without claiming exhaustive verification", () => {
   renderInformationPage("/methodology");
   const section = screen.getByRole("region", { name: "Apoio de inteligência artificial" });
