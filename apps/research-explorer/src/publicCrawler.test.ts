@@ -155,3 +155,47 @@ describe("static HTML entry social sharing metadata", () => {
     expect(bytes.readUInt32BE(20)).toBe(630);
   });
 });
+
+/**
+ * Unknown paths: the host serves the build's root 404.html with HTTP status
+ * 404 for any path that matches no deployed file. That only holds while the
+ * entry is emitted at the build root and no rewrite/route sends unknown paths
+ * to a 200 document.
+ */
+describe("static not-found entry and deployment configuration", () => {
+  const APP_ROOT = path.join(__dirname, "..");
+  const REPOSITORY_ROOT = path.join(APP_ROOT, "..", "..");
+  const notFoundHtml = readFileSync(path.join(APP_ROOT, "404.html"), "utf-8");
+  const head = new DOMParser().parseFromString(notFoundHtml, "text/html");
+
+  it("is a PT-PT document that boots the shared app shell flagged as not-found", () => {
+    expect(head.documentElement.getAttribute("lang")).toBe("pt-PT");
+    expect(head.querySelector("#root")?.getAttribute("data-page")).toBe("not-found");
+    expect(head.querySelector('script[type="module"]')?.getAttribute("src")).toBe("/src/main.tsx");
+  });
+
+  it("is kept out of search indexes and declares no canonical or share URL of its own", () => {
+    expect(head.querySelector('meta[name="robots"]')?.getAttribute("content")).toBe("noindex");
+    expect(head.querySelector('link[rel="canonical"]')).toBeNull();
+    expect(head.querySelector('meta[property="og:url"]')).toBeNull();
+    expect(sitemapXml()).not.toContain("404");
+  });
+
+  it("uses root-absolute asset URLs, so it renders at any unknown nested path", () => {
+    for (const node of head.querySelectorAll("link[href], script[src]")) {
+      expect(node.getAttribute("href") ?? node.getAttribute("src")).toMatch(/^\//);
+    }
+  });
+
+  it("is a build input emitted at the build root", () => {
+    const viteConfig = readFileSync(path.join(APP_ROOT, "vite.config.ts"), "utf-8");
+    expect(viteConfig).toMatch(/notFound:\s*`\$\{APP_ROOT\}404\.html`/);
+    expect(viteConfig).toMatch(/outDir:\s*"dist"/);
+  });
+
+  it("deploys the build output statically with no rewrite or route that could turn unknown paths into 200s", () => {
+    const vercel = JSON.parse(readFileSync(path.join(REPOSITORY_ROOT, "vercel.json"), "utf-8"));
+    expect(vercel.outputDirectory).toBe("apps/research-explorer/dist");
+    for (const key of ["rewrites", "routes", "redirects", "cleanUrls", "trailingSlash"]) expect(vercel, key).not.toHaveProperty(key);
+  });
+});

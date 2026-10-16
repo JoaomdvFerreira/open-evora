@@ -5,7 +5,7 @@ import { loadExplorerStartupState, type ExplorerStartupState } from "./startup";
 import { Explorer } from "./Explorer";
 import { AppSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
-import { PublicFooter, TrustPage, trustPageForPath } from "./TrustPage";
+import { NotFoundPage, PublicFooter, TrustPage, trustPageForPath } from "./TrustPage";
 import { SKIP_TARGET_ID } from "./skipTarget";
 
 const defaultProvider: DataProvider = new StaticDataProvider();
@@ -21,15 +21,17 @@ const ERROR_TITLES: Record<string, string> = {
 
 interface AppProps {
   dataProvider?: DataProvider;
+  /** Set by the static 404.html entry, which the host serves at whatever unknown path was requested — so it cannot be recognised from the pathname. */
+  notFound?: boolean;
 }
 
-export function App({ dataProvider = defaultProvider }: AppProps) {
-  const trustPage = trustPageForPath(window.location.pathname);
+export function App({ dataProvider = defaultProvider, notFound = false }: AppProps) {
+  const trustPage = notFound ? null : trustPageForPath(window.location.pathname);
   const [state, setState] = useState<ExplorerStartupState | { status: "loading" }>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    if (trustPage) return;
+    if (notFound || trustPage) return;
     let cancelled = false;
     setState({ status: "loading" });
     loadExplorerStartupState(dataProvider).then((result) => {
@@ -38,7 +40,7 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
     return () => {
       cancelled = true;
     };
-  }, [dataProvider, attempt, trustPage]);
+  }, [dataProvider, attempt, notFound, trustPage]);
 
   return (
     <>
@@ -46,7 +48,7 @@ export function App({ dataProvider = defaultProvider }: AppProps) {
         Saltar para o conteúdo
       </a>
       <main id="main-content" className="explorer-shell">
-        {trustPage ? <TrustPage page={trustPage} skipTargetId={SKIP_TARGET_ID} dataProvider={dataProvider} /> : <>
+        {notFound ? <NotFoundPage skipTargetId={SKIP_TARGET_ID} /> : trustPage ? <TrustPage page={trustPage} skipTargetId={SKIP_TARGET_ID} dataProvider={dataProvider} /> : <>
         {state.status === "loading" && <div id={SKIP_TARGET_ID} tabIndex={-1}><AppSkeleton /></div>}
 
         {state.status === "error" && (

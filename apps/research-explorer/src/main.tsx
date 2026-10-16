@@ -86,7 +86,7 @@ if (!container) {
 createRoot(container).render(
   <StrictMode>
     <ToastProvider>
-      <App />
+      <App notFound={container.dataset.page === "not-found"} />
     </ToastProvider>
   </StrictMode>
 );

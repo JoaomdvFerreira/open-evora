@@ -1075,8 +1075,11 @@ body:has(.prb-details-view) .public-footer {
 }
 
 /* 768–1023: section labels move into normal content flow (no left-rail
-   column); Estado da investigação / Âmbito keep the six-column grid with a
-   tighter cell inset and type so the longest canonical value fits its cell. */
+   column); Estado da investigação / Base da investigação keep their
+   three-cell rows with a tighter cell inset and type. One six-column row is
+   too narrow here for whole canonical values ("Parcialmente validada",
+   "Corroborada"), so each group takes the full width: heading, separator and
+   three cells for Estado (then its methodology link), the same for Base. */
 @media (min-width: 768px) and (max-width: 1023px) {
   .prb-details-view,
   .prb-history-view {
@@ -1102,6 +1105,34 @@ body:has(.prb-details-view) .public-footer {
     --prb-band-heading-size: 28px;
     --prb-audit-pad-top: 60px;
     --prb-audit-row-gap: 28px;
+  }
+
+  .prb-state-block > .detail-panel-label,
+  .prb-state-grid,
+  .prb-state-method-link,
+  .prb-scope-block > .detail-panel-label,
+  .prb-scope-metrics {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .prb-scope-block > .detail-panel-label {
+    padding-left: 0;
+  }
+
+  /* Base's own heading/data separator: the same band-anchored,
+     static-position rule as .prb-state-grid::before. */
+  .prb-scope-metrics::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--color-separator-standard);
+  }
+
+  .prb-scope-metric:first-child {
+    padding-left: 0;
+    border-left: 0;
   }
 
   .prb-section-frame {

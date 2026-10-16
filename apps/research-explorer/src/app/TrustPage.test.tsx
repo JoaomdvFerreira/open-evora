@@ -364,3 +364,57 @@ describe("PublicFooter — editorial identity/PROJETO/DADOS structure (Overview 
     }
   });
 });
+
+/**
+ * The static 404.html entry is served by the host at whatever unknown path
+ * was requested, so the not-found page must render from the entry's own flag
+ * — never from the pathname, and never by falling back to the Explorer.
+ */
+describe("Not-found page", () => {
+  const NOT_FOUND_TITLE = "Página não encontrada — Explorador de Investigação Open Évora";
+
+  function renderNotFound(atPath: string, dataProvider: DataProvider = provider) {
+    window.history.replaceState(null, "", atPath);
+    return render(<App dataProvider={dataProvider} notFound />);
+  }
+
+  it.each(["/pagina-inexistente", "/about/inexistente", "/about"])("renders the branded not-found page at %s without loading Explorer data", (atPath) => {
+    const getManifest = vi.fn(provider.getManifest);
+    const listRecords = vi.fn(provider.listRecords);
+    renderNotFound(atPath, { ...provider, getManifest, listRecords });
+
+    expect(screen.getByRole("heading", { level: 1, name: "Página não encontrada" })).toBeTruthy();
+    expect(screen.getByText(/não corresponde a nenhuma página do Open Évora/)).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Sobre o Open Évora" })).toBeNull();
+    expect(screen.queryByRole("navigation", { name: "Informação sobre o Open Évora" })).toBeNull();
+    expect(getManifest).not.toHaveBeenCalled();
+    expect(listRecords).not.toHaveBeenCalled();
+  });
+
+  it("offers Visão geral and Registos as ordinary navigations to their Explorer destinations", () => {
+    renderNotFound("/pagina-inexistente");
+    const navigation = screen.getByRole("navigation", { name: "Continuar no Open Évora" });
+    expect(within(navigation).getAllByRole("link").map((link) => [link.textContent, link.getAttribute("href")])).toEqual([
+      ["Visão geral", "/"],
+      ["Registos", "/?view=records"],
+    ]);
+  });
+
+  it("keeps the shared public shell: global header with no current item, skip target and footer", () => {
+    renderNotFound("/pagina-inexistente");
+    const header = screen.getByRole("navigation", { name: "Navegação principal", hidden: true });
+    expect(within(header).getAllByRole("link", { hidden: true }).filter((link) => link.getAttribute("aria-current") === "page")).toHaveLength(0);
+    expect(screen.getAllByRole("main")).toHaveLength(1);
+    const article = screen.getByRole("heading", { level: 1, name: "Página não encontrada" }).closest("article");
+    expect(article?.id).toBe(screen.getByRole("link", { name: "Saltar para o conteúdo" }).getAttribute("href")?.slice(1));
+    expect(screen.getByRole("contentinfo")).toBeTruthy();
+  });
+
+  it("sets the same document title as the static entry's pre-hydration <title>", () => {
+    document.title = "Open Évora — Explorador de Investigação";
+    renderNotFound("/pagina-inexistente");
+    expect(document.title).toBe(NOT_FOUND_TITLE);
+    const staticHtml = readFileSync(path.join(__dirname, "..", "..", "404.html"), "utf-8");
+    expect(/<title>([^<]*)<\/title>/.exec(staticHtml)?.[1]).toBe(NOT_FOUND_TITLE);
+  });
+});

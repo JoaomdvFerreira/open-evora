@@ -50,6 +50,10 @@ export default defineConfig({
       input: {
         main: fileURLToPath(new URL("./index.html", import.meta.url)),
         ...Object.fromEntries(TRUST_PAGE_INPUTS.map((path) => [path, `${APP_ROOT}${path}/index.html`])),
+        // Emitted as dist/404.html: the static host serves it, with HTTP
+        // status 404, for any path that matches no deployed file. No rewrite
+        // routes unknown paths to index.html, so they never become 200s.
+        notFound: `${APP_ROOT}404.html`,
       },
     },
   },
