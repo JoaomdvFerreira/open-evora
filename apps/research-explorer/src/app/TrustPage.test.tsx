@@ -20,9 +20,28 @@ it("explains website and GitHub data handling without a data dependency", () => 
 
   expect(screen.getByRole("heading", { name: "Privacidade" })).toBeTruthy();
   expect(screen.getByText("Não é necessária.")).toBeTruthy();
+  expect(screen.getByText("Vercel (alojamento), Google/Gmail (email) e GitHub (repositório e Issues).")).toBeTruthy();
   expect(screen.getByRole("heading", { name: "Compromisso" })).toBeTruthy();
   expect(screen.getByText(/não significa ausência de tratamento de dados pessoais/)).toBeTruthy();
-  expect(screen.getByText(/O formulário prepara um issue público no GitHub/)).toBeTruthy();
+
+  const controller = screen.getByRole("region", { name: "Responsável pelo tratamento" });
+  expect(controller.textContent).toContain("iniciativa cívica individual e independente");
+  expect(controller.textContent).toContain("ainda não consta desta página");
+  const website = screen.getByRole("region", { name: "Consulta do website" });
+  expect(website.textContent).toContain("alojado na Vercel");
+  expect(website.textContent).toContain("Vercel Analytics e o Speed Insights estão atualmente desativados");
+  const email = screen.getByRole("region", { name: "Mensagens por email" });
+  expect(email.textContent).toContain("Gmail");
+  expect(email.textContent).toContain("arquivada para assegurar a rastreabilidade");
+  expect(email.textContent).toContain("não são publicados automaticamente");
+  const github = screen.getByRole("region", { name: "Contribuições no GitHub" });
+  expect(github.textContent).toContain("Os GitHub Issues são públicos");
+  expect(github.textContent).toContain("o envio é concluído no GitHub");
+  expect(screen.getByRole("region", { name: "Finalidades e fundamentos jurídicos" }).textContent).toContain("não foi concluída uma avaliação de interesse legítimo");
+  expect(screen.getByRole("region", { name: "Conservação" }).textContent).toContain("vai adotar uma revisão anual");
+  const rights = screen.getByRole("region", { name: "Os seus direitos" });
+  expect(within(rights).getByRole("link", { name: "CNPD" }).getAttribute("href")).toBe("https://www.cnpd.pt");
+
   const privacyContact = screen.getByRole("region", { name: "Contacto para questões de privacidade" });
   expect(within(privacyContact).getByRole("link", { name: "openevora@gmail.com" }).getAttribute("href")).toBe("mailto:openevora@gmail.com");
   expect(privacyContact.textContent).toContain("prestador externo");

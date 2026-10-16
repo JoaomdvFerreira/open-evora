@@ -157,20 +157,44 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
   },
   "/privacy": {
     heading: "Privacidade",
-    summary: "O que é necessário para consultar o Explorador de Investigação.",
+    summary: "Que dados podem ser tratados quando consulta o website ou contacta o Open Évora.",
     body: <>
       <InfoFacts facts={[
+        ["Projeto", "Iniciativa cívica individual e independente."],
         ["Conta", "Não é necessária."],
-        ["Contribuições", "O formulário prepara um issue público no GitHub; o envio é concluído nessa plataforma."],
-        ["Alojamento", "Infraestrutura de terceiros."],
-        ["Dados técnicos", "Endereços IP e registos de acesso, processados pelo alojamento para funcionamento e segurança, segundo as respetivas políticas."],
+        ["Prestadores", "Vercel (alojamento), Google/Gmail (email) e GitHub (repositório e Issues)."],
+        ["Medição de audiência", "Vercel Analytics e Speed Insights estão atualmente desativados."],
       ]} />
-      <p>A ausência de uma conta ou de um formulário de envio próprio não significa ausência de tratamento de dados pessoais. A consulta do website envolve dados técnicos tratados pela infraestrutura de alojamento; as contribuições feitas no GitHub seguem também as práticas dessa plataforma.</p>
+      <p>A ausência de uma conta ou de um formulário de envio próprio não significa ausência de tratamento de dados pessoais. A consulta do website, o contacto por email e as contribuições no GitHub podem envolver o tratamento de dados pessoais, descrito abaixo.</p>
+      <InfoSection id="privacy-controller" title="Responsável pelo tratamento">
+        <p>O Open Évora é uma iniciativa cívica individual e independente, sem ligação à autarquia. A identificação formal do responsável pelo tratamento ainda não consta desta página. Os pedidos relativos a dados pessoais podem ser enviados para <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+      </InfoSection>
+      <InfoSection id="privacy-website" title="Consulta do website">
+        <p>O website está alojado na Vercel. A consulta pode envolver o tratamento de dados técnicos de acesso, como endereços IP e registos de acesso, pela Vercel, para assegurar o funcionamento e a segurança do serviço, segundo as respetivas políticas.</p>
+        <p>O Vercel Analytics e o Speed Insights estão atualmente desativados.</p>
+      </InfoSection>
+      <InfoSection id="privacy-email" title="Mensagens por email">
+        <p>As mensagens enviadas para {CONTACT_EMAIL} são recebidas através do Gmail, um serviço da Google. Podem conter dados pessoais fornecidos pelos remetentes, como o nome, o endereço de email e o conteúdo da mensagem. Estas mensagens são usadas para responder ao pedido e, quando relevante, para apoiar a investigação.</p>
+        <p>A correspondência relevante para a investigação é arquivada para assegurar a rastreabilidade da investigação. Os contributos enviados em privado não são publicados automaticamente.</p>
+      </InfoSection>
+      <InfoSection id="privacy-github" title="Contribuições no GitHub">
+        <p>Os GitHub Issues são públicos. O formulário de contribuição apenas prepara o issue: o envio é concluído no GitHub, que pode exigir autenticação e trata os dados segundo as suas próprias políticas. Não inclua dados pessoais desnecessários nem informação sensível.</p>
+      </InfoSection>
+      <InfoSection id="privacy-legal-basis" title="Finalidades e fundamentos jurídicos">
+        <p>As finalidades de cada tratamento são as indicadas acima. O fundamento jurídico aplicável a cada tratamento ainda está em análise e não é indicado nesta página; não foi concluída uma avaliação de interesse legítimo.</p>
+      </InfoSection>
+      <InfoSection id="privacy-retention" title="Conservação">
+        <p>Os dados pessoais são conservados apenas enquanto forem necessários para responder aos pedidos e para a documentação da investigação. O projeto vai adotar uma revisão anual da correspondência arquivada, para eliminar o que deixar de ser necessário.</p>
+      </InfoSection>
+      <InfoSection id="privacy-rights" title="Os seus direitos">
+        <p>Nos termos do Regulamento Geral sobre a Proteção de Dados (RGPD), pode pedir o acesso aos seus dados pessoais, a retificação, o apagamento, a limitação do tratamento ou a portabilidade, e opor-se ao tratamento, quando aplicável.</p>
+        <p>Pode também apresentar reclamação à Comissão Nacional de Proteção de Dados (<a href="https://www.cnpd.pt">CNPD</a>).</p>
+      </InfoSection>
       <InfoSection id="privacy-contact" title="Contacto para questões de privacidade">
-        <p>Para pedidos relativos a dados pessoais, contacte <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. O contacto por email pode envolver o tratamento dos dados que fornecer; o serviço de email utiliza um prestador externo. Envie apenas a informação necessária para analisarmos o pedido.</p>
+        <p>Para exercer os seus direitos ou colocar questões sobre dados pessoais, contacte <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. O contacto por email envolve o tratamento dos dados que fornecer; o serviço de email utiliza um prestador externo. Envie apenas a informação necessária para analisarmos o pedido.</p>
       </InfoSection>
       <InfoSection id="privacy-commitment" title="Compromisso">
-        <p>O Open Évora não deve introduzir formulários de recolha de dados pessoais, analytics adicionais, cookies não essenciais ou mecanismos semelhantes sem rever e atualizar previamente esta informação.</p>
+        <p>O Open Évora não deve introduzir formulários de recolha de dados pessoais, analytics, medição de desempenho, cookies não essenciais ou mecanismos semelhantes sem rever e atualizar previamente esta informação.</p>
       </InfoSection>
     </>,
   },
