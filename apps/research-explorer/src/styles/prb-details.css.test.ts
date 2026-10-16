@@ -273,10 +273,37 @@ describe("PRB Details Estado da investigação / Âmbito band — six-column gri
     expect(ruleBodies(prbCompact, ".prb-state-info-tooltip")).toHaveLength(0);
   });
 
-  it("keeps six columns at tablet width (no restacking), tightening only the cell tokens", () => {
+  it("gives each group the full width at tablet width so whole status values fit, without shrinking type further", () => {
+    // Same grid and wrappers (markup order unchanged); only the placement changes.
     expect(ruleBodies(prbTablet, ".prb-state-scope-row")).toHaveLength(0);
     expect(ruleBodies(prbTablet, ".prb-state-block")).toHaveLength(0);
-    expect(onlyRuleBody(prbTablet, ".prb-details-view")).toMatch(/--prb-state-cell-pad-x:/);
+    const tokens = onlyRuleBody(prbTablet, ".prb-details-view");
+    expect(tokens).toMatch(/--prb-state-label-size:\s*13px;/);
+    expect(tokens).toMatch(/--prb-state-value-size:\s*15px;/);
+    for (const selector of [
+      ".prb-state-block > .detail-panel-label",
+      ".prb-state-grid",
+      ".prb-state-method-link",
+      ".prb-scope-block > .detail-panel-label",
+      ".prb-scope-metrics",
+    ]) {
+      expect(ruleBodies(prbTablet, selector).some((rule) => /grid-column:\s*1 \/ -1;/.test(rule) && /grid-row:\s*auto;/.test(rule)), selector).toBe(true);
+    }
+    // Each group's cells keep their three-column split.
+    expect(prbTablet).not.toMatch(/grid-template-columns/);
+    // Base starts on the frame axis and draws its own heading/data separator.
+    expect(ruleBodies(prbTablet, ".prb-scope-block > .detail-panel-label")).toContain("padding-left: 0;");
+    expect(onlyRuleBody(prbTablet, ".prb-scope-metric:first-child")).toMatch(/border-left:\s*0;/);
+    const separator = onlyRuleBody(prbTablet, ".prb-scope-metrics::before");
+    expect(separator).toMatch(/position:\s*absolute;[\s\S]*left:\s*0;[\s\S]*right:\s*0;/);
+    expect(separator).toMatch(/border-top:\s*1px solid var\(--color-separator-standard\);/);
+  });
+
+  it("keeps the one-row six-column composition from 1024px up", () => {
+    for (const selector of [".prb-state-grid", ".prb-scope-metrics", ".prb-state-block > .detail-panel-label"]) {
+      expect(ruleBodies(prbFit, selector), selector).toHaveLength(0);
+    }
+    expect(ruleBodies(prbCss, ".prb-scope-metrics::before").length).toBe(1);
   });
 
   it("recomposes the band at compact width instead of forcing six columns", () => {
