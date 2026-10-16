@@ -20,9 +20,37 @@ it("explains website and GitHub data handling without a data dependency", () => 
 
   expect(screen.getByRole("heading", { name: "Privacidade" })).toBeTruthy();
   expect(screen.getByText("Não é necessária.")).toBeTruthy();
+  expect(screen.getByText("Vercel (alojamento), Google/Gmail (email) e GitHub (repositório e Issues).")).toBeTruthy();
   expect(screen.getByRole("heading", { name: "Compromisso" })).toBeTruthy();
   expect(screen.getByText(/não significa ausência de tratamento de dados pessoais/)).toBeTruthy();
-  expect(screen.getByText(/O formulário prepara um issue público no GitHub/)).toBeTruthy();
+
+  const controller = screen.getByRole("region", { name: "Responsável pelo tratamento" });
+  expect(controller.textContent).toContain("iniciativa cívica individual e independente");
+  expect(controller.textContent).toContain("O responsável pelo tratamento é João Ferreira");
+  expect(within(controller).getByRole("link", { name: "openevora@gmail.com" }).getAttribute("href")).toBe("mailto:openevora@gmail.com");
+  const website = screen.getByRole("region", { name: "Consulta do website" });
+  expect(website.textContent).toContain("alojado na Vercel");
+  expect(website.textContent).toContain("Vercel Analytics e o Speed Insights estão atualmente desativados");
+  const email = screen.getByRole("region", { name: "Mensagens por email" });
+  expect(email.textContent).toContain("Gmail");
+  expect(email.textContent).toContain("arquivada para assegurar a rastreabilidade");
+  expect(email.textContent).toContain("não são publicados automaticamente");
+  const github = screen.getByRole("region", { name: "Contribuições no GitHub" });
+  expect(github.textContent).toContain("Os GitHub Issues são públicos");
+  expect(github.textContent).toContain("o envio é concluído no GitHub");
+  const externalServices = screen.getByRole("region", { name: "Serviços externos" });
+  expect(externalServices.textContent).toContain("fora do Espaço Económico Europeu");
+  expect(externalServices.textContent).toContain("dependem do prestador e do serviço utilizado");
+  expect(externalServices.textContent).not.toMatch(/cláusulas contratuais-tipo|DPA/);
+  const legalBasis = screen.getByRole("region", { name: "Finalidades e fundamentos jurídicos" });
+  expect(legalBasis.textContent).toContain("Interesse legítimo (artigo 6.º, n.º 1, alínea f), do RGPD)");
+  expect(legalBasis.textContent).toContain("Cumprimento de uma obrigação jurídica (artigo 6.º, n.º 1, alínea c), do RGPD)");
+  expect(legalBasis.textContent).toContain("realizado pela Vercel, cujo papel nesse tratamento é definido pelas respetivas condições e políticas");
+  expect(legalBasis.textContent).not.toContain("em análise");
+  expect(screen.getByRole("region", { name: "Conservação" }).textContent).toContain("vai adotar uma revisão anual");
+  const rights = screen.getByRole("region", { name: "Os seus direitos" });
+  expect(within(rights).getByRole("link", { name: "CNPD" }).getAttribute("href")).toBe("https://www.cnpd.pt");
+
   const privacyContact = screen.getByRole("region", { name: "Contacto para questões de privacidade" });
   expect(within(privacyContact).getByRole("link", { name: "openevora@gmail.com" }).getAttribute("href")).toBe("mailto:openevora@gmail.com");
   expect(privacyContact.textContent).toContain("prestador externo");
@@ -206,6 +234,18 @@ it("renders the About publication sequence as three ordered steps", () => {
   ]);
 });
 
+it("explains record types, the limits of statements and reports, and every closure reason on Methodology", () => {
+  renderInformationPage("/methodology");
+  expect(screen.getByRole("region", { name: "Tipos de registo" }).textContent).toContain("Problemas (PRB), que descrevem questões cívicas em investigação; Evidências (EVD), que registam observações delimitadas e os seus limites; e Fontes (SRC), que identificam a origem da informação.");
+  const validation = screen.getByRole("region", { name: "Validação" });
+  expect(validation.textContent).toContain("não demonstra, por si só, que uma medida foi executada, foi eficaz ou continua em vigor");
+  expect(validation.textContent).toContain("não constituem automaticamente evidência admissível");
+  const closure = screen.getByRole("region", { name: "Encerramento de problemas" });
+  for (const reason of ["resolução demonstrada", "ausência de demonstração da sua manifestação atual", "falta de informação que permita continuar a acompanhá-lo", "substituição por outro registo", "exclusão do âmbito do projeto"]) expect(closure.textContent).toContain(reason);
+  expect(closure.textContent).toContain("Encerramento não significa necessariamente resolução.");
+  expect(screen.getByRole("link", { name: "Registos fora do âmbito" }).getAttribute("href")).toBe("/out-of-scope");
+});
+
 it("discloses AI assistance and human editorial control without claiming exhaustive verification", () => {
   renderInformationPage("/methodology");
   const section = screen.getByRole("region", { name: "Apoio de inteligência artificial" });
@@ -235,6 +275,7 @@ it("renders the Contact contribution section with its public-GitHub guidance and
   const section = screen.getByRole("region", { name: "Contribuir para a investigação" });
   expect(section.textContent).toContain("issue público no GitHub");
   expect(section.textContent).toContain("Não inclua dados pessoais nem informação sensível.");
+  expect(section.textContent).toContain("Os contributos são avaliados antes de poderem integrar a investigação. O envio não garante a abertura de um novo problema nem a aceitação ou publicação da informação como evidência.");
   expect(within(section).getByRole("group", { name: /Tipo de contribuição/ })).toBeTruthy();
   expect(within(section).getByRole("button", { name: "Preparar issue no GitHub" })).toBeTruthy();
 });

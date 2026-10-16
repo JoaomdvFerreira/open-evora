@@ -1,6 +1,7 @@
 # Open Évora FREEZE Plan
 
-Status: owner-approved programme record.
+Status: historical record of a closed programme. The owner lifted the FREEZE;
+no FREEZE-specific gate remains active.
 
 This document is the durable canonical reference for the Open Évora FREEZE
 programme identifiers (FZ-01 … FZ-11) and the historical CRR review-tooling
@@ -8,29 +9,21 @@ migration decisions. References such as "FZ-02" or "CRR-04" in
 commits, pull requests and issues resolve here and must not depend on
 conversation history.
 
-This document records programme scope, sequencing and owner decisions. It does
+This document records historical programme scope, sequencing and owner decisions. It does
 **not** replace the semantic contracts owned by `AGENTS.md`,
 `docs/investigationstrategy.md`, `docs/datamodel.md` or
 `docs/explorerarchitecture.md`. Where this document and those contracts appear
 to differ, those contracts govern until they are changed through their own
 process.
 
-## 1. FREEZE operating boundary
+## 1. Historical FREEZE operating boundary
 
-- The FREEZE concerns canonical research publication and integration. It does
-  not freeze all repository work.
-- Noncanonical drafts, deterministic checks, tooling, Explorer work and
-  authorized support-only Source Verification Support (SVS) work may proceed.
-- External publication of canonical PRB/EVD/SRC changes requires explicit owner authorization.
-- Authorized canonical direct changes follow `npm run research:check` →
-  `git diff --check` → local commit → independent owner-side semantic review
-  of the exact commit/diff → explicit owner publication authorization before
-  push or PR → deterministic CI → owner merge.
-- PRB-0002's historical authorization does not resume FZ-02 in this action.
-- This plan does not start or resume FZ-02; its status remains as recorded in
-  the FZ-02 section.
-- FZ-02 does not depend on CRR.
-- The owner remains the final merge authority.
+The FREEZE formerly governed canonical research publication and integration;
+it did not freeze all repository work. Its restrictions and sequencing no
+longer control current work. The owner closed the programme without changing
+the recorded status of each FZ item or automatically authorizing any pending
+research integration. Current publication, review and merge safeguards are
+owned by `AGENTS.md` and `docs/investigationstrategy.md` §12.
 
 ## 2. FZ programme items
 
@@ -48,14 +41,14 @@ process.
   PRB wording exceeds linked Evidence.
 - Lexical signals alone are not sufficient.
 - Status: audit completed; resulting remediation proceeds independently.
-- FZ-02 does not depend on the CRR migration.
+- FZ-02 did not depend on the CRR migration.
 
 ### FZ-03 — PRB-0002 integrity repair
 
 - Repair confirmed evidence-boundary/layer-integrity defects without weakening
   uncertainty or broadening claims.
-- Status: content-approved draft; canonical integration remains pending
-  through the active direct review workflow defined in `docs/investigationstrategy.md` §12.
+- Status at programme closure: content-approved draft; canonical integration
+  remained pending. Any later integration follows `docs/investigationstrategy.md` §12.
 
 ### FZ-04 — PT-PT canonical repair
 
@@ -66,8 +59,8 @@ process.
 
 - Primary boundary: Évora city / urban TREVO service.
 - TPAC evidence remains contextual.
-- Status: decision reflected in the approved draft; canonical integration
-  pending.
+- Status at programme closure: decision reflected in the approved draft;
+  canonical integration remained pending.
 
 ### FZ-06 — Material-omission review
 
@@ -85,14 +78,15 @@ process.
 
 ### FZ-08 — Source monitoring cycle
 
-Owns Source-health monitoring:
+Historically covered Source-health monitoring:
 
 - canonical-reference availability;
 - redirects/status;
 - broken-source follow-up;
 - freshness / `last_checked_at` maintenance.
 
-Live Source availability and freshness are FZ-08 monitoring concerns, not semantic-review gates.
+The FZ-08 monitoring remit did not make live Source availability or freshness
+semantic-review gates.
 
 ### FZ-09 — Institutional diligence model
 
@@ -104,7 +98,8 @@ Live Source availability and freshness are FZ-08 monitoring concerns, not semant
 
 - Improve public PRB comprehension without weakening evidential meaning.
 - FZ-10a (PRB-details presentation work) is complete and merged in PR #215.
-- FZ-10 remains open as the broader programme item.
+- FZ-10 was still open as a broader item when the programme closed; closure
+  does not itself complete that work.
 
 ### FZ-11 — Static subscriptions
 
@@ -115,6 +110,6 @@ Live Source availability and freshness are FZ-08 monitoring concerns, not semant
 
 CRR experiments are historical. CRR-07 concluded `BENCHMARK_INCONCLUSIVE / NO CUTOVER`. The automated semantic-review and attestation machinery was subsequently retired. Semantic review remains independent of the implementing agent and owner-side. Git history preserves implementation detail; the active workflow is owned by `docs/investigationstrategy.md` §12.
 
-The historical safety-admission decisions remain: source availability/freshness belongs to FZ-08; non-authoritative claim authority is not an automatic blocker; non-empty inference limits do not require a separate human-resolution process; private/publication safety is governed by `AGENTS.md` and the surviving publication-safety checks.
+The historical safety-admission decisions were: source availability/freshness was assigned to FZ-08; non-authoritative claim authority was not an automatic blocker; non-empty inference limits did not require a separate human-resolution process. Current private/publication safety is governed by `AGENTS.md` and the surviving publication-safety checks.
 
 Preserved safeguards include canonical schema/reference and Source Verification Support validation, the CLEC, PRB-to-EVD evidence boundaries, independent owner-side semantic review, fail-closed publication-path checks, and owner publication/merge authority.

@@ -6,6 +6,7 @@ import { RecordDetailPanel } from "./RecordDetailPanel";
 import { RecordsSkeleton } from "../loading/LoadingSkeletons";
 import { ErrorNotice } from "../presentation/ErrorNotice";
 import { initialRecordsControllerState, recordsControllerReducer } from "./recordsController";
+import type { HistoryNavigation } from "../navigation/useExplorerUrlState";
 
 const ERROR_TITLES: Record<string, string> = {
   missing: "Modelo de leitura gerado não encontrado",
@@ -17,6 +18,8 @@ const ERROR_TITLES: Record<string, string> = {
 interface RecordsExplorerProps {
   dataProvider: DataProvider;
   selectedId: string | null;
+  /** How the current location was reached — forwarded to Record Detail's scroll/focus handling. */
+  navigation?: HistoryNavigation;
   onSelect: (id: string) => void;
   query: string;
   onQueryChange: (query: string) => void;
@@ -44,6 +47,7 @@ interface RecordsExplorerProps {
 export function RecordsExplorer({
   dataProvider,
   selectedId,
+  navigation = "load",
   onSelect,
   query,
   onQueryChange,
@@ -102,6 +106,7 @@ export function RecordsExplorer({
         dataProvider={dataProvider}
         lookup={indexState.lookup}
         selectedId={selectedId}
+        navigation={navigation}
         onSelect={handleSelectRecord}
         onBackToRecords={onBackToRecords}
         onViewAsProblem={onViewAsProblem}

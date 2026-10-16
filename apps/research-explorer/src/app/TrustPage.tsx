@@ -99,12 +99,19 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
         ["Inferências", "Conclusões retiradas da evidência, assinaladas como tal."],
         ["Limitações", "O que a informação disponível não permite afirmar."],
       ]} />
+      <InfoSection id="methodology-records" title="Tipos de registo">
+        <p>A investigação organiza-se em três tipos de registo: Problemas (PRB), que descrevem questões cívicas em investigação; Evidências (EVD), que registam observações delimitadas e os seus limites; e Fontes (SRC), que identificam a origem da informação.</p>
+      </InfoSection>
       <InfoSection id="methodology-validation" title="Validação">
         <p>Os registos passam por verificações estruturais e decisões editoriais humanas antes da integração no conjunto de dados canónico. Estas verificações não demonstram, por si só, que uma afirmação é verdadeira.</p>
         <p>A existência de uma fonte não significa que todas as conclusões possíveis a partir dessa fonte estejam estabelecidas; o Explorador procura tornar explícitos o âmbito e os limites da evidência apresentada.</p>
+        <p>Uma declaração institucional documenta o que uma entidade comunicou, mas não demonstra, por si só, que uma medida foi executada, foi eficaz ou continua em vigor. Os relatos de cidadãos podem indicar situações a investigar, mas não constituem automaticamente evidência admissível para sustentar afirmações factuais.</p>
       </InfoSection>
       <InfoSection id="methodology-ai" title="Apoio de inteligência artificial">
         <p>Assistentes de inteligência artificial apoiam a pesquisa, a análise, a redação e o desenvolvimento técnico do projeto. As decisões editoriais e a publicação de investigação canónica são controladas pelo responsável humano. Este apoio não significa que todas as fontes ou conclusões tenham sido integralmente revistas por uma pessoa ou verificadas de forma independente.</p>
+      </InfoSection>
+      <InfoSection id="methodology-closure" title="Encerramento de problemas">
+        <p>Um problema pode ser encerrado por resolução demonstrada, ausência de demonstração da sua manifestação atual, falta de informação que permita continuar a acompanhá-lo, substituição por outro registo ou exclusão do âmbito do projeto. Encerramento não significa necessariamente resolução.</p>
       </InfoSection>
       <InfoSection id="methodology-scope" title="Âmbito geográfico">
         <p>Alguns registos são encerrados quando a evidência disponível não permite estabelecer uma manifestação específica da cidade. Consulte <a href="/out-of-scope">Registos fora do âmbito</a>.</p>
@@ -151,26 +158,57 @@ const TRUST_PAGES: Record<TrustNavigationPath, TrustPageContent> = {
           <li>Não inclua dados pessoais nem informação sensível.</li>
         </ul>
         <p>A contribuição é enviada através de um <strong>issue público no GitHub</strong>: o formulário prepara o issue e o envio é concluído no GitHub.</p>
+        <p>Os contributos são avaliados antes de poderem integrar a investigação. O envio não garante a abertura de um novo problema nem a aceitação ou publicação da informação como evidência.</p>
         <ContributionForm />
       </InfoSection>
     </>,
   },
   "/privacy": {
     heading: "Privacidade",
-    summary: "O que é necessário para consultar o Explorador de Investigação.",
+    summary: "Que dados podem ser tratados quando consulta o website ou contacta o Open Évora.",
     body: <>
       <InfoFacts facts={[
+        ["Projeto", "Iniciativa cívica individual e independente."],
         ["Conta", "Não é necessária."],
-        ["Contribuições", "O formulário prepara um issue público no GitHub; o envio é concluído nessa plataforma."],
-        ["Alojamento", "Infraestrutura de terceiros."],
-        ["Dados técnicos", "Endereços IP e registos de acesso, processados pelo alojamento para funcionamento e segurança, segundo as respetivas políticas."],
+        ["Prestadores", "Vercel (alojamento), Google/Gmail (email) e GitHub (repositório e Issues)."],
+        ["Medição de audiência", "Vercel Analytics e Speed Insights estão atualmente desativados."],
       ]} />
-      <p>A ausência de uma conta ou de um formulário de envio próprio não significa ausência de tratamento de dados pessoais. A consulta do website envolve dados técnicos tratados pela infraestrutura de alojamento; as contribuições feitas no GitHub seguem também as práticas dessa plataforma.</p>
+      <p>A ausência de uma conta ou de um formulário de envio próprio não significa ausência de tratamento de dados pessoais. A consulta do website, o contacto por email e as contribuições no GitHub podem envolver o tratamento de dados pessoais, descrito abaixo.</p>
+      <InfoSection id="privacy-controller" title="Responsável pelo tratamento">
+        <p>O responsável pelo tratamento é João Ferreira, no âmbito do Open Évora, uma iniciativa cívica individual e independente, sem ligação à autarquia. Contacto: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+      </InfoSection>
+      <InfoSection id="privacy-website" title="Consulta do website">
+        <p>O website está alojado na Vercel. A consulta pode envolver o tratamento de dados técnicos de acesso, como endereços IP e registos de acesso, pela Vercel, para assegurar o funcionamento e a segurança do serviço, segundo as respetivas políticas.</p>
+        <p>O Vercel Analytics e o Speed Insights estão atualmente desativados.</p>
+      </InfoSection>
+      <InfoSection id="privacy-email" title="Mensagens por email">
+        <p>As mensagens enviadas para {CONTACT_EMAIL} são recebidas através do Gmail, um serviço da Google. Podem conter dados pessoais fornecidos pelos remetentes, como o nome, o endereço de email e o conteúdo da mensagem. Estas mensagens são usadas para responder ao pedido e, quando relevante, para apoiar a investigação.</p>
+        <p>A correspondência relevante para a investigação é arquivada para assegurar a rastreabilidade da investigação. Os contributos enviados em privado não são publicados automaticamente.</p>
+      </InfoSection>
+      <InfoSection id="privacy-github" title="Contribuições no GitHub">
+        <p>Os GitHub Issues são públicos. O formulário de contribuição apenas prepara o issue: o envio é concluído no GitHub, que pode exigir autenticação e trata os dados segundo as suas próprias políticas. Não inclua dados pessoais desnecessários nem informação sensível.</p>
+      </InfoSection>
+      <InfoSection id="privacy-external-services" title="Serviços externos">
+        <p>Os serviços externos utilizados pelo Open Évora podem envolver o tratamento de dados pessoais fora do Espaço Económico Europeu. As condições e garantias aplicáveis dependem do prestador e do serviço utilizado, incluindo os mecanismos de proteção de dados previstos na legislação aplicável.</p>
+      </InfoSection>
+      <InfoSection id="privacy-legal-basis" title="Finalidades e fundamentos jurídicos">
+        <p>As finalidades de cada tratamento são as indicadas acima e assentam nos seguintes fundamentos jurídicos:</p>
+        <p><strong>Interesse legítimo</strong> (artigo 6.º, n.º 1, alínea f), do RGPD): responder a contactos, analisar contributos, realizar investigação cívica e manter um arquivo documental proporcional que assegure a rastreabilidade da investigação.</p>
+        <p><strong>Cumprimento de uma obrigação jurídica</strong> (artigo 6.º, n.º 1, alínea c), do RGPD): tratar os dados necessários para responder a pedidos de exercício dos direitos previstos no RGPD.</p>
+        <p><strong>Alojamento:</strong> o tratamento de dados técnicos de acesso descrito em «Consulta do website» é realizado pela Vercel, cujo papel nesse tratamento é definido pelas respetivas condições e políticas.</p>
+      </InfoSection>
+      <InfoSection id="privacy-retention" title="Conservação">
+        <p>Os dados pessoais são conservados apenas enquanto forem necessários para responder aos pedidos e para a documentação da investigação. O projeto vai adotar uma revisão anual da correspondência arquivada, para eliminar o que deixar de ser necessário.</p>
+      </InfoSection>
+      <InfoSection id="privacy-rights" title="Os seus direitos">
+        <p>Nos termos do Regulamento Geral sobre a Proteção de Dados (RGPD), pode pedir o acesso aos seus dados pessoais, a retificação, o apagamento, a limitação do tratamento ou a portabilidade, e opor-se ao tratamento, quando aplicável.</p>
+        <p>Pode também apresentar reclamação à Comissão Nacional de Proteção de Dados (<a href="https://www.cnpd.pt">CNPD</a>).</p>
+      </InfoSection>
       <InfoSection id="privacy-contact" title="Contacto para questões de privacidade">
-        <p>Para pedidos relativos a dados pessoais, contacte <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. O contacto por email pode envolver o tratamento dos dados que fornecer; o serviço de email utiliza um prestador externo. Envie apenas a informação necessária para analisarmos o pedido.</p>
+        <p>Para exercer os seus direitos ou colocar questões sobre dados pessoais, contacte <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. O contacto por email envolve o tratamento dos dados que fornecer; o serviço de email utiliza um prestador externo. Envie apenas a informação necessária para analisarmos o pedido.</p>
       </InfoSection>
       <InfoSection id="privacy-commitment" title="Compromisso">
-        <p>O Open Évora não deve introduzir formulários de recolha de dados pessoais, analytics adicionais, cookies não essenciais ou mecanismos semelhantes sem rever e atualizar previamente esta informação.</p>
+        <p>O Open Évora não deve introduzir formulários de recolha de dados pessoais, analytics, medição de desempenho, cookies não essenciais ou mecanismos semelhantes sem rever e atualizar previamente esta informação.</p>
       </InfoSection>
     </>,
   },

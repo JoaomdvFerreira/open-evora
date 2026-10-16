@@ -194,6 +194,15 @@ main {
   width: 100%;
 }
 
+/* The whole Record Detail container receives programmatic focus on arrival
+   (tabindex="-1", never in the tab order) so assistive technology lands on
+   the new content. It is not an interactive control, so it draws no focus
+   ring around the entire page; every interactive descendant keeps the
+   global :focus-visible outline. */
+.record-detail-focus-target:focus {
+  outline: none;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;

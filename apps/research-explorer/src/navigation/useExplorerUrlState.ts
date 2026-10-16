@@ -4,6 +4,15 @@ import { parseUrlState, serializeUrlState, type ExplorerUrlState, type ExplorerV
 import type { GraphDepth } from "../graph/neighbourhood";
 
 /**
+ * How the current location was reached: the document's initial load (direct
+ * URL, bookmark, reload), an in-app `push` navigation, or a browser
+ * Back/Forward `pop`. Lets a destination decide whether it owns the scroll
+ * position (a fresh in-app navigation opens at the top) or must leave it to
+ * the browser (initial load and Back/Forward scroll restoration).
+ */
+export type HistoryNavigation = "load" | "push" | "pop";
+
+/**
  * Bridges ExplorerUrlState to the real address bar via native History API —
  * no React Router. Two history-write modes:
  *  - push (view, record selection, type filter): a discrete navigation the
@@ -33,9 +42,13 @@ import type { GraphDepth } from "../graph/neighbourhood";
  */
 export function useExplorerUrlState() {
   const [state, setState] = useState<ExplorerUrlState>(() => parseUrlState(window.location.search));
+  const [navigation, setNavigation] = useState<HistoryNavigation>("load");
 
   useEffect(() => {
-    const onPopState = () => setState(parseUrlState(window.location.search));
+    const onPopState = () => {
+      setNavigation("pop");
+      setState(parseUrlState(window.location.search));
+    };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
@@ -80,6 +93,7 @@ export function useExplorerUrlState() {
     if (serializeUrlState(normalized) === serializeUrlState(state)) return;
     const hash = fragment ? `#${encodeURIComponent(fragment)}` : "";
     window.history.pushState(null, "", (serializeUrlState(normalized) || window.location.pathname) + hash);
+    setNavigation("push");
     setState(normalized);
   }
 
@@ -96,6 +110,7 @@ export function useExplorerUrlState() {
 
   return {
     state,
+    navigation,
     setView: (view: ExplorerView) => push({ ...state, view }),
     setSelectedId: (selectedId: string | null) => push({ ...state, selectedId }),
     setQuery: (query: string) => replace({ ...state, query }),

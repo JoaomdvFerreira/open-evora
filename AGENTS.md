@@ -186,6 +186,27 @@ Before handing work back:
 
 Do not claim validation that was not performed.
 
+### Pre-launch branch discipline
+
+For the approved pre-launch sequence, use one local branch and make one
+independent commit for each completed action. Run appropriate tests and
+`git diff --check` after each action. Before the first push, inspect the
+accumulated diff for unnecessary personal data, private correspondence,
+credentials, secrets, local-machine state, and material with uncertain
+publication or reuse rights. Apply the publication boundary above; the first
+push containing canonical research requires explicit owner authorization for
+external publication. Do not push or open the consolidated pull request until
+that authorization is given. Push authorization is not merge approval. The
+owner alone merges after independent review and deterministic validation.
+
 ### Direct canonical research changes
 
-The active canonical-research workflow is: edit locally → `npm run research:check` → `git diff --check` → local commit → independent owner-side semantic review of the exact commit/diff → explicit owner publication authorization → push/PR → deterministic CI → owner merge. The implementation agent must not approve its own semantic change. Before publication, hand off the exact local commit SHA, the canonical files changed, and the exact canonical Git diff/patch for that commit. Do not create a repository review artifact. A local commit is not external publication; no canonical research may be pushed or included in a PR before explicit owner authorization. The semantic-review and publication-safety policy is owned by `docs/investigationstrategy.md` §12.
+Canonical research changes require `npm run research:check`, independent
+owner-side semantic review and an owner Gate 1 decision under
+`docs/investigationstrategy.md` §12. The implementation agent must not approve
+its own semantic change. A local commit is not external publication; no
+canonical research may be pushed or included in a PR before explicit owner
+publication authorization. Independent semantic review may take place in the
+consolidated pre-launch PR after that authorization and before owner merge.
+The research-review method and workflow are owned by
+`docs/investigationstrategy.md` §12.

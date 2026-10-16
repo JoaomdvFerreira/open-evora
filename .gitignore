@@ -4,6 +4,7 @@ Thumbs.db
 .env
 .env.*
 /.research-workbench/
+/.aiqt/
 .playwright-mcp/
 node_modules/
 /prompts
