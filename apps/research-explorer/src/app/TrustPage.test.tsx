@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -244,6 +244,22 @@ it("explains record types, the limits of statements and reports, and every closu
   for (const reason of ["resolução demonstrada", "ausência de demonstração da sua manifestação atual", "falta de informação que permita continuar a acompanhá-lo", "substituição por outro registo", "exclusão do âmbito do projeto"]) expect(closure.textContent).toContain(reason);
   expect(closure.textContent).toContain("Encerramento não significa necessariamente resolução.");
   expect(screen.getByRole("link", { name: "Registos fora do âmbito" }).getAttribute("href")).toBe("/out-of-scope");
+});
+
+it("explains each supported evidence and validation status at a direct fragment target", () => {
+  const scrollIntoView = vi.fn();
+  const previousScrollIntoView = HTMLElement.prototype.scrollIntoView;
+  HTMLElement.prototype.scrollIntoView = scrollIntoView;
+  renderInformationPage("/methodology#methodology-investigation-status");
+  const section = screen.getByRole("region", { name: "Estados da investigação" });
+  expect(section.querySelector("h2")?.id).toBe("methodology-investigation-status");
+  for (const label of ["Evidência: Identificada", "Evidência: Corroborada", "Validação: Por validar", "Validação: Parcialmente validada", "Validação: Validada"]) {
+    expect(within(section).getByText(label)).toBeTruthy();
+  }
+  expect(section.textContent).toContain("Corroborar a evidência não substitui validar a leitura do Problema.");
+  expect(section.textContent).toContain("não demonstra que o Problema esteja resolvido ou que a situação descrita se mantenha atual");
+  expect(scrollIntoView).toHaveBeenCalledOnce();
+  HTMLElement.prototype.scrollIntoView = previousScrollIntoView;
 });
 
 it("discloses AI assistance and human editorial control without claiming exhaustive verification", () => {

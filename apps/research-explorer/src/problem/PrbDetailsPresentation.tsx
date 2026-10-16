@@ -181,6 +181,7 @@ function PrbInvestigationStateSection({ data }: { data: PrbDetailsData }) {
               </div>
             )}
           </dl>
+          <p className="prb-state-method-link"><a href="/methodology#methodology-investigation-status">O que significam estes estados?</a></p>
         </div>
         <div className="prb-scope-block">
           <h3 className="detail-panel-label">Base da investigação</h3>

@@ -76,6 +76,11 @@ it("archives only CLOSED OUT_OF_SCOPE Problems from every Overview surface and p
   expect(screen.queryByText("PRB-ARCHIVED")).toBeNull();
   expect(screen.queryByText("Registo municipal arquivado")).toBeNull();
   expect(screen.getByText("4", { selector: ".overview-metric-value" }).closest(".overview-metric")?.textContent).toBe("4 Total de registos");
+  expect(screen.getByRole("list", { name: "Números da investigação" }).querySelector("li")?.textContent).toBe("1 Problema");
+  const scope = screen.getByText(/O número de Problemas conta os que estão em investigação/);
+  expect(scope.textContent).toContain("O total exclui apenas os registos fora do âmbito");
+  expect(within(scope).getByRole("link", { name: "registos fora do âmbito" }).getAttribute("href")).toBe("/out-of-scope");
+  expect(within(scope).getByRole("link", { name: "Registos" }).getAttribute("href")).toBe("/?view=records");
 
   const user = userEvent.setup();
   await user.type(screen.getByLabelText("Pesquisar problemas"), "PRB-ARCHIVED");

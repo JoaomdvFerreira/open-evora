@@ -149,6 +149,10 @@ body:has(.info-page) .public-footer {
   text-transform: uppercase;
 }
 
+#methodology-investigation-status {
+  scroll-margin-top: 64px;
+}
+
 /* A section whose body is running text keeps the rule-free heading of the
    targets (Validação, Compromisso): the text reads straight beneath it. */
 .info-section-title:has(+ p) {

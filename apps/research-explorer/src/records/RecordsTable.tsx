@@ -190,6 +190,7 @@ export function RecordsTable({
           <p className="records-lede">
             Problemas, fontes e evidências que compõem a investigação. Cada registo tem um identificador estável para citação.
           </p>
+          <p className="records-scope">Esta lista inclui a coleção completa, incluindo os <a href="/out-of-scope">registos fora do âmbito</a> excluídos do total da Visão geral.</p>
         </header>
 
         <div className="records-filter-bar">
