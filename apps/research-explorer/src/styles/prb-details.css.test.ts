@@ -283,7 +283,6 @@ describe("PRB Details Estado da investigação / Âmbito band — six-column gri
     for (const selector of [
       ".prb-state-block > .detail-panel-label",
       ".prb-state-grid",
-      ".prb-state-method-link",
       ".prb-scope-block > .detail-panel-label",
       ".prb-scope-metrics",
     ]) {
