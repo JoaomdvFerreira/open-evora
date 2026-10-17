@@ -191,9 +191,7 @@ describe("PrbDetailsPresentation — generic PRB Details composition", () => {
     expect(screen.getByText("Aberto")).toBeTruthy();
     expect(screen.getByText("Identificada")).toBeTruthy();
     expect(screen.getByText("Por validar")).toBeTruthy();
-    const link = screen.getByRole("link", { name: "O que significam estes estados?" });
-    expect(link.getAttribute("href")).toBe("/methodology#methodology-investigation-status");
-    expect(link.closest("section")?.id).toBe("prb-estado");
+    expect(screen.queryByRole("link", { name: "O que significam estes estados?" })).toBeNull();
   });
 
   it("omits state dimension items entirely when their canonical field is absent, never a placeholder", () => {

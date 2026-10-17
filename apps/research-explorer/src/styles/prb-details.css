@@ -321,14 +321,6 @@
   grid-column: 1 / 4;
 }
 
-.prb-state-method-link {
-  grid-column: 1 / 4;
-  grid-row: 3;
-  margin: 0 0 16px;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
 .prb-scope-metrics {
   grid-column: 4 / 7;
 }
@@ -1109,7 +1101,6 @@ body:has(.prb-details-view) .public-footer {
 
   .prb-state-block > .detail-panel-label,
   .prb-state-grid,
-  .prb-state-method-link,
   .prb-scope-block > .detail-panel-label,
   .prb-scope-metrics {
     grid-column: 1 / -1;
