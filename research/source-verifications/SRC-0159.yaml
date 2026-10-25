@@ -6,7 +6,7 @@ retrieval:
   archive_reference: https://gdoc.uevora.pt/671276
 verified_claims:
   - locator: "P. 1, gráfico Número total de estudantes alojados em residência universitária"
-    statement: "O gráfico apresenta um valor por ano letivo de 2019/20 a 2025/26, sem rótulos numéricos; pela escala, os valores ficam entre 400 e 600 até 2023/24 e entre 600 e 700 em 2024/25 e 2025/26."
+    statement: "O gráfico apresenta um valor por ano letivo de 2019/20 a 2025/26, sem rótulos numéricos; numa leitura visual aproximada da escala, as barras ficam entre cerca de 400 e 600 até 2023/24 e entre cerca de 600 e 700 em 2024/25 e 2025/26."
   - locator: "P. 1, gráfico Estudantes alojados"
     statement: "O gráfico distingue estudantes bolseiros e não bolseiros alojados, de 2019/20 a 2024/25, sem rótulos numéricos."
   - locator: "P. 2, gráficos por residência"

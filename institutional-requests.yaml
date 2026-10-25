@@ -68,16 +68,16 @@ requests:
     response_date: null
     follow_up_decision: Verificar primeiro os indicadores públicos e a documentação das competências.
   - request_id: IREQ-0007
-    prb_references: [PRB-0009, PRB-0010]
+    prb_references: [PRB-0009]
     intended_recipient: União das Freguesias de Bacelo e Senhora da Saúde
     requested_information: Relatório de atividades de julho a setembro de 2026, incluindo informação sobre higiene urbana disponível por zona.
     why_needed: Completar a revisão documental da atividade após a reorganização.
-    already_known_sources: [SRC-0151, PRB-0009, PRB-0010]
+    already_known_sources: [SRC-0151, PRB-0009]
     last_known_contact_state: Relatório obtido por consulta pública em 15 de outubro de 2026 e integrado na investigação; sem contacto documentado.
     authorization_status: Envio não autorizado; o documento pedido já foi consultado.
     send_date: null
     response_date: null
-    follow_up_decision: Pedido considerado desnecessário e mantido apenas como registo histórico; não solicitar o relatório. Continuam sem resposta pública as datas e desfechos de cada ocorrência e os resultados e a localização do levantamento de arruamentos referido pela junta; qualquer novo pedido sobre estes pontos exige reformulação própria e autorização expressa do owner.
+    follow_up_decision: Pedido considerado desnecessário e mantido apenas como registo histórico; não solicitar o relatório. Continuam sem resposta pública as datas e desfechos de cada ocorrência. Os resultados e a localização do levantamento de arruamentos referido pela junta não fazem parte deste pedido; qualquer pedido sobre estes pontos seria um pedido separado, ainda não preparado nem autorizado, e exige autorização expressa do owner.
   - request_id: IREQ-0008
     prb_references: [PRB-0009]
     intended_recipient: Assembleia Municipal de Évora
