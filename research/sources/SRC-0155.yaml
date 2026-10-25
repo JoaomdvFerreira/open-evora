@@ -35,4 +35,4 @@ temporal:
   update_frequency: irregular
 caveats:
   - Os campos de data de encerramento e de preço efetivo total do registo não estavam preenchidos na consulta de 25 de outubro de 2026.
-  - O registo inclui em anexo o texto do contrato, publicado com dados pessoais ocultados.
+  - O registo lista um documento anexo com o texto do contrato.
