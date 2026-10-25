@@ -1,6 +1,6 @@
 problem_id: PRB-0006
 created_at: "2026-08-28"
-updated_at: "2026-10-14"
+updated_at: "2026-10-25"
 title: "Alojamento estudantil em Évora: lugares disponíveis e procura não satisfeita"
 domain: [HOU, EDU]
 geography:
@@ -17,7 +17,12 @@ problem_statement: >-
   a Universidade comunicou financiamento aprovado para mais 105 camas, sem
   comprovar entrega ou funcionamento. A publicação de maio de 2026 sobre a
   reabilitação da Residência Manuel Álvares não confirma a conclusão das obras,
-  a reabertura ou a capacidade disponível. Os SASUÉ dizem dispor de dados
+  a reabertura ou a capacidade disponível. Em outubro de 2026, o reitor afirmou
+  que as obras de requalificação estavam praticamente a terminar e que a
+  Universidade vai ter 515 camas requalificadas, sem explicar a relação com os
+  525 lugares nominais; segundo a imprensa, a Residência António Gedeão estava
+  encerrada para obras no início desse mês. A capacidade disponível em
+  2026/2027 não está confirmada. Os SASUÉ dizem dispor de dados
   agregados sobre candidaturas e colocações, mas não forneceram os valores;
   a procura atual não satisfeita permanece por quantificar.
 investigation:
@@ -33,6 +38,14 @@ investigation:
       latest_result: >-
         Os SASUÉ referiram em agosto de 2026 dispor de informação agregada sobre
         candidaturas, vagas, não colocados, listas de espera e tempos de decisão.
+        Os gráficos públicos dos SASUÉ mostram o número de estudantes alojados
+        em residência por ano letivo, mas não candidaturas, vagas ou listas de
+        espera. Em outubro de 2026, segundo a imprensa, um inquérito da
+        Associação Académica a 300 estudantes indicou que 85,7% dos
+        participantes que vivem fora da cidade sem alojamento em Évora apontaram
+        o custo do alojamento ou a falta de oferta como razão; a divulgação
+        indica que os resultados não podem ser extrapolados para o conjunto dos
+        estudantes.
       current_action: >-
         Está preparado, mas não enviado, um pedido aos SASUÉ de séries anuais
         comparáveis, quando disponíveis, sobre candidaturas, vagas, colocados,
@@ -40,7 +53,7 @@ investigation:
       resolution_condition: >-
         Dados agregados por ano letivo, com definições suficientes para comparar
         candidaturas, lugares disponíveis, colocações e procura não satisfeita.
-      evidence: [EVD-000126, EVD-000043]
+      evidence: [EVD-000126, EVD-000043, EVD-000197, EVD-000199]
     - question: >-
         Quantos lugares estão efetivamente disponíveis nas residências da
         Universidade de Évora e qual é o estado das 105 camas adicionais para
@@ -49,21 +62,35 @@ investigation:
       why_open: >-
         A capacidade publicada é nominal; o financiamento aprovado e a publicação
         sobre a Residência Manuel Álvares não estabelecem entrega, reabertura ou
-        capacidade efetiva atual.
+        capacidade efetiva atual. As 515 camas requalificadas referidas pelo
+        reitor são um resultado esperado das obras, e os números de estudantes
+        alojados publicados pelos SASUÉ não indicam o critério de contagem;
+        nenhum destes valores mede os lugares utilizáveis em 2026/2027.
       latest_result: >-
         A informação institucional documenta 525 lugares nominais em sete
         residências, encerramentos temporários em 2025/2026, financiamento
         aprovado em 2022 para 105 camas e uma publicação de maio de 2026 sobre
-        reabilitação, sem confirmar os resultados dessas intervenções.
+        reabilitação, sem confirmar os resultados dessas intervenções. Numa
+        entrevista publicada em 9 de outubro de 2026, o reitor afirmou que as
+        obras de requalificação financiadas pelo PRR estavam praticamente a
+        terminar e que a Universidade vai ter as 515 camas requalificadas, e
+        descreveu um plano para quase duplicar o número de camas. Segundo a
+        imprensa, a Residência António Gedeão estava encerrada para obras entre
+        3 e 10 de outubro de 2026. Os gráficos dos SASUÉ, atualizados em maio de
+        2026, situam entre 600 e 700 os estudantes alojados em 2024/25 e
+        2025/26, sem definir como são contados.
       current_action: >-
-        Está por verificar se comunicações públicas atuais da Universidade e dos
-        SASUÉ esclarecem reaberturas, encerramentos, capacidade efetiva, se as
-        105 camas adicionais com financiamento PRR aprovado foram entregues ou
-        entraram em funcionamento, e a execução da reabilitação documentada.
+        A informação pública consultada até 25 de outubro de 2026 não confirma
+        a capacidade em funcionamento em 2026/2027, a reabertura da Residência
+        António Gedeão, a relação entre as 515 camas requalificadas e os 525
+        lugares nominais, nem se as 105 camas adicionais com financiamento PRR
+        aprovado foram entregues. O pedido de informação aos SASUÉ sobre
+        capacidade, critérios de contagem e procura não satisfeita ainda não
+        foi enviado.
       resolution_condition: >-
         Informação institucional atual que distinga lugares nominais de lugares
         utilizáveis e confirme o estado de cada expansão ou reabilitação.
-      evidence: [EVD-000043, EVD-000145, EVD-000100]
+      evidence: [EVD-000043, EVD-000145, EVD-000100, EVD-000196, EVD-000198, EVD-000199]
   path:
     initial_signal:
       summary: >-
@@ -86,7 +113,10 @@ investigation:
         mais amplo não mede por si só a manifestação na cidade.
         A habitação municipal a preços comportáveis e as respetivas intervenções
         são tratadas separadamente no problema sobre habitação a preços comportáveis em Évora.
-      evidence: [EVD-000043, EVD-000126, EVD-000031]
+        As 515 camas requalificadas anunciadas em outubro de 2026 não foram
+        tratadas como capacidade em funcionamento, e o inquérito da Associação
+        Académica não foi usado para estimar a procura de todos os estudantes.
+      evidence: [EVD-000043, EVD-000126, EVD-000031, EVD-000196, EVD-000197]
 evidence:
   - evidence_id: EVD-000031
     effects: [REFINES]
@@ -109,6 +139,18 @@ evidence:
   - evidence_id: EVD-000126
     effects: [BOUNDS, REFINES]
     research_roles: [LOCAL_OBSERVATION]
+  - evidence_id: EVD-000196
+    effects: [BOUNDS, REFINES]
+    research_roles: [PLANNED_RESPONSE]
+  - evidence_id: EVD-000197
+    effects: [REFINES, BOUNDS]
+    research_roles: [LOCAL_OBSERVATION]
+  - evidence_id: EVD-000198
+    effects: [BOUNDS, REFINES]
+    research_roles: [LOCAL_OBSERVATION]
+  - evidence_id: EVD-000199
+    effects: [BOUNDS, REFINES]
+    research_roles: [EXISTING_RESPONSE]
 evidence_status: corroborated
 validation_status: unvalidated
 digital_tractability: not_assessed
@@ -136,6 +178,18 @@ history:
       O âmbito passou a ser a cidade de Évora; o planeamento municipal
       mais amplo passou a contexto e foi retirada imprensa secundária que não
       era necessária à formulação do alojamento estudantil na cidade.
+  - date: 2026-10-25
+    summary: >-
+      Foram integradas a declaração do reitor sobre 515 camas requalificadas
+      e o plano de expansão, a informação noticiada sobre o encerramento da
+      Residência António Gedeão para obras em outubro de 2026, os gráficos
+      dos SASUÉ sobre estudantes alojados e um inquérito da Associação
+      Académica com resultados limitados aos participantes. A investigação
+      passou a distinguir lugares nominais, camas requalificadas e lugares
+      utilizáveis. A capacidade em funcionamento em 2026/2027 e a procura não
+      satisfeita continuam por quantificar; os estados canónicos permanecem
+      inalterados.
+    evidence: [EVD-000196, EVD-000197, EVD-000198, EVD-000199]
 decision_basis:
   contract_version: "0.1"
   eligibility_basis: >-

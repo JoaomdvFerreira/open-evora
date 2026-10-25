@@ -1,0 +1,35 @@
+source_id: SRC-0158
+publisher: O Digital
+creators:
+  - Hugo Calado
+name: Há estudantes a percorrer mais de 100 quilómetros para estudar em Évora. Associação Académica está preocupada
+resource_type: webpage
+scope:
+  geography:
+    level: city
+    area: Évora
+  temporal:
+    start: 2026-10-03
+    end: 2026-10-10
+  domains:
+    - EDU
+    - HOU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://odigital.sapo.pt/estudo-alojamento-estudantes-evora-rendas-deslocacoes/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-10-14
+  last_checked_at: 2026-10-25
+  update_frequency: one_off
+caveats:
+  - A peça relata um inquérito da Associação Académica da Universidade de Évora; o estudo não foi localizado publicado na íntegra e a peça não descreve o método de recrutamento dos participantes nem o número de respostas em cada subgrupo.
+  - A peça indica que os resultados dizem respeito apenas aos 300 participantes e não podem ser extrapolados para o conjunto dos estudantes da Universidade de Évora.

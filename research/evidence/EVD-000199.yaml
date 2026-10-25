@@ -1,0 +1,27 @@
+evidence_id: EVD-000199
+provenance:
+  sources:
+    - SRC-0159
+  extracted_at: 2026-10-25
+observation:
+  summary: >-
+    O documento Estatísticas - Alojamento dos Serviços de Ação Social da Universidade de Évora, atualizado em 7 de maio de 2026, apresenta em gráfico o número total de estudantes alojados em residência universitária por ano letivo, de 2019/20 a 2025/26. Os valores não têm rótulos numéricos; pela escala do gráfico, situam-se entre 400 e 600 de 2019/20 a 2023/24 e entre 600 e 700 em 2024/25 e 2025/26. Outro gráfico distingue estudantes bolseiros e não bolseiros alojados até 2024/25.
+scope:
+  geography:
+    level: city
+    area: Residências da Universidade de Évora, cidade de Évora
+  populations:
+    - estudantes alojados em residências da Universidade de Évora
+  temporal:
+    start: "2019"
+    end: "2026"
+domains:
+  - EDU
+  - HOU
+evidence_nature: measurement
+claim_authority: authoritative
+inference_limits:
+  - Os valores são lidos na escala dos gráficos, sem precisão unitária.
+  - O documento não define o critério de contagem; não indica se conta estudantes distintos alojados ao longo do ano ou a ocupação num dado momento, pelo que não mede a capacidade das residências.
+  - O documento não indica se o ano letivo 2025/26 estava completo à data da atualização.
+  - O documento não apresenta candidaturas, colocações recusadas nem listas de espera e não quantifica a procura não satisfeita.

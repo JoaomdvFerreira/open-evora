@@ -1,0 +1,24 @@
+evidence_id: EVD-000198
+provenance:
+  sources:
+    - SRC-0158
+  extracted_at: 2026-10-25
+observation:
+  summary: >-
+    Segundo o O Digital, a Residência António Gedeão não foi considerada no inquérito da Associação Académica, realizado entre 3 e 10 de outubro de 2026, por se encontrar encerrada para obras de reabilitação à data da realização do estudo.
+scope:
+  geography:
+    level: site
+    area: Residência António Gedeão, Universidade de Évora
+  temporal:
+    start: 2026-10-03
+    end: 2026-10-10
+domains:
+  - EDU
+  - HOU
+evidence_nature: claim
+claim_authority: non_authoritative
+inference_limits:
+  - A informação é relatada pela imprensa a partir da Associação Académica, sem confirmação dos Serviços de Ação Social ou da Universidade.
+  - Não indica a data prevista de reabertura nem o número de camas indisponíveis.
+  - Não estabelece a situação das outras residências nem a capacidade total disponível no ano letivo 2026/2027.

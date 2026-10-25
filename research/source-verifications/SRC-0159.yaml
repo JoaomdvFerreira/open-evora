@@ -1,0 +1,15 @@
+source_id: SRC-0159
+retrieval:
+  retrieved_at: "2026-10-25"
+  content_sha256: e68413e045263cd9e69107264f39659c05782ef7a280ab566a831648db5291ee
+  media_type: application/pdf
+  archive_reference: https://gdoc.uevora.pt/671276
+verified_claims:
+  - locator: "P. 1, gráfico Número total de estudantes alojados em residência universitária"
+    statement: "O gráfico apresenta um valor por ano letivo de 2019/20 a 2025/26, sem rótulos numéricos; pela escala, os valores ficam entre 400 e 600 até 2023/24 e entre 600 e 700 em 2024/25 e 2025/26."
+  - locator: "P. 1, gráfico Estudantes alojados"
+    statement: "O gráfico distingue estudantes bolseiros e não bolseiros alojados, de 2019/20 a 2024/25, sem rótulos numéricos."
+  - locator: "P. 2, gráficos por residência"
+    statement: "Os gráficos de estudantes bolseiros e não bolseiros alojados por residência abrangem sete residências e os anos letivos de 2020/21 a 2024/25."
+  - locator: "Documento completo"
+    statement: "O documento não define o critério de contagem dos estudantes alojados nem apresenta candidaturas, vagas ou listas de espera."

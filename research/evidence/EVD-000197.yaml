@@ -1,0 +1,27 @@
+evidence_id: EVD-000197
+provenance:
+  sources:
+    - SRC-0158
+  extracted_at: 2026-10-25
+observation:
+  summary: >-
+    Segundo o O Digital, a Associação Académica da Universidade de Évora apresentou em 13 de outubro de 2026 um inquérito sobre alojamento estudantil, realizado entre 3 e 10 de outubro com 300 participantes. Entre os participantes que residem fora da cidade e não têm alojamento em Évora, 50,1% percorrem mais de 100 quilómetros e 85,7% indicaram o custo do alojamento ou a falta de oferta como origem da decisão de continuar a viver fora da cidade. Entre os participantes que precisaram de encontrar habitação na cidade, 66,4% vivem em quartos arrendados, 15,3% em residências universitárias públicas e 10,6% em residências privadas; o encargo médio mensal de um estudante deslocado com alojamento em Évora é de cerca de 362 euros. A peça indica que os resultados dizem respeito apenas aos participantes e não podem ser extrapolados para o conjunto dos estudantes.
+scope:
+  geography:
+    level: city
+    area: Évora
+  populations:
+    - estudantes da Universidade de Évora que participaram no inquérito da Associação Académica
+  temporal:
+    start: 2026-10-03
+    end: 2026-10-10
+domains:
+  - EDU
+  - HOU
+evidence_nature: claim
+claim_authority: non_authoritative
+inference_limits:
+  - Os resultados são relatados pela imprensa; o estudo não foi consultado na íntegra.
+  - A amostra de 300 participantes não é apresentada como representativa; o método de recrutamento e o número de respostas em cada subgrupo não são indicados.
+  - As percentagens não quantificam a procura não satisfeita de alojamento estudantil nem o número de estudantes que vivem fora da cidade por falta de alojamento.
+  - A presidente da Associação Académica manifestou reservas sobre a representatividade de pelo menos um dos resultados, segundo a peça.
