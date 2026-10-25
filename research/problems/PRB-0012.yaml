@@ -1,6 +1,6 @@
 problem_id: PRB-0012
 created_at: 2026-08-28
-updated_at: 2026-10-15
+updated_at: 2026-10-25
 title: Escola Básica do Chafariz d'El-Rei fechada desde novembro de 2025
 domain:
   - EDU
@@ -43,7 +43,10 @@ investigation:
       why_open: O âmbito técnico da intervenção pode depender da avaliação da
         laje superior; não estão documentados marcos contratuais ou de execução
         que permitam confirmar o calendário de reabertura.
-      current_action: Pedido de informação ao Município preparado, não enviado.
+      current_action: Em 25 de outubro de 2026 foi enviado à área de Educação
+        da Câmara Municipal um pedido de informação sobre a avaliação técnica do
+        edifício, a contratação e o calendário da reabilitação; aguarda-se
+        resposta.
       resolution_condition: Evidência institucional que estabeleça os trabalhos
         necessários, o estado de execução e marcos verificáveis para a
         reabertura.

@@ -1,6 +1,6 @@
 problem_id: PRB-0011
 created_at: 2026-08-28
-updated_at: 2026-10-14
+updated_at: 2026-10-25
 title: Barreiras de língua no acesso à saúde para migrantes em Évora
 domain:
   - SOC
@@ -39,8 +39,9 @@ investigation:
         de associações de migrantes e comunitárias e dos meios de comunicação
         locais. Esta ausência de informação pública não demonstra que as
         barreiras não existam.
-      current_action: O pedido de informação à ULS do Alentejo Central está
-        preparado e ainda não foi enviado.
+      current_action: Em 25 de outubro de 2026 foi enviado à ULS do Alentejo
+        Central um pedido de informação agregada sobre interpretação, tradução e
+        mediação cultural nas unidades de saúde da cidade; aguarda-se resposta.
       resolution_condition: Informação agregada recente das unidades de saúde
         da cidade ou relatos verificáveis de pessoas que nelas procuraram
         cuidados, suficientes para estabelecer se ocorreram barreiras em 2025
@@ -69,12 +70,15 @@ investigation:
         não foi encontrada informação documentada dos serviços de saúde que
         estabeleça se interpretação, tradução ou mediação reduziram barreiras
         de língua na cidade."
-      current_action: O pedido de informação à ULS do Alentejo Central está
-        preparado e ainda não foi enviado. Não há números
-        agregados verificados sobre a execução e os resultados do Acolher no
-        VAGAR, nem sobre a utilização e os encaminhamentos do CLAIM. Os pedidos
-        ao Município e à Universidade estão em rascunho e não foram enviados;
-        cada envio exige autorização própria.
+      current_action: Em 25 de outubro de 2026 foram enviados três pedidos de
+        informação distintos, todos a aguardar resposta. À ULS do Alentejo
+        Central, sobre interpretação, tradução e mediação nas unidades de saúde
+        da cidade; à equipa do projeto Acolher no VAGAR do Município, sobre as
+        atividades realizadas, a participação e os apoios relacionados com a
+        língua e com o acesso à saúde; e à Universidade de Évora, sobre o
+        funcionamento e a utilização do CLAIM. Não há números agregados
+        verificados sobre a execução e os resultados do Acolher no VAGAR, nem
+        sobre a utilização e os encaminhamentos do CLAIM.
       resolution_condition: Informação específica, datada e verificável que
         permita distinguir, para cada apoio, a disponibilidade efetiva, a
         população e a área abrangidas, a utilização quando registada, os

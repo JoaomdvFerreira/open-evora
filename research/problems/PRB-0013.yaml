@@ -1,6 +1,6 @@
 problem_id: PRB-0013
 created_at: "2026-10-12"
-updated_at: "2026-10-15"
+updated_at: "2026-10-25"
 title: "Habitação a preços comportáveis em Évora: necessidade identificada e respostas municipais"
 domain: [HOU, SOC]
 geography:
@@ -47,11 +47,12 @@ investigation:
         Está por verificar se informação pública municipal atual identifica as
         restantes intervenções situadas na cidade e as respetivas conclusões,
         entregas e ocupações, incluindo o estado posterior à informação de
-        2025 sobre a Rua Alexandre Rosado. Está preparado, mas não enviado, um
-        pedido ao Município para desagregar por localização o programa de 459
-        habitações, indicar os números da cidade concluídos, entregues e
-        ocupados, quando disponíveis, e esclarecer se as 12 casas da Malagueira
-        e a intervenção da Rua Alexandre Rosado integram essa contagem.
+        2025 sobre a Rua Alexandre Rosado. Em 25 de outubro de 2026 foi enviado
+        à Habévora um pedido de informação para desagregar por localização o
+        programa de 459 habitações, indicar os números da cidade concluídos,
+        entregues e ocupados, quando disponíveis, e esclarecer se as 12 casas da
+        Malagueira e a intervenção da Rua Alexandre Rosado integram essa
+        contagem; aguarda-se resposta.
       resolution_condition: >-
         Informação municipal com localização que distinga financiamento, obra,
         conclusão, entrega e ocupação na cidade e esclareça a relação da
