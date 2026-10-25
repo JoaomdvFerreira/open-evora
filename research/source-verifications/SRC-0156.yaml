@@ -1,0 +1,15 @@
+source_id: SRC-0156
+retrieval:
+  retrieved_at: "2026-10-25"
+  content_sha256: 8ac960ef1f0581fd25e98534f66f59059ae9eb2148b993aa32f6d0da048b9b9a
+  media_type: text/plain
+  archive_reference: https://www.base.gov.pt/Base4/pt/detalhe/?type=contratos&id=15771848
+verified_claims:
+  - locator: "Registo do contrato n.º 15771848, campos de objeto, entidade adjudicante, adjudicatário e tipo de procedimento"
+    statement: "O registo identifica um contrato de aquisição de serviços, por ajuste direto em regime geral, entre o Município de Évora e a mpt - mobilidade e planeamento do território, para adequação/revisão do Plano de Mobilidade Urbana Sustentável de Évora."
+  - locator: "Registo do contrato n.º 15771848, campo de objeto"
+    statement: "O objeto refere o Fundo de Transportes relativo ao Aviso n.º 5/2024, de apoio ao desenvolvimento de Planos de Mobilidade Urbana Sustentável."
+  - locator: "Registo do contrato n.º 15771848, campos de data de celebração e de data de publicação"
+    statement: "O registo indica que o contrato foi celebrado em 18 de junho de 2026 e publicado no portal em 14 de outubro de 2026."
+  - locator: "Registo do contrato n.º 15771848, campos de preço contratual inicial, prazo de execução, data de encerramento e preço efetivo total"
+    statement: "O registo indica um preço contratual inicial de 57 000 euros e um prazo de execução de 182 dias; na consulta, os campos de data de encerramento e de preço efetivo total estavam vazios."

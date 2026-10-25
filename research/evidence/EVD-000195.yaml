@@ -1,0 +1,22 @@
+evidence_id: EVD-000195
+provenance:
+  sources:
+    - SRC-0156
+  extracted_at: 2026-10-25
+observation:
+  summary: >-
+    O registo do contrato n.º 15771848 no Portal BASE, publicado em 14 de outubro de 2026, indica que o Município de Évora celebrou em 18 de junho de 2026, por ajuste direto, um contrato de aquisição de serviços para adequação/revisão do Plano de Mobilidade Urbana Sustentável de Évora com a mpt - mobilidade e planeamento do território, com preço contratual inicial de 57 000 euros e prazo de execução de 182 dias. O objeto refere o Fundo de Transportes, Aviso n.º 5/2024, de apoio ao desenvolvimento de Planos de Mobilidade Urbana Sustentável.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: 2026-06-18
+domains:
+  - MOB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - O contrato documenta a contratação de serviços de adequação/revisão do plano, não a conclusão ou aprovação de uma versão revista.
+  - O registo não descreve o conteúdo da revisão nem indica se abrange a rede ciclável ou a informação ao passageiro.
+  - A revisão do plano não estabelece que as medidas do plano anterior tenham sido executadas, abandonadas ou reprogramadas.
