@@ -1,5 +1,7 @@
 # Non-canonical information backlog. It does not authorize contact or change PRB state.
 # Dates are null where the canonical record does not establish the event date.
+# send_date/response_date describe the most recent outreach. When a later send supersedes
+# an earlier contact, the earlier contact is kept unchanged in previous_contacts.
 requests:
   - request_id: IREQ-0001
     prb_references: [PRB-0001, PRB-0002]
@@ -51,22 +53,26 @@ requests:
     requested_information: Por residência e por ano letivo, de 2023/24 a 2026/27, lugares nominais, camas requalificadas e lugares efetivamente utilizáveis, com datas de encerramento e reabertura, incluindo a Residência António Gedeão; relação entre os 525 lugares nominais publicados e as 515 camas requalificadas referidas pelo reitor; critério de contagem dos estudantes alojados nas estatísticas públicas dos SASUÉ; candidaturas, colocações, não colocados e listas de espera por ano letivo, com as respetivas definições. Sem dados individuais.
     why_needed: A informação pública não distingue de forma verificável lugares nominais, camas requalificadas e oferta utilizável, e os gráficos de estudantes alojados não indicam o critério de contagem nem medem a procura não satisfeita. O inquérito da Associação Académica não é generalizável a todos os estudantes.
     already_known_sources: [SRC-0119, SRC-0157, SRC-0158, SRC-0159, PRB-0006]
-    last_known_contact_state: Contacto D5 respondido em agosto de 2026; novo pedido de dados preparado, mas não enviado.
-    authorization_status: Novo envio não autorizado.
-    send_date: null
-    response_date: 2026-08-13
-    follow_up_decision: Pedido reformulado em 25 de outubro de 2026 para incluir a capacidade em funcionamento em 2026/2027, o critério de contagem e a procura não satisfeita; não pedir o que as estatísticas públicas já mostram. Qualquer envio depende de autorização expressa do owner.
+    last_known_contact_state: Novo pedido de esclarecimento enviado pelo owner em 25 de outubro de 2026 (primeira ronda), dirigido ao alojamento dos SASUÉ; envio confirmado pelo owner, sem confirmação de entrega, receção ou leitura. O texto enviado pode diferir ligeiramente do pedido aqui descrito. Sem resposta institucional registada a este pedido; a resposta de agosto de 2026 refere-se ao contacto anterior.
+    authorization_status: Envio de 25 de outubro de 2026 realizado pelo owner; nenhum seguimento ou novo envio autorizado.
+    send_date: 2026-10-25
+    response_date: null
+    previous_contacts:
+      - send_date: null
+        response_date: 2026-08-13
+        contact_state: Contacto D5 respondido em agosto de 2026.
+    follow_up_decision: Pedido reformulado em 25 de outubro de 2026 para incluir a capacidade em funcionamento em 2026/2027, o critério de contagem e a procura não satisfeita. Resposta institucional pendente, sem prazo definido; a ausência de resposta não constitui evidência sobre o problema. Qualquer seguimento exige nova decisão expressa do owner.
   - request_id: IREQ-0006
     prb_references: [PRB-0009]
     intended_recipient: Município de Évora
     requested_information: Para a cidade de Évora depois de agosto de 2026, circuitos de recolha programados e realizados; atrasos e recolhas falhadas registados; incidentes e registos operacionais do serviço; queixas recebidas, por data e zona quando disponível; tempos de resposta e de resolução; relatórios de monitorização posteriores à reorganização; e nível de desagregação geográfica da informação disponível. Documentação sobre responsabilidades urbanas e encaminhamento de falhas.
     why_needed: Avaliar o funcionamento habitual após a reorganização e a divisão efetiva de tarefas com as juntas urbanas.
     already_known_sources: [SRC-0151, PRB-0009]
-    last_known_contact_state: Pedido de informação pendente e não enviado.
-    authorization_status: Envio não autorizado.
-    send_date: null
+    last_known_contact_state: Pedido de informação enviado pelo owner em 25 de outubro de 2026 (primeira ronda), dirigido à área de Higiene Urbana da Câmara Municipal; envio confirmado pelo owner, sem confirmação de entrega, receção ou leitura. O texto enviado pode diferir ligeiramente do pedido aqui descrito. Sem resposta institucional registada.
+    authorization_status: Envio de 25 de outubro de 2026 realizado pelo owner; nenhum seguimento ou novo envio autorizado.
+    send_date: 2026-10-25
     response_date: null
-    follow_up_decision: Verificar primeiro os indicadores públicos e a documentação das competências.
+    follow_up_decision: Resposta institucional pendente, sem prazo definido; a ausência de resposta não constitui evidência sobre o problema. Qualquer seguimento exige nova decisão expressa do owner.
   - request_id: IREQ-0007
     prb_references: [PRB-0009]
     intended_recipient: União das Freguesias de Bacelo e Senhora da Saúde
@@ -84,22 +90,22 @@ requests:
     requested_information: Documento da deliberação de 25 de setembro de 2026 e anexos sobre as tarefas de higiene urbana das juntas, se aplicáveis, incluindo o texto dos autos de transferência para as uniões de freguesias urbanas com efeitos a partir de 1 de janeiro de 2027, as tarefas e mapas das áreas abrangidas e as regras de encaminhamento de pedidos e falhas entre as juntas e o Município.
     why_needed: Confirmar o alcance e a data prevista das mudanças de responsabilidade. O contrato interadministrativo de 2026 com a União das Freguesias de Bacelo e Senhora da Saúde diz respeito a refeitórios escolares, espaços de jogo e recreio e placas toponímicas e não documenta as responsabilidades de higiene urbana a partir de 2027.
     already_known_sources: [SRC-0053, SRC-0081, PRB-0009]
-    last_known_contact_state: Documento identificado, ainda não consultado; sem contacto documentado. A pesquisa pública até 25 de outubro de 2026 não localizou o texto dos autos de transferência.
-    authorization_status: Envio não autorizado.
-    send_date: null
+    last_known_contact_state: Documento identificado, ainda não consultado. A pesquisa pública até 25 de outubro de 2026 não localizou o texto dos autos de transferência. Pedido de documentação enviado pelo owner em 25 de outubro de 2026 (segunda ronda), dirigido à Assembleia Municipal; envio confirmado pelo owner em conjunto para os seis pedidos da segunda ronda, sem confirmação individual de entrega, receção ou leitura. O texto enviado pode diferir ligeiramente do pedido aqui descrito. Sem resposta institucional registada.
+    authorization_status: Envio de 25 de outubro de 2026 realizado pelo owner; nenhum seguimento ou novo envio autorizado.
+    send_date: 2026-10-25
     response_date: null
-    follow_up_decision: Verificar primeiro a publicação da deliberação e dos autos nos sítios da Assembleia Municipal e do Município; só depois, e após autorização expressa do owner, solicitar à Assembleia Municipal ou ao Município os elementos ainda em falta.
+    follow_up_decision: Resposta institucional pendente, sem prazo definido; a ausência de resposta não constitui evidência sobre o problema. Qualquer seguimento, incluindo um pedido ao Município, exige nova decisão expressa do owner.
   - request_id: IREQ-0009
     prb_references: [PRB-0010]
     intended_recipient: Município de Évora
     requested_information: Auto de consignação e data efetiva de início da empreitada geral do procedimento 4772/2026; ordens de trabalho e lista das ruas da cidade selecionadas; intervenções concluídas por rua, com datas; alterações, atrasos e estado de conclusão; levantamento técnico de fevereiro ou avaliação municipal atual do estado do pavimento nas ruas da cidade; execução das intervenções noticiadas em setembro na Estrada Nacional 114, junto à Escola do Bairro da Câmara e nas Portas da Lagoa.
     why_needed: Distinguir consignação, início e execução da empreitada geral nas ruas da cidade e avaliar as condições da cidade após as intervenções. A celebração do contrato da empreitada geral em 19 de junho de 2026, o preço contratual e o prazo já constam do Portal BASE e não são pedidos; o mesmo se aplica ao contrato do procedimento 6244/2026.
     already_known_sources: [SRC-0125, SRC-0126, SRC-0127, SRC-0138, SRC-0139, SRC-0140, SRC-0141, SRC-0147, SRC-0148, SRC-0155]
-    last_known_contact_state: Pedido pendente de preparação e não enviado.
-    authorization_status: Envio não autorizado.
-    send_date: null
+    last_known_contact_state: Pedido de informação enviado pelo owner em 25 de outubro de 2026 (primeira ronda), dirigido à área de Obras da Câmara Municipal; envio confirmado pelo owner, sem confirmação de entrega, receção ou leitura. O texto enviado pode diferir ligeiramente do pedido aqui descrito. Sem resposta institucional registada.
+    authorization_status: Envio de 25 de outubro de 2026 realizado pelo owner; nenhum seguimento ou novo envio autorizado.
+    send_date: 2026-10-25
     response_date: null
-    follow_up_decision: Preparar perguntas documentais delimitadas, sem contactar a instituição nesta fase. Verificar primeiro se as peças do procedimento referidas no contrato, como o caderno de encargos e o mapa de quantidades, identificam publicamente as ruas incluídas.
+    follow_up_decision: Resposta institucional pendente, sem prazo definido; a ausência de resposta não constitui evidência sobre o problema. Qualquer seguimento exige nova decisão expressa do owner.
   - request_id: IREQ-0011
     prb_references: [PRB-0007]
     intended_recipient: Município de Évora / DEIS
@@ -139,52 +145,63 @@ requests:
     requested_information: Informação operacional agregada para 2025 e 2026 sobre interpretação, tradução e mediação cultural nas unidades de saúde situadas na cidade de Évora, incluindo línguas apoiadas, utilização, barreiras de acesso documentadas e encaminhamentos para serviços de saúde mental. Sem dados individuais, registos identificáveis ou histórias clínicas.
     why_needed: Estabelecer se as barreiras identificadas no diagnóstico de 2023 persistem e avaliar a disponibilidade e cobertura das respostas existentes.
     already_known_sources: [SRC-0120, SRC-0122, SRC-0123, SRC-0149, PRB-0011]
-    last_known_contact_state: Pedido identificado e preparado, mas não enviado; não há contacto anterior com a ULS documentado neste registo.
-    authorization_status: Envio não autorizado.
-    send_date: null
+    last_known_contact_state: Pedido de informação enviado pelo owner em 25 de outubro de 2026 (segunda ronda), dirigido à ULS Alentejo Central; envio confirmado pelo owner em conjunto para os seis pedidos da segunda ronda, sem confirmação individual de entrega, receção ou leitura. O texto enviado pode diferir ligeiramente do pedido aqui descrito. Não há contacto anterior com a ULS documentado neste registo; sem resposta institucional registada.
+    authorization_status: Envio de 25 de outubro de 2026 realizado pelo owner; nenhum seguimento ou novo envio autorizado.
+    send_date: 2026-10-25
     response_date: null
-    follow_up_decision: Manter o pedido para autorização separada do owner antes de qualquer envio.
+    follow_up_decision: Resposta institucional pendente, sem prazo definido; a ausência de resposta não constitui evidência sobre o problema. Qualquer seguimento exige nova decisão expressa do owner.
   - request_id: IREQ-0015
     prb_references: [PRB-0012]
     intended_recipient: Município de Évora
     requested_information: Avaliação técnica do edifício, incluindo a laje superior, e projeto de reabilitação; referência e publicação do procedimento de contratação; decisão de adjudicação e contrato assinado, se aplicáveis; valor contratual e prazo de execução; datas previstas de início e conclusão dos trabalhos; condições de segurança estrutural e de reabertura; data atualmente prevista para a reabertura da Escola Básica do Chafariz d'El-Rei.
     why_needed: Esclarecer o âmbito técnico, a contratação e o calendário da reabilitação, ainda sem marcos verificáveis na pesquisa pública delimitada.
     already_known_sources: [SRC-0128, SRC-0143, SRC-0145, PRB-0012]
-    last_known_contact_state: Pedido preparado e não enviado; sem contacto documentado sobre esta reabilitação.
-    authorization_status: Envio não autorizado.
-    send_date: null
+    last_known_contact_state: Pedido de informação enviado pelo owner em 25 de outubro de 2026 (primeira ronda), dirigido à área de Educação da Câmara Municipal; envio confirmado pelo owner, sem confirmação de entrega, receção ou leitura. O texto enviado pode diferir ligeiramente do pedido aqui descrito. Sem contacto anterior documentado sobre esta reabilitação; sem resposta institucional registada.
+    authorization_status: Envio de 25 de outubro de 2026 realizado pelo owner; nenhum seguimento ou novo envio autorizado.
+    send_date: 2026-10-25
     response_date: null
-    follow_up_decision: Aguardar autorização expressa do owner antes de qualquer envio.
+    follow_up_decision: Resposta institucional pendente, sem prazo definido; a ausência de resposta não constitui evidência sobre o problema. Qualquer seguimento exige nova decisão expressa do owner.
   - request_id: IREQ-0016
     prb_references: [PRB-0011]
     intended_recipient: Município de Évora
     requested_information: Execução do projeto Acolher no VAGAR, com atividades efetivamente realizadas, períodos e área abrangida; número de participantes, quando disponível; apoios relacionados com a língua e com o acesso à saúde; encaminhamentos agregados e avaliações do projeto, quando existam. Sem dados individuais, registos identificáveis ou informação clínica.
     why_needed: A ficha do projeto apresenta medidas previstas e metas, que não estabelecem a execução nem resultados no acesso à saúde na cidade.
     already_known_sources: [SRC-0120, SRC-0122, PRB-0011]
-    last_known_contact_state: Pedido em rascunho, não enviado; sem contacto documentado sobre este projeto.
-    authorization_status: Envio não autorizado.
-    send_date: null
+    last_known_contact_state: Pedido de informação enviado pelo owner em 25 de outubro de 2026 (segunda ronda), dirigido à equipa do projeto Acolher no VAGAR da Câmara Municipal; envio confirmado pelo owner em conjunto para os seis pedidos da segunda ronda, sem confirmação individual de entrega, receção ou leitura. O texto enviado pode diferir ligeiramente do pedido aqui descrito. Sem contacto anterior documentado sobre este projeto; sem resposta institucional registada.
+    authorization_status: Envio de 25 de outubro de 2026 realizado pelo owner; nenhum seguimento ou novo envio autorizado.
+    send_date: 2026-10-25
     response_date: null
-    follow_up_decision: Rever o rascunho e decidir separadamente sobre qualquer envio, apenas após autorização expressa do owner.
+    follow_up_decision: Resposta institucional pendente, sem prazo definido; a ausência de resposta não constitui evidência sobre o problema. Qualquer seguimento exige nova decisão expressa do owner.
   - request_id: IREQ-0017
     prb_references: [PRB-0011]
     intended_recipient: Universidade de Évora
     requested_information: Funcionamento do gabinete do CLAIM da comunidade académica, com data de início de atendimento, público efetivamente atendido e utilização agregada; tipos de apoio prestados; encaminhamentos relacionados com cuidados de saúde, se registados; limitações conhecidas dos dados de acompanhamento. Sem dados individuais, registos identificáveis ou informação clínica.
     why_needed: As fontes públicas identificam o CLAIM e o seu público académico, mas não estabelecem utilização, tipos de apoio ou encaminhamentos para cuidados de saúde.
     already_known_sources: [SRC-0123, SRC-0150, PRB-0011]
-    last_known_contact_state: Pedido em rascunho, não enviado; sem contacto documentado sobre o CLAIM.
-    authorization_status: Envio não autorizado.
-    send_date: null
+    last_known_contact_state: Pedido de informação enviado pelo owner em 25 de outubro de 2026 (segunda ronda), dirigido ao CLAIM da Universidade de Évora; envio confirmado pelo owner em conjunto para os seis pedidos da segunda ronda, sem confirmação individual de entrega, receção ou leitura. O texto enviado pode diferir ligeiramente do pedido aqui descrito. Sem contacto anterior documentado sobre o CLAIM; sem resposta institucional registada.
+    authorization_status: Envio de 25 de outubro de 2026 realizado pelo owner; nenhum seguimento ou novo envio autorizado.
+    send_date: 2026-10-25
     response_date: null
-    follow_up_decision: Rever o rascunho e decidir separadamente sobre qualquer envio, apenas após autorização expressa do owner.
+    follow_up_decision: Resposta institucional pendente, sem prazo definido; a ausência de resposta não constitui evidência sobre o problema. Qualquer seguimento exige nova decisão expressa do owner.
   - request_id: IREQ-0018
     prb_references: [PRB-0013]
     intended_recipient: Município de Évora / Habévora
     requested_information: Desagregação por localização do programa municipal de 459 habitações, com as habitações situadas na cidade de Évora financiadas, em obra, concluídas, entregues e ocupadas; relação das 12 casas entregues na Malagueira e da intervenção da Rua Alexandre Rosado com esse programa; estado atual das frações da Rua Alexandre Rosado; número de pedidos de habitação registados na Habévora ou no Município, com data de referência, critérios de registo e desagregação para a cidade, quando disponível. Sem dados individuais.
     why_needed: A informação pública não distingue na cidade financiamento, obra, conclusão, entrega e ocupação, nem quantifica a procura registada. Os números referidos em declarações políticas e a capacidade prevista no futuro Plano de Urbanização não substituem estes dados.
     already_known_sources: [SRC-0029, SRC-0035, SRC-0036, SRC-0152, SRC-0153, SRC-0154, PRB-0013]
-    last_known_contact_state: Pedido preparado, conforme registado no problema, mas não enviado; sem contacto documentado.
-    authorization_status: Envio não autorizado.
-    send_date: null
+    last_known_contact_state: Pedido de informação enviado pelo owner em 25 de outubro de 2026 (segunda ronda), dirigido à Habévora; envio confirmado pelo owner em conjunto para os seis pedidos da segunda ronda, sem confirmação individual de entrega, receção ou leitura. O texto enviado pode diferir ligeiramente do pedido aqui descrito. Sem contacto anterior documentado; sem resposta institucional registada.
+    authorization_status: Envio de 25 de outubro de 2026 realizado pelo owner; nenhum seguimento ou novo envio autorizado.
+    send_date: 2026-10-25
     response_date: null
-    follow_up_decision: Verificar primeiro a informação pública do Município e da Habévora; qualquer envio depende de autorização expressa do owner.
+    follow_up_decision: Resposta institucional pendente, sem prazo definido; a ausência de resposta não constitui evidência sobre o problema. Qualquer seguimento exige nova decisão expressa do owner.
+  - request_id: IREQ-0019
+    prb_references: [PRB-0006]
+    intended_recipient: Associação Académica da Universidade de Évora
+    requested_information: Acesso ao estudo sobre alojamento estudantil em Évora apresentado em outubro de 2026, incluindo o relatório completo, se disponível; metodologia e forma de recrutamento dos participantes; questionário; resultados agregados e dimensão das amostras dos subgrupos relevantes. Sem dados pessoais nem respostas individuais.
+    why_needed: Verificar e interpretar corretamente o inquérito de outubro de 2026 já referido na investigação, conhecido apenas através da imprensa, cujos resultados dizem respeito apenas aos participantes.
+    already_known_sources: [SRC-0158, PRB-0006]
+    last_known_contact_state: Pedido de acesso enviado pelo owner em 25 de outubro de 2026 (segunda ronda), dirigido à Associação Académica; envio confirmado pelo owner em conjunto para os seis pedidos da segunda ronda, sem confirmação individual de entrega, receção ou leitura. O texto enviado pode diferir ligeiramente do pedido aqui descrito. Sem contacto anterior documentado; sem resposta registada.
+    authorization_status: Envio de 25 de outubro de 2026 realizado pelo owner; nenhum seguimento ou novo envio autorizado.
+    send_date: 2026-10-25
+    response_date: null
+    follow_up_decision: Resposta pendente, sem prazo definido; a ausência de resposta não constitui evidência sobre o problema. Qualquer seguimento exige nova decisão expressa do owner.
