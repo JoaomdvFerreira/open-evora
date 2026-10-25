@@ -1,0 +1,15 @@
+source_id: SRC-0155
+retrieval:
+  retrieved_at: "2026-10-25"
+  content_sha256: e7ba46aec809416ede7722abdc274a2bd25c3ee6fe09a0944405bc99ac5b1eb9
+  media_type: text/plain
+  archive_reference: https://www.base.gov.pt/Base4/pt/detalhe/?type=contratos&id=15792843
+verified_claims:
+  - locator: "Registo do contrato n.º 15792843, campos de objeto, entidade adjudicante, adjudicatário, tipo de procedimento e local de execução"
+    statement: "O registo identifica um contrato de empreitada de obras públicas, precedido de concurso público, entre o Município de Évora e a Tecnovia Sociedade de Empreitadas S.A., para reparação de estradas municipais no concelho de Évora, com local de execução em Évora."
+  - locator: "Registo do contrato n.º 15792843, campos de data de celebração e de data de publicação"
+    statement: "O registo indica que o contrato foi celebrado em 19 de junho de 2026 e publicado no portal em 19 de outubro de 2026."
+  - locator: "Registo do contrato n.º 15792843, campos de preço contratual inicial e de prazo de execução"
+    statement: "O registo indica um preço contratual inicial de 745 000 euros e um prazo de execução de 304 dias."
+  - locator: "Registo do contrato n.º 15792843, campos de data de encerramento, preço efetivo total e documentos"
+    statement: "Na consulta, os campos de data de encerramento e de preço efetivo total estavam vazios; o registo lista um documento anexo com o texto do contrato."
