@@ -1,6 +1,6 @@
 problem_id: PRB-0009
 created_at: 2026-08-28
-updated_at: 2026-10-15
+updated_at: 2026-10-25
 title: Fiabilidade da recolha de resíduos e da higiene urbana na cidade de Évora em 2026
 domain:
   - ENV
@@ -41,7 +41,7 @@ investigation:
     - question: Que tarefas e áreas de higiene urbana passarão efetivamente para as juntas urbanas a partir de 1 de janeiro de 2027, e como serão encaminhadas as falhas entre as juntas e o Município?
       why_open: Os acordos aprovados delimitam tarefas e áreas diferentes para cada união de freguesias, com efeitos previstos a partir de 1 de janeiro de 2027. Ainda não está esclarecido como serão encaminhados os pedidos e as falhas entre as juntas urbanas e o Município.
       latest_result: Os acordos aprovados têm efeitos previstos para 1 de janeiro de 2027. A recolha de resíduos urbanos e de monos não passa integralmente para as juntas; tarefas e áreas variam entre uniões. A preparação técnica e operacional ainda era necessária.
-      current_action: A documentação pública disponível não estabelece por completo os mapas e áreas finais, o início efetivo das tarefas nem o encaminhamento dos pedidos ou falhas entre as juntas urbanas e o Município.
+      current_action: A documentação pública disponível não estabelece por completo os mapas e áreas finais, o início efetivo das tarefas nem o encaminhamento dos pedidos ou falhas entre as juntas urbanas e o Município. A pesquisa pública até 25 de outubro de 2026 não localizou o texto dos autos de transferência nem os mapas das áreas abrangidas.
       resolution_condition: Documentação pública que estabeleça tarefas, áreas, data de início efetivo e responsabilidades pelo encaminhamento de falhas.
       evidence:
         - EVD-000096
@@ -66,7 +66,7 @@ investigation:
         - EVD-000096
     delimitation:
       summary: >-
-        As declarações sobre situações localizadas não confirmam a frequência das falhas na cidade. O relatório da junta contabiliza ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, incluindo depois de agosto, sem identificar quais correspondem a falhas de recolha ou descrever o desempenho dos circuitos municipais. O documento de deliberação da Assembleia Municipal de 25 de setembro permanece por consultar. O STAL comunicou elevada adesão à greve nacional de 2 de outubro de 2026 nos primeiros serviços noturnos de recolha e higiene urbana em Évora, mas não foi verificado o impacto efetivo na recolha na cidade. Este episódio pontual não permite avaliar a fiabilidade habitual da recolha depois da reorganização; nem a recuperação da fiabilidade nem a continuação de falhas no funcionamento habitual foram demonstradas.
+        As declarações sobre situações localizadas não confirmam a frequência das falhas na cidade. O relatório da junta contabiliza ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, incluindo depois de agosto, sem identificar quais correspondem a falhas de recolha ou descrever o desempenho dos circuitos municipais. O documento de deliberação da Assembleia Municipal de 25 de setembro permanece por consultar. O STAL comunicou elevada adesão à greve nacional de 2 de outubro de 2026 nos primeiros serviços noturnos de recolha e higiene urbana em Évora, mas não foi verificado o impacto efetivo na recolha na cidade. Este episódio pontual não permite avaliar a fiabilidade habitual da recolha depois da reorganização; nem a recuperação da fiabilidade nem a continuação de falhas no funcionamento habitual foram demonstradas. Em 16 de outubro, segundo a DianaFM, o presidente da União das Freguesias do Centro Histórico afirmou que a junta faz limpeza e remoção de ervas em ruas e travessas que considera da responsabilidade do Município, perante o que descreve como degradação do espaço público e falta de resposta da Câmara. Esta declaração não foi verificada de forma independente e não diz respeito aos circuitos de recolha de resíduos.
       evidence:
         - EVD-000095
         - EVD-000066
@@ -74,6 +74,7 @@ investigation:
         - EVD-000186
         - EVD-000189
         - EVD-000191
+        - EVD-000200
 evidence:
   - evidence_id: EVD-000065
     effects:
@@ -144,6 +145,11 @@ evidence:
       - BOUNDS
     research_roles:
       - EXISTING_RESPONSE
+  - evidence_id: EVD-000200
+    effects:
+      - BOUNDS
+    research_roles:
+      - CONTEXTUAL
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: low
