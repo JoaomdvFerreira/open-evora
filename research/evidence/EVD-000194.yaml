@@ -5,7 +5,7 @@ provenance:
   extracted_at: 2026-10-25
 observation:
   summary: >-
-    O registo do contrato n.º 15792843 no Portal BASE, publicado em 19 de outubro de 2026, indica que o Município de Évora celebrou em 19 de junho de 2026 com a Tecnovia — Sociedade de Empreitadas, S.A. o contrato da empreitada de reparação de estradas municipais no concelho de Évora, com preço contratual inicial de 745 000 euros e prazo de execução de 304 dias. O texto do contrato anexo, datado de 16 de junho e assinado digitalmente em 19 de junho, fixa um preço até 745 000 euros sem IVA e um prazo de 10 meses contado da consignação ou da comunicação da aprovação do plano de segurança e saúde, se esta for posterior.
+    O registo do contrato n.º 15792843 no Portal BASE, publicado em 19 de outubro de 2026, indica que o Município de Évora celebrou em 19 de junho de 2026 com a Tecnovia — Sociedade de Empreitadas, S.A. o contrato da empreitada de reparação de estradas municipais no concelho de Évora, com preço contratual inicial de 745 000 euros e prazo de execução de 304 dias. O registo lista em anexo um documento com o texto do contrato.
 scope:
   geography:
     level: municipality
@@ -19,7 +19,8 @@ evidence_nature: fact
 claim_authority: authoritative
 inference_limits:
   - A celebração do contrato não estabelece a data de consignação, o início efetivo dos trabalhos, a execução física ou a conclusão.
-  - O prazo conta-se a partir da consignação ou da aprovação do plano de segurança e saúde; sem essas datas, não é possível saber quando termina.
-  - O registo e o texto do contrato não identificam as ruas da cidade incluídas; remetem para peças do procedimento que não foram consultadas.
-  - O preço contratual é um limite máximo, não despesa executada.
+  - O conteúdo do documento anexo com o texto do contrato não foi verificado de forma independente; a data desse documento e a regra de início da contagem do prazo não são observações desta evidência.
+  - Os campos verificados do registo indicam a duração do prazo de execução, não a data em que começa a contar nem a data em que termina.
+  - Os campos verificados do registo indicam Évora como local de execução e não identificam as ruas da cidade incluídas.
+  - O preço contratual inicial não é despesa executada.
   - A falta de data de encerramento no registo, na consulta, não demonstra que a obra esteja ou não concluída.
