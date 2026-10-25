@@ -1,0 +1,35 @@
+source_id: SRC-0159
+publisher: Serviços de Ação Social da Universidade de Évora
+name: Estatísticas - Alojamento (SASUE em Números - Alojamento)
+resource_type: document
+identity:
+  version: "6"
+scope:
+  geography:
+    level: city
+    area: Évora
+  temporal:
+    start: "2019"
+    end: "2026"
+  domains:
+    - EDU
+    - HOU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: download
+  format: pdf
+acquisition:
+  method: public_web
+canonical_reference: https://gdoc.uevora.pt/671276
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  updated_at: 2026-05-07
+  last_checked_at: 2026-10-25
+  update_frequency: irregular
+caveats:
+  - Os valores são apresentados apenas em gráficos, sem rótulos numéricos nem tabela de dados.
+  - O documento não define o critério de contagem dos estudantes alojados nem indica se o ano letivo 2025/26 estava completo à data da última atualização.

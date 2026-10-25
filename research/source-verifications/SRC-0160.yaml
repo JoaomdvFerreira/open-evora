@@ -1,0 +1,15 @@
+source_id: SRC-0160
+retrieval:
+  retrieved_at: "2026-10-25"
+  content_sha256: 303e2b9e3d459a5809df67c1093d4fe8a4332dc9ff4908158f12b01677b14f83
+  media_type: text/html
+  archive_reference: https://www.dianafm.com/uniao-das-freguesias-do-centro-historico-de-evora-avanca-com-intervencoes-de-limpeza-em-ruas-e-pede-resposta-a-camara-municipal/
+verified_claims:
+  - locator: "Data da notícia e primeiro parágrafo"
+    statement: "A notícia, de sexta-feira, 16 de outubro de 2026, indica que a União das Freguesias do Centro Histórico de Évora realiza limpeza e remoção de ervas em ruas e travessas, perante o que considera degradação do espaço público e falta de resposta da Câmara Municipal."
+  - locator: "Terceiro e quarto parágrafos"
+    statement: "O presidente da junta considera estas intervenções responsabilidade do Município e indica que a freguesia dispõe de um assistente operacional e de outra pessoa com contrato de inserção profissional."
+  - locator: "Quinto e sexto parágrafos"
+    statement: "Os trabalhos começaram na Rua da Cal Branca e deverão prosseguir para outras ruas e travessas da zona; a junta diz não ter meios financeiros para uma intervenção mais abrangente."
+  - locator: "Último parágrafo"
+    statement: "O presidente da junta manifesta disponibilidade para negociar com a Câmara Municipal, nomeadamente através de um contrato administrativo."

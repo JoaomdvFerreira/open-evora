@@ -1,0 +1,15 @@
+source_id: SRC-0157
+retrieval:
+  retrieved_at: "2026-10-25"
+  content_sha256: 478e755cba79e393a7d2d19c57ec99cae98074fcfd067fd62104d26f18bc39d5
+  media_type: text/html
+  archive_reference: https://diariodosul.pt/2026/10/09/entrevista-com-o-reitor-da-universidade-de-evora-antonio-candeias/
+verified_claims:
+  - locator: "Metadados da página e parágrafos introdutórios"
+    statement: "A entrevista foi publicada em 9 de outubro de 2026; a introdução refere que o reitor tomou posse em 11 de maio de 2026 e que tinham passado cerca de quatro meses desde então."
+  - locator: "Resposta à pergunta sobre alojamento"
+    statement: "O reitor diz que a Universidade tem sete residências, que as obras de requalificação no âmbito do PRR estão praticamente a terminar e que, por isso, a Universidade vai ter as 515 camas requalificadas."
+  - locator: "Resposta à pergunta sobre alojamento"
+    statement: "O reitor descreve um plano, que espera ver concretizado no ano seguinte, para aumentar o número de camas quase para o dobro, com uma nova residência nos terrenos da Malagueira, a requalificação de outros espaços da Universidade e parcerias com grupos privados."
+  - locator: "Resposta sobre o número de estudantes"
+    statement: "O reitor indica que a Universidade tem quase 10 000 estudantes."

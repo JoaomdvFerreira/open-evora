@@ -1,0 +1,19 @@
+source_id: SRC-0158
+retrieval:
+  retrieved_at: "2026-10-25"
+  content_sha256: e73e64c2e29f46f75fc3fe4ada172b5cdef29fb2146a08f8d2f9b713c3a09abe
+  media_type: text/html
+  archive_reference: https://odigital.sapo.pt/estudo-alojamento-estudantes-evora-rendas-deslocacoes/
+verified_claims:
+  - locator: "Data da peça e terceiro parágrafo"
+    statement: "A peça, de 14 de outubro de 2026, indica que o estudo da Associação Académica foi apresentado em 13 de outubro e resulta de um inquérito realizado entre 3 e 10 de outubro com 300 estudantes."
+  - locator: "Parágrafos sobre deslocações"
+    statement: "Entre os inquiridos que residem fora da cidade e não têm alojamento em Évora, 50,1% percorrem mais de 100 quilómetros; nesta categoria, 85,7% indicaram o custo do alojamento ou a falta de oferta habitacional como origem da decisão de continuar a viver fora."
+  - locator: "Secção sobre o custo do alojamento"
+    statement: "Um estudante deslocado suporta em média cerca de 362 euros mensais com alojamento em Évora; entre os que precisaram de encontrar habitação na cidade, 66,4% vivem em quartos arrendados, 15,3% em residências universitárias públicas e 10,6% em residências privadas."
+  - locator: "Secção sobre contratos de arrendamento"
+    statement: "A presidente da Associação Académica considera que os resultados devem ser lidos com prudência por causa da dimensão da amostra e duvida que a proporção de estudantes sem contrato corresponda à realidade."
+  - locator: "Secção sobre as residências universitárias"
+    statement: "A Residência António Gedeão não foi considerada no levantamento por estar encerrada para obras de reabilitação à data do estudo."
+  - locator: "Penúltimo parágrafo do texto"
+    statement: "A peça afirma que os resultados dizem respeito apenas aos 300 participantes e que não é possível extrapolar as percentagens para todos os estudantes da Universidade de Évora."

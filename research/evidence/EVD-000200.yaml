@@ -1,0 +1,24 @@
+evidence_id: EVD-000200
+provenance:
+  sources:
+    - SRC-0160
+  extracted_at: 2026-10-25
+observation:
+  summary: >-
+    Segundo a DianaFM, em 16 de outubro de 2026, o presidente da União das Freguesias do Centro Histórico de Évora afirmou que a junta está a realizar trabalhos de limpeza e remoção de ervas em ruas e travessas, começando pela Rua da Cal Branca, perante o que considera ser degradação do espaço público e falta de resposta da Câmara Municipal. Afirmou considerar estas intervenções responsabilidade do Município, referiu meios limitados da junta e manifestou disponibilidade para negociar com a Câmara um contrato administrativo.
+scope:
+  geography:
+    level: local_area
+    area: Ruas e travessas do Centro Histórico de Évora, incluindo a Rua da Cal Branca
+  temporal:
+    as_of: 2026-10-16
+domains:
+  - ENV
+  - PUB
+evidence_nature: claim
+claim_authority: non_authoritative
+inference_limits:
+  - A degradação do espaço público e a falta de resposta municipal são avaliações atribuídas ao presidente da junta, não verificadas de forma independente.
+  - A declaração diz respeito a limpeza de ruas e remoção de ervas; não documenta falhas nos circuitos municipais de recolha de resíduos.
+  - Não indica a extensão das situações, os locais além da Rua da Cal Branca nem a frequência de limpeza municipal.
+  - A peça não cita resposta do Município.

@@ -6,12 +6,12 @@ requests:
     intended_recipient: Município de Évora
     requested_information: Horários e partidas atuais da rede urbana, atrasos por carreira e sentido nos acessos ao Centro Histórico e Parque Industrial, resposta à petição estudantil se existente, estado da informação e acessibilidade nas paragens descritas pelo PMUSE e execução das medidas propostas.
     why_needed: Distinguir oferta e condições atuais dos diagnósticos históricos e avaliar efeitos concretos nas deslocações.
-    already_known_sources: [PRB-0001, PRB-0002]
+    already_known_sources: [PRB-0001, PRB-0002, SRC-0156]
     last_known_contact_state: Pedido documental partilhado preparado, mas não enviado; consulta pública adicional pendente.
     authorization_status: Envio não autorizado.
     send_date: null
     response_date: null
-    follow_up_decision: Delimitar o pedido após consultar os horários oficiais e verificar respostas públicas.
+    follow_up_decision: Delimitar o pedido após consultar os horários oficiais e verificar respostas públicas. A adequação/revisão do PMUSE contratada em junho de 2026 não documenta a execução das medidas; verificar se a versão revista é publicada antes de pedir o estado de execução.
   - request_id: IREQ-0002
     prb_references: [PRB-0003]
     intended_recipient: Município de Évora
@@ -39,29 +39,29 @@ requests:
     intended_recipient: Município de Évora
     requested_information: Cartografia atual da rede ciclável, destino dos eixos propostos em 2017, estado da ligação Saúde–Xarrama–Santa Luzia e da ligação à Escola André de Resende.
     why_needed: Verificar o que foi executado e a configuração atual antes de avaliar deslocações afetadas.
-    already_known_sources: [PRB-0004]
+    already_known_sources: [PRB-0004, SRC-0156]
     last_known_contact_state: Consulta pública pendente; pedido municipal previsto se persistirem lacunas, sem envio documentado.
     authorization_status: Envio não autorizado.
     send_date: null
     response_date: null
-    follow_up_decision: Consultar primeiro a informação pública e delimitar as lacunas remanescentes.
+    follow_up_decision: Consultar primeiro a informação pública e delimitar as lacunas remanescentes. A adequação/revisão do PMUSE contratada em junho de 2026, com prazo de 182 dias, pode vir a documentar a rede atual e o destino dos eixos propostos; verificar a sua publicação antes de qualquer pedido sobre estes pontos.
   - request_id: IREQ-0005
     prb_references: [PRB-0006]
     intended_recipient: Serviços de Ação Social da Universidade de Évora
-    requested_information: Séries anuais de capacidade nominal e efetiva, ocupação, encerramentos e reaberturas das residências, com datas e critérios de contagem.
-    why_needed: Separar lugares nominais de oferta efetiva e de procura não satisfeita.
-    already_known_sources: [SRC-0119, PRB-0006]
+    requested_information: Por residência e por ano letivo, de 2023/24 a 2026/27, lugares nominais, camas requalificadas e lugares efetivamente utilizáveis, com datas de encerramento e reabertura, incluindo a Residência António Gedeão; relação entre os 525 lugares nominais publicados e as 515 camas requalificadas referidas pelo reitor; critério de contagem dos estudantes alojados nas estatísticas públicas dos SASUÉ; candidaturas, colocações, não colocados e listas de espera por ano letivo, com as respetivas definições. Sem dados individuais.
+    why_needed: A informação pública não distingue de forma verificável lugares nominais, camas requalificadas e oferta utilizável, e os gráficos de estudantes alojados não indicam o critério de contagem nem medem a procura não satisfeita. O inquérito da Associação Académica não é generalizável a todos os estudantes.
+    already_known_sources: [SRC-0119, SRC-0157, SRC-0158, SRC-0159, PRB-0006]
     last_known_contact_state: Contacto D5 respondido em agosto de 2026; novo pedido de dados preparado, mas não enviado.
     authorization_status: Novo envio não autorizado.
     send_date: null
     response_date: 2026-08-13
-    follow_up_decision: Rever os agregados necessários e a disponibilidade pública antes de eventual seguimento.
+    follow_up_decision: Pedido reformulado em 25 de outubro de 2026 para incluir a capacidade em funcionamento em 2026/2027, o critério de contagem e a procura não satisfeita; não pedir o que as estatísticas públicas já mostram. Qualquer envio depende de autorização expressa do owner.
   - request_id: IREQ-0006
     prb_references: [PRB-0009]
     intended_recipient: Município de Évora
     requested_information: Para a cidade de Évora depois de agosto de 2026, circuitos de recolha programados e realizados; atrasos e recolhas falhadas registados; incidentes e registos operacionais do serviço; queixas recebidas, por data e zona quando disponível; tempos de resposta e de resolução; relatórios de monitorização posteriores à reorganização; e nível de desagregação geográfica da informação disponível. Documentação sobre responsabilidades urbanas e encaminhamento de falhas.
     why_needed: Avaliar o funcionamento habitual após a reorganização e a divisão efetiva de tarefas com as juntas urbanas.
-    already_known_sources: [PRB-0009]
+    already_known_sources: [SRC-0151, PRB-0009]
     last_known_contact_state: Pedido de informação pendente e não enviado.
     authorization_status: Envio não autorizado.
     send_date: null
@@ -72,34 +72,34 @@ requests:
     intended_recipient: União das Freguesias de Bacelo e Senhora da Saúde
     requested_information: Relatório de atividades de julho a setembro de 2026, incluindo informação sobre higiene urbana disponível por zona.
     why_needed: Completar a revisão documental da atividade após a reorganização.
-    already_known_sources: [PRB-0009]
-    last_known_contact_state: Documento identificado, ainda não consultado; sem contacto documentado.
-    authorization_status: Envio não autorizado.
+    already_known_sources: [SRC-0151, PRB-0009]
+    last_known_contact_state: Relatório obtido por consulta pública em 15 de outubro de 2026 e integrado na investigação; sem contacto documentado.
+    authorization_status: Envio não autorizado; o documento pedido já foi consultado.
     send_date: null
     response_date: null
-    follow_up_decision: Solicitar o relatório à União das Freguesias após autorização expressa do owner; não repetir a investigação pública nesta fase.
+    follow_up_decision: Pedido considerado desnecessário e mantido apenas como registo histórico; não solicitar o relatório. Continuam sem resposta pública as datas e desfechos de cada ocorrência. Os resultados e a localização do levantamento de arruamentos referido pela junta não fazem parte deste pedido; qualquer pedido sobre estes pontos seria um pedido separado, ainda não preparado nem autorizado, e exige autorização expressa do owner.
   - request_id: IREQ-0008
     prb_references: [PRB-0009]
     intended_recipient: Assembleia Municipal de Évora
-    requested_information: Documento da deliberação de 25 de setembro de 2026 e anexos sobre as tarefas de higiene urbana das juntas, se aplicáveis.
-    why_needed: Confirmar o alcance e a data prevista das mudanças de responsabilidade.
-    already_known_sources: [PRB-0009]
-    last_known_contact_state: Documento identificado, ainda não consultado; sem contacto documentado.
+    requested_information: Documento da deliberação de 25 de setembro de 2026 e anexos sobre as tarefas de higiene urbana das juntas, se aplicáveis, incluindo o texto dos autos de transferência para as uniões de freguesias urbanas com efeitos a partir de 1 de janeiro de 2027, as tarefas e mapas das áreas abrangidas e as regras de encaminhamento de pedidos e falhas entre as juntas e o Município.
+    why_needed: Confirmar o alcance e a data prevista das mudanças de responsabilidade. O contrato interadministrativo de 2026 com a União das Freguesias de Bacelo e Senhora da Saúde diz respeito a refeitórios escolares, espaços de jogo e recreio e placas toponímicas e não documenta as responsabilidades de higiene urbana a partir de 2027.
+    already_known_sources: [SRC-0053, SRC-0081, PRB-0009]
+    last_known_contact_state: Documento identificado, ainda não consultado; sem contacto documentado. A pesquisa pública até 25 de outubro de 2026 não localizou o texto dos autos de transferência.
     authorization_status: Envio não autorizado.
     send_date: null
     response_date: null
-    follow_up_decision: Solicitar o documento e anexos pertinentes à Assembleia Municipal após autorização expressa do owner.
+    follow_up_decision: Verificar primeiro a publicação da deliberação e dos autos nos sítios da Assembleia Municipal e do Município; só depois, e após autorização expressa do owner, solicitar à Assembleia Municipal ou ao Município os elementos ainda em falta.
   - request_id: IREQ-0009
     prb_references: [PRB-0010]
     intended_recipient: Município de Évora
-    requested_information: Contrato assinado da empreitada geral do procedimento 4772/2026, consignação e data efetiva de início; ordens de trabalho e lista das ruas da cidade selecionadas; intervenções concluídas por rua, com datas; alterações, atrasos e estado de conclusão; levantamento técnico de fevereiro ou avaliação municipal atual do estado do pavimento nas ruas da cidade; execução das intervenções noticiadas em setembro na Estrada Nacional 114, junto à Escola do Bairro da Câmara e nas Portas da Lagoa.
-    why_needed: Distinguir adjudicação, assinatura, início e execução da empreitada geral nas ruas da cidade e avaliar as condições da cidade após as intervenções. O preço, a data de celebração e o prazo do contrato do procedimento 6244/2026 já constam do Portal BASE e não são pedidos.
-    already_known_sources: [SRC-0125, SRC-0126, SRC-0127, SRC-0138, SRC-0139, SRC-0140, SRC-0141, SRC-0147, SRC-0148]
+    requested_information: Auto de consignação e data efetiva de início da empreitada geral do procedimento 4772/2026; ordens de trabalho e lista das ruas da cidade selecionadas; intervenções concluídas por rua, com datas; alterações, atrasos e estado de conclusão; levantamento técnico de fevereiro ou avaliação municipal atual do estado do pavimento nas ruas da cidade; execução das intervenções noticiadas em setembro na Estrada Nacional 114, junto à Escola do Bairro da Câmara e nas Portas da Lagoa.
+    why_needed: Distinguir consignação, início e execução da empreitada geral nas ruas da cidade e avaliar as condições da cidade após as intervenções. A celebração do contrato da empreitada geral em 19 de junho de 2026, o preço contratual e o prazo já constam do Portal BASE e não são pedidos; o mesmo se aplica ao contrato do procedimento 6244/2026.
+    already_known_sources: [SRC-0125, SRC-0126, SRC-0127, SRC-0138, SRC-0139, SRC-0140, SRC-0141, SRC-0147, SRC-0148, SRC-0155]
     last_known_contact_state: Pedido pendente de preparação e não enviado.
     authorization_status: Envio não autorizado.
     send_date: null
     response_date: null
-    follow_up_decision: Preparar perguntas documentais delimitadas, sem contactar a instituição nesta fase.
+    follow_up_decision: Preparar perguntas documentais delimitadas, sem contactar a instituição nesta fase. Verificar primeiro se as peças do procedimento referidas no contrato, como o caderno de encargos e o mapa de quantidades, identificam publicamente as ruas incluídas.
   - request_id: IREQ-0011
     prb_references: [PRB-0007]
     intended_recipient: Município de Évora / DEIS
@@ -177,3 +177,14 @@ requests:
     send_date: null
     response_date: null
     follow_up_decision: Rever o rascunho e decidir separadamente sobre qualquer envio, apenas após autorização expressa do owner.
+  - request_id: IREQ-0018
+    prb_references: [PRB-0013]
+    intended_recipient: Município de Évora / Habévora
+    requested_information: Desagregação por localização do programa municipal de 459 habitações, com as habitações situadas na cidade de Évora financiadas, em obra, concluídas, entregues e ocupadas; relação das 12 casas entregues na Malagueira e da intervenção da Rua Alexandre Rosado com esse programa; estado atual das frações da Rua Alexandre Rosado; número de pedidos de habitação registados na Habévora ou no Município, com data de referência, critérios de registo e desagregação para a cidade, quando disponível. Sem dados individuais.
+    why_needed: A informação pública não distingue na cidade financiamento, obra, conclusão, entrega e ocupação, nem quantifica a procura registada. Os números referidos em declarações políticas e a capacidade prevista no futuro Plano de Urbanização não substituem estes dados.
+    already_known_sources: [SRC-0029, SRC-0035, SRC-0036, SRC-0152, SRC-0153, SRC-0154, PRB-0013]
+    last_known_contact_state: Pedido preparado, conforme registado no problema, mas não enviado; sem contacto documentado.
+    authorization_status: Envio não autorizado.
+    send_date: null
+    response_date: null
+    follow_up_decision: Verificar primeiro a informação pública do Município e da Habévora; qualquer envio depende de autorização expressa do owner.

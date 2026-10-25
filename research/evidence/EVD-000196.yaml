@@ -1,0 +1,26 @@
+evidence_id: EVD-000196
+provenance:
+  sources:
+    - SRC-0157
+  extracted_at: 2026-10-25
+observation:
+  summary: >-
+    Numa entrevista publicada pelo Diário do Sul em 9 de outubro de 2026, o reitor da Universidade de Évora afirmou que a Universidade tem sete residências, que as obras de requalificação financiadas pelo PRR estavam praticamente a terminar e que a Universidade vai ter as 515 camas requalificadas. Afirmou também que a Universidade espera concretizar no ano seguinte um plano para aumentar o número de camas quase para o dobro das atuais, incluindo uma nova residência nos terrenos da Malagueira, a requalificação de outros espaços e parcerias com grupos privados.
+scope:
+  geography:
+    level: city
+    area: Residências da Universidade de Évora, cidade de Évora
+  populations:
+    - estudantes da Universidade de Évora
+  temporal:
+    as_of: 2026-10-09
+domains:
+  - EDU
+  - HOU
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - As 515 camas são apresentadas como resultado esperado das obras, não como capacidade em funcionamento confirmada à data da entrevista.
+  - A declaração não indica que residências estavam abertas ou encerradas, nem quantas camas estavam disponíveis no ano letivo 2026/2027.
+  - O reitor não explica a relação entre as 515 camas requalificadas e os 525 lugares nominais publicados anteriormente; não se pode assumir que medem o mesmo.
+  - O aumento de camas é um plano, sem financiamento, contratos ou datas documentados na entrevista.

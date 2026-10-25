@@ -1,0 +1,38 @@
+source_id: SRC-0155
+publisher: Instituto dos Mercados Públicos, do Imobiliário e da Construção (IMPIC) — Portal BASE
+creators:
+  - Município de Évora
+name: Portal BASE — contrato n.º 15792843, empreitada de reparação de estradas municipais no concelho de Évora
+resource_type: database
+identity:
+  persistent_identifier:
+    scheme: Portal BASE (contrato)
+    value: "15792843"
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: 2026-06-19
+  domains:
+    - URB
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: true
+  method: api
+  format: json
+acquisition:
+  method: public_web
+canonical_reference: https://www.base.gov.pt/Base4/pt/detalhe/?type=contratos&id=15792843
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-10-19
+  last_checked_at: 2026-10-25
+  update_frequency: irregular
+caveats:
+  - Os campos de data de encerramento e de preço efetivo total do registo não estavam preenchidos na consulta de 25 de outubro de 2026.
+  - O registo inclui em anexo o texto do contrato, publicado com dados pessoais ocultados.

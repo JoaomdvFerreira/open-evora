@@ -1,6 +1,6 @@
 problem_id: PRB-0004
 created_at: "2026-08-28"
-updated_at: "2026-10-14"
+updated_at: "2026-10-25"
 title: Limitações e propostas de expansão da rede ciclável de Évora
 domain:
   - MOB
@@ -34,7 +34,10 @@ investigation:
       latest_result: >-
         Estão documentadas uma rede limitada e descontínua, uma proposta de
         expansão e trabalho posterior na ligação Saúde–Xarrama. A relação entre
-        esse trabalho e a proposta continua por estabelecer.
+        esse trabalho e a proposta continua por estabelecer. Segundo o Portal
+        BASE, o Município contratou em junho de 2026 serviços de
+        adequação/revisão do PMUSE, com prazo de 182 dias; o registo não
+        descreve o conteúdo da revisão nem indica que eixos foram executados.
       current_action: >-
         Está pendente a consulta de informação pública atual sobre a rede, a
         execução ou revisão da proposta e a ligação Saúde–Xarrama–Santa Luzia.
@@ -51,6 +54,7 @@ investigation:
         - EVD-000119
         - EVD-000120
         - EVD-000121
+        - EVD-000195
     - question: A ligação da zona nascente à Escola 2,3 André de Resende foi
         entretanto estudada, programada ou integrada em planos posteriores? Foi
         executada ou permanece fora dos planos atuais?
@@ -192,6 +196,11 @@ evidence:
     research_roles:
       - LOCAL_OBSERVATION
       - EXISTING_RESPONSE
+  - evidence_id: EVD-000195
+    effects:
+      - BOUNDS
+    research_roles:
+      - CONTEXTUAL
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: not_assessed

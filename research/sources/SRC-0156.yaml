@@ -1,0 +1,36 @@
+source_id: SRC-0156
+publisher: Instituto dos Mercados Públicos, do Imobiliário e da Construção (IMPIC) — Portal BASE
+creators:
+  - Município de Évora
+name: Portal BASE — contrato n.º 15771848, aquisição de serviços para adequação/revisão do Plano de Mobilidade Urbana Sustentável de Évora
+resource_type: database
+identity:
+  persistent_identifier:
+    scheme: Portal BASE (contrato)
+    value: "15771848"
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: 2026-06-18
+  domains:
+    - MOB
+access:
+  level: public
+  availability: available
+  machine_readable: true
+  method: api
+  format: json
+acquisition:
+  method: public_web
+canonical_reference: https://www.base.gov.pt/Base4/pt/detalhe/?type=contratos&id=15771848
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-10-14
+  last_checked_at: 2026-10-25
+  update_frequency: irregular
+caveats:
+  - Os campos de data de encerramento e de preço efetivo total do registo não estavam preenchidos na consulta de 25 de outubro de 2026.

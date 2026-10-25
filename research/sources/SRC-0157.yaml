@@ -1,0 +1,31 @@
+source_id: SRC-0157
+publisher: Diário do Sul
+name: Entrevista com o reitor da Universidade de Évora, António Candeias
+resource_type: webpage
+scope:
+  geography:
+    level: city
+    area: Évora
+  temporal:
+    as_of: 2026-10-09
+  domains:
+    - EDU
+    - HOU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://diariodosul.pt/2026/10/09/entrevista-com-o-reitor-da-universidade-de-evora-antonio-candeias/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-10-09
+  last_checked_at: 2026-10-25
+  update_frequency: one_off
+caveats:
+  - A peça não indica a data em que a entrevista foi realizada; refere que tinham passado cerca de quatro meses desde a tomada de posse do reitor, em 11 de maio de 2026.
