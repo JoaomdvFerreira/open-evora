@@ -1,0 +1,24 @@
+evidence_id: EVD-000203
+provenance:
+  sources:
+    - SRC-0154
+  extracted_at: 2026-11-14
+observation:
+  summary: >-
+    O Plano de Ação 2026 do Plano de Desenvolvimento Social de Évora inclui, no eixo de mobilidade e acessibilidades, a medida 1.1.3, de realização das obras necessárias de acesso ao Terminal Rodoviário a partir da Praça do Giraldo, da responsabilidade da Câmara Municipal de Évora, calendarizada para 2024–2027 e com a execução da obra como indicador. A ação prevista para 2026 é averiguar linhas de financiamento e apresentar candidatura.
+scope:
+  geography:
+    level: local_area
+    area: Acesso entre a Praça do Giraldo e o Terminal Rodoviário, cidade de Évora
+  temporal:
+    as_of: "2026"
+domains:
+  - ACC
+  - MOB
+  - URB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - A ação prevista para 2026 não estabelece que tenham sido identificadas linhas de financiamento, que uma candidatura tenha sido apresentada ou aprovada, nem que a obra tenha sido adjudicada, iniciada ou concluída.
+  - O plano não descreve as obras necessárias, o percurso exato nem os constrangimentos que pretendem corrigir, e não estabelece o estado atual do acesso.
+  - A inclusão da medida no plano não demonstra a eficácia de uma futura intervenção.

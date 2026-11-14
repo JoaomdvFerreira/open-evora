@@ -1,6 +1,6 @@
 problem_id: PRB-0003
 created_at: "2026-08-28"
-updated_at: "2026-10-14"
+updated_at: "2026-11-14"
 title: Barreiras à circulação pedonal e à acessibilidade identificadas em locais da cidade de Évora
 domain:
   - ACC
@@ -61,7 +61,11 @@ investigation:
         com mobilidade reduzida no Terminal e ligações pedonais deficientes ou
         degradadas. O Plano de Desenvolvimento Social 2024-2027 preconiza a
         melhoria da ligação à Praça do Giraldo; não confirma execução ou
-        correção dos constrangimentos.
+        correção dos constrangimentos. No Plano de Ação 2026, a ação prevista
+        para as obras de acesso ao Terminal a partir da Praça do Giraldo é
+        averiguar linhas de financiamento e apresentar candidatura; o plano não
+        indica que a candidatura tenha sido apresentada nem que a obra tenha
+        começado.
       current_action: >-
         O mesmo pedido municipal, preparado mas não enviado,
         inclui a componente 2: estado da medida Terminal Rodoviário–Praça do
@@ -73,6 +77,7 @@ investigation:
         - EVD-000006
         - EVD-000009
         - EVD-000112
+        - EVD-000203
     - question: Quais barreiras identificadas nas edições 1.0 e 1.1 do Acesso
         Universal foram objeto de intervenção e qual é o seu estado em cada
         localização?
@@ -162,7 +167,9 @@ investigation:
         descreveu avaliações no local e problemas nos acessos, sem inventário
         atualizado por localização. O planeamento municipal recomendou rever
         o plano local de acessibilidade, atualizar o levantamento de obstáculos
-        e melhorar a ligação Terminal–Praça do Giraldo. Em maio de 2026, a Évora 2027 — Capital Europeia da Cultura comunicou o desenvolvimento de um plano de acessibilidade
+        e melhorar a ligação Terminal–Praça do Giraldo; no Plano de Ação 2026,
+        a ação prevista para essas obras é averiguar financiamento e apresentar
+        candidatura. Em maio de 2026, a Évora 2027 — Capital Europeia da Cultura comunicou o desenvolvimento de um plano de acessibilidade
         cultural com a Acesso Cultura; a sua conclusão não está estabelecida.
       evidence:
         - EVD-000009
@@ -172,6 +179,7 @@ investigation:
         - EVD-000104
         - EVD-000112
         - EVD-000113
+        - EVD-000203
     delimitation:
       summary: Em agosto de 2026, a APCE relatou que algumas barreiras das
         edições 1.0 e 1.1 do Acesso Universal foram posteriormente alvo de
@@ -266,6 +274,12 @@ evidence:
     research_roles:
       - LOCAL_OBSERVATION
       - EXISTING_RESPONSE
+  - evidence_id: EVD-000203
+    effects:
+      - BOUNDS
+      - REFINES
+    research_roles:
+      - PLANNED_RESPONSE
 evidence_status: corroborated
 validation_status: partially_validated
 digital_tractability: not_assessed

@@ -11,6 +11,8 @@ scope:
   domains:
     - HOU
     - SOC
+    - ACC
+    - MOB
 access:
   level: public
   availability: available
@@ -24,4 +26,4 @@ licensing:
   status: unknown
   reuse: unknown
 temporal:
-  last_checked_at: 2026-10-15
+  last_checked_at: 2026-11-14

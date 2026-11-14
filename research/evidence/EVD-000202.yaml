@@ -1,0 +1,25 @@
+evidence_id: EVD-000202
+provenance:
+  sources:
+    - SRC-0162
+  extracted_at: 2026-11-14
+observation:
+  summary: >-
+    Segundo a Rádio Nova Antena, em 11 de novembro de 2026, o vice-presidente da Câmara Municipal de Évora declarou que já há serviços de higiene e limpeza urbana a trabalhar por turnos, com presença em quase todo o dia e recurso a piquetes à noite. A peça refere que, no modelo anterior de jornada contínua, a capacidade de resposta ficava limitada a partir do início ou do meio da tarde e as ocorrências mais tardias ficavam a cargo de um piquete. O vice-presidente admitiu que os equipamentos disponíveis deixaram de ser adequados às necessidades, mencionou a compra de novos meios e disse que as alterações estão a ser introduzidas progressivamente, em diálogo com os trabalhadores.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: 2026-11-11
+domains:
+  - ENV
+  - PUB
+evidence_nature: claim
+claim_authority: authoritative
+inference_limits:
+  - A declaração reportada não foi verificada de forma independente; a peça não apresenta dados operacionais nem outras vozes.
+  - Não identifica que serviços, equipas, circuitos ou zonas da cidade funcionam por turnos, nem desde quando.
+  - Não mede a regularidade da recolha, as recolhas falhadas ou atrasadas, nem os tempos de resposta depois da reorganização.
+  - A peça não refere o centro de recolha temporária de volumosos e não confirma a sua abertura.
+  - A declaração provém do mesmo responsável municipal a que a comunicação do Município de 30 de outubro atribui o anúncio do trabalho por turnos; não constitui uma voz independente do Município.

@@ -1,0 +1,31 @@
+source_id: SRC-0162
+publisher: Rádio Nova Antena
+name: Évora reforça meios e reorganiza serviços municipais de higiene e limpeza
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: 2026-11-11
+  domains:
+    - ENV
+    - PUB
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://radionovaantena.com/2026/11/11/evora-reforca-meios-e-reorganiza-servicos-municipais-de-higiene-e-limpeza/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-11-11
+  last_checked_at: 2026-11-14
+  update_frequency: one_off
+caveats:
+  - A peça relata sobretudo declarações do vice-presidente da Câmara Municipal; não apresenta dados operacionais, outras vozes nem resposta de terceiros.

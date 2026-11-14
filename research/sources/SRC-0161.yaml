@@ -1,0 +1,34 @@
+source_id: SRC-0161
+publisher: Município de Évora
+name: Centro Municipal de Recolha Temporária de Volumosos entra em funcionamento a partir de 4 de novembro, junto ao Largo de Machede Velho
+resource_type: webpage
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  temporal:
+    as_of: 2026-10-30
+  domains:
+    - ENV
+    - PUB
+    - HOU
+access:
+  level: public
+  availability: available
+  machine_readable: false
+  method: browser
+  format: html
+acquisition:
+  method: public_web
+canonical_reference: https://www.cm-evora.pt/centro-municipal-de-recolha-temporaria-de-volumosos-entra-em-funcionamento-a-partir-de-4-de-novembro-junto-ao-largo-de-machede-velho/
+licensing:
+  status: unknown
+  reuse: unknown
+temporal:
+  published_at: 2026-10-30
+  updated_at: 2026-10-30
+  last_checked_at: 2026-11-14
+  update_frequency: one_off
+caveats:
+  - A página é uma comunicação institucional do Município sobre uma reunião da Câmara Municipal; relata anúncios, deliberações e números comunicados pelos próprios responsáveis municipais.
+  - A página trata também de habitação municipal e de outras propostas aprovadas na mesma reunião.
