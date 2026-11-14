@@ -16,7 +16,7 @@ domains:
   - ENV
   - PUB
 evidence_nature: claim
-claim_authority: non_authoritative
+claim_authority: authoritative
 inference_limits:
   - A declaração reportada não foi verificada de forma independente; a peça não apresenta dados operacionais nem outras vozes.
   - Não identifica que serviços, equipas, circuitos ou zonas da cidade funcionam por turnos, nem desde quando.
