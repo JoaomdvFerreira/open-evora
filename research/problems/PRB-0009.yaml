@@ -1,6 +1,6 @@
 problem_id: PRB-0009
 created_at: 2026-08-28
-updated_at: 2026-10-25
+updated_at: 2026-11-14
 title: Fiabilidade da recolha de resíduos e da higiene urbana na cidade de Évora em 2026
 domain:
   - ENV
@@ -14,7 +14,7 @@ problem_statement: >-
   Em janeiro de 2026, um residente relatou recolha deficiente ou irregular e acumulação de resíduos junto à Igreja da Misericórdia, no Centro Histórico, e na Estrada de Santo Antonico. Em março, um vereador referiu queixas de residentes sobre acumulação no Bairro António Sérgio / Largo da Boa Vontade. As atas documentam estas declarações, sem confirmar de forma independente as ocorrências nem mostrar a frequência ou a dimensão do problema na cidade de Évora.
 
 
-  Em fevereiro, o Município comunicou uma perturbação da recolha no concelho. Em maio, comunicou a entrada em serviço de quatro veículos de recolha e, entre julho e agosto, anunciou reforços de pessoal e viaturas, alterações de horários e circuitos e a reorganização do serviço.
+  Em fevereiro, o Município comunicou uma perturbação da recolha no concelho. Em maio, comunicou a entrada em serviço de quatro veículos de recolha e, entre julho e agosto, anunciou reforços de pessoal e viaturas, alterações de horários e circuitos e a reorganização do serviço. Em 30 de outubro, o Município anunciou a criação de um centro temporário de recolha de resíduos volumosos e a implementação de trabalho por turnos na recolha a partir de 4 de novembro. Em 11 de novembro, segundo a Rádio Nova Antena, o vice-presidente da Câmara afirmou que já havia serviços de higiene e limpeza urbana a funcionar por turnos, sem especificar quais. Estas comunicações não permitem avaliar a fiabilidade da recolha na cidade.
 
 
   O relatório de atividades da União das Freguesias de Bacelo e Senhora da Saúde regista situações de higiene urbana e resíduos urbanos até 18 de setembro, mas não permite identificar falhas nos circuitos municipais de recolha nem avaliar a fiabilidade do serviço depois de agosto.
@@ -24,7 +24,7 @@ investigation:
       why_open: >-
         As declarações sobre situações localizadas na cidade, registadas em janeiro e março de 2026, são anteriores às medidas municipais de maio e de julho/agosto. O relatório da junta regista situações até 18 de setembro, mas não discrimina recolhas falhadas, circuitos realizados ou tempos de resolução. As medidas e os registos administrativos não mostram como passou a funcionar a recolha municipal.
       latest_result: >-
-        As declarações sobre situações localizadas na cidade foram registadas em janeiro e março de 2026. Entre 1 de julho e 18 de setembro, a junta de Bacelo e Senhora da Saúde recebeu 124 comunicações e registou 137 ocorrências distintas, além de 15 reforços; 48 ocorrências foram classificadas em Higiene Urbana (19 em julho, 14 em agosto e 15 de 1 a 18 de setembro) e 11 em Resíduos Urbanos (5 de 1 a 18 de setembro). Estas categorias não identificam quantas situações foram falhas de recolha. Continuam sem dados suficientes os circuitos programados e realizados, atrasos, falhas e tempos de resposta na cidade. O documento de deliberação da Assembleia Municipal de 25 de setembro permanece por consultar.
+        As declarações sobre situações localizadas na cidade foram registadas em janeiro e março de 2026. Entre 1 de julho e 18 de setembro, a junta de Bacelo e Senhora da Saúde recebeu 124 comunicações e registou 137 ocorrências distintas, além de 15 reforços; 48 ocorrências foram classificadas em Higiene Urbana (19 em julho, 14 em agosto e 15 de 1 a 18 de setembro) e 11 em Resíduos Urbanos (5 de 1 a 18 de setembro). Estas categorias não identificam quantas situações foram falhas de recolha. Em 30 de outubro, o Município anunciou trabalho por turnos na recolha a partir de 4 de novembro e comunicou que, em outubro, a linha de recolha domiciliária de volumosos recebeu 119 pedidos e efetuou 108 recolhas. Estes números referem-se apenas a volumosos e não permitem avaliar a recolha regular. Em 11 de novembro, segundo a Rádio Nova Antena, o vice-presidente afirmou que já havia serviços de higiene e limpeza urbana a funcionar por turnos, sem identificar quais. Continuam sem dados suficientes os circuitos programados e realizados, atrasos, falhas e tempos de resposta na cidade. O documento de deliberação da Assembleia Municipal de 25 de setembro permanece por consultar.
       current_action: >-
         Consultado o relatório da junta, falta obter registos operacionais dos circuitos municipais depois de agosto, incluindo circuitos programados e realizados, recolhas falhadas ou atrasadas e tempos de resolução por zona ou circuito. O documento de deliberação da Assembleia Municipal de 25 de setembro de 2026 permanece por consultar. Em 25 de outubro de 2026 foram enviados dois pedidos distintos, ambos a aguardar resposta: à área de Higiene Urbana da Câmara Municipal, sobre o funcionamento da recolha depois de agosto, e à Assembleia Municipal, sobre o documento daquela deliberação e respetivos anexos.
       resolution_condition: >-
@@ -38,6 +38,8 @@ investigation:
         - EVD-000174
         - EVD-000189
         - EVD-000191
+        - EVD-000201
+        - EVD-000202
     - question: Que tarefas e áreas de higiene urbana passarão efetivamente para as juntas urbanas a partir de 1 de janeiro de 2027, e como serão encaminhadas as falhas entre as juntas e o Município?
       why_open: Os acordos aprovados delimitam tarefas e áreas diferentes para cada união de freguesias, com efeitos previstos a partir de 1 de janeiro de 2027. Ainda não está esclarecido como serão encaminhados os pedidos e as falhas entre as juntas urbanas e o Município.
       latest_result: Os acordos aprovados têm efeitos previstos para 1 de janeiro de 2027. A recolha de resíduos urbanos e de monos não passa integralmente para as juntas; tarefas e áreas variam entre uniões. A preparação técnica e operacional ainda era necessária.
@@ -56,7 +58,7 @@ investigation:
         - EVD-000173
     development:
       summary: >-
-        Em fevereiro, o Município comunicou uma perturbação da recolha no concelho. Em maio, comunicou a entrada em serviço de quatro veículos de recolha. Em julho de 2026, descreveu a higiene urbana como um problema urgente. Entre julho e agosto, anunciou reforços de pessoal e viaturas, alterações de horários e circuitos, reorganização do serviço, medidas logísticas, monitorização interna e equipas externas no perímetro urbano. As competências transferidas para as uniões de freguesias urbanas têm efeitos previstos a partir de 1 de janeiro de 2027.
+        Em fevereiro, o Município comunicou uma perturbação da recolha no concelho. Em maio, comunicou a entrada em serviço de quatro veículos de recolha. Em julho de 2026, descreveu a higiene urbana como um problema urgente. Entre julho e agosto, anunciou reforços de pessoal e viaturas, alterações de horários e circuitos, reorganização do serviço, medidas logísticas, monitorização interna e equipas externas no perímetro urbano. As competências transferidas para as uniões de freguesias urbanas têm efeitos previstos a partir de 1 de janeiro de 2027. Em 30 de outubro, o Município anunciou um centro temporário de recolha de volumosos junto ao Largo de Machede Velho e trabalho por turnos na recolha, ambos a partir de 4 de novembro, e foram aprovados protocolos com a GESAMB para entrega gratuita de volumosos pelos munícipes. A recolha porta-a-porta no Centro Histórico e um canal para comércio e serviços estavam em preparação. Em 11 de novembro, segundo a Rádio Nova Antena, o vice-presidente da Câmara afirmou que já havia serviços de higiene e limpeza urbana a funcionar por turnos, sem identificar quais.
       evidence:
         - EVD-000071
         - EVD-000095
@@ -64,9 +66,11 @@ investigation:
         - EVD-000066
         - EVD-000174
         - EVD-000096
+        - EVD-000201
+        - EVD-000202
     delimitation:
       summary: >-
-        As declarações sobre situações localizadas não confirmam a frequência das falhas na cidade. O relatório da junta contabiliza ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, incluindo depois de agosto, sem identificar quais correspondem a falhas de recolha ou descrever o desempenho dos circuitos municipais. O documento de deliberação da Assembleia Municipal de 25 de setembro permanece por consultar. O STAL comunicou elevada adesão à greve nacional de 2 de outubro de 2026 nos primeiros serviços noturnos de recolha e higiene urbana em Évora, mas não foi verificado o impacto efetivo na recolha na cidade. Este episódio pontual não permite avaliar a fiabilidade habitual da recolha depois da reorganização; nem a recuperação da fiabilidade nem a continuação de falhas no funcionamento habitual foram demonstradas. Em 16 de outubro, segundo a DianaFM, o presidente da União das Freguesias do Centro Histórico afirmou que a junta faz limpeza e remoção de ervas em ruas e travessas que considera da responsabilidade do Município, perante o que descreve como degradação do espaço público e falta de resposta da Câmara. Esta declaração não foi verificada de forma independente e não diz respeito aos circuitos de recolha de resíduos.
+        As declarações sobre situações localizadas não confirmam a frequência das falhas na cidade. O relatório da junta contabiliza ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, incluindo depois de agosto, sem identificar quais correspondem a falhas de recolha ou descrever o desempenho dos circuitos municipais. O documento de deliberação da Assembleia Municipal de 25 de setembro permanece por consultar. O STAL comunicou elevada adesão à greve nacional de 2 de outubro de 2026 nos primeiros serviços noturnos de recolha e higiene urbana em Évora, mas não foi verificado o impacto efetivo na recolha na cidade. Este episódio pontual não permite avaliar a fiabilidade habitual da recolha depois da reorganização; nem a recuperação da fiabilidade nem a continuação de falhas no funcionamento habitual foram demonstradas. Em 16 de outubro, segundo a DianaFM, o presidente da União das Freguesias do Centro Histórico afirmou que a junta faz limpeza e remoção de ervas em ruas e travessas que considera da responsabilidade do Município, perante o que descreve como degradação do espaço público e falta de resposta da Câmara. Esta declaração não foi verificada de forma independente e não diz respeito aos circuitos de recolha de resíduos. As comunicações municipais de 30 de outubro e 11 de novembro de 2026 anunciam medidas e incluem uma declaração de que já existem serviços de higiene e limpeza urbana a funcionar por turnos, sem identificar quais; não confirmam a abertura do centro de volumosos, se o trabalho por turnos anunciado para a recolha de resíduos foi implementado nem o efeito na regularidade da recolha. Os números de outubro dizem respeito apenas à recolha de volumosos ao domicílio e não permitem avaliar a recolha regular de resíduos indiferenciados.
       evidence:
         - EVD-000095
         - EVD-000066
@@ -75,6 +79,8 @@ investigation:
         - EVD-000189
         - EVD-000191
         - EVD-000200
+        - EVD-000201
+        - EVD-000202
 evidence:
   - evidence_id: EVD-000065
     effects:
@@ -150,6 +156,17 @@ evidence:
       - BOUNDS
     research_roles:
       - CONTEXTUAL
+  - evidence_id: EVD-000201
+    effects:
+      - BOUNDS
+    research_roles:
+      - EXISTING_RESPONSE
+      - PLANNED_RESPONSE
+  - evidence_id: EVD-000202
+    effects:
+      - BOUNDS
+    research_roles:
+      - EXISTING_RESPONSE
 evidence_status: discovered
 validation_status: unvalidated
 digital_tractability: low
@@ -178,7 +195,7 @@ decision_basis:
       - EVD-000173
   currentness:
     assessment: >-
-      As declarações sobre falhas em janeiro e março são anteriores à entrada em serviço de quatro veículos de recolha comunicada pelo Município em maio e às medidas anunciadas em julho/agosto. O relatório da junta regista ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, mas não identifica falhas de recolha nem mede o funcionamento dos circuitos municipais. Nem a recuperação da fiabilidade nem a continuação de falhas generalizadas foram demonstradas.
+      As declarações sobre falhas em janeiro e março são anteriores à entrada em serviço de quatro veículos de recolha comunicada pelo Município em maio e às medidas anunciadas em julho/agosto. O relatório da junta regista ocorrências de higiene urbana e resíduos urbanos até 18 de setembro, mas não identifica falhas de recolha nem mede o funcionamento dos circuitos municipais. As medidas anunciadas pelo Município em 30 de outubro para 4 de novembro e a declaração de 11 de novembro, segundo a qual já havia serviços de higiene e limpeza urbana a funcionar por turnos, sem identificar quais, não medem o funcionamento posterior da recolha. Nem a recuperação da fiabilidade nem a continuação de falhas generalizadas foram demonstradas.
     evidence:
       - EVD-000171
       - EVD-000172
@@ -188,14 +205,18 @@ decision_basis:
       - EVD-000066
       - EVD-000174
       - EVD-000189
+      - EVD-000201
+      - EVD-000202
   contradiction_search:
     performed: true
     summary: >-
-      A pesquisa pública até 14 de outubro de 2026 consultou material do Município, reuniões da Câmara e da Assembleia Municipal quando acessíveis, fontes das juntas urbanas, meios locais e regionais e relatos públicos de residentes localizáveis. Em 15 de outubro foi consultado o relatório de atividades da União das Freguesias de Bacelo e Senhora da Saúde, com ocorrências classificadas em Higiene Urbana e Resíduos Urbanos até 18 de setembro. A classificação não permite identificar falhas dos circuitos de recolha, e o relatório também descreve trabalhos de limpeza e papeleiras da junta, sem medir a recolha municipal. O documento de deliberação da Assembleia Municipal de 25 de setembro de 2026 permanece por consultar. O STAL comunicou elevada adesão à greve nacional de 2 de outubro nos primeiros serviços noturnos de recolha e higiene urbana em Évora, sem que o impacto efetivo na recolha na cidade tenha sido verificado. O episódio foi considerado separadamente porque não mostra o funcionamento habitual da recolha. Continuam sem dados suficientes os circuitos programados e realizados, recolhas falhadas, atrasos, pedidos ou tempos de resposta na cidade. A pesquisa não demonstra resolução nem continuação de falhas.
+      A pesquisa pública até 14 de outubro de 2026 consultou material do Município, reuniões da Câmara e da Assembleia Municipal quando acessíveis, fontes das juntas urbanas, meios locais e regionais e relatos públicos de residentes localizáveis. Em 15 de outubro foi consultado o relatório de atividades da União das Freguesias de Bacelo e Senhora da Saúde, com ocorrências classificadas em Higiene Urbana e Resíduos Urbanos até 18 de setembro. A classificação não permite identificar falhas dos circuitos de recolha, e o relatório também descreve trabalhos de limpeza e papeleiras da junta, sem medir a recolha municipal. O documento de deliberação da Assembleia Municipal de 25 de setembro de 2026 permanece por consultar. O STAL comunicou elevada adesão à greve nacional de 2 de outubro nos primeiros serviços noturnos de recolha e higiene urbana em Évora, sem que o impacto efetivo na recolha na cidade tenha sido verificado. O episódio foi considerado separadamente porque não mostra o funcionamento habitual da recolha. Continuam sem dados suficientes os circuitos programados e realizados, recolhas falhadas, atrasos, pedidos ou tempos de resposta na cidade. A pesquisa não demonstra resolução nem continuação de falhas. Em 14 de novembro de 2026, foi consultada a comunicação municipal de 30 de outubro, a peça da Rádio Nova Antena de 11 de novembro e outras notícias regionais sobre as medidas; as notícias encontradas reproduzem o anúncio municipal ou declarações de responsáveis municipais e não confirmam a abertura do centro de volumosos, quais os serviços de higiene e limpeza urbana a funcionar por turnos nem o desempenho dos circuitos de recolha.
     evidence:
       - EVD-000186
       - EVD-000189
       - EVD-000191
+      - EVD-000201
+      - EVD-000202
   overlap_check:
     performed: true
     summary: Nenhum outro PRB-* canónico aborda a fiabilidade dos serviços municipais de higiene urbana e recolha de resíduos; PRB-0009 não duplica nem se sobrepõe a outro registo.
@@ -217,8 +238,10 @@ decision_basis:
     - EVD-000186
     - EVD-000189
     - EVD-000191
+    - EVD-000201
+    - EVD-000202
   independence_assessment: >-
-    EVD-000171 e EVD-000172 correspondem a um residente, uma reunião e uma intervenção em janeiro, ainda que descrevam dois locais. EVD-000173 corresponde a um evento separado de relato de queixas em março; as queixas individuais subjacentes não estão disponíveis como evidência canónica independente. A separação das reuniões não confirma as ocorrências descritas. O Município representa uma única voz institucional; os seus registos não são vozes institucionais independentes. Os registos da junta são uma classificação administrativa de comunicações, não verificação operacional independente das falhas de recolha. Não se contam mecanicamente IDs, fontes ou documentos para inferir independência ou representatividade.
+    EVD-000171 e EVD-000172 correspondem a um residente, uma reunião e uma intervenção em janeiro, ainda que descrevam dois locais. EVD-000173 corresponde a um evento separado de relato de queixas em março; as queixas individuais subjacentes não estão disponíveis como evidência canónica independente. A separação das reuniões não confirma as ocorrências descritas. O Município representa uma única voz institucional; os seus registos não são vozes institucionais independentes. EVD-000201 e EVD-000202 provêm do mesmo responsável municipal, numa comunicação do Município e numa peça jornalística que relata as suas declarações; não são duas observações operacionais independentes. Os registos da junta são uma classificação administrativa de comunicações, não verificação operacional independente das falhas de recolha. Não se contam mecanicamente IDs, fontes ou documentos para inferir independência ou representatividade.
   scope:
     geography: Cidade de Évora. As declarações registadas em atas dizem respeito a locais da cidade; não confirmam as ocorrências nesses locais nem permitem generalizar ao conjunto da cidade.
     population: Residentes da cidade. As uniões urbanas são atores de governação e serviço, não população afetada estabelecida pela evidência.

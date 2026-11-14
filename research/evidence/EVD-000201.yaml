@@ -1,0 +1,28 @@
+evidence_id: EVD-000201
+provenance:
+  sources:
+    - SRC-0161
+  extracted_at: 2026-11-14
+observation:
+  summary: >-
+    Segundo comunicação do Município de 30 de outubro de 2026 sobre uma reunião da Câmara Municipal, um vereador anunciou a entrada em funcionamento, a partir de 4 de novembro, de um Centro Municipal de Recolha Temporária de Volumosos junto ao Largo de Machede Velho, para entrega de colchões, móveis e outros resíduos volumosos, excluindo resíduos de construção e demolição e resíduos verdes. Informou também que, a partir da mesma data, seria implementado trabalho por turnos para a recolha de resíduos se processar com horário mais alargado. Na reunião foram aprovados dois protocolos com a GESAMB que permitem aos munícipes entregar gratuitamente resíduos volumosos nas instalações da GESAMB, até 5 m³ por habitação e por ano, e foi simplificada a entrega de resíduos de pequenas obras particulares. O vereador referiu que, só em outubro, a linha dedicada à recolha de volumosos ao domicílio recebeu 119 pedidos e procedeu à recolha de 108 em 18 dias; que já tinham sido recebidos contentores de indiferenciados, para substituir os deteriorados, substituição já em curso, e para sistemas porta-a-porta; e que a recolha porta-a-porta em zonas do Centro Histórico e um canal para comércio e serviços (HORECA) estavam a ser trabalhados com a GESAMB, a alargar à medida que a Câmara tiver condições.
+scope:
+  geography:
+    level: municipality
+    area: Município de Évora
+  populations:
+    - residentes
+  temporal:
+    as_of: 2026-10-30
+domains:
+  - ENV
+  - PUB
+evidence_nature: fact
+claim_authority: authoritative
+inference_limits:
+  - O anúncio não comprova que o centro de volumosos abriu em 4 de novembro, o seu horário ou a sua utilização, nem que o trabalho por turnos foi implementado, em que equipas ou em que circuitos.
+  - A referência a 18 dias não permite determinar o tempo médio de resposta, o prazo de conclusão de cada pedido ou a duração total das operações descritas.
+  - Os 119 pedidos e as 108 recolhas são números comunicados pelo Município e dizem respeito apenas à linha de recolha de volumosos ao domicílio em outubro de 2026; não medem a recolha regular de resíduos indiferenciados, outros meses, nem o funcionamento da recolha na cidade.
+  - A recolha porta-a-porta no Centro Histórico e o canal HORECA são descritos como projetos em preparação; a fonte não estabelece calendário, zonas abrangidas nem execução.
+  - A comunicação diz respeito ao concelho e não indica a distribuição destas medidas pelas zonas da cidade de Évora.
+  - O objetivo declarado de reduzir a deposição e o abandono ilegal de resíduos volumosos não demonstra que esse efeito ocorra.
